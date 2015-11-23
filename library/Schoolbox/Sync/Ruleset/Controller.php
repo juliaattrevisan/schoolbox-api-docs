@@ -52,7 +52,7 @@ class Controller extends Base {
      *
      * @param $params
      */
-    public function ruleset($params) {
+    public function read($params) {
 
         /* Produce Twig template data based on Role
          */
@@ -71,7 +71,7 @@ class Controller extends Base {
      *
      * @param $params
      */
-    public function testsubmit($params) {
-        new \Alaress_Probe($_POST);
+    public function update($params) {
+        new \Alaress_Probe($params, $_POST);
     }
 }

@@ -34,8 +34,8 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath) {
         $this->addGetRoute($router, 'intro', $basePath, "");
-        $this->addGetRoute($router, 'ruleset', $basePath, "/{rulesetId}");
-        $this->addPostRoute($router, 'testsubmit', $basePath, "/testsubmit");
+        $this->addGetRoute($router, 'read', $basePath, "/{rulesetId}");
+        $this->addPostRoute($router, 'update', $basePath, "/ruleset/update");
     }
 
     /**
@@ -46,7 +46,7 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher) {
         $this->addRoutePreload(
             $matcher,
-            '(?:ruleset)',
+            '(?:read)',
             function($params) {
                 return array(
                     'params' => $params,
