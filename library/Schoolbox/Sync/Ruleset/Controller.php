@@ -15,6 +15,18 @@ use Alaress\Web\Controller\Base;
 class Controller extends Base {
 
     /**
+     * Render intro
+     */
+    public function intro() {
+
+        /* Twig data
+         */
+        $this->getResponse()->content->set([
+            'template' => '@sync/intro.twig',
+        ]);
+    }
+
+    /**
      * Test Method
      *
      * @param array $params

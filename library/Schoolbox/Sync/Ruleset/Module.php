@@ -33,6 +33,7 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath) {
+        $this->addGetRoute($router, 'intro', $basePath, "");
         $this->addGetRoute($router, 'student', $basePath, "/student");
         $this->addPostRoute($router, 'testsubmit', $basePath, "/testsubmit");
     }
