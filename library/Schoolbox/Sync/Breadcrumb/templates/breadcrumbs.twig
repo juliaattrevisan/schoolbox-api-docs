@@ -1,9 +1,0 @@
-{% if allBreadcrumbs|length %}
-<dl class="sub-nav">
-    {% for currentBreadcrumb in allBreadcrumbs %}
-    <dd {% if currentBreadcrumb.isActive() %}class="active"{% endif %}>
-        <a href="{{ currentBreadcrumb.getUrl() }}">{{ currentBreadcrumb.getName() }}</a>
-    </dd>
-    {% endfor %}
-</dl>
-{% endif %}
