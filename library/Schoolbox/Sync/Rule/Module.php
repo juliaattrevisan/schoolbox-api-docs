@@ -39,7 +39,7 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'edit', $basePath, "/edit/{ruleId}");
         $this->addPostRoute($router, 'update', $basePath, "/update");
 
-        $this->addPostRoute($router, 'delete', $basePath, "/delete/{ruleId}");
+        $this->addPostRoute($router, 'delete', $basePath, "/delete");
     }
 
     /**

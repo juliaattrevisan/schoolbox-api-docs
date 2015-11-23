@@ -169,7 +169,7 @@
             </div>
 
             {% for currentRule in ruleset.rules %}
-            <div class="row">
+            <div class="row" id="rule-{{ currentRule.id }}">
                 <div class="small-12 columns">
                     <div class="actions-small-3">
                         <div class="list-item">
@@ -180,8 +180,6 @@
                                         <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
                                     {% endif %}
                                 </h3>
-
-                                <span id='rule-{{ currentRule.id }}-status' class="label highlight full-width hide"></span>
                             </div>
                         </div>
                         <nav>
@@ -190,36 +188,40 @@
                             <a href="/adminv2/sync/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule"></a>
                         </nav>
                     </div>
+
+                    <span id='rule-{{ currentRule.id }}-status' class="label highlight full-width hide"></span>
+                </div>
+                <div class="small-12 columns">
+                    <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
+                        <div class="actions-small-1 row">
+                            <div class="list-item">
+                                <div class="small-12 columns">
+                                    <h4>Conditions</h4>
+                                </div>
+                            </div>
+                            <nav>
+                                <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
+                            </nav>
+                            <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
+                                <li><a href="/adminv2/sync/condition/add/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
+                                <li><a href="/adminv2/sync/condition/add/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+                            </ul>
+                        </div>
+
+                        <ul class="information-list" id="rule-{{ currentRule.id }}-conditions">
+                            {% for currentCondition in currentRule.conditions %}
+                                {% if currentCondition.condition.type == conditionGeneral %}
+                                    {% include '@syncCondition/general.twig' with currentCondition %}
+                                {% elseif currentCondition.condition.type == conditionUserExists %}
+                                    {% include '@syncCondition/userExists.twig' with currentCondition %}
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+
+                        <h4>Effects</h4>
+                    </section>
                 </div>
             </div>
-            <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
-                <div class="actions-small-1 row">
-                    <div class="list-item">
-                        <div class="small-12 columns">
-                            <h4>Conditions</h4>
-                        </div>
-                    </div>
-                    <nav>
-                        <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
-                    </nav>
-                    <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
-                        <li><a href="/adminv2/sync/condition/add/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
-                        <li><a href="/adminv2/sync/condition/add/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
-                    </ul>
-                </div>
-
-                <ul class="information-list" id="rule-{{ currentRule.id }}-conditions">
-                    {% for currentCondition in currentRule.conditions %}
-                        {% if currentCondition.condition.type == conditionGeneral %}
-                            {% include '@syncCondition/general.twig' with currentCondition %}
-                        {% elseif currentCondition.condition.type == conditionUserExists %}
-                            {% include '@syncCondition/userExists.twig' with currentCondition %}
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-
-                <h4>Effects</h4>
-            </section>
             {% endfor %}
 
             <input type="submit" value="Save Ruleset" />

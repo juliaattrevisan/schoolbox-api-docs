@@ -123,13 +123,21 @@ class Controller extends Base {
      */
     public function delete($params) {
 
-        /* TODO: Database Transaction
+        /* TODO: Perform actual deletion from db via mappers etc
+         * new \Alaress_Probe($_POST);
          */
-        new \Alaress_Probe($params, $_POST);
 
-        /* TODO: Redirect back to Ruleset when finished
+        /* Tell us whether the deletion was successful
+         * 1 is successfully deleted
+         * 0 is not
          */
-        echo "Delete rule";
+        $deleted = true;
+
+        if ($deleted) {
+            echo true;
+            exit();
+        }
+
         exit();
     }
 }
