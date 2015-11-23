@@ -1,0 +1,230 @@
+{% set conditionGeneral = 1 %}
+{% set conditionUserExists = 2 %}
+
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        /* Insert a new Condition
+         */
+        $('#ruleset').on('click', '[data-condition-create]', function(event) {
+            event.preventDefault();
+
+            /* The Rule into which the new Condition is injected
+             */
+            var ruleId = '#rule-' + $(this).attr('data-condition-create') + '-conditions';
+
+            /* The url from which new Conditions are spawned
+             */
+            var url = $(this).attr('href');
+
+            $.get(url, function(responseText) {
+                $(ruleId).append(responseText);
+            });
+        });
+
+        /* Delete a Condition
+         */
+        $('#ruleset').on('click', '[data-condition-delete]', function(event) {
+            event.preventDefault();
+
+            var conditionId = $(this).attr('data-condition-delete');
+            var label = $('#condition-' + conditionId + '-status');
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this Condition?',
+                confirmEvent: function() {
+
+                    /* Activate indicator label
+                     */
+                    label.labelActivate();
+
+                    /* Delete asynchronously if successful; ignore if unsuccessful
+                     */
+                    $.post('/adminv2/sync/condition/delete', { conditionId: conditionId }, function(responseText) {
+                        if (responseText == '1') {
+                            $('#condition-' + conditionId).remove();
+
+                            /* Indicator label gets removed with the condition so we
+                             * don't need to bother showing animation
+                             */
+                        }
+                        else {
+
+                            /* Show that something failed
+                             */
+                            label.labelTimeout({
+                                text: 'Failed',
+                                css: 'alert'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        /* Toggle input disability for modification
+         * Works on both Conditions and Effects
+         */
+        $('#ruleset').on('click', '[data-condition-modify-lock]', function(event) {
+            event.preventDefault();
+
+            var id = '#' + $(this).attr('data-condition-modify-lock');
+
+            if ($(id).attr('data-locked') == 1) {
+                $(id).find('input, textarea, select').attr('disabled', false);
+                $(id).attr('data-locked', 0);
+
+                $(this).removeClass('icon-unlocked').addClass('icon-locked');
+            }
+            else {
+                $(id).find('input, textarea, select').attr('disabled', true);
+                $(id).attr('data-locked', 1);
+
+                $(this).removeClass('icon-locked').addClass('icon-unlocked');
+            }
+        });
+
+        $('#ruleset').on('click', '[data-rule-delete]', function(event) {
+            event.preventDefault();
+
+            var ruleId = $(this).attr('data-rule-delete');
+            var label = $('#rule-' + ruleId + '-status');
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this Rule?',
+                confirmEvent: function() {
+
+                    /* Activate indicator label
+                     */
+                    label.labelActivate();
+
+                    /* Delete asynchronously if successful; ignore if unsuccessful
+                     */
+                    $.post('/adminv2/sync/rule/delete', { ruleId: ruleId }, function(responseText) {
+                        if (responseText == '1') {
+                            $('#rule-' + ruleId).remove();
+
+                            /* Indicator label gets removed with the condition so we
+                             * don't need to bother showing animation
+                             */
+                        }
+                        else {
+
+                            /* Show that something failed
+                             */
+                            label.labelTimeout({
+                                text: 'Failed',
+                                css: 'alert'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        /* Enable all input fields for form submission, otherwise they
+         * don't get transmitted; then immediately disable them lol
+         */
+        $('#ruleset').on('click', 'input[type=submit]', function(event) {
+            event.preventDefault();
+
+            $('#ruleset').find('input, select, textarea').attr('disabled', false);
+            $('#ruleset').submit();
+            $('#ruleset').find('input, select, textarea').attr('disabled', true);
+        });
+
+        /* Collapsable Rules
+         */
+        $('[data-collapser]').collapsable();
+    });
+</script>
+
+{% include '@sync/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sync (UPS)</h1>
+
+        {% include '@sync/navigation.twig' with { allNodes: allNavigation } %}
+    </div>
+
+    <div class="small-12 island">
+        <form id='ruleset' action='/adminv2/sync/testsubmit' method="post">
+            <input type="hidden" name="ruleset" value="{{ rulesetId }}" />
+
+            <div class="actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <h2 class="subheader">{{ rulesetId|capitalize }} Ruleset</h2>
+                    </div>
+                </div>
+                <nav>
+                    <a class="icon-more" title="" data-dropdown="ruleset-options"></a>
+                </nav>
+                <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
+                    <li><a href='/adminv2/sync/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                </ul>
+            </div>
+
+            {% for currentRule in ruleset.rules %}
+            <div class="row" id="rule-{{ currentRule.id }}">
+                <div class="small-12 columns">
+                    <div class="actions-small-3">
+                        <div class="list-item">
+                            <div class="small-12 columns">
+                                <h3 class="subheader">
+                                    {{ currentRule.name }}
+                                    {% if currentRule.description|length %}
+                                        <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
+                                    {% endif %}
+                                </h3>
+                            </div>
+                        </div>
+                        <nav>
+                            <a href="#" class="icon-add" data-collapser="rule-{{ currentRule.id }}-contents" title="Collapse Content"></a>
+                            <a href="/adminv2/sync/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule"></a>
+                            <a href="/adminv2/sync/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule"></a>
+                        </nav>
+                    </div>
+
+                    <span id='rule-{{ currentRule.id }}-status' class="label highlight full-width hide"></span>
+                </div>
+                <div class="small-12 columns">
+                    <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
+                        <div class="actions-small-1 row">
+                            <div class="list-item">
+                                <div class="small-12 columns">
+                                    <h4>Conditions</h4>
+                                </div>
+                            </div>
+                            <nav>
+                                <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
+                            </nav>
+                            <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
+                                <li><a href="/adminv2/sync/condition/add/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
+                                <li><a href="/adminv2/sync/condition/add/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+                            </ul>
+                        </div>
+
+                        <ul class="information-list" id="rule-{{ currentRule.id }}-conditions">
+                            {% for currentCondition in currentRule.conditions %}
+                                {% if currentCondition.condition.type == conditionGeneral %}
+                                    {% include '@syncCondition/general.twig' with currentCondition %}
+                                {% elseif currentCondition.condition.type == conditionUserExists %}
+                                    {% include '@syncCondition/userExists.twig' with currentCondition %}
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+
+                        <h4>Effects</h4>
+                    </section>
+                </div>
+            </div>
+            {% endfor %}
+
+            <input type="submit" value="Save Ruleset" />
+        </form>
+    </div>
+</div>

@@ -77,16 +77,91 @@ class Controller extends Base {
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation' => $allNavigation->getAllNodes(),
+
+                /* TODO: Replace with data from db
+                 */
                 'rulesetId' => 'student',
                 'ruleset' => $this->getTestRuleset(),
             ]
         ]);
     }
 
-    public function parent() {
+    /**
+     * Parent Test Method
+     *
+     * @param array $params
+     */
+    public function parent($params) {
+
+        /* Breadcrumbs
+         */
+        $allBreadcrumbs = new Navigator(
+            new Node('Home', '/adminv2', false),
+            new Node('Sync (UPS)', '/adminv2/sync', false),
+            new Node('Parent', '/adminv2/sync/parent', true)
+        );
+
+        /* Navigation
+         */
+        $allNavigation = new Navigator(
+            new Node('Student', '/adminv2/sync/student', false),
+            new Node('Parent', '/adminv2/sync/parent', true),
+            new Node('Staff', '/adminv2/sync/staff', false)
+        );
+
+        /* Twig data
+         */
+        $this->getResponse()->content->set([
+            'template' => '@sync/parent.twig',
+            'data' => [
+                'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
+                'allNavigation' => $allNavigation->getAllNodes(),
+
+                /* TODO: Replace with data from db
+                 */
+                'rulesetId' => 'parent',
+                'ruleset' => $this->getTestRuleset(),
+            ]
+        ]);
     }
 
-    public function staff() {
+    /**
+     * Staff Test Method
+     *
+     * @param array $params
+     */
+    public function staff($params) {
+
+        /* Breadcrumbs
+         */
+        $allBreadcrumbs = new Navigator(
+            new Node('Home', '/adminv2', false),
+            new Node('Sync (UPS)', '/adminv2/sync', false),
+            new Node('Staff', '/adminv2/sync/staff', true)
+        );
+
+        /* Navigation
+         */
+        $allNavigation = new Navigator(
+            new Node('Student', '/adminv2/sync/student', false),
+            new Node('Parent', '/adminv2/sync/parent', false),
+            new Node('Staff', '/adminv2/sync/staff', true)
+        );
+
+        /* Twig data
+         */
+        $this->getResponse()->content->set([
+            'template' => '@sync/staff.twig',
+            'data' => [
+                'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
+                'allNavigation' => $allNavigation->getAllNodes(),
+
+                /* TODO: Replace with data from db
+                 */
+                'rulesetId' => 'staff',
+                'ruleset' => $this->getTestRuleset(),
+            ]
+        ]);
     }
 
     /**
