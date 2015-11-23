@@ -86,6 +86,7 @@ class External_Offline_User implements External_UserInterface
     public function getStudentUserAccountIterator()
     {
         // Return nothing
+        return new Schoolbox\Sync\Iterator\Student(new ArrayIterator());
     }
 
     public function getParentUserAccountInfo()
@@ -99,6 +100,7 @@ class External_Offline_User implements External_UserInterface
     public function getParentUserAccountIterator()
     {
         // return nothing
+        return new Schoolbox\Sync\Iterator\Guardian(new ArrayIterator());
     }
 
     public function getStaffUserAccountInfo()
@@ -112,6 +114,7 @@ class External_Offline_User implements External_UserInterface
     public function getStaffUserAccountIterator()
     {
         // Return nothing
+        return new Schoolbox\Sync\Iterator\Staff(new ArrayIterator());
     }
 
     public function determineBoarderType($boarderValue)

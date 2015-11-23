@@ -402,7 +402,8 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStudentUserAccountIterator()
     {
-        // TODO: Implement getStudentUserAccountIterator() method.
+        // This will never be implemented
+        return new Schoolbox\Sync\Iterator\Student(new ArrayIterator());
     }
 
     /**
@@ -675,7 +676,8 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getParentUserAccountIterator()
     {
-        // TODO: Implement getParentUserAccountIterator() method.
+        // This will never be implemented
+        return new Schoolbox\Sync\Iterator\Guardian(new ArrayIterator());
     }
 
     /**
@@ -781,7 +783,8 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getStaffUserAccountIterator()
     {
-        // TODO: Implement getStaffUserAccountIterator() method.
+        // This will never be implemented
+        return new Schoolbox\Sync\Iterator\Staff(new ArrayIterator());
     }
 
     /**
