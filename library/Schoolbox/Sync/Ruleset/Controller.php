@@ -127,11 +127,20 @@ class Controller extends Base {
             ]
         ];
 
+        /* Breadcrumbs
+         */
+        $allBreadcrumbs = new Breadcrumbs(
+            new Breadcrumb('Student', '/adminv2/sync/student', true),
+            new Breadcrumb('Parent', '/adminv2/sync/parent', false),
+            new Breadcrumb('Staff', '/adminv2/sync/staff', false)
+        );
+
         /* Twig data
          */
         $this->getResponse()->content->set([
             'template' => '@sync/student.twig',
             'data' => [
+                'allBreadcrumbs' => $allBreadcrumbs->getAllBreadcrumbs(),
                 'ruleset' => $ruleset,
             ]
         ]);
