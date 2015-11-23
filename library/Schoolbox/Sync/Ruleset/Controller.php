@@ -161,6 +161,7 @@ class Controller extends Base {
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation' => $allNavigation->getAllNodes(),
+                'rulesetId' => 'student',
                 'ruleset' => $ruleset,
             ]
         ]);
