@@ -7,17 +7,18 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Model;
+namespace Schoolbox\Sync\Effect;
 
+use Schoolbox\Sync;
 
-class Effect
+class Model
 {
-    use RuleComponentTrait;
+    use Sync\Rule\ComponentTrait;
 
     /** @var string */
     protected $userProperty;
 
-    /** @var EffectType */
+    /** @var Type\Model */
     protected $effectType;
 
 
@@ -42,7 +43,7 @@ class Effect
 
 
     /**
-     * @return EffectType
+     * @return Type\Model
      */
     public function getEffectType()
     {
@@ -51,7 +52,7 @@ class Effect
 
 
     /**
-     * @param EffectType $effectType
+     * @param Type\Model $effectType
      * @return static
      */
     public function setEffectType($effectType)

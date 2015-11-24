@@ -7,10 +7,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Model;
+namespace Schoolbox\Sync\Effect\Type;
 
 
-class EffectType
+class Model
 {
 
     /** @var int */

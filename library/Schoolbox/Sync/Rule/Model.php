@@ -7,12 +7,13 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Model;
+namespace Schoolbox\Sync\Rule;
 
 
 use Schoolbox\Collection;
+use Schoolbox\Sync;
 
-class Rule
+class Model
 {
 
     /** @var int */
@@ -27,10 +28,10 @@ class Rule
     /** @var int */
     protected $sequence;
 
-    /** @var Collection|Condition[] */
+    /** @var Collection|Sync\Condition\Model[] */
     protected $conditions;
 
-    /** @var Collection|Effect[] */
+    /** @var Collection|Sync\Effect\Model[] */
     protected $effects;
 
 
@@ -125,7 +126,7 @@ class Rule
 
 
     /**
-     * @return Collection|Condition[]
+     * @return Collection|Sync\Condition\Model[]
      */
     public function getConditions()
     {
@@ -134,7 +135,7 @@ class Rule
 
 
     /**
-     * @param Collection|Condition[] $conditions
+     * @param Collection|Sync\Condition\Model[] $conditions
      * @return static
      */
     public function setConditions($conditions)
@@ -145,7 +146,7 @@ class Rule
 
 
     /**
-     * @return Collection|Effect[]
+     * @return Collection|Sync\Effect\Model[]
      */
     public function getEffects()
     {
@@ -154,7 +155,7 @@ class Rule
 
 
     /**
-     * @param Collection|Effect[] $effects
+     * @param Collection|Sync\Effect\Model[] $effects
      * @return static
      */
     public function setEffects($effects)

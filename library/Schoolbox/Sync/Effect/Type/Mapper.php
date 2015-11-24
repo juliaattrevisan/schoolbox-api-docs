@@ -7,12 +7,12 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Model;
+namespace Schoolbox\Sync\Effect\Type;
 
 
-use Schoolbox\Mapper;
+use Schoolbox;
 
-class ConditionTypeMapper extends Mapper
+class Mapper extends Schoolbox\Mapper
 {
 
     /**
@@ -22,8 +22,8 @@ class ConditionTypeMapper extends Mapper
      */
     protected function mapping()
     {
-        $this->hasPrototype(new ConditionType());
-        $this->hasTable('ups_condition_type');
+        $this->hasPrototype(new Model());
+        $this->hasTable('ups_effect_type');
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);

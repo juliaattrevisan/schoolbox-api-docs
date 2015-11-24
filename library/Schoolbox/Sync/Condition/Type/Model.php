@@ -7,10 +7,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Model;
+namespace Schoolbox\Sync\Condition\Type;
 
 
-class ConditionType
+class Model
 {
     /** @var int */
     protected $id;

@@ -7,14 +7,15 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync;
+namespace Schoolbox\Sync\Ruleset;
 
 
 use Alaress\Rules\Lang\Map;
 use OutOfBoundsException;
 use OutOfRangeException;
 use ReflectionException;
-use Schoolbox\Sync\Model\RuleMapper;
+use Schoolbox\Sync\Rule\Mapper as RuleMapper;
+use Schoolbox\Sync\Rule\Model as Rule;
 use Schoolbox\Sync\Rules\UserRuleset;
 use Schoolbox\UserMapper;
 
@@ -88,7 +89,7 @@ class Factory
 
         /**
          * pull these rules out in sequence
-         * @var Model\Rule[] $dbRules
+         * @var Rule[] $dbRules
          */
         $dbRules = $this->ruleMapper->findByColumnList($search, [
             'order' => [

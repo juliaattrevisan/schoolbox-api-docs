@@ -7,21 +7,22 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Model;
+namespace Schoolbox\Sync\Effect;
+
 
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
-use Schoolbox\Mapper;
+use Schoolbox;
 
 /**
- * Class ConditionMapper
+ * Class EffectMapper
  *
  * @package Schoolbox\Sync\Model
- * @method Condition findById($id)
- * @method Condition hydrate(array $row, $alias = '', $callback = '')
+ * @method Model findById($id)
+ * @method Model hydrate(array $row, $alias = '', $callback = '')
  */
-class ConditionMapper extends Mapper
+class Mapper extends Schoolbox\Mapper
 {
 
     /**
@@ -31,15 +32,15 @@ class ConditionMapper extends Mapper
      */
     protected function mapping()
     {
-        $this->hasPrototype(new Condition());
-        $this->hasTable('ups_condition');
+        $this->hasPrototype(new Model());
+        $this->hasTable('ups_effect');
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('user_property', self::TYPE_STRING);
         $this->uses('arguments', self::TYPE_JSON);
 
 //        $this->joins('rule_id', RuleMapper::class);
-        $this->joins('condition_type_id', ConditionTypeMapper::class);
-
+        $this->joins('effect_type_id', Type\Mapper::class);
     }
 
 
@@ -50,16 +51,16 @@ class ConditionMapper extends Mapper
     {
         return "
             SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('condition_type_id', 't')}
+                   {$this->getJoinColumnString('effect_type_id', 't')}
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('condition_type_id', '', 't')}
+            LEFT JOIN {$this->getJoinSql('effect_type_id', '', 't')}
         ";
     }
 
 
     /**
      * @param PDOStatement $statement
-     * @return Collection
+     * @return Collection|Model[]
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -67,10 +68,10 @@ class ConditionMapper extends Mapper
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             try {
-                $condition = $this->hydrate($row);
-                $condition->setConditionType($this->hydrateJoin($row, 'condition_type_id', 't'));
+                $effect = $this->hydrate($row);
+                $effect->setEffectType($this->hydrateJoin($row, 'effect_type_id', 't'));
 
-                $collection->add($condition);
+                $collection->add($effect);
             } catch (\InvalidArgumentException $e) {
                 // this will have been thrown if the arguments field failed to JSON-decode
                 // not much we can really do about that except keep it from blowing everything else up...

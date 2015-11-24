@@ -7,21 +7,22 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Model;
+namespace Schoolbox\Sync\Rule;
 
 
 use PDOStatement;
 use Schoolbox\Collection;
-use Schoolbox\Mapper;
+use Schoolbox;
+use Schoolbox\Sync;
 
 /**
  * Class RuleMapper
  *
  * @package Schoolbox\Sync\Model
- * @method Rule findById($id)
- * @method Collection|Rule[] findByColumn($columnName, $columnValue, $options = array())
+ * @method Model findById($id)
+ * @method Collection|Model[] findByColumn($columnName, $columnValue, $options = array())
  */
-class RuleMapper extends Mapper
+class Mapper extends Schoolbox\Mapper
 {
 
     /**
@@ -31,7 +32,7 @@ class RuleMapper extends Mapper
      */
     protected function mapping()
     {
-        $this->hasPrototype(new Rule());
+        $this->hasPrototype(new Model());
         $this->hasTable('ups_rule');
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
@@ -40,14 +41,14 @@ class RuleMapper extends Mapper
         $this->uses('sequence', self::TYPE_INTEGER);
 
         $this->hasJoin('ups_condition', [
-            'mapper'    => ConditionMapper::class,
+            'mapper'    => Sync\Condition\Mapper::class,
             'this_key'  => 'id',
             'other_key' => 'rule_id',
             'multiple'  => true
         ]);
 
         $this->hasJoin('ups_effect', [
-            'mapper'    => EffectMapper::class,
+            'mapper'    => Sync\Effect\Mapper::class,
             'this_key'  => 'id',
             'other_key' => 'rule_id',
             'multiple'  => true
@@ -62,7 +63,7 @@ class RuleMapper extends Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Rule[] $collection */
+        /** @var Model[] $collection */
         $collection = parent::hydrateSelect($statement);
 
         // ideally this would have been all captured in the initial query, but hydrating a cross-product isn't straightforward...

@@ -29,7 +29,7 @@ if (!$_SESSION['user']->isSuperUser()) {
     exit;
 }
 
-$stratFactory = new Sync\Factory();
+$stratFactory = new Sync\Ruleset\Factory();
 
 $studentSet = $stratFactory->build(Role::STUDENT);
 

@@ -7,19 +7,20 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Model;
+namespace Schoolbox\Sync\Condition;
 
+use Schoolbox\Sync;
 
-class Condition
+class Model
 {
-    use RuleComponentTrait;
+    use Sync\Rule\ComponentTrait;
 
-    /** @var ConditionType */
+    /** @var Type\Model */
     protected $conditionType;
 
 
     /**
-     * @return ConditionType
+     * @return Type\Model
      */
     public function getConditionType()
     {
@@ -28,7 +29,7 @@ class Condition
 
 
     /**
-     * @param ConditionType $conditionType
+     * @param Type\Model $conditionType
      * @return static
      */
     public function setConditionType($conditionType)

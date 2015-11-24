@@ -7,10 +7,10 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Model;
+namespace Schoolbox\Sync\Rule;
 
 
-trait RuleComponentTrait
+trait ComponentTrait
 {
 
     /** @var int */
