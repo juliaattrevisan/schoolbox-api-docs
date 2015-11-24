@@ -64,9 +64,16 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 			 */
 			$returnValue = false;
 
+			/* Parse metadata
+ 			 */
+			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
+				$page->parse('socialstream_post_has_metadata_block', 'socialstream_post_has_metadata');
+				$returnValue = true;
+			}
+
 			/* Parse icon
  			 */
-			if ($matches || strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
+			if ($matches) {
 				$page->setVar(array(
 					'SOCIALSTREAM_POST_ICON' => $matches[1],
 				));
