@@ -108,7 +108,7 @@ input[type="submit"]{
 	background-color: $submit-button-bg-color;
 	&:hover, &:focus {
 		color: $submit-button-color;
-		background-color: $submit-button-bg-color;
+		background-color: $submit-button-bg-hover;
 	}
 	&:disabled {
 		opacity: $button-disabled-opacity;
