@@ -50,7 +50,7 @@ class Synchronise_External_Lahore_Translator_Structure extends Synchronise_Exter
                             'Term Finish'   => $termFinish,
                             'Term Offset'   => 0,
                             'Period Day'    => $day,
-                            'Period Title'  => $period['id'],
+                            'Period Title'  => $period['number'],
                             'Period Start'  => $period['start'],
                             'Period Finish' => $period['finish'],
                         ];
