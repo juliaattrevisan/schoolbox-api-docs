@@ -21,10 +21,11 @@ class Ruleset extends TokenizedRuleset
     /**
      * @param Mapper $mapper
      * @param string $context
+     * @param $map
      */
-    public function __construct(Mapper $mapper, $context)
+    public function __construct(Mapper $mapper, $context, $map)
     {
-        parent::__construct(new Tokenizer($context));
+        parent::__construct(new Tokenizer($context, $map));
         $this->mapper = $mapper;
     }
 

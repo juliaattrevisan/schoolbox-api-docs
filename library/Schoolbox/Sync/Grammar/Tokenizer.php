@@ -23,42 +23,12 @@ class Tokenizer extends Super {
 
 
     /**
-     * TODO this could probably be better...
-     *
      * @param $prefix
+     * @param $map
      */
-    public function __construct($prefix)
+    public function __construct($prefix, $map)
     {
         $this->prefix = $prefix;
-
-        $map = [
-            'id'                     => 'identifier',
-            'title'                  => 'title',
-            'preferredName'          => 'preferred name',
-            'givenName'              => 'first given name',
-            'lastname'               => 'last name',
-
-            'publiclyVisible'        => 'visibility',
-            'dob'                    => 'date of birth',
-            'gender'                 => 'gender',
-            'email.address'          => 'email address(es)',
-
-            'year.level'             => 'year level',
-
-            'account.active'         => 'account activation status',
-            'account.login'          => 'account login username',
-
-            'phoneHome.number'       => 'home phone number',
-            'phoneHome.silent'       => 'home phone silent status',
-            'phoneMobile.number'     => 'mobile phone number',
-            'phoneMobile.silent'     => 'mobile phone silent status',
-
-            'campus.code'            => 'campus(es) code(s)',
-            'campus.name'            => 'campus(es) name(s)',
-
-            'house.code'             => 'house code',
-            'house.name'             => 'house name',
-        ];
 
         foreach ($map as $key => $label) {
             $this->addTokenMapping($key, $label);
