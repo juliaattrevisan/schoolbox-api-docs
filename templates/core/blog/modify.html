@@ -14,9 +14,15 @@
             event.preventDefault();
 
             $(this).confirmDialog({
-                text: 'Are you sure you want to delete this Blog?',
+                text: 'Are you sure you want to delete this blog post?',
                 confirmEvent: function() {
-                    $('[data-delete]').unbind().click();
+                     $('<input>').attr({
+                     type: 'hidden',
+                     name: 'delete',
+                     value: '1'
+                     }).appendTo('#blogForm');
+
+                     $('#blogForm').submit();
                 }
             });
         });
@@ -34,22 +40,23 @@
                     <h1>{ACTION} Blog</h1>
                 </div>
             </div>
+            <!-- BEGIN delete -->
             <nav>
                 <a class="icon-more" title="" data-dropdown="header-options" aria-expanded="false"></a>
             </nav>
             <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
                 <li>
-                    <!-- BEGIN delete -->
+
                     <a class="icon-delete" title="Delete Blog" data-delete />Delete Blog</a>
-                    <!-- END delete -->
                 </li>
             </ul>
+            <!-- END delete -->
         </div>
     </div>
 </div>
 <div class="row">
 	<div class="small-12 island">
-		<form method="post" enctype="multipart/form-data" id="blogForm" action="/blog/modifyForm.php" class="top">
+		<form method="post" id="blogForm" action="/blog/modifyForm.php">
             <input type="hidden" name="cid" value="{CID}" />
             <input type="hidden" name="blogID" value="{ID}" />
 
@@ -58,7 +65,7 @@
 					<div class="small-12 columns">
 						<label>
                             Title
-    						<input type="text" name="heading" size="35" maxlength="100" class="required" value="{ENTRY_HEADING}" />
+    						<input type="text" name="heading" maxlength="100" class="required" value="{ENTRY_HEADING}" />
                         </label>
 						<label>
                             Body
@@ -69,7 +76,7 @@
 			</section>
 			<div class="row">
 				<div class="small-12 column">
-                    <input type="submit" name="submit" value="{ACTION} Blog" />
+                    <input type="submit" name="submits" value="{ACTION} Blog" />
 				</div>
 			</div>
 		</form>
