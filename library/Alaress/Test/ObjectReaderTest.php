@@ -213,4 +213,46 @@ class ObjectReaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($names, $output);
     }
 
+
+    /**
+     * Test that an object structure can correctly have its paths extracted
+     */
+    public function testPathIteration()
+    {
+        $reader = new ObjectReader();
+
+        $value = 'foobar';
+
+        $input = (object)[
+            'a' => (object)[
+                'b' => (object)[
+                    'c' => $value
+                ]
+            ],
+            'b' => (object)[
+                'c' => (object)[
+                    'd' => $value,
+                    'e' => $value
+                ],
+                'd' => (object)[
+                    'e' => $value,
+                    'f' => $value
+                ],
+                'e' => $value
+            ],
+            'c' => $value
+        ];
+
+
+        $paths = $reader->paths($input);
+
+        $this->assertContains('a.b.c', $paths);
+        $this->assertContains('b.c.d', $paths);
+        $this->assertContains('b.c.e', $paths);
+        $this->assertContains('b.d.e', $paths);
+        $this->assertContains('b.d.f', $paths);
+        $this->assertContains('b.e', $paths);
+        $this->assertContains('c', $paths);
+        $this->assertCount(7, $paths);
+    }
 }

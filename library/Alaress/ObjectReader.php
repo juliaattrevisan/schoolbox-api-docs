@@ -9,8 +9,12 @@
 
 namespace Alaress;
 
+use Alaress_Date_Format;
 use ArrayAccess;
 use DomainException;
+use ReflectionMethod;
+use ReflectionObject;
+use ReflectionProperty;
 use Traversable;
 
 /**
@@ -49,6 +53,124 @@ class ObjectReader
         }
 
         return (string)$value;
+    }
+
+
+    /**
+     * Accepts any input, and returns the list of path strings that could be validly accepted by self::read()
+     *
+     * @param mixed $input
+     * @return array
+     */
+    public function paths($input)
+    {
+        // this probably seems trite, but it protects the prefix argument from abuse
+        return array_keys($this->recursePaths($input));
+    }
+
+
+    /**
+     * @param mixed  $input
+     * @param string $prefix
+     * @param array  $stack
+     * @return array
+     */
+    protected function recursePaths($input, $prefix = '', $stack = [])
+    {
+        $paths = [];
+
+        if (is_array($input) || $input instanceof Traversable) {
+
+            foreach ($input as $key => $sample) {
+                $paths = $this->flattenPaths($paths, $prefix, $key, $sample, $input, $stack);
+            }
+
+        } elseif (is_object($input)) {
+
+            $ro = new ReflectionObject($input);
+
+            foreach ($ro->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
+                $key = $prop->getName();
+                $sample = $prop->getValue($input);
+
+                $paths = $this->flattenPaths($paths, $prefix, $key, $sample, $input, $stack);
+            }
+
+            foreach ($ro->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+                $name = $method->getName();
+                if (strpos($name, 'get') !== 0 || strlen($name) < 4) {
+                    continue;
+                }
+
+                $key = lcfirst(substr($name, 3));
+                $sample = $method->invoke($input);
+
+                $paths = $this->flattenPaths($paths, $prefix, $key, $sample, $input, $stack);
+            }
+
+        } else {
+            // we've reached a leaf, append it
+            $paths[$prefix] = true;
+        }
+
+        return $paths;
+    }
+
+
+    /**
+     * @param array  $paths
+     * @param string $prefix
+     * @param string $key
+     * @param mixed  $sample
+     * @param mixed  $input
+     * @param array  $stack
+     * @return array
+     */
+    protected function flattenPaths($paths, $prefix, $key, $sample, $input, $stack)
+    {
+        // bail out if this iteration is not to continue
+        if ($this->isPathBlacklisted($sample) || $this->pathRecursionDetected($stack, $input)) {
+            return $paths;
+        }
+
+        // input passed, so push it onto the recursion-check stack
+        $stack[] = $input;
+
+        // treat integers special-like (since properties and methods cannot start with a number, these must be array/collection keys)
+        if (is_int($key)) {
+            $newPrefix = $prefix . '[]';
+        } else {
+            $newPrefix = $prefix ? "$prefix.$key" : $key;
+        }
+
+        $result = $this->recursePaths($sample, $newPrefix, $stack);
+
+        return array_merge($paths, $result);
+    }
+
+
+    /**
+     * @param mixed $input
+     * @return bool
+     */
+    protected function isPathBlacklisted($input)
+    {
+        if ($input instanceof Alaress_Date_Format) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param array $stack
+     * @param object $input
+     * @return bool
+     */
+    protected function pathRecursionDetected($stack, $input)
+    {
+        return in_array($input, $stack);
     }
 
     /**
