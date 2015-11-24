@@ -77,9 +77,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         //due output
         $this->setBlock($templateHandle, 'duework', 'duework_block');
         $this->setBlock('duework', 'duework_due_date', 'duework_due_date_block');
-        $this->setBlock('duework', 'has_actions', 'has_actions_block');
         $this->setBlock('duework', 'duework_result_link', 'duework_result_link_block');
-        $this->setBlock('has_actions', 'duework_actions', 'duework_actions_block');
+        $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
         $this->setBlock($templateHandle, 'allwork_button', 'allwork_button_block');
         $this->setBlock($templateHandle, "submit_dw", "submit_dw_block");
 
@@ -209,28 +208,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                 $this->setVar('duework_result_link_block', '');
             }
 
-            /* Display actions column if you have buttons
-			 * (you do, as superuser)
-			 */
-            if ($displayActions) {
-                $this->parse('has_actions_block', 'has_actions');
-            } else {
-                $this->setVar(
-                    array(
-                        'has_actions_block' => ''
-                    )
-                );
-            }
-
             $this->parse("duework_block", "duework", true);
-
-            /* Clear children after parsing out the parent
-			 */
-            $this->setVar(
-                array(
-                    'has_actions_block' => ''
-                )
-            );
         }
 
         //setup block for submission button
