@@ -150,33 +150,59 @@ class Controller extends AbstractController
      */
     protected function getAccess(array $folderIds)
     {
+        // Superusers always have full access
         if ($this->getUser()->isSuperuser()) {
             return UserAccess::ACCESS_FULL;
         }
 
+        $accessLevels = [];
+
+        // Check CMS access level
+        try {
+            $accessLevels[] = $this->userAccessMapper
+                ->getAccess($this->getUser(), null, UserAccess::SERVICE_CMS)
+                ->getAccessLevel();
+            // Shortcircuit if access is full
+            if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
+                return UserAccess::ACCESS_FULL;
+            }
+        } catch (Mapper\Exception $e) {
+            // noop
+        }
+
         if (count($folderIds) != 1) {
-            return $this->userAccessMapper
+            $accessLevels[] = $this->userAccessMapper
                         ->userHasMinimumAccessToAll($this->getUser()->getId(), $folderIds, UserAccess::ACCESS_WRITE)
                 ? UserAccess::ACCESS_WRITE
                 : UserAccess::ACCESS_DENY;
-        }
-
-        try {
-            return $this->userAccessMapper
-                ->getAccess($this->getUser(), $folderIds[0])
-                ->getAccessLevel();
-
-        } catch (Mapper\Exception $e) {
+        } else {
+            // Check user access level
             try {
-                return $this->roleAccessMapper
+                $accessLevels[] = $this->userAccessMapper
+                    ->getAccess($this->getUser(), $folderIds[0])
+                    ->getAccessLevel();
+                // Shortcircuit if access is full
+                if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
+                    return UserAccess::ACCESS_FULL;
+                }
+            } catch (Mapper\Exception $e) {
+                // noop
+            }
+
+            // Check role access level
+            try {
+                $accessLevels[] = $this->roleAccessMapper
                     ->getAccess($this->getUser(), $folderIds[0])
                     ->getType();
-
             } catch (Mapper\Exception $e) {
-                // no accesseses found...you get nothin'
-                return null;
+                // noop
             }
         }
+
+        if (empty($accessLevels)) {
+            return UserAccess::ACCESS_DENY;
+        }
+        return max($accessLevels);
     }
 
 } 
