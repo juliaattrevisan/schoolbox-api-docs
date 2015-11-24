@@ -50,6 +50,15 @@ $this->setVar(array(
     'SELECTED_FORMATTED_FINISH' => $end->getURLDate(),
 ));
 
+foreach($validPages as $pageNav) {
+    if($pageNav == $page) {
+        $this->setVar('SETTING_TAB_'.$pageNav, 'active');
+    }
+    else {
+        $this->setVar('SETTING_TAB_'.$pageNav, '');
+    }
+}
+
 $this->setFile('REPORT_CONTENT', 'adminv2/engagement/' . $page . '.html');
 
 include(dirname ( __FILE__ ) .'/'. $page.'.php');
