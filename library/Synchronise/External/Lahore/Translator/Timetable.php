@@ -92,7 +92,7 @@ class Synchronise_External_Lahore_Translator_Timetable extends Synchronise_Exter
                     }
 
                     // Add an entry for every teacher
-                    foreach (array_unique($teacherIds) as $teacherId) {
+                    foreach (array_filter(array_unique($teacherIds)) as $teacherId) {
                         if (!isset($result['teachers'][$teacherId])) {
                             continue;
                         }
@@ -102,20 +102,35 @@ class Synchronise_External_Lahore_Translator_Timetable extends Synchronise_Exter
                             'Teacher Lastname'  => $result['teachers'][$teacherId]['lastname'],
                         ];
 
-                        // Pluck out period from days in card
-                        foreach ($card['days'] as $day) {
-                            $resultPeriod = [
-                                'Period Day'   => $day,
-                                'Period Title' => $card['period'],
+                        // Add an entry for every classroom
+                        // (Allow a single blank entry, for classes with no classroom)
+                        $classroomIds = array_filter(array_unique($classroomIds));
+                        if (empty($classroomIds)) {
+                            $classroomIds[] = '';
+                        }
+                        foreach ($classroomIds as $classroomId) {
+                            $resultClassroom = [
+                                'Class Room' => isset($result['classrooms'][$classroomId])
+                                    ? $result['classrooms'][$classroomId]['code']
+                                    : '',
                             ];
 
-                            // Pluck out everything else
-                            $endResult[] = array_merge(
-                                $resultTerm,
-                                $resultPeriod,
-                                $resultSubject,
-                                $resultTeacher
-                            );
+                            // Pluck out period from days in card
+                            foreach ($card['days'] as $day) {
+                                $resultPeriod = [
+                                    'Period Day'   => $day,
+                                    'Period Title' => $card['period'],
+                                ];
+
+                                // We finally have a result
+                                $endResult[] = array_merge(
+                                    $resultTerm,
+                                    $resultPeriod,
+                                    $resultSubject,
+                                    $resultClassroom,
+                                    $resultTeacher
+                                );
+                            }
                         }
                     }
                 }
