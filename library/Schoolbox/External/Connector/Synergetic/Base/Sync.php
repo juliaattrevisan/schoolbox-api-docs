@@ -20,7 +20,7 @@ class Sync {
     /**
      * {@inheritdoc}
      */
-    public function getStudent()
+    public function findAllStudents()
     {
         $query = "
             SELECT
@@ -50,7 +50,7 @@ class Sync {
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function findAllParents()
     {
         $query = "
             SELECT DISTINCT
@@ -101,7 +101,7 @@ class Sync {
     /**
      * {@inheritdoc}
      */
-    public function getStaffUser()
+    public function findAllStaff()
     {
         $query = "
             SELECT
