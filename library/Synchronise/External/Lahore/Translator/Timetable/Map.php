@@ -41,6 +41,7 @@ class Synchronise_External_Lahore_Translator_Timetable_Map extends IteratorItera
                 'termId'       => (string)$attrs->termsdefid,
                 'subjectId'    => (string)$attrs->subjectid,
                 'teacherIds'   => explode(',', (string)$attrs->teacherids),
+                'classIds'     => explode(',', (string)$attrs->classids),
             ];
         } elseif ($current->matches('//subjects/subject')) {
             return [
