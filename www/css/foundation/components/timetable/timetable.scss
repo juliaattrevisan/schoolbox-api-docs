@@ -44,12 +44,12 @@ $timetable-cell-border: $body-bg;
             /* override global icon colour.
             *  make it normal icon size.
             */
+            [class^="icon-"]:before{
+                font-size: $base-font-size;
+            }
+            [class^="icon-"]:before,
             [class^="icon-"] {
                 color: $anchor-font-color;
-                font-size: $base-font-size;
-                &:hover{
-                    text-decoration: none;
-                }
             }
         }
     }
