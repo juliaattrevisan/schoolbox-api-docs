@@ -40,6 +40,17 @@ $timetable-cell-border: $body-bg;
          */
         .timetable-subject {
             padding: 1rem;
+            
+            /* override global icon colour.
+            *  make it normal icon size.
+            */
+            [class^="icon-"]:before{
+                font-size: $base-font-size;
+            }
+            [class^="icon-"]:before,
+            [class^="icon-"] {
+                color: $anchor-font-color;
+            }
         }
     }
 
