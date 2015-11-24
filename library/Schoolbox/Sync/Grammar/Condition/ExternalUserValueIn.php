@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Rules\Condition;
+namespace Schoolbox\Sync\Grammar\Condition;
 
 use Alaress\ObjectReader;
 use Alaress\Rules\Condition;

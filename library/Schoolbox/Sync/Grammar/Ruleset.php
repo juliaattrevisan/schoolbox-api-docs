@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Rules;
+namespace Schoolbox\Sync\Grammar;
 
 use Alaress\Rules\TokenizedRuleset;
 use Schoolbox\Mapper;

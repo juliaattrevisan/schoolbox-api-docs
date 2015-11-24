@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Rules;
+namespace Schoolbox\Sync\Grammar;
 
 
 use Schoolbox\CampusMapper;

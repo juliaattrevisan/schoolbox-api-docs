@@ -11,7 +11,7 @@
 use Schoolbox\External\Normalise\User\Adapter;
 use Schoolbox\Role;
 use Schoolbox\Sync;
-use Schoolbox\Sync\Rules\Condition;
+use Schoolbox\Sync\Grammar\Condition;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -34,7 +34,7 @@ $stratFactory = new Sync\Ruleset\Factory();
 $studentSet = $stratFactory->build(Role::STUDENT);
 
 
-function testData(Sync\Rules\Ruleset $studentSet, SitePage $page)
+function testData(Sync\Grammar\Ruleset $studentSet, SitePage $page)
 {
 
     $euh = new External_User();

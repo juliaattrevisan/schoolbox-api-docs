@@ -16,12 +16,12 @@ use OutOfRangeException;
 use ReflectionException;
 use Schoolbox\Sync\Rule\Mapper as RuleMapper;
 use Schoolbox\Sync\Rule\Model as Rule;
-use Schoolbox\Sync\Rules\UserRuleset;
+use Schoolbox\Sync\Grammar\UserRuleset;
 use Schoolbox\UserMapper;
 
 class Factory
 {
-    const CONDITION_NAMESPACE = '\Schoolbox\Sync\Rules\Condition';
+    const CONDITION_NAMESPACE = '\Schoolbox\Sync\Grammar\Condition';
     const EFFECT_NAMESPACE    = '\Alaress\Rules\Lang';
 
     /** @var UserMapper */
