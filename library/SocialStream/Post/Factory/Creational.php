@@ -445,9 +445,7 @@ class Creational extends AbstractFactory
         else {
             $url = "/storage/fetch.php?hash={$uploadedFile->getHash()}";
             $this->getProduct()->setUrl($url);
-
-            $chain = new \SocialStream\Post\Thumbnail\Chain(null, $uploadedFile->getFilename());
-            $this->getProduct()->setThumbnail($chain->getResult());
+            $this->getProduct()->setThumbnail('icon:'.$uploadedFile->getMimetype()->getIconFile());
         }
     }
 
@@ -498,9 +496,7 @@ class Creational extends AbstractFactory
         else {
             $url = "/send.php?id={$file->getId()}";
             $this->getProduct()->setUrl($url);
-
-            $chain = new \SocialStream\Post\Thumbnail\Chain(null, $file->getFilename());
-            $this->getProduct()->setThumbnail($chain->getResult());
+            $this->getProduct()->setThumbnail('icon:'.$file->getMimetype()->getIconFile());
         }
 
 //		/* Force icon representation for now
