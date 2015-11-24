@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Ruleset;
+namespace Schoolbox\Sync\Grammar;
 
 
 use Alaress\Rules\Lang\Map;
@@ -16,7 +16,6 @@ use OutOfRangeException;
 use ReflectionException;
 use Schoolbox\Sync\Rule\Mapper as RuleMapper;
 use Schoolbox\Sync\Rule\Model as Rule;
-use Schoolbox\Sync\Grammar\UserRuleset;
 use Schoolbox\UserMapper;
 
 class Factory
