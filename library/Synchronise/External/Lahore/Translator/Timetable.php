@@ -45,9 +45,58 @@ class Synchronise_External_Lahore_Translator_Timetable extends Synchronise_Exter
             $result = $reducer($result, $row);
         }
 
-        echo "<?php\n";
-        var_export($result);
-        echo ";\n";
+        // Each campus/term combo gets this import once
+        // (For Lahore, there only ought to be one combo)
+        $endResult = [];
+        foreach (\Schoolbox\CampusMapper::getInstance()->findAll() as $campus) {
+            /** @var \Schoolbox\Campus $campus */
+            foreach ($result['terms'] as $term) {
+                $resultTerm = [
+                    'Term Campus' => $campus->getExtTimetableCode(),
+                    'Term Title'  => $term['name'],
+                ];
+                // Delve into each card, and pluck out its period day and title
+                foreach ($result['cards'] as $card) {
+                    // Pluck out lesson from card
+                    $lessonId = $card['lessonId'];
+                    if (!isset($result['lessons'][$lessonId])) {
+                        continue;
+                    }
+                    $lesson = $result['lessons'][$lessonId];
+
+                    // Pluck out subject from lesson
+                    $subjectId = $lesson['subjectId'];
+                    if (!isset($result['subjects'][$subjectId])) {
+                        continue;
+                    }
+                    $subject       = $result['subjects'][$subjectId];
+                    $resultSubject = [
+                        'Class Code'  => $subject['code'],
+                        'Class Title' => $subject['name'],
+                    ];
+
+                    // Pluck out period from days in card
+                    foreach ($card['days'] as $day) {
+                        $resultPeriod = [
+                            'Period Day'   => $day,
+                            'Period Title' => $card['period'],
+                        ];
+
+                        // Pluck out everything else
+                        $endResult[] = array_merge(
+                            $resultTerm,
+                            $resultPeriod,
+                            $resultSubject
+                        );
+                    }
+                }
+            }
+        }
+        return $endResult;
+
+//        echo "<?php\n";
+//        var_export($result);
+//        echo ";\n";
 
 //        $fields = [
 //            'Term Campus'       => 'The campus to import a timetable for (must already be imported)',
