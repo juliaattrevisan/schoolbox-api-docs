@@ -108,7 +108,6 @@ input[type="submit"]{
 	background-color: $submit-button-bg-color;
 	&:hover, &:focus {
 		color: $submit-button-color;
-		//background-color: $submit-button-bg-color;
 		background-color: tint($submit-button-bg-color, 20%)
 	}
 	&:disabled {
