@@ -48,6 +48,13 @@ class Synchronise_External_Lahore_Translator_Timetable_Map extends IteratorItera
                 'code'         => (string)$attrs->short,
                 'name'         => (string)$attrs->name,
             ];
+        } elseif ($current->matches('//classrooms/classroom')) {
+            return [
+                'type'         => 'classroom',
+                'id'           => (string)$attrs->id,
+                'code'         => (string)$attrs->short,
+                'name'         => (string)$attrs->name,
+            ];
         }
         // Fall through without matching - return nothing
         return [];

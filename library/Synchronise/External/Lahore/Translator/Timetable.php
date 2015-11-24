@@ -18,13 +18,13 @@ class Synchronise_External_Lahore_Translator_Timetable extends Synchronise_Exter
     {
         $reducer = new Synchronise_External_Lahore_Translator_Timetable_Reduce();
         $result  = [
-            'cards'    => [],
-            'terms'    => [],
-            'lessons'  => [],
-            'subjects' => [],
-            'rooms'    => [],
-            'classes'  => [],
-            'teachers' => [],
+            'cards'      => [],
+            'terms'      => [],
+            'lessons'    => [],
+            'subjects'   => [],
+            'classrooms' => [],
+            'classes'    => [],
+            'teachers'   => [],
         ];
         foreach (
             new Synchronise_External_Lahore_Translator_Timetable_Map(
@@ -34,7 +34,7 @@ class Synchronise_External_Lahore_Translator_Timetable extends Synchronise_Exter
                         '//cards/card',
                         '//termsdefs/termsdef',
                         '//lessons/lesson',
-//                        '//classrooms/classroom',
+                        '//classrooms/classroom',
 //                        '//classes/class',
 //                        '//teachers/teacher',
                         '//subjects/subject',

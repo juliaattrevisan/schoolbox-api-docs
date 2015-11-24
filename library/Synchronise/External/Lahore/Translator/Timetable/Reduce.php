@@ -33,6 +33,9 @@ class Synchronise_External_Lahore_Translator_Timetable_Reduce
             case 'subject':
                 $carry['subjects'][$item['id']] = $item;
                 break;
+            case 'classroom':
+                $carry['classrooms'][$item['id']] = $item;
+                break;
         }
         return $carry;
     }
