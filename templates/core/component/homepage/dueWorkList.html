@@ -8,7 +8,7 @@
             <section>
                 <ul class="action-list">
                     <!-- BEGIN duework -->
-                    <li class="actions-small-1">
+                    <li class="actions-small-{DUE_ACTION_COUNT}">
                         <div class="list-item">
                             <div class="info card small-12">
                                 <!-- BEGIN duework_result_link -->
@@ -16,6 +16,14 @@
                                     <h3>{DUE_NAME}</h3>
                                 </a>
                                 <!-- END duework_result_link -->
+                                <!-- BEGIN duework_history_link -->
+                                <a href="/submission/submissionHistory/{DUE_ID}/{USER_ID}">
+                                    <h3>{DUE_NAME}</h3>
+                                </a>
+                                <!-- END duework_history_link -->
+                                <!-- BEGIN duework_no_link -->
+                                <h3>{DUE_NAME}</h3>
+                                <!-- END duework_no_link -->
                                 <!-- BEGIN duework_due_date -->
                                 <p class="meta">
                                     <span class="gradient-{WORK_URGENCY}">Due {DUE_DATE_RELATIVE}</span> on {DUE_DATE}

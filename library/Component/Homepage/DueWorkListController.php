@@ -78,6 +78,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'duework', 'duework_block');
         $this->setBlock('duework', 'duework_due_date', 'duework_due_date_block');
         $this->setBlock('duework', 'duework_result_link', 'duework_result_link_block');
+        $this->setBlock('duework', 'duework_history_link', 'duework_history_link_block');
+        $this->setBlock('duework', 'duework_no_link', 'duework_no_link_block');
         $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
         $this->setBlock($templateHandle, 'allwork_button', 'allwork_button_block');
         $this->setBlock($templateHandle, "submit_dw", "submit_dw_block");
@@ -136,6 +138,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
             $displayActions = false;
             $displayResults = false;
+            $displayHistory = false;
             $displayDueDate = !$isTask;
 
             /* Actions Block */
@@ -157,6 +160,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             }
 
             $this->setVar('duework_result_link_block', '');
+            $this->setVar('duework_history_link_block', '');
+            $this->setVar('duework_no_link_block', '');
             $this->setVar('duework_actions_block', '');
             $this->setVar('duework_due_date_block', '');
 
@@ -164,7 +169,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                 // what to display if student
                 if (!$isTask) {
                     $displayActions = false;
-                    $actionURL      = '/submission/submissionHistory/' . $box_id . '/' . $_SESSION['id'];
+                    $displayHistory = true;
                 }
             } elseif ($this->permission >= WRITE_ACCESS && $this->groupHandler->isStaff()) {
                 // what to display if staff
@@ -184,6 +189,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                 'DUE_ACTION'        => $actionURL,
                 'DUE_ACTION_NAME'   => $dueActionName,
                 'DUE_ACTION_ICON'   => $dueActionIcon,
+                'DUE_ACTION_COUNT'  => $displayActions ? 1 : 0,
                 'DUE_NAME'          => $nameHTML,
                 'DUE_DATE'          => $dateHTML,
                 'DUE_COMMENT'       => Scrub::html($submission->getDescription()),
@@ -204,8 +210,10 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             }
             if ($displayResults) {
                 $this->parse('duework_result_link_block', 'duework_result_link');
+            } elseif ($displayHistory) {
+                $this->parse('duework_history_link_block', 'duework_history_link');
             } else {
-                $this->setVar('duework_result_link_block', '');
+                $this->parse('duework_no_link_block', 'duework_no_link');
             }
 
             $this->parse("duework_block", "duework", true);
