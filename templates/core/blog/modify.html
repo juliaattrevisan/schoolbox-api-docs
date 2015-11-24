@@ -27,9 +27,28 @@
 {BREADCRUMB}
 
 <div class="row">
+    <div class="column small-12">
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h1>{ACTION} Blog</h1>
+                </div>
+            </div>
+            <nav>
+                <a class="icon-more" title="" data-dropdown="header-options" aria-expanded="false"></a>
+            </nav>
+            <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
+                <li>
+                    <!-- BEGIN delete -->
+                    <a class="icon-delete" title="Delete Blog" data-delete />Delete Blog</a>
+                    <!-- END delete -->
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
 	<div class="small-12 island">
-		<h1>{ACTION} Blog</h1>
-
 		<form method="post" enctype="multipart/form-data" id="blogForm" action="/blog/modifyForm.php" class="top">
             <input type="hidden" name="cid" value="{CID}" />
             <input type="hidden" name="blogID" value="{ID}" />
@@ -51,9 +70,6 @@
 			<div class="row">
 				<div class="small-12 column">
                     <input type="submit" name="submit" value="{ACTION} Blog" />
-					<!-- BEGIN delete -->
-					<input type="submit" name="delete" value="Delete Blog" class="alert" data-delete />
-					<!-- END delete -->
 				</div>
 			</div>
 		</form>
