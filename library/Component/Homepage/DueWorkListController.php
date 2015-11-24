@@ -78,7 +78,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'duework', 'duework_block');
         $this->setBlock('duework', 'duework_due_date', 'duework_due_date_block');
         $this->setBlock('duework', 'has_actions', 'has_actions_block');
-        $this->setBlock('has_actions', 'duework_result_link', 'duework_result_link_block');
+        $this->setBlock('duework', 'duework_result_link', 'duework_result_link_block');
         $this->setBlock('has_actions', 'duework_actions', 'duework_actions_block');
         $this->setBlock($templateHandle, 'allwork_button', 'allwork_button_block');
         $this->setBlock($templateHandle, "submit_dw", "submit_dw_block");
