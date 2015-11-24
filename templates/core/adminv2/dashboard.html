@@ -72,17 +72,18 @@
         <h2 class="subheader">Dashboard</h2>
 
         <section>
-            <div data-definition-palette class="content">
-                <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
+            <div class="content">
+                <form id="template-action" class="no-margin" action="/adminv2/homepage/homepageForm.php" method="POST">
                     <input type="hidden" name="action" value="delete" />
-                    <select id="templateSelector" data-template-select name="template">
+                    <select id="templateSelector" class="no-margin" data-template-select name="template">
                         <!-- BEGIN group -->
                         <option value="{group.id}">{group.name}</option>
                         <!-- END group -->
                     </select>
                 </form>
-
-                <ul data-component-list class="component-palette content grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {COMPONENT_CATEGORY_CLASS}">
+            </div>
+            <div data-definition-palette>
+                <ul data-component-list class="component-palette grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {COMPONENT_CATEGORY_CLASS}">
                     <!-- BEGIN component -->
                     <li>
                         <div class="{COMPONENT_MULTIPLE_STATE} no-margin"
@@ -100,7 +101,6 @@
                     </li>
                     <!-- END component -->
                 </ul>
-
             </div>
         </section>
     </div>
