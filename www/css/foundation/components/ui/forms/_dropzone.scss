@@ -42,7 +42,7 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
         height: 100%;
         padding: 0;
         opacity: 0;
-        display: block;
+        display: table;
         z-index: -1;
 
         @include easy-transition(
@@ -491,7 +491,6 @@ ul.az-error-list {
         vertical-align: middle;
         text-align: center;
         span {
-            @include transform(translate(-50%, -50%));
             color: $attachzone-resting-color;
         }
     }
@@ -530,9 +529,11 @@ ul.az-error-list {
         opacity: 1;
         -ms-filter: none;
         filter: none;
-        position: absolute;
         height: 100%;
         width: 100%;
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
     }
 
     .dz-preview,
@@ -693,7 +694,6 @@ ul.az-error-list {
 
 .dz-default.dz-message span {
     color: $attachzone-resting-color;
-    display: block;
     font-weight: $body-font-weight;
     width: 100%;
     position: relative;
