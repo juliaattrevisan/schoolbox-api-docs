@@ -311,7 +311,7 @@ ul.az-error-list {
     .dzone {
         width: 100%;
         span {
-            display: inline-block;
+            display: table-cell;
             vertical-align: middle;
             padding: 4px;
         }
@@ -367,7 +367,7 @@ ul.az-error-list {
     background-color: $attachzone-resting-background;
     border: 2px dashed $attachzone-resting-color;
     background-repeat: no-repeat;
-    display: block;
+    display: table;
     color: $attachzone-resting-color;
     @include easy-transition(
         background-color 360ms $attachzone-overlay-timing,
@@ -397,7 +397,7 @@ ul.az-error-list {
 #ab-upload {
     .dzone {
         min-height: 100px;
-
+        width: 100%;
         &.dz-started, &.dz-browser-not-supported {
             border-color: transparent;
             background-color: transparent;
@@ -487,13 +487,12 @@ ul.az-error-list {
     .dz-default {
         width: 100%;
         height: 100%;
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
         span {
-            position: absolute;
-            top: 45%;
-            left: 50%;
             @include transform(translate(-50%, -50%));
             color: $attachzone-resting-color;
-            text-shadow: 0 1px 0 $white;
         }
     }
     .dz-progress [data-dz-uploadprogress] {
@@ -695,11 +694,9 @@ ul.az-error-list {
 .dz-default.dz-message span {
     color: $attachzone-resting-color;
     display: block;
-    text-align: center;
     font-weight: $body-font-weight;
     width: 100%;
     position: relative;
-    top: 35%;
     @extend %p;
 }
 .dropzone.dz-square .dz-default.dz-message {
