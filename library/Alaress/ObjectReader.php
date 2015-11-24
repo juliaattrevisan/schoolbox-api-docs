@@ -29,6 +29,7 @@ class ObjectReader
 
     /**
      * @param mixed $value
+     * @throws DomainException
      * @return string
      */
     public function coerceToString($value)
@@ -174,9 +175,10 @@ class ObjectReader
     }
 
     /**
-     * @param object|array  $input
-     * @param string        $path
-     * @param bool          $requireStringCoercible
+     * @param object|array $input
+     * @param string $path
+     * @param bool $requireStringCoercible
+     * @throws DomainException
      * @return mixed
      */
     public function read($input, $path, $requireStringCoercible = false)
