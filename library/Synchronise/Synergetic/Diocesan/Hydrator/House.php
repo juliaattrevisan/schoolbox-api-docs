@@ -62,10 +62,26 @@ class House implements Synchronise_Base_IHydrator
      */
     public function hydrate($externalUser, $newUser)
     {
+        /*
+         * ALWAYS house MAPS externalUser.StudentHouse AS [
+         *   'CO' => Cochrane (1),
+         *   'CW' => Cowie (2)
+         *   'ED' => Edwards (3)
+         *   'MI' => Mitchelson (4)
+         *   'MP' => Mary Pulling (5)
+         *   'NE' => Neligan (6)
+         *   'RO' => Roberton (7)
+         *   'SE' => Selwyn (8)
+         * ]
+         */
         if (in_array($externalUser['StudentHouse'], $this->map)) {
             $newUser['house'] = $this->map[$externalUser['StudentHouse']];
         }
 
+        /*
+         * IF externalUser.StudentBoardingHouse NOT BLANK
+         * THEN residentialHouse = Innes House (1)
+         */
         // boarder?
         if ($externalUser['StudentBoardingHouse']) {
             $newUser['residential_house_id'] = self::BOARD_INNES;

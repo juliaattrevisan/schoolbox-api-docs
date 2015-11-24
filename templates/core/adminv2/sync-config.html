@@ -1,0 +1,160 @@
+<!-- BEGIN custom_head -->
+<style type="text/css">
+
+  .sync-rule > a {
+    display: block;
+    transition: all 200ms ease-out;
+    border-left: solid 2px transparent;
+    padding-left: 4px;
+    margin-left: 2px;
+  }
+  .sync-rule > em {
+    white-space: pre;
+    font-family: monospace;
+  }
+  em .ctrl {
+    font-weight: bold;
+    color: #37a;
+  }
+  .sync-token-list, .sync-filter-list {
+    margin-left: 24px;
+  }
+  .sync-token, .sync-filter {
+    list-style: disc;
+  }
+  .sync-token code, .sync-filter code, .tok {
+    font-weight: bold;
+    color: #407;
+  }
+  .admin-contents > div:first-of-type {
+    float: left;
+    margin: 0 1% 0 0 !important;
+  }
+  .admin-contents > div {
+    margin: 0 !important;
+  }
+  .sync-token {
+    margin-bottom: 4px;
+  }
+  span[title] {
+      border-bottom: dashed 1px;
+      cursor: help;
+  }
+  .sync-rule cite {
+      border-bottom: dashed 1px #999;
+  }
+
+</style>
+<script type="text/javascript">
+    $(function () {
+
+        $('#ruleset').on('click', 'a.btn', function (e) {
+            e.preventDefault();
+
+            $('<div/>').load(this.href, {}, function () {
+                $(this).dialog({
+                    modal: true,
+                    title: 'Rule Example',
+                    width: 768,
+                    height: 768
+                });
+            });
+
+        });
+
+    });
+</script>
+<!-- END custom_head -->
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+  <!-- BEGIN admin_nav_item -->
+  <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
+  <!-- END admin_nav_item -->
+</ul>
+<div class="admin-contents clearfix">
+  <h2>External Database Sync Configuration</h2>
+  <p>
+    The rules defined here will dictate how users will be synchronised.
+    In order for a rule to match, <strong>ALL</strong> conditions of the rule must evaluate to
+    true for the given user, otherwise the <em>effects</em> of that rule will not be applied. This can
+    be used for making distinctions between subgroups, such as differentiating on both Role and
+    Campus simultaneously.
+  </p>
+  <p>
+    The order of the rules below is the order they would be applied to a user; this order is
+    <span title="ie. the fewer conditions a rule has, the earlier it will be applied">ascending
+    order of precedence (defined as the number of conditions, and then rule order)</span>.
+  </p>
+  <div class="two-thirds">
+    <div class="level clearfix">
+      <h3>Mapping Rules</h3>
+      <ul class="sync-rules" id="ruleset">
+      <!-- BEGIN rule -->
+        <li class="sync-rule">
+          <hr/>
+          <span class="actions">
+            <a href="/adminv2/sync-config/example/rule/{SYNC_RULE_N}" class="btn no-text eyeball" title="See an example of this rule"><span></span></a>
+          <!--
+            <a href="/adminv2/sync-config/modify/rule/{SYNC_RULE_N}"  class="btn no-text modify"  title="Modify this rule"><span></span></a>
+            <a href="/adminv2/sync-config/delete/rule/{SYNC_RULE_N}"  class="btn no-text delete"  title="Delete this rule"><span></span></a>
+          -->
+          </span>
+          <em>{SYNC_RULE_SUMMARY}</em>
+        </li>
+      <!-- END rule -->
+      </ul>
+    </div>
+  </div>
+
+  <div class="one-third">
+  <!--
+    <div class="level clearfix">
+      <form action="/adminv2/sync-config" method="POST">
+        <h3>System Defaults</h3>
+        <p>These are the default values used for any fields that are not populated by a mapping rule for a user.</p>
+        <label>URI
+          <input type="text" name="baseUri" placeholder="http://" value="{SYNC_DEF_BASE_URI}" />
+        </label>
+        <label>Username
+          <input type="text" name="baseUri" placeholder="{:username}" value="{SYNC_DEF_USERNAME}" />
+        </label>
+        <label>Password
+          <input type="text" name="baseUri" placeholder="{:password}" value="{SYNC_DEF_PASSWORD}" />
+        </label>
+        <input value="Save" type="submit" class="submit-btn-plain" />
+      </form>
+    </div>
+  -->
+  </div>
+    <div class="one-third">
+        <div class="level">
+            <h3>Tokens</h3>
+            <p>
+                The following tokens can be used in rules to define output relative to the user being tested:
+            <ul class="sync-token-list">
+                <!-- BEGIN token -->
+                <li class="sync-token">
+                    <code>{TOKEN}</code> - {TOKEN_DESCR}
+                </li>
+                <!-- END token -->
+            </ul>
+            </p>
+        </div>
+    </div>
+    <div class="one-third">
+        <div class="level">
+            <h3>Filters</h3>
+            <p>
+                The following filters can be used in rules to change the output of <code class="tok">{:tokens}</code>:
+            <ul class="sync-filter-list">
+                <!-- BEGIN filter -->
+                <li class="sync-filter">
+                    <code>{FILTER}</code> - {FILTER_DESCR}
+                </li>
+                <!-- END filter -->
+            </ul>
+            </p>
+        </div>
+    </div>
+
+</div>

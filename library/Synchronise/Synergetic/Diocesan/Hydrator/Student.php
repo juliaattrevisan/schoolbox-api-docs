@@ -52,6 +52,46 @@ class Student extends Synchronise_Base_Hydrator_Student
     {
         $newUser = parent::hydrate($externalUser, $newUser);
 
+        /*
+         * IF externalUser.StudentYearLevel = 0
+         * AND externalUser.StudentCampus = F
+         * THEN role = Foundation Class (1)
+         * AND defaultCampus = Junior School (1)
+         *
+         *
+         * IF externalUser.StudentCampus NOT = F
+         * THEN role MAPS externalUser.StudentYearLevel AS [
+         *    0 => Year 1 Students (2)
+         *    1 => Year 1 Students (2)
+         *    2 => Year 2 Students (3)
+         *    3 => Year 3 Students (4)
+         *    4 => Year 4 Students (5)
+         *    5 => Year 5 Students (6)
+         *    6 => Year 6 Students (7)
+         *    7 => Year 7 Students (8)
+         *    8 => Year 8 Students (9)
+         *    9 => Year 9 Students (10)
+         *   10 => Year 10 Students (11)
+         *   11 => Year 11 Students (12)
+         *   12 => Year 12 Students (13)
+         *   13 => Year 13 Students (14)
+         * ]
+         *
+         *
+         * IF externalUser.StudentCampus = J
+         * THEN defaultCampus = Junior School (1)
+         *
+         *
+         * IF externalUser.StudentCampus = S
+         * AND externalUser.StudentYearLevel IN (7, 8, 9, 10)
+         * THEN defaultCampus = Junior High (2)
+         *
+         *
+         * IF externalUser.StudentCampus = S
+         * AND externalUser.StudentYearLevel IN (11, 12, 13)
+         * THEN default Campus = Senior School (3)
+         *
+         */
         $roleMap = array(
             'F' => array(
                 0 => array(self::ROLE_YR_F, self::CAMPUS_JUNIOR),

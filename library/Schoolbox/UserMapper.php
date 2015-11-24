@@ -102,7 +102,13 @@ class UserMapper extends Mapper
             array(
                 'column' => 'house',
                 'property' => 'schoolHouse',
-                'type' => Mapper::TYPE_INTEGER,
+                'type' => Mapper::TYPE_MODEL,
+                'join' => 'house',
+                'join_def' => array(
+                    'mapper' => \HouseMapper::class,
+                    'this_key' => 'house',
+                    'other_key' => 'id'
+                )
             )
         );
 
@@ -110,7 +116,13 @@ class UserMapper extends Mapper
             array(
                 'column' => 'residential_house_id',
                 'property' => 'residentialHouse',
-                'type' => Mapper::TYPE_INTEGER,
+                'type' => Mapper::TYPE_MODEL,
+                'join' => 'reshouse',
+                'join_def' => array(
+                    'mapper' => \HouseResidentialMapper::class,
+                    'this_key' => 'residential_house_id',
+                    'other_key' => 'id'
+                )
             )
         );
 

@@ -69,6 +69,7 @@ abstract class Mapper implements IMapper, Serializable
     const TYPE_TIMESPAN   = 14;
     const TYPE_DECIMAL    = 20;
     const TYPE_SERIALIZED = 30;
+    const TYPE_JSON       = 31;
     const TYPE_MODEL      = 40;
     const TYPE_COLLECTION = 41;
     const TYPE_COLOR      = 50;
@@ -577,7 +578,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @return mixed
      */
-    protected function getModelProperty($model, $property)
+    public function getModelProperty($model, $property)
     {
         $get_method  = $this->getGetMethodName($property);
         $value       = $model->$get_method();
@@ -613,7 +614,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @return $this
      */
-    protected function setModelProperty($model, $property, $value)
+    public function setModelProperty($model, $property, $value)
     {
         $set_method  = $this->getSetMethodName($property);
         $map         = $this->map->getOffset($property);
