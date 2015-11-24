@@ -158,7 +158,7 @@
                  */
                 var url = $(this).attr('href');
 
-                $.get(url, function(responseText) {
+                $.post(url, function(responseText) {
                     $(ruleId).append(responseText);
                 });
             });

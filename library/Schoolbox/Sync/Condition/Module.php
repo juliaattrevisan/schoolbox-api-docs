@@ -17,11 +17,7 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
-use Schoolbox\Permission\Access\UserAccess;
-
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Collection;
 
 class Module extends BaseModule
 {
@@ -33,7 +29,7 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath) {
-        $this->addGetRoute($router, 'add', $basePath, "/add/{ruleId}/{conditionType}");
+        $this->addPostRoute($router, 'add', $basePath, "/add/{ruleId}/{conditionType}");
         $this->addPostRoute($router, 'delete', $basePath, "/delete");
     }
 
