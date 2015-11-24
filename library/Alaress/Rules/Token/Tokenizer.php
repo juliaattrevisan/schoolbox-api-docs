@@ -30,20 +30,10 @@ abstract class Tokenizer
     `ix';
 
     /** @var Token[] */
-    protected $tokens;
+    protected $tokens = [];
 
     /** @var Filter[] */
-    protected $filters;
-
-
-    /**
-     */
-    public function __construct()
-    {
-        $this->tokens = array();
-        $this->filters = array();
-    }
-
+    protected $filters = [];
 
     /**
      * @return Token[]

@@ -20,8 +20,6 @@ class Tokenizer extends Super {
      */
     public function __construct()
     {
-        parent::__construct();
-
         $this->addToken(new Token('username', "The user's username", function ($user, $settings) {
             /** @var User $user */
             return $user->getUsername();

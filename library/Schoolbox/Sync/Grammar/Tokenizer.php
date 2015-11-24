@@ -31,8 +31,6 @@ class Tokenizer extends Super {
     {
         $this->prefix = $prefix;
 
-        parent::__construct();
-
         $map = [
             'id'                     => 'identifier',
             'title'                  => 'title',
