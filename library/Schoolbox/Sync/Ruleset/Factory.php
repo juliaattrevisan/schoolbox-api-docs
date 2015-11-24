@@ -10,10 +10,14 @@
 
 namespace Schoolbox\Sync\Ruleset;
 
-use \Schoolbox\Sync\Navigator\Navigator;
-use \Schoolbox\Sync\Navigator\Node;
+use Schoolbox\Role;
+use Schoolbox\Sync\Grammar\FieldFactory;
+use Schoolbox\Sync\Navigator\Navigator;
+use Schoolbox\Sync\Navigator\Node;
+use Schoolbox\Sync\Rule;
 
-class Factory {
+class Factory
+{
 
     /**
      * Role type - typically one of student|parent|staff
@@ -38,32 +42,36 @@ class Factory {
      */
     private $meta = [
         'disabled' => 'disabled',
-        'lock' => [
+        'lock'     => [
             'status' => 1,
-            'icon' => 'unlocked',
+            'icon'   => 'unlocked',
         ]
     ];
+
 
     /**
      * Constructor
      *
      * @param $rulesetId
      */
-    public function __construct($rulesetId) {
+    public function __construct($rulesetId)
+    {
         $this->setType($rulesetId);
     }
+
 
     /**
      * Produce a twig template data based on Role Type
      *
      * @return array
      */
-    public function produce() {
-        switch($this->getType()) {
+    public function produce()
+    {
+        switch ($this->getType()) {
 
             /* Students
              */
-            case 'student':
+            case Role::STUDENT:
                 $allBreadcrumbs = new Navigator(
                     new Node('Home', '/adminv2/home', false),
                     new Node('Sync (UPS)', '/adminv2/sync', false),
@@ -80,7 +88,7 @@ class Factory {
 
             /* Parents
              */
-            case 'parent':
+            case Role::PARENT:
                 $allBreadcrumbs = new Navigator(
                     new Node('Home', '/adminv2/home', false),
                     new Node('Sync (UPS)', '/adminv2/sync', false),
@@ -97,7 +105,7 @@ class Factory {
 
             /* Staff
              */
-            case 'staff':
+            case Role::STAFF:
                 $allBreadcrumbs = new Navigator(
                     new Node('Home', '/adminv2/home', false),
                     new Node('Sync (UPS)', '/adminv2/sync', false),
@@ -118,90 +126,37 @@ class Factory {
                 return [];
         }
 
+        $ffactory = new FieldFactory();
+
+        $metas = [];
+
+        foreach (Rule\Mapper::getInstance()->findIdsByColumnList([ 'role_type' => $this->getType() ]) as $ruleId) {
+            $metas[$ruleId] = $this->getMeta();
+        }
+
         /* If it was one of the known cases, return a well-formed structure
          * Otherwise it would have returned empty array earlier
          */
         return [
             'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
-            'allNavigation' => $allNavigation->getAllNodes(),
-            'rulesetId' => $this->getType(),
-            'ruleset' => $this->findRuleset(),
+            'allNavigation'  => $allNavigation->getAllNodes(),
+            'rulesetId'      => $this->getType(),
+            'ruleset'        => [ 'rules' => $this->findRuleset() ],
+            'allNDSField'    => $ffactory->buildMap($this->getType()),
+            'meta'           => $metas
         ];
     }
+
 
     /**
      * Load a Ruleset based on Role Type student|parent|staff
      *
-     * TODO: Load from database
-     *
      * @return array
      */
-    private function findRuleset() {
-
-        /* TODO: Construct Ruleset from database via $this->getType()
-         * This is an example Ruleset structure
-         */
-        $ruleset = [
-            'rules' => [
-                [
-                    'id' => 999,
-                    'name' => 'The First Rule',
-                    'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin tempus consequat leo, id tempor arcu dapibus sit amet. Maecenas at bibendum leo, quis vestibulum dolor.',
-                    'conditions' => [
-                        [
-                            'condition' => [
-                                'id' => 1231,
-                                'type' => 1,
-                                'rule_id' => 999,
-                                'meta' => $this->getMeta()
-                            ],
-                            'selected' => [
-                                'NDSField' => 3,
-                                'matches' => 1,
-                                'values' => "Mort\nBart\nGruber"
-                            ]
-                        ],
-                        [
-                            'condition' => [
-                                'id' => 4458,
-                                'type' => 2,
-                                'rule_id' => 999,
-                                'meta' => $this->getMeta()
-                            ],
-                            'selected' => [
-                                'matches' => 1,
-                            ]
-                        ]
-                    ],
-                    'effects' => [
-                    ]
-                ],
-                [
-                    'id' => 1000,
-                    'name' => 'The Second Rule',
-                    'description' => 'Duis lobortis, augue eget luctus pulvinar, est mauris pellentesque eros, non bibendum diam urna a libero. Nam mattis nulla eu tincidunt vestibulum. Integer feugiat auctor massa ac egestas',
-                    'conditions' => [
-                        [
-                            'condition' => [
-                                'id' => 789,
-                                'type' => 1,
-                                'rule_id' => 1000,
-                                'meta' => $this->getMeta()
-                            ],
-                            'selected' => [
-                                'NDSField' => 1,
-                                'matches' => 2,
-                                'values' => "S-12344"
-                            ]
-                        ]
-                    ],
-                    'effects' => [
-                    ]
-                ]
-            ]
-        ];
-
-        return $ruleset;
+    private function findRuleset()
+    {
+        // TODO DI
+        return Rule\Mapper::getInstance()->findByColumnList([ 'role_type' => $this->getType() ]);
     }
 
     /* Getters/Setters
@@ -212,9 +167,11 @@ class Factory {
      *
      * @return array
      */
-    private function getMeta() {
+    private function getMeta()
+    {
         return $this->meta;
     }
+
 
     /**
      * @param string $type
@@ -223,6 +180,7 @@ class Factory {
     {
         $this->type = $type;
     }
+
 
     /**
      * @return string

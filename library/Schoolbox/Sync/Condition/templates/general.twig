@@ -1,8 +1,7 @@
-{% set allNDSField = ['Alpha', 'Bravo', 'Charlie', 'Delta'] %}
 {% set allMatches = ['Matches', "Doesn't Match"] %}
 
-<li id="condition-{{ currentCondition.condition.id }}" class="actions-small-2 content" data-locked="{{ currentCondition.condition.meta.lock.status }}">
-    <input type="hidden" name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][type]" value="1">
+<li id="condition-{{ currentCondition.id }}" class="actions-small-2 content" data-locked="{{ meta[currentCondition.id].lock.status }}">
+    <input type="hidden" name="rule[{{ currentRule.id }}][condition][{{ currentCondition.id }}][type]" value="1">
 
     <div class="list-item">
         <div class="row">
@@ -10,30 +9,30 @@
                 If
             </div>
             <div class="small-11 medium-5 large-5 columns">
-                <select {{ currentCondition.condition.meta.disabled }} name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][ndsfield]">
-                    {% for currentNDSField in allNDSField %}
-                    <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.selected.NDSField %}selected="selected"{% endif %}>
+                <select {{ meta[currentCondition.id].disabled }} name="rule[{{ currentRule.id }}][condition][{{ currentCondition.id }}][arguments][0]">
+                    {% for currentNDSKey, currentNDSField in allNDSField %}
+                    <option value="{{ currentNDSKey }}" {% if currentNDSKey == currentCondition.arguments[0] %}selected="selected"{% endif %}>
                         {{ currentNDSField }}
                     </option>
                     {% endfor %}
                 </select>
             </div>
             <div class="small-6 medium-3 large-3 columns">
-                <select {{ currentCondition.condition.meta.disabled }} name="rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][matches]">
+                <select {{ meta[currentCondition.id].disabled }} name="rule[{{ currentRule.id }}][condition][{{ currentCondition.id }}][arguments][2]">
                     {% for currentMatches in allMatches %}
-                    <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.selected.matches %}selected="selected"{% endif %}>{{ currentMatches }}</option>
+                    <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.arguments[2] %}selected="selected"{% endif %}>{{ currentMatches }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="small-6 medium-3 large-3 columns">
-                <textarea {{ currentCondition.condition.meta.disabled }} name='rule[{{ currentCondition.condition.rule_id }}][condition][{{ currentCondition.condition.id }}][selected][values]' rows="5">{{ currentCondition.selected.values }}</textarea>
+                <textarea {{ meta[currentCondition.id].disabled }} name='rule[{{ currentRule.id }}][condition][{{ currentCondition.id }}][arguments][1]' rows="5">{{ currentCondition.arguments[1] | join("\n") }}</textarea>
             </div>
         </div>
     </div>
     <nav>
-        <a href="/adminv2/sync/condition/delete/{{ currentCondition.condition.id }}" class="icon-delete" title="Delete" data-condition-delete="{{ currentCondition.condition.id }}"></a>
-        <a href="" class="icon-{{ currentCondition.condition.meta.lock.icon }}" title='Toggle Readonly Mode' data-condition-modify-lock="condition-{{ currentCondition.condition.id }}"></a>
+        <a href="/adminv2/sync/condition/delete/{{ currentCondition.id }}" class="icon-delete" title="Delete" data-condition-delete="{{ currentCondition.id }}"></a>
+        <a href="" class="icon-{{ meta[currentCondition.id].lock.icon }}" title='Toggle Readonly Mode' data-condition-modify-lock="condition-{{ currentCondition.id }}"></a>
     </nav>
 
-    <span id='condition-{{ currentCondition.condition.id }}-status' class="label highlight full-width hide"></span>
+    <span id='condition-{{ currentCondition.id }}-status' class="label highlight full-width hide"></span>
 </li>

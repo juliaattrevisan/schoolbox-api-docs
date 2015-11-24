@@ -80,10 +80,10 @@
 
                         <ul class="information-list" id="rule-{{ currentRule.id }}-conditions">
                             {% for currentCondition in currentRule.conditions %}
-                                {% if currentCondition.condition.type == conditionGeneral %}
-                                    {% include '@syncCondition/general.twig' with currentCondition %}
-                                {% elseif currentCondition.condition.type == conditionUserExists %}
-                                    {% include '@syncCondition/userExists.twig' with currentCondition %}
+                                {% if currentCondition.conditionType.id == conditionGeneral %}
+                                    {% include '@syncCondition/general.twig' %}
+                                {% elseif currentCondition.conditionType.id == conditionUserExists %}
+                                    {% include '@syncCondition/userExists.twig' %}
                                 {% endif %}
                             {% endfor %}
                         </ul>
