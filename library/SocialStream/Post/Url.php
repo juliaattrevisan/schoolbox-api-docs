@@ -50,8 +50,8 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
 		 * Display a mime icon
 		 * Otherwise display thumbnail via image transform
 		 */
-		$matches = $this->determineIcon();
 
+		$matches = $this->determineIcon();
 		if ($context == 'post') {
 			$page->setVar(array(
 				'SOCIALSTREAM_POST_URL' => $this->getUrl(),
@@ -68,7 +68,6 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
  			 */
 			if (strlen($this->getExternalTitle()) || strlen($this->getExternalBody())) {
 				$page->parse('socialstream_post_has_metadata_block', 'socialstream_post_has_metadata');
-
 				$returnValue = true;
 			}
 
