@@ -142,18 +142,13 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             /* Actions Block */
 
             $actionURL     = null;
-            $nameHTML      = null;
+            $nameHTML      = Scrub::text($submission->getName());
             $dateHTML      = null;
             $dueActionName = '';
             $dueActionIcon = '';
             if ($submission->getTask()->getId()) {
-                $nameHTML = Scrub::text($submission->getName());
                 $dateHTML = '';
             } else {
-                $nameHTML =
-                    ($actionURL ? '<a href="' . $actionURL . '">' : "")
-                    . Scrub::text($submission->getName())
-                    . ($actionURL ? '</a>' : "");
                 // Show due time if there is one
                 if ($submission->getDueDate()->isAtEndOfDay()) {
                     $dateHTML = $submission->getDueDate()->getDateOnly();
