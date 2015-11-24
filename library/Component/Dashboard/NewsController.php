@@ -22,8 +22,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
 
     public function execute() {
         $this->headlineList = $this->news->getNewsListing(false);
-
-        return true;
+        return !empty($this->headlineList);
     }
 
     public function renderTemplate($templateHandle) {
@@ -116,7 +115,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                 $this->parse('topic_block', 'topic', true);
             }
         } else {
-            $this->setVar("topic_block", "<li>No news articles available</li>");
+            $this->setVar("topic_block", '');
         }
 
         // output tabs
