@@ -30,6 +30,7 @@ class Synchronise_External_Lahore_Translator_Structure_Reduce
                 break;
             case 'period':
                 $carry['periods'][] = [
+                    'number' => $item['id'],
                     'title'  => $item['periodTitle'],
                     'start'  => $item['periodStart'],
                     'finish' => $item['periodFinish'],

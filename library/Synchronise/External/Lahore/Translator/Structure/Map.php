@@ -44,7 +44,7 @@ class Synchronise_External_Lahore_Translator_Structure_Map extends IteratorItera
         } elseif ($current->matches('//periods/period')) {
             return [
                 'type'         => 'period',
-                'id'           => (string)$attrs->id,
+                'id'           => (string)$attrs->period,
                 'periodTitle'  => (string)$attrs->name,
                 'periodStart'  => (string)$attrs->starttime,
                 'periodFinish' => (string)$attrs->endtime,
