@@ -703,8 +703,15 @@ $rotate-th-width: $square-grid-td-size;
 	}
 }
 
-.accordion a{
-	@include single-transition(all, 0.15s, linear);
+.accordion{
+	// insane core foundation override
+	.accordion-navigation.active a{
+		color: $accordion-navigation-font-color;
+	}
+	a {
+		@include single-transition(all, 0.15s, linear);
+	}
+
 }
 
 nav {
