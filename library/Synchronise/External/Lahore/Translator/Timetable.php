@@ -137,50 +137,5 @@ class Synchronise_External_Lahore_Translator_Timetable extends Synchronise_Exter
             }
         }
         return $endResult;
-
-//        echo "<?php\n";
-//        var_export($result);
-//        echo ";\n";
-
-//        $fields = [
-//            'Term Campus'       => 'The campus to import a timetable for (must already be imported)',
-//            'Term Title'        => 'The name of the term (must already be imported)',
-//            'Period Day'        => 'The day number that this period is on (must already be imported)',
-//            'Period Title'      => 'The name of this period (must already be imported)',
-//            'Class Code'        => 'The code for the class',
-//            'Class Title'       => 'The display name for the class',
-//            'Class Room'        => '(optional) The room that this class is in',
-//            'Class Description' => '(optional) A description for this class',
-//            'Teacher Code'      => 'The code for the teacher of this class (must correspond to a teacher\'s external ID)',
-//        ];
-
-//        $endResult = [];
-//        if ($result['termStart'] instanceof Alaress_Date_Format) {
-//
-//            // Get all timetable cycles, and use that to set term vars.
-//
-//            $termStart  = $result['termStart']->getDatabaseDate();
-//            $termFinish = clone $result['termStart'];
-//            $termFinish = $termFinish->addYears(1)->getDatabaseDate();
-//            foreach (\Schoolbox\CampusMapper::getInstance()->findAll() as $campus) {
-//                /** @var \Schoolbox\Campus $campus */
-//                foreach ($result['periods'] as $period) {
-//                    foreach (range(1, $result['dayCount']) as $day) {
-//                        $endResult[] = [
-//                            'Term Campus'   => $campus->getExtTimetableCode(),
-//                            'Term Title'    => $result['termTitle'],
-//                            'Term Start'    => $termStart,
-//                            'Term Finish'   => $termFinish,
-//                            'Term Offset'   => 0,
-//                            'Period Day'    => $day,
-//                            'Period Title'  => 'Day '.$day,
-//                            'Period Start'  => $period['start'],
-//                            'Period Finish' => $period['finish'],
-//                        ];
-//                    }
-//                }
-//            }
-//        }
-//        return $endResult;
     }
 }
