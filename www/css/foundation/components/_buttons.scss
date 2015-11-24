@@ -43,7 +43,7 @@ $button-bg-hover: $content-ui-hover;
 
 $submit-button-color: $content-ui-submit-foreground;
 $submit-button-bg-color: $content-ui-submit-background;
-$submit-button-bg-hover: $content-ui-submit-background;
+$submit-button-bg-hover: tint($content-ui-submit-background, 20%);
 
 $button-border-color: transparent;
 $secondary-button-bg-hover: tint($submit-button-color, 20%);
