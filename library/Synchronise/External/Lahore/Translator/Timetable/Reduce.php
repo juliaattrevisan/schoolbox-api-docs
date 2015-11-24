@@ -20,21 +20,30 @@ class Synchronise_External_Lahore_Translator_Timetable_Reduce
         if (!isset($item['type'])) {
             return $carry;
         }
-        switch ($item['type']) {
+        $id   = !empty($item['id']) ? $item['id'] : '';
+        $type = $item['type'];
+        unset($item['id'], $item['type']);
+        switch ($type) {
             case 'termsdef':
-                $carry['terms'][$item['id']] = $item;
+                $carry['terms'][$id] = $item;
                 break;
             case 'card':
                 $carry['cards'][] = $item;
                 break;
             case 'lesson':
-                $carry['lessons'][$item['id']] = $item;
+                $carry['lessons'][$id] = $item;
                 break;
             case 'subject':
-                $carry['subjects'][$item['id']] = $item;
+                $carry['subjects'][$id] = $item;
                 break;
             case 'classroom':
-                $carry['classrooms'][$item['id']] = $item;
+                $carry['classrooms'][$id] = $item;
+                break;
+            case 'class':
+                $carry['classes'][$id] = $item;
+                break;
+            case 'teacher':
+                $carry['teachers'][$id] = $item;
                 break;
         }
         return $carry;

@@ -40,6 +40,7 @@ class Synchronise_External_Lahore_Translator_Timetable_Map extends IteratorItera
                 'id'           => (string)$attrs->id,
                 'termId'       => (string)$attrs->termsdefid,
                 'subjectId'    => (string)$attrs->subjectid,
+                'teacherIds'   => explode(',', (string)$attrs->teacherids),
             ];
         } elseif ($current->matches('//subjects/subject')) {
             return [
@@ -54,6 +55,22 @@ class Synchronise_External_Lahore_Translator_Timetable_Map extends IteratorItera
                 'id'           => (string)$attrs->id,
                 'code'         => (string)$attrs->short,
                 'name'         => (string)$attrs->name,
+            ];
+        } elseif ($current->matches('//classes/class')) {
+            return [
+                'type'         => 'class',
+                'id'           => (string)$attrs->id,
+                'code'         => (string)$attrs->short,
+                'classroomIds' => explode(',', (string)$attrs->classroomids),
+                'teacherId'    => (string)$attrs->teacherid,
+            ];
+        } elseif ($current->matches('//teachers/teacher')) {
+            return [
+                'type'         => 'teacher',
+                'id'           => (string)$attrs->id,
+                'firstname'    => (string)$attrs->firstname,
+                'lastname'     => (string)$attrs->lastname,
+                'short'        => (string)$attrs->short,
             ];
         }
         // Fall through without matching - return nothing

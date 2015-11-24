@@ -35,8 +35,8 @@ class Synchronise_External_Lahore_Translator_Timetable extends Synchronise_Exter
                         '//termsdefs/termsdef',
                         '//lessons/lesson',
                         '//classrooms/classroom',
-//                        '//classes/class',
-//                        '//teachers/teacher',
+                        '//classes/class',
+                        '//teachers/teacher',
                         '//subjects/subject',
                     ]
                 )
