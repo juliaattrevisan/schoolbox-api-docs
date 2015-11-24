@@ -69,7 +69,7 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
     .content {
         &.preload {
             background: transparent url("/images/loading-bar.gif") no-repeat 50%;
-            height: 10rem;
+            height: 30rem;
         }
         iframe {
             width: 100%;
