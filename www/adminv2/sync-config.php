@@ -8,10 +8,12 @@
  */
 
 
+use Schoolbox\External\Normalise\User\Adapter;
 use Schoolbox\Role;
 use Schoolbox\Sync;
 use Schoolbox\Sync\Rules\Condition;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 
 if (empty($this)) {
@@ -32,32 +34,36 @@ $stratFactory = new Sync\Factory();
 $studentSet = $stratFactory->build(Role::STUDENT);
 
 
-function testData(Sync\Rules\Ruleset $studentSet)
+function testData(Sync\Rules\Ruleset $studentSet, SitePage $page)
 {
 
     $euh = new External_User();
 
 // students
-    $studentUserAccountInfo = $euh->getStudentUserAccountInfo();
+    $studentUserAccountInfo = (array)$euh->getStudentUserAccountInfo();
+    /** @var Schoolbox\External\Normalise\User\Student[] $studentData */
     $studentData            = [];
 
 // collate the student data, because there be lotsa dupes
+    $adapter = new Adapter($euh);
+
     foreach ($studentUserAccountInfo as $datum) {
-        $studentData[$datum['StudentID']] = $datum;
+        $extId = $datum['StudentID'];
+        if (empty($studentData[$extId])) {
+            $studentData[$extId] = $adapter->getStudent($extId);
+        }
     }
 
 
-    /** @var SitePage $this */
+    if ($page->arg[0] == 'example' && $page->arg[1] == 'rule') {
 
-    if ($this->arg[0] == 'example' && $this->arg[1] == 'rule') {
-
-        if (!isset($this->arg[2])) {
+        if (!isset($page->arg[2])) {
             error(2);
         }
 
         $input = $studentData[array_rand($studentData)];
 
-        $result = $studentSet->applyPartial([$this->arg[2]], $input);
+        $result = $studentSet->applyPartial([$page->arg[2]], $input);
 
         new Alaress_Probe($input, $result);
 
@@ -68,9 +74,9 @@ function testData(Sync\Rules\Ruleset $studentSet)
     $x = microtime(true);
     foreach ($studentData as $externalStudent) {
 
-        if (!$externalStudent['StudentID']) {
-            continue;
-        }
+//        if (!$externalStudent['StudentID']) {
+//            continue;
+//        }
 
 //    try {
         // has this student already been loaded into Schoolbox?
@@ -84,7 +90,7 @@ function testData(Sync\Rules\Ruleset $studentSet)
 //        continue; // for testing, only interested in existing users
 //    }
 
-        $results[] = $studentSet->applyTo($externalStudent, $internalStudent);
+        $results[$externalStudent->getId()] = $studentSet->applyTo($externalStudent, $internalStudent);
     }
 
     $duration = microtime(true) - $x;
@@ -99,12 +105,12 @@ function testData(Sync\Rules\Ruleset $studentSet)
 
 //new Alaress_Probe($output[0], $output[1]);
     printf("<pre>%d users processed in %s</pre>", count($results), $duration);
-
+    var_dump(UserMapper::getInstance()->dehydrate($results[135]));
 }
 
 
 if ($_GET['test'] || count($this->arg)) {
-    testData($studentSet);
+    testData($studentSet, $this);
 }
 
 
