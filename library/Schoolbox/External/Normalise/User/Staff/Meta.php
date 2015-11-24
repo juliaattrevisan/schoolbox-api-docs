@@ -63,6 +63,13 @@ class Meta {
     private $extension = '';
 
     /**
+     * Type
+     *
+     * @var string
+     */
+    private $type = '';
+
+    /**
      * Constructor
      */
     public function __construct() {
