@@ -9,9 +9,11 @@
 
 namespace Schoolbox\Sync\Rules;
 
+use Alaress\ObjectReader;
 use Alaress\Rules\Token\Filter;
 use Alaress\Rules\Token\Token;
 use Alaress\Rules\Token\Tokenizer as Super;
+use Schoolbox\External;
 use Schoolbox\User;
 
 class Tokenizer extends Super {
@@ -31,43 +33,59 @@ class Tokenizer extends Super {
 
         parent::__construct();
 
-        $this->addToken(new Token("NetworkLogin", "The user's network login",
-            function ($externalStudent, $settings) {
-                return $externalStudent['NetworkLogin'];
-            }
-        ));
+        $map = [
+            'id'                     => 'identifier',
+            'title'                  => 'title',
+            'preferredName'          => 'preferred name',
+            'givenName'              => 'first given name',
+            'lastname'               => 'last name',
 
-        $externalKeys = [
-            'ID'            => 'external ID',
-            'Title'         => 'title',
-            'Preferred'     => 'preferred name',
-            'Surname'       => 'last name',
-            'Gender'        => 'gender',
-            'Email'         => 'home email address',
-            'OccupEmail'    => 'work email address',
-            'YearLevel'     => 'year level',
-            'House'         => 'house',
-            'Boarder'       => 'boarding status',
-            'BoardingHouse' => 'boarding house, if a boarder',
-            'Campus'        => 'default campus'
+            'publiclyVisible'        => 'visibility',
+            'dob'                    => 'date of birth',
+            'gender'                 => 'gender',
+            'email.address'          => 'email address(es)',
+
+            'year.level'             => 'year level',
+
+            'account.active'         => 'account activation status',
+            'account.login'          => 'account login username',
+
+            'phoneHome.number'       => 'home phone number',
+            'phoneHome.silent'       => 'home phone silent status',
+            'phoneMobile.number'     => 'mobile phone number',
+            'phoneMobile.silent'     => 'mobile phone silent status',
+
+            'campus.code'            => 'campus(es) code(s)',
+            'campus.name'            => 'campus(es) name(s)',
+
+            'house.code'             => 'house code',
+            'house.name'             => 'house name',
         ];
 
-        foreach ($externalKeys as $key => $label) {
-
-            $this->addToken(new Token("$this->prefix$key", "The user's $label",
-                function ($externalStudent, $settings) use ($key) {
-                    return $externalStudent["$this->prefix$key"];
-                }
-            ));
-
+        foreach ($map as $key => $label) {
+            $this->addTokenMapping($key, $label);
         }
-
 
         $this->addFilter(new Filter('lc',    'Converts to lowercase', function ($input) { return strtolower($input); }));
         $this->addFilter(new Filter('uc',    'Converts to uppercase', function ($input) { return strtoupper($input); }));
-        $this->addFilter(new Filter('first', 'Returns only the first character', function ($input) { return $input[0]; }));
+        $this->addFilter(new Filter('first', 'Returns only the first character', function ($input) { return strlen($input) ? $input[0] : ''; }));
         $this->addFilter(new Filter('alpha', 'Strips all non-alpha characters', function ($input) { return preg_replace('`[^a-z]`i', '', $input); }));
 
+    }
+
+
+    /**
+     * @param $key
+     * @param $label
+     */
+    protected function addTokenMapping($key, $label)
+    {
+        $context = strtolower($this->prefix);
+
+        $this->addToken(new Token($key, "The $context's $label", function ($entity, $settings) use ($key) {
+            $reader = new ObjectReader();
+            return $reader->read($entity, $key);
+        }));
     }
 
 }
