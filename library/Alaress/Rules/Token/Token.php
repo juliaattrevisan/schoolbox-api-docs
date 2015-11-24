@@ -27,8 +27,7 @@ class Token {
      */
     public function __construct($token, $description, $callback)
     {
-        // remove any "multi-value" hints from the actual token
-        $this->token       = str_replace('[]', '', $token);
+        $this->token       = $token;
         $this->description = $description;
         $this->callback    = $callback;
     }
