@@ -112,6 +112,8 @@ class Factory
                 $rules[$i]['effects'][$effect->getUserProperty()] = $this->buildEffect($effect->getEffectType()->getName(), $effect->getArguments());
             }
 
+            /* You can negate entire rules but we don't do it in UPS
+             */
 //            $rules[$i]['negate'] = isset($rule['negate']) && $rule['negate'];
         }
 
@@ -161,6 +163,7 @@ class Factory
      * @param string $namespace
      * @param string $classname
      * @param array $arguments
+     * @throws OutOfRangeException
      * @return object
      */
     protected function reflectivelyBuild($namespace, $classname, array $arguments)

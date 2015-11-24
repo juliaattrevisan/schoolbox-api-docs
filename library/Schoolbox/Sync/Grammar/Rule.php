@@ -98,6 +98,8 @@ class Rule extends Super
      */
     public function getObjectOutput($obj)
     {
+        /* Maybe not useful - refine as you see fit
+         */
         if (is_object($obj) && !$obj instanceof \Traversable) {
             if (is_callable([ $obj, '__toString' ])) {
                 // just use toString if available

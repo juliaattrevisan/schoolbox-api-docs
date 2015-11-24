@@ -29,9 +29,9 @@ class Ruleset extends TokenizedRuleset
     }
 
     /**
-     * The $input array for this method should be an External_User record
+     * The $input for this method should be an NDS record
      *
-     * @param mixed  $input    - the incoming record to manipulate
+     * @param mixed  $input    - the NDS record to manipulate
      * @param object $previous - an instance of the object mapped by the mapper
      * @return object          - an instance of the object mapped by the mapper
      */
@@ -43,14 +43,16 @@ class Ruleset extends TokenizedRuleset
     }
 
     /**
-     * The $input array for this method should be an External_User record
+     * Apply specific rules from the ruleset
      *
-     * @param array  $precs    - the precedence keys of the rules to be applied
-     * @param mixed  $input    - the incoming record to manipulate
-     * @param object $previous - an instance of the object mapped by the mapper
-     * @return object          - an instance of the object mapped by the mapper
+     * The $input for this method should be an NDS record
+     *
+     * @param array  $sequences - the sequence of the rules to be applied
+     * @param mixed  $input     - the NDS record to manipulate
+     * @param object $previous  - an instance of the object mapped by the mapper
+     * @return object           - an instance of the object mapped by the mapper
      */
-    public function applyPartial(array $precs, $input, $previous = null)
+    public function applyPartial(array $sequences, $input, $previous = null)
     {
         $object = $previous ?: $this->mapper->createModel();
 
@@ -58,9 +60,9 @@ class Ruleset extends TokenizedRuleset
 
         $rules = $this->getRules();
 
-        foreach ($rules as $precedence => $rule) {
+        foreach ($rules as $sequence => $rule) {
 
-            if (!in_array($precedence, $precs)) {
+            if (!in_array($sequence, $sequences)) {
                 continue;
             }
 
