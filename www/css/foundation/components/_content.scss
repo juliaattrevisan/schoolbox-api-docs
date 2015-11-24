@@ -705,7 +705,7 @@ $rotate-th-width: $square-grid-td-size;
 
 .accordion{
 	// insane core foundation override
-	.accordion-navigation.active a{
+	.accordion-navigation.active > a{
 		color: $accordion-navigation-font-color;
 	}
 	a {
