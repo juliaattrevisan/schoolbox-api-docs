@@ -59,7 +59,8 @@ class Sync implements SyncInterface
                 s.campus_code AS StudentCampus
             FROM student AS s
             LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
-            WHERE s.dol IS NULL
+            WHERE s.cmpy_code = {$this->database->smartQuote($this->companyCode)}
+            AND   s.dol IS NULL
         ";
         return new Iterator\Student(
             $this->database->getIterator($query)->addMap([$this, 'trimRow'])
@@ -73,6 +74,7 @@ class Sync implements SyncInterface
     {
         // Attempt to create separate accounts for parent and spouse
         // Not yet supported: children from split families
+        $companyCode = $this->database->smartQuote($this->companyCode);
         $query = "
             SELECT
                 'P' + p.par_code AS StudentContactID,
@@ -95,7 +97,8 @@ class Sync implements SyncInterface
                 AND p.cmpy_code = sf.cmpy_code
             LEFT JOIN student as s
                 ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
-            WHERE p.f_name IS NOT NULL
+            WHERE p.cmpy_code = $companyCode
+            AND   p.f_name IS NOT NULL
 
             UNION ALL
 
@@ -120,7 +123,8 @@ class Sync implements SyncInterface
                 AND p.cmpy_code = sf.cmpy_code
             LEFT JOIN student as s
                 ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
-            WHERE p.m_name IS NOT NULL
+            WHERE p.cmpy_code = $companyCode
+            AND   p.f_name IS NOT NULL
 
             ORDER BY StudentContactID ASC
         ";
@@ -150,24 +154,29 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT
-                vStaff.StaffID,
-                NetworkLogin,
-                ActiveFlag,
-                vStaff.StaffTitle,
-                vStaff.StaffPreferredName,
-                vStaff.StaffSurname,
-                DefaultEmailCode,
-                OccupEmail,
-                Email,
-                vStaff.StaffCampus,
-                StaffCategoryType,
-                StaffCategory,
-                vStaff.StaffDepartment
-            FROM SynergyOne.dbo.vStaff vStaff
-            LEFT JOIN Community ON Community.ID = StaffID
-            WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
-            ORDER BY vStaff.StaffID ASC
+                te.tch_code AS StaffID,
+                '' AS NetworkLogin,
+                CASE
+                    WHEN (t.term_date) IS NULL THEN 0
+                    ELSE 1
+                END AS ActiveFlag,
+                t.salutation_flag AS StaffTitle,
+                t.prefer_name_text AS StaffPreferredName,
+                t.surname_text AS StaffSurname,
+                '' AS DefaultEmailCode,
+                '' AS OccupEmail,
+                t.e_mail AS Email,
+                '' AS StaffCampus,
+                '' AS StaffCategoryType,
+                '' AS StaffCategory,
+                td.tch_dept AS StaffDepartment
+            FROM tel_vw_telemf AS t
+            LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
+            LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
+            WHERE t.cmpy_code = {$this->database->smartQuote($this->companyCode)}
         ";
-        return new Iterator\Staff($this->database->getIterator($query));
+        return new Iterator\Staff(
+            $this->database->getIterator($query)->addMap([$this, 'trimRow'])
+        );
     }
 } 
