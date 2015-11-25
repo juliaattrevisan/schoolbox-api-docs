@@ -18,11 +18,22 @@
                 </select>
             </div>
             <div class="small-2 medium-2 large-2 columns">
-                <select {{ meta[currentCondition.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][arguments][2]">
+                <select {{ meta[currentCondition.id].disabled }} data-effect-mappingtype="{{ currentEffect.id }}" name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][arguments][2]">
+                    <option value="-1" disabled selected="selected">Please Select</option>
                     {% for currentEffectMappingType in allEffectMappingTypes %}
-                        <option value="{{ loop.index0 }}" {% if loop.index0 == currentEffect.arguments[2] %}selected="selected"{% endif %}>{{ currentEffectMappingType }}</option>
+                    <option value="{{ loop.index0 }}" {% if loop.index0 == currentEffect.arguments[2] %}selected="selected"{% endif %}>{{ currentEffectMappingType }}</option>
                     {% endfor %}
                 </select>
+
+                <script type="text/javascript">
+                    $(function() {
+                        $('#ruleset').on('click', '[data-effect-mappingtype]', function(event) {
+                            $(this).on('change', function(event) {
+                                console.log($(this).val());
+                            });
+                        });
+                    });
+                </script>
             </div>
         </div>
     </div>
