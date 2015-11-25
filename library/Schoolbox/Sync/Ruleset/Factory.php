@@ -15,6 +15,7 @@ use Schoolbox\Sync\Grammar\FieldFactory;
 use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
 use Schoolbox\Sync\Rule;
+use Schoolbox\Sync\Condition;
 
 class Factory
 {
@@ -130,8 +131,10 @@ class Factory
 
         $metas = [];
 
-        foreach (Rule\Mapper::getInstance()->findIdsByColumnList([ 'role_type' => $this->getType() ]) as $ruleId) {
-            $metas[$ruleId] = $this->getMeta();
+        $ruleIds = Rule\Mapper::getInstance()->findIdsByColumnList([ 'role_type' => $this->getType() ]);
+
+        foreach (Condition\Mapper::getInstance()->findIdsByColumnList([ 'rule_id' => $ruleIds ]) as $conditionId) {
+            $metas[$conditionId] = $this->getMeta();
         }
 
         /* If it was one of the known cases, return a well-formed structure
