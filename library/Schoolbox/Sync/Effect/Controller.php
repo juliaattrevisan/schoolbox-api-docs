@@ -53,7 +53,7 @@ class Controller extends Base {
 
         /* TODO: Manufacture and save this properly
          */
-        $newEffect->setId(1);
+        $newEffect->setId(rand(1,1000));
 
         $data = [
             'allUserField'  => [
