@@ -10,8 +10,8 @@
 
 namespace Schoolbox\External\Connector;
 
-
-class UserFactory {
+class UserFactory
+{
     const GENERAL = 1;
     const SYNC = 2;
 
@@ -32,7 +32,8 @@ class UserFactory {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->setExternalDbType(\Config::get('external_type'));
     }
 
@@ -42,7 +43,8 @@ class UserFactory {
      * @return mixed
      * @throws \Exception
      */
-    public function produce() {
+    public function produce()
+    {
         $prefix = '\Schoolbox\External\Connector\\' .  ucwords($this->getExternalDbType());
 
         /* School-specific version of the Connector
@@ -66,8 +68,7 @@ class UserFactory {
 
         if (class_exists($specificClassname)) {
             return new $specificClassname;
-        }
-        else if (class_exists($generalClassname)) {
+        } elseif (class_exists($generalClassname)) {
             return new $generalClassname;
         }
 
@@ -77,14 +78,16 @@ class UserFactory {
     /**
      * Use usual generic class methods
      */
-    public function useGeneral() {
+    public function useGeneral()
+    {
         $this->setType(self::GENERAL);
     }
 
     /**
      * Use Sync (UPS) classes
      */
-    public function useSync() {
+    public function useSync()
+    {
         $this->setType(self::SYNC);
     }
 

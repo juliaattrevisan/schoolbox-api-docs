@@ -123,4 +123,4 @@ class Sync implements SyncInterface
         $statement->execute();
         return new Iterator\Staff($statement);
     }
-} 
+}

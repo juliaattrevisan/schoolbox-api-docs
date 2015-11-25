@@ -136,4 +136,4 @@ class Sync implements SyncInterface
         ";
         return new Iterator\Staff($this->database->getIterator($query));
     }
-} 
+}

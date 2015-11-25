@@ -179,4 +179,4 @@ class Sync implements SyncInterface
             $this->database->getIterator($query)->addMap([$this, 'trimRow'])
         );
     }
-} 
+}

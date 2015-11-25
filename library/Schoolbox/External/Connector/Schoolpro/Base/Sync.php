@@ -82,4 +82,4 @@ class Sync implements SyncInterface
             $this->database->getProcedureIterator($vars[0], $vars[1])
         );
     }
-} 
+}

@@ -135,4 +135,4 @@ class Sync implements SyncInterface
         $stmt->execute();
         return new Iterator\Staff($stmt);
     }
-} 
+}
