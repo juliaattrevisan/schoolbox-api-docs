@@ -80,8 +80,50 @@ class Controller extends Base {
      * or a freeform text input
      */
     public function change() {
+
+        /* if mappingtype is set to Equals:
+         *    if $_GET['userField'] is a boolean, present Boolean select options
+         *    else if $_GET['userField'] is a lookup, present Lookup select options
+         *    else if $_GET['userField'] is a generic varchar, present input field
+         * else
+         *    present mapping
+         *
+         * TODO: Update with actual values
+         */
+        $mappingType = [
+            0 => 'equals',
+            1 => 'maps'
+        ];
+
+        $userField = [
+            'username' => 'boolean',
+            'firstname' => 'lookup',
+            'surname' => 'varchar'
+        ];
+
+        $template = '';
+
         new \Alaress_Probe($_GET);
 
-        exit();
+        if ($mappingType[$_GET['mappingType']] == 'equals') {
+            if ($userField[$_GET['userField']] == 'boolean') {
+                $template = '@syncEffect/boolean.twig';
+            }
+            else if ($userField[$_GET['userField']] == 'lookup') {
+                $template = '@syncEffect/lookup.twig';
+            }
+            else if ($userField[$_GET['userField']] == 'varchar') {
+                $template = '@syncEffect/varchar.twig';
+            }
+        }
+        else {
+            $template = '@syncEffect/map.twig';
+        }
+
+        $this->getResponse()->content->set([
+            'template' => $template,
+            'data'     => [],
+            'format'   => 'nochrome'
+        ]);
     }
 }
