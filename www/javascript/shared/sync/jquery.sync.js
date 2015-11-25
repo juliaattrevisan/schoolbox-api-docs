@@ -71,7 +71,11 @@
 
                 /* Server response when an ajax transaction was successful
                  */
-                success: '1'
+                success: '1',
+
+                /* Valid Input Types for Conditions and Effects
+                 */
+                validInputTypes: 'input, select, textarea'
             }
 
             var derived = {
@@ -92,9 +96,9 @@
             $(config.element).on('click', 'input[type=submit]', function(event) {
                 event.preventDefault();
 
-                $(config.element).find('input, select, textarea').attr('disabled', false);
+                $(config.element).find(config.validInputTypes).attr('disabled', false);
                 $(config.element).submit();
-                $(config.element).find('input, select, textarea').attr('disabled', true);
+                $(config.element).find(config.validInputTypes).attr('disabled', true);
             });
         }
 
@@ -182,13 +186,13 @@
                 var id = '#' + $(this).attr('data-condition-modify-lock');
 
                 if ($(id).attr('data-locked') == config.locked) {
-                    $(id).find('input, textarea, select').attr('disabled', false);
+                    $(id).find(config.validInputTypes).attr('disabled', false);
                     $(id).attr('data-locked', config.unlocked);
 
                     $(this).removeClass('icon-unlocked').addClass('icon-locked');
                 }
                 else {
-                    $(id).find('input, textarea, select').attr('disabled', true);
+                    $(id).find(config.validInputTypes).attr('disabled', true);
                     $(id).attr('data-locked', config.locked);
 
                     $(this).removeClass('icon-locked').addClass('icon-unlocked');
@@ -274,13 +278,13 @@
                 var id = '#' + $(this).attr('data-effect-modify-lock');
 
                 if ($(id).attr('data-locked') == config.locked) {
-                    $(id).find('input, textarea, select').attr('disabled', false);
+                    $(id).find(config.validInputTypes).attr('disabled', false);
                     $(id).attr('data-locked', config.unlocked);
 
                     $(this).removeClass('icon-unlocked').addClass('icon-locked');
                 }
                 else {
-                    $(id).find('input, textarea, select').attr('disabled', true);
+                    $(id).find(config.validInputTypes).attr('disabled', true);
                     $(id).attr('data-locked', config.locked);
 
                     $(this).removeClass('icon-locked').addClass('icon-unlocked');
