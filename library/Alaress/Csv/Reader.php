@@ -69,15 +69,22 @@ class Reader implements \Iterator {
     /**
      * Sets up the reader to read from the current file name.
      *
-     * @param string $filename
+     * @param string|resource $filename
      *
      * @throws \RuntimeException if file isn't found or readable
      */
     public function __construct($filename) {
         if (!is_readable($filename)) {
-            throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
+            // maybe it's a resource
+            if (is_resource($filename)) {
+                $this->filename = null;
+                $this->fp       = $filename;
+            } else {
+                throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
+            }
+        } else {
+            $this->filename = $filename;
         }
-        $this->filename = $filename;
     }
 
     /**
@@ -143,7 +150,9 @@ class Reader implements \Iterator {
      */
     public function rewind() {
         $this->cleanup();
-        $this->fp = fopen($this->filename, 'r');
+        if (!is_resource($this->fp)) {
+            $this->fp = fopen($this->filename, 'r');
+        }
 
         // Am I loading the column list from the first column?
         // If so, load that and set it as the column list.
@@ -154,7 +163,7 @@ class Reader implements \Iterator {
     }
 
     protected function cleanup() {
-        if (is_resource($this->fp)) {
+        if (is_resource($this->fp) && $this->filename) {
             fclose($this->fp);
             unset($this->fp);
         }
