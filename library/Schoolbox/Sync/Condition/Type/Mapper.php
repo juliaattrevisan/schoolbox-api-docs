@@ -12,6 +12,12 @@ namespace Schoolbox\Sync\Condition\Type;
 
 use Schoolbox;
 
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\Sync\Condition\Type
+ * @method Model findById($id)
+ */
 class Mapper extends Schoolbox\Mapper
 {
 
