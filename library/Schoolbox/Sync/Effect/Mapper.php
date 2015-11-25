@@ -14,6 +14,7 @@ use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox;
+use Schoolbox\Sync\Rule;
 
 /**
  * Class EffectMapper
@@ -39,7 +40,7 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('user_property', self::TYPE_STRING);
         $this->uses('arguments', self::TYPE_JSON);
 
-//        $this->joins('rule_id', RuleMapper::class);
+        $this->joins('rule_id', Rule\Mapper::class);
         $this->joins('effect_type_id', Type\Mapper::class);
     }
 
@@ -51,8 +52,10 @@ class Mapper extends Schoolbox\Mapper
     {
         return "
             SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('rule_id', 'r')},
                    {$this->getJoinColumnString('effect_type_id', 't')}
             FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('rule_id', '', 'r')}
             LEFT JOIN {$this->getJoinSql('effect_type_id', '', 't')}
         ";
     }
@@ -70,6 +73,7 @@ class Mapper extends Schoolbox\Mapper
             try {
                 $effect = $this->hydrate($row);
                 $effect->setEffectType($this->hydrateJoin($row, 'effect_type_id', 't'));
+                $effect->setRule($this->hydrateJoin($row, 'rule_id', 'r'));
 
                 $collection->add($effect);
             } catch (\InvalidArgumentException $e) {
