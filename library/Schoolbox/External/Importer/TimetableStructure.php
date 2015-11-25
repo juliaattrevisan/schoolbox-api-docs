@@ -100,18 +100,20 @@ class TimetableStructure extends AbstractImporter
             if (!isset($result[$key])) {
                 $this->log->info(sprintf('Term "%s" for campus "%s" has not been parsed: parsing now', $termTitle, $termCampus));
                 $campusObject = $this->campusList->getBy('extTimetableCode', $termCampus);
-                if (!$campusObject) {
+                if (!$campusObject instanceof Campus) {
                     $this->log->warning(sprintf('Campus "%s" not found: skipping!', $termCampus));
                     continue;
                 }
 
                 // Timetable cycle - calculate cycle and day length later
+//                $cycle = $this->timetableCycleMapper->findOneByColumn('title', $termTitle);
                 $cycle = new TimetableCycle();
                 $cycle
                     ->setTitle($termTitle)
                     ->setRegular(true);
 
                 // Timetable campus
+//                $campus = $this->timetableCampusMapper->findOneByColumn('cycle_id', $cycle->getId());
                 $campus = new TimetableCampus();
                 $campus
                     ->setCycle($cycle)
@@ -132,14 +134,19 @@ class TimetableStructure extends AbstractImporter
             // Sort the periods by start then end later, then use that to apply a sequence
             $day    = $row['Period Day'];
             $title  = $row['Period Title'];
+//            $period = $this->timetablePeriodMapper->findOneByColumnList([
+//                'cycle_id' => $result[$key]['cycle']->getId(),
+//                'day'      => $day,
+//                'title'    => $title,
+//            ]);
             $period = new TimetablePeriod();
             $this->log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
             $period
                 ->setCycle($result[$key]['cycle'])
                 ->setDay($day)
+                ->setTitle($title)
                 ->setStart(new Alaress_Date_Format($row['Period Start'], Alaress_Date_Format::DATABASE_TIME_FORMAT))
                 ->setFinish(new Alaress_Date_Format($row['Period Finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT))
-                ->setTitle($row['Period Title'])
                 ->setUsable(true);
             if (!isset($result[$key]['periods'][$day])) {
                 $result[$key]['periods'][$day] = new Collection();
