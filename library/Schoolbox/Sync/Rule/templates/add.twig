@@ -1,0 +1,41 @@
+{% if rule.id > 0 %}
+    {% set heading = 'Modify Rule' %}
+    {% set url = 'update' %}
+{% else %}
+    {% set heading = 'Add New Rule' %}
+    {% set url = 'create' %}
+{% endif %}
+
+{% include '@sync/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ heading }} for {{ rulesetId|capitalize }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <form action="/adminv2/sync/rule/{{ url }}" method="post">
+            <input type="hidden" name="rulesetId" value="{{ rulesetId }}" />
+            <input type="hidden" name="ruleId" value="{{ rule.id }}" />
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Name
+                            <input type="text" name="name" value="{{ rule.name }}" />
+                        </label>
+
+                        <label>
+                            Description
+                            <textarea name="description" rows="3">{{ rule.description }}</textarea>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>

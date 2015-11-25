@@ -19,8 +19,8 @@ trait ComponentTrait
     /** @var array */
     protected $arguments;
 
-//    /** @var Rule */
-//    protected $rule;
+    /** @var Model */
+    protected $rule;
 
 
     /**
@@ -43,24 +43,24 @@ trait ComponentTrait
     }
 
 
-//    /**
-//     * @return Rule
-//     */
-//    public function getRule()
-//    {
-//        return $this->rule;
-//    }
-//
-//
-//    /**
-//     * @param Rule $rule
-//     * @return static
-//     */
-//    public function setRule($rule)
-//    {
-//        $this->rule = $rule;
-//        return $this;
-//    }
+    /**
+     * @return Model
+     */
+    public function getRule()
+    {
+        return $this->rule;
+    }
+
+
+    /**
+     * @param Model $rule
+     * @return static
+     */
+    public function setRule($rule)
+    {
+        $this->rule = $rule;
+        return $this;
+    }
 
 
     /**

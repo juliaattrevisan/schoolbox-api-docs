@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync;
+namespace Schoolbox\Sync\Condition;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
@@ -17,15 +17,11 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
-use Schoolbox\Permission\Access\UserAccess;
-
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Collection;
 
 class Module extends BaseModule
 {
-    protected $basename = 'sync';
+    protected $basename = 'syncCondition';
 
     /**
      * Basic routes for this module
@@ -33,7 +29,8 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath) {
-        $this->addGetRoute($router, 'test', $basePath, "/test");
+        $this->addPostRoute($router, 'add', $basePath, "/add/{ruleId}/{conditionType}");
+        $this->addPostRoute($router, 'delete', $basePath, "/delete");
     }
 
     /**
@@ -42,6 +39,15 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initRoutePreloads(PathMatcher $matcher) {
+        $this->addRoutePreload(
+            $matcher,
+            '(?:add|delete)',
+            function($params) {
+                return array(
+                    'params' => $params,
+                );
+            }
+        );
     }
 
     /**
@@ -73,7 +79,7 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\Sync\\Controller')
+            $injector->lazyNew('Schoolbox\\Sync\\Condition\\Controller')
         );
     }
 }

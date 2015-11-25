@@ -13,12 +13,14 @@ use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox;
+use Schoolbox\Sync\Rule;
 
 /**
  * Class ConditionMapper
  *
  * @package Schoolbox\Sync\Model
  * @method Model findById($id)
+ * @method Model createModel()
  * @method Model hydrate(array $row, $alias = '', $callback = '')
  */
 class Mapper extends Schoolbox\Mapper
@@ -37,7 +39,7 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('arguments', self::TYPE_JSON);
 
-//        $this->joins('rule_id', RuleMapper::class);
+        $this->joins('rule_id', Rule\Mapper::class);
         $this->joins('condition_type_id', Type\Mapper::class);
 
     }
@@ -50,8 +52,10 @@ class Mapper extends Schoolbox\Mapper
     {
         return "
             SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('rule_id', 'r')},
                    {$this->getJoinColumnString('condition_type_id', 't')}
             FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('rule_id', '', 'r')}
             LEFT JOIN {$this->getJoinSql('condition_type_id', '', 't')}
         ";
     }
@@ -69,6 +73,7 @@ class Mapper extends Schoolbox\Mapper
             try {
                 $condition = $this->hydrate($row);
                 $condition->setConditionType($this->hydrateJoin($row, 'condition_type_id', 't'));
+                $condition->setRule($this->hydrateJoin($row, 'rule_id', 'r'));
 
                 $collection->add($condition);
             } catch (\InvalidArgumentException $e) {

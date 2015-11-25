@@ -28,6 +28,9 @@ class Model
     /** @var int */
     protected $sequence;
 
+    /** @var string */
+    protected $name;
+
     /** @var Collection|Sync\Condition\Model[] */
     protected $conditions;
 
@@ -121,6 +124,26 @@ class Model
     public function setSequence($sequence)
     {
         $this->sequence = $sequence;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * @param string $name
+     * @return static
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
         return $this;
     }
 

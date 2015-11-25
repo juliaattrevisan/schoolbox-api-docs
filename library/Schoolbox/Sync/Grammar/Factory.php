@@ -55,41 +55,9 @@ class Factory
     {
         $context = ucfirst($roletype);
 
-        /* This might change based on Role Type
-         * Construct it here and pass it all the way down to Tokenizer
-         *
-         * Maybe make a FieldFactory in the future
-         */
-        $map = [
-            'id'                     => 'identifier',
-            'title'                  => 'title',
-            'preferredName'          => 'preferred name',
-            'givenName'              => 'first given name',
-            'lastname'               => 'last name',
+        $ffactory = new FieldFactory();
 
-            'publiclyVisible'        => 'visibility',
-            'dob'                    => 'date of birth',
-            'gender'                 => 'gender',
-            'email.address'          => 'email address(es)',
-
-            'year.level'             => 'year level',
-
-            'account.active'         => 'account activation status',
-            'account.login'          => 'account login username',
-
-            'phoneHome.number'       => 'home phone number',
-            'phoneHome.silent'       => 'home phone silent status',
-            'phoneMobile.number'     => 'mobile phone number',
-            'phoneMobile.silent'     => 'mobile phone silent status',
-
-            'campus.code'            => 'campus(es) code(s)',
-            'campus.name'            => 'campus(es) name(s)',
-
-            'house.code'             => 'house code',
-            'house.name'             => 'house name',
-        ];
-
-        $set = new UserRuleset($this->userMapper, $context, $map);
+        $set = new UserRuleset($this->userMapper, $context, $ffactory->buildMap($roletype));
 
         foreach ($this->findRulesForRoleType($roletype) as $rule) {
 
