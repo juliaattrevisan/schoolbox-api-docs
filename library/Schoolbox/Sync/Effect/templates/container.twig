@@ -9,7 +9,7 @@
                 Then
             </div>
             <div class="small-11 medium-5 large-5 columns">
-                <select {{ meta[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][arguments][0]">
+                <select {{ meta[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][arguments][0]" data-effect-userfield="{{ currentEffect.id }}">
                     {% for currentUserKey, currentUserField in allUserField %}
                         <option value="{{ currentUserKey }}" {% if currentUserKey == currentEffect.arguments[0] %}selected="selected"{% endif %}>
                             {{ currentUserField }}
@@ -27,11 +27,7 @@
 
                 <script type="text/javascript">
                     $(function() {
-                        $('#ruleset').on('click', '[data-effect-mappingtype]', function(event) {
-                            $(this).on('change', function(event) {
-                                console.log($(this).val());
-                            });
-                        });
+
                     });
                 </script>
             </div>

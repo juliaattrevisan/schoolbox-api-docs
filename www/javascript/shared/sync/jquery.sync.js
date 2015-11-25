@@ -27,6 +27,7 @@
 
         initEffectCreate();
         initEffectModifyLock();
+        initEffectMappingTypeChange();
 
         /**
          * Init
@@ -289,6 +290,22 @@
 
                     $(this).removeClass('icon-locked').addClass('icon-unlocked');
                 }
+            });
+        }
+
+        /**
+         * Detect when the mapping type changes
+         */
+        function initEffectMappingTypeChange() {
+            $(config.element).on('click', '[data-effect-mappingtype]', function(event) {
+                $(this).on('change', function(event) {
+
+                    var effectId = $(this).attr('data-effect-mappingtype');
+                    var userField = $('[data-effect-userfield='+effectId+']').val();
+                    var mappingType = $(this).val();
+
+                    console.log(effectId, mappingType, userField);
+                });
             });
         }
     }
