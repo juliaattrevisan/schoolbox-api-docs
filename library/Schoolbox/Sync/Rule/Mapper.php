@@ -20,6 +20,7 @@ use Schoolbox\Sync;
  *
  * @package Schoolbox\Sync\Model
  * @method Model findById($id)
+ * @method Model createModel()
  * @method Collection|Model[] findByColumn($columnName, $columnValue, $options = array())
  */
 class Mapper extends Schoolbox\Mapper
@@ -76,4 +77,17 @@ class Mapper extends Schoolbox\Mapper
         return $collection;
     }
 
+
+    /**
+     * @param string $roleType
+     * @return int
+     */
+    public function findNextAvailableSequence($roleType)
+    {
+        return $this->database->query("
+          SELECT COALESCE(MAX(sequence), 0) + 1
+          FROM ups_rule
+          WHERE role_type = ?
+        ", [ $roleType ])->fetchColumn();
+    }
 }

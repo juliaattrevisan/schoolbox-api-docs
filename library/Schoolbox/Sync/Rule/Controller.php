@@ -50,17 +50,22 @@ class Controller extends Base {
      *
      * @param $params
      */
-    public function create($params) {
+    public function create($params)
+    {
+        $mapper = Mapper::getInstance();
 
-        /* TODO: Database Transaction
-         */
-        new \Alaress_Probe($params, $_POST);
+        $postData = $this->getRequest()->post;
 
-        /* TODO: Redirect back to Ruleset when finished
-         * $this->getResponse()->redirect->to("/adminv2/{$params['rulesetId']}");
-         */
-        echo "Create Rule";
-        exit();
+        $roleType = $postData->get('rulesetId');
+
+        $rule = $mapper->createModel()
+                       ->setRoleType($roleType)
+                       ->setName($postData->get('name'))
+                       ->setSequence($mapper->findNextAvailableSequence($roleType));
+
+        $mapper->create($rule);
+
+        $this->getResponse()->redirect->to("/adminv2/sync/$roleType");
     }
 
     /**
@@ -68,19 +73,11 @@ class Controller extends Base {
      *
      * @param $params
      */
-    public function edit($params) {
+    public function edit($params)
+    {
+        $rule = Mapper::getInstance()->findById($params['ruleId']);
 
-        /* TODO: Fetch from db
-         */
-        $rulesetId = 'student';
-
-        /* TODO: Fetch from db
-         */
-        $rule = [
-            'id' => $params['ruleId'],
-            'name' => "Some generic name for ruleId: {$params['ruleId']}",
-            'description' => 'Some generic rule description'
-        ];
+        $rulesetId = $rule->getRoleType();
 
         /* Breadcrumbs
          */
@@ -105,17 +102,18 @@ class Controller extends Base {
      *
      * @param $params
      */
-    public function update($params) {
+    public function update($params)
+    {
+        $postData = $this->getRequest()->post;
 
-        /* TODO: Database Transaction
-         */
-        new \Alaress_Probe($params, $_POST);
+        $rule = Mapper::getInstance()
+            ->findById($postData->get('ruleId'))
+            ->setRoleType($postData->get('rulesetId'))
+            ->setName($postData->get('name'));
 
-        /* TODO: Redirect back to Ruleset when finished
-         * $this->getResponse()->redirect->to("/adminv2/{$params['rulesetId']}");
-         */
-        echo "Update Rule";
-        exit();
+        Mapper::getInstance()->save($rule);
+
+        $this->getResponse()->redirect->to("/adminv2/sync/{$params['rulesetId']}");
     }
 
     /**
@@ -123,23 +121,15 @@ class Controller extends Base {
      *
      * @param $params
      */
-    public function delete($params) {
+    public function delete($params)
+    {
+        $ruleId = $this->getRequest()->post->get('ruleId');
+        $deleteCount = Mapper::getInstance()->deleteByColumn('id', $ruleId);
 
-        /* TODO: Perform actual deletion from db via mappers etc
-         * new \Alaress_Probe($_POST);
-         */
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => $deleteCount > 0
+        ]);
 
-        /* Tell us whether the deletion was successful
-         * 1 is successfully deleted
-         * 0 is not
-         */
-        $deleted = true;
-
-        if ($deleted) {
-            echo true;
-            exit();
-        }
-
-        exit();
     }
 }
