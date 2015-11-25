@@ -26,6 +26,7 @@
         initConditionDelete();
 
         initEffectCreate();
+        initEffectModifyLock();
 
         /**
          * Init
@@ -260,5 +261,31 @@
             });
         }
 
+        /**
+         * Effect Modify Lock
+         *
+         * Toggle input disability for modification
+         * Works on both Conditions and Effects
+         */
+        function initEffectModifyLock() {
+            $(config.element).on('click', '[data-effect-modify-lock]', function(event) {
+                event.preventDefault();
+
+                var id = '#' + $(this).attr('data-effect-modify-lock');
+
+                if ($(id).attr('data-locked') == config.locked) {
+                    $(id).find('input, textarea, select').attr('disabled', false);
+                    $(id).attr('data-locked', config.unlocked);
+
+                    $(this).removeClass('icon-unlocked').addClass('icon-locked');
+                }
+                else {
+                    $(id).find('input, textarea, select').attr('disabled', true);
+                    $(id).attr('data-locked', config.locked);
+
+                    $(this).removeClass('icon-locked').addClass('icon-unlocked');
+                }
+            });
+        }
     }
 }(jQuery));
