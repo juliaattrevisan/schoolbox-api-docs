@@ -80,41 +80,14 @@ class External_Offline_User implements External_UserInterface
         // Return nothing
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getStudentUserAccountIterator()
-    {
-        // Return nothing
-        return [];
-    }
-
     public function getParentUserAccountInfo()
     {
         // Return nothing
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParentUserAccountIterator()
-    {
-        // return nothing
-        return [];
-    }
-
     public function getStaffUserAccountInfo()
     {
         // Return nothing
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStaffUserAccountIterator()
-    {
-        // Return nothing
-        return [];
     }
 
     public function determineBoarderType($boarderValue)

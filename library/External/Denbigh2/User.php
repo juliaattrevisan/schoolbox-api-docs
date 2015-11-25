@@ -398,15 +398,6 @@ class External_Denbigh2_User implements External_UserInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getStudentUserAccountIterator()
-    {
-        // This will never be implemented
-        return [];
-    }
-
-    /**
      * Returns a list of email parent email addresseses for students.
      *
      * @param array $synergyIds
@@ -672,15 +663,6 @@ class External_Denbigh2_User implements External_UserInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getParentUserAccountIterator()
-    {
-        // This will never be implemented
-        return [];
-    }
-
-    /**
      * Get the following fields for the staff member $externalUserId
      *
      * SchoolStaffCode,
@@ -776,15 +758,6 @@ class External_Denbigh2_User implements External_UserInterface
         }
 
         return $staff;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStaffUserAccountIterator()
-    {
-        // This will never be implemented
-        return [];
     }
 
     /**

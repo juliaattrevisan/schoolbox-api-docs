@@ -14,8 +14,6 @@
  */
 
 namespace Schoolbox\External\Normalise\User;
-use External_StudentAccountIterator;
-use Schoolbox;
 use Schoolbox\Collection;
 
 /* Interface usage disabled while the repopulation takes place
@@ -358,14 +356,6 @@ class Adapter  implements \External_UserInterface {
         $collection->reindex();
 
         return $collection;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParentUserAccountIterator()
-    {
-        return $this->getHandler()->getParentUserAccountIterator();
     }
 
     /* Students
@@ -1091,14 +1081,6 @@ class Adapter  implements \External_UserInterface {
         return $collection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getStudentUserAccountIterator()
-    {
-        return $this->getHandler()->getStudentUserAccountIterator();
-    }
-
     /* Staff
      */
 
@@ -1300,14 +1282,6 @@ class Adapter  implements \External_UserInterface {
         }
 
         return $collection;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStaffUserAccountIterator()
-    {
-        return $this->getHandler()->getStaffUserAccountIterator();
     }
 
     /**

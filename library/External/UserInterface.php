@@ -171,16 +171,6 @@ interface External_UserInterface {
     public function getStudentUserAccountInfo();
 
     /**
-     * Gets a collection of normalized student objects.
-     *
-     * This method should return an iterator instead of an array, for memory
-     * efficiency reasons.
-     *
-     * @return Schoolbox\External\Normalise\User\Student[]
-     */
-    public function getStudentUserAccountIterator();
-
-    /**
      * Returns a list of email parent email addresseses for students.
      *
      * @param array $synergyIds
@@ -289,16 +279,6 @@ interface External_UserInterface {
      */
     public function getParentUserAccountInfo();
 
-    /**
-     * Gets a collection of normalized parent objects.
-     *
-     * This method should return an iterator instead of an array, for memory
-     * efficiency reasons.
-     *
-     * @return Schoolbox\External\Normalise\User\Guardian[]
-     */
-    public function getParentUserAccountIterator();
-
     /* Staff-specific
      */
 
@@ -344,16 +324,6 @@ interface External_UserInterface {
      * )
      */
     public function getStaffUserAccountInfo();
-
-    /**
-     * Gets a collection of normalized staff objects.
-     *
-     * This method should return an iterator instead of an array, for memory
-     * efficiency reasons.
-     *
-     * @return Schoolbox\External\Normalise\User\Staff[]
-     */
-    public function getStaffUserAccountIterator();
 
     /* Common methods
      */

@@ -173,14 +173,6 @@ class External_User implements External_UserInterface {
 	}
 
 	/**
-	 * {@inheritdoc}
-	 */
-	public function getStudentUserAccountIterator()
-	{
-		return $this->getDatabase()->getStudentUserAccountIterator();
-	}
-
-	/**
 	 * No usages found
 	 *
 	 * @todo Review usage of method
@@ -191,14 +183,6 @@ class External_User implements External_UserInterface {
 	}
 
 	/**
-	 * {@inheritdoc}
-	 */
-	public function getParentUserAccountIterator()
-	{
-		return $this->getDatabase()->getParentUserAccountIterator();
-	}
-
-	/**
 	 * No usages found
 	 *
 	 * @todo Review usage of method
@@ -206,14 +190,6 @@ class External_User implements External_UserInterface {
 	 */
 	public function getStaffUserAccountInfo () {
 		return $this->getDatabase()->getStaffUserAccountInfo();
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function getStaffUserAccountIterator()
-	{
-		return $this->getDatabase()->getStaffUserAccountIterator();
 	}
 
     /**

@@ -370,38 +370,6 @@ class External_Tass_User implements External_UserInterface
         return $staffList;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getStaffUserAccountIterator()
-    {
-        $query = "
-            SELECT
-                te.tch_code AS StaffID,
-                '' AS NetworkLogin,
-                CASE
-                    WHEN (t.term_date) IS NULL THEN 0
-                    ELSE 1
-                END AS ActiveFlag,
-                t.salutation_flag AS StaffTitle,
-                t.prefer_name_text AS StaffPreferredName,
-                t.surname_text AS StaffSurname,
-                '' AS DefaultEmailCode,
-                '' AS OccupEmail,
-                t.e_mail AS Email,
-                '' AS StaffCampus,
-                '' AS StaffCategoryType,
-                '' AS StaffCategory,
-                td.tch_dept AS StaffDepartment
-            FROM tel_vw_telemf AS t
-            LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
-            LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
-        ";
-        return new \Schoolbox\Sync\Iterator\Staff(
-            $this->getDatabase()->getIterator($query)->addMap([$this, 'trimRow'])
-        );
-    }
-
     public function getStudentUserAccountInfo()
     {
         // Get all students who have a campus, and don't have a leaving date?
@@ -427,35 +395,6 @@ class External_Tass_User implements External_UserInterface
 
         $result = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStudentUserAccountIterator()
-    {
-        $query = "
-            SELECT
-                s.stud_code AS StudentID,
-                '' AS NetworkLogin,
-                '' AS StudentTitle,
-                s.preferred_name AS StudentPreferred,
-                s.surname AS StudentSurname,
-                s.sex AS StudentGender,
-                s.e_mail AS StudentEmail,
-                '' AS StudentOccupEmail,
-                s.year_grp AS StudentYearLevel,
-                s.house AS StudentHouse,
-                (IF ((sb.resid_code IS NOT NULL), 'Y', 'N')) AS StudentBoarder,
-                sb.resid_code AS StudentBoardingHouse,
-                s.campus_code AS StudentCampus
-            FROM student AS s
-            LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
-            WHERE s.dol IS NULL
-        ";
-        return new \Schoolbox\Sync\Iterator\Student(
-            $this->getDatabase()->getIterator($query)->addMap([$this, 'trimRow'])
-        );
     }
 
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
@@ -568,83 +507,6 @@ class External_Tass_User implements External_UserInterface
         }
 
         return $newList;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParentUserAccountIterator()
-    {
-        // Attempt to create separate accounts for parent and spouse
-        // Not yet supported: children from split families
-        $query = "
-            SELECT
-                'P' + p.par_code AS StudentContactID,
-                ''               AS StudentContactTitle,
-                p.f_name         AS StudentContactPreferred,
-                ''               AS StudentContactSurname,
-                ''               AS StudentContactDefaultEmail,
-                sf.sfa_num       AS StudentContactSplitFamilyNumber,
-                s.year_grp       AS StudentYearLevel,
-                s.campus_code    AS StudentCampus,
-                s.sex            AS StudentGender,
-                s.preferred_name AS StudentPreferred,
-                s.surname        AS StudentSurname
-            FROM parent AS p
-            INNER JOIN paraddress as pa
-                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
-            LEFT JOIN pia_sfaccess AS sf
-                ON p.par_code = sf.par_code
-                AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
-                AND p.cmpy_code = sf.cmpy_code
-            LEFT JOIN student as s
-                ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
-            WHERE p.f_name IS NOT NULL
-
-            UNION ALL
-
-            SELECT
-                'S' + p.par_code AS StudentContactID,
-                ''               AS StudentContactTitle,
-                p.m_name         AS StudentContactPreferred,
-                ''               AS StudentContactSurname,
-                ''               AS StudentContactDefaultEmail,
-                sf.sfa_num       AS StudentContactSplitFamilyNumber,
-                s.year_grp       AS StudentYearLevel,
-                s.campus_code    AS StudentCampus,
-                s.sex            AS StudentGender,
-                s.preferred_name AS StudentPreferred,
-                s.surname        AS StudentSurname
-            FROM parent AS p
-            INNER JOIN paraddress as pa
-                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
-            LEFT JOIN pia_sfaccess AS sf
-                ON p.par_code = sf.par_code
-                AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
-                AND p.cmpy_code = sf.cmpy_code
-            LEFT JOIN student as s
-                ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
-            WHERE p.m_name IS NOT NULL
-
-            ORDER BY StudentContactID ASC
-        ";
-
-        return new \Schoolbox\Sync\Iterator\Guardian(
-            $this->getDatabase()->getIterator($query)
-                ->addMap([$this, 'trimRow'])
-                ->addMap(function ($row) {
-                    list($firstName, $surname)      = preg_split("/\\s+/", $row['StudentContactPreferred'], 2);
-                    $row['StudentContactPreferred'] = $firstName;
-                    $row['StudentContactSurname']   = $surname;
-                    return $row;
-                })
-                ->addMap(function ($row) {
-                    if (isset($row['StudentContactSplitFamilyNumber'])) {
-                        $row['StudentContactID'] .= $row['StudentContactSplitFamilyNumber'];
-                    }
-                    return $row;
-                })
-        );
     }
 
     /**

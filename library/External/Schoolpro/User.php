@@ -13,7 +13,7 @@ class External_Schoolpro_User implements External_UserInterface
     /**
      * An instance of MSSQL
      *
-     * @var MSSQL
+     * @var null
      */
     private $db = null;
 
@@ -536,25 +536,6 @@ class External_Schoolpro_User implements External_UserInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getStudentUserAccountIterator()
-    {
-        // This might work!
-        $vars = array(
-            'sbGetStudentAccounts',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-            )
-        );
-
-        return new \Schoolbox\Sync\Iterator\Student(
-            $this->getDb()->getProcedureIterator($vars[0], $vars[1])
-        );
-    }
-
-    /**
      * Stub method, probably not used
      */
     public function getParentUserAccountInfo()
@@ -573,26 +554,6 @@ class External_Schoolpro_User implements External_UserInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getParentUserAccountIterator()
-    {
-        // This might work!
-        // It probably returns both parents in one row though.
-        $vars = array(
-            'sbGetGuardianAccounts',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-            )
-        );
-
-        return new \Schoolbox\Sync\Iterator\Guardian(
-            $this->getDb()->getProcedureIterator($vars[0], $vars[1])
-        );
-    }
-
-    /**
      * Stub method, probably not used
      */
     public function getStaffUserAccountInfo()
@@ -608,25 +569,6 @@ class External_Schoolpro_User implements External_UserInterface
         $result = $this->getDb()->executeProcedure($vars[0], $vars[1]);
 
         new \Alaress_Probe($result);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStaffUserAccountIterator()
-    {
-        // This might work!
-        $vars = array(
-            'sbGetStaffAccounts',
-            array(
-                array('@pUserName', 'alaress', SQLVARCHAR, false, false, -1),
-                array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
-            )
-        );
-
-        return new \Schoolbox\Sync\Iterator\Staff(
-            $this->getDb()->getProcedureIterator($vars[0], $vars[1])
-        );
     }
 
     /**
@@ -681,7 +623,7 @@ class External_Schoolpro_User implements External_UserInterface
     /**
      * Set db
      *
-     * @param MSSQL $db
+     * @param null $db
      */
     private function setDb($db)
     {
@@ -691,7 +633,7 @@ class External_Schoolpro_User implements External_UserInterface
     /**
      * Get db
      *
-     * @return MSSQL
+     * @return null
      */
     private function getDb()
     {

@@ -424,33 +424,6 @@ class External_Denbigh_User implements External_UserInterface {
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getStudentUserAccountIterator()
-    {
-        $statement = $this->getExternalDatabase()->prepare("
-            SELECT
-                denbighID AS StudentID,
-                username AS NetworkLogin,
-                '' AS StudentTitle,
-                firstname AS StudentPreferred,
-                surname AS StudentSurname,
-                '' AS StudentGender,
-                email AS StudentEmail,
-                '' AS StudentOccupEmail,
-                academicYear AS StudentYearLevel,
-                house AS StudentHouse,
-                boardingStatus AS StudentBoarder,
-                cateringHouse AS StudentBoardingHouse,
-                '' AS StudentCampus
-            FROM Schoolbox_Student
-            ORDER BY denbighID ASC
-        ");
-        $statement->execute();
-        return new \Schoolbox\Sync\Iterator\Student($statement);
-    }
-
     public function getParentUserAccountInfo() {
         $query = $this->getExternalDatabase()->query(
             "
@@ -466,36 +439,6 @@ class External_Denbigh_User implements External_UserInterface {
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParentUserAccountIterator()
-    {
-        $statement = $this->getExternalDatabase()->prepare("
-            SELECT
-                par.loginID AS StudentContactNetworkLogin,
-                peo.denbighID AS StudentContactID,
-                peo.title AS StudentContactTitle,
-                preferred_name AS StudentContactPreferred,
-                peo.surname AS StudentContactSurname,
-                peo.email AS StudentContactDefaultEmail,
-                s.denbighID AS StudentId,
-                s.academicYear AS StudentYearLevel,
-                '' AS StudentCampus,
-                s.gender AS StudentGender,
-                s.preferred_name AS StudentPreferred,
-                s.surname AS StudentSurname
-            FROM Addresses adr
-            LEFT JOIN Parents par ON par.familyDenbighID = adr.familyDenbighID
-            LEFT JOIN People peo ON peo.denbighID = par.peopleDenbighID
-            LEFT JOIN Students s ON s.familyDenbighID = par.familyDenbighID
-            WHERE peo.id IS NOT NULL
-            GROUP BY peo.denbighID
-            ORDER BY familyDenbighID ASC, denbighID ASC
-        ");
-        $statement->execute();
-        return new \Schoolbox\Sync\Iterator\Guardian($statement);
-    }
 
     /**
      * Gets all Staff account info from Denbigh
@@ -509,33 +452,6 @@ class External_Denbigh_User implements External_UserInterface {
             LEFT JOIN People ON Staff.`peopleDenbighID` = People.`denbighID`"
         );
         return $query->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStaffUserAccountIterator()
-    {
-        $statement = $this->getExternalDatabase()->prepare("
-            SELECT
-                p.denbighID AS StaffID,
-                staffCode AS NetworkLogin,
-                1 AS ActiveFlag,
-                title AS StaffTitle,
-                preferred_name AS StaffPreferredName,
-                surname AS StaffSurname,
-                '' AS DefaultEmailCode,
-                '' AS OccupEmail,
-                email AS Email,
-                '' AS StaffCampus,
-                '' AS StaffCategoryType,
-                '' AS StaffCategory,
-                '' AS StaffDepartment
-            FROM Staff s
-            LEFT JOIN People p ON s.peopleDenbighID = p.denbighID
-        ");
-        $statement->execute();
-        return new \Schoolbox\Sync\Iterator\Staff($statement);
     }
 
     /**

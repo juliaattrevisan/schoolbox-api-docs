@@ -317,40 +317,13 @@ class External_Schoolbox_User implements External_UserInterface
 
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getStudentUserAccountIterator()
-    {
-        // Will probably never exist for Schoolbox connector
-        return [];
-    }
-
     public function getParentUserAccountInfo()
     {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParentUserAccountIterator()
-    {
-        // Will probably never exist for Schoolbox connector
-        return [];
     }
 
     public function getStaffUserAccountInfo()
     {
 
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStaffUserAccountIterator()
-    {
-        // Will probably never exist for Schoolbox connector
-        return [];
     }
 
     /**

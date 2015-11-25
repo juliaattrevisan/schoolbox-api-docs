@@ -392,31 +392,6 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getStudentUserAccountIterator()
-    {
-        $stmt = $this->getDatabase()->prepare('
-            SELECT
-            STUDENT_NUMBER AS "StudentID",
-            USERNAME       AS "NetworkLogin",
-            NULL           AS "StudentTitle",
-            FIRSTNAME      AS "StudentPreferred",
-            SURNAME        AS "StudentSurname",
-            EMAIL_ADDRESS  AS "StudentEmail",
-            NULL           AS "StudentOccupEmail",
-            YEAR_LEVEL     AS "StudentYearLevel",
-            HOUSE          AS "StudentHouse",
-            NULL           AS "StudentBoarder",
-            NULL           AS "StudentBoardingHouse",
-            NULL           AS "StudentCampus"
-            FROM db2inst1.schoolbox_students
-        ');
-        $stmt->execute();
-        return new \Schoolbox\Sync\Iterator\Student($stmt);
-    }
-
-    /**
      * Sync Method: Parent
      */
     public function getParentUserAccountInfo() {
@@ -446,60 +421,6 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getParentUserAccountIterator()
-    {
-        $stmt = $this->getDatabase()->prepare('
-            SELECT
-                NULL                     AS "StudentContactNetworkLogin",
-                p.CARER_NUMBER           AS "StudentContactID",
-                NULL                     AS "StudentContactTitle",
-                p.FULL_NAME              AS "StudentContactPreferred",
-                NULL                     AS "StudentContactSurname",
-                p.COMBINED_EMAIL_ADDRESS AS "StudentContactDefaultEmail",
-                s.STUDENT_NUMBER         AS "StudentId",
-                s.YEAR_LEVEL             AS "StudentYearLevel",
-                NULL                     AS "StudentCampus",
-                NULL                     AS "StudentGender",
-                s.FIRSTNAME              AS "StudentPreferred",
-                s.SURNAME                AS "StudentSurname"
-            FROM db2inst1.schoolbox_parents AS p
-            INNER JOIN db2inst1.schoolbox_parent_student
-                AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
-            INNER JOIN db2inst1.schoolbox_students
-                AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
-            WHERE p.CARER_NUMBER IS NOT NULL
-
-            UNION ALL
-
-            SELECT
-                NULL                     AS "StudentContactNetworkLogin",
-                p.SPOUSE_CARER_NUMBER    AS "StudentContactID",
-                NULL                     AS "StudentContactTitle",
-                p.SPOUSE_FULL_NAME       AS "StudentContactPreferred",
-                NULL                     AS "StudentContactSurname",
-                p.SPOUSE_EMAIL           AS "StudentContactDefaultEmail",
-                s.STUDENT_NUMBER         AS "StudentId",
-                s.YEAR_LEVEL             AS "StudentYearLevel",
-                NULL                     AS "StudentCampus",
-                NULL                     AS "StudentGender",
-                s.FIRSTNAME              AS "StudentPreferred",
-                s.SURNAME                AS "StudentSurname"
-            FROM db2inst1.schoolbox_parents AS p
-            INNER JOIN db2inst1.schoolbox_parent_student
-                AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
-            INNER JOIN db2inst1.schoolbox_students
-                AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
-            WHERE p.SPOUSE_CARER_NUMBER IS NOT NULL
-
-            ORDER BY INTEGER("StudentContactID") ASC, INTEGER("StudentId") ASC
-        ');
-        $stmt->execute();
-        return new \Schoolbox\Sync\Iterator\Guardian($stmt);
-    }
-
-    /**
      * Sync Method: Staff
      */
     public function getStaffUserAccountInfo() {
@@ -524,32 +445,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         return $stmt->fetchAll(DB2::FETCH_ASSOC);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getStaffUserAccountIterator()
-    {
-        $stmt = $this->getDatabase()->prepare('
-            SELECT
-                STAFF_NUMBER  AS "StaffID",
-                USERNAME      AS "NetworkLogin",
-                1             AS "ActiveFlag",
-                SALUTATION    AS "StaffTitle",
-                FIRSTNAME     AS "StaffPreferredName",
-                SURNAME       AS "StaffSurname",
-                NULL          AS "DefaultEmailCode",
-                EMAIL_ADDRESS AS "OccupEmail",
-                EMAIL_ADDRESS AS "Email",
-                CAMPUS        AS "StaffCampus",
-                NULL          AS "StaffCategoryType",
-                NULL          AS "StaffCategory",
-                NULL          AS "StaffDepartment"
-            FROM db2inst1.schoolbox_staff
-            WHERE USERNAME IS NOT NULL
-        ');
-        $stmt->execute();
-        return new \Schoolbox\Sync\Iterator\Staff($stmt);
-    }
+
 
     /**
      * Method not implemented
