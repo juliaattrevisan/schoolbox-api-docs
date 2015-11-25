@@ -72,4 +72,16 @@ class Controller extends Base {
             'format'   => 'nochrome'
         ]);
     }
+
+    /**
+     * Decide whether to return
+     * a boolean select,
+     * a lookup select,
+     * or a freeform text input
+     */
+    public function change() {
+        new \Alaress_Probe($_GET);
+
+        exit();
+    }
 }

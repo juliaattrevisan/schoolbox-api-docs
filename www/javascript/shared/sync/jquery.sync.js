@@ -54,6 +54,14 @@
                     }
                 },
 
+                /* Effect Settings
+                 */
+                effect: {
+                    change: {
+                        url: '/adminv2/sync/effect/change'
+                    }
+                },
+
                 /* Rule Settings
                  */
                 rule: {
@@ -260,7 +268,6 @@
                 var url = $(this).attr('href');
 
                 $.post(url, function(responseText) {
-                    console.log('mort');
                     $(ruleId).append(responseText);
                 });
             });
@@ -299,12 +306,19 @@
         function initEffectMappingTypeChange() {
             $(config.element).on('click', '[data-effect-mappingtype]', function(event) {
                 $(this).on('change', function(event) {
-
                     var effectId = $(this).attr('data-effect-mappingtype');
                     var userField = $('[data-effect-userfield='+effectId+']').val();
                     var mappingType = $(this).val();
 
-                    console.log(effectId, mappingType, userField);
+                    var data = {
+                        effectId: effectId,
+                        userField: userField,
+                        mappingType: mappingType
+                    }
+
+                    $.get(config.effect.change.url, data, function(responseText) {
+                        console.log(responseText);
+                    });
                 });
             });
         }
