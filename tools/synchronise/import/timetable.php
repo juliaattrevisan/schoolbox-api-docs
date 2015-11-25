@@ -8,7 +8,7 @@ use Alaress\Lumberjack\Logger;
 use Schoolbox\External\Importer;
 
 // Manage options
-$options = getopt('v', ['perform-update', 'structure-file:', 'timetable-file:', 'enrolment-file:',]);
+$options = getopt('v', ['perform-update', 'structure::', 'timetable::', 'enrolment::',]);
 $update  = isset($options['perform-update']);
 
 /**
@@ -42,6 +42,9 @@ $displayFormat = function ($fields) {
  */
 $getReader = function ($file, Logger $logger) {
     try {
+        if ($file === false) {
+            $file = STDIN;
+        }
         $reader = new Reader($file);
         $reader->setLoadFromFirst(true)->setFillDown(true);
         return $reader;
@@ -52,21 +55,24 @@ $getReader = function ($file, Logger $logger) {
 };
 
 // Output help
-if (!isset($options['structure-file']) && !isset($options['timetable-file']) && !isset($options['enrolment-file'])) {
+if (!isset($options['structure']) && !isset($options['timetable']) && !isset($options['enrolment'])) {
     echo <<<HELP
 Imports timetable into the Schoolbox user connector.
 
 Usage: timetable.php [-v] [--perform-update]
-       [--structure-file=STRUCTURE_FILE]
-       [--timetable-file=TIMETABLE_FILE]
-       [--enrolment-file=ENROLMENT_FILE]
+       [--structure=STRUCTURE_FILE]
+       [--timetable=TIMETABLE_FILE]
+       [--enrolment=ENROLMENT_FILE]
     -v:               Verbose mode
     --perform-update: If set, updates DB - otherwise, performs a dry run.
-    --structure-file: Timetable structure file to import, in CSV format.
-    --timetable-file: Timetable file to import, in CSV format.
+    --structure:      Timetable structure file to import, in CSV format.
+                      Uses stdin if no STRUCTURE_FILE given.
+    --timetable:      Timetable file to import, in CSV format.
+                      Uses stdin if no TIMETABLE_FILE given.
                       Must not be imported before STRUCTURE_FILE.
-    --enrolment-file: Enrolment file to import, in CSV format.
+    --enrolment:      Enrolment file to import, in CSV format.
                       Must not be imported before TIMETABLE_FILE.
+                      Uses stdin if no ENROLMENT_FILE given.
 
 Format for STRUCTURE_FILE:
 {$displayFormat(Importer\TimetableStructure::getFormat())}
@@ -83,27 +89,27 @@ HELP;
 $logger = new Logger(STDOUT, STDERR, isset($options['v']) ? Monolog\Logger::DEBUG : Monolog\Logger::INFO);
 
 // For each of structure file, timetable file and enrolment file:
-if (isset($options['structure-file'])) {
+if (isset($options['structure'])) {
     $logger->info('Starting structure import...');
-    $parser = new Importer\TimetableStructure($getReader($options['structure-file'], $logger), $logger, $update);
+    $parser = new Importer\TimetableStructure($getReader($options['structure'], $logger), $logger, $update);
     $parser->save();
     $logger->info('Structure import done!');
 } else {
     $logger->info('Skipping structure import - no file provided');
 }
 
-if (isset($options['timetable-file'])) {
+if (isset($options['timetable'])) {
     $logger->info('Starting timetable import...');
-    $parser = new Importer\Timetable($getReader($options['timetable-file'], $logger), $logger, $update);
+    $parser = new Importer\Timetable($getReader($options['timetable'], $logger), $logger, $update);
     $parser->save();
     $logger->info('Timetable import done!');
 } else {
     $logger->info('Skipping timetable import - no file provided');
 }
 
-if (isset($options['enrolment-file'])) {
+if (isset($options['enrolment'])) {
     $logger->info('Starting enrolment import...');
-    $parser = new Importer\Enrolment($getReader($options['enrolment-file'], $logger), $logger, $update);
+    $parser = new Importer\Enrolment($getReader($options['enrolment'], $logger), $logger, $update);
     $parser->save();
     $logger->info('Timetable import done!');
 } else {
