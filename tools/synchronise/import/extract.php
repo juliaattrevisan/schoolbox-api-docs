@@ -5,12 +5,11 @@ require_once(__DIR__ . '/../../../include/Bootstrap.php');
 
 $options = getopt('', ['structure', 'timetable', 'enrolment',]);
 
-if (!isset($options['structure']) && !isset($options['timetable']) && !isset($options['enrolment'])) {
-}
-
 $reader = new XMLReader();
-if (!$reader->open(array_pop($argv))) {
-
+$file   = array_pop($argv);
+if (!$reader->open($file)) {
+    fwrite(STDERR, "Could not open file \"$file\"\n");
+    exit(1);
 }
 
 if (isset($options['structure'])) {
