@@ -9,6 +9,7 @@
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
+use External_User;
 use MSSQL;
 use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\Sync\Iterator;
@@ -21,11 +22,25 @@ class Sync implements SyncInterface
     private $database;
 
     /**
+     * @var string
+     */
+    private $year;
+
+    /**
+     * @var string
+     */
+    private $semester;
+
+    /**
      * Sync constructor
      */
     public function __construct()
     {
         $this->database = MSSQL::getInstance();
+        // Figure out the current year and semester
+        $externalUser = new \External_User();
+        $this->year     = $externalUser->getCurrentYear();
+        $this->semester = $externalUser->getCurrentSemester();
     }
 
     /**
@@ -51,8 +66,8 @@ class Sync implements SyncInterface
             FROM SynergyOne.dbo.vStudents vStudents
             LEFT JOIN Community ON Community.ID = StudentID
             WHERE
-            FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
+            FileSemester = '" . $this->database->quote($this->semester) . "'
+            AND FileYear = '" . $this->database->quote($this->year) . "'
             ORDER BY vStudents.StudentID ASC
         ";
         return new Iterator\Student($this->database->getIterator($query));
@@ -80,8 +95,8 @@ class Sync implements SyncInterface
             FROM SynergyOne.dbo.vStudentContactAllAddress s
             INNER JOIN SynergyOne.dbo.Community cp ON s.StudentContactID = cp.ID
             WHERE (s.StudentContactType IN ('SC1', 'SC2'))
-            AND   s.FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND   s.FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
+            AND   s.FileSemester = '" . $this->database->quote($this->semester) . "'
+            AND   s.FileYear = '" . $this->database->quote($this->year) . "'
 
             UNION ALL
 
@@ -101,8 +116,8 @@ class Sync implements SyncInterface
             FROM SynergyOne.dbo.vStudentContactAllAddress s
             INNER JOIN SynergyOne.dbo.Community cs ON s.StudentContactSpouseID = cs.ID
             WHERE (s.StudentContactType IN ('SC1', 'SC2'))
-            AND   s.FileSemester = '" . $this->database->quote($this->getCurrentSemester()) . "'
-            AND   s.FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
+            AND   s.FileSemester = '" . $this->database->quote($this->semester) . "'
+            AND   s.FileYear = '" . $this->database->quote($this->year) . "'
 
             ORDER BY StudentContactID ASC
         ";
