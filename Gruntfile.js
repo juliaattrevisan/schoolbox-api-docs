@@ -3,21 +3,10 @@ var shell = require('shelljs');
 
 module.exports = function(grunt) {
 
-    // Core watch task: builds CSS for all schools
     var cssDirs = glob.sync('www/css/*/');
-    var watchTasks = {
-        core: {
-            options: {
-                interrupt: true,
-                interval: 5007
-            },
-            files: ['www/css/core/*.less'],
-            tasks: ['build.css:core', 'build.css.current']
-        }
-    };
     var buildTasks = {};
 
-    // Create watch and build tasks for each CSS directory.
+    // Create build tasks for each CSS directory.
     for (var i in cssDirs) {
         var dir     = cssDirs[i];
         var matches = dir.match(/^www\/css\/(.*?)\/$/)
@@ -33,19 +22,7 @@ module.exports = function(grunt) {
                 dest: 'www/css/',
                 ext: '.css'
             }]
-        }
-        // Don't clobber core's watcher
-        if (cssDir === 'core') {
-            continue;
-        }
-        watchTasks[cssDir] = {
-            options: {
-                interrupt: true,
-                interval: 5007
-            },
-            files: ['www/css/'+cssDir+'/*.less'],
-            tasks: ['build.css:'+cssDir]
-        }
+        };
     }
 
     // Project configuration.
@@ -181,8 +158,7 @@ module.exports = function(grunt) {
             js: ['www/javascript/components/schoolbox.{min,map}.js'],
             css: ['www/css/*/chrome.css']
         },
-        less: buildTasks,
-        watch: watchTasks
+        less: buildTasks
     });
 
     require('jit-grunt')(grunt, {bower: 'grunt-bower-task'})
