@@ -28,10 +28,10 @@ class SyncFactory
         $specificClassname = "{$prefix}\\{$specific}\\Sync";
         $generalClassname = "{$prefix}\\{$general}\\Sync";
 
+        // TODO move instantiation logic out of constructors, and into here
         if (class_exists($specificClassname)) {
             return new $specificClassname();
-        }
-        else if (class_exists($generalClassname)) {
+        } elseif (class_exists($generalClassname)) {
             return new $generalClassname();
         }
 
