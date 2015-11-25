@@ -305,22 +305,20 @@
          */
         function initEffectMappingTypeChange() {
             $(config.element).on('click', '[data-effect-mappingtype]', function(event) {
-                $(this).on('click', function(event) {
-                    var effectId = $(this).attr('data-effect-mappingtype');
-                    var userField = $('[data-effect-userfield='+effectId+']').val();
-                    var mappingType = $(this).val();
+                var effectId = $(this).attr('data-effect-mappingtype');
+                var userField = $('[data-effect-userfield='+effectId+']').val();
+                var mappingType = $(this).val();
 
-                    var data = {
-                        effectId: effectId,
-                        userField: userField,
-                        mappingType: mappingType
-                    }
+                var data = {
+                    effectId: effectId,
+                    userField: userField,
+                    mappingType: mappingType
+                }
 
-                    /* Inject fragment into Effect container
-                     */
-                    $.get(config.effect.change.url, data, function(responseText) {
-                        $('[data-effect-fragment='+effectId+']').html(responseText);
-                    });
+                /* Inject fragment into Effect container
+                 */
+                $.get(config.effect.change.url, data, function(responseText) {
+                    $('[data-effect-fragment='+effectId+']').html(responseText);
                 });
             });
         }
