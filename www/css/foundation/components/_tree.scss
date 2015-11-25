@@ -17,6 +17,26 @@ $tree-course-icon-color: #008600;
 $tree-favorite-icon-color: darkorange;
 
 
+%browser-icon-colors {
+    .icon-folder:before {
+        color: $tree-folder-icon-color;
+    }
+
+    .icon-home:before {
+        color: $tree-homepage-icon-color;
+    }
+
+    .icon-course-builder, .icon-course {
+        &:before {
+            color: $tree-course-icon-color;
+        }
+    }
+
+    .icon-favourite:before {
+        color: $tree-favorite-icon-color;
+    }
+}
+
 // a whole bushel of jstree overrides.....
 
 div.jstree-default, ul.jstree-default {
@@ -70,23 +90,7 @@ div.jstree-default, ul.jstree-default {
         padding: 0 1rem !important;
     }
 
-    .icon-folder:before {
-        color: $tree-folder-icon-color;
-    }
-
-    .icon-home:before {
-        color: $tree-homepage-icon-color;
-    }
-
-    .icon-course-builder, .icon-course {
-        &:before {
-            color: $tree-course-icon-color;
-        }
-    }
-
-    .icon-favourite:before {
-        color: $tree-favorite-icon-color;
-    }
+    @extend %browser-icon-colors;
 
     .icon-loading:before {
         background-image: url('/images/resources/ajax.gif');
@@ -132,6 +136,10 @@ div.jstree-default, ul.jstree-default {
             position: absolute;
             content: "Loading...";
             z-index: 1;
+        }
+
+        .meta-preview {
+            @extend %browser-icon-colors;
         }
     }
 
