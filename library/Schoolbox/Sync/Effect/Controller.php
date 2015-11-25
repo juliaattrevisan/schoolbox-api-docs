@@ -13,7 +13,7 @@ namespace Schoolbox\Sync\Effect;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Sync\Grammar\FieldFactory;
 use Schoolbox\Sync\Rule;
-use Schoolbox\Sync\Condition;
+use Schoolbox\Sync\Effect;
 
 class Controller extends Base {
     const EFFECT_SKIP = 1;
@@ -47,7 +47,24 @@ class Controller extends Base {
             'status' => 'Effect not yet saved'
         ];
 
-        $data = [];
+        $rule = Rule\Mapper::getInstance()->findById($params['ruleId']);
+
+        $newEffect = Effect\Mapper::getInstance()->createModel();
+
+        /* TODO: Manufacture and save this properly
+         */
+        $newEffect->setId(1);
+
+        $data = [
+            'allUserField'  => [
+                'username'  => 'Username',
+                'firstname' => 'First Name',
+                'surname'   => 'Last Name'
+            ],
+            'meta'          => [ $newEffect->getId() => $meta ],
+            'currentEffect' => $newEffect,
+            'currentRule'   => [ 'id' => $rule->getId() ]
+        ];
 
         $this->getResponse()->content->set([
             'template' => '@syncEffect/container.twig',

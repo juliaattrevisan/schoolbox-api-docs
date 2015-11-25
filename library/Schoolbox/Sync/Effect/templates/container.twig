@@ -1,5 +1,35 @@
-Choose a Schoolbox User field
-<select>
-    <option>Username</option>
-    <option>NetworkLogin</option>
-</select>
+{% set allEffectMappingTypes = ['Equals', 'Maps'] %}
+
+<li id="effect-{{ currentEffect.id }}" class="actions-small-2 content" data-locked="{{ meta[currentEffect.id].lock.status }}">
+    <input type="hidden" name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][type]" value="">
+
+    <div class="list-item">
+        <div class="row">
+            <div class="small-1 medium-1 large-1 columns">
+                Then
+            </div>
+            <div class="small-11 medium-5 large-5 columns">
+                <select {{ meta[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][arguments][0]">
+                    {% for currentUserKey, currentUserField in allUserField %}
+                        <option value="{{ currentUserKey }}" {% if currentUserKey == currentEffect.arguments[0] %}selected="selected"{% endif %}>
+                            {{ currentUserField }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="small-2 medium-2 large-2 columns">
+                <select {{ meta[currentCondition.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][arguments][2]">
+                    {% for currentEffectMappingType in allEffectMappingTypes %}
+                        <option value="{{ loop.index0 }}" {% if loop.index0 == currentEffect.arguments[2] %}selected="selected"{% endif %}>{{ currentEffectMappingType }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    <nav>
+        <a href="/adminv2/sync/effect/delete/{{ currentEffect.id }}" class="icon-delete" title="Delete" data-effect-delete="{{ currentEffect.id }}"></a>
+        <a href="" class="icon-{{ meta[currentEffect.id].lock.icon }}" title='Toggle Readonly Mode' data-effect-modify-lock="effect-{{ currentEffect.id }}"></a>
+    </nav>
+
+    <span id='effect-{{ currentEffect.id }}-status' class="label highlight full-width {{ meta[currentEffect.id].status ? '' : 'hide' }}">{{ meta[currentEffect.id].status }}</span>
+</li>
