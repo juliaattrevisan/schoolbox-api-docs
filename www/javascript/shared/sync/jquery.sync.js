@@ -17,11 +17,15 @@
         var config = init(options, $(this));
 
         initRulesetUpdate();
+
         initRuleDelete();
         initRuleCollapse();
+
         initConditionCreate();
         initConditionModifyLock();
         initConditionDelete();
+
+        initEffectCreate();
 
         /**
          * Init
@@ -233,5 +237,28 @@
                 });
             });
         }
+
+        /**
+         * Add a new Effect
+         */
+        function initEffectCreate() {
+            $(config.element).on('click', '[data-effect-create]', function(event) {
+                event.preventDefault();
+
+                /* The Rule into which the new Effect is injected
+                 */
+                var ruleId = '#rule-' + $(this).attr('data-effect-create') + '-effects';
+
+                /* The url from which new Effect are spawned
+                 */
+                var url = $(this).attr('href');
+
+                $.post(url, function(responseText) {
+                    console.log('mort');
+                    $(ruleId).append(responseText);
+                });
+            });
+        }
+
     }
 }(jQuery));
