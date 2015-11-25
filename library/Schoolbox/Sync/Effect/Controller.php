@@ -103,8 +103,9 @@ class Controller extends Base {
 
         $template = '';
 
-        new \Alaress_Probe($_GET);
-
+        /* TODO: Replace with something properly considered
+         * These were purely for trying things out
+         */
         if ($mappingType[$_GET['mappingType']] == 'equals') {
             if ($userField[$_GET['userField']] == 'boolean') {
                 $template = '@syncEffect/boolean.twig';

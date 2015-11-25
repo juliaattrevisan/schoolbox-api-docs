@@ -305,7 +305,7 @@
          */
         function initEffectMappingTypeChange() {
             $(config.element).on('click', '[data-effect-mappingtype]', function(event) {
-                $(this).on('change', function(event) {
+                $(this).on('click', function(event) {
                     var effectId = $(this).attr('data-effect-mappingtype');
                     var userField = $('[data-effect-userfield='+effectId+']').val();
                     var mappingType = $(this).val();
@@ -316,8 +316,10 @@
                         mappingType: mappingType
                     }
 
+                    /* Inject fragment into Effect container
+                     */
                     $.get(config.effect.change.url, data, function(responseText) {
-                        console.log(responseText);
+                        $('[data-effect-fragment='+effectId+']').html(responseText);
                     });
                 });
             });
