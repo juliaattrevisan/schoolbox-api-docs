@@ -39,6 +39,7 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('role_type', self::TYPE_STRING);
         $this->uses('enabled', self::TYPE_BOOLEAN);
         $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('name', self::TYPE_STRING);
 
         $this->hasJoin('ups_condition', [
             'mapper'    => Sync\Condition\Mapper::class,
