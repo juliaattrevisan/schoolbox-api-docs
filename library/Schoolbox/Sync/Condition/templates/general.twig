@@ -34,5 +34,5 @@
         <a href="" class="icon-{{ meta[currentCondition.id].lock.icon }}" title='Toggle Readonly Mode' data-condition-modify-lock="condition-{{ currentCondition.id }}"></a>
     </nav>
 
-    <span id='condition-{{ currentCondition.id }}-status' class="label highlight full-width hide"></span>
+    <span id='condition-{{ currentCondition.id }}-status' class="label highlight full-width {{ meta[currentCondition.id].status ? '' : 'hide' }}">{{ meta[currentCondition.id].status }}</span>
 </li>
