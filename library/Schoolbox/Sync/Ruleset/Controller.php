@@ -13,6 +13,8 @@ namespace Schoolbox\Sync\Ruleset;
 use Alaress\Web\Controller\Base;
 use \Schoolbox\Sync\Navigator\Navigator;
 use \Schoolbox\Sync\Navigator\Node;
+use \Schoolbox\Sync\Condition;
+use \Schoolbox;
 
 class Controller extends Base {
 
@@ -69,16 +71,68 @@ class Controller extends Base {
     /**
      * Update each Rule in the Ruleset
      */
-    public function update() {
+    public function update()
+    {
+        $postData = $this->getRequest()->post;
 
-        /* TODO: Database Transaction
-         */
-        new \Alaress_Probe($_POST);
+        $roleType = $postData['rulesetId'];
 
-        /* TODO: Redirect back to Ruleset when finished
-         * $this->getResponse()->redirect->to("/adminv2/sync/{$_POST['rulesetId']}");
-         */
-        echo "Update Rule";
-        exit();
+        foreach ($postData['rule'] as $ruleId => $ruleData) {
+            $this->updateConditions($ruleId, $ruleData['condition']);
+        }
+
+        $this->getResponse()->redirect->to("/adminv2/sync/$roleType");
+    }
+
+
+    /**
+     * @param int $ruleId
+     * @param array $conditions
+     */
+    protected function updateConditions($ruleId, $conditions)
+    {
+        // TODO DI
+        $mapper = Condition\Mapper::getInstance();
+
+        foreach ($conditions as $conditionId => $conditionData) {
+
+            $conditionType = $conditionData['type'];
+            // NOT WORKING
+            $conditionArgs = (array)$conditionData['arguments'];
+
+            // ensure this is in the right order
+            ksort($conditionArgs);
+
+            // this is pretty hacky and not overly extensible...
+            if ($conditionType == 1 && count($conditionArgs) == 3) {
+                if (strlen($conditionArgs[1])) {
+                    $conditionArgs[1] = preg_split("`[\r\n]+`", $conditionArgs[1]);
+                }
+                $conditionArgs[2] = (bool)$conditionArgs[2];
+
+            } else {
+                $conditionArgs[0] = (bool)$conditionArgs[0];
+            }
+
+            $condition = [
+                'id'                => $conditionId,
+                'rule_id'           => $ruleId,
+                'condition_type_id' => $conditionType,
+                'arguments'         => json_encode($conditionArgs)
+            ];
+
+            try {
+                $mapper->save($mapper->hydrate($condition));
+            } catch (\PDOException $e) {
+                // clean up after yourself
+                $mapper->deleteByColumn('id', $conditionId);
+            }
+        }
+
+        // housekeeping - make sure there aren't any remnant invalid conditions flying around
+        $mapper->deleteByColumnList([
+            'rule_id'   => $ruleId,
+            'arguments' => json_encode(null)
+        ]);
     }
 }

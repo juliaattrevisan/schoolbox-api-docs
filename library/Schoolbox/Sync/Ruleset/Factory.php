@@ -156,7 +156,9 @@ class Factory
     private function findRuleset()
     {
         // TODO DI
-        return Rule\Mapper::getInstance()->findByColumnList([ 'role_type' => $this->getType() ]);
+        return Rule\Mapper::getInstance()->findByColumnList([ 'role_type' => $this->getType() ], [
+            'order' => [ 'sequence' => 'ASC' ]
+        ]);
     }
 
     /* Getters/Setters

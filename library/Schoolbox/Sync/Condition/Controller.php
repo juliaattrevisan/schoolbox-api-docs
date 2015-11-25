@@ -11,6 +11,9 @@
 namespace Schoolbox\Sync\Condition;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Sync\Grammar\FieldFactory;
+use Schoolbox\Sync\Rule;
+use Schoolbox\Sync\Condition;
 
 class Controller extends Base {
     const CONDITION_GENERAL = 1;
@@ -41,41 +44,42 @@ class Controller extends Base {
             'lock' => [
                 'status' => 0,
                 'icon' => 'locked',
-            ]
+            ],
+            'status' => 'Condition not yet saved'
         ];
 
-        /* TODO: Save instance to db, then populate type and id
-         * TODO: This new Condition should exist in the db so it has an id and type
-         */
+        $rule = Rule\Mapper::getInstance()->findById($params['ruleId']);
+
+        $newCondition = Condition\Mapper::getInstance()->createModel();
+
+        $newCondition->setRule($rule)->setConditionType(Condition\Type\Mapper::getInstance()->findById($params['conditionType']));
+
+        Condition\Mapper::getInstance()->create($newCondition);
+
+        $ffactory = new FieldFactory();
+
         $data = [
-            'currentCondition' => [
-                'condition' => [
-                    'id' => rand(0, 10000),
-                    'type' => $params['conditionType'],
-                    'rule_id' => $params['ruleId'],
-                    'meta' => $meta,
-                ]
-            ]
+            'allNDSField'      => $ffactory->buildMap($rule->getRoleType()),
+            'meta'             => [ $newCondition->getId() => $meta ],
+            'currentCondition' => $newCondition,
+            'currentRule'      => [ 'id' => $rule->getId() ]
         ];
 
-        /* Is a factory?
-         */
-        switch ($params['conditionType']) {
-            case self::CONDITION_GENERAL:
-                $fragment = $this->getDi()->get('templateEngine')->render('@syncCondition/general.twig', $data);
-                break;
+        // the list of templates available for rendering
+        $templates = [
+            self::CONDITION_GENERAL => '@syncCondition/general.twig',
+            self::CONDITION_USER    => '@syncCondition/userExists.twig'
+        ];
 
-            case self::CONDITION_USER:
-                $fragment = $this->getDi()->get('templateEngine')->render('@syncCondition/userExists.twig', $data);
-                break;
-
-            default:
-                $fragment = '';
-                break;
+        if (isset($templates[$params['conditionType']])) {
+            $this->getResponse()->content->set([
+                'template' => $templates[$params['conditionType']],
+                'data'     => $data,
+                'format'   => 'nochrome'
+            ]);
+        } else {
+            // TODO uh... how do I throw a 400 from here?
         }
-
-        echo $fragment;
-        exit();
     }
 
     /**
@@ -85,23 +89,14 @@ class Controller extends Base {
      *
      * @return bool
      */
-    public function delete() {
+    public function delete()
+    {
+        $conditionId = $this->getRequest()->post->get('conditionId');
+        $deleteCount = Condition\Mapper::getInstance()->deleteByColumn('id', $conditionId);
 
-        /* TODO: Perform actual deletion from db via mappers etc
-         * new \Alaress_Probe($_POST);
-         */
-
-        /* Tell us whether the deletion was successful
-         * 1 is successfully deleted
-         * 0 is not
-         */
-        $deleted = true;
-
-        if ($deleted) {
-            echo true;
-            exit();
-        }
-
-        exit();
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => $deleteCount > 0
+        ]);
     }
 }
