@@ -1,20 +1,31 @@
 <?php
 /**
- * User
+ * Synergetic implementation of sync connector.
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
+ * @author    Steve Chan <steve.chan@alaress.com.au>
+ * @copyright Copyright 2015, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
+use MSSQL;
+use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\Sync\Iterator;
 
-class Sync {
+class Sync implements SyncInterface
+{
+    /**
+     * @var MSSQL
+     */
+    private $database;
 
-    public function __construct() {
-        $this->database = \MSSQL::getInstance();
+    /**
+     * Sync constructor
+     */
+    public function __construct()
+    {
+        $this->database = MSSQL::getInstance();
     }
 
     /**
@@ -44,7 +55,7 @@ class Sync {
             AND FileYear = '" . $this->database->quote($this->getCurrentYear()) . "'
             ORDER BY vStudents.StudentID ASC
         ";
-        return new \Schoolbox\Sync\Iterator\Student($this->getDatabase()->getIterator($query));
+        return new Iterator\Student($this->database->getIterator($query));
     }
 
     /**
@@ -95,7 +106,7 @@ class Sync {
 
             ORDER BY StudentContactID ASC
         ";
-        return new \Schoolbox\Sync\Iterator\Guardian($this->getDatabase()->getIterator($query));
+        return new Iterator\Guardian($this->database->getIterator($query));
     }
 
     /**
@@ -123,6 +134,6 @@ class Sync {
             WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
             ORDER BY vStaff.StaffID ASC
         ";
-        return new \Schoolbox\Sync\Iterator\Staff($this->getDatabase()->getIterator($query));
+        return new Iterator\Staff($this->database->getIterator($query));
     }
 } 
