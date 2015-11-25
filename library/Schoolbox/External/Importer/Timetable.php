@@ -194,6 +194,12 @@ class Timetable extends AbstractImporter
      */
     public function save()
     {
+        if ($this->performUpdate) {
+            $this->log->notice('Cleaning up all existing classes');
+            $this->classMapper->truncate();
+            $this->log->notice('Cleaning up all existing class teachers');
+            $this->classPeriodMapper->truncate();
+        }
         // Eventual override rules:
         // * Class: none, update if there
         // * Class Periods: delete all existing and re-insert

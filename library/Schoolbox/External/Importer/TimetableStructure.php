@@ -206,6 +206,14 @@ class TimetableStructure extends AbstractImporter
         // Eventual override rules:
         // * Term: same title/campus combination
         // * Period: same term, and period title/day combination
+        if ($this->performUpdate) {
+            $this->log->notice('Cleaning up all existing cycles');
+            $this->timetableCycleMapper->truncate();
+            $this->log->notice('Cleaning up all existing campus cycles');
+            $this->timetableCampusMapper->truncate();
+            $this->log->notice('Cleaning up all existing periods');
+            $this->timetableCampusMapper->truncate();
+        }
         foreach ($this->parse() as $row) {
             /** @var TimetableCycle $cycle */
             $cycle = $row['cycle'];

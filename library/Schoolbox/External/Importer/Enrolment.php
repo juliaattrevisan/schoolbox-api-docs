@@ -74,6 +74,10 @@ class Enrolment extends AbstractImporter
      */
     protected function parse()
     {
+        if ($this->performUpdate) {
+            $this->log->notice('Cleaning up all existing enrolments');
+            $this->enrolmentMapper->truncate();
+        }
         $result = [];
         foreach ($this->reader as $i => $row) {
             $this->log->info("Parsing row $i...");
