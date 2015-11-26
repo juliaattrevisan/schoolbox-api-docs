@@ -56,22 +56,6 @@ abstract class Tokenizer
 
 
     /**
-     * @param array $settings
-     * @param array $ruleset
-     * @param mixed $input
-     * @return array
-     */
-    public function populateSettings(array $settings, array $ruleset, $input)
-    {
-        foreach ($ruleset as $field => $fieldValue) {
-            $settings[$field] = $this->parseTokens($settings, $field, $fieldValue, $input);
-        }
-
-        return $settings;
-    }
-
-
-    /**
      * @param Token $token
      * @return self
      */
