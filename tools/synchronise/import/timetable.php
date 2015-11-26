@@ -87,7 +87,13 @@ HELP;
 }
 
 // Set up the logger
-$logger = new Logger(STDOUT, STDERR, isset($options['v']) ? Monolog\Logger::DEBUG : Monolog\Logger::INFO);
+$logger = new Logger(
+    STDOUT,
+    STDERR,
+    isset($options['v']) ? Monolog\Logger::DEBUG : Monolog\Logger::INFO,
+    [],
+    true
+);
 
 // For each of structure file, timetable file and enrolment file:
 if (isset($options['structure'])) {
