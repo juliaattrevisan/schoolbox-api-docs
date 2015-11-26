@@ -23,7 +23,7 @@ abstract class Tokenizer
             )                           # /$1
             (                           # $2
                 (?:
-                    \s*\|\s*[a-z]+      # filters are prepended with a pipe, then alpha only
+                    \|[a-z]+            # filters are prepended with a pipe, then alpha only
                 )*
             )?                          # /$2
         }                               # token end
