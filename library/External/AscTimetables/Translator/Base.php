@@ -1,6 +1,7 @@
 <?php
 /**
- * Base translator from Lahore's ASC Timetables XML export to Schoolbox CSV.
+ * Base translator from ASC Timetables XML export to Schoolbox CSV timetable
+ * import.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd

@@ -1,7 +1,6 @@
 <?php
 /**
- * Translator from Lahore's ASC Timetables XML export to Schoolbox CSV
- * timetable import format.
+ * Translator from ASC Timetables XML export to Schoolbox CSV timetable import.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -45,8 +44,8 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
             $result = $reducer($result, $row);
         }
 
-        // Each campus/term combo gets this import once
-        // (For Lahore, there only ought to be one combo)
+        // Each campus/term combo gets this import once.
+        // TODO revise this assumption when a school has multiple campuses
         $endResult = [];
         foreach (\Schoolbox\CampusMapper::getInstance()->findAll() as $campus) {
             /** @var \Schoolbox\Campus $campus */

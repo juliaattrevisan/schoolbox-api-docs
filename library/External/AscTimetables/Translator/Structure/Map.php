@@ -1,7 +1,9 @@
 <?php
 /**
- * Map function - converts an XML node from Lahore's ASC Timetables XML export
- * to a more understandable intermediary format.
+ * Map function - converts an XML node from ASC Timetables XML export to a more
+ * understandable intermediary format.
+ *
+ * Mapped values are used in the creation of the timetable structure.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
