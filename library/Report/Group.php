@@ -167,16 +167,16 @@ class Report_Group extends Report_Abstract implements Report_IReport
 
             foreach ($this->dataSet as $user) {
                 // Format email address
-                $address = $this->emailObj->formatEmailFromArray($user);
+                $address = Scrub::text($this->emailObj->formatEmailFromArray($user));
                 $email = $address ? "<a href=\"{$_SESSION['mailhandle']}$address\">$address</a>" : '';
 
                 $page->setVar(array(
-                    'UID'             => $user['id'],
-                    'USER_TITLE'      => $user['title'],
-                    'USER_FIRSTNAME'  => $user['firstname'],
-                    'USER_SURNAME'    => $user['lastname'],
-                    'USER_USERNAME'   => $user['username'],
-                    'USER_SYNERGY_ID' => $user['synergy_id'],
+                    'UID'             => Scrub::text($user['id']),
+                    'USER_TITLE'      => Scrub::text($user['title']),
+                    'USER_FIRSTNAME'  => Scrub::text($user['firstname']),
+                    'USER_SURNAME'    => Scrub::text($user['lastname']),
+                    'USER_USERNAME'   => Scrub::text($user['username']),
+                    'USER_SYNERGY_ID' => Scrub::text($user['synergy_id']),
                     'USER_EMAIL'      => $email,
                     'USER_YEAR'       => empty($user['year']) ? '' : "Year {$user['year']}",
                     'USER_CAMPUS'     => Scrub::text($user['campus']),
@@ -196,7 +196,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
             $page->setVar(array(
                 'RESULT'                => 'No results.',
                 'USER_DISP_COUNT'       => $this->dataCount,
-                'USER_GROUP'            => $groupName,
+                'USER_GROUP'            => Scrub::text($groupName),
                 'previous_button_block' => '',
                 'next_button_block'     => '',
                 'page_number_block'     => ''

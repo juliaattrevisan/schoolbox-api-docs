@@ -250,7 +250,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
         if (!empty($this->dataSet)) {
             $page->setVar(array(
                 'COUNTABLE_COUNT' => $this->dataCount,
-                'REPORT_TITLE'      => "Login",
+                'REPORT_TITLE'    => Scrub::text($this->getReportTitle()),
                 'SORT_BASE'       => "login/{$this->getIndexID()}",
                 'COUNTABLE'       => 'events'
             ));
@@ -270,12 +270,12 @@ class Report_Login extends Report_Abstract implements Report_IReport
                 $displayName = $userHandler->formatName($nameShards);
 
                 $page->setVar(array(
-                    'UID'       => $log['user'],
-                    'DATE'      => $log['date'],
-                    'USERNAME'  => $displayName,
-                    'ACTION'    => $action,
-                    'IP'        => $log['ip'],
-                    'ROLE'  => $log['role']
+                    'UID'       => Scrub::text($log['user']),
+                    'DATE'      => Scrub::text($log['date']),
+                    'USERNAME'  => Scrub::text($displayName),
+                    'ACTION'    => Scrub::text($action),
+                    'IP'        => Scrub::text($log['ip']),
+                    'ROLE'      => Scrub::text($log['role']),
                 ));
 
                 $page->parse('activity_block', 'activity', true);
@@ -291,7 +291,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
             $page->setVar(array(
                 'RESULT'                => 'No results.',
                 'COUNTABLE_COUNT'       => $this->dataCount,
-                'REPORT_TITLE'          => $this->getReportTitle(),
+                'REPORT_TITLE'          => Scrub::text($this->getReportTitle()),
                 'previous_button_block' => '',
                 'next_button_block'     => '',
                 'page_number_block'     => ''
