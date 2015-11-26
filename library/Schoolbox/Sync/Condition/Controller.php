@@ -60,7 +60,11 @@ class Controller extends Base {
 
         $data = [
             'allNDSField'      => $ffactory->buildMap($rule->getRoleType()),
-            'meta'             => [ $newCondition->getId() => $meta ],
+            'meta'             => [
+                'condition' => [
+                    $newCondition->getId() => $meta
+                ]
+            ],
             'currentCondition' => $newCondition,
             'currentRule'      => [ 'id' => $rule->getId() ]
         ];
