@@ -58,7 +58,7 @@ class Controller extends Base {
         $paths = $reader->paths($user);
         $allUserField = array_combine($paths, $paths);
 
-        /* Spawn rule
+        /* Spawn Rule
          */
         $rule = Rule\Mapper::getInstance()->findById($params['ruleId']);
 
@@ -68,9 +68,11 @@ class Controller extends Base {
         $default = [
             'effectType' => AllUserField::EFFECT_TYPE_LITERAL,
             'userProperty' => 'lastname',
-            'arguments' => '[false]'
+            'arguments' => [null]
         ];
 
+        /* Add stub Effect for this Rule
+         */
         $newEffect = Effect\Mapper::getInstance()->createModel();
         $newEffect
             ->setRule($rule)
@@ -80,7 +82,14 @@ class Controller extends Base {
 
         Effect\Mapper::getInstance()->create($newEffect);
 
+        /* Decide which Effect Fragment to use
+         */
+        $allUserField = new AllUserField();
+
         $data = [
+            'allEffectFragments' => [
+                $newEffect->getId() => $allUserField->getEffectFragmentTemplate($default['effectType'], $default['userProperty'])
+            ],
             'allUserField'  => $allUserField,
             'meta'          => [ $newEffect->getId() => $meta ],
             'currentEffect' => $newEffect,
