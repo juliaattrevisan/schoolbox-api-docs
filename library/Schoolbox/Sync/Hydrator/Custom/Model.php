@@ -1,0 +1,144 @@
+<?php
+/**
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2015, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Sync\Hydrator\Custom;
+
+use Schoolbox\Sync;
+
+/**
+ * Mapper for custom hydrators
+ */
+class Model
+{
+    /**
+     * Primary key
+     *
+     * @var int
+     */
+    protected $id;
+
+    /**
+     * The class name for this custom hydrator
+     *
+     * @var string
+     */
+    protected $class;
+
+    /**
+     * The role type. One of the following constants:
+     * * `\Schoolbox\Role::STAFF`
+     * * `\Schoolbox\Role::STUDENT`
+     * * `\Schoolbox\Role::PARENT`.
+     *
+     * @var string
+     */
+    protected $roleType;
+
+    /**
+     * Is this hydrator enabled?
+     *
+     * @var bool
+     */
+    protected $enabled;
+
+    /**
+     * The order of execution of this custom hydrator. Lower numbers run first.
+     *
+     * @var int
+     */
+    protected $sequence;
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param  int $id
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClass()
+    {
+        return $this->class;
+    }
+
+    /**
+     * @param  string $class
+     * @return $this
+     */
+    public function setClass($class)
+    {
+        $this->class = $class;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoleType()
+    {
+        return $this->roleType;
+    }
+
+    /**
+     * @param  string $roleType
+     * @return $this
+     */
+    public function setRoleType($roleType)
+    {
+        $this->roleType = $roleType;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @param  bool $enabled
+     * @return $this
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSequence()
+    {
+        return $this->sequence;
+    }
+
+    /**
+     * @param  int $sequence
+     * @return $this
+     */
+    public function setSequence($sequence)
+    {
+        $this->sequence = $sequence;
+        return $this;
+    }
+}
