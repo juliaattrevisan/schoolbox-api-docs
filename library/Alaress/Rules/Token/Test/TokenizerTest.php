@@ -30,9 +30,11 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->tokenizer = new MockTokenizer([
-            'foo' => 'The foo',
-            'bar' => 'The bar',
-            'baz.bar' => "The baz's bar",
+            'foo'            => 'The foo',
+            'bar'            => 'The bar',
+            'baz.bar'        => "The baz's bar",
+            'single.multi'   => "The single's multi",
+            'alpha.bravo.id' => "The IDs of the alpha's bravos"
         ]);
 
         $this->tree = [
@@ -41,6 +43,21 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
             'baz' => [
                 'bar' => 'data3'
             ],
+            'single' => [
+                'multi' => [
+                    'first',
+                    'second',
+                    'third',
+                    'fourth'
+                ]
+            ],
+            'alpha' => [
+                'bravo'   => [ 'id' => 'B' ],
+                'charlie' => [ 'id' => 'C' ],
+                'delta'   => [ 'id' => 'D' ],
+                'echo'    => [ 'id' => 'E' ],
+                'foxtrot' => [ 'id' => 'F' ]
+            ]
         ];
     }
 
@@ -51,17 +68,36 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
     public function tokenParsingData()
     {
         return [
-            [ 'bar',                    'bar'                             ],
-            [ '{:bar}',                 'data2'                           ],
-            [ '{:bar}',                 'data2'                           ],
-            [ '{:baz.bar}',             'data3'                           ],
-            [ 'a{:foo}-{:bar}b',        'adata1-data2b'                   ],
-            [ 'a{:foo}-{:bam}b',        'adata1-b'                        ],
-            [ '{:baz.bar|first}',       'd'                               ],
-            [ 'a{:foo|first}',          'ad'                              ],
-            [ new Map('my{:foo}', [
-                'mydata1' => 'something else'
-            ]),                         'something else'                  ],
+            'literal'
+                => ['bar', 'bar'],
+            'simple'
+                => ['{:bar}', 'data2'],
+            'different simple'
+                => ['{:bar}', 'data2'],
+            'nested value'
+                => ['{:baz.bar}', 'data3'],
+            'multi-token'
+                => ['a{:foo}-{:bar}b', 'adata1-data2b'],
+            'missing token'
+                => ['a{:foo}-{:bam}b', 'adata1-b'],
+            'filter'
+                => ['{:baz.bar|first}', 'd'],
+            'concat filter'
+                => ['a{:foo|first}', 'ad'],
+            'mapped'
+                => [ new Map('my{:foo}', [ 'mydata1' => 'something else']), 'something else'],
+            'nested multi-value'
+                => ['{:single.multi}', ['first', 'second', 'third', 'fourth']],
+            'nested mutli-value extract'
+                => ['{:single.multi[1]}', 'second'],
+            'nested multi-value extract dot-notation'
+                => ['{:single.multi.2}', 'third'],
+            'nested multi-value subvalue'
+                => ['{:alpha.bravo.id}', ['B', 'C', 'D', 'E', 'F']],
+            'nested multi-value subvalue extract'
+                => ['{:alpha.bravo[2].id}', 'D'],
+            'nested multi-value subvalue extract dot-notation'
+                => ['{:alpha.bravo.4.id}', 'F'],
         ];
     }
 
@@ -73,7 +109,7 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
      */
     public function testTokenParsing($token, $expected)
     {
-        $actual = $this->tokenizer->parseTokens([], '', $token, $this->tree);
+        $actual = $this->tokenizer->parseTokens([], 'fizz', $token, $this->tree);
 
         $this->assertEquals($expected, $actual);
     }
