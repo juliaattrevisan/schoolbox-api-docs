@@ -142,6 +142,11 @@ class Factory
             $metas['effect'][$effectId] = $this->getMeta();
         }
 
+        /* TODO: Replace with UserMapper lookup
+         * This is just some hardcoded values for now
+         */
+        $allUserField = new \Schoolbox\Sync\Effect\AllUserField();
+
         /* If it was one of the known cases, return a well-formed structure
          * Otherwise it would have returned empty array earlier
          */
@@ -151,6 +156,7 @@ class Factory
             'rulesetId'      => $this->getType(),
             'ruleset'        => [ 'rules' => $this->findRuleset() ],
             'allNDSField'    => $ffactory->buildMap($this->getType()),
+            'allUserField'   => $allUserField->getAllFields(),
             'meta'           => $metas
         ];
     }
