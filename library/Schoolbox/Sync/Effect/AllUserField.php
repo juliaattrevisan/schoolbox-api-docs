@@ -46,6 +46,10 @@ class AllUserField {
         return $this->allFields;
     }
 
+    public function getType($field) {
+        return $this->allFields[$field];
+    }
+
     public function isBoolean($field) {
         if ($this->allFields[$field] == self::TYPE_BOOLEAN) {
             return true;

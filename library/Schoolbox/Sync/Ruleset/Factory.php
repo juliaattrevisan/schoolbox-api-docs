@@ -128,8 +128,16 @@ class Factory
                 return [];
         }
 
+        /* Load Ruleset
+         */
+        $ruleset = $this->findRuleset();
+
+        /* Load NDS Fields to chooze from
+         */
         $ffactory = new FieldFactory();
 
+        /* Compile metadata about Conditions and Effects, for presentation
+         */
         $metas = [];
 
         $ruleIds = Rule\Mapper::getInstance()->findIdsByColumnList([ 'role_type' => $this->getType() ]);
@@ -142,10 +150,22 @@ class Factory
             $metas['effect'][$effectId] = $this->getMeta();
         }
 
+        /* Determine which Effect Fragments to load initially
+         */
+        $allEffects = [
+            'fragments' => []
+        ];
+
         /* TODO: Replace with UserMapper lookup
          * This is just some hardcoded values for now
          */
         $allUserField = new \Schoolbox\Sync\Effect\AllUserField();
+
+        foreach ($ruleset as $currentRule) {
+            foreach ($currentRule->getEffects() as $currentEffect) {
+                $allEffects['fragments'][$currentEffect->getId()] = $allUserField->getType($currentEffect->getUserProperty());
+            }
+        }
 
         /* If it was one of the known cases, return a well-formed structure
          * Otherwise it would have returned empty array earlier
@@ -154,13 +174,13 @@ class Factory
             'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
             'allNavigation'  => $allNavigation->getAllNodes(),
             'rulesetId'      => $this->getType(),
-            'ruleset'        => [ 'rules' => $this->findRuleset() ],
+            'ruleset'        => [ 'rules' => $ruleset ],
             'allNDSField'    => $ffactory->buildMap($this->getType()),
             'allUserField'   => $allUserField->getAllFields(),
+            'allEffects'     => $allEffects,
             'meta'           => $metas
         ];
     }
-
 
     /**
      * Load a Ruleset based on Role Type student|parent|staff
