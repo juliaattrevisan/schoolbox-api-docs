@@ -14,7 +14,9 @@ use Alaress\Web\Controller\Base;
 use \Schoolbox\Sync\Navigator\Navigator;
 use \Schoolbox\Sync\Navigator\Node;
 use \Schoolbox\Sync\Condition;
+use \Schoolbox\Sync\Effect;
 use \Schoolbox;
+
 
 class Controller extends Base {
 
@@ -79,6 +81,7 @@ class Controller extends Base {
 
         foreach ($postData['rule'] as $ruleId => $ruleData) {
             $this->updateConditions($ruleId, $ruleData['condition']);
+            $this->updateEffects($ruleId, $ruleData['effect']);
         }
 
         $this->getResponse()->redirect->to("/adminv2/sync/$roleType");
@@ -126,6 +129,46 @@ class Controller extends Base {
             } catch (\PDOException $e) {
                 // clean up after yourself
                 $mapper->deleteByColumn('id', $conditionId);
+            }
+        }
+
+        // housekeeping - make sure there aren't any remnant invalid conditions flying around
+        $mapper->deleteByColumnList([
+            'rule_id'   => $ruleId,
+            'arguments' => json_encode(null)
+        ]);
+    }
+
+    /**
+     * @param int $ruleId
+     * @param array $effects
+     */
+    protected function updateEffects($ruleId, $effects)
+    {
+        // TODO DI
+        $mapper = Effect\Mapper::getInstance();
+
+        foreach ($effects as $effectId => $effectData) {
+            $effectType = $effectData['type'];
+
+            // NOT WORKING
+            $effectArgs = (array)$effectData['arguments'];
+
+            // ensure this is in the right order
+            ksort($effectArgs);
+
+            $effect = [
+                'id'             => $effectId,
+                'rule_id'        => $ruleId,
+                'effect_type_id' => $effectType,
+                'arguments'      => json_encode($effectArgs)
+            ];
+
+            try {
+                $mapper->save($mapper->hydrate($effect));
+            } catch (\PDOException $e) {
+                // clean up after yourself
+                $mapper->deleteByColumn('id', $effectId);
             }
         }
 

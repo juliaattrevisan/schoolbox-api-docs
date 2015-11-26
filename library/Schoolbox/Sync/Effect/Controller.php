@@ -61,10 +61,21 @@ class Controller extends Base {
          */
         $rule = Rule\Mapper::getInstance()->findById($params['ruleId']);
 
-        /* TODO: Manufacture and save this properly
+        /* TODO: Remove Hardcoding
+         * Assume Literal Effect Type to start with
          */
+        $default = [
+            'effectType' => 2,
+            'userProperty' => 'lastname',
+        ];
+
         $newEffect = Effect\Mapper::getInstance()->createModel();
-        $newEffect->setId(rand(1,1000));
+        $newEffect
+            ->setRule($rule)
+            ->setUserProperty($default['userProperty'])
+            ->setEffectType(Effect\Type\Mapper::getInstance()->findById($default['effectType']));
+
+        Effect\Mapper::getInstance()->create($newEffect);
 
         $data = [
             'allUserField'  => $allUserField,
