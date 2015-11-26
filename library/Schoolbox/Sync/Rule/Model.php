@@ -31,6 +31,9 @@ class Model
     /** @var string */
     protected $name;
 
+    /** @var string */
+    protected $description;
+
     /** @var Collection|Sync\Condition\Model[] */
     protected $conditions;
 
@@ -187,4 +190,21 @@ class Model
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param  string $description
+     * @return static
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+        return $this;
+    }
 }
