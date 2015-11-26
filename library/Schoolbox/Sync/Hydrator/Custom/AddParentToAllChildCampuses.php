@@ -55,9 +55,12 @@ class AddParentToAllChildCampuses implements HydratorInterface
                     continue;
                 }
                 foreach ($childUser->getCampusCollection() as $campus) {
-                    $campusCopy = new Campus();
-                    $campusCopy->setId($campus->getId());
-                    $previous->getCampusCollection()->add($campusCopy);
+                    $campusId = $campus->getId();
+                    if (empty($previous->getCampusCollection()->filterBy('id', $campusId))) {
+                        $campusCopy = new Campus();
+                        $campusCopy->setId($campusId);
+                        $previous->getCampusCollection()->add($campusCopy);
+                    }
                 }
             }
         }
