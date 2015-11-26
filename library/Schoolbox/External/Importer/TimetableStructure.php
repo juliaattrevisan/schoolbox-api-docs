@@ -145,8 +145,8 @@ class TimetableStructure extends AbstractImporter
                 ->setCycle($result[$key]['cycle'])
                 ->setDay($day)
                 ->setTitle($title)
-                ->setStart(new Alaress_Date_Format($row['Period Start'], Alaress_Date_Format::DATABASE_TIME_FORMAT))
-                ->setFinish(new Alaress_Date_Format($row['Period Finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT))
+                ->setStart(new Alaress_Date_Format($row['Period Start'], 'H:i'))
+                ->setFinish(new Alaress_Date_Format($row['Period Finish'], 'H:i'))
                 ->setUsable(true);
             if (!isset($result[$key]['periods'][$day])) {
                 $result[$key]['periods'][$day] = new Collection();
