@@ -17,7 +17,7 @@
                 Then
             </div>
             <div class="small-11 medium-5 large-5 columns">
-                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][arguments][0]" data-effect-userfield="{{ currentEffect.id }}" >
+                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][userProperty]" data-effect-userfield="{{ currentEffect.id }}" >
                     {% for currentUserKey, currentUserField in allUserField %}
                         <option value="{{ currentUserKey }}" {% if currentUserKey == currentEffect.getUserProperty() %}selected="selected"{% endif %}>
                             {{ currentUserKey }}
@@ -26,7 +26,7 @@
                 </select>
             </div>
             <div class="small-2 medium-2 large-2 columns">
-                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][arguments][2]" data-effect-mappingtype="{{ currentEffect.id }}">
+                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][type]" data-effect-mappingtype="{{ currentEffect.id }}">
                     <option {{ meta.effect[currentEffect.id].disabled }} selected="selected">Please Select</option>
 
                     {% for currentEffectMappingType in allEffectMappingTypes %}

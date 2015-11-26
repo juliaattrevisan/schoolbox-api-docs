@@ -149,19 +149,28 @@ class Controller extends Base {
         $mapper = Effect\Mapper::getInstance();
 
         foreach ($effects as $effectId => $effectData) {
-            $effectType = $effectData['type'];
-
-            // NOT WORKING
             $effectArgs = (array)$effectData['arguments'];
 
             // ensure this is in the right order
             ksort($effectArgs);
 
+            /* Figure out what type it was, and cast accordingly
+             */
+            $allFields = new \Schoolbox\Sync\Effect\AllUserField();
+
+            if ($allFields->isBoolean($effectData['userProperty'])) {
+                $arg = [(bool)$effectArgs[0]];
+            }
+            else {
+                $arg = $effectArgs;
+            }
+
             $effect = [
                 'id'             => $effectId,
                 'rule_id'        => $ruleId,
-                'effect_type_id' => $effectType,
-                'arguments'      => json_encode($effectArgs)
+                'effect_type_id' => $effectData['type'],
+                'user_property'  => $effectData['userProperty'],
+                'arguments'      => json_encode($arg)
             ];
 
             try {

@@ -67,12 +67,14 @@ class Controller extends Base {
         $default = [
             'effectType' => 2,
             'userProperty' => 'lastname',
+            'arguments' => '[false]'
         ];
 
         $newEffect = Effect\Mapper::getInstance()->createModel();
         $newEffect
             ->setRule($rule)
             ->setUserProperty($default['userProperty'])
+            ->setArguments($default['arguments'])
             ->setEffectType(Effect\Type\Mapper::getInstance()->findById($default['effectType']));
 
         Effect\Mapper::getInstance()->create($newEffect);
