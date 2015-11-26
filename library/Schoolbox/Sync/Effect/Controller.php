@@ -68,7 +68,7 @@ class Controller extends Base {
         $default = [
             'effectType' => AllUserField::EFFECT_TYPE_LITERAL,
             'userProperty' => 'lastname',
-            'arguments' => [null]
+            'arguments' => [false]
         ];
 
         /* Add stub Effect for this Rule
