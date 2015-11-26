@@ -74,7 +74,7 @@ class Ruleset extends TokenizedRuleset
 
                     // Apply tokenization to returned value. The value returned should be a primitive,
                     // which will then by hydrated into the model by the mapper
-                    $value   = $this->tokenizer->parseTokens([], $property, $value, $input);
+                    $value   = $this->tokenizer->parseToken($input, $value);
                     $value   = trim($value);
                     $mapping = $map->getOffset($property);
 

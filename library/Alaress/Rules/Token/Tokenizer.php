@@ -92,15 +92,13 @@ abstract class Tokenizer
 
 
     /**
-     * TODO MAKE PROTECTED: accessor methods are populateSettings() and parseSimpleToken()
-     *
      * @param array                  $settings      (If in doubt, leave this empty)
      * @param string                 $field         Only means anything if you passed anything through $settings and $fieldValue is an array.
      * @param string|array|Construct $fieldValue    A string or Construct (or array structure thereof) that will determine how to render the output. Typically looks "something{:like|this}".
      * @param mixed                  $dataset       This is the dataset from which values will be taken and jammed into the tokenized string. Typically an array- or object-based hierarchy.
      * @return string|array                         The rendered string (or array thereof if the dataset returned an array for a particular token).
      */
-    public function parseTokens($settings, $field, $fieldValue, $dataset)
+    protected function parseTokens($settings, $field, $fieldValue, $dataset)
     {
         // if field value is an array, dig into it and recursively parse
         if (is_array($fieldValue)) {
