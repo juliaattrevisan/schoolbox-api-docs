@@ -66,7 +66,7 @@ class Controller extends Base {
          * Assume Literal Effect Type to start with
          */
         $default = [
-            'effectType' => 2,
+            'effectType' => AllUserField::EFFECT_TYPE_LITERAL,
             'userProperty' => 'lastname',
             'arguments' => '[false]'
         ];
