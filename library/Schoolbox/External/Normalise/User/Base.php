@@ -127,7 +127,7 @@ abstract class Base {
     /**
      * A collection of Common\Campus instances
      *
-     * @var \Schoolbox\Collection
+     * @var \Schoolbox\Collection|Common\Campus[]
      */
     protected $campus = null;
 
@@ -186,7 +186,7 @@ abstract class Base {
     /**
      * Set campus collection
      *
-     * @param Collection $campus
+     * @param Collection|Common\Campus[] $campus
      * @return $this
      */
     public function setCampus($campus)
@@ -198,7 +198,7 @@ abstract class Base {
     /**
      * Get campus collection
      *
-     * @return Collection
+     * @return Collection|Common\Campus[]
      */
     public function getCampus()
     {
