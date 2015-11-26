@@ -98,9 +98,10 @@ class Timetable extends AbstractImporter
      */
     protected function parse()
     {
-        $result = [];
+        $result               = [];
         $timetableCampusCache = [];
         $timetablePeriodCache = [];
+        $teacherCache         = [];
         foreach ($this->reader as $i => $row) {
             $this->log->info("Parsing row $i...");
             $key = $row['Class Code'];
@@ -180,12 +181,21 @@ class Timetable extends AbstractImporter
                 }
             }
 
-            try {
-                $teacher = $this->userMapper->findOneByColumn('synergy_id', $row['Teacher Code']);
-            } catch (Mapper\Exception $e) {
-                $this->log->warning(sprintf('Teacher code "%s" not found: skipping!', $row['Teacher Code']));
-                continue;
+            // Load teacher from DB or cache
+            $teacherCode = $row['Teacher Code'];
+            /** @var \Schoolbox\User $teacher */
+            if (isset($teacherCache[$teacherCode])) {
+                $teacher = $teacherCache[$teacherCode];
+            } else {
+                try {
+                    $teacher = $this->userMapper->findOneByColumn('synergy_id', $teacherCode);
+                } catch (Mapper\Exception $e) {
+                    $this->log->warning(sprintf('Teacher code "%s" not found: skipping!', $teacherCode));
+                    continue;
+                }
             }
+
+            // Add the class period for this item
             $classPeriod = new ClassPeriod();
             $classPeriod
                 ->setClass($result[$key]['class'])
@@ -196,8 +206,8 @@ class Timetable extends AbstractImporter
             $this->log->info(
                 sprintf(
                     'Period "%s", day "%s" has been parsed',
-                    $row['Period Title'],
-                    $row['Period Day']
+                    $periodTitle,
+                    $periodDay
                 )
             );
         }
