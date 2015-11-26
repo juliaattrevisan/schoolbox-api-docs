@@ -85,7 +85,7 @@ abstract class Tokenizer
      * @param string|Construct $tokenString     A string or Construct that will determine how to render the output. Typically looks like "{:this}".
      * @return array|string                     The rendered string (or array thereof if the dataset returned an array for a particular token).
      */
-    public function parseSimpleToken($dataSet, $tokenString)
+    public function parseToken($dataSet, $tokenString)
     {
         return $this->parseTokens([], '_', $tokenString, $dataSet);
     }

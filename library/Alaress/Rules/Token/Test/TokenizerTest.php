@@ -122,7 +122,7 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
      */
     public function testTokenParsing($token, $expected)
     {
-        $actual = $this->tokenizer->parseSimpleToken($this->tree, $token);
+        $actual = $this->tokenizer->parseToken($this->tree, $token);
 
         $this->assertEquals($expected, $actual);
     }
