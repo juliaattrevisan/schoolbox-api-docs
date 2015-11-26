@@ -155,4 +155,20 @@ class Controller extends Base {
             'format'   => 'nochrome'
         ]);
     }
+
+    /**
+     * Delete a Effect asynchronously
+     *
+     * @return bool
+     */
+    public function delete()
+    {
+        $effectId = $this->getRequest()->post->get('effectId');
+        $deleteCount = Effect\Mapper::getInstance()->deleteByColumn('id', $effectId);
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => $deleteCount > 0
+        ]);
+    }
 }

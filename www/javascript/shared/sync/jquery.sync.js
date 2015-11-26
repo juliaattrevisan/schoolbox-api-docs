@@ -28,6 +28,7 @@
         initEffectCreate();
         initEffectModifyLock();
         initEffectMappingTypeChange();
+        initEffectDelete();
 
         /**
          * Init
@@ -59,6 +60,11 @@
                 effect: {
                     change: {
                         url: '/adminv2/sync/effect/change'
+                    },
+                    delete: {
+                        url: '/adminv2/sync/effect/delete',
+                        confirm: 'Are you sure you want to delete this Effect?',
+                        fail: 'Could not delete Effect'
                     }
                 },
 
@@ -319,6 +325,49 @@
                  */
                 $.get(config.effect.change.url, data, function(responseText) {
                     $('[data-effect-fragment='+effectId+']').html(responseText);
+                });
+            });
+        }
+
+        /**
+         * Delete a Condition
+         */
+        function initEffectDelete() {
+            $(config.element).on('click', '[data-effect-delete]', function(event) {
+                event.preventDefault();
+
+                var effectId = $(this).attr('data-effect-delete');
+                var label = $('#effect-' + effectId + '-status');
+
+                $(this).confirmDialog({
+                    text: config.effect.delete.confirm,
+                    confirmEvent: function() {
+
+                        /* Activate indicator label
+                         */
+                        label.labelActivate();
+
+                        /* Delete asynchronously if successful; ignore if unsuccessful
+                         */
+                        $.post(config.effect.delete.url, { effectId: effectId }, function(responseText) {
+                            if (responseText == config.success) {
+                                $('#effect-' + effectId).remove();
+
+                                /* Indicator label gets removed with the condition so we
+                                 * don't need to bother showing animation
+                                 */
+                            }
+                            else {
+
+                                /* Show that something failed
+                                 */
+                                label.labelTimeout({
+                                    text: config.effect.delete.fail,
+                                    css: 'alert'
+                                });
+                            }
+                        });
+                    }
                 });
             });
         }

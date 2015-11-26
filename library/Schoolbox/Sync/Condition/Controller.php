@@ -85,8 +85,6 @@ class Controller extends Base {
     /**
      * Delete a Condition asynchronously
      *
-     * Return true if deletion was successful
-     *
      * @return bool
      */
     public function delete()
