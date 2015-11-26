@@ -74,16 +74,13 @@ class Reader implements \Iterator {
      * @throws \RuntimeException if file isn't found or readable
      */
     public function __construct($filename) {
-        if (!is_readable($filename)) {
-            // maybe it's a resource
-            if (is_resource($filename)) {
-                $this->filename = null;
-                $this->fp       = $filename;
-            } else {
-                throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
-            }
-        } else {
+        if (is_resource($filename)) {
+            $this->filename = null;
+            $this->fp       = $filename;
+        } elseif (is_readable($filename)) {
             $this->filename = $filename;
+        } else {
+            throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
         }
     }
 
