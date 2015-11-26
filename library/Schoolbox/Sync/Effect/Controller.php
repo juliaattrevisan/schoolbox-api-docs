@@ -90,7 +90,7 @@ class Controller extends Base {
             'allEffectFragments' => [
                 $newEffect->getId() => $allUserField->getEffectFragmentTemplate($default['effectType'], $default['userProperty'])
             ],
-            'allUserField'  => $allUserField,
+            'allUserField'  => $allUserField->getAllFields(),
             'meta'          => [ $newEffect->getId() => $meta ],
             'currentEffect' => $newEffect,
             'currentRule'   => [ 'id' => $rule->getId() ]
