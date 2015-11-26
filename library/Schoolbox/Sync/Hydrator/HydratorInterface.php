@@ -15,6 +15,20 @@ use Schoolbox\User as InternalUser;
 interface HydratorInterface
 {
     /**
+     * Gets the publicly visible name of this hydrator.
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Gets the publicly visible description of this hydrator.
+     *
+     * @return string
+     */
+    public function getDescription();
+
+    /**
      * Hydrates an internal user,
      *
      * @param ExternalUser      $input

@@ -202,4 +202,23 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
         return new Rule($effect, $negate);
     }
 
+    /**
+     * Rulesets have no relevant publicly visible name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return '';
+    }
+
+    /**
+     * Rulesets have no relevant publicly visible description.
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return '';
+    }
 }

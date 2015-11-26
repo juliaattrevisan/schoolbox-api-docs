@@ -66,4 +66,20 @@ class AddParentToAllChildCampuses implements HydratorInterface
         }
         return $previous;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getName()
+    {
+        return 'Add Parent to All Children\'s Campuses';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDescription()
+    {
+        return 'This custom hydrator adds each parent to all the campuses that their children belong to.';
+    }
 }
