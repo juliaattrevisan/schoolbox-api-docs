@@ -19,11 +19,12 @@ if (isset($options['structure'])) {
 } elseif (isset($options['enrolment'])) {
     $translator = new Synchronise_External_Lahore_Translator_Enrolment($reader);
 } else {
+    $basename = basename(__FILE__);
     echo <<<HELP
 Extracts a Schoolbox CSV import from an ASC Timetables XML export.
 Outputs extract to stdout.
 
-Usage: extract.php [--structure] [--timetable] [--enrolment] FILE
+Usage: $basename [--structure] [--timetable] [--enrolment] FILE
     --structure: Extracts timetable structure data from FILE.
     --timetable: Extracts timetable data from FILE.
     --enrolment: Extracts enrolment data from FILE.

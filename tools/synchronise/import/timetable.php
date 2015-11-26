@@ -56,10 +56,11 @@ $getReader = function ($file, Logger $logger) {
 
 // Output help
 if (!isset($options['structure']) && !isset($options['timetable']) && !isset($options['enrolment'])) {
+    $basename = basename(__FILE__);
     echo <<<HELP
 Imports timetable into the Schoolbox user connector.
 
-Usage: timetable.php [-v] [--perform-update]
+Usage: $basename [-v] [--perform-update]
        [--structure=STRUCTURE_FILE]
        [--timetable=TIMETABLE_FILE]
        [--enrolment=ENROLMENT_FILE]
