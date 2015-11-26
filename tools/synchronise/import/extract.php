@@ -23,7 +23,7 @@ if (isset($options['structure'])) {
 Extracts a Schoolbox CSV import from an ASC Timetables XML export.
 Outputs extract to stdout.
 
-Usage: .php [--structure] [--timetable] [--enrolment] FILE
+Usage: extract.php [--structure] [--timetable] [--enrolment] FILE
     --structure: Extracts timetable structure data from FILE.
     --timetable: Extracts timetable data from FILE.
     --enrolment: Extracts enrolment data from FILE.
