@@ -119,26 +119,7 @@ class Controller extends Base {
          * This is just some hardcoded values for now
          */
         $allUserField = new \Schoolbox\Sync\Effect\AllUserField();
-
-        $template = '';
-
-        /* TODO: Replace with something properly considered
-         * These were purely for trying things out
-         */
-        if ($mappingType[$_GET['mappingType']] == 'equals') {
-            if ($allUserField->isBoolean($_GET['userField'])) {
-                $template = '@syncEffect/boolean.twig';
-            }
-            else if ($allUserField->isLookup($_GET['userField'])) {
-                $template = '@syncEffect/lookup.twig';
-            }
-            else if ($allUserField->isString($_GET['userField'])) {
-                $template = '@syncEffect/varchar.twig';
-            }
-        }
-        else {
-            $template = '@syncEffect/map.twig';
-        }
+        $template = $allUserField->getEffectFragmentTemplate($mappingType[$_GET['mappingType']], $_GET['userField']);
 
         $this->getResponse()->content->set([
             'template' => $template,

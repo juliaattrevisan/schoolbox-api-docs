@@ -50,6 +50,31 @@ class AllUserField {
         return $this->allFields[$field];
     }
 
+    /**
+     * Determine which Effect Fragment to load for this field
+     * (boolean, lookup, etc)
+     *
+     * @param $mappingType
+     * @param $userField
+     * @return string
+     */
+    public function getEffectFragmentTemplate($mappingType, $userField) {
+        if ($mappingType == 'equals') {
+            if ($this->isBoolean($userField)) {
+                return '@syncEffect/boolean.twig';
+            }
+            else if ($this->isLookup($userField)) {
+                return '@syncEffect/lookup.twig';
+            }
+            else if ($this->isString($userField)) {
+                return '@syncEffect/varchar.twig';
+            }
+        }
+
+        return '@syncEffect/map.twig';
+    }
+
+
     public function isBoolean($field) {
         if ($this->allFields[$field] == self::TYPE_BOOLEAN) {
             return true;
