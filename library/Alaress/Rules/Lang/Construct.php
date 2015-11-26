@@ -38,7 +38,7 @@ interface Construct
     /**
      * Apply this construct to the given input and return the result
      *
-     * @param string $inputValue
+     * @param array $inputValue will be an array of strings
      * @return mixed
      */
     public function apply($inputValue);
