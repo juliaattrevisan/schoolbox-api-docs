@@ -91,9 +91,15 @@ class Controller extends Base {
                 $newEffect->getId() => $allUserField->getEffectFragmentTemplate($default['effectType'], $default['userProperty'])
             ],
             'allUserField'  => $allUserField->getAllFields(),
-            'meta'          => [ $newEffect->getId() => $meta ],
+            'meta'          => [
+                'effect' => [
+                    $newEffect->getId() => $meta
+                ]
+            ],
             'currentEffect' => $newEffect,
-            'currentRule'   => [ 'id' => $rule->getId() ]
+            'currentRule'   => [
+                'id' => $rule->getId()
+            ]
         ];
 
         $this->getResponse()->content->set([
