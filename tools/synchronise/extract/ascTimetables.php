@@ -13,11 +13,11 @@ if (!$reader->open($file)) {
 }
 
 if (isset($options['structure'])) {
-    $translator = new Synchronise_External_Lahore_Translator_Structure($reader);
+    $translator = new External_AscTimetables_Translator_Structure($reader);
 } elseif (isset($options['timetable'])) {
-    $translator = new Synchronise_External_Lahore_Translator_Timetable($reader);
+    $translator = new External_AscTimetables_Translator_Timetable($reader);
 } elseif (isset($options['enrolment'])) {
-    $translator = new Synchronise_External_Lahore_Translator_Enrolment($reader);
+    $translator = new External_AscTimetables_Translator_Enrolment($reader);
 } else {
     $basename = basename(__FILE__);
     echo <<<HELP

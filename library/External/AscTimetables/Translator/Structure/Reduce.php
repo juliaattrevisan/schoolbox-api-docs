@@ -1,13 +1,13 @@
 <?php
 /**
- * Reduce function - smooshes results from `Synchronise_External_Lahore_Translator_Structure_Map`
+ * Reduce function - smooshes results from `External_AscTimetables_Translator_Structure_Map`
  * into a single result.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_External_Lahore_Translator_Structure_Reduce
+class External_AscTimetables_Translator_Structure_Reduce
 {
     /**
      * @param array $carry

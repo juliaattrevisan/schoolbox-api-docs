@@ -7,7 +7,7 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Synchronise_External_Lahore_Translator_Enrolment extends Synchronise_External_Lahore_Translator_Base
+class External_AscTimetables_Translator_Enrolment extends External_AscTimetables_Translator_Base
 {
     /**
      * Translates the input XML file to a timetable structure.
@@ -16,10 +16,10 @@ class Synchronise_External_Lahore_Translator_Enrolment extends Synchronise_Exter
      */
     public function translateXmlToArray()
     {
-        $reducer = new Synchronise_External_Lahore_Translator_Enrolment_Reduce();
+        $reducer = new External_AscTimetables_Translator_Enrolment_Reduce();
         $result  = [];
         foreach (
-            new Synchronise_External_Lahore_Translator_Enrolment_Map(
+            new External_AscTimetables_Translator_Enrolment_Map(
                 new Alaress\Xml\Filter\Path(
                     $this->iterator,
                     [
