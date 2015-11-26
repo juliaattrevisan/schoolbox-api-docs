@@ -78,8 +78,9 @@ class Synchronise_External_Lahore_Translator_Timetable extends Synchronise_Exter
                     }
                     $subject       = $result['subjects'][$subjectId];
                     $resultSubject = [
-                        'Class Code'  => $subject['code'],
-                        'Class Title' => $subject['name'],
+                        'Class Code'        => $subject['code'],
+                        'Class Title'       => $subject['name'],
+                        'Class Description' => '',
                     ];
 
                     // Probably don't need classes at all, but if I do it's to get teachers and rooms
