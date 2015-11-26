@@ -19,6 +19,10 @@ use Alaress\ObjectReader;
 class Controller extends Base {
     const EFFECT_SKIP = 1;
 
+    const TYPE_BOOLEAN = 1;
+    const TYPE_LOOKUP = 2;
+    const TYPE_STRING = 3;
+
     /**
      * Forge a data structure to feed into twig template,
      * so that new Effects can be injected directly into
@@ -102,10 +106,27 @@ class Controller extends Base {
             1 => 'maps'
         ];
 
-        $userField = [
-            'username' => 'boolean',
-            'firstname' => 'lookup',
-            'surname' => 'varchar'
+        /* Manufacture a list of Schoolbox User fields to chooze from
+         * TODO: Connect up to UserMapper to determine type
+         * TODO: This should contain a human-friendly version
+         */
+        $allFields = [
+            'email' => self::TYPE_STRING,
+            'altEmail' => self::TYPE_STRING,
+            'webmail' => self::TYPE_BOOLEAN,
+            'eportfolioEnable' => self::TYPE_BOOLEAN,
+            'externalId' => self::TYPE_STRING,
+            'firstname' => self::TYPE_STRING,
+            'lastname' => self::TYPE_STRING,
+            'localEmail' => self::TYPE_BOOLEAN,
+            'residentialHouse' => self::TYPE_LOOKUP,
+            'schoolHouse' => self::TYPE_LOOKUP,
+            'title' => self::TYPE_LOOKUP,
+            'useInternalMail' => self::TYPE_BOOLEAN,
+            'username' => self::TYPE_STRING,
+            'year' => self::TYPE_STRING,
+            'enabled' =>  self::TYPE_BOOLEAN,
+            'boardingStatus' => self::TYPE_STRING,
         ];
 
         $template = '';
@@ -114,13 +135,13 @@ class Controller extends Base {
          * These were purely for trying things out
          */
         if ($mappingType[$_GET['mappingType']] == 'equals') {
-            if ($userField[$_GET['userField']] == 'boolean') {
+            if ($allFields[$_GET['userField']] == self::TYPE_BOOLEAN) {
                 $template = '@syncEffect/boolean.twig';
             }
-            else if ($userField[$_GET['userField']] == 'lookup') {
+            else if ($allFields[$_GET['userField']] == self::TYPE_LOOKUP) {
                 $template = '@syncEffect/lookup.twig';
             }
-            else if ($userField[$_GET['userField']] == 'varchar') {
+            else if ($allFields[$_GET['userField']] == self::TYPE_STRING) {
                 $template = '@syncEffect/varchar.twig';
             }
         }
