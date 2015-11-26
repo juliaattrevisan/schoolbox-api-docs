@@ -21,7 +21,7 @@ abstract class Tokenizer
         {:                              # token start
             (                           # $1
                 [a-z_]                  # must start with alpha or underscore
-                [a-z_0-9\.\[\]]*        # only alphanum, period or squarebrackets allowed
+                [a-z_0-9\.\[\]]*        # only alphanumeric, underscore, period or square brackets allowed
             )                           # /$1
             (                           # $2
                 (?:
@@ -81,7 +81,8 @@ abstract class Tokenizer
     /**
      * Process a token string with the given dataset
      *
-     * @param mixed            $dataSet         This is the dataset from which values will be taken and jammed into the tokenized string. Typically an array- or object-based hierarchy.
+     * @param mixed            $dataSet         This is the dataset from which values will be taken and jammed into the tokenized string.
+     *                                          Typically an array- or object-based hierarchy.
      * @param string|Construct $tokenString     A string or Construct that will determine how to render the output. Typically looks like "{:this}".
      * @return array|string                     The rendered string (or array thereof if the dataset returned an array for a particular token).
      */
@@ -94,8 +95,10 @@ abstract class Tokenizer
     /**
      * @param array                  $settings      (If in doubt, leave this empty)
      * @param string                 $field         Only means anything if you passed anything through $settings and $fieldValue is an array.
-     * @param string|array|Construct $fieldValue    A string or Construct (or array structure thereof) that will determine how to render the output. Typically looks "something{:like|this}".
-     * @param mixed                  $dataset       This is the dataset from which values will be taken and jammed into the tokenized string. Typically an array- or object-based hierarchy.
+     * @param string|array|Construct $fieldValue    A string or Construct (or array structure thereof) that will determine how to render the output.
+     *                                              Typically looks "something{:like|this}".
+     * @param mixed                  $dataset       This is the dataset from which values will be taken and jammed into the tokenized string.
+     *                                              Typically an array- or object-based hierarchy.
      * @return string|array                         The rendered string (or array thereof if the dataset returned an array for a particular token).
      */
     protected function parseTokens($settings, $field, $fieldValue, $dataset)
@@ -109,7 +112,8 @@ abstract class Tokenizer
             return $settings[$field];
         }
 
-        // most of the time $fieldValue will just be a string, but if it's a Construct, split that into its own variable for safe keeping (we'll use it later)
+        // most of the time $fieldValue will just be a string, but if it's a Construct,
+        // split that into its own variable for safe keeping (we'll use it later)
         if ($fieldValue instanceof Construct) {
             // rescue the construct before we lose it
             $construct  = $fieldValue;
@@ -138,7 +142,8 @@ abstract class Tokenizer
                 $substitution = $tokenMatches[0][$i];
                 $filterString = $tokenMatches[2][$i];
 
-                // for the currently iterated token key, get the corresponding value(s) from the given $input via the set of Tokens registered against this Tokenizer
+                // for the currently iterated token key, get the corresponding value(s) from
+                // the given $input via the set of Tokens registered against this Tokenizer
                 $replacements = $this->renderToken($tokenKey, $dataset, $settings);
 
                 // apply any filters by mutating $replacement
