@@ -52,11 +52,11 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
                 ]
             ],
             'alpha' => [
-                'bravo'   => [ 'id' => 'B' ],
-                'charlie' => [ 'id' => 'C' ],
-                'delta'   => [ 'id' => 'D' ],
-                'echo'    => [ 'id' => 'E' ],
-                'foxtrot' => [ 'id' => 'F' ]
+                [ 'id' => 'bravo' ],
+                [ 'id' => 'charlie' ],
+                [ 'id' => 'delta' ],
+                [ 'id' => 'echo' ],
+                [ 'id' => 'foxtrot' ]
             ]
         ];
     }
@@ -88,16 +88,29 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
                 => [ new Map('my{:foo}', [ 'mydata1' => 'something else']), 'something else'],
             'nested multi-value'
                 => ['{:single.multi}', ['first', 'second', 'third', 'fourth']],
+            'nested multi-value filter'
+                => ['{:single.multi|first}', ['f', 's', 't', 'f']],
+            'nested multi-value x multi-value'
+                => ['{:single.multi|first}y{:single.multi}', [
+                        'fyfirst','fysecond','fythird','fyfourth',
+                        'syfirst','sysecond','sythird','syfourth',
+                        'tyfirst','tysecond','tythird','tyfourth',
+                        'fyfirst','fysecond','fythird','fyfourth',
+                    ]],
             'nested mutli-value extract'
                 => ['{:single.multi[1]}', 'second'],
             'nested multi-value extract dot-notation'
                 => ['{:single.multi.2}', 'third'],
             'nested multi-value subvalue'
-                => ['{:alpha.bravo.id}', ['B', 'C', 'D', 'E', 'F']],
+                => ['{:alpha.id}', ['bravo', 'charlie', 'delta', 'echo', 'foxtrot']],
+            'nested multi-value subvalue filter'
+                => ['{:alpha.id|first}', ['b', 'c', 'd', 'e', 'f']],
             'nested multi-value subvalue extract'
-                => ['{:alpha.bravo[2].id}', 'D'],
+                => ['{:alpha[2].id}', 'delta'],
+            'nested multi-value subvalue extract filter'
+                => ['{:alpha[2].id|first}', 'd'],
             'nested multi-value subvalue extract dot-notation'
-                => ['{:alpha.bravo.4.id}', 'F'],
+                => ['{:alpha.4.id}', 'foxtrot'],
         ];
     }
 
