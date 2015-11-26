@@ -58,7 +58,7 @@ $getReader = function ($file, Logger $logger) {
 if (!isset($options['structure']) && !isset($options['timetable']) && !isset($options['enrolment'])) {
     $basename = basename(__FILE__);
     echo <<<HELP
-Imports timetable into the Schoolbox user connector.
+Imports timetable from CSV into the Schoolbox user connector.
 
 Usage: $basename [-v] [--perform-update]
        [--structure=STRUCTURE_FILE]
@@ -66,12 +66,12 @@ Usage: $basename [-v] [--perform-update]
        [--enrolment=ENROLMENT_FILE]
     -v:               Verbose mode
     --perform-update: If set, updates DB - otherwise, performs a dry run.
-    --structure:      Timetable structure file to import, in CSV format.
+    --structure:      Timetable structure file to import.
                       Uses stdin if no STRUCTURE_FILE given.
-    --timetable:      Timetable file to import, in CSV format.
+    --timetable:      Timetable file to import.
                       Uses stdin if no TIMETABLE_FILE given.
                       Must not be imported before STRUCTURE_FILE.
-    --enrolment:      Enrolment file to import, in CSV format.
+    --enrolment:      Enrolment file to import.
                       Must not be imported before TIMETABLE_FILE.
                       Uses stdin if no ENROLMENT_FILE given.
 
