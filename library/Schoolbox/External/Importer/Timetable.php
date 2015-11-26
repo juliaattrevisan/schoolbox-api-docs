@@ -99,6 +99,7 @@ class Timetable extends AbstractImporter
     protected function parse()
     {
         $result = [];
+        $timetableCampusCache = [];
         foreach ($this->reader as $i => $row) {
             $this->log->info("Parsing row $i...");
             $key = $row['Class Code'];
@@ -126,21 +127,27 @@ class Timetable extends AbstractImporter
             }
 
             // Load period and teacher from DB
-            try {
-                /** @var TimetableCampus $timetableCampus */
-                $timetableCampus = $this->timetableCampusMapper->findOneByNameAndCampusCode(
-                    $row['Term Title'],
-                    $row['Term Campus']
-                );
-            } catch (Mapper\Exception $e) {
-                $this->log->warning(
-                    sprintf(
-                        'Term "%s" for campus "%s" not found: skipping!',
-                        $row['Term Title'],
-                        $row['Term Campus']
-                    )
-                );
-                continue;
+            $termTitle  = $row['Term Title'];
+            $termCampus = $row['Term Campus'];
+            /** @var TimetableCampus $timetableCampus */
+            if (isset($timetableCampusCache[$termTitle][$termCampus])) {
+                $timetableCampus = $timetableCampusCache[$termTitle][$termCampus];
+            } else {
+                try {
+                    $timetableCampus = $this->timetableCampusMapper->findOneByNameAndCampusCode(
+                        $termTitle,
+                        $termCampus
+                    );
+                } catch (Mapper\Exception $e) {
+                    $this->log->warning(
+                        sprintf(
+                            'Term "%s" for campus "%s" not found: skipping!',
+                            $termTitle,
+                            $termCampus
+                        )
+                    );
+                    continue;
+                }
             }
 
             try {
