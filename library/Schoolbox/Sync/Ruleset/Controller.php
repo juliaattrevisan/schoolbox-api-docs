@@ -16,7 +16,7 @@ use \Schoolbox\Sync\Navigator\Node;
 use \Schoolbox\Sync\Condition;
 use \Schoolbox\Sync\Effect;
 use \Schoolbox;
-
+use Schoolbox\Sync\Effect\AllUserField;
 
 class Controller extends Base {
 
@@ -156,7 +156,7 @@ class Controller extends Base {
 
             /* Figure out what type it was, and cast accordingly
              */
-            $allFields = new \Schoolbox\Sync\Effect\AllUserField();
+            $allFields = new AllUserField();
 
             if ($allFields->isBoolean($effectData['userProperty'])) {
                 $arg = [(bool)$effectArgs[0]];

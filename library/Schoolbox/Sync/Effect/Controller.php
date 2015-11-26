@@ -15,6 +15,7 @@ use Schoolbox\Sync\Grammar\FieldFactory;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Effect;
 use Alaress\ObjectReader;
+use Schoolbox\Sync\Effect\AllUserField;
 
 class Controller extends Base {
     const EFFECT_SKIP = 1;
@@ -118,7 +119,7 @@ class Controller extends Base {
         /* TODO: Replace with UserMapper lookup
          * This is just some hardcoded values for now
          */
-        $allUserField = new \Schoolbox\Sync\Effect\AllUserField();
+        $allUserField = new AllUserField();
         $template = $allUserField->getEffectFragmentTemplate($mappingType[$_GET['mappingType']], $_GET['userField']);
 
         $this->getResponse()->content->set([

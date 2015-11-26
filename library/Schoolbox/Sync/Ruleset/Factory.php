@@ -17,6 +17,7 @@ use Schoolbox\Sync\Navigator\Node;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Condition;
 use Schoolbox\Sync\Effect;
+use Schoolbox\Sync\Effect\AllUserField;
 
 class Factory
 {
@@ -151,19 +152,15 @@ class Factory
         }
 
         /* Determine which Effect Fragments to load initially
+         * This is just some hardcoded values for now.
+         * It tells frontend which templates to use for Effects.
          */
-        $allEffects = [
-            'fragments' => []
-        ];
-
-        /* TODO: Replace with UserMapper lookup
-         * This is just some hardcoded values for now
-         */
-        $allUserField = new \Schoolbox\Sync\Effect\AllUserField();
+        $allUserField = new AllUserField();
+        $allEffectFragments = [];
 
         foreach ($ruleset as $currentRule) {
             foreach ($currentRule->getEffects() as $currentEffect) {
-                $allEffects['fragments'][$currentEffect->getId()] = $allUserField->getType($currentEffect->getUserProperty());
+                $allEffectFragments[$currentEffect->getId()] = $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
             }
         }
 
@@ -171,14 +168,14 @@ class Factory
          * Otherwise it would have returned empty array earlier
          */
         return [
-            'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
-            'allNavigation'  => $allNavigation->getAllNodes(),
-            'rulesetId'      => $this->getType(),
-            'ruleset'        => [ 'rules' => $ruleset ],
-            'allNDSField'    => $ffactory->buildMap($this->getType()),
-            'allUserField'   => $allUserField->getAllFields(),
-            'allEffects'     => $allEffects,
-            'meta'           => $metas
+            'allBreadcrumbs'     => $allBreadcrumbs->getAllNodes(),
+            'allNavigation'      => $allNavigation->getAllNodes(),
+            'rulesetId'          => $this->getType(),
+            'ruleset'            => [ 'rules' => $ruleset ],
+            'allNDSField'        => $ffactory->buildMap($this->getType()),
+            'allUserField'       => $allUserField->getAllFields(),
+            'allEffectFragments' => $allEffectFragments,
+            'meta'               => $metas
         ];
     }
 

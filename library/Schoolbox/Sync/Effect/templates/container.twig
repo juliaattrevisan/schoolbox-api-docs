@@ -35,17 +35,7 @@
                 </select>
             </div>
             <div class="small-12 medium-4 large-4 columns" data-effect-fragment="{{ currentEffect.id }}">
-                {% if currentEffect.effectType.id == effectTypeMap %}
-                    {% include '@syncEffect/map.twig' %}
-                {% elseif currentEffect.effectType.id == effectTypeLiteral %}
-                    {% if allEffects.fragments[currentEffect.id] == effectBoolean %}
-                        {% include '@syncEffect/boolean.twig' %}
-                    {% elseif allEffects.fragments[currentEffect.id] == effectLookup %}
-                        {% include '@syncEffect/lookup.twig' %}
-                    {% elseif allEffects.fragments[currentEffect.id] == effectString %}
-                        {% include '@syncEffect/varchar.twig' %}
-                    {% endif %}
-                {% endif %}
+                {% include allEffectFragments[currentEffect.id] %}
             </div>
         </div>
     </div>

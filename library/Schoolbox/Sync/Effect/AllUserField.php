@@ -2,6 +2,10 @@
 /**
  * AllUserField
  *
+ * An associative array of fields for which you can choose Effects,
+ * and also provide a means to figure out what type they were:
+ * boolean, lookup, string or map
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -42,12 +46,13 @@ class AllUserField {
     public function __construct() {
     }
 
+    /**
+     * Get the associative array of fields
+     *
+     * @return array
+     */
     public function getAllFields() {
         return $this->allFields;
-    }
-
-    public function getType($field) {
-        return $this->allFields[$field];
     }
 
     /**
@@ -67,14 +72,19 @@ class AllUserField {
                 return '@syncEffect/lookup.twig';
             }
             else if ($this->isString($userField)) {
-                return '@syncEffect/varchar.twig';
+                return '@syncEffect/string.twig';
             }
         }
 
         return '@syncEffect/map.twig';
     }
 
-
+    /**
+     * Determine whether the current field is a Boolean
+     *
+     * @param $field
+     * @return bool
+     */
     public function isBoolean($field) {
         if ($this->allFields[$field] == self::TYPE_BOOLEAN) {
             return true;
@@ -83,6 +93,12 @@ class AllUserField {
         return false;
     }
 
+    /**
+     * Determine whether the current field is a Lookup
+     *
+     * @param $field
+     * @return bool
+     */
     public function isLookup($field) {
         if ($this->allFields[$field] == self::TYPE_LOOKUP) {
             return true;
@@ -91,6 +107,12 @@ class AllUserField {
         return false;
     }
 
+    /**
+     * Determine whether the current field is a String
+     *
+     * @param $field
+     * @return bool
+     */
     public function isString($field) {
         if ($this->allFields[$field] == self::TYPE_STRING) {
             return true;
