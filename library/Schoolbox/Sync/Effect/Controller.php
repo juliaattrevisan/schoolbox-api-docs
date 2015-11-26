@@ -102,8 +102,8 @@ class Controller extends Base {
          * TODO: Update with actual values
          */
         $mappingType = [
-            0 => 'equals',
-            1 => 'maps'
+            1 => 'equals',
+            2 => 'maps'
         ];
 
         /* Manufacture a list of Schoolbox User fields to chooze from

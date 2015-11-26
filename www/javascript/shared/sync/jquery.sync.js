@@ -310,7 +310,7 @@
          * Detect when the mapping type changes
          */
         function initEffectMappingTypeChange() {
-            $(config.element).on('click', '[data-effect-mappingtype]', function(event) {
+            $(config.element).on('change', '[data-effect-mappingtype]', function(event) {
                 var effectId = $(this).attr('data-effect-mappingtype');
                 var userField = $('[data-effect-userfield='+effectId+']').val();
                 var mappingType = $(this).val();

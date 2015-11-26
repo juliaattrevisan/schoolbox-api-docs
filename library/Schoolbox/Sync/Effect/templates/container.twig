@@ -18,10 +18,11 @@
                 </select>
             </div>
             <div class="small-2 medium-2 large-2 columns">
-                <select {{ meta[currentCondition.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][arguments][2]" data-effect-mappingtype="{{ currentEffect.id }}">
-                    <option value="-1" disabled selected="selected">Please Select</option>
+                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][arguments][2]" data-effect-mappingtype="{{ currentEffect.id }}">
+                    <option disabled selected="selected">Please Select</option>
+
                     {% for currentEffectMappingType in allEffectMappingTypes %}
-                    <option value="{{ loop.index0 }}" {% if loop.index0 == currentEffect.arguments[2] %}selected="selected"{% endif %}>{{ currentEffectMappingType }}</option>
+                        <option value="{{ loop.index }}" {% if loop.index == currentEffect.effectType.id %}selected="selected"{% endif %}>{{ currentEffectMappingType }}</option>
                     {% endfor %}
                 </select>
             </div>
