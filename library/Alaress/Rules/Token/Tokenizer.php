@@ -214,22 +214,22 @@ abstract class Tokenizer
 
     /**
      * @param string $token
-     * @param mixed  $input
+     * @param mixed  $dataset
      * @param array  $settings
      * @throws DomainException
      * @return array
      */
-    protected function renderToken($token, $input, $settings)
+    protected function renderToken($token, $dataset, $settings)
     {
         try {
             // direct token exists?
             $token = strtolower($token);
-            return $this->applyToken($token, $input, $settings);
+            return $this->applyToken($token, $dataset, $settings);
         } catch (OutOfBoundsException $e) {
             try {
                 // does this token exist without numbers in it?
                 $token = preg_replace('`\.\d+`', '', $token);
-                return $this->applyToken($token, $input, $settings);
+                return $this->applyToken($token, $dataset, $settings);
             } catch (OutOfBoundsException $e) {
                 // no matches: go home hungry
                 return [''];
@@ -240,11 +240,11 @@ abstract class Tokenizer
 
     /**
      * @param string $token
-     * @param string $input
+     * @param mixed  $dataset
      * @param array  $settings
      * @return array
      */
-    protected function applyToken($token, $input, $settings)
+    protected function applyToken($token, $dataset, $settings)
     {
         if (empty($this->tokens[$token])) {
             throw new OutOfBoundsException("Token '$token' is not registered");
@@ -252,7 +252,7 @@ abstract class Tokenizer
 
         $reader = new ObjectReader();
 
-        $values = (array)$this->tokens[$token]->apply($input, $settings);
+        $values = (array)$this->tokens[$token]->apply($dataset, $settings);
 
         foreach ($values as $i => $value) {
             $values[$i] = $reader->coerceToString($value);
