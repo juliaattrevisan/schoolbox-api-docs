@@ -20,6 +20,11 @@ class AllUserField {
     const TYPE_LOOKUP = 2;
     const TYPE_STRING = 3;
 
+    /* As per ups_effect_type in the db
+     * Used to determine Effect Fragment templates
+     */
+    const EFFECT_TYPE_LITERAL = 2;
+
     /* Manufacture a list of Schoolbox User fields to chooze from
      * TODO: Connect up to UserMapper to determine type
      * TODO: This should contain a human-friendly version
@@ -43,6 +48,9 @@ class AllUserField {
         'boardingStatus' => self::TYPE_STRING,
     ];
 
+    /**
+     * Constructor
+     */
     public function __construct() {
     }
 
@@ -64,7 +72,7 @@ class AllUserField {
      * @return string
      */
     public function getEffectFragmentTemplate($mappingType, $userField) {
-        if ($mappingType == 'equals') {
+        if ($mappingType == self::EFFECT_TYPE_LITERAL) {
             if ($this->isBoolean($userField)) {
                 return '@syncEffect/boolean.twig';
             }

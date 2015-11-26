@@ -101,26 +101,8 @@ class Controller extends Base {
      * or a freeform text input
      */
     public function change() {
-
-        /* if mappingtype is set to Equals:
-         *    if $_GET['userField'] is a boolean, present Boolean select options
-         *    else if $_GET['userField'] is a lookup, present Lookup select options
-         *    else if $_GET['userField'] is a generic varchar, present input field
-         * else
-         *    present mapping
-         *
-         * TODO: Update with actual values
-         */
-        $mappingType = [
-            1 => 'maps',
-            2 => 'equals',
-        ];
-
-        /* TODO: Replace with UserMapper lookup
-         * This is just some hardcoded values for now
-         */
         $allUserField = new AllUserField();
-        $template = $allUserField->getEffectFragmentTemplate($mappingType[$_GET['mappingType']], $_GET['userField']);
+        $template = $allUserField->getEffectFragmentTemplate($_GET['mappingType'], $_GET['userField']);
 
         $this->getResponse()->content->set([
             'template' => $template,
