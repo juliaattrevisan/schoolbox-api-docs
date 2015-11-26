@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Sync\Grammar\FieldFactory;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Effect;
+use Alaress\ObjectReader;
 
 class Controller extends Base {
     const EFFECT_SKIP = 1;
@@ -47,20 +48,26 @@ class Controller extends Base {
             'status' => 'Effect not yet saved'
         ];
 
-        $rule = Rule\Mapper::getInstance()->findById($params['ruleId']);
+        /* Manufacture a list of Schoolbox User fields to chooze from
+         * TODO: This should contain a human-friendly version
+         */
+        $reader = new ObjectReader();
+        $userMapper = new \Schoolbox\UserMapper();
+        $user = $userMapper->createModel();
+        $paths = $reader->paths($user);
+        $allUserField = array_combine($paths, $paths);
 
-        $newEffect = Effect\Mapper::getInstance()->createModel();
+        /* Spawn rule
+         */
+        $rule = Rule\Mapper::getInstance()->findById($params['ruleId']);
 
         /* TODO: Manufacture and save this properly
          */
+        $newEffect = Effect\Mapper::getInstance()->createModel();
         $newEffect->setId(rand(1,1000));
 
         $data = [
-            'allUserField'  => [
-                'username'  => 'Username',
-                'firstname' => 'First Name',
-                'surname'   => 'Last Name'
-            ],
+            'allUserField'  => $allUserField,
             'meta'          => [ $newEffect->getId() => $meta ],
             'currentEffect' => $newEffect,
             'currentRule'   => [ 'id' => $rule->getId() ]
