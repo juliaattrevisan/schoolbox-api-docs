@@ -349,6 +349,9 @@ OR ml.name        LIKE :keyword
             case 'myfolder':
                 $datum['objectId'] = $datum['ml_name'];
                 break;
+            case 'content':
+                $datum['objectId'] = $datum['textbox_heading'];
+                break;
             default:
                 $datum['objectId'] = 'unknown resource';
         }
