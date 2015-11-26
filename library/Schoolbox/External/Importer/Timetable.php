@@ -100,6 +100,7 @@ class Timetable extends AbstractImporter
     {
         $result = [];
         $timetableCampusCache = [];
+        $timetablePeriodCache = [];
         foreach ($this->reader as $i => $row) {
             $this->log->info("Parsing row $i...");
             $key = $row['Class Code'];
@@ -126,7 +127,7 @@ class Timetable extends AbstractImporter
                 $this->log->info(sprintf('Class "%s" has been parsed', $key));
             }
 
-            // Load period and teacher from DB
+            // Load timetable campus from DB or cache
             $termTitle  = $row['Term Title'];
             $termCampus = $row['Term Campus'];
             /** @var TimetableCampus $timetableCampus */
@@ -150,26 +151,33 @@ class Timetable extends AbstractImporter
                 }
             }
 
-            try {
-                /** @var TimetablePeriod $timetablePeriod */
-                $timetablePeriod = $this->timetablePeriodMapper->findOneByColumnList(
-                    [
-                        'cycle_id' => $timetableCampus->getCycle()->getId(),
-                        'title'    => $row['Period Title'],
-                        'day'      => $row['Period Day'],
-                    ]
-                );
-            } catch (Mapper\Exception $e) {
-                $this->log->warning(
-                    sprintf(
-                        'Period "%s", day "%s" for term "%s" / campus "%s" not found: skipping!',
-                        $row['Period Title'],
-                        $row['Period Day'],
-                        $row['Term Title'],
-                        $row['Term Campus']
-                    )
-                );
-                continue;
+            // Load timetable period from DB or cache
+            $periodTitle = $row['Period Title'];
+            $periodDay   = $row['Period Day'];
+            /** @var TimetablePeriod $timetablePeriod */
+            if (isset($timetablePeriodCache[$periodTitle][$periodDay])) {
+                $timetablePeriod = $timetablePeriodCache[$periodTitle][$periodDay];
+            } else {
+                try {
+                    $timetablePeriod = $this->timetablePeriodMapper->findOneByColumnList(
+                        [
+                            'cycle_id' => $timetableCampus->getCycle()->getId(),
+                            'title'    => $periodTitle,
+                            'day'      => $periodDay,
+                        ]
+                    );
+                } catch (Mapper\Exception $e) {
+                    $this->log->warning(
+                        sprintf(
+                            'Period "%s", day "%s" for term "%s" / campus "%s" not found: skipping!',
+                            $periodTitle,
+                            $periodDay,
+                            $termTitle,
+                            $termCampus
+                        )
+                    );
+                    continue;
+                }
             }
 
             try {
