@@ -61,8 +61,20 @@ abstract class Tokenizer
      */
     protected function addToken($token)
     {
+        $tokenString = strtolower($token->getToken());
+
+        // if this accepts multi...
+        if (strpos($tokenString, '[]')) {
+            // index by the standard token
+            $allString = str_replace('[]', '', $tokenString);
+            $this->tokens[$allString] = $token;
+
+            // but also index by a regex token
+            $tokenString = str_replace(['.', '[]'], ['\.', '\.\d+'], $tokenString);
+        }
+
         // index by token
-        $this->tokens[strtolower($token->getToken())] = $token;
+        $this->tokens[$tokenString] = $token;
         return $this;
     }
 
@@ -195,7 +207,8 @@ abstract class Tokenizer
      * @param array $input
      * @return array
      */
-    protected function cartesian(array $input) {
+    protected function cartesian(array $input)
+    {
         // filter out empty values
         $input = array_filter($input);
 
@@ -217,6 +230,7 @@ abstract class Tokenizer
         return $result;
     }
 
+
     /**
      * @param string $token
      * @param mixed  $dataset
@@ -231,14 +245,7 @@ abstract class Tokenizer
             $token = strtolower($token);
             return $this->applyToken($token, $dataset, $settings);
         } catch (OutOfBoundsException $e) {
-            try {
-                // does this token exist without numbers in it?
-                $token = preg_replace('`\.\d+`', '', $token);
-                return $this->applyToken($token, $dataset, $settings);
-            } catch (OutOfBoundsException $e) {
-                // no matches: go home hungry
-                return [''];
-            }
+            return [''];
         }
     }
 
@@ -251,13 +258,8 @@ abstract class Tokenizer
      */
     protected function applyToken($token, $dataset, $settings)
     {
-        if (empty($this->tokens[$token])) {
-            throw new OutOfBoundsException("Token '$token' is not registered");
-        }
-
         $reader = new ObjectReader();
-
-        $values = (array)$this->tokens[$token]->apply($dataset, $settings);
+        $values = (array)$this->getToken($token)->apply($dataset, $settings);
 
         foreach ($values as $i => $value) {
             $values[$i] = $reader->coerceToString($value);
@@ -266,6 +268,26 @@ abstract class Tokenizer
         return $values;
     }
 
+
+    /**
+     * @param string $token
+     * @throws OutOfBoundsException
+     * @return Token
+     */
+    protected function getToken($token)
+    {
+        if (empty($this->tokens[$token])) {
+            // if no literal, spend a bit more time and see if there's a preg match
+            foreach ($this->tokens as $key => $value) {
+                if (preg_match("`^$key$`", $token)) {
+                    return $value;
+                }
+            }
+            throw new OutOfBoundsException("Token '$token' is not registered");
+        }
+
+        return $this->tokens[$token];
+    }
 
     /**
      * @param string $filter
