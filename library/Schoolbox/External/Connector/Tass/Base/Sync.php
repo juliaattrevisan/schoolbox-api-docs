@@ -46,7 +46,7 @@ class Sync implements SyncInterface
             SELECT
                 s.stud_code AS student_id,
                 '' AS network_login,
-                '' AS StudentTitle,
+                '' AS student_title,
                 s.preferred_name AS StudentPreferred,
                 s.surname AS StudentSurname,
                 s.sex AS StudentGender,

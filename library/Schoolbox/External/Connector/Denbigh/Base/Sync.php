@@ -48,7 +48,7 @@ class Sync implements SyncInterface
             SELECT
                 denbighID AS student_id,
                 username AS network_login,
-                '' AS StudentTitle,
+                '' AS student_title,
                 firstname AS StudentPreferred,
                 surname AS StudentSurname,
                 '' AS StudentGender,

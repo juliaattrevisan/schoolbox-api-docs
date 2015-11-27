@@ -39,7 +39,7 @@ class Sync implements SyncInterface
             SELECT
             STUDENT_NUMBER AS "student_id",
             USERNAME       AS "network_login",
-            NULL           AS "StudentTitle",
+            NULL           AS "student_title",
             FIRSTNAME      AS "StudentPreferred",
             SURNAME        AS "StudentSurname",
             EMAIL_ADDRESS  AS "StudentEmail",

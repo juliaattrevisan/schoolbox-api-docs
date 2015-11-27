@@ -37,7 +37,7 @@ class Sync implements SyncInterface
             SELECT
                 STKEY      AS student_id,
                 USER_NAME  AS network_login,
-                NULL       AS StudentTitle,
+                NULL       AS student_title,
                 FIRST_NAME AS StudentPreferred,
                 SURNAME    AS StudentSurname,
                 NULL       AS StudentOccupEmail,
