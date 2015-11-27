@@ -235,36 +235,14 @@ class MSSQL {
 	 *               result:  if the procedure returned a result set, the results
 	 *                        from the procedure (untested)
 	 */
-	public function executeProcedure($name, $params) {
-		$proc          = mssql_init($name, $this->dbf);
-		$bound_inputs  = array();
+	public function executeProcedure($name, $params)
+	{
 		$bound_outputs = array();
-
-		// Bind each parameter to the procedure
-		foreach ($params as $param) {
-			list($param_name, $var, $type, $is_output, $is_null, $maxlen) = $param;
-			if (!$is_output) {
-				$is_output = false;
-			}
-			if (!$is_null) {
-				$is_null = false;
-			}
-			if (!$maxlen) {
-				$maxlen = -1;
-			}
-			if ($is_output) {
-				mssql_bind($proc, $param_name, $bound_outputs[$param_name], $type, true, $is_null, $maxlen);
-			}
-			else {
-				$bound_inputs[$param_name] = $var;
-				mssql_bind($proc, $param_name, $bound_inputs[$param_name], $type, false, $is_null, $maxlen);
-			}
-		}
+		$proc          = $this->buildProcedure($name, $params, $bound_outputs);
 
 		// Run procedure, fetching the result set if there is one
 		$success = true;
 		$return  = array();
-		$message = '';
 		try {
 			$result  = mssql_execute($proc);
 			$message = mssql_get_last_message();
@@ -335,6 +313,8 @@ class MSSQL {
 	 * Gets an 3 dimensional associative array of all rows returned by query,
 	 * returns false if no rows
 	 *
+	 * @deprecated Use getIterator() instead if possible.
+	 *
 	 * @param string $sql_q
 	 * @return array|bool
 	 */
@@ -354,6 +334,34 @@ class MSSQL {
 			return false;
 	}
 
+	/**
+	 * Gets an iterator over a query.
+	 *
+	 * @param string $sql_q
+	 * @return MssqlResultIterator
+	 */
+	public function getIterator($sql_q)
+	{
+		return new MssqlResultIterator($this->query($sql_q));
+	}
+
+	/**
+	 * Gets an iterator over a stored procedure.
+	 *
+	 * This currently only works with stored procs that return a result set
+	 * directly - any result text or output variables will be ignored.
+	 *
+	 * @see $this->executeProcedure()
+	 *
+	 * @return MssqlResultIterator
+	 */
+	public function getProcedureIterator($name, $params)
+	{
+		// Bound outputs will be ignored
+		$bound_outputs = [];
+		$proc          = $this->buildProcedure($name, $params, $bound_outputs);
+		return new MssqlResultIterator(mssql_execute($proc));
+	}
 
 	/**
 	 * Returns the next result from a query result resource
@@ -517,5 +525,39 @@ class MSSQL {
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param string $name
+	 * @param array  $params
+	 * @param array  &$bound_outputs
+	 *
+	 * @return resource
+	 */
+	protected function buildProcedure($name, $params, &$bound_outputs)
+	{
+		$proc         = mssql_init($name, $this->dbf);
+		$bound_inputs = array();
+
+		// Bind each parameter to the procedure
+		foreach ($params as $param) {
+			list($param_name, $var, $type, $is_output, $is_null, $maxlen) = $param;
+			if (!$is_output) {
+				$is_output = false;
+			}
+			if (!$is_null) {
+				$is_null = false;
+			}
+			if (!$maxlen) {
+				$maxlen = -1;
+			}
+			if ($is_output) {
+				mssql_bind($proc, $param_name, $bound_outputs[$param_name], $type, true, $is_null, $maxlen);
+			} else {
+				$bound_inputs[$param_name] = $var;
+				mssql_bind($proc, $param_name, $bound_inputs[$param_name], $type, false, $is_null, $maxlen);
+			}
+		}
+		return $proc;
 	}
 }

@@ -1,0 +1,129 @@
+<?php
+/**
+ * MAZE implementation of sync connector.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2015, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\External\Connector\Maze\Base;
+
+use MSSQL;
+use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\Sync\Iterator;
+
+class Sync implements SyncInterface
+{
+    /**
+     * @var MSSQL
+     */
+    private $database;
+
+    /**
+     * Sync constructor
+     */
+    public function __construct()
+    {
+        $this->database = MSSQL::getInstance();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findAllStudents()
+    {
+        $query = "
+            SELECT
+                STKEY      AS student_id,
+                USER_NAME  AS network_login,
+                NULL       AS student_title,
+                FIRST_NAME AS student_preferred,
+                SURNAME    AS student_surname,
+                NULL       AS student_occup_email,
+                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
+                           AS student_year_level,
+                HOUSE      AS student_house,
+                BOARDER    AS student_boarder,
+                NULL       AS student_boarding_house,
+                CAMPUS     AS student_campus
+            FROM ST
+            WHERE STATUS != 'LEFT'
+        ";
+        return new Iterator\Student($this->database->getIterator($query));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findAllParents()
+    {
+        // TODO this spouse student_contact_id won't work, as getEnrolledStudents doesn't support it
+        $query = "
+            SELECT
+                NULL          AS student_contact_network_login,
+                DF.DFKEY      AS student_contact_id,
+                DF.FTITLE     AS student_contact_title,
+                DF.FNAME      AS student_contact_preferred,
+                DF.FSURNAME   AS student_contact_surname,
+                DF.F_EMAIL    AS student_contact_default_email,
+                ST.STKEY      AS student_id,
+                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
+                              AS student_year_level,
+                ST.CAMPUS     AS student_campus,
+                ST.FIRST_NAME AS student_preferred,
+                ST.SURNAME    AS student_surname
+            FROM ST
+            LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR ST.FAMB = DF.DFKEY)
+
+            UNION ALL
+
+            -- Speese
+            SELECT
+                NULL           AS student_contact_network_login,
+                (DF.DFKEY+'1') AS student_contact_id,
+                DF.MTITLE      AS student_contact_title,
+                DF.MNAME       AS student_contact_preferred,
+                DF.MSURNAME    AS student_contact_surname,
+                DF.M_EMAIL     AS student_contact_default_email,
+                ST.STKEY       AS student_id,
+                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
+                               AS student_year_level,
+                ST.CAMPUS      AS student_campus,
+                ST.FIRST_NAME  AS student_preferred,
+                ST.SURNAME     AS student_surname
+            FROM ST
+            LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR ST.FAMB = DF.DFKEY)
+
+            ORDER BY student_contact_id ASC
+        ";
+        return new Iterator\Guardian($this->database->getIterator($query));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findAllStaff()
+    {
+        $query = "
+            SELECT
+                SFKEY      AS staff_id,
+                USER_NAME  AS network_login,
+                STAFF_TYPE AS active_flag,
+                NULL       AS staff_title,
+                FIRST_NAME AS staff_preferred_name,
+                SURNAME    AS staff_surname,
+                NULL       AS default_email_code,
+                NULL       AS occup_email,
+                SF_EMAIL   AS email,
+                CAMPUS     AS staff_campus,
+                NULL       AS staff_category_type,
+                NULL       AS staff_category,
+                NULL       AS staff_department
+            FROM SF
+            WHERE FINISH IS NULL
+            AND STAFF_TYPE != 'L'
+        ";
+        return new Iterator\Staff($this->database->getIterator($query));
+    }
+}

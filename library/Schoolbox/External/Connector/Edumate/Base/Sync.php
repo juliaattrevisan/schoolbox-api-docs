@@ -1,0 +1,138 @@
+<?php
+/**
+ * Edumate implementation of sync connector.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2015, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\External\Connector\Edumate\Base;
+
+use DB2;
+use External_Edumate_Connection;
+use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\Sync\Iterator;
+
+class Sync implements SyncInterface
+{
+    /**
+     * @var DB2
+     */
+    private $database;
+
+    /**
+     * Sync constructor
+     */
+    public function __construct()
+    {
+        $connection     = new External_Edumate_Connection();
+        $this->database = $connection->getDatabase();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findAllStudents()
+    {
+        $stmt = $this->database->prepare('
+            SELECT
+            STUDENT_NUMBER AS "student_id",
+            USERNAME       AS "network_login",
+            NULL           AS "student_title",
+            FIRSTNAME      AS "student_preferred",
+            SURNAME        AS "student_surname",
+            EMAIL_ADDRESS  AS "student_email",
+            NULL           AS "student_occup_email",
+            YEAR_LEVEL     AS "student_year_level",
+            HOUSE          AS "student_house",
+            NULL           AS "student_boarder",
+            NULL           AS "student_boarding_house",
+            NULL           AS "student_campus"
+            FROM db2inst1.schoolbox_students
+        ');
+        $stmt->execute();
+        return new Iterator\Student(new ResultIterator($stmt));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findAllParents()
+    {
+        $stmt = $this->database->prepare('
+            SELECT
+                NULL                     AS "student_contact_network_login",
+                p.CARER_NUMBER           AS "student_contact_id",
+                NULL                     AS "student_contact_title",
+                p.FULL_NAME              AS "student_contact_preferred",
+                NULL                     AS "student_contact_surname",
+                p.COMBINED_EMAIL_ADDRESS AS "student_contact_default_email",
+                s.STUDENT_NUMBER         AS "student_id",
+                s.YEAR_LEVEL             AS "student_year_level",
+                NULL                     AS "student_campus",
+                NULL                     AS "student_gender",
+                s.FIRSTNAME              AS "student_preferred",
+                s.SURNAME                AS "student_surname"
+            FROM db2inst1.schoolbox_parents AS p
+            INNER JOIN db2inst1.schoolbox_parent_student
+                AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
+            INNER JOIN db2inst1.schoolbox_students
+                AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
+            WHERE p.CARER_NUMBER IS NOT NULL
+
+            UNION ALL
+
+            SELECT
+                NULL                     AS "student_contact_network_login",
+                p.SPOUSE_CARER_NUMBER    AS "student_contact_id",
+                NULL                     AS "student_contact_title",
+                p.SPOUSE_FULL_NAME       AS "student_contact_preferred",
+                NULL                     AS "student_contact_surname",
+                p.SPOUSE_EMAIL           AS "student_contact_default_email",
+                s.STUDENT_NUMBER         AS "student_id",
+                s.YEAR_LEVEL             AS "student_year_level",
+                NULL                     AS "student_campus",
+                NULL                     AS "student_gender",
+                s.FIRSTNAME              AS "student_preferred",
+                s.SURNAME                AS "student_surname"
+            FROM db2inst1.schoolbox_parents AS p
+            INNER JOIN db2inst1.schoolbox_parent_student
+                AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
+            INNER JOIN db2inst1.schoolbox_students
+                AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
+            WHERE p.SPOUSE_CARER_NUMBER IS NOT NULL
+
+            ORDER BY INTEGER("student_contact_id") ASC, INTEGER("student_id") ASC
+        ');
+        $stmt->execute();
+        return new Iterator\Guardian(new ResultIterator($stmt));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findAllStaff()
+    {
+        $stmt = $this->database->prepare('
+            SELECT
+                STAFF_NUMBER  AS "staff_id",
+                USERNAME      AS "network_login",
+                1             AS "active_flag",
+                SALUTATION    AS "staff_title",
+                FIRSTNAME     AS "staff_preferred_name",
+                SURNAME       AS "staff_surname",
+                NULL          AS "default_email_code",
+                EMAIL_ADDRESS AS "occup_email",
+                EMAIL_ADDRESS AS "email",
+                CAMPUS        AS "staff_campus",
+                NULL          AS "staff_category_type",
+                NULL          AS "staff_category",
+                NULL          AS "staff_department"
+            FROM db2inst1.schoolbox_staff
+            WHERE USERNAME IS NOT NULL
+        ');
+        $stmt->execute();
+        return new Iterator\Staff(new ResultIterator($stmt));
+    }
+}
