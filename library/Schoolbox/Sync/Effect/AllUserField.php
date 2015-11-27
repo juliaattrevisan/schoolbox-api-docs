@@ -25,6 +25,10 @@ class AllUserField {
      */
     const EFFECT_TYPE_LITERAL = 2;
 
+    /* Skip Effect Type
+     */
+    const EFFECT_TYPE_SKIP = 3;
+
     /* Manufacture a list of Schoolbox User fields to chooze from
      * TODO: Connect up to UserMapper to determine type
      * TODO: This should contain a human-friendly version

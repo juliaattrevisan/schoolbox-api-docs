@@ -30,6 +30,12 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath) {
         $this->addPostRoute($router, 'add', $basePath, "/add/{ruleId}");
+
+        /* Special case
+         * Has no inputs or anything so we can lighten the backend load
+         */
+        $this->addPostRoute($router, 'addSkip', $basePath, "/add/{ruleId}/skip");
+
         $this->addPostRoute($router, 'delete', $basePath, "/delete");
         $this->addGetRoute($router, 'change', $basePath, "/change");
     }
@@ -42,7 +48,7 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher) {
         $this->addRoutePreload(
             $matcher,
-            '(?:add|delete|change)',
+            '(?:add|addSkip|delete|change)',
             function($params) {
                 return array(
                     'params' => $params,
