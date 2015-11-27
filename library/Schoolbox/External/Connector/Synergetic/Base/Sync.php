@@ -131,19 +131,19 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT
-                vStaff.StaffID,
-                NetworkLogin,
-                ActiveFlag,
-                vStaff.StaffTitle,
-                vStaff.StaffPreferredName,
-                vStaff.StaffSurname,
-                DefaultEmailCode,
-                OccupEmail,
-                Email,
-                vStaff.StaffCampus,
-                StaffCategoryType,
-                StaffCategory,
-                vStaff.StaffDepartment
+                vStaff.StaffID            AS staff_id,
+                NetworkLogin              AS network_login,
+                ActiveFlag                AS active_flag,
+                vStaff.StaffTitle         AS staff_title,
+                vStaff.StaffPreferredName AS staff_preferred_name,
+                vStaff.StaffSurname       AS staff_surname,
+                DefaultEmailCode          AS default_email_code,
+                OccupEmail                AS occup_email,
+                Email                     AS email,
+                vStaff.StaffCampus        AS staff_campus,
+                StaffCategoryType         AS staff_category_type,
+                StaffCategory             AS staff_category,
+                vStaff.StaffDepartment    AS staff_department
             FROM SynergyOne.dbo.vStaff vStaff
             LEFT JOIN Community ON Community.ID = StaffID
             WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
