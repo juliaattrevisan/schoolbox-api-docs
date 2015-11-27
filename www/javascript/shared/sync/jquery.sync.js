@@ -95,7 +95,12 @@
 
                 /* Valid Input Types for Conditions and Effects
                  */
-                validInputTypes: 'input, select, textarea'
+                validInputTypes: 'input, select, textarea',
+
+                /* Stub Effect Prefix
+                 * Used when creating new Effects, to avoid stub records
+                 */
+                stubPrefix: 'new'
             }
 
             var derived = {
@@ -279,7 +284,7 @@
                 var url = $(this).attr('href');
 
                 $.post(url, function(responseText) {
-                    var effectId = 'new-'+latestEffectInstance;
+                    var effectId = config.stubPrefix + '-' + latestEffectInstance;
                     var effectContainerId = 'effect-'+effectId;
                     var statusId = 'effect-'+effectId+'-status';
 
@@ -290,7 +295,7 @@
                     instance.attr('id', effectContainerId);
 
                     $.each(instance.find(config.validInputTypes), function(index, element) {
-                        $(element).attr('name', $(element).attr('name').replace('new', effectId));
+                        $(element).attr('name', $(element).attr('name').replace(config.stubPrefix, effectId));
                     });
 
                     /* Update other miscellaneous id-based data vars
@@ -313,7 +318,7 @@
                     /* Make status indicator unique
                      */
                     $(instance)
-                        .find('#effect-new-status')
+                        .find('#effect-' + config.stubPrefix + '-status')
                         .attr('id', statusId)
                         .attr('data-effect-fragment', statusId);
 
@@ -403,21 +408,30 @@
                         /* Delete asynchronously if successful; ignore if unsuccessful
                          */
                         $.post(config.effect.delete.url, { effectId: effectId }, function(responseText) {
-                            if (responseText == config.success) {
-                                $('#effect-' + effectId).remove();
 
-                                /* Indicator label gets removed with the condition so we
-                                 * don't need to bother showing animation
-                                 */
+                            /* Unsaved effects can be removed without needing the indicator
+                             * as these don't require backend confirmation
+                             */
+                            if (effectId.match(config.stubPrefix)) {
+                                $('#effect-' + effectId).remove();
                             }
                             else {
+                                if (responseText == config.success) {
+                                    $('#effect-' + effectId).remove();
 
-                                /* Show that something failed
-                                 */
-                                label.labelTimeout({
-                                    text: config.effect.delete.fail,
-                                    css: 'alert'
-                                });
+                                    /* Indicator label gets removed with the condition so we
+                                     * don't need to bother showing animation
+                                     */
+                                }
+                                else {
+
+                                    /* Show that something failed
+                                     */
+                                    label.labelTimeout({
+                                        text: config.effect.delete.fail,
+                                        css: 'alert'
+                                    });
+                                }
                             }
                         });
                     }
