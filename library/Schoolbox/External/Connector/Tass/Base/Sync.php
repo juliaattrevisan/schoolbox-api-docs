@@ -154,22 +154,22 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT
-                te.tch_code AS StaffID,
+                te.tch_code AS staff_id,
                 '' AS network_login,
                 CASE
                     WHEN (t.term_date) IS NULL THEN 0
                     ELSE 1
-                END AS ActiveFlag,
-                t.salutation_flag AS StaffTitle,
-                t.prefer_name_text AS StaffPreferredName,
-                t.surname_text AS StaffSurname,
-                '' AS DefaultEmailCode,
-                '' AS OccupEmail,
-                t.e_mail AS Email,
-                '' AS StaffCampus,
-                '' AS StaffCategoryType,
-                '' AS StaffCategory,
-                td.tch_dept AS StaffDepartment
+                END AS active_flag,
+                t.salutation_flag AS staff_title,
+                t.prefer_name_text AS staff_preferred_name,
+                t.surname_text AS staff_surname,
+                '' AS default_email_code,
+                '' AS occup_email,
+                t.e_mail AS email,
+                '' AS staff_campus,
+                '' AS staff_category_type,
+                '' AS staff_category,
+                td.tch_dept AS staff_department
             FROM tel_vw_telemf AS t
             LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
             LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code

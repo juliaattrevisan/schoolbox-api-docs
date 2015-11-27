@@ -104,19 +104,19 @@ class Sync implements SyncInterface
     {
         $statement = $this->database->prepare("
             SELECT
-                p.denbighID AS StaffID,
+                p.denbighID AS staff_id,
                 staffCode AS network_login,
-                1 AS ActiveFlag,
-                title AS StaffTitle,
-                preferred_name AS StaffPreferredName,
-                surname AS StaffSurname,
-                '' AS DefaultEmailCode,
-                '' AS OccupEmail,
-                email AS Email,
-                '' AS StaffCampus,
-                '' AS StaffCategoryType,
-                '' AS StaffCategory,
-                '' AS StaffDepartment
+                1 AS active_flag,
+                title AS staff_title,
+                preferred_name AS staff_preferred_name,
+                surname AS staff_surname,
+                '' AS default_email_code,
+                '' AS occup_email,
+                email AS email,
+                '' AS staff_campus,
+                '' AS staff_category_type,
+                '' AS staff_category,
+                '' AS staff_department
             FROM Staff s
             LEFT JOIN People p ON s.peopleDenbighID = p.denbighID
         ");

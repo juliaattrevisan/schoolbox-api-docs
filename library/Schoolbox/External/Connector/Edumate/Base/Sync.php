@@ -116,19 +116,19 @@ class Sync implements SyncInterface
     {
         $stmt = $this->database->prepare('
             SELECT
-                STAFF_NUMBER  AS "StaffID",
+                STAFF_NUMBER  AS "staff_id",
                 USERNAME      AS "network_login",
-                1             AS "ActiveFlag",
-                SALUTATION    AS "StaffTitle",
-                FIRSTNAME     AS "StaffPreferredName",
-                SURNAME       AS "StaffSurname",
-                NULL          AS "DefaultEmailCode",
-                EMAIL_ADDRESS AS "OccupEmail",
-                EMAIL_ADDRESS AS "Email",
-                CAMPUS        AS "StaffCampus",
-                NULL          AS "StaffCategoryType",
-                NULL          AS "StaffCategory",
-                NULL          AS "StaffDepartment"
+                1             AS "active_flag",
+                SALUTATION    AS "staff_title",
+                FIRSTNAME     AS "staff_preferred_name",
+                SURNAME       AS "staff_surname",
+                NULL          AS "default_email_code",
+                EMAIL_ADDRESS AS "occup_email",
+                EMAIL_ADDRESS AS "email",
+                CAMPUS        AS "staff_campus",
+                NULL          AS "staff_category_type",
+                NULL          AS "staff_category",
+                NULL          AS "staff_department"
             FROM db2inst1.schoolbox_staff
             WHERE USERNAME IS NOT NULL
         ');

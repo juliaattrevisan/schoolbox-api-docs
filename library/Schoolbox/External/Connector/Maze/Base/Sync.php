@@ -104,19 +104,19 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT
-                SFKEY      AS StaffID,
+                SFKEY      AS staff_id,
                 USER_NAME  AS network_login,
-                STAFF_TYPE AS ActiveFlag,
-                NULL       AS StaffTitle,
-                FIRST_NAME AS StaffPreferredName,
-                SURNAME    AS StaffSurname,
-                NULL       AS DefaultEmailCode,
-                NULL       AS OccupEmail,
-                SF_EMAIL   AS Email,
-                CAMPUS     AS StaffCampus,
-                NULL       AS StaffCategoryType,
-                NULL       AS StaffCategory,
-                NULL       AS StaffDepartment
+                STAFF_TYPE AS active_flag,
+                NULL       AS staff_title,
+                FIRST_NAME AS staff_preferred_name,
+                SURNAME    AS staff_surname,
+                NULL       AS default_email_code,
+                NULL       AS occup_email,
+                SF_EMAIL   AS email,
+                CAMPUS     AS staff_campus,
+                NULL       AS staff_category_type,
+                NULL       AS staff_category,
+                NULL       AS staff_department
             FROM SF
             WHERE FINISH IS NULL
             AND STAFF_TYPE != 'L'
