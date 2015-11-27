@@ -16,6 +16,11 @@
 
         var config = init(options, $(this));
 
+        /* When adding new Effects, they have this pseudo-id suffix, e.g.
+         * #effect-new-latestEffectInstance
+         */
+        var latestEffectInstance = 1;
+
         initRulesetUpdate();
 
         initRuleDelete();
@@ -274,9 +279,7 @@
                 var url = $(this).attr('href');
 
                 $.post(url, function(responseText) {
-                    var latestInstance = 117;
-
-                    var effectId = 'new-'+latestInstance;
+                    var effectId = 'new-'+latestEffectInstance;
                     var effectContainerId = 'effect-'+effectId;
                     var statusId = 'effect-'+effectId+'-status';
 
@@ -321,6 +324,10 @@
                     /* Ram it back in
                      */
                     $(ruleId).append(instance);
+
+                    /* Keep count
+                     */
+                    latestEffectInstance++;
                 });
             });
         }
