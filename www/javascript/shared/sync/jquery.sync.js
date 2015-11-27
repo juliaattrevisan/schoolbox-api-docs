@@ -276,18 +276,18 @@
                 $.post(url, function(responseText) {
                     var latestInstance = 117;
 
-                    var tempId = 'new-'+latestInstance;
-                    var statusId = 'effect-new-'+latestInstance+'-status';
-                    var effectId = 'effect-'+latestInstance;
+                    var effectId = 'new-'+latestInstance;
+                    var effectContainerId = 'effect-'+effectId;
+                    var statusId = 'effect-'+effectId+'-status';
 
                     var instance = $(responseText);
 
                     /* Update ids to use temporary index integer
                      */
-                    instance.attr('id', effectId);
+                    instance.attr('id', effectContainerId);
 
                     $.each(instance.find(config.validInputTypes), function(index, element) {
-                        $(element).attr('name', $(element).attr('name').replace('new', tempId));
+                        $(element).attr('name', $(element).attr('name').replace('new', effectId));
                     });
 
                     /* Update other miscellaneous id-based data vars
@@ -301,7 +301,7 @@
                     ];
 
                     $.each(allDataVars, function(index, element) {
-                        instance.find('['+element+']').attr(element, tempId);
+                        instance.find('['+element+']').attr(element, effectId);
                     });
 
                     /* Make status indicator unique
@@ -315,6 +315,7 @@
                      */
                     $(instance).find('[data-effect-delete]').attr('href', '');
 
+                    console.log(instance);
                     /* Ram it back in
                      */
                     $(ruleId).append(instance);
