@@ -110,7 +110,7 @@
 
                         <ul class="information-list" id="rule-{{ currentRule.id }}-effects">
                             {% for currentEffect in currentRule.effects %}
-                            {% include allEffectContainers[currentEffect.id] %}
+                            {% include allEffectStructures.containers[currentEffect.id] %}
                             {% endfor %}
                         </ul>
                     </section>

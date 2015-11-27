@@ -83,8 +83,10 @@ class Controller extends Base {
         $allUserField = new AllUserField();
 
         $data = [
-            'allEffectFragments' => [
-                $newEffect->getId() => $allUserField->getEffectFragmentTemplate($default['effectType'], $default['userProperty'])
+            'allEffectStructures' => [
+                'fragments' => [
+                    $newEffect->getId() => $allUserField->getEffectFragmentTemplate($default['effectType'], $default['userProperty'])
+                ]
             ],
             'allUserField'  => $allUserField->getAllFields(),
             'meta'          => [

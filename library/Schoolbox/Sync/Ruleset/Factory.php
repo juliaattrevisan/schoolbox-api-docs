@@ -156,19 +156,25 @@ class Factory
          * It tells frontend which templates to use for Effects.
          */
         $allUserField = new AllUserField();
-        $allEffectContainers = [];
-        $allEffectFragments = [];
+
+        /* Which twig containers and fragments to load for this
+         * Ruleset's Effects
+         */
+        $allEffectStructures = [
+            'containers' => [],
+            'fragments' => [],
+        ];
 
         /* Skip Effect has a different container since it's a unique kind of Effect
          */
         foreach ($ruleset as $currentRule) {
             foreach ($currentRule->getEffects() as $currentEffect) {
                 if ($currentEffect->getEffectType()->getId() == AllUserField::EFFECT_TYPE_SKIP) {
-                    $allEffectContainers[$currentEffect->getId()] = '@syncEffect/container-skip.twig';
+                    $allEffectStructures['containers'][$currentEffect->getId()] = '@syncEffect/container-skip.twig';
                 }
                 else {
-                    $allEffectContainers[$currentEffect->getId()] = '@syncEffect/container.twig';
-                    $allEffectFragments[$currentEffect->getId()] = $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+                    $allEffectStructures['containers'][$currentEffect->getId()] = '@syncEffect/container.twig';
+                    $allEffectStructures['fragments'][$currentEffect->getId()] = $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
                 }
             }
         }
@@ -183,8 +189,7 @@ class Factory
             'ruleset'             => [ 'rules' => $ruleset ],
             'allNDSField'         => $ffactory->buildMap($this->getType()),
             'allUserField'        => $allUserField->getAllFields(),
-            'allEffectContainers' => $allEffectContainers,
-            'allEffectFragments'  => $allEffectFragments,
+            'allEffectStructures' => $allEffectStructures,
             'meta'                => $metas
         ];
     }
