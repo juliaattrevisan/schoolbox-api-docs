@@ -39,7 +39,7 @@ class Sync implements SyncInterface
                 USER_NAME  AS network_login,
                 NULL       AS student_title,
                 FIRST_NAME AS student_preferred,
-                SURNAME    AS StudentSurname,
+                SURNAME    AS student_surname,
                 NULL       AS StudentOccupEmail,
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
                 HOUSE      AS StudentHouse,
@@ -70,7 +70,7 @@ class Sync implements SyncInterface
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
                 ST.CAMPUS     AS StudentCampus,
                 ST.FIRST_NAME AS student_preferred,
-                ST.SURNAME    AS StudentSurname
+                ST.SURNAME    AS student_surname
             FROM ST
             LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR ST.FAMB = DF.DFKEY)
 
@@ -88,7 +88,7 @@ class Sync implements SyncInterface
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
                 ST.CAMPUS      AS StudentCampus,
                 ST.FIRST_NAME  AS student_preferred,
-                ST.SURNAME     AS StudentSurname
+                ST.SURNAME     AS student_surname
             FROM ST
             LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR ST.FAMB = DF.DFKEY)
 
