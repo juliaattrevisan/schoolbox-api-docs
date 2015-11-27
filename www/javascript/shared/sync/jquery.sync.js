@@ -297,12 +297,15 @@
                         'data-effect-mappingtype',
                         'data-effect-fragment',
                         'data-effect-delete',
-                        'data-effect-modify-lock'
                     ];
 
                     $.each(allDataVars, function(index, element) {
                         instance.find('['+element+']').attr(element, effectId);
                     });
+
+                    /* Enable Modify Lock
+                     */
+                    instance.find('[data-effect-modify-lock]').attr('data-effect-modify-lock', effectContainerId);
 
                     /* Make status indicator unique
                      */
@@ -315,7 +318,6 @@
                      */
                     $(instance).find('[data-effect-delete]').attr('href', '');
 
-                    console.log(instance);
                     /* Ram it back in
                      */
                     $(ruleId).append(instance);
