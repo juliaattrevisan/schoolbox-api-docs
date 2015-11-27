@@ -27,38 +27,38 @@ class Staff extends IteratorIterator
         $currentResult = $this->getInnerIterator()->current();
         $staff         = new User\Staff();
         $staff
-            ->setId($currentResult['StaffID'])
-            ->setTitle($currentResult['StaffTitle'])
-            ->setPreferredName($currentResult['StaffPreferredName'])
-            ->setLastname($currentResult['StaffSurname'])
+            ->setId($currentResult['staff_id'])
+            ->setTitle($currentResult['staff_title'])
+            ->setPreferredName($currentResult['staff_preferred_name'])
+            ->setLastname($currentResult['staff_surname'])
             ->getMeta()
-            ->setDepartment($currentResult['StaffDepartment'])
+            ->setDepartment($currentResult['staff_department'])
         ;
 
         $staff
             ->getMeta()
             ->getCategory()
-            ->setType($currentResult['StaffCategoryType'])
+            ->setType($currentResult['staff_category_type'])
         ;
 
         /* Account
          */
         $staff
             ->getAccount()
-            ->setLogin($currentResult['NetworkLogin'])
-            ->setActive($currentResult['ActiveFlag'])
+            ->setLogin($currentResult['network_login'])
+            ->setActive($currentResult['active_flag'])
         ;
 
         /* Email
          */
         $email1 = new User\Common\Email();
         $email1
-            ->setAddress($currentResult['Email'])
+            ->setAddress($currentResult['email'])
         ;
 
         $email2 = new User\Common\Email();
         $email2
-            ->setAddress($currentResult['OccupEmail'])
+            ->setAddress($currentResult['occup_email'])
         ;
 
         foreach (array($email1, $email2) as $currentEmail) {
@@ -72,7 +72,7 @@ class Staff extends IteratorIterator
          */
         $campus = new User\Common\Campus();
         $campus
-            ->setName($currentResult['StaffCampus'])
+            ->setName($currentResult['staff_campus'])
         ;
 
         $staff

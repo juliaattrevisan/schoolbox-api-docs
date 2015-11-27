@@ -38,7 +38,7 @@ class Guardian extends IteratorIterator
         $id       = null;
         $preStack = [];
         while ($this->getInnerIterator()->valid() && $row = $this->getInnerIterator()->current()) {
-            $thisId = $row['StudentContactID'];
+            $thisId = $row['student_contact_id'];
             if (!isset($id)) {
                 $id = $thisId;
             }
@@ -57,30 +57,30 @@ class Guardian extends IteratorIterator
 
         // Forge a single parent out of the disparate parts of the prestack
         // Only the following fields will vary:
-        // * StudentYearLevel
-        // * StudentCampus
-        // * StudentGender
+        // * student_year_level
+        // * student_campus
+        // * student_gender
         $currentResult = current($preStack);
         $guardian      = new User\Guardian();
         $guardian
-            ->setId($currentResult['StudentContactID'])
-            ->setTitle($currentResult['StudentContactTitle'])
-            ->setPreferredName($currentResult['StudentContactPreferred'])
-            ->setLastname($currentResult['StudentContactSurname'])
-            ->setGender($currentResult['StudentGender'])
+            ->setId($currentResult['student_contact_id'])
+            ->setTitle($currentResult['student_contact_title'])
+            ->setPreferredName($currentResult['student_contact_preferred'])
+            ->setLastname($currentResult['student_contact_surname'])
+            ->setGender($currentResult['student_gender'])
         ;
 
         /* Email
          */
         $email = new User\Common\Email();
-        $email->setAddress($currentResult['StudentContactDefaultEmail']);
+        $email->setAddress($currentResult['student_contact_default_email']);
         $guardian->addEmail($email);
 
         /* Account
          */
         $guardian
             ->getAccount()
-            ->setLogin($currentResult['StudentContactNetworkLogin'])
+            ->setLogin($currentResult['student_contact_network_login'])
         ;
 
         // Add details for each one of their students
@@ -88,21 +88,21 @@ class Guardian extends IteratorIterator
             // Students
             $student = new User\Student();
             $student
-                ->setId($row['StudentId'])
-                ->setPreferredName($row['StudentPreferred'])
-                ->setLastname($row['StudentSurname'])
-                ->setGender($row['StudentGender'])
+                ->setId($row['student_id'])
+                ->setPreferredName($row['student_preferred'])
+                ->setLastname($row['student_surname'])
+                ->setGender($row['student_gender'])
             ;
 
             $student
                 ->getYear()
-                ->setLevel($row['StudentYearLevel'])
+                ->setLevel($row['student_year_level'])
             ;
 
             /* Campus
              */
             $campus = new User\Common\Campus();
-            $campus->setName($row['StudentCampus']);
+            $campus->setName($row['student_campus']);
             $student->getCampus()->add($campus);
             $guardian->addStudent($student);
         }
