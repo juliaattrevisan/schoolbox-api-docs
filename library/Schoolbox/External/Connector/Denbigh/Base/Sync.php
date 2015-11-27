@@ -51,7 +51,7 @@ class Sync implements SyncInterface
                 '' AS student_title,
                 firstname AS student_preferred,
                 surname AS student_surname,
-                '' AS StudentGender,
+                '' AS student_gender,
                 email AS StudentEmail,
                 '' AS StudentOccupEmail,
                 academicYear AS StudentYearLevel,
@@ -82,7 +82,7 @@ class Sync implements SyncInterface
                 s.denbighID AS student_id,
                 s.academicYear AS StudentYearLevel,
                 '' AS StudentCampus,
-                s.gender AS StudentGender,
+                s.gender AS student_gender,
                 s.preferred_name AS student_preferred,
                 s.surname AS student_surname
             FROM Addresses adr

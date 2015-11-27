@@ -49,7 +49,7 @@ class Sync implements SyncInterface
                 '' AS student_title,
                 s.preferred_name AS student_preferred,
                 s.surname AS student_surname,
-                s.sex AS StudentGender,
+                s.sex AS student_gender,
                 s.e_mail AS StudentEmail,
                 '' AS StudentOccupEmail,
                 s.year_grp AS StudentYearLevel,
@@ -85,7 +85,7 @@ class Sync implements SyncInterface
                 sf.sfa_num       AS StudentContactSplitFamilyNumber,
                 s.year_grp       AS StudentYearLevel,
                 s.campus_code    AS StudentCampus,
-                s.sex            AS StudentGender,
+                s.sex            AS student_gender,
                 s.preferred_name AS student_preferred,
                 s.surname        AS student_surname
             FROM parent AS p
@@ -111,7 +111,7 @@ class Sync implements SyncInterface
                 sf.sfa_num       AS StudentContactSplitFamilyNumber,
                 s.year_grp       AS StudentYearLevel,
                 s.campus_code    AS StudentCampus,
-                s.sex            AS StudentGender,
+                s.sex            AS student_gender,
                 s.preferred_name AS student_preferred,
                 s.surname        AS student_surname
             FROM parent AS p

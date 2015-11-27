@@ -71,7 +71,7 @@ class Sync implements SyncInterface
                 s.STUDENT_NUMBER         AS "student_id",
                 s.YEAR_LEVEL             AS "StudentYearLevel",
                 NULL                     AS "StudentCampus",
-                NULL                     AS "StudentGender",
+                NULL                     AS "student_gender",
                 s.FIRSTNAME              AS "student_preferred",
                 s.SURNAME                AS "student_surname"
             FROM db2inst1.schoolbox_parents AS p
@@ -93,7 +93,7 @@ class Sync implements SyncInterface
                 s.STUDENT_NUMBER         AS "student_id",
                 s.YEAR_LEVEL             AS "StudentYearLevel",
                 NULL                     AS "StudentCampus",
-                NULL                     AS "StudentGender",
+                NULL                     AS "student_gender",
                 s.FIRSTNAME              AS "student_preferred",
                 s.SURNAME                AS "student_surname"
             FROM db2inst1.schoolbox_parents AS p
