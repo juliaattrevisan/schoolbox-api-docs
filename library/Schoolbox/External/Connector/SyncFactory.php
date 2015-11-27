@@ -15,7 +15,7 @@ class SyncFactory
      * Choose which variant of the sync to spawn
      *
      * @return SyncInterface
-     * @throws \LogicException if nothing can be built
+     * @throws \UnexpectedValueException if nothing can be built
      */
     public function build()
     {
@@ -35,6 +35,6 @@ class SyncFactory
             return new $generalClassname();
         }
 
-        throw new \LogicException("Unknown classes: {$specificClassname} {$generalClassname}");
+        throw new \UnexpectedValueException("Unknown classes: {$specificClassname} {$generalClassname}");
     }
 }
