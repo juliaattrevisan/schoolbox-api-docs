@@ -52,7 +52,7 @@ class Sync implements SyncInterface
             FROM db2inst1.schoolbox_students
         ');
         $stmt->execute();
-        return new Iterator\Student($stmt);
+        return new Iterator\Student(new ResultIterator($stmt));
     }
 
     /**
@@ -106,7 +106,7 @@ class Sync implements SyncInterface
             ORDER BY INTEGER("student_contact_id") ASC, INTEGER("student_id") ASC
         ');
         $stmt->execute();
-        return new Iterator\Guardian($stmt);
+        return new Iterator\Guardian(new ResultIterator($stmt));
     }
 
     /**
@@ -133,6 +133,6 @@ class Sync implements SyncInterface
             WHERE USERNAME IS NOT NULL
         ');
         $stmt->execute();
-        return new Iterator\Staff($stmt);
+        return new Iterator\Staff(new ResultIterator($stmt));
     }
 }
