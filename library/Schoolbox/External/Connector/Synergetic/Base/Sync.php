@@ -80,18 +80,18 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT DISTINCT
-                cp.NetworkLogin AS StudentContactNetworkLogin,
-                s.StudentContactID,
-                s.StudentContactTitle,
-                s.StudentContactPreferred,
-                s.StudentContactSurname,
-                s.StudentContactDefaultEmail,
-                s.StudentId,
-                s.StudentYearLevel,
-                s.StudentCampus,
-                s.StudentGender,
-                s.StudentPreferred,
-                s.StudentSurname
+                cp.NetworkLogin              AS student_contact_network_login,
+                s.StudentContactID           AS student_contact_id,
+                s.StudentContactTitle        AS student_contact_title,
+                s.StudentContactPreferred    AS student_contact_preferred,
+                s.StudentContactSurname      AS student_contact_surname,
+                s.StudentContactDefaultEmail AS student_contact_default_email,
+                s.StudentId                  AS student_id,
+                s.StudentYearLevel           AS student_year_level,
+                s.StudentCampus              AS student_campus,
+                s.StudentGender              AS student_gender,
+                s.StudentPreferred           AS student_preferred,
+                s.StudentSurname             AS student_surname
             FROM SynergyOne.dbo.vStudentContactAllAddress s
             INNER JOIN SynergyOne.dbo.Community cp ON s.StudentContactID = cp.ID
             WHERE (s.StudentContactType IN ('SC1', 'SC2'))
@@ -101,25 +101,25 @@ class Sync implements SyncInterface
             UNION ALL
 
             SELECT DISTINCT
-                cs.NetworkLogin AS StudentContactNetworkLogin,
-                s.StudentContactSpouseID AS StudentContactID,
-                s.StudentContactSpouseTitle AS StudentContactTitle,
-                s.StudentContactSpousePreferred AS StudentContactPreferred,
-                s.StudentContactSpouseSurname AS StudentContactSurname,
-                s.StudentContactSpouseDefaultEmail AS StudentContactDefaultEmail,
-                s.StudentId,
-                s.StudentYearLevel,
-                s.StudentCampus,
-                s.StudentGender,
-                s.StudentPreferred,
-                s.StudentSurname
+                cs.NetworkLogin                    AS student_contact_network_login,
+                s.StudentContactSpouseID           AS student_contact_id,
+                s.StudentContactSpouseTitle        AS student_contact_title,
+                s.StudentContactSpousePreferred    AS student_contact_preferred,
+                s.StudentContactSpouseSurname      AS student_contact_surname,
+                s.StudentContactSpouseDefaultEmail AS student_contact_default_email,
+                s.StudentId                        AS student_id,
+                s.StudentYearLevel                 AS student_year_level,
+                s.StudentCampus                    AS student_campus,
+                s.StudentGender                    AS student_gender,
+                s.StudentPreferred                 AS student_preferred,
+                s.StudentSurname                   AS student_surname
             FROM SynergyOne.dbo.vStudentContactAllAddress s
             INNER JOIN SynergyOne.dbo.Community cs ON s.StudentContactSpouseID = cs.ID
             WHERE (s.StudentContactType IN ('SC1', 'SC2'))
             AND   s.FileSemester = '" . $this->database->quote($this->semester) . "'
             AND   s.FileYear = '" . $this->database->quote($this->year) . "'
 
-            ORDER BY StudentContactID ASC
+            ORDER BY student_contact_id ASC
         ";
         return new Iterator\Guardian($this->database->getIterator($query));
     }
