@@ -173,7 +173,10 @@ class Factory
             foreach ($currentRule->getEffects() as $currentEffect) {
                 $allEffectStructures['containers'][$currentEffect->getId()] = $currentEffect->getEffectType()->getTemplate();
 
-                if ($currentEffect->getEffectType()->getId() != EffectTypeMapper::EFFECT_TYPE_SKIP) {
+                /* Figure out which fragment to use if this type isn't a Skip
+                 * Skip Effects don't use fragments
+                 */
+                if (!$currentEffect->getEffectType()->isSkip()) {
                     $allEffectStructures['fragments'][$currentEffect->getId()] = $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
                 }
             }

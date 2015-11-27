@@ -38,11 +38,24 @@ class Model {
      * @return string
      */
     public function getTemplate() {
-        if ($this->getId() == EffectTypeMapper::EFFECT_TYPE_SKIP) {
+        if ($this->isSkip()) {
             return $this->getEffectSkipTemplate();
         }
 
         return $this->getEffectTemplate();
+    }
+
+    /**
+     * Is this a Skip Effect?
+     *
+     * @return bool
+     */
+    public function isSkip() {
+        if ($this->getId() == EffectTypeMapper::EFFECT_TYPE_SKIP) {
+            return true;
+        }
+
+        return false;
     }
 
     /* Getters/Setters
