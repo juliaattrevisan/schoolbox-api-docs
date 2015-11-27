@@ -115,7 +115,7 @@ class Controller extends Base {
 
         Mapper::getInstance()->save($rule);
 
-        $this->getResponse()->redirect->to("/adminv2/sync/{$params['rulesetId']}");
+        $this->getResponse()->redirect->to("/adminv2/sync/{$postData->get('rulesetId')}");
     }
 
     /**
