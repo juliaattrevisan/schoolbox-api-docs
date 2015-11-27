@@ -22,5 +22,17 @@ INSERT INTO `ups_custom_hydrator` (
     'Schoolbox\\Sync\\Hydrator\\Custom\\AddParentToAllChildCampuses',
     'parent',
     TRUE,
-    (SELECT COALESCE(MAX(`ch`.`sequence`), 0) FROM `ups_custom_hydrator` `ch` WHERE `role_type` = 'parent')
+    (SELECT COALESCE(MAX(`ch`.`sequence`), -1)+1 FROM `ups_custom_hydrator` `ch` WHERE `role_type` = 'parent')
+);
+
+INSERT INTO `ups_custom_hydrator` (
+    `class`,
+    `role_type`,
+    `enabled`,
+    `sequence`
+) VALUES (
+    'Schoolbox\\Sync\\Hydrator\\Custom\\SkipParentIfNoChildren',
+    'parent',
+    FALSE,
+    (SELECT COALESCE(MAX(`ch`.`sequence`), -1)+1 FROM `ups_custom_hydrator` `ch` WHERE `role_type` = 'parent')
 );
