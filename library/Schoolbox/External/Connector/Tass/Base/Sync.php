@@ -77,12 +77,12 @@ class Sync implements SyncInterface
         $companyCode = $this->database->smartQuote($this->companyCode);
         $query = "
             SELECT
-                'P' + p.par_code AS StudentContactID,
-                ''               AS StudentContactTitle,
-                p.f_name         AS StudentContactPreferred,
-                ''               AS StudentContactSurname,
-                ''               AS StudentContactDefaultEmail,
-                sf.sfa_num       AS StudentContactSplitFamilyNumber,
+                'P' + p.par_code AS student_contact_id,
+                ''               AS student_contact_title,
+                p.f_name         AS student_contact_preferred,
+                ''               AS student_contact_surname,
+                ''               AS student_contact_default_email,
+                sf.sfa_num       AS student_contact_split_family_number,
                 s.year_grp       AS student_year_level,
                 s.campus_code    AS student_campus,
                 s.sex            AS student_gender,
@@ -103,12 +103,12 @@ class Sync implements SyncInterface
             UNION ALL
 
             SELECT
-                'S' + p.par_code AS StudentContactID,
-                ''               AS StudentContactTitle,
-                p.m_name         AS StudentContactPreferred,
-                ''               AS StudentContactSurname,
-                ''               AS StudentContactDefaultEmail,
-                sf.sfa_num       AS StudentContactSplitFamilyNumber,
+                'S' + p.par_code AS student_contact_id,
+                ''               AS student_contact_title,
+                p.m_name         AS student_contact_preferred,
+                ''               AS student_contact_surname,
+                ''               AS student_contact_default_email,
+                sf.sfa_num       AS student_contact_split_family_number,
                 s.year_grp       AS student_year_level,
                 s.campus_code    AS student_campus,
                 s.sex            AS student_gender,
@@ -126,21 +126,21 @@ class Sync implements SyncInterface
             WHERE p.cmpy_code = $companyCode
             AND   p.f_name IS NOT NULL
 
-            ORDER BY StudentContactID ASC
+            ORDER BY student_contact_id ASC
         ";
 
         return new Iterator\Guardian(
             $this->database->getIterator($query)
                 ->addMap([$this->database, 'trimRow'])
                 ->addMap(function ($row) {
-                    list($firstName, $surname)      = preg_split("/\\s+/", $row['StudentContactPreferred'], 2);
-                    $row['StudentContactPreferred'] = $firstName;
-                    $row['StudentContactSurname']   = $surname;
+                    list($firstName, $surname)        = preg_split("/\\s+/", $row['student_contact_preferred'], 2);
+                    $row['student_contact_preferred'] = $firstName;
+                    $row['student_contact_surname']   = $surname;
                     return $row;
                 })
                 ->addMap(function ($row) {
-                    if (isset($row['StudentContactSplitFamilyNumber'])) {
-                        $row['StudentContactID'] .= $row['StudentContactSplitFamilyNumber'];
+                    if (isset($row['student_contact_split_family_number'])) {
+                        $row['student_contact_id'] .= $row['student_contact_split_family_number'];
                     }
                     return $row;
                 })

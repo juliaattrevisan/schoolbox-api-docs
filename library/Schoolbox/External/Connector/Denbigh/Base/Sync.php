@@ -73,12 +73,12 @@ class Sync implements SyncInterface
     {
         $statement = $this->database->prepare("
             SELECT
-                par.loginID AS StudentContactNetworkLogin,
-                peo.denbighID AS StudentContactID,
-                peo.title AS StudentContactTitle,
-                preferred_name AS StudentContactPreferred,
-                peo.surname AS StudentContactSurname,
-                peo.email AS StudentContactDefaultEmail,
+                par.loginID AS student_contact_network_login,
+                peo.denbighID AS student_contact_id,
+                peo.title AS student_contact_title,
+                preferred_name AS student_contact_preferred,
+                peo.surname AS student_contact_surname,
+                peo.email AS student_contact_default_email,
                 s.denbighID AS student_id,
                 s.academicYear AS student_year_level,
                 '' AS student_campus,

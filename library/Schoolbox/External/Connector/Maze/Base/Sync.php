@@ -57,15 +57,15 @@ class Sync implements SyncInterface
      */
     public function findAllParents()
     {
-        // TODO this spouse StudentContactID won't work, as getEnrolledStudents doesn't support it
+        // TODO this spouse student_contact_id won't work, as getEnrolledStudents doesn't support it
         $query = "
             SELECT
-                NULL          AS StudentContactNetworkLogin,
-                DF.DFKEY      AS StudentContactID,
-                DF.FTITLE     AS StudentContactTitle,
-                DF.FNAME      AS StudentContactPreferred,
-                DF.FSURNAME   AS StudentContactSurname,
-                DF.F_EMAIL    AS StudentContactDefaultEmail,
+                NULL          AS student_contact_network_login,
+                DF.DFKEY      AS student_contact_id,
+                DF.FTITLE     AS student_contact_title,
+                DF.FNAME      AS student_contact_preferred,
+                DF.FSURNAME   AS student_contact_surname,
+                DF.F_EMAIL    AS student_contact_default_email,
                 ST.STKEY      AS student_id,
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS student_year_level,
                 ST.CAMPUS     AS student_campus,
@@ -78,12 +78,12 @@ class Sync implements SyncInterface
 
             -- Speese
             SELECT
-                NULL           AS StudentContactNetworkLogin,
-                (DF.DFKEY+'1') AS StudentContactID,
-                DF.MTITLE      AS StudentContactTitle,
-                DF.MNAME       AS StudentContactPreferred,
-                DF.MSURNAME    AS StudentContactSurname,
-                DF.M_EMAIL     AS StudentContactDefaultEmail,
+                NULL           AS student_contact_network_login,
+                (DF.DFKEY+'1') AS student_contact_id,
+                DF.MTITLE      AS student_contact_title,
+                DF.MNAME       AS student_contact_preferred,
+                DF.MSURNAME    AS student_contact_surname,
+                DF.M_EMAIL     AS student_contact_default_email,
                 ST.STKEY       AS student_id,
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS student_year_level,
                 ST.CAMPUS      AS student_campus,
@@ -92,7 +92,7 @@ class Sync implements SyncInterface
             FROM ST
             LEFT JOIN DF ON (ST.FAMILY = DF.DFKEY OR ST.FAMB = DF.DFKEY)
 
-            ORDER BY StudentContactID ASC
+            ORDER BY student_contact_id ASC
         ";
         return new Iterator\Guardian($this->database->getIterator($query));
     }

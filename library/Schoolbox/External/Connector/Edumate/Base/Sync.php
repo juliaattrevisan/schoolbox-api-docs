@@ -62,12 +62,12 @@ class Sync implements SyncInterface
     {
         $stmt = $this->database->prepare('
             SELECT
-                NULL                     AS "StudentContactNetworkLogin",
-                p.CARER_NUMBER           AS "StudentContactID",
-                NULL                     AS "StudentContactTitle",
-                p.FULL_NAME              AS "StudentContactPreferred",
-                NULL                     AS "StudentContactSurname",
-                p.COMBINED_EMAIL_ADDRESS AS "StudentContactDefaultEmail",
+                NULL                     AS "student_contact_network_login",
+                p.CARER_NUMBER           AS "student_contact_id",
+                NULL                     AS "student_contact_title",
+                p.FULL_NAME              AS "student_contact_preferred",
+                NULL                     AS "student_contact_surname",
+                p.COMBINED_EMAIL_ADDRESS AS "student_contact_default_email",
                 s.STUDENT_NUMBER         AS "student_id",
                 s.YEAR_LEVEL             AS "student_year_level",
                 NULL                     AS "student_campus",
@@ -84,12 +84,12 @@ class Sync implements SyncInterface
             UNION ALL
 
             SELECT
-                NULL                     AS "StudentContactNetworkLogin",
-                p.SPOUSE_CARER_NUMBER    AS "StudentContactID",
-                NULL                     AS "StudentContactTitle",
-                p.SPOUSE_FULL_NAME       AS "StudentContactPreferred",
-                NULL                     AS "StudentContactSurname",
-                p.SPOUSE_EMAIL           AS "StudentContactDefaultEmail",
+                NULL                     AS "student_contact_network_login",
+                p.SPOUSE_CARER_NUMBER    AS "student_contact_id",
+                NULL                     AS "student_contact_title",
+                p.SPOUSE_FULL_NAME       AS "student_contact_preferred",
+                NULL                     AS "student_contact_surname",
+                p.SPOUSE_EMAIL           AS "student_contact_default_email",
                 s.STUDENT_NUMBER         AS "student_id",
                 s.YEAR_LEVEL             AS "student_year_level",
                 NULL                     AS "student_campus",
@@ -103,7 +103,7 @@ class Sync implements SyncInterface
                 AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
             WHERE p.SPOUSE_CARER_NUMBER IS NOT NULL
 
-            ORDER BY INTEGER("StudentContactID") ASC, INTEGER("student_id") ASC
+            ORDER BY INTEGER("student_contact_id") ASC, INTEGER("student_id") ASC
         ');
         $stmt->execute();
         return new Iterator\Guardian($stmt);
