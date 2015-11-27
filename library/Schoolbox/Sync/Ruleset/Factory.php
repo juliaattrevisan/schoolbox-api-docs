@@ -163,6 +163,7 @@ class Factory
         $allEffectStructures = [
             'containers' => [],
             'fragments' => [],
+            'allUserField' => $allUserField->getAllFields(),
         ];
 
         /* Skip Effect has a different container since it's a unique kind of Effect
@@ -188,7 +189,6 @@ class Factory
             'rulesetId'           => $this->getType(),
             'ruleset'             => [ 'rules' => $ruleset ],
             'allNDSField'         => $ffactory->buildMap($this->getType()),
-            'allUserField'        => $allUserField->getAllFields(),
             'allEffectStructures' => $allEffectStructures,
             'meta'                => $metas
         ];
