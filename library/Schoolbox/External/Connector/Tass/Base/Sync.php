@@ -63,7 +63,7 @@ class Sync implements SyncInterface
             AND   s.dol IS NULL
         ";
         return new Iterator\Student(
-            $this->database->getIterator($query)->addMap([$this, 'trimRow'])
+            $this->database->getIterator($query)->addMap([$this->database, 'trimRow'])
         );
     }
 
@@ -131,7 +131,7 @@ class Sync implements SyncInterface
 
         return new Iterator\Guardian(
             $this->database->getIterator($query)
-                ->addMap([$this, 'trimRow'])
+                ->addMap([$this->database, 'trimRow'])
                 ->addMap(function ($row) {
                     list($firstName, $surname)      = preg_split("/\\s+/", $row['StudentContactPreferred'], 2);
                     $row['StudentContactPreferred'] = $firstName;
@@ -176,7 +176,7 @@ class Sync implements SyncInterface
             WHERE t.cmpy_code = {$this->database->smartQuote($this->companyCode)}
         ";
         return new Iterator\Staff(
-            $this->database->getIterator($query)->addMap([$this, 'trimRow'])
+            $this->database->getIterator($query)->addMap([$this->database, 'trimRow'])
         );
     }
 }
