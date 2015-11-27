@@ -50,19 +50,19 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT
-                vStudents.StudentID,
-                NetworkLogin,
-                vStudents.StudentTitle,
-                vStudents.StudentPreferred,
-                vStudents.StudentSurname,
-                StudentGender,
-                StudentEmail,
-                StudentOccupEmail,
-                vStudents.StudentYearLevel,
-                vStudents.StudentHouse,
-                vStudents.StudentBoarder,
-                vStudents.StudentBoardingHouse,
-                StudentCampus
+                vStudents.StudentID            AS student_id,
+                NetworkLogin                   AS network_login,
+                vStudents.StudentTitle         AS student_title,
+                vStudents.StudentPreferred     AS student_preferred,
+                vStudents.StudentSurname       AS student_surname,
+                StudentGender                  AS student_gender,
+                StudentEmail                   AS student_email,
+                StudentOccupEmail              AS student_occup_email,
+                vStudents.StudentYearLevel     AS student_year_level,
+                vStudents.StudentHouse         AS student_house,
+                vStudents.StudentBoarder       AS student_boarder,
+                vStudents.StudentBoardingHouse AS student_boarding_house,
+                StudentCampus                  AS student_campus
             FROM SynergyOne.dbo.vStudents vStudents
             LEFT JOIN Community ON Community.ID = StudentID
             WHERE

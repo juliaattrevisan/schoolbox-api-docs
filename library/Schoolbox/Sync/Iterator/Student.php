@@ -27,37 +27,37 @@ class Student extends IteratorIterator
         $currentResult = $this->getInnerIterator()->current();
         $student       = new User\Student();
         $student
-            ->setId($currentResult['StudentID'])
-            ->setTitle($currentResult['StudentTitle'])
-            ->setPreferredName($currentResult['StudentPreferred'])
-            ->setLastname($currentResult['StudentSurname'])
-            ->setGender($currentResult['StudentGender'])
+            ->setId($currentResult['student_id'])
+            ->setTitle($currentResult['student_title'])
+            ->setPreferredName($currentResult['student_preferred'])
+            ->setLastname($currentResult['student_surname'])
+            ->setGender($currentResult['student_gender'])
         ;
 
         $student
             ->getYear()
-            ->setLevel($currentResult['StudentYearLevel'])
+            ->setLevel($currentResult['student_year_level'])
         ;
 
         $student
             ->getHouse()
-            ->setName($currentResult['StudentHouse'])
+            ->setName($currentResult['student_house'])
         ;
 
         $student
             ->getAccount()
-            ->setLogin($currentResult['NetworkLogin'])
+            ->setLogin($currentResult['network_login'])
         ;
 
         /* Assign emails
          */
         $email1 = new User\Common\Email();
         $email1
-            ->setAddress($currentResult['StudentEmail']);
+            ->setAddress($currentResult['student_email']);
 
         $email2 = new User\Common\Email();
         $email2
-            ->setAddress($currentResult['StudentOccupEmail']);
+            ->setAddress($currentResult['student_occup_email']);
 
         foreach (array($email1, $email2) as $currentEmail) {
             /** @var User\Common\Email $currentEmail */
@@ -66,10 +66,10 @@ class Student extends IteratorIterator
             }
         }
 
-        if ($currentResult['StudentBoarder'] == 'Y') {
+        if ($currentResult['student_boarder'] == 'Y') {
             $boardingHouse = new User\Common\BoardingHouse();
             $boardingHouse
-                ->setName($currentResult['StudentBoardingHouse'])
+                ->setName($currentResult['student_boarding_house'])
             ;
 
             $student
@@ -81,7 +81,7 @@ class Student extends IteratorIterator
          */
         $campus = new User\Common\Campus();
         $campus
-            ->setName($currentResult['StudentCampus'])
+            ->setName($currentResult['student_campus'])
         ;
 
         $student
