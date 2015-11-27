@@ -124,17 +124,24 @@
                             <div class="list-item">
                                 <h3 class="subheader">
                                     {{ customRule.getHydrator().getName() }}
+                                    <span class='hint has-tip tip-top'
+                                          data-tooltip
+                                          title="{{ customRule.getHydrator().getDescription() }}">?</span>
                                 </h3>
                             </div>
                             <nav>
-                                <a href="#" class="icon-add" data-collapser="customRule-{{ customRule.getId()  }}-contents" title="Collapse Content"></a>
+                                <span class="switch round">
+                                    <input id="customRule-{{ customRule.getId() }}-switch"
+                                           name="customRule[{{ customRule.getId() }}]"
+                                           type="checkbox"
+                                           {% if customRule.getEnabled() %}checked{% endif %}>
+                                    <label for="customRule-{{ customRule.getId() }}-switch">
+                                        <span>On</span>
+                                        <span>Off</span>
+                                    </label>
+                                </span>
                             </nav>
                         </div>
-                    </div>
-                    <div class="small-12 columns">
-                        <section class="content hide" data-collapsable="customRule-{{ customRule.getId()  }}-contents" data-collapse-state="collapsed">
-                            {{ customRule.getHydrator().getDescription() }}
-                        </section>
                     </div>
                 </div>
             {% endfor %}
