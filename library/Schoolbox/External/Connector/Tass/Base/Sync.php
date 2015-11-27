@@ -45,7 +45,7 @@ class Sync implements SyncInterface
         $query = "
             SELECT
                 s.stud_code AS student_id,
-                '' AS NetworkLogin,
+                '' AS network_login,
                 '' AS StudentTitle,
                 s.preferred_name AS StudentPreferred,
                 s.surname AS StudentSurname,
@@ -155,7 +155,7 @@ class Sync implements SyncInterface
         $query = "
             SELECT
                 te.tch_code AS StaffID,
-                '' AS NetworkLogin,
+                '' AS network_login,
                 CASE
                     WHEN (t.term_date) IS NULL THEN 0
                     ELSE 1

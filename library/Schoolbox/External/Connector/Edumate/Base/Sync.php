@@ -38,7 +38,7 @@ class Sync implements SyncInterface
         $stmt = $this->database->prepare('
             SELECT
             STUDENT_NUMBER AS "student_id",
-            USERNAME       AS "NetworkLogin",
+            USERNAME       AS "network_login",
             NULL           AS "StudentTitle",
             FIRSTNAME      AS "StudentPreferred",
             SURNAME        AS "StudentSurname",
@@ -117,7 +117,7 @@ class Sync implements SyncInterface
         $stmt = $this->database->prepare('
             SELECT
                 STAFF_NUMBER  AS "StaffID",
-                USERNAME      AS "NetworkLogin",
+                USERNAME      AS "network_login",
                 1             AS "ActiveFlag",
                 SALUTATION    AS "StaffTitle",
                 FIRSTNAME     AS "StaffPreferredName",

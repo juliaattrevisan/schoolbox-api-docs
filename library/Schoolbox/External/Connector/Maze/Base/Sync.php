@@ -36,7 +36,7 @@ class Sync implements SyncInterface
         $query = "
             SELECT
                 STKEY      AS student_id,
-                USER_NAME  AS NetworkLogin,
+                USER_NAME  AS network_login,
                 NULL       AS StudentTitle,
                 FIRST_NAME AS StudentPreferred,
                 SURNAME    AS StudentSurname,
@@ -105,7 +105,7 @@ class Sync implements SyncInterface
         $query = "
             SELECT
                 SFKEY      AS StaffID,
-                USER_NAME  AS NetworkLogin,
+                USER_NAME  AS network_login,
                 STAFF_TYPE AS ActiveFlag,
                 NULL       AS StaffTitle,
                 FIRST_NAME AS StaffPreferredName,
