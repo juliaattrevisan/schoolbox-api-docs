@@ -52,13 +52,13 @@ class Sync implements SyncInterface
                 firstname AS student_preferred,
                 surname AS student_surname,
                 '' AS student_gender,
-                email AS StudentEmail,
-                '' AS StudentOccupEmail,
-                academicYear AS StudentYearLevel,
-                house AS StudentHouse,
-                boardingStatus AS StudentBoarder,
-                cateringHouse AS StudentBoardingHouse,
-                '' AS StudentCampus
+                email AS student_email,
+                '' AS student_occup_email,
+                academicYear AS student_year_level,
+                house AS student_house,
+                boardingStatus AS student_boarder,
+                cateringHouse AS student_boarding_house,
+                '' AS student_campus
             FROM Schoolbox_Student
             ORDER BY denbighID ASC
         ");
@@ -80,8 +80,8 @@ class Sync implements SyncInterface
                 peo.surname AS StudentContactSurname,
                 peo.email AS StudentContactDefaultEmail,
                 s.denbighID AS student_id,
-                s.academicYear AS StudentYearLevel,
-                '' AS StudentCampus,
+                s.academicYear AS student_year_level,
+                '' AS student_campus,
                 s.gender AS student_gender,
                 s.preferred_name AS student_preferred,
                 s.surname AS student_surname

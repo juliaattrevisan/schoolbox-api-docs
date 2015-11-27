@@ -40,12 +40,12 @@ class Sync implements SyncInterface
                 NULL       AS student_title,
                 FIRST_NAME AS student_preferred,
                 SURNAME    AS student_surname,
-                NULL       AS StudentOccupEmail,
-                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
-                HOUSE      AS StudentHouse,
-                BOARDER    AS StudentBoarder,
-                NULL       AS StudentBoardingHouse,
-                CAMPUS     AS StudentCampus
+                NULL       AS student_occup_email,
+                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS student_year_level,
+                HOUSE      AS student_house,
+                BOARDER    AS student_boarder,
+                NULL       AS student_boarding_house,
+                CAMPUS     AS student_campus
             FROM ST
             WHERE STATUS != 'LEFT'
         ";
@@ -67,8 +67,8 @@ class Sync implements SyncInterface
                 DF.FSURNAME   AS StudentContactSurname,
                 DF.F_EMAIL    AS StudentContactDefaultEmail,
                 ST.STKEY      AS student_id,
-                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
-                ST.CAMPUS     AS StudentCampus,
+                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS student_year_level,
+                ST.CAMPUS     AS student_campus,
                 ST.FIRST_NAME AS student_preferred,
                 ST.SURNAME    AS student_surname
             FROM ST
@@ -85,8 +85,8 @@ class Sync implements SyncInterface
                 DF.MSURNAME    AS StudentContactSurname,
                 DF.M_EMAIL     AS StudentContactDefaultEmail,
                 ST.STKEY       AS student_id,
-                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
-                ST.CAMPUS      AS StudentCampus,
+                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS student_year_level,
+                ST.CAMPUS      AS student_campus,
                 ST.FIRST_NAME  AS student_preferred,
                 ST.SURNAME     AS student_surname
             FROM ST

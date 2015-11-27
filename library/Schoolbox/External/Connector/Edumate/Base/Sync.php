@@ -42,13 +42,13 @@ class Sync implements SyncInterface
             NULL           AS "student_title",
             FIRSTNAME      AS "student_preferred",
             SURNAME        AS "student_surname",
-            EMAIL_ADDRESS  AS "StudentEmail",
-            NULL           AS "StudentOccupEmail",
-            YEAR_LEVEL     AS "StudentYearLevel",
-            HOUSE          AS "StudentHouse",
-            NULL           AS "StudentBoarder",
-            NULL           AS "StudentBoardingHouse",
-            NULL           AS "StudentCampus"
+            EMAIL_ADDRESS  AS "student_email",
+            NULL           AS "student_occup_email",
+            YEAR_LEVEL     AS "student_year_level",
+            HOUSE          AS "student_house",
+            NULL           AS "student_boarder",
+            NULL           AS "student_boarding_house",
+            NULL           AS "student_campus"
             FROM db2inst1.schoolbox_students
         ');
         $stmt->execute();
@@ -69,8 +69,8 @@ class Sync implements SyncInterface
                 NULL                     AS "StudentContactSurname",
                 p.COMBINED_EMAIL_ADDRESS AS "StudentContactDefaultEmail",
                 s.STUDENT_NUMBER         AS "student_id",
-                s.YEAR_LEVEL             AS "StudentYearLevel",
-                NULL                     AS "StudentCampus",
+                s.YEAR_LEVEL             AS "student_year_level",
+                NULL                     AS "student_campus",
                 NULL                     AS "student_gender",
                 s.FIRSTNAME              AS "student_preferred",
                 s.SURNAME                AS "student_surname"
@@ -91,8 +91,8 @@ class Sync implements SyncInterface
                 NULL                     AS "StudentContactSurname",
                 p.SPOUSE_EMAIL           AS "StudentContactDefaultEmail",
                 s.STUDENT_NUMBER         AS "student_id",
-                s.YEAR_LEVEL             AS "StudentYearLevel",
-                NULL                     AS "StudentCampus",
+                s.YEAR_LEVEL             AS "student_year_level",
+                NULL                     AS "student_campus",
                 NULL                     AS "student_gender",
                 s.FIRSTNAME              AS "student_preferred",
                 s.SURNAME                AS "student_surname"

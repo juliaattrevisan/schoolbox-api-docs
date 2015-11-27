@@ -50,13 +50,13 @@ class Sync implements SyncInterface
                 s.preferred_name AS student_preferred,
                 s.surname AS student_surname,
                 s.sex AS student_gender,
-                s.e_mail AS StudentEmail,
-                '' AS StudentOccupEmail,
-                s.year_grp AS StudentYearLevel,
-                s.house AS StudentHouse,
-                (IF ((sb.resid_code IS NOT NULL), 'Y', 'N')) AS StudentBoarder,
-                sb.resid_code AS StudentBoardingHouse,
-                s.campus_code AS StudentCampus
+                s.e_mail AS student_email,
+                '' AS student_occup_email,
+                s.year_grp AS student_year_level,
+                s.house AS student_house,
+                (IF ((sb.resid_code IS NOT NULL), 'Y', 'N')) AS student_boarder,
+                sb.resid_code AS student_boarding_house,
+                s.campus_code AS student_campus
             FROM student AS s
             LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
             WHERE s.cmpy_code = {$this->database->smartQuote($this->companyCode)}
@@ -83,8 +83,8 @@ class Sync implements SyncInterface
                 ''               AS StudentContactSurname,
                 ''               AS StudentContactDefaultEmail,
                 sf.sfa_num       AS StudentContactSplitFamilyNumber,
-                s.year_grp       AS StudentYearLevel,
-                s.campus_code    AS StudentCampus,
+                s.year_grp       AS student_year_level,
+                s.campus_code    AS student_campus,
                 s.sex            AS student_gender,
                 s.preferred_name AS student_preferred,
                 s.surname        AS student_surname
@@ -109,8 +109,8 @@ class Sync implements SyncInterface
                 ''               AS StudentContactSurname,
                 ''               AS StudentContactDefaultEmail,
                 sf.sfa_num       AS StudentContactSplitFamilyNumber,
-                s.year_grp       AS StudentYearLevel,
-                s.campus_code    AS StudentCampus,
+                s.year_grp       AS student_year_level,
+                s.campus_code    AS student_campus,
                 s.sex            AS student_gender,
                 s.preferred_name AS student_preferred,
                 s.surname        AS student_surname
