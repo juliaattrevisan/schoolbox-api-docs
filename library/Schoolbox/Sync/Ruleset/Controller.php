@@ -97,38 +97,40 @@ class Controller extends Base {
         // TODO DI
         $mapper = Condition\Mapper::getInstance();
 
-        foreach ($conditions as $conditionId => $conditionData) {
+        if (count($conditions)) {
+            foreach ($conditions as $conditionId => $conditionData) {
 
-            $conditionType = $conditionData['type'];
-            // NOT WORKING
-            $conditionArgs = (array)$conditionData['arguments'];
+                $conditionType = $conditionData['type'];
+                // NOT WORKING
+                $conditionArgs = (array)$conditionData['arguments'];
 
-            // ensure this is in the right order
-            ksort($conditionArgs);
+                // ensure this is in the right order
+                ksort($conditionArgs);
 
-            // this is pretty hacky and not overly extensible...
-            if ($conditionType == 1 && count($conditionArgs) == 3) {
-                if (strlen($conditionArgs[1])) {
-                    $conditionArgs[1] = preg_split("`[\r\n]+`", $conditionArgs[1]);
+                // this is pretty hacky and not overly extensible...
+                if ($conditionType == 1 && count($conditionArgs) == 3) {
+                    if (strlen($conditionArgs[1])) {
+                        $conditionArgs[1] = preg_split("`[\r\n]+`", $conditionArgs[1]);
+                    }
+                    $conditionArgs[2] = (bool)$conditionArgs[2];
+
+                } else {
+                    $conditionArgs[0] = (bool)$conditionArgs[0];
                 }
-                $conditionArgs[2] = (bool)$conditionArgs[2];
 
-            } else {
-                $conditionArgs[0] = (bool)$conditionArgs[0];
-            }
+                $condition = [
+                    'id'                => $conditionId,
+                    'rule_id'           => $ruleId,
+                    'condition_type_id' => $conditionType,
+                    'arguments'         => json_encode($conditionArgs)
+                ];
 
-            $condition = [
-                'id'                => $conditionId,
-                'rule_id'           => $ruleId,
-                'condition_type_id' => $conditionType,
-                'arguments'         => json_encode($conditionArgs)
-            ];
-
-            try {
-                $mapper->save($mapper->hydrate($condition));
-            } catch (\PDOException $e) {
-                // clean up after yourself
-                $mapper->deleteByColumn('id', $conditionId);
+                try {
+                    $mapper->save($mapper->hydrate($condition));
+                } catch (\PDOException $e) {
+                    // clean up after yourself
+                    $mapper->deleteByColumn('id', $conditionId);
+                }
             }
         }
 
@@ -175,13 +177,12 @@ class Controller extends Base {
 
             try {
                 $mapper->save($mapper->hydrate($effect));
-            } catch (\PDOException $e) {
-                // clean up after yourself
-                $mapper->deleteByColumn('id', $effectId);
+            }
+            catch (\PDOException $e) {
             }
         }
 
-        // housekeeping - make sure there aren't any remnant invalid conditions flying around
+        // housekeeping - make sure there aren't any remnant invalid effects flying around
         $mapper->deleteByColumnList([
             'rule_id'   => $ruleId,
             'arguments' => json_encode(null)
