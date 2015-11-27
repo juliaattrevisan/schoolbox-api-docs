@@ -8,6 +8,8 @@
 namespace Schoolbox\Sync\Hydrator\Custom;
 
 use Schoolbox\Sync;
+use Schoolbox\Sync\Hydrator\HydratorInterface;
+use UnexpectedValueException;
 
 /**
  * Mapper for custom hydrators
@@ -51,6 +53,26 @@ class Model
      * @var int
      */
     protected $sequence;
+
+    /**
+     * The actual hydrator this model points to.
+     *
+     * @var HydratorInterface
+     */
+    protected $hydrator;
+
+    /**
+     * Loads the hydrator that this model points to.
+     *
+     * @return $this
+     * @throws UnexpectedValueException if class doesn't exist, or it's not instanceof HydratorInterface
+     */
+    public function loadHydratorFromClass()
+    {
+        $factory = new Factory();
+        $this->setHydrator($factory->produceFromModel($this));
+        return $this;
+    }
 
     /**
      * @return int
@@ -139,6 +161,24 @@ class Model
     public function setSequence($sequence)
     {
         $this->sequence = $sequence;
+        return $this;
+    }
+
+    /**
+     * @return HydratorInterface
+     */
+    public function getHydrator()
+    {
+        return $this->hydrator;
+    }
+
+    /**
+     * @param  HydratorInterface $hydrator
+     * @return $this
+     */
+    public function setHydrator($hydrator)
+    {
+        $this->hydrator = $hydrator;
         return $this;
     }
 }
