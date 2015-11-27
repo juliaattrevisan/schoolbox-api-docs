@@ -11,6 +11,7 @@ namespace Alaress;
 
 use Alaress_Date_Format;
 use ArrayAccess;
+use ArrayObject;
 use DomainException;
 use ReflectionMethod;
 use ReflectionObject;
@@ -194,6 +195,11 @@ class ObjectReader
         try {
             foreach ($parts as $get) {
 
+                // this is *so* cheating, but it exposes a unified interface for the functionality below
+                if (is_array($value)) {
+                    $value = new ArrayObject($value);
+                }
+
                 if ($value instanceof ArrayAccess) {
 
                     if ($value->offsetExists($get)) {
@@ -241,10 +247,6 @@ class ObjectReader
                 } elseif (is_object($value)) {
                     $string .= '->get'.ucfirst($get).'()';
                     $value = $this->readObjectProperty($value, $get);
-
-                } elseif (is_array($value)) {
-                    $string .= "[$get]";
-                    $value = $this->readArrayProperty($value, $get);
 
                 } else {
                     throw new DomainException("Reading '$get' from $string, but property '$value' is not readable (path was $path)");
