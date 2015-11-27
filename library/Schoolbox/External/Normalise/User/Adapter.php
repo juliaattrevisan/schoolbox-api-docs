@@ -1241,7 +1241,7 @@ class Adapter  implements \External_UserInterface {
                  */
                 $staff
                     ->getAccount()
-                        ->setLogin($currentResult['network_login'])
+                        ->setLogin($currentResult['NetworkLogin'])
                         ->setActive($currentResult['ActiveFlag'])
                 ;
 
