@@ -32,6 +32,7 @@
 
         initEffectCreate();
         initEffectModifyLock();
+        initEffectUserfieldChange();
         initEffectMappingTypeChange();
         initEffectDelete();
 
@@ -304,7 +305,7 @@
                         'data-effect-userfield',
                         'data-effect-mappingtype',
                         'data-effect-fragment',
-                        'data-effect-delete',
+                        'data-effect-delete'
                     ];
 
                     $.each(allDataVars, function(index, element) {
@@ -361,6 +362,24 @@
 
                     $(this).removeClass('icon-locked').addClass('icon-unlocked');
                 }
+            });
+        }
+
+        /**
+         * Detect when the Schoolbox User Field is changed, forcing
+         * people to select a Mapping Type
+         */
+        function initEffectUserfieldChange() {
+            $(config.element).on('change', '[data-effect-userfield]', function(event) {
+                var effectId = $(this).attr('data-effect-userfield');
+
+                /* Reset Mapping Type
+                 */
+                $('[data-effect-mappingtype='+effectId+']').val(-1);
+
+                /* Empty the Effect Fragment container
+                 */
+                $('[data-effect-fragment='+effectId+']').html('');
             });
         }
 
