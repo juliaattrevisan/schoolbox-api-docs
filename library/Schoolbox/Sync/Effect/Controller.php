@@ -16,6 +16,7 @@ use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Effect;
 use Alaress\ObjectReader;
 use Schoolbox\Sync\Effect\AllUserField;
+use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
 class Controller extends Base {
     const EFFECT_SKIP = 1;
@@ -58,7 +59,7 @@ class Controller extends Base {
          * Assume Literal Effect Type to start with
          */
         $default = [
-            'effectType' => AllUserField::EFFECT_TYPE_LITERAL,
+            'effectType' => EffectTypeMapper::EFFECT_TYPE_LITERAL,
             'userProperty' => 'lastname',
             'arguments' => [false]
         ];
@@ -122,7 +123,7 @@ class Controller extends Base {
          * Assume Literal Effect Type to start with
          */
         $default = [
-            'effectType' => AllUserField::EFFECT_TYPE_SKIP,
+            'effectType' => EffectTypeMapper::EFFECT_TYPE_SKIP,
             'userProperty' => '',
             'arguments' => []
         ];

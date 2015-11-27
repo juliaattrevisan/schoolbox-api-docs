@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Sync\Effect\Type;
 
+use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
 class Model {
 
@@ -37,7 +38,7 @@ class Model {
      * @return string
      */
     public function getTemplate() {
-        if ($this->getId() == \Schoolbox\Sync\Effect\AllUserField::EFFECT_TYPE_SKIP) {
+        if ($this->getId() == EffectTypeMapper::EFFECT_TYPE_SKIP) {
             return $this->getEffectSkipTemplate();
         }
 

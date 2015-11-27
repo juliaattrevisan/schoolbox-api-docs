@@ -14,20 +14,12 @@
 
 namespace Schoolbox\Sync\Effect;
 
+use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
 class AllUserField {
     const TYPE_BOOLEAN = 1;
     const TYPE_LOOKUP = 2;
     const TYPE_STRING = 3;
-
-    /* As per ups_effect_type in the db
-     * Used to determine Effect Fragment templates
-     */
-    const EFFECT_TYPE_LITERAL = 2;
-
-    /* Skip Effect Type
-     */
-    const EFFECT_TYPE_SKIP = 3;
 
     /* Manufacture a list of Schoolbox User fields to chooze from
      * TODO: Connect up to UserMapper to determine type
@@ -76,7 +68,7 @@ class AllUserField {
      * @return string
      */
     public function getEffectFragmentTemplate($mappingType, $userField) {
-        if ($mappingType == self::EFFECT_TYPE_LITERAL) {
+        if ($mappingType == EffectTypeMapper::EFFECT_TYPE_LITERAL) {
             if ($this->isBoolean($userField)) {
                 return '@syncEffect/boolean.twig';
             }

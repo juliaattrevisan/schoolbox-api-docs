@@ -18,6 +18,7 @@ use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Condition;
 use Schoolbox\Sync\Effect;
 use Schoolbox\Sync\Effect\AllUserField;
+use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
 class Factory
 {
@@ -172,7 +173,7 @@ class Factory
             foreach ($currentRule->getEffects() as $currentEffect) {
                 $allEffectStructures['containers'][$currentEffect->getId()] = $currentEffect->getEffectType()->getTemplate();
 
-                if ($currentEffect->getEffectType()->getId() != AllUserField::EFFECT_TYPE_SKIP) {
+                if ($currentEffect->getEffectType()->getId() != EffectTypeMapper::EFFECT_TYPE_SKIP) {
                     $allEffectStructures['fragments'][$currentEffect->getId()] = $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
                 }
             }
