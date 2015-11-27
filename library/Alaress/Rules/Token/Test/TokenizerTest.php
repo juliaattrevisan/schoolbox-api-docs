@@ -33,8 +33,8 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
             'foo'            => 'The foo',
             'bar'            => 'The bar',
             'baz.bar'        => "The baz's bar",
-            'single.multi'   => "The single's multi",
-            'alpha.bravo.id' => "The IDs of the alpha's bravos"
+            'single.multi[]' => "The single's multi",
+            'alpha[].id'     => "The IDs of the alpha's bravos"
         ]);
 
         $this->tree = [
