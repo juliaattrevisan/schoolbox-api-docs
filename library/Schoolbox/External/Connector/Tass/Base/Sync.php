@@ -44,7 +44,7 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT
-                s.stud_code AS StudentID,
+                s.stud_code AS student_id,
                 '' AS NetworkLogin,
                 '' AS StudentTitle,
                 s.preferred_name AS StudentPreferred,

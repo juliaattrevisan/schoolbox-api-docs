@@ -37,7 +37,7 @@ class Sync implements SyncInterface
     {
         $stmt = $this->database->prepare('
             SELECT
-            STUDENT_NUMBER AS "StudentID",
+            STUDENT_NUMBER AS "student_id",
             USERNAME       AS "NetworkLogin",
             NULL           AS "StudentTitle",
             FIRSTNAME      AS "StudentPreferred",
@@ -68,7 +68,7 @@ class Sync implements SyncInterface
                 p.FULL_NAME              AS "StudentContactPreferred",
                 NULL                     AS "StudentContactSurname",
                 p.COMBINED_EMAIL_ADDRESS AS "StudentContactDefaultEmail",
-                s.STUDENT_NUMBER         AS "StudentId",
+                s.STUDENT_NUMBER         AS "student_id",
                 s.YEAR_LEVEL             AS "StudentYearLevel",
                 NULL                     AS "StudentCampus",
                 NULL                     AS "StudentGender",
@@ -90,7 +90,7 @@ class Sync implements SyncInterface
                 p.SPOUSE_FULL_NAME       AS "StudentContactPreferred",
                 NULL                     AS "StudentContactSurname",
                 p.SPOUSE_EMAIL           AS "StudentContactDefaultEmail",
-                s.STUDENT_NUMBER         AS "StudentId",
+                s.STUDENT_NUMBER         AS "student_id",
                 s.YEAR_LEVEL             AS "StudentYearLevel",
                 NULL                     AS "StudentCampus",
                 NULL                     AS "StudentGender",
@@ -103,7 +103,7 @@ class Sync implements SyncInterface
                 AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
             WHERE p.SPOUSE_CARER_NUMBER IS NOT NULL
 
-            ORDER BY INTEGER("StudentContactID") ASC, INTEGER("StudentId") ASC
+            ORDER BY INTEGER("StudentContactID") ASC, INTEGER("student_id") ASC
         ');
         $stmt->execute();
         return new Iterator\Guardian($stmt);

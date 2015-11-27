@@ -35,7 +35,7 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT
-                STKEY      AS StudentID,
+                STKEY      AS student_id,
                 USER_NAME  AS NetworkLogin,
                 NULL       AS StudentTitle,
                 FIRST_NAME AS StudentPreferred,
@@ -66,7 +66,7 @@ class Sync implements SyncInterface
                 DF.FNAME      AS StudentContactPreferred,
                 DF.FSURNAME   AS StudentContactSurname,
                 DF.F_EMAIL    AS StudentContactDefaultEmail,
-                ST.STKEY      AS StudentId,
+                ST.STKEY      AS student_id,
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
                 ST.CAMPUS     AS StudentCampus,
                 ST.FIRST_NAME AS StudentPreferred,
@@ -84,7 +84,7 @@ class Sync implements SyncInterface
                 DF.MNAME       AS StudentContactPreferred,
                 DF.MSURNAME    AS StudentContactSurname,
                 DF.M_EMAIL     AS StudentContactDefaultEmail,
-                ST.STKEY       AS StudentId,
+                ST.STKEY       AS student_id,
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
                 ST.CAMPUS      AS StudentCampus,
                 ST.FIRST_NAME  AS StudentPreferred,

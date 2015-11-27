@@ -46,7 +46,7 @@ class Sync implements SyncInterface
     {
         $statement = $this->database->prepare("
             SELECT
-                denbighID AS StudentID,
+                denbighID AS student_id,
                 username AS NetworkLogin,
                 '' AS StudentTitle,
                 firstname AS StudentPreferred,
@@ -79,7 +79,7 @@ class Sync implements SyncInterface
                 preferred_name AS StudentContactPreferred,
                 peo.surname AS StudentContactSurname,
                 peo.email AS StudentContactDefaultEmail,
-                s.denbighID AS StudentId,
+                s.denbighID AS student_id,
                 s.academicYear AS StudentYearLevel,
                 '' AS StudentCampus,
                 s.gender AS StudentGender,
