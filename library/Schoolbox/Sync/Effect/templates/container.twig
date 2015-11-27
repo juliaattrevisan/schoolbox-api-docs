@@ -1,12 +1,5 @@
 {# Corresponds to db indexes for effectType - could be fed from backend one day #}
 {% set allEffectMappingTypes = ['Maps', 'Equals'] %}
-{% set effectBoolean = 1 %}
-{% set effectLookup = 2 %}
-{% set effectString = 3 %}
-
-{% set effectTypeMap = 1 %}
-{% set effectTypeLiteral = 2 %}
-
 
 <li id="effect-{{ currentEffect.id }}" class="actions-small-2 content" data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
     <input type="hidden" name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][type]" value="">
