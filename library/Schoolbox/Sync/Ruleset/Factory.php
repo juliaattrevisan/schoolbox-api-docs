@@ -156,11 +156,20 @@ class Factory
          * It tells frontend which templates to use for Effects.
          */
         $allUserField = new AllUserField();
+        $allEffectContainers = [];
         $allEffectFragments = [];
 
+        /* Skip Effect has a different container since it's a unique kind of Effect
+         */
         foreach ($ruleset as $currentRule) {
             foreach ($currentRule->getEffects() as $currentEffect) {
-                $allEffectFragments[$currentEffect->getId()] = $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+                if ($currentEffect->getEffectType()->getId() == AllUserField::EFFECT_TYPE_SKIP) {
+                    $allEffectContainers[$currentEffect->getId()] = '@syncEffect/container-skip.twig';
+                }
+                else {
+                    $allEffectContainers[$currentEffect->getId()] = '@syncEffect/container.twig';
+                    $allEffectFragments[$currentEffect->getId()] = $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+                }
             }
         }
 
@@ -168,14 +177,15 @@ class Factory
          * Otherwise it would have returned empty array earlier
          */
         return [
-            'allBreadcrumbs'     => $allBreadcrumbs->getAllNodes(),
-            'allNavigation'      => $allNavigation->getAllNodes(),
-            'rulesetId'          => $this->getType(),
-            'ruleset'            => [ 'rules' => $ruleset ],
-            'allNDSField'        => $ffactory->buildMap($this->getType()),
-            'allUserField'       => $allUserField->getAllFields(),
-            'allEffectFragments' => $allEffectFragments,
-            'meta'               => $metas
+            'allBreadcrumbs'      => $allBreadcrumbs->getAllNodes(),
+            'allNavigation'       => $allNavigation->getAllNodes(),
+            'rulesetId'           => $this->getType(),
+            'ruleset'             => [ 'rules' => $ruleset ],
+            'allNDSField'         => $ffactory->buildMap($this->getType()),
+            'allUserField'        => $allUserField->getAllFields(),
+            'allEffectContainers' => $allEffectContainers,
+            'allEffectFragments'  => $allEffectFragments,
+            'meta'                => $metas
         ];
     }
 
