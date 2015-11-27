@@ -184,11 +184,14 @@ class Factory
         }
 
         // Get all of the custom rules too
-        $hydratorFactory = new Hydrator\Custom\Factory();
-        $hydratorModels  = Hydrator\Custom\Mapper::getInstance()->findByColumnList(
+        /** @var Hydrator\Custom\Model[] $hydratorModels */
+        $hydratorModels = Hydrator\Custom\Mapper::getInstance()->findByColumnList(
             ['role_type' => $this->getType()],
             ['order' => ['sequence' => 'asc'],]
         );
+        foreach ($hydratorModels as $hydrator) {
+            $hydrator->loadHydratorFromClass();
+        }
 
         /* If it was one of the known cases, return a well-formed structure
          * Otherwise it would have returned empty array earlier
@@ -198,7 +201,7 @@ class Factory
             'allNavigation'       => $allNavigation->getAllNodes(),
             'rulesetId'           => $this->getType(),
             'ruleset'             => [ 'rules' => $ruleset ],
-            'customRules'         => $hydratorFactory->produceFromCollection($hydratorModels),
+            'customRules'         => $hydratorModels,
             'allEffectStructures' => $allEffectStructures,
             'meta'                => $metas
         ];

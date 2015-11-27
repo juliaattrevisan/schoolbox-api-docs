@@ -123,28 +123,25 @@
 
             <h2 class="subheader">Custom Rules</h2>
 
-            {% for i, customRule in customRules %}
-                <div class="row" id="customRule-{{ i }}">
+            {% for customRule in customRules %}
+                <div class="row" id="customRule-{{ customRule.getId() }}">
                     <div class="small-12 columns">
                         <div class="actions-small-1">
                             <div class="list-item">
                                 <div class="small-12 columns">
                                     <h3 class="subheader">
-                                        {{ customRule.getName() }}
-                                        {% if currentRule.description|length %}
-                                            <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
-                                        {% endif %}
+                                        {{ customRule.getHydrator().getName() }}
                                     </h3>
                                 </div>
                             </div>
                             <nav>
-                                <a href="#" class="icon-add" data-collapser="customRule-{{ i }}-contents" title="Collapse Content"></a>
+                                <a href="#" class="icon-add" data-collapser="customRule-{{ customRule.getId()  }}-contents" title="Collapse Content"></a>
                             </nav>
                         </div>
                     </div>
                     <div class="small-12 columns">
-                        <section class="content hide" data-collapsable="customRule-{{ i }}-contents" data-collapse-state="collapsed">
-                            {{ customRule.getDescription() }}
+                        <section class="content hide" data-collapsable="customRule-{{ customRule.getId()  }}-contents" data-collapse-state="collapsed">
+                            {{ customRule.getHydrator().getDescription() }}
                         </section>
                     </div>
                 </div>
