@@ -405,17 +405,16 @@
                          */
                         label.labelActivate();
 
+                        /* Unsaved effects can be removed without needing the indicator
+                         * as these don't require backend confirmation
+                         */
+                        if (effectId.match(config.stubPrefix)) {
+                            $('#effect-' + effectId).remove();
+                        }
                         /* Delete asynchronously if successful; ignore if unsuccessful
                          */
-                        $.post(config.effect.delete.url, { effectId: effectId }, function(responseText) {
-
-                            /* Unsaved effects can be removed without needing the indicator
-                             * as these don't require backend confirmation
-                             */
-                            if (effectId.match(config.stubPrefix)) {
-                                $('#effect-' + effectId).remove();
-                            }
-                            else {
+                        else {
+                            $.post(config.effect.delete.url, { effectId: effectId }, function(responseText) {
                                 if (responseText == config.success) {
                                     $('#effect-' + effectId).remove();
 
@@ -432,8 +431,8 @@
                                         css: 'alert'
                                     });
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 });
             });
