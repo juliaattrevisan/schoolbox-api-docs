@@ -26,9 +26,7 @@
 
             <div class="actions-small-1">
                 <div class="list-item">
-                    <div class="small-12 columns">
-                        <h2 class="subheader">{{ rulesetId|capitalize }} Ruleset</h2>
-                    </div>
+                    <h2 class="subheader">{{ rulesetId|capitalize }} Ruleset</h2>
                 </div>
                 <nav>
                     <a class="icon-more" title="" data-dropdown="ruleset-options"></a>
@@ -43,19 +41,17 @@
                 <div class="small-12 columns">
                     <div class="actions-small-3">
                         <div class="list-item">
-                            <div class="small-12 columns">
-                                <h3 class="subheader">
-                                    {% if currentRule.name|length %}
-                                        {{ currentRule.name }}
-                                    {% else %}
-                                        Rule {{ currentRule.id }}
-                                    {% endif %}
+                            <h3 class="subheader">
+                                {% if currentRule.name|length %}
+                                    {{ currentRule.name }}
+                                {% else %}
+                                    Rule {{ currentRule.id }}
+                                {% endif %}
 
-                                    {% if currentRule.description|length %}
-                                        <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
-                                    {% endif %}
-                                </h3>
-                            </div>
+                                {% if currentRule.description|length %}
+                                    <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
+                                {% endif %}
+                            </h3>
                         </div>
                         <nav>
                             <a href="#" class="icon-add" data-collapser="rule-{{ currentRule.id }}-contents" title="Collapse Content"></a>
@@ -70,9 +66,7 @@
                     <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
                         <div class="actions-small-1 row">
                             <div class="list-item">
-                                <div class="small-12 columns">
-                                    <h4>Conditions</h4>
-                                </div>
+                                <h4>Conditions</h4>
                             </div>
                             <nav>
                                 <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
@@ -128,11 +122,9 @@
                     <div class="small-12 columns">
                         <div class="actions-small-1">
                             <div class="list-item">
-                                <div class="small-12 columns">
-                                    <h3 class="subheader">
-                                        {{ customRule.getHydrator().getName() }}
-                                    </h3>
-                                </div>
+                                <h3 class="subheader">
+                                    {{ customRule.getHydrator().getName() }}
+                                </h3>
                             </div>
                             <nav>
                                 <a href="#" class="icon-add" data-collapser="customRule-{{ customRule.getId()  }}-contents" title="Collapse Content"></a>
