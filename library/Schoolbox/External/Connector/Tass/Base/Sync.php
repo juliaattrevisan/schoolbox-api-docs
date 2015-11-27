@@ -44,19 +44,20 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT
-                s.stud_code AS student_id,
-                '' AS network_login,
-                '' AS student_title,
+                s.stud_code      AS student_id,
+                ''               AS network_login,
+                ''               AS student_title,
                 s.preferred_name AS student_preferred,
-                s.surname AS student_surname,
-                s.sex AS student_gender,
-                s.e_mail AS student_email,
-                '' AS student_occup_email,
-                s.year_grp AS student_year_level,
-                s.house AS student_house,
-                (IF ((sb.resid_code IS NOT NULL), 'Y', 'N')) AS student_boarder,
-                sb.resid_code AS student_boarding_house,
-                s.campus_code AS student_campus
+                s.surname        AS student_surname,
+                s.sex            AS student_gender,
+                s.e_mail         AS student_email,
+                ''               AS student_occup_email,
+                s.year_grp       AS student_year_level,
+                s.house          AS student_house,
+                (IF ((sb.resid_code IS NOT NULL), 'Y', 'N'))
+                                 AS student_boarder,
+                sb.resid_code    AS student_boarding_house,
+                s.campus_code    AS student_campus
             FROM student AS s
             LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
             WHERE s.cmpy_code = {$this->database->smartQuote($this->companyCode)}
@@ -154,22 +155,22 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT
-                te.tch_code AS staff_id,
-                '' AS network_login,
+                te.tch_code         AS staff_id,
+                ''                  AS network_login,
                 CASE
                     WHEN (t.term_date) IS NULL THEN 0
                     ELSE 1
-                END AS active_flag,
-                t.salutation_flag AS staff_title,
-                t.prefer_name_text AS staff_preferred_name,
-                t.surname_text AS staff_surname,
-                '' AS default_email_code,
-                '' AS occup_email,
-                t.e_mail AS email,
-                '' AS staff_campus,
-                '' AS staff_category_type,
-                '' AS staff_category,
-                td.tch_dept AS staff_department
+                END                 AS active_flag,
+                t.salutation_flag   AS staff_title,
+                t.prefer_name_text  AS staff_preferred_name,
+                t.surname_text      AS staff_surname,
+                ''                  AS default_email_code,
+                ''                  AS occup_email,
+                t.e_mail            AS email,
+                ''                  AS staff_campus,
+                ''                  AS staff_category_type,
+                ''                  AS staff_category,
+                td.tch_dept         AS staff_department
             FROM tel_vw_telemf AS t
             LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
             LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code

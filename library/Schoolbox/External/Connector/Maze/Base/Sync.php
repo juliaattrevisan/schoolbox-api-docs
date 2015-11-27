@@ -41,7 +41,8 @@ class Sync implements SyncInterface
                 FIRST_NAME AS student_preferred,
                 SURNAME    AS student_surname,
                 NULL       AS student_occup_email,
-                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS student_year_level,
+                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
+                           AS student_year_level,
                 HOUSE      AS student_house,
                 BOARDER    AS student_boarder,
                 NULL       AS student_boarding_house,
@@ -67,7 +68,8 @@ class Sync implements SyncInterface
                 DF.FSURNAME   AS student_contact_surname,
                 DF.F_EMAIL    AS student_contact_default_email,
                 ST.STKEY      AS student_id,
-                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS student_year_level,
+                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
+                              AS student_year_level,
                 ST.CAMPUS     AS student_campus,
                 ST.FIRST_NAME AS student_preferred,
                 ST.SURNAME    AS student_surname
@@ -85,7 +87,8 @@ class Sync implements SyncInterface
                 DF.MSURNAME    AS student_contact_surname,
                 DF.M_EMAIL     AS student_contact_default_email,
                 ST.STKEY       AS student_id,
-                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS student_year_level,
+                REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
+                               AS student_year_level,
                 ST.CAMPUS      AS student_campus,
                 ST.FIRST_NAME  AS student_preferred,
                 ST.SURNAME     AS student_surname
