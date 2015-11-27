@@ -1,4 +1,4 @@
 <select name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][arguments]">
-    <option value="1">True</option>
-    <option value="0">False</option>
+    <option value="1" {% if currentEffect.arguments[0] == true %}selected="selected"{% endif %}>True</option>
+    <option value="0" {% if currentEffect.arguments[0] == false %}selected="selected"{% endif %}>False</option>
 </select>
