@@ -49,15 +49,6 @@ class Controller extends Base {
             'status' => 'Effect not yet saved'
         ];
 
-        /* Manufacture a list of Schoolbox User fields to chooze from
-         * TODO: This should contain a human-friendly version
-         */
-        $reader = new ObjectReader();
-        $userMapper = new \Schoolbox\UserMapper();
-        $user = $userMapper->createModel();
-        $paths = $reader->paths($user);
-        $allUserField = array_combine($paths, $paths);
-
         /* Spawn Rule
          */
         $rule = Rule\Mapper::getInstance()->findById($params['ruleId']);
