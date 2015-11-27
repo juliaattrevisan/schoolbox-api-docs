@@ -274,7 +274,50 @@
                 var url = $(this).attr('href');
 
                 $.post(url, function(responseText) {
-                    $(ruleId).append(responseText);
+                    var latestInstance = 117;
+
+                    var tempId = 'new-'+latestInstance;
+                    var statusId = 'effect-new-'+latestInstance+'-status';
+                    var effectId = 'effect-'+latestInstance;
+
+                    var instance = $(responseText);
+
+                    /* Update ids to use temporary index integer
+                     */
+                    instance.attr('id', effectId);
+
+                    $.each(instance.find(config.validInputTypes), function(index, element) {
+                        $(element).attr('name', $(element).attr('name').replace('new', tempId));
+                    });
+
+                    /* Update other miscellaneous id-based data vars
+                     */
+                    var allDataVars = [
+                        'data-effect-userfield',
+                        'data-effect-mappingtype',
+                        'data-effect-fragment',
+                        'data-effect-delete',
+                        'data-effect-modify-lock'
+                    ];
+
+                    $.each(allDataVars, function(index, element) {
+                        instance.find('['+element+']').attr(element, tempId);
+                    });
+
+                    /* Make status indicator unique
+                     */
+                    $(instance)
+                        .find('#effect-new-status')
+                        .attr('id', statusId)
+                        .attr('data-effect-fragment', statusId);
+
+                    /* New instance will not have a delete link
+                     */
+                    $(instance).find('[data-effect-delete]').attr('href', '');
+
+                    /* Ram it back in
+                     */
+                    $(ruleId).append(instance);
                 });
             });
         }

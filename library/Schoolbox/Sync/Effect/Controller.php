@@ -71,16 +71,20 @@ class Controller extends Base {
             'arguments' => [false]
         ];
 
-        /* Add stub Effect for this Rule
+        /* Don't make a stub, due to (rule_id,user_property) uniqueness
+         * which prevents the same field from being modified multiple times
+         * in the same rule. As a result, the "primary key" for this
+         * new Effect instance will simply be "new" and the js will have to
+         * swap that out for something else, such as "new-1", "new-2" etc.
+         * to maintain uniqueuness in that land.
          */
         $newEffect = Effect\Mapper::getInstance()->createModel();
         $newEffect
+            ->setId('new')
             ->setRule($rule)
             ->setUserProperty($default['userProperty'])
             ->setArguments($default['arguments'])
             ->setEffectType(Effect\Type\Mapper::getInstance()->findById($default['effectType']));
-
-        Effect\Mapper::getInstance()->create($newEffect);
 
         /* Decide which Effect Fragment to use
          */
