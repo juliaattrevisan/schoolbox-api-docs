@@ -6,6 +6,7 @@ CREATE TABLE `ups_rule`(
   `enabled` BOOL NOT NULL DEFAULT 1,
   `sequence` INT UNSIGNED NOT NULL,
   `name` VARCHAR(256) NULL,
+  `description` TEXT NULL,
   PRIMARY KEY (`id`),
   INDEX (`role_type`),
   INDEX (`role_type`, `enabled`),

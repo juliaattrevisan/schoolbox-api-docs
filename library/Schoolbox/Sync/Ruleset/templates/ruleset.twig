@@ -45,7 +45,12 @@
                         <div class="list-item">
                             <div class="small-12 columns">
                                 <h3 class="subheader">
-                                    {{ currentRule.name }}
+                                    {% if currentRule.name|length %}
+                                        {{ currentRule.name }}
+                                    {% else %}
+                                        Rule {{ currentRule.id }}
+                                    {% endif %}
+
                                     {% if currentRule.description|length %}
                                         <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
                                     {% endif %}

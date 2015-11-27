@@ -61,6 +61,7 @@ class Controller extends Base {
         $rule = $mapper->createModel()
                        ->setRoleType($roleType)
                        ->setName($postData->get('name'))
+                       ->setDescription($postData->get('description'))
                        ->setSequence($mapper->findNextAvailableSequence($roleType));
 
         $mapper->create($rule);
@@ -109,11 +110,12 @@ class Controller extends Base {
         $rule = Mapper::getInstance()
             ->findById($postData->get('ruleId'))
             ->setRoleType($postData->get('rulesetId'))
-            ->setName($postData->get('name'));
+            ->setName($postData->get('name'))
+            ->setDescription($postData->get('description'));
 
         Mapper::getInstance()->save($rule);
 
-        $this->getResponse()->redirect->to("/adminv2/sync/{$params['rulesetId']}");
+        $this->getResponse()->redirect->to("/adminv2/sync/{$postData->get('rulesetId')}");
     }
 
     /**
