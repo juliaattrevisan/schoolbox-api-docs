@@ -52,19 +52,6 @@ class Factory
     ];
 
     /**
-     * Container Template file for Skip Effect
-     * @var string
-     */
-    private $effectSkipTemplate = '@syncEffect/container-skip.twig';
-
-    /**
-     * Container Template file for regular other Effects
-     *
-     * @var string
-     */
-    private $effectTemplate = '@syncEffect/container.twig';
-
-    /**
      * Constructor
      *
      * @param $rulesetId
@@ -183,11 +170,9 @@ class Factory
          */
         foreach ($ruleset as $currentRule) {
             foreach ($currentRule->getEffects() as $currentEffect) {
-                if ($currentEffect->getEffectType()->getId() == AllUserField::EFFECT_TYPE_SKIP) {
-                    $allEffectStructures['containers'][$currentEffect->getId()] = $this->getEffectSkipTemplate();
-                }
-                else {
-                    $allEffectStructures['containers'][$currentEffect->getId()] = $this->getEffectTemplate();
+                $allEffectStructures['containers'][$currentEffect->getId()] = $currentEffect->getEffectType()->getTemplate();
+
+                if ($currentEffect->getEffectType()->getId() != AllUserField::EFFECT_TYPE_SKIP) {
                     $allEffectStructures['fragments'][$currentEffect->getId()] = $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
                 }
             }
@@ -250,44 +235,5 @@ class Factory
     private function getType()
     {
         return $this->type;
-    }
-
-    /**
-     * Set Effect Skip Template
-     * @param string $effectSkipTemplate
-     */
-    private function setEffectSkipTemplate($effectSkipTemplate)
-    {
-        $this->effectSkipTemplate = $effectSkipTemplate;
-    }
-
-    /**
-     * Get Effect Skip Template
-     *
-     * @return string
-     */
-    private function getEffectSkipTemplate()
-    {
-        return $this->effectSkipTemplate;
-    }
-
-    /**
-     * Set Effect Template
-     *
-     * @param string $effectTemplate
-     */
-    private function setEffectTemplate($effectTemplate)
-    {
-        $this->effectTemplate = $effectTemplate;
-    }
-
-    /**
-     * Get Effect Template
-     *
-     * @return string
-     */
-    private function getEffectTemplate()
-    {
-        return $this->effectTemplate;
     }
 }

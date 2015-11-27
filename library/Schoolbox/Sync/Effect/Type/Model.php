@@ -10,8 +10,7 @@
 namespace Schoolbox\Sync\Effect\Type;
 
 
-class Model
-{
+class Model {
 
     /** @var int */
     protected $id;
@@ -19,6 +18,34 @@ class Model
     /** @var string */
     protected $name;
 
+    /**
+     * Container Template file for Skip Effect
+     * @var string
+     */
+    private $effectSkipTemplate = '@syncEffect/container-skip.twig';
+
+    /**
+     * Container Template file for regular other Effects
+     *
+     * @var string
+     */
+    private $effectTemplate = '@syncEffect/container.twig';
+
+    /**
+     * Decide which Container to use for this Effect
+     *
+     * @return string
+     */
+    public function getTemplate() {
+        if ($this->getId() == \Schoolbox\Sync\Effect\AllUserField::EFFECT_TYPE_SKIP) {
+            return $this->getEffectSkipTemplate();
+        }
+
+        return $this->getEffectTemplate();
+    }
+
+    /* Getters/Setters
+     */
 
     /**
      * @return string
@@ -27,7 +54,6 @@ class Model
     {
         return $this->name;
     }
-
 
     /**
      * @param string $name
@@ -39,7 +65,6 @@ class Model
         return $this;
     }
 
-
     /**
      * @return int
      */
@@ -47,7 +72,6 @@ class Model
     {
         return $this->id;
     }
-
 
     /**
      * @param int $id
@@ -58,5 +82,45 @@ class Model
         $this->id = $id;
         return $this;
     }
+
+    /**
+     * Set Effect Skip Template
+     * @param string $effectSkipTemplate
+     */
+    private function setEffectSkipTemplate($effectSkipTemplate)
+    {
+        $this->effectSkipTemplate = $effectSkipTemplate;
+    }
+
+    /**
+     * Get Effect Skip Template
+     *
+     * @return string
+     */
+    private function getEffectSkipTemplate()
+    {
+        return $this->effectSkipTemplate;
+    }
+
+    /**
+     * Set Effect Template
+     *
+     * @param string $effectTemplate
+     */
+    private function setEffectTemplate($effectTemplate)
+    {
+        $this->effectTemplate = $effectTemplate;
+    }
+
+    /**
+     * Get Effect Template
+     *
+     * @return string
+     */
+    private function getEffectTemplate()
+    {
+        return $this->effectTemplate;
+    }
+
 
 }
