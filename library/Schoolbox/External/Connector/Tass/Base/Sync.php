@@ -47,7 +47,7 @@ class Sync implements SyncInterface
                 s.stud_code AS student_id,
                 '' AS network_login,
                 '' AS student_title,
-                s.preferred_name AS StudentPreferred,
+                s.preferred_name AS student_preferred,
                 s.surname AS StudentSurname,
                 s.sex AS StudentGender,
                 s.e_mail AS StudentEmail,
@@ -86,7 +86,7 @@ class Sync implements SyncInterface
                 s.year_grp       AS StudentYearLevel,
                 s.campus_code    AS StudentCampus,
                 s.sex            AS StudentGender,
-                s.preferred_name AS StudentPreferred,
+                s.preferred_name AS student_preferred,
                 s.surname        AS StudentSurname
             FROM parent AS p
             INNER JOIN paraddress as pa
@@ -112,7 +112,7 @@ class Sync implements SyncInterface
                 s.year_grp       AS StudentYearLevel,
                 s.campus_code    AS StudentCampus,
                 s.sex            AS StudentGender,
-                s.preferred_name AS StudentPreferred,
+                s.preferred_name AS student_preferred,
                 s.surname        AS StudentSurname
             FROM parent AS p
             INNER JOIN paraddress as pa

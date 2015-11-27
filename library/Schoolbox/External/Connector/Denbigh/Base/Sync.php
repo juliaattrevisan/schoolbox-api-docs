@@ -49,7 +49,7 @@ class Sync implements SyncInterface
                 denbighID AS student_id,
                 username AS network_login,
                 '' AS student_title,
-                firstname AS StudentPreferred,
+                firstname AS student_preferred,
                 surname AS StudentSurname,
                 '' AS StudentGender,
                 email AS StudentEmail,
@@ -83,7 +83,7 @@ class Sync implements SyncInterface
                 s.academicYear AS StudentYearLevel,
                 '' AS StudentCampus,
                 s.gender AS StudentGender,
-                s.preferred_name AS StudentPreferred,
+                s.preferred_name AS student_preferred,
                 s.surname AS StudentSurname
             FROM Addresses adr
             LEFT JOIN Parents par ON par.familyDenbighID = adr.familyDenbighID

@@ -40,7 +40,7 @@ class Sync implements SyncInterface
             STUDENT_NUMBER AS "student_id",
             USERNAME       AS "network_login",
             NULL           AS "student_title",
-            FIRSTNAME      AS "StudentPreferred",
+            FIRSTNAME      AS "student_preferred",
             SURNAME        AS "StudentSurname",
             EMAIL_ADDRESS  AS "StudentEmail",
             NULL           AS "StudentOccupEmail",
@@ -72,7 +72,7 @@ class Sync implements SyncInterface
                 s.YEAR_LEVEL             AS "StudentYearLevel",
                 NULL                     AS "StudentCampus",
                 NULL                     AS "StudentGender",
-                s.FIRSTNAME              AS "StudentPreferred",
+                s.FIRSTNAME              AS "student_preferred",
                 s.SURNAME                AS "StudentSurname"
             FROM db2inst1.schoolbox_parents AS p
             INNER JOIN db2inst1.schoolbox_parent_student
@@ -94,7 +94,7 @@ class Sync implements SyncInterface
                 s.YEAR_LEVEL             AS "StudentYearLevel",
                 NULL                     AS "StudentCampus",
                 NULL                     AS "StudentGender",
-                s.FIRSTNAME              AS "StudentPreferred",
+                s.FIRSTNAME              AS "student_preferred",
                 s.SURNAME                AS "StudentSurname"
             FROM db2inst1.schoolbox_parents AS p
             INNER JOIN db2inst1.schoolbox_parent_student
