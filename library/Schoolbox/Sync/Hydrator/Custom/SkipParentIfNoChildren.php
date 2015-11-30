@@ -64,6 +64,6 @@ class SkipParentIfNoChildren implements HydratorInterface
      */
     public function getDescription()
     {
-        return 'This custom hydrator skips any parents who have no children currently enrolled.';
+        return 'This custom rule skips any parents who have no children currently enrolled.';
     }
 }

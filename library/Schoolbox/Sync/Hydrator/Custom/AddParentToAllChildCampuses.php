@@ -80,6 +80,6 @@ class AddParentToAllChildCampuses implements HydratorInterface
      */
     public function getDescription()
     {
-        return 'This custom hydrator adds each parent to all the campuses that their children belong to.';
+        return 'This custom rule adds each parent to all the campuses that their children belong to.';
     }
 }
