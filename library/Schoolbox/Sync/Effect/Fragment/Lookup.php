@@ -2,6 +2,10 @@
 /**
  * Lookup
  *
+ * Extract a value/label tuple from any of the Lookup possibilities
+ * found in the UserMapper. These are typically used to construct
+ * select dropdowns in Effect Fragments
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -16,8 +20,7 @@ use \Schoolbox\ValueLabelInterface;
 class Lookup {
 
     /**
-     * A list of mappers to use when retrieving
-     * lookup data
+     * A list of mappers to use when retrieving lookup data
      *
      * @var array
      */
