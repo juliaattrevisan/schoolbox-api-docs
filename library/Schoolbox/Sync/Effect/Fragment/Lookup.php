@@ -30,7 +30,7 @@ class Lookup {
      * @param $userField
      * @return array
      */
-    public function getEffectFragmentLookupData($userField) {
+    public function findData($userField) {
         if (in_array($userField, array_keys($this->allLookups))) {
             $mapperName = $this->allLookups[$userField];
 

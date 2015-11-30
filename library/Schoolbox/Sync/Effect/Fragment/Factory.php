@@ -81,7 +81,7 @@ class Factory {
                 return new Fragment('@syncEffect/boolean.twig', []);
             }
             else if ($this->isLookup($userField)) {
-                return new Fragment('@syncEffect/lookup.twig', $this->getLookup()->getEffectFragmentLookupData($userField));
+                return new Fragment('@syncEffect/lookup.twig', $this->getLookup()->findData($userField));
             }
             else if ($this->isString($userField)) {
                 return new Fragment('@syncEffect/string.twig', []);
