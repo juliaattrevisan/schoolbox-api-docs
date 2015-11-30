@@ -165,8 +165,9 @@ abstract class Tokenizer
                     // apply all filters to all replacements
                     foreach ($replacements as $j => $replacement) {
                         foreach ($filters as $filterName) {
-                            $replacements[$j] = $this->applyFilter($filterName, $replacement);
+                            $replacement = $this->applyFilter($filterName, $replacement);
                         }
+                        $replacements[$j] = $replacement;
                     }
                 }
 
