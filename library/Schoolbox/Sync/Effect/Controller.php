@@ -179,7 +179,11 @@ class Controller extends Base {
 
                 /* Contains Lookup data
                  */
-                $allEffectStructures['fragments'][$queryData['effectId']] = $fragment,
+                'allEffectStructures' => [
+                    'fragments' => [
+                        $queryData['effectId'] => $fragment
+                    ],
+                ],
 
                 /* If this Effect hasn't been saved it, it won't have a ruleId
                  * nor an effectId, so recycle it from frontend, as fragments
