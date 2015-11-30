@@ -17,14 +17,14 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="small-6 medium-3 large-3 columns">
+            <div class="small-12 medium-3 large-3 columns">
                 <select {{ meta.condition[currentCondition.id].disabled }} name="rule[{{ currentRule.id }}][condition][{{ currentCondition.id }}][arguments][2]">
                     {% for currentMatches in allMatches %}
                     <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.arguments[2] %}selected="selected"{% endif %}>{{ currentMatches }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="small-6 medium-3 large-3 columns">
+            <div class="small-12 medium-3 large-3 columns">
                 <textarea {{ meta.condition[currentCondition.id].disabled }} name='rule[{{ currentRule.id }}][condition][{{ currentCondition.id }}][arguments][1]' rows="5">{{ currentCondition.arguments[1] | join("\n") }}</textarea>
             </div>
         </div>
