@@ -12,7 +12,6 @@ namespace Schoolbox\Wiki;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;

@@ -25,7 +25,6 @@ use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\Folder\Model as Category;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\User;

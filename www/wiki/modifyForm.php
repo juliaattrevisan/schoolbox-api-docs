@@ -1,5 +1,4 @@
 <?php
-use Schoolbox\Notif\SilentNotif;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
