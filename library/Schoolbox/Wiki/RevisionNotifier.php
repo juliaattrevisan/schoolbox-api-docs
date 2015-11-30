@@ -18,8 +18,6 @@ use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -28,7 +26,7 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -121,7 +119,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 * @param string $roleType
 	 * @param Revision $revision
 	 * @param User $author
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyRevised($roleType, $revision, $author) {
 
@@ -169,7 +167,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 * @param Revision $revision
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentRevised($revision, $author, $diff = array()) {
 		return $this->notifyRevised(Role::STUDENT, $revision, $author);
@@ -179,7 +177,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 * @param Revision $revision
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStaffRevised($revision, $author, $diff = array()) {
 		return $this->notifyRevised(Role::STAFF, $revision, $author);
@@ -189,7 +187,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 * @param Revision $revision
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyParentRevised($revision, $author, $diff = array()) {
 		return $this->notifyRevised(Role::PARENT, $revision, $author);
