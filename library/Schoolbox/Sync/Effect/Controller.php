@@ -166,8 +166,10 @@ class Controller extends Base {
      * or a freeform text input
      */
     public function change() {
+        $queryData = $this->getRequest()->query;
+
         $allUserField = new AllUserField();
-        $template = $allUserField->getEffectFragmentTemplate($_GET['mappingType'], $_GET['userField']);
+        $template = $allUserField->getEffectFragmentTemplate($queryData['mappingType'], $queryData['userField']);
 
         $this->getResponse()->content->set([
             'template' => $template,
@@ -178,9 +180,9 @@ class Controller extends Base {
                  * expect both values
                  */
                 'currentEffect' => [
-                    'id' => $_GET['effectId'],
+                    'id' => $queryData['effectId'],
                     'rule' => [
-                        'id' => $_GET['ruleId'],
+                        'id' => $queryData['ruleId'],
                     ],
                 ],
             ],
