@@ -2,7 +2,7 @@
 {% set allEffectMappingTypes = ['Maps', 'Equals'] %}
 
 <li id="effect-{{ currentEffect.id }}" class="actions-small-2 content" data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
-    <input type="hidden" name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][type]" value="">
+    <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" value="">
 
     <div class="list-item">
         <div class="row">
@@ -10,7 +10,7 @@
                 Then
             </div>
             <div class="small-11 medium-5 large-5 columns">
-                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][userProperty]" data-effect-userfield="{{ currentEffect.id }}" >
+                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][userProperty]" data-effect-userfield="{{ currentEffect.id }}" >
                     {% for currentUserKey, currentUserField in allEffectStructures.allUserField %}
                         <option value="{{ currentUserKey }}" {% if currentUserKey == currentEffect.getUserProperty() %}selected="selected"{% endif %}>
                             {{ currentUserKey }}
@@ -19,7 +19,7 @@
                 </select>
             </div>
             <div class="small-2 medium-2 large-2 columns">
-                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][type]" data-effect-mappingtype="{{ currentEffect.id }}" data-effect-ruleid="{{ currentRule.id }}">
+                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" data-effect-mappingtype="{{ currentEffect.id }}" data-effect-ruleid="{{ currentEffect.rule.id }}">
                     <option value="-1" disabled selected="selected">Please Select</option>
 
                     {% for currentEffectMappingType in allEffectMappingTypes %}

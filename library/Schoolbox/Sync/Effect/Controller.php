@@ -150,9 +150,6 @@ class Controller extends Base {
                 ]
             ],
             'currentEffect' => $newEffect,
-            'currentRule'   => [
-                'id' => $rule->getId()
-            ]
         ];
 
         $this->getResponse()->content->set([
@@ -182,10 +179,10 @@ class Controller extends Base {
                  */
                 'currentEffect' => [
                     'id' => $_GET['effectId'],
+                    'rule' => [
+                        'id' => $_GET['ruleId'],
+                    ],
                 ],
-                'currentRule' => [
-                    'id' => $_GET['ruleId'],
-                ]
             ],
             'format' => 'nochrome'
         ]);
