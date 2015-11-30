@@ -15,7 +15,7 @@ use Schoolbox\Sync\Grammar\FieldFactory;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Effect;
 use Alaress\ObjectReader;
-use Schoolbox\Sync\Effect\AllUserField;
+use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
 class Controller extends Base {
@@ -81,16 +81,16 @@ class Controller extends Base {
 
         /* Decide which Effect Fragment to use
          */
-        $allUserField = new AllUserField();
+        $fragmentFactory = new FragmentFactory();
 
-        $fragment = $allUserField->getEffectFragmentTemplate($default['effectType'], $default['userProperty']);
+        $fragment = $fragmentFactory->getEffectFragmentTemplate($default['effectType'], $default['userProperty']);
 
         $data = [
             'allEffectStructures' => [
                 'fragments' => [
                     $newEffect->getId() => $fragment
                 ],
-                'allUserField' => $allUserField->getAllFields(),
+                'allUserField' => $fragmentFactory->getAllFields(),
             ],
             'meta' => [
                 'effect' => [
@@ -170,8 +170,8 @@ class Controller extends Base {
     public function change() {
         $queryData = $this->getRequest()->query;
 
-        $allUserField = new AllUserField();
-        $fragment = $allUserField->getEffectFragmentTemplate($queryData['mappingType'], $queryData['userField']);
+        $fragmentFactory = new FragmentFactory();
+        $fragment = $fragmentFactory->getEffectFragmentTemplate($queryData['mappingType'], $queryData['userField']);
 
         $this->getResponse()->content->set([
             'template' => $fragment->getFilename(),

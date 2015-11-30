@@ -17,7 +17,7 @@ use Schoolbox\Sync\Navigator\Node;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Condition;
 use Schoolbox\Sync\Effect;
-use Schoolbox\Sync\Effect\AllUserField;
+use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
 class Factory
@@ -155,7 +155,7 @@ class Factory
          * This is just some hardcoded values for now.
          * It tells frontend which templates to use for Effects.
          */
-        $allUserField = new AllUserField();
+        $fragmentFactory = new FragmentFactory();
 
         /* Which twig containers and fragments to load for this
          * Ruleset's Effects
@@ -163,7 +163,7 @@ class Factory
         $allEffectStructures = [
             'containers' => [],
             'fragments' => [],
-            'allUserField' => $allUserField->getAllFields(),
+            'allUserField' => $fragmentFactory->getAllFields(),
             'allNDSField' => $ffactory->buildMap($this->getType()),
         ];
 
@@ -177,7 +177,7 @@ class Factory
                  * Skip Effects don't use fragments
                  */
                 if (!$currentEffect->getEffectType()->isSkip()) {
-                    $fragment = $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+                    $fragment = $fragmentFactory->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
 
                     $allEffectStructures['fragments'][$currentEffect->getId()] = $fragment;
                 }

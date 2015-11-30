@@ -1,10 +1,10 @@
 <?php
 /**
- * AllUserField
+ * Factory (FragmentFactory)
  *
- * An associative array of fields for which you can choose Effects,
- * and also provide a means to figure out what type they were:
- * boolean, lookup, string or map
+ * A Factory which produces instances of Fragment based on which
+ * fields were selected, and the properties of that field in the
+ * UserMapper definition
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -12,13 +12,11 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Sync\Effect;
+namespace Schoolbox\Sync\Effect\Fragment;
 
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
-use \Schoolbox\Sync\Effect\Fragment\Fragment;
-use \Schoolbox\Sync\Effect\Fragment\Lookup;
 
-class AllUserField {
+class Factory {
     const TYPE_BOOLEAN = 1;
     const TYPE_LOOKUP = 2;
     const TYPE_STRING = 3;
@@ -91,19 +89,6 @@ class AllUserField {
         }
 
         return new Fragment('@syncEffect/map.twig', []);
-    }
-
-    /**
-     * Get lookup data
-     *
-     * Delegate Method
-     *
-     * @param $userField
-     * @return array
-     * @deprecated
-     */
-    public function getEffectFragmentLookupData($userField) {
-        $this->getLookup()->getEffectFragmentLookupData($userField);
     }
 
     /**
