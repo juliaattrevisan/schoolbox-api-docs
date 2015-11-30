@@ -34,6 +34,7 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
             'bar'            => 'The bar',
             'baz.bar'        => "The baz's bar",
             'single.multi[]' => "The single's multi",
+            'empty[]'        => "An empty multi",
             'alpha[].id'     => "The IDs of the alpha's bravos"
         ]);
 
@@ -51,6 +52,7 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
                     'fourth'
                 ]
             ],
+            'empty' => [],
             'alpha' => [
                 [ 'id' => 'bravo' ],
                 [ 'id' => 'charlie' ],
@@ -90,6 +92,8 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
                 => [ new Map('my{:foo}', [ 'mydata1' => 'something else']), 'something else'],
             'missing mapped value'
                 => [ new Map('my{:foo}', [ 'mydata2' => 'something else']), ''],
+            'empty multi-value'
+                => ['{:empty}', ''],
             'nested multi-value'
                 => ['{:single.multi}', ['first', 'second', 'third', 'fourth']],
             'nested multi-value filter'
@@ -101,6 +105,8 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
                         'tyfirst','tysecond','tythird','tyfourth',
                         'fyfirst','fysecond','fythird','fyfourth',
                     ]],
+            'nested multi-value x empty'
+                => ['{:single.multi}-{:empty}', ['first-', 'second-', 'third-', 'fourth-']],
             'nested mutli-value extract'
                 => ['{:single.multi[1]}', 'second'],
             'nested multi-value extract dot-notation'
