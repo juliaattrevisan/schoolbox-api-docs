@@ -15,6 +15,7 @@
 namespace Schoolbox\Sync\Effect;
 
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
+use \Schoolbox\Sync\Effect\Fragment\Lookup;
 
 class AllUserField {
     const TYPE_BOOLEAN = 1;
@@ -45,20 +46,17 @@ class AllUserField {
     ];
 
     /**
-     * A list of mappers to use when retrieving
-     * lookup data
+     * A Lookup instance
      *
-     * @var array
+     * @var Lookup
      */
-    private $allLookups = [
-        'residentialHouse' => '\HouseResidentialMapper',
-        'schoolHouse' => '\HouseMapper',
-    ];
+    private $lookup = null;
 
     /**
      * Constructor
      */
     public function __construct() {
+        $this->setLookup(new Lookup());
     }
 
     /**
@@ -97,33 +95,13 @@ class AllUserField {
     /**
      * Get lookup data
      *
+     * Delegate Method
+     *
      * @param $userField
      * @return array
      */
     public function getEffectFragmentLookupData($userField) {
-        if (in_array($userField, array_keys($this->allLookups))) {
-            $mapperName = $this->allLookups[$userField];
-
-            /* Spawn a mapper so we can utilise its findAll()
-             */
-            if (class_exists($mapperName)) {
-                $mapper = new $mapperName();
-                $allResults = $mapper->findAll();
-
-                $stack = [];
-
-                /* Get key/value version of a model
-                 * This varies depending on the model
-                 */
-                foreach ($allResults as $currentResult) {
-                    $stack = '';
-                }
-
-                return $stack;
-            }
-        }
-
-        return [];
+        $this->getLookup()->getEffectFragmentLookupData($userField);
     }
 
     /**
@@ -167,4 +145,27 @@ class AllUserField {
 
         return false;
     }
-} 
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set Lookup instance
+     *
+     * @param Lookup $lookup
+     */
+    private function setLookup($lookup)
+    {
+        $this->lookup = $lookup;
+    }
+
+    /**
+     * Get Lookup instance
+     *
+     * @return Lookup
+     */
+    private function getLookup()
+    {
+        return $this->lookup;
+    }
+}
