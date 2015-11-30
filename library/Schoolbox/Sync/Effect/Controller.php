@@ -83,13 +83,12 @@ class Controller extends Base {
          */
         $allUserField = new AllUserField();
 
+        $fragment = $allUserField->getEffectFragmentTemplate($default['effectType'], $default['userProperty']);
+
         $data = [
             'allEffectStructures' => [
                 'fragments' => [
-                    $newEffect->getId() => [
-                        'filename' => $allUserField->getEffectFragmentTemplate($default['effectType'], $default['userProperty']),
-                        'data' => []
-                    ]
+                    $newEffect->getId() => $fragment
                 ],
                 'allUserField' => $allUserField->getAllFields(),
             ],
@@ -175,7 +174,7 @@ class Controller extends Base {
         $fragment = $allUserField->getEffectFragmentTemplate($queryData['mappingType'], $queryData['userField']);
 
         $this->getResponse()->content->set([
-            'template' => $fragment['filename'],
+            'template' => $fragment->getFilename(),
             'data' => [
 
                 /* Contains Lookup data

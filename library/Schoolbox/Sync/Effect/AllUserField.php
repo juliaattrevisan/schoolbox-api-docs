@@ -15,6 +15,7 @@
 namespace Schoolbox\Sync\Effect;
 
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
+use \Schoolbox\Sync\Effect\Fragment\Fragment;
 use \Schoolbox\Sync\Effect\Fragment\Lookup;
 
 class AllUserField {
@@ -74,34 +75,22 @@ class AllUserField {
      *
      * @param $mappingType
      * @param $userField
-     * @return string
+     * @return Fragment
      */
     public function getEffectFragmentTemplate($mappingType, $userField) {
         if ($mappingType == EffectTypeMapper::EFFECT_TYPE_LITERAL) {
             if ($this->isBoolean($userField)) {
-                return [
-                    'filename' => '@syncEffect/boolean.twig',
-                    'data' => []
-                ];
+                return new Fragment('@syncEffect/boolean.twig', []);
             }
             else if ($this->isLookup($userField)) {
-                return [
-                    'filename' => '@syncEffect/lookup.twig',
-                    'data' => $this->getLookup()->getEffectFragmentLookupData($userField)
-                ];
+                return new Fragment('@syncEffect/lookup.twig', $this->getLookup()->getEffectFragmentLookupData($userField));
             }
             else if ($this->isString($userField)) {
-                return [
-                    'filename' => '@syncEffect/string.twig',
-                    'data' => []
-                ];
+                return new Fragment('@syncEffect/string.twig', []);
             }
         }
 
-        return [
-            'filename' => '@syncEffect/map.twig',
-            'data' => []
-        ];
+        return new Fragment('@syncEffect/map.twig', []);
     }
 
     /**
