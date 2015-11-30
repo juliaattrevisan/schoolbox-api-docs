@@ -10,6 +10,8 @@
 
 namespace Schoolbox\Sync\Effect\Fragment;
 
+use \Schoolbox\Collection;
+use \Schoolbox\ValueLabelInterface;
 
 class Lookup {
 
@@ -28,9 +30,11 @@ class Lookup {
      * Get lookup data
      *
      * @param $userField
-     * @return array
+     * @return Collection
      */
     public function findData($userField) {
+        $stack = new Collection;
+
         if (in_array($userField, array_keys($this->allLookups))) {
             $mapperName = $this->allLookups[$userField];
 
@@ -40,19 +44,17 @@ class Lookup {
                 $mapper = new $mapperName();
                 $allResults = $mapper->findAll();
 
-                $stack = [];
-
                 /* Get key/value version of a model
                  * This varies depending on the model
                  */
                 foreach ($allResults as $currentResult) {
-                    $stack = '';
+                    if ($currentResult instanceof ValueLabelInterface) {
+                        $stack->add($currentResult->findValueLabelPair());
+                    }
                 }
-
-                return $stack;
             }
         }
 
-        return [];
+        return $stack;
     }
 } 
