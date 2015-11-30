@@ -189,9 +189,6 @@ class Factory
             ['role_type' => $this->getType()],
             ['order' => ['sequence' => 'asc'],]
         );
-        foreach ($hydratorModels as $hydrator) {
-            $hydrator->loadHydratorFromClass();
-        }
 
         /* If it was one of the known cases, return a well-formed structure
          * Otherwise it would have returned empty array earlier
