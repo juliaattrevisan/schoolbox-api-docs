@@ -214,16 +214,15 @@ class Generator implements GeneratorInterface
         }
 
         // house bindings
-        if ($house = $user->getSchoolHouse()) {
+        if ($house = $user->getSchoolHouse()->getId()) {
             // *.notify.house.{id}.#
             $bindings['house'] = array(
                 "$house.#"
             );
         }
 
-
         // residential house bindings
-        if ($resHouse = $user->getResidentialHouse()) {
+        if ($resHouse = $user->getResidentialHouse()->getId()) {
             // *.notify.reshouse.{id}.#
             $bindings['reshouse'] = array(
                 "$resHouse.#"

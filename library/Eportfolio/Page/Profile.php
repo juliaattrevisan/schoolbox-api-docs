@@ -444,7 +444,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
         $houseName = '';
         try {
-            $house = HouseMapper::getInstance()->findById($this->user->getSchoolHouse());
+            $house = HouseMapper::getInstance()->findById($this->user->getSchoolHouse()->getId());
             $houseName = $house->getHouse();
         } catch (Schoolbox\Mapper\Exception $e) {
         }
