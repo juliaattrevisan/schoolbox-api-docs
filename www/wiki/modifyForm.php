@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\Notif\SilentNotif;
+
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page         = new SitePage();
@@ -7,6 +9,7 @@ $groupHandler = new Group(HOMEPAGE_SERVICE);
 
 $wikiMapper     = \Schoolbox\Wiki\WikiMapper::getInstance();
 $revisionMapper = \Schoolbox\Wiki\RevisionMapper::getInstance();
+$folderMapper   = Schoolbox\Resource\Folder\Mapper::getInstance();
 
 $now = new Alaress_Date_Format(time(), 'U');
 
@@ -18,8 +21,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
         exit;
     }
     // generate the revision object regardless of whether or not the wiki exists
-    $revision = new \Schoolbox\Wiki\Revision();
-    $revision
+    $revision = $revisionMapper->createModel()
         ->setHeading($heading)
         ->setCreated($now)
         ->setBody($revisionMapper->createStubLinks($_POST['body'], $_POST['categoryID']))
@@ -45,13 +47,10 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
         }
     } else {
         // request to create new wiki
-        $cat = new \Schoolbox\Resource\Category();
-        $cat->setId($_POST['categoryID']);
         $url  = new Url($heading);
-        $wiki = new \Schoolbox\Wiki\Wiki();
-        $wiki
-            ->setCategory($cat)
-            ->setLatestRevision(new \Schoolbox\Wiki\Revision())
+        $wiki = $wikiMapper->createModel()
+            ->setCategory($folderMapper->createModel()->setId($_POST['categoryID']))
+            ->setLatestRevision($revisionMapper->createModel()->setId(0))
             ->setCreated($now)
             // Never set slug from form
             ->setSlug($url->getSlug())
@@ -83,9 +82,14 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 
     /* at this juncture, $revision has no ID; $wiki *may* have an ID */
 
-    // persist our revision, and update with the resultant ID
-    $revisionIds = $revisionMapper->save($revision);
-    $revision->setId($revisionIds[0]);
+    // if the wiki already existed, no change; if not, it just got assigned its ID
+    $wikiMapper->save($wiki);
+
+    // assign the wiki to the revision we just created
+    $revision->setWiki($wiki);
+
+    // persist our revision (which updates with the resultant ID)
+    $revisionMapper->save($revision);
 
     // is there a previous revision that's snuck in and caused merge conflicts?
     if ($_POST['revision'] < $wiki->getLatestRevision()->getId()) {
@@ -95,11 +99,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 
     // no merge conflict? ok, persist the wiki entity with the latest revision
     $wiki->setLatestRevision($revision);
-    $wikiIds = $wikiMapper->save($wiki);
-
-    // update the revision with this wiki ID (if wiki previously existed, this won't change anything)
-    $revision->setWiki($wiki->setId($wikiIds[0]));
-    $revisionMapper->save($revision);
+    $wikiMapper->save($wiki);
 
     SitePage::localRedir('/wiki/' . $wiki->getCategory()->getId() . '/' . $wiki->getSlug());
 } elseif (is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {
