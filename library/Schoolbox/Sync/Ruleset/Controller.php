@@ -15,6 +15,7 @@ use \Schoolbox\Sync\Navigator\Navigator;
 use \Schoolbox\Sync\Navigator\Node;
 use \Schoolbox\Sync\Condition;
 use \Schoolbox\Sync\Effect;
+use \Schoolbox\Sync\Hydrator;
 use \Schoolbox;
 use Schoolbox\Sync\Effect\AllUserField;
 
@@ -83,7 +84,7 @@ class Controller extends Base {
             $this->updateConditions($ruleId, $ruleData['condition']);
             $this->updateEffects($ruleId, $ruleData['effect']);
         }
-
+        $this->updateCustomRules($roleType, $postData['customRule']);
         $this->getResponse()->redirect->to("/adminv2/sync/$roleType");
     }
 
@@ -187,5 +188,27 @@ class Controller extends Base {
             'rule_id'   => $ruleId,
             'arguments' => json_encode(null)
         ]);
+    }
+
+    /**
+     * Saves custom rules for this role type.
+     *
+     * @param string $roleType
+     * @param array  $customRules Custom rule options
+     */
+    protected function updateCustomRules($roleType, $customRules)
+    {
+        // TODO DI some more
+        $mapper = Hydrator\Custom\Mapper::getInstance();
+        /** @var Hydrator\Custom\Model[] $rules */
+        $rules  = $mapper->findByColumnList([
+            'role_type' => $roleType,
+            'id'        => array_keys($customRules),
+        ]);
+        foreach ($rules as $rule) {
+            $ruleParams = $customRules[$rule->getId()];
+            $rule->setEnabled($ruleParams['enabled']);
+        }
+        $mapper->save($rules);
     }
 }

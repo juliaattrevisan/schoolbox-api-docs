@@ -26,9 +26,7 @@
 
             <div class="actions-small-1">
                 <div class="list-item">
-                    <div class="small-12 columns">
-                        <h2 class="subheader">{{ rulesetId|capitalize }} Ruleset</h2>
-                    </div>
+                    <h2 class="subheader">{{ rulesetId|capitalize }} Ruleset</h2>
                 </div>
                 <nav>
                     <a class="icon-more" title="" data-dropdown="ruleset-options"></a>
@@ -43,19 +41,17 @@
                 <div class="small-12 columns">
                     <div class="actions-small-3">
                         <div class="list-item">
-                            <div class="small-12 columns">
-                                <h3 class="subheader">
-                                    {% if currentRule.name|length %}
-                                        {{ currentRule.name }}
-                                    {% else %}
-                                        Rule {{ currentRule.id }}
-                                    {% endif %}
+                            <h3 class="subheader">
+                                {% if currentRule.name|length %}
+                                    {{ currentRule.name }}
+                                {% else %}
+                                    Rule {{ currentRule.id }}
+                                {% endif %}
 
-                                    {% if currentRule.description|length %}
-                                        <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
-                                    {% endif %}
-                                </h3>
-                            </div>
+                                {% if currentRule.description|length %}
+                                    <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
+                                {% endif %}
+                            </h3>
                         </div>
                         <nav>
                             <a href="#" class="icon-add" data-collapser="rule-{{ currentRule.id }}-contents" title="Collapse Content"></a>
@@ -68,11 +64,9 @@
                 </div>
                 <div class="small-12 columns">
                     <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
-                        <div class="actions-small-1 row">
+                        <div class="actions-small-1">
                             <div class="list-item">
-                                <div class="small-12 columns">
-                                    <h4>Conditions</h4>
-                                </div>
+                                <h4>Conditions</h4>
                             </div>
                             <nav>
                                 <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
@@ -117,6 +111,46 @@
                 </div>
             </div>
             {% endfor %}
+
+            {# Display custom rules #}
+            {% if customRules is not empty %}
+
+            <h2 class="subheader">Custom Rules</h2>
+
+            {% for customRule in customRules %}
+                <div class="row" id="customRule-{{ customRule.getId() }}">
+                    <div class="small-12 columns">
+                        <div class="actions-small-1">
+                            <div class="list-item">
+                                <h3 class="subheader">
+                                    {{ customRule.getHydrator().getName() }}
+                                    <span class='hint has-tip tip-top'
+                                          data-tooltip
+                                          title="{{ customRule.getHydrator().getDescription() }}">?</span>
+                                </h3>
+                            </div>
+                            <nav>
+                                <span class="switch round">
+                                    <input type="hidden"
+                                           name="customRule[{{ customRule.getId() }}][enabled]"
+                                           value="0">
+                                    <input type="checkbox"
+                                           id="customRule-{{ customRule.getId() }}-switch"
+                                           name="customRule[{{ customRule.getId() }}][enabled]"
+                                           {% if customRule.getEnabled() %}checked{% endif %}
+                                           value="1">
+                                    <label for="customRule-{{ customRule.getId() }}-switch">
+                                        <span>On</span>
+                                        <span>Off</span>
+                                    </label>
+                                </span>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% endif %}
 
             <input type="submit" value="Save Ruleset" />
         </form>

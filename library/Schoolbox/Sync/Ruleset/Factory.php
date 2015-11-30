@@ -19,6 +19,7 @@ use Schoolbox\Sync\Condition;
 use Schoolbox\Sync\Effect;
 use Schoolbox\Sync\Effect\AllUserField;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
+use Schoolbox\Sync\Hydrator;
 
 class Factory
 {
@@ -182,6 +183,13 @@ class Factory
             }
         }
 
+        // Get all of the custom rules too
+        /** @var Hydrator\Custom\Model[] $hydratorModels */
+        $hydratorModels = Hydrator\Custom\Mapper::getInstance()->findByColumnList(
+            ['role_type' => $this->getType()],
+            ['order' => ['sequence' => 'asc'],]
+        );
+
         /* If it was one of the known cases, return a well-formed structure
          * Otherwise it would have returned empty array earlier
          */
@@ -190,6 +198,7 @@ class Factory
             'allNavigation'       => $allNavigation->getAllNodes(),
             'rulesetId'           => $this->getType(),
             'ruleset'             => [ 'rules' => $ruleset ],
+            'customRules'         => $hydratorModels,
             'allEffectStructures' => $allEffectStructures,
             'meta'                => $metas
         ];

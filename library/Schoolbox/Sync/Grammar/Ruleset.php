@@ -10,9 +10,12 @@
 namespace Schoolbox\Sync\Grammar;
 
 use Alaress\Rules\TokenizedRuleset;
+use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\Mapper;
+use Schoolbox\Sync\Hydrator\HydratorInterface;
+use Schoolbox\User as InternalUser;
 
-class Ruleset extends TokenizedRuleset
+class Ruleset extends TokenizedRuleset implements HydratorInterface
 {
 
     /** @var Mapper */
@@ -27,6 +30,19 @@ class Ruleset extends TokenizedRuleset
     {
         parent::__construct(new Tokenizer($context, $map));
         $this->mapper = $mapper;
+    }
+
+    /**
+     * Hydrates the internal user by passing through to `applyTo()`.
+     *
+     * @param ExternalUser      $input
+     * @param InternalUser|null $previous
+     *
+     * @return InternalUser
+     */
+    public function hydrate(ExternalUser $input, InternalUser $previous = null)
+    {
+        return $this->applyTo($input, $previous);
     }
 
     /**
@@ -186,4 +202,23 @@ class Ruleset extends TokenizedRuleset
         return new Rule($effect, $negate);
     }
 
+    /**
+     * Rulesets have no relevant publicly visible name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return '';
+    }
+
+    /**
+     * Rulesets have no relevant publicly visible description.
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return '';
+    }
 }

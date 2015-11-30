@@ -45,7 +45,7 @@ class Guardian extends Base {
     /**
      * A collection of Student instances
      *
-     * @var Collection
+     * @var Collection|Student[]
      */
     protected $students = null;
 
@@ -188,7 +188,7 @@ class Guardian extends Base {
     /**
      * Set students
      *
-     * @param Collection $students
+     * @param Collection|Student[] $students
      */
     private function setStudents($students)
     {
@@ -198,7 +198,7 @@ class Guardian extends Base {
     /**
      * Get students
      *
-     * @return Collection
+     * @return Collection|Student[]
      */
     public function getStudents()
     {
