@@ -36,22 +36,27 @@ class Factory {
      * @var array
      */
     private $allFieldKeys = [
-        'email' => 'Email Address',
-        'altEmail' => 'Alt Email Address',
-        'webmail' => 'Webmail',
-        'eportfolioEnable' => 'Eportfolio Enabled?',
         'externalId' => 'External ID',
+        'username' => 'Username',
+
+        'title' => 'Title' ,
         'firstname' => 'Firstname',
         'lastname' => 'Surname',
-        'localEmail' => 'Local Email?',
+        'year' => 'Year',
+
+        'email' => 'Email Address',
+        'altEmail' => 'Alt Email Address',
+
         'residentialHouse' => 'Residential House',
         'schoolHouse' => 'School House',
-        'title' => 'Title' ,
+
+        'boardingStatus' => 'Boarding Status',
+
+        'localEmail' => 'Local Email?',
         'useInternalMail' => 'Use Internal Mail',
-        'username' => 'Username',
-        'year' => 'Year',
         'enabled' => 'Schoolbox Account Enabled?',
-        'boardingStatus' => 'Boarding Status'
+        'webmail' => 'Webmail',
+        'eportfolioEnable' => 'Eportfolio Enabled?',
     ];
 
     /**
