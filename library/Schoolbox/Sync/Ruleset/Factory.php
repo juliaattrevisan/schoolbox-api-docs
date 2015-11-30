@@ -177,7 +177,10 @@ class Factory
                  * Skip Effects don't use fragments
                  */
                 if (!$currentEffect->getEffectType()->isSkip()) {
-                    $allEffectStructures['fragments'][$currentEffect->getId()] = $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+                    $allEffectStructures['fragments'][$currentEffect->getId()] = [
+                        'filename' => $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty()),
+                        'data' => $allUserField->getEffectFragmentLookupData($currentEffect->getUserProperty()),
+                    ];
                 }
             }
         }

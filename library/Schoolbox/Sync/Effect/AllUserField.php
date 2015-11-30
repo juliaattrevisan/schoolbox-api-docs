@@ -36,12 +36,23 @@ class AllUserField {
         'localEmail' => self::TYPE_BOOLEAN,
         'residentialHouse' => self::TYPE_LOOKUP,
         'schoolHouse' => self::TYPE_LOOKUP,
-        'title' => self::TYPE_LOOKUP,
+        'title' => self::TYPE_STRING,
         'useInternalMail' => self::TYPE_BOOLEAN,
         'username' => self::TYPE_STRING,
         'year' => self::TYPE_STRING,
         'enabled' =>  self::TYPE_BOOLEAN,
         'boardingStatus' => self::TYPE_STRING,
+    ];
+
+    /**
+     * A list of mappers to use when retrieving
+     * lookup data
+     *
+     * @var array
+     */
+    private $allLookups = [
+        'residentialHouse' => '\HouseResidentialMapper',
+        'schoolHouse' => '\HouseMapper',
     ];
 
     /**
@@ -81,6 +92,38 @@ class AllUserField {
         }
 
         return '@syncEffect/map.twig';
+    }
+
+    /**
+     * Get lookup data
+     *
+     * @param $userField
+     * @return array
+     */
+    public function getEffectFragmentLookupData($userField) {
+        if (in_array($userField, array_keys($this->allLookups))) {
+            $mapperName = $this->allLookups[$userField];
+
+            /* Spawn a mapper so we can utilise its findAll()
+             */
+            if (class_exists($mapperName)) {
+                $mapper = new $mapperName();
+                $allResults = $mapper->findAll();
+
+                $stack = [];
+
+                /* Get key/value version of a model
+                 * This varies depending on the model
+                 */
+                foreach ($allResults as $currentResult) {
+                    $stack = '';
+                }
+
+                return $stack;
+            }
+        }
+
+        return [];
     }
 
     /**
