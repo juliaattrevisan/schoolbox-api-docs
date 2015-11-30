@@ -121,6 +121,8 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
                 => ['{:alpha[2].id|first}', 'd'],
             'nested multi-value subvalue extract dot-notation'
                 => ['{:alpha.4.id}', 'foxtrot'],
+            'nested multi-value subvalue extract out-of-range'
+                => ['{:alpha.9.id}', ''],
         ];
     }
 
