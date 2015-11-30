@@ -174,7 +174,6 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$envelope = new Envelope();
 
 		$wikiId       = $wiki->getId();
-		$wikiName     = $wiki->getLatestRevision()->getHeading();
 		$wikiSlug     = $wiki->getSlug();
 
 		$author       = $this->userMapper->findById($author->getId());
@@ -185,10 +184,9 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 		$bob = new Builder();
 
-		$bob->setTitle(':author created the wiki :title in :catname')
+		$bob->setTitle(':author created a new wiki in :catname')
 			->setParams([
 				'author'  => new UserParam($author),
-				'title'   => new Param($wikiName, "/wiki/$folderId/$wikiSlug"),
 				'catname' => new CategoryParam($folder)
 			])
 			->setHref("/wiki/$folderId/$wikiSlug")
