@@ -149,7 +149,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
             ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
             ->addTopic("wiki.$revisionId.created")
             ->setSeverity(Logger::INFO)
-            ->setNamespace(self::getNamespace())
+            ->setNamespace($this->getSlug())
             ->setParams([
                 'author' => new UserParam($author),
                 'title'  => new Param($revisionName, $href),
