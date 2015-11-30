@@ -25,7 +25,7 @@ use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Category;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -123,21 +123,17 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 */
 	public function notifyRevised($roleType, $revision, $author) {
 
-		// Hydrate revision because it might not have been when passed -_-
+		/** @var Revision $revision */
 		$revision     = $this->mapper->findById($revision->getId());
 		$revisionId   = $revision->getId();
-		$revisionName = $revision->getHeading();
 
-		/** @var Wiki $wiki */
-		$wiki = $this->wikiMapper->findById($revision->getWiki()->getId());
-		$wikiId = $wiki->getId();
+		$wiki         = $revision->getWiki();
+		$wikiId       = $wiki->getId();
 
-		/** @var Category $cat */
-		$cat = $this->catMapper->findById($wiki->getCategory()->getId());
+		$cat          = $wiki->getCategory();
+		$categoryId   = $cat->getId();
 
 		$authorExtId  = $author->getExternalId();
-
-		$categoryId   = $cat->getId();
 
 		$href = "/wiki/revision/$wikiId/$revisionId";
 
@@ -152,7 +148,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
             ->setNamespace($this->getSlug())
             ->setParams([
                 'author' => new UserParam($author),
-                'title'  => new Param($revisionName, $href),
+                'title'  => new Param($revision->getHeading(), $href),
                 'folder' => new CategoryParam($cat)
             ])
             ->setFilter([
