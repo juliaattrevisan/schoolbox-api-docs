@@ -158,9 +158,6 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface
         $col = $this->createCollection();
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-
-            file_put_contents('/vagrant/data/sqld.log', json_encode(['pid' => getmypid(), 'data' => $r])."\n", FILE_APPEND);
-
             $revision = $this->hydrate($r);
             $revision->setWiki($this->hydrateJoin($r, 'wiki', 'w'));
             $revision->getWiki()->setCategory($this->getJoinMapper('wiki')->hydrateJoin($r, 'category', 'c'));
