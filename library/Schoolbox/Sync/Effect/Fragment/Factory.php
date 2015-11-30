@@ -78,17 +78,17 @@ class Factory {
     public function produce($mappingType, $userField) {
         if ($mappingType == EffectTypeMapper::EFFECT_TYPE_LITERAL) {
             if ($this->isBoolean($userField)) {
-                return new Fragment('@syncEffect/boolean.twig', []);
+                return new Fragment('@syncEffect/boolean.twig');
             }
             else if ($this->isLookup($userField)) {
                 return new Fragment('@syncEffect/lookup.twig', $this->getLookup()->findData($userField));
             }
             else if ($this->isString($userField)) {
-                return new Fragment('@syncEffect/string.twig', []);
+                return new Fragment('@syncEffect/string.twig');
             }
         }
 
-        return new Fragment('@syncEffect/map.twig', []);
+        return new Fragment('@syncEffect/map.twig');
     }
 
     /**

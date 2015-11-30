@@ -13,6 +13,7 @@
 
 namespace Schoolbox\Sync\Effect\Fragment;
 
+use \Schoolbox\Collection;
 
 class Fragment {
 
@@ -24,21 +25,27 @@ class Fragment {
     private $filename = '';
 
     /**
-     * An array of key/value pairs
+     * A Collection of ValueLabelInterface instances
      *
      * @var array
      */
-    private $data = [];
+    private $data = null;
 
     /**
      * Constructor
      *
      * @param $filename
-     * @param array $data
+     * @param Collection $data
      */
-    public function __construct($filename, $data = []) {
+    public function __construct($filename, $data = null) {
         $this->setFilename($filename);
-        $this->setData($data);
+
+        if ($data instanceof Collection) {
+            $this->setData($data);
+        }
+        else {
+            $this->setData(new Collection());
+        }
     }
 
     /* Getters/Setters
@@ -47,7 +54,7 @@ class Fragment {
     /**
      * Set data
      *
-     * @param array $data
+     * @param Collection $data
      */
     private function setData($data)
     {
@@ -57,7 +64,7 @@ class Fragment {
     /**
      * Get data
      *
-     * @return array
+     * @return Collection
      */
     public function getData()
     {
