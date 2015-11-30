@@ -197,6 +197,9 @@ abstract class Tokenizer
         }
 
         // if one value, return as string, otherwise return the array of strings
+        if (!count($settings[$field])) {
+            return '';
+        }
         return count($settings[$field]) == 1 ? $settings[$field][0] : $settings[$field];
     }
 
