@@ -177,7 +177,7 @@ class Factory
                  * Skip Effects don't use fragments
                  */
                 if (!$currentEffect->getEffectType()->isSkip()) {
-                    $fragment = $fragmentFactory->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+                    $fragment = $fragmentFactory->produce($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
 
                     $allEffectStructures['fragments'][$currentEffect->getId()] = $fragment;
                 }

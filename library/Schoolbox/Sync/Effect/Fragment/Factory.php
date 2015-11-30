@@ -75,7 +75,7 @@ class Factory {
      * @param $userField
      * @return Fragment
      */
-    public function getEffectFragmentTemplate($mappingType, $userField) {
+    public function produce($mappingType, $userField) {
         if ($mappingType == EffectTypeMapper::EFFECT_TYPE_LITERAL) {
             if ($this->isBoolean($userField)) {
                 return new Fragment('@syncEffect/boolean.twig', []);

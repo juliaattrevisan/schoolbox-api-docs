@@ -83,7 +83,7 @@ class Controller extends Base {
          */
         $fragmentFactory = new FragmentFactory();
 
-        $fragment = $fragmentFactory->getEffectFragmentTemplate($default['effectType'], $default['userProperty']);
+        $fragment = $fragmentFactory->produce($default['effectType'], $default['userProperty']);
 
         $data = [
             'allEffectStructures' => [
@@ -171,7 +171,7 @@ class Controller extends Base {
         $queryData = $this->getRequest()->query;
 
         $fragmentFactory = new FragmentFactory();
-        $fragment = $fragmentFactory->getEffectFragmentTemplate($queryData['mappingType'], $queryData['userField']);
+        $fragment = $fragmentFactory->produce($queryData['mappingType'], $queryData['userField']);
 
         $this->getResponse()->content->set([
             'template' => $fragment->getFilename(),
