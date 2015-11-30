@@ -150,35 +150,37 @@ class Controller extends Base {
         // TODO DI
         $mapper = Effect\Mapper::getInstance();
 
-        foreach ($effects as $effectId => $effectData) {
-            $effectArgs = (array)$effectData['arguments'];
+        if (is_array($effects)) {
+            foreach ($effects as $effectId => $effectData) {
+                $effectArgs = (array)$effectData['arguments'];
 
-            // ensure this is in the right order
-            ksort($effectArgs);
+                // ensure this is in the right order
+                ksort($effectArgs);
 
-            /* Figure out what type it was, and cast accordingly
-             */
-            $allFields = new AllUserField();
+                /* Figure out what type it was, and cast accordingly
+                 */
+                $allFields = new AllUserField();
 
-            if ($allFields->isBoolean($effectData['userProperty'])) {
-                $arg = [(bool)$effectArgs[0]];
-            }
-            else {
-                $arg = $effectArgs;
-            }
+                if ($allFields->isBoolean($effectData['userProperty'])) {
+                    $arg = [(bool)$effectArgs[0]];
+                }
+                else {
+                    $arg = $effectArgs;
+                }
 
-            $effect = [
-                'id'             => $effectId,
-                'rule_id'        => $ruleId,
-                'effect_type_id' => $effectData['type'],
-                'user_property'  => $effectData['userProperty'],
-                'arguments'      => json_encode($arg)
-            ];
+                $effect = [
+                    'id'             => $effectId,
+                    'rule_id'        => $ruleId,
+                    'effect_type_id' => $effectData['type'],
+                    'user_property'  => $effectData['userProperty'],
+                    'arguments'      => json_encode($arg)
+                ];
 
-            try {
-                $mapper->save($mapper->hydrate($effect));
-            }
-            catch (\PDOException $e) {
+                try {
+                    $mapper->save($mapper->hydrate($effect));
+                }
+                catch (\PDOException $e) {
+                }
             }
         }
 

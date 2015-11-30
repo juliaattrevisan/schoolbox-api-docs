@@ -388,11 +388,16 @@
          */
         function initEffectMappingTypeChange() {
             $(config.element).on('change', '[data-effect-mappingtype]', function(event) {
+                var ruleId = $(this).attr('data-effect-ruleid');
                 var effectId = $(this).attr('data-effect-mappingtype');
                 var userField = $('[data-effect-userfield='+effectId+']').val();
                 var mappingType = $(this).val();
 
+                /* ruleId won't exist for unsaved effects when changing mapping type
+                 * so we store it in a data var and recycle its value
+                 */
                 var data = {
+                    ruleId: ruleId,
                     effectId: effectId,
                     userField: userField,
                     mappingType: mappingType

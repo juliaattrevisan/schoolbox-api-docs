@@ -144,7 +144,7 @@ class Controller extends Base {
             ->setEffectType(Effect\Type\Mapper::getInstance()->findById($default['effectType']));
 
         $data = [
-            'meta'          => [
+            'meta' => [
                 'effect' => [
                     $newEffect->getId() => $this->getMeta()
                 ]
@@ -174,8 +174,20 @@ class Controller extends Base {
 
         $this->getResponse()->content->set([
             'template' => $template,
-            'data'     => [],
-            'format'   => 'nochrome'
+            'data' => [
+
+                /* If this Effect hasn't been saved it, it won't have a ruleId
+                 * nor an effectId, so recycle it from frontend, as fragments
+                 * expect both values
+                 */
+                'currentEffect' => [
+                    'id' => $_GET['effectId'],
+                ],
+                'currentRule' => [
+                    'id' => $_GET['ruleId'],
+                ]
+            ],
+            'format' => 'nochrome'
         ]);
     }
 

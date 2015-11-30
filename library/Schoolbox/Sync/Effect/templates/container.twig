@@ -19,7 +19,7 @@
                 </select>
             </div>
             <div class="small-2 medium-2 large-2 columns">
-                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][type]" data-effect-mappingtype="{{ currentEffect.id }}">
+                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][type]" data-effect-mappingtype="{{ currentEffect.id }}" data-effect-ruleid="{{ currentRule.id }}">
                     <option value="-1" disabled selected="selected">Please Select</option>
 
                     {% for currentEffectMappingType in allEffectMappingTypes %}
