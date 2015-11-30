@@ -79,17 +79,29 @@ class AllUserField {
     public function getEffectFragmentTemplate($mappingType, $userField) {
         if ($mappingType == EffectTypeMapper::EFFECT_TYPE_LITERAL) {
             if ($this->isBoolean($userField)) {
-                return '@syncEffect/boolean.twig';
+                return [
+                    'filename' => '@syncEffect/boolean.twig',
+                    'data' => []
+                ];
             }
             else if ($this->isLookup($userField)) {
-                return '@syncEffect/lookup.twig';
+                return [
+                    'filename' => '@syncEffect/lookup.twig',
+                    'data' => $this->getLookup()->getEffectFragmentLookupData($userField)
+                ];
             }
             else if ($this->isString($userField)) {
-                return '@syncEffect/string.twig';
+                return [
+                    'filename' => '@syncEffect/string.twig',
+                    'data' => []
+                ];
             }
         }
 
-        return '@syncEffect/map.twig';
+        return [
+            'filename' => '@syncEffect/map.twig',
+            'data' => []
+        ];
     }
 
     /**
@@ -99,6 +111,7 @@ class AllUserField {
      *
      * @param $userField
      * @return array
+     * @deprecated
      */
     public function getEffectFragmentLookupData($userField) {
         $this->getLookup()->getEffectFragmentLookupData($userField);

@@ -172,18 +172,15 @@ class Controller extends Base {
         $queryData = $this->getRequest()->query;
 
         $allUserField = new AllUserField();
-        $template = $allUserField->getEffectFragmentTemplate($queryData['mappingType'], $queryData['userField']);
+        $fragment = $allUserField->getEffectFragmentTemplate($queryData['mappingType'], $queryData['userField']);
 
         $this->getResponse()->content->set([
-            'template' => $template,
+            'template' => $fragment['filename'],
             'data' => [
 
                 /* Contains Lookup data
                  */
-                $allEffectStructures['fragments'][$queryData['effectId']] = [
-                    'filename' => $template,
-                    'data' => $allUserField->getEffectFragmentLookupData($queryData['userField']),
-                ],
+                $allEffectStructures['fragments'][$queryData['effectId']] = $fragment,
 
                 /* If this Effect hasn't been saved it, it won't have a ruleId
                  * nor an effectId, so recycle it from frontend, as fragments
