@@ -34,6 +34,7 @@ class MockTokenizer extends Tokenizer
         $this->addFilter(new Filter('first', 'Return the first character', function ($value) {
             return strlen($value) ? $value[0] : '';
         }));
+        $this->addFilter(new Filter('uc', 'Converts to uppercase', function ($input) { return strtoupper($input); }));
     }
 
 

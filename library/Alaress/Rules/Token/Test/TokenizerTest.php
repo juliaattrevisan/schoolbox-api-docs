@@ -84,6 +84,8 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
                 => ['{:baz.bar|first}', 'd'],
             'concat filter'
                 => ['a{:foo|first}', 'ad'],
+            'chained filters'
+                => ['a{:foo|first|uc}', 'aD'],
             'mapped'
                 => [ new Map('my{:foo}', [ 'mydata1' => 'something else']), 'something else'],
             'nested multi-value'
