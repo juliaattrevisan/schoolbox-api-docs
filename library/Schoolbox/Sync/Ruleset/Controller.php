@@ -97,7 +97,7 @@ class Controller extends Base {
         // TODO DI
         $mapper = Condition\Mapper::getInstance();
 
-        if (count($conditions)) {
+        if (is_array($conditions)) {
             foreach ($conditions as $conditionId => $conditionData) {
 
                 $conditionType = $conditionData['type'];
