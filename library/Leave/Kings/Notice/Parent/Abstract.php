@@ -32,7 +32,7 @@ abstract class Leave_Kings_Notice_Parent_Abstract extends Leave_Notice_Abstract_
         $accessMapper = new UserAccessMapper();
         foreach ($accessMapper->findUsersForService(
             UserAccess::SERVICE_HOUSEMASTER,
-            $this->getRequest()->getUser()->getResidentialHouse()
+            $this->getRequest()->getUser()->getResidentialHouse()->getId()
         ) as $housemaster) {
             $housemasterName  = $housemaster->formatName();
             $housemasterEmail = $housemaster->getEmail();

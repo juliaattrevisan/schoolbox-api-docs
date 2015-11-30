@@ -237,7 +237,7 @@
 
                     {% if showButtons %}
                         {% block buttons_boarderLeave %}
-                            {% if config.boarder_leave_enabled and user.getResidentialHouse() %}
+                            {% if config.boarder_leave_enabled and user.getResidentialHouse().getId() %}
                                 <li class="no-pad">
                                     <a href="/modules/leave/student/{{ user.getId() }}"
                                        class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
