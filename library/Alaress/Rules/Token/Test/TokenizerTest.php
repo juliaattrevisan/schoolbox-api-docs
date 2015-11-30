@@ -88,6 +88,8 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
                 => ['a{:foo|first|uc}', 'aD'],
             'mapped'
                 => [ new Map('my{:foo}', [ 'mydata1' => 'something else']), 'something else'],
+            'missing mapped value'
+                => [ new Map('my{:foo}', [ 'mydata2' => 'something else']), ''],
             'nested multi-value'
                 => ['{:single.multi}', ['first', 'second', 'third', 'fourth']],
             'nested multi-value filter'
