@@ -1,4 +1,4 @@
-<select name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][arguments]">
+<select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][arguments]">
     {% for current in allEffectStructures.fragments[currentEffect.id].getData() %}
         {% set selected = '' %}
 
