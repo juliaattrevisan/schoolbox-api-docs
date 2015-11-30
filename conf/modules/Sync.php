@@ -32,5 +32,8 @@ class Sync implements ModuleConfigInterface {
 
         $condition = new \Schoolbox\Sync\Condition\Module($di);
         $condition->init('/adminv2/sync/condition');
+
+        $effect = new \Schoolbox\Sync\Effect\Module($di);
+        $effect->init('/adminv2/sync/effect');
     }
 }

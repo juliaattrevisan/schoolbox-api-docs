@@ -93,7 +93,26 @@
                             {% endfor %}
                         </ul>
 
-                        <h4>Effects</h4>
+                        <div class="actions-small-1 row">
+                            <div class="list-item">
+                                <div class="small-12 columns">
+                                    <h4>Effects</h4>
+                                </div>
+                            </div>
+                            <nav>
+                                <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-effect-options"></a>
+                            </nav>
+                            <ul id="rule-{{ currentRule.id }}-effect-options" class="f-dropdown" data-dropdown-content>
+                                <li><a href="/adminv2/sync/effect/add/{{ currentRule.id }}" class="icon-add" title="Spawn new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
+                                <li><a href="/adminv2/sync/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip</a></li>
+                            </ul>
+                        </div>
+
+                        <ul class="information-list" id="rule-{{ currentRule.id }}-effects">
+                            {% for currentEffect in currentRule.effects %}
+                            {% include allEffectStructures.containers[currentEffect.id] %}
+                            {% endfor %}
+                        </ul>
                     </section>
                 </div>
             </div>

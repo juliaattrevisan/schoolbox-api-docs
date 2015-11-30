@@ -16,6 +16,9 @@ use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Condition;
+use Schoolbox\Sync\Effect;
+use Schoolbox\Sync\Effect\AllUserField;
+use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
 class Factory
 {
@@ -48,7 +51,6 @@ class Factory
             'icon'   => 'unlocked',
         ]
     ];
-
 
     /**
      * Constructor
@@ -127,29 +129,71 @@ class Factory
                 return [];
         }
 
+        /* Load Ruleset
+         */
+        $ruleset = $this->findRuleset();
+
+        /* Load NDS Fields to chooze from
+         */
         $ffactory = new FieldFactory();
 
+        /* Compile metadata about Conditions and Effects, for presentation
+         */
         $metas = [];
 
         $ruleIds = Rule\Mapper::getInstance()->findIdsByColumnList([ 'role_type' => $this->getType() ]);
 
         foreach (Condition\Mapper::getInstance()->findIdsByColumnList([ 'rule_id' => $ruleIds ]) as $conditionId) {
-            $metas[$conditionId] = $this->getMeta();
+            $metas['condition'][$conditionId] = $this->getMeta();
+        }
+
+        foreach (Effect\Mapper::getInstance()->findIdsByColumnList([ 'rule_id' => $ruleIds ]) as $effectId) {
+            $metas['effect'][$effectId] = $this->getMeta();
+        }
+
+        /* Determine which Effect Fragments to load initially
+         * This is just some hardcoded values for now.
+         * It tells frontend which templates to use for Effects.
+         */
+        $allUserField = new AllUserField();
+
+        /* Which twig containers and fragments to load for this
+         * Ruleset's Effects
+         */
+        $allEffectStructures = [
+            'containers' => [],
+            'fragments' => [],
+            'allUserField' => $allUserField->getAllFields(),
+            'allNDSField' => $ffactory->buildMap($this->getType()),
+        ];
+
+        /* Skip Effect has a different container since it's a unique kind of Effect
+         */
+        foreach ($ruleset as $currentRule) {
+            foreach ($currentRule->getEffects() as $currentEffect) {
+                $allEffectStructures['containers'][$currentEffect->getId()] = $currentEffect->getEffectType()->getTemplate();
+
+                /* Figure out which fragment to use if this type isn't a Skip
+                 * Skip Effects don't use fragments
+                 */
+                if (!$currentEffect->getEffectType()->isSkip()) {
+                    $allEffectStructures['fragments'][$currentEffect->getId()] = $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+                }
+            }
         }
 
         /* If it was one of the known cases, return a well-formed structure
          * Otherwise it would have returned empty array earlier
          */
         return [
-            'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
-            'allNavigation'  => $allNavigation->getAllNodes(),
-            'rulesetId'      => $this->getType(),
-            'ruleset'        => [ 'rules' => $this->findRuleset() ],
-            'allNDSField'    => $ffactory->buildMap($this->getType()),
-            'meta'           => $metas
+            'allBreadcrumbs'      => $allBreadcrumbs->getAllNodes(),
+            'allNavigation'       => $allNavigation->getAllNodes(),
+            'rulesetId'           => $this->getType(),
+            'ruleset'             => [ 'rules' => $ruleset ],
+            'allEffectStructures' => $allEffectStructures,
+            'meta'                => $metas
         ];
     }
-
 
     /**
      * Load a Ruleset based on Role Type student|parent|staff
@@ -177,8 +221,9 @@ class Factory
         return $this->meta;
     }
 
-
     /**
+     * Set type
+     *
      * @param string $type
      */
     private function setType($type)
@@ -186,8 +231,9 @@ class Factory
         $this->type = $type;
     }
 
-
     /**
+     * Get type
+     *
      * @return string
      */
     private function getType()

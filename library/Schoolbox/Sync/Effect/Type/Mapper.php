@@ -14,6 +14,15 @@ use Schoolbox;
 
 class Mapper extends Schoolbox\Mapper
 {
+    /* As per ups_effect_type in the db
+     * Used to determine Effect Fragment templates
+     */
+    const EFFECT_TYPE_LITERAL = 2;
+
+    /* Skip Effect Type
+     */
+    const EFFECT_TYPE_SKIP = 3;
+
 
     /**
      * Setup method. Implementing classes to define their SQL map here.

@@ -1,0 +1,41 @@
+{# Corresponds to db indexes for effectType - could be fed from backend one day #}
+{% set allEffectMappingTypes = ['Maps', 'Equals'] %}
+
+<li id="effect-{{ currentEffect.id }}" class="actions-small-2 content" data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
+    <input type="hidden" name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][type]" value="">
+
+    <div class="list-item">
+        <div class="row">
+            <div class="small-1 medium-1 large-1 columns">
+                Then
+            </div>
+            <div class="small-11 medium-5 large-5 columns">
+                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][userProperty]" data-effect-userfield="{{ currentEffect.id }}" >
+                    {% for currentUserKey, currentUserField in allEffectStructures.allUserField %}
+                        <option value="{{ currentUserKey }}" {% if currentUserKey == currentEffect.getUserProperty() %}selected="selected"{% endif %}>
+                            {{ currentUserKey }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="small-2 medium-2 large-2 columns">
+                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][type]" data-effect-mappingtype="{{ currentEffect.id }}">
+                    <option value="-1" disabled selected="selected">Please Select</option>
+
+                    {% for currentEffectMappingType in allEffectMappingTypes %}
+                        <option value="{{ loop.index }}" {% if loop.index == currentEffect.effectType.id %}selected="selected"{% endif %}>{{ currentEffectMappingType }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="small-12 medium-4 large-4 columns" data-effect-fragment="{{ currentEffect.id }}">
+                {% include allEffectStructures.fragments[currentEffect.id] %}
+            </div>
+        </div>
+    </div>
+    <nav>
+        <a href="/adminv2/sync/effect/delete/{{ currentEffect.id }}" class="icon-delete" title="Delete" data-effect-delete="{{ currentEffect.id }}"></a>
+        <a href="" class="icon-{{ meta.effect[currentEffect.id].lock.icon }}" title='Toggle Readonly Mode' data-effect-modify-lock="effect-{{ currentEffect.id }}"></a>
+    </nav>
+
+    <span id='effect-{{ currentEffect.id }}-status' class="label highlight full-width {{ meta.effect[currentEffect.id].status ? '' : 'hide' }}">{{ meta.effect[currentEffect.id].status }}</span>
+</li>
