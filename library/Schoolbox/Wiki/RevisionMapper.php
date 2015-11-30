@@ -10,10 +10,19 @@
 namespace Schoolbox\Wiki;
 
 use PDO;
+use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 
+/**
+ * Class RevisionMapper
+ *
+ * @package Schoolbox\Wiki
+ * @method Revision hydrate(array $row, $alias = '', $callback = null)
+ * @method Revision findById($id)
+ * @method Revision createModel()
+ */
 class RevisionMapper extends Mapper implements FeedableMapperInterface
 {
 
@@ -100,43 +109,69 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface
         $time   = date('Y-m-d H:i:s', $time ? : time());
         $limit  = (int)$limit;
         $offset = (int)$offset;
-        $stmt   = $this->database->prepare(
-            "
-            SELECT
-                {$this->getColumnString('r')},
-                {$this->getJoinColumnString('user', 'u')},
-                {$this->getJoinColumnString('wiki', 'w')},
-                {$this->getJoinMapper('wiki')->getJoinColumnString('category', 'c')}
-            FROM
-                `{$this->getTable()}` `r`
-                LEFT JOIN {$this->getJoinSql('user', 'r', 'u')}
-                LEFT JOIN {$this->getJoinSql('wiki', 'r', 'w')}
-                LEFT JOIN {$this->getJoinMapper('wiki')->getJoinSql('category', 'w', 'c')}
+        $stmt   = $this->database->prepare("
+            {$this->getSelectString()}
             WHERE
                 `c`.`id` = :cat_id
                 AND `w`.`deleted` = 'false'
-                AND `r`.`created` < :time
-            ORDER BY `r`.`created` DESC
+                AND `wikiRevision`.`created` < :time
+            ORDER BY `wikiRevision`.`created` DESC
             LIMIT $offset, $limit
-        "
-        );
+        ");
         $stmt->execute(
             array(
                 'cat_id' => $categoryId,
                 'time'   => $time
             )
         );
-        $c = $this->createCollection();
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            /** @var Revision $revision */
-            $revision = $this->hydrate($r, 'r');
-            $revision->setUser($this->hydrateJoin($r, 'user', 'u'));
+
+        return $this->hydrateSelect($stmt);
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('wiki', 'w')},
+                {$this->getJoinMapper('wiki')->getJoinColumnString('category', 'c')},
+                {$this->getJoinColumnString('user', 'u')}
+            FROM
+                `{$this->getTable()}`
+                LEFT JOIN {$this->getJoinSql('wiki', '', 'w')}
+                LEFT JOIN {$this->getJoinMapper('wiki')->getJoinSql('category', 'w', 'c')}
+                LEFT JOIN {$this->getJoinSql('user', '', 'u')}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $col = $this->createCollection();
+
+        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
+
+            file_put_contents('/vagrant/data/sqld.log', json_encode(['pid' => getmypid(), 'data' => $r])."\n", FILE_APPEND);
+
+            $revision = $this->hydrate($r);
             $revision->setWiki($this->hydrateJoin($r, 'wiki', 'w'));
             $revision->getWiki()->setCategory($this->getJoinMapper('wiki')->hydrateJoin($r, 'category', 'c'));
-            $c->add($revision);
+            $revision->setUser($this->hydrateJoin($r, 'user', 'u'));
+
+            $col->add($revision);
         }
-        return $c;
+
+        return $col;
     }
+
 
     /**
      * Figure out if there are any empty links - these are assumed to be stubs.
