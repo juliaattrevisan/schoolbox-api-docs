@@ -15,33 +15,43 @@
 namespace Schoolbox\Sync\Effect\Fragment;
 
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
+use \Schoolbox\UserMapper;
 
 class Factory {
     const TYPE_BOOLEAN = 1;
     const TYPE_LOOKUP = 2;
     const TYPE_STRING = 3;
 
-    /* Manufacture a list of Schoolbox User fields to chooze from
-     * TODO: Connect up to UserMapper to determine type
-     * TODO: This should contain a human-friendly version
+    /**
+     * Manufacture a list of Schoolbox User fields to chooze from
+     * This combines $allFieldKeys' data with its type, as derived
+     * from the UserMapper definition
      */
-    private $allFields = [
-        'email' => self::TYPE_STRING,
-        'altEmail' => self::TYPE_STRING,
-        'webmail' => self::TYPE_BOOLEAN,
-        'eportfolioEnable' => self::TYPE_BOOLEAN,
-        'externalId' => self::TYPE_STRING,
-        'firstname' => self::TYPE_STRING,
-        'lastname' => self::TYPE_STRING,
-        'localEmail' => self::TYPE_BOOLEAN,
-        'residentialHouse' => self::TYPE_LOOKUP,
-        'schoolHouse' => self::TYPE_LOOKUP,
-        'title' => self::TYPE_STRING,
-        'useInternalMail' => self::TYPE_BOOLEAN,
-        'username' => self::TYPE_STRING,
-        'year' => self::TYPE_STRING,
-        'enabled' =>  self::TYPE_BOOLEAN,
-        'boardingStatus' => self::TYPE_STRING,
+    private $allFields = [];
+
+    /**
+     * A list of all the Schoolbox UserMapper fields to
+     * allow in the Effect select dropdowns
+     *
+     * @var array
+     */
+    private $allFieldKeys = [
+        'email' => 'Email Address',
+        'altEmail' => 'Alt Email Address',
+        'webmail' => 'Webmail',
+        'eportfolioEnable' => 'Eportfolio Enabled?',
+        'externalId' => 'External ID',
+        'firstname' => 'Firstname',
+        'lastname' => 'Surname',
+        'localEmail' => 'Local Email?',
+        'residentialHouse' => 'Residential House',
+        'schoolHouse' => 'School House',
+        'title' => 'Title' ,
+        'useInternalMail' => 'Use Internal Mail',
+        'username' => 'Username',
+        'year' => 'Year',
+        'enabled' => 'Schoolbox Account Enabled?',
+        'boardingStatus' => 'Boarding Status'
     ];
 
     /**
@@ -56,15 +66,63 @@ class Factory {
      */
     public function __construct() {
         $this->setLookup(new Lookup());
+
+        $this->setAllFields($this->generateAllFields());
     }
 
     /**
-     * Get the associative array of fields
-     *
-     * @return array
+     * Figure out what each desired field's type is, via the UserMapper
+     * Also compile human-readable versions of the field
      */
-    public function getAllFields() {
-        return $this->allFields;
+    private function generateAllFields() {
+        $allFields = [];
+
+        $mapper = new UserMapper();
+        $allMaps = $mapper->getMap();
+
+        /* Get the associative array of fields
+         */
+        foreach ($this->getAllFieldKeys() as $key => $label) {
+            $currentMap = $allMaps->getOffset($key);
+
+            /* Condense types
+             */
+            switch ($currentMap['type']) {
+
+                /* Both Boolean types (lol)
+                 */
+                case UserMapper::TYPE_BOOL_ENUM :
+                case UserMapper::TYPE_BOOLEAN :
+                    $allFields[$key] = [
+                        'type' => self::TYPE_BOOLEAN,
+                        'label' => $label
+                    ];
+
+                    break;
+
+                /* Model Join (Lookup, typically)
+                 */
+                case UserMapper::TYPE_MODEL :
+                    $allFields[$key] = [
+                        'type' => self::TYPE_LOOKUP,
+                        'label' => $label
+                    ];
+
+                    break;
+
+                /* All other types
+                 */
+                default:
+                    $allFields[$key] = [
+                        'type' => self::TYPE_STRING,
+                        'label' => $label
+                    ];
+
+                    break;
+            }
+        }
+
+        return $allFields;
     }
 
     /**
@@ -98,7 +156,7 @@ class Factory {
      * @return bool
      */
     public function isBoolean($field) {
-        if ($this->allFields[$field] == self::TYPE_BOOLEAN) {
+        if ($this->allFields[$field]['type'] == self::TYPE_BOOLEAN) {
             return true;
         }
 
@@ -112,7 +170,7 @@ class Factory {
      * @return bool
      */
     public function isLookup($field) {
-        if ($this->allFields[$field] == self::TYPE_LOOKUP) {
+        if ($this->allFields[$field]['type'] == self::TYPE_LOOKUP) {
             return true;
         }
 
@@ -126,7 +184,7 @@ class Factory {
      * @return bool
      */
     public function isString($field) {
-        if ($this->allFields[$field] == self::TYPE_STRING) {
+        if ($this->allFields[$field]['type'] == self::TYPE_STRING) {
             return true;
         }
 
@@ -154,5 +212,43 @@ class Factory {
     private function getLookup()
     {
         return $this->lookup;
+    }
+
+    /**
+     * Set all field keys
+     *
+     * @param array $allFieldKeys
+     */
+    private function setAllFieldKeys($allFieldKeys)
+    {
+        $this->allFieldKeys = $allFieldKeys;
+    }
+
+    /**
+     * Get all field keys
+     *
+     * @return array
+     */
+    private function getAllFieldKeys()
+    {
+        return $this->allFieldKeys;
+    }
+
+    /**
+     * Get all fields
+     *
+     * @return array
+     */
+    public function getAllFields() {
+        return $this->allFields;
+    }
+
+    /**
+     * Set all fields
+     *
+     * @param $allFields
+     */
+    private function setAllFields($allFields) {
+        $this->allFields = $allFields;
     }
 }

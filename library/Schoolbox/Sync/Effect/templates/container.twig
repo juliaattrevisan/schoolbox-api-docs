@@ -13,7 +13,7 @@
                 <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][userProperty]" data-effect-userfield="{{ currentEffect.id }}" >
                     {% for currentUserKey, currentUserField in allEffectStructures.allUserField %}
                         <option value="{{ currentUserKey }}" {% if currentUserKey == currentEffect.getUserProperty() %}selected="selected"{% endif %}>
-                            {{ currentUserKey }}
+                            {{ currentUserField.label }}
                         </option>
                     {% endfor %}
                 </select>
