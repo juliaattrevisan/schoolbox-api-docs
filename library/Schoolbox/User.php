@@ -10,25 +10,54 @@
 
 namespace Schoolbox;
 
+use House;
+use HouseResidential;
 use JsonSerializable;
+use Schoolbox\External\Subject;
+use Schoolbox\External\SubjectCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
 class User implements JsonSerializable
 {
 
+    /** @var int */
     private $id;
+
+    /** @var string */
     private $title;
+
+    /** @var string */
     private $firstname;
+
+    /** @var string */
     private $lastname;
+
+    /** @var int */
     private $externalId;
+
+    /** @var string */
     private $altEmail;
+
+    /** @var bool */
     private $webmail;
+
+    /** @var string */
     private $username;
+
+    /** @var string */
     private $password;
+
+    /** @var string */
     private $year;
+
+    /** @var House */
     private $schoolHouse;
+
+    /** @var HouseResidential */
     private $residentialHouse;
+
+    /** @var Collection|self[] */
     private $linkedUser;
 
     /**
@@ -48,14 +77,35 @@ class User implements JsonSerializable
      */
     private $key = '';
 
-    private $role; //Users role within the system
-    private $campusCollection; //Collection of campuses
-    private $defaultCampus; //The users default campus
-    private $superuser; //Bool
-    private $enabled; //Bool
+    /**
+     * Users role within the system
+     *
+     * @var Role
+     */
+    private $role;
 
     /**
-     * @var \Schoolbox\External\SubjectCollection
+     * Collection of campuses
+     *
+     * @var CampusCollection|Campus[]
+     */
+    private $campusCollection;
+
+    /**
+     * The user's default campus
+     *
+     * @var Campus
+     */
+    private $defaultCampus;
+
+    /** @var bool */
+    private $superuser;
+
+    /** @var bool */
+    private $enabled;
+
+    /**
+     * @var SubjectCollection|Subject[]
      */
     protected $subject_collection;
 
@@ -65,23 +115,47 @@ class User implements JsonSerializable
     /** @var Collection|UserAccess[] */
     protected $accessList;
 
-    //User config options
-    private $localEmail; //Controls if user has local domain email username@domain
-    private $eportfolioEnable; //Controls if user has eportfolio
-    private $useInternalMail; //Controls mailto or internal schoolbox mail sending
-    private $calendarView; //Controls default calendar view
+    /**
+     * Controls if user has local domain email username@domain
+     *
+     * @var bool
+     */
+    private $localEmail;
+
+    /**
+     * Controls if user has eportfolio
+     *
+     * @var bool
+     */
+    private $eportfolioEnable;
+
+    /**
+     * Controls mailto (false) or internal schoolbox (true) mail sending
+     *
+     * @var bool
+     */
+    private $useInternalMail;
+
+    /**
+     * Controls default calendar view
+     *
+     * @var string
+     */
+    private $calendarView;
 
     /**
      * A Collection of User objects who should be receiving email
      * notifications about this User. These recipients are usually,
      * but not necessarily, a parent of this User instance.
      *
-     * @var null
+     * @var Collection|self[]
      */
-    private $emailRecipients = null;
+    private $emailRecipients;
 
     /**
      * Student's boarding status (only used if boarder leave module is enabled)
+     *
+     * @var string
      */
     protected $boardingStatus;
 
@@ -90,11 +164,15 @@ class User implements JsonSerializable
      */
     protected $config_loader;
 
+
+    /**
+     * Build default empty objects so things don't explode
+     */
     public function __construct()
     {
         $this->setCampusCollection(new CampusCollection(array()));
         $this->setConfigLoader(new ConfigLoader());
-        $this->setLinkedUser(new \Schoolbox\Collection(array()));
+        $this->setLinkedUser(new Collection(array()));
         $this->setRole(new Role());
     }
 
@@ -131,6 +209,9 @@ class User implements JsonSerializable
     }
 
 
+    /**
+     * @return bool
+     */
     public function isSuperuser()
     {
         return $this->superuser;
@@ -141,18 +222,26 @@ class User implements JsonSerializable
      *
      * @return Role
      */
-
     public function getRole()
     {
         return $this->role;
     }
 
+
+    /**
+     * @param Role $role
+     * @return self
+     */
     public function setRole($role)
     {
         $this->role = $role;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getEmail()
     {
         if ($this->localEmail == true) {
@@ -161,6 +250,10 @@ class User implements JsonSerializable
         return $this->altEmail;
     }
 
+
+    /**
+     * @return string
+     */
     public function getFullName()
     {
         return $this->formatName();
@@ -170,7 +263,7 @@ class User implements JsonSerializable
     /**
      * Format a name from a user object
      *
-     * @param null $format
+     * @param string $format
      *
      * @return string
      */
@@ -188,6 +281,7 @@ class User implements JsonSerializable
         foreach ($tags[0] as $tag) {
             $key  = trim($tag, '{}');
             $func = 'get' . ucfirst($key);
+            $value = '';
             if (method_exists($this, $func)) {
                 if (is_string($this->$func())) {
                     $value = $this->$func();
@@ -205,20 +299,28 @@ class User implements JsonSerializable
         }
     }
 
+
+    /**
+     * @param string $altEmail
+     * @return self
+     */
     public function setAltEmail($altEmail)
     {
         $this->altEmail = $altEmail;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getAltEmail()
     {
         return $this->altEmail;
     }
 
     /**
-     * @param int $webmail
-     *
+     * @param bool $webmail
      * @return self
      */
     public function setWebmail($webmail)
@@ -228,7 +330,7 @@ class User implements JsonSerializable
     }
 
     /**
-     * @return int
+     * @return bool
      */
     public function getWebmail()
     {
@@ -236,193 +338,350 @@ class User implements JsonSerializable
     }
 
 
+    /**
+     * @param string $calendarView
+     * @return self
+     */
     public function setCalendarView($calendarView)
     {
         $this->calendarView = $calendarView;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getCalendarView()
     {
         return $this->calendarView;
     }
 
+
+    /**
+     * @param bool $eportfolioEnable
+     * @return self
+     */
     public function setEportfolioEnable($eportfolioEnable)
     {
         $this->eportfolioEnable = $eportfolioEnable;
         return $this;
     }
 
+
+    /**
+     * @return bool
+     */
     public function getEportfolioEnable()
     {
         return $this->eportfolioEnable;
     }
 
+
+    /**
+     * @param int $externalId
+     * @return self
+     */
     public function setExternalId($externalId)
     {
         $this->externalId = $externalId;
         return $this;
     }
 
+
+    /**
+     * @return int
+     */
     public function getExternalId()
     {
         return $this->externalId;
     }
 
+
+    /**
+     * @param string$firstname
+     * @return self
+     */
     public function setFirstname($firstname)
     {
         $this->firstname = $firstname;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getFirstname()
     {
         return $this->firstname;
     }
 
+
+    /**
+     * @param string $hash
+     * @return self
+     */
     public function setHash($hash)
     {
         $this->hash = $hash;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getHash()
     {
         return $this->hash;
     }
 
+
+    /**
+     * @param int $id
+     * @return self
+     */
     public function setId($id)
     {
         $this->id = $id;
         return $this;
     }
 
+
+    /**
+     * @return int
+     */
     public function getId()
     {
         return $this->id;
     }
 
+
+    /**
+     * @param string $key
+     * @return self
+     */
     public function setKey($key)
     {
         $this->key = $key;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getKey()
     {
         return $this->key;
     }
 
+
+    /**
+     * @param string $lastname
+     * @return self
+     */
     public function setLastname($lastname)
     {
         $this->lastname = $lastname;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getLastname()
     {
         return $this->lastname;
     }
 
+
+    /**
+     * @param bool $localEmail
+     * @return self
+     */
     public function setLocalEmail($localEmail)
     {
         $this->localEmail = $localEmail;
         return $this;
     }
 
+
+    /**
+     * @return bool
+     */
     public function getLocalEmail()
     {
         return $this->localEmail;
     }
 
+
+    /**
+     * @param string $password
+     * @return self
+     */
     public function setPassword($password)
     {
         $this->password = $password;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getPassword()
     {
         return $this->password;
     }
 
+
+    /**
+     * @param HouseResidential $residentialHouse
+     * @return self
+     */
     public function setResidentialHouse($residentialHouse)
     {
         $this->residentialHouse = $residentialHouse;
         return $this;
     }
 
+
+    /**
+     * @return HouseResidential
+     */
     public function getResidentialHouse()
     {
         return $this->residentialHouse;
     }
 
+
+    /**
+     * @param House $schoolHouse
+     * @return self
+     */
     public function setSchoolHouse($schoolHouse)
     {
         $this->schoolHouse = $schoolHouse;
         return $this;
     }
 
+
+    /**
+     * @return House
+     */
     public function getSchoolHouse()
     {
         return $this->schoolHouse;
     }
 
+
+    /**
+     * @param bool $superuser
+     * @return self
+     */
     public function setSuperuser($superuser)
     {
         $this->superuser = $superuser;
         return $this;
     }
 
+
+    /**
+     * @return bool
+     */
     public function getSuperuser()
     {
         return $this->superuser;
     }
 
+
+    /**
+     * @param string $title
+     * @return self
+     */
     public function setTitle($title)
     {
         $this->title = $title;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getTitle()
     {
         return $this->title;
     }
 
+
+    /**
+     * @param bool $useInternalMail
+     * @return self
+     */
     public function setUseInternalMail($useInternalMail)
     {
         $this->useInternalMail = $useInternalMail;
         return $this;
     }
 
+
+    /**.
+     * @return bool
+     */
     public function getUseInternalMail()
     {
         return $this->useInternalMail;
     }
 
+
+    /**
+     * @param string $username
+     * @return self
+     */
     public function setUsername($username)
     {
         $this->username = $username;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getUsername()
     {
         return $this->username;
     }
 
+
+    /**
+     * @param string $year
+     * @return self
+     */
     public function setYear($year)
     {
         $this->year = $year;
         return $this;
     }
 
+
+    /**
+     * @return string
+     */
     public function getYear()
     {
         return $this->year;
     }
 
+
+    /**
+     * @param bool $enabled
+     * @return self
+     */
     public function setEnabled($enabled)
     {
         // explicit cast
@@ -430,18 +689,32 @@ class User implements JsonSerializable
         return $this;
     }
 
+
+    /**
+     * @return bool
+     */
     public function getEnabled()
     {
         // explicit cast
         return $this->enabled ? true : false;
     }
 
+
+    /**
+     * @param CampusCollection $campusCollection
+     * @return self
+     */
     public function setCampusCollection($campusCollection)
     {
         $this->campusCollection = $campusCollection;
         return $this;
     }
 
+
+    /**
+     * @param Campus $defaultCampus
+     * @return self
+     */
     public function setDefaultCampus($defaultCampus)
     {
         $this->defaultCampus = $defaultCampus;
@@ -482,7 +755,7 @@ class User implements JsonSerializable
     }
 
     /**
-     * @param \Schoolbox\External\SubjectCollection $subject_collection
+     * @param SubjectCollection $subject_collection
      *
      * @return self
      */
@@ -493,7 +766,7 @@ class User implements JsonSerializable
     }
 
     /**
-     * @return \Schoolbox\External\SubjectCollection
+     * @return SubjectCollection|Subject[]
      */
     public function getSubjectCollection()
     {
@@ -502,7 +775,7 @@ class User implements JsonSerializable
 
 
     /**
-     * @param \Schoolbox\IConfigLoader $config_loader
+     * @param IConfigLoader $config_loader
      *
      * @return self
      */
@@ -537,7 +810,7 @@ class User implements JsonSerializable
     }
 
     /**
-     * @return \Schoolbox\IConfigLoader
+     * @return IConfigLoader
      */
     public function getConfigLoader()
     {
@@ -628,7 +901,7 @@ class User implements JsonSerializable
     /**
      * Get the parents associated with this user
      *
-     * @return Collection
+     * @return Collection|self[]
      */
     public function getParents()
     {
@@ -636,6 +909,8 @@ class User implements JsonSerializable
     }
 
     /**
+     * TODO this logic needs to go in the mapper. Or somewhere. Just not here!
+     *
      * Find the email recipients for this user who should be notified whenever
      * a comment is made, or when some other email-worthy action takes place
      *
@@ -646,9 +921,9 @@ class User implements JsonSerializable
      *
      * Migrated from Conversation.php
      *
-     * @param $user
+     * @param self $user
      *
-     * @return \Schoolbox\Collection
+     * @return Collection|self[]
      */
     private function findEmailRecipients($user)
     {
@@ -696,6 +971,8 @@ class User implements JsonSerializable
 
     /**
      * Public alias for the Report Card approach
+     *
+     * @return void
      */
     public function loadEmailRecipients()
     {
@@ -708,7 +985,7 @@ class User implements JsonSerializable
     /**
      * Set recipients
      *
-     * @param \Schoolbox\Collection $emailRecipients
+     * @param Collection|self[] $emailRecipients
      *
      * @return self
      */
@@ -721,7 +998,7 @@ class User implements JsonSerializable
     /**
      * Get recipients
      *
-     * @return \Schoolbox\Collection
+     * @return Collection|self[]
      */
     public function getEmailRecipients()
     {
@@ -744,7 +1021,7 @@ class User implements JsonSerializable
     }
 
     /**
-     * @param \Schoolbox\Collection $linkedUser
+     * @param Collection|self[] $linkedUser
      */
     public function setLinkedUser($linkedUser)
     {
@@ -752,7 +1029,7 @@ class User implements JsonSerializable
     }
 
     /**
-     * @return \Schoolbox\Collection
+     * @return Collection|self[]
      */
     public function getLinkedUser()
     {
