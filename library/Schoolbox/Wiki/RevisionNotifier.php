@@ -130,28 +130,29 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 
 		/** @var Wiki $wiki */
 		$wiki = $this->wikiMapper->findById($revision->getWiki()->getId());
+		$wikiId = $wiki->getId();
 
 		/** @var Category $cat */
 		$cat = $this->catMapper->findById($wiki->getCategory()->getId());
-
-		$revisionSlug = $wiki->getSlug();
 
 		$authorExtId  = $author->getExternalId();
 
 		$categoryId   = $cat->getId();
 
+		$href = "/wiki/revision/$wikiId/$revisionId";
+
         $envelope = new Envelope();
         $bob = new Builder();
 
         $bob->setTitle(':author revised the wiki :title in :folder')
-            ->setHref("/wiki/$categoryId/$revisionSlug")
+            ->setHref($href)
             ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
             ->addTopic("wiki.$revisionId.created")
             ->setSeverity(Logger::INFO)
             ->setNamespace(self::getNamespace())
             ->setParams([
                 'author' => new UserParam($author),
-                'title'  => new Param($revisionName, "/wiki/$categoryId/$revisionSlug"),
+                'title'  => new Param($revisionName, $href),
                 'folder' => new CategoryParam($cat)
             ])
             ->setFilter([
