@@ -59,16 +59,18 @@ class Map implements Construct
 
 
     /**
-     * @param string $inputValue
+     * @param array $inputValue will be an array of strings
      * @return mixed
      */
     public function apply($inputValue)
     {
-        if (array_key_exists($inputValue, $this->map)) {
-            return $this->map[$inputValue];
+        $output = [];
+        foreach ($inputValue as $input) {
+            if (array_key_exists($input, $this->map)) {
+                $output[] = $this->map[$input];
+            }
         }
-
-        return null;
+        return $output;
     }
 
 } 

@@ -52,8 +52,22 @@ class Tokenizer extends Super {
 
         $this->addToken(new Token($key, "The $context's $label", function ($entity, $settings) use ($key) {
             $reader = new ObjectReader();
-            return $reader->read($entity, $key);
+            return $reader->read($entity, $settings[0]);
         }));
+    }
+
+
+    /**
+     * Override default functionality and pass the dynamic token through as a setting
+     *
+     * @param string $token
+     * @param mixed  $dataset
+     * @param array  $settings
+     * @return array
+     */
+    protected function applyToken($token, $dataset, $settings)
+    {
+        return parent::applyToken($token, $dataset, [ $token ]);
     }
 
 }

@@ -29,10 +29,10 @@ class FieldFactory
             'givenName'              => 'Given Name',
             'lastname'               => 'Last Name',
 
-            'publiclyVisible'        => 'visibility',
+            'publiclyVisible'        => 'Visibility',
             'dob'                    => 'Date of Birth',
             'gender'                 => 'Gender',
-            'email.address'          => 'Email Address(es)',
+            'email[].address'        => 'Email Address(es)',
 
             'year.level'             => 'Year Level',
 
@@ -44,11 +44,13 @@ class FieldFactory
             'phoneMobile.number'     => 'Mobile phone number',
             'phoneMobile.silent'     => 'Mobile phone silent status',
 
-            'campus.code'            => 'Campus(es) Code(s)',
-            'campus.name'            => 'Campus(es) Name(s)',
+            'campus[].code'          => 'Campus(es) Code(s)',
+            'campus[].name'          => 'Campus(es) Name(s)',
 
             'house.code'             => 'House Code',
             'house.name'             => 'House Name',
+
+            'residentialHouse'       => 'Boarding House Code',
         ];
 
         return $map;

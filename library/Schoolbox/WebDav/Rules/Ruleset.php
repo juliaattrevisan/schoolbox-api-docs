@@ -15,7 +15,7 @@ use Schoolbox\User;
 
 class Ruleset extends TokenizedRuleset {
 
-    /** @var \Alaress\Rules\Token\Tokenizer */
+    /** @var Tokenizer */
     protected $tokenizer;
 
 
