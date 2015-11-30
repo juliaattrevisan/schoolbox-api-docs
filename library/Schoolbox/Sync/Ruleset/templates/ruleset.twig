@@ -31,15 +31,15 @@
                 <nav>
                     <span class="switch round">
                         <input type="hidden"
-                               name="configuration[{{ rulesetId }}][enabled]"
+                               name="config[{{ rulesetId }}][enabled]"
                                value="0">
                         <input type="checkbox"
-                               id="configuration-{{ rulesetId }}-switch"
-                               name="configuration[{{ rulesetId }}][enabled]"
+                               id="config-{{ rulesetId }}-switch"
+                               name="config[{{ rulesetId }}][enabled]"
                                checked
                                {#{% if customRule.getEnabled() %}checked{% endif %}#}
                                value="1">
-                        <label for="configuration-{{ rulesetId }}-switch">
+                        <label for="config-{{ rulesetId }}-switch">
                             <span>On</span>
                             <span>Off</span>
                         </label>
