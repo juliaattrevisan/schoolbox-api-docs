@@ -36,8 +36,7 @@
                         <input type="checkbox"
                                id="config-{{ rulesetId }}-switch"
                                name="config[{{ rulesetId }}][enabled]"
-                               checked
-                               {#{% if customRule.getEnabled() %}checked{% endif %}#}
+                               {% if ruleset.config.getEnabled() %}checked{% endif %}
                                value="1">
                         <label for="config-{{ rulesetId }}-switch">
                             <span>On</span>

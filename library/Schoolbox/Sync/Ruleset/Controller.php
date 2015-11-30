@@ -80,6 +80,7 @@ class Controller extends Base {
 
         $roleType = $postData['rulesetId'];
 
+        $this->updateConfig($roleType, $postData['config'][$roleType]);
         foreach ($postData['rule'] as $ruleId => $ruleData) {
             $this->updateConditions($ruleId, $ruleData['condition']);
             $this->updateEffects($ruleId, $ruleData['effect']);
@@ -88,6 +89,18 @@ class Controller extends Base {
         $this->getResponse()->redirect->to("/adminv2/sync/$roleType");
     }
 
+    /**
+     * @param $roleType
+     * @param $config
+     */
+    protected function updateConfig($roleType, $config)
+    {
+        // TODO DI all of this
+        $mapper = Config\Mapper::getInstance();
+        $model  = $mapper->findById($roleType);
+        $model->setEnabled($config['enabled']);
+        $mapper->save($model);
+    }
 
     /**
      * @param int $ruleId
