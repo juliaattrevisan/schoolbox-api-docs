@@ -11,6 +11,8 @@
             </div>
             <div class="small-10 medium-11 large-4 columns">
                 <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][userProperty]" data-effect-userfield="{{ currentEffect.id }}" >
+                    <option value="-1" disabled selected="selected">Please Select</option>
+
                     {% for currentUserKey, currentUserField in allEffectStructures.allUserField %}
                         <option value="{{ currentUserKey }}" {% if currentUserKey == currentEffect.getUserProperty() %}selected="selected"{% endif %}>
                             {{ currentUserField.label }}

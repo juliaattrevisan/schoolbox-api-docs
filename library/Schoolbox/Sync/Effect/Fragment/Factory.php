@@ -150,8 +150,14 @@ class Factory {
                 return new Fragment('@syncEffect/string.twig');
             }
         }
+        else if ($mappingType == EffectTypeMapper::EFFECT_TYPE_MAP) {
+            return new Fragment('@syncEffect/map.twig');
+        }
 
-        return new Fragment('@syncEffect/map.twig');
+        /* Return empty Fragment, prompting the user to choose
+         * a User field to modify and a Mapping Type
+         */
+        return new Fragment('@syncEffect/empty.twig');
     }
 
     /**

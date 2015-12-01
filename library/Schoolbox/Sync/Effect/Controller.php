@@ -11,6 +11,7 @@
 namespace Schoolbox\Sync\Effect;
 
 use Alaress\Web\Controller\Base;
+use PDepend\Util\Type;
 use Schoolbox\Sync\Grammar\FieldFactory;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Effect;
@@ -59,8 +60,8 @@ class Controller extends Base {
          * Assume Literal Effect Type to start with
          */
         $default = [
-            'effectType' => EffectTypeMapper::EFFECT_TYPE_LITERAL,
-            'userProperty' => 'lastname',
+            'effectType' => null,
+            'userProperty' => null,
             'arguments' => [false]
         ];
 
@@ -71,13 +72,16 @@ class Controller extends Base {
          * swap that out for something else, such as "new-1", "new-2" etc.
          * to maintain uniqueuness in that land.
          */
+        $effectTypeMapper = new EffectTypeMapper();
+        $effectType = $effectTypeMapper->createModel();
+
         $newEffect = Effect\Mapper::getInstance()->createModel();
         $newEffect
             ->setId('new')
             ->setRule($rule)
             ->setUserProperty($default['userProperty'])
             ->setArguments($default['arguments'])
-            ->setEffectType(Effect\Type\Mapper::getInstance()->findById($default['effectType']));
+            ->setEffectType($effectType);
 
         /* Decide which Effect Fragment to use
          */
@@ -125,8 +129,8 @@ class Controller extends Base {
          * Assume Literal Effect Type to start with
          */
         $default = [
-            'effectType' => EffectTypeMapper::EFFECT_TYPE_SKIP,
-            'userProperty' => '',
+            'effectType' => null,
+            'userProperty' => null,
             'arguments' => []
         ];
 
@@ -137,13 +141,16 @@ class Controller extends Base {
          * swap that out for something else, such as "new-1", "new-2" etc.
          * to maintain uniqueuness in that land.
          */
+        $effectTypeMapper = new EffectTypeMapper();
+        $effectType = $effectTypeMapper->createModel();
+
         $newEffect = Effect\Mapper::getInstance()->createModel();
         $newEffect
             ->setId('new')
             ->setRule($rule)
             ->setUserProperty($default['userProperty'])
             ->setArguments($default['arguments'])
-            ->setEffectType(Effect\Type\Mapper::getInstance()->findById($default['effectType']));
+            ->setEffectType($effectType);
 
         $data = [
             'meta' => [
