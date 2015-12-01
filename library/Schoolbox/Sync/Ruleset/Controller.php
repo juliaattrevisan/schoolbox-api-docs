@@ -127,9 +127,8 @@ class Controller extends Base {
 
                 try {
                     $mapper->save($mapper->hydrate($condition));
-                } catch (\PDOException $e) {
-                    // clean up after yourself
-                    $mapper->deleteByColumn('id', $conditionId);
+                }
+                catch (\PDOException $e) {
                 }
             }
         }
