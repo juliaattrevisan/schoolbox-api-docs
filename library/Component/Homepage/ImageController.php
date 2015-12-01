@@ -51,6 +51,7 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
                 'size'      => 1,
             ]
         );
+
         if (count($images)) {
             $image = $images->first();
         } else {
@@ -67,7 +68,13 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
             if (count($images)) {
                 $image = $images->first();
             } else {
+                $this->setComponentName('Image');
+
                 $this->setVar('preview_block', '');
+
+                /* Parse the empty/default title even if no images are present/chosen
+                 */
+                $this->parseConfig();
                 return true;
             }
         }
