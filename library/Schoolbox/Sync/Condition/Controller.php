@@ -20,6 +20,27 @@ class Controller extends Base {
     const CONDITION_USER = 2;
 
     /**
+     * A meta field for various Condition-specific UI
+     * so that when you load a Ruleset UI, all Conditions are
+     * impossible to accidentally break. You must actively unlock
+     * each Condition you want to edit.
+     *
+     * meta->disabled is the attribute on input, select, textarea elements
+     * meta->lock->status is a flag for whether the Condition is locked (1 yes, 0 no)
+     * meta->lock->icon is the action button icon- class to start with
+     *
+     * Should be set to "disabled", "1" and "locked" by default
+     */
+    private $meta = [
+        'disabled' => '',
+        'lock' => [
+            'status' => 0,
+            'icon' => 'locked',
+        ],
+        'status' => 'Condition not yet saved'
+    ];
+
+    /**
      * Forge a data structure to feed into twig template,
      * so that new Conditions can be injected directly into
      * the ui after being received via ajax
@@ -28,33 +49,15 @@ class Controller extends Base {
      */
     public function add($params) {
 
-        /* A meta field for various Condition-specific UI
-         * so that when you load a Ruleset UI, all Conditions are
-         * impossible to accidentally break. You must actively unlock
-         * each Condition you want to edit.
-         *
-         * meta->disabled is the attribute on input, select, textarea elements
-         * meta->lock->status is a flag for whether the Condition is locked (1 yes, 0 no)
-         * meta->lock->icon is the action button icon- class to start with
-         *
-         * Should be set to "disabled", "1" and "locked" by default
+        /* Spawn Rule
          */
-        $meta = [
-            'disabled' => '',
-            'lock' => [
-                'status' => 0,
-                'icon' => 'locked',
-            ],
-            'status' => 'Condition not yet saved'
-        ];
-
         $rule = Rule\Mapper::getInstance()->findById($params['ruleId']);
 
         $newCondition = Condition\Mapper::getInstance()->createModel();
-
-        $newCondition->setRule($rule)->setConditionType(Condition\Type\Mapper::getInstance()->findById($params['conditionType']));
-
-        Condition\Mapper::getInstance()->create($newCondition);
+        $newCondition
+            ->setId('new')
+            ->setRule($rule)
+            ->setConditionType(Condition\Type\Mapper::getInstance()->findById($params['conditionType']));
 
         $ffactory = new FieldFactory();
 
@@ -62,7 +65,7 @@ class Controller extends Base {
             'allNDSField'      => $ffactory->buildMap($rule->getRoleType()),
             'meta'             => [
                 'condition' => [
-                    $newCondition->getId() => $meta
+                    $newCondition->getId() => $this->getMeta()
                 ]
             ],
             'currentCondition' => $newCondition,
@@ -100,5 +103,28 @@ class Controller extends Base {
             'format' => 'json',
             'data'   => $deleteCount > 0
         ]);
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Set meta
+     *
+     * @param mixed $meta
+     */
+    private function setMeta($meta)
+    {
+        $this->meta = $meta;
+    }
+
+    /**
+     * Get meta
+     *
+     * @return mixed
+     */
+    private function getMeta()
+    {
+        return $this->meta;
     }
 }
