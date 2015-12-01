@@ -39,7 +39,7 @@
             </div>
 
             {% for currentRule in ruleset.rules %}
-            <div class="row" id="rule-{{ currentRule.id }}">
+            <div class="row" id="rule-{{ currentRule.id }}" data-rule="{{ currentRule.id }}">
                 <div class="small-12 columns">
                     <div class="actions-small-3">
                         <div class="list-item">

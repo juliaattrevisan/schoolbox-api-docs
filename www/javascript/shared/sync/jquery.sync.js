@@ -371,6 +371,7 @@
          */
         function initEffectUserfieldChange() {
             $(config.element).on('change', '[data-effect-userfield]', function(event) {
+                var ruleId = $(this).parents('[data-rule]').attr('data-rule');
                 var effectId = $(this).attr('data-effect-userfield');
 
                 /* Reset Mapping Type
@@ -380,6 +381,10 @@
                 /* Empty the Effect Fragment container
                  */
                 $('[data-effect-fragment='+effectId+']').html('');
+
+                /* Disable User Fields already in play
+                 */
+                refreshUserFieldAvailability(ruleId);
             });
         }
 
@@ -456,6 +461,59 @@
                                     });
                                 }
                             });
+                        }
+                    }
+                });
+            });
+        }
+
+        /**
+         * Disable User Fields already in play
+         * Otherwise enable them
+         *
+         * Each User Field can only be modified once per Rule
+         */
+        function refreshUserFieldAvailability(ruleId) {
+            var allUserFields = $(config.element).find('[data-rule='+ruleId+']').find('[data-effect-userfield]');
+
+            /* Find all the User Fields currently chozen
+             */
+            var used = [];
+
+            /* jQuery can't return the .val() of the option
+             * when the option has been disabled, even if it
+             * is also selected - which makes our Disable
+             * campaign a little more finicky than desired
+             *
+             * (A $(select).val() will return null when its
+             * currently selected option is disabled)
+             *
+             * https://bugs.jquery.com/ticket/13097
+             */
+            $.each(allUserFields, function(index, element) {
+                var selectedIndex = ($(element).prop("selectedIndex")+1);
+                var value = $(element).find('option:nth-child(' + selectedIndex + ')').attr('value');
+
+                used.push(value);
+            });
+
+            /* Disable all usages of these fields everywhere
+             * in this rule
+             */
+            console.log(used);
+            $.each(allUserFields, function(index, select) {
+                $.each($(select).find('option'), function(index, option) {
+
+                    /* Ignore "Please Select"
+                     */
+                    if ($(option).val() != -1) {
+                        if ($.inArray($(option).val(), used) > -1) {
+                            $(option).attr('disabled', 'disabled');
+                            console.log('   Disabling ' + $(option).val() + ' in ' + $(select).attr('name'));
+                        }
+                        else {
+                            $(option).removeAttr('disabled');
+                            console.log('Enabling ' + $(option).val() + ' in ' + $(select).attr('name'));
                         }
                     }
                 });
