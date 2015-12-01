@@ -500,7 +500,6 @@
             /* Disable all usages of these fields everywhere
              * in this rule
              */
-            console.log(used);
             $.each(allUserFields, function(index, select) {
                 $.each($(select).find('option'), function(index, option) {
 
@@ -509,11 +508,9 @@
                     if ($(option).val() != -1) {
                         if ($.inArray($(option).val(), used) > -1) {
                             $(option).attr('disabled', 'disabled');
-                            console.log('   Disabling ' + $(option).val() + ' in ' + $(select).attr('name'));
                         }
                         else {
                             $(option).removeAttr('disabled');
-                            console.log('Enabling ' + $(option).val() + ' in ' + $(select).attr('name'));
                         }
                     }
                 });
