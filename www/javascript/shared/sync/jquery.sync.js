@@ -36,6 +36,8 @@
         initEffectMappingTypeChange();
         initEffectDelete();
 
+        initEffectUserFieldAvailability();
+
         /**
          * Init
          *
@@ -514,6 +516,17 @@
                         }
                     }
                 });
+            });
+        }
+
+        /**
+         * Disable options upon startup
+         */
+        function initEffectUserFieldAvailability() {
+            $.each($(config.element).find('[data-rule]'), function(index, element) {
+                var ruleId = $(element).attr('data-rule');
+
+                refreshUserFieldAvailability(ruleId);
             });
         }
     }
