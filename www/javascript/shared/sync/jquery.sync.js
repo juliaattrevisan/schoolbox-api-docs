@@ -125,6 +125,7 @@
                 event.preventDefault();
 
                 $(config.element).find(config.validInputTypes).attr('disabled', false);
+                $(config.element).find('option').removeAttr('disabled');
                 $(config.element).submit();
                 $(config.element).find(config.validInputTypes).attr('disabled', true);
             });
