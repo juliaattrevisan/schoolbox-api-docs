@@ -29,7 +29,8 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="small-12 medium-6 large-4 columns" data-effect-fragment="{{ currentEffect.id }}">
+
+            <div data-effect-fragment="{{ currentEffect.id }}">
                 {% include allEffectStructures.fragments[currentEffect.id].getFilename() %}
             </div>
         </div>

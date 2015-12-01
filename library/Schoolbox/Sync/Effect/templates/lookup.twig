@@ -1,11 +1,13 @@
-<select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][arguments]">
-    {% for current in allEffectStructures.fragments[currentEffect.id].getData() %}
-        {% set selected = '' %}
+<div class="small-12 medium-6 large-4 columns">
+    <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][arguments]">
+        {% for current in allEffectStructures.fragments[currentEffect.id].getData() %}
+            {% set selected = '' %}
 
-        {% if currentEffect.arguments[0] == current.value %}
-            {% set selected = 'selected="selected"' %}
-        {% endif %}
+            {% if currentEffect.arguments[0] == current.value %}
+                {% set selected = 'selected="selected"' %}
+            {% endif %}
 
-        <option value="{{ current.value }}" {{ selected }}>{{ current.label }}</option>
-    {% endfor %}
-</select>
+            <option value="{{ current.value }}" {{ selected }}>{{ current.label }}</option>
+        {% endfor %}
+    </select>
+</div>
