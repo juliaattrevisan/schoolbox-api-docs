@@ -16,6 +16,11 @@
 
         var config = init(options, $(this));
 
+        /* When adding new Conditions, they have this pseudo-id suffix, e.g.
+         * #condition-new-latestConditionInstance
+         */
+        var latestConditionInstance = 1;
+
         /* When adding new Effects, they have this pseudo-id suffix, e.g.
          * #effect-new-latestEffectInstance
          */
@@ -187,16 +192,61 @@
             $(config.element).on('click', '[data-condition-create]', function(event) {
                 event.preventDefault();
 
-                /* The Rule into which the new Condition is injected
+                /* The Rule into which the new Effect is injected
                  */
-                var ruleId = '#rule-' + $(this).attr('data-condition-create') + '-conditions';
+                var ruleId = $(this).attr('data-condition-create');
+                var ruleContainer = '#rule-' + ruleId + '-conditions';
 
                 /* The url from which new Conditions are spawned
                  */
                 var url = $(this).attr('href');
 
                 $.post(url, function(responseText) {
-                    $(ruleId).append(responseText);
+                    var conditionId = config.stubPrefix + '-' + latestConditionInstance;
+                    var conditionContainerId = 'condition-'+conditionId;
+                    var statusId = 'condition-'+conditionId+'-status';
+
+                    var instance = $(responseText);
+
+                    /* Update ids to use temporary index integer
+                     */
+                    instance.attr('id', conditionContainerId);
+
+                    $.each(instance.find(config.validInputTypes), function(index, element) {
+                        $(element).attr('name', $(element).attr('name').replace(config.stubPrefix, conditionId));
+                    });
+
+                    /* Update other miscellaneous id-based data vars
+                     */
+                    var allDataVars = [
+                        'data-condition-delete'
+                    ];
+
+                    $.each(allDataVars, function(index, element) {
+                        instance.find('['+element+']').attr(element, conditionId);
+                    });
+
+                    /* Enable Modify Lock
+                     */
+                    instance.find('[data-condition-modify-lock]').attr('data-condition-modify-lock', conditionContainerId);
+
+                    /* Make status indicator unique
+                     */
+                    $(instance)
+                        .find('#condition-' + config.stubPrefix + '-status')
+                        .attr('id', statusId);
+
+                    /* New instance will not have a delete link
+                     */
+                    $(instance).find('[data-condition-delete]').attr('href', '');
+
+                    /* Ram it back in
+                     */
+                    $(ruleContainer).append(instance);
+
+                    /* Keep count
+                     */
+                    latestConditionInstance++;
                 });
             });
         }
@@ -246,26 +296,34 @@
                          */
                         label.labelActivate();
 
+                        /* Unsaved Conditions can be removed without needing the indicator
+                         * as these don't require backend confirmation
+                         */
+                        if (conditionId.match(config.stubPrefix)) {
+                            $('#condition-' + conditionId).remove();
+                        }
                         /* Delete asynchronously if successful; ignore if unsuccessful
                          */
-                        $.post(config.condition.delete.url, { conditionId: conditionId }, function(responseText) {
-                            if (responseText == config.success) {
-                                $('#condition-' + conditionId).remove();
+                        else {
+                            $.post(config.condition.delete.url, { conditionId: conditionId }, function(responseText) {
+                                if (responseText == config.success) {
+                                    $('#condition-' + conditionId).remove();
 
-                                /* Indicator label gets removed with the condition so we
-                                 * don't need to bother showing animation
-                                 */
-                            }
-                            else {
+                                    /* Indicator label gets removed with the condition so we
+                                     * don't need to bother showing animation
+                                     */
+                                }
+                                else {
 
-                                /* Show that something failed
-                                 */
-                                label.labelTimeout({
-                                    text: config.condition.delete.fail,
-                                    css: 'alert'
-                                });
-                            }
-                        });
+                                    /* Show that something failed
+                                     */
+                                    label.labelTimeout({
+                                        text: config.condition.delete.fail,
+                                        css: 'alert'
+                                    });
+                                }
+                            });
+                        }
                     }
                 });
             });
@@ -439,7 +497,7 @@
                          */
                         label.labelActivate();
 
-                        /* Unsaved effects can be removed without needing the indicator
+                        /* Unsaved Effects can be removed without needing the indicator
                          * as these don't require backend confirmation
                          */
                         if (effectId.match(config.stubPrefix)) {
