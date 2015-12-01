@@ -35,7 +35,6 @@
         initEffectUserfieldChange();
         initEffectMappingTypeChange();
         initEffectDelete();
-
         initEffectUserFieldAvailability();
 
         /**
@@ -281,7 +280,8 @@
 
                 /* The Rule into which the new Effect is injected
                  */
-                var ruleId = '#rule-' + $(this).attr('data-effect-create') + '-effects';
+                var ruleId = $(this).attr('data-effect-create');
+                var ruleContainer = '#rule-' + ruleId + '-effects';
 
                 /* The url from which new Effect are spawned
                  */
@@ -332,11 +332,13 @@
 
                     /* Ram it back in
                      */
-                    $(ruleId).append(instance);
+                    $(ruleContainer).append(instance);
 
                     /* Keep count
                      */
                     latestEffectInstance++;
+
+                    refreshUserFieldAvailability(ruleId);
                 });
             });
         }
