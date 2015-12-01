@@ -400,7 +400,7 @@
             $(config.element).on('change', '[data-effect-mappingtype]', function(event) {
                 var ruleId = $(this).attr('data-effect-ruleid');
                 var effectId = $(this).attr('data-effect-mappingtype');
-                var userField = $('[data-effect-userfield='+effectId+']').val();
+                var userField = disabledVal($('[data-effect-userfield='+effectId+']'));
                 var mappingType = $(this).val();
 
                 /* ruleId won't exist for unsaved effects when changing mapping type
@@ -496,10 +496,7 @@
              * https://bugs.jquery.com/ticket/13097
              */
             $.each(allUserFields, function(index, element) {
-                var selectedIndex = ($(element).prop("selectedIndex")+1);
-                var value = $(element).find('option:nth-child(' + selectedIndex + ')').attr('value');
-
-                used.push(value);
+                used.push(disabledVal(element));
             });
 
             /* Disable all usages of these fields everywhere
@@ -531,6 +528,18 @@
 
                 refreshUserFieldAvailability(ruleId);
             });
+        }
+
+        /**
+         * An alternative to jQuery .val() which can't give you
+         * the selected option for a <select> element when that
+         * selected option is currently disabled
+         */
+        function disabledVal(element) {
+            var selectedIndex = ($(element).prop("selectedIndex")+1);
+            var value = $(element).find('option:nth-child(' + selectedIndex + ')').attr('value');
+
+            return value;
         }
     }
 }(jQuery));
