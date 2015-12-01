@@ -205,9 +205,18 @@ class Factory
     private function findRuleset()
     {
         // TODO DI
-        return Rule\Mapper::getInstance()->findByColumnList([ 'role_type' => $this->getType() ], [
+        $ruleset = Rule\Mapper::getInstance()->findByColumnList([ 'role_type' => $this->getType() ], [
             'order' => [ 'sequence' => 'ASC' ]
         ]);
+
+        /* Order Conditions and Effects chronologically
+         */
+        foreach ($ruleset as $currentRule) {
+            $currentRule->getConditions()->sortBy('id', 'ASC');
+            $currentRule->getEffects()->sortBy('id', 'ASC');
+        }
+
+        return $ruleset;
     }
 
     /* Getters/Setters
