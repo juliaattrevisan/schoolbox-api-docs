@@ -26,6 +26,7 @@ class AdminV2_Nav
         'messages' => 'Messages',
         'list' => 'Lists',
         'cleanup' => 'Cleanup',
+        'usage' => 'Usage',
         'engagement' => 'Engagement',
         'synchronise' => 'Synchronise',
     );
