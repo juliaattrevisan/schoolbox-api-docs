@@ -24,14 +24,6 @@ use Schoolbox\Sync\Hydrator;
 
 class Factory
 {
-
-    /**
-     * Role type - typically one of student|parent|staff
-     *
-     * @var string
-     */
-    private $type = '';
-
     /**
      * Default state of Conditions when loading a Ruleset
      *
@@ -55,24 +47,15 @@ class Factory
     ];
 
     /**
-     * Constructor
-     *
-     * @param $rulesetId
-     */
-    public function __construct($rulesetId)
-    {
-        $this->setType($rulesetId);
-    }
-
-
-    /**
      * Produce a twig template data based on Role Type
+     *
+     * @param string $rulesetId Role type - typically one of student|parent|staff
      *
      * @return array
      */
-    public function produce()
+    public function produce($rulesetId)
     {
-        switch ($this->getType()) {
+        switch ($rulesetId) {
 
             /* Students
              */
@@ -133,7 +116,7 @@ class Factory
 
         /* Load Ruleset
          */
-        $ruleset = $this->findRuleset();
+        $ruleset = $this->findRuleset($rulesetId);
 
         /* Load NDS Fields to chooze from
          */
@@ -143,7 +126,7 @@ class Factory
          */
         $metas = [];
 
-        $ruleIds = Rule\Mapper::getInstance()->findIdsByColumnList([ 'role_type' => $this->getType() ]);
+        $ruleIds = Rule\Mapper::getInstance()->findIdsByColumnList([ 'role_type' => $rulesetId ]);
 
         foreach (Condition\Mapper::getInstance()->findIdsByColumnList([ 'rule_id' => $ruleIds ]) as $conditionId) {
             $metas['condition'][$conditionId] = $this->getMeta();
@@ -207,7 +190,7 @@ class Factory
         // Get all of the custom rules too
         /** @var Hydrator\Custom\Model[] $hydratorModels */
         $hydratorModels = Hydrator\Custom\Mapper::getInstance()->findByColumnList(
-            ['role_type' => $this->getType()],
+            ['role_type' => $rulesetId],
             ['order' => ['sequence' => 'asc'],]
         );
 
@@ -217,15 +200,15 @@ class Factory
         return [
             'allBreadcrumbs'         => $allBreadcrumbs->getAllNodes(),
             'allNavigation'          => $allNavigation->getAllNodes(),
-            'rulesetId'              => $this->getType(),
+            'rulesetId'              => $rulesetId,
             'ruleset'  => [
-                'rules'  => $this->findRuleset(),
-                'config' => Config\Mapper::getInstance()->findById($this->getType()),
+                'rules'  => $this->findRuleset($rulesetId),
+                'config' => Config\Mapper::getInstance()->findById($rulesetId),
             ],
             'customRules'            => $hydratorModels,
             'allConditionStructures' => $allConditionStructures,
             'allEffectStructures'    => $allEffectStructures,
-            'allNDSField'            => $ffactory->buildMap($this->getType()),
+            'allNDSField'            => $ffactory->buildMap($rulesetId),
             'meta'                   => $metas
         ];
     }
@@ -233,12 +216,14 @@ class Factory
     /**
      * Load a Ruleset based on Role Type student|parent|staff
      *
+     * @param string $rulesetId
+     *
      * @return array
      */
-    private function findRuleset()
+    private function findRuleset($rulesetId)
     {
         // TODO DI
-        $ruleset = Rule\Mapper::getInstance()->findByColumnList([ 'role_type' => $this->getType() ], [
+        $ruleset = Rule\Mapper::getInstance()->findByColumnList([ 'role_type' => $rulesetId ], [
             'order' => [ 'sequence' => 'ASC' ]
         ]);
 
@@ -263,25 +248,5 @@ class Factory
     private function getMeta()
     {
         return $this->meta;
-    }
-
-    /**
-     * Set type
-     *
-     * @param string $type
-     */
-    private function setType($type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    private function getType()
-    {
-        return $this->type;
     }
 }
