@@ -9,14 +9,9 @@
 
         /* Count number of things selected
          */
-        $('table[data-users="true"] input[data-selectallgroup="users"], input[data-selectall="true"]').click(function(event) {
-            setTimeout(
-                function() {
-                    var num = $('table[data-users="true"] input[data-selectallgroup="users"]:checked').length;
-                    $('span[data-selected="true"]').text(num);
-                },
-                10
-            );
+        $('[data-select-all-for-group="users"], [data-select-all-group="users"]').change(function() {
+            var num = $('[data-select-all-group="users"]:checked').length;
+            $('span[data-selected="true"]').text(num);
         });
 
         $('input[data-action="delete"]').click(function(event) {
