@@ -76,18 +76,14 @@
             submitHandler: function (form) {
                 // Smoosh the magnitude of userIds into a single POST var
                 var userIds      = [];
-                var userIdInputs = updateForm.find(':input[name="userId[]"]');
+                var userIdInputs = updateForm.find(':input[data-user-selector]');
                 userIdInputs.each(function() {
                     if (this.checked) {
                         userIds.push(this.value);
                     }
                 });
-                userIdInputs.prop('disabled', true);
-                var newUserIdInput = $('<input type="hidden" name="userId" />').val(userIds.join(','));
-                updateForm.append(newUserIdInput);
+                updateForm.find('input[name="userId"]').val(userIds.join(','));
                 updateForm.get(0).submit();
-                newUserIdInput.remove();
-                userIdInputs.prop('disabled', false);
             }
         });
     });
@@ -185,6 +181,7 @@
         <h2 class="subheader">Users</h2>
 
         <form data-action="userUpdate" id="updateForm" action="/adminv2/user/bulk/modifyForm" method="post">
+            <input type="hidden" name="userId" />
             <div class="scrollable">
                 <table data-users="true">
                     <thead>
@@ -205,7 +202,7 @@
                         <!-- BEGIN user -->
                         <tr>
                             <td>
-                                <input data-select-all-group="users" type="checkbox" value="{USER_ID}" id="user-{USER_ID}" />
+                                <input data-select-all-group="users" data-user-selector type="checkbox" value="{USER_ID}" id="user-{USER_ID}" />
                                 <label for="user-{USER_ID}" class="checkbox-label"></label>
                             </td>
                             <td>{USER_FIRSTNAME}</td>
