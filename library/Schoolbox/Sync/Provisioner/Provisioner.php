@@ -7,7 +7,10 @@
 
 namespace Schoolbox\Sync\Provisioner;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\Role;
+use Schoolbox\Sync\Ruleset;
+use Schoolbox\UserMapper;
 
 /**
  * The User Provisioning System.
@@ -16,6 +19,27 @@ use Schoolbox\Role;
  */
 class Provisioner
 {
+    /**
+     * A ruleset factory - this is used for building rulesets for each item.
+     *
+     * @var Ruleset\Factory
+     */
+    protected $rulesetFactory;
+
+    /**
+     * A user mapper - this retrieves user's initial states, and saves them.
+     *
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * A logger
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
     /**
      * The order in which syncs are to be run.
      *
@@ -27,11 +51,28 @@ class Provisioner
     protected $runOrder = [Role::STUDENT, Role::STAFF, Role::PARENT,];
 
     /**
+     * Constructor
+     *
+     * @param Ruleset\Factory $rulesetFactory
+     * @param UserMapper      $userMapper
+     * @param LoggerInterface $logger
+     */
+    public function __construct(
+        Ruleset\Factory $rulesetFactory,
+        UserMapper $userMapper,
+        LoggerInterface $logger
+    ) {
+        $this->rulesetFactory = $rulesetFactory;
+        $this->userMapper     = $userMapper;
+        $this->logger         = $logger;
+    }
+
+    /**
      * Runs the UPS.
      *
      * @param bool $update If true, updates - otherwise, performs a dry run.
      */
-    public function run($update)
+    public function run($update = false)
     {
         //
     }
