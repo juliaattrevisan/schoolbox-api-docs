@@ -1,4 +1,4 @@
-<select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][to][]">
+<select {{ dynamicDisabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][to][]">
     <option value="1" {% if mapTo == true %}selected="selected"{% endif %}>True</option>
     <option value="0" {% if mapTo == false %}selected="selected"{% endif %}>False</option>
 </select>

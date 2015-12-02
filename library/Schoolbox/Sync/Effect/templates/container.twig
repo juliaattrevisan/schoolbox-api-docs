@@ -30,6 +30,10 @@
                 </select>
             </div>
 
+            {# Dynamically construct input names
+             #}
+            {% set dynamicDisabled = meta.effect[currentEffect.id].disabled %}
+
             <div data-effect-fragment="{{ currentEffect.id }}">
                 {% include allEffectStructures.fragments[currentEffect.id].fragment.getFilename() %}
             </div>

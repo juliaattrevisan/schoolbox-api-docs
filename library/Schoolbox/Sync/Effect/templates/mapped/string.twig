@@ -1,1 +1,1 @@
-<input type="text" {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][to][]" value="{{ mapTo }}" />
+<input type="text" {{ dynamicDisabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][to][]" value="{{ mapTo }}" />
