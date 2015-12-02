@@ -180,6 +180,19 @@ class Factory
                     $fragment = $fragmentFactory->produce($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
 
                     $allEffectStructures['fragments'][$currentEffect->getId()]['fragment'] = $fragment;
+
+                    /* Produce subfragments for Mapped Key/Value Pairs
+                     * This particular type always spawns subfragments
+                     */
+                    if ($currentEffect->getEffectType()->isMap()) {
+                        $subfragment = $fragmentFactory->produceSubtype($currentEffect->getUserProperty());
+
+                        $allEffectStructures['fragments'][$currentEffect->getId()]['subfragments'] = [
+                            'fragment' => $subfragment,
+                            'mapFrom' => '',
+                            'mapTo' => '',
+                        ];
+                    }
                 }
             }
         }
