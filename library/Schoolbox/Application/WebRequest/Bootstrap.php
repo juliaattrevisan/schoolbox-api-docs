@@ -406,12 +406,10 @@ class Bootstrap implements BootstrapInterface {
 
 					// Global access to config object and localisation
 					$twig->addGlobal('config', $config);
-
-					$l10n = $di->get('l10n');
-
-//					$l10n['date'] = new Alaress_Date_Locale_Config();
-
-					$twig->addGlobal('locale', $l10n);
+					$twig->addGlobal('locale',  $di->get('l10n'));
+					$dateFormats = new Alaress_Date_Locale_Config();
+					$dateFormats->setConfig($config);
+					$twig->addGlobal('dateFormats', $dateFormats);
 
                     // Define modules that are required by a template
                     $twig->addFunction(
