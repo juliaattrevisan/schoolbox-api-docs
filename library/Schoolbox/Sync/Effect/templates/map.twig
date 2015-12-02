@@ -3,11 +3,10 @@
 </div>
 
 <div class="small-12 columns">
-    {% if currentEffect.arguments[1]|length %}
-        {% for mapFrom, mapTo in currentEffect.arguments[1] %}
-            {% include '@syncEffect/map-row.twig' %}
-        {% endfor %}
-    {% else %}
+    {% for mapFrom, mapTo in currentEffect.arguments[1] %}
         {% include '@syncEffect/map-row.twig' %}
-    {% endif %}
+    {% endfor %}
+
+    {# Always spawn an empty row to use #}
+    {% include '@syncEffect/map-row.twig' %}
 </div>
