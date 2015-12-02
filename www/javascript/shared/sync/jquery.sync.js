@@ -615,6 +615,10 @@
                 var row = $(this).parents('[data-map]');
                 var rowContainer = row.parent();
 
+                var ruleId = rowContainer.parents('[data-rule]').attr('data-rule');
+                var effectId = rowContainer.parents('[data-effect-fragment]').attr('data-effect-fragment');
+                var userProperty = disabledVal($('#effect-' + effectId).find('[data-effect-userfield='+effectId+']'));
+
                 /* Find out if all inputs are filled
                  */
                 var allInputs = rowContainer.find('input');
@@ -629,12 +633,10 @@
                  * Bring focus to first input of new row
                  */
                 if (numInputs == numFilled) {
-                    var ruleId = rowContainer.parents('[data-rule]').attr('data-rule');
-                    var effectId = rowContainer.parents('[data-effect-fragment]').attr('data-effect-fragment');
-
                     var data = {
                         ruleId: ruleId,
-                        effectId: effectId
+                        effectId: effectId,
+                        userProperty: userProperty
                     }
 
                     $.get(config.effect.map.newRowUrl, data, function(responseText) {
