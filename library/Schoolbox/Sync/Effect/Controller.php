@@ -180,6 +180,15 @@ class Controller extends Base {
         $fragmentFactory = new FragmentFactory();
         $fragment = $fragmentFactory->produce($queryData['mappingType'], $queryData['userField']);
 
+        $effectTypeMapper = new EffectTypeMapper();
+
+        if ($effectTypeMapper->isMap($queryData['mappingType'])) {
+            $subfragment = $fragmentFactory->produceSubtype($queryData['userField']);
+        }
+        else {
+            $subfragment = [];
+        }
+
         $this->getResponse()->content->set([
             'template' => $fragment->getFilename(),
             'data' => [
@@ -189,7 +198,12 @@ class Controller extends Base {
                 'allEffectStructures' => [
                     'fragments' => [
                         $queryData['effectId'] => [
-                            'fragment' => $fragment
+                            'fragment' => $fragment,
+                            'subfragments' => [
+                                'fragment' => $subfragment,
+                                'mapFrom' => '',
+                                'mapTo' => '',
+                            ]
                         ]
                     ],
                 ],
