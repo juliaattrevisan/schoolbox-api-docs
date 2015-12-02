@@ -77,6 +77,22 @@
                 }
 
                 error.insertAfter(location);
+            },
+            submitHandler: function (form) {
+                // Smoosh the magnitude of userIds into a single POST var
+                var userIds      = [];
+                var userIdInputs = updateForm.find(':input[name="userId[]"]');
+                userIdInputs.each(function() {
+                    if (this.checked) {
+                        userIds.push(this.value);
+                    }
+                });
+                userIdInputs.prop('disabled', true);
+                var newUserIdInput = $('<input type="hidden" name="userId" />').val(userIds.join(','));
+                updateForm.append(newUserIdInput);
+                updateForm.get(0).submit();
+                newUserIdInput.remove();
+                userIdInputs.prop('disabled', false);
             }
         });
     });
