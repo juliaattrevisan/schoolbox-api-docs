@@ -41,6 +41,7 @@
         initEffectMappingTypeChange();
         initEffectDelete();
         initEffectUserFieldAvailability();
+        initEffectMappingRows();
 
         /**
          * Init
@@ -598,6 +599,39 @@
             var value = $(element).find('option:nth-child(' + selectedIndex + ')').attr('value');
 
             return value;
+        }
+
+        /**
+         * Every time a key or value input is blurred,
+         * ensure there is an empty pair waiting to be
+         * filled in - this saves us from having to make
+         * a whole new set of add/delete controls
+         */
+        function initEffectMappingRows() {
+            $(config.element).find('[data-map] input').on('blur', function(event) {
+                var row = $(this).parents('[data-map]');
+                var rowContainer = row.parent();
+
+                /* Find out if all inputs are filled
+                 */
+                var allInputs = row.find('input');
+
+                var numInputs = allInputs.length;
+
+                var numFilled = allInputs.filter(function () {
+                    return this.value.length > 0
+                }).length;
+
+                /* If all the inputs are filled spawn a new row
+                 * Bring focus to first input of new row
+                 */
+                if (numInputs == numFilled) {
+                    console.log('insert new row');
+//                    $.post(spawnNewRow, function(responseText) {
+//                        rowContainer.append(responseText);
+//                    });
+                }
+            });
         }
     }
 }(jQuery));

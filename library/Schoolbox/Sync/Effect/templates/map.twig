@@ -3,19 +3,5 @@
 </div>
 
 <div class="small-12 columns">
-
-    {# repeatable#}
-    <div class="row">
-        <div class="small-5 columns">
-            <input type="text" name="[]" />
-        </div>
-        <div class="small-2 columns text-center no-pad">
-            <h1>&#10155;</h1>
-        </div>
-        <div class="small-5 columns">
-            <input type="text" name="[]" />
-        </div>
-    </div>
-    {# repeatable#}
-
+    {% include '@syncEffect/map-row.twig' %}
 </div>
