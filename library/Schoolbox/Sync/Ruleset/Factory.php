@@ -201,15 +201,27 @@ class Factory
             'allBreadcrumbs'         => $allBreadcrumbs->getAllNodes(),
             'allNavigation'          => $allNavigation->getAllNodes(),
             'rulesetId'              => $rulesetId,
-            'ruleset'  => [
-                'rules'  => $this->findRuleset($rulesetId),
-                'config' => Config\Mapper::getInstance()->findById($rulesetId),
-            ],
+            'ruleset'                => $this->produceRuleset($rulesetId),
             'customRules'            => $hydratorModels,
             'allConditionStructures' => $allConditionStructures,
             'allEffectStructures'    => $allEffectStructures,
             'allNDSField'            => $ffactory->buildMap($rulesetId),
             'meta'                   => $metas
+        ];
+    }
+
+    /**
+     * Produce ruleset data based on Role Type
+     *
+     * @param string $rulesetId Role type - typically one of student|parent|staff
+     *
+     * @return array
+     */
+    public function produceRuleset($rulesetId)
+    {
+        return [
+            'rules'  => $this->findRuleset($rulesetId),
+            'config' => Config\Mapper::getInstance()->findById($rulesetId),
         ];
     }
 
