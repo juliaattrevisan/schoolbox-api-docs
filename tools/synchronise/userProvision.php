@@ -26,7 +26,7 @@ $upsConfig = Schoolbox\Sync\Ruleset\Config\Mapper::getInstance()->findAll();
 // Rulesets
 // This factory is intended for Twig data but I can easily reuse it here
 $ruleFactory = new Schoolbox\Sync\Ruleset\Factory();
-$rules       = $ruleFactory->produceTemplateData(\Schoolbox\Role::STUDENT);
+$rules       = $ruleFactory->produceRuleset(\Schoolbox\Role::STUDENT);
 
 var_dump($rules);
 
