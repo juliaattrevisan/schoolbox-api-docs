@@ -107,8 +107,7 @@ $(document).ready(function() {
 
     });
 
-    var addUserSelector = $('#addUser');
-    addUserSelector
+    $('#addUser')
         .selectizeSelector({
             multiple: true,
             ajax: {
@@ -117,6 +116,38 @@ $(document).ready(function() {
                 data:     {groupID: 0},
                 dataType: 'json'
             }
+        });
+
+    $('#addUsersBySystemGroup')
+        .selectizeSelector({
+            ajax: {
+                url:      '/ajax/addUserByGroup.php',
+                type:     'GET',
+                data:     {type: 'system'},
+                dataType: 'json'
+            }
+        })
+        .on('selectize.item_add', function(event, value) {
+            $('#systemGroupID').val(value)
+        })
+        .on('selectize.item_remove', function() {
+            $('#systemGroupID').val('')
+        });
+
+    $('#addUsersByIndividualGroup')
+        .selectizeSelector({
+            ajax: {
+                url:      '/ajax/addUserByGroup.php',
+                type:     'GET',
+                data:     {type: 'individual'},
+                dataType: 'json'
+            }
+        })
+        .on('selectize.item_add', function(event, value) {
+            $('#individualGroupID').val(value)
+        })
+        .on('selectize.item_remove', function() {
+            $('#individualGroupID').val('')
         });
 });
 </script>
