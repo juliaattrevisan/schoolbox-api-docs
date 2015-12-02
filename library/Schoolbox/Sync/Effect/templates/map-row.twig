@@ -6,6 +6,7 @@
         <h1>&#10155;</h1>
     </div>
     <div class="small-5 columns">
-        <input type="text" {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][to][]" value="{{ mapTo }}" />
+        {{ dump(allEffectStructures.fragments[currentEffect.id].fragment) }}
+        {#{% include allEffectStructures.fragments[currentEffect.id].fragment.getFilename() %}#}
     </div>
 </div>

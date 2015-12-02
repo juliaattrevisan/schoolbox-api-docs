@@ -1,0 +1,11 @@
+<select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][arguments]">
+    {% for current in allEffectStructures.subfragments[currentEffect.id].fragment.getData() %}
+        {% set selected = '' %}
+
+        {% if allEffectStructures.subfragments.mapTo == current.value %}
+            {% set selected = 'selected="selected"' %}
+        {% endif %}
+
+        <option value="{{ current.value }}" {{ selected }}>{{ current.label }}</option>
+    {% endfor %}
+</select>

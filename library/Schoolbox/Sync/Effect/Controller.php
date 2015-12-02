@@ -188,7 +188,9 @@ class Controller extends Base {
                  */
                 'allEffectStructures' => [
                     'fragments' => [
-                        $queryData['effectId'] => $fragment
+                        $queryData['effectId'] => [
+                            'fragment' => $fragment
+                        ]
                     ],
                 ],
 
@@ -236,6 +238,9 @@ class Controller extends Base {
             ]
         ];
 
+        $fragmentFactory = new FragmentFactory();
+        $subfragment = $fragmentFactory->produceSubtype($queryData['userProperty']);
+
         $data = [
             'currentEffect' => $effect,
             'meta' => [
@@ -243,8 +248,17 @@ class Controller extends Base {
                     $queryData['effectId'] => $this->getMeta()
                 ]
             ],
-            'mapFrom' => '',
-            'mapTo' => '',
+            'allEffectStructures' => [
+                'fragments' => [
+                    $queryData['effectId'] => [
+                        'subfragments' => [
+                            'fragment' => $subfragment,
+                            'mapFrom' => '',
+                            'mapTo' => '',
+                        ]
+                    ]
+                ]
+            ],
         ];
 
         $this->getResponse()->content->set([

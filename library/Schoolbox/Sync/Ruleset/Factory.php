@@ -179,7 +179,7 @@ class Factory
                 if (!$currentEffect->getEffectType()->isSkip()) {
                     $fragment = $fragmentFactory->produce($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
 
-                    $allEffectStructures['fragments'][$currentEffect->getId()] = $fragment;
+                    $allEffectStructures['fragments'][$currentEffect->getId()]['fragment'] = $fragment;
                 }
             }
         }
