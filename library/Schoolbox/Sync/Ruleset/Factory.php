@@ -189,8 +189,6 @@ class Factory
 
                         $allEffectStructures['fragments'][$currentEffect->getId()]['subfragments'] = [
                             'fragment' => $subfragment,
-                            'mapFrom' => '',
-                            'mapTo' => '',
                         ];
                     }
                 }
