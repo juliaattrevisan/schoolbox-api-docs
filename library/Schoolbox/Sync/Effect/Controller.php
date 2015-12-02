@@ -231,11 +231,11 @@ class Controller extends Base {
 
         $mapRow = [
             'from' => [
-                'name' => "rule[{$queryData['ruleId']}][effect][{$queryData['effectId']}][from]",
+                'name' => "rule[{$queryData['ruleId']}][effect][{$queryData['effectId']}][from][]",
                 'value' => ''
             ],
             'to' => [
-                'name' => "rule[{$queryData['ruleId']}][effect][{$queryData['effectId']}][to]",
+                'name' => "rule[{$queryData['ruleId']}][effect][{$queryData['effectId']}][to][]",
                 'value' => ''
             ],
         ];
