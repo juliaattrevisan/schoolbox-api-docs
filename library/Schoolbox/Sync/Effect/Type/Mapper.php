@@ -16,13 +16,18 @@ class Mapper extends Schoolbox\Mapper
 {
     /* As per ups_effect_type in the db
      * Used to determine Effect Fragment templates
+     *
+     * Mapped Key/Value Pairs
+     */
+    const EFFECT_TYPE_MAP = 1;
+
+    /* Freeform Text Input/Single Select Dropdown Effect Type
      */
     const EFFECT_TYPE_LITERAL = 2;
 
     /* Skip Effect Type
      */
     const EFFECT_TYPE_SKIP = 3;
-
 
     /**
      * Setup method. Implementing classes to define their SQL map here.
@@ -36,7 +41,5 @@ class Mapper extends Schoolbox\Mapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
-
     }
-
 }

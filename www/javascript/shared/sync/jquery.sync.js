@@ -16,6 +16,11 @@
 
         var config = init(options, $(this));
 
+        /* When adding new Conditions, they have this pseudo-id suffix, e.g.
+         * #condition-new-latestConditionInstance
+         */
+        var latestConditionInstance = 1;
+
         /* When adding new Effects, they have this pseudo-id suffix, e.g.
          * #effect-new-latestEffectInstance
          */
@@ -35,6 +40,7 @@
         initEffectUserfieldChange();
         initEffectMappingTypeChange();
         initEffectDelete();
+        initEffectUserFieldAvailability();
 
         /**
          * Init
@@ -123,6 +129,7 @@
                 event.preventDefault();
 
                 $(config.element).find(config.validInputTypes).attr('disabled', false);
+                $(config.element).find('option').removeAttr('disabled');
                 $(config.element).submit();
                 $(config.element).find(config.validInputTypes).attr('disabled', true);
             });
@@ -185,16 +192,61 @@
             $(config.element).on('click', '[data-condition-create]', function(event) {
                 event.preventDefault();
 
-                /* The Rule into which the new Condition is injected
+                /* The Rule into which the new Effect is injected
                  */
-                var ruleId = '#rule-' + $(this).attr('data-condition-create') + '-conditions';
+                var ruleId = $(this).attr('data-condition-create');
+                var ruleContainer = '#rule-' + ruleId + '-conditions';
 
                 /* The url from which new Conditions are spawned
                  */
                 var url = $(this).attr('href');
 
                 $.post(url, function(responseText) {
-                    $(ruleId).append(responseText);
+                    var conditionId = config.stubPrefix + '-' + latestConditionInstance;
+                    var conditionContainerId = 'condition-'+conditionId;
+                    var statusId = 'condition-'+conditionId+'-status';
+
+                    var instance = $(responseText);
+
+                    /* Update ids to use temporary index integer
+                     */
+                    instance.attr('id', conditionContainerId);
+
+                    $.each(instance.find(config.validInputTypes), function(index, element) {
+                        $(element).attr('name', $(element).attr('name').replace(config.stubPrefix, conditionId));
+                    });
+
+                    /* Update other miscellaneous id-based data vars
+                     */
+                    var allDataVars = [
+                        'data-condition-delete'
+                    ];
+
+                    $.each(allDataVars, function(index, element) {
+                        instance.find('['+element+']').attr(element, conditionId);
+                    });
+
+                    /* Enable Modify Lock
+                     */
+                    instance.find('[data-condition-modify-lock]').attr('data-condition-modify-lock', conditionContainerId);
+
+                    /* Make status indicator unique
+                     */
+                    $(instance)
+                        .find('#condition-' + config.stubPrefix + '-status')
+                        .attr('id', statusId);
+
+                    /* New instance will not have a delete link
+                     */
+                    $(instance).find('[data-condition-delete]').attr('href', '');
+
+                    /* Ram it back in
+                     */
+                    $(ruleContainer).append(instance);
+
+                    /* Keep count
+                     */
+                    latestConditionInstance++;
                 });
             });
         }
@@ -244,26 +296,34 @@
                          */
                         label.labelActivate();
 
+                        /* Unsaved Conditions can be removed without needing the indicator
+                         * as these don't require backend confirmation
+                         */
+                        if (conditionId.match(config.stubPrefix)) {
+                            $('#condition-' + conditionId).remove();
+                        }
                         /* Delete asynchronously if successful; ignore if unsuccessful
                          */
-                        $.post(config.condition.delete.url, { conditionId: conditionId }, function(responseText) {
-                            if (responseText == config.success) {
-                                $('#condition-' + conditionId).remove();
+                        else {
+                            $.post(config.condition.delete.url, { conditionId: conditionId }, function(responseText) {
+                                if (responseText == config.success) {
+                                    $('#condition-' + conditionId).remove();
 
-                                /* Indicator label gets removed with the condition so we
-                                 * don't need to bother showing animation
-                                 */
-                            }
-                            else {
+                                    /* Indicator label gets removed with the condition so we
+                                     * don't need to bother showing animation
+                                     */
+                                }
+                                else {
 
-                                /* Show that something failed
-                                 */
-                                label.labelTimeout({
-                                    text: config.condition.delete.fail,
-                                    css: 'alert'
-                                });
-                            }
-                        });
+                                    /* Show that something failed
+                                     */
+                                    label.labelTimeout({
+                                        text: config.condition.delete.fail,
+                                        css: 'alert'
+                                    });
+                                }
+                            });
+                        }
                     }
                 });
             });
@@ -278,7 +338,8 @@
 
                 /* The Rule into which the new Effect is injected
                  */
-                var ruleId = '#rule-' + $(this).attr('data-effect-create') + '-effects';
+                var ruleId = $(this).attr('data-effect-create');
+                var ruleContainer = '#rule-' + ruleId + '-effects';
 
                 /* The url from which new Effect are spawned
                  */
@@ -329,11 +390,13 @@
 
                     /* Ram it back in
                      */
-                    $(ruleId).append(instance);
+                    $(ruleContainer).append(instance);
 
                     /* Keep count
                      */
                     latestEffectInstance++;
+
+                    refreshUserFieldAvailability(ruleId);
                 });
             });
         }
@@ -371,6 +434,7 @@
          */
         function initEffectUserfieldChange() {
             $(config.element).on('change', '[data-effect-userfield]', function(event) {
+                var ruleId = $(this).parents('[data-rule]').attr('data-rule');
                 var effectId = $(this).attr('data-effect-userfield');
 
                 /* Reset Mapping Type
@@ -380,6 +444,10 @@
                 /* Empty the Effect Fragment container
                  */
                 $('[data-effect-fragment='+effectId+']').html('');
+
+                /* Disable User Fields already in play
+                 */
+                refreshUserFieldAvailability(ruleId);
             });
         }
 
@@ -388,11 +456,16 @@
          */
         function initEffectMappingTypeChange() {
             $(config.element).on('change', '[data-effect-mappingtype]', function(event) {
+                var ruleId = $(this).attr('data-effect-ruleid');
                 var effectId = $(this).attr('data-effect-mappingtype');
-                var userField = $('[data-effect-userfield='+effectId+']').val();
+                var userField = disabledVal($('[data-effect-userfield='+effectId+']'));
                 var mappingType = $(this).val();
 
+                /* ruleId won't exist for unsaved effects when changing mapping type
+                 * so we store it in a data var and recycle its value
+                 */
                 var data = {
+                    ruleId: ruleId,
                     effectId: effectId,
                     userField: userField,
                     mappingType: mappingType
@@ -424,7 +497,7 @@
                          */
                         label.labelActivate();
 
-                        /* Unsaved effects can be removed without needing the indicator
+                        /* Unsaved Effects can be removed without needing the indicator
                          * as these don't require backend confirmation
                          */
                         if (effectId.match(config.stubPrefix)) {
@@ -455,6 +528,76 @@
                     }
                 });
             });
+        }
+
+        /**
+         * Disable User Fields already in play
+         * Otherwise enable them
+         *
+         * Each User Field can only be modified once per Rule
+         */
+        function refreshUserFieldAvailability(ruleId) {
+            var allUserFields = $(config.element).find('[data-rule='+ruleId+']').find('[data-effect-userfield]');
+
+            /* Find all the User Fields currently chozen
+             */
+            var used = [];
+
+            /* jQuery can't return the .val() of the option
+             * when the option has been disabled, even if it
+             * is also selected - which makes our Disable
+             * campaign a little more finicky than desired
+             *
+             * (A $(select).val() will return null when its
+             * currently selected option is disabled)
+             *
+             * https://bugs.jquery.com/ticket/13097
+             */
+            $.each(allUserFields, function(index, element) {
+                used.push(disabledVal(element));
+            });
+
+            /* Disable all usages of these fields everywhere
+             * in this rule
+             */
+            $.each(allUserFields, function(index, select) {
+                $.each($(select).find('option'), function(index, option) {
+
+                    /* Ignore "Please Select"
+                     */
+                    if ($(option).val() != -1) {
+                        if ($.inArray($(option).val(), used) > -1) {
+                            $(option).attr('disabled', 'disabled');
+                        }
+                        else {
+                            $(option).removeAttr('disabled');
+                        }
+                    }
+                });
+            });
+        }
+
+        /**
+         * Disable options upon startup
+         */
+        function initEffectUserFieldAvailability() {
+            $.each($(config.element).find('[data-rule]'), function(index, element) {
+                var ruleId = $(element).attr('data-rule');
+
+                refreshUserFieldAvailability(ruleId);
+            });
+        }
+
+        /**
+         * An alternative to jQuery .val() which can't give you
+         * the selected option for a <select> element when that
+         * selected option is currently disabled
+         */
+        function disabledVal(element) {
+            var selectedIndex = ($(element).prop("selectedIndex")+1);
+            var value = $(element).find('option:nth-child(' + selectedIndex + ')').attr('value');
+
+            return value;
         }
     }
 }(jQuery));

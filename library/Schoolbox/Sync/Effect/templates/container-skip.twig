@@ -1,12 +1,16 @@
 <li id="effect-{{ currentEffect.id }}" class="actions-small-1 content" data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
-    <input type="hidden" name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][type]" value="3">
+    <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" value="3">
 
     <div class="list-item">
         <div class="row">
-            <div class="small-12 medium-12 large-12 columns">
-                Then Skip
+            <div class="small-2 medium-1 large-1 columns">
+                <span class="meta">Then</span>
+            </div>
 
-                <input type="hidden" name="rule[{{ currentRule.id }}][effect][{{ currentEffect.id }}][userProperty]" value="" />
+            <div class="small-10 medium-11 large-11 columns">
+                Skip
+
+                <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][userProperty]" value="" />
             </div>
         </div>
     </div>

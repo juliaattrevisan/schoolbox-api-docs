@@ -17,7 +17,7 @@ use Schoolbox\Sync\Navigator\Node;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Condition;
 use Schoolbox\Sync\Effect;
-use Schoolbox\Sync\Effect\AllUserField;
+use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 use Schoolbox\Sync\Hydrator;
 
@@ -156,7 +156,7 @@ class Factory
          * This is just some hardcoded values for now.
          * It tells frontend which templates to use for Effects.
          */
-        $allUserField = new AllUserField();
+        $fragmentFactory = new FragmentFactory();
 
         /* Which twig containers and fragments to load for this
          * Ruleset's Effects
@@ -164,8 +164,7 @@ class Factory
         $allEffectStructures = [
             'containers' => [],
             'fragments' => [],
-            'allUserField' => $allUserField->getAllFields(),
-            'allNDSField' => $ffactory->buildMap($this->getType()),
+            'allUserField' => $fragmentFactory->getAllFields(),
         ];
 
         /* Skip Effect has a different container since it's a unique kind of Effect
@@ -178,7 +177,9 @@ class Factory
                  * Skip Effects don't use fragments
                  */
                 if (!$currentEffect->getEffectType()->isSkip()) {
-                    $allEffectStructures['fragments'][$currentEffect->getId()] = $allUserField->getEffectFragmentTemplate($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+                    $fragment = $fragmentFactory->produce($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+
+                    $allEffectStructures['fragments'][$currentEffect->getId()] = $fragment;
                 }
             }
         }
@@ -200,6 +201,7 @@ class Factory
             'ruleset'             => [ 'rules' => $ruleset ],
             'customRules'         => $hydratorModels,
             'allEffectStructures' => $allEffectStructures,
+            'allNDSField'         => $ffactory->buildMap($this->getType()),
             'meta'                => $metas
         ];
     }
@@ -212,9 +214,18 @@ class Factory
     private function findRuleset()
     {
         // TODO DI
-        return Rule\Mapper::getInstance()->findByColumnList([ 'role_type' => $this->getType() ], [
+        $ruleset = Rule\Mapper::getInstance()->findByColumnList([ 'role_type' => $this->getType() ], [
             'order' => [ 'sequence' => 'ASC' ]
         ]);
+
+        /* Order Conditions and Effects chronologically
+         */
+        foreach ($ruleset as $currentRule) {
+            $currentRule->getConditions()->sortBy('id', 'ASC');
+            $currentRule->getEffects()->sortBy('id', 'ASC');
+        }
+
+        return $ruleset;
     }
 
     /* Getters/Setters

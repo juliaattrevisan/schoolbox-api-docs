@@ -68,5 +68,5 @@ INSERT INTO `ups_condition_type` (`name`)
   ON DUPLICATE KEY UPDATE `id` = `id`;
 
 INSERT INTO `ups_effect_type` (`name`)
-  VALUES ('Map'), ('literal')
+  VALUES ('Map'), ('literal'), ('Skip')
   ON DUPLICATE KEY UPDATE `id` = `id`;

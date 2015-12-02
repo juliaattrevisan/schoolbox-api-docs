@@ -1,1 +1,11 @@
-Select Lookup Input
+<select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][arguments]">
+    {% for current in allEffectStructures.fragments[currentEffect.id].getData() %}
+        {% set selected = '' %}
+
+        {% if currentEffect.arguments[0] == current.value %}
+            {% set selected = 'selected="selected"' %}
+        {% endif %}
+
+        <option value="{{ current.value }}" {{ selected }}>{{ current.label }}</option>
+    {% endfor %}
+</select>

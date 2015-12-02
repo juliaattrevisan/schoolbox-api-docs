@@ -11,11 +11,12 @@
 namespace Schoolbox\Sync\Effect;
 
 use Alaress\Web\Controller\Base;
+use PDepend\Util\Type;
 use Schoolbox\Sync\Grammar\FieldFactory;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Effect;
 use Alaress\ObjectReader;
-use Schoolbox\Sync\Effect\AllUserField;
+use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
 class Controller extends Base {
@@ -59,8 +60,8 @@ class Controller extends Base {
          * Assume Literal Effect Type to start with
          */
         $default = [
-            'effectType' => EffectTypeMapper::EFFECT_TYPE_LITERAL,
-            'userProperty' => 'lastname',
+            'effectType' => null,
+            'userProperty' => null,
             'arguments' => [false]
         ];
 
@@ -71,24 +72,29 @@ class Controller extends Base {
          * swap that out for something else, such as "new-1", "new-2" etc.
          * to maintain uniqueuness in that land.
          */
+        $effectTypeMapper = new EffectTypeMapper();
+        $effectType = $effectTypeMapper->createModel();
+
         $newEffect = Effect\Mapper::getInstance()->createModel();
         $newEffect
             ->setId('new')
             ->setRule($rule)
             ->setUserProperty($default['userProperty'])
             ->setArguments($default['arguments'])
-            ->setEffectType(Effect\Type\Mapper::getInstance()->findById($default['effectType']));
+            ->setEffectType($effectType);
 
         /* Decide which Effect Fragment to use
          */
-        $allUserField = new AllUserField();
+        $fragmentFactory = new FragmentFactory();
+
+        $fragment = $fragmentFactory->produce($default['effectType'], $default['userProperty']);
 
         $data = [
             'allEffectStructures' => [
                 'fragments' => [
-                    $newEffect->getId() => $allUserField->getEffectFragmentTemplate($default['effectType'], $default['userProperty'])
+                    $newEffect->getId() => $fragment
                 ],
-                'allUserField' => $allUserField->getAllFields(),
+                'allUserField' => $fragmentFactory->getAllFields(),
             ],
             'meta' => [
                 'effect' => [
@@ -123,8 +129,8 @@ class Controller extends Base {
          * Assume Literal Effect Type to start with
          */
         $default = [
-            'effectType' => EffectTypeMapper::EFFECT_TYPE_SKIP,
-            'userProperty' => '',
+            'effectType' => null,
+            'userProperty' => null,
             'arguments' => []
         ];
 
@@ -135,24 +141,24 @@ class Controller extends Base {
          * swap that out for something else, such as "new-1", "new-2" etc.
          * to maintain uniqueuness in that land.
          */
+        $effectTypeMapper = new EffectTypeMapper();
+        $effectType = $effectTypeMapper->createModel();
+
         $newEffect = Effect\Mapper::getInstance()->createModel();
         $newEffect
             ->setId('new')
             ->setRule($rule)
             ->setUserProperty($default['userProperty'])
             ->setArguments($default['arguments'])
-            ->setEffectType(Effect\Type\Mapper::getInstance()->findById($default['effectType']));
+            ->setEffectType($effectType);
 
         $data = [
-            'meta'          => [
+            'meta' => [
                 'effect' => [
                     $newEffect->getId() => $this->getMeta()
                 ]
             ],
             'currentEffect' => $newEffect,
-            'currentRule'   => [
-                'id' => $rule->getId()
-            ]
         ];
 
         $this->getResponse()->content->set([
@@ -169,13 +175,35 @@ class Controller extends Base {
      * or a freeform text input
      */
     public function change() {
-        $allUserField = new AllUserField();
-        $template = $allUserField->getEffectFragmentTemplate($_GET['mappingType'], $_GET['userField']);
+        $queryData = $this->getRequest()->query;
+
+        $fragmentFactory = new FragmentFactory();
+        $fragment = $fragmentFactory->produce($queryData['mappingType'], $queryData['userField']);
 
         $this->getResponse()->content->set([
-            'template' => $template,
-            'data'     => [],
-            'format'   => 'nochrome'
+            'template' => $fragment->getFilename(),
+            'data' => [
+
+                /* Contains Lookup data
+                 */
+                'allEffectStructures' => [
+                    'fragments' => [
+                        $queryData['effectId'] => $fragment
+                    ],
+                ],
+
+                /* If this Effect hasn't been saved it, it won't have a ruleId
+                 * nor an effectId, so recycle it from frontend, as fragments
+                 * expect both values
+                 */
+                'currentEffect' => [
+                    'id' => $queryData['effectId'],
+                    'rule' => [
+                        'id' => $queryData['ruleId'],
+                    ],
+                ],
+            ],
+            'format' => 'nochrome'
         ]);
     }
 
