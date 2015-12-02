@@ -78,6 +78,9 @@
                         url: '/adminv2/sync/effect/delete',
                         confirm: 'Are you sure you want to delete this Effect?',
                         fail: 'Could not delete Effect'
+                    },
+                    map: {
+                        newRowUrl: '/adminv2/sync/effect/newMappedRow'
                     }
                 },
 
@@ -625,10 +628,8 @@
                 /* If all the inputs are filled spawn a new row
                  * Bring focus to first input of new row
                  */
-                var url = '/adminv2/sync/effect/newMappedRow';
-
                 if (numInputs == numFilled) {
-                    $.get(url, function(responseText) {
+                    $.get(config.effect.map.newRowUrl, function(responseText) {
                         rowContainer.append(responseText);
 
                         /* So apparently I can't use input:nth-last-child(2)
