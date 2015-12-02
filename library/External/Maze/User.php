@@ -807,7 +807,7 @@ class External_Maze_User implements External_UserInterface {
 	public function getPortrait($externalUserId) {
 		$userMapper = new \Schoolbox\UserMapper();
         try {
-		    $user = $userMapper->findByColumn('synergy_id', $externalUserId);
+		    $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
         } catch (Exception_Schoolbox $e) {
             /* User not found */
             return false;
@@ -815,7 +815,7 @@ class External_Maze_User implements External_UserInterface {
 
 		/* Students and staff store their pics in different places
 		 */
-		if ($this->getGroup()->isStudent($user->first()->getId())) {
+		if ($this->getGroup()->isStudent($user->getId())) {
 			$query = "
 				SELECT
 					CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
@@ -823,7 +823,7 @@ class External_Maze_User implements External_UserInterface {
 				WHERE ST.STKEY = '{$externalUserId}'
 			";
 		}
-		else if ($this->getGroup()->isStaff($user->first()->getId())) {
+		else if ($this->getGroup()->isStaff($user->getId())) {
 			$query = "
 				SELECT
 					CONVERT(VARCHAR, LW_DATE, 120) AS ModifiedDate
@@ -847,7 +847,7 @@ class External_Maze_User implements External_UserInterface {
 			$modifiedTime = strtotime($photo['ModifiedDate']);
 
 			if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
-				if ($this->getGroup()->isStudent($user->first()->getId())) {
+				if ($this->getGroup()->isStudent($user->getId())) {
 					$query = "
 						SELECT
 							STUDENT_PIC AS Photo
@@ -855,7 +855,7 @@ class External_Maze_User implements External_UserInterface {
 						WHERE ST.STKEY = '{$externalUserId}'
 					";
 				}
-				else if ($this->getGroup()->isStaff($user->first()->getId())) {
+				else if ($this->getGroup()->isStaff($user->getId())) {
 					$query = "
 						SELECT
 							STAFF_PIC AS Photo
