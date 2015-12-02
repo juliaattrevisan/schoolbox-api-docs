@@ -614,7 +614,7 @@
 
                 /* Find out if all inputs are filled
                  */
-                var allInputs = row.find('input');
+                var allInputs = rowContainer.find('input');
 
                 var numInputs = allInputs.length;
 
