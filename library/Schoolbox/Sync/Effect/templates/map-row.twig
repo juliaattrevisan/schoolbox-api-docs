@@ -1,11 +1,12 @@
 <div class="row" data-map>
     <div class="small-5 columns">
-        <input type="text" name="{{ mapRow.from.name }}" value="{{ mapRow.from.value }}" />
+
+        <input type="text" name="rule[{{ ruleId }}][effect][{{ effectId }}][from][]" value="{{ mapFrom }}" />
     </div>
     <div class="small-2 columns text-center no-pad">
         <h1>&#10155;</h1>
     </div>
     <div class="small-5 columns">
-        <input type="text" name="{{ mapRow.to.name }}" value="{{ mapRow.to.value }}" />
+        <input type="text" name="rule[{{ ruleId }}][effect][{{ effectId }}][to][]" value="{{ mapTo }}" />
     </div>
 </div>

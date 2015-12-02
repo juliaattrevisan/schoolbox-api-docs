@@ -229,22 +229,16 @@ class Controller extends Base {
     public function newMappedRow() {
         $queryData = $this->getRequest()->query;
 
-        $mapRow = [
-            'from' => [
-                'name' => "rule[{$queryData['ruleId']}][effect][{$queryData['effectId']}][from][]",
-                'value' => ''
-            ],
-            'to' => [
-                'name' => "rule[{$queryData['ruleId']}][effect][{$queryData['effectId']}][to][]",
-                'value' => ''
-            ],
+        $data = [
+            'ruleId' => $queryData['ruleId'],
+            'effectId' => $queryData['effectId'],
+            'mapFrom' => '',
+            'mapTo' => '',
         ];
 
         $this->getResponse()->content->set([
             'template' => '@syncEffect/map-row.twig',
-            'data'     => [
-                'mapRow' => $mapRow
-            ],
+            'data'     => $data,
             'format'   => 'nochrome'
         ]);
     }

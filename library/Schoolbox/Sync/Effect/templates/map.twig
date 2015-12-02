@@ -3,5 +3,7 @@
 </div>
 
 <div class="small-12 columns">
-    {% include '@syncEffect/map-row.twig' %}
+    {% for mapFrom, mapTo in currentEffect.arguments[1] %}
+        {% include '@syncEffect/map-row.twig' %}
+    {% endfor %}
 </div>
