@@ -630,6 +630,11 @@
                 if (numInputs == numFilled) {
                     $.get(url, function(responseText) {
                         rowContainer.append(responseText);
+
+                        /* So apparently I can't use input:nth-last-child(2)
+                         * Imma go around the long way
+                         */
+                        rowContainer.find('.row:nth-last-child(1)').find('input:first').focus();
                     });
                 }
             });
