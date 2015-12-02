@@ -53,7 +53,7 @@ class Factory
      *
      * @return array
      */
-    public function produce($rulesetId)
+    public function produceTemplateData($rulesetId)
     {
         switch ($rulesetId) {
 

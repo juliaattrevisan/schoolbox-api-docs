@@ -68,7 +68,7 @@ class Controller extends Base {
          */
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/ruleset.twig',
-            'data' => $factory->produce($params['rulesetId'])
+            'data' => $factory->produceTemplateData($params['rulesetId'])
         ]);
     }
 
