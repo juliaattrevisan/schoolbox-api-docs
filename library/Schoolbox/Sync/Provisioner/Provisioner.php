@@ -8,6 +8,7 @@
 namespace Schoolbox\Sync\Provisioner;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\Role;
 use Schoolbox\Sync\Ruleset;
 use Schoolbox\UserMapper;
@@ -25,6 +26,13 @@ class Provisioner
      * @var Ruleset\Factory
      */
     protected $rulesetFactory;
+
+    /**
+     * A connection to an external database - retrieves users from the external DB.
+     *
+     * @var SyncInterface
+     */
+    protected $externalUserMapper;
 
     /**
      * A user mapper - this retrieves user's initial states, and saves them.
@@ -54,17 +62,20 @@ class Provisioner
      * Constructor
      *
      * @param Ruleset\Factory $rulesetFactory
+     * @param SyncInterface   $externalUserSource
      * @param UserMapper      $userMapper
      * @param LoggerInterface $logger
      */
     public function __construct(
         Ruleset\Factory $rulesetFactory,
+        SyncInterface $externalUserSource,
         UserMapper $userMapper,
         LoggerInterface $logger
     ) {
-        $this->rulesetFactory = $rulesetFactory;
-        $this->userMapper     = $userMapper;
-        $this->logger         = $logger;
+        $this->rulesetFactory     = $rulesetFactory;
+        $this->externalUserSource = $externalUserSource;
+        $this->userMapper         = $userMapper;
+        $this->logger             = $logger;
     }
 
     /**

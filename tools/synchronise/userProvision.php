@@ -24,8 +24,11 @@ $logger = new Alaress\Lumberjack\Logger(
 // This factory is intended for Twig data but I can easily repurpose it
 $ruleFactory = new Schoolbox\Sync\Ruleset\Factory();
 
+// Sync factory
+$syncFactory = new \Schoolbox\External\Connector\SyncFactory();
+
 // User mapper
-$userMapper = \Schoolbox\UserMapper::getInstance();
+$userMapper = Schoolbox\UserMapper::getInstance();
 
 // Inject:
 // * logger
@@ -33,5 +36,5 @@ $userMapper = \Schoolbox\UserMapper::getInstance();
 // * UserMapper
 // * SyncFactory
 // TODO set this up in DI so that dry run can use it with the exact same configuration
-$ups = new Schoolbox\Sync\Provisioner\Provisioner($ruleFactory, $userMapper, $logger);
+$ups = new Schoolbox\Sync\Provisioner\Provisioner($ruleFactory, $syncFactory->build(), $userMapper, $logger);
 $ups->run(isset($options['perform-update']));
