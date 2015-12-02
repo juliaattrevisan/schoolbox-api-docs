@@ -629,7 +629,15 @@
                  * Bring focus to first input of new row
                  */
                 if (numInputs == numFilled) {
-                    $.get(config.effect.map.newRowUrl, function(responseText) {
+                    var ruleId = rowContainer.parents('[data-rule]').attr('data-rule');
+                    var effectId = rowContainer.parents('[data-effect-fragment]').attr('data-effect-fragment');
+
+                    var data = {
+                        ruleId: ruleId,
+                        effectId: effectId
+                    }
+
+                    $.get(config.effect.map.newRowUrl, data, function(responseText) {
                         rowContainer.append(responseText);
 
                         /* So apparently I can't use input:nth-last-child(2)
