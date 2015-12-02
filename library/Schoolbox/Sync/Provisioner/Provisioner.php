@@ -74,6 +74,12 @@ class Provisioner
      */
     public function run($update = false)
     {
-        //
+        foreach ($this->runOrder as $roleType) {
+            $ruleset = $this->rulesetFactory->produceRuleset($roleType);
+            if ($ruleset->getConfig()->getEnabled()) {
+                // run something
+                // do something with each roletype's users
+            }
+        }
     }
 }
