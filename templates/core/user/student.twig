@@ -73,7 +73,7 @@
                                 {% block details_dob %}
                                 {% if externalUser.StudentBirthDate %}
                                 <dt class="no-margin small-6 medium-3">Date of Birth</dt>
-                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate|date(locale.date.dateOnlyFormat) }}</dd>
+                                <dd class="no-margin small-6 medium-9">{{ externalUser.StudentBirthDate|date(dateFormats.dateOnlyFormat) }}</dd>
                                 {% endif %}
                                 {% endblock details_dob %}
 
