@@ -180,15 +180,9 @@ class Controller extends Base {
                  */
                 $fragmentFactory = new FragmentFactory();
 
-                /* Force cast of boolean arg so it doesn't save in some
-                 * other data format
-                 */
-                if ($fragmentFactory->isBoolean($effectData['userProperty'])) {
-                    $arg = [(bool)$effectArgs[0]];
-                }
                 /* Forge key/value for Mapped Key/Value Pairs
                  */
-                else if ($effectTypeMapper->isMap($effectData['type'])) {
+                if ($effectTypeMapper->isMap($effectData['type'])) {
 
                     /* Keep arg[0], that token field
                      */
@@ -199,9 +193,25 @@ class Controller extends Base {
                      */
                     $pairs = array_combine($effectData['from'], $effectData['to']);
 
-                    /* Dump empty values
+                    /* array_filter filters out values that equate to false
+                     * such as zero (which is valid data...). Use unset pears
+                     * approach instead
+                     *
+                     * http://stackoverflow.com/questions/243132/how-do-you-remove-a-value-that-has-an-empty-key-from-an-associative-array-in-php
                      */
-                    $arg[] = array_filter($pairs);
+                    unset($pairs[null]);
+
+                    $arg[] = $pairs;
+                }
+                /* Force cast of boolean arg so it doesn't save in some
+                 * other data format.
+                 *
+                 * Sequential Dependency:
+                 * This has to take place after isMap() check because the
+                 * Mapped Key/Value Pairs can utilise a boolean field
+                 */
+                else if ($fragmentFactory->isBoolean($effectData['userProperty'])) {
+                    $arg = [(bool)$effectArgs[0]];
                 }
                 /* Otherwise just save it as given
                  */
