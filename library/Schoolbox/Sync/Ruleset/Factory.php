@@ -207,18 +207,18 @@ class Factory
      *
      * @param string $rulesetId Role type - typically one of student|parent|staff
      *
-     * @return array
+     * @return Ruleset
      */
     public function produceRuleset($rulesetId)
     {
-        return [
-            'rules'  => $this->findRuleset($rulesetId),
-            'config' => Config\Mapper::getInstance()->findById($rulesetId),
-            'custom' => Hydrator\Custom\Mapper::getInstance()->findByColumnList(
+        return new Ruleset(
+            $this->findRuleset($rulesetId),
+            Hydrator\Custom\Mapper::getInstance()->findByColumnList(
                 ['role_type' => $rulesetId],
                 ['order' => ['sequence' => 'asc'],]
             ),
-        ];
+            Config\Mapper::getInstance()->findById($rulesetId)
+        );
     }
 
     /**
@@ -226,7 +226,7 @@ class Factory
      *
      * @param string $rulesetId
      *
-     * @return array
+     * @return Rule\Model[]
      */
     private function findRuleset($rulesetId)
     {
