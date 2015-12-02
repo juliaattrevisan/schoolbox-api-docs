@@ -127,11 +127,11 @@
             {% endfor %}
 
             {# Display custom rules #}
-            {% if customRules is not empty %}
+            {% if ruleset.custom is not empty %}
 
             <h2 class="subheader">Custom Rules</h2>
 
-            {% for customRule in customRules %}
+            {% for customRule in ruleset.custom %}
             <div class="row" id="customRule-{{ customRule.getId() }}">
                 <div class="small-12 columns">
                     <div class="actions-small-1">

@@ -187,13 +187,6 @@ class Factory
             }
         }
 
-        // Get all of the custom rules too
-        /** @var Hydrator\Custom\Model[] $hydratorModels */
-        $hydratorModels = Hydrator\Custom\Mapper::getInstance()->findByColumnList(
-            ['role_type' => $rulesetId],
-            ['order' => ['sequence' => 'asc'],]
-        );
-
         /* If it was one of the known cases, return a well-formed structure
          * Otherwise it would have returned empty array earlier
          */
@@ -202,7 +195,6 @@ class Factory
             'allNavigation'          => $allNavigation->getAllNodes(),
             'rulesetId'              => $rulesetId,
             'ruleset'                => $this->produceRuleset($rulesetId),
-            'customRules'            => $hydratorModels,
             'allConditionStructures' => $allConditionStructures,
             'allEffectStructures'    => $allEffectStructures,
             'allNDSField'            => $ffactory->buildMap($rulesetId),
@@ -222,6 +214,10 @@ class Factory
         return [
             'rules'  => $this->findRuleset($rulesetId),
             'config' => Config\Mapper::getInstance()->findById($rulesetId),
+            'custom' => Hydrator\Custom\Mapper::getInstance()->findByColumnList(
+                ['role_type' => $rulesetId],
+                ['order' => ['sequence' => 'asc'],]
+            ),
         ];
     }
 
