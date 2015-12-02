@@ -266,22 +266,22 @@ OR ml.name        LIKE :keyword
 
                 switch($log['object']) {
                     case 'folder':
-                        $actionString .= 'folder <a href="/homepage/' . $log['c_id'] . '">' . $log['c_name'] . '</a>';
+                        $actionString .= 'folder <a href="/homepage/' . $log['c_id'] . '">' . Scrub::text($log['c_name']) . '</a>';
                         break;
                     case 'file':
-                        $actionString .= 'file <a href="/send.php?id=' . $log['f_id'] . '">' . $log['f_description'] . '</a> in <a href=/homepage/'. $log['f_cid'] .'>'.$log['f_catname'].'</a>';
+                        $actionString .= 'file <a href="/send.php?id=' . $log['f_id'] . '">' . Scrub::text($log['f_description']) . '</a> in <a href=/homepage/'. $log['f_cid'] .'>'.$log['f_catname'].'</a>';
                         break;
                     case 'link':
-                        $actionString .= 'link <a href="/redir.php?id=' . $log['l_cid'] . '">' . $log['l_description'] . '</a> in <a href=/homepage/'. $log['l_cid'] .'>'.$log['l_catname'].'</a>';
+                        $actionString .= 'link <a href="/redir.php?id=' . $log['l_cid'] . '">' . Scrub::text($log['l_description']) . '</a> in <a href=/homepage/'. $log['l_cid'] .'>'.$log['l_catname'].'</a>';
                         break;
                     case 'myfile':
-                        $actionString .= 'myFile <a href="/my-files/' . $log['mf_id'] . '">' . $log['mf_description'] . '</a>';
+                        $actionString .= 'myFile <a href="/my-files/' . $log['mf_id'] . '">' . Scrub::text($log['mf_description']) . '</a>';
                         break;
                     case 'myfolder':
-                        $actionString .= 'myFolder <a href="/my-files/' . $log['ml_id'] . '">' . $log['ml_name'] . '</a>';
+                        $actionString .= 'myFolder <a href="/my-files/' . $log['ml_id'] . '">' . Scrub::text($log['ml_name']) . '</a>';
                         break;
                     case 'content':
-                        $actionString .= 'textbox <a href="/homepage/'.$log['textbox_cid'].'">'.$log['textbox_heading'].'</a>';
+                        $actionString .= 'textbox <a href="/homepage/'.$log['textbox_cid'].'">'. Scrub::text($log['textbox_heading']) .'</a>';
                         break;
                     default:
                         $actionString .= 'unknown resource';
@@ -298,7 +298,7 @@ OR ml.name        LIKE :keyword
                 $page->setVar(array(
                     'UID'       => $log['user_id'],
                     'DATE'      => $log['time'],
-                    'USERNAME'  => $displayName,
+                    'USERNAME'  => Scrub::text($displayName),
                     'ACTION'    => $actionString,
                     'IP'        => $log['ip']
                 ));
@@ -348,6 +348,9 @@ OR ml.name        LIKE :keyword
                 break;
             case 'myfolder':
                 $datum['objectId'] = $datum['ml_name'];
+                break;
+            case 'content':
+                $datum['objectId'] = $datum['textbox_heading'];
                 break;
             default:
                 $datum['objectId'] = 'unknown resource';

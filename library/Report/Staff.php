@@ -98,19 +98,19 @@ class Report_Staff extends Report_Abstract
             foreach ($allStaff as $currentStaff) {
                 $this->getPage()->setVar(
                     array(
-                        'STAFF_STAFFID'    => $currentStaff['StaffID'],
-                        'STAFF_STAFFCODE'  => $currentStaff['SchoolStaffCode'],
-                        'STAFF_TITLE'      => $currentStaff['StaffTitle'],
-                        'STAFF_FIRSTNAME'  => $currentStaff['StaffPreferredName'],
-                        'STAFF_SURNAME'    => $currentStaff['StaffSurname'],
-                        'STAFF_ROLE'       => implode(', ', $currentStaff['JobPositionDescription']),
-                        'STAFF_DEPARTMENT' => $currentStaff['StaffDepartmentDescription'],
-                        'STAFF_CAMPUS'     => $currentStaff['StaffCampusDescription'],
-                        'STAFF_EXTENSION'  => $currentStaff['StaffExtension'],
-                        'STAFF_MOBILE'     => $currentStaff['StaffDefaultMobilePhone'],
-                        'STAFF_VOICEMAIL'  => $currentStaff['StaffVoiceMail'],
-                        'STAFF_PHONE'      => $currentStaff['StaffOccupPhone'],
-                        'STAFF_EMAIL'      => $currentStaff['StaffOccupEmail'],
+                        'STAFF_STAFFID'    => Scrub::text($currentStaff['StaffID']),
+                        'STAFF_STAFFCODE'  => Scrub::text($currentStaff['SchoolStaffCode']),
+                        'STAFF_TITLE'      => Scrub::text($currentStaff['StaffTitle']),
+                        'STAFF_FIRSTNAME'  => Scrub::text($currentStaff['StaffPreferredName']),
+                        'STAFF_SURNAME'    => Scrub::text($currentStaff['StaffSurname']),
+                        'STAFF_ROLE'       => Scrub::text(implode(', ', $currentStaff['JobPositionDescription'])),
+                        'STAFF_DEPARTMENT' => Scrub::text($currentStaff['StaffDepartmentDescription']),
+                        'STAFF_CAMPUS'     => Scrub::text($currentStaff['StaffCampusDescription']),
+                        'STAFF_EXTENSION'  => Scrub::text($currentStaff['StaffExtension']),
+                        'STAFF_MOBILE'     => Scrub::text($currentStaff['StaffDefaultMobilePhone']),
+                        'STAFF_VOICEMAIL'  => Scrub::text($currentStaff['StaffVoiceMail']),
+                        'STAFF_PHONE'      => Scrub::text($currentStaff['StaffOccupPhone']),
+                        'STAFF_EMAIL'      => Scrub::text($currentStaff['StaffOccupEmail']),
                     )
                 );
                 $this->getPage()->parse('staff_block', 'staff', true);
