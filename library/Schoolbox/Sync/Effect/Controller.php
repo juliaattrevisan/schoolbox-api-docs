@@ -92,7 +92,9 @@ class Controller extends Base {
         $data = [
             'allEffectStructures' => [
                 'fragments' => [
-                    $newEffect->getId() => $fragment
+                    $newEffect->getId() => [
+                        'fragment' => $fragment
+                    ]
                 ],
                 'allUserField' => $fragmentFactory->getAllFields(),
             ],
