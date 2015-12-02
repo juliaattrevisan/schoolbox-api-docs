@@ -46,6 +46,19 @@ class Model {
     }
 
     /**
+     * Is this a Map Effect?
+     *
+     * @return bool
+     */
+    public function isMap() {
+        if ($this->getId() == EffectTypeMapper::EFFECT_TYPE_MAP) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Is this a Skip Effect?
      *
      * @return bool
