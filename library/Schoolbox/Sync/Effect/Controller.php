@@ -238,6 +238,11 @@ class Controller extends Base {
 
         $data = [
             'currentEffect' => $effect,
+            'meta' => [
+                'effect' => [
+                    $queryData['effectId'] => $this->getMeta()
+                ]
+            ],
             'mapFrom' => '',
             'mapTo' => '',
         ];
