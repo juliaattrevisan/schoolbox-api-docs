@@ -64,10 +64,6 @@ then
 	rm -f /etc/init.d/php5-fpm;
 fi
 
-# Kill all old grunt processes, they're probably watches
-echo "$vag Stopping background Grunt processes";
-pkill grunt;
-
 echo "$vag Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -ptnp879 mysql;
 
@@ -172,9 +168,6 @@ echo "$vag Installing grunt-cli if not already installed";
 
 echo "$vag Building CSS and JS";
 /vagrant/tools/pkg-build-css-js.sh --sass;
-
-echo "$vag Starting watcher for changes to CSS files";
-grunt --no-color watch > /vagrant/data/watch.output.txt &
 
 echo "$vag Enabling modules";
 /vagrant/tools/module.sh enable leave;
