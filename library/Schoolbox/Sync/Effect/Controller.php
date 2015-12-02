@@ -229,9 +229,15 @@ class Controller extends Base {
     public function newMappedRow() {
         $queryData = $this->getRequest()->query;
 
+        $effect = [
+            'id' => $queryData['effectId'],
+            'rule' => [
+                'id' => $queryData['ruleId'],
+            ]
+        ];
+
         $data = [
-            'ruleId' => $queryData['ruleId'],
-            'effectId' => $queryData['effectId'],
+            'currentEffect' => $effect,
             'mapFrom' => '',
             'mapTo' => '',
         ];
