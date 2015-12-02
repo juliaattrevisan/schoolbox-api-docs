@@ -29,6 +29,21 @@
                     <h2 class="subheader">{{ rulesetId|capitalize }} Ruleset</h2>
                 </div>
                 <nav>
+                    <span class="switch round">
+                        <input type="hidden"
+                               name="config[{{ rulesetId }}][enabled]"
+                               value="0">
+                        <input type="checkbox"
+                               id="config-{{ rulesetId }}-switch"
+                               name="config[{{ rulesetId }}][enabled]"
+                               {% if ruleset.config.getEnabled() %}checked{% endif %}
+                               value="1">
+                        <label for="config-{{ rulesetId }}-switch">
+                            <span>On</span>
+                            <span>Off</span>
+                        </label>
+                    </span>
+                    {#<a href='/adminv2/sync/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule"></a>#}
                     <a class="icon-more" title="" data-dropdown="ruleset-options"></a>
                 </nav>
                 <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>

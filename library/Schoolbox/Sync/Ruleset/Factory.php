@@ -198,7 +198,10 @@ class Factory
             'allBreadcrumbs'      => $allBreadcrumbs->getAllNodes(),
             'allNavigation'       => $allNavigation->getAllNodes(),
             'rulesetId'           => $this->getType(),
-            'ruleset'             => [ 'rules' => $ruleset ],
+            'ruleset'             => [
+                'rules'  => $this->findRuleset(),
+                'config' => Config\Mapper::getInstance()->findById($this->getType()),
+            ],
             'customRules'         => $hydratorModels,
             'allEffectStructures' => $allEffectStructures,
             'allNDSField'         => $ffactory->buildMap($this->getType()),

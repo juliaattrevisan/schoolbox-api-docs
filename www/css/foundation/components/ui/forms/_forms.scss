@@ -191,6 +191,7 @@ th, td{
 	}
 
 	@include switch-label(0.5rem);
+	vertical-align: middle;
 
 	span {
 		position: absolute;
