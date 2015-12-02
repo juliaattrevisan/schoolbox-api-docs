@@ -608,7 +608,7 @@
          * a whole new set of add/delete controls
          */
         function initEffectMappingRows() {
-            $(config.element).find('[data-map] input').on('blur', function(event) {
+            $(config.element).on('blur', '[data-map] input', function(event) {
                 var row = $(this).parents('[data-map]');
                 var rowContainer = row.parent();
 
@@ -625,11 +625,12 @@
                 /* If all the inputs are filled spawn a new row
                  * Bring focus to first input of new row
                  */
+                var url = '/adminv2/sync/effect/newMappedRow';
+
                 if (numInputs == numFilled) {
-                    console.log('insert new row');
-//                    $.post(spawnNewRow, function(responseText) {
-//                        rowContainer.append(responseText);
-//                    });
+                    $.get(url, function(responseText) {
+                        rowContainer.append(responseText);
+                    });
                 }
             });
         }
