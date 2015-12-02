@@ -449,6 +449,19 @@ class Factory
 //            /** @var OnlineAssessment $quiz */
 //            $grades['q'.$quiz->getId()]['quiz'] = $quiz;
 //        }
+
+        // Sort assessments by due date
+        uasort(
+            $grades,
+            function($a, $b) {
+                $assessA = $a['assessment'];
+                $assessB = $b['assessment'];
+                if ($assessA instanceof SubmissionBox && $assessB instanceof SubmissionBox) {
+                    return $assessA->getDueDate()->compare($assessB->getDueDate());
+                }
+                return 0;
+            }
+        );
         return $grades;
     }
 
