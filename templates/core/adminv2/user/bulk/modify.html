@@ -1,11 +1,11 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('table[data-users="true"]').selectAll({
-            key: 'selectall',
-            checkboxName: 'userId[]'
-        });
+//        $('table[data-users="true"]').selectAll({
+//            key: 'selectall',
+//            checkboxName: 'userId[]'
+//        });
 
         /* Count number of things selected
          */
@@ -195,7 +195,7 @@
                     <thead>
                         <tr>
                             <th>
-                                <input type="checkbox" data-selectall="true" id="selectAll">
+                                <input type="checkbox" data-select-all data-select-all-for-group="users" id="selectAll">
                                 <label for="selectAll" class="checkbox-label"></label>
                             </th>
                             <th>Firstname</th>
@@ -210,7 +210,7 @@
                         <!-- BEGIN user -->
                         <tr>
                             <td>
-                                <input data-selectallgroup="users" name='userId[]' type="checkbox" value="{USER_ID}" id="user-{USER_ID}" />
+                                <input data-select-all-group="users" type="checkbox" value="{USER_ID}" id="user-{USER_ID}" />
                                 <label for="user-{USER_ID}" class="checkbox-label"></label>
                             </td>
                             <td>{USER_FIRSTNAME}</td>
