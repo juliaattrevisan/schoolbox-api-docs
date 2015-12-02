@@ -1,8 +1,8 @@
 <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][arguments]">
-    {% for current in allEffectStructures.subfragments[currentEffect.id].fragment.getData() %}
+    {% for current in allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
         {% set selected = '' %}
 
-        {% if allEffectStructures.subfragments.mapTo == current.value %}
+        {% if allEffectStructures.fragments[currentEffect.id].subfragments.mapTo == current.value %}
             {% set selected = 'selected="selected"' %}
         {% endif %}
 

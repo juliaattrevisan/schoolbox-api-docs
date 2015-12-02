@@ -6,7 +6,6 @@
         <h1>&#10155;</h1>
     </div>
     <div class="small-5 columns">
-        {{ dump(allEffectStructures.fragments[currentEffect.id].fragment) }}
-        {#{% include allEffectStructures.fragments[currentEffect.id].fragment.getFilename() %}#}
+        {% include allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getFilename() %}
     </div>
 </div>
