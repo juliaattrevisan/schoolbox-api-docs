@@ -38,6 +38,10 @@ class Module extends BaseModule
 
         $this->addPostRoute($router, 'delete', $basePath, "/delete");
         $this->addGetRoute($router, 'change', $basePath, "/change");
+
+        /* Spawn a new Mapped Key/Value fragment
+         */
+        $this->addGetRoute($router, 'newMappedRow', $basePath, "/newMappedRow");
     }
 
     /**

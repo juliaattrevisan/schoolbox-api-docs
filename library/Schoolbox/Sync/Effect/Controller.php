@@ -223,6 +223,17 @@ class Controller extends Base {
         ]);
     }
 
+    /**
+     * Spawn a new mapped row fragment
+     */
+    public function newMappedRow() {
+        $this->getResponse()->content->set([
+            'template' => '@syncEffect/map-row.twig',
+            'data'     => [],
+            'format'   => 'nochrome'
+        ]);
+    }
+
     /* Getters/Setters
      */
 
