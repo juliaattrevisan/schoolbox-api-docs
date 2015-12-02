@@ -460,7 +460,7 @@
         var editEventForm = $('#calendar-bubble').find('#editEvent');
         editEventForm.on(
             'click',
-            '[booking-button=booking-approve], [booking-button=booking-reject], [booking-button=booking-cancel]',
+            '[data-booking-button=booking-approve], [data-booking-button=booking-reject], [data-booking-button=booking-cancel]',
             function(event) {
                 event.preventDefault()
                 var href     = this.href

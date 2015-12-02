@@ -3,7 +3,6 @@
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 <script type="text/javascript" src="/javascript/shared/jquery.device.js"></script>
-<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.fullcalendar.js"></script>
 <script type="text/javascript">
 
@@ -194,7 +193,7 @@
         // For any AJAX event - open a dialog if this is a series event
         $('#calendar-bubble').find('#editEvent').on(
             'click',
-            '[data-booking-button]',
+            '[data-booking-button=booking-approve], [data-booking-button=booking-reject], [data-booking-button=booking-cancel]',
             function(event) {
                 event.preventDefault()
                 var href     = this.href
