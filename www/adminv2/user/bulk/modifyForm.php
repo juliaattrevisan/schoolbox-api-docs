@@ -14,14 +14,18 @@ $userMapper = new \Schoolbox\UserBulkMapper();
 $modified = new \Schoolbox\Collection();
 
 if (isset($_POST['updateUsers'])) {
-    if (is_array($_POST['userId']) && count($_POST['userId'])) {
+    $userIds = [];
+    if (isset($_POST['userId'])) {
+        $userIds = array_filter(explode(',', $_POST['userId']));
+    }
+    if (count($userIds)) {
         $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) started a user bulk modify";
 
         $userMapper->log($message, array());
 
         /* Modify each user
          */
-        foreach ($_POST['userId'] as $currentUserId) {
+        foreach ($userIds as $currentUserId) {
             $user = $userMapper->findById($currentUserId);
 
             $userMapper->bulkModifyUpdate(
@@ -42,7 +46,7 @@ if (isset($_POST['updateUsers'])) {
     }
 } else {
     if (isset($_POST['deleteUsers'])) {
-        $userCollection = $userMapper->findByColumn('id', $_POST['userId']);
+        $userCollection = $userMapper->findByColumn('id', $userIds);
         $userMapper->hardDelete($userCollection);
 
         $modified = $userCollection;
