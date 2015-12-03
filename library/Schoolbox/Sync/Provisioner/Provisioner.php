@@ -7,8 +7,11 @@
 
 namespace Schoolbox\Sync\Provisioner;
 
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\SyncInterface;
+use Schoolbox\External\Normalise;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\Sync\Ruleset;
 use Schoolbox\UserMapper;
@@ -21,7 +24,7 @@ use Schoolbox\UserMapper;
 class Provisioner
 {
     /**
-     * A ruleset factory - this is used for building rulesets for each item.
+     * A ruleset factory - this is used for building configuration and rulesets for each item.
      *
      * @var Ruleset\Factory
      */
@@ -32,7 +35,7 @@ class Provisioner
      *
      * @var SyncInterface
      */
-    protected $externalUserMapper;
+    protected $externalUserSource;
 
     /**
      * A user mapper - this retrieves user's initial states, and saves them.
@@ -90,7 +93,44 @@ class Provisioner
             if ($ruleset->getConfig()->getEnabled()) {
                 // run something
                 // do something with each roletype's users
+                foreach ($this->getAllExternalUsers($roleType) as $externalUser) {
+                    // Run this user through the ruleset
+                    try {
+                        $internalUser = $this->userMapper->findByExternalId($externalUser->getId());
+                    } catch (MapperException $e) {
+                        $internalUser = $this->userMapper->createModel();
+                    }
+                    $originalUser = clone $internalUser;
+                    // Build a Grammar\Ruleset out of $ruleset
+                    foreach ($ruleset->getRules() as $rule) {
+                    }
+                    foreach ($ruleset->getCustomRules() as $rule) {
+                        $internalUser = $rule->getHydrator()->hydrate($externalUser, $internalUser);
+                    }
+                    // Compare $originalUser vs. $internalUser
+                }
             }
         }
+    }
+
+    /**
+     * Gets all users out of $this->externalUserSource for this roletype.
+     *
+     * @param string $roleType Role type of users to fetch
+     *
+     * @return Normalise\User\Base[]
+     * @throws InvalidArgumentException if $roleType isn't staff, student or parent
+     */
+    protected function getAllExternalUsers($roleType)
+    {
+        switch ($roleType) {
+            case Role::STUDENT:
+                return $this->externalUserSource->findAllStudents();
+            case Role::STAFF:
+                return $this->externalUserSource->findAllStaff();
+            case Role::PARENT:
+                return $this->externalUserSource->findAllParents();
+        }
+        throw new InvalidArgumentException("$roleType is not one of: student, staff, parent");
     }
 }
