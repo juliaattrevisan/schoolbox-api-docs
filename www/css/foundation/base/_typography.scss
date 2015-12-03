@@ -170,7 +170,6 @@ dl { @extend %sm; }
 // Heading 1
 h1{
 	font-weight: $font-weight-bold; // override
-	color: calc-text-color($body-bg);
 }
 
 //@media #{$large-down} {
