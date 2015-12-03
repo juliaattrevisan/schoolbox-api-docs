@@ -10,7 +10,7 @@
 namespace Schoolbox\Wiki;
 
 
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Category;
 
 class Wiki {
 

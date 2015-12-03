@@ -18,8 +18,6 @@ use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -27,8 +25,7 @@ use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -121,39 +118,36 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 * @param string $roleType
 	 * @param Revision $revision
 	 * @param User $author
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyRevised($roleType, $revision, $author) {
 
-		// Hydrate revision because it might not have been when passed -_-
+		/** @var Revision $revision */
 		$revision     = $this->mapper->findById($revision->getId());
 		$revisionId   = $revision->getId();
-		$revisionName = $revision->getHeading();
 
-		/** @var Wiki $wiki */
-		$wiki = $this->wikiMapper->findById($revision->getWiki()->getId());
+		$wiki         = $revision->getWiki();
+		$wikiId       = $wiki->getId();
 
-		/** @var Category $cat */
-		$cat = $this->catMapper->findById($wiki->getCategory()->getId());
-
-		$revisionSlug = $wiki->getSlug();
+		$cat          = $wiki->getCategory();
+		$categoryId   = $cat->getId();
 
 		$authorExtId  = $author->getExternalId();
 
-		$categoryId   = $cat->getId();
+		$href = "/wiki/revision/$wikiId/$revisionId";
 
         $envelope = new Envelope();
         $bob = new Builder();
 
         $bob->setTitle(':author revised the wiki :title in :folder')
-            ->setHref("/wiki/$categoryId/$revisionSlug")
+            ->setHref($href)
             ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
             ->addTopic("wiki.$revisionId.created")
             ->setSeverity(Logger::INFO)
-            ->setNamespace(self::getNamespace())
+            ->setNamespace($this->getSlug())
             ->setParams([
                 'author' => new UserParam($author),
-                'title'  => new Param($revisionName, "/wiki/$categoryId/$revisionSlug"),
+                'title'  => new Param($revision->getHeading(), $href),
                 'folder' => new CategoryParam($cat)
             ])
             ->setFilter([
@@ -169,7 +163,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 * @param Revision $revision
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentRevised($revision, $author, $diff = array()) {
 		return $this->notifyRevised(Role::STUDENT, $revision, $author);
@@ -179,7 +173,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 * @param Revision $revision
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStaffRevised($revision, $author, $diff = array()) {
 		return $this->notifyRevised(Role::STAFF, $revision, $author);
@@ -189,7 +183,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 * @param Revision $revision
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyParentRevised($revision, $author, $diff = array()) {
 		return $this->notifyRevised(Role::PARENT, $revision, $author);

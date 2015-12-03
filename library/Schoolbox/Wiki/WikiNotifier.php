@@ -10,17 +10,21 @@
 namespace Schoolbox\Wiki;
 
 
+use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -34,6 +38,9 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 
     /** @var UserMapper */
     protected $userMapper;
+
+	/** @var Folder\Mapper */
+	protected $folderMapper;
 
 	/**
 	 * @return string
@@ -51,9 +58,12 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
         if (empty($dependencies['revisionMapper'])) {
             $dependencies['revisionMapper'] = RevisionMapper::getInstance();
         }
-        if (empty($dependencies['userMapper'])) {
-            $dependencies['userMapper'] = UserMapper::getInstance();
-        }
+	    if (empty($dependencies['userMapper'])) {
+		    $dependencies['userMapper'] = UserMapper::getInstance();
+	    }
+	    if (empty($dependencies['folderMapper'])) {
+		    $dependencies['folderMapper'] = Folder\Mapper::getInstance();
+	    }
 
         parent::loadDependencies($dependencies);
     }
@@ -80,6 +90,16 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
         return $this;
     }
 
+
+	/**
+	 * @param Folder\Mapper $folderMapper
+	 * @return static
+	 */
+	protected function setFolderMapper($folderMapper)
+	{
+		$this->folderMapper = $folderMapper;
+		return $this;
+	}
 
     /**
 	 * @param TriggerBundle $bundle
@@ -147,49 +167,44 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param string $roleType
 	 * @param Wiki $wiki
 	 * @param User $author
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	protected function notifyCreated($roleType, $wiki, $author) {
-		$msgr = new Messenger();
+		$envelope = new Envelope();
 
 		$wikiId       = $wiki->getId();
-		$wikiName     = $wiki->getLatestRevision()->getHeading();
 		$wikiSlug     = $wiki->getSlug();
 
-		$authorId     = $author->getId();
-		$authorName   = $author->formatName();
+		$author       = $this->userMapper->findById($author->getId());
 		$authorExtId  = $author->getExternalId();
 
-		$categoryId   = $wiki->getCategory()->getId();
-		$categoryName = $wiki->getCategory()->getName();
+		$folder       = $this->folderMapper->findById($wiki->getCategory()->getId());
+		$folderId     = $folder->getId();
 
+		$bob = new Builder();
 
-		$msg = new Message(
-			':author created the wiki :title in :catname',
-			"/portrait.php?userId=$authorExtId&size={$this->iconSize}",
-			"/wiki/$categoryId/$wikiSlug",
-			array(
-				'subtitle',
-				'abstract'
-			)
-		);
+		$bob->setTitle(':author created a new wiki in :catname')
+			->setParams([
+				'author'  => new UserParam($author),
+				'catname' => new CategoryParam($folder)
+			])
+			->setHref("/wiki/$folderId/$wikiSlug")
+			->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
+			->setSeverity(Logger::INFO)
+			->setTopics([ "wiki.$wikiId.created" ])
+			->setFilter([ 'roletype' => $roleType ])
+			->setNamespace($this->getSlug());
 
-		$msgr->broadcastToCategory($categoryId, $msg, "wiki.$wikiId.created", Logger::INFO, array(
-			'author'  => array($authorName, "/search/user/$authorId"),
-			'title'   => array($wikiName, "/wiki/$categoryId/$wikiSlug"),
-			'catname' => array($categoryName, "/homepage/$categoryId")
-		), array(
-			'roletype' => $roleType
-		));
+		$envelope->broadcastToCategory($folderId, UserAccess::ACCESS_READ, $bob->build());
 
-		return $msgr;
+		return $envelope;
 	}
 
 	/**
 	 * @param Wiki $wiki
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStudentCreated($wiki, $author, $diff = array()) {
 		return $this->notifyCreated(Role::STUDENT, $wiki, $author);
@@ -199,7 +214,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param Wiki $wiki
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyStaffCreated($wiki, $author, $diff = array()) {
 		return $this->notifyCreated(Role::STAFF, $wiki, $author);
@@ -209,7 +224,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @param Wiki $wiki
 	 * @param User $author
 	 * @param array $diff
-	 * @return Messenger
+	 * @return Envelope
 	 */
 	public function notifyParentCreated($wiki, $author, $diff = array()) {
 		return $this->notifyCreated(Role::PARENT, $wiki, $author);

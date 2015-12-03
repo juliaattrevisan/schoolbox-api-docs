@@ -15,6 +15,12 @@ use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 
+/**
+ * Class WikiMapper
+ *
+ * @package Schoolbox\Wiki
+ * @method Wiki createModel()
+ */
 class WikiMapper extends Mapper implements FeedableMapperInterface {
 
 	/**
@@ -70,7 +76,7 @@ class WikiMapper extends Mapper implements FeedableMapperInterface {
 		));
 
 		$this->hasJoin('category', array(
-			'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+			'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
 			'this_key'  => 'categoryID',
 			'other_key' => 'id'
 		));
