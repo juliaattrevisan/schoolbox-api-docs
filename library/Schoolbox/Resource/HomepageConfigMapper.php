@@ -89,27 +89,6 @@ class HomepageConfigMapper extends Mapper
                 'type'     => self::TYPE_STRING,
             )
         );
-        $this->hasMap(
-            array(
-                'column'   => 'left_bg_secondary',
-                'property' => 'leftBgSecondary',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'left_link',
-                'property' => 'leftLink',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'left_hover',
-                'property' => 'leftHover',
-                'type'     => self::TYPE_STRING,
-            )
-        );
         /**
          * Right Colours
          */
@@ -141,27 +120,6 @@ class HomepageConfigMapper extends Mapper
                 'type'     => self::TYPE_STRING,
             )
         );
-        $this->hasMap(
-            array(
-                'column'   => 'right_bg_secondary',
-                'property' => 'rightBgSecondary',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'right_link',
-                'property' => 'rightLink',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'right_hover',
-                'property' => 'rightHover',
-                'type'     => self::TYPE_STRING,
-            )
-        );
         /**
          * Top colours
          */
@@ -190,27 +148,6 @@ class HomepageConfigMapper extends Mapper
             array(
                 'column'   => 'top_bg_primary',
                 'property' => 'topBgPrimary',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'top_bg_secondary',
-                'property' => 'topBgSecondary',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'top_link',
-                'property' => 'topLink',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'top_hover',
-                'property' => 'topHover',
                 'type'     => self::TYPE_STRING,
             )
         );
@@ -263,7 +200,7 @@ class HomepageConfigMapper extends Mapper
         $this->emptyHomepage($homepage);
         $homepageConfig = array();
         $positions      = array('top', 'left', 'right');
-        $opts           = array('head_font', 'head_bg', 'font', 'bg_primary', 'bg_secondary', 'link', 'hover');
+        $opts           = array('head_font', 'head_bg', 'font', 'bg_primary');
         // prep colour resets
         foreach ($positions as $position) {
             foreach ($opts as $opt) {

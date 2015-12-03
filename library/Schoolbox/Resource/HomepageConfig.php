@@ -69,28 +69,6 @@ class HomepageConfig {
 	protected $left_bg_primary;
 
 	/**
-	 * Background colour
-	 *
-	 * @var string
-	 */
-	protected $left_bg_secondary;
-
-	/**
-	 * Link colour
-	 *
-	 * @var string
-	 */
-	protected $left_link;
-
-	/**
-	 * Hover colour
-	 *
-	 * @var string
-	 */
-	protected $left_hover;
-
-
-	/**
 	 * Font colour
 	 *
 	 * @var string
@@ -119,27 +97,6 @@ class HomepageConfig {
 	protected $right_bg_primary;
 
 	/**
-	 * Background colour
-	 *
-	 * @var string
-	 */
-	protected $right_bg_secondary;
-
-	/**
-	 * Link colour
-	 *
-	 * @var string
-	 */
-	protected $right_link;
-
-	/**
-	 * Hover colour
-	 *
-	 * @var string
-	 */
-	protected $right_hover;
-
-	/**
 	 * Font colour
 	 *
 	 * @var string
@@ -166,27 +123,6 @@ class HomepageConfig {
 	 * @var string
 	 */
 	protected $top_bg_primary;
-
-	/**
-	 * Background colour
-	 *
-	 * @var string
-	 */
-	protected $top_bg_secondary;
-
-	/**
-	 * Link colour
-	 *
-	 * @var string
-	 */
-	protected $top_link;
-
-	/**
-	 * Hover colour
-	 *
-	 * @var string
-	 */
-	protected $top_hover;
 
     /**
      * @param \Schoolbox\Resource\Category $category
@@ -242,23 +178,6 @@ class HomepageConfig {
         return $this->left_bg_primary;
     }
 
-    /**
-     * @param string $left_bg_secondary
-     * @return $this
-     */
-    public function setLeftBgSecondary($left_bg_secondary)
-    {
-        $this->left_bg_secondary = $left_bg_secondary;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLeftBgSecondary()
-    {
-        return $this->left_bg_secondary;
-    }
 
     /**
      * @param string $left_font
@@ -315,42 +234,6 @@ class HomepageConfig {
     }
 
     /**
-     * @param  $left_hover
-     * @return $this
-     */
-    public function setLeftHover($left_hover)
-    {
-        $this->left_hover = $left_hover;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLeftHover()
-    {
-        return $this->left_hover;
-    }
-
-    /**
-     * @param  $left_link
-     * @return $this
-     */
-    public function setLeftLink($left_link)
-    {
-        $this->left_link = $left_link;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLeftLink()
-    {
-        return $this->left_link;
-    }
-
-    /**
      * @param float $rightColumnWidth
      * @return $this
      */
@@ -384,24 +267,6 @@ class HomepageConfig {
     public function getRightBgPrimary()
     {
         return $this->right_bg_primary;
-    }
-
-    /**
-     * @param  $right_bg_secondary
-     * @return $this
-     */
-    public function setRightBgSecondary($right_bg_secondary)
-    {
-        $this->right_bg_secondary = $right_bg_secondary;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRightBgSecondary()
-    {
-        return $this->right_bg_secondary;
     }
 
     /**
@@ -459,42 +324,6 @@ class HomepageConfig {
     }
 
     /**
-     * @param  $right_hover
-     * @return $this
-     */
-    public function setRightHover($right_hover)
-    {
-        $this->right_hover = $right_hover;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRightHover()
-    {
-        return $this->right_hover;
-    }
-
-    /**
-     * @param  $right_link
-     * @return $this
-     */
-    public function setRightLink($right_link)
-    {
-        $this->right_link = $right_link;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRightLink()
-    {
-        return $this->right_link;
-    }
-
-    /**
      * @param HomepageTemplate $template
      * @return $this
      */
@@ -528,24 +357,6 @@ class HomepageConfig {
     public function getTopBgPrimary()
     {
         return $this->top_bg_primary;
-    }
-
-    /**
-     * @param  $top_bg_secondary
-     * @return $this
-     */
-    public function setTopBgSecondary($top_bg_secondary)
-    {
-        $this->top_bg_secondary = $top_bg_secondary;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTopBgSecondary()
-    {
-        return $this->top_bg_secondary;
     }
 
     /**
@@ -600,42 +411,6 @@ class HomepageConfig {
     public function getTopHeadFont()
     {
         return $this->top_head_font;
-    }
-
-    /**
-     * @param string $top_hover
-     * @return $this
-     */
-    public function setTopHover($top_hover)
-    {
-        $this->top_hover = $top_hover;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTopHover()
-    {
-        return $this->top_hover;
-    }
-
-    /**
-     * @param  $top_link
-     * @return $this
-     */
-    public function setTopLink($top_link)
-    {
-        $this->top_link = $top_link;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTopLink()
-    {
-        return $this->top_link;
     }
 
 

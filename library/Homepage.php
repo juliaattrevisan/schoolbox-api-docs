@@ -151,9 +151,9 @@ class Homepage
 
     function getColorList()
     {
-        $query = "SELECT left_head_font, left_head_bg, left_font, left_bg_primary, left_bg_secondary, left_link, left_hover,
-						right_head_font, right_head_bg, right_font, right_bg_primary, right_bg_secondary, right_link, right_hover,
-						top_head_font, top_head_bg, top_font, top_bg_primary, top_bg_secondary, top_link, top_hover
+        $query = "SELECT left_head_font, left_head_bg, left_font, left_bg_primary,
+						right_head_font, right_head_bg, right_font, right_bg_primary,
+						top_head_font, top_head_bg, top_font, top_bg_primary
 						FROM homepage_config WHERE cid = '{$this->cid}'";
         $colourList = $this->db->getRow($query);
 
@@ -317,10 +317,7 @@ class Homepage
                 $position . '_head_font' => Cfg::get('homepage_colour_head_font'),
                 $position . '_head_bg' => Cfg::get('homepage_colour_head_bg'),
                 $position . '_font' => Cfg::get('homepage_colour_font'),
-                $position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary'),
-                $position . '_bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
-                $position . '_link' => Cfg::get('homepage_colour_link'),
-                $position . '_hover' => Cfg::get('homepage_colour_hover')
+                $position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary')
             ));
         }
 
@@ -636,9 +633,9 @@ class Homepage
 
         $query = "
             SELECT `cid`, `template`, `left_column_width`, `right_column_width`, `left_head_font`, `left_head_bg`,
-                `left_font`, `left_bg_primary`, `left_bg_secondary`, `left_link`, `left_hover`, `right_head_font`,
-                `right_head_bg`, `right_font`, `right_bg_primary`, `right_bg_secondary`, `right_link`, `right_hover`,
-                `top_head_font`, `top_head_bg`, `top_font`, `top_bg_primary`, `top_bg_secondary`, `top_link`, `top_hover`
+                `left_font`, `left_bg_primary`, `right_head_font`,
+                `right_head_bg`, `right_font`, `right_bg_primary`,
+                `top_head_font`, `top_head_bg`, `top_font`, `top_bg_primary`
             FROM homepage_config
             WHERE `cid` = $categoryId
         ";
