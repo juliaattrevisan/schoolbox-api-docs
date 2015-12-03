@@ -1,7 +1,10 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.syncDates.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
 <script type="text/javascript">
     $(function() {
+
+        $('[data-datepicker]').datepicker({  dateFormat: 'dd-mm-yy' });
+
 
         /* Calendar controls
          */
@@ -55,7 +58,7 @@
                 <fieldset>
                     <legend>Report Range</legend>
                     <div class="column small-12 medium-6">
-                        <input id="start_date" data-datepicker placeholder="Start Date" value="{SELECTED_FORMATTED_START}" />
+                        <input id="start_date" data-datepicker placeholder="Start Date" name='start_date' value="{SELECTED_FORMATTED_START}" />
                     </div>
                     <div class="column small-12 medium-6">
                         <input id="finish_date" data-datepicker placeholder="End Date" name='finish_date'  value="{SELECTED_FORMATTED_FINISH}" />
