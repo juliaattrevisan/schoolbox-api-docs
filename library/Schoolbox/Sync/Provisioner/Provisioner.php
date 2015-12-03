@@ -104,21 +104,24 @@ class Provisioner
         foreach ($this->runOrder as $roleType) {
             $ruleset = $this->rulesetFactory->produceRuleset($roleType);
             if ($ruleset->getConfig()->getEnabled()) {
-                // run something
-                // do something with each roletype's users
+
+                // TODO Try to build Grammar\Ruleset out of $ruleset instead of thru separate factory
+                $grammar = $this->grammarFactory->build($roleType);
                 foreach ($this->getAllExternalUsers($roleType) as $externalUser) {
-                    // Run this user through the ruleset
+                    // Get the currently stored user
                     try {
                         $internalUser = $this->userMapper->findByExternalId($externalUser->getId());
                     } catch (MapperException $e) {
                         $internalUser = $this->userMapper->createModel();
                     }
                     $originalUser = clone $internalUser;
-                    // Consider building a Grammar\Ruleset out of $ruleset
-                    $this->grammarFactory->build($roleType)->hydrate($externalUser, $internalUser);
+
+                    // Run this user through the hydrators
+                    $grammar->hydrate($externalUser, $internalUser);
                     foreach ($ruleset->getCustomRules() as $rule) {
                         $internalUser = $rule->getHydrator()->hydrate($externalUser, $internalUser);
                     }
+
                     // Compare $originalUser vs. $internalUser
                 }
             }
