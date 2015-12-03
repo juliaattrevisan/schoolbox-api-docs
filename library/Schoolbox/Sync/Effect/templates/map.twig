@@ -9,7 +9,7 @@
 </div>
 
 <div class="small-12 columns">
-    {% for mapFrom, mapTo in currentEffect.arguments[1] %}
+    {% for mapFrom, preselected in currentEffect.arguments[1] %}
         {% include '@syncEffect/map-row.twig' %}
     {% endfor %}
 

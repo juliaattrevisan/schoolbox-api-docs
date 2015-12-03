@@ -2,7 +2,7 @@
     {% for current in allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
         {% set selected = '' %}
 
-        {% if mapTo == current.value %}
+        {% if preselected == current.value %}
             {% set selected = 'selected="selected"' %}
         {% endif %}
 
