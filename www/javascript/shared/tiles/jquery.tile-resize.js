@@ -3,9 +3,11 @@
  * Resizes the title within grid tiles based on the width of the tile.
  *
  * Settings:
- * * minSize, maxSize: the font size bounds for the title (measured in em)
+ * * minSize, maxSize: the font size bounds for the title
  *                     Defaults to a range of 1-6 em
- * * getSize:          a callback for retrieving the font size (in em)
+ * * unit:             the unit minSize, maxSize and getSize are measured in.
+ *                     Defaults to em.
+ * * getSize:          a callback for retrieving the font size
  *                     Defaults to width of the tile in px, / 120
  * * titleSelector:    a selector for getting the title from the tile.
  *                     Defaults to ".title"
@@ -15,6 +17,7 @@
         var defaults = {
             minSize: 1,
             maxSize: 6,
+            unit:    'em',
             getSize: function(tile, settings) {
                 return tile.width() / 120;
             },
@@ -32,8 +35,8 @@
                 )
             );
             tileTitle.css({
-                fontSize: String(width)+'em',
-                padding: String(width/4)+'em'
+                fontSize: String(width)+settings.unit,
+                padding: String(width/4)+settings.unit
             });
 
             // If the title is taller than the tile:
