@@ -186,7 +186,9 @@ if ($_POST['name']) {
             error(12);
         }
     }
-    $categoryMapper->delete($categoryMapper->findById($_GET['delete']));
+
+    // This deletes all contents of this folder and all of its children.
+    $categoryMapper->recursiveDelete($category);
 
     $_SESSION['resourcesID'] = $category->getParent()->getId();
 } elseif (is_numeric($_GET['deleteAll'])) {
