@@ -30,11 +30,23 @@ $syncFactory = new \Schoolbox\External\Connector\SyncFactory();
 // User mapper
 $userMapper = Schoolbox\UserMapper::getInstance();
 
+// Grammar factory
+$grammarFactory = new Schoolbox\Sync\Grammar\Factory(
+    $userMapper,
+    Schoolbox\Sync\Rule\Mapper::getInstance()
+);
+
 // Inject:
 // * logger
 // * config/ruleset
 // * UserMapper
 // * SyncFactory
 // TODO set this up in DI so that dry run can use it with the exact same configuration
-$ups = new Schoolbox\Sync\Provisioner\Provisioner($ruleFactory, $syncFactory->build(), $userMapper, $logger);
+$ups = new Schoolbox\Sync\Provisioner\Provisioner(
+    $ruleFactory,
+    $grammarFactory,
+    $syncFactory->build(),
+    $userMapper,
+    $logger
+);
 $ups->run(isset($options['perform-update']));

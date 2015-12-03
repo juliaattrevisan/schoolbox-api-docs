@@ -13,6 +13,7 @@ use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\External\Normalise;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
+use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Ruleset;
 use Schoolbox\UserMapper;
 
@@ -29,6 +30,15 @@ class Provisioner
      * @var Ruleset\Factory
      */
     protected $rulesetFactory;
+
+    /**
+     * A grammar factory - this is used for building the actual hydratable ruleset object.
+     *
+     * TODO: we shouldn't need both this and $rulesetFactory
+     *
+     * @var Grammar\Factory
+     */
+    protected $grammarFactory;
 
     /**
      * A connection to an external database - retrieves users from the external DB.
@@ -65,17 +75,20 @@ class Provisioner
      * Constructor
      *
      * @param Ruleset\Factory $rulesetFactory
+     * @param Grammar\Factory $grammarFactory
      * @param SyncInterface   $externalUserSource
      * @param UserMapper      $userMapper
      * @param LoggerInterface $logger
      */
     public function __construct(
         Ruleset\Factory $rulesetFactory,
+        Grammar\Factory $grammarFactory,
         SyncInterface $externalUserSource,
         UserMapper $userMapper,
         LoggerInterface $logger
     ) {
         $this->rulesetFactory     = $rulesetFactory;
+        $this->grammarFactory     = $grammarFactory;
         $this->externalUserSource = $externalUserSource;
         $this->userMapper         = $userMapper;
         $this->logger             = $logger;
