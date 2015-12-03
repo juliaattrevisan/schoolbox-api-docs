@@ -105,7 +105,18 @@ if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
         copy($tmpfile, $outfile);
         // Copy the sourcemap
         if (is_readable($tmpfile.'.map')) {
-            copy($tmpfile.'.map', $outfile.'.map');
+            $tmpMap = $tmpfile.'.map';
+            $outMap = $outfile.'.map';
+            copy($tmpMap, $outMap);
+            // Look for the sourcemap reference in $outfile and fix it manually
+            file_put_contents(
+                $outfile,
+                str_replace(
+                    basename($tmpMap),
+                    basename($outMap),
+                    file_get_contents($outfile)
+                )
+            );
         }
 
         $logger->info("Splitting for IE < 10 using blessc...");
