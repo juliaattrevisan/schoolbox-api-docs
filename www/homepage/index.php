@@ -89,10 +89,7 @@ $defaultColour = array(
     'head_font' => Cfg::get('homepage_colour_head_font'),
     'head_bg' => Cfg::get('homepage_colour_head_bg'),
     'font' => Cfg::get('homepage_colour_font'),
-    'bg_primary' => Cfg::get('homepage_colour_bg_primary'),
-    'bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
-    'link' => Cfg::get('homepage_colour_link'),
-    'hover' => Cfg::get('homepage_colour_hover')
+    'bg_primary' => Cfg::get('homepage_colour_bg_primary')
 );
 
 // Load this homepage's color list, falling back to defaults as required
@@ -354,10 +351,7 @@ $defaultColour = array(
     'head_font' => Cfg::get('homepage_colour_head_font'),
     'head_bg' => Cfg::get('homepage_colour_head_bg'),
     'font' => Cfg::get('homepage_colour_font'),
-    'bg_primary' => Cfg::get('homepage_colour_bg_primary'),
-    'bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
-    'link' => Cfg::get('homepage_colour_link'),
-    'hover' => Cfg::get('homepage_colour_hover')
+    'bg_primary' => Cfg::get('homepage_colour_bg_primary')
 );
 
 $columns = array('top', 'left', 'right');
