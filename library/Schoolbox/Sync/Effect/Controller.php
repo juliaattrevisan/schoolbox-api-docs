@@ -279,6 +279,12 @@ class Controller extends Base {
                     ]
                 ]
             ],
+
+            /* Special case for async injecting pre-forged twig templates -_-
+             * Normally this is derived in twig land but in this case, a fully
+             * formed html file is rammed in and thus need to inject this manually
+             */
+            'dynamicInputName' => "rule[{$queryData['ruleId']}][effect][{$queryData['effectId']}][to][]",
         ];
 
         $this->getResponse()->content->set([

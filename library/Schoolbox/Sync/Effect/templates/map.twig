@@ -2,8 +2,7 @@
  # This is how we can share templates between Literal and Mapped types
  # ...I think.
  #}
-{% set dynamicInputName = '' %}
-
+{% set dynamicInputName = 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][to][]' %}
 
 <div class="small-12 medium-6 large-4 columns">
     <input {{ dynamicDisabled }} type="text" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][arguments][0]" value="{{ currentEffect.arguments[0] }}">
