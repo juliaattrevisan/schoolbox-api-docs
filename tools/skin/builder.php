@@ -90,9 +90,9 @@ if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
     $logger->info('Skin has changed, or build was forced - rebuilding');
     // Compile the new sass file.
     $infile  = SITE_root . '/www/css/foundation/chrome-foundation.scss';
-    $outfile = SITE_root . '/www/css/foundation/'.$siteLocation.'/chrome.css';
+    $outfile = SITE_root . '/www/css/'.$siteLocation.'/chrome-foundation.css';
     $outdir  = dirname($outfile);
-    $ie9file = SITE_root . '/www/css/foundation/'.$siteLocation.'/chrome-ie9.css';
+    $ie9file = SITE_root . '/www/css/'.$siteLocation.'/chrome-foundation-ie9.css';
     $tmpfile = tempnam(sys_get_temp_dir(), 'css');
     $cmd     = sprintf('sass %s %s', escapeshellarg($infile), escapeshellarg($tmpfile));
     $logger->info("Building SASS...");
