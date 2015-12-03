@@ -33,7 +33,7 @@
         // Constrain font size based on width of tile
         $(function() {
             var resizeTitles = function() {
-                $('#tileList-{{ layout.id }}').find('.tile').tileResize({minSize: 1, maxSize: 1.5, unit: 'rem'});
+                $('#tileList-{{ layout.id }}').find('.tile').tileResize({minSize: 0.725, maxSize: 1.725, unit: 'rem'});
             };
             resizeTitles();
             $(window).resize(resizeTitles);
