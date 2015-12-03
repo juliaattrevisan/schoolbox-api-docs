@@ -178,22 +178,10 @@ class Factory
                  */
                 if (!$currentEffect->getEffectType()->isSkip()) {
                     $fragment = $fragmentFactory->produce($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+                    $subfragment = $fragmentFactory->produceType($currentEffect->getUserProperty());
 
                     $allEffectStructures['fragments'][$currentEffect->getId()]['fragment'] = $fragment;
-
-                    /* Produce subfragments for Mapped Key/Value Pairs
-                     * This particular type always spawns subfragments
-                     */
-                    if ($currentEffect->getEffectType()->isMap()) {
-                        $subfragment = $fragmentFactory->produceSubtype($currentEffect->getUserProperty());
-                    }
-                    else {
-                        $subfragment = $fragmentFactory->produceType($currentEffect->getUserProperty());
-                    }
-
-                    $allEffectStructures['fragments'][$currentEffect->getId()]['subfragments'] = [
-                        'fragment' => $subfragment,
-                    ];
+                    $allEffectStructures['fragments'][$currentEffect->getId()]['subfragments']['fragment'] = $subfragment;
                 }
             }
         }

@@ -167,27 +167,6 @@ class Factory {
     }
 
     /**
-     * Produce a subtype
-     *
-     * Used when putting different kinds of input sub-types
-     * into Mapped Key/Value Pairs Effect Type
-     *
-     * @param $userField
-     * @return Fragment
-     */
-    public function produceSubtype($userField) {
-        if ($this->isBoolean($userField)) {
-            return new Fragment('@syncEffect/mapped/boolean.twig');
-        }
-        else if ($this->isLookup($userField)) {
-            return new Fragment('@syncEffect/mapped/lookup.twig', $this->getLookup()->findData($userField));
-        }
-        else if ($this->isString($userField)) {
-            return new Fragment('@syncEffect/mapped/string.twig');
-        }
-    }
-
-    /**
      * Determine whether the current field is a Boolean
      *
      * @param $field

@@ -184,15 +184,7 @@ class Controller extends Base {
 
         $fragmentFactory = new FragmentFactory();
         $fragment = $fragmentFactory->produce($queryData['mappingType'], $queryData['userField']);
-
-        $effectTypeMapper = new EffectTypeMapper();
-
-        if ($effectTypeMapper->isMap($queryData['mappingType'])) {
-            $subfragment = $fragmentFactory->produceSubtype($queryData['userField']);
-        }
-        else {
-            $subfragment = $fragmentFactory->produceType($queryData['userField']);
-        }
+        $subfragment = $fragmentFactory->produceType($queryData['userField']);
 
         /* Contains Lookup data
          */
@@ -259,7 +251,7 @@ class Controller extends Base {
         ];
 
         $fragmentFactory = new FragmentFactory();
-        $subfragment = $fragmentFactory->produceSubtype($queryData['userProperty']);
+        $subfragment = $fragmentFactory->produceType($queryData['userProperty']);
 
         $data = [
             'currentEffect' => $effect,
