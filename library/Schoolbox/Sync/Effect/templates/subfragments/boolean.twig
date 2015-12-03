@@ -1,4 +1,4 @@
-<select {{ dynamicDisabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][arguments]">
+<select {{ dynamicDisabled }} name="{{ dynamicInputName }}">
     <option value="1" {% if currentEffect.arguments[0] == true %}selected="selected"{% endif %}>True</option>
     <option value="0" {% if currentEffect.arguments[0] == false %}selected="selected"{% endif %}>False</option>
 </select>
