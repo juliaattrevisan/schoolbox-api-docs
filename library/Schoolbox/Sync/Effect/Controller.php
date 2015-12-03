@@ -191,36 +191,37 @@ class Controller extends Base {
             $subfragment = [];
         }
 
-        $this->getResponse()->content->set([
-            'template' => $fragment->getFilename(),
-            'data' => [
-
-                /* Contains Lookup data
-                 */
-                'allEffectStructures' => [
-                    'fragments' => [
-                        $queryData['effectId'] => [
-                            'fragment' => $fragment,
-                            'subfragments' => [
-                                'fragment' => $subfragment,
-                                'mapFrom' => '',
-                                'mapTo' => '',
-                            ]
+        /* Contains Lookup data
+         */
+        $data = [
+            'allEffectStructures' => [
+                'fragments' => [
+                    $queryData['effectId'] => [
+                        'fragment' => $fragment,
+                        'subfragments' => [
+                            'fragment' => $subfragment,
+                            'mapFrom' => '',
+                            'mapTo' => '',
                         ]
-                    ],
-                ],
-
-                /* If this Effect hasn't been saved it, it won't have a ruleId
-                 * nor an effectId, so recycle it from frontend, as fragments
-                 * expect both values
-                 */
-                'currentEffect' => [
-                    'id' => $queryData['effectId'],
-                    'rule' => [
-                        'id' => $queryData['ruleId'],
-                    ],
+                    ]
                 ],
             ],
+
+            /* If this Effect hasn't been saved it, it won't have a ruleId
+             * nor an effectId, so recycle it from frontend, as fragments
+             * expect both values
+             */
+            'currentEffect' => [
+                'id' => $queryData['effectId'],
+                'rule' => [
+                    'id' => $queryData['ruleId'],
+                ],
+            ]
+        ];
+
+        $this->getResponse()->content->set([
+            'template' => $fragment->getFilename(),
+            'data' => $data,
             'format' => 'nochrome'
         ]);
     }
