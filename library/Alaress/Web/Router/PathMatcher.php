@@ -101,12 +101,15 @@ class PathMatcher {
             $tags = array($tags);
         }
         $usesTags = count($tags) > 0;
+        // Anything after the : in a path is ignored.
+        // (example: "update:post" matches all rules "update" does)
+        $mainPath = preg_replace('/:.*$/', '', $path);
         foreach ($this->ruleList as $rule) {
             // Don't run this rule if we're only running items with a tag.
             if ($usesTags && count(array_intersect($tags, $rule['tags'])) === 0) {
                 continue;
             }
-            if (preg_match($rule['pathMatch'], $path)) {
+            if (preg_match($rule['pathMatch'], $mainPath)) {
                 $action = $rule['action'];
 
                 // Did the callback return anything? update $params if it did

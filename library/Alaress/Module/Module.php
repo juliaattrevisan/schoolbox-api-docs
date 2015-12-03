@@ -170,6 +170,9 @@ class Module {
     /**
      * Helper for calling $router->add() for this component's basename.
      *
+     * Anything after the ':' character in $alias is ignored when matching
+     * the requested path against preloads or permissions.
+     *
      * @param Router $router   The router to add the route to
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
@@ -186,6 +189,9 @@ class Module {
 
     /**
      * Helper for calling $router->addGet() for this component's basename.
+     *
+     * Anything after the ':' character in $alias is ignored when matching
+     * the requested path against preloads or permissions.
      *
      * @param Router $router   The router to add the route to
      * @param string $alias    The alias for this route.
@@ -204,6 +210,9 @@ class Module {
     /**
      * Helper for calling $router->addGet() for this component's basename.
      *
+     * Anything after the ':' character in $alias is ignored when matching
+     * the requested path against preloads or permissions.
+     *
      * @param Router $router   The router to add the route to
      * @param string $alias    The alias for this route.
      *                         Its actual alias will be "$this->basename.$alias"
@@ -220,6 +229,10 @@ class Module {
 
     /**
      * Helper for attaching a set of REST routes for this module.
+     *
+     * The "update:post", "replace:post" and "delete:post" routes this method
+     * match against preloads or permissions for "update", "replace" and "delete"
+     * respectively.
      *
      * @param Router $router   The router to add the route to
      * @param string $basePath The base path for this route
