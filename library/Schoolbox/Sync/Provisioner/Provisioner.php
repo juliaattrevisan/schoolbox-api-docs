@@ -114,9 +114,8 @@ class Provisioner
                         $internalUser = $this->userMapper->createModel();
                     }
                     $originalUser = clone $internalUser;
-                    // Build a Grammar\Ruleset out of $ruleset
-                    foreach ($ruleset->getRules() as $rule) {
-                    }
+                    // Consider building a Grammar\Ruleset out of $ruleset
+                    $this->grammarFactory->build($roleType)->hydrate($externalUser, $internalUser);
                     foreach ($ruleset->getCustomRules() as $rule) {
                         $internalUser = $rule->getHydrator()->hydrate($externalUser, $internalUser);
                     }
