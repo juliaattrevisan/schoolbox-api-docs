@@ -43,10 +43,6 @@ if (Config::get('skin_builder')) {
         'body-bg'         => Config::get('skin_colour_body_bg'),
         'button-input-scale' => Config::get('skin_button_input_scale'),
         'login-form-background-color' => Config::get('skin_colour_login_background'),
-
-//        'primary-color'   => Config::get('skin_primary_colour'),
-//        'secondary-color' => Config::get('skin_secondary_colour'),
-//        'tertiary-color'  => Config::get('skin_tertiary_colour'),
     ];
 } else {
     $logger->info('Skin builder is off - building using default color settings');
@@ -89,18 +85,23 @@ if($fp) {
     $logger->info("Skin file created (hash: $newSha)");
 }
 
+$siteLocation = Config::get('site_location');
 if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
     $logger->info('Skin has changed, or build was forced - rebuilding');
     // Compile the new sass file.
     $infile  = SITE_root . '/www/css/foundation/chrome-foundation.scss';
-    $outfile = SITE_root . '/www/css/foundation/chrome.css';
-    $ie9file = SITE_root . '/www/css/foundation/chrome-ie9.css';
+    $outfile = SITE_root . '/www/css/foundation/'.$siteLocation.'/chrome.css';
+    $outdir  = dirname($outfile);
+    $ie9file = SITE_root . '/www/css/foundation/'.$siteLocation.'/chrome-ie9.css';
     $tmpfile = tempnam(sys_get_temp_dir(), 'css');
     $cmd     = sprintf('sass %s %s', escapeshellarg($infile), escapeshellarg($tmpfile));
     $logger->info("Building SASS...");
     exec($cmd, $output, $outputCode);
     if ($outputCode === 0) {
         $logger->info("SASS built - copying to CSS location");
+        if (!is_dir($outdir)) {
+            mkdir($outdir);
+        }
         copy($tmpfile, $outfile);
         // Copy the sourcemap
         if (is_readable($tmpfile.'.map')) {
