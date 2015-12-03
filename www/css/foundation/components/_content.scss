@@ -1326,7 +1326,8 @@ ul.flex-list {
     }
 
     &.info {
-        color: $black;
+        // No need to override color if .info style excludes .card
+        //color: $black;
         ~ article, ~ .list-item-content {
             margin-left: (rem-calc($base-font-size));
         }

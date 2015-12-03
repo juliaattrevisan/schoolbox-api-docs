@@ -260,7 +260,8 @@ blockquote{
 	color: $warning-color;
 }
 
-.info{
+// .info.card is not the same thing as .info
+.info:not(.card){
 	color: $info-color;
 }
 
