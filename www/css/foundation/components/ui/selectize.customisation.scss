@@ -71,6 +71,7 @@ $selectize-padding-item-y: 0;
 
 .selectize-input {
     line-height: 2rem;
+    margin: 0 0 $form-spacing 0;
     input {
         height: auto;
 
