@@ -87,13 +87,16 @@ class Controller extends Base {
          */
         $fragmentFactory = new FragmentFactory();
 
-        $fragment = $fragmentFactory->produce($default['effectType'], $default['userProperty']);
+        /* All fragments and subfragments use empty by default, thus
+         * forcing the user to choose a userfield/mappingType combo
+         */
+        $fragment = $fragmentFactory->produceEmpty();
 
         $data = [
             'allEffectStructures' => [
                 'fragments' => [
                     $newEffect->getId() => [
-                        'fragment' => $fragment
+                        'fragment' => $fragment,
                     ]
                 ],
                 'allUserField' => $fragmentFactory->getAllFields(),
@@ -188,7 +191,7 @@ class Controller extends Base {
             $subfragment = $fragmentFactory->produceSubtype($queryData['userField']);
         }
         else {
-            $subfragment = [];
+            $subfragment = $fragmentFactory->produceType($queryData['userField']);
         }
 
         /* Contains Lookup data

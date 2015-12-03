@@ -186,11 +186,14 @@ class Factory
                      */
                     if ($currentEffect->getEffectType()->isMap()) {
                         $subfragment = $fragmentFactory->produceSubtype($currentEffect->getUserProperty());
-
-                        $allEffectStructures['fragments'][$currentEffect->getId()]['subfragments'] = [
-                            'fragment' => $subfragment,
-                        ];
                     }
+                    else {
+                        $subfragment = $fragmentFactory->produceType($currentEffect->getUserProperty());
+                    }
+
+                    $allEffectStructures['fragments'][$currentEffect->getId()]['subfragments'] = [
+                        'fragment' => $subfragment,
+                    ];
                 }
             }
         }
