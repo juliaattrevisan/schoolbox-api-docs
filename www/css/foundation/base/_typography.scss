@@ -170,7 +170,6 @@ dl { @extend %sm; }
 // Heading 1
 h1{
 	font-weight: $font-weight-bold; // override
-	color: calc-text-color($body-bg);
 }
 
 //@media #{$large-down} {
@@ -261,7 +260,8 @@ blockquote{
 	color: $warning-color;
 }
 
-.info{
+// .info.card is not the same thing as .info
+.info:not(.card){
 	color: $info-color;
 }
 
