@@ -53,10 +53,7 @@ class EportfolioTemplate extends  DeprecatedModel {
 					$position . '_head_font' => Cfg::get('homepage_colour_head_font'),
 					$position . '_head_bg' => Cfg::get('homepage_colour_head_bg'),
 					$position . '_font' => Cfg::get('homepage_colour_font'),
-					$position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary'),
-					$position . '_bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
-					$position . '_link' => Cfg::get('homepage_colour_link'),
-					$position . '_hover' => Cfg::get('homepage_colour_hover')
+					$position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary')
 				));
 			}
 

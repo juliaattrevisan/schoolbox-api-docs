@@ -76,27 +76,6 @@ class Page implements ISoftDeletable{
 	private $left_bg_primary;
 
 	/**
-	 * Background colour
-	 *
-	 * @var
-	 */
-	private $left_bg_secondary;
-
-	/**
-	 * Link colour
-	 *
-	 * @var
-	 */
-	private $left_link;
-
-	/**
-	 * Hover colour
-	 *
-	 * @var
-	 */
-	private $left_hover;
-
-	/**
 	 * Width of the right column as a percentage
 	 *
 	 * @var
@@ -132,27 +111,6 @@ class Page implements ISoftDeletable{
 	private $right_bg_primary;
 
 	/**
-	 * Background colour
-	 *
-	 * @var
-	 */
-	private $right_bg_secondary;
-
-	/**
-	 * Link colour
-	 *
-	 * @var
-	 */
-	private $right_link;
-
-	/**
-	 * Hover colour
-	 *
-	 * @var
-	 */
-	private $right_hover;
-
-	/**
 	 * Font colour
 	 *
 	 * @var
@@ -180,26 +138,6 @@ class Page implements ISoftDeletable{
 	 */
 	private $top_bg_primary;
 
-	/**
-	 * Background colour
-	 *
-	 * @var
-	 */
-	private $top_bg_secondary;
-
-	/**
-	 * Link colour
-	 *
-	 * @var
-	 */
-	private $top_link;
-
-	/**
-	 * Hover colour
-	 *
-	 * @var
-	 */
-	private $top_hover;
 
 	/**
 	 * Created at
@@ -255,24 +193,6 @@ class Page implements ISoftDeletable{
 	 */
 	public function getLeftBgPrimary() {
 		return $this->left_bg_primary;
-	}
-
-	/**
-	 * Set colour
-	 *
-	 * @param $left_bg_secondary
-	 */
-	public function setLeftBgSecondary($left_bg_secondary) {
-		$this->left_bg_secondary = $left_bg_secondary;
-	}
-
-	/**
-	 * Get colour
-	 *
-	 * @return mixed
-	 */
-	public function getLeftBgSecondary() {
-		return $this->left_bg_secondary;
 	}
 
 	/**
@@ -348,42 +268,6 @@ class Page implements ISoftDeletable{
 	}
 
 	/**
-	 * Set colour
-	 *
-	 * @param $left_hover
-	 */
-	public function setLeftHover($left_hover) {
-		$this->left_hover = $left_hover;
-	}
-
-	/**
-	 * Get colour
-	 *
-	 * @return mixed
-	 */
-	public function getLeftHover() {
-		return $this->left_hover;
-	}
-
-	/**
-	 * Set colour
-	 *
-	 * @param $left_link
-	 */
-	public function setLeftLink($left_link) {
-		$this->left_link = $left_link;
-	}
-
-	/**
-	 * Get colour
-	 *
-	 * @return mixed
-	 */
-	public function getLeftLink() {
-		return $this->left_link;
-	}
-
-	/**
 	 * Set page id
 	 *
 	 * @param $page_id
@@ -435,24 +319,6 @@ class Page implements ISoftDeletable{
 	 */
 	public function getRightBgPrimary() {
 		return $this->right_bg_primary;
-	}
-
-	/**
-	 * Set colour
-	 *
-	 * @param $right_bg_secondary
-	 */
-	public function setRightBgSecondary($right_bg_secondary) {
-		$this->right_bg_secondary = $right_bg_secondary;
-	}
-
-	/**
-	 * Get colour
-	 *
-	 * @return mixed
-	 */
-	public function getRightBgSecondary() {
-		return $this->right_bg_secondary;
 	}
 
 	/**
@@ -530,42 +396,6 @@ class Page implements ISoftDeletable{
 	/**
 	 * Set colour
 	 *
-	 * @param $right_hover
-	 */
-	public function setRightHover($right_hover) {
-		$this->right_hover = $right_hover;
-	}
-
-	/**
-	 * Get colour
-	 *
-	 * @return mixed
-	 */
-	public function getRightHover() {
-		return $this->right_hover;
-	}
-
-	/**
-	 * Set colour
-	 *
-	 * @param $right_link
-	 */
-	public function setRightLink($right_link) {
-		$this->right_link = $right_link;
-	}
-
-	/**
-	 * Get colour
-	 *
-	 * @return mixed
-	 */
-	public function getRightLink() {
-		return $this->right_link;
-	}
-
-	/**
-	 * Set colour
-	 *
 	 * @param $template
 	 */
 	public function setTemplate($template) {
@@ -597,24 +427,6 @@ class Page implements ISoftDeletable{
 	 */
 	public function getTopBgPrimary() {
 		return $this->top_bg_primary;
-	}
-
-	/**
-	 * Set colour
-	 *
-	 * @param $top_bg_secondary
-	 */
-	public function setTopBgSecondary($top_bg_secondary) {
-		$this->top_bg_secondary = $top_bg_secondary;
-	}
-
-	/**
-	 * Get colour
-	 *
-	 * @return mixed
-	 */
-	public function getTopBgSecondary() {
-		return $this->top_bg_secondary;
 	}
 
 	/**
@@ -669,42 +481,6 @@ class Page implements ISoftDeletable{
 	 */
 	public function getTopHeadFont() {
 		return $this->top_head_font;
-	}
-
-	/**
-	 * Set colour
-	 *
-	 * @param $top_hover
-	 */
-	public function setTopHover($top_hover) {
-		$this->top_hover = $top_hover;
-	}
-
-	/**
-	 * Get colour
-	 *
-	 * @return mixed
-	 */
-	public function getTopHover() {
-		return $this->top_hover;
-	}
-
-	/**
-	 * Set colour
-	 *
-	 * @param $top_link
-	 */
-	public function setTopLink($top_link) {
-		$this->top_link = $top_link;
-	}
-
-	/**
-	 * Get colour
-	 *
-	 * @return mixed
-	 */
-	public function getTopLink() {
-		return $this->top_link;
 	}
 
 	/**

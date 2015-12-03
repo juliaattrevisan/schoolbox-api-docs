@@ -79,24 +79,6 @@ class PageMapper extends Schoolbox\Mapper {
 		));
 
 		$this->hasMap(array(
-			'column'     => 'left_bg_secondary',
-			'property'   => 'leftBgSecondary',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'left_link',
-			'property'   => 'leftLink',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'left_hover',
-			'property'   => 'leftHover',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
 			'column'     => 'right_column_width',
 			'property'   => 'rightColumnWidth',
 			'type'       => self::TYPE_STRING,
@@ -127,24 +109,6 @@ class PageMapper extends Schoolbox\Mapper {
 		));
 
 		$this->hasMap(array(
-			'column'     => 'right_bg_secondary',
-			'property'   => 'rightBgSecondary',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'right_link',
-			'property'   => 'rightLink',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'right_hover',
-			'property'   => 'rightHover',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
 			'column'     => 'top_head_font',
 			'property'   => 'topHeadFont',
 			'type'       => self::TYPE_STRING,
@@ -165,24 +129,6 @@ class PageMapper extends Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column'     => 'top_bg_primary',
 			'property'   => 'topBgPrimary',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'top_bg_secondary',
-			'property'   => 'topBgSecondary',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'top_link',
-			'property'   => 'topLink',
-			'type'       => self::TYPE_STRING,
-		));
-
-		$this->hasMap(array(
-			'column'     => 'top_hover',
-			'property'   => 'topHover',
 			'type'       => self::TYPE_STRING,
 		));
 
