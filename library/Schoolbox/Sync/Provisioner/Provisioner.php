@@ -117,12 +117,22 @@ class Provisioner
                     $originalUser = clone $internalUser;
 
                     // Run this user through the hydrators
-                    $grammar->hydrate($externalUser, $internalUser);
-                    foreach ($ruleset->getCustomRules() as $rule) {
-                        $internalUser = $rule->getHydrator()->hydrate($externalUser, $internalUser);
+                    try {
+                        $grammar->hydrate($externalUser, $internalUser);
+                        foreach ($ruleset->getCustomRules() as $rule) {
+                            $internalUser = $rule->getHydrator()->hydrate($externalUser, $internalUser);
+                        }
+                    } catch (\Exception $e) {
+                        // TODO create a special SkipException
+                        continue;
                     }
 
-                    // Compare $originalUser vs. $internalUser
+//                    // Compare $originalUser vs. $internalUser
+//                    var_dump(
+//                        $this->userMapper->dehydrate($originalUser),
+//                        $this->userMapper->dehydrate($internalUser),
+//                        $this->userMapper->diff($originalUser, $internalUser)
+//                    );
                 }
             }
         }
