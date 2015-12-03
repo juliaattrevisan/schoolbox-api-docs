@@ -80,7 +80,13 @@
                         fail: 'Could not delete Effect'
                     },
                     map: {
-                        newRowUrl: '/adminv2/sync/effect/newMappedRow'
+                        newRowUrl: '/adminv2/sync/effect/newMappedRow',
+
+                        /* Focus on first input in new Mapping Rows when they spawn
+                         * This is pretty annoying for the Dropdown subfragment,
+                         * so the default is off
+                         */
+                        focus: false
                     }
                 },
 
@@ -642,10 +648,14 @@
                     $.get(config.effect.map.newRowUrl, data, function(responseText) {
                         rowContainer.append(responseText);
 
-                        /* So apparently I can't use input:nth-last-child(2)
+                        /* Bring focus to first input of new mapping row
+                         *
+                         * So apparently I can't use input:nth-last-child(2)
                          * Imma go around the long way
                          */
-                        rowContainer.find('.row:nth-last-child(1)').find('input:first').focus();
+                        if (config.effect.map.focus) {
+                            rowContainer.find('.row:nth-last-child(1)').find('input:first').focus();
+                        }
                     });
                 }
             });
