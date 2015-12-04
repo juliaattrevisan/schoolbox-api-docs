@@ -79,14 +79,14 @@ class Factory
             case Role::STUDENT:
                 $allBreadcrumbs = new Navigator(
                     new Node('Home', '/adminv2/home', false),
-                    new Node('User Provisioning System', '/adminv2/sync', false),
-                    new Node('Student', '/adminv2/sync/student', true)
+                    new Node('User Provisioning System', '/adminv2/ups', false),
+                    new Node('Student', '/adminv2/ups/student', true)
                 );
 
                 $allNavigation = new Navigator(
-                    new Node('Student', '/adminv2/sync/student', true),
-                    new Node('Parent', '/adminv2/sync/parent', false),
-                    new Node('Staff', '/adminv2/sync/staff', false)
+                    new Node('Student', '/adminv2/ups/student', true),
+                    new Node('Parent', '/adminv2/ups/parent', false),
+                    new Node('Staff', '/adminv2/ups/staff', false)
                 );
 
                 break;
@@ -96,14 +96,14 @@ class Factory
             case Role::PARENT:
                 $allBreadcrumbs = new Navigator(
                     new Node('Home', '/adminv2/home', false),
-                    new Node('User Provisioning System', '/adminv2/sync', false),
-                    new Node('Parent', '/adminv2/sync/parent', true)
+                    new Node('User Provisioning System', '/adminv2/ups', false),
+                    new Node('Parent', '/adminv2/ups/parent', true)
                 );
 
                 $allNavigation = new Navigator(
-                    new Node('Student', '/adminv2/sync/student', false),
-                    new Node('Parent', '/adminv2/sync/parent', true),
-                    new Node('Staff', '/adminv2/sync/staff', false)
+                    new Node('Student', '/adminv2/ups/student', false),
+                    new Node('Parent', '/adminv2/ups/parent', true),
+                    new Node('Staff', '/adminv2/ups/staff', false)
                 );
 
                 break;
@@ -113,14 +113,14 @@ class Factory
             case Role::STAFF:
                 $allBreadcrumbs = new Navigator(
                     new Node('Home', '/adminv2/home', false),
-                    new Node('User Provisioning System', '/adminv2/sync', false),
-                    new Node('Staff', '/adminv2/sync/staff', true)
+                    new Node('User Provisioning System', '/adminv2/ups', false),
+                    new Node('Staff', '/adminv2/ups/staff', true)
                 );
 
                 $allNavigation = new Navigator(
-                    new Node('Student', '/adminv2/sync/student', false),
-                    new Node('Parent', '/adminv2/sync/parent', false),
-                    new Node('Staff', '/adminv2/sync/staff', true)
+                    new Node('Student', '/adminv2/ups/student', false),
+                    new Node('Parent', '/adminv2/ups/parent', false),
+                    new Node('Staff', '/adminv2/ups/staff', true)
                 );
 
                 break;

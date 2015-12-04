@@ -31,15 +31,15 @@ class Controller extends Base {
          */
         $allBreadcrumbs = new Navigator(
             new Node('Home', '/adminv2/home', false),
-            new Node('User Provisioning System', '/adminv2/sync', true)
+            new Node('User Provisioning System', '/adminv2/ups', true)
         );
 
         /* Navigation
          */
         $allNavigation = new Navigator(
-            new Node('Student', '/adminv2/sync/student', false),
-            new Node('Parent', '/adminv2/sync/parent', false),
-            new Node('Staff', '/adminv2/sync/staff', false)
+            new Node('Student', '/adminv2/ups/student', false),
+            new Node('Parent', '/adminv2/ups/parent', false),
+            new Node('Staff', '/adminv2/ups/staff', false)
         );
 
         /* Twig data
@@ -87,7 +87,7 @@ class Controller extends Base {
             $this->updateEffects($ruleId, $ruleData['effect']);
         }
         $this->updateCustomRules($roleType, $postData['customRule']);
-        $this->getResponse()->redirect->to("/adminv2/sync/$roleType");
+        $this->getResponse()->redirect->to("/adminv2/ups/$roleType");
     }
 
     /**

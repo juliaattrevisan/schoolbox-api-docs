@@ -21,7 +21,7 @@
     </div>
 
     <div class="small-12 island">
-        <form id='ruleset' action='/adminv2/sync/ruleset/update' method="post">
+        <form id='ruleset' action='/adminv2/ups/ruleset/update' method="post">
             <input type="hidden" name="rulesetId" value="{{ rulesetId }}" />
 
             <div class="actions-small-1">
@@ -43,11 +43,11 @@
                             <span>Off</span>
                         </label>
                     </span>
-                    {#<a href='/adminv2/sync/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule"></a>#}
+                    {#<a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule"></a>#}
                     <a class="icon-more" title="" data-dropdown="ruleset-options"></a>
                 </nav>
                 <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
-                    <li><a href='/adminv2/sync/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                    <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
                 </ul>
             </div>
 
@@ -70,8 +70,8 @@
                         </div>
                         <nav>
                             <a href="#" class="icon-add" data-collapser="rule-{{ currentRule.id }}-contents" title="Collapse Content"></a>
-                            <a href="/adminv2/sync/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule"></a>
-                            <a href="/adminv2/sync/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule"></a>
+                            <a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule"></a>
+                            <a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule"></a>
                         </nav>
                     </div>
 
@@ -89,8 +89,8 @@
                                 <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
                             </nav>
                             <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
-                                <li><a href="/adminv2/sync/condition/add/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
-                                <li><a href="/adminv2/sync/condition/add/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+                                <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
+                                <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
                             </ul>
                         </div>
 
@@ -111,8 +111,8 @@
                                 <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-effect-options"></a>
                             </nav>
                             <ul id="rule-{{ currentRule.id }}-effect-options" class="f-dropdown" data-dropdown-content>
-                                <li><a href="/adminv2/sync/effect/add/{{ currentRule.id }}" class="icon-add" title="Spawn new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
-                                <li><a href="/adminv2/sync/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip</a></li>
+                                <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Spawn new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
+                                <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip</a></li>
                             </ul>
                         </div>
 
