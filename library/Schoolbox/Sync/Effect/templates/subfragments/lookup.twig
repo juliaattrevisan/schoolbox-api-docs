@@ -1,4 +1,5 @@
 <select {{ dynamicDisabled }} name="{{ dynamicInputName }}">
+    <option disabled="disabled" {% if not preselected %}selected="selected"{% endif %}>Please Select</option>
     {% for current in allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
         {% set selected = '' %}
 
