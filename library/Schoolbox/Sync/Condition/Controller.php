@@ -71,7 +71,6 @@ class Controller extends Base {
                 ]
             ],
             'currentCondition' => $newCondition,
-            'currentRule'      => [ 'id' => $rule->getId() ]
         ];
 
         // the list of templates available for rendering

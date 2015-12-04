@@ -1,7 +1,7 @@
 {% set allMatches = ['Matches', "Doesn't Match"] %}
 
 <li id="condition-{{ currentCondition.id }}" class="actions-small-2 content" data-locked="{{ meta.condition[currentCondition.id].lock.status }}">
-    <input type="hidden" name="rule[{{ currentRule.id }}][condition][{{ currentCondition.id }}][type]" value="1">
+    <input type="hidden" name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][type]" value="1">
 
     <div class="list-item">
         <div class="row">
@@ -9,7 +9,7 @@
                 <span class="meta">If</span>
             </div>
             <div class="small-11 medium-5 large-5 columns">
-                <select {{ meta.condition[currentCondition.id].disabled }} name="rule[{{ currentRule.id }}][condition][{{ currentCondition.id }}][arguments][0]">
+                <select {{ meta.condition[currentCondition.id].disabled }} name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][0]">
                     {% for currentNDSKey, currentNDSField in allNDSField %}
                     <option value="{{ currentNDSKey }}" {% if currentNDSKey == currentCondition.arguments[0] %}selected="selected"{% endif %}>
                         {{ currentNDSField }}
@@ -18,14 +18,14 @@
                 </select>
             </div>
             <div class="small-12 medium-3 large-3 columns">
-                <select {{ meta.condition[currentCondition.id].disabled }} name="rule[{{ currentRule.id }}][condition][{{ currentCondition.id }}][arguments][2]">
+                <select {{ meta.condition[currentCondition.id].disabled }} name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][2]">
                     {% for currentMatches in allMatches %}
                     <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.arguments[2] %}selected="selected"{% endif %}>{{ currentMatches }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="small-12 medium-3 large-3 columns">
-                <textarea {{ meta.condition[currentCondition.id].disabled }} name='rule[{{ currentRule.id }}][condition][{{ currentCondition.id }}][arguments][1]' rows="5">{{ currentCondition.arguments[1] | join("\n") }}</textarea>
+                <textarea {{ meta.condition[currentCondition.id].disabled }} name='rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][1]' rows="5">{{ currentCondition.arguments[1] | join("\n") }}</textarea>
             </div>
         </div>
     </div>
