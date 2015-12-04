@@ -247,6 +247,10 @@ class Controller extends Base {
      */
     protected function updateCustomRules($roleType, $customRules)
     {
+        if (!is_array($customRules)) {
+            return;
+        }
+
         // TODO DI some more
         $mapper = Hydrator\Custom\Mapper::getInstance();
         /** @var Hydrator\Custom\Model[] $rules */
