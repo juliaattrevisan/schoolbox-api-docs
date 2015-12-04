@@ -104,13 +104,14 @@
                             {% endfor %}
                         </ul>
 
-                        <div class="actions-small-1 row">
+                        <div class="actions-small-2 row">
                             <div class="list-item">
                                 <div class="small-12 columns">
                                     <h4>Effects</h4>
                                 </div>
                             </div>
                             <nav>
+                                <a class="icon-help" title="Show available Tokens" data-reveal-id="token-list"></a>
                                 <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-effect-options"></a>
                             </nav>
                             <ul id="rule-{{ currentRule.id }}-effect-options" class="f-dropdown" data-dropdown-content>
@@ -171,5 +172,39 @@
 
             <input type="submit" value="Save Ruleset" />
         </form>
+
+        <div id="token-list" class="reveal-modal" data-reveal>
+            <div class="row">
+                <div class="small-12 medium-6 columns">
+                    <h5>Available Tokens</h5>
+
+                    <dl>
+                        {% for token, description in allNDSField %}
+                            <dt>{:{{ token }}}</dt>
+                            <dd>{{ description }}</dd>
+                        {% endfor %}
+                    </dl>
+                </div>
+                <div class="small-12 medium-6 columns">
+                    <h5>Available Filters</h5>
+
+                    <dl>
+                        <dt>uc</dt>
+                        <dd>Converts to uppercase</dd>
+
+                        <dt>lc</dt>
+                        <dd>Converts to lowercase</dd>
+
+                        <dt>first</dt>
+                        <dd>Returns only the first character</dd>
+
+                        <dt>alpha</dt>
+                        <dd>Strips all non-alpha characters</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <a class="close-reveal-modal">&#215;</a>
+        </div>
     </div>
 </div>
