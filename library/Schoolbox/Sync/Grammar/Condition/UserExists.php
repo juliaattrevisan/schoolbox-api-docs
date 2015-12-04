@@ -22,7 +22,7 @@ class UserExists extends Condition
     {
         parent::__construct(
             function ($input, $previous) {
-                return $previous instanceof User;
+                return $previous instanceof User && $previous->getId();
             },
             $negate
         );
