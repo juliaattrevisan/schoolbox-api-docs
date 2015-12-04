@@ -18,8 +18,6 @@ use Schoolbox\Sync\Condition\Fragment\Fragment;
 use Schoolbox\Sync\Condition\Fragment\Factory as ConditionFragmentFactory;
 
 class Controller extends Base {
-    const CONDITION_GENERAL = 1;
-    const CONDITION_USER = 2;
 
     /**
      * A meta field for various Condition-specific UI
