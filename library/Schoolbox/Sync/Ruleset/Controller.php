@@ -31,7 +31,7 @@ class Controller extends Base {
          */
         $allBreadcrumbs = new Navigator(
             new Node('Home', '/adminv2/home', false),
-            new Node('Sync (UPS)', '/adminv2/sync', true)
+            new Node('User Provisioning System', '/adminv2/sync', true)
         );
 
         /* Navigation

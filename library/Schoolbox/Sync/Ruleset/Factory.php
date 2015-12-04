@@ -79,7 +79,7 @@ class Factory
             case Role::STUDENT:
                 $allBreadcrumbs = new Navigator(
                     new Node('Home', '/adminv2/home', false),
-                    new Node('Sync (UPS)', '/adminv2/sync', false),
+                    new Node('User Provisioning System', '/adminv2/sync', false),
                     new Node('Student', '/adminv2/sync/student', true)
                 );
 
@@ -96,7 +96,7 @@ class Factory
             case Role::PARENT:
                 $allBreadcrumbs = new Navigator(
                     new Node('Home', '/adminv2/home', false),
-                    new Node('Sync (UPS)', '/adminv2/sync', false),
+                    new Node('User Provisioning System', '/adminv2/sync', false),
                     new Node('Parent', '/adminv2/sync/parent', true)
                 );
 
@@ -113,7 +113,7 @@ class Factory
             case Role::STAFF:
                 $allBreadcrumbs = new Navigator(
                     new Node('Home', '/adminv2/home', false),
-                    new Node('Sync (UPS)', '/adminv2/sync', false),
+                    new Node('User Provisioning System', '/adminv2/sync', false),
                     new Node('Staff', '/adminv2/sync/staff', true)
                 );
 
