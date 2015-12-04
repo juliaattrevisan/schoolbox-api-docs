@@ -114,7 +114,7 @@ class Provisioner
                     } catch (MapperException $e) {
                         $internalUser = $this->userMapper->createModel();
                     }
-                    $originalUser = clone $internalUser;
+//                    $originalUser = clone $internalUser;
 
                     // Run this user through the hydrators
                     try {
@@ -127,12 +127,17 @@ class Provisioner
                         continue;
                     }
 
-//                    // Compare $originalUser vs. $internalUser
-//                    var_dump(
+//                    new \Alaress_Probe(
 //                        $this->userMapper->dehydrate($originalUser),
 //                        $this->userMapper->dehydrate($internalUser),
 //                        $this->userMapper->diff($originalUser, $internalUser)
 //                    );
+//                    echo '<hr style="clear:both"/>';
+
+                    // And save
+                    if ($update) {
+                        $this->userMapper->save($internalUser);
+                    }
                 }
             }
         }
