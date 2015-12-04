@@ -15,7 +15,11 @@ use \Schoolbox\Sync\Navigator\Navigator;
 use \Schoolbox\Sync\Navigator\Node;
 use \Schoolbox\Sync\Condition;
 use \Schoolbox\Sync\Effect;
+<<<<<<< HEAD
 use \Schoolbox\Sync\Hydrator;
+=======
+use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
+>>>>>>> f807dcd... Save mapped key/value pairs to db [SB-10290]
 use \Schoolbox;
 use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 
@@ -163,6 +167,8 @@ class Controller extends Base {
         // TODO DI
         $mapper = Effect\Mapper::getInstance();
 
+        $effectTypeMapper = new EffectTypeMapper();
+
         if (is_array($effects)) {
             foreach ($effects as $effectId => $effectData) {
                 $effectArgs = (array)$effectData['arguments'];
@@ -174,9 +180,31 @@ class Controller extends Base {
                  */
                 $fragmentFactory = new FragmentFactory();
 
+                /* Force cast of boolean arg so it doesn't save in some
+                 * other data format
+                 */
                 if ($fragmentFactory->isBoolean($effectData['userProperty'])) {
                     $arg = [(bool)$effectArgs[0]];
                 }
+                /* Forge key/value for Mapped Key/Value Pairs
+                 */
+                else if ($effectTypeMapper->isMap($effectData['type'])) {
+
+                    /* Keep arg[0], that token field
+                     */
+                    $arg = $effectData['arguments'];
+
+                    /* Forge this into key/value pairs and ram that
+                     * into $args as well
+                     */
+                    $pairs = array_combine($effectData['from'], $effectData['to']);
+
+                    /* Dump empty values
+                     */
+                    $arg[] = array_filter($pairs);
+                }
+                /* Otherwise just save it as given
+                 */
                 else {
                     $arg = $effectArgs;
                 }

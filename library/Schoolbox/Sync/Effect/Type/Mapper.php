@@ -42,4 +42,32 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
     }
+
+    /**
+     * Is this a Map Effect?
+     *
+     * @param $type
+     * @return bool
+     */
+    public function isMap($type) {
+        if ($type == self::EFFECT_TYPE_MAP) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Is this a Skip Effect?
+     *
+     * @param $type
+     * @return bool
+     */
+    public function isSkip($type) {
+        if ($type == self::EFFECT_TYPE_SKIP) {
+            return true;
+        }
+
+        return false;
+    }
 }
