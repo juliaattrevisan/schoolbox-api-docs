@@ -10,7 +10,7 @@ CREATE TABLE `ups_rule`(
   PRIMARY KEY (`id`),
   INDEX (`role_type`),
   INDEX (`role_type`, `enabled`),
-  UNIQUE INDEX (`sequence`)
+  UNIQUE INDEX `sequence_roletype` (`role_type`, `sequence`)
 );
 
 CREATE TABLE `ups_condition`(
