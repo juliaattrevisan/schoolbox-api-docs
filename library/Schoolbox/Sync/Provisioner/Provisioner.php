@@ -116,7 +116,7 @@ class Provisioner
 
                     // Get the currently stored user
                     try {
-                        $internalUser = $this->userMapper->findByExternalId($externalUserId);
+                        $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
                     } catch (MapperException $e) {
                         $internalUser = $this->userMapper->createModel();
                     }
