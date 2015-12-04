@@ -45,7 +45,7 @@ class Controller extends Base {
         /* Twig data
          */
         $this->getResponse()->content->set([
-            'template' => '@sync/intro.twig',
+            'template' => '@upsRuleset/intro.twig',
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation' => $allNavigation->getAllNodes(),
@@ -67,7 +67,7 @@ class Controller extends Base {
         /* Twig data
          */
         $this->getResponse()->content->set([
-            'template' => '@sync/ruleset.twig',
+            'template' => '@upsRuleset/ruleset.twig',
             'data' => $factory->produce()
         ]);
     }

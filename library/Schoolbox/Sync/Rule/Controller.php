@@ -33,7 +33,7 @@ class Controller extends Base {
         );
 
         $this->getResponse()->content->set([
-            'template' => '@syncRule/add.twig',
+            'template' => '@upsRule/add.twig',
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'rulesetId' => $params['rulesetId'],
@@ -89,7 +89,7 @@ class Controller extends Base {
         );
 
         $this->getResponse()->content->set([
-            'template' => '@syncRule/add.twig',
+            'template' => '@upsRule/add.twig',
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'rulesetId' => $rulesetId,

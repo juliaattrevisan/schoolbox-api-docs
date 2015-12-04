@@ -139,10 +139,10 @@ class Factory {
      */
     public function produce($mappingType) {
         if ($mappingType == EffectTypeMapper::EFFECT_TYPE_LITERAL) {
-            return new Fragment('@syncEffect/literal.twig');
+            return new Fragment('@upsEffect/literal.twig');
         }
         else if ($mappingType == EffectTypeMapper::EFFECT_TYPE_MAP) {
-            return new Fragment('@syncEffect/map.twig');
+            return new Fragment('@upsEffect/map.twig');
         }
     }
 
@@ -151,18 +151,24 @@ class Factory {
      * a User field to modify and a Mapping Type
      */
     public function produceEmpty() {
-        return new Fragment('@syncEffect/empty.twig');
+        return new Fragment('@upsEffect/empty.twig');
     }
 
+    /**
+     * Produce a Subfragment
+     *
+     * @param $userField
+     * @return Fragment
+     */
     public function produceType($userField) {
         if ($this->isBoolean($userField)) {
-            return new Fragment('@syncEffect/subfragments/boolean.twig');
+            return new Fragment('@upsEffect/subfragments/boolean.twig');
         }
         else if ($this->isLookup($userField)) {
-            return new Fragment('@syncEffect/subfragments/lookup.twig', $this->getLookup()->findData($userField));
+            return new Fragment('@upsEffect/subfragments/lookup.twig', $this->getLookup()->findData($userField));
         }
         else if ($this->isString($userField)) {
-            return new Fragment('@syncEffect/subfragments/string.twig');
+            return new Fragment('@upsEffect/subfragments/string.twig');
         }
     }
 

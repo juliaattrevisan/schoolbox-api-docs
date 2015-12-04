@@ -113,7 +113,7 @@ class Controller extends Base {
         ];
 
         $this->getResponse()->content->set([
-            'template' => '@syncEffect/container.twig',
+            'template' => '@upsEffect/container.twig',
             'data'     => $data,
             'format'   => 'nochrome'
         ]);
@@ -167,7 +167,7 @@ class Controller extends Base {
         ];
 
         $this->getResponse()->content->set([
-            'template' => '@syncEffect/container-skip.twig',
+            'template' => '@upsEffect/container-skip.twig',
             'data'     => $data,
             'format'   => 'nochrome'
         ]);
@@ -280,7 +280,7 @@ class Controller extends Base {
         ];
 
         $this->getResponse()->content->set([
-            'template' => '@syncEffect/map-row.twig',
+            'template' => '@upsEffect/map-row.twig',
             'data'     => $data,
             'format'   => 'nochrome'
         ]);
