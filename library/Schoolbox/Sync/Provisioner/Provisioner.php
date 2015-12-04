@@ -108,9 +108,15 @@ class Provisioner
                 // TODO Try to build Grammar\Ruleset out of $ruleset instead of thru separate factory
                 $grammar = $this->grammarFactory->build($roleType);
                 foreach ($this->getAllExternalUsers($roleType) as $externalUser) {
+                    // No user id? do nothing
+                    $externalUserId = $externalUser->getId();
+                    if (!$externalUserId) {
+                        continue;
+                    }
+
                     // Get the currently stored user
                     try {
-                        $internalUser = $this->userMapper->findByExternalId($externalUser->getId());
+                        $internalUser = $this->userMapper->findByExternalId($externalUserId);
                     } catch (MapperException $e) {
                         $internalUser = $this->userMapper->createModel();
                     }
