@@ -2,7 +2,7 @@
  * Applies javascript manipulators on a Ruleset element
  * ie. the element containing Rules
  *
- * Usage: $('#ruleset').sync()
+ * Usage: $('#ruleset').ups()
  */
 (function() {
 
@@ -13,7 +13,7 @@
      *
      * @param options
      */
-    $.fn.sync = function(options) {
+    $.fn.ups = function(options) {
         options = options || {};
 
         var config = init(options, $(this));
