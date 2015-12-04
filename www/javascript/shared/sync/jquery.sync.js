@@ -396,6 +396,10 @@
                         .attr('id', statusId)
                         .attr('data-effect-fragment', statusId);
 
+                    $(instance)
+                        .find('#effect-' + config.stubPrefix + '-fragment-status')
+                        .attr('id', statusId);
+
                     /* New instance will not have a delete link
                      */
                     $(instance).find('[data-effect-delete]').attr('href', '');
@@ -483,10 +487,18 @@
                     mappingType: mappingType
                 }
 
+                var label = $('#effect-' + effectId + '-fragment-status');
+
+                label.labelActivate();
+
                 /* Inject fragment into Effect container
                  */
                 $.get(config.effect.change.url, data, function(responseText) {
                     $('[data-effect-fragment='+effectId+']').html(responseText);
+
+                    label.labelTimeout({
+                        text: 'Ready',
+                    });
                 });
             });
         }
@@ -650,8 +662,15 @@
                     // block any new requests while we're retrieving a new row
                     fetchInProgress = true;
 
+                    var label = $('#effect-' + effectId + '-status');
+                    label.labelActivate();
+
                     $.get(config.effect.map.newRowUrl, data, function(responseText) {
                         rowContainer.append(responseText);
+
+                        label.labelTimeout({
+                            text: 'Ready'
+                        });
                     }).always(function () {
                         // ensure we don't accidentally infiniblock new row generation on the off-chance of a server error
                         fetchInProgress = false;
