@@ -7,15 +7,17 @@
 
 namespace Schoolbox\Sync\Ruleset;
 
+use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\Sync\Hydrator;
 use Schoolbox\Sync\Rule;
+use Schoolbox\User as InternalUser;
 
 /**
  * A ruleset.
  *
  * @package Schoolbox\Sync\Ruleset
  */
-class Ruleset
+class Ruleset implements Hydrator\HydratorInterface
 {
     /**
      * A set of admin-built rules to run.
@@ -48,6 +50,38 @@ class Ruleset
         $this->rules       = $rules;
         $this->customRules = $customRules;
         $this->config      = $config;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getName()
+    {
+        return '';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDescription()
+    {
+        return '';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hydrate(ExternalUser $input, InternalUser $previous = null)
+    {
+        if ($this->getConfig()->getEnabled()) {
+            foreach ($this->getRules() as $rule) {
+                // figure out how to hydrate a rule
+            }
+            foreach ($this->getCustomRules() as $rule) {
+                $previous = $rule->getHydrator()->hydrate($input, $previous);
+            }
+        }
+        return $previous;
     }
 
     /**
