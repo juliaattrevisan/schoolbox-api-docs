@@ -96,11 +96,7 @@
 
                         <ul class="information-list" id="rule-{{ currentRule.id }}-conditions">
                             {% for currentCondition in currentRule.conditions %}
-                                {% if currentCondition.conditionType.id == conditionGeneral %}
-                                    {% include '@syncCondition/general.twig' %}
-                                {% elseif currentCondition.conditionType.id == conditionUserExists %}
-                                    {% include '@syncCondition/userExists.twig' %}
-                                {% endif %}
+                            {% include allConditionStructures.fragments[currentCondition.id].fragment.getFilename() %}
                             {% endfor %}
                         </ul>
 

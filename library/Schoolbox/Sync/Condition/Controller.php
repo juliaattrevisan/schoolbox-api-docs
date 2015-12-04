@@ -14,6 +14,8 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Sync\Grammar\FieldFactory;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Condition;
+use Schoolbox\Sync\Condition\Fragment\Fragment;
+use Schoolbox\Sync\Condition\Fragment\Factory as ConditionFragmentFactory;
 
 class Controller extends Base {
     const CONDITION_GENERAL = 1;
@@ -73,14 +75,16 @@ class Controller extends Base {
         ];
 
         // the list of templates available for rendering
-        $templates = [
-            self::CONDITION_GENERAL => '@syncCondition/general.twig',
-            self::CONDITION_USER    => '@syncCondition/userExists.twig'
-        ];
 
-        if (isset($templates[$params['conditionType']])) {
+        /* Determine which Condition Fragments to load initially
+         * It tells frontend which templates to use for Conditions.
+         */
+        $conditionFragmentFactory = new ConditionFragmentFactory();
+        $fragment = $conditionFragmentFactory->produce($newCondition->getConditionType());
+
+        if ($fragment instanceof Fragment) {
             $this->getResponse()->content->set([
-                'template' => $templates[$params['conditionType']],
+                'template' => $fragment->getFilename(),
                 'data'     => $data,
                 'format'   => 'nochrome'
             ]);

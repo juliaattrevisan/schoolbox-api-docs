@@ -16,8 +16,9 @@ use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Condition;
+use Schoolbox\Sync\Condition\Fragment\Factory as ConditionFragmentFactory;
 use Schoolbox\Sync\Effect;
-use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
+use Schoolbox\Sync\Effect\Fragment\Factory as EffectFragmentFactory;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 use Schoolbox\Sync\Hydrator;
 
@@ -152,11 +153,22 @@ class Factory
             $metas['effect'][$effectId] = $this->getMeta();
         }
 
+        /* Determine which Condition Fragments to load initially
+         * It tells frontend which templates to use for Conditions.
+         */
+        $conditionFragmentFactory = new ConditionFragmentFactory();
+
+        /* Which twig containers and fragments to load for this
+         * Ruleset's Conditions
+         */
+        $allConditionStructures = [
+            'fragments' => []
+        ];
+
         /* Determine which Effect Fragments to load initially
-         * This is just some hardcoded values for now.
          * It tells frontend which templates to use for Effects.
          */
-        $fragmentFactory = new FragmentFactory();
+        $effectFragmentFactory = new EffectFragmentFactory();
 
         /* Which twig containers and fragments to load for this
          * Ruleset's Effects
@@ -164,12 +176,18 @@ class Factory
         $allEffectStructures = [
             'containers' => [],
             'fragments' => [],
-            'allUserField' => $fragmentFactory->getAllFields(),
+            'allUserField' => $effectFragmentFactory->getAllFields(),
         ];
 
-        /* Skip Effect has a different container since it's a unique kind of Effect
-         */
         foreach ($ruleset as $currentRule) {
+            foreach ($currentRule->getConditions() as $currentCondition) {
+                $fragment = $conditionFragmentFactory->produce($currentCondition->getConditionType());
+
+                $allConditionStructures['fragments'][$currentCondition->getId()]['fragment'] = $fragment;
+            }
+
+            /* Skip Effect has a different container since it's a unique kind of Effect
+             */
             foreach ($currentRule->getEffects() as $currentEffect) {
                 $allEffectStructures['containers'][$currentEffect->getId()] = $currentEffect->getEffectType()->getTemplate();
 
@@ -177,8 +195,8 @@ class Factory
                  * Skip Effects don't use fragments
                  */
                 if (!$currentEffect->getEffectType()->isSkip()) {
-                    $fragment = $fragmentFactory->produce($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
-                    $subfragment = $fragmentFactory->produceType($currentEffect->getUserProperty());
+                    $fragment = $effectFragmentFactory->produce($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+                    $subfragment = $effectFragmentFactory->produceType($currentEffect->getUserProperty());
 
                     $allEffectStructures['fragments'][$currentEffect->getId()]['fragment'] = $fragment;
                     $allEffectStructures['fragments'][$currentEffect->getId()]['subfragments']['fragment'] = $subfragment;
@@ -197,17 +215,18 @@ class Factory
          * Otherwise it would have returned empty array earlier
          */
         return [
-            'allBreadcrumbs'      => $allBreadcrumbs->getAllNodes(),
-            'allNavigation'       => $allNavigation->getAllNodes(),
-            'rulesetId'           => $this->getType(),
-            'ruleset'             => [
+            'allBreadcrumbs'         => $allBreadcrumbs->getAllNodes(),
+            'allNavigation'          => $allNavigation->getAllNodes(),
+            'rulesetId'              => $this->getType(),
+            'ruleset'  => [
                 'rules'  => $this->findRuleset(),
                 'config' => Config\Mapper::getInstance()->findById($this->getType()),
             ],
-            'customRules'         => $hydratorModels,
-            'allEffectStructures' => $allEffectStructures,
-            'allNDSField'         => $ffactory->buildMap($this->getType()),
-            'meta'                => $metas
+            'customRules'            => $hydratorModels,
+            'allConditionStructures' => $allConditionStructures,
+            'allEffectStructures'    => $allEffectStructures,
+            'allNDSField'            => $ffactory->buildMap($this->getType()),
+            'meta'                   => $metas
         ];
     }
 
