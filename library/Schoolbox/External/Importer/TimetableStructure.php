@@ -219,7 +219,7 @@ class TimetableStructure extends AbstractImporter
             $this->log->notice('Cleaning up all existing campus cycles');
             $this->timetableCampusMapper->truncate();
             $this->log->notice('Cleaning up all existing periods');
-            $this->timetableCampusMapper->truncate();
+            $this->timetablePeriodMapper->truncate();
         }
         foreach ($this->parse() as $row) {
             /** @var TimetableCycle $cycle */
