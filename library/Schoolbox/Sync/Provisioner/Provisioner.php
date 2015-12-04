@@ -142,6 +142,7 @@ class Provisioner
 
                     // And save
                     if ($update) {
+                        // TODO add some sort of sanity check to $internalUser
                         $this->userMapper->save($internalUser);
                     }
                 }
