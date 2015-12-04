@@ -15,11 +15,8 @@ use \Schoolbox\Sync\Navigator\Navigator;
 use \Schoolbox\Sync\Navigator\Node;
 use \Schoolbox\Sync\Condition;
 use \Schoolbox\Sync\Effect;
-<<<<<<< HEAD
 use \Schoolbox\Sync\Hydrator;
-=======
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
->>>>>>> f807dcd... Save mapped key/value pairs to db [SB-10290]
 use \Schoolbox;
 use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 
