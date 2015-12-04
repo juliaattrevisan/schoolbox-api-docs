@@ -1,0 +1,11 @@
+<div class="row" data-map>
+    <div class="small-5 columns">
+        <input type="text" data-key {{ dynamicDisabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][from][]" value="{{ mapFrom }}" />
+    </div>
+    <div class="small-2 columns text-center no-pad">
+        <h1>&#10155;</h1>
+    </div>
+    <div class="small-5 columns">
+        {% include allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getFilename() %}
+    </div>
+</div>

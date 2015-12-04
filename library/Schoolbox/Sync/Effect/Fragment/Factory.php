@@ -135,29 +135,35 @@ class Factory {
      * (boolean, lookup, etc)
      *
      * @param $mappingType
-     * @param $userField
      * @return Fragment
      */
-    public function produce($mappingType, $userField) {
+    public function produce($mappingType) {
         if ($mappingType == EffectTypeMapper::EFFECT_TYPE_LITERAL) {
-            if ($this->isBoolean($userField)) {
-                return new Fragment('@syncEffect/boolean.twig');
-            }
-            else if ($this->isLookup($userField)) {
-                return new Fragment('@syncEffect/lookup.twig', $this->getLookup()->findData($userField));
-            }
-            else if ($this->isString($userField)) {
-                return new Fragment('@syncEffect/string.twig');
-            }
+            return new Fragment('@syncEffect/literal.twig');
         }
         else if ($mappingType == EffectTypeMapper::EFFECT_TYPE_MAP) {
             return new Fragment('@syncEffect/map.twig');
         }
+    }
 
-        /* Return empty Fragment, prompting the user to choose
-         * a User field to modify and a Mapping Type
-         */
+    /**
+     * Return empty Fragment, prompting the user to choose
+     * a User field to modify and a Mapping Type
+     */
+    public function produceEmpty() {
         return new Fragment('@syncEffect/empty.twig');
+    }
+
+    public function produceType($userField) {
+        if ($this->isBoolean($userField)) {
+            return new Fragment('@syncEffect/subfragments/boolean.twig');
+        }
+        else if ($this->isLookup($userField)) {
+            return new Fragment('@syncEffect/subfragments/lookup.twig', $this->getLookup()->findData($userField));
+        }
+        else if ($this->isString($userField)) {
+            return new Fragment('@syncEffect/subfragments/string.twig');
+        }
     }
 
     /**

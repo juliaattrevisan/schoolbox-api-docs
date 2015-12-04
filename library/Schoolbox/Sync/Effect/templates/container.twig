@@ -29,8 +29,13 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="small-12 medium-6 large-4 columns" data-effect-fragment="{{ currentEffect.id }}">
-                {% include allEffectStructures.fragments[currentEffect.id].getFilename() %}
+
+            {# Dynamically construct input names
+             #}
+            {% set dynamicDisabled = meta.effect[currentEffect.id].disabled %}
+
+            <div data-effect-fragment="{{ currentEffect.id }}">
+                {% include allEffectStructures.fragments[currentEffect.id].fragment.getFilename() %}
             </div>
         </div>
     </div>

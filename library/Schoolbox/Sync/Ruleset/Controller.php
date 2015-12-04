@@ -16,6 +16,7 @@ use \Schoolbox\Sync\Navigator\Node;
 use \Schoolbox\Sync\Condition;
 use \Schoolbox\Sync\Effect;
 use \Schoolbox\Sync\Hydrator;
+use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 use \Schoolbox;
 use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 
@@ -163,6 +164,8 @@ class Controller extends Base {
         // TODO DI
         $mapper = Effect\Mapper::getInstance();
 
+        $effectTypeMapper = new EffectTypeMapper();
+
         if (is_array($effects)) {
             foreach ($effects as $effectId => $effectData) {
                 $effectArgs = (array)$effectData['arguments'];
@@ -174,9 +177,41 @@ class Controller extends Base {
                  */
                 $fragmentFactory = new FragmentFactory();
 
-                if ($fragmentFactory->isBoolean($effectData['userProperty'])) {
+                /* Forge key/value for Mapped Key/Value Pairs
+                 */
+                if ($effectTypeMapper->isMap($effectData['type'])) {
+
+                    /* Keep arg[0], that token field
+                     */
+                    $arg = $effectData['arguments'];
+
+                    /* Forge this into key/value pairs and ram that
+                     * into $args as well
+                     */
+                    $pairs = array_combine($effectData['from'], $effectData['to']);
+
+                    /* array_filter filters out values that equate to false
+                     * such as zero (which is valid data...). Use unset pears
+                     * approach instead
+                     *
+                     * http://stackoverflow.com/questions/243132/how-do-you-remove-a-value-that-has-an-empty-key-from-an-associative-array-in-php
+                     */
+                    unset($pairs[null]);
+
+                    $arg[] = $pairs;
+                }
+                /* Force cast of boolean arg so it doesn't save in some
+                 * other data format.
+                 *
+                 * Sequential Dependency:
+                 * This has to take place after isMap() check because the
+                 * Mapped Key/Value Pairs can utilise a boolean field
+                 */
+                else if ($fragmentFactory->isBoolean($effectData['userProperty'])) {
                     $arg = [(bool)$effectArgs[0]];
                 }
+                /* Otherwise just save it as given
+                 */
                 else {
                     $arg = $effectArgs;
                 }
@@ -212,6 +247,10 @@ class Controller extends Base {
      */
     protected function updateCustomRules($roleType, $customRules)
     {
+        if (!is_array($customRules)) {
+            return;
+        }
+
         // TODO DI some more
         $mapper = Hydrator\Custom\Mapper::getInstance();
         /** @var Hydrator\Custom\Model[] $rules */

@@ -178,8 +178,10 @@ class Factory
                  */
                 if (!$currentEffect->getEffectType()->isSkip()) {
                     $fragment = $fragmentFactory->produce($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+                    $subfragment = $fragmentFactory->produceType($currentEffect->getUserProperty());
 
-                    $allEffectStructures['fragments'][$currentEffect->getId()] = $fragment;
+                    $allEffectStructures['fragments'][$currentEffect->getId()]['fragment'] = $fragment;
+                    $allEffectStructures['fragments'][$currentEffect->getId()]['subfragments']['fragment'] = $subfragment;
                 }
             }
         }

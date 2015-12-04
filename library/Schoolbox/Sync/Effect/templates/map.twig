@@ -1,1 +1,17 @@
-Mapped Key/Value Pairs
+{# Configure input names and preselection comparator values
+ # This is how we can share templates between Literal and Mapped types
+ #}
+{% set dynamicInputName = 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][to][]' %}
+
+<div class="small-12 medium-6 large-4 columns">
+    <input {{ dynamicDisabled }} type="text" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][arguments][0]" value="{{ currentEffect.arguments[0] }}">
+</div>
+
+<div class="small-12 columns">
+    {% for mapFrom, preselected in currentEffect.arguments[1] %}
+        {% include '@syncEffect/map-row.twig' %}
+    {% endfor %}
+
+    {# Always spawn an empty row to use #}
+    {% include '@syncEffect/map-row.twig' %}
+</div>

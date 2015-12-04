@@ -1,0 +1,9 @@
+{# Configure input names and preselection comparator values
+ # This is how we can share templates between Literal and Mapped types
+ #}
+{% set dynamicInputName = 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][arguments]' %}
+{% set preselected = currentEffect.arguments[0] %}
+
+<div class="small-12 medium-6 large-4 columns">
+    {% include allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getFilename() %}
+</div>

@@ -6,6 +6,8 @@
  */
 (function() {
 
+    var fetchInProgress = false;
+
     /**
      * Plugin
      *
@@ -41,6 +43,7 @@
         initEffectMappingTypeChange();
         initEffectDelete();
         initEffectUserFieldAvailability();
+        initEffectMappingRows();
 
         /**
          * Init
@@ -77,6 +80,15 @@
                         url: '/adminv2/sync/effect/delete',
                         confirm: 'Are you sure you want to delete this Effect?',
                         fail: 'Could not delete Effect'
+                    },
+                    map: {
+                        newRowUrl: '/adminv2/sync/effect/newMappedRow',
+
+                        /* Focus on first input in new Mapping Rows when they spawn
+                         * This is pretty annoying for the Dropdown subfragment,
+                         * so the default is off
+                         */
+                        focus: false
                     }
                 },
 
@@ -598,6 +610,54 @@
             var value = $(element).find('option:nth-child(' + selectedIndex + ')').attr('value');
 
             return value;
+        }
+
+        /**
+         * Every time a key or value input is blurred,
+         * ensure there is an empty pair waiting to be
+         * filled in - this saves us from having to make
+         * a whole new set of add/delete controls
+         */
+        function initEffectMappingRows() {
+            $(config.element).on('change keydown', '[data-map] input', function(event) {
+                var row = $(this).parents('[data-map]');
+                var rowContainer = row.parent();
+
+                var ruleId = rowContainer.parents('[data-rule]').attr('data-rule');
+                var effectId = rowContainer.parents('[data-effect-fragment]').attr('data-effect-fragment');
+                var userProperty = disabledVal($('#effect-' + effectId).find('[data-effect-userfield='+effectId+']'));
+
+                /* Find out if all inputs are filled
+                 */
+                var allKeyInputs = rowContainer.find('input[data-key]');
+
+                var numInputs = allKeyInputs.length;
+
+                var numFilled = allKeyInputs.filter(function () {
+                    return this.value.length > 0
+                }).length;
+
+                /* If all the inputs are filled spawn a new row
+                 * Bring focus to first input of new row
+                 */
+                if (numInputs == numFilled && !fetchInProgress) {
+                    var data = {
+                        ruleId: ruleId,
+                        effectId: effectId,
+                        userProperty: userProperty
+                    };
+
+                    // block any new requests while we're retrieving a new row
+                    fetchInProgress = true;
+
+                    $.get(config.effect.map.newRowUrl, data, function(responseText) {
+                        rowContainer.append(responseText);
+                    }).always(function () {
+                        // ensure we don't accidentally infiniblock new row generation on the off-chance of a server error
+                        fetchInProgress = false;
+                    });
+                }
+            });
         }
     }
 }(jQuery));

@@ -87,12 +87,17 @@ class Controller extends Base {
          */
         $fragmentFactory = new FragmentFactory();
 
-        $fragment = $fragmentFactory->produce($default['effectType'], $default['userProperty']);
+        /* All fragments and subfragments use empty by default, thus
+         * forcing the user to choose a userfield/mappingType combo
+         */
+        $fragment = $fragmentFactory->produceEmpty();
 
         $data = [
             'allEffectStructures' => [
                 'fragments' => [
-                    $newEffect->getId() => $fragment
+                    $newEffect->getId() => [
+                        'fragment' => $fragment,
+                    ]
                 ],
                 'allUserField' => $fragmentFactory->getAllFields(),
             ],
@@ -179,30 +184,39 @@ class Controller extends Base {
 
         $fragmentFactory = new FragmentFactory();
         $fragment = $fragmentFactory->produce($queryData['mappingType'], $queryData['userField']);
+        $subfragment = $fragmentFactory->produceType($queryData['userField']);
+
+        /* Contains Lookup data
+         */
+        $data = [
+            'allEffectStructures' => [
+                'fragments' => [
+                    $queryData['effectId'] => [
+                        'fragment' => $fragment,
+                        'subfragments' => [
+                            'fragment' => $subfragment,
+                            'mapFrom' => '',
+                            'mapTo' => '',
+                        ]
+                    ]
+                ],
+            ],
+
+            /* If this Effect hasn't been saved it, it won't have a ruleId
+             * nor an effectId, so recycle it from frontend, as fragments
+             * expect both values
+             */
+            'currentEffect' => [
+                'id' => $queryData['effectId'],
+                'rule' => [
+                    'id' => $queryData['ruleId'],
+                ],
+            ]
+        ];
 
         $this->getResponse()->content->set([
             'template' => $fragment->getFilename(),
-            'data' => [
-
-                /* Contains Lookup data
-                 */
-                'allEffectStructures' => [
-                    'fragments' => [
-                        $queryData['effectId'] => $fragment
-                    ],
-                ],
-
-                /* If this Effect hasn't been saved it, it won't have a ruleId
-                 * nor an effectId, so recycle it from frontend, as fragments
-                 * expect both values
-                 */
-                'currentEffect' => [
-                    'id' => $queryData['effectId'],
-                    'rule' => [
-                        'id' => $queryData['ruleId'],
-                    ],
-                ],
-            ],
+            'data' => $data,
             'format' => 'nochrome'
         ]);
     }
@@ -220,6 +234,55 @@ class Controller extends Base {
         $this->getResponse()->content->set([
             'format' => 'json',
             'data'   => $deleteCount > 0
+        ]);
+    }
+
+    /**
+     * Spawn a new mapped row fragment
+     */
+    public function newMappedRow() {
+        $queryData = $this->getRequest()->query;
+
+        $effect = [
+            'id' => $queryData['effectId'],
+            'rule' => [
+                'id' => $queryData['ruleId'],
+            ]
+        ];
+
+        $fragmentFactory = new FragmentFactory();
+        $subfragment = $fragmentFactory->produceType($queryData['userProperty']);
+
+        $data = [
+            'currentEffect' => $effect,
+            'meta' => [
+                'effect' => [
+                    $queryData['effectId'] => $this->getMeta()
+                ]
+            ],
+            'allEffectStructures' => [
+                'fragments' => [
+                    $queryData['effectId'] => [
+                        'subfragments' => [
+                            'fragment' => $subfragment,
+                            'mapFrom' => '',
+                            'mapTo' => '',
+                        ]
+                    ]
+                ]
+            ],
+
+            /* Special case for async injecting pre-forged twig templates -_-
+             * Normally this is derived in twig land but in this case, a fully
+             * formed html file is rammed in and thus need to inject this manually
+             */
+            'dynamicInputName' => "rule[{$queryData['ruleId']}][effect][{$queryData['effectId']}][to][]",
+        ];
+
+        $this->getResponse()->content->set([
+            'template' => '@syncEffect/map-row.twig',
+            'data'     => $data,
+            'format'   => 'nochrome'
         ]);
     }
 
