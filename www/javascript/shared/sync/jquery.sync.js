@@ -6,6 +6,8 @@
  */
 (function() {
 
+    var fetchInProgress = false;
+
     /**
      * Plugin
      *
@@ -617,7 +619,7 @@
          * a whole new set of add/delete controls
          */
         function initEffectMappingRows() {
-            $(config.element).on('blur', '[data-map] input', function(event) {
+            $(config.element).on('change keydown', '[data-map] input', function(event) {
                 var row = $(this).parents('[data-map]');
                 var rowContainer = row.parent();
 
@@ -627,35 +629,32 @@
 
                 /* Find out if all inputs are filled
                  */
-                var allInputs = rowContainer.find('input');
+                var allKeyInputs = rowContainer.find('input[data-key]');
 
-                var numInputs = allInputs.length;
+                var numInputs = allKeyInputs.length;
 
-                var numFilled = allInputs.filter(function () {
+                var numFilled = allKeyInputs.filter(function () {
                     return this.value.length > 0
                 }).length;
 
                 /* If all the inputs are filled spawn a new row
                  * Bring focus to first input of new row
                  */
-                if (numInputs == numFilled) {
+                if (numInputs == numFilled && !fetchInProgress) {
                     var data = {
                         ruleId: ruleId,
                         effectId: effectId,
                         userProperty: userProperty
-                    }
+                    };
+
+                    // block any new requests while we're retrieving a new row
+                    fetchInProgress = true;
 
                     $.get(config.effect.map.newRowUrl, data, function(responseText) {
                         rowContainer.append(responseText);
-
-                        /* Bring focus to first input of new mapping row
-                         *
-                         * So apparently I can't use input:nth-last-child(2)
-                         * Imma go around the long way
-                         */
-                        if (config.effect.map.focus) {
-                            rowContainer.find('.row:nth-last-child(1)').find('input:first').focus();
-                        }
+                    }).always(function () {
+                        // ensure we don't accidentally infiniblock new row generation on the off-chance of a server error
+                        fetchInProgress = false;
                     });
                 }
             });
