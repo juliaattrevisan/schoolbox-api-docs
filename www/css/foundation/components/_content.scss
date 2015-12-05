@@ -1351,10 +1351,15 @@ ul.flex-list {
 		padding-top: 0;
 
 		&.avatar {
+
+			h3 {
+				padding-top: 0.325rem;
+			}
+
 			img, [class*="icon-"] {
-				width: 2rem;
-				margin-right: 0.5rem;
+				width: 4rem;
 				margin-top: 0;
+				padding: 0.375rem 0 0 1.125rem;
 			}
 
 			p {
