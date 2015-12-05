@@ -290,6 +290,11 @@ $errors = $dem->listDisplayValues();
 
 $recent_activity = null;
 $recent_return     = null;
+$crocodocReturn = null;
+$fileReturn = array();
+$recentComment = null;
+$recentMark = null;
+
 if (count($submission_history)) {
     $j = 0;
 
@@ -452,6 +457,26 @@ if (count($submission_history)) {
             if (!isset($recent_return)) {
                 $recent_return = $activity_item;
             }
+
+            /* Remember most recently return crocodoc */
+            if( !isset($crocodocReturn) && $activity_item->getReturnedWork()->getUuid()) {
+                $crocodocReturn = $activity_item->getReturnedWork();
+            }
+
+            /* Remember all returned files, could be more multiple */
+            if( $activity_item->getReturnedWork()->getStorage()->getHash()) {
+                $fileReturn[] = $activity_item->getReturnedWork();
+            }
+
+            /* Remember most recent comment */
+            if( !isset($recentComment) && $activity_item->getReturnedWork()->getComment()) {
+                $recentComment =  $activity_item->getReturnedWork()->getComment();
+            }
+
+            if( !isset($recentMark) && $activity_item->getReturnedWork()->getMark()) {
+                $recentMark =  $activity_item->getReturnedWork()->getMark();
+            }
+
         }
 
         $this->parse('work_block', 'work', true);
@@ -619,7 +644,7 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
     // get filetype details
     $return = $recent_return->getReturnedWork();
 
-    $mark = $return->getMark();
+    $mark = $recentMark;
 
     if ($box->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER
         || in_array($mark, $errors)
@@ -632,9 +657,9 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
     $this->setVar(
         array(
             'RETURNED_WORK_OWNER_ID'   => $return->getOwner()->getId(),
-            'RETURNED_WORK_COMMENT'    => Scrub::Text($return->getComment()),
+            'RETURNED_WORK_COMMENT'    => Scrub::Text($recentComment),
             'RETURNED_WORK_MARK'       => $mark,
-            'RETURNED_WORK_MARK_TIP'   => $mark == $return->getMark() ? '' : $return->getMark(),
+            'RETURNED_WORK_MARK_TIP'   => $mark == $recentMark ? '' : $recentMark,
             'RETURNED_WORK_GRADIENT'   => $return->getGradientFromNormalizedMark(),
             'STATUS_HEALTH'            => 'ok',
             'STATUS_LABEL'             => 'Marked'
@@ -651,9 +676,9 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
     /* If there's a crocodoc document, display a link to it.
      * Do this even if there's no returned file in storage.
      */
-    if ($return->getUuid()) {
+    if (isset($crocodocReturn) && $crocodocReturn->getUuid()) {
         try {
-            $associatedSubmission = $submissionMapper->findOneByColumn('uuid', $return->getUuid());
+            $associatedSubmission = $submissionMapper->findOneByColumn('uuid', $crocodocReturn->getUuid());
 
             $this->setVar(
                 array(
@@ -667,28 +692,29 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
         $this->parse('return_file_uuid_block', 'return_file_uuid');
     }
 
-    if($return->getStorage()->getHash() && !$parentOnly) {
-        try{
+    $this->setVar('return_file_block', '');
 
-            $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($return->getStorage()->getHash());
+    if(count($fileReturn) && !$parentOnly) {
+        foreach($fileReturn as $returnedFile) {
+            if($returnedFile->getStorage()->getHash()) {
+                try{
+                    $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($returnedFile->getStorage()->getHash());
 
-            $this->setVar(
-                array(
-                    'RETURNED_WORK_FILE_ID'    => $return->getId(),
-                    'RETURNED_WORK_FILE_SIZE'  => Alaress_Byte_Format::bytesToString($storage->getSize()),
-                    'RETURNED_WORK_FILE_NAME'  => Scrub::Text($storage->getFilename()),
-                    'RETURNED_WORK_FILE_DATE'  => $return->getReturned()->getRelativeTime(),
-                    'RETURNED_WORK_FILE_THUMB' => $storage->getMimetype()->getIconFile() ?: 'txt.png',
-                )
-            );
-            $this->parse('return_file_block', 'return_file');
+                    $this->setVar(
+                        array(
+                            'RETURNED_WORK_FILE_ID'    => $returnedFile->getId(),
+                            'RETURNED_WORK_FILE_SIZE'  => Alaress_Byte_Format::bytesToString($storage->getSize()),
+                            'RETURNED_WORK_FILE_NAME'  => Scrub::Text($storage->getFilename()),
+                            'RETURNED_WORK_FILE_DATE'  => $returnedFile->getReturned()->getRelativeTime(),
+                            'RETURNED_WORK_FILE_THUMB' => $storage->getMimetype()->getIconFile() ?: 'txt.png',
+                        )
+                    );
+                    $this->parse('return_file_block', 'return_file',true);
 
-        } catch (Schoolbox\Mapper\Exception $e) {
-            $this->setVar('return_file_block', '');
+                } catch (Schoolbox\Mapper\Exception $e) {
+                }
+            }
         }
-    }
-    else {
-        $this->setVar('return_file_block', '');
     }
 
     $this->parse('returned_work_block', 'returned_work');
