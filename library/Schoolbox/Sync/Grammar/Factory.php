@@ -53,23 +53,26 @@ class Factory
      */
     public function build($roletype)
     {
-        $context = ucfirst($roletype);
+        $search = [
+            'role_type' => $roletype,
+            'enabled'   => true,
+        ];
 
-        $ffactory = new FieldFactory();
+//        if (!$includeDisabled) {
+//            $search['enabled'] = true;
+//        }
 
-        $set = new UserRuleset($this->userMapper, $context, $ffactory->buildMap($roletype));
+        /**
+         * pull these rules out in sequence
+         * @var Rule[] $dbRules
+         */
+        $dbRules = $this->ruleMapper->findByColumnList($search, [
+            'order' => [
+                'sequence' => 'ASC'
+            ]
+        ]);
 
-        foreach ($this->findRulesForRoleType($roletype) as $rule) {
-
-            $set->newRule(
-                $rule['conditions'],
-                $rule['effects'],
-                $rule['negate']
-            );
-
-        }
-
-        return $set;
+        return $this->buildFromRuleCollection($roletype, $dbRules);
     }
 
     /**
