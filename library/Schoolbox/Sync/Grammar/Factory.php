@@ -72,6 +72,33 @@ class Factory
         return $set;
     }
 
+    /**
+     * Builds a ruleset out of a roletype and a collection of rule models.
+     *
+     * @param string $roletype
+     * @param Rule[] $ruleCollection
+     *
+     * @return UserRuleset
+     */
+    public function buildFromRuleCollection($roletype, $ruleCollection)
+    {
+        $context = ucfirst($roletype);
+
+        $ffactory = new FieldFactory();
+
+        $set = new UserRuleset($this->userMapper, $context, $ffactory->buildMap($roletype));
+
+        foreach ($ruleCollection as $rule) {
+            $translatedRule = $this->translateRuleModelToAddableRule($rule);
+            $set->newRule(
+                $translatedRule['conditions'],
+                $translatedRule['effects'],
+                $translatedRule['negate']
+            );
+        }
+        return $set;
+    }
+
 
     /**
      * Retrieves and prepares the rule data for the given roletype
