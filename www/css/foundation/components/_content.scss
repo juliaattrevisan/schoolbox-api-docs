@@ -1621,10 +1621,11 @@ ul.meta {
 
 dl {
 	&.inline-dl {
-
 		@include grid-row($behavior:nest);
 
-		dt, dd {
+        margin-bottom: 1rem;
+
+        dt, dd {
 			@include grid-column($columns:false, $position:true);
 		}
 
