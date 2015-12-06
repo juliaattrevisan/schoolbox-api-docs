@@ -27,13 +27,13 @@ class Controller extends Base {
          */
         $allBreadcrumbs = new Navigator(
             new Node('Home', '/adminv2/home', false),
-            new Node('Sync (UPS)', '/adminv2/sync', false),
-            new Node(ucwords($params['rulesetId']), "/adminv2/sync/{$params['rulesetId']}", false),
+            new Node('User Provisioning System', '/adminv2/ups', false),
+            new Node(ucwords($params['rulesetId']), "/adminv2/ups/{$params['rulesetId']}", false),
             new Node('Add Rule', '#', true)
         );
 
         $this->getResponse()->content->set([
-            'template' => '@syncRule/add.twig',
+            'template' => '@upsRule/add.twig',
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'rulesetId' => $params['rulesetId'],
@@ -66,7 +66,7 @@ class Controller extends Base {
 
         $mapper->create($rule);
 
-        $this->getResponse()->redirect->to("/adminv2/sync/$roleType");
+        $this->getResponse()->redirect->to("/adminv2/ups/$roleType");
     }
 
     /**
@@ -84,12 +84,12 @@ class Controller extends Base {
          */
         $allBreadcrumbs = new Navigator(
             new Node('Home', '/adminv2/home', false),
-            new Node('Sync (UPS)', '/adminv2/sync', false),
-            new Node(ucwords($rulesetId), "/adminv2/sync/{$rulesetId}", true)
+            new Node('User Provisioning System', '/adminv2/ups', false),
+            new Node(ucwords($rulesetId), "/adminv2/ups/{$rulesetId}", true)
         );
 
         $this->getResponse()->content->set([
-            'template' => '@syncRule/add.twig',
+            'template' => '@upsRule/add.twig',
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'rulesetId' => $rulesetId,
@@ -115,7 +115,7 @@ class Controller extends Base {
 
         Mapper::getInstance()->save($rule);
 
-        $this->getResponse()->redirect->to("/adminv2/sync/{$postData->get('rulesetId')}");
+        $this->getResponse()->redirect->to("/adminv2/ups/{$postData->get('rulesetId')}");
     }
 
     /**

@@ -21,7 +21,7 @@ use Schoolbox\Mapper\Exception;
 
 class Module extends BaseModule
 {
-    protected $basename = 'syncEffect';
+    protected $basename = 'upsEffect';
 
     /**
      * Basic routes for this module

@@ -2,7 +2,7 @@
  * Applies javascript manipulators on a Ruleset element
  * ie. the element containing Rules
  *
- * Usage: $('#ruleset').sync()
+ * Usage: $('#ruleset').ups()
  */
 (function() {
 
@@ -13,7 +13,7 @@
      *
      * @param options
      */
-    $.fn.sync = function(options) {
+    $.fn.ups = function(options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -64,7 +64,7 @@
                         userExists: 2
                     },
                     delete: {
-                        url: '/adminv2/sync/condition/delete',
+                        url: '/adminv2/ups/condition/delete',
                         confirm: 'Are you sure you want to delete this Condition?',
                         fail: 'Could not delete Condition'
                     }
@@ -74,15 +74,15 @@
                  */
                 effect: {
                     change: {
-                        url: '/adminv2/sync/effect/change'
+                        url: '/adminv2/ups/effect/change'
                     },
                     delete: {
-                        url: '/adminv2/sync/effect/delete',
+                        url: '/adminv2/ups/effect/delete',
                         confirm: 'Are you sure you want to delete this Effect?',
                         fail: 'Could not delete Effect'
                     },
                     map: {
-                        newRowUrl: '/adminv2/sync/effect/newMappedRow',
+                        newRowUrl: '/adminv2/ups/effect/newMappedRow',
 
                         /* Focus on first input in new Mapping Rows when they spawn
                          * This is pretty annoying for the Dropdown subfragment,
@@ -96,7 +96,7 @@
                  */
                 rule: {
                     delete: {
-                        url: '/adminv2/sync/rule/delete',
+                        url: '/adminv2/ups/rule/delete',
                         confirm: 'Are you sure you want to delete this Rule?',
                         fail: 'Could not delete Rule'
                     }

@@ -21,7 +21,7 @@ use Schoolbox\Mapper\Exception;
 
 class Module extends BaseModule
 {
-    protected $basename = 'syncCondition';
+    protected $basename = 'upsCondition';
 
     /**
      * Basic routes for this module

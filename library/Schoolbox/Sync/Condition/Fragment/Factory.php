@@ -22,10 +22,10 @@ class Factory {
      */
     public function produce(ConditionType $conditionType) {
         if ($conditionType->getId() == self::TYPE_GENERAL) {
-            return new Fragment('@syncCondition/general.twig');
+            return new Fragment('@upsCondition/general.twig');
         }
         else if ($conditionType->getId() == self::TYPE_USEREXISTS) {
-            return new Fragment('@syncCondition/userExists.twig');
+            return new Fragment('@upsCondition/userExists.twig');
         }
     }
 } 

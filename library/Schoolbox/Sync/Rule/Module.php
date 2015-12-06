@@ -25,7 +25,7 @@ use Schoolbox\Collection;
 
 class Module extends BaseModule
 {
-    protected $basename = 'syncRule';
+    protected $basename = 'upsRule';
 
     /**
      * Basic routes for this module

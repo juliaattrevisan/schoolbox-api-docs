@@ -6,7 +6,7 @@
     {% set url = 'create' %}
 {% endif %}
 
-{% include '@sync/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
 
 <div class="row">
     <div class="small-12 columns">
@@ -17,11 +17,12 @@
     <div class="small-12 island">
         <div class="alert-box">
             Providing a Name and/or Description for your Rule may help you to
-            manage and document your Sync (UPS) setup. They are optional; Rules
-            will be given a generic name if one is not provided here.
+            manage and document your User Provisioning System setup. They are
+            optional; Rules will be given a generic name if one is not provided
+            here.
         </div>
 
-        <form action="/adminv2/sync/rule/{{ url }}" method="post">
+        <form action="/adminv2/ups/rule/{{ url }}" method="post">
             <input type="hidden" name="rulesetId" value="{{ rulesetId }}" />
             <input type="hidden" name="ruleId" value="{{ rule.id }}" />
 

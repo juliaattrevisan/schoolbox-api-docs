@@ -9,9 +9,9 @@
 
 <div class="small-12 columns">
     {% for mapFrom, preselected in currentEffect.arguments[1] %}
-        {% include '@syncEffect/map-row.twig' %}
+        {% include '@upsEffect/map-row.twig' %}
     {% endfor %}
 
     {# Always spawn an empty row to use #}
-    {% include '@syncEffect/map-row.twig' %}
+    {% include '@upsEffect/map-row.twig' %}
 </div>

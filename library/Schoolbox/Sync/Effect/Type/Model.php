@@ -23,14 +23,14 @@ class Model {
      * Container Template file for Skip Effect
      * @var string
      */
-    private $effectSkipTemplate = '@syncEffect/container-skip.twig';
+    private $effectSkipTemplate = '@upsEffect/container-skip.twig';
 
     /**
      * Container Template file for regular other Effects
      *
      * @var string
      */
-    private $effectTemplate = '@syncEffect/container.twig';
+    private $effectTemplate = '@upsEffect/container.twig';
 
     /**
      * Decide which Container to use for this Effect

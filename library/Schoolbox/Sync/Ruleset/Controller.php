@@ -31,21 +31,21 @@ class Controller extends Base {
          */
         $allBreadcrumbs = new Navigator(
             new Node('Home', '/adminv2/home', false),
-            new Node('Sync (UPS)', '/adminv2/sync', true)
+            new Node('User Provisioning System', '/adminv2/ups', true)
         );
 
         /* Navigation
          */
         $allNavigation = new Navigator(
-            new Node('Student', '/adminv2/sync/student', false),
-            new Node('Parent', '/adminv2/sync/parent', false),
-            new Node('Staff', '/adminv2/sync/staff', false)
+            new Node('Student', '/adminv2/ups/student', false),
+            new Node('Parent', '/adminv2/ups/parent', false),
+            new Node('Staff', '/adminv2/ups/staff', false)
         );
 
         /* Twig data
          */
         $this->getResponse()->content->set([
-            'template' => '@sync/intro.twig',
+            'template' => '@upsRuleset/intro.twig',
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation' => $allNavigation->getAllNodes(),
@@ -67,7 +67,7 @@ class Controller extends Base {
         /* Twig data
          */
         $this->getResponse()->content->set([
-            'template' => '@sync/ruleset.twig',
+            'template' => '@upsRuleset/ruleset.twig',
             'data' => $factory->produce()
         ]);
     }
@@ -87,7 +87,7 @@ class Controller extends Base {
             $this->updateEffects($ruleId, $ruleData['effect']);
         }
         $this->updateCustomRules($roleType, $postData['customRule']);
-        $this->getResponse()->redirect->to("/adminv2/sync/$roleType");
+        $this->getResponse()->redirect->to("/adminv2/ups/$roleType");
     }
 
     /**
