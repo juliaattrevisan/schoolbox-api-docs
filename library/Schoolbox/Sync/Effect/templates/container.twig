@@ -34,8 +34,15 @@
              #}
             {% set dynamicDisabled = meta.effect[currentEffect.id].disabled %}
 
-            <div data-effect-fragment="{{ currentEffect.id }}">
-                {% include allEffectStructures.fragments[currentEffect.id].fragment.getFilename() %}
+            <div>
+                <div data-effect-fragment="{{ currentEffect.id }}">
+                    {% include allEffectStructures.fragments[currentEffect.id].fragment.getFilename() %}
+                </div>
+                <div class="small-12 columns">
+                    <span id='effect-{{ currentEffect.id }}-fragment-status' class="label highlight full-width hide">Loading</span>
+
+                    <span id='effect-{{ currentEffect.id }}-status' class="label highlight full-width {{ meta.effect[currentEffect.id].status ? '' : 'hide' }}">{{ meta.effect[currentEffect.id].status }}</span>
+                </div>
             </div>
         </div>
     </div>
@@ -43,6 +50,4 @@
         <a href="/adminv2/sync/effect/delete/{{ currentEffect.id }}" class="icon-delete" title="Delete" data-effect-delete="{{ currentEffect.id }}"></a>
         <a href="" class="icon-{{ meta.effect[currentEffect.id].lock.icon }}" title='Toggle Readonly Mode' data-effect-modify-lock="effect-{{ currentEffect.id }}"></a>
     </nav>
-
-    <span id='effect-{{ currentEffect.id }}-status' class="label highlight full-width {{ meta.effect[currentEffect.id].status ? '' : 'hide' }}">{{ meta.effect[currentEffect.id].status }}</span>
 </li>
