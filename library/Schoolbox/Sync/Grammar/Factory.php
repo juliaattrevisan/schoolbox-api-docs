@@ -103,27 +103,45 @@ class Factory
         ]);
 
         foreach ($dbRules as $i => $rule) {
-
-            $rules[$i] = [
-                'conditions' => [],
-                'effects' => [],
-                'negate' => false
-            ];
-
-            foreach ($rule->getConditions() as $condition) {
-                $rules[$i]['conditions'][] = $this->buildCondition($condition->getConditionType()->getName(), $condition->getArguments());
-            }
-
-            foreach ($rule->getEffects() as $effect) {
-                $rules[$i]['effects'][$effect->getUserProperty()] = $this->buildEffect($effect->getEffectType()->getName(), $effect->getArguments());
-            }
-
-            /* You can negate entire rules but we don't do it in UPS
-             */
-//            $rules[$i]['negate'] = isset($rule['negate']) && $rule['negate'];
+            $rules[$i] = $this->translateRuleModelToAddableRule($rule);
         }
 
         return $rules;
+    }
+
+    /**
+     * Translates a rule model object to a rule that is addable to
+     * `UserRuleset->newRule()`.
+     *
+     * @param Rule $rule
+     *
+     * @return array An array with the following keys:
+     *               * conditions: a list of conditions
+     *               * effects:    a list of effects
+     *               * negate:     whether the condition is to be negated
+     *
+     */
+    protected function translateRuleModelToAddableRule(Rule $rule)
+    {
+        $result = [
+            'conditions' => [],
+            'effects' => [],
+            'negate' => false
+        ];
+
+        foreach ($rule->getConditions() as $condition) {
+            $result['conditions'][] = $this->buildCondition($condition->getConditionType()->getName(), $condition->getArguments());
+        }
+
+        foreach ($rule->getEffects() as $effect) {
+            $result['effects'][$effect->getUserProperty()] = $this->buildEffect($effect->getEffectType()->getName(), $effect->getArguments());
+        }
+
+        /* You can negate entire rules but we don't do it in UPS
+         */
+//        $result['negate'] = isset($rule['negate']) && $rule['negate'];
+
+        return $result;
     }
 
 
