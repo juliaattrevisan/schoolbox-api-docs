@@ -44,7 +44,7 @@ if (isset($type) && isset($id)) {
     /* Prevent multibyte encoding as it might mess with video stream */
     mb_http_output("pass");
     ini_set('zlib.output_compression', 0);
-    apache_setenv('no-gzip', 1);
+    if (substr_count(strtolower(php_sapi_name()),'apache') > 0) { apache_setenv('no-gzip', 1); }
 
     $filename = $video->getFileLocation();
     // Get mimetype of encoded file, not from upload
