@@ -8,6 +8,7 @@
 namespace Schoolbox\Sync\Ruleset;
 
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
+use Schoolbox\Sync\Grammar\Ruleset as GrammarRuleset;
 use Schoolbox\Sync\Hydrator;
 use Schoolbox\Sync\Rule;
 use Schoolbox\User as InternalUser;
@@ -39,17 +40,30 @@ class Ruleset implements Hydrator\HydratorInterface
     protected $config;
 
     /**
+     * Optional grammar ruleset
+     *
+     * @var GrammarRuleset|null
+     */
+    protected $grammar = null;
+
+    /**
      * Constructor
      *
      * @param Rule\Model[]            $rules
      * @param Hydrator\Custom\Model[] $customRules
      * @param Config\Model            $config
+     * @param GrammarRuleset          $grammar
      */
-    public function __construct($rules, $customRules, Config\Model $config)
-    {
+    public function __construct(
+        $rules,
+        $customRules,
+        Config\Model $config,
+        GrammarRuleset $grammar = null
+    ) {
         $this->rules       = $rules;
         $this->customRules = $customRules;
         $this->config      = $config;
+        $this->grammar     = $grammar;
     }
 
     /**
@@ -74,9 +88,9 @@ class Ruleset implements Hydrator\HydratorInterface
     public function hydrate(ExternalUser $input, InternalUser $previous = null)
     {
         if ($this->getConfig()->getEnabled()) {
-            foreach ($this->getRules() as $rule) {
-                // figure out how to hydrate a rule
-            }
+            // Previously: I used a grammar factory to create rules
+            // Now: the grammar class is embedded at construct time.
+            $this->grammar->hydrate($input, $previous);
             foreach ($this->getCustomRules() as $rule) {
                 $previous = $rule->getHydrator()->hydrate($input, $previous);
             }

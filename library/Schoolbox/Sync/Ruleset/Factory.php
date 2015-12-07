@@ -11,6 +11,7 @@
 namespace Schoolbox\Sync\Ruleset;
 
 use Schoolbox\Role;
+use Schoolbox\Sync\Grammar\Factory as GrammarFactory;
 use Schoolbox\Sync\Grammar\FieldFactory;
 use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
@@ -205,20 +206,30 @@ class Factory
     /**
      * Produce ruleset data based on Role Type
      *
-     * @param string $rulesetId Role type - typically one of student|parent|staff
+     * @param string         $rulesetId      Role type - typically one of student|parent|staff
+     * @param GrammarFactory $grammarFactory An optional grammar builder, for converting the ruleset to grammar rules.
+     *                                       Required if the UPS is to be run on users.
      *
      * @return Ruleset
      */
-    public function produceRuleset($rulesetId)
+    public function produceRuleset($rulesetId, GrammarFactory $grammarFactory = null)
     {
-        return new Ruleset(
-            $this->findRuleset($rulesetId),
-            Hydrator\Custom\Mapper::getInstance()->findByColumnList(
-                ['role_type' => $rulesetId],
-                ['order' => ['sequence' => 'asc'],]
-            ),
-            Config\Mapper::getInstance()->findById($rulesetId)
+        $rules       = $this->findRuleset($rulesetId);
+        $customRules = Hydrator\Custom\Mapper::getInstance()->findByColumnList(
+            ['role_type' => $rulesetId],
+            ['order' => ['sequence' => 'asc'],]
         );
+        $config      = Config\Mapper::getInstance()->findById($rulesetId);
+        if (isset($grammarFactory)) {
+            return new Ruleset(
+                $rules,
+                $customRules,
+                $config,
+                $grammarFactory->buildFromRuleCollection($rulesetId, $rules)
+            );
+        } else {
+            return new Ruleset($rules, $customRules, $config);
+        }
     }
 
     /**
