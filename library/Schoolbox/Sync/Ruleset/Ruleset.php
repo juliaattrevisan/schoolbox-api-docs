@@ -85,7 +85,7 @@ class Ruleset implements Hydrator\HydratorInterface
     /**
      * @inheritDoc
      */
-    public function hydrate(ExternalUser $input, InternalUser $previous = null)
+    public function hydrate(ExternalUser $input, InternalUser $previous)
     {
         if ($this->getConfig()->getEnabled()) {
             // Previously: I used a grammar factory to create rules

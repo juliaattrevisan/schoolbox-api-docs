@@ -41,7 +41,7 @@ class SkipParentIfNoChildren implements HydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function hydrate(ExternalUser $input, InternalUser $previous = null)
+    public function hydrate(ExternalUser $input, InternalUser $previous)
     {
         if ($input instanceof ExternalParent) {
             if (empty($this->externalUserHandler->getEnrolledStudents($previous->getExternalId()))) {

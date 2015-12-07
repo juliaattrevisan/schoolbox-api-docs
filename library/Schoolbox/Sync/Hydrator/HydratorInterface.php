@@ -31,10 +31,10 @@ interface HydratorInterface
     /**
      * Hydrates an internal user,
      *
-     * @param ExternalUser      $input
-     * @param InternalUser|null $previous
+     * @param ExternalUser $input
+     * @param InternalUser $previous
      *
      * @return InternalUser
      */
-    public function hydrate(ExternalUser $input, InternalUser $previous = null);
+    public function hydrate(ExternalUser $input, InternalUser $previous);
 }

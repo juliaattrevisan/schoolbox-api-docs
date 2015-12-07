@@ -42,7 +42,7 @@ class AddParentToAllChildCampuses implements HydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function hydrate(ExternalUser $input, InternalUser $previous = null)
+    public function hydrate(ExternalUser $input, InternalUser $previous)
     {
         if ($input instanceof ExternalParent) {
             // Don't attempt to parse campuses of children from $input.

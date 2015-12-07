@@ -35,12 +35,12 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
     /**
      * Hydrates the internal user by passing through to `applyTo()`.
      *
-     * @param ExternalUser      $input
-     * @param InternalUser|null $previous
+     * @param ExternalUser $input
+     * @param InternalUser $previous
      *
      * @return InternalUser
      */
-    public function hydrate(ExternalUser $input, InternalUser $previous = null)
+    public function hydrate(ExternalUser $input, InternalUser $previous)
     {
         return $this->applyTo($input, $previous);
     }
