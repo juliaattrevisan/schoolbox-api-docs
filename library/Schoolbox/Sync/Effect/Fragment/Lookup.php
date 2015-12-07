@@ -27,6 +27,7 @@ class Lookup {
     private $allLookups = [
         'residentialHouse' => '\HouseResidentialMapper',
         'schoolHouse' => '\HouseMapper',
+        'role' => '\Schoolbox\RoleMapper',
     ];
 
     /**
