@@ -85,9 +85,24 @@ class Controller extends Base {
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/dryRun.twig',
             'data'     => $factory->produceTemplateData($rulesetId),
-            'after'    => function() use ($rulesetId) {
-                $this->dryRunCallback($rulesetId);
-            },
+        ]);
+    }
+
+    /**
+     * Start Dry Run view
+     *
+     * @param array $params
+     */
+    public function dryRunStart($params)
+    {
+        $rulesetId = $params['rulesetId'];
+        $this->getResponse()->redirect->to($this->getRouter()->generate('upsRuleset.dryRun'));
+        $this->getResponse()->content->set([
+            'after' => [
+                function() use ($rulesetId) {
+                    $this->dryRunCallback($rulesetId);
+                }
+            ],
         ]);
     }
 
