@@ -28,7 +28,7 @@ class AdminV2_Nav
         'cleanup' => 'Cleanup',
         'usage' => 'Usage',
         'engagement' => 'Engagement',
-        'synchronise' => 'Synchronise',
+        'ups' => 'User Provisioning System',
     );
 
     public function parse(SitePage $page, $currentPage = 'home')
