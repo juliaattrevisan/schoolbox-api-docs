@@ -105,8 +105,7 @@ class Provisioner
             $ruleset = $this->rulesetFactory->produceRuleset($roleType);
             if ($ruleset->getConfig()->getEnabled()) {
 
-                // TODO Try to build Grammar\Ruleset out of $ruleset instead of thru separate factory
-                $grammar = $this->grammarFactory->build($roleType);
+                $grammar = $this->grammarFactory->buildFromRuleCollection($roleType, $ruleset->getRules());
                 foreach ($this->getAllExternalUsers($roleType) as $externalUser) {
                     // No user id? do nothing
                     $externalUserId = $externalUser->getId();
