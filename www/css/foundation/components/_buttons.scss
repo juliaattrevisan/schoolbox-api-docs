@@ -60,3 +60,10 @@ $alert-button-border-color: transparent;
 // We use this to set default opacity and cursor for disabled buttons.
 $button-disabled-opacity: 0.5;
 // $button-disabled-cursor: $cursor-default-value;
+
+
+// Override buttons with icons font-size
+.button[class^="icon-"]:before,
+.button[class*=" icon-"]:before{
+	font-size: 1rem;
+}
