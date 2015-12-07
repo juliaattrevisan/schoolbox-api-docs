@@ -91,12 +91,14 @@ class Controller extends Base {
         $this->updateRuleSequence(array_keys($postData['rule']));
         $this->updateCustomRules($roleType, $postData['customRule']);
 
-        die();
-        //$this->getResponse()->redirect->to("/adminv2/ups/$roleType");
+        $this->getResponse()->redirect->to("/adminv2/ups/$roleType");
     }
 
     /**
      * Update a Rule's sequencing
+     *
+     * Just do a direct query, to save us fetching and resaving
+     * a Rule instance that we never had in the first place
      *
      * @param $sequencing
      */

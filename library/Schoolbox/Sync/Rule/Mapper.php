@@ -102,16 +102,6 @@ class Mapper extends Schoolbox\Mapper
     {
         $identifierName = $this->identifier['column'];
 
-        $this->database->beginTransaction();
-
-        /* Three, Two, One...Turn
-         */
-        $uniqueStatement = $this->database->prepare("SET unique_checks=:val");
-        $uniqueStatement->bindValue(':val', 0, \PDO::PARAM_INT);
-        $uniqueStatement->execute();
-
-
-
         $statement = $this->database->prepare("
             UPDATE `{$this->table}`
             SET sequence = :sequence
@@ -122,11 +112,8 @@ class Mapper extends Schoolbox\Mapper
             $statement->bindValue(':sequence', $i);
             $statement->bindValue(':identifierValue', $sequencing[$i-1]);
 
-            echo "Setting :identifierValue {$sequencing[$i]} to sequence $i <BR>";
             $statement->execute();
         }
-
-        $this->database->commit();
 
         return true;
     }
