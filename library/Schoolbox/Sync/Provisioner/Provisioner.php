@@ -102,10 +102,8 @@ class Provisioner
     public function run($update = false)
     {
         foreach ($this->runOrder as $roleType) {
-            $ruleset = $this->rulesetFactory->produceRuleset($roleType);
+            $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->grammarFactory);
             if ($ruleset->getConfig()->getEnabled()) {
-
-                $grammar = $this->grammarFactory->buildFromRuleCollection($roleType, $ruleset->getRules());
                 foreach ($this->getAllExternalUsers($roleType) as $externalUser) {
                     // No user id? do nothing
                     $externalUserId = $externalUser->getId();
@@ -123,10 +121,7 @@ class Provisioner
 
                     // Run this user through the hydrators
                     try {
-                        $grammar->hydrate($externalUser, $internalUser);
-                        foreach ($ruleset->getCustomRules() as $rule) {
-                            $internalUser = $rule->getHydrator()->hydrate($externalUser, $internalUser);
-                        }
+                        $ruleset->hydrate($externalUser, $internalUser);
                     } catch (\Exception $e) {
                         // TODO create a special SkipException
                         continue;
