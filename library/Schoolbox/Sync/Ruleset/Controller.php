@@ -96,9 +96,15 @@ class Controller extends Base {
     public function dryRunStart($params)
     {
         $rulesetId = $params['rulesetId'];
-        $this->getResponse()->redirect->to($this->getRouter()->generate('upsRuleset.dryRun'));
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate(
+                'upsRuleset.dryRun',
+                ['rulesetId' => $rulesetId]
+            )
+        );
+        // Not the best place to put it but it will do for now
         $this->getResponse()->content->set([
-            'after' => [
+            'postRedirect' => [
                 function() use ($rulesetId) {
                     $this->dryRunCallback($rulesetId);
                 }
@@ -114,7 +120,8 @@ class Controller extends Base {
     public function dryRunCallback($rulesetId)
     {
         // perform the actual dry run
-        sleep(10);
+        sleep(5);
+        sleep(5);
         // notify
     }
 
