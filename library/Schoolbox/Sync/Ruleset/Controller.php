@@ -73,6 +73,37 @@ class Controller extends Base {
     }
 
     /**
+     * Dry Run view
+     *
+     * @param array $params
+     */
+    public function dryRun($params)
+    {
+        $rulesetId = $params['rulesetId'];
+        $factory   = new Factory();
+        // This time around, the factory actually needs to create an entire hydrator.
+        $this->getResponse()->content->set([
+            'template' => '@upsRuleset/dryRun.twig',
+            'data'     => $factory->produceTemplateData($rulesetId),
+            'after'    => function() use ($rulesetId) {
+                $this->dryRunCallback($rulesetId);
+            },
+        ]);
+    }
+
+    /**
+     * Performs an actual dry run.
+     *
+     * @param string $rulesetId
+     */
+    public function dryRunCallback($rulesetId)
+    {
+        // perform the actual dry run
+        sleep(10);
+        // notify
+    }
+
+    /**
      * Update each Rule in the Ruleset
      */
     public function update()

@@ -48,6 +48,7 @@
                 </nav>
                 <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
                     <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                    <li><a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run">Perform Dry Run</a></li>
                 </ul>
             </div>
 

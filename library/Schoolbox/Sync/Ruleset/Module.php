@@ -36,6 +36,7 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'intro', $basePath, "");
         $this->addGetRoute($router, 'read', $basePath, "/{rulesetId}");
         $this->addPostRoute($router, 'update', $basePath, "/ruleset/update");
+        $this->addGetRoute($router, 'dryRun', $basePath, "/{rulesetId}/dry-run");
     }
 
     /**
@@ -46,7 +47,7 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher) {
         $this->addRoutePreload(
             $matcher,
-            '(?:read)',
+            '(?:read|dryRun)',
             function($params) {
                 return array(
                     'params' => $params,
