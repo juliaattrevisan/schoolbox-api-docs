@@ -11,6 +11,7 @@
 namespace Schoolbox\Sync\Ruleset;
 
 use Schoolbox\Role;
+use Schoolbox\Sync\Grammar\Factory as GrammarFactory;
 use Schoolbox\Sync\Grammar\FieldFactory;
 use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
@@ -24,14 +25,6 @@ use Schoolbox\Sync\Hydrator;
 
 class Factory
 {
-
-    /**
-     * Role type - typically one of student|parent|staff
-     *
-     * @var string
-     */
-    private $type = '';
-
     /**
      * Default state of Conditions when loading a Ruleset
      *
@@ -55,24 +48,15 @@ class Factory
     ];
 
     /**
-     * Constructor
-     *
-     * @param $rulesetId
-     */
-    public function __construct($rulesetId)
-    {
-        $this->setType($rulesetId);
-    }
-
-
-    /**
      * Produce a twig template data based on Role Type
+     *
+     * @param string $rulesetId Role type - typically one of student|parent|staff
      *
      * @return array
      */
-    public function produce()
+    public function produceTemplateData($rulesetId)
     {
-        switch ($this->getType()) {
+        switch ($rulesetId) {
 
             /* Students
              */
@@ -133,7 +117,7 @@ class Factory
 
         /* Load Ruleset
          */
-        $ruleset = $this->findRuleset();
+        $ruleset = $this->findRuleset($rulesetId);
 
         /* Load NDS Fields to chooze from
          */
@@ -143,7 +127,7 @@ class Factory
          */
         $metas = [];
 
-        $ruleIds = Rule\Mapper::getInstance()->findIdsByColumnList([ 'role_type' => $this->getType() ]);
+        $ruleIds = Rule\Mapper::getInstance()->findIdsByColumnList([ 'role_type' => $rulesetId ]);
 
         foreach (Condition\Mapper::getInstance()->findIdsByColumnList([ 'rule_id' => $ruleIds ]) as $conditionId) {
             $metas['condition'][$conditionId] = $this->getMeta();
@@ -204,41 +188,61 @@ class Factory
             }
         }
 
-        // Get all of the custom rules too
-        /** @var Hydrator\Custom\Model[] $hydratorModels */
-        $hydratorModels = Hydrator\Custom\Mapper::getInstance()->findByColumnList(
-            ['role_type' => $this->getType()],
-            ['order' => ['sequence' => 'asc'],]
-        );
-
         /* If it was one of the known cases, return a well-formed structure
          * Otherwise it would have returned empty array earlier
          */
         return [
             'allBreadcrumbs'         => $allBreadcrumbs->getAllNodes(),
             'allNavigation'          => $allNavigation->getAllNodes(),
-            'rulesetId'              => $this->getType(),
-            'ruleset'  => [
-                'rules'  => $this->findRuleset(),
-                'config' => Config\Mapper::getInstance()->findById($this->getType()),
-            ],
-            'customRules'            => $hydratorModels,
+            'rulesetId'              => $rulesetId,
+            'ruleset'                => $this->produceRuleset($rulesetId),
             'allConditionStructures' => $allConditionStructures,
             'allEffectStructures'    => $allEffectStructures,
-            'allNDSField'            => $ffactory->buildMap($this->getType()),
+            'allNDSField'            => $ffactory->buildMap($rulesetId),
             'meta'                   => $metas
         ];
     }
 
     /**
+     * Produce ruleset data based on Role Type
+     *
+     * @param string         $rulesetId      Role type - typically one of student|parent|staff
+     * @param GrammarFactory $grammarFactory An optional grammar builder, for converting the ruleset to grammar rules.
+     *                                       Required if the UPS is to be run on users.
+     *
+     * @return Ruleset
+     */
+    public function produceRuleset($rulesetId, GrammarFactory $grammarFactory = null)
+    {
+        $rules       = $this->findRuleset($rulesetId);
+        $customRules = Hydrator\Custom\Mapper::getInstance()->findByColumnList(
+            ['role_type' => $rulesetId],
+            ['order' => ['sequence' => 'asc'],]
+        );
+        $config      = Config\Mapper::getInstance()->findById($rulesetId);
+        if (isset($grammarFactory)) {
+            return new Ruleset(
+                $rules,
+                $customRules,
+                $config,
+                $grammarFactory->buildFromRuleCollection($rulesetId, $rules)
+            );
+        } else {
+            return new Ruleset($rules, $customRules, $config);
+        }
+    }
+
+    /**
      * Load a Ruleset based on Role Type student|parent|staff
      *
-     * @return array
+     * @param string $rulesetId
+     *
+     * @return Rule\Model[]
      */
-    private function findRuleset()
+    private function findRuleset($rulesetId)
     {
         // TODO DI
-        $ruleset = Rule\Mapper::getInstance()->findByColumnList([ 'role_type' => $this->getType() ], [
+        $ruleset = Rule\Mapper::getInstance()->findByColumnList([ 'role_type' => $rulesetId ], [
             'order' => [ 'sequence' => 'ASC' ]
         ]);
 
@@ -263,25 +267,5 @@ class Factory
     private function getMeta()
     {
         return $this->meta;
-    }
-
-    /**
-     * Set type
-     *
-     * @param string $type
-     */
-    private function setType($type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    private function getType()
-    {
-        return $this->type;
     }
 }

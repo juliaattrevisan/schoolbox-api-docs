@@ -62,13 +62,13 @@ class Controller extends Base {
 
         /* Produce Twig template data based on Role
          */
-        $factory = new Factory($params['rulesetId']);
+        $factory = new Factory();
 
         /* Twig data
          */
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/ruleset.twig',
-            'data' => $factory->produce()
+            'data' => $factory->produceTemplateData($params['rulesetId'])
         ]);
     }
 

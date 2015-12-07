@@ -307,17 +307,19 @@ class UserMapper extends Mapper
     /**
      * Find a user by their external id and come with roles, campus, etc
      *
-     * @param $id
-     * @return bool|User
+     * @param int    $id
+     * @param string $roleType If provided, restrict to this role type.
+     *                         One of `Role::STAFF`, `Role::STUDENT`, `Role::PARENT`, `Role::GUEST`
+     * @return User
      * @throws Mapper\Exception
      */
-    public function findByExternalId($id) {
+    public function findByExternalId($id, $roleType = null) {
         $user = false;
         $roleMapper = new RoleMapper;
         $campusMapper = new CampusMapper;
         $linkedUserList = array();
 
-        $statement = $this->database->prepare("
+        $query = "
             SELECT
                 {$this->getColumnString('u')}, IF(su.id, 1, 0) as `u.superuser`,
                 {$roleMapper->getColumnString('g')},
@@ -330,9 +332,15 @@ class UserMapper extends Mapper
             LEFT JOIN luCampus c ON c.id = uc.`campus`
             LEFT JOIN {$this->getJoinSql('user_link', 'u', 'lu')}
             WHERE u.synergy_id = ?
-        ");
+        ";
+        $params = [$id];
+        if (isset($roleType)) {
+            $query .= ' AND g.group_type = ?';
+            $params[] = $roleType;
+        }
 
-        $statement->execute(array($id));
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
 
         /** @var User $user */
         foreach ($statement as $row) {

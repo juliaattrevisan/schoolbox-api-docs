@@ -53,22 +53,52 @@ class Factory
      */
     public function build($roletype)
     {
+        $search = [
+            'role_type' => $roletype,
+            'enabled'   => true,
+        ];
+
+//        if (!$includeDisabled) {
+//            $search['enabled'] = true;
+//        }
+
+        /**
+         * pull these rules out in sequence
+         * @var Rule[] $dbRules
+         */
+        $dbRules = $this->ruleMapper->findByColumnList($search, [
+            'order' => [
+                'sequence' => 'ASC'
+            ]
+        ]);
+
+        return $this->buildFromRuleCollection($roletype, $dbRules);
+    }
+
+    /**
+     * Builds a ruleset out of a roletype and a collection of rule models.
+     *
+     * @param string $roletype
+     * @param Rule[] $ruleCollection
+     *
+     * @return UserRuleset
+     */
+    public function buildFromRuleCollection($roletype, $ruleCollection)
+    {
         $context = ucfirst($roletype);
 
         $ffactory = new FieldFactory();
 
         $set = new UserRuleset($this->userMapper, $context, $ffactory->buildMap($roletype));
 
-        foreach ($this->findRulesForRoleType($roletype) as $rule) {
-
+        foreach ($ruleCollection as $rule) {
+            $translatedRule = $this->translateRuleModelToAddableRule($rule);
             $set->newRule(
-                $rule['conditions'],
-                $rule['effects'],
-                $rule['negate']
+                $translatedRule['conditions'],
+                $translatedRule['effects'],
+                $translatedRule['negate']
             );
-
         }
-
         return $set;
     }
 
@@ -103,27 +133,45 @@ class Factory
         ]);
 
         foreach ($dbRules as $i => $rule) {
-
-            $rules[$i] = [
-                'conditions' => [],
-                'effects' => [],
-                'negate' => false
-            ];
-
-            foreach ($rule->getConditions() as $condition) {
-                $rules[$i]['conditions'][] = $this->buildCondition($condition->getConditionType()->getName(), $condition->getArguments());
-            }
-
-            foreach ($rule->getEffects() as $effect) {
-                $rules[$i]['effects'][$effect->getUserProperty()] = $this->buildEffect($effect->getEffectType()->getName(), $effect->getArguments());
-            }
-
-            /* You can negate entire rules but we don't do it in UPS
-             */
-//            $rules[$i]['negate'] = isset($rule['negate']) && $rule['negate'];
+            $rules[$i] = $this->translateRuleModelToAddableRule($rule);
         }
 
         return $rules;
+    }
+
+    /**
+     * Translates a rule model object to a rule that is addable to
+     * `UserRuleset->newRule()`.
+     *
+     * @param Rule $rule
+     *
+     * @return array An array with the following keys:
+     *               * conditions: a list of conditions
+     *               * effects:    a list of effects
+     *               * negate:     whether the condition is to be negated
+     *
+     */
+    protected function translateRuleModelToAddableRule(Rule $rule)
+    {
+        $result = [
+            'conditions' => [],
+            'effects' => [],
+            'negate' => false
+        ];
+
+        foreach ($rule->getConditions() as $condition) {
+            $result['conditions'][] = $this->buildCondition($condition->getConditionType()->getName(), $condition->getArguments());
+        }
+
+        foreach ($rule->getEffects() as $effect) {
+            $result['effects'][$effect->getUserProperty()] = $this->buildEffect($effect->getEffectType()->getName(), $effect->getArguments());
+        }
+
+        /* You can negate entire rules but we don't do it in UPS
+         */
+//        $result['negate'] = isset($rule['negate']) && $rule['negate'];
+
+        return $result;
     }
 
 

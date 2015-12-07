@@ -49,7 +49,6 @@ class Factory {
 
         'residentialHouse' => 'Residential House',
         'schoolHouse' => 'School House',
-
         'boardingStatus' => 'Boarding Status',
 
         'localEmail' => 'Local Email?',
@@ -57,6 +56,8 @@ class Factory {
         'enabled' => 'Schoolbox Account Enabled?',
         'webmail' => 'Webmail',
         'eportfolioEnable' => 'Eportfolio Enabled?',
+
+        'role' => 'Role'
     ];
 
     /**
