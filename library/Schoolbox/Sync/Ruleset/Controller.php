@@ -67,7 +67,7 @@ class Controller extends Base {
         /* Twig data
          */
         $twigData = $factory->produceTemplateData($params['rulesetId']);
-        if ($this->getSession()->getSegment('upsRuleset')->getFlash('hasDryRun')) {
+        if ($this->getSession()->getSegment(static::class)->getFlash('hasDryRun')) {
             $twigData['hasDryRun'] = true;
         }
         $this->getResponse()->content->set([
@@ -85,7 +85,7 @@ class Controller extends Base {
     {
         $rulesetId = $params['rulesetId'];
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
-        $this->getSession()->getSegment('upsRuleset')->setFlash('hasDryRun', true);
+        $this->getSession()->getSegment(static::class)->setFlash('hasDryRun', true);
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate(
                 'upsRuleset.read',
