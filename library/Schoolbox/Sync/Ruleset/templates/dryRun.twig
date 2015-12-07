@@ -10,7 +10,14 @@
     <div class="small-12 island">
         <section class="content">
             <h2 class="subheader">Running {{ rulesetId|capitalize }} Dry Run</h2>
-            <p>Please be patient - we'll let you know when it's done.</p>
+            {% if config.messaging_enabled %}
+                <p>Please be patient - we'll let you know when it's done.</p>
+            {% else %}
+                <p>
+                    If messaging was enabled, you would receive an alert when the dry run was completed.
+                    It isn't though, so maybe check again in a few minutes?
+                </p>
+            {% endif %}
         </section>
     </div>
 </div>
