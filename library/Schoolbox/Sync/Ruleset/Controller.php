@@ -84,22 +84,6 @@ class Controller extends Base {
     public function dryRun($params)
     {
         $rulesetId = $params['rulesetId'];
-        $factory   = new Factory();
-        // This time around, the factory actually needs to create an entire hydrator.
-        $this->getResponse()->content->set([
-            'template' => '@upsRuleset/dryRun.twig',
-            'data'     => $factory->produceTemplateData($rulesetId),
-        ]);
-    }
-
-    /**
-     * Start Dry Run view
-     *
-     * @param array $params
-     */
-    public function dryRunStart($params)
-    {
-        $rulesetId = $params['rulesetId'];
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->getSession()->getSegment('upsRuleset')->setFlash('hasDryRun', true);
         $this->getResponse()->redirect->to(
