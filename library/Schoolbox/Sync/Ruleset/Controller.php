@@ -104,7 +104,7 @@ class Controller extends Base {
         );
         // Not the best place to put it but it will do for now
         $this->getResponse()->content->set([
-            'postRedirect' => [
+            'postOutput' => [
                 function() use ($rulesetId) {
                     $this->dryRunCallback($rulesetId);
                 }
@@ -122,7 +122,23 @@ class Controller extends Base {
         // perform the actual dry run
         sleep(5);
         sleep(5);
+
         // notify
+        // TODO make this show in notifications instead of as an alert
+        $user   = $this->getUser();
+        $userId = $user->getId();
+        $bob    = new \Alaress\Async\Notification\Instance\Builder();
+        $bob->setTitle('Your dry run has finished')
+            ->setSeverity(\Monolog\Logger::INFO)
+            ->setNamespace('ALERT')
+            ->setHref('#')
+            ->setIcon('/images/icon.php?icon=bolt&size=64')
+            ->addTopic("notify.user.$userId")
+//            ->putMeta('ttl', 30)
+            ->putMeta('title', 'Message from ' . $user->formatName());
+
+        $n = new \Schoolbox\Notif\Notif("instant.user.$userId");
+        $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
     }
 
     /**
