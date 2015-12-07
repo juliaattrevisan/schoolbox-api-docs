@@ -37,6 +37,25 @@ class Base {
         $location = $this->getResponse()->headers->get('location');
         if (!isset($location)) {
             $this->outputResponseBody();
+        } else {
+            // Output post callbacks
+            $content = $this->getResponse()->content->get();
+            if (is_array($content) && isset($content['postRedirect'])) {
+                // Output now
+                header('Content-Encoding: none');
+                header("Content-Length: 0");
+                header('Connection: close');
+                ignore_user_abort();
+                flush();
+                session_write_close();
+
+                // Callbacks
+                foreach ($content['postRedirect'] as $callback) {
+                    if (is_callable($callback)) {
+                        $callback();
+                    }
+                }
+            }
         }
     }
 
