@@ -1,7 +1,25 @@
 <input type="text" {{ dynamicDisabled }} name="{{ dynamicInputName }}" value="{{ preselected }}" />
 
-<script type="text/javascript">
-    $(function() {
-        console.log($('input[name="{{ dynamicInputName }}"]').val());
-    });
-</script>
+{% set mapRowIdentifier = 'mappingrow-' ~ random(100000000) %}
+
+<div data-mapping-row="{{ mapRowIdentifier }}">
+{% for campusId, campusName in allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
+
+    {# Each checkbox needs to be unique on the whole page
+     # due to custom checkbox design requiring ids
+     #}
+    {% set checkboxIdentifier = 'effect-' ~ currentEffect.id ~ '-' ~ 'checkbox-' ~ random(10000000) %}
+
+    <script type="text/javascript">
+        $(function() {
+            $('#ruleset').find('[data-mapping-row={{ mapRowIdentifier }}]').find('input[type=checkbox]').change(function(event) {
+                console.log('changed!');
+            });
+        });
+    </script>
+
+    <input id="{{ checkboxIdentifier }}" type="checkbox" />
+    <label for="{{ checkboxIdentifier }}" class="checkbox-label">{{ campusName }}</label>
+{% endfor %}
+</div>
+
