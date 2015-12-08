@@ -9,11 +9,12 @@
                 <span class="meta">If</span>
             </div>
             <div class="small-11 columns">
-                <select {{ meta.condition[currentCondition.id].disabled }} name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][0]">
-                    {% for currentMatches in allMatches %}
-                    <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.arguments[0] %}selected="selected"{% endif %}>{{ currentMatches }}</option>
-                    {% endfor %}
-                </select>
+                {% include '@upsCondition/select.twig' with {
+                    name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][0]',
+                    options: allMatches,
+                    preselected: currentCondition.arguments[0],
+                    disabled: meta.condition[currentCondition.id].disabled
+                } %}
             </div>
             <div class="small-12 columns">
                 <span id='condition-{{ currentCondition.id }}-status' class="label highlight full-width {{ meta.condition[currentCondition.id].status ? '' : 'hide' }}">{{ meta.condition[currentCondition.id].status }}</span>
