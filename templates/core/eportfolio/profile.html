@@ -179,18 +179,18 @@
         <!-- BEGIN has_subjects -->
         <div class="row">
             <div class="small-12 island">
-                <h2 class="subheader">My Current Subjects</h2>
+                <h2 class="subheader">My Subjects</h2>
                 <section>
                     <ul class="action-list">
                         <!-- BEGIN subject -->
                         <li>
-                            <div class="info card small-12">
-                                <span class="icon-home icon-32" title="Visit Homepage"></span>
+                            <div class="small avatar card small-12">
+                                <span class="icon-home" title="Visit Homepage"></span>
                                 <!-- BEGIN subject_linked -->
-                                <a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a>
+                                <h3><a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a></h3>
                                 <!-- END subject_linked -->
                                 <!-- BEGIN subject_unlinked -->
-                                {SUBJECT_NAME}
+                                <h3>{SUBJECT_NAME}</h3>
                                 <!-- END subject_unlinked -->
                             </div>
                         </li>
@@ -204,18 +204,18 @@
         <!-- BEGIN has_groups -->
         <div class="row">
             <div class="small-12 island">
-                <h2 class="subheader">My Current Groups</h2>
+                <h2 class="subheader">My Groups</h2>
                 <section>
                     <ul class="action-list">
                         <!-- BEGIN group -->
                         <li>
-                            <div class="info card small-12">
-                                <span class="icon-home icon-32" title="Visit Homepage"></span>
+                            <div class="small avatar card small-12">
+                                <span class="icon-home" title="Visit Homepage"></span>
                                 <!-- BEGIN group_linked -->
-                                <a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a>
+                                <h3><a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a></h3>
                                 <!-- END group_linked -->
                                 <!-- BEGIN group_unlinked -->
-                                {GROUP_NAME}
+                                <h3>{GROUP_NAME}</h3>
                                 <!-- END group_unlinked -->
                             </div>
                         </li>
