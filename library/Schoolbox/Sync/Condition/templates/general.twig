@@ -10,7 +10,7 @@
             </div>
             <div class="small-11 medium-5 large-5 columns">
                 <label title="Data from your SIS">
-                    {% include '@upsCondition/select.twig' with {
+                    {% include 'sub/select.twig' with {
                         name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][0]',
                         options: allNDSField,
                         preselected: currentCondition.arguments[0],
@@ -19,7 +19,7 @@
                 </label>
             </div>
             <div class="small-12 medium-3 large-3 columns">
-                {% include '@upsCondition/select.twig' with {
+                {% include 'sub/select.twig' with {
                     name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][2]',
                     options: allMatches,
                     preselected: currentCondition.arguments[2],

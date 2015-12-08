@@ -8,7 +8,7 @@
             </div>
             <div class="small-10 medium-11 large-4 columns">
                 <label title="This Schoolbox User Field will be modified">
-                    {% include '@upsCondition/select.twig' with {
+                    {% include 'sub/select.twig' with {
                         name: 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][userProperty]',
                         options: allEffectStructures.allUserField,
                         preselected: currentEffect.getUserProperty(),
@@ -21,7 +21,7 @@
             </div>
             <div class="small-12 medium-6 large-3 columns">
                 <label title="Mapping Type">
-                    {% include '@upsCondition/select.twig' with {
+                    {% include 'sub/select.twig' with {
                         name: 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][type]',
                         options: {
                             1: 'Maps',

@@ -9,7 +9,7 @@
                 <span class="meta">If</span>
             </div>
             <div class="small-11 columns">
-                {% include '@upsCondition/select.twig' with {
+                {% include 'sub/select.twig' with {
                     name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][0]',
                     options: allMatches,
                     preselected: currentCondition.arguments[0],
