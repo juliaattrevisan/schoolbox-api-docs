@@ -28,6 +28,7 @@ class Lookup {
         'residentialHouse' => '\HouseResidentialMapper',
         'schoolHouse' => '\HouseMapper',
         'role' => '\Schoolbox\RoleMapper',
+        'campusCollection' => '\Schoolbox\CampusMapper',
     ];
 
     /**

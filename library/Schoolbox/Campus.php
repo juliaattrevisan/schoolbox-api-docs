@@ -8,7 +8,7 @@
  */
 namespace Schoolbox;
 
-class Campus {
+class Campus implements ValueLabelInterface {
 
 	/** @var string */
     private $name;
@@ -94,6 +94,24 @@ class Campus {
 		return $this->timetableDay;
 	}
 
-
+    /**
+     * Find a key/value representation of this model's data
+     * and return it as a 2D array of value (an identifier)
+     * and label (a human-readable description, usually)
+     *
+     * return [
+     *     'value' => ...
+     *     'label' => ...
+     * ];
+     *
+     * @return array
+     */
+    public function findValueLabelPair()
+    {
+        return [
+            'value' => $this->getId(),
+            'label' => $this->getName()
+        ];
+    }
 }
 

@@ -184,7 +184,7 @@ class Factory {
             return new Fragment('@upsEffect/subfragments/string.twig');
         }
         else if ($this->isCollection($userField)) {
-            return new Fragment('@upsEffect/subfragments/collection.twig');
+            return new Fragment('@upsEffect/subfragments/collection.twig', $this->getLookup()->findData($userField));
         }
     }
 
