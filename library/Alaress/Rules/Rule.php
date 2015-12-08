@@ -46,12 +46,10 @@ class Rule
      */
     public function apply($_ = null)
     {
-        // no conditions means always fire
-        if (!$this->conditions->count()) {
-            $fire = true;
+        $fire = true;
 
-        } else {
-            $fire = true;
+        // no conditions means always fire
+        if ($this->conditions->count()) {
             // iterate conditions and ensure all match
             foreach ($this->conditions as $condition) {
                 // failfast
