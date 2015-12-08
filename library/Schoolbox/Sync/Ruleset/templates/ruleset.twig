@@ -51,80 +51,95 @@
                 </ul>
             </div>
 
-            {% for currentRule in ruleset.getRules() %}
-            <div class="row" id="rule-{{ currentRule.id }}" data-rule="{{ currentRule.id }}">
-                <div class="small-12 columns">
-                    <div class="actions-small-3">
-                        <div class="list-item">
-                            <h3 class="subheader">
-                                {% if currentRule.name|length %}
-                                    {{ currentRule.name }}
-                                {% else %}
-                                    Rule {{ currentRule.id }}
-                                {% endif %}
+            <ul class="information-list sortable" data-sortable>
+            
+                {% for currentRule in ruleset.getRules() %}
+                <li class="row" id="rule-{{ currentRule.id }}" data-rule="{{ currentRule.id }}">
 
-                                {% if currentRule.description|length %}
-                                    <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
-                                {% endif %}
-                            </h3>
+                    {# Ensure rule[] gets POSTed, even when it has no Conditions or Effects
+                      # We do that so the Rule can be sequenced prior to creation of Conditions
+                      # and/or Effects
+                      #}
+                    {% if currentRule.conditions|length == 0 %}
+                    <input type="hidden" name="rule[{{ currentRule.id }}]" value="" />
+                    <input type="hidden" name="rule[{{ currentRule.id }}][conditions]" value="" />
+                    <input type="hidden" name="rule[{{ currentRule.id }}][effects]" value="" />
+                    {% endif %}
+
+                    <div class="grip"></div>
+                    <div class="small-11 columns no-pad">
+                        <div class="actions-small-3">
+                            <div class="list-item">
+                                <h3 class="subheader">
+                                    {% if currentRule.name|length %}
+                                        {{ currentRule.name }}
+                                    {% else %}
+                                        Rule {{ currentRule.id }}
+                                    {% endif %}
+    
+                                    {% if currentRule.description|length %}
+                                        <span class='hint has-tip tip-top' data-tooltip title="{{ currentRule.description }}">?</span>
+                                    {% endif %}
+                                </h3>
+                            </div>
+                            <nav>
+                                <a href="#" class="icon-add" data-collapser="rule-{{ currentRule.id }}-contents" title="Collapse Content"></a>
+                                <a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule"></a>
+                                <a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule"></a>
+                            </nav>
                         </div>
-                        <nav>
-                            <a href="#" class="icon-add" data-collapser="rule-{{ currentRule.id }}-contents" title="Collapse Content"></a>
-                            <a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule"></a>
-                            <a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule"></a>
-                        </nav>
+    
+                        <span id='rule-{{ currentRule.id }}-status' class="label highlight full-width hide"></span>
                     </div>
-
-                    <span id='rule-{{ currentRule.id }}-status' class="label highlight full-width hide"></span>
-                </div>
-                <div class="small-12 columns">
-                    <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
-                        <div class="actions-small-1 row">
-                            <div class="list-item">
-                                <div class="small-12 columns">
-                                    <h4>Conditions</h4>
+                    <div class="small-12 columns no-pad">
+                        <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
+                            <div class="actions-small-1 row">
+                                <div class="list-item">
+                                    <div class="small-12 columns">
+                                        <h4>Conditions</h4>
+                                    </div>
                                 </div>
+                                <nav>
+                                    <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
+                                </nav>
+                                <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
+                                    <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
+                                    <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+                                </ul>
                             </div>
-                            <nav>
-                                <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
-                            </nav>
-                            <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
-                                <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
-                                <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+    
+                            <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-conditions">
+                                {% for currentCondition in currentRule.conditions %}
+                                {% include allConditionStructures.fragments[currentCondition.id].fragment.getFilename() %}
+                                {% endfor %}
                             </ul>
-                        </div>
-
-                        <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-conditions">
-                            {% for currentCondition in currentRule.conditions %}
-                            {% include allConditionStructures.fragments[currentCondition.id].fragment.getFilename() %}
-                            {% endfor %}
-                        </ul>
-
-                        <div class="actions-small-2 row">
-                            <div class="list-item">
-                                <div class="small-12 columns">
-                                    <h4>Effects</h4>
+    
+                            <div class="actions-small-2 row">
+                                <div class="list-item">
+                                    <div class="small-12 columns">
+                                        <h4>Effects</h4>
+                                    </div>
                                 </div>
+                                <nav>
+                                    <a class="icon-help" title="Show available Tokens" data-reveal-id="token-list"></a>
+                                    <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-effect-options"></a>
+                                </nav>
+                                <ul id="rule-{{ currentRule.id }}-effect-options" class="f-dropdown" data-dropdown-content>
+                                    <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Spawn new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
+                                    <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip</a></li>
+                                </ul>
                             </div>
-                            <nav>
-                                <a class="icon-help" title="Show available Tokens" data-reveal-id="token-list"></a>
-                                <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-effect-options"></a>
-                            </nav>
-                            <ul id="rule-{{ currentRule.id }}-effect-options" class="f-dropdown" data-dropdown-content>
-                                <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Spawn new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
-                                <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip</a></li>
+    
+                            <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-effects">
+                                {% for currentEffect in currentRule.effects %}
+                                {% include allEffectStructures.containers[currentEffect.id] %}
+                                {% endfor %}
                             </ul>
-                        </div>
-
-                        <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-effects">
-                            {% for currentEffect in currentRule.effects %}
-                            {% include allEffectStructures.containers[currentEffect.id] %}
-                            {% endfor %}
-                        </ul>
-                    </section>
-                </div>
-            </div>
-            {% endfor %}
+                        </section>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
 
             {# Display custom rules #}
             {% if ruleset.getCustomRules() is not empty %}

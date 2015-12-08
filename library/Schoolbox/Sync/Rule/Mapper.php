@@ -91,4 +91,30 @@ class Mapper extends Schoolbox\Mapper
           WHERE role_type = ?
         ", [ $roleType ])->fetchColumn();
     }
+
+    /**
+     * Resequence Rules
+     *
+     * @param $sequencing
+     * @return bool
+     */
+    public function updateRuleSequence($sequencing)
+    {
+        $identifierName = $this->identifier['column'];
+
+        $statement = $this->database->prepare("
+            UPDATE `{$this->table}`
+            SET sequence = :sequence
+            WHERE `{$identifierName}` = :identifierValue
+        ");
+
+        for ($i = 1; $i <= count($sequencing); $i++) {
+            $statement->bindValue(':sequence', $i);
+            $statement->bindValue(':identifierValue', $sequencing[$i-1]);
+
+            $statement->execute();
+        }
+
+        return true;
+    }
 }
