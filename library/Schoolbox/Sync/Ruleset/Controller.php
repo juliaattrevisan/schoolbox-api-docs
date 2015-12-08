@@ -17,6 +17,7 @@ use \Schoolbox\Sync\Condition;
 use \Schoolbox\Sync\Effect;
 use \Schoolbox\Sync\Hydrator;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
+use Schoolbox\Sync\Provisioner\Provisioner;
 use \Schoolbox;
 use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 
@@ -79,9 +80,10 @@ class Controller extends Base {
     /**
      * Dry Run view
      *
-     * @param string $rulesetId
+     * @param string      $rulesetId
+     * @param Provisioner $provisioner
      */
-    public function dryRun($rulesetId)
+    public function dryRun($rulesetId, Provisioner $provisioner)
     {
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->getSession()->getSegment(static::class)->setFlash('hasDryRun', true);
@@ -94,8 +96,8 @@ class Controller extends Base {
         // Not the best place to put it but it will do for now
         $this->getResponse()->content->set([
             'postOutput' => [
-                function() use ($rulesetId) {
-                    $this->dryRunCallback($rulesetId);
+                function() use ($rulesetId, $provisioner) {
+                    $this->dryRunCallback($rulesetId, $provisioner);
                 }
             ],
         ]);
@@ -104,13 +106,13 @@ class Controller extends Base {
     /**
      * Performs an actual dry run.
      *
-     * @param string $rulesetId
+     * @param string      $rulesetId
+     * @param Provisioner $provisioner
      */
-    public function dryRunCallback($rulesetId)
+    public function dryRunCallback($rulesetId, Provisioner $provisioner)
     {
         // perform the actual dry run
-        sleep(5);
-        sleep(5);
+        $provisioner->run(false);
 
         // notify
         // TODO make this show in notifications instead of as an alert
