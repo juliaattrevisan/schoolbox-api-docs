@@ -226,7 +226,11 @@ class Factory
 
         $rc = new \ReflectionClass($fqcn);
 
-        $expectedCount = $rc->getConstructor()->getNumberOfParameters();
+        $expectedCount = 0;
+        $constructor   = $rc->getConstructor();
+        if ($constructor instanceof \ReflectionMethod) {
+            $expectedCount = $constructor->getNumberOfParameters();
+        }
 
         $actualCount = count($arguments);
 
