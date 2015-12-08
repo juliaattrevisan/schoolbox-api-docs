@@ -57,7 +57,7 @@
          #}
         {% set checkboxIdentifier = 'effect-' ~ currentEffect.id ~ '-' ~ 'checkbox-' ~ random(10000000) %}
 
-        <input id="{{ checkboxIdentifier }}" type="checkbox" value="{{ campusId }}" />
+        <input {{ dynamicDisabled }} id="{{ checkboxIdentifier }}" type="checkbox" value="{{ campusId }}" />
         <label for="{{ checkboxIdentifier }}" class="checkbox-label">{{ campusName }}</label>
     {% endfor %}
 </div>
