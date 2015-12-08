@@ -32,6 +32,7 @@
 
         initRuleDelete();
         initRuleCollapse();
+        initRuleReordering();
 
         initConditionCreate();
         initConditionModifyLock();
@@ -195,6 +196,16 @@
          */
         function initRuleCollapse() {
             $('[data-collapser]').collapsable();
+        }
+
+        /**
+         * Allow Rule Reordering
+         */
+        function initRuleReordering() {
+            $(config.element).find('[data-sortable]').sortable({
+                handle: '.grip',
+                axis: 'y'
+            });
         }
 
         /**
