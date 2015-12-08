@@ -24,25 +24,25 @@ class FieldFactory
          */
         $map = [
             'id'                     => ucfirst($roleType) . ' ID',
+
+            'account.login'          => 'Account Username',
+            'account.active'         => 'Account Activation Status',
+
             'title'                  => 'Title',
             'preferredName'          => 'Preferred Name',
             'givenName'              => 'Given Name',
             'lastname'               => 'Last Name',
+            'year.level'             => 'Year Level',
 
             'publiclyVisible'        => 'Visibility',
             'dob'                    => 'Date of Birth',
             'gender'                 => 'Gender',
             'email[].address'        => 'Email Address(es)',
 
-            'year.level'             => 'Year Level',
-
-            'account.active'         => 'Account Activation Status',
-            'account.login'          => 'Account Username',
-
-            'phoneHome.number'       => 'Home phone number',
-            'phoneHome.silent'       => 'Home phone silent status',
-            'phoneMobile.number'     => 'Mobile phone number',
-            'phoneMobile.silent'     => 'Mobile phone silent status',
+            'phoneHome.number'       => 'Home Phone Number',
+            'phoneHome.silent'       => 'Home Phone Silent Status',
+            'phoneMobile.number'     => 'Mobile Phone Number',
+            'phoneMobile.silent'     => 'Mobile Phone Silent Status',
 
             'campus[].code'          => 'Campus(es) Code(s)',
             'campus[].name'          => 'Campus(es) Name(s)',

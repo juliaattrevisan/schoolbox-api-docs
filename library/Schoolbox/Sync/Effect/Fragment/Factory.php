@@ -37,12 +37,13 @@ class Factory {
      */
     private $allFieldKeys = [
         'externalId' => 'External ID',
+
         'username' => 'Username',
 
         'title' => 'Title' ,
         'firstname' => 'Firstname',
         'lastname' => 'Surname',
-        'year' => 'Year',
+        'year' => 'Year Level',
 
         'email' => 'Email Address',
         'altEmail' => 'Alt Email Address',
