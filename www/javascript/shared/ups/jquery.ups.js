@@ -45,6 +45,7 @@
         initEffectDelete();
         initEffectUserFieldAvailability();
         initEffectMappingRows();
+        initEffectCheckbox();
         initEffectCheckboxChange();
 
         /**
@@ -621,6 +622,28 @@
                 var ruleId = $(element).attr('data-rule');
 
                 refreshUserFieldAvailability(ruleId);
+            });
+        }
+
+        /**
+         * Preselect checkboxes in a key-multivalue context
+         */
+        function initEffectCheckbox() {
+            $.each($(config.element).find('[data-mapping-row]'), function(index, element) {
+                var container = $(element);
+                var mapRowIdentifier = container.attr('data-mapping-row');
+
+                var csv = $('#mapping-row-input-' + mapRowIdentifier).val();
+
+                /* Split csv into their origina values
+                 */
+                var values = csv.split(',');
+
+                /* Tick, where values were previously saved
+                 */
+                for (var i = 0; i < values.length; i++) {
+                    container.find('input[value='+values[i]+']').prop('checked', true);
+                }
             });
         }
 
