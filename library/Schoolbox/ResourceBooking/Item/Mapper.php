@@ -20,7 +20,7 @@ class Mapper extends BaseMapper
     public function mapping()
     {
         $this->hasTable('resource');
-        $this->hasModel('Schoolbox\\ResourceBooking\\Item\\Model');
+        $this->hasPrototype(new Model());
         $this->hasMap(
             array(
                 'column'     => 'id',
