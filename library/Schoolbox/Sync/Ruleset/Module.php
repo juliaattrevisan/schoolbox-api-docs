@@ -13,9 +13,13 @@ namespace Schoolbox\Sync\Ruleset;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
+use Alaress\Redis;
+use Aura\Di;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Storage;
 use Twig_Loader_Chain;
 
 class Module extends BaseModule
@@ -44,6 +48,13 @@ class Module extends BaseModule
             $matcher,
             '(?:dryRun)',
             function () {
+
+                /** @var Di\Container $di */
+                $di = $this->getInjector();
+
+                // prep the key Redis will use for this dry run
+                $di->values['ups.redisKey'] = INSTANCE_ID . '.provision.user.' . getmypid() . '.dry';
+
                 return array(
                     'provisioner' => $this->getInjector()->get('ups.provisioner'),
                 );
