@@ -63,16 +63,17 @@
                 <div class="content">
                     <article>{TEXTBOX_BODY}</article>
                 </div>
-
-                <div class="content">
                     <!-- BEGIN modify_text -->
-                    <a href="/homepage/{ID}/textBoxModify/{COMPONENT_INSTANCE_ID}#go-to{COMPONENT_INSTANCE_ID}" class="button icon-modify">Modify</a>
-                    <a href="/textbox/textBoxForm.php?delete={TEXTBOX_ID}&originID={ID}" data-delete class="button icon-delete">Delete</a>
+                    <div class="content">
+                        <a href="/homepage/{ID}/textBoxModify/{COMPONENT_INSTANCE_ID}#go-to{COMPONENT_INSTANCE_ID}" class="button icon-modify">Modify</a>
+                        <a href="/textbox/textBoxForm.php?delete={TEXTBOX_ID}&originID={ID}" data-delete class="button icon-delete">Delete</a>
+                    </div>
                     <!-- END modify_text -->
                     <!-- BEGIN create_text -->
-                    <a href="/homepage/{ID}/textBoxCreate/{COMPONENT_INSTANCE_ID}" class="button icon-add">Create</a>
+                    <div class="content">
+                        <a href="/homepage/{ID}/textBoxCreate/{COMPONENT_INSTANCE_ID}" class="button icon-add">Create</a>
+                    </div>
                     <!-- END create_text -->
-                </div>
                 <!-- END text_locked -->
             </section>
         </div>
