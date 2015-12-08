@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Sync\Provisioner;
 
+use Alaress\Rules\Lang\SkipException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\SyncInterface;
@@ -122,17 +123,25 @@ class Provisioner
                     // Run this user through the hydrators
                     try {
                         $ruleset->hydrate($externalUser, $internalUser);
+//                        new \Alaress_Probe(
+//                            $this->userMapper->dehydrate($originalUser),
+//                            $this->userMapper->dehydrate($internalUser),
+//                            $this->userMapper->diff($originalUser, $internalUser)
+//                        );
+//                        echo '<hr style="clear:both"/>';
+                    } catch (SkipException $e) {
+                        // This ruleset is to be skipped - continue
+//                        new \Alaress_Probe(
+//                            $this->userMapper->dehydrate($originalUser),
+//                            'skip',
+//                            []
+//                        );
+//                        echo '<hr style="clear:both"/>';
+                        continue;
                     } catch (\Exception $e) {
-                        // TODO create a special SkipException
+                        // something untoward happened - better raise an error
                         continue;
                     }
-
-//                    new \Alaress_Probe(
-//                        $this->userMapper->dehydrate($originalUser),
-//                        $this->userMapper->dehydrate($internalUser),
-//                        $this->userMapper->diff($originalUser, $internalUser)
-//                    );
-//                    echo '<hr style="clear:both"/>';
 
                     // And save
                     if ($update) {
