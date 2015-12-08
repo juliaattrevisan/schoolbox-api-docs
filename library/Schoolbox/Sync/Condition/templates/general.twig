@@ -10,21 +10,21 @@
             </div>
             <div class="small-11 medium-5 large-5 columns">
                 <label title="Data from your SIS">
-                    <select {{ meta.condition[currentCondition.id].disabled }} name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][0]">
-                        {% for currentNDSKey, currentNDSField in allNDSField %}
-                        <option value="{{ currentNDSKey }}" {% if currentNDSKey == currentCondition.arguments[0] %}selected="selected"{% endif %}>
-                            {{ currentNDSField }}
-                        </option>
-                        {% endfor %}
-                    </select>
+                    {% include '@upsCondition/select.twig' with {
+                        name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][0]',
+                        options: allNDSField,
+                        preselected: currentCondition.arguments[0],
+                        disabled: meta.condition[currentCondition.id].disabled
+                    } %}
                 </label>
             </div>
             <div class="small-12 medium-3 large-3 columns">
-                <select {{ meta.condition[currentCondition.id].disabled }} name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][2]">
-                    {% for currentMatches in allMatches %}
-                    <option value="{{ loop.index0 }}" {% if loop.index0 == currentCondition.arguments[2] %}selected="selected"{% endif %}>{{ currentMatches }}</option>
-                    {% endfor %}
-                </select>
+                {% include '@upsCondition/select.twig' with {
+                    name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][2]',
+                    options: allMatches,
+                    preselected: currentCondition.arguments[2],
+                    disabled: meta.condition[currentCondition.id].disabled
+                } %}
             </div>
             <div class="small-12 medium-3 large-3 columns">
                 <label title="A newline-separated list of possible values from your SIS">
@@ -41,3 +41,6 @@
         <a href="" class="icon-{{ meta.condition[currentCondition.id].lock.icon }}" title='Toggle Readonly Mode' data-condition-modify-lock="condition-{{ currentCondition.id }}"></a>
     </nav>
 </li>
+
+
+

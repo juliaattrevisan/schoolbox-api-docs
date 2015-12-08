@@ -53,7 +53,9 @@ class Lookup {
                  */
                 foreach ($allResults as $currentResult) {
                     if ($currentResult instanceof ValueLabelInterface) {
-                        $stack->add($currentResult->findValueLabelPair());
+                        $pair = $currentResult->findValueLabelPair();
+
+                        $stack->setOffset($pair['value'], $pair['label']);
                     }
                 }
             }

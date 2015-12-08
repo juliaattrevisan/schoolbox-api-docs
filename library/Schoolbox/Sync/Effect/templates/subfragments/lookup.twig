@@ -1,12 +1,6 @@
-<select {{ dynamicDisabled }} name="{{ dynamicInputName }}">
-    <option disabled="disabled" {% if not preselected %}selected="selected"{% endif %}>Please Select</option>
-    {% for current in allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
-        {% set selected = '' %}
-
-        {% if preselected == current.value %}
-            {% set selected = 'selected="selected"' %}
-        {% endif %}
-
-        <option value="{{ current.value }}" {{ selected }}>{{ current.label }}</option>
-    {% endfor %}
-</select>
+{% include '@upsCondition/select.twig' with {
+    name: dynamicInputName,
+    options: allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData(),
+    preselected: preselected,
+    disabled: dynamicDisabled
+} %}
