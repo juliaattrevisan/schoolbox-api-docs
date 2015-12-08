@@ -447,12 +447,12 @@ select.visibility {
 	input[type=checkbox]:not(.plain) + label.checkbox-label{
 		display: inline-block;
 	}
-}
-
-.source{
-    margin: 0 0 $form-spacing 0;
-    span{
-        margin: 0 0 0 $form-spacing;
+    // Ensure that the source form input type is spaced like the others
+    .source{
+        margin: 0 0 $form-spacing 0;
+        span{
+            margin: 0 0 0 $form-spacing;
+        }
     }
 }
 
