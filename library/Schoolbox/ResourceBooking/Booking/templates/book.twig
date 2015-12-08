@@ -543,11 +543,16 @@ $(function() {
             </section>
             <div class="row">
                 <div class="small-12 columns">
-                    <input id="resource-booking-save" type="submit" value="{% if item.id %}Update Booking{% else %}Book{% endif %}" data-action="{{ saveAction }}" data-loading-value="Validating..." />
-
-                    {% if item.id %}
-                        <input id="resource-booking-cancel" type="submit" value="Cancel Booking" data-action="{{ routeLookup('resourceBooking.cancel', {id: item.id}) }}" />
-                    {% endif %}
+                    <ul class="flex-list buttons">
+                        <li>
+                            <input id="resource-booking-save" type="submit" value="{% if item.id %}Update Booking{% else %}Book{% endif %}" data-action="{{ saveAction }}" data-loading-value="Validating..." />
+                        </li>
+                        {% if item.id %}
+                        <li>
+                            <a id="resource-booking-cancel" class="button" data-action="{{ routeLookup('resourceBooking.cancel', {id: item.id}) }}">Cancel Booking</a>
+                        </li>
+                        {% endif %}
+                    </ul>
                 </div>
             </div>
         </form>
