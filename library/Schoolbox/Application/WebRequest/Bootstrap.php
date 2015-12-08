@@ -440,6 +440,18 @@ class Bootstrap implements BootstrapInterface {
 
 		// Build a user provisioner
 		// TODO unify this definition and the one in Daemon\Bootstrap
+		$di->set('ups.logger',
+			$di->lazyNew(
+				\Schoolbox\Notif\StoredisLogger::class,
+				[
+					'redisClient' => $di->lazy(function () { return Redis::getClientInstance(); }),
+					'redisKey'    => $di->lazyValue('ups.redisKey'),
+					'receiver'    => $di->lazyNew(\Schoolbox\Resource\Storage\Mapper::class),
+				]
+			)
+		);
+
+		// Build a user provisioner
 		$di->set(
 			'ups.provisioner',
 			$di->lazyNew(
@@ -449,6 +461,7 @@ class Bootstrap implements BootstrapInterface {
 					'grammarFactory' => $di->lazyNew(
 						\Schoolbox\Sync\Grammar\Factory::class,
 						[
+							'log'        => $di->lazyGet('ups.logger'),
 							'userMapper' => $di->lazyNew(\Schoolbox\UserMapper::class),
 							'ruleMapper' => $di->lazyNew(\Schoolbox\Sync\Rule\Mapper::class),
 						]
@@ -458,10 +471,12 @@ class Bootstrap implements BootstrapInterface {
 						return $source->build();
 					}),
 					'userMapper'     => $di->lazyNew(\Schoolbox\UserMapper::class),
-					'logger'         => $di->lazyNew(\Alaress\Lumberjack\Logger::class),
+					'logger'         => $di->lazyGet('ups.logger'),
+					'logMapper'      => $di->lazyNew(\Schoolbox\Sync\Log\Mapper::class),
 				]
 			)
 		);
+
 
 		// load dependencies into the kernel itself
 		$this->kernel->setDependencyInjector($di);
