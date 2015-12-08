@@ -26,7 +26,7 @@
 
                 /* Set csv into hidden input field
                  */
-                $('#mapping-row-input-{{ mapRowIdentifier }}').val(csv);
+                $('#mapping-row-input-' + mapRowIdentifier).val(csv);
             });
 
             /* Pre-tick checkboxes
@@ -35,7 +35,7 @@
                 var container = $(element);
                 var mapRowIdentifier = container.attr('data-mapping-row');
 
-                var csv = $('#mapping-row-input-{{ mapRowIdentifier }}').val();
+                var csv = $('#mapping-row-input-' + mapRowIdentifier).val();
 
                 /* Split csv into their origina values
                  */
