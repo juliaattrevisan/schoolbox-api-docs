@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Sync\Provisioner;
 
+use Alaress\Rules\Lang\SkipException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\SyncInterface;
@@ -122,8 +123,11 @@ class Provisioner
                     // Run this user through the hydrators
                     try {
                         $ruleset->hydrate($externalUser, $internalUser);
+                    } catch (SkipException $e) {
+                        // This ruleset is to be skipped - continue
+                        continue;
                     } catch (\Exception $e) {
-                        // TODO create a special SkipException
+                        // something untoward happened - better raise an error
                         continue;
                     }
 
