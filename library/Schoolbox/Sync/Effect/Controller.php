@@ -20,7 +20,6 @@ use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
 class Controller extends Base {
-    const EFFECT_SKIP = 1;
 
     /**
      * A meta field for various Condition-specific UI
