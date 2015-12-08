@@ -5,7 +5,7 @@
 <div data-mapping-row="{{ mapRowIdentifier }}">
     <script type="text/javascript">
         $(function() {
-            $('#ruleset').find('[data-mapping-row={{ mapRowIdentifier }}]').find('input[type=checkbox]').change(function(event) {
+            $('#ruleset').on('change', '[data-mapping-row] input[type=checkbox]', function(event) {
                 var container = $(this).parents('[data-mapping-row]');
                 var mapRowIdentifier = container.attr('data-mapping-row');
 
@@ -31,7 +31,7 @@
 
             /* Pre-tick checkboxes
              */
-            $.each($('#ruleset').find('[data-mapping-row={{ mapRowIdentifier }}]'), function(index, element) {
+            $.each($('#ruleset').find('[data-mapping-row]'), function(index, element) {
                 var container = $(element);
                 var mapRowIdentifier = container.attr('data-mapping-row');
 
