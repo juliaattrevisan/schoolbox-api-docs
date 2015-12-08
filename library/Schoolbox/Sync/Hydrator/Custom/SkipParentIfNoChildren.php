@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Sync\Hydrator\Custom;
 
+use Alaress\Rules\Lang\SkipException;
 use External_User;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\External\Normalise\User\Guardian as ExternalParent;
@@ -45,7 +46,7 @@ class SkipParentIfNoChildren implements HydratorInterface
     {
         if ($input instanceof ExternalParent) {
             if (empty($this->externalUserHandler->getEnrolledStudents($previous->getExternalId()))) {
-                throw new \Exception('Parents with no children are not synced');
+                throw new SkipException('Parents with no children are not synced');
             }
         }
         return $previous;
