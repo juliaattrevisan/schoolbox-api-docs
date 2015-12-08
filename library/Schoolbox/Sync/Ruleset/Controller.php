@@ -18,7 +18,8 @@ use \Schoolbox\Sync\Effect;
 use \Schoolbox\Sync\Hydrator;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 use \Schoolbox;
-use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
+use \Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
+use \Schoolbox\Sync\Rule\Mapper as RuleMapper;
 
 class Controller extends Base {
 
@@ -78,16 +79,32 @@ class Controller extends Base {
     public function update()
     {
         $postData = $this->getRequest()->post;
-
         $roleType = $postData['rulesetId'];
 
         $this->updateConfig($roleType, $postData['config'][$roleType]);
+
         foreach ($postData['rule'] as $ruleId => $ruleData) {
             $this->updateConditions($ruleId, $ruleData['condition']);
             $this->updateEffects($ruleId, $ruleData['effect']);
         }
+
+        $this->updateRuleSequence(array_keys($postData['rule']));
         $this->updateCustomRules($roleType, $postData['customRule']);
-        $this->getResponse()->redirect->to("/adminv2/ups/$roleType");
+
+        die();
+        //$this->getResponse()->redirect->to("/adminv2/ups/$roleType");
+    }
+
+    /**
+     * Update a Rule's sequencing
+     *
+     * @param $sequencing
+     */
+    protected function updateRuleSequence($sequencing) {
+
+        // TODO DI some more
+        $mapper = RuleMapper::getInstance();
+        $mapper->updateRuleSequence($sequencing);
     }
 
     /**
@@ -238,6 +255,7 @@ class Controller extends Base {
             'arguments' => json_encode(null)
         ]);
     }
+
 
     /**
      * Saves custom rules for this role type.
