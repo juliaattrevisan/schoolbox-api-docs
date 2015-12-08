@@ -35,8 +35,17 @@ class Base {
         $this->outputCookies();
         // Don't send response body if there is a redirect.
         $location = $this->getResponse()->headers->get('location');
+
+        // Is there a post-output callback?
+        // Buffer response body and output it later
+        if ($this->hasPostOutputCallbacks()) {
+            ob_start();
+        }
         if (!isset($location)) {
             $this->outputResponseBody();
+        }
+        if ($this->hasPostOutputCallbacks()) {
+            $this->runPostOutputCallbacks(ob_get_clean());
         }
     }
 
@@ -88,6 +97,62 @@ class Base {
      */
     protected function outputResponseBody() {
         echo $this->getResponse()->content->get();
+    }
+
+    /**
+     * Gets post-output callbacks out of the response content.
+     *
+     * @todo put them somewhere else, as they don't belong in content.
+     *
+     * @return array
+     */
+    protected function getPostOutputCallbacks()
+    {
+        $content = $this->getResponse()->content->get();
+        if (is_array($content) && isset($content['postOutput'])) {
+            return $content['postOutput'];
+        }
+        return [];
+    }
+
+    /**
+     * Does this have any post-output callbacks?
+     *
+     * @return bool
+     */
+    protected function hasPostOutputCallbacks()
+    {
+        return count($this->getPostOutputCallbacks()) > 0;
+    }
+
+    /**
+     * Runs post-output callbacks, but not before sending output to the client.
+     *
+     * Processing of callbacks will run in the background.
+     *
+     * @param string $output
+     */
+    protected function runPostOutputCallbacks($output = '')
+    {
+        $callbacks = $this->getPostOutputCallbacks();
+        if (!empty($callbacks)) {
+            // Output now
+            // No content encoding because gzip interferes with content length
+            echo $output;
+            header('Content-Encoding: none');
+            header("Content-Length: ".strlen($output));
+            header('Connection: close');
+            ignore_user_abort();
+            flush();
+            session_write_close();
+
+            // Callbacks
+            foreach ($callbacks as $callback) {
+                if (is_callable($callback)) {
+                    $callback();
+                }
+            }
+        }
     }
 
     /**

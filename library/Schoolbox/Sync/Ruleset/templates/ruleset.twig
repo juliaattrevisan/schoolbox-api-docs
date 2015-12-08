@@ -21,6 +21,20 @@
     </div>
 
     <div class="small-12 island">
+        {% if hasDryRun %}
+            <div data-alert class="alert-box">
+                <h2>Running {{ rulesetId|capitalize }} Dry Run</h2>
+                {% if config.messaging_enabled %}
+                    <p>Please be patient - we'll notify you when it's done.</p>
+                {% else %}
+                    <p>
+                        If messaging was enabled, you would be notified when the dry run was completed.
+                        It isn't though, so maybe check again in a few minutes?
+                    </p>
+                {% endif %}
+                <a href="" class="close">×</a>
+            </div>
+        {% endif %}
         <form id='ruleset' action='/adminv2/ups/ruleset/update' method="post">
             <input type="hidden" name="rulesetId" value="{{ rulesetId }}" />
 
@@ -48,6 +62,7 @@
                 </nav>
                 <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
                     <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                    <li><a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run">Perform Dry Run</a></li>
                 </ul>
             </div>
 

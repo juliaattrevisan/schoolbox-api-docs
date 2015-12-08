@@ -17,6 +17,7 @@ use \Schoolbox\Sync\Condition;
 use \Schoolbox\Sync\Effect;
 use \Schoolbox\Sync\Hydrator;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
+use Schoolbox\Sync\Provisioner\Provisioner;
 use \Schoolbox;
 use \Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 use \Schoolbox\Sync\Rule\Mapper as RuleMapper;
@@ -57,9 +58,9 @@ class Controller extends Base {
     /**
      * Ruleset view
      *
-     * @param $params
+     * @param string $rulesetId
      */
-    public function read($params) {
+    public function read($rulesetId) {
 
         /* Produce Twig template data based on Role
          */
@@ -67,10 +68,75 @@ class Controller extends Base {
 
         /* Twig data
          */
+        $twigData = $factory->produceTemplateData($rulesetId);
+        if ($this->getSession()->getSegment(static::class)->getFlash('hasDryRun')) {
+            $twigData['hasDryRun'] = true;
+        }
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/ruleset.twig',
-            'data' => $factory->produceTemplateData($params['rulesetId'])
+            'data'     => $twigData,
         ]);
+    }
+
+    /**
+     * Dry Run view
+     *
+     * @param string      $rulesetId
+     * @param Provisioner $provisioner
+     */
+    public function dryRun($rulesetId, Provisioner $provisioner)
+    {
+        // Redirect back to ruleset page, with either an alert message on the page or in notifications
+        $this->getSession()->getSegment(static::class)->setFlash('hasDryRun', true);
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate(
+                'upsRuleset.read',
+                ['rulesetId' => $rulesetId]
+            )
+        );
+        // Not the best place to put it but it will do for now
+        $this->getResponse()->content->set([
+            'postOutput' => [
+                function() use ($rulesetId, $provisioner) {
+                    $this->dryRunCallback($rulesetId, $provisioner);
+                }
+            ],
+        ]);
+    }
+
+    /**
+     * Performs an actual dry run.
+     *
+     * @param string      $rulesetId
+     * @param Provisioner $provisioner
+     */
+    public function dryRunCallback($rulesetId, Provisioner $provisioner)
+    {
+        // perform the actual dry run (only for $rulesetId)
+        try {
+            $provisioner->run(false, $rulesetId);
+            $message = 'Your dry run has finished';
+        } catch (\Exception $e) {
+            // shove something in the bell notifier
+            $message = 'Something went wrong in your dry run - '.$e->getTraceAsString();
+        }
+
+        // notify
+        // TODO make this show in notifications instead of as an alert
+        $user   = $this->getUser();
+        $userId = $user->getId();
+        $bob    = new \Alaress\Async\Notification\Instance\Builder();
+        $bob->setTitle($message)
+            ->setSeverity(\Monolog\Logger::INFO)
+            ->setNamespace('ALERT')
+            ->setHref('#')
+            ->setIcon('/images/icon.php?icon=bolt&size=64')
+            ->addTopic("notify.user.$userId")
+//            ->putMeta('ttl', 30)
+            ->putMeta('title', 'Message from ' . $user->formatName());
+
+        $n = new \Schoolbox\Notif\Notif("instant.user.$userId");
+        $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
     }
 
     /**

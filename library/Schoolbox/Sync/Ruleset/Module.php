@@ -17,11 +17,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
-use Schoolbox\Permission\Access\UserAccess;
-
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Collection;
 
 class Module extends BaseModule
 {
@@ -36,20 +31,21 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'intro', $basePath, "");
         $this->addGetRoute($router, 'read', $basePath, "/{rulesetId}");
         $this->addPostRoute($router, 'update', $basePath, "/ruleset/update");
+        $this->addGetRoute($router, 'dryRun', $basePath, "/{rulesetId}/dry-run");
     }
 
     /**
-     * Inject params into controller
+     * Inject the provisioner into the dry run action
      *
      * {@inheritdoc}
      */
     public function initRoutePreloads(PathMatcher $matcher) {
         $this->addRoutePreload(
             $matcher,
-            '(?:read)',
-            function($params) {
+            '(?:dryRun)',
+            function () {
                 return array(
-                    'params' => $params,
+                    'provisioner' => $this->getInjector()->get('ups.provisioner'),
                 );
             }
         );
@@ -85,7 +81,7 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\Sync\\Ruleset\\Controller')
+            $injector->lazyNew(Controller::class)
         );
     }
 }
