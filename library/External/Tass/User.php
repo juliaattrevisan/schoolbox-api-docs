@@ -55,11 +55,18 @@ class External_Tass_User implements External_UserInterface
             INNER JOIN student s ON p.par_code=s.par_code AND p.cmpy_code=s.cmpy_code
             WHERE s.stud_code IN ($idList)
             AND pa.add_num IN (1, 4, 5)
-            ORDER BY pa.add_num ASC
         ";
         $this->getDatabase()->query($query);
         while ($row = $this->getDatabase()->getNextArray()) {
-            $emailList[$row['par_code'].'-'.$row['add_num']] = trim($row['e_mail']);
+            if(stristr($row['e_mail'],';')) {
+                $i=0;
+                foreach(explode(';',$row['e_mail']) as $email) {
+                    $emailList[trim($row['par_code']).'-'.trim($row['add_num'].'-'.$i++)] = $email;
+                }
+            }
+            else {
+                $emailList[trim($row['par_code']).'-'.trim($row['add_num'])] = trim($row['e_mail']);
+            }
         }
         return $emailList;
     }
