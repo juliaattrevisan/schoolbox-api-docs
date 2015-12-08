@@ -1,5 +1,3 @@
-{% set allMatches = ['User Exists', "User Doesn't Exist"] %}
-
 <li id="condition-{{ currentCondition.id }}" class="actions-small-2 content" data-locked="{{ meta.condition[currentCondition.id].lock.status }}">
     <input type="hidden" name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][type]" value="2">
 
@@ -11,7 +9,7 @@
             <div class="small-11 columns">
                 {% include 'sub/select.twig' with {
                     name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][0]',
-                    options: allMatches,
+                    options: ['User Exists', "User Doesn't Exist"],
                     preselected: currentCondition.arguments[0],
                     disabled: meta.condition[currentCondition.id].disabled
                 } %}
