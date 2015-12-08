@@ -48,6 +48,17 @@ CREATE TABLE `ups_effect_type`(
   UNIQUE INDEX (`name`)
 );
 
+CREATE TABLE `ups_log`(
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `role_type` ENUM('student','staff','parent') NOT NULL, -- omitting 'guest', this enum mirrors groups.group_type
+  `dry` BOOL NOT NULL,
+  `users_created` INT UNSIGNED NOT NULL,
+  `users_updated` INT UNSIGNED NOT NULL,
+  `users_skipped` INT UNSIGNED NOT NULL,
+  `hash` VARCHAR(40) NOT NULL,
+  PRIMARY KEY (`id`)
+) CHARSET=utf8 COLLATE=utf8_bin;
+
 
 /* Apply foreign key constraints */
 
