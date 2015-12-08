@@ -10,24 +10,28 @@
                 <span class="meta">Then</span>
             </div>
             <div class="small-10 medium-11 large-4 columns">
-                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][userProperty]" data-effect-userfield="{{ currentEffect.id }}" >
-                    <option value="-1" disabled selected="selected">Please Select</option>
+                <label title="Data from your SIS">
+                    <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][userProperty]" data-effect-userfield="{{ currentEffect.id }}" >
+                        <option value="-1" disabled selected="selected">Please Select</option>
 
-                    {% for currentUserKey, currentUserField in allEffectStructures.allUserField %}
-                        <option value="{{ currentUserKey }}" {% if currentUserKey == currentEffect.getUserProperty() %}selected="selected"{% endif %}>
-                            {{ currentUserField.label }}
-                        </option>
-                    {% endfor %}
-                </select>
+                        {% for currentUserKey, currentUserField in allEffectStructures.allUserField %}
+                            <option value="{{ currentUserKey }}" {% if currentUserKey == currentEffect.getUserProperty() %}selected="selected"{% endif %}>
+                                {{ currentUserField.label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
             </div>
             <div class="small-12 medium-6 large-3 columns">
-                <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" data-effect-mappingtype="{{ currentEffect.id }}" data-effect-ruleid="{{ currentEffect.rule.id }}">
-                    <option value="-1" disabled selected="selected">Please Select</option>
+                <label title="Mapping Type">
+                    <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" data-effect-mappingtype="{{ currentEffect.id }}" data-effect-ruleid="{{ currentEffect.rule.id }}">
+                        <option value="-1" disabled selected="selected">Please Select</option>
 
-                    {% for currentEffectMappingType in allEffectMappingTypes %}
-                        <option value="{{ loop.index }}" {% if loop.index == currentEffect.effectType.id %}selected="selected"{% endif %}>{{ currentEffectMappingType }}</option>
-                    {% endfor %}
-                </select>
+                        {% for currentEffectMappingType in allEffectMappingTypes %}
+                            <option value="{{ loop.index }}" {% if loop.index == currentEffect.effectType.id %}selected="selected"{% endif %}>{{ currentEffectMappingType }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
             </div>
 
             {# Dynamically construct input names
@@ -40,7 +44,6 @@
                 </div>
                 <div class="small-12 columns">
                     <span id='effect-{{ currentEffect.id }}-fragment-status' class="label highlight full-width hide">Loading</span>
-
                     <span id='effect-{{ currentEffect.id }}-status' class="label highlight full-width {{ meta.effect[currentEffect.id].status ? '' : 'hide' }}">{{ meta.effect[currentEffect.id].status }}</span>
                 </div>
             </div>

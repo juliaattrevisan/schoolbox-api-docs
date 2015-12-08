@@ -1,11 +1,15 @@
 <div class="row" data-map>
     <div class="small-5 columns">
-        <input type="text" data-key {{ dynamicDisabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][from][]" value="{{ mapFrom }}" placeholder="SIS Output" />
+        <label title="This is the value found in your SIS and also the value of your SIS after you alter it with tokens. Both can be used to determine the resultant Schoolbox Value.">
+            <input type="text" data-key {{ dynamicDisabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][from][]" value="{{ mapFrom }}" placeholder="SIS Output" />
+        </label>
     </div>
     <div class="small-2 columns text-center no-pad">
         <h1>&#10155;</h1>
     </div>
     <div class="small-5 columns">
+        <label title="Schoolbox Value">
         {% include allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getFilename() %}
+        </label>
     </div>
 </div>
