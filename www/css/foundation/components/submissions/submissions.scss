@@ -53,6 +53,11 @@ table.rubric {
         input:checked + label {
             background-color: $table-cell-highlight-background;
         }
+
+        input[type=radio]:not(.plain):disabled + label{
+            cursor: default;
+            opacity: 1;
+        }
     }
 }
 
