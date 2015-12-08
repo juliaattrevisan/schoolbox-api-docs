@@ -67,3 +67,18 @@ $button-disabled-opacity: 0.5;
 .button[class*=" icon-"]:before{
 	font-size: 1rem;
 }
+
+.icon-32[class^="icon-"]:before,
+.icon-32[class*=" icon-"]:before{
+	font-size: 2rem;
+}
+
+.icon-48[class^="icon-"]:before,
+.icon-48[class*=" icon-"]:before{
+	font-size: 3rem;
+}
+
+.icon-64[class^="icon-"]:before,
+.icon-64[class*=" icon-"]:before{
+	font-size: 4rem;
+}
