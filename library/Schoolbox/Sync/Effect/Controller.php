@@ -194,8 +194,6 @@ class Controller extends Base {
                         'fragment' => $fragment,
                         'subfragments' => [
                             'fragment' => $subfragment,
-                            'mapFrom' => '',
-                            'mapTo' => '',
                         ]
                     ]
                 ],
@@ -264,8 +262,6 @@ class Controller extends Base {
                     $queryData['effectId'] => [
                         'subfragments' => [
                             'fragment' => $subfragment,
-                            'mapFrom' => '',
-                            'mapTo' => '',
                         ]
                     ]
                 ]
