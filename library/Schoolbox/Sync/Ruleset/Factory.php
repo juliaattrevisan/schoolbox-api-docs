@@ -160,7 +160,7 @@ class Factory
         $allEffectStructures = [
             'containers' => [],
             'fragments' => [],
-            'allUserField' => $effectFragmentFactory->getAllFields(),
+            'allUserField' => $effectFragmentFactory->getAllFieldsKeyValue(),
         ];
 
         foreach ($ruleset as $currentRule) {

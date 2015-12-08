@@ -11,15 +11,15 @@
             </div>
             <div class="small-10 medium-11 large-4 columns">
                 <label title="This Schoolbox User Field will be modified">
-                    <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][userProperty]" data-effect-userfield="{{ currentEffect.id }}" >
-                        <option value="-1" disabled selected="selected">Please Select</option>
-
-                        {% for currentUserKey, currentUserField in allEffectStructures.allUserField %}
-                            <option value="{{ currentUserKey }}" {% if currentUserKey == currentEffect.getUserProperty() %}selected="selected"{% endif %}>
-                                {{ currentUserField.label }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                    {% include '@upsCondition/select.twig' with {
+                        name: 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][userProperty]',
+                        options: allEffectStructures.allUserField,
+                        preselected: currentEffect.getUserProperty(),
+                        disabled: meta.effect[currentEffect.id].disabled,
+                        selectData: {
+                            'data-effect-userfield': currentEffect.id
+                        }
+                    } %}
                 </label>
             </div>
             <div class="small-12 medium-6 large-3 columns">

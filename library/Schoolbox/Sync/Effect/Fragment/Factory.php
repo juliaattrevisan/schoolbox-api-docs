@@ -188,6 +188,23 @@ class Factory {
     }
 
     /**
+     * Gets the key/value representation of $allFields
+     *
+     * @return array
+     */
+    public function getAllFieldsKeyValue() {
+        $allFields = $this->getAllFields();
+
+        $stack = [];
+
+        foreach ($allFields as $key => $data) {
+            $stack[$key] = $data['label'];
+        }
+
+        return $stack;
+    }
+
+    /**
      * Determine whether the current field is a Lookup
      *
      * @param $field
