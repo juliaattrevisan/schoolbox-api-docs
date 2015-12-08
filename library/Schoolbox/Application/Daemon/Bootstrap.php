@@ -160,6 +160,29 @@ class Bootstrap implements BootstrapInterface {
 //			}
 //		}
 
+        // Build a user provisioner
+        $di->set(
+            'ups.provisioner',
+            $di->lazyNew(
+                \Schoolbox\Sync\Provisioner\Provisioner::class,
+                [
+                    'rulesetFactory' => $di->lazyNew(\Schoolbox\Sync\Ruleset\Factory::class),
+                    'grammarFactory' => $di->lazyNew(
+                        \Schoolbox\Sync\Grammar\Factory::class,
+                        [
+                            'userMapper' => $di->lazyNew(\Schoolbox\UserMapper::class),
+                            'ruleMapper' => $di->lazyNew(\Schoolbox\Sync\Rule\Mapper::class),
+                        ]
+                    ),
+                    'externalUserSource' => $di->lazy(function() use ($di) {
+                        $source = new \Schoolbox\External\Connector\SyncFactory();
+                        return $source->build();
+                    }),
+                    'userMapper'     => $di->lazyNew(\Schoolbox\UserMapper::class),
+                    'logger'         => $di->lazyNew(\Alaress\Lumberjack\Logger::class),
+                ]
+            )
+        );
 	}
 
 } 

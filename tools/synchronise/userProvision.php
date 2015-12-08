@@ -16,41 +16,9 @@ spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('UPS');
 
-// A logger
-// TODO use Monolog - it supplies a Redis logger
-$logger = new Alaress\Lumberjack\Logger(
-    STDOUT,
-    STDERR,
-    (isset($options['v']) ? Monolog\Logger::DEBUG : Monolog\Logger::INFO)
-);
-
-// Rulesets
-// This factory is intended for Twig data but I can easily repurpose it
-$ruleFactory = new Schoolbox\Sync\Ruleset\Factory();
-
-// Sync factory
-$syncFactory = new \Schoolbox\External\Connector\SyncFactory();
-
-// User mapper
-$userMapper = Schoolbox\UserMapper::getInstance();
-
-// Grammar factory
-$grammarFactory = new Schoolbox\Sync\Grammar\Factory(
-    $userMapper,
-    Schoolbox\Sync\Rule\Mapper::getInstance()
-);
-
-// Inject:
-// * logger
-// * config/ruleset
-// * UserMapper
-// * SyncFactory
-// TODO set this up in DI so that dry run can use it with the exact same configuration
-$ups = new Schoolbox\Sync\Provisioner\Provisioner(
-    $ruleFactory,
-    $grammarFactory,
-    $syncFactory->build(),
-    $userMapper,
-    $logger
-);
+/** @var Schoolbox\Sync\Provisioner\Provisioner $ups */
+$ups = $kernel->getDependencyInjector()->get('ups.provisioner');
+// Note that trying to overwrite the logger (and thus destroy the old one)
+// will cause an exit as soon as stdout is written
+// (because stdout is closed when the old logger is destroyed)
 $ups->run(isset($options['perform-update']));
