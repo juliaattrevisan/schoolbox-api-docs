@@ -6,6 +6,18 @@
             paging: false,
             searching: false
         });
+
+        $('#content').find('[data-delete]').click(function (event) {
+            event.preventDefault();
+
+            var element = $(this);
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this content permanently?',
+                confirmEvent: function () {
+                    window.location.href = element.attr('href');
+                }
+            });
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -103,7 +115,7 @@
                         <!-- BEGIN writable_duework -->
                         <td class="actions-small-2">
                             <nav>
-                                <a href="/submission/submissionForm.php?deleteBox={ID}" class="icon-delete"  title="Delete" onclick='return(confirm("Remove {JAVAASSDESC}?"));'></a>
+                                <a href="/submission/submissionForm.php?deleteBox={ID}" class="icon-delete"  title="Delete" data-delete></a>
                                 <a href="/submission/createSubmission/modify/{ID}" class="icon-modify" title="Modify"></a>
                             </nav>
                         </td>
