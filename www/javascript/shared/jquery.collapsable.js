@@ -25,7 +25,9 @@
         function init(options, element) {
             var defaults = {
                 element: element,
-                container: '[data-component]'
+                container: '[data-component]',
+                iconExpand: 'icon-down-arrow',
+                iconCollapse: 'icon-up-arrow'
             }
 
             var derived = {
@@ -99,6 +101,6 @@
      * @param icon
      */
     $.fn.executeIconToggle = function(icon) {
-        icon.toggleClass('icon-up-arrow icon-down-arrow');
+        icon.toggleClass([ config.iconExpand, config.iconCollapse ].join(' '));
     }
 }(jQuery));
