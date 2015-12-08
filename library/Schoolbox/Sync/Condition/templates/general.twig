@@ -25,7 +25,7 @@
                 </select>
             </div>
             <div class="small-12 medium-3 large-3 columns">
-                <textarea {{ meta.condition[currentCondition.id].disabled }} name='rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][1]' rows="5">{{ currentCondition.arguments[1] | join("\n") }}</textarea>
+                <textarea {{ meta.condition[currentCondition.id].disabled }} name='rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][1]' rows="5" placeholder="SIS values">{{ currentCondition.arguments[1] | join("\n") }}</textarea>
             </div>
             <div class="small-12 columns">
                 <span id='condition-{{ currentCondition.id }}-status' class="label highlight full-width {{ meta.condition[currentCondition.id].status ? '' : 'hide' }}">{{ meta.condition[currentCondition.id].status }}</span>
