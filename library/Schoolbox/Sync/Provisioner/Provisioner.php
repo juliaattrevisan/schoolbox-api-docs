@@ -9,12 +9,16 @@ namespace Schoolbox\Sync\Provisioner;
 
 use Alaress\Rules\Lang\SkipException;
 use InvalidArgumentException;
+use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Collection;
 use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\External\Normalise;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
+use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Ruleset;
 use Schoolbox\UserMapper;
 
@@ -73,26 +77,37 @@ class Provisioner
     protected $runOrder = [Role::STUDENT, Role::STAFF, Role::PARENT,];
 
     /**
+     * A mapper the the logger
+     *
+     * @var Log\Mapper
+     */
+    private $logMapper;
+
+
+    /**
      * Constructor
      *
      * @param Ruleset\Factory $rulesetFactory
      * @param Grammar\Factory $grammarFactory
      * @param SyncInterface   $externalUserSource
      * @param UserMapper      $userMapper
-     * @param LoggerInterface $logger
+     * @param CacheableLoggerInterface $logger
+     * @param Log\Mapper      $logMapper
      */
     public function __construct(
         Ruleset\Factory $rulesetFactory,
         Grammar\Factory $grammarFactory,
         SyncInterface $externalUserSource,
         UserMapper $userMapper,
-        LoggerInterface $logger
+        CacheableLoggerInterface $logger,
+        Log\Mapper $logMapper
     ) {
         $this->rulesetFactory     = $rulesetFactory;
         $this->grammarFactory     = $grammarFactory;
         $this->externalUserSource = $externalUserSource;
         $this->userMapper         = $userMapper;
         $this->logger             = $logger;
+        $this->logMapper          = $logMapper;
     }
 
     /**
@@ -122,22 +137,42 @@ class Provisioner
                 // Don't run the provisioner for this role
                 continue;
             }
-            $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->grammarFactory);
+            $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->logger, $this->grammarFactory);
             if ($ruleset->getConfig()->getEnabled() || $roleType == $forRoleType) {
+
+                $this->logger->warning("Commencing $roleType user provision: " . ($update ? 'updating' : 'dry run only'));
+
+                $created = $updated = $skipped = 0;
+
                 foreach ($this->getAllExternalUsers($roleType) as $externalUser) {
                     // No user id? do nothing
                     $externalUserId = $externalUser->getId();
                     if (!$externalUserId) {
+                        $this->logger->notice("Skipping user, no externalUserId found");
+                        ++$skipped;
                         continue;
                     }
+
+                    // this is the context that needs to be applied to every log message while working with a user, for filtering
+                    $commonContext = [
+                        'externalUserId' => $externalUserId
+                    ];
 
                     // Get the currently stored user
                     try {
                         $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
+                        $commonContext['internalUserId'] = $internalUser->getId();
+                        $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
+                        $action = 'update';
+
                     } catch (MapperException $e) {
                         $internalUser = $this->userMapper->createModel();
+                        $this->logger->debug("No existing user to retrieve: new user", $commonContext);
+                        $action = 'create';
+
                     }
-//                    $originalUser = clone $internalUser;
+
+                    $originalUser = clone $internalUser;
 
                     // Run this user through the hydrators
                     try {
@@ -156,18 +191,53 @@ class Provisioner
 //                            []
 //                        );
 //                        echo '<hr style="clear:both"/>';
+                        $this->logger->notice("Skipping user: ".$e->getMessage(), array_merge($commonContext, [ 'error' => $e ]));
+                        ++$skipped;
                         continue;
                     } catch (\Exception $e) {
                         // something untoward happened - better raise an error
+                        $this->logger->error("Error provisioning user: ".$e->getMessage(), array_merge($commonContext, [ 'error' => $e ]));
+                        ++$skipped;
                         continue;
                     }
+
+                    // get a diff of the original user and what we've ended up with
+                    $diff = $this->userMapper->diff($originalUser, $internalUser);
+
+                    $originalName = ($action == 'create') ? 'New user' : $originalUser->formatName();
+
+                    if (count($diff)) {
+                        $level   = Logger::NOTICE;
+                        $message = $update ? "Preparing to $action $originalName" : "$originalName would have been {$action}d";
+                        $context = array_merge($commonContext, [ 'diff' => $diff ]);
+
+                        if ($action == 'update') {
+                            ++$updated;
+                        } else {
+                            ++$created;
+                        }
+
+                    } else {
+                        $level   = Logger::DEBUG;
+                        $message = ($update ? "Skipping $action of $originalName" : "$originalName would not have been {$action}d") . ': data is unchanged';
+                        $context = $commonContext;
+
+                        ++$skipped;
+                    }
+
+                    $this->logger->log($level, $message, $context);
 
                     // And save
                     if ($update) {
                         // TODO add some sort of sanity check to $internalUser
                         $this->userMapper->save($internalUser);
+                        $this->logger->debug("User record saved", $commonContext);
                     }
                 }
+
+                // end of a strat - save the result
+                $this->logger->warning("SUMMARY: $created users created, $updated users updated, $skipped users skipped");
+                $this->logMapper->flush($this->logger);
             }
         }
     }

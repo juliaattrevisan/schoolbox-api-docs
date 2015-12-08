@@ -10,6 +10,8 @@
 
 namespace Schoolbox\Sync\Ruleset;
 
+use Psr\Log\LoggerInterface;
+use Schoolbox\Collection;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar\Factory as GrammarFactory;
 use Schoolbox\Sync\Grammar\FieldFactory;
@@ -20,7 +22,6 @@ use Schoolbox\Sync\Condition;
 use Schoolbox\Sync\Condition\Fragment\Factory as ConditionFragmentFactory;
 use Schoolbox\Sync\Effect;
 use Schoolbox\Sync\Effect\Fragment\Factory as EffectFragmentFactory;
-use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 use Schoolbox\Sync\Hydrator;
 
 class Factory
@@ -181,7 +182,7 @@ class Factory
                  * Skip Effects don't use fragments
                  */
                 if (!$currentEffect->getEffectType()->isSkip()) {
-                    $fragment = $effectFragmentFactory->produce($currentEffect->getEffectType()->getId(), $currentEffect->getUserProperty());
+                    $fragment = $effectFragmentFactory->produce($currentEffect->getEffectType()->getId());
                     $subfragment = $effectFragmentFactory->produceType($currentEffect->getUserProperty());
 
                     $allEffectStructures['fragments'][$currentEffect->getId()]['fragment'] = $fragment;
@@ -208,19 +209,33 @@ class Factory
     /**
      * Produce ruleset data based on Role Type
      *
-     * @param string         $rulesetId      Role type - typically one of student|parent|staff
-     * @param GrammarFactory $grammarFactory An optional grammar builder, for converting the ruleset to grammar rules.
-     *                                       Required if the UPS is to be run on users.
+     * @param string          $rulesetId      Role type - typically one of student|parent|staff
+     * @param LoggerInterface $log            The logger instance. Not optional.
+     * @param GrammarFactory  $grammarFactory An optional grammar builder, for converting the ruleset to grammar rules.
+     *                                        Required if the UPS is to be run on users.
      *
      * @return Ruleset
      */
-    public function produceRuleset($rulesetId, GrammarFactory $grammarFactory = null)
+    public function produceRuleset($rulesetId, LoggerInterface $log = null, GrammarFactory $grammarFactory = null)
     {
         $rules       = $this->findRuleset($rulesetId);
         $customRules = Hydrator\Custom\Mapper::getInstance()->findByColumnList(
             ['role_type' => $rulesetId],
             ['order' => ['sequence' => 'asc'],]
         );
+
+        if ($log) {
+            /**
+             * Inject the logger into every custom hydrator found
+             *
+             * @var Collection|Hydrator\Custom\Model[] $customRules
+             */
+            $customRules = $customRules->map(function ($hydrator) use ($log) {
+                /** @var Hydrator\Custom\Model $hydrator */
+                return $hydrator->setLogger($log);
+            });
+        }
+
         $config      = Config\Mapper::getInstance()->findById($rulesetId);
         if (isset($grammarFactory)) {
             return new Ruleset(
@@ -238,8 +253,7 @@ class Factory
      * Load a Ruleset based on Role Type student|parent|staff
      *
      * @param string $rulesetId
-     *
-     * @return Rule\Model[]
+     * @return Collection|Rule\Model[]
      */
     private function findRuleset($rulesetId)
     {

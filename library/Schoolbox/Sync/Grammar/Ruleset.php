@@ -10,6 +10,7 @@
 namespace Schoolbox\Sync\Grammar;
 
 use Alaress\Rules\TokenizedRuleset;
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\Mapper;
 use Schoolbox\Sync\Hydrator\HydratorInterface;
@@ -21,16 +22,23 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
     /** @var Mapper */
     protected $mapper;
 
+    /** @var LoggerInterface */
+    protected $log;
+
+
     /**
      * @param Mapper $mapper
      * @param string $context
-     * @param $map
+     * @param array  $map
+     * @param LoggerInterface $log
      */
-    public function __construct(Mapper $mapper, $context, $map)
+    public function __construct(Mapper $mapper, $context, $map, LoggerInterface $log)
     {
         parent::__construct(new Tokenizer($context, $map));
         $this->mapper = $mapper;
+        $this->log    = $log;
     }
+
 
     /**
      * Hydrates the internal user by passing through to `applyTo()`.
@@ -42,7 +50,32 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
      */
     public function hydrate(ExternalUser $input, InternalUser $previous)
     {
-        return $this->applyTo($input, $previous);
+        $context = [
+            'externalUserId' => $input->getId(),
+        ];
+
+        if ($previous->getId()) {
+            $context['internalUserId'] = $previous->getId();
+        }
+
+        $result = $this->applyTo($input, $previous);
+
+        // TODO log whether or not this hydrator mutated this user, and if so, how? [SB-10513]
+        if ($previous) {
+            $diff = $this->mapper->diff($previous, $result);
+        } else {
+            $diff = $this->mapper->dehydrate($result);
+        }
+
+        $diff = array_filter($diff, function ($value) { return !is_null($value); });
+
+        if (count($diff)) {
+            $this->log->info("New values set", array_merge($context, [ 'diff' => $diff ]));
+        } else {
+            $this->log->info("No change to user", $context);
+        }
+
+        return $result;
     }
 
     /**
@@ -64,10 +97,10 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
      *
      * The $input for this method should be an NDS record
      *
-     * @param array  $sequences - the sequence of the rules to be applied
-     * @param mixed  $input     - the NDS record to manipulate
-     * @param object $previous  - an instance of the object mapped by the mapper
-     * @return object           - an instance of the object mapped by the mapper
+     * @param array        $sequences - the sequence of the rules to be applied
+     * @param ExternalUser $input     - the NDS record to manipulate
+     * @param InternalUser $previous  - an instance of the object mapped by the mapper
+     * @return InternalUser           - an instance of the object mapped by the mapper
      */
     public function applyPartial(array $sequences, $input, $previous = null)
     {
@@ -84,6 +117,17 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
             }
 
             $data = $rule->apply($input, $previous);
+
+            $context = [
+                'externalUserid' => $input->getId(),
+            ];
+
+            if ($previous->getId()) {
+                $context['internalUserId'] = $previous->getId();
+            }
+
+            $context['rulestring'] = $rule->getSummary();
+
 
             if (is_array($data)) {
                 foreach ($data as $property => $value) {
@@ -110,7 +154,17 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                     }
 
                     $this->applyModelPropertyValue($object, $property, $value);
+                    $context['newdata'][$property] = $value;
                 }
+
+                // TODO log that the rule applied [SB-10514], and provide the new set of values [SB-10515]
+                $this->log->debug("Rule matched and applied", $context);
+
+            } else {
+
+                // TODO log that the rule did not apply [SB-10514]
+                $this->log->debug("Rule did not match", $context);
+
             }
         }
 
