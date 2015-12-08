@@ -309,7 +309,7 @@ th, td{
 }
 
 // Toggle Checkbox (VAPORWAVE)
-@mixin vaporwave($label-class: false, $toggle-size: ($input-height - 0.5), $background-color: $content-ui-foreground, $hover-background-color: $button-bg-hover, $active-color: $content-ui-foreground) {
+@mixin vaporwave($label-class: false, $toggle-size: ($input-height), $background-color: $content-ui-foreground, $hover-background-color: $button-bg-hover, $active-color: $content-ui-foreground) {
 
 	$label-selector: "label";
 
@@ -631,17 +631,8 @@ section > fieldset {
 	&.collapsible {
 
 		> legend {
-
 			color: inherit;
 			width: auto;
-			text-indent: rem-calc(-26px);
-
-			@media #{$small-only} {
-				margin-left: 0;
-			}
-			@media #{$medium-up} {
-				margin-left: rem-calc(26px);
-			}
 
 			&:before {
 				@extend a;
