@@ -21,13 +21,13 @@ class Skip implements Construct
     }
 
     /**
-     * Skip rules don't apply to a field.
+     * Skip rules don't apply to a field, but one is required anyway.
      *
-     * @return null
+     * @return string
      */
     public function getField()
     {
-        return null;
+        return '';
     }
 
     /**
