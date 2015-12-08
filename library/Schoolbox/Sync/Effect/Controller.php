@@ -99,7 +99,7 @@ class Controller extends Base {
                         'fragment' => $fragment,
                     ]
                 ],
-                'allUserField' => $fragmentFactory->getAllFields(),
+                'allUserField' => $fragmentFactory->getAllFieldsKeyValue(),
             ],
             'meta' => [
                 'effect' => [
