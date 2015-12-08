@@ -111,8 +111,8 @@ class Controller extends Base {
      */
     public function dryRunCallback($rulesetId, Provisioner $provisioner)
     {
-        // perform the actual dry run
-        $provisioner->run(false);
+        // perform the actual dry run (only for $rulesetId)
+        $provisioner->run(false, $rulesetId);
 
         // notify
         // TODO make this show in notifications instead of as an alert

@@ -109,13 +109,20 @@ class Provisioner
     /**
      * Runs the UPS.
      *
-     * @param bool $update If true, updates - otherwise, performs a dry run.
+     * @param bool   $update      If true, updates - otherwise, performs a dry run.
+     * @param string $forRoleType If set, provisions this role type
+     *                            (and only this role type) regardless of if
+     *                            it's enabled or not.
      */
-    public function run($update = false)
+    public function run($update = false, $forRoleType = null)
     {
         foreach ($this->runOrder as $roleType) {
+            if (isset($forRoleType) && $roleType != $forRoleType) {
+                // Don't run the provisioner for this role
+                continue;
+            }
             $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->grammarFactory);
-            if ($ruleset->getConfig()->getEnabled()) {
+            if ($ruleset->getConfig()->getEnabled() || $roleType == $forRoleType) {
                 foreach ($this->getAllExternalUsers($roleType) as $externalUser) {
                     // No user id? do nothing
                     $externalUserId = $externalUser->getId();
