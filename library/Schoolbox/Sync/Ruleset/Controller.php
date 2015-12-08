@@ -56,9 +56,9 @@ class Controller extends Base {
     /**
      * Ruleset view
      *
-     * @param $params
+     * @param string $rulesetId
      */
-    public function read($params) {
+    public function read($rulesetId) {
 
         /* Produce Twig template data based on Role
          */
@@ -66,7 +66,7 @@ class Controller extends Base {
 
         /* Twig data
          */
-        $twigData = $factory->produceTemplateData($params['rulesetId']);
+        $twigData = $factory->produceTemplateData($rulesetId);
         if ($this->getSession()->getSegment(static::class)->getFlash('hasDryRun')) {
             $twigData['hasDryRun'] = true;
         }
@@ -79,11 +79,10 @@ class Controller extends Base {
     /**
      * Dry Run view
      *
-     * @param array $params
+     * @param string $rulesetId
      */
-    public function dryRun($params)
+    public function dryRun($rulesetId)
     {
-        $rulesetId = $params['rulesetId'];
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
         $this->getSession()->getSegment(static::class)->setFlash('hasDryRun', true);
         $this->getResponse()->redirect->to(
