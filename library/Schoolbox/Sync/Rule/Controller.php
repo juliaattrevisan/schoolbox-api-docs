@@ -58,10 +58,13 @@ class Controller extends Base {
 
         $roleType = $postData->get('rulesetId');
 
+        /* Rules are always enabled, for now
+         */
         $rule = $mapper->createModel()
                        ->setRoleType($roleType)
                        ->setName($postData->get('name'))
                        ->setDescription($postData->get('description'))
+                       ->setEnabled(true)
                        ->setSequence($mapper->findNextAvailableSequence($roleType));
 
         $mapper->create($rule);
