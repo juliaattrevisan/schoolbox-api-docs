@@ -1,0 +1,17 @@
+{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Sync (UPS) Logs</h1>
+        {% include '@upsRuleset/log/table.twig' %}
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $('[data-tablesorter]').DataTable({
+            info: false,
+            paging: false,
+            searching: false
+        });
+    });
+</script>

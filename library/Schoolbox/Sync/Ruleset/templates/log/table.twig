@@ -1,0 +1,38 @@
+<table data-tablesorter class="stack-for-small-down">
+    <thead>
+    <tr>
+        {% for th, td in logs|first %}
+            <th>{{ th }}</th>
+        {% endfor %}
+        <th data-orderable="false">&nbsp;</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for id, log in logs %}
+        <tr>
+            {% for th, td in log %}
+                <td title="{{ th }}">
+                    {% if td is iterable %}
+                        <ul>
+                            {% for li in td %}
+                                <li>{{ li }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% elseif td is same as(false) %}
+                        No
+                    {% elseif td is same as(true) %}
+                        Yes
+                    {% else %}
+                        {{ td }}
+                    {% endif %}
+                </td>
+            {% endfor %}
+            <td class="actions-small-1">
+                <nav>
+                    <a href="{{ routeLookup('upsRuleset.log', { logId: id }) }}" class="icon-next" title="View log"></a>
+                </nav>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,11 @@
+{%- if value is same as(true) -%}
+    TRUE
+{%- elseif value is same as(false) -%}
+    FALSE
+{%- elseif value is same as('') -%}
+    BLANK
+{%- elseif value is same as(null) -%}
+    NULL
+{%- else -%}
+    {{ value }}
+{%- endif -%}

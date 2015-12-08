@@ -11,5 +11,12 @@
         <section class="content">
             <p>This is a place where you can make your Sync Scripts.</p>
         </section>
+        <h2 class="subheader">Recent Runs</h2>
+        {% include '@upsRuleset/log/table.twig' %}
+    </div>
+    <div class="small-12 column">
+        <section>
+            <a href="{{ routeLookup('upsRuleset.logs') }}" class="button icon-view">View All Logs</a>
+        </section>
     </div>
 </div>
