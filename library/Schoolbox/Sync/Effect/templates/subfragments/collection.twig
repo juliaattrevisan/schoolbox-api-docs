@@ -2,7 +2,7 @@
 
 <input id='mapping-row-input-{{ mapRowIdentifier }}' type="hidden" {{ dynamicDisabled }} name="{{ dynamicInputName }}" value="{{ preselected }}" />
 
-<div data-mapping-row="{{ mapRowIdentifier }}">
+<div data-mapping-row="{{ mapRowIdentifier }}" class="ups-mapping-row-collection">
     {% for campusId, campusName in allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
 
         {# Each checkbox needs to be unique on the whole page
