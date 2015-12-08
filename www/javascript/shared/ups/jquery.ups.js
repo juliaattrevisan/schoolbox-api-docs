@@ -45,6 +45,7 @@
         initEffectDelete();
         initEffectUserFieldAvailability();
         initEffectMappingRows();
+        initEffectCheckboxChange();
 
         /**
          * Init
@@ -620,6 +621,37 @@
                 var ruleId = $(element).attr('data-rule');
 
                 refreshUserFieldAvailability(ruleId);
+            });
+        }
+
+        /**
+         * Enable compilation of checkbox values into a csv upon
+         * state change for aforementioned checkboxes. This allows
+         * a key-multivalue (serialised) pair to exist
+         */
+        function initEffectCheckboxChange() {
+            $(config.element).on('change', '[data-mapping-row] input[type=checkbox]', function(event) {
+                var container = $(this).parents('[data-mapping-row]');
+                var mapRowIdentifier = container.attr('data-mapping-row');
+
+                /* csv of campusId values
+                 */
+                var values = [];
+
+                /* Find all the ticked checkboxes in this div
+                 */
+                $.each(container.find('input[type=checkbox]:checked'), function(index, element) {
+
+                    /* Assemble all ticked checkboxes' values into a csv
+                     */
+                    values.push($(element).val());
+                });
+
+                var csv = values.join(',');
+
+                /* Set csv into hidden input field
+                 */
+                $('#mapping-row-input-' + mapRowIdentifier).val(csv);
             });
         }
 
