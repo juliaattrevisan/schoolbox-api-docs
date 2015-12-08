@@ -112,14 +112,20 @@ class Controller extends Base {
     public function dryRunCallback($rulesetId, Provisioner $provisioner)
     {
         // perform the actual dry run (only for $rulesetId)
-        $provisioner->run(false, $rulesetId);
+        try {
+            $provisioner->run(false, $rulesetId);
+            $message = 'Your dry run has finished';
+        } catch (\Exception $e) {
+            // shove something in the bell notifier
+            $message = 'Something went wrong in your dry run - '.$e->getTraceAsString();
+        }
 
         // notify
         // TODO make this show in notifications instead of as an alert
         $user   = $this->getUser();
         $userId = $user->getId();
         $bob    = new \Alaress\Async\Notification\Instance\Builder();
-        $bob->setTitle('Your dry run has finished')
+        $bob->setTitle($message)
             ->setSeverity(\Monolog\Logger::INFO)
             ->setNamespace('ALERT')
             ->setHref('#')
