@@ -438,6 +438,31 @@ class Bootstrap implements BootstrapInterface {
 		// Paginator internal object
 		$di->setters['Alaress\\Paginator\\UrlPaginator']['setPaginator'] = $di->lazyNew('Alaress\\Paginator\\Paginator');
 
+		// Build a user provisioner
+		// TODO unify this definition and the one in Daemon\Bootstrap
+		$di->set(
+			'ups.provisioner',
+			$di->lazyNew(
+				\Schoolbox\Sync\Provisioner\Provisioner::class,
+				[
+					'rulesetFactory' => $di->lazyNew(\Schoolbox\Sync\Ruleset\Factory::class),
+					'grammarFactory' => $di->lazyNew(
+						\Schoolbox\Sync\Grammar\Factory::class,
+						[
+							'userMapper' => $di->lazyNew(\Schoolbox\UserMapper::class),
+							'ruleMapper' => $di->lazyNew(\Schoolbox\Sync\Rule\Mapper::class),
+						]
+					),
+					'externalUserSource' => $di->lazy(function() use ($di) {
+						$source = new \Schoolbox\External\Connector\SyncFactory();
+						return $source->build();
+					}),
+					'userMapper'     => $di->lazyNew(\Schoolbox\UserMapper::class),
+					'logger'         => $di->lazyNew(\Alaress\Lumberjack\Logger::class),
+				]
+			)
+		);
+
 		// load dependencies into the kernel itself
 		$this->kernel->setDependencyInjector($di);
 		$this->kernel->setDebugMode($this->debugEnabled);
