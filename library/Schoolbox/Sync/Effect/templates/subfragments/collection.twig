@@ -1,25 +1,44 @@
-<input type="text" {{ dynamicDisabled }} name="{{ dynamicInputName }}" value="{{ preselected }}" />
-
 {% set mapRowIdentifier = 'mappingrow-' ~ random(100000000) %}
 
+<input id='mapping-row-input-{{ mapRowIdentifier }}' type="text" {{ dynamicDisabled }} name="{{ dynamicInputName }}" value="{{ preselected }}" />
+
 <div data-mapping-row="{{ mapRowIdentifier }}">
-{% for campusId, campusName in allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
-
-    {# Each checkbox needs to be unique on the whole page
-     # due to custom checkbox design requiring ids
-     #}
-    {% set checkboxIdentifier = 'effect-' ~ currentEffect.id ~ '-' ~ 'checkbox-' ~ random(10000000) %}
-
     <script type="text/javascript">
         $(function() {
             $('#ruleset').find('[data-mapping-row={{ mapRowIdentifier }}]').find('input[type=checkbox]').change(function(event) {
-                console.log('changed!');
+                var container = $(this).parents('[data-mapping-row]');
+
+                /* csv of campusId values
+                 */
+                var values = [];
+
+                /* Find all the ticked checkboxes in this div
+                 */
+                $.each(container.find('input[type=checkbox]:checked'), function(index, element) {
+
+                    /* Assemble all ticked checkboxes' values into a csv
+                     */
+                    values.push($(element).val());
+                });
+
+                var csv = values.join(',');
+
+                /* Set csv into hidden input field
+                 */
+                $('#mapping-row-input-{{ mapRowIdentifier }}').val(csv);
             });
         });
     </script>
 
-    <input id="{{ checkboxIdentifier }}" type="checkbox" />
-    <label for="{{ checkboxIdentifier }}" class="checkbox-label">{{ campusName }}</label>
-{% endfor %}
+    {% for campusId, campusName in allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
+
+        {# Each checkbox needs to be unique on the whole page
+         # due to custom checkbox design requiring ids
+         #}
+        {% set checkboxIdentifier = 'effect-' ~ currentEffect.id ~ '-' ~ 'checkbox-' ~ random(10000000) %}
+
+        <input id="{{ checkboxIdentifier }}" type="checkbox" value="{{ campusId }}" />
+        <label for="{{ checkboxIdentifier }}" class="checkbox-label">{{ campusName }}</label>
+    {% endfor %}
 </div>
 
