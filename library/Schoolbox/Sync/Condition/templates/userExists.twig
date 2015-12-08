@@ -15,12 +15,13 @@
                     {% endfor %}
                 </select>
             </div>
+            <div class="small-12 columns">
+                <span id='condition-{{ currentCondition.id }}-status' class="label highlight full-width {{ meta.condition[currentCondition.id].status ? '' : 'hide' }}">{{ meta.condition[currentCondition.id].status }}</span>
+            </div>
         </div>
     </div>
     <nav>
         <a href="/adminv2/ups/condition/delete/{{ currentCondition.id }}" class="icon-delete" title="Delete" data-condition-delete="{{ currentCondition.id }}"></a>
         <a href="" class="icon-{{ meta.condition[currentCondition.id].lock.icon }}" title='Toggle Readonly Mode' data-condition-modify-lock="condition-{{ currentCondition.id }}"></a>
     </nav>
-
-    <span id='condition-{{ currentCondition.id }}-status' class="label highlight full-width {{ meta.condition[currentCondition.id].status ? '' : 'hide' }}">{{ meta.condition[currentCondition.id].status }}</span>
 </li>
