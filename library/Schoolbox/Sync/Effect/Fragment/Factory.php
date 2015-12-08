@@ -21,6 +21,7 @@ class Factory {
     const TYPE_BOOLEAN = 1;
     const TYPE_LOOKUP = 2;
     const TYPE_STRING = 3;
+    const TYPE_COLLECTION = 4;
 
     /**
      * Manufacture a list of Schoolbox User fields to chooze from
@@ -47,6 +48,8 @@ class Factory {
 
         'email' => 'Email Address',
         'altEmail' => 'Alt Email Address',
+
+        'campusCollection' => 'Campus',
 
         'residentialHouse' => 'Residential House',
         'schoolHouse' => 'School House',
@@ -117,6 +120,14 @@ class Factory {
 
                     break;
 
+                case UserMapper::TYPE_COLLECTION :
+                     $allFields[$key] = [
+                         'type' => self::TYPE_COLLECTION,
+                         'label' => $label
+                     ];
+
+                    break;
+
                 /* All other types
                  */
                 default:
@@ -172,6 +183,9 @@ class Factory {
         else if ($this->isString($userField)) {
             return new Fragment('@upsEffect/subfragments/string.twig');
         }
+        else if ($this->isCollection($userField)) {
+            return new Fragment('@upsEffect/subfragments/collection.twig');
+        }
     }
 
     /**
@@ -182,6 +196,20 @@ class Factory {
      */
     public function isBoolean($field) {
         if ($this->allFields[$field]['type'] == self::TYPE_BOOLEAN) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine whether the current field is a Collection
+     *
+     * @param $field
+     * @return bool
+     */
+    public function isCollection($field) {
+        if ($this->allFields[$field]['type'] == self::TYPE_COLLECTION) {
             return true;
         }
 
