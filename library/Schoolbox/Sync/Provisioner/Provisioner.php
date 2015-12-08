@@ -95,6 +95,18 @@ class Provisioner
     }
 
     /**
+     * Set the logger from outside this class.
+     *
+     * @param  LoggerInterface $logger
+     * @return $this
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+
+    /**
      * Runs the UPS.
      *
      * @param bool $update If true, updates - otherwise, performs a dry run.
