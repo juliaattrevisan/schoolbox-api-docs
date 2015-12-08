@@ -4,7 +4,9 @@
 {% set dynamicInputName = 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][to][]' %}
 
 <div class="small-12 medium-6 large-4 columns">
-    <input {{ dynamicDisabled }} type="text" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][arguments][0]" value="{{ currentEffect.arguments[0] }}">
+    <label title="You can use optionally use tokens to modify your SIS Output Value, which is then used to determine Schoolbox Values in the key/value inputs below">
+        <input {{ dynamicDisabled }} type="text" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][arguments][0]" value="{{ currentEffect.arguments[0] }}" placeholder="Alter SIS Output with tokens">
+    </label>
 </div>
 
 <div class="small-12 columns">

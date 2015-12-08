@@ -9,13 +9,15 @@
                 <span class="meta">If</span>
             </div>
             <div class="small-11 medium-5 large-5 columns">
-                <select {{ meta.condition[currentCondition.id].disabled }} name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][0]">
-                    {% for currentNDSKey, currentNDSField in allNDSField %}
-                    <option value="{{ currentNDSKey }}" {% if currentNDSKey == currentCondition.arguments[0] %}selected="selected"{% endif %}>
-                        {{ currentNDSField }}
-                    </option>
-                    {% endfor %}
-                </select>
+                <label title="Data from your SIS">
+                    <select {{ meta.condition[currentCondition.id].disabled }} name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][0]">
+                        {% for currentNDSKey, currentNDSField in allNDSField %}
+                        <option value="{{ currentNDSKey }}" {% if currentNDSKey == currentCondition.arguments[0] %}selected="selected"{% endif %}>
+                            {{ currentNDSField }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
             </div>
             <div class="small-12 medium-3 large-3 columns">
                 <select {{ meta.condition[currentCondition.id].disabled }} name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][2]">
@@ -25,7 +27,12 @@
                 </select>
             </div>
             <div class="small-12 medium-3 large-3 columns">
-                <textarea {{ meta.condition[currentCondition.id].disabled }} name='rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][1]' rows="5">{{ currentCondition.arguments[1] | join("\n") }}</textarea>
+                <label title="A newline-separated list of possible values from your SIS">
+                    <textarea {{ meta.condition[currentCondition.id].disabled }} name='rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][1]' rows="5" placeholder="SIS values">{{ currentCondition.arguments[1] | join("\n") }}</textarea>
+                </label>
+            </div>
+            <div class="small-12 columns">
+                <span id='condition-{{ currentCondition.id }}-status' class="label highlight full-width {{ meta.condition[currentCondition.id].status ? '' : 'hide' }}">{{ meta.condition[currentCondition.id].status }}</span>
             </div>
         </div>
     </div>
@@ -33,6 +40,4 @@
         <a href="/adminv2/ups/condition/delete/{{ currentCondition.id }}" class="icon-delete" title="Delete" data-condition-delete="{{ currentCondition.id }}"></a>
         <a href="" class="icon-{{ meta.condition[currentCondition.id].lock.icon }}" title='Toggle Readonly Mode' data-condition-modify-lock="condition-{{ currentCondition.id }}"></a>
     </nav>
-
-    <span id='condition-{{ currentCondition.id }}-status' class="label highlight full-width {{ meta.condition[currentCondition.id].status ? '' : 'hide' }}">{{ meta.condition[currentCondition.id].status }}</span>
 </li>

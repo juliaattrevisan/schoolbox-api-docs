@@ -94,7 +94,7 @@
                             </ul>
                         </div>
 
-                        <ul class="information-list" id="rule-{{ currentRule.id }}-conditions">
+                        <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-conditions">
                             {% for currentCondition in currentRule.conditions %}
                             {% include allConditionStructures.fragments[currentCondition.id].fragment.getFilename() %}
                             {% endfor %}
@@ -116,7 +116,7 @@
                             </ul>
                         </div>
 
-                        <ul class="information-list" id="rule-{{ currentRule.id }}-effects">
+                        <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-effects">
                             {% for currentEffect in currentRule.effects %}
                             {% include allEffectStructures.containers[currentEffect.id] %}
                             {% endfor %}
