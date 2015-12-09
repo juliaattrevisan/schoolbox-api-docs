@@ -25,16 +25,9 @@ class External_AscTimetables_Translator_Timetable_Map extends IteratorIterator
                 'type'         => 'card',
                 'lessonId'     => (string)$attrs->lessonid,
                 'classroomIds' => explode(',', (string)$attrs->classroomids),
-                'terms'        => $this->parseBits($attrs->terms),
-                'days'         => $this->parseBits($attrs->days),
+//                'terms'        => $this->parseBits($attrs->terms),
+                'day'          => (int)$attrs->day,
                 'period'       => (string)$attrs->period,
-            ];
-        } elseif ($current->matches('//termsdefs/termsdef')) {
-            return [
-                'type'         => 'termsdef',
-                'id'           => (string)$attrs->id,
-                'name'         => (string)$attrs->name,
-                'terms'        => $this->parseBits($attrs->terms),
             ];
         } elseif ($current->matches('//lessons/lesson')) {
             return [

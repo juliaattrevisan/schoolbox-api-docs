@@ -18,7 +18,7 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
         $reducer = new External_AscTimetables_Translator_Timetable_Reduce();
         $result  = [
             'cards'      => [],
-            'terms'      => [],
+            'terms'      => [['name' => 'Whole Year']],
             'lessons'    => [],
             'subjects'   => [],
             'classrooms' => [],
@@ -31,7 +31,6 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                     $this->iterator,
                     [
                         '//cards/card',
-                        '//termsdefs/termsdef',
                         '//lessons/lesson',
                         '//classrooms/classroom',
                         '//classes/class',
@@ -123,21 +122,19 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                                         : '',
                                 ];
                                 // Pluck out period from days in card
-                                foreach ($card['days'] as $day) {
-                                    $resultPeriod = [
-                                        'Period Day'   => $day,
-                                        'Period Title' => $card['period'],
-                                    ];
+                                $resultPeriod = [
+                                    'Period Day'   => $card['day'],
+                                    'Period Title' => $card['period'],
+                                ];
 
-                                    // We finally have a result
-                                    $endResult[] = array_merge(
-                                        $resultTerm,
-                                        $resultPeriod,
-                                        $resultClass,
-                                        $resultClassroom,
-                                        $resultTeacher
-                                    );
-                                }
+                                // We finally have a result
+                                $endResult[] = array_merge(
+                                    $resultTerm,
+                                    $resultPeriod,
+                                    $resultClass,
+                                    $resultClassroom,
+                                    $resultTeacher
+                                );
                             }
                         }
                     }

@@ -24,9 +24,6 @@ class External_AscTimetables_Translator_Timetable_Reduce
         $type = $item['type'];
         unset($item['id'], $item['type']);
         switch ($type) {
-            case 'termsdef':
-                $carry['terms'][$id] = $item;
-                break;
             case 'card':
                 $carry['cards'][] = $item;
                 break;
