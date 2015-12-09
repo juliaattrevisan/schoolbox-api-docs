@@ -143,7 +143,7 @@ class Controller extends Base {
     {
         $allBreadcrumbs = new Navigator(
             new Node('Home', '/adminv2/home', false),
-            new Node('Sync (UPS)', $this->getBasePath(), false),
+            new Node('User Provisioning System', $this->getBasePath(), false),
             new Node('Logs', $this->getBasePath() . '/logs', true)
         );
 
@@ -194,7 +194,7 @@ class Controller extends Base {
 
             $allBreadcrumbs = new Navigator(
                 new Node('Home', '/adminv2/home', false),
-                new Node('Sync (UPS)', $this->getBasePath(), false),
+                new Node('User Provisioning System', $this->getBasePath(), false),
                 new Node('Logs', $this->getBasePath() . '/logs', false),
                 new Node("{$log['timestamp']->getDatabase()} ({$log['roleType']})", $this->getBasePath() . "/log/$logId", true)
             );
