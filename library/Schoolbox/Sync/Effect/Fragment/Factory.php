@@ -64,6 +64,14 @@ class Factory {
     ];
 
     /**
+     * The current Ruleset
+     * Synonymous with Role Type
+     *
+     * @var string
+     */
+    private $roleType = '';
+
+    /**
      * A Lookup instance
      *
      * @var Lookup
@@ -73,9 +81,10 @@ class Factory {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct($roleType) {
         $this->setLookup(new Lookup());
 
+        $this->setRoleType($roleType);
         $this->setAllFields($this->generateAllFields());
     }
 
@@ -177,7 +186,7 @@ class Factory {
             return new Fragment('@upsEffect/subfragments/boolean.twig');
         }
         else if ($this->isLookup($userField)) {
-            return new Fragment('@upsEffect/subfragments/lookup.twig', $this->getLookup()->findData($userField));
+            return new Fragment('@upsEffect/subfragments/lookup.twig', $this->getLookup()->findData($userField, $this->getRoleType()));
         }
         else if ($this->isString($userField)) {
             return new Fragment('@upsEffect/subfragments/string.twig');
@@ -320,4 +329,22 @@ class Factory {
     private function setAllFields($allFields) {
         $this->allFields = $allFields;
     }
+
+    /**
+     * @param string $roleType
+     */
+    private function setRoleType($roleType)
+    {
+        $this->roleType = $roleType;
+    }
+
+    /**
+     * @return string
+     */
+    private function getRoleType()
+    {
+        return $this->roleType;
+    }
+
+
 }

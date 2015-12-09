@@ -152,7 +152,7 @@ class Factory
         /* Determine which Effect Fragments to load initially
          * It tells frontend which templates to use for Effects.
          */
-        $effectFragmentFactory = new EffectFragmentFactory();
+        $effectFragmentFactory = new EffectFragmentFactory($rulesetId);
 
         /* Which twig containers and fragments to load for this
          * Ruleset's Effects
