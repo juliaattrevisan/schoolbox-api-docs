@@ -165,9 +165,11 @@ class Factory
 
         foreach ($ruleset as $currentRule) {
             foreach ($currentRule->getConditions() as $currentCondition) {
-                $fragment = $conditionFragmentFactory->produce($currentCondition->getConditionType());
+                $fragment = $conditionFragmentFactory->produce();
+                $subfragment = $conditionFragmentFactory->produceType($currentCondition->getConditionType());
 
                 $allConditionStructures['fragments'][$currentCondition->getId()]['fragment'] = $fragment;
+                $allConditionStructures['fragments'][$currentCondition->getId()]['subfragments']['fragment'] = $subfragment;
             }
 
             /* Skip Effect has a different container since it's a unique kind of Effect

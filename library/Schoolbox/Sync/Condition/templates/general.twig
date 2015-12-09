@@ -1,53 +1,37 @@
-{% if config.useModifyLock %}
-    {% set numActions = 2 %}
-{% else %}
-    {% set numActions = 1 %}
-{% endif %}
-
-<li id="condition-{{ currentCondition.id }}" class="actions-small-{{ numActions }} content" data-locked="{{ meta.condition[currentCondition.id].lock.status }}">
-    <input type="hidden" name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][type]" value="1">
-
-    <div class="list-item">
-        <div class="row">
-            <div class="small-1 medium-1 large-1 columns">
-                <span class="meta">If</span>
-            </div>
-            <div class="small-11 medium-5 large-5 columns">
-                <label title="Data from your SIS">
-                    {% include 'sub/select.twig' with {
-                        name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][0]',
-                        options: allNDSField,
-                        preselected: currentCondition.arguments[0],
-                        disabled: meta.condition[currentCondition.id].disabled
-                    } %}
-                </label>
-            </div>
-            <div class="small-12 medium-3 large-3 columns">
+<div class="list-item">
+    <div class="row">
+        <div class="small-1 medium-1 large-1 columns">
+            <span class="meta">If</span>
+        </div>
+        <div class="small-11 medium-5 large-5 columns">
+            <label title="Data from your SIS">
                 {% include 'sub/select.twig' with {
-                    name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][2]',
-                    options: ['Matches', "Doesn't Match"],
-                    preselected: currentCondition.arguments[2],
+                    name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][0]',
+                    options: allNDSField,
+                    preselected: currentCondition.arguments[0],
                     disabled: meta.condition[currentCondition.id].disabled
                 } %}
-            </div>
-            <div class="small-12 medium-3 large-3 columns">
-                <label title="A newline-separated list of possible values from your SIS">
-                    <textarea {{ meta.condition[currentCondition.id].disabled }} name='rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][1]' rows="5" placeholder="SIS values">{{ currentCondition.arguments[1] | join("\n") }}</textarea>
-                </label>
-            </div>
-            <div class="small-12 columns">
-                <span id='condition-{{ currentCondition.id }}-status' class="label highlight full-width {{ meta.condition[currentCondition.id].status ? '' : 'hide' }}">{{ meta.condition[currentCondition.id].status }}</span>
-            </div>
+            </label>
+        </div>
+        <div class="small-12 medium-3 large-3 columns">
+            {% include 'sub/select.twig' with {
+                name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][2]',
+                options: ['Matches', "Doesn't Match"],
+                preselected: currentCondition.arguments[2],
+                disabled: meta.condition[currentCondition.id].disabled
+            } %}
+        </div>
+        <div class="small-12 medium-3 large-3 columns">
+            <label title="A newline-separated list of possible values from your SIS">
+                <textarea {{ meta.condition[currentCondition.id].disabled }} name='rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][arguments][1]' rows="5" placeholder="SIS values">{{ currentCondition.arguments[1] | join("\n") }}</textarea>
+            </label>
+        </div>
+        <div class="small-12 columns">
+            <span id='condition-{{ currentCondition.id }}-status' class="label highlight full-width {{ meta.condition[currentCondition.id].status ? '' : 'hide' }}">{{ meta.condition[currentCondition.id].status }}</span>
         </div>
     </div>
-    <nav>
-        <a href="/adminv2/ups/condition/delete/{{ currentCondition.id }}" class="icon-delete" title="Delete" data-condition-delete="{{ currentCondition.id }}"></a>
+</div>
 
-        {% if config.useModifyLock %}
-        <a href="" class="icon-{{ meta.condition[currentCondition.id].lock.icon }}" title='Toggle Readonly Mode' data-condition-modify-lock="condition-{{ currentCondition.id }}"></a>
-        {% endif %}
-    </nav>
-</li>
 
 
 

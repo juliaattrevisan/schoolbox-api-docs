@@ -17,15 +17,26 @@ class Factory {
     const TYPE_USEREXISTS = 2;
 
     /**
+     * Produce a Container
+     *
+     * @return Fragment
+     */
+    public function produce() {
+        return new Fragment('@upsCondition/container.twig');
+    }
+
+    /**
+     * Produce a subfragment
+     *
      * @param $conditionType
      * @return Fragment
      */
-    public function produce(ConditionType $conditionType) {
+    public function produceType(ConditionType $conditionType) {
         if ($conditionType->getId() == self::TYPE_GENERAL) {
             return new Fragment('@upsCondition/general.twig');
         }
         else if ($conditionType->getId() == self::TYPE_USEREXISTS) {
-            return new Fragment('@upsCondition/userExists.twig');
+            return new Fragment('@upsCondition/user-exists.twig');
         }
     }
 } 
