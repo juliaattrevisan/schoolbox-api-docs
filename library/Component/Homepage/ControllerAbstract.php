@@ -118,14 +118,14 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
     {
         if ($this->getConfig('collapse') == 1) {
             return array(
-                'icon'  => 'icon-add',
+                'icon'  => 'icon-down-arrow',
                 'class' => 'hide',
                 'data'  => 'collapsed'
             );
         }
 
         return array(
-            'icon'  => 'icon-collapse',
+            'icon'  => 'icon-up-arrow',
             'class' => '',
             'data'  => 'uncollapsed'
         );

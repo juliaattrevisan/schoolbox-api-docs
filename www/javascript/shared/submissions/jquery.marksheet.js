@@ -253,8 +253,8 @@
                  * Icon to show when you can expand/collapse
                  */
                 icon: {
-                    expand: 'icon-add',
-                    collapse: 'icon-collapse'
+                    expand: 'icon-down-arrow',
+                    collapse: 'icon-up-arrow'
                 }
             }
 

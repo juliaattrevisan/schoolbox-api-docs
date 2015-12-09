@@ -52,7 +52,7 @@
                 </div>
                 <nav>
                     <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
-                    <a data-collapser="true" href="#" class="icon-collapse collapse" title="Collapse Content"></a>
+                    <a data-collapser="true" href="#" class="icon-up-arrow collapse" title="Collapse Content"></a>
                     <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
                 </nav>
             </li>
@@ -1064,7 +1064,7 @@
         });
 
         $('a[data-interaction="toggle-expanded"]').on('click', function(){
-            $(this).toggleClass('icon-add icon-collapse');
+            $(this).toggleClass('icon-down-arrow icon-up-arrow');
             $(this).closest('li').toggleClass('expanded');
             event.preventDefault();
         });
