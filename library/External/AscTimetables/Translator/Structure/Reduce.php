@@ -21,12 +21,11 @@ class External_AscTimetables_Translator_Structure_Reduce
             return $carry;
         }
         switch ($item['type']) {
-            case 'termsdef':
-                $carry['termTitle'] = $item['termTitle'];
-                break;
-            case 'daysdef':
-                $carry['termStart'] = $item['startDate'];
-                $carry['dayCount']  = $item['dayCount'];
+            case 'day':
+                $carry['dayCount']++;
+                if ($item['day'] == 0) {
+                    $carry['termStart'] = $item['startDate'];
+                }
                 break;
             case 'period':
                 $carry['periods'][] = [

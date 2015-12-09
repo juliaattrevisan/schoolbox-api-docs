@@ -20,14 +20,14 @@ class External_AscTimetables_Translator_Structure extends External_AscTimetables
         $result  = [
             'termStart' => null,
             'dayCount'  => 0,
-            'termTitle' => '',
+            'termTitle' => 'Whole Year',
             'periods'   => [],
         ];
         foreach (
             new External_AscTimetables_Translator_Structure_Map(
                 new Alaress\Xml\Filter\Path(
                     $this->iterator,
-                    ['//daysdefs/daysdef', '//periods/period', '//termsdefs/termsdef']
+                    ['//days/day', '//periods/period',]
                 )
             ) as $row
         ) {
