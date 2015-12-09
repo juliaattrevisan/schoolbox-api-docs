@@ -78,12 +78,10 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                     }
                     $subject = $result['subjects'][$subjectId];
 
-                    // Probably don't need classes at all, but if I do it's to get teachers and rooms
-                    // Pluck out classes from lesson
+                    // Get teachers and rooms from classes
                     foreach ($lesson['classIds'] as $class) {
                         if (isset($result['classes'][$class])) {
                             $classes[] = $result['classes'][$class];
-//                            $classroomIds = array_merge($result['classes'][$class]['classroomIds'], $classroomIds);
                         }
                     }
 
@@ -103,39 +101,43 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                             $resultClass = [
                                 'Class Code'        => $subject['code'].' '.$class['code'],
                                 'Class Title'       => $subject['name'].' '.$class['code'],
-                                'Class Room'        => '',
                                 'Class Description' => '',
                             ];
-                            // Try adding a classroom ID later?
-//                        }
-//
-//                        // Add an entry for every classroom
-//                        // (Allow a single blank entry, for classes with no classroom)
-//                        $classroomIds = array_filter(array_unique($classroomIds));
-//                        if (empty($classroomIds)) {
-//                            $classroomIds[] = '';
-//                        }
-//                        foreach ($classroomIds as $classroomId) {
-//                            $resultClassroom = [
-//                                'Class Room' => isset($result['classrooms'][$classroomId])
-//                                    ? $result['classrooms'][$classroomId]['code']
-//                                    : '',
-//                            ];
-
-                            // Pluck out period from days in card
-                            foreach ($card['days'] as $day) {
-                                $resultPeriod = [
-                                    'Period Day'   => $day,
-                                    'Period Title' => $card['period'],
+                            // Add an entry for every classroom
+                            // (Allow a single blank entry, for classes with no classroom)
+                            $classClassroomIds = array_filter(
+                                array_unique(
+                                    array_merge(
+                                        $class['classroomIds'],
+                                        $classroomIds
+                                    )
+                                )
+                            );
+                            if (empty($classClassroomIds)) {
+                                $classClassroomIds = [''];
+                            }
+                            foreach ($classClassroomIds as $classroomId) {
+                                $resultClassroom = [
+                                    'Class Room' => isset($result['classrooms'][$classroomId])
+                                        ? $result['classrooms'][$classroomId]['code']
+                                        : '',
                                 ];
+                                // Pluck out period from days in card
+                                foreach ($card['days'] as $day) {
+                                    $resultPeriod = [
+                                        'Period Day'   => $day,
+                                        'Period Title' => $card['period'],
+                                    ];
 
-                                // We finally have a result
-                                $endResult[] = array_merge(
-                                    $resultTerm,
-                                    $resultPeriod,
-                                    $resultClass,
-                                    $resultTeacher
-                                );
+                                    // We finally have a result
+                                    $endResult[] = array_merge(
+                                        $resultTerm,
+                                        $resultPeriod,
+                                        $resultClass,
+                                        $resultClassroom,
+                                        $resultTeacher
+                                    );
+                                }
                             }
                         }
                     }
