@@ -1,0 +1,37 @@
+$ups-debug-color:   #98CDD2 !default;
+$ups-info-color:    #338042 !default;
+$ups-notice-color:  #69502C !default;
+$ups-warning-color: #3d1405 !default;
+$ups-error-color:   #a31c15 !default;
+$ups-hover-color:   $body-font-color !default;
+
+$ups-log-window-height: 30rem !default;
+
+.ups {
+
+    .level-100 { color: $ups-debug-color;   }
+    .level-200 { color: $ups-info-color;    }
+    .level-250 { color: $ups-notice-color;  }
+    .level-300 { color: $ups-warning-color; }
+    .level-400 { color: $ups-error-color;   }
+
+    [class^="level-"]:hover {
+        color: $ups-hover-color;
+    }
+
+    li.squash {
+        height: 0;
+        overflow: hidden;
+        min-height: 0 !important;
+        border-bottom-width: 0;
+    }
+
+    .information-list li {
+        @include easy-transition(max-height 360ms ease, min-height 360ms ease !important);
+    }
+    .scroll-window {
+        max-height: $ups-log-window-height;
+        overflow-y: auto;
+    }
+
+}

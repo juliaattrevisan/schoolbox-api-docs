@@ -1,41 +1,4 @@
 {% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
-<style type="text/css">
-    .level-100 {
-        color: #98CDD2;
-    }
-    .level-200 {
-        color: #338042;
-    }
-    .level-250 {
-        color: #69502C;
-    }
-    .level-300 {
-        color: #3d1405;
-    }
-    .level-400 {
-        color: #a31c15;
-    }
-    [class^="level-"] {
-        transition: all 360ms ease !important;
-    }
-    [class^="level-"]:hover {
-        color: #222;
-    }
-    li.squash {
-        height: 0;
-        overflow: hidden;
-        min-height: 0 !important;
-        border-bottom-width: 0;
-    }
-    .information-list li {
-        transition: max-height 360ms ease, min-height 360ms ease !important;
-    }
-    .scroll-window {
-        max-height: 30rem;
-        overflow-y: auto;
-    }
-</style>
-
 <div class="row actions-small-1">
     <div class="list-item">
         <div class="small-12 column">
@@ -77,7 +40,7 @@
                 <option value="400">Errors Only</option>
             </select>
         </label>
-        <section>
+        <section class="ups">
             <div class="scroll-window" data-cinnamon>
                 <ul class="information-list" id="datalist">
                     {% include '@upsRuleset/log/lines.twig' %}
