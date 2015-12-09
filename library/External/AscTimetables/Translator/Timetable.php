@@ -76,12 +76,7 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                     if (!isset($result['subjects'][$subjectId])) {
                         continue;
                     }
-                    $subject       = $result['subjects'][$subjectId];
-                    $resultSubject = [
-                        'Class Code'        => $subject['code'],
-                        'Class Title'       => $subject['name'],
-                        'Class Description' => '',
-                    ];
+                    $subject = $result['subjects'][$subjectId];
 
                     // Probably don't need classes at all, but if I do it's to get teachers and rooms
                     // Pluck out classes from lesson
@@ -106,9 +101,10 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                         // Go thru each class entry for this lesson, and add its classroom.
                         foreach ($classes as $class) {
                             $resultClass = [
-                                'Class Code'  => $subject['code'].' '.$class['code'],
-                                'Class Title' => $subject['name'].' '.$class['code'],
-                                'Class Room'  => '',
+                                'Class Code'        => $subject['code'].' '.$class['code'],
+                                'Class Title'       => $subject['name'].' '.$class['code'],
+                                'Class Room'        => '',
+                                'Class Description' => '',
                             ];
                             // Try adding a classroom ID later?
 //                        }
@@ -137,7 +133,6 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                                 $endResult[] = array_merge(
                                     $resultTerm,
                                     $resultPeriod,
-                                    $resultSubject,
                                     $resultClass,
                                     $resultTeacher
                                 );
