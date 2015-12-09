@@ -1,5 +1,18 @@
-{% set conditionGeneral = 1 %}
-{% set conditionUserExists = 2 %}
+{# Configuration in Twig Land
+ #
+ # Use to provide some front-end configurability
+ # and a bunch of const-like settings, without
+ # having to do it in back-end first
+ #}
+{%
+set config = {
+    'condition': {
+        'general': 1,
+        'userExists': 2
+    },
+    'useModifyLock': true
+}
+%}
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
@@ -103,8 +116,8 @@
                                     <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
                                 </nav>
                                 <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
-                                    <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
-                                    <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+                                    <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ config.condition.general }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
+                                    <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ config.condition.userExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
                                 </ul>
                             </div>
     
