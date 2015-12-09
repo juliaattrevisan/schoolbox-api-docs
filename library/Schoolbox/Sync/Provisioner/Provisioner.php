@@ -142,14 +142,15 @@ class Provisioner
 
                 $this->logger->warning("Commencing $roleType user provision: " . ($update ? 'updating' : 'dry run only'));
 
-                $created = $updated = $skipped = 0;
+                $created = $updated = $skipped = $errors = 0;
 
                 foreach ($this->getAllExternalUsers($roleType) as $externalUser) {
                     // No user id? do nothing
                     $externalUserId = $externalUser->getId();
                     if (!$externalUserId) {
-                        $this->logger->notice("Skipping user, no externalUserId found");
+                        $this->logger->error("Cannot process user: no externalUserId in record");
                         ++$skipped;
+                        ++$errors;
                         continue;
                     }
 
@@ -177,27 +178,17 @@ class Provisioner
                     // Run this user through the hydrators
                     try {
                         $ruleset->hydrate($externalUser, $internalUser);
-//                        new \Alaress_Probe(
-//                            $this->userMapper->dehydrate($originalUser),
-//                            $this->userMapper->dehydrate($internalUser),
-//                            $this->userMapper->diff($originalUser, $internalUser)
-//                        );
-//                        echo '<hr style="clear:both"/>';
+
                     } catch (SkipException $e) {
-                        // This ruleset is to be skipped - continue
-//                        new \Alaress_Probe(
-//                            $this->userMapper->dehydrate($originalUser),
-//                            'skip',
-//                            []
-//                        );
-//                        echo '<hr style="clear:both"/>';
-                        $this->logger->notice("Skipping user: ".$e->getMessage(), array_merge($commonContext, [ 'error' => $e ]));
+                        $this->logger->notice("Skipping user: ".$e->getMessage(), $commonContext);
                         ++$skipped;
                         continue;
+
                     } catch (\Exception $e) {
                         // something untoward happened - better raise an error
                         $this->logger->error("Error provisioning user: ".$e->getMessage(), array_merge($commonContext, [ 'error' => $e ]));
                         ++$skipped;
+                        ++$errors;
                         continue;
                     }
 
