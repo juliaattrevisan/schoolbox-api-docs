@@ -9,16 +9,9 @@ set config = {
     'condition': {
         'general': 1,
         'userExists': 2
-    },
-    'useModifyLock': 1
+    }
 }
 %}
-
-{% if config.useModifyLock %}
-    {% set numActions = 2 %}
-{% else %}
-    {% set numActions = 1 %}
-{% endif %}
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
@@ -26,9 +19,7 @@ set config = {
 
 <script type="text/javascript">
     $(function() {
-        $('#ruleset').ups({
-            useModifyLock: {{ config.useModifyLock }}
-        });
+        $('#ruleset').ups();
     });
 </script>
 

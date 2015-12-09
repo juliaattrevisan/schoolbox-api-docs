@@ -1,4 +1,4 @@
-<li id="effect-{{ currentEffect.id }}" class="actions-small-{{ numActions }} content" data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
+<li id="effect-{{ currentEffect.id }}" class="actions-small-2 content" data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
     <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" value="">
 
     <div class="list-item">
@@ -53,9 +53,6 @@
     </div>
     <nav>
         <a href="/adminv2/ups/effect/delete/{{ currentEffect.id }}" class="icon-delete" title="Delete" data-effect-delete="{{ currentEffect.id }}"></a>
-
-        {% if config.useModifyLock %}
         <a href="" class="icon-{{ meta.effect[currentEffect.id].lock.icon }}" title='Toggle Readonly Mode' data-effect-modify-lock="effect-{{ currentEffect.id }}"></a>
-        {% endif %}
     </nav>
 </li>
