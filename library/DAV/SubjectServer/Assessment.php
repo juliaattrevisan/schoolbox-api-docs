@@ -73,11 +73,14 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
         $mapper        = new Submission\FileMapper();
         $nameGenerator = new DAV_NameGenerator();
         $files         = $mapper->findByColumnList(
-            array(
+            [
                 'owner'  => $this->getUser()->getId(),
                 'box_id' => $this->getAssessment()->getId(),
                 'draft'  => false,
-            )
+            ],
+            [
+                'order' => ['realname' => 'asc', 'id' => 'asc',]
+            ]
         );
         foreach ($files as $file) {
 
