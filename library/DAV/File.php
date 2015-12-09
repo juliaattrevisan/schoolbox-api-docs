@@ -74,7 +74,7 @@ class DAV_File extends Sabre\DAV\File
         try {
             // accept the data as a new storage
             $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->acceptStream(
-                $this->getFile()->getFilename(), $data, false
+                $this->getFile()->getBasename(), $data, false
             );
 
             // point this file to the new content
