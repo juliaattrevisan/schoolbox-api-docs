@@ -69,11 +69,11 @@ set config = {
                             <span>Off</span>
                         </label>
                     </span>
-                    {#<a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule"></a>#}
+                    <a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule"></a>
                     <a class="icon-more" title="" data-dropdown="ruleset-options"></a>
                 </nav>
                 <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
-                    <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                    <li></li>
                     <li><a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run">Perform Dry Run</a></li>
                 </ul>
             </div>
@@ -110,7 +110,7 @@ set config = {
                                 </h3>
                             </div>
                             <nav>
-                                <a href="#" class="icon-add" data-collapser="rule-{{ currentRule.id }}-contents" title="Collapse Content"></a>
+                                <a href="#" class="icon-down-arrow" data-collapser="rule-{{ currentRule.id }}-contents" title="Collapse Content"></a>
                                 <a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule"></a>
                                 <a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule"></a>
                             </nav>
