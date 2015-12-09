@@ -95,7 +95,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
                 $child = new DAV_SubjectServer_Submission(
                     $nameGenerator->getUniqueChildName(
                         $this,
-                        $nameGenerator->sanitiseName($file->getFilename())
+                        $nameGenerator->sanitiseName($file->getBasename())
                     ),
                     $storage->readStream()
                 );
@@ -130,7 +130,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
         $submission
             ->setSubmissionBox($this->getAssessment())
             ->setOwner($this->getUser())
-            ->setFilename($name)
+            ->setFilename($storage->getFilename())
             ->setCreatedAt($submit_date)
             ->setLate($is_late)
             ->setStorage($storage);
