@@ -602,7 +602,7 @@
 
                     /* Ignore "Please Select"
                      */
-                    if ($(option).val() != -1) {
+                    if (option.hasAttribute('value')) {
                         if ($.inArray($(option).val(), used) > -1) {
                             $(option).attr('disabled', 'disabled');
                         }
