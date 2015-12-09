@@ -55,11 +55,11 @@ class Factory {
         'schoolHouse' => 'School House',
         'boardingStatus' => 'Boarding Status',
 
-        'localEmail' => 'Local Email?',
-        'useInternalMail' => 'Use Internal Mail',
-        'enabled' => 'Schoolbox Account Enabled?',
-        'webmail' => 'Webmail',
-        'eportfolioEnable' => 'Eportfolio Enabled?',
+        'localEmail' => 'Email Address from Username',
+        'useInternalMail' => 'Use External Mail Client',
+        'enabled' => 'Schoolbox Account Enabled',
+        'webmail' => 'Enable Webmail Tab',
+        'eportfolioEnable' => 'E-Portfolio Enabled',
 
         'role' => 'Role'
     ];
