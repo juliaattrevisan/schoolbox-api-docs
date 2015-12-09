@@ -59,6 +59,7 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
 
                     // Pluck out classroom from card (if there is one)
                     $classroomIds = $card['classroomIds'];
+                    $classes      = [];
 
                     // Pluck out lesson from card
                     $lessonId = $card['lessonId'];
@@ -86,12 +87,12 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                     // Pluck out classes from lesson
                     foreach ($lesson['classIds'] as $class) {
                         if (isset($result['classes'][$class])) {
-                            $classroomIds = array_merge($result['classes'][$class]['classroomIds'], $classroomIds);
-                            $teacherIds[] = $result['classes'][$class]['teacherId'];
+                            $classes[] = $result['classes'][$class];
+//                            $classroomIds = array_merge($result['classes'][$class]['classroomIds'], $classroomIds);
                         }
                     }
 
-                    // Add an entry for every teacher
+                    // Add an entry for every teacher/classCode
                     foreach (array_filter(array_unique($teacherIds)) as $teacherId) {
                         if (!isset($result['teachers'][$teacherId])) {
                             continue;
@@ -102,18 +103,28 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                             'Teacher Lastname'  => $result['teachers'][$teacherId]['lastname'],
                         ];
 
-                        // Add an entry for every classroom
-                        // (Allow a single blank entry, for classes with no classroom)
-                        $classroomIds = array_filter(array_unique($classroomIds));
-                        if (empty($classroomIds)) {
-                            $classroomIds[] = '';
-                        }
-                        foreach ($classroomIds as $classroomId) {
-                            $resultClassroom = [
-                                'Class Room' => isset($result['classrooms'][$classroomId])
-                                    ? $result['classrooms'][$classroomId]['code']
-                                    : '',
+                        // Go thru each class entry for this lesson, and add its classroom.
+                        foreach ($classes as $class) {
+                            $resultClass = [
+                                'Class Code'  => $subject['code'].' '.$class['code'],
+                                'Class Title' => $subject['name'].' '.$class['code'],
+                                'Class Room'  => '',
                             ];
+                            // Try adding a classroom ID later?
+//                        }
+//
+//                        // Add an entry for every classroom
+//                        // (Allow a single blank entry, for classes with no classroom)
+//                        $classroomIds = array_filter(array_unique($classroomIds));
+//                        if (empty($classroomIds)) {
+//                            $classroomIds[] = '';
+//                        }
+//                        foreach ($classroomIds as $classroomId) {
+//                            $resultClassroom = [
+//                                'Class Room' => isset($result['classrooms'][$classroomId])
+//                                    ? $result['classrooms'][$classroomId]['code']
+//                                    : '',
+//                            ];
 
                             // Pluck out period from days in card
                             foreach ($card['days'] as $day) {
@@ -127,7 +138,7 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                                     $resultTerm,
                                     $resultPeriod,
                                     $resultSubject,
-                                    $resultClassroom,
+                                    $resultClass,
                                     $resultTeacher
                                 );
                             }
