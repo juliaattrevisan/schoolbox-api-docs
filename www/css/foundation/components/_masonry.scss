@@ -73,239 +73,284 @@ $masonry-drop-background: $input-focus-bg-color;
 // Homepage masonry icons
 .icon-masonry:before {
     // default icon
-    @extend .icon-add:before;
+    @extend .icon-add;
 }
 
 .icon-masonry-Component_Homepage_BreadcrumbController:before {
-  @extend .icon-breadcrumbs:before;
+  @extend .icon-breadcrumbs;
+  color: $breadcrumbs;
 }
 .icon-masonry-Component_Homepage_NewsController:before {
-  @extend .icon-news:before;
+  @extend .icon-news;
+  color: $news;
 }
 .icon-masonry-Component_Homepage_LinkListController:before {
-  @extend .icon-link:before;
+  @extend .icon-link;
+  color: $links;
 }
 .icon-masonry-Component_Homepage_FileListController:before {
-  @extend .icon-files:before;
+  @extend .icon-files;
+  color: $files;
 }
 .icon-masonry-Component_Homepage_MembersController:before {
-  @extend .icon-group:before;
+  @extend .icon-group;
+  color: $group-members;
 }
 .icon-masonry-Component_Homepage_ForumListController:before {
-  @extend .icon-forum:before;
+  @extend .icon-forum;
+  color: $forum;
 }
 .icon-masonry-Component_Homepage_ManageClassController:before {
-  @extend .icon-class-list:before;
+  @extend .icon-class-list;
+  color: $class-list;
 }
 .icon-masonry-Component_Homepage_ManageFolderController:before {
-  @extend .icon-folder:before;
+  @extend .icon-folder;
+  color: $folders;
 }
 .icon-masonry-Component_Homepage_ManagersController:before {
-  @extend .icon-group-managers:before;
+  @extend .icon-group-managers;
+  color: $group-members;
 }
 .icon-masonry-Component_Homepage_ImageController:before {
-  @extend .icon-image:before;
+  @extend .icon-image;
+  color: $image;
 }
 .icon-masonry-Component_Homepage_FolderListController:before {
-  @extend .icon-folder:before;
+  @extend .icon-folder;
+  color: $folders;
 }
 .icon-masonry-Component_Homepage_EventListController:before {
-  @extend .icon-calendar:before;
+  @extend .icon-calendar;
+  color: $calendar;
 }
 .icon-masonry-Component_Homepage_ClickviewController:before {
-  @extend .icon-click-view:before;
+  @extend .icon-click-view;
+  color: $clickView;
 }
 .icon-masonry-Component_Homepage_ImageGalleryController:before {
-  @extend .icon-image-gallery:before;
+  @extend .icon-image-gallery;
+  color: $image-gallery;
 }
 .icon-masonry-Component_Homepage_RandImageController:before {
-  @extend .icon-random-image:before;
+  @extend .icon-random-image;
+  color: $random-image;
 }
 .icon-masonry-Component_Homepage_DropBoxController:before {
-  @extend .icon-drop-box:before;
+  @extend .icon-drop-box;
+  color: $file-drop-box;
 }
 .icon-masonry-Component_Homepage_DueWorkListController:before {
-  @extend .icon-due-work:before;
+  @extend .icon-due-work;
+  color: $due-work;
 }
 .icon-masonry-Component_Homepage_RSSController:before {
-  @extend .icon-rss:before;
+  @extend .icon-rss;
+  color: $rss-feed;
 }
 .icon-masonry-Component_Homepage_TeachersController:before {
-  @extend .icon-teacher:before;
+  @extend .icon-teacher;
+  color: $class-teachers;
 }
 .icon-masonry-Component_Homepage_CalendarListController:before {
-  @extend .icon-calendar:before;
+  @extend .icon-calendar;
+  color: $calendar;
 }
 .icon-masonry-Component_Homepage_DutiesController:before {
   // ?
-  @extend .icon-task:before;
+  @extend .icon-task;
 }
 .icon-masonry-Component_Homepage_PollController:before {
-  @extend .icon-poll:before;
+  @extend .icon-poll;
+  color: $poll;
 }
 .icon-masonry-Component_Homepage_WikiController:before {
-  @extend .icon-wiki:before;
+  @extend .icon-wiki;
+  color: $wiki;
 }
 .icon-masonry-Component_Homepage_FeedController:before {
-  @extend .icon-homepagefeed:before;
+  @extend .icon-homepagefeed;
+  color: $homepage-feed;
 }
 .icon-masonry-Component_Homepage_TextBoxController:before {
-  @extend .icon-textbox:before;
+  @extend .icon-textbox;
+  color: $text-box;
 }
 .icon-masonry-Component_Homepage_AudioController:before {
-  @extend .icon-audio:before;
+  @extend .icon-audio;
+  color: $audio;
 }
 .icon-masonry-Component_Homepage_PodcastController:before {
-  @extend .icon-podcast:before;
+  @extend .icon-podcast;
+  color: $podcast;
 }
 .icon-masonry-Component_Homepage_BlogController:before {
-  @extend .icon-comment:before;
+  @extend .icon-comment;
+  color: $chat;
 }
 // Doesn't yet exist and probably never will
 //.icon-masonry-Component_Homepage_TranslateController:before {
 //}
 .icon-masonry-Component_Homepage_ScrollerController:before {
-  @extend .icon-image-slideshow:before;
+  @extend .icon-image-slideshow;
+  color: $image-slideshow;
 }
 .icon-masonry-Component_Homepage_AssessController:before {
-  @extend .icon-quiz:before;
+  @extend .icon-quiz;
+  color: $quizzes;
 }
 .icon-masonry-Component_Homepage_CountdownController:before {
-  @extend .icon-countdown:before;
+  @extend .icon-countdown;
+  color: $countdown;
 }
 .icon-masonry-Component_Homepage_ChatController:before {
-  @extend .icon-chat:before;
+  @extend .icon-chat;
+  color: $chat;
 }
 .icon-masonry-Component_Homepage_SurveyController:before {
-  @extend .icon-surveys:before;
+  @extend .icon-surveys;
+  color: $surveys;
 }
 .icon-masonry-Component_Homepage_TwitterController:before {
-  @extend .icon-twitter:before;
+  @extend .icon-twitter;
+  color: $twitter;
 }
 .icon-masonry-Component_Homepage_ClassListController:before {
-  @extend .icon-class-list:before;
+  @extend .icon-class-list;
+  color: $class-list;
 }
 .icon-masonry-Component_Homepage_VideoController:before {
-  @extend .icon-video:before;
+  @extend .icon-video;
+  color: $video-player;
 }
 .icon-masonry-Component_Homepage_WolframController:before {
-  @extend .icon-wolfram-alpha:before;
+  @extend .icon-wolfram-alpha;
+  color: $wolfram-alpha;
 }
 .icon-masonry-Component_Homepage_CourseOutlineController:before {
-  @extend .icon-course-outline:before;
+  @extend .icon-course-outline;
+  color: $course-outline;
 }
 .icon-masonry-Component_Homepage_CourseBuilderController:before {
-  @extend .icon-course-builder:before;
+  @extend .icon-course-builder;
+  color: $course-builder;
 }
 .icon-masonry-Component_Homepage_RubricController:before {
-  @extend .icon-criteria:before;
+  @extend .icon-criteria;
+  color: $course-criteria;
 }
 .icon-masonry-Component_Homepage_SocialStreamController:before {
-  @extend .icon-social-stream:before;
+  @extend .icon-social-stream;
+  color: $social-stream;
 }
 .icon-masonry-Component_Homepage_EtherpadController:before {
-  @extend .icon-collab-docs:before;
+  @extend .icon-collab-docs;
+  color: $collab-doc;
 }
 .icon-masonry-Component_Homepage_PinterestController:before {
-  @extend .icon-pinterest:before;
+  @extend .icon-pinterest;
+  color: $pinterest;
 }
 .icon-masonry-Schoolbox_Tile_Component_HomepageTileController:before {
-  @extend .icon-tiles:before;
+  @extend .icon-tiles;
+  color: $tiles;
 }
 .icon-masonry-Schoolbox_Curriculum_Component_CurriculumDetailsController:before {
-  @extend .icon-curriculum-details:before;
+  @extend .icon-curriculum-details;
+  color: $curriculum-details;
 }
 .icon-masonry-Schoolbox_Curriculum_Component_CurriculumOverviewController:before {
-  @extend .icon-curriculum:before;
+  @extend .icon-curriculum;
+  color: $curriculum-overview;
 }
 
 // Eportfolio masonry icons
 .icon-masonry-Component_Eportfolio_AdvancedListController:before {
-  @extend .icon-advanced-list:before;
+  @extend .icon-advanced-list;
 }
 .icon-masonry-Component_Eportfolio_BasicListController:before {
-  @extend .icon-list:before;
+  @extend .icon-list;
 }
 .icon-masonry-Component_Eportfolio_BlogController:before {
-  @extend .icon-blog:before;
+  @extend .icon-blog;
 }
 .icon-masonry-Component_Eportfolio_FileListController:before {
-  @extend .icon-files:before;
+  @extend .icon-files;
 }
 .icon-masonry-Component_Eportfolio_ImageController:before {
-  @extend .icon-image:before;
+  @extend .icon-image;
 }
 .icon-masonry-Component_Eportfolio_ImageListController:before {
-  @extend .icon-image-gallery:before;
+  @extend .icon-image-gallery;
 }
 .icon-masonry-Component_Eportfolio_LinkListController:before {
-  @extend .icon-link:before;
+  @extend .icon-link;
 }
 .icon-masonry-Component_Eportfolio_TextboxController:before {
-  @extend .icon-textbox:before;
+  @extend .icon-textbox;
 }
 .icon-masonry-Component_Eportfolio_VideoController:before {
-  @extend .icon-video:before;
+  @extend .icon-video;
 }
 
 // Dashboard masonry icons
 .icon-masonry-Component_Dashboard_ActivityController:before {
-  @extend .icon-info:before;
+  @extend .icon-info;
 }
 .icon-masonry-Component_Dashboard_CalendarController:before {
-  @extend .icon-calendar:before;
+  @extend .icon-calendar;
 }
 .icon-masonry-Component_Dashboard_ChildSubjectController:before {
-  @extend .icon-progress:before;
+  @extend .icon-progress;
 }
 .icon-masonry-Component_Dashboard_GreetingController:before {
-  @extend .icon-chat:before;
+  @extend .icon-chat;
 }
 .icon-masonry-Component_Dashboard_HomepageNewsController:before {
-  @extend .icon-news:before;
+  @extend .icon-news;
 }
 .icon-masonry-Component_Dashboard_ImageGalleryController:before {
-  @extend .icon-image-gallery:before;
+  @extend .icon-image-gallery;
 }
 .icon-masonry-Component_Dashboard_ImageSliderController:before {
-  @extend .icon-image-slideshow:before;
+  @extend .icon-image-slideshow;
 }
 .icon-masonry-Component_Dashboard_NewsController:before {
-  @extend .icon-news:before;
+  @extend .icon-news;
 }
 .icon-masonry-Component_Dashboard_RecentSubmissionsController:before {
-  @extend .icon-due-work:before;
+  @extend .icon-due-work;
 }
 .icon-masonry-Component_Dashboard_RssController:before {
-  @extend .icon-rss:before;
+  @extend .icon-rss;
 }
 .icon-masonry-Component_Dashboard_ScrollerController:before {
-  @extend .icon-image-slideshow:before;
+  @extend .icon-image-slideshow;
 }
 .icon-masonry-Component_Dashboard_SubjectController:before {
-  @extend .icon-progress:before;
+  @extend .icon-progress;
 }
 .icon-masonry-Component_Dashboard_TextboxController:before {
-  @extend .icon-textbox:before;
+  @extend .icon-textbox;
 }
 .icon-masonry-Component_Dashboard_TimetableController:before {
-  @extend .icon-timetable:before;
+  @extend .icon-timetable;
 }
 .icon-masonry-Component_Dashboard_TwitterController:before {
-  @extend .icon-twitter:before;
+  @extend .icon-twitter;
 }
 .icon-masonry-Component_Dashboard_UpcomingWorkController:before {
-  @extend .icon-due-work:before;
+  @extend .icon-due-work;
 }
 .icon-masonry-Component_Dashboard_VideoController:before {
-  @extend .icon-video:before;
+  @extend .icon-video;
 }
 .icon-masonry-Component_Dashboard_WeatherController:before {
-  @extend .icon-weather:before;
+  @extend .icon-weather;
 }
 .icon-masonry-Schoolbox_ResourceBooking_Booking_Component_ResourceManagement:before {
-  @extend .icon-resource-booking:before;
+  @extend .icon-resource-booking;
 }
 .icon-masonry-Schoolbox_Tile_Component_DashboardTileController:before {
-  @extend .icon-tiles:before;
+  @extend .icon-tiles;
 }
