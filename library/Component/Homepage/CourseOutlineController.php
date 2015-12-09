@@ -284,7 +284,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 'UNIT_STUDENT_COUNT'          => count($this->student_list),
                 'UNIT_TASK_COMPLETE_CLASS'    => '',
                 'UNIT_EXPANDED_STATE'         => ($is_expanded ? 'expanded' : 'collapsed'),
-                'UNIT_EXPANDED_STATE_ICON'    => ($is_expanded  ? 'icon-collapse' : 'icon-add'),
+                'UNIT_EXPANDED_STATE_ICON'    => ($is_expanded  ? 'icon-up-arrow' : 'icon-down-arrow'),
                 'UNIT_LIST_CLASS'             => ($is_expanded ? '' : 'hide'),
                 'unit_task_block'             => '',
                 'unit_task_allow_move_block'  => '',

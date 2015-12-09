@@ -71,7 +71,7 @@
                     component.stop().slideUp();
                 }
 
-                icon.toggleClass('icon-collapse icon-add');
+                icon.toggleClass('icon-up-arrow icon-down-arrow');
             });
         }
     }
