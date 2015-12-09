@@ -55,6 +55,11 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                 ];
                 // Delve into each card, and pluck out its period day and title
                 foreach ($result['cards'] as $card) {
+                    // Pluck out period from card
+                    $resultPeriod = [
+                        'Period Day'   => $card['day'],
+                        'Period Title' => $card['period'],
+                    ];
 
                     // Pluck out classroom from card (if there is one)
                     $classroomIds = $card['classroomIds'];
@@ -120,11 +125,6 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                                     'Class Room' => isset($result['classrooms'][$classroomId])
                                         ? $result['classrooms'][$classroomId]['code']
                                         : '',
-                                ];
-                                // Pluck out period from days in card
-                                $resultPeriod = [
-                                    'Period Day'   => $card['day'],
-                                    'Period Title' => $card['period'],
                                 ];
 
                                 // We finally have a result
