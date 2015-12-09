@@ -76,6 +76,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
             array(
                 'owner'  => $this->getUser()->getId(),
                 'box_id' => $this->getAssessment()->getId(),
+                'draft'  => false,
             )
         );
         foreach ($files as $file) {
