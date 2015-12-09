@@ -103,8 +103,8 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                         // Go thru each class entry for this lesson, and add its classroom.
                         foreach ($classes as $class) {
                             $resultClass = [
-                                'Class Code'        => $subject['code'].' '.$class['code'],
-                                'Class Title'       => $subject['name'].' '.$class['code'],
+                                'Class Code'        => $subject['code'].'-'.$class['code'],
+                                'Class Title'       => $subject['name'],
                                 'Class Description' => '',
                             ];
                             // Add an entry for every classroom
