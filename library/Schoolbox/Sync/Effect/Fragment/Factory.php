@@ -46,7 +46,6 @@ class Factory {
         'lastname' => 'Surname',
         'year' => 'Year Level',
 
-        'email' => 'Email Address',
         'altEmail' => 'Alt Email Address',
 
         'campusCollection' => 'Campus',
