@@ -78,83 +78,83 @@ $masonry-drop-background: $input-focus-bg-color;
 
 .icon-masonry-Component_Homepage_BreadcrumbController:before {
   @extend .icon-breadcrumbs;
-  color: $breadcrumbs;
+  color: $icon-color-breadcrumbs;
 }
 .icon-masonry-Component_Homepage_NewsController:before {
   @extend .icon-news;
-  color: $news;
+  color: $icon-color-news;
 }
 .icon-masonry-Component_Homepage_LinkListController:before {
   @extend .icon-link;
-  color: $links;
+  color: $icon-color-links;
 }
 .icon-masonry-Component_Homepage_FileListController:before {
   @extend .icon-files;
-  color: $files;
+  color: $icon-color-files;
 }
 .icon-masonry-Component_Homepage_MembersController:before {
   @extend .icon-group;
-  color: $group-members;
+  color: $icon-color-group-members;
 }
 .icon-masonry-Component_Homepage_ForumListController:before {
   @extend .icon-forum;
-  color: $forum;
+  color: $icon-color-forum;
 }
 .icon-masonry-Component_Homepage_ManageClassController:before {
   @extend .icon-class-list;
-  color: $class-list;
+  color: $icon-color-class-list;
 }
 .icon-masonry-Component_Homepage_ManageFolderController:before {
   @extend .icon-folder;
-  color: $folders;
+  color: $icon-color-folders;
 }
 .icon-masonry-Component_Homepage_ManagersController:before {
   @extend .icon-group-managers;
-  color: $group-members;
+  color: $icon-color-group-members;
 }
 .icon-masonry-Component_Homepage_ImageController:before {
   @extend .icon-image;
-  color: $image;
+  color: $icon-color-image;
 }
 .icon-masonry-Component_Homepage_FolderListController:before {
   @extend .icon-folder;
-  color: $folders;
+  color: $icon-color-folders;
 }
 .icon-masonry-Component_Homepage_EventListController:before {
   @extend .icon-calendar;
-  color: $calendar;
+  color: $icon-color-calendar;
 }
 .icon-masonry-Component_Homepage_ClickviewController:before {
   @extend .icon-click-view;
-  color: $clickView;
+  color: $icon-color-clickView;
 }
 .icon-masonry-Component_Homepage_ImageGalleryController:before {
   @extend .icon-image-gallery;
-  color: $image-gallery;
+  color: $icon-color-image-gallery;
 }
 .icon-masonry-Component_Homepage_RandImageController:before {
   @extend .icon-random-image;
-  color: $random-image;
+  color: $icon-color-random-image;
 }
 .icon-masonry-Component_Homepage_DropBoxController:before {
   @extend .icon-drop-box;
-  color: $file-drop-box;
+  color: $icon-color-file-drop-box;
 }
 .icon-masonry-Component_Homepage_DueWorkListController:before {
   @extend .icon-due-work;
-  color: $due-work;
+  color: $icon-color-due-work;
 }
 .icon-masonry-Component_Homepage_RSSController:before {
   @extend .icon-rss;
-  color: $rss-feed;
+  color: $icon-color-rss-feed;
 }
 .icon-masonry-Component_Homepage_TeachersController:before {
   @extend .icon-teacher;
-  color: $class-teachers;
+  color: $icon-color-class-teachers;
 }
 .icon-masonry-Component_Homepage_CalendarListController:before {
   @extend .icon-calendar;
-  color: $calendar;
+  color: $icon-color-calendar;
 }
 .icon-masonry-Component_Homepage_DutiesController:before {
   // ?
@@ -162,106 +162,106 @@ $masonry-drop-background: $input-focus-bg-color;
 }
 .icon-masonry-Component_Homepage_PollController:before {
   @extend .icon-poll;
-  color: $poll;
+  color: $icon-color-poll;
 }
 .icon-masonry-Component_Homepage_WikiController:before {
   @extend .icon-wiki;
-  color: $wiki;
+  color: $icon-color-wiki;
 }
 .icon-masonry-Component_Homepage_FeedController:before {
   @extend .icon-homepagefeed;
-  color: $homepage-feed;
+  color: $icon-color-homepage-feed;
 }
 .icon-masonry-Component_Homepage_TextBoxController:before {
   @extend .icon-textbox;
-  color: $text-box;
+  color: $icon-color-text-box;
 }
 .icon-masonry-Component_Homepage_AudioController:before {
   @extend .icon-audio;
-  color: $audio;
+  color: $icon-color-audio;
 }
 .icon-masonry-Component_Homepage_PodcastController:before {
   @extend .icon-podcast;
-  color: $podcast;
+  color: $icon-color-podcast;
 }
 .icon-masonry-Component_Homepage_BlogController:before {
   @extend .icon-comment;
-  color: $chat;
+  color: $icon-color-chat;
 }
 // Doesn't yet exist and probably never will
 //.icon-masonry-Component_Homepage_TranslateController:before {
 //}
 .icon-masonry-Component_Homepage_ScrollerController:before {
   @extend .icon-image-slideshow;
-  color: $image-slideshow;
+  color: $icon-color-image-slideshow;
 }
 .icon-masonry-Component_Homepage_AssessController:before {
   @extend .icon-quiz;
-  color: $quizzes;
+  color: $icon-color-quizzes;
 }
 .icon-masonry-Component_Homepage_CountdownController:before {
   @extend .icon-countdown;
-  color: $countdown;
+  color: $icon-color-countdown;
 }
 .icon-masonry-Component_Homepage_ChatController:before {
   @extend .icon-chat;
-  color: $chat;
+  color: $icon-color-chat;
 }
 .icon-masonry-Component_Homepage_SurveyController:before {
   @extend .icon-surveys;
-  color: $surveys;
+  color: $icon-color-surveys;
 }
 .icon-masonry-Component_Homepage_TwitterController:before {
   @extend .icon-twitter;
-  color: $twitter;
+  color: $icon-color-twitter;
 }
 .icon-masonry-Component_Homepage_ClassListController:before {
   @extend .icon-class-list;
-  color: $class-list;
+  color: $icon-color-class-list;
 }
 .icon-masonry-Component_Homepage_VideoController:before {
   @extend .icon-video;
-  color: $video-player;
+  color: $icon-color-video-player;
 }
 .icon-masonry-Component_Homepage_WolframController:before {
   @extend .icon-wolfram-alpha;
-  color: $wolfram-alpha;
+  color: $icon-color-wolfram-alpha;
 }
 .icon-masonry-Component_Homepage_CourseOutlineController:before {
   @extend .icon-course-outline;
-  color: $course-outline;
+  color: $icon-color-course-outline;
 }
 .icon-masonry-Component_Homepage_CourseBuilderController:before {
   @extend .icon-course-builder;
-  color: $course-builder;
+  color: $icon-color-course-builder;
 }
 .icon-masonry-Component_Homepage_RubricController:before {
   @extend .icon-criteria;
-  color: $course-criteria;
+  color: $icon-color-course-criteria;
 }
 .icon-masonry-Component_Homepage_SocialStreamController:before {
   @extend .icon-social-stream;
-  color: $social-stream;
+  color: $icon-color-social-stream;
 }
 .icon-masonry-Component_Homepage_EtherpadController:before {
   @extend .icon-collab-docs;
-  color: $collab-doc;
+  color: $icon-color-collab-doc;
 }
 .icon-masonry-Component_Homepage_PinterestController:before {
   @extend .icon-pinterest;
-  color: $pinterest;
+  color: $icon-color-pinterest;
 }
 .icon-masonry-Schoolbox_Tile_Component_HomepageTileController:before {
   @extend .icon-tiles;
-  color: $tiles;
+  color: $icon-color-tiles;
 }
 .icon-masonry-Schoolbox_Curriculum_Component_CurriculumDetailsController:before {
   @extend .icon-curriculum-details;
-  color: $curriculum-details;
+  color: $icon-color-curriculum-details;
 }
 .icon-masonry-Schoolbox_Curriculum_Component_CurriculumOverviewController:before {
   @extend .icon-curriculum;
-  color: $curriculum-overview;
+  color: $icon-color-curriculum-overview;
 }
 
 // Eportfolio masonry icons
