@@ -1,6 +1,6 @@
 {% set mapRowIdentifier = 'mappingrow-' ~ random(100000000) %}
 
-<input id='mapping-row-input-{{ mapRowIdentifier }}' type="hidden" {{ dynamicDisabled }} name="{{ dynamicInputName }}" value="{{ preselected }}" />
+<input id='{{ mapRowIdentifier }}-input' type="hidden" {{ dynamicDisabled }} name="{{ dynamicInputName }}" value="{{ preselected }}" />
 
 <div data-mapping-row="{{ mapRowIdentifier }}" class="ups-mapping-row-collection">
     {% for campusId, campusName in allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}

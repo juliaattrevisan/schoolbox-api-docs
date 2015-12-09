@@ -642,7 +642,7 @@
                 var container = $(element);
                 var mapRowIdentifier = container.attr('data-mapping-row');
 
-                var csv = $('#mapping-row-input-' + mapRowIdentifier).val();
+                var csv = $('#' + mapRowIdentifier + '-input').val();
 
                 /* Split csv into their origina values
                  */
@@ -683,7 +683,7 @@
 
                 /* Set csv into hidden input field
                  */
-                $('#mapping-row-input-' + mapRowIdentifier).val(csv);
+                $('#' + mapRowIdentifier + '-input').val(csv);
             });
         }
 
