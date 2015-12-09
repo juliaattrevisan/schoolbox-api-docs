@@ -158,17 +158,30 @@ class TimetableStructure extends AbstractImporter
 
         // Sort the period list, and set sequence based on that
         foreach ($result as $key => $timetable) {
+            /** @var TimetableCampus $campus */
+            $campus = $timetable['campus'];
             $this->log->info(
                 sprintf(
                     'Calculating day and period count for term "%s" / campus "%s"',
                     $timetable['cycle']->getTitle(),
-                    $timetable['campus']->getCampus()->getExtTimetableCode()
+                    $campus->getCampus()->getExtTimetableCode()
                 )
             );
             $dayCount    = max(array_keys($timetable['periods']));
             $periodCount = max(array_map('count', $timetable['periods']));
             $this->log->info(sprintf('Day count: %d, period count: %d', $dayCount, $periodCount));
             $timetable['cycle']->setCycleLength($dayCount)->setDayLength($periodCount);
+
+            // The campus start date needs to be set into the past
+            if ($campus->getStart()->isFuture()) {
+                $this->log->info(sprintf('Timetable cycle is starting in future - offsetting so it starts in past'));
+                $i = 0;
+                while ($campus->getStart()->isFuture() && $i++ < 100) {
+                    // Go back $dayCount weekdays until $start is not in future
+                    $campus->getStart()->addWeekdays(-$dayCount);
+                }
+                $this->log->info(sprintf('Timetable cycle now starts on "%s"', $campus->getStart()->getDatabaseDate()));
+            }
 
             // Sort periods by day, and then set period sequence that way
             $this->log->info('Setting sequence for periods');
