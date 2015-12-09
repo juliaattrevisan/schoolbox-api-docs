@@ -468,7 +468,7 @@
 
                 /* Reset Mapping Type
                  */
-                $('[data-effect-mappingtype='+effectId+']').val(-1);
+                $('[data-effect-mappingtype='+effectId+']')[0].selectedIndex = 0;
 
                 /* Empty the Effect Fragment container
                  */
