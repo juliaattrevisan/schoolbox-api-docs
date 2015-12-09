@@ -213,10 +213,22 @@ set config = {
 
                     <dl class="inline-dl">
                         {% for token, description in allNDSField %}
-                        <dt class="small-6">{:{{ token }}}</dt>
+                        <dt class="small-6">{:{{ token|replace({'[]': ''}) }}}</dt>
                         <dd class="small-6">{{ description }}</dd>
                         {% endfor %}
                     </dl>
+
+                    <p>
+                        Note that you can use square brackets to reference nth elements.
+                        This applies to tokens for {:email.address}, {:campus.code}
+                        and {:campus.name}
+                    </p>
+                    <p>
+                        For example, you can use them like this:<br />
+                        {:email[0].address}<br />
+                        {:campus[1].code}<br />
+                        {:campus[2].name}
+                    </p>
                 </div>
                 <div class="small-12 large-6 columns">
                     <h3>Available Filters</h3>
