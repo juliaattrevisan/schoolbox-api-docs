@@ -371,28 +371,9 @@ class Controller extends Base {
         // perform the actual dry run (only for $rulesetId)
         try {
             $provisioner->run(false, $rulesetId);
-            $message = 'Your dry run has finished';
         } catch (\Exception $e) {
-            // shove something in the bell notifier
-            $message = 'Something went wrong in your dry run - '.$e->getTraceAsString();
+            // the client has already detached - not much we can do
         }
-
-        // notify
-        // TODO make this show in notifications instead of as an alert
-        $user   = $this->getUser();
-        $userId = $user->getId();
-        $bob    = new \Alaress\Async\Notification\Instance\Builder();
-        $bob->setTitle($message)
-            ->setSeverity(\Monolog\Logger::INFO)
-            ->setNamespace('ALERT')
-            ->setHref('#')
-            ->setIcon('/images/icon.php?icon=bolt&size=64')
-            ->addTopic("notify.user.$userId")
-//            ->putMeta('ttl', 30)
-            ->putMeta('title', 'Message from ' . $user->formatName());
-
-        $n = new \Schoolbox\Notif\Notif("instant.user.$userId");
-        $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
     }
 
     /**
