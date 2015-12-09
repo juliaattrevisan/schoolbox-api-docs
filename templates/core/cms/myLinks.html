@@ -3,7 +3,7 @@
 $(function() {
     // Form validation
     $(document).on('open.fndtn.reveal', '[data-reveal]', function() {
-        $(this).find('form[data-role="link-form"]').validate({
+        $(this).find('form[data-role="link-form"]').alaressValidate({
             rules: {
                 url: {
                     isURL: true,

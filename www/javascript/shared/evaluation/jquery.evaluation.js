@@ -93,7 +93,7 @@
 						/* If a custom error location is desired
 						 */
 						if (configuration.errorContainer != undefined) {
-							$(element).validate({
+							$(element).alaressValidate({
 								onfocusout: false,
 								errorPlacement: function(error, inputElement) {
 									$(element).find(configuration.errorContainer).html(error);
@@ -102,7 +102,7 @@
 							});
 						}
 						else {
-							$(element).validate({
+							$(element).alaressValidate({
 								onfocusout: false,
 								ignore: ':hidden:not(:checkbox):not(:radio)'
 							});

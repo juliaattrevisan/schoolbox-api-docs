@@ -128,7 +128,7 @@
             });
 
             config.element.each(function() {
-                $(this).validate({
+                $(this).alaressValidate({
                     focusInvalid: false,
                     errorPlacement: function(error, element) {
                         // Attach to a table row if there is one there

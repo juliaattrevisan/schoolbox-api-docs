@@ -224,7 +224,7 @@ $('#rubric-tbody').inlineGradingRubrics({
 		 * Set up validation behaviours for rubrics form
 		 */
 		function initForm() {
-			$(config.formElement).validate({
+			$(config.formElement).alaressValidate({
 				submitHandler: function(form) {
 					var success = updateWarningElements();
 

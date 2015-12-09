@@ -7,7 +7,7 @@ $(document).ready(function() {
     var forms = $('form[data-role="question-submit"]');
 
     forms.each(function(index, formElement) {
-         $(formElement).validate({
+         $(formElement).alaressValidate({
             submitHandler: function() {
 //                showAlert(formElement);
                 $.post(

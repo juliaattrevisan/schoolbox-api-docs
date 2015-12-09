@@ -11,7 +11,7 @@
             var gradeTemplate = doT.template($('script#submission-grade-template').html().trim());
 
             var form = $('form[data-action="saveGradeLevels"]');
-            form.validate();
+            form.alaressValidate();
 
             /**
              * Adds a new grade to the given group.

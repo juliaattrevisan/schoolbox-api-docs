@@ -90,7 +90,7 @@ function init(){
             });
 
         $(document).ready(function(){
-            $('#loginForm').validate({
+            $('#loginForm').alaressValidate({
                 errorPlacement: function(error, element) {
                     if (element.attr("name") == "tandc"  ) {
                         error.appendTo("#error-msg");

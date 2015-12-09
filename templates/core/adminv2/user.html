@@ -35,7 +35,7 @@
             return cloneDest.val() != cloneSrc.val();
         }, "Roles cannot be the same");
 
-        cloneForm.validate({
+        cloneForm.alaressValidate({
             submitHandler: function (form) {
                 var src  = cloneSrc.children('option[value=' + cloneSrc.val() + ']').text(),
                         dest = cloneDest.children('option[value=' + cloneDest.val() + ']').text(),

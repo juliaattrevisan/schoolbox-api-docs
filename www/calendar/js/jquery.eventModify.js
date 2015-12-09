@@ -390,7 +390,7 @@
                 return false;
             };
 
-			$(config.element).validate({
+			$(config.element).alaressValidate({
 				rules: {
 					'campus[]': {
 						required: {

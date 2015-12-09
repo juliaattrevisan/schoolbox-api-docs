@@ -36,7 +36,7 @@
             });
 
         // Form validation: Run the validation on submit only
-        form.validate();
+        form.alaressValidate();
 
         // Open date validation
         form.find('[data-role="open_date"]').each(function() {
