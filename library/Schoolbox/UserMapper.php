@@ -139,7 +139,7 @@ class UserMapper extends Mapper
             array(
                 'column' => 'alt_email',
                 'property' => 'altEmail',
-                'type' => Mapper::TYPE_STRING,
+                'type' => Mapper::TYPE_BOOLEAN,
             )
         );
         $this->hasMap(
@@ -154,7 +154,7 @@ class UserMapper extends Mapper
             array(
                 'column' => 'mail_handler',
                 'property' => 'useInternalMail',
-                'type' => Mapper::TYPE_INTEGER,
+                'type' => Mapper::TYPE_BOOLEAN,
             )
         );
 
@@ -178,7 +178,7 @@ class UserMapper extends Mapper
             array(
                 'column' => 'eportfolio_enabled',
                 'property' => 'eportfolioEnable',
-                'type' => Mapper::TYPE_STRING,
+                'type' => Mapper::TYPE_BOOLEAN,
             )
         );
 
