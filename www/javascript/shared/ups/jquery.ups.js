@@ -45,6 +45,8 @@
         initEffectDelete();
         initEffectUserFieldAvailability();
         initEffectMappingRows();
+        initEffectCheckbox();
+        initEffectCheckboxChange();
 
         /**
          * Init
@@ -466,7 +468,7 @@
 
                 /* Reset Mapping Type
                  */
-                $('[data-effect-mappingtype='+effectId+']').val(-1);
+                $('[data-effect-mappingtype='+effectId+']')[0].selectedIndex = 0;
 
                 /* Empty the Effect Fragment container
                  */
@@ -600,7 +602,7 @@
 
                     /* Ignore "Please Select"
                      */
-                    if ($(option).val() != -1) {
+                    if (option.hasAttribute('value')) {
                         if ($.inArray($(option).val(), used) > -1) {
                             $(option).attr('disabled', 'disabled');
                         }
@@ -620,6 +622,59 @@
                 var ruleId = $(element).attr('data-rule');
 
                 refreshUserFieldAvailability(ruleId);
+            });
+        }
+
+        /**
+         * Preselect checkboxes in a key-multivalue context
+         */
+        function initEffectCheckbox() {
+            $.each($(config.element).find('[data-mapping-row]'), function(index, element) {
+                var container = $(element);
+                var mapRowIdentifier = container.attr('data-mapping-row');
+
+                var csv = $('#' + mapRowIdentifier + '-input').val();
+
+                /* Split csv into their origina values
+                 */
+                var values = csv.split(',');
+
+                /* Tick, where values were previously saved
+                 */
+                for (var i = 0; i < values.length; i++) {
+                    container.find('input[value='+values[i]+']').prop('checked', true);
+                }
+            });
+        }
+
+        /**
+         * Enable compilation of checkbox values into a csv upon
+         * state change for aforementioned checkboxes. This allows
+         * a key-multivalue (serialised) pair to exist
+         */
+        function initEffectCheckboxChange() {
+            $(config.element).on('change', '[data-mapping-row] input[type=checkbox]', function(event) {
+                var container = $(this).parents('[data-mapping-row]');
+                var mapRowIdentifier = container.attr('data-mapping-row');
+
+                /* csv of campusId values
+                 */
+                var values = [];
+
+                /* Find all the ticked checkboxes in this div
+                 */
+                $.each(container.find('input[type=checkbox]:checked'), function(index, element) {
+
+                    /* Assemble all ticked checkboxes' values into a csv
+                     */
+                    values.push($(element).val());
+                });
+
+                var csv = values.join(',');
+
+                /* Set csv into hidden input field
+                 */
+                $('#' + mapRowIdentifier + '-input').val(csv);
             });
         }
 

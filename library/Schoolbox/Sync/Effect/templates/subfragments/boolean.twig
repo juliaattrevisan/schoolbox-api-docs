@@ -1,4 +1,9 @@
-<select {{ dynamicDisabled }} name="{{ dynamicInputName }}">
-    <option value="1" {% if preselected == true %}selected="selected"{% endif %}>True</option>
-    <option value="0" {% if preselected == false %}selected="selected"{% endif %}>False</option>
-</select>
+{% include 'sub/select.twig' with {
+    name: dynamicInputName,
+    options: {
+        0: 'False',
+        1: 'True'
+    },
+    preselected: preselected,
+    disabled: dynamicDisabled
+} %}

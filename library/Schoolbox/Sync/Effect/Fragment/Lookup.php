@@ -28,15 +28,17 @@ class Lookup {
         'residentialHouse' => '\HouseResidentialMapper',
         'schoolHouse' => '\HouseMapper',
         'role' => '\Schoolbox\RoleMapper',
+        'campusCollection' => '\Schoolbox\CampusMapper',
     ];
 
     /**
      * Get lookup data
      *
      * @param $userField
+     * @param $roleType
      * @return Collection
      */
-    public function findData($userField) {
+    public function findData($userField, $roleType = null) {
         $stack = new Collection;
 
         if (in_array($userField, array_keys($this->allLookups))) {
@@ -46,14 +48,25 @@ class Lookup {
              */
             if (class_exists($mapperName)) {
                 $mapper = new $mapperName();
-                $allResults = $mapper->findAll();
+
+                /* Special Case for Role Mapper: this mapper should restrict
+                 * possibilities to those appropriate for the current Ruleset
+                 */
+                if ($userField == 'role') {
+                    $allResults = $mapper->findByColumn('group_type', $roleType);
+                }
+                else {
+                    $allResults = $mapper->findAll();
+                }
 
                 /* Get key/value version of a model
                  * This varies depending on the model
                  */
                 foreach ($allResults as $currentResult) {
                     if ($currentResult instanceof ValueLabelInterface) {
-                        $stack->add($currentResult->findValueLabelPair());
+                        $pair = $currentResult->findValueLabelPair();
+
+                        $stack->setOffset($pair['value'], $pair['label']);
                     }
                 }
             }

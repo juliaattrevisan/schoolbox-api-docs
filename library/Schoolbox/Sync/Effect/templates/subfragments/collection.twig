@@ -1,0 +1,17 @@
+{% set mapRowIdentifier = 'mappingrow-' ~ random(100000000) %}
+
+<input id='{{ mapRowIdentifier }}-input' type="hidden" {{ dynamicDisabled }} name="{{ dynamicInputName }}" value="{{ preselected }}" />
+
+<div data-mapping-row="{{ mapRowIdentifier }}" class="ups-mapping-row-collection">
+    {% for campusId, campusName in allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
+
+        {# Each checkbox needs to be unique on the whole page
+         # due to custom checkbox design requiring ids
+         #}
+        {% set checkboxIdentifier = mapRowIdentifier ~ '-' ~ campusId %}
+
+        <input {{ dynamicDisabled }} id="{{ checkboxIdentifier }}" type="checkbox" value="{{ campusId }}" />
+        <label for="{{ checkboxIdentifier }}" class="checkbox-label">{{ campusName }}</label>
+    {% endfor %}
+</div>
+

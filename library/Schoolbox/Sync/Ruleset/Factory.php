@@ -152,7 +152,7 @@ class Factory
         /* Determine which Effect Fragments to load initially
          * It tells frontend which templates to use for Effects.
          */
-        $effectFragmentFactory = new EffectFragmentFactory();
+        $effectFragmentFactory = new EffectFragmentFactory($rulesetId);
 
         /* Which twig containers and fragments to load for this
          * Ruleset's Effects
@@ -160,14 +160,16 @@ class Factory
         $allEffectStructures = [
             'containers' => [],
             'fragments' => [],
-            'allUserField' => $effectFragmentFactory->getAllFields(),
+            'allUserField' => $effectFragmentFactory->getAllFieldsKeyValue(),
         ];
 
         foreach ($ruleset as $currentRule) {
             foreach ($currentRule->getConditions() as $currentCondition) {
-                $fragment = $conditionFragmentFactory->produce($currentCondition->getConditionType());
+                $fragment = $conditionFragmentFactory->produce();
+                $subfragment = $conditionFragmentFactory->produceType($currentCondition->getConditionType());
 
                 $allConditionStructures['fragments'][$currentCondition->getId()]['fragment'] = $fragment;
+                $allConditionStructures['fragments'][$currentCondition->getId()]['subfragments']['fragment'] = $subfragment;
             }
 
             /* Skip Effect has a different container since it's a unique kind of Effect

@@ -21,6 +21,7 @@ class Factory {
     const TYPE_BOOLEAN = 1;
     const TYPE_LOOKUP = 2;
     const TYPE_STRING = 3;
+    const TYPE_COLLECTION = 4;
 
     /**
      * Manufacture a list of Schoolbox User fields to chooze from
@@ -37,28 +38,39 @@ class Factory {
      */
     private $allFieldKeys = [
         'externalId' => 'External ID',
+
         'username' => 'Username',
 
         'title' => 'Title' ,
         'firstname' => 'Firstname',
         'lastname' => 'Surname',
-        'year' => 'Year',
+        'year' => 'Year Level',
 
-        'email' => 'Email Address',
+        'role' => 'Role',
+
         'altEmail' => 'Alt Email Address',
+
+        'campusCollection' => 'Campus Involvement',
 
         'residentialHouse' => 'Residential House',
         'schoolHouse' => 'School House',
         'boardingStatus' => 'Boarding Status',
 
-        'localEmail' => 'Local Email?',
-        'useInternalMail' => 'Use Internal Mail',
-        'enabled' => 'Schoolbox Account Enabled?',
-        'webmail' => 'Webmail',
-        'eportfolioEnable' => 'Eportfolio Enabled?',
+        'localEmail' => 'Email Address from Username',
+        'useInternalMail' => 'Use External Mail Client',
+        'enabled' => 'Schoolbox Account Enabled',
+        'webmail' => 'Enable Webmail Tab',
+        'eportfolioEnable' => 'E-Portfolio Enabled',
 
-        'role' => 'Role'
     ];
+
+    /**
+     * The current Ruleset
+     * Synonymous with Role Type
+     *
+     * @var string
+     */
+    private $roleType = '';
 
     /**
      * A Lookup instance
@@ -70,9 +82,10 @@ class Factory {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct($roleType) {
         $this->setLookup(new Lookup());
 
+        $this->setRoleType($roleType);
         $this->setAllFields($this->generateAllFields());
     }
 
@@ -113,6 +126,14 @@ class Factory {
                         'type' => self::TYPE_LOOKUP,
                         'label' => $label
                     ];
+
+                    break;
+
+                case UserMapper::TYPE_COLLECTION :
+                     $allFields[$key] = [
+                         'type' => self::TYPE_COLLECTION,
+                         'label' => $label
+                     ];
 
                     break;
 
@@ -166,10 +187,13 @@ class Factory {
             return new Fragment('@upsEffect/subfragments/boolean.twig');
         }
         else if ($this->isLookup($userField)) {
-            return new Fragment('@upsEffect/subfragments/lookup.twig', $this->getLookup()->findData($userField));
+            return new Fragment('@upsEffect/subfragments/lookup.twig', $this->getLookup()->findData($userField, $this->getRoleType()));
         }
         else if ($this->isString($userField)) {
             return new Fragment('@upsEffect/subfragments/string.twig');
+        }
+        else if ($this->isCollection($userField)) {
+            return new Fragment('@upsEffect/subfragments/collection.twig', $this->getLookup()->findData($userField));
         }
     }
 
@@ -185,6 +209,37 @@ class Factory {
         }
 
         return false;
+    }
+
+    /**
+     * Determine whether the current field is a Collection
+     *
+     * @param $field
+     * @return bool
+     */
+    public function isCollection($field) {
+        if ($this->allFields[$field]['type'] == self::TYPE_COLLECTION) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets the key/value representation of $allFields
+     *
+     * @return array
+     */
+    public function getAllFieldsKeyValue() {
+        $allFields = $this->getAllFields();
+
+        $stack = [];
+
+        foreach ($allFields as $key => $data) {
+            $stack[$key] = $data['label'];
+        }
+
+        return $stack;
     }
 
     /**
@@ -275,4 +330,22 @@ class Factory {
     private function setAllFields($allFields) {
         $this->allFields = $allFields;
     }
+
+    /**
+     * @param string $roleType
+     */
+    private function setRoleType($roleType)
+    {
+        $this->roleType = $roleType;
+    }
+
+    /**
+     * @return string
+     */
+    private function getRoleType()
+    {
+        return $this->roleType;
+    }
+
+
 }

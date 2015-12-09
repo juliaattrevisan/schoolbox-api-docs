@@ -61,6 +61,12 @@ class Controller extends Base {
 
         $ffactory = new FieldFactory();
 
+        /* Determine which Condition Fragments to load initially
+         * It tells frontend which templates to use for Conditions.
+         */
+        $conditionFragmentFactory = new ConditionFragmentFactory();
+        $subfragment = $conditionFragmentFactory->produceType($newCondition->getConditionType());
+
         $data = [
             'allNDSField'      => $ffactory->buildMap($rule->getRoleType()),
             'meta'             => [
@@ -69,25 +75,23 @@ class Controller extends Base {
                 ]
             ],
             'currentCondition' => $newCondition,
+
+            'allConditionStructures' => [
+                'fragments' => [
+                    $newCondition->getId() => [
+                        'subfragments' => [
+                            'fragment' => $subfragment,
+                        ]
+                    ]
+                ]
+            ],
         ];
 
-        // the list of templates available for rendering
-
-        /* Determine which Condition Fragments to load initially
-         * It tells frontend which templates to use for Conditions.
-         */
-        $conditionFragmentFactory = new ConditionFragmentFactory();
-        $fragment = $conditionFragmentFactory->produce($newCondition->getConditionType());
-
-        if ($fragment instanceof Fragment) {
-            $this->getResponse()->content->set([
-                'template' => $fragment->getFilename(),
-                'data'     => $data,
-                'format'   => 'nochrome'
-            ]);
-        } else {
-            // TODO uh... how do I throw a 400 from here?
-        }
+        $this->getResponse()->content->set([
+            'template' => '@upsCondition/container.twig',
+            'data'     => $data,
+            'format'   => 'nochrome'
+        ]);
     }
 
     /**

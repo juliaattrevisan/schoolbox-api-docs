@@ -1,5 +1,17 @@
-{% set conditionGeneral = 1 %}
-{% set conditionUserExists = 2 %}
+{# Configuration in Twig Land
+ #
+ # Use to provide some front-end configurability
+ # and a bunch of const-like settings, without
+ # having to do it in back-end first
+ #}
+{%
+set config = {
+    'condition': {
+        'general': 1,
+        'userExists': 2
+    }
+}
+%}
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
@@ -118,8 +130,8 @@
                                     <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
                                 </nav>
                                 <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
-                                    <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ conditionGeneral }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
-                                    <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ conditionUserExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+                                    <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ config.condition.general }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
+                                    <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ config.condition.userExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
                                 </ul>
                             </div>
     
@@ -200,18 +212,41 @@
 
         <div id="token-list" class="reveal-modal" data-reveal>
             <div class="row">
+                <div class="small-12 columns">
+                    <h2>Tokens and Filters</h2>
+                    <p>
+                        Tokens and Filters allow you to modify your SIS Output value.
+                        The modified output value can be used in Effects to construct
+                        or match complicated text strings. They are entirely optional.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="small-12 large-6 columns">
-                    <h2>Available Tokens</h2>
+                    <h3>Available Tokens</h3>
 
                     <dl class="inline-dl">
                         {% for token, description in allNDSField %}
-                        <dt class="small-6">{:{{ token }}}</dt>
+                        <dt class="small-6">{:{{ token|replace({'[]': ''}) }}}</dt>
                         <dd class="small-6">{{ description }}</dd>
                         {% endfor %}
                     </dl>
+
+                    <p>
+                        Note that you can use square brackets to reference nth elements.
+                        This applies to tokens for {:email.address}, {:campus.code}
+                        and {:campus.name}
+                    </p>
+                    <p>
+                        For example, you can use them like this:<br />
+                        {:email[0].address}<br />
+                        {:campus[1].code}<br />
+                        {:campus[2].name}
+                    </p>
                 </div>
                 <div class="small-12 large-6 columns">
-                    <h2>Available Filters</h2>
+                    <h3>Available Filters</h3>
 
                     <dl class="inline-dl">
                         <dt class="small-6">uc</dt>

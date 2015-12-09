@@ -20,7 +20,6 @@ use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
 class Controller extends Base {
-    const EFFECT_SKIP = 1;
 
     /**
      * A meta field for various Condition-specific UI
@@ -85,7 +84,7 @@ class Controller extends Base {
 
         /* Decide which Effect Fragment to use
          */
-        $fragmentFactory = new FragmentFactory();
+        $fragmentFactory = new FragmentFactory($rule->getRoleType());
 
         /* All fragments and subfragments use empty by default, thus
          * forcing the user to choose a userfield/mappingType combo
@@ -99,7 +98,7 @@ class Controller extends Base {
                         'fragment' => $fragment,
                     ]
                 ],
-                'allUserField' => $fragmentFactory->getAllFields(),
+                'allUserField' => $fragmentFactory->getAllFieldsKeyValue(),
             ],
             'meta' => [
                 'effect' => [
@@ -182,7 +181,9 @@ class Controller extends Base {
     public function change() {
         $queryData = $this->getRequest()->query;
 
-        $fragmentFactory = new FragmentFactory();
+        $rule = Rule\Mapper::getInstance()->findById($queryData['ruleId']);
+
+        $fragmentFactory = new FragmentFactory($rule->getRoleType());
         $fragment = $fragmentFactory->produce($queryData['mappingType'], $queryData['userField']);
         $subfragment = $fragmentFactory->produceType($queryData['userField']);
 
@@ -195,8 +196,6 @@ class Controller extends Base {
                         'fragment' => $fragment,
                         'subfragments' => [
                             'fragment' => $subfragment,
-                            'mapFrom' => '',
-                            'mapTo' => '',
                         ]
                     ]
                 ],
@@ -265,8 +264,6 @@ class Controller extends Base {
                     $queryData['effectId'] => [
                         'subfragments' => [
                             'fragment' => $subfragment,
-                            'mapFrom' => '',
-                            'mapTo' => '',
                         ]
                     ]
                 ]

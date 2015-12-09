@@ -1,0 +1,13 @@
+<select {{ disabled }} name="{{ name }}"
+    {% for dataVar, dataValue in selectData %}
+        {{ dataVar }}="{{ dataValue }}"
+    {% endfor %}
+>
+    <option disabled selected="selected">Please Select</option>
+
+    {% for value, label in options %}
+    <option value="{{ value }}" {% if value == preselected %}selected="selected"{% endif %}>
+        {{ label }}
+    </option>
+    {% endfor %}
+</select>

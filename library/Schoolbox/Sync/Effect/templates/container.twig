@@ -1,6 +1,3 @@
-{# Corresponds to db indexes for effectType - could be fed from backend one day #}
-{% set allEffectMappingTypes = ['Maps', 'Equals'] %}
-
 <li id="effect-{{ currentEffect.id }}" class="actions-small-2 content" data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
     <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" value="">
 
@@ -11,31 +8,36 @@
             </div>
             <div class="small-10 medium-11 large-4 columns">
                 <label title="This Schoolbox User Field will be modified">
-                    <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][userProperty]" data-effect-userfield="{{ currentEffect.id }}" >
-                        <option value="-1" disabled selected="selected">Please Select</option>
-
-                        {% for currentUserKey, currentUserField in allEffectStructures.allUserField %}
-                            <option value="{{ currentUserKey }}" {% if currentUserKey == currentEffect.getUserProperty() %}selected="selected"{% endif %}>
-                                {{ currentUserField.label }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                    {% include 'sub/select.twig' with {
+                        name: 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][userProperty]',
+                        options: allEffectStructures.allUserField,
+                        preselected: currentEffect.getUserProperty(),
+                        disabled: meta.effect[currentEffect.id].disabled,
+                        selectData: {
+                            'data-effect-userfield': currentEffect.id
+                        }
+                    } %}
                 </label>
             </div>
             <div class="small-12 medium-6 large-3 columns">
                 <label title="Mapping Type">
-                    <select {{ meta.effect[currentEffect.id].disabled }} name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" data-effect-mappingtype="{{ currentEffect.id }}" data-effect-ruleid="{{ currentEffect.rule.id }}">
-                        <option value="-1" disabled selected="selected">Please Select</option>
-
-                        {% for currentEffectMappingType in allEffectMappingTypes %}
-                            <option value="{{ loop.index }}" {% if loop.index == currentEffect.effectType.id %}selected="selected"{% endif %}>{{ currentEffectMappingType }}</option>
-                        {% endfor %}
-                    </select>
+                    {% include 'sub/select.twig' with {
+                        name: 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][type]',
+                        options: {
+                            1: 'Maps',
+                            2: 'Equals'
+                        },
+                        preselected: currentEffect.effectType.id,
+                        disabled: meta.effect[currentEffect.id].disabled,
+                        selectData: {
+                            'data-effect-mappingtype': currentEffect.id,
+                            'data-effect-ruleid': currentEffect.rule.id
+                        }
+                    } %}
                 </label>
             </div>
 
-            {# Dynamically construct input names
-             #}
+            {# Dynamically construct input names #}
             {% set dynamicDisabled = meta.effect[currentEffect.id].disabled %}
 
             <div>
