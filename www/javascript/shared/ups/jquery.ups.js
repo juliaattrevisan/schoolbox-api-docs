@@ -105,6 +105,11 @@
                     }
                 },
 
+                /* Use Modify Lock capability to prevent people accidentally
+                 * changing values when scrolling on touch devices
+                 */
+                useModifyLock: 1,
+
                 /* data-locked value when a Condition/Effect is locked
                  * data-locked value when a Condition/Effect is unlocked
                  */
@@ -283,24 +288,26 @@
          * Works on both Conditions and Effects
          */
         function initConditionModifyLock() {
-            $(config.element).on('click', '[data-condition-modify-lock]', function(event) {
-                event.preventDefault();
+            if (config.useModifyLock) {
+                $(config.element).on('click', '[data-condition-modify-lock]', function(event) {
+                    event.preventDefault();
 
-                var id = '#' + $(this).attr('data-condition-modify-lock');
+                    var id = '#' + $(this).attr('data-condition-modify-lock');
 
-                if ($(id).attr('data-locked') == config.locked) {
-                    $(id).find(config.validInputTypes).attr('disabled', false);
-                    $(id).attr('data-locked', config.unlocked);
+                    if ($(id).attr('data-locked') == config.locked) {
+                        $(id).find(config.validInputTypes).attr('disabled', false);
+                        $(id).attr('data-locked', config.unlocked);
 
-                    $(this).removeClass('icon-unlocked').addClass('icon-locked');
-                }
-                else {
-                    $(id).find(config.validInputTypes).attr('disabled', true);
-                    $(id).attr('data-locked', config.locked);
+                        $(this).removeClass('icon-unlocked').addClass('icon-locked');
+                    }
+                    else {
+                        $(id).find(config.validInputTypes).attr('disabled', true);
+                        $(id).attr('data-locked', config.locked);
 
-                    $(this).removeClass('icon-locked').addClass('icon-unlocked');
-                }
-            });
+                        $(this).removeClass('icon-locked').addClass('icon-unlocked');
+                    }
+                });
+            }
         }
 
         /**
@@ -437,24 +444,26 @@
          * Works on both Conditions and Effects
          */
         function initEffectModifyLock() {
-            $(config.element).on('click', '[data-effect-modify-lock]', function(event) {
-                event.preventDefault();
+            if (config.useModifyLock) {
+                $(config.element).on('click', '[data-effect-modify-lock]', function(event) {
+                    event.preventDefault();
 
-                var id = '#' + $(this).attr('data-effect-modify-lock');
+                    var id = '#' + $(this).attr('data-effect-modify-lock');
 
-                if ($(id).attr('data-locked') == config.locked) {
-                    $(id).find(config.validInputTypes).attr('disabled', false);
-                    $(id).attr('data-locked', config.unlocked);
+                    if ($(id).attr('data-locked') == config.locked) {
+                        $(id).find(config.validInputTypes).attr('disabled', false);
+                        $(id).attr('data-locked', config.unlocked);
 
-                    $(this).removeClass('icon-unlocked').addClass('icon-locked');
-                }
-                else {
-                    $(id).find(config.validInputTypes).attr('disabled', true);
-                    $(id).attr('data-locked', config.locked);
+                        $(this).removeClass('icon-unlocked').addClass('icon-locked');
+                    }
+                    else {
+                        $(id).find(config.validInputTypes).attr('disabled', true);
+                        $(id).attr('data-locked', config.locked);
 
-                    $(this).removeClass('icon-locked').addClass('icon-unlocked');
-                }
-            });
+                        $(this).removeClass('icon-locked').addClass('icon-unlocked');
+                    }
+                });
+            }
         }
 
         /**

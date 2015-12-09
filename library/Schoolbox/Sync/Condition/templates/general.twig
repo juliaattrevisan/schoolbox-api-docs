@@ -1,4 +1,10 @@
-<li id="condition-{{ currentCondition.id }}" class="actions-small-2 content" data-locked="{{ meta.condition[currentCondition.id].lock.status }}">
+{% if config.useModifyLock %}
+    {% set numActions = 2 %}
+{% else %}
+    {% set numActions = 1 %}
+{% endif %}
+
+<li id="condition-{{ currentCondition.id }}" class="actions-small-{{ numActions }} content" data-locked="{{ meta.condition[currentCondition.id].lock.status }}">
     <input type="hidden" name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][type]" value="1">
 
     <div class="list-item">
@@ -36,7 +42,10 @@
     </div>
     <nav>
         <a href="/adminv2/ups/condition/delete/{{ currentCondition.id }}" class="icon-delete" title="Delete" data-condition-delete="{{ currentCondition.id }}"></a>
+
+        {% if config.useModifyLock %}
         <a href="" class="icon-{{ meta.condition[currentCondition.id].lock.icon }}" title='Toggle Readonly Mode' data-condition-modify-lock="condition-{{ currentCondition.id }}"></a>
+        {% endif %}
     </nav>
 </li>
 
