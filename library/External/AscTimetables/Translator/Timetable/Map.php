@@ -25,7 +25,6 @@ class External_AscTimetables_Translator_Timetable_Map extends IteratorIterator
                 'type'         => 'card',
                 'lessonId'     => (string)$attrs->lessonid,
                 'classroomIds' => explode(',', (string)$attrs->classroomids),
-//                'terms'        => $this->parseBits($attrs->terms),
                 'day'          => (int)$attrs->day,
                 'period'       => (string)$attrs->period,
             ];
@@ -71,23 +70,5 @@ class External_AscTimetables_Translator_Timetable_Map extends IteratorIterator
         }
         // Fall through without matching - return nothing
         return [];
-    }
-
-    /**
-     * Parses a bit sequence into a list of set bits.
-     *
-     * @param $bitString
-     *
-     * @return array
-     */
-    protected function parseBits($bitString)
-    {
-        $result = [];
-        foreach (str_split($bitString, 1) as $i => $bit) {
-            if (intval($bit) === 1) {
-                $result[] = $i+1;
-            }
-        }
-        return $result;
     }
 }
