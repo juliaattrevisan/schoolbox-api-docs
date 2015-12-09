@@ -578,6 +578,18 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
     }
 
     /**
+     * Add/subtract weekdays and reinitialise
+     *
+     * @param  $val
+     * @return \Alaress_Date_Format
+     */
+    public function addWeekdays($val)
+    {
+        $this->getDateTimeObject()->addWeekdays($val);
+        return $this;
+    }
+
+    /**
      * @param $val
      * @return $this
      */
