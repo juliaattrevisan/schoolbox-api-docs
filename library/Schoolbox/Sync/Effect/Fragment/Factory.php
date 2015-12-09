@@ -46,9 +46,11 @@ class Factory {
         'lastname' => 'Surname',
         'year' => 'Year Level',
 
+        'role' => 'Role',
+
         'altEmail' => 'Alt Email Address',
 
-        'campusCollection' => 'Campus',
+        'campusCollection' => 'Campus Involvement',
 
         'residentialHouse' => 'Residential House',
         'schoolHouse' => 'School House',
@@ -60,7 +62,6 @@ class Factory {
         'webmail' => 'Enable Webmail Tab',
         'eportfolioEnable' => 'E-Portfolio Enabled',
 
-        'role' => 'Role'
     ];
 
     /**
