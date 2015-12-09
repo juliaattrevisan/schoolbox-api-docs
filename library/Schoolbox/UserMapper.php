@@ -139,14 +139,14 @@ class UserMapper extends Mapper
             array(
                 'column' => 'alt_email',
                 'property' => 'altEmail',
-                'type' => Mapper::TYPE_BOOLEAN,
+                'type' => Mapper::TYPE_STRING,
             )
         );
         $this->hasMap(
             array(
                 'column' => 'webmail',
                 'property' => 'webmail',
-                'type' => Mapper::TYPE_INTEGER,
+                'type' => Mapper::TYPE_BOOLEAN,
             )
         );
 
