@@ -1,3 +1,4 @@
+<script type="text/javascript" src="/javascript/shared/jquery.infiniscroll.js"></script>
 {% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
 <div class="row actions-small-1">
     <div class="list-item">
@@ -53,31 +54,11 @@
 <script type="text/javascript">
     $(function () {
 
-            // configurable values
-        var threshold        = 0.2,                            // the tolerance for when to load the next ajax page
-            maxPages         = 3,                              // the max number of pages we're prepared to hold in the DOM
-            url              = '/adminv2/ups/log/{{ id }}',
-            pageParam        = 'p',
-            filterParam      = 'filter',
-
-            // internal values
-            prevPosition     = 0,                              // where we were previously
-            currentFirstPage = queryStringValue(pageParam, 1),
-            currentLastPage  = currentFirstPage,
-            fetchInProgress  = false,                          // are we currently fetching a page?
-            pagesFetched     = [ currentFirstPage ],
-            firstPage,
-            lastPage;
-
-
         var $elem      = $('[data-cinnamon]'),
             $inner     = $elem.children().eq(0),
             $verbosity = $('#verbosity');
 
-
-        // apply the page number to the content we already have
-        $inner.children().attr('data-page', currentFirstPage);
-
+        // allow records to expand/collapse
         $elem.on('click', '[data-collapser]', function (e) {
             e.preventDefault();
 
@@ -95,6 +76,7 @@
 
         });
 
+        // allow verbosity to be filtered
         $verbosity.on('change', function () {
 
             var v     = this.value,
@@ -104,212 +86,16 @@
             lines.filter(function () { return $(this).data('level') < v; }).addClass('squash');
         });
 
+        // allow the pane to scroll and scroll and scroll
+        $elem.infiniscroll({
+            url: '{{ routeLookup('upsRuleset.log', { logId: id }) }}',
+            onUpdate: function () {
 
-
-        function pageToFetch(increment)
-        {
-            if (increment > 0) {
-                // are we about to increment/decrement to a place we already know doesn't exist?
-                if (typeof lastPage != 'undefined' && currentLastPage >= lastPage) {
-                    // if we know we're on the first page, bug out
-                    // console.log('We have the last page, not going down any further');
-                    return -1;
-                }
-
-            } else {
-                // are we about to increment/decrement to a place we already know doesn't exist?
-                if (currentFirstPage == 1 || (typeof firstPage != 'undefined' && currentFirstPage <= firstPage)) {
-                    // if we know we're on the first page, bug out
-                    // console.log('We have the first page, not going up any further');
-                    return -1;
-                }
+                // reapply the verbosity filter
+                $verbosity.trigger('change');
 
             }
-
-            var targetPage = (increment > 0 ? currentLastPage : currentFirstPage) + increment;
-
-            if (pagesFetched.indexOf(targetPage) > -1) {
-                // we've already fetched this page
-                // console.log('Avoiding fetch: already got page ' + targetPage);
-                return -1;
-            }
-
-            return targetPage;
-        }
-
-
-        $elem.on('scroll', function () {
-
-            var fromTop       = $elem.scrollTop(),
-                innerHeight   = $inner.height(),
-                wrapperHeight = $elem.height(),
-                fromBottom    = innerHeight - wrapperHeight - fromTop,
-                relevantValue, percentageDistance, increment, params, filterValue, targetPage;
-
-            if (fromTop == prevPosition || fetchInProgress) {
-                // if no scroll or already fetching, do nothing
-                return true;
-            }
-
-            if (fromTop > prevPosition) {
-                // heading toward the bottom, use these values
-                relevantValue = fromBottom;
-                increment     = 1;
-
-            } else {
-                // heading toward the top, use these values
-                relevantValue = fromTop;
-                increment     = -1;
-
-            }
-
-            // keep track of where we are
-            prevPosition = fromTop;
-
-            // how far away from our relevant face are we?
-            percentageDistance = relevantValue / innerHeight;
-
-            // if we're withing the threshold, ajax another page
-            if (percentageDistance <= threshold) {
-
-                targetPage = pageToFetch(increment);
-
-                // no page to fetch
-                if (targetPage == -1) {
-                    return true;
-                }
-
-                params = {};
-                params[pageParam] = targetPage;
-
-                filterValue = queryStringValue(filterParam, null);
-
-                if (filterValue) {
-                    params[filterParam] = filterValue;
-                }
-
-                // console.log(['Fetching page', params[pageParam], '- travelling', increment > 0 ? 'down' : 'up'].join(' '));
-
-                // block other requests
-                fetchInProgress = true;
-
-                // fetch the next/previous page
-                $.get(url, params, function (data) {
-
-                    var pageToPop, indexToPop, DOMToPop, fn, $keepInView,
-                        wrapTop, listTop, kievTop, newListTop, newKievTop, dKievTop;
-
-                    // set up a hook we can scroll to once the new data has been jammed in
-                    $keepInView = $inner.children().filter(function () {
-                        return $(this).offset().top > $elem.offset().top;
-                    }).eq(0);
-
-                    // calculate original keepInView position
-                    wrapTop = $elem.offset().top;
-                    listTop = $inner.offset().top - wrapTop;
-                    kievTop = $keepInView.offset().top - listTop;
-
-
-                    // we need to stamp the returned data with the page number
-                    data = $(data).attr('data-page', targetPage);
-
-                    // special delivery! where am I putting this? just over here? ok!
-                    if (increment > 0) {
-                        $inner.append(data);
-                        // console.log('Appended page ' + targetPage);
-
-                        // update our know-last
-                        currentLastPage = targetPage;
-                    } else {
-                        $inner.prepend(data);
-                        // console.log('Prepended page ' + targetPage);
-
-                        // update our know-last
-                        currentFirstPage = targetPage;
-                    }
-
-
-                    // and add the page to the list of pages fetched
-                    pagesFetched.push(targetPage);
-
-                    // dump out stuff we can't see
-                    if (pagesFetched.length > maxPages) {
-
-                        // which end are we popping?
-                        fn = increment > 0 ? Math.min : Math.max;
-
-                        // the page to pop
-                        pageToPop = fn.apply(null, pagesFetched);
-
-                        // find the page in the array
-                        indexToPop = pagesFetched.indexOf(pageToPop);
-
-                        // find the corresponding log records
-                        DOMToPop = $inner.children('[data-page=' + pageToPop + ']');
-
-                        // chop it!!
-                        // TODO rather than dump it out completely
-                        DOMToPop.detach();
-                        pagesFetched.splice(indexToPop, 1);
-
-                        // console.log(['Dumped out page', pageToPop].join(' '));
-                        // console.log('Current pages indexed', pagesFetched);
-
-                        // pull the bounds in by 1, in whichever direction we're travelling
-                        if (increment > 0) {
-                            ++currentFirstPage;
-                        } else {
-                            --currentLastPage;
-                        }
-                    }
-
-                    // reapply the verbosity filter
-                    $verbosity.trigger('change');
-
-                    // calculate our new scroll position
-                    newListTop = $inner.offset().top - wrapTop;
-                    newKievTop = $keepInView.offset().top - newListTop;
-                    dKievTop   = kievTop - newKievTop;
-
-                    // calculate the new scroll position
-                    var scrollPosition = (0 - listTop) - dKievTop;
-
-                    // make sure our scroll-to element still *looks* like it's where it was, even though the DOM has shifted under its feet
-                    $elem.scrollTop(scrollPosition);
-
-                }).fail(function () {
-
-                    // so that page didn't exist: depending on which way we were travelling, institute bounds-check for that direction
-                    if (increment > 0) {
-                        lastPage = currentLastPage;
-                    } else {
-                        firstPage = currentFirstPage;
-                    }
-
-                }).always(function () {
-                    // prevent permablock of future requests
-                    fetchInProgress = false;
-                });
-            }
-
         });
-
-
-        /**
-         * @param {string} param
-         * @param {*}      alt
-         * @returns {string}
-         */
-        function queryStringValue(param, alt)
-        {
-            if (typeof alt == 'undefined') {
-                alt = '';
-            }
-
-            var result = window.location.search.match(new RegExp(param + '=([^&]*)'));
-
-            return result ? result[1] : alt;
-        }
 
     });
 </script>
