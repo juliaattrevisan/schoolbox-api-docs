@@ -249,7 +249,10 @@ class Controller extends Base {
         // TODO DI
         $mapper = Effect\Mapper::getInstance();
 
-        $effectTypeMapper = new EffectTypeMapper();
+        $effectTypeMapper = $mapper->getJoinMapper('effect_type_id');
+        $ruleMapper = $mapper->getJoinMapper('rule_id');
+
+        $rule = $ruleMapper->findById($ruleId);
 
         if (is_array($effects)) {
             foreach ($effects as $effectId => $effectData) {
@@ -260,7 +263,7 @@ class Controller extends Base {
 
                 /* Figure out what type it was, and cast accordingly
                  */
-                $fragmentFactory = new FragmentFactory();
+                $fragmentFactory = new FragmentFactory($rule->getRoleType());
 
                 /* Forge key/value for Mapped Key/Value Pairs
                  */
