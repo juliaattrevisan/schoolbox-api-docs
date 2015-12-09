@@ -14,6 +14,12 @@ set config = {
 }
 %}
 
+{% if config.useModifyLock %}
+    {% set numActions = 2 %}
+{% else %}
+    {% set numActions = 1 %}
+{% endif %}
+
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript" src="/javascript/shared/ups/jquery.ups.js"></script>

@@ -1,9 +1,3 @@
-{% if config.useModifyLock %}
-    {% set numActions = 2 %}
-{% else %}
-    {% set numActions = 1 %}
-{% endif %}
-
 <li id="effect-{{ currentEffect.id }}" class="actions-small-{{ numActions }} content" data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
     <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" value="">
 
