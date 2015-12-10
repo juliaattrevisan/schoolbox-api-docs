@@ -28,7 +28,8 @@ class DAV_ExceptionPlugin extends ServerPlugin {
 	 */
 	public function initialize(Server $server) {
 		$this->setConfigLoader(new ConfigLoader());
-		$server->subscribeEvent('exception', array($this, 'onException'), 10);
+		$server->on('exception', array($this, 'onException'), 10);
+		set_error_handler([$this, 'onError'], error_reporting());
 	}
 
 	/**
@@ -41,9 +42,15 @@ class DAV_ExceptionPlugin extends ServerPlugin {
 	 */
 	public function onException(Exception $exception) {
 		$fp = fopen($this->getConfigLoader()->get('logs_dir').'/dav.err', 'ab');
-		fwrite($fp, sprintf("[%s] %s\n", date("Y-m-d H:i:s"), $exception->getMessage()));
+		fwrite($fp, sprintf("[%s] %s %s\n", date("Y-m-d H:i:s"), $exception->getMessage(), $exception->getTraceAsString()));
 		fclose($fp);
 		return true;
+	}
+
+	public function onError($errno, $errstr, $errfile, $errline) {
+		$fp = fopen($this->getConfigLoader()->get('logs_dir').'/dav.err', 'ab');
+		fwrite($fp, sprintf("[%s] %s %s:%s\n", date("Y-m-d H:i:s"), $errstr, $errfile, $errline));
+		fclose($fp);
 	}
 
 	/**
