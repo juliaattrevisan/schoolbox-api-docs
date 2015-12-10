@@ -48,6 +48,8 @@
         initEffectCheckbox();
         initEffectCheckboxChange();
 
+        initAutoExpand();
+
         /**
          * Init
          *
@@ -743,6 +745,19 @@
                     });
                 }
             });
+        }
+
+        /**
+         * Automatically expand a Rule when there's a hash
+         * anchor in the url
+         */
+        function initAutoExpand() {
+            var ruleId = window.location.hash.toString().substring(1, window.location.hash.length);
+
+            var component = $(config.element).find('[data-collapsable='+ruleId+'-contents]');
+            var icon = $(config.element).find('[data-collapser='+ruleId+'-contents]');
+
+            $.fn.executeCollapsable(component, icon);
         }
     }
 }(jQuery));
