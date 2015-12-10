@@ -14,6 +14,9 @@ $categoryMapper = CategoryMapper::getInstance();
 $categoryMapper->setSessionData($_SESSION);
 $groupHandler = new Group();
 
+// Great Scott! (go one step further BTTF if I deleted a folder)
+$bttfCount = 1;
+
 if ($_POST['name']) {
     /** @var \Schoolbox\Resource\Category $model */
     $model = $categoryMapper->createModel()
@@ -191,6 +194,7 @@ if ($_POST['name']) {
     $categoryMapper->recursiveDelete($category);
 
     $_SESSION['resourcesID'] = $category->getParent()->getId();
+    $bttfCount = 2;
 } elseif (is_numeric($_GET['deleteAll'])) {
 // only superusers can do this no matter what
     if (!$groupHandler->isSuperuser()) {
@@ -204,6 +208,7 @@ if ($_POST['name']) {
     } catch (Exception $e) {
         error(2);
     }
+    $bttfCount = 2;
 } else {
     error(2);
 }
@@ -211,5 +216,5 @@ if ($_POST['name']) {
 if ($_REQUEST['ajax']) {
     die(json_encode(['result' => 'success']));
 } else {
-    $page->backToTheFuture(1);
+    $page->backToTheFuture($bttfCount);
 }
