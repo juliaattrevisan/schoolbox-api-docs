@@ -345,15 +345,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 {$this->getColumnString('c')},
                 {$code_mapper->getColumnString('cc')},
                 {$homepageConfig_mapper->getColumnString('hp')},
-                {$group_mapper->getColumnString('ug')},
-                (
-                    SELECT COUNT(*) FROM `task` `t`
-                    WHERE `t`.`category_id` IN (
-                        SELECT `subc`.`id`
-                        FROM {$this->getTable()} `subc`
-                        WHERE `subc`.`parent` = `c`.`id`
-                    )
-                ) AS `c.taskCount`
+                {$group_mapper->getColumnString('ug')}
             FROM {$this->getTable()} c
             LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
@@ -364,6 +356,24 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         $statement = $this->database->prepare($query);
         $statement->execute(array($id));
+
+        // Get task count as separate result set
+        $taskCountQuery = "
+            SELECT
+                c.id,
+                COUNT(t.id) AS taskCount
+            FROM {$this->getTable()} c
+            LEFT JOIN {$this->getTable()} subc ON subc.parent = c.id AND subc.deleted_at IS NULL
+            JOIN `task` t ON t.category_id = subc.id AND t.deleted_at IS NULL
+            WHERE c.deleted_at IS NULL AND c.parent=?
+            GROUP BY c.id
+        ";
+        $taskCountStatement = $this->database->prepare($taskCountQuery);
+        $taskCountStatement->execute([$id]);
+        $taskCounts = [];
+        foreach ($taskCountStatement as $row) {
+            $taskCounts[$row['id']] = $row['taskCount'];
+        }
 
         $collection = new \Schoolbox\Collection();
         $category = null;
@@ -378,8 +388,8 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 }
             } else {
                 $category = $this->hydrate($row, 'c');
-                if (isset($row['c.taskCount'])) {
-                    $category->setTaskCount($row['c.taskCount']);
+                if (isset($taskCounts[$row['c.id']])) {
+                    $category->setTaskCount($taskCounts[$row['c.id']]);
                 }
                 $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
                 $category->setHomepage($homepageConfig);
