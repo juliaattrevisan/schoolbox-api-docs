@@ -94,7 +94,7 @@ set config = {
 
                     <div class="grip"></div>
                     <div class="small-11 columns no-pad">
-                        <div class="actions-small-3">
+                        <div class="actions-small-4">
                             <div class="list-item">
                                 <h3 class="subheader">
                                     {% if currentRule.name|length %}
@@ -110,37 +110,36 @@ set config = {
                             </div>
                             <nav>
                                 <a href="#" class="icon-down-arrow" data-collapser="rule-{{ currentRule.id }}-contents" title="Collapse Content"></a>
-                                <a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule"></a>
-                                <a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule"></a>
+                                <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
                             </nav>
                         </div>
     
                         <span id='rule-{{ currentRule.id }}-status' class="label highlight full-width hide"></span>
                     </div>
+
+                    <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
+                        <li class="separator">Rule</li>
+                        <li><a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule">Edit Rule</a></li>
+                        <li><a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule">Delete Rule</a></li>
+                        <li class="separator">Conditions</li>
+                        <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ config.condition.general }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
+                        <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ config.condition.userExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+                        <li class="separator">Effects</li>
+                        <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Spawn new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
+                        <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip User</a></li>
+                    </ul>
+
                     <div class="small-12 columns no-pad">
                         <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
-                            <div class="actions-small-1 row">
-                                <div class="list-item">
-                                    <div class="small-12 columns">
-                                        <h4>Conditions</h4>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-options"></a>
-                                </nav>
-                                <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
-                                    <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ config.condition.general }}" class="icon-add" title="Spawn new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
-                                    <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ config.condition.userExists }}" class="icon-add" title="Spawn new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
-                                </ul>
-                            </div>
-    
+                            <h4>Conditions</h4>
+
                             <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-conditions">
                                 {% for currentCondition in currentRule.conditions %}
                                 {% include allConditionStructures.fragments[currentCondition.id].fragment.getFilename() %}
                                 {% endfor %}
                             </ul>
     
-                            <div class="actions-small-2 row">
+                            <div class="actions-small-1 row">
                                 <div class="list-item">
                                     <div class="small-12 columns">
                                         <h4>Effects</h4>
@@ -148,12 +147,7 @@ set config = {
                                 </div>
                                 <nav>
                                     <a class="icon-help" title="Show available Tokens" data-reveal-id="token-list"></a>
-                                    <a class="icon-more" title="" data-dropdown="rule-{{ currentRule.id }}-effect-options"></a>
                                 </nav>
-                                <ul id="rule-{{ currentRule.id }}-effect-options" class="f-dropdown" data-dropdown-content>
-                                    <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Spawn new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
-                                    <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip</a></li>
-                                </ul>
                             </div>
     
                             <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-effects">
