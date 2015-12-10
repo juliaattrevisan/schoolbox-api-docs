@@ -5,7 +5,7 @@
  # having to do it in back-end first
  #}
 {%
-set config = {
+set upsConfig = {
     'condition': {
         'general': 1,
         'userExists': 2
@@ -157,8 +157,8 @@ set config = {
                         <li><a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule">Edit Rule</a></li>
                         <li><a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule">Delete Rule</a></li>
                         <li class="separator">Conditions</li>
-                        <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ config.condition.general }}" class="icon-add" title="Add new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
-                        <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ config.condition.userExists }}" class="icon-add" title="Add new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+                        <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }}" class="icon-add" title="Add new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
+                        <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" class="icon-add" title="Add new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
                         <li class="separator">Effects</li>
                         <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Add new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
                         <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip User</a></li>
