@@ -5,24 +5,21 @@
 <script type="text/javascript">
     $(function() {
         $('#folderForm').alaressValidate({
-            rules: {
-                'group[{REQUIRED_PERMS}]': {
-                    groupCheck: true
+            submitHandler: function(form) {
+                var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
+                var individualPerms = $('input[name=groupcheck]').is(':checked');
+                if ((hasDefaultPerms < 2) && !individualPerms) {
+                    $(form).confirmDialog({
+                        text: 'You do not currently have write access to this folder. Do you wish to continue?',
+                        confirmEvent: function() {
+                            form.submit();
+                        }
+                    });
+                } else {
+                    form.submit();
                 }
             }
         });
-
-        jQuery.validator.addMethod("groupCheck", function(value, element, params) {
-            var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
-            var individualPerms = $('input[name=groupcheck]').is(':checked');
-
-            if ((hasDefaultPerms < 2) && !individualPerms) {
-                return confirm("You do not currently have write access to this folder. Do you wish to continue?");
-            }
-            else {
-                return true;
-            }
-        }, "Please select write access for this group.");
 
 
         $('[data-reset-homepage-content]').click(function(event) {
