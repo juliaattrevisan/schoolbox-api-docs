@@ -90,6 +90,15 @@
             component.stop().slideUp();
         }
 
+        $.fn.executeIconToggle(icon);
+    }
+
+    /**
+     * Toggle expand/collapse icon state
+     *
+     * @param icon
+     */
+    $.fn.executeIconToggle = function(icon) {
         icon.toggleClass('icon-up-arrow icon-down-arrow');
     }
 }(jQuery));

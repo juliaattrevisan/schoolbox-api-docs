@@ -57,7 +57,7 @@ set config = {
         <form id='ruleset' action='/adminv2/ups/ruleset/update' method="post">
             <input type="hidden" name="rulesetId" value="{{ rulesetId }}" />
 
-            <div class="actions-small-2">
+            <div class="actions-small-3">
                 <div class="list-item">
                     <h2 class="subheader">{{ rulesetId|capitalize }} Ruleset</h2>
                 </div>
@@ -76,6 +76,7 @@ set config = {
                             <span>Off</span>
                         </label>
                     </span>
+                    <a class="icon-down-arrow" title="Expand/Collapse All Rules" data-expand-all></a>
                     <a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run"></a>
                 </nav>
             </div>
