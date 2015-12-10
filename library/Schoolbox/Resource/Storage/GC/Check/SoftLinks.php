@@ -108,6 +108,16 @@ class SoftLinks implements Check
 
 
     /**
+     * @param string $table
+     * @return int
+     */
+    protected function fetchRowCount($table)
+    {
+        return (int)$this->db->query("SELECT COUNT(*) FROM $table")->fetchColumn();
+    }
+
+
+    /**
      * Takes an array of hashes, and returns the subset that this check regards as 'stale'
      *
      * @param array $test
@@ -141,7 +151,7 @@ class SoftLinks implements Check
             }
 
             // stats
-            $rowCount = $this->db->query("SELECT COUNT(*) FROM $table")->fetchColumn();
+            $rowCount = $this->fetchRowCount($table);
             $progress = (int)(count($test) / 100) ?: 1;
             $i        = 0;
             $seen     = [];
