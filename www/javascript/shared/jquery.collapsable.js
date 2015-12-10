@@ -11,9 +11,9 @@
     $.fn.collapsable = function(options) {
         options = options || {};
 
-        var config = init(options, $(this));
+        this.config = init(options, $(this));
 
-        setupCollapsable();
+        setupCollapsable.call(this);
 
         /**
          * Init
@@ -42,7 +42,8 @@
          * Set up collapsable toggle
          */
         function setupCollapsable() {
-            $(config.element).click(function(event) {
+            var self = this;
+            $(self.config.element).click(function(event) {
                 event.preventDefault();
 
                 var component,
@@ -59,7 +60,7 @@
                     icon      = $(this);
                 }
 
-                $.fn.executeCollapsable(component, icon);
+                $.fn.executeCollapsable.call(self, component, icon);
             });
         }
     }
@@ -92,7 +93,7 @@
             component.stop().slideUp();
         }
 
-        $.fn.executeIconToggle(icon);
+        $.fn.executeIconToggle.call(this, icon);
     }
 
     /**
@@ -101,6 +102,7 @@
      * @param icon
      */
     $.fn.executeIconToggle = function(icon) {
-        icon.toggleClass([ config.iconExpand, config.iconCollapse ].join(' '));
+        var classes = this.config ? [ this.config.iconExpand, this.config.iconCollapse ] : [ 'icon-down-arrow', 'icon-up-arrow' ];
+        icon.toggleClass(classes.join(' '));
     }
 }(jQuery));
