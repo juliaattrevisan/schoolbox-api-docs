@@ -8,7 +8,7 @@
 <ul class="flex-list buttons{% for size, count in sizing %} {{ size }}-{{ count }}{% endfor %}">
     {{- list -}}
     <li class="overflow">
-        <a class="icon-more" data-dropdown="{{ id }}"></a>
+        <a class="icon-more" data-dropdown="{{ id }}" title="Actions"></a>
         <ul class="f-dropdown" id="{{ id }}" data-dropdown-content>
             {{- list -}}
         </ul>
