@@ -48,6 +48,9 @@
         initEffectCheckbox();
         initEffectCheckboxChange();
 
+        initAutoExpand();
+        initExpandAll();
+
         /**
          * Init
          *
@@ -742,6 +745,37 @@
                         fetchInProgress = false;
                     });
                 }
+            });
+        }
+
+        /**
+         * Automatically expand a Rule when there's a hash
+         * anchor in the url
+         */
+        function initAutoExpand() {
+            var ruleId = window.location.hash.toString().substring(1, window.location.hash.length);
+
+            var component = $(config.element).find('[data-collapsable='+ruleId+'-contents]');
+            var icon = $(config.element).find('[data-collapser='+ruleId+'-contents]');
+
+            $.fn.executeCollapsable(component, icon);
+        }
+
+        /**
+         * Expand all Rules
+         */
+        function initExpandAll() {
+            $(config.element).find('[data-expand-all]').click(function(event) {
+                $.fn.executeIconToggle($(this));
+
+                $.each($(config.element).find('[data-rule]'), function(index, element) {
+                    var ruleId = 'rule-' + $(element).attr('data-rule');
+
+                    var component = $(element).find('[data-collapsable='+ruleId+'-contents]');
+                    var icon = $(element).find('[data-collapser='+ruleId+'-contents]');
+
+                    $.fn.executeCollapsable(component, icon);
+                });
             });
         }
     }

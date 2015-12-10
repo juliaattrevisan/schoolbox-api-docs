@@ -69,7 +69,7 @@ class Controller extends Base {
 
         $mapper->create($rule);
 
-        $this->getResponse()->redirect->to("/adminv2/ups/$roleType");
+        $this->getResponse()->redirect->to("/adminv2/ups/$roleType#rule-{$rule->getId()}");
     }
 
     /**
@@ -118,7 +118,7 @@ class Controller extends Base {
 
         Mapper::getInstance()->save($rule);
 
-        $this->getResponse()->redirect->to("/adminv2/ups/{$postData->get('rulesetId')}");
+        $this->getResponse()->redirect->to("/adminv2/ups/{$postData->get('rulesetId')}#rule-{$rule->getId()}");
     }
 
     /**
