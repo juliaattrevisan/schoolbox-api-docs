@@ -148,7 +148,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
                         foreach ($value as $subvalue) {
                             // if the value we got isn't in this array, append it
-                            if (!in_array($subvalue, $array)) {
+                            if (strlen(trim($subvalue)) && !in_array($subvalue, $array)) {
                                 $array[] = $subvalue;
                             }
                         }
