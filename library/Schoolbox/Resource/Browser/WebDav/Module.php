@@ -27,7 +27,10 @@ class Module extends AbstractModule
      */
     protected function getSetterList(Container $ci)
     {
-        $lazyDav = $ci->lazy(function () {
+        $lazyDav = $ci->lazy(function () use ($ci) {
+            // open session first, because webdav factory needs session to
+            // determine user's permissions
+            $ci->get('session')->start();
             return PortfolioWebDAV::factory();
         });
 
