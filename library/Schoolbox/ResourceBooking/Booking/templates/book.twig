@@ -255,24 +255,6 @@ $(function() {
                 pattern:  /^(?:am|pm)$/i
             }
         },
-        errorPlacement: function(label, element) {
-            var name = element.attr('name')
-            switch (element.attr('name')) {
-                case 'start_datetime[date]':
-                case 'start_datetime[hour]':
-                case 'start_datetime[minute]':
-                case 'start_datetime[meridien]':
-                case 'end_datetime[date]':
-                case 'end_datetime[hour]':
-                case 'end_datetime[minute]':
-                case 'end_datetime[meridien]':
-                    element.closest('td').append(label)
-                    break
-                default:
-                    label.insertAfter(element)
-                    break
-            }
-        },
         submitHandler: function() {
             // Consider: one pass for validation, another pass for saving
             var bookingId = form.find('input[name="id"]').val()
