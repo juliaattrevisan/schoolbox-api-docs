@@ -95,7 +95,6 @@ class Notifier extends AbstractModuleNotifier
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addTopic(implode('.', ['ups', $log->getId(), self::TRIGGER_LOGGED]))
-            ->setByline($log->getSummary())
             ->setTimestamp($storage->getCreatedAt()->getUnixTimeStamp());
 
         // forcibly send this message to the user
