@@ -118,19 +118,14 @@ class SoftLinks implements Check
 
 
     /**
-     * Takes an array of hashes, and returns the subset that this check regards as 'stale'
+     * Fetch a table-indexed array of the fields we're operating on
      *
-     * @param array $test
      * @return array
      */
-    public function getStale(array $test)
+    protected function fetchSourceMap()
     {
-        if ($this->limit) {
-            $test = array_slice($test, 0, $this->limit);
-        }
         $sources = [];
         $i       = 0;
-        $debug   = $this->log instanceof \Alaress\Lumberjack\Logger && $this->log->getThreshold() <= Logger::DEBUG;
 
         while (list($table, $field) = $this->getStatement()->fetch(PDO::FETCH_NUM)) {
             // index by table
@@ -142,6 +137,24 @@ class SoftLinks implements Check
 
         $this->log->info("Scanning $i fields from $j tables");
 
+        return $sources;
+    }
+
+
+    /**
+     * Takes an array of hashes, and returns the subset that this check regards as 'stale'
+     *
+     * @param array $test
+     * @return array
+     */
+    public function getStale(array $test)
+    {
+        if ($this->limit) {
+            $test = array_slice($test, 0, $this->limit);
+        }
+
+        $debug   = $this->log instanceof \Alaress\Lumberjack\Logger && $this->log->getThreshold() <= Logger::DEBUG;
+        $sources = $this->fetchSourceMap();
 
         foreach ($sources as $table => $fields) {
 
