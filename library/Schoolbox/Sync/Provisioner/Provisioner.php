@@ -172,6 +172,8 @@ class Provisioner
 
                     }
 
+                    $commonContext['action'] = $action;
+
                     $originalUser = clone $internalUser;
 
                     // Run this user through the hydrators
@@ -179,6 +181,7 @@ class Provisioner
                         $ruleset->hydrate($externalUser, $internalUser);
 
                     } catch (SkipException $e) {
+                        $commonContext['action'] = 'skip';
                         $this->logger->notice("Skipping user: ".$e->getMessage(), $commonContext);
                         ++$skipped;
                         continue;
@@ -194,7 +197,7 @@ class Provisioner
                     // get a diff of the original user and what we've ended up with
                     $diff = $this->userMapper->diff($originalUser, $internalUser, ['old','new']);
 
-                    $originalName = ($action == 'create') ? 'New user' : $originalUser->formatName();
+                    $originalName = ($action == 'create') ? "New user ({$internalUser->formatName()})" : $originalUser->formatName();
 
                     if (count($diff)) {
                         $level   = Logger::NOTICE;
