@@ -14,14 +14,14 @@
             $('span[data-selected="true"]').text(num);
         });
 
-        $('input[data-action="delete"]').click(function(event) {
+        var updateForm = $('form[data-action="userUpdate"]');
+        $('a[data-action="delete"]').click(function(event) {
             event.preventDefault();
-            var theForm = $(this).closest('form');
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete the selected users?',
                 confirmEvent: function() {
-                    theForm.append('<input name="deleteUsers" type="hidden" value="1" />');
-                    theForm.submit();
+                    updateForm.append('<input name="deleteUsers" type="hidden" value="1" />');
+                    updateForm.submit();
                 }
             });
         });
@@ -176,10 +176,24 @@
     </div>
 </div>
 
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h2 class="subheader">Users</h2>
+        </div>
+    </div>
+    <nav>
+        <a href="#" class="icon-more" data-dropdown="user-header-options" aria-expanded="false" title="Actions"></a>
+    </nav>
+    <ul class="f-dropdown" data-dropdown-content id="user-header-options">
+        <li>
+            <a class="icon-delete" data-action="delete" title="Delete Selected Users">Delete Selected Users</a>
+        </li>
+    </ul>
+</div>
+
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Users</h2>
-
         <form data-action="userUpdate" id="updateForm" action="/adminv2/user/bulk/modifyForm" method="post">
             <input type="hidden" name="userId" />
             <div class="scrollable">
@@ -317,9 +331,7 @@
                     </div>
                 </div>
             </section>
-
             <input name='updateUsers' type="submit" value="Apply To Selected" />
-            <input name='deleteUsers' type="submit" value="Delete Selected Users" data-action="delete" />
         </form>
     </div>
 </div>
