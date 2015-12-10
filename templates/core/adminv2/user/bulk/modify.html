@@ -14,14 +14,14 @@
             $('span[data-selected="true"]').text(num);
         });
 
+        var updateForm = $('form[data-action="userUpdate"]');
         $('a[data-action="delete"]').click(function(event) {
             event.preventDefault();
-            var theForm = $(this).closest('form');
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete the selected users?',
                 confirmEvent: function() {
-                    theForm.append('<input name="deleteUsers" type="hidden" value="1" />');
-                    theForm.submit();
+                    updateForm.append('<input name="deleteUsers" type="hidden" value="1" />');
+                    updateForm.submit();
                 }
             });
         });
