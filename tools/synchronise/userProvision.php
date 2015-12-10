@@ -17,14 +17,15 @@ use Schoolbox\Notif\StoredisLogger;
 use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Provisioner\Provisioner;
 
-$options = getopt("v", array('perform-update'));
+$options = getopt("vr:", array('perform-update'));
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('UPS', [
-    'verbose' => isset($options['v']) ? $options['v'] : null,
-    'perform' => isset($options['perform-update']),
+    'verbose'  => isset($options['v']) ? $options['v'] : null,
+    'perform'  => isset($options['perform-update']),
+    'roleType' => (isset($options['r']) && in_array($options['r'], [ 'staff', 'student', 'parent' ])) ? $options['r'] : null,
 ]);
 
 
@@ -53,6 +54,6 @@ $kernel->run(
         // Note that trying to overwrite the logger (and thus destroy the old one)
         // will cause an exit as soon as stdout is written
         // (because stdout is closed when the old logger is destroyed)
-        $ups->run($opts['perform']);
+        $ups->run($opts['perform'], $opts['roleType']);
     }
 );
