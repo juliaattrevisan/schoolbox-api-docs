@@ -486,6 +486,7 @@ class Controller extends Base {
         // TODO DI
         $mapper = Effect\Mapper::getInstance();
 
+        /** @var EffectTypeMapper $effectTypeMapper */
         $effectTypeMapper = $mapper->getJoinMapper('effect_type_id');
         $ruleMapper = $mapper->getJoinMapper('rule_id');
 
@@ -510,10 +511,20 @@ class Controller extends Base {
                      */
                     $arg = $effectData['arguments'];
 
+                    if ($fragmentFactory->isCollection($effectData['userProperty'])) {
+                        $to = [];
+                        foreach ($effectData['to'] as $k => $v) {
+                            $xpl = explode(',', $v);
+                            $to[$k] = count($xpl) == 1 ? $xpl[0] : $xpl;
+                        }
+                    } else {
+                        $to = $effectData['to'];
+                    }
+
                     /* Forge this into key/value pairs and ram that
                      * into $args as well
                      */
-                    $pairs = array_combine($effectData['from'], $effectData['to']);
+                    $pairs = array_combine($effectData['from'], $to);
 
                     /* array_filter filters out values that equate to false
                      * such as zero (which is valid data...). Use unset pears
@@ -534,6 +545,14 @@ class Controller extends Base {
                  */
                 else if ($fragmentFactory->isBoolean($effectData['userProperty'])) {
                     $arg = [(bool)$effectArgs[0]];
+                }
+                /*
+                 * Explode the collection type on comma
+                 */
+                elseif ($fragmentFactory->isCollection($effectData['userProperty'])) {
+                    $xpl = explode(',', $effectArgs[0]);
+                    $arg = [count($xpl) == 1 ? $xpl[0] : $xpl];
+
                 }
                 /* Otherwise just save it as given
                  */
