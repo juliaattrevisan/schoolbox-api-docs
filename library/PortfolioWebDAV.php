@@ -8,135 +8,10 @@ use Schoolbox\Resource\File\ILocator as FileLocatorInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Resource\Folder\ILocator as FolderLocatorInterface;
 
-class Sabre_DAV_Client_Extended extends Sabre\DAV\Client
-{
-
-    /**
-     * Overridden to implement Content-Length header in $this->request call
-     *
-     * @param $url
-     * @param $settings
-     *
-     * @return array
-     */
-    protected function curlRequest($url, $settings)
-    {
-        if ($settings[CURLOPT_CUSTOMREQUEST] == 'PROPFIND') {
-            $settings[CURLOPT_HTTPHEADER][] = 'Content-Length: 0';
-        }
-
-        $settings[CURLOPT_HTTPAUTH] = Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC;
-        $settings[CURLOPT_COOKIEFILE] = '';
-
-        if (Cfg::get('webdav_allow_insecure')) {
-            $settings[CURLOPT_SSL_VERIFYHOST] = false;
-            $settings[CURLOPT_SSL_VERIFYPEER] = false;
-        }
-
-        $curl = curl_init($url);
-
-        curl_setopt_array($curl, $settings);
-
-        return array(
-            curl_exec($curl),
-            curl_getinfo($curl),
-            curl_errno($curl),
-            curl_error($curl)
-        );
-    }
-
-    /**
-     * Uploads a file via a PUT request
-     *
-     * @param string $path Destination path on the server
-     * @param string $file Path to source file
-     *
-     * @return array
-     */
-    public function put($path, $file)
-    {
-
-        $curl = curl_init($this->getAbsoluteUrl($path));
-
-        $settings = array(
-            CURLOPT_HTTPAUTH   => Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC,
-            CURLOPT_USERPWD    => $this->userName . ':' . $this->password,
-            CURLOPT_COOKIEFILE => '',
-            CURLOPT_PUT        => true,
-            CURLOPT_INFILE     => fopen($file, "r"),
-            CURLOPT_INFILESIZE => filesize($file),
-        );
-        if (Cfg::get('webdav_allow_insecure')) {
-            $settings[CURLOPT_SSL_VERIFYHOST] = false;
-            $settings[CURLOPT_SSL_VERIFYPEER] = false;
-        }
-        curl_setopt_array($curl, $settings);
-
-        return array(
-            curl_exec($curl),
-            curl_getinfo($curl),
-            curl_errno($curl),
-            curl_error($curl)
-        );
-    }
-
-    /**
-     * Uploads a file resource via a PUT request
-     *
-     * @param string   $path     Destination path on the server
-     * @param resource $resource A resource that points to a stream
-     *
-     * @return array
-     */
-    public function putResource($path, $resource)
-    {
-        rewind($resource);
-        $metadata = stream_get_meta_data($resource);
-        $size     = filesize($metadata['uri']);
-        $curl     = curl_init($this->getAbsoluteUrl($path));
-
-        $settings = array(
-            CURLOPT_HTTPAUTH   => Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC,
-            CURLOPT_USERPWD    => $this->userName . ':' . $this->password,
-            CURLOPT_COOKIEFILE => '',
-            CURLOPT_PUT        => true,
-            CURLOPT_INFILE     => $resource,
-            CURLOPT_INFILESIZE => $size,
-        );
-        if (Cfg::get('webdav_allow_insecure')) {
-            $settings[CURLOPT_SSL_VERIFYHOST] = false;
-            $settings[CURLOPT_SSL_VERIFYPEER] = false;
-        }
-        curl_setopt_array($curl, $settings);
-
-        return array(
-            curl_exec($curl),
-            curl_getinfo($curl),
-            curl_errno($curl),
-            curl_error($curl)
-        );
-    }
-
-    /**
-     * Moves/renames a file or directory
-     *
-     * @param string $path Source path
-     * @param string $destination Destination path
-     *
-     * @return array
-     */
-    public function move($path, $destination)
-    {
-        return $this->request('MOVE', $path, null, array(
-                'Destination' => $this->getAbsoluteUrl($destination)));
-    }
-}
-
 class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, FetcherInterface
 {
-
     /**
-     * @var Sabre_DAV_Client_Extended
+     * @var DAV_ExtendedClient
      */
     private $client;
 
@@ -169,11 +44,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     protected $mimeMapper;
 
     /**
-     * @param \Sabre_DAV_Client_Extended $client
-     * @param array $paths List of paths from the baseUri to access
-     * @param bool  $lite
+     * @param \DAV_ExtendedClient $client
+     * @param array               $paths List of paths from the baseUri to access
+     * @param bool                $lite
      */
-    public function __construct(Sabre_DAV_Client_Extended $client, array $paths = array('/'), $lite = false)
+    public function __construct(DAV_ExtendedClient $client, array $paths = array('/'), $lite = false)
     {
         $this->client = $client;
 
@@ -573,7 +448,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             throw new DomainException("Drives is not configured");
         }
 
-        $client = new Sabre_DAV_Client_Extended($settings);
+        $client = new DAV_ExtendedClient($settings);
 
         return new self($client, $paths, $lite);
     }
