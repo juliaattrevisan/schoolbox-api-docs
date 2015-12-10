@@ -56,24 +56,6 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         $this->parseConfig();
 
-        /* Tick for checkbox which controls whether to show the Posted By details
-        */
-        if ($this->getConfig('compactMode') == 1) {
-            $this->setVar(
-                array(
-                    'COMPONENT_COMPACTMODE'                 => 'hide',
-                    'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => 'checked="checked"'
-                )
-            );
-        } else {
-            $this->setVar(
-                array(
-                    'COMPONENT_COMPACTMODE'                 => '',
-                    'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => ''
-                )
-            );
-        }
-
         //due output
         $this->setBlock($templateHandle, 'duework', 'duework_block');
         $this->setBlock('duework', 'duework_due_date', 'duework_due_date_block');
