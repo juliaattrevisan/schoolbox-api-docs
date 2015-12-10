@@ -69,7 +69,6 @@ set config = {
                             <span>Off</span>
                         </label>
                     </span>
-                    <a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule"></a>
                     <a class="icon-more" title="" data-dropdown="ruleset-options"></a>
                 </nav>
                 <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
@@ -77,6 +76,7 @@ set config = {
                 </ul>
             </div>
 
+            {% if ruleset.getRules() is not empty %}
             <ul class="information-list sortable" data-sortable>
             
                 {% for currentRule in ruleset.getRules() %}
@@ -94,7 +94,7 @@ set config = {
 
                     <div class="grip"></div>
                     <div class="small-11 columns no-pad">
-                        <div class="actions-small-4">
+                        <div class="actions-small-2">
                             <div class="list-item">
                                 <h3 class="subheader">
                                     {% if currentRule.name|length %}
@@ -161,6 +161,18 @@ set config = {
                 </li>
                 {% endfor %}
             </ul>
+            {% else %}
+            <div class="row">
+                <div class="small-12 island">
+                    <section class="content">
+                        <p>
+                            Start by
+                            <a href='/adminv2/ups/rule/add/{{ rulesetId }}' title="Add New Rule">adding a new Rule</a>.
+                        </p>
+                    </section>
+                </div>
+            </div>
+            {% endif %}
 
             {# Display custom rules #}
             {% if ruleset.getCustomRules() is not empty %}
