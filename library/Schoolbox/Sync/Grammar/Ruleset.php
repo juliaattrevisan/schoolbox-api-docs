@@ -62,7 +62,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
         // TODO log whether or not this hydrator mutated this user, and if so, how? [SB-10513]
         if ($previous) {
-            $diff = $this->mapper->diff($previous, $result);
+            $diff = $this->mapper->diff($previous, $result, ['old', 'new']);
         } else {
             $diff = $this->mapper->dehydrate($result);
         }
@@ -72,7 +72,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
         if (count($diff)) {
             $this->log->info("New values set", array_merge($context, [ 'diff' => $diff ]));
         } else {
-            $this->log->info("No change to user", $context);
+//            $this->log->info("No change to user", $context);
         }
 
         return $result;

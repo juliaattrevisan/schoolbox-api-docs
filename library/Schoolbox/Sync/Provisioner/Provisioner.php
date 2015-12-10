@@ -11,7 +11,6 @@ use Alaress\Rules\Lang\SkipException;
 use InvalidArgumentException;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Collection;
 use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\External\Normalise;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -193,7 +192,7 @@ class Provisioner
                     }
 
                     // get a diff of the original user and what we've ended up with
-                    $diff = $this->userMapper->diff($originalUser, $internalUser);
+                    $diff = $this->userMapper->diff($originalUser, $internalUser, ['old','new']);
 
                     $originalName = ($action == 'create') ? 'New user' : $originalUser->formatName();
 

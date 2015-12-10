@@ -1,11 +1,11 @@
-{% if dataset|length == 2 and dataset|keys == [0,1] %}
+{% if dataset|length == 2 and dataset|keys == ['old','new'] %}
     <div class="row">
         <div class="small-5 column text-right">
-            {% include '@upsRuleset/log/visible-value.twig' with { value: dataset[0] } %}
+            {%- include '@upsRuleset/log/visible-value.twig' with { value: dataset['old'] } -%}
         </div>
         <div class="small-2 column text-center">&rarr;</div>
         <div class="small-5 column text-left">
-            {% include '@upsRuleset/log/visible-value.twig' with { value: dataset[1] } %}
+            {%- include '@upsRuleset/log/visible-value.twig' with { value: dataset['new'] } -%}
         </div>
     </div>
 {% else %}
@@ -13,13 +13,13 @@
         {% for key, val in dataset %}
             <dt class="small-4 large-3">{{ key }}</dt>
             <dd class="small-8 large-9">
-                {% if val is iterable %}
-                    {% include '@upsRuleset/log/key-value-pair.twig' with { dataset: val } %}
-                {% else %}
+                {%- if val is iterable -%}
+                    {%- include '@upsRuleset/log/key-value-pair.twig' with { dataset: val } -%}
+                {%- else -%}
                     <pre>
-                        {% include '@upsRuleset/log/visible-value.twig' with { value: val } %}
+                        {%- include '@upsRuleset/log/visible-value.twig' with { value: val } -%}
                     </pre>
-                {% endif %}
+                {%- endif -%}
             </dd>
         {% endfor %}
     </dl>
