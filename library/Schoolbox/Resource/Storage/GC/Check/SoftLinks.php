@@ -26,7 +26,7 @@ class SoftLinks implements Check
     protected $dbName;
 
     /** @var PDOStatement */
-    protected $stmt;
+    protected $scanStmt;
 
     /** @var LoggerInterface */
     protected $log;
@@ -79,14 +79,14 @@ class SoftLinks implements Check
     /**
      * @return PDOStatement
      */
-    protected function getStatement()
+    protected function getScannableFieldsStatement()
     {
         // lazyload
-        if (empty($this->stmt)) {
+        if (empty($this->scanStmt)) {
             $blacklist = implode("', '", $this->blacklist);
 
             // Unfortunately there are fields which are varchar and contain hash references.
-            $this->stmt = $this->db->query("
+            $this->scanStmt = $this->db->query("
                 SELECT TABLE_NAME, COLUMN_NAME
                 FROM information_schema.COLUMNS
                 WHERE table_schema = '$this->dbName'
@@ -103,7 +103,7 @@ class SoftLinks implements Check
             ");
         }
 
-        return $this->stmt;
+        return $this->scanStmt;
     }
 
 
@@ -127,7 +127,7 @@ class SoftLinks implements Check
         $sources = [];
         $i       = 0;
 
-        while (list($table, $field) = $this->getStatement()->fetch(PDO::FETCH_NUM)) {
+        while (list($table, $field) = $this->getScannableFieldsStatement()->fetch(PDO::FETCH_NUM)) {
             // index by table
             $sources[$table][] = $field;
             ++$i;
