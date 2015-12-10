@@ -104,6 +104,13 @@
          */
         element.on('focus', inputSelector, function () {
             var input = $(this);
+
+            element.find(critSelector + ', ' + descriptorSelector)
+                .removeClass(editingClass)
+                .find(inputSelector)
+                //.prop('readonly', true)
+                .removeAttr('placeholder');
+
             input
                 .closest(critSelector)
                 .addClass(editingClass);
@@ -115,15 +122,5 @@
                 .attr('placeholder', placeholderText);
         });
 
-        /**
-         * Un-focus on an descriptor input - undo resize magick
-         */
-        element.on('blur', inputSelector, function () {
-            element.find(critSelector + ', ' + descriptorSelector)
-                .removeClass(editingClass)
-                .find(inputSelector)
-                //.prop('readonly', true)
-                .removeAttr('placeholder');
-        });
     };
 }(jQuery));
