@@ -249,7 +249,9 @@ class Controller extends Base {
             ]
         ];
 
-        $fragmentFactory = new FragmentFactory();
+        $rule = Rule\Mapper::getInstance()->findById($queryData['ruleId']);
+
+        $fragmentFactory = new FragmentFactory($rule->getRoleType());
         $subfragment = $fragmentFactory->produceType($queryData['userProperty']);
 
         $data = [
