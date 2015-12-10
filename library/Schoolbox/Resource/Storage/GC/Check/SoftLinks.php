@@ -28,6 +28,9 @@ class SoftLinks implements Check
     /** @var PDOStatement */
     protected $scanStmt;
 
+    /** @var PDOStatement */
+    protected $softStmt;
+
     /** @var LoggerInterface */
     protected $log;
 
@@ -108,6 +111,28 @@ class SoftLinks implements Check
 
 
     /**
+     * @return PDOStatement
+     */
+    protected function getSoftDeleteFieldsStatement()
+    {
+        if (empty($this->softStmt)) {
+            $blacklist = implode("', '", $this->blacklist);
+
+            $this->softStmt = $this->db->query("
+                SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE
+                FROM information_schema.COLUMNS
+                WHERE table_schema = '$this->dbName'
+                AND table_name NOT IN ('$blacklist')
+                AND column_name LIKE 'delete%'
+                ORDER BY TABLE_NAME, COLUMN_NAME;
+            ");
+        }
+
+        return $this->softStmt;
+    }
+
+
+    /**
      * @param string $table
      * @return int
      */
@@ -127,15 +152,46 @@ class SoftLinks implements Check
         $sources = [];
         $i       = 0;
 
+        // cache the list of fields to scan
         while (list($table, $field) = $this->getScannableFieldsStatement()->fetch(PDO::FETCH_NUM)) {
             // index by table
-            $sources[$table][] = $field;
+            $sources[$table]['fields'][] = $field;
+            $sources[$table]['delete'] = ''; // ensure this is set, even if blank
             ++$i;
         }
 
         $j = count($sources);
 
         $this->log->info("Scanning $i fields from $j tables");
+
+        // cache the list of soft-delete fields to compensate for
+        while (list($table, $field, $type) = $this->getSoftDeleteFieldsStatement()->fetch(PDO::FETCH_NUM)) {
+
+            switch($type) {
+                case 'datetime':
+                case 'timestamp':
+                    // confirm nullness of datetime-deleted
+                    $shard = "AND `$field` IS NULL";
+                    break;
+                case 'int':
+                case 'tinyint':
+                    // confirm falseness of boolean-deleted
+                    $shard = "AND `$field` IS FALSE";
+                    break;
+                case 'enum':
+                    // *sigh*
+                    $shard = "AND `$field` = 'false'";
+                    break;
+                default:
+                    // not sure how you could get into this state, but accommodate it
+                    $this->log->warning("Encountered soft-delete field of unexpected type: $table.$field ($type)");
+                    $shard = '';
+                    break;
+            }
+
+            // index by table
+            $sources[$table]['delete'] = $shard;
+        }
 
         return $sources;
     }
@@ -156,7 +212,10 @@ class SoftLinks implements Check
         $debug   = $this->log instanceof \Alaress\Lumberjack\Logger && $this->log->getThreshold() <= Logger::DEBUG;
         $sources = $this->fetchSourceMap();
 
-        foreach ($sources as $table => $fields) {
+        foreach ($sources as $table => $tableData) {
+
+            $fields = $tableData['fields'];
+            $delete = $tableData['delete'];
 
             if (!count($test)) {
                 $this->log->info("No more hashes to test; bailing out");
@@ -178,7 +237,7 @@ class SoftLinks implements Check
             $this->log->debug(sprintf("Scanning `%s` (`%s`) [%s records]", $table, implode('`, `', $fields), $rowCount));
 
             $like  = implode('` LIKE :hash OR `', $fields);
-            $query = $this->db->prepare("SELECT COUNT(*) FROM `$table` WHERE `$like` LIKE :hash");
+            $query = $this->db->prepare("SELECT COUNT(*) FROM `$table` WHERE `$like` LIKE :hash $delete");
 
             foreach ($test as $k => $hash) {
                 $query->execute(['hash' => "%$hash%"]);
