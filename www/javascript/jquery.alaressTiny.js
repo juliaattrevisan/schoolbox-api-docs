@@ -23,12 +23,14 @@
 
 			/* Standard options across all tinyMCE instances
 			 */
+			// Site location can be a global
+			var siteLocation = options.site_location || window.siteLocation || 'core';
 			var standard = {
 				theme: "advanced",
 				skin: "cirkuit",
 				plugins: "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker,noneditable",
 				browser_spellcheck: true,
-				content_css: "/css/{SITE_LOCATION}/chrome-foundation.css",
+				content_css: "/css/"+siteLocation+"/chrome-foundation.css",
 				accessibility_warnings: false,
 				extended_valid_elements: "a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
 				theme_advanced_blockformats: "h3,h4,p,address,pre",
