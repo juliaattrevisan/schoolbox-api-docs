@@ -11,8 +11,8 @@
 {% else %}
     <dl class="inline-dl">
         {% for key, val in dataset %}
-            <dt class="small-4 large-3">{{ key }}</dt>
-            <dd class="small-8 large-9">
+            <dt class="small-12 medium-4 large-3">{{ key }}</dt>
+            <dd class="small-12 medium-8 large-9">
                 {%- if val is iterable -%}
                     {%- include '@upsRuleset/log/key-value-pair.twig' with { dataset: val } -%}
                 {%- else -%}
