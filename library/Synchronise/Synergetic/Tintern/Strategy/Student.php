@@ -68,12 +68,14 @@ class Synchronise_Synergetic_Tintern_Strategy_Student extends Synchronise_Base_S
 		$map[32]['F'] = 6;
 		$map[33]['F'] = 6;
 		$map[40]['F'] = 6;
-		$map[50]['F'] = 6;
+		$map[42]['F'] = 6;
+		$map[43]['F'] = 6;
 		$map[30]['M'] = 6;
 		$map[32]['M'] = 6;
 		$map[33]['M'] = 6;
 		$map[40]['M'] = 6;
-		$map[50]['M'] = 6;
+		$map[42]['M'] = 6;
+		$map[43]['M'] = 6;
 
 		/* Junior School Girls
 		 */
@@ -140,7 +142,8 @@ class Synchronise_Synergetic_Tintern_Strategy_Student extends Synchronise_Base_S
 			case 32:
 			case 33:
 			case 40:
-			case 50:
+			case 42:
+			case 43:
 				return 'ELC';
             default:
                 return $currentUser['StudentYearLevel'];
