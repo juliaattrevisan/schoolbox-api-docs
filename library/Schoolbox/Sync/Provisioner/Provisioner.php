@@ -236,6 +236,29 @@ class Provisioner
     }
 
     /**
+     * Callback for when UPS processing is interrupted for some reason.
+     *
+     * @param int $signo One of the signal constants (SIGTERM, SIGINT, etc.)
+     */
+    public function onInterrupt($signo = null)
+    {
+        switch ($signo) {
+            case SIGTERM:
+                $message = 'Execution interrupted by external signal - flushing log';
+                break;
+            case SIGINT:
+            case SIGQUIT:
+                $message = 'Execution interrupted by user - flushing log';
+                break;
+            default:
+                $message = sprintf('Execution interrupted by some other signal (%d) - flushing log', $signo);
+                break;
+        }
+        $this->logger->alert($message);
+        $this->logMapper->flush($this->logger);
+    }
+
+    /**
      * Gets all users out of $this->externalUserSource for this roletype.
      *
      * @param string $roleType Role type of users to fetch
