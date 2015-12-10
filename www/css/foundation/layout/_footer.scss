@@ -6,15 +6,15 @@ $footer-margin-bottom: 1rem;
      * Three-argument margin: third arg is margin-bottom
      */
     @media #{$small-up} {
-        margin: 0 2rem 14rem;
+        margin: 0 2rem 20rem;
     }
 
     @media #{$medium-up} {
-        margin: 0 2.5rem 16rem;
+        margin: 0 2.5rem 22rem;
     }
 
     @media #{$large-up} {
-        margin: 0 3rem 16rem;
+        margin: 0 3rem 22rem;
     }
 
     clear: both;

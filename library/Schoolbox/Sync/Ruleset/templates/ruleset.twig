@@ -131,7 +131,7 @@ set config = {
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-help" title="Show available Tokens" data-reveal-id="token-list"></a>
+
                                 </nav>
                             </div>
     
@@ -154,6 +154,8 @@ set config = {
                         <li class="separator">Effects</li>
                         <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Add new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
                         <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip User</a></li>
+                        <li class="separator">Help</li>
+                        <li><a class="icon-help" title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">About Tokens and Filters</a></li>
                     </ul>
                 </li>
                 {% endfor %}
