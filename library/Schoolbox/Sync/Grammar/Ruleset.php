@@ -119,7 +119,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
             $data = $rule->apply($input, $previous);
 
             $context = [
-                'externalUserid' => $input->getId(),
+                'externalUserId' => $input->getId(),
             ];
 
             if ($previous->getId()) {
@@ -135,7 +135,6 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                     // Apply tokenization to returned value. The value returned should be a primitive,
                     // which will then by hydrated into the model by the mapper
                     $value   = $this->tokenizer->parseToken($input, $value);
-                    $value   = trim($value);
                     $mapping = $map->getOffset($property);
 
                     // treat collections special-like
@@ -144,17 +143,30 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                         // first, read the value out of the object
                         $array = $this->mapper->getModelProperty($object, $property);
 
-                        // if the value we got isn't in this array, append it
-                        if (!in_array($value, $array)) {
-                            $array[] = $value;
+                        // wrap value in an array if not already one
+                        $value = (array)$value;
+
+                        foreach ($value as $subvalue) {
+                            // if the value we got isn't in this array, append it
+                            if (!in_array($subvalue, $array)) {
+                                $array[] = $subvalue;
+                            }
                         }
 
                         // reassign the value to the now (maybe) changed array
                         $value = $array;
+
+                    } else {
+                        if (is_array($value)) {
+                            // not a collection, so we can only accept one value: take the first one
+                            $value = reset($value);
+                        }
+                        // ensure lack of whitespace
+                        $value = trim($value);
                     }
 
                     $this->applyModelPropertyValue($object, $property, $value);
-                    $context['newdata'][$property] = $value;
+                    $context['new data'][$property] = $value;
                 }
 
                 // TODO log that the rule applied [SB-10514], and provide the new set of values [SB-10515]

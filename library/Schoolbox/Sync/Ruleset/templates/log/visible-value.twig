@@ -6,6 +6,8 @@
     BLANK
 {%- elseif value is same as(null) -%}
     NULL
+{%- elseif value is iterable -%}
+    [{{ value|join(', ') }}]
 {%- else -%}
     {{ value }}
 {%- endif -%}
