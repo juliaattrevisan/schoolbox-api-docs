@@ -9,13 +9,9 @@
 
         $('#content').find('[data-delete]').click(function (event) {
             event.preventDefault();
-
-            var element = $(this);
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this content permanently?',
-                confirmEvent: function () {
-                    window.location.href = element.attr('href');
-                }
+                confirmEvent: $.confirmDialog.followHref
             });
         });
     });
