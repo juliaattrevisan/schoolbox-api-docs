@@ -148,6 +148,7 @@ set config = {
 
                     <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
                         <li class="separator">Rule</li>
+                        <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
                         <li><a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule">Edit Rule</a></li>
                         <li><a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule">Delete Rule</a></li>
                         <li class="separator">Conditions</li>
