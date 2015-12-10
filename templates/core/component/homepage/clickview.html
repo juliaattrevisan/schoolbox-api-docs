@@ -8,8 +8,8 @@
                 // Use the ClickView Events API to catch the cv-lms-addvideo event
                 var eventsApi = new CVEventsApi(document.getElementById('plugin-frame{COMPONENT_INSTANCE_ID}').contentWindow);
                 eventsApi.on("cv-lms-addvideo", function (event, args) {
-                    $('#videohere{COMPONENT_INSTANCE_ID}').html(args.embedHtml);
-                    $('#videohere{COMPONENT_INSTANCE_ID}').children('iframe').width('100%');
+                    $('#videohere{COMPONENT_INSTANCE_ID}').html('<div class="flex-video widescreen">' + args.embedHtml + '</div>');
+                    $('#videohere{COMPONENT_INSTANCE_ID}').children('iframe');
 
                     $.ajax({
                         url: '/homepage/configForm.php',
@@ -37,22 +37,24 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
-                <div class="flex-video widescreen" id="videohere{COMPONENT_INSTANCE_ID}">
-                    <!-- BEGIN has_clickview -->
+                <div id="videohere{COMPONENT_INSTANCE_ID}">
+                <!-- BEGIN has_clickview -->
                     <script type='text/javascript' src="//webplayer.clickview.com.au/e.aspx?p={VIDEO_ID}"></script>
-                    <!-- END has_clickview -->
-                    <!-- BEGIN online_clickview -->
+                <!-- END has_clickview -->
+                <!-- BEGIN online_clickview -->
                     <script type="text/javascript" src="//online.clickview.com.au/scripts/cv-online.view_player_embedding.js?e=1&i={VIDEO_ID}"></script>
-                    <!-- END online_clickview -->
-                    <!-- BEGIN iframe_clickview -->
-                    <iframe frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen width="600" height="338" src="//online.clickview.com.au/Share/PlayEmbed?shareCode={VIDEO_ID}&a=false"></iframe>
-                    <!-- END iframe_clickview -->
+                <!-- END online_clickview -->
+                <!-- BEGIN iframe_clickview -->
+                    <div class="flex-video widescreen">
+                        <iframe frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen width="640" height="360" src="//online.clickview.com.au/Share/PlayEmbed?shareCode={VIDEO_ID}&a=false"></iframe>
+                    </div>
+                <!-- END iframe_clickview -->
+                <!-- BEGIN select_video -->
                 </div>
                 <div class="content">
-                    <!-- BEGIN select_video -->
                     <a href="#" class="button icon-add" id="videoadd{COMPONENT_INSTANCE_ID}" data-reveal-id="plugin{COMPONENT_INSTANCE_ID}">Select Video</a>
-                    <!-- END select_video -->
                 </div>
+                <!-- END select_video -->
             </section>
         </div>
     </div>
