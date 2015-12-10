@@ -13,11 +13,11 @@ $userMapper = new \Schoolbox\UserBulkMapper();
 
 $modified = new \Schoolbox\Collection();
 
+$userIds = [];
+if (isset($_POST['userId'])) {
+    $userIds = array_filter(explode(',', $_POST['userId']));
+}
 if (isset($_POST['updateUsers'])) {
-    $userIds = [];
-    if (isset($_POST['userId'])) {
-        $userIds = array_filter(explode(',', $_POST['userId']));
-    }
     if (count($userIds)) {
         $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) started a user bulk modify";
 
