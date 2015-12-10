@@ -98,7 +98,7 @@ function init(){
                 'background-image': 'url(/images/{SITE_LOCATION}/' + images[Math.floor(Math.random() * images.length)] + ')'
             });
 
-        $('#loginForm').validate({
+        $('#loginForm').alaressValidate({
             errorPlacement: function(error, element) {
                 if (element.attr("name") == "tandc"  ) {
                     error.appendTo("#error-msg");

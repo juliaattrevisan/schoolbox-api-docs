@@ -91,7 +91,7 @@
         };
         var hourValid = { '12hour': true };
         var minuteValid = { minute: true };
-        form.validate({
+        form.alaressValidate({
             rules: {
                 markvalue: {
                     required: {

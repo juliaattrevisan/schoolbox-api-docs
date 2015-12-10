@@ -34,7 +34,7 @@
 		 * Set up review saving events
 		 */
 		function initSaveReview() {
-			$(config.questionForm).validate({
+			$(config.questionForm).alaressValidate({
 				submitHandler: function() {
 //					showAlert(config.questionForm);
 

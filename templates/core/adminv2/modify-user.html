@@ -57,7 +57,7 @@
         /**
          * User details validation
          */
-        $('form[data-validatable-as="userDetails"]').validate({
+        $('form[data-validatable-as="userDetails"]').alaressValidate({
             rules: {
                 alt_email: {
                     email:true
@@ -92,9 +92,9 @@
         /**
          * Service validation
          */
-        $('form[data-validatable-as="addService"]').validate();
+        $('form[data-validatable-as="addService"]').alaressValidate();
 
-        $('form[data-validatable-as="addGroup"]').validate();
+        $('form[data-validatable-as="addGroup"]').alaressValidate();
 
         // Handles autosuggest for linking users to other user accounts
         var addUserSelector = $(':input[data-selectizeuser="addUser"]');

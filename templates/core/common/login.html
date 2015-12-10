@@ -99,7 +99,7 @@ function init(){
                 </div>
                 <script type="text/javascript">
                     $(function () {
-                        $('#login').validate({
+                        $('#login').alaressValidate({
                             errorPlacement: function(error, element) {
                                 if (element.attr("name") == "tandc") {
                                     error.appendTo("#error-msg");

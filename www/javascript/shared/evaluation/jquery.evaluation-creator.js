@@ -103,7 +103,7 @@
             $(config.element).submit(function() {
                 // update underlying textarea before submit validation
                 tinyMCE.triggerSave();
-            }).validate({
+            }).alaressValidate({
                 onfocusout: false,
                 rules: config.rules,
                 messages: config.messages,
@@ -343,7 +343,7 @@
             $(config.element).submit(function() {
                 // update underlying textarea before submit validation
                 tinyMCE.triggerSave();
-            }).validate({
+            }).alaressValidate({
                 onfocusout: false,
                 submitHandler: function() {
                     var theForm = $(config.element);

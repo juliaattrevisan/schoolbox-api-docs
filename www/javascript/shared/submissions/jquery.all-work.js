@@ -107,7 +107,7 @@
             /* Don't use submitHandler in here, because that forces you to double-click
              * to actually perform an action - so do it programatically
              */
-            $(target).validate({
+            $(target).alaressValidate({
                 rules: {
                     comment: 'required'
                 }
