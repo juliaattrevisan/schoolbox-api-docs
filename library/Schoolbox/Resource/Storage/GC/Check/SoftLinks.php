@@ -31,6 +31,12 @@ class SoftLinks implements Check
     /** @var PDOStatement */
     protected $softStmt;
 
+    /** @var PDOStatement[] */
+    protected $hashTestStmts;
+
+    /** @var array */
+    protected $sources;
+
     /** @var LoggerInterface */
     protected $log;
 
@@ -56,13 +62,17 @@ class SoftLinks implements Check
      * @param string          $dbName
      * @param LoggerInterface $log
      * @param int             $limit
+     * @param array           $blacklist
      */
-    public function __construct(Database $db, $dbName, LoggerInterface $log = null, $limit = 0)
+    public function __construct(Database $db, $dbName, LoggerInterface $log = null, $limit = 0, $blacklist = [])
     {
         $this->db     = $db;
         $this->dbName = $dbName;
         $this->log    = $log ?: new Logger('null', [new NullHandler()]);
         $this->limit  = $limit;
+
+        $this->cacheTables($blacklist);
+
     }
 
 
@@ -72,9 +82,17 @@ class SoftLinks implements Check
      * @param array $blacklist
      * @return self
      */
-    public function setTableBlacklist(array $blacklist)
+    public function cacheTables(array $blacklist)
     {
+        // fallback to default if nothing specified
+        $blacklist = $blacklist ?: $this->blacklist;
+
+        // set the blacklist
         $this->blacklist = $blacklist;
+
+        // (re)cache our sources
+        $this->sources = $this->fetchSourceMap();
+
         return $this;
     }
 
@@ -167,6 +185,11 @@ class SoftLinks implements Check
         // cache the list of soft-delete fields to compensate for
         while (list($table, $field, $type) = $this->getSoftDeleteFieldsStatement()->fetch(PDO::FETCH_NUM)) {
 
+            // we're only interested in tables we've already seen
+            if (!array_key_exists($table, $sources)) {
+                continue;
+            }
+
             switch($type) {
                 case 'datetime':
                 case 'timestamp':
@@ -198,6 +221,64 @@ class SoftLinks implements Check
 
 
     /**
+     * @return array
+     */
+    protected function getTableList()
+    {
+        return array_keys($this->sources);
+    }
+
+
+    /**
+     * @param string $table
+     * @return array
+     */
+    protected function getTableFields($table)
+    {
+        return $this->sources[$table]['fields'];
+    }
+
+
+    /**
+     * @param string $table
+     * @return string
+     */
+    protected function getTableSoftDeleteShard($table)
+    {
+        return $this->sources[$table]['delete'];
+    }
+
+
+    /**
+     * Return whether or not the given hash is present on this table
+     *
+     * @param string $table
+     * @param string $hash
+     * @return bool
+     */
+    protected function tableContainsHash($table, $hash)
+    {
+
+        // prepare on-demand
+        if (empty($this->hashTestStmts[$table])) {
+            // retreive cache information
+            $fields = $this->getTableFields($table);
+            $delete = $this->getTableSoftDeleteShard($table);
+
+            // compile query
+            $like = implode('` LIKE :hash OR `', $fields);
+            $this->hashTestStmts[$table] = $this->db->prepare("SELECT COUNT(*) FROM `$table` WHERE `$like` LIKE :hash $delete");
+        }
+
+        // search for this hash
+        $this->hashTestStmts[$table]->execute(['hash' => "%$hash%"]);
+
+        // if fetchColumn > 0, this hash is "seen"
+        return $this->hashTestStmts[$table]->fetchColumn() > 0;
+    }
+
+
+    /**
      * Takes an array of hashes, and returns the subset that this check regards as 'stale'
      *
      * @param array $test
@@ -210,12 +291,10 @@ class SoftLinks implements Check
         }
 
         $debug   = $this->log instanceof \Alaress\Lumberjack\Logger && $this->log->getThreshold() <= Logger::DEBUG;
-        $sources = $this->fetchSourceMap();
 
-        foreach ($sources as $table => $tableData) {
+        foreach ($this->getTableList() as $table) {
 
-            $fields = $tableData['fields'];
-            $delete = $tableData['delete'];
+            $fields = $this->getTableFields($table);
 
             if (!count($test)) {
                 $this->log->info("No more hashes to test; bailing out");
@@ -236,14 +315,8 @@ class SoftLinks implements Check
 
             $this->log->debug(sprintf("Scanning `%s` (`%s`) [%s records]", $table, implode('`, `', $fields), $rowCount));
 
-            $like  = implode('` LIKE :hash OR `', $fields);
-            $query = $this->db->prepare("SELECT COUNT(*) FROM `$table` WHERE `$like` LIKE :hash $delete");
-
             foreach ($test as $k => $hash) {
-                $query->execute(['hash' => "%$hash%"]);
-
-                // if fetchColumn > 0, this hash is "seen"
-                if ($query->fetchColumn()) {
+                if ($this->tableContainsHash($table, $hash)) {
                     // remove from list
                     unset($test[$k]);
                     $seen[$hash] = true;
@@ -261,7 +334,7 @@ class SoftLinks implements Check
             }
 
             if (count($seen)) {
-                $this->log->info(sprintf("Detected %d hashes in `%s`", count($seen), $table), ['char' => '+']);
+                $this->log->info(sprintf("Detected %d hash%s to retain in `%s`", count($seen), count($seen) == 1 ? '' : 'es',  $table), ['char' => '+']);
             }
 
 
