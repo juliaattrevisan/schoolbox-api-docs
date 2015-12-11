@@ -249,6 +249,7 @@ EOL;
 	 * @param Exception $e
 	 */
 	public function onException($e) {
+		$this->callExceptionCallbacks($e);
         try {
             $this->logger()->alert('FATAL ' . get_class($e) . ': ' . $e->getMessage(), array($e));
         } catch (IOException $e) {
