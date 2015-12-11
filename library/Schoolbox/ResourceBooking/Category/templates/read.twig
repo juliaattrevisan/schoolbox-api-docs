@@ -135,7 +135,7 @@
                  * @param jsEvent
                  * @param view
                  */
-                dayClick: function(date, jsEvent, view) {
+                dayClick: function(date, jsEvent, view, resource) {
                     // Bookings may not be made in the past.
                     var allDay = !date.hasTime();
                     var eventData = {
@@ -150,6 +150,9 @@
                     }
 
                     $('#calendar-create').foundation('reveal','open');
+
+                    // Mangled action unavoidable
+                    $('#createEvent').attr('action', '/resource-booking/booking/bookItem/'+resource.id);
 
                     c.bubble.display('create', eventData, jsEvent, this)
                 },
@@ -260,17 +263,14 @@
 </div>
 
 <div class="reveal-modal small" data-reveal aria-hidden="true" role="dialog" id="calendar-create">
-    <form id="createEvent" data-no-calendar-listener="" method="get" action="{{ routeLookup('resourceBooking.book', {id: item.id}) }}">
+    <form id="createEvent" data-no-calendar-listener="" method="get" action="">
         <input type="hidden" name="startDate" />
         <input type="hidden" name="startTime" />
 
-        {% if isRouteAuthorized('resourceBooking.book', {id: item.id, item: item}) %}
-            <p>Create booking for: <span data-event-modal-field="displayDate"></span></p>
-
-            <input type="submit" class='expand' value="Create Booking" />
-        {% else %}
-            <p>This resource may only be booked by a resource moderator.</p>
-        {% endif %}
+        {# I can't tell if this item is bookable from here or not, because I don't know the URL #}
+        <p>Create booking for: <span data-event-modal-field="displayDate"></span></p>
+        <input type="submit" class='expand' value="Create Booking" />
+        {#<p>This resource may only be booked by a resource moderator.</p>#}
     </form>
 </div>
 
