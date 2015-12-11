@@ -4,6 +4,7 @@
 <link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.css" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 
+<script type="text/javascript" src="/javascript/shared/calendar/jquery.fullcalendar.js"></script>
 <script type="text/javascript" src="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
 <script type="text/javascript">
     // Do stuff here
@@ -20,10 +21,24 @@
 
         $('#calendar').fullCalendar({
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-            defaultView: 'timelineMonth',
-            events: [
-                // comes from a feed
-            ],
+            defaultView: 'timelineWeek',
+            events: function(start, end, timezone, callback) {
+                var data = [
+                    {name: 'start', value: Calendar.reOffsetTimestamp(start.unix())},
+                    {name: 'end',   value: Calendar.reOffsetTimestamp(end.unix())}
+                ];
+                $.ajax({
+                    data:     data,
+                    dataType: 'json',
+                    url:      {{ routeLookup('resourceCategory.calendar', {id: item.id})|json_encode|raw }},
+                    success: function(data) {
+                        callback(data.filter(function(v) {
+                            return 'start' in v;
+                        }));
+                    },
+                    cache: false
+                });
+            },
             resources: resources
         })
     });
