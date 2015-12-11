@@ -9,8 +9,6 @@
 <script type="text/javascript">
     // Do stuff here
     $(function() {
-        "use strict";
-
         // Mangle resources into FullCalendar format
         var resources = {{ resources|json_encode|raw }}.map(function(r) {
             return {
@@ -19,6 +17,7 @@
             }
         });
 
+        var calendarLoadingElement = $('#calendar-loading');
         c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
                 enabled: true,
