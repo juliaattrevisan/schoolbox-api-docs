@@ -8,8 +8,10 @@
  */
 
 namespace Schoolbox\ResourceBooking\Category;
+
 use Alaress\Paginator\IUrlPaginator;
 use Alaress\Web\Controller\Base;
+use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 
 class Controller extends Base {
 
@@ -96,7 +98,12 @@ class Controller extends Base {
             array(
                 'template' => '@resourceCategory/read.twig',
                 'data'     => array(
-                    'item' => $item,
+                    'item'      => $item,
+                    'resources' => ItemMapper::getInstance()->findByColumn(
+                        'resource_category_id',
+                        $item->getId(),
+                        ['order' => ['name' => 'asc',]]
+                    ),
                 ),
             )
         );

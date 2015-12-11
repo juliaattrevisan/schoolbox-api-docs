@@ -1,4 +1,33 @@
-{# I need some way of adding custom_head #}
+{# Let's put the resource calendar view here for now #}
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+
+<script type="text/javascript" src="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
+<script type="text/javascript">
+    // Do stuff here
+    $(function() {
+        "use strict";
+
+        // Mangle resources into FullCalendar format
+        var resources = {{ resources|json_encode|raw }}.map(function(r) {
+            return {
+                id: r.id,
+                title: r.name
+            }
+        });
+
+        $('#calendar').fullCalendar({
+            schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+            defaultView: 'timelineMonth',
+            events: [
+                // comes from a feed
+            ],
+            resources: resources
+        })
+    });
+</script>
 
 <div class="row">
     <div class="small-12 columns">
@@ -17,5 +46,16 @@
                 <dd>{{ item.name }}</dd>
             </dl>
         </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">
+            Resources of this type
+            <span class="hint has-tip tip-top" data-tooltip title="Click the calendar to add a booking for that time.">?</span>
+        </h2>
+
+        <div id="calendar"></div>
     </div>
 </div>
