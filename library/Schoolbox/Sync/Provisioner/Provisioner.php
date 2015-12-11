@@ -238,21 +238,26 @@ class Provisioner
     /**
      * Callback for when UPS processing is interrupted for some reason.
      *
-     * @param int $signo One of the signal constants (SIGTERM, SIGINT, etc.)
+     * @param int $reason One of the signal constants (SIGTERM, SIGINT, etc.)
+     *                    or an Exception
      */
-    public function onInterrupt($signo = null)
+    public function onInterrupt($reason = null)
     {
-        switch ($signo) {
-            case SIGTERM:
-                $message = 'Execution interrupted by external signal - flushing log';
-                break;
-            case SIGINT:
-            case SIGQUIT:
-                $message = 'Execution interrupted by user - flushing log';
-                break;
-            default:
-                $message = sprintf('Execution interrupted by some other signal (%d) - flushing log', $signo);
-                break;
+        if ($reason instanceof \Exception) {
+            $message = sprintf("Execution interrupted by exception:\n%s", $reason->getTraceAsString());
+        } else {
+            switch ($reason) {
+                case SIGTERM:
+                    $message = 'Execution interrupted by external signal - flushing log';
+                    break;
+                case SIGINT:
+                case SIGQUIT:
+                    $message = 'Execution interrupted by user - flushing log';
+                    break;
+                default:
+                    $message = sprintf('Execution interrupted by some other signal (%d) - flushing log', $reason);
+                    break;
+            }
         }
         $this->logger->alert($message);
         $this->logMapper->flush($this->logger);
