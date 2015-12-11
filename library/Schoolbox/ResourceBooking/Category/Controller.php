@@ -11,7 +11,9 @@ namespace Schoolbox\ResourceBooking\Category;
 
 use Alaress\Paginator\IUrlPaginator;
 use Alaress\Web\Controller\Base;
+use Calendar\Event\Collection\Renderer;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
+use Schoolbox\ResourceBooking\Report\CalendarApiFactory;
 
 class Controller extends Base {
 
@@ -151,6 +153,38 @@ class Controller extends Base {
         $this->getMapper()->delete($item);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('resourceCategory.browse', array())
+        );
+    }
+
+    /**
+     * Action for outputting a calendar
+     *
+     * @param Model $item
+     */
+    public function calendar(Model $item)
+    {
+        $apiFactory = new CalendarApiFactory($this->getUser(), new \External_Timetable());
+        $source     = $apiFactory->buildFromResourceCollection(
+            ItemMapper::getInstance()->findByColumn(
+                'resource_category_id',
+                $item->getId(),
+                ['order' => ['name' => 'asc',]]
+            )
+        );
+        // put the results into a renderer
+        $calendar = new Renderer(
+            $source,
+            $this->getRequest()->query->get('start'),
+            $this->getRequest()->query->get('end'),
+            $this->getUser(),
+            $this->getDi()->get('sitePage')
+        );
+        $output = json_decode('[' . $calendar->renderAll('javascript') . '{}]');
+        $this->getResponse()->content->set(
+            array(
+                'format' => 'json',
+                'data'   => $output,
+            )
         );
     }
 
