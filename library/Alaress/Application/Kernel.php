@@ -31,6 +31,14 @@ abstract class Kernel {
 	protected $shutdown;
 
 	/**
+	 * A list of callbacks to call after an uncaught exception has been raised.
+	 * This includes ErrorException instances.
+	 *
+	 * @var callable[]
+	 */
+	protected $exceptionCallbacks;
+
+	/**
 	 * Load the boot loader, returning success or failure
 	 *
 	 * @return bool
@@ -96,4 +104,24 @@ abstract class Kernel {
 		}
 	}
 
+	/**
+	 * @param callable $callable
+	 */
+	public function registerExceptionCallback($callable) {
+		if(is_callable($callable)) {
+			$this->exceptionCallbacks[] = $callable;
+		}
+	}
+
+	/**
+	 * Calls all exception callbacks with the given exception.
+	 *
+	 * @param Exception $e
+	 */
+	public function callExceptionCallbacks(Exception $e)
+	{
+		foreach ($this->exceptionCallbacks as $callback) {
+			call_user_func($callback, $e);
+		}
+	}
 }
