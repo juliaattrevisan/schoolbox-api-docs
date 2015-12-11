@@ -2,10 +2,29 @@
     <div class="small-12 island">
         <section>
             {% if list|length %}
-            <ul class="information-list">
+            <ul class="action-list">
                 {% for item in list %}
-                <li class="content">
-                    {{ include(linkTemplate|default('@resourceCategory/sub/link.twig')) }}
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            {% if isRouteAuthorized('resourceCategory.read', {id: item.id, item: item}) %}
+                                <a id="resourcecategory-read-{{item.id}}"
+                                   href="{{ routeLookup('resourceCategory.read', {id: item.id}) }}">{{ item.name }}</a>
+                            {% else %}
+                                {{ item.name }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <nav>
+                        {% if isRouteAuthorized('resourceCategory.edit', {id: item.id, item: item}) %}
+                            <a id="resourcecategory-edit-{{item.id}}"
+                               href="{{ routeLookup('resourceCategory.edit', {id: item.id}) }}"
+                               title="Edit"
+                               class="icon icon-modify"></a>
+                        {% else %}
+                            {{ item.name }}
+                        {% endif %}
+                    </nav>
                 </li>
                 {% endfor %}
             </ul>
