@@ -42,9 +42,9 @@
                                         <div class="timetable-subject" style="background:{PERIOD_COLOUR};" data-timetable-subject>
                                             <a href="{PERIOD_URL}">
                                                 {PERIOD_DESC}
-                                                <p class="meta">{PERIOD_CODE}</p>
-                                                <p class="meta">{PERIOD_ROOM}</p>
                                             </a>
+                                            <p>{PERIOD_CODE}<br />
+                                            {PERIOD_ROOM}</p>
                                             <!-- BEGIN period_class_link_attendance -->
                                             <a class="{ATTENDANCE_ICON}"
                                                href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'
@@ -56,8 +56,8 @@
                                         <!-- BEGIN period_class -->
                                         <div class="timetable-subject" style="background:{PERIOD_COLOUR};" data-timetable-subject>
                                             {PERIOD_DESC}
-                                            <p class="meta">{PERIOD_CODE}</p>
-                                            <p class="meta">{PERIOD_ROOM}</p>
+                                            <p>{PERIOD_CODE}<br />
+                                            {PERIOD_ROOM}</p>
                                             <!-- BEGIN period_class_attendance -->
                                             <a class="{ATTENDANCE_ICON}"
                                                href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'
