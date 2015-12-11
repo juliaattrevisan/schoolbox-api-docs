@@ -40,6 +40,7 @@ $cleanup = function($signo) use ($kernel) {
 pcntl_signal(SIGINT, $cleanup);
 pcntl_signal(SIGTERM, $cleanup);
 pcntl_signal(SIGQUIT, $cleanup);
+$kernel->registerExceptionCallback($cleanup);
 
 $kernel->run(
     function ($di, $loop, $log, $opts) {
