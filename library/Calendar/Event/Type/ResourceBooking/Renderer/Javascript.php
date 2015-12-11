@@ -113,6 +113,7 @@ class Javascript extends Base
 
         $detail = $this->getEvent()->getDetail();
         $event  = array(
+            'resourceId' => $booking->getResource()->getId(),
             'title' => $this->getEvent()->getTitle(),
             'start' => $start,
             'end' => $end,
