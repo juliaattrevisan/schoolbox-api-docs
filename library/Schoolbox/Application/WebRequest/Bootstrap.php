@@ -535,6 +535,7 @@ class Bootstrap implements BootstrapInterface {
             if ($outputStackTrace) {
                 $error['message'] = "<pre>$e</pre>";
             }
+            $this->kernel->callExceptionCallbacks($e);
         } else {
             $error = error_get_last();
         }
