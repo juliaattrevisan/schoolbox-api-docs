@@ -42,6 +42,14 @@
                 ],
                 toolbarCanCollapse: true,
                 removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent',
+
+                magicline_color: '#0000FF',
+
+                format_tags: 'p;h3;h4;pre;address',
+
+                filebrowserBrowseUrl: '/resources/attachment',
+                filebrowserUploadUrl: '/storage/asyncUpload.php'
+
             };
 
 
@@ -126,7 +134,6 @@
 		 * Disturb the sleeping dragon
 		 */
 		function tiny(setting) {
-
 
             if(setting.mode == "exact") {
                 CKEDITOR.replace(setting.elements,config);
