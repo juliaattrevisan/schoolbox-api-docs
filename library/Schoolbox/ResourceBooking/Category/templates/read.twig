@@ -9,14 +9,6 @@
 <script type="text/javascript">
     // Do stuff here
     $(function() {
-        // Mangle resources into FullCalendar format
-        var resources = {{ resources|json_encode|raw }}.map(function(r) {
-            return {
-                id: r.id,
-                title: r.name
-            }
-        });
-
         var calendarLoadingElement = $('#calendar-loading');
         c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
@@ -68,7 +60,14 @@
                         cache: false
                     });
                 },
-                resources: resources,
+                resourceColumns: [{
+                    labelText: 'Resource',
+                    render: function(resource, el) {
+                        var href = $('<a />').attr('href', '/resource-booking/item/'+resource.id);
+                        el.find('.fc-cell-text').empty().append(href.text(resource.name));
+                    }
+                }],
+                resources: {{ resources|json_encode|raw }},
                 loading: function(isLoading) {
                     /* Show loading div right in the middle
                      */
