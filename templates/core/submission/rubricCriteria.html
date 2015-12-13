@@ -6,7 +6,7 @@ $(function() {
     var criterionMaxId = Number('{MAX_CRIT_ID}');
 
     // logic for adding new inputs
-    form.find('input').keyup(function() {
+    var onCriterionUpdate = function() {
         if (this.value.length > 0) {
             var input        = $(this);
             var container    = [];
@@ -63,7 +63,10 @@ $(function() {
                 }
             }
         }
-    });
+    };
+    // Apply to both keyup and paste
+    form.on('keyup', 'input', onCriterionUpdate);
+    form.on('paste', 'input', onCriterionUpdate);
 
     // logic for removing inputs
     form.find('[data-role="remove-criterion"]').click(function(e) {
