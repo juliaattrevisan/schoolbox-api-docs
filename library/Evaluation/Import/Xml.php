@@ -88,16 +88,9 @@ class Evaluation_Import_Xml {
 			$max_attempts = ($allow_resit || strlen($allow_resit) === 0) ? 0 : 1;
 		}
 
-		//
-		// Build description out of the nodes which might be part of it.
-		// Description should just be a single node, but maybe it wasn't wrapped
-		// in <![CDATA[ ]]> tags.
-		$description  = trim("{$xml->description}");
-		if (!$xml->description) {
-			foreach ($xml->xpath('/quiz/description/*') as $desc_node) {
-				$description .= $desc_node->asXML();
-			};
-		}
+		// Build description and complete message
+		$description = $this->parseRichTextNode($xml, 'description');
+		$completionMessage = $this->parseRichTextNode($xml, 'completionmessage');
 
 		/* Remember the title, for the course builder
 		 */
@@ -108,6 +101,7 @@ class Evaluation_Import_Xml {
 			'user_id' => $_SESSION['id'],
 			'title' => $this->getTitle(),
 			'description' => $description,
+			'completion_message' => $completionMessage,
 			'start' => $xml->start,
 			'finish' => $xml->finish,
 			'duration' => $xml->duration,
@@ -177,6 +171,27 @@ class Evaluation_Import_Xml {
 			}
 		}
 		return $assess_id;
+	}
+
+	/**
+	 * Parses a rich text node
+	 *
+	 * @param SimpleXMLElement $xml
+	 * @param string           $nodename
+	 *
+	 * @return string
+	 */
+	protected function parseRichTextNode(SimpleXMLElement $xml, $nodename)
+	{
+		// Value should just be a single node, but maybe it wasn't wrapped in
+		// <![CDATA[ ]]> tags.
+		$value = trim("{$xml->$nodename}");
+		if (!$xml->$nodename) {
+			foreach ($xml->xpath("/quiz/$nodename/*") as $desc_node) {
+				$value .= $desc_node->asXML();
+			};
+		}
+		return $value;
 	}
 
 	/* Getters/Setters
