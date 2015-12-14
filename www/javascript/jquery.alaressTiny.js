@@ -10,19 +10,20 @@
 
 		var config = init(options);
 
-		tiny(options);
+		tiny();
 
 		/**
 		 * Init
 		 *
 		 * @param options
-		 * @param element
 		 * @returns {*}
 		 */
 		function init(options) {
 
-
-            var config =  {
+            /* These are the default CKEDITOR.config values
+             * You can find more at http://docs.ckeditor.com/#!/api/CKEDITOR.config
+             */
+            var defaults =  {
                 toolbarGroups: [
                     {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                     {name: 'links', groups: ['links']},
@@ -40,17 +41,35 @@
                     {name: 'clipboard', groups: ['clipboard', 'undo']},
                     {name: 'about', groups: ['about']}
                 ],
+
                 toolbarCanCollapse: true,
                 removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent',
-
                 magicline_color: '#0000FF',
-
                 format_tags: 'p;h3;h4;pre;address',
-
                 filebrowserBrowseUrl: '/resources/attachment',
-                filebrowserUploadUrl: '/storage/asyncUpload.php'
+                filebrowserUploadUrl: '/storage/asyncUpload.php',
 
+                /* This used to be 'mode', a legacy setting from Tiny.
+                 *
+                 * Instead of using its broken interface design, I levelled it up
+                 * so that you can use jquery selectors here and it will try to
+                 * derive the id or name and then apply the ckeditor. It's a bit
+                 * different to Tiny, but we use css selectors to start editors
+                 *
+                 * This also unifies the various scattered instantiations styles
+                 * which were previously totally stupid
+                 *
+                 * The elements must have an id or name for it to work this way
+                 */
+                targetElements: $('textarea')
             };
+
+            var derived = {
+            }
+
+            var merged = $.extend(defaults, derived, options);
+
+            return merged;
 
 
 
@@ -126,26 +145,23 @@
 			 */
 			//var merged = $.extend(standard, defaults, derived, options);
 			//merged.file_browser_category_id = parseInt(merged.file_browser_category_id);
-
-			return config;
 		}
 
 		/**
 		 * Disturb the sleeping dragon
 		 */
-		function tiny(setting) {
+		function tiny() {
+            $.each(config.targetElements, function(index, element) {
+                var id = $(element).attr('id');
+                var name = $(element).attr('name');
 
-            if(setting.mode == "exact") {
-                CKEDITOR.replace(setting.elements,config);
-            }
-            if(setting.mode == "specific_textareas") {
-                CKEDITOR.replace(setting.editor_selector,config);
-            }
-            else if(setting.mode == 'textareas') {
-                $('textarea').each( function() {
-                    CKEDITOR.replace(this, config);
-                });
-            }
+                if ((id !== undefined) && (id.length)) {
+                    CKEDITOR.replace(id, config);
+                }
+                else if ((name !== undefined) && (name.length)) {
+                    CKEDITOR.replace(name, config);
+                }
+            });
 		}
 	}
 })(jQuery);

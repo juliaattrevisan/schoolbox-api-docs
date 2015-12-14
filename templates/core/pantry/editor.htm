@@ -1,0 +1,68 @@
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+
+        /* You can try using jquery selectors to feed a
+         * jquery collection to targetElements.
+         *
+         * Each textarea or element must have an id or name
+         * attribute - it checks the id first, then the name
+         */
+        $.fn.alaressTiny({
+            targetElements: $('textarea[name=green]')
+        });
+    });
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="/">Schoolbox</a></li>
+    <li><a href="/pantry">Pantry</a></li>
+    <li class="active"><a href="/pantry/editor">Editor</a></li>
+</ul>
+<div class="row">
+    <div class="small-12 island">
+        <form action="/test.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            id='cat', name='red'
+                            <textarea id='cat' name="red" rows="10"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            id='dog', name='blue'
+                            <textarea id='dog' name="blue" rows="10"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            id='horse', name='green'
+                            <textarea id='horse' name="green" rows="10"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            id='komodo' name='gold'
+                            <textarea id="komodo" name="gold" rows="10"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>
