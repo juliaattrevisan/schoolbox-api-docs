@@ -10,7 +10,7 @@
 
 		var config = init(options);
 
-		tiny();
+		start();
 
 		/**
 		 * Init
@@ -160,7 +160,7 @@
 		/**
 		 * Disturb the sleeping dragon
 		 */
-		function tiny() {
+		function start() {
             $.each(config.targetElements, function(index, element) {
                 var id = $(element).attr('id');
                 var name = $(element).attr('name');
@@ -178,25 +178,29 @@
                  * http://stackoverflow.com/questions/5143516/detecting-onchange-events-from-a-ckeditor-using-jquery
                  */
                 if ((id !== undefined) && (id.length)) {
-                    config.setup($(element));
-
-                    CKEDITOR.replace(id, config);
-
-                    CKEDITOR.instances[id].on('change', function(event) {
-                        config.change($(element));
-                    });
+                    applyCallbacks(id, element);
                 }
                 else if ((name !== undefined) && (name.length)) {
-                    config.setup($(element));
-
-                    CKEDITOR.replace(name, config);
-
-                    CKEDITOR.instances[name].on('change', function(event) {
-                        config.change($(element));
-                    });
+                    applyCallbacks(name, element);
                 }
             });
 		}
+
+        /**
+         * Apply setup, ckeditor spawn, and change events
+         *
+         * @param identifier
+         * @param element
+         */
+        function applyCallbacks(identifier, element) {
+            config.setup($(element));
+
+            CKEDITOR.replace(identifier, config);
+
+            CKEDITOR.instances[identifier].on('change', function(event) {
+                config.change($(element));
+            });
+        }
 	}
 })(jQuery);
 
