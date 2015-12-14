@@ -204,7 +204,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getParentSync($externalUserId)
     {
-        // TODO: Implement getParentSync() method.
+        return [];
     }
 
     /**
@@ -212,7 +212,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getParentUserAccountInfo()
     {
-        // TODO: Implement getParentUserAccountInfo() method.
+        return [];
     }
 
     /**
