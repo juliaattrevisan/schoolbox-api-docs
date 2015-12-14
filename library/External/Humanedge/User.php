@@ -130,7 +130,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
-        // TODO: Implement getStudentContactListExtended() method.
+        return [];
     }
 
     /**
@@ -138,7 +138,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo()
     {
-        // TODO: Implement getStudentUserAccountInfo() method.
+        return [];
     }
 
     /**
