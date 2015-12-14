@@ -232,9 +232,12 @@ class Provisioner
 
                     // And save
                     if ($update) {
-                        // TODO add some sort of sanity check to $internalUser
-                        $this->userMapper->save($internalUser);
-                        $this->logger->debug("User record saved", $commonContext);
+                        try {
+                            $this->userMapper->save($internalUser);
+                            $this->logger->debug("User record saved", $commonContext);
+                        } catch (\Exception $e) {
+                            $this->logger->error("User record save failed!", array_merge($commonContext, [ 'error' => $e ]));
+                        }
                     }
                 }
 
