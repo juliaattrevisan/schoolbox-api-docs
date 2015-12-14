@@ -148,7 +148,24 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getParentEmails($synergyIds)
     {
-        // TODO: Implement getParentEmails() method.
+        if (empty($synergyIds)) {
+            return [];
+        }
+        $query = "
+            SELECT
+                s.Code AS StudentID,
+                c.Code AS ContactID,
+                c.Email
+            FROM Contact c
+            INNER JOIN StudentContact sc ON c.ID = sc.ContactID
+            INNER JOIN Student s ON sc.ContactID = s.ID
+            WHERE c.Code IN (%s)
+        ";
+        $result = [];
+        foreach ($this->getDatabase()->getOne($query) as $row) {
+            $result[$row['StudentID'].'-'.$row['ContactID']] = $row['Email'];
+        }
+        return $result;
     }
 
     /**
