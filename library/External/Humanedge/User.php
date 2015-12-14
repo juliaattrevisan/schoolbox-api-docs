@@ -351,7 +351,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function determineBoarderType($boarderValue)
     {
-        // TODO: Implement determineBoarderType() method.
+        return '';
     }
 
     /**
@@ -359,7 +359,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getHousemasterByHouseId($houseID)
     {
-        // TODO: Implement getHousemasterByHouseId() method.
+        return '';
     }
 
     /**
@@ -367,7 +367,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getCampusFromTimetable($staffID)
     {
-        // TODO: Implement getCampusFromTimetable() method.
+        return '';
     }
 
     /**
@@ -375,7 +375,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getStudentForms()
     {
-        // TODO: Implement getStudentForms() method.
+        return '';
     }
 
     /**
