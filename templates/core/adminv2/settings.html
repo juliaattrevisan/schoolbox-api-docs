@@ -20,8 +20,7 @@
         });
 
         $.fn.alaressTiny({
-            mode: "specific_textareas",
-            editor_selector: "mceEditor"
+            targetElements: $('#settings').find('[data-html-editor]')
         });
 
         /**
@@ -137,7 +136,7 @@
                         <!-- END setting_type_textarea -->
 
                         <!-- BEGIN setting_type_html -->
-                        <textarea id="{SETTING_NAME}" class="mceEditor {OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
+                        <textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}" data-html-editor>{SETTING_VALUE}</textarea>
                         <!-- END setting_type_html -->
 
                         <!-- BEGIN setting_type_resource -->
