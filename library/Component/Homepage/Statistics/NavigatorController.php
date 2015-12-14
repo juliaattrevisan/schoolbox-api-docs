@@ -29,29 +29,25 @@ class Component_Homepage_Statistics_NavigatorController extends Component_Homepa
         $this->setBlock($templateHandle, 'date_start_option', 'date_start_option_block');
         $this->setBlock($templateHandle, 'date_end_option', 'date_end_option_block');
 
-        $dt = new DateTime('midnight');
-
-        // for one reason or another, an extra day needs to be added here
-        $startDT = DateTime::createFromFormat('U', $this->dateRange[0] + (3600 * 24));
-        $endDT = DateTime::createFromFormat('U', $this->dateRange[1]);
+        $dt = Alaress_Date_Format::now()->endOfDay();
 
         for ($i = 0; $i < 12; ++$i) {
             $this->setVar(array(
-                'DATE_START_SELECTED' => $dt->format('Ym') == $startDT->format('Ym') ? ' selected="selected"' : '',
-                'DATE_START_VALUE'    => $dt->format('Y-m'),
-                'DATE_START_NAME'     => $dt->format('M, Y')
+                'DATE_START_SELECTED' => $dt->getUsingFormat('Ym') == $this->startDate->getUsingFormat('Ym') ? ' selected="selected"' : '',
+                'DATE_START_VALUE'    => $dt->getUsingFormat('Y-m'),
+                'DATE_START_NAME'     => $dt->getUsingFormat('M, Y')
             ));
 
             $this->setVar(array(
-                'DATE_END_SELECTED' => $dt->format('Ym') == $endDT->format('Ym') ? ' selected="selected"' : '',
-                'DATE_END_VALUE'    => $dt->format('Y-m'),
-                'DATE_END_NAME'     => $dt->format('M, Y')
+                'DATE_END_SELECTED' => $dt->getUsingFormat('Ym') == $this->endDate->getUsingFormat('Ym') ? ' selected="selected"' : '',
+                'DATE_END_VALUE'    => $dt->getUsingFormat('Y-m'),
+                'DATE_END_NAME'     => $dt->getUsingFormat('M, Y')
             ));
 
             $this->parse('date_start_option_block', 'date_start_option', true);
             $this->parse('date_end_option_block', 'date_end_option', true);
 
-            $dt->add(DateInterval::createFromDateString('-1 month'));
+            $dt->addMonths(-1);
         }
 
 
