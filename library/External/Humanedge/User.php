@@ -298,7 +298,7 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS classType
             FROM Class cl
             INNER JOIN ClassDetail cd ON cl.ID = cd.ClassID
-            INNER JOIN Subject s ON cl.SubjectID = s.ID
+            INNER JOIN Subject su ON cl.SubjectID = su.ID
             WHERE cd.StudentID = {$this->getDatabase()->smartQuote($externalUserId)}
         ";
         return $this->getDatabase()->getAll($query);
