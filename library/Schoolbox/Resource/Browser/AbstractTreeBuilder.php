@@ -307,7 +307,7 @@ abstract class AbstractTreeBuilder
      * @param IFolder $folder
      * @return string
      */
-    protected function getFolderType(IFolder $folder)
+    public function getFolderType(IFolder $folder)
     {
         return 'folder';
     }

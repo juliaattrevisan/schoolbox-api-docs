@@ -64,7 +64,7 @@ class TreeBuilder extends AbstractTreeBuilder
      * @param IFolder|Folder\Model $folder
      * @return string
      */
-    protected function getFolderType(IFolder $folder)
+    public function getFolderType(IFolder $folder)
     {
         // Type: homepage or folder
         // Could be a course as well, if any child has tasks.
