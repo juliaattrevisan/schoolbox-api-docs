@@ -155,6 +155,15 @@
                 var id = $(element).attr('id');
                 var name = $(element).attr('name');
 
+                /* Enormous Note: the name attribute must be unique on the page
+                 * ckeditor cannot handle having multiple editors on elements
+                 * sharing the same name= attribute
+                 *
+                 * So that forces you to id everything, mostly, unless there is
+                 * only ever one ckeditor on a page (such as modify/create).
+                 *
+                 * Discovered on component-based pages
+                 */
                 if ((id !== undefined) && (id.length)) {
                     CKEDITOR.replace(id, config);
                 }

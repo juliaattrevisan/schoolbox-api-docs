@@ -163,9 +163,10 @@
         });
 
 		$.fn.alaressTiny({
-			mode: "specific_textareas",
-			editor_selector: "mceEditor"
+            targetElements: $('[data-html-editor]')
 		});
+
+        console.log($('[data-html-editor]'));
 
 		// all forms should submit without prevention
 		$("#component-layout").on('submit', 'form',  function() {

@@ -20,7 +20,7 @@
                     <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
                     <input type='hidden' name='textboxId' value='{COMPONENT_INSTANCE_ID}' />
 
-                    <textarea name='content' class='mceEditor' rows="20">{TEXTBOX_CONTENT}</textarea>
+                    <textarea id='createTextbox-{COMPONENT_INSTANCE_ID}' name='content' rows="20" data-html-editor>{TEXTBOX_CONTENT}</textarea>
 
                     <input type="submit" value="Save Document" />
                 </form>
