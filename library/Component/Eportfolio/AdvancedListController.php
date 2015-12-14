@@ -81,7 +81,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
-					'LIST_ITEM_CONTENT' => Scrub::text($currentItem->getContent()),
+					'LIST_ITEM_CONTENT' => Scrub::html($currentItem->getContent()),
 				));
 
 				/* Parse out the image if one was assigned
