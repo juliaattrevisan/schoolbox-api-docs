@@ -104,9 +104,14 @@ class Component_Homepage_Statistics_PageVisitsController extends Component_Homep
             return false;
         }
 
+        $dateFilter = sprintf(
+            "AND time BETWEEN '%s' AND '%s'",
+            $this->startDate->getDatabase(),
+            $this->endDate->getDatabase()
+        );
         $this->setVar(array(
-            'GRAPH_XMIN'    => $this->dateRange[0] * 1000,
-            'GRAPH_XMAX'    => $this->dateRange[1] * 1000,
+            'GRAPH_XMIN'    => $this->startDate->getUnixTimeStamp() * 1000,
+            'GRAPH_XMAX'    => $this->endDate->getUnixTimeStamp() * 1000,
             'GRAPH_JSON'    => json_encode($this->graphData),
             'GRAPH_COLOURS' => json_encode($this->colours)
         ));

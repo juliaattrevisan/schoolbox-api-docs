@@ -14,12 +14,9 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
     {
         $this->unvisitors = array();
 
-        $dateFilter = '';
-        if (count($this->dateRange)) {
-            $dateFilter = sprintf(
-                "AND datetime BETWEEN '%s' AND NOW()", date('Y-m-d', $this->dateRange[0])
-            );
-        }
+        $dateFilter = sprintf(
+            "AND datetime BETWEEN '%s' AND NOW()", $this->startDate->getDatabaseDate()
+        );
 
         $groupFilter = '';
         if ($this->groupType != 'all') {
