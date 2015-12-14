@@ -258,7 +258,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getStaffUserAccountInfo()
     {
-        // TODO: Implement getStaffUserAccountInfo() method.
+        return [];
     }
 
     /**
@@ -266,7 +266,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getStaffContactListExtended()
     {
-        // TODO: Implement getStaffContactListExtended() method.
+        return [];
     }
 
     /**
