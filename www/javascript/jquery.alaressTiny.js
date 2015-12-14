@@ -175,6 +175,7 @@
                  *
                  * Note that in the CKEDITOR.instances literal, ids (when they
                  * exist) take precedence over name
+                 * http://stackoverflow.com/questions/5143516/detecting-onchange-events-from-a-ckeditor-using-jquery
                  */
                 if ((id !== undefined) && (id.length)) {
                     config.setup($(element));
