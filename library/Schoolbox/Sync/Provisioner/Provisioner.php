@@ -19,7 +19,9 @@ use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Ruleset;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 /**
  * The User Provisioning System.
@@ -220,6 +222,14 @@ class Provisioner
 
                     $this->logger->log($level, $message, $context);
 
+                    try {
+                        $this->sanityCheck($internalUser);
+                        $this->logger->debug("User record passes sanity check");
+                    } catch (UnexpectedValueException $e) {
+                        $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()));
+                        continue;
+                    }
+
                     // And save
                     if ($update) {
                         // TODO add some sort of sanity check to $internalUser
@@ -282,5 +292,41 @@ class Provisioner
                 return $this->externalUserSource->findAllParents();
         }
         throw new InvalidArgumentException("$roleType is not one of: student, staff, parent");
+    }
+
+    /**
+     * Performs a sanity check on this user - checks if all their required
+     * fields are set.
+     *
+     * Throws validation exceptions if it isn't.
+     *
+     * @todo consider moving to mapper object, and having it introspect mapper's properties for validation
+     *
+     * @param User $internalUser
+     * @throws UnexpectedValueException if a value isn't what it should be
+     */
+    protected function sanityCheck(User $internalUser)
+    {
+        if ($internalUser->getUsername() === null) {
+            throw new UnexpectedValueException('Username cannot be null');
+        }
+        if ($internalUser->getRole() === null) {
+            throw new UnexpectedValueException('User role cannot be null');
+        }
+        if ($internalUser->getFirstname() === null) {
+            throw new UnexpectedValueException('Firstname cannot be null');
+        }
+        if ($internalUser->getLocalEmail() === null) {
+            throw new UnexpectedValueException('Local email flag cannot be null');
+        }
+        if ($internalUser->getWebmail() === null) {
+            throw new UnexpectedValueException('Webmail flag cannot be null');
+        }
+        if ($internalUser->getUseInternalMail() === null) {
+            throw new UnexpectedValueException('Use internal mail flag cannot be null');
+        }
+        if ($internalUser->getEportfolioEnable() === null) {
+            throw new UnexpectedValueException('Eportfolio enabled flag cannot be null');
+        }
     }
 }
