@@ -173,7 +173,30 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getParent($externalUserId)
     {
-        // TODO: Implement getParent() method.
+        $query = "
+            SELECT
+                c.Title AS Title,
+                c.PreferredName AS Preferred,
+                c.LastName AS Surname,
+                c.Email AS Email,
+                c.WorkEmail as OccupEmail,
+                c.PhoneFamily AS HomePhone,
+                '' AS SilentPhoneFlag,
+                c.PhoneMobile AS MobilePhone,
+                '' AS DirectoryIncludeFlag,
+                '' AS SpouseID,
+                '' AS SpouseTitle,
+                '' AS SpousePreferred,
+                '' AS SpouseSurname,
+                '' AS SpouseEmail,
+                '' AS SpouseOccupEmail,
+                '' AS SpouseDefaultEmailCode,
+                '' AS SpouseMobilePhone,
+                '' AS SpouseDirectoryIncludeFlag
+            FROM Contact c
+            WHERE c.Code = {$this->getDatabase()->smartQuote($externalUserId)}
+        ";
+        return $this->getDatabase()->getOne($query);
     }
 
     /**
