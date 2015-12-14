@@ -329,7 +329,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getEmail($externalUserId)
     {
-        // TODO: Implement getEmail() method.
+        return '';
     }
 
     /**
