@@ -58,7 +58,19 @@ class External_Humanedge_Class implements External_ClassInterface
      */
     public function getTeacherName($classCode)
     {
-        // TODO: Implement getTeacherName() method.
+        $query = "
+            SELECT t.Code
+            FROM Staff t
+            INNER JOIN ClassStaff ct ON t.ID = ct.StaffID
+            INNER JOIN Class cl ON ct.ClassID = cl.ID
+            INNER JOIN Subject su ON cl.SubjectID = su.ID
+            WHERE (su.Code+'-'+cl.ClassGroup) = {$this->getDatabase()->smartQuote($classCode)}
+        ";
+        $result = [];
+        foreach ($this->getDatabase()->getAll($query) as $row) {
+            $result[] = $row['Code'];
+        }
+        return $result;
     }
 
     /**
