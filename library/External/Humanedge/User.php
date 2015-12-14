@@ -309,7 +309,19 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getEnrolledStudents($externalUserId)
     {
-        // TODO: Implement getEnrolledStudents() method.
+        $query = "
+            SELECT
+                s.Code AS StudentID
+            FROM Student s
+            LEFT JOIN StudentContact sc ON s.ID = sc.StudentID
+            LEFT JOIN Contact c ON sc.ContactID = c.ID
+            WHERE c.Code = {$this->getDatabase()->smartQuote($externalUserId)}
+        ";
+        $result = [];
+        foreach ($this->getDatabase()->getAll($query) as $row) {
+            $result[] = $row['StudentID'];
+        }
+        return $result;
     }
 
     /**
