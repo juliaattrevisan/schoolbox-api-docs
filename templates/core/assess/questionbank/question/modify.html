@@ -8,11 +8,9 @@
         /* For the question part itself
          */
         $.fn.alaressTiny({
-            mode: 'exact',
-            elements: 'question',
+            targetElements: $('textarea[name=question]'),
             file_browser_category_id: '{ASSESS_CATEGORY_ID}',
-            removeformat_selector: 'b,strong,em,i,span,ins',
-            width: "100%"
+            removeformat_selector: 'b,strong,em,i,span,ins'
         });
 
         /* Enforce two decimal places
@@ -82,7 +80,7 @@
 
                 <label>
                     Question
-                    <textarea name="question" />{QUESTION}</textarea>
+                    <textarea name="question">{QUESTION}</textarea>
                 </label>
 
                 <!-- BEGIN has_answer_configuration -->
