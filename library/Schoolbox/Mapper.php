@@ -973,11 +973,17 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
         $this->database->beginTransaction();
-        foreach ($collection as $model) {
-            $statement->bindValue(':identifierValue', $this->getModelProperty($model, $identifierProperty));
-            if (!$statement->execute()) {
-                return false;
+        try {
+            foreach ($collection as $model) {
+                $statement->bindValue(':identifierValue', $this->getModelProperty($model, $identifierProperty));
+                if (!$statement->execute()) {
+                    $this->database->rollBack();
+                    return false;
+                }
             }
+        } catch (PDOException $e) {
+            $this->database->rollBack();
+            throw $e;
         }
         $this->database->commit();
         foreach ($collection as $model) {
@@ -1142,7 +1148,15 @@ abstract class Mapper implements IMapper, Serializable
             $statement->bindValue($key, $id);
         }
         $this->database->beginTransaction();
-        $result = $statement->execute();
+        try {
+            if (!($result = $statement->execute())) {
+                $this->database->rollBack();
+                return $result;
+            }
+        } catch (PDOException $e) {
+            $this->database->rollBack();
+            throw $e;
+        }
         $this->database->commit();
         //
         // Trigger the post-trigger, if there is one.
