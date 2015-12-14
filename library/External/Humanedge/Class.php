@@ -34,7 +34,22 @@ class External_Humanedge_Class implements External_ClassInterface
      */
     public function getStudents($classCode)
     {
-        // TODO: Implement getStudents() method.
+        $query = "
+            SELECT
+                s.PreferredName AS firstname,
+                s.LastName AS lastname,
+                s.Year AS StudentYearLevel,
+                '' AS StudentHouseDescription,
+                '' AS StudentMedicalAlert,
+                s.SpecialNeeds AS StudentSpecialNeedsFlag,
+                s.Code AS synergy_id,
+                '' AS ClassCampus
+            FROM Student s
+            INNER JOIN ClassDetail cd ON s.ID = cd.StudentID
+            INNER JOIN Subject su ON cd.SubjectID = su.ID
+            WHERE (su.Code+'-'+cl.ClassGroup) = {$this->getDatabase()->smartQuote($classCode)}
+        ";
+        return $this->getDatabase()->getAll($query);
     }
 
     /**
