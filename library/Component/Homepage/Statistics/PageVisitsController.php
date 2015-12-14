@@ -21,8 +21,8 @@ class Component_Homepage_Statistics_PageVisitsController extends Component_Homep
         );
 
         // list of epoch days included in this
-        $start = (int)($this->dateRange[0] / 86400);
-        $end = (int)($this->dateRange[1] / 86400);
+        $start = (int)($this->startDate->getUnixTimeStamp() / 86400);
+        $end   = (int)($this->endDate->getUnixTimeStamp() / 86400);
 
         // create a template array for populating into to account for zero days
         $data = array();
@@ -33,7 +33,12 @@ class Component_Homepage_Statistics_PageVisitsController extends Component_Homep
         }
 
         $groupFilter = $this->groupType == 'all' ? '' : "AND group_type = '{$this->groupType}'";
-        $dateFilter = "AND date BETWEEN '" . date('Y-m-d', $this->dateRange[0]) . "' AND '" . date('Y-m-d', $this->dateRange[1]) . "'";
+        $dateFilter  = sprintf(
+            "AND date BETWEEN '%s' AND '%s'",
+            $this->startDate->getDatabase(),
+            $this->endDate->getDatabase()
+        );
+
 
         $stmt = Database::getInstance()->prepare("
             SELECT hv.date, SUM(hitcount) hcount, group_type
