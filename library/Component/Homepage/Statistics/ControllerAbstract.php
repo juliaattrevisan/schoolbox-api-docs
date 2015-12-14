@@ -8,8 +8,16 @@
  */
 abstract class Component_Homepage_Statistics_ControllerAbstract extends Component_ControllerAbstract
 {
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $startDate;
 
-    protected $dateRange = array();
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $endDate;
+
     protected $groupType;
     private $validGroups = array('student','parent','staff','guest');
 
@@ -32,28 +40,26 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
         $args = $this->sitepage->arg;
 
         // $args[1]: start month
-        $start = Alaress_Date_Format::now();
+        $this->startDate = Alaress_Date_Format::now();
         if (isset($args[1])) {
             try {
-                $start = new Alaress_Date_Format($args[1], 'Y-m');
+                $this->startDate = new Alaress_Date_Format($args[1], 'Y-m');
             } catch (InvalidArgumentException $e) {
                 // noop
             }
         }
-        $start = $start->startOfMonth();
+        $this->startDate = $this->startDate->startOfMonth();
 
         // $args[2]: end month
-        $end = clone($start);
-        $end = $end->endOfMonth();
+        $this->endDate = clone($this->startDate);
         if (isset($args[2])) {
             try {
-                $end = new Alaress_Date_Format($args[2], 'Y-m');
+                $this->endDate = new Alaress_Date_Format($args[2], 'Y-m');
             } catch (InvalidArgumentException $e) {
                 // noop
             }
         }
-
-        $this->dateRange = [$start, $end];
+        $this->endDate = $this->endDate->endOfMonth();
 
         // args[3]: group type, default all
         $this->groupType = isset($args[3]) && in_array($args[3], $this->validGroups) ? $args[3] : 'all';
