@@ -117,8 +117,8 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS StudentContactType,
                 '' AS StudentContactSpouseRelation
             FROM Contact c
-            LEFT JOIN StudentContact sc ON c.ID = sc.ContactID
-            LEFT JOIN Student s ON sc.ContactID = s.ID
+            INNER JOIN StudentContact sc ON c.ID = sc.ContactID
+            INNER JOIN Student s ON sc.ContactID = s.ID
             -- LEFT JOIN ContactFamily cf ON c.ID = cf.ContactID
             -- LEFT JOIN Family f ON cf.FamilyID = f.ID
             LEFT JOIN vw_Contact_Addresses ca ON c.ID = ca.ContactID
