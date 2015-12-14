@@ -162,7 +162,7 @@ class External_Humanedge_User implements External_UserInterface
             WHERE c.Code IN (%s)
         ";
         $result = [];
-        foreach ($this->getDatabase()->getOne($query) as $row) {
+        foreach ($this->getDatabase()->getAll($query) as $row) {
             $result[$row['StudentID'].'-'.$row['ContactID']] = $row['Email'];
         }
         return $result;
