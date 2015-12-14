@@ -61,7 +61,12 @@
                  *
                  * The elements must have an id or name for it to work this way
                  */
-                targetElements: $('textarea')
+                targetElements: $('textarea'),
+
+                /* A callback to fire when content is changed
+                 */
+                change: function(element) {
+                }
             };
 
             var derived = {
@@ -161,14 +166,24 @@
                  *
                  * So that forces you to id everything, mostly, unless there is
                  * only ever one ckeditor on a page (such as modify/create).
-                 *
                  * Discovered on component-based pages
+                 *
+                 * Note that in the CKEDITOR.instances literal, ids (when they
+                 * exist) take precedence over name
                  */
                 if ((id !== undefined) && (id.length)) {
                     CKEDITOR.replace(id, config);
+
+                    CKEDITOR.instances[id].on('change', function(event) {
+                        config.change($(element));
+                    });
                 }
                 else if ((name !== undefined) && (name.length)) {
                     CKEDITOR.replace(name, config);
+
+                    CKEDITOR.instances[name].on('change', function(event) {
+                        config.change($(element));
+                    });
                 }
             });
 		}
