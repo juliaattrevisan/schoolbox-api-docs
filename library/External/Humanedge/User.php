@@ -220,7 +220,37 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getStaff($externalUserId)
     {
-        // TODO: Implement getStaff() method.
+        /**
+         * Get the following fields for the staff member $externalUserId
+         *
+         * SchoolStaffCode,
+         * StaffBuilding,
+         * StaffRoom,
+         * StaffExtension,
+         * StaffMobilePhone,
+         * StaffCampusDescription,
+         * StaffCategoryDescription,
+         * StaffDepartment,
+         * StaffVoiceMail
+         *
+         * @param $externalUserId
+         * @return array
+         */
+        $query = "
+            SELECT
+                '' AS SchoolStaffCode,
+                '' AS StaffBuilding,
+                '' AS StaffRoom,
+                '' AS StaffExtension,
+                t.Mobile AS StaffMobilePhone,
+                '' AS StaffCampusDescription,
+                '' AS StaffCategoryDescription,
+                '' AS StaffDepartment,
+                '' AS StaffVoiceMail
+            FROM Staff t
+            WHERE t.Code = {$this->getDatabase()->smartQuote($externalUserId)}
+        ";
+        return $this->getDatabase()->getOne($query);
     }
 
     /**
