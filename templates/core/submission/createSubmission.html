@@ -40,10 +40,7 @@
         var form = $('#createSubmissionForm');
         form.submissionFormValidate();
 
-        $.fn.alaressTiny({
-            mode: 'exact',
-            elements: 'description-box'
-        });
+        $.fn.alaressTiny();
 
         // When I change the number of assessment levels,
         // that means I want to use assessment specific descriptors.
@@ -131,7 +128,7 @@
                     <div class="small-12 columns">
                         <label>
                             Description
-                            <textarea id="description-box" name="description">{DESCRIPTION}</textarea>
+                            <textarea name="description">{DESCRIPTION}</textarea>
                         </label>
                     </div>
 
