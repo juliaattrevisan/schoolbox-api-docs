@@ -75,7 +75,7 @@ class TreeBuilder extends AbstractTreeBuilder
         if ($this->taskMapper->countByColumn('category_id', $childIds)) {
             $type = 'course';
         } else {
-            $type = $folder->hasHomepage() ? 'homepage' : 'folder';
+            $type = $folder->hasHomepage() ? 'home' : 'folder';
         }
 
         return  $type;
