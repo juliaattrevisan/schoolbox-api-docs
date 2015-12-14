@@ -46,7 +46,8 @@ class External_Humanedge_Class implements External_ClassInterface
                 '' AS ClassCampus
             FROM Student s
             INNER JOIN ClassDetail cd ON s.ID = cd.StudentID
-            INNER JOIN Subject su ON cd.SubjectID = su.ID
+            INNER JOIN Class cl ON cd.ClassID = cl.ID
+            INNER JOIN Subject su ON cl.SubjectID = su.ID
             WHERE (su.Code+'-'+cl.ClassGroup) = {$this->getDatabase()->smartQuote($classCode)}
         ";
         return $this->getDatabase()->getAll($query);
