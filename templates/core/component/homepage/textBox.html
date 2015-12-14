@@ -28,8 +28,7 @@
                 <script type="text/javascript">
                     $(function() {
                         $.fn.alaressTiny({
-                            mode : "exact",
-                            elements: "textBoxBody",
+                            targetElements: $('textarea[name=textBoxBody]'),
                             file_browser_category_id : {ID}
                         });
                     });
