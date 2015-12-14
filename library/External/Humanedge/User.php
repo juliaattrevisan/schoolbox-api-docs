@@ -290,7 +290,18 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getSubjectList($externalUserId, $userId)
     {
-        // TODO: Implement getSubjectList() method.
+        $query = "
+            SELECT
+                (su.Code+'-'+cl.ClassGroup) AS ClassCode,
+                '' AS ClassCampus,
+                su.Name AS name,
+                '' AS classType
+            FROM Class cl
+            INNER JOIN ClassDetail cd ON cl.ID = cd.ClassID
+            INNER JOIN Subject s ON cl.SubjectID = s.ID
+            WHERE cd.StudentID = {$this->getDatabase()->smartQuote($externalUserId)}
+        ";
+        return $this->getDatabase()->getAll($query);
     }
 
     /**
