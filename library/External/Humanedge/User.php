@@ -274,7 +274,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getCurrentSemester($externalUserId = null)
     {
-        // TODO: Implement getCurrentSemester() method.
+        return date('Y');
     }
 
     /**
@@ -282,7 +282,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getCurrentYear($externalUserId = null)
     {
-        // TODO: Implement getCurrentYear() method.
+        return date('m') < 6 ? 1 : 2;
     }
 
     /**
