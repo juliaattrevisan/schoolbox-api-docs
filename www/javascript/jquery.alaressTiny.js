@@ -63,9 +63,14 @@
                  */
                 targetElements: $('textarea'),
 
-                /* A callback to fire when this plugin inits
+                /* A callback to fire prior to ck spawn
                  */
                 setup: function(element) {
+                },
+
+                /* A callback to fire immediately after ck spawn
+                 */
+                start: function(element) {
                 },
 
                 /* A callback to fire when content is changed
@@ -196,6 +201,8 @@
             config.setup($(element));
 
             CKEDITOR.replace(identifier, config);
+
+            config.start($(element));
 
             CKEDITOR.instances[identifier].on('change', function(event) {
                 config.change($(element));
