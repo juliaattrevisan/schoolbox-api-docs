@@ -88,7 +88,41 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getStudentContactList($externalUserId)
     {
-        // TODO: Implement getStudentContactList() method.
+        $query = "
+            SELECT
+                c.Code AS StudentContactID,
+                c.Title AS StudentContactTitle,
+                c.PreferredName AS StudentContactPreferred,
+                c.LastName AS StudentContactSurname,
+                c.Email AS StudentContactDefaultEmail,
+                '' AS ValidAddressFlag,
+                ca.Address1 AS StudentContactAddress1,
+                ca.Address2 AS StudentContactAddress2,
+                ca.Address3 AS StudentContactAddress3,
+                '' AS StudentContactSuburb,
+                ca.PostCode AS StudentContactPostCode,
+                '' AS StudentContactState,
+                '' AS StudentContactPhoneActual,
+                '' AS StudentContactMobilePhone,
+                '' AS StudentContactOccupPhone,
+                '' AS StudentContactRelation,
+                -- No speese
+                '' AS StudentContactSpouseID,
+                '' AS StudentContactSpouseTitle,
+                '' AS StudentContactSpousePreferred,
+                '' AS StudentContactSpouseSurname,
+                '' AS StudentContactSpouseMobilePhone,
+                '' AS StudentContactSpouseOccupPhone,
+                '' AS StudentContactSpouseDefaultEmail,
+                '' AS StudentContactType,
+                '' AS StudentContactSpouseRelation
+            FROM Contact c
+            -- LEFT JOIN ContactFamily cf ON c.ID = cf.ContactID
+            -- LEFT JOIN Family f ON cf.FamilyID = f.ID
+            LEFT JOIN vw_Contact_Addresses ca ON c.ID = ca.ContactID
+            WHERE c.Code = {$this->getDatabase()->smartQuote($externalUserId)}
+        ";
+        return $this->getDatabase()->getOne($query);
     }
 
     /**
