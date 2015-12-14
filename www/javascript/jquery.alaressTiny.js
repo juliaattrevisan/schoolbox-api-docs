@@ -63,6 +63,11 @@
                  */
                 targetElements: $('textarea'),
 
+                /* A callback to fire when this plugin inits
+                 */
+                setup: function(element) {
+                },
+
                 /* A callback to fire when content is changed
                  */
                 change: function(element) {
@@ -172,6 +177,8 @@
                  * exist) take precedence over name
                  */
                 if ((id !== undefined) && (id.length)) {
+                    config.setup($(element));
+
                     CKEDITOR.replace(id, config);
 
                     CKEDITOR.instances[id].on('change', function(event) {
@@ -179,6 +186,8 @@
                     });
                 }
                 else if ((name !== undefined) && (name.length)) {
+                    config.setup($(element));
+
                     CKEDITOR.replace(name, config);
 
                     CKEDITOR.instances[name].on('change', function(event) {
