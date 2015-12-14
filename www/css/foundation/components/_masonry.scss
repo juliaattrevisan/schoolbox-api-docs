@@ -267,90 +267,119 @@ $masonry-drop-background: $input-focus-bg-color;
 // Eportfolio masonry icons
 .icon-masonry-Component_Eportfolio_AdvancedListController:before {
   @extend .icon-advanced-list;
+  color: $icon-color-advanced-list;
 }
 .icon-masonry-Component_Eportfolio_BasicListController:before {
   @extend .icon-list;
+  color: $icon-color-basic-list;
 }
 .icon-masonry-Component_Eportfolio_BlogController:before {
   @extend .icon-blog;
+  color: $icon-color-blog;
 }
 .icon-masonry-Component_Eportfolio_FileListController:before {
   @extend .icon-files;
+  color: $icon-color-files;
 }
 .icon-masonry-Component_Eportfolio_ImageController:before {
   @extend .icon-image;
+  color: $icon-color-image;
 }
 .icon-masonry-Component_Eportfolio_ImageListController:before {
   @extend .icon-image-gallery;
+  color: $icon-color-image-gallery;
 }
 .icon-masonry-Component_Eportfolio_LinkListController:before {
   @extend .icon-link;
+  color: $icon-color-links;
 }
 .icon-masonry-Component_Eportfolio_TextboxController:before {
   @extend .icon-textbox;
+  color: $icon-color-text-box;
 }
 .icon-masonry-Component_Eportfolio_VideoController:before {
   @extend .icon-video;
+  color: $icon-color-video-player;
 }
 
 // Dashboard masonry icons
 .icon-masonry-Component_Dashboard_ActivityController:before {
   @extend .icon-info;
+  color: $icon-color-homepage-activity;
 }
 .icon-masonry-Component_Dashboard_CalendarController:before {
   @extend .icon-calendar;
+  color: $icon-color-calendar;
 }
 .icon-masonry-Component_Dashboard_ChildSubjectController:before {
   @extend .icon-progress;
+  color: $icon-color-child-subject;
 }
 .icon-masonry-Component_Dashboard_GreetingController:before {
   @extend .icon-chat;
+  color: $icon-color-greeting;
 }
 .icon-masonry-Component_Dashboard_HomepageNewsController:before {
   @extend .icon-news;
+  color: $icon-color-news;
 }
 .icon-masonry-Component_Dashboard_ImageGalleryController:before {
   @extend .icon-image-gallery;
+  color: $icon-color-image-gallery;
 }
 .icon-masonry-Component_Dashboard_ImageSliderController:before {
   @extend .icon-image-slideshow;
+  color: $icon-color-image-slideshow;
 }
 .icon-masonry-Component_Dashboard_NewsController:before {
   @extend .icon-news;
+  color: $icon-color-news;
 }
 .icon-masonry-Component_Dashboard_RecentSubmissionsController:before {
   @extend .icon-due-work;
+  color: $icon-color-due-work;
 }
 .icon-masonry-Component_Dashboard_RssController:before {
   @extend .icon-rss;
+  color: $icon-color-rss-feed;
 }
 .icon-masonry-Component_Dashboard_ScrollerController:before {
   @extend .icon-image-slideshow;
+  color: $icon-color-image-slideshow;
 }
 .icon-masonry-Component_Dashboard_SubjectController:before {
   @extend .icon-progress;
+  color: $icon-color-subject-list;
 }
 .icon-masonry-Component_Dashboard_TextboxController:before {
   @extend .icon-textbox;
+  color: $icon-color-text-box;
 }
 .icon-masonry-Component_Dashboard_TimetableController:before {
   @extend .icon-timetable;
+  color: $icon-color-timetable;
 }
 .icon-masonry-Component_Dashboard_TwitterController:before {
   @extend .icon-twitter;
+  color: $icon-color-twitter;
 }
 .icon-masonry-Component_Dashboard_UpcomingWorkController:before {
   @extend .icon-due-work;
+  color: $icon-color-due-work;
 }
 .icon-masonry-Component_Dashboard_VideoController:before {
   @extend .icon-video;
+  color: $icon-color-video-player;
 }
 .icon-masonry-Component_Dashboard_WeatherController:before {
   @extend .icon-weather;
+  color: $icon-color-weather;
 }
 .icon-masonry-Schoolbox_ResourceBooking_Booking_Component_ResourceManagement:before {
   @extend .icon-resource-booking;
+  color: $icon-color-resource-management;
 }
 .icon-masonry-Schoolbox_Tile_Component_DashboardTileController:before {
   @extend .icon-tiles;
+  color: $icon-color-tiles;
 }
