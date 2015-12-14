@@ -34,7 +34,53 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getStudent($externalUserId)
     {
-        // TODO: Implement getStudent() method.
+        // Smoosh all of the contacts into one
+        $query = "
+            SELECT
+                s.Code AS StudentID,
+                s.PreferredName AS StudentGiven1,
+                s.LastName AS StudentSurname,
+                s.DOB AS StudentBirthDate,
+                '' AS StudentHouseDescription,
+                s.House AS StudentHouse,
+                '' AS HeadOfHouseID,
+                '' AS StudentHeadOfHouse,
+                s.BoarderType AS StudentBoarder
+                s.Form AS StudentForm,
+                '' AS FormDescription,
+                '' AS StudentFormStaffName,
+                '' AS StudentTutor,
+                '' AS StudentTutorName,
+                '' AS StudentTutorDescription,
+                '' AS TeacherFormID,
+                '' AS TeacherTutorID,
+                s.Year AS StudentYearLevel,
+                '' AS YearLevelCoordID,
+                '' AS StudentYearLevelCoordinator,
+                '' AS StudentLockerBook,
+                (c.PreferredName + ' ' + c.LastName) AS StudentEmergencyName,
+                c.PhoneHome AS StudentEmergencyPhone,
+                c.PhoneWork AS StudentEmergencyPhoneAlt,
+                '' AS StudentMedicalAlert,
+                s.SpecialNeeds AS StudentSpecialNeedsFlag,
+                '' AS StudentStudiesCode,
+                '' AS AlertMessage
+            FROM Student s
+            LEFT JOIN StudentContact sc ON s.ID = sc.StudentID
+            LEFT JOIN Contact c ON sc.ContactID = c.ID
+            WHERE s.Code = {$this->getDatabase()->smartQuote($externalUserId)}
+        ";
+        $result = [];
+        foreach ($this->getDatabase()->getAll($query) as $i => $row) {
+            if (empty($result)) {
+                $result = $row;
+            } else {
+                $result["StudentEmergency{$i}Name"]     = $row['StudentEmergencyName'];
+                $result["StudentEmergency{$i}PhoneAlt"] = $row['StudentEmergencyPhoneAlt'];
+                $result["StudentEmergency{$i}Phone"]    = $row['StudentEmergencyPhone'];
+            }
+        }
+        return $result;
     }
 
     /**
