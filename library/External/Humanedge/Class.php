@@ -30,6 +30,22 @@ class External_Humanedge_Class implements External_ClassInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getStudents($classCode)
+    {
+        // TODO: Implement getStudents() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTeacherName($classCode)
+    {
+        // TODO: Implement getTeacherName() method.
+    }
+
+    /**
      * @param MSSQL $database
      */
     private function setDatabase($database)

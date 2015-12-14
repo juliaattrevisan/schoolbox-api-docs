@@ -30,6 +30,70 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
+    {
+        // TODO: Implement getTimetableDefinition() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
+    {
+        // TODO: Implement getDayNumber() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    function getDayName($dayNumber)
+    {
+        // TODO: Implement getDayName() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
+    {
+        // TODO: Implement getPeriodNumber() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+    {
+        // TODO: Implement getDayTimetable() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    {
+        // TODO: Implement getTimetableForDate() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
+    {
+        // TODO: Implement getFullTimetable() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getRoomTimetable($roomCodes)
+    {
+        // TODO: Implement getRoomTimetable() method.
+    }
+
+    /**
      * @param MSSQL $database
      */
     private function setDatabase($database)
