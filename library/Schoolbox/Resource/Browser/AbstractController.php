@@ -149,13 +149,13 @@ abstract class AbstractController extends BaseController
         $tree = $folder->getParent() instanceof IFolder ? $this->getBreadcrumbs($folder->getParent()) : [];
 
         return [
-            'tree'       => $tree,
-            'folder'     => $folder,
-            'folderType' => $this->treeBuilder->getFolderType($folder),
-            'access'     => $this->getAccess([ $folderId ]),
-            'user'       => $this->getUser(),
-            'conf'       => $this->conf,
-            'namespace'  => $this->namespace,
+            'tree'      => $tree,
+            'folder'    => $folder,
+            'icon'      => $this->treeBuilder->getFolderIcon($folder),
+            'access'    => $this->getAccess([ $folderId ]),
+            'user'      => $this->getUser(),
+            'conf'      => $this->conf,
+            'namespace' => $this->namespace,
         ];
     }
 
