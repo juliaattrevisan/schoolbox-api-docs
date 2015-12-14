@@ -42,7 +42,7 @@ set upsConfig = {
     <div class="small-12 island">
         {% if hasDryRun %}
             <div data-alert class="alert-box">
-                <h2>Running {{ rulesetId|capitalize }} Dry Run</h2>
+                <h2>Processing {{ rulesetId|capitalize }} Dry Run</h2>
                 {% if config.messaging_enabled %}
                     <p>Please be patient - we'll notify you when it's done.</p>
                 {% else %}
