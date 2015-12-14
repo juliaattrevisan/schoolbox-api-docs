@@ -157,7 +157,7 @@ class Bootstrap implements BootstrapInterface {
 		}
 
 		// Redis connection configuration
-		Redis::getInstance()->connect(ConfigMapper::getInstance()->get('redis_url'));
+		Redis::getInstance()->connect(ConfigMapper::getInstance()->get('redis_url'), null, INSTANCE_ID);
 	}
 
 
