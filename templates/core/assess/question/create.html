@@ -75,11 +75,9 @@
         /* For the question part itself
          */
         $.fn.alaressTiny({
-            mode: 'exact',
-            elements: 'question',
+            targetElements: $('#question'),
             file_browser_category_id: '{ASSESS_CATEGORY_ID}',
-            removeformat_selector: 'b,strong,em,i,span,ins',
-            width: "100%"
+            removeformat_selector: 'b,strong,em,i,span,ins'
         });
 
         /* Change state
