@@ -3,58 +3,7 @@
 <script type='text/javascript' src="/javascript/shared/evaluation/jquery.evaluation.validation.js"></script>
 <script type="text/javascript">
     $(function() {
-        $.fn.alaressTiny({
-            targetElements: $('#answerBox'),
-            file_browser_category_id: '{ASSESS_CATEGORY_ID}',
-
-            toolbarGroups: [
-                {name: 'schoolbox', groups: []},
-                {name: 'basicstyles', groups: ['cleanup']}
-            ],
-
-            allowedContent: {
-                span: {
-                    classes: 'selected-word'
-                }
-            },
-
-            /* Words to "make blank" in fillgap
-             */
-            load: function() {
-                CKEDITOR.addCss('span.selected-word { background: #CAE9B9; }');
-            },
-
-            start: function(element) {
-                var instance = CKEDITOR.instances['answerBox'];
-
-                /* Add special unique buttons
-                 */
-                instance.addCommand("makeBlank", {
-                    exec: function(editorInstance) {
-                        var selectedContent = editorInstance.getSelection().getSelectedText();
-                        var updatedContent = '<span class="selected-word">' + selectedContent + '</span>'
-
-                        /* Replace selected content in editor
-                         */
-                        editorInstance.insertHtml(updatedContent, 'unfiltered_html');
-                    }
-                });
-
-                instance.ui.addButton('MakeBlank', { // add new button and bind our command
-                    label: "Make Blank",
-                    command: 'makeBlank',
-                    toolbar: 'schoolbox',
-                    icon: 'https://avatars1.githubusercontent.com/u/1073167?v=3&amp;s=460'
-                });
-            }
-        });
-
-        $('#createQuestionForm').shortCreate({
-            customValidationRules: function(config) {
-                $.fn.addCustomRules_greaterThanZero(config);
-                $.fn.addCustomRules_emptyAnswer(config);
-            }
-        });
+        $.fn.fillgapCreate();
     });
 </script>
 
