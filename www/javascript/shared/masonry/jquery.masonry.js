@@ -824,23 +824,15 @@
         opts.column.onToggle.apply(this);
 
         this.columns.each(function() {
-            var column, components, dragging, markerHeight, componentSelector;
+            var column, components, dragging;
 
-            try {
-                componentSelector = opts.component.selector + ', ' + opts.palette.handleSelector;
-            } catch (e) {
-                componentSelector = opts.component.selector;
-            }
-
-            column       = $(this);
-            components   = column.find(componentSelector).not('.' + sortingClass);
-            dragging     = column.find('.' + sortingClass);
-            markerHeight = 0;
+            column     = $(this);
+            components = column.find(opts.component.selector).not('.' + sortingClass);
+            dragging   = column.find('.' + sortingClass);
 
             // filter out this component by id if it's being dragged
             if (dragging.length) {
-                components   = components.not('#' + dragging.attr('id'));
-                markerHeight = dragging.height();
+                components = components.not('#' + dragging.attr('id'));
             }
 
             if (components.length) {
