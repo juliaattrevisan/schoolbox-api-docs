@@ -7,11 +7,10 @@
             targetElements: $('#answerBox'),
             file_browser_category_id: '{ASSESS_CATEGORY_ID}',
 
-            /* TODO: Remove this junk
-             */
-            theme_advanced_buttons1: "addSpans,removeformat",
-            removeformat_selector: 'b,strong,em,i,span,ins',
-            disable_toolbars: [2, 3, 4],
+            toolbarGroups: [
+                {name: 'schoolbox', groups: []},
+                {name: 'basicstyles', groups: ['cleanup']}
+            ],
 
             allowedContent: {
                 span: {
