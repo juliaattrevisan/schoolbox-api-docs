@@ -67,19 +67,15 @@
 			$('[data-question]').each(function(index, element) {
 				var id = $(element).data('question');
 
-				var prefix = "$.fn." + $(element).data('plugin');
+				var pluginName = $(element).data('plugin');
 
-				/* Run saveOne() multiple times
+				/* Run saveOne() multiple times (once for each question)
 				 */
-				var plugin = prefix + ".saveOne($('#questionForm-" + id + "'))";
-				var hadoken = new Function(plugin);
-				hadoken();
+				$.fn[pluginName].saveOne($('#questionForm-'+id));
 
 				/* Extract validation ruleset for this particular question type
 				 */
-				var method = prefix + ".getValidationRules()";
-				var shoryuken = new Function('return ' + method);
-				var configuration = shoryuken();
+				var configuration = $.fn[pluginName].getValidationRules();
 
 				/* If configuration exists for this question type, apply settings
 				 * otherwise ignore it
