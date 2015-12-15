@@ -56,20 +56,15 @@
 	 * Save individual form contents
 	 *
 	 * @param element
+	 * @returns jqXHR
 	 */
 	$.fn.evaluationRichText.saveOne = function(element) {
 		tinyMCE.triggerSave();
 
-		$.ajax({
+		return $.ajax({
 			type: 'post',
 			url: $(element).attr('action'),
 			data: $(element).serialize(),
-
-			/* Ensure all forms submit before redirecting
-			 * Do not upgrade jquery to 1.9 or you'll lose this
-			 */
-			async: false,
-
 			/* Callback on success
 			 */
 			success: function(responseText) {

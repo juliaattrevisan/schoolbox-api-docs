@@ -64,6 +64,7 @@
 		function saveForms() {
 			var errors = false;
 
+			// Each saveOne() call returns a promise to run the next one
 			$('[data-question]').each(function(index, element) {
 				var id = $(element).data('question');
 
