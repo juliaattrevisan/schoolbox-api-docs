@@ -128,7 +128,6 @@
     CurriculumBrowser.prototype.buildForm = function(actions, data, previous)
     {
         var self = this;
-        tinyMCE.execCommand('mceRemoveControl', true, 'curriculumDescription');
 
         // Update data
         data.actions = actions;
@@ -147,7 +146,10 @@
                 self.buildView(actions, data);
             }
         });
-        tinyMCE.execCommand('mceAddControl', true, 'curriculumDescription');
+
+        $.fn.alaressTiny({
+            targetElements: $('#curriculumDescription')
+        });
     };
 
     /**

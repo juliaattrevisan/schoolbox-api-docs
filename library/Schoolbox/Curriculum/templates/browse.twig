@@ -3,15 +3,11 @@
 <script type="text/javascript" src="/javascript/shared/curriculum/jquery.curriculum-browser.js"></script>
 <script type="text/javascript" src="/javascript/components/jstree/dist/jstree.min.js"></script>
 <script type="text/javascript" src="/javascript/components/doT/doT.js"></script>
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
 <script type="text/javascript">
     (function($) {
         $(function() {
-            // Setup Tiny now, for later addition
-            $.fn.alaressTiny({
-                mode: 'none'
-            });
 
             // Set up the browser
             var browser = $('[data-role="curriculum-browser"]').curriculumBrowser({
