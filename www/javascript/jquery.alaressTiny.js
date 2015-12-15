@@ -76,6 +76,11 @@
                 /* A callback to fire when content is changed
                  */
                 change: function(element) {
+                },
+
+                /* A callback to fire when editor blurs
+                 */
+                blur: function(element) {
                 }
             };
 
@@ -206,6 +211,10 @@
 
             CKEDITOR.instances[identifier].on('change', function(event) {
                 config.change($(element));
+            });
+
+            CKEDITOR.instances[identifier].on('blur', function(event) {
+                config.blur($(element));
             });
         }
 	}
