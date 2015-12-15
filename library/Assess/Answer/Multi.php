@@ -129,16 +129,6 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
             ));
 
             foreach ($allAnswers as $currentAnswer) {
-                if ($currentAnswer->correct) {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'evaluation-correct-answer-option'
-                    ));
-                } else {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => ''
-                    ));
-                }
-
                 $page->setVar(array(
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
@@ -148,13 +138,23 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                     && is_array($existingAnswer)
                     && in_array($currentAnswer->value, $existingAnswer)
                 ) {
-                    $page->setVar(array(
-                        'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
-                    ));
+                    // The student chose this answer.
+                    // If it's correct show a tick, if not show a cross.
+                    $page->setVar('ANSWER_CHECKED', 'evaluation-selected-answer-option');
+                    if ($currentAnswer->correct) {
+                        $page->setVar('ACTUAL_CORRECT_VALUE', 'evaluation-correct-answer-option');
+                    } else {
+                        $page->setVar('ACTUAL_CORRECT_VALUE', 'evaluation-incorrect-answer-option');
+                    }
                 } else {
-                    $page->setVar(array(
-                        'ANSWER_CHECKED' => '',
-                    ));
+                    // The student didn't choose this answer.
+                    // If it's correct show a cross (they should have chose it), if not show no icon.
+                    $page->setVar('ANSWER_CHECKED', '');
+                    if ($currentAnswer->correct) {
+                        $page->setVar('ACTUAL_CORRECT_VALUE', 'evaluation-incorrect-answer-option');
+                    } else {
+                        $page->setVar('ACTUAL_CORRECT_VALUE', '');
+                    }
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
