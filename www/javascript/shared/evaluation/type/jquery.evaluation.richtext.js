@@ -33,33 +33,24 @@
 		 * Initialise tiny
 		 */
 		function initChange() {
-			$.fn.alaressTiny({
-				mode : "exact",
-                elements: config.editorSelector,
-				disable_toolbars: [2, 3, 4],
-				setup : function(ed) {
-					ed.onInit.add(function(ed) {
-						var dom = ed.dom,
-							doc = ed.getDoc(),
-							el = doc.content_editable ? ed.getBody() : (tinymce.isGecko ? doc : ed.getWin());
-
-						tinymce.dom.Event.add(el, 'blur', function(e) {
-							$.fn.evaluationRichText.saveOne(config.questionForm);
-						});
-					});
-				}
-			});
+            $.fn.alaressTiny({
+                targetElements: $('#' + config.editorSelector),
+                blur: function(element) {
+                    $.fn.evaluationRichText.saveOne(config.editorSelector, config.questionForm);
+                }
+            });
 		}
 	}
 
 	/**
 	 * Save individual form contents
 	 *
+     * @param identifier
 	 * @param element
 	 * @returns jqXHR
 	 */
-	$.fn.evaluationRichText.saveOne = function(element) {
-		tinyMCE.triggerSave();
+	$.fn.evaluationRichText.saveOne = function(identifier, element) {
+		CKEDITOR.instances[identifier].updateElement();
 
 		return $.ajax({
 			type: 'post',
