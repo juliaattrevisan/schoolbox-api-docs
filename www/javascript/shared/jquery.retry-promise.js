@@ -7,22 +7,14 @@
                 deferred.resolve(arguments);
             })
             .fail(function() {
-                if (times <= 0) {
+                if (times <= 1) {
                     deferred.reject(arguments);
                 } else {
                     // Try again
-                    return $.retryPromise(internalPromise, times-1);
-                    //deferred.then(function() {
-                    //    return $.retryPromise(internalPromise, times-1);
-                    //});
-                    //setTimeout(
-                    //    function() {
-                    //        deferred.then(function() {
-                    //            return $.retryPromise(internalPromise, times-1);
-                    //        });
-                    //    },
-                    //    1000
-                    //);
+                    return $.retryPromise(internalPromise, times-1)
+                        .fail(function() {
+                            deferred.reject(arguments);
+                        });
                 }
             });
 
