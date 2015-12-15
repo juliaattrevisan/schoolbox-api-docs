@@ -39,7 +39,10 @@
                     {name: 'others', groups: ['others']},
                     '/',
                     {name: 'clipboard', groups: ['clipboard', 'undo']},
-                    {name: 'about', groups: ['about']}
+
+                    /* Custom schoolbox-specific plugin stuff can go here
+                     */
+                    {name: 'schoolbox', groups: []}
                 ],
 
                 toolbarCanCollapse: true,

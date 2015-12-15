@@ -13,6 +13,31 @@
         $.fn.alaressTiny({
             targetElements: $('textarea[name=green]')
         });
+
+        /* Spawn a pseudo plugin
+         * http://stackoverflow.com/questions/1957156/how-to-add-a-custom-button-to-the-toolbar-that-calls-a-javascript-function
+         * http://docs.ckeditor.com/#!/api/CKEDITOR.ui-method-addButton
+         */
+        $.fn.alaressTiny({
+            targetElements: $('#mort'),
+            start: function(element) {
+
+                /* Add special unique buttons
+                 */
+                CKEDITOR.instances['mort'].addCommand("exampleCommand", { // create named command
+                    exec: function(editorInstance) {
+                        alert(editorInstance.getData());
+                    }
+                });
+
+                CKEDITOR.instances['mort'].ui.addButton('SomeGenericIdentifier', { // add new button and bind our command
+                    label: "Example Label",
+                    command: 'exampleCommand',
+                    toolbar: 'schoolbox',
+                    icon: 'https://avatars1.githubusercontent.com/u/1073167?v=3&amp;s=460'
+                });
+            }
+        });
     });
 </script>
 
@@ -21,7 +46,32 @@
     <li><a href="/pantry">Pantry</a></li>
     <li class="active"><a href="/pantry/editor">Editor</a></li>
 </ul>
+
 <div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">"Plugins"</h2>
+    </div>
+    <div class="small-12 island">
+        <form action="/test.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            <textarea id='mort' name='mort' rows="10"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Generic Usage</h2>
+    </div>
     <div class="small-12 island">
         <form action="/test.php" method="post">
             <section>
