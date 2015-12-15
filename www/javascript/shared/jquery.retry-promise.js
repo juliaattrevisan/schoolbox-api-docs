@@ -50,6 +50,9 @@
                             )
                         );
                         return _retryPromise(internalPromise, settings, attempts+1, jitter)
+                            .done(function() {
+                                deferred.resolve(arguments);
+                            })
                             .fail(function() {
                                 deferred.reject(arguments);
                             });
