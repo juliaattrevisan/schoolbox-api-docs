@@ -66,6 +66,11 @@
                  */
                 targetElements: $('textarea'),
 
+                /* A callback to execute prior to the ritual spawning of all ck
+                 */
+                load: function() {
+                },
+
                 /* A callback to fire prior to ck spawn
                  */
                 setup: function(element) {
@@ -174,6 +179,8 @@
 		 * Disturb the sleeping dragon
 		 */
 		function start() {
+            config.load();
+
             $.each(config.targetElements, function(index, element) {
                 var id = $(element).attr('id');
                 var name = $(element).attr('name');

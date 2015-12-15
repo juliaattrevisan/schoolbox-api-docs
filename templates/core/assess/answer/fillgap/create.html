@@ -4,24 +4,48 @@
 <script type="text/javascript">
     $(function() {
         $.fn.alaressTiny({
-            mode: 'exact',
-            elements: 'answerBox',
-            theme_advanced_buttons1: "addSpans,removeformat",
+            targetElements: $('#answerBox'),
             file_browser_category_id: '{ASSESS_CATEGORY_ID}',
+
+            /* TODO: Remove this junk
+             */
+            theme_advanced_buttons1: "addSpans,removeformat",
             removeformat_selector: 'b,strong,em,i,span,ins',
-            width: "100%",
             disable_toolbars: [2, 3, 4],
-            setup: function(ed) {
-                ed.addButton('addSpans', {
-                    title : 'wraps selected text with custom tag',
-                    image : '/javascript/tiny_mce/themes/advanced/img/icons.gif',
-                    class : 'make-blank',
-                    onclick : (function() {
-                        var sel = ed.selection.getContent();
-                        if (sel !== '') {
-                            ed.selection.setContent('<span class="selected-word">' + sel + '</span>');
-                        }
-                    })
+
+            allowedContent: {
+                span: {
+                    classes: 'selected-word'
+                }
+            },
+
+            /* Words to "make blank" in fillgap
+             */
+            load: function() {
+                CKEDITOR.addCss('span.selected-word { background: #CAE9B9; }');
+            },
+
+            start: function(element) {
+                var instance = CKEDITOR.instances['answerBox'];
+
+                /* Add special unique buttons
+                 */
+                instance.addCommand("makeBlank", {
+                    exec: function(editorInstance) {
+                        var selectedContent = editorInstance.getSelection().getSelectedText();
+                        var updatedContent = '<span class="selected-word">' + selectedContent + '</span>'
+
+                        /* Replace selected content in editor
+                         */
+                        editorInstance.insertHtml(updatedContent, 'unfiltered_html');
+                    }
+                });
+
+                instance.ui.addButton('MakeBlank', { // add new button and bind our command
+                    label: "Make Blank",
+                    command: 'makeBlank',
+                    toolbar: 'schoolbox',
+                    icon: 'https://avatars1.githubusercontent.com/u/1073167?v=3&amp;s=460'
                 });
             }
         });
