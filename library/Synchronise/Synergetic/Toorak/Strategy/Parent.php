@@ -42,7 +42,7 @@ class Synchronise_Synergetic_Toorak_Strategy_Parent extends Synchronise_Synerget
         $newUser['firstname'] = $currentUser['StudentContactPreferred'];
         $newUser['lastname'] = $currentUser['StudentContactSurname'];
         $newUser['alt_email'] = $currentUser['StudentContactDefaultEmail'];
-        $newUser['password'] = $currentUser['StudentContactSpouseID'] + self::PASSWORD_KEY;
+        $newUser['password'] = $currentUser['StudentContactID'] + self::PASSWORD_KEY;
 
         // get campuses of attached children
         $newUser['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
