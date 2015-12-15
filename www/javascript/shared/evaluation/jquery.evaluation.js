@@ -47,7 +47,7 @@
 		// Don't need to wait 2500ms now that AJAX calls are asynchronous
 
 		var questions = $('[data-question]');
-		$.retryPromise(saveForms)
+		saveForms()
 			.fail(function() {
 				// Did any request fail? Try it again?
 				console.log(arguments);
@@ -135,7 +135,11 @@
 			questions.each(function(index, element) {
 				var id = $(element).data('question');
 				var pluginName = $(element).data('plugin');
-				ajaxes.push($.fn[pluginName].saveOne($('#questionForm-'+id)));
+				ajaxes.push(
+					$.retryPromise(function() {
+						return $.fn[pluginName].saveOne($('#questionForm-'+id))
+					})
+				);
 			});
 			return $.when.apply(null, ajaxes);
 		}
