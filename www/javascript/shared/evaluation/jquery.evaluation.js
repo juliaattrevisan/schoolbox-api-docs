@@ -47,7 +47,7 @@
 		// Don't need to wait 2500ms now that AJAX calls are asynchronous
 
 		var questions = $('[data-question]');
-		$.retryPromise(saveForms, 3)
+		$.retryPromise(saveForms)
 			.fail(function() {
 				// Did any request fail? Try it again?
 				console.log(arguments);
