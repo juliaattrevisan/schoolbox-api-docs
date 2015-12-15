@@ -120,21 +120,23 @@
 							}
 						}
 					});
+					/* Remove loading gif; show success label
+					 */
+					var saving = $('#evaluation-saving');
+					saving.removeClass('loader')
+						.find('[data-evaluation-progress-saved]').removeClass('hide');
+
+					/* Detect errors, prevent redirection if any were made
+					 * and hide that Saving box
+					 */
+					if (!errors) {
+						location.href = href;
+					}
+					else {
+						saving.addClass('loader hide')
+							.find('[data-evaluation-progress-saved]').addClass('hide');
+					}
 				});
-
-            /* Remove loading gif; show success label
-             */
-            $('#evaluation-saving').removeClass('loader').find('[data-evaluation-progress-saved]').removeClass('hide');
-
-			/* Detect errors, prevent redirection if any were made
-			 * and hide that Saving box
-			 */
-			if (!errors) {
-				location.href = href;
-			}
-			else {
-				$('#evaluation-saving').addClass('loader hide').find('[data-evaluation-progress-saved]').addClass('hide');
-			}
 		}
 	}
 
