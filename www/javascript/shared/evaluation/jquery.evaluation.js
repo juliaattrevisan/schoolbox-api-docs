@@ -44,12 +44,8 @@
 	$.fn.evaluation.saveAll = function(href) {
 		init();
 
-		/* Allow display of saving indicator before locking browser up
-		 * by using a delayed response
-		 *
-		 * http://stackoverflow.com/questions/4971062/jquery-ajax-synchronous-call-beforesend
-		 */
-		setTimeout(saveForms, 2500);
+		// Don't need to wait 2500ms now that AJAX calls are asynchronous
+		saveForms();
 
 		/**
 		 * Init - show loading div
