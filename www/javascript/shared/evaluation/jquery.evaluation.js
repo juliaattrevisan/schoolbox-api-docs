@@ -62,62 +62,65 @@
 		 * Save each question form
 		 */
 		function saveForms() {
-			var errors = false;
-
-			// Each saveOne() call returns a promise to run the next one
-			$('[data-question]').each(function(index, element) {
+			// Run all AJAX calls asynchronously now, and wait for them all to finish before continuing.
+			var errors    = false;
+			var ajaxes    = [];
+			var questions = $('[data-question]');
+			questions.each(function(index, element) {
 				var id = $(element).data('question');
-
 				var pluginName = $(element).data('plugin');
-
-				/* Run saveOne() multiple times (once for each question)
-				 */
-				$.fn[pluginName].saveOne($('#questionForm-'+id));
-
-				/* Extract validation ruleset for this particular question type
-				 */
-				var configuration = $.fn[pluginName].getValidationRules();
-
-				/* If configuration exists for this question type, apply settings
-				 * otherwise ignore it
-				 */
-				if (configuration != undefined) {
-
-					/* If the question is mandatory, apply validation requirements
-					 */
-					if ($(element).find('span[data-mandatory="required"]').length) {
-
-						/* If a custom error location is desired
-						 */
-						if (configuration.errorContainer != undefined) {
-							$(element).alaressValidate({
-								onfocusout: false,
-								errorPlacement: function(error, inputElement) {
-									$(element).find(configuration.errorContainer).html(error);
-								},
-								ignore: ':hidden:not(:checkbox):not(:radio)'
-							});
-						}
-						else {
-							$(element).alaressValidate({
-								onfocusout: false,
-								ignore: ':hidden:not(:checkbox):not(:radio)'
-							});
-						}
-
-						/* Apply custom rules if validation is required, in accordance with
-						 * http://jquery.bassistance.de/validate/demo/
-						 */
-						$(element).find(configuration.element).rules('add', configuration.rules);
-
-						/* If any aren't valid, mark as bad
-						 */
-						if (!$(element).valid()) {
-							errors = true;
-						}
-					}
-				}
+				ajaxes.push($.fn[pluginName].saveOne($('#questionForm-'+id)));
 			});
+			$.when.apply(null, ajaxes)
+				.always(function() {
+					questions.each(function(index, element) {
+						var pluginName = $(element).data('plugin');
+
+						/* Extract validation ruleset for this particular question type
+						 */
+						var configuration = $.fn[pluginName].getValidationRules();
+
+						/* If configuration exists for this question type, apply settings
+						 * otherwise ignore it
+						 */
+						if (configuration != undefined) {
+
+							/* If the question is mandatory, apply validation requirements
+							 */
+							if ($(element).find('span[data-mandatory="required"]').length) {
+
+								/* If a custom error location is desired
+								 */
+								if (configuration.errorContainer != undefined) {
+									$(element).alaressValidate({
+										onfocusout: false,
+										errorPlacement: function(error, inputElement) {
+											$(element).find(configuration.errorContainer).html(error);
+										},
+										ignore: ':hidden:not(:checkbox):not(:radio)'
+									});
+								}
+								else {
+									$(element).alaressValidate({
+										onfocusout: false,
+										ignore: ':hidden:not(:checkbox):not(:radio)'
+									});
+								}
+
+								/* Apply custom rules if validation is required, in accordance with
+								 * http://jquery.bassistance.de/validate/demo/
+								 */
+								$(element).find(configuration.element).rules('add', configuration.rules);
+
+								/* If any aren't valid, mark as bad
+								 */
+								if (!$(element).valid()) {
+									errors = true;
+								}
+							}
+						}
+					});
+				});
 
             /* Remove loading gif; show success label
              */
