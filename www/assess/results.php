@@ -17,14 +17,15 @@
  * process students in the class, and then later used to deal with remainder
  * attempts in a separate iteration.
  *
- * @param  $assessHandler
- * @param  $attemptHandler
- * @param  $responseHandler
- * @param  $sectionHandler
- * @param  $currentAttempt
- * @param  $page
- * @param  $currentStudent
- * @param $previousAttempt
+ * @param Assess_Main     $assessHandler
+ * @param Assess_Attempt  $attemptHandler
+ * @param Assess_Response $responseHandler
+ * @param Assess_Section  $sectionHandler
+ * @param array           $currentAttempt
+ * @param SitePage        $page
+ * @param array           $currentStudent
+ * @param array           $previousAttempt
+ * @param bool            $readonly
  *
  * @return void
  */
@@ -106,6 +107,8 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         $finish = $responseHandler->getLastSave($currentAttempt['attempt_id']);
 
         if (empty($finish)) {
+            // Has the end time of the quiz passed? If so, say they finished at that time.
+
             $page->setVar(array(
                 'ATTEMPT_FINISH' => 'Incomplete',
                 'submitted_block' => '',
