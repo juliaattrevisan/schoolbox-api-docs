@@ -16,9 +16,6 @@ $options = getopt("v", array('perform-update'));
 $xmlImport    = Config::get('external_sync_asctimetables_xml');
 $enrolmentCsv = Config::get('external_sync_enrolment_csv');
 
-$xmlImport    = SITE_root.'/tools/synchronise/import/ascTimetables.xml';
-$enrolmentCsv = SITE_root.'/tools/synchronise/import/enrolment.csv';
-
 /**
  * Gets an command for sync $type
  *
