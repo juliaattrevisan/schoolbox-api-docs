@@ -65,6 +65,7 @@ echo <<<OUTPUT
 |
 | Starting timetable structure import
 |
+
 OUTPUT;
 passthru($extractCommand('structure', $xmlImport).' | '.$importCommand('structure'), $returnCode);
 if ($returnCode > 0) {
@@ -76,6 +77,7 @@ echo <<<OUTPUT
 |
 | Timetable structure import done - starting timetable import
 |
+
 OUTPUT;
 passthru($extractCommand('timetable', $xmlImport).' | '.$importCommand('timetable'), $returnCode);
 if ($returnCode > 0) {
@@ -87,6 +89,7 @@ echo <<<OUTPUT
 |
 | Timetable import done - starting enrolment import
 |
+
 OUTPUT;
 passthru($importCommand('enrolment').' < '.escapeshellarg($enrolmentCsv), $returnCode);
 if ($returnCode > 0) {
@@ -97,4 +100,5 @@ echo <<<OUTPUT
 |
 | Import complete!
 |
+
 OUTPUT;
