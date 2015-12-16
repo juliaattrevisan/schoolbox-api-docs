@@ -561,7 +561,7 @@
 
                             /* Replace selected content in editor
                              */
-                            editorInstance.insertHtml(updatedContent, 'unfiltered_html');
+                            editorInstance.insertHtml(updatedContent, 'html');
                         }
                     });
 
