@@ -14,6 +14,7 @@
     var isFolder = function(jstree, nodeId) {
         switch (jstree.get_type(nodeId)) {
             case 'folder':
+            case 'home':
             case 'homepage':
             case 'course':
                 return true;
@@ -168,6 +169,9 @@
                     },
                     folder: {
                         icon: 'icon-folder'
+                    },
+                    home: {
+                        icon: 'icon-home'
                     },
                     homepage: {
                         icon: 'icon-home'

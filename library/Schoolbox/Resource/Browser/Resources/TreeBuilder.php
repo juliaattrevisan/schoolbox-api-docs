@@ -64,7 +64,7 @@ class TreeBuilder extends AbstractTreeBuilder
      * @param IFolder|Folder\Model $folder
      * @return string
      */
-    protected function getFolderType(IFolder $folder)
+    public function getFolderIcon(IFolder $folder)
     {
         // Type: homepage or folder
         // Could be a course as well, if any child has tasks.
@@ -75,7 +75,7 @@ class TreeBuilder extends AbstractTreeBuilder
         if ($this->taskMapper->countByColumn('category_id', $childIds)) {
             $type = 'course';
         } else {
-            $type = $folder->hasHomepage() ? 'homepage' : 'folder';
+            $type = $folder->hasHomepage() ? 'home' : 'folder';
         }
 
         return  $type;

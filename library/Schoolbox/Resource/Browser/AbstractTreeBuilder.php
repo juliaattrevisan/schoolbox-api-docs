@@ -176,7 +176,7 @@ abstract class AbstractTreeBuilder
         }
 
         // this seems so trivial, but it's so these can be overridden
-        $type = $this->getFolderType($folder);
+        $type = $this->getFolderIcon($folder);
         $name = $this->getFolderName($folder);
         $href = $this->getFolderHref($folder);
 
@@ -307,7 +307,7 @@ abstract class AbstractTreeBuilder
      * @param IFolder $folder
      * @return string
      */
-    protected function getFolderType(IFolder $folder)
+    public function getFolderIcon(IFolder $folder)
     {
         return 'folder';
     }
