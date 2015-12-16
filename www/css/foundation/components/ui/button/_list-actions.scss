@@ -18,10 +18,11 @@
 				display: inline-block;
 				margin: 0;
 				padding: 0;
-				position: absolute;
+				//position: absolute;
 				top: 0;
 				height: $button-size;
 				white-space: nowrap;
+				float: right;
 
 				@media #{$small-only} {
 					right: 0;
