@@ -66,4 +66,4 @@ $importCommand = function ($type) use ($getCommand) {
 $output = [];
 passthru($extractCommand('structure', $xmlImport).' | '.$importCommand('structure'), $returnCode);
 passthru($extractCommand('timetable', $xmlImport).' | '.$importCommand('timetable'), $returnCode);
-passthru('cat '.escapeshellarg($enrolmentCsv).' | '.$importCommand('enrolment'), $returnCode);
+passthru($importCommand('enrolment').' < '.escapeshellarg($enrolmentCsv), $returnCode);
