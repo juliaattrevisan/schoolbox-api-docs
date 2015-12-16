@@ -63,7 +63,6 @@ $importCommand = function ($type) use ($getCommand) {
     return $getCommand($type, '/tools/synchronise/import/csv.php');
 };
 
-$output = [];
 passthru($extractCommand('structure', $xmlImport).' | '.$importCommand('structure'), $returnCode);
 passthru($extractCommand('timetable', $xmlImport).' | '.$importCommand('timetable'), $returnCode);
 passthru($importCommand('enrolment').' < '.escapeshellarg($enrolmentCsv), $returnCode);
