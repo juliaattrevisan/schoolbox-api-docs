@@ -512,11 +512,11 @@
 
                 /* CSS for indicating which data to "make blank"
                  */
-                css: 'span.selected-word { background: #CAE9B9; }',
+                css: 'span.selected-word { background: #cae9b9; }',
 
                 /* Icon for the Make Blank Button
                  */
-                icon: 'https://avatars1.githubusercontent.com/u/1073167?v=3&amp;s=460'
+                icon: '/images/core/assess/fillgap.png'
             }
 
             var merged = $.extend(defaults, derived, options);
