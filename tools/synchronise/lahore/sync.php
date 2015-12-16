@@ -64,6 +64,6 @@ $importCommand = function ($type) use ($getCommand) {
 };
 
 $output = [];
-exec($extractCommand('structure', $xmlImport).' | '.$importCommand('structure'), $output, $returnCode);
-exec($extractCommand('timetable', $xmlImport).' | '.$importCommand('timetable'), $output, $returnCode);
-exec('cat '.escapeshellarg($enrolmentCsv).' | '.$importCommand('enrolment'), $output, $returnCode);
+passthru($extractCommand('structure', $xmlImport).' | '.$importCommand('structure'), $returnCode);
+passthru($extractCommand('timetable', $xmlImport).' | '.$importCommand('timetable'), $returnCode);
+passthru('cat '.escapeshellarg($enrolmentCsv).' | '.$importCommand('enrolment'), $returnCode);
