@@ -63,6 +63,41 @@ $importCommand = function ($type) use ($getCommand) {
     return $getCommand($type, '/tools/synchronise/import/csv.php');
 };
 
+// Actually run the exports
+echo <<<OUTPUT
+|
+| Starting timetable structure import
+|
+OUTPUT;
 passthru($extractCommand('structure', $xmlImport).' | '.$importCommand('structure'), $returnCode);
+if ($returnCode > 0) {
+    echo "Something went wrong in timetable structure import - exiting\n";
+    exit($returnCode);
+}
+
+echo <<<OUTPUT
+|
+| Timetable structure import done - starting timetable import
+|
+OUTPUT;
 passthru($extractCommand('timetable', $xmlImport).' | '.$importCommand('timetable'), $returnCode);
+if ($returnCode > 0) {
+    echo "Something went wrong in timetable import - exiting\n";
+    exit($returnCode);
+}
+
+echo <<<OUTPUT
+|
+| Timetable import done - starting enrolment import
+|
+OUTPUT;
 passthru($importCommand('enrolment').' < '.escapeshellarg($enrolmentCsv), $returnCode);
+if ($returnCode > 0) {
+    echo "Something went wrong in enrolment import - exiting\n";
+    exit($returnCode);
+}
+echo <<<OUTPUT
+|
+| Import complete!
+|
+OUTPUT;
