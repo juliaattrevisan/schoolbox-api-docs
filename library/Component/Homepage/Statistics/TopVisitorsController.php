@@ -15,14 +15,11 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
     {
         $visitors = array();
 
-        $dateFilter = '';
-        if (count($this->dateRange)) {
-            $dateFilter = sprintf(
-                "AND datetime BETWEEN '%s 00:00:00' AND '%s 23:59:59'",
-                date('Y-m-d', $this->dateRange[0]),
-                date('Y-m-d', $this->dateRange[1])
-            );
-        }
+        $dateFilter = sprintf(
+            "AND datetime BETWEEN '%s' AND '%s'",
+            $this->startDate->getDatabase(),
+            $this->endDate->getDatabase()
+        );
 
         $groupFilter = '';
         if ($this->groupType != 'all') {

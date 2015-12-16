@@ -8,8 +8,16 @@
  */
 abstract class Component_Homepage_Statistics_ControllerAbstract extends Component_ControllerAbstract
 {
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $startDate;
 
-    protected $dateRange = array();
+    /**
+     * @var Alaress_Date_Format
+     */
+    protected $endDate;
+
     protected $groupType;
     private $validGroups = array('student','parent','staff','guest');
 
@@ -31,35 +39,30 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
 
         $args = $this->sitepage->arg;
 
+        // $args[1]: start month
+        $this->startDate = Alaress_Date_Format::now();
         if (isset($args[1])) {
-            $start = explode('-', $args[1]);
-
-            // from 1 to 2
-            if (isset($args[2])) {
-                $end = explode('-', $args[2]);
-            } // just 1
-            else {
-                $end = explode('-', $args[1]);
+            try {
+                $this->startDate = new Alaress_Date_Format($args[1], 'Y-m');
+            } catch (InvalidArgumentException $e) {
+                // noop
             }
-
-            ++$end[1];
-            if ($end[1] > 12) {
-                ++$end[0];
-                $end[1] -= 12;
-            }
-
-            $this->dateRange = array(
-                strtotime(implode('-', $start).'-01'),
-                strtotime(implode('-', $end).'-01') - (24 * 3600)
-            );
-
-            $args[3] = strtolower($args[3]);
-            $this->groupType = isset($args[3]) && in_array($args[3], $this->validGroups) ? $args[3] : 'all';
-
-        } // show default (all time?)
-        else {
-            $this->groupType = 'all';
         }
+        $this->startDate = $this->startDate->startOfMonth();
+
+        // $args[2]: end month
+        $this->endDate = clone($this->startDate);
+        if (isset($args[2])) {
+            try {
+                $this->endDate = new Alaress_Date_Format($args[2], 'Y-m');
+            } catch (InvalidArgumentException $e) {
+                // noop
+            }
+        }
+        $this->endDate = $this->endDate->endOfMonth();
+
+        // args[3]: group type, default all
+        $this->groupType = isset($args[3]) && in_array($args[3], $this->validGroups) ? $args[3] : 'all';
 
         $this->sitepage->setVar(array(
             'ID'    => $contextId,

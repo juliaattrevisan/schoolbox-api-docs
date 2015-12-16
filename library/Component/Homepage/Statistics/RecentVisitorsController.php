@@ -12,13 +12,11 @@ class Component_Homepage_Statistics_RecentVisitorsController extends Component_H
 
     public function execute()
     {
-        $dateFilter = '';
-        if (count($this->dateRange)) {
-            $dateFilter = sprintf(
-                "AND datetime BETWEEN '%s' AND '%s'", date('Y-m-d', $this->dateRange[0]),
-                date('Y-m-d', $this->dateRange[1])
-            );
-        }
+        $dateFilter = sprintf(
+            "AND datetime BETWEEN '%s' AND '%s'",
+            $this->startDate->getDatabase(),
+            $this->endDate->getDatabase()
+        );
 
         $groupFilter = '';
         if ($this->groupType != 'all') {

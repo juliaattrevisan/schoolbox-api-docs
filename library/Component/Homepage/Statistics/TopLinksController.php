@@ -15,14 +15,11 @@ class Component_Homepage_Statistics_TopLinksController extends Component_Homepag
     public function execute()
     {
 
-        $dateFilter = '';
-        if (count($this->dateRange)) {
-            $dateFilter = sprintf(
-                "AND time BETWEEN '%s 00:00:00' AND '%s 23:59:59'",
-                date('Y-m-d', $this->dateRange[0]),
-                date('Y-m-d', $this->dateRange[1])
-            );
-        }
+        $dateFilter = sprintf(
+            "AND time BETWEEN '%s' AND '%s'",
+            $this->startDate->getDatabase(),
+            $this->endDate->getDatabase()
+        );
 
         $stmt = Database::getInstance()->prepare(
             "

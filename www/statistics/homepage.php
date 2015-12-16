@@ -40,11 +40,6 @@ if (!is_numeric($folder->getId())) {
     }
 }
 
-// hack away at the args provided
-if (!(isset($this->arg[1]) && preg_match('#[0-9]+-[0-9]+#', $this->arg[1]))) {
-    $this->arg[1] = date('Y-m');
-}
-
 $homepageHandler = new Homepage($folder->getId());
 
 $g = new Group();
