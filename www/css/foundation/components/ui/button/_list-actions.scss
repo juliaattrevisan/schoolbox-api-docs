@@ -5,7 +5,7 @@
 @mixin action-html-classes($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
 	@for $i from 1 through $total-columns {
 		.actions-#{$size}-#{$i} {
-			position: relative;
+			//position: relative;
 			min-width: $button-size * $i;
 			min-height: $button-size;
 
