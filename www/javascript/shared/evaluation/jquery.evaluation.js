@@ -45,12 +45,13 @@
 		init();
 
 		// Don't need to wait 2500ms now that AJAX calls are asynchronous
-
+		var saving    = $('#evaluation-saving');
+		var label     = saving.find('[data-evaluation-progress-saved]');
 		var questions = $('[data-question]');
-		saveForms()
+		saveForms(questions)
 			.fail(function() {
-				// Did any request fail? Try it again?
-				console.log(arguments);
+				saving.removeClass('loader');
+				label.labelActivate({text: 'Progress Save Failed!', css: 'alert'});
 			})
 			.done(function() {
 				var errors = false;
@@ -103,9 +104,9 @@
 				});
 				/* Remove loading gif; show success label
 				 */
-				var saving = $('#evaluation-saving');
-				saving.removeClass('loader')
-					.find('[data-evaluation-progress-saved]').removeClass('hide');
+				saving.removeClass('loader');
+				label.removeClass('hide').labelTimeout({text: 'Progress Saved'});
+					//.find('[data-evaluation-progress-saved]').removeClass('hide');
 
 				/* Detect errors, prevent redirection if any were made
 				 * and hide that Saving box
@@ -114,8 +115,7 @@
 					location.href = href;
 				}
 				else {
-					saving.addClass('loader hide')
-						.find('[data-evaluation-progress-saved]').addClass('hide');
+					saving.addClass('loader hide');
 				}
 			});
 
@@ -129,7 +129,7 @@
 		/**
 		 * Save each question form
 		 */
-		function saveForms() {
+		function saveForms(questions) {
 			// Run all AJAX calls asynchronously now, and wait for them all to finish before continuing.
 			var ajaxes = [];
 			questions.each(function(index, element) {
