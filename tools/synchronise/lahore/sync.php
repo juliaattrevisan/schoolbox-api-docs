@@ -50,7 +50,7 @@ $getCommand = function ($type, $script, $infile = null) use ($options) {
  * @return string
  */
 $extractCommand = function ($type, $infile) use ($getCommand) {
-    return $getCommand($type, '/tools/synchronise/extract.php', $infile);
+    return $getCommand($type, '/tools/synchronise/extract/ascTimetables.php', $infile);
 };
 
 /**
@@ -60,7 +60,7 @@ $extractCommand = function ($type, $infile) use ($getCommand) {
  * @return string
  */
 $importCommand = function ($type) use ($getCommand) {
-    return $getCommand($type, '/tools/synchronise/import.php');
+    return $getCommand($type, '/tools/synchronise/import/csv.php');
 };
 
 $output = [];
