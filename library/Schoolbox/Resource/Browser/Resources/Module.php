@@ -92,6 +92,8 @@ class Module extends AbstractModule
                 return $injector->get('l10n')->translate('resource', true, true);
             }
         );
+
+        $injector->setters[$this->getControllerClass()]['setTab'] = 'resources';
     }
 
 } 
