@@ -13,7 +13,17 @@
 <tr data-group="{{ groupId }}" data-groupname="{{ groupName }}" class="rb-group-header">
     {# no criteria specified, meaning this was an empty group (and the above iteration didn't run) #}
     <th rowspan="2">
-        <label{% if not group.name %} class="meta"{% endif %}>{{ groupName }}</label>
+        {% if group.name %}
+            <label>
+                {%- if group.used -%}
+                    {{ groupName | raw }}
+                {% else %}
+                    <input type="text" value="{{ groupName }}" />
+                {% endif %}
+            </label>
+        {% else %}
+            <label class="meta">{{ groupName | raw }}</label>
+        {% endif %}
     </th>
 </tr>
 {% endif %}

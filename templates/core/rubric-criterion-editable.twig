@@ -4,7 +4,14 @@
 
 <th>
     <input  id="{{ checkName }}" data-criterion-name="{{ crit.name }}" name="{{ checkName }}" type="checkbox" value="{{ crit.id }}" {% if checkChecked %}checked="checked"{% endif %} />
-    <label for="{{ checkName }}" class="checkbox-label">{{ crit.name | raw }}</label>
+    <label for="{{ checkName }}" class="checkbox-label rb-criterion">
+        {%- if crit.used -%}
+        {{ crit.name | raw }}
+        {%- else -%}
+            <input type="text" value="{{ crit.name }}" />
+        {%- endif -%}
+    </label>
+
 </th>
 
 {% for levelIndex, level in rubric.levels -%}

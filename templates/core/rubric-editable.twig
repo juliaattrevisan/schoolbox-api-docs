@@ -133,6 +133,18 @@
         border-top: solid 4px #ededed;
     }
 
+    .rb-criterion {
+        margin-bottom: 0;
+    }
+
+    .rb-criterion:before {
+        top: 13px !important;
+    }
+
+    .rb-criterion:after {
+        top: 15px !important;
+    }
+
     @media only screen and (min-width: 64.0125em) {
         .rb textarea {
             min-height: 4rem;
@@ -380,7 +392,7 @@
                 $textarea = $cell.find('textarea');
 
             $check.prop('checked', true).trigger('change');
-            $textarea.focus();
+            $textarea.focus().trigger('focus');
         });
 
         $rb.on('change', 'th [data-level]', function () {
@@ -406,6 +418,7 @@
 
         // TODO do this via twig
         $rb.find('input[data-level]').trigger('change');
+        $rb.find('textarea').trigger('keyup');
 
     });
 </script>

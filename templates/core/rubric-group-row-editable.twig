@@ -1,12 +1,22 @@
 {# ensure these are set #}
 {%- set rubricId  = rubricId ?: 'rb-' ~ rubric.id -%}
 {%- set groupId   = groupId ?: rubricId ~ '-' ~ group.id -%}
-{%- set groupName = groupName ? group.name ? group.name|raw : '(no ' ~ locale.rubricGroup ~ ')' -%}
+{%- set groupName = groupName ? group.name ? group.name : '(no ' ~ locale.rubricGroup ~ ')' -%}
 
 {%- if rowspan is not null -%}
 <tr data-group="{{ groupId }}" data-groupname="{{ group.name }}" class="rb-group-header">
     <th rowspan="{{ rowspan ? rowspan : 2 }}">
-        <label{% if not group.name %} class="meta"{% endif %}>{{ groupName }}</label>
+        {% if group.name %}
+            <label>
+                {%- if group.used -%}
+                    {{ groupName | raw }}
+                {% else %}
+                    <input type="text" value="{{ groupName }}" />
+                {% endif %}
+            </label>
+        {% else %}
+            <label class="meta">{{ groupName | raw }}</label>
+        {% endif %}
     </th>
 </tr>
 {%- endif %}
