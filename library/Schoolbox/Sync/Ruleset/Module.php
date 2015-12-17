@@ -18,6 +18,7 @@ use Aura\Di;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Twig_Loader_Chain;
@@ -94,7 +95,10 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            $injector->lazyNew(
+                Controller::class,
+                ['mimetypeMapper' => $injector->lazyNew(MimetypeMapper::class),]
+            )
         );
     }
 }
