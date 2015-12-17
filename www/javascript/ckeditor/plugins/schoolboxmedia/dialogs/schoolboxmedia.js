@@ -35,34 +35,27 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                     message = event.originalEvent.data;
                                 }
 
-                                /* Asynchronously find out more information
-                                 * Inject appropriate url into dialog
-                                 */
-                                var textInput = self.getDialog().getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url');
-
-                                /* The url from which to request more info
-                                 */
-                                var url = '/editor/nodeInfo.php';
 
                                 /* Find out how to render this file
                                  */
-                                $.getJSON(url, { hash: message.data[0].hash }, function(responseText) {
-                                    console.log(responseText);
+                                $.getJSON('/editor/nodeInfo.php', { hash: message.data[0].hash }, function(responseText) {
+                                    var content = '';
+
+                                    /* Inject appropriate url into dialog
+                                     */
+                                    if (responseText.type == 'image') {
+                                        var urlInput = self.getDialog().getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url');
+
+                                        content = '/storage/image.php?hash='+responseText.hash;
+
+                                        urlInput.setValue(content);
+                                    }
+
+                                    /* Shut modal, go back to Dialog
+                                     */
+                                    $('[data-schoolboxmedia-reveal]').foundation('reveal', 'close');
                                 });
-
-//                                var response = $.parseJSON(responseText);
-//
-//
-//
-//
-//                                content = '/storage/image.php?hash='+response.hash;
-//
-//                                textInput.setValue(content);
-//                            });
-
-
                             });
-
                         }
                     },
                     {
