@@ -40,6 +40,7 @@ if (!empty($_POST)) {
             'name' => $_POST['name'],
             'id'   => rand(1, PHP_INT_MAX),
             'descriptors' => [],
+            'used' => false,
         ];
 
         die($twig->render('rubric-group-row-editable.twig', $context));
@@ -51,6 +52,7 @@ if (!empty($_POST)) {
         $context['group'] = [
             'id'   => rand(1, PHP_INT_MAX),
             'name' => $_POST['name'],
+            'used' => false,
         ];
 
         die($twig->render('rubric-group-editable.twig', $context));
