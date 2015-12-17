@@ -51,6 +51,8 @@ class Module extends AbstractModule
                 return $injector->get('session')->getAuthUser();
             }
         );
+
+        $injector->setters[$this->getControllerClass()]['setTab'] = 'myfiles';
     }
 
 

@@ -42,6 +42,9 @@ class ThemedHtml extends Html {
                 $page->error(null, 'Template not found', $code ?: 500);
             }
         } else {
+            if ($response['tab']) {
+                $page->setTab($response['tab']);
+            }
             $page->setFile(TEMPLATE_content, 'output.html');
             $page->buildPage();
             $page->setVar('OUTPUT', $this->getTemplateEngine()->render($template, $data));

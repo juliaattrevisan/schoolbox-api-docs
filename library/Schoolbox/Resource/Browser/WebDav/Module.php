@@ -49,7 +49,7 @@ class Module extends AbstractModule
      */
     protected function initSetters(Container $injector)
     {
-        // noop
+        $injector->setters[$this->getControllerClass()]['setTab'] = 'network';
     }
 
 

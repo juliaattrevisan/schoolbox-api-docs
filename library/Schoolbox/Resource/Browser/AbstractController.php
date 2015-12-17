@@ -47,6 +47,12 @@ abstract class AbstractController extends BaseController
     /** @var string */
     protected $nodeType;
 
+    /**
+     * Which tab gets highlighted?
+     *
+     * @var string
+     */
+    protected $tab = 'resources';
 
     /**
      * @param UserMapper $userMapper
@@ -223,6 +229,7 @@ abstract class AbstractController extends BaseController
         $this->getResponse()->content->set([
             'template' => '@resourceBrowser/browse.twig',
             'data'     => $data,
+            'tab'      => $this->tab,
         ]);
     }
 
@@ -390,4 +397,13 @@ abstract class AbstractController extends BaseController
      */
     protected abstract function getAccess(array $folderIds);
 
+    /**
+     * @param  string $tab
+     * @return $this
+     */
+    public function setTab($tab)
+    {
+        $this->tab = $tab;
+        return $this;
+    }
 }
