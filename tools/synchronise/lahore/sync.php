@@ -64,6 +64,7 @@ $importCommand = function ($type) use ($getCommand) {
 echo <<<OUTPUT
 |
 | Starting timetable structure import
+| Reading from $xmlImport
 |
 
 OUTPUT;
@@ -76,6 +77,7 @@ if ($returnCode > 0) {
 echo <<<OUTPUT
 |
 | Timetable structure import done - starting timetable import
+| Reading from $xmlImport
 |
 
 OUTPUT;
@@ -88,6 +90,7 @@ if ($returnCode > 0) {
 echo <<<OUTPUT
 |
 | Timetable import done - starting enrolment import
+| Reading from $enrolmentCsv
 |
 
 OUTPUT;
