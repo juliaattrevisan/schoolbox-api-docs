@@ -109,11 +109,11 @@ EOL;
 		}
         catch(\Schoolbox\External\Exception $e) {
             $this->logger()->emergency($e->getMessage(), array($e));
-            return;
+            throw $e;
         }
 		catch(Exception $e) {
 			$this->logger()->critical("{$this->name} daemon failed to launch: " . $e->getMessage(), array($e));
-            return;
+            throw $e;
 		}
 
 		try {
@@ -249,6 +249,7 @@ EOL;
 	 * @param Exception $e
 	 */
 	public function onException($e) {
+		$this->callExceptionCallbacks($e);
         try {
             $this->logger()->alert('FATAL ' . get_class($e) . ': ' . $e->getMessage(), array($e));
         } catch (IOException $e) {

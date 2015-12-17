@@ -1,0 +1,41 @@
+{%- for lineNumber, line in log.lines -%}
+    <li class="info card tiny" data-level="{{ line.level }}">
+        <a href="#" class="level-{{ line.level }}" data-collapser="line-{{ lineNumber }}">
+            <div class="small-8 medium-10 column">
+                <span>{{ line.message }}</span>
+            </div>
+            <div class="text-right small-4 medium-2 column">
+                <span class="meta">
+                    {{- line.datetime.date | slice(11,12) -}}
+                </span>
+            </div>
+        </a>
+        <div class="small-12 column hide" data-collapsable="line-{{ lineNumber }}" data-collapse-state="collapsed">
+            {% if line.context %}
+
+                <dl class="inline-dl">
+                    {% for key, val in line.context %}
+                        <dt class="small-4 large-3">{{ key }}</dt>
+                        <dd class="small-8 large-9">
+                            {% if val is iterable %}
+                                {% include '@upsRuleset/log/key-value-pair.twig' with { dataset: val } %}
+                            {% elseif key not in filterBlacklist %}
+                                <a href="{{ routeLookup('upsRuleset.log', { logId: id }) }}?filter={{ key }}({{ val }})" title="Filter log on {{ key }} = {{ val }}">
+                                    <pre>
+                                        {%- include '@upsRuleset/log/visible-value.twig' with { value: val } -%}
+                                    </pre>
+                                </a>
+                            {% else %}
+                                <pre>
+                                    {%- include '@upsRuleset/log/visible-value.twig' with { value: val } -%}
+                                </pre>
+                            {% endif %}
+                        </dd>
+                    {% endfor %}
+                </dl>
+            {% else %}
+                <p class="meta">No context data available</p>
+            {% endif %}
+        </div>
+    </li>
+{%- endfor -%}

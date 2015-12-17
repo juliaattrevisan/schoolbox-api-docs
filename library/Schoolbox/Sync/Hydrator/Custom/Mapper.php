@@ -7,11 +7,13 @@
 
 namespace Schoolbox\Sync\Hydrator\Custom;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Mapper for custom hydrators
  * @method Model createModel()
+ * @method Collection|Model[] findByColumnList($columnList, $options = array())
  */
 class Mapper extends BaseMapper
 {

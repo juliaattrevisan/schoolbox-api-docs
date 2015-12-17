@@ -13,6 +13,7 @@ namespace Schoolbox\Sync\Grammar;
 use Alaress\Rules\Lang\Map;
 use OutOfBoundsException;
 use OutOfRangeException;
+use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Schoolbox\Sync\Rule\Mapper as RuleMapper;
 use Schoolbox\Sync\Rule\Model as Rule;
@@ -29,17 +30,21 @@ class Factory
     /** @var RuleMapper */
     protected $ruleMapper;
 
+    /** @var array */
     protected $tokenMap = [];
 
-
+    /** @var LoggerInterface */
+    protected $log;
 
 
     /**
-     * @param UserMapper $userMapper
-     * @param RuleMapper $ruleMapper
+     * @param LoggerInterface $log
+     * @param UserMapper      $userMapper
+     * @param RuleMapper      $ruleMapper
      */
-    public function __construct(UserMapper $userMapper = null, RuleMapper $ruleMapper = null)
+    public function __construct(LoggerInterface $log, UserMapper $userMapper = null, RuleMapper $ruleMapper = null)
     {
+        $this->log        = $log;
         $this->userMapper = $userMapper ?: UserMapper::getInstance();
         $this->ruleMapper = $ruleMapper ?: RuleMapper::getInstance();
     }
@@ -89,7 +94,7 @@ class Factory
 
         $ffactory = new FieldFactory();
 
-        $set = new UserRuleset($this->userMapper, $context, $ffactory->buildMap($roletype));
+        $set = new UserRuleset($this->userMapper, $context, $ffactory->buildMap($roletype), $this->log);
 
         foreach ($ruleCollection as $rule) {
             $translatedRule = $this->translateRuleModelToAddableRule($rule);

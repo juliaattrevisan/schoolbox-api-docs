@@ -93,14 +93,14 @@ abstract class Tokenizer
     /**
      * Process a token string with the given dataset
      *
-     * @param mixed            $dataSet         This is the dataset from which values will be taken and jammed into the tokenized string.
+     * @param mixed                  $dataSet   This is the dataset from which values will be taken and jammed into the tokenized string.
      *                                          Typically an array- or object-based hierarchy.
-     * @param string|Construct $tokenString     A string or Construct that will determine how to render the output. Typically looks like "{:this}".
+     * @param string|array|Construct $token     A string or Construct that will determine how to render the output. Typically looks like "{:this}".
      * @return array|string                     The rendered string (or array thereof if the dataset returned an array for a particular token).
      */
-    public function parseToken($dataSet, $tokenString)
+    public function parseToken($dataSet, $token)
     {
-        return $this->parseTokens([], '_', $tokenString, $dataSet);
+        return $this->parseTokens([], '_', $token, $dataSet);
     }
 
 

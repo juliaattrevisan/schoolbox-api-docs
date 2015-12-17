@@ -11,8 +11,6 @@
 namespace Schoolbox\Sync\Ruleset;
 
 use Alaress\Web\Controller\Base;
-use \Schoolbox\Sync\Navigator\Navigator;
-use \Schoolbox\Sync\Navigator\Node;
 use \Schoolbox\Sync\Condition;
 use \Schoolbox\Sync\Effect;
 use \Schoolbox\Sync\Hydrator;
@@ -21,8 +19,28 @@ use Schoolbox\Sync\Provisioner\Provisioner;
 use \Schoolbox;
 use \Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
 use \Schoolbox\Sync\Rule\Mapper as RuleMapper;
+use OutOfBoundsException;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Storage;
+use Schoolbox\Sync\Log;
+use Schoolbox\Sync\Navigator\Navigator;
+use Schoolbox\Sync\Navigator\Node;
 
 class Controller extends Base {
+
+    /** @var string */
+    protected $basePath;
+
+
+    /**
+     * @return bool|string
+     */
+    function getBasePath()
+    {
+        // cache
+        return $this->basePath ?: $this->basePath = $this->getRouteIfAuthorized('upsRuleset.intro');
+    }
+
 
     /**
      * Render intro
@@ -33,15 +51,15 @@ class Controller extends Base {
          */
         $allBreadcrumbs = new Navigator(
             new Node('Home', '/adminv2/home', false),
-            new Node('User Provisioning System', '/adminv2/ups', true)
+            new Node('User Provisioning System', $this->getBasePath(), true)
         );
 
         /* Navigation
          */
         $allNavigation = new Navigator(
-            new Node('Student', '/adminv2/ups/student', false),
-            new Node('Parent', '/adminv2/ups/parent', false),
-            new Node('Staff', '/adminv2/ups/staff', false)
+            new Node('Student', "{$this->getBasePath()}/student", false),
+            new Node('Parent', "{$this->getBasePath()}/parent", false),
+            new Node('Staff', "{$this->getBasePath()}/staff", false)
         );
 
         /* Twig data
@@ -51,6 +69,7 @@ class Controller extends Base {
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation' => $allNavigation->getAllNodes(),
+                'logs'         => $this->findLogs(2)
             ]
         ]);
     }
@@ -77,6 +96,243 @@ class Controller extends Base {
             'data'     => $twigData,
         ]);
     }
+
+
+    /**
+     * Find a specific set of logs
+     *
+     * @param int   $limit   limit the number of results
+     * @param array $search  the search params to be passed into findByColumnList()
+     * @param array $order   the default order in which to return the results
+     * @return array
+     */
+    protected function findLogs($limit = 0, $search = [], $order = [ 'id' => 'desc' ])
+    {
+        $options = [ 'order' => $order ];
+
+        if ($limit) {
+            $options['limit'] = (int)max(0, $limit);
+        }
+
+        $logs = Log\Mapper::getInstance()->findByColumnList($search, $options);
+
+        $logdata = [];
+
+        foreach ($logs as $log) {
+            $logdata[$log->getId()] = [
+                'Timestamp' => $log->getStorage()->getCreatedAt()->getDatabase(),
+                'Role Type' => ucfirst($log->getRoleType()),
+                'Dry Run'   => $log->isDry(),
+                'Created'   => $log->getUsersCreated(),
+                'Updated'   => $log->getUsersUpdated(),
+                'Skipped'   => $log->getUsersSkipped()
+            ];
+        }
+
+        return $logdata;
+    }
+
+
+    /**
+     * @api   /adminv2/sync/logs
+     * @level 156
+     *
+     * @return void
+     */
+    public function logs()
+    {
+        $allBreadcrumbs = new Navigator(
+            new Node('Home', '/adminv2/home', false),
+            new Node('User Provisioning System', $this->getBasePath(), false),
+            new Node('Logs', $this->getBasePath() . '/logs', true)
+        );
+
+        $this->getResponse()->content->set([
+            'template' => '@upsRuleset/log/list.twig',
+            'data'     => [
+                'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
+                'logs'           => $this->findLogs()
+            ]
+        ]);
+    }
+
+
+    /**
+     * @api   /adminv2/sync/log/{logId}
+     * @level 156
+     *
+     * @param int $logId
+     * @return void
+     */
+    public function log($logId)
+    {
+        if ($this->getRequest()->isXhr()) {
+            $template = 'lines';
+            $format   = 'nochrome';
+        } else {
+            $template = 'detail';
+            $format   = 'html';
+        }
+
+        $query    = $this->getRequest()->query;
+        $page     = $query->get('p', 1);
+        $filter   = $query->get('filter', '');
+        $template = "@upsRuleset/log/$template.twig";
+
+        try {
+            $model  = Log\Mapper::getInstance()->findById($logId);
+
+            $log = [
+                'timestamp' => $model->getStorage()->getCreatedAt(),
+                'roleType'  => $model->getRoleType(),
+                'dryRun'    => $model->isDry(),
+                'created'   => $model->getUsersCreated(),
+                'updated'   => $model->getUsersUpdated(),
+                'skipped'   => $model->getUsersSkipped(),
+                'lines'     => $this->getLogPartial($model->getStorage(), $page, $this->parseFilterString($filter))
+            ];
+
+            $allBreadcrumbs = new Navigator(
+                new Node('Home', '/adminv2/home', false),
+                new Node('User Provisioning System', $this->getBasePath(), false),
+                new Node('Logs', $this->getBasePath() . '/logs', false),
+                new Node("{$log['timestamp']->getDatabase()} ({$log['roleType']})", $this->getBasePath() . "/log/$logId", true)
+            );
+
+            $data = [
+                'id'              => $logId,
+                'filterBlacklist' => [ 'rulestring' ],
+                'log'             => $log,
+                'allBreadcrumbs'  => $allBreadcrumbs->getAllNodes(),
+                'filterSummary'   => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
+            ];
+
+            $this->getResponse()->content->set([
+                'template' => $template,
+                'format'   => $format,
+                'data'     => $data
+            ]);
+
+        } catch (Mapper\Exception $e) {
+            // 404 on the log - we have no aura way of doing this!! :(
+            $this->getDi()->get('sitePage')->error(41, '', 404);
+            exit;
+
+        } catch (OutOfBoundsException $e) {
+            // 400: requested a page that doesn't exist
+            if ($this->getRequest()->isXhr()) {
+                // just tell them they're naughty, that will be enough
+                $this->getResponse()->status->set(400);
+                $this->getResponse()->content->set([
+                    'format' => 'json',
+                    'data'   => $e->getMessage()
+                ]);
+
+            } else {
+                $this->getResponse()->redirect->to($this->getRouteIfAuthorized('upsRuleset.log', [ 'logId' => $logId ]));
+            }
+        }
+    }
+
+
+    /**
+     *
+     * @param Storage\Model $storage
+     * @param int           $page
+     * @param array         $filter       in the format externalUserId(135);firstName(David)
+     * @param int           $linesPerPage
+     * @throws OutOfBoundsException
+     * @return array
+     */
+    protected function getLogPartial(Storage\Model $storage, $page = 1, $filter = [], $linesPerPage = 50)
+    {
+        // read the stream so we don't load 50,000 lines of JSON into memory at once
+        $inStream = $storage->readStream();
+
+        // type enforcement
+        $page         = (int)max($page, 0);
+        $linesPerPage = (int)max($linesPerPage, 1);
+
+        // figure out which records we want
+        $firstLine = ($page - 1) * $linesPerPage;
+        $lastLine  = $firstLine + $linesPerPage - 1;
+
+        $result = [];
+
+        if ($page == 0) {
+            throw new OutOfBoundsException("Page not found: $page");
+        }
+
+        // read the file, ignoring the first 0 - $firstLine lines
+        for ($i = 0; ($line = fgets($inStream)) && $i <= $lastLine; ++$i) {
+
+            // ignore the first $n lines
+            if ($i < $firstLine) {
+                continue;
+            }
+
+            // rip that newline off the end. like a bandaid.
+            $line = trim($line);
+
+            // empty lines don't count toward the total
+            if (!strlen($line)) {
+                --$i;
+                continue;
+            }
+
+            // every line is individually JSON-encoded, btw
+            $linedata = json_decode($line, true);
+
+            // apply the filter if there is one
+            if ($filter) {
+                // we'll be reading context for the keypair values
+                $context = $linedata['context'];
+
+                $exclude = false;
+                // the filter has to pass *all* given keys, not just *any*
+                foreach ($filter as $key => $value) {
+                    if (!array_key_exists($key, $context) || $context[$key] != $value) {
+                        $exclude = true;
+                        break;
+                    }
+                }
+
+                // excluded lines don't count toward the total either
+                if ($exclude) {
+                    --$i;
+                    continue;
+                }
+            }
+
+            // this line is being used? well, ok then
+            $result[] = $linedata;
+        }
+
+        if (count($result) == 0) {
+            throw new OutOfBoundsException("Page not found: $page");
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @param string $filterString  in the format 'externalId(135);firstName(David)'
+     * @return array
+     */
+    protected function parseFilterString($filterString)
+    {
+        if (preg_match_all("`([a-zA-Z_]+)\(([^\)]+)\);?`", $filterString, $matches)) {
+
+            // get rid of the first (wholestring match) index
+            array_shift($matches);
+
+            return array_combine($matches[0], $matches[1]);
+        }
+
+        return [];
+    }
+
 
     /**
      * Dry Run view
@@ -115,28 +371,9 @@ class Controller extends Base {
         // perform the actual dry run (only for $rulesetId)
         try {
             $provisioner->run(false, $rulesetId);
-            $message = 'Your dry run has finished';
         } catch (\Exception $e) {
-            // shove something in the bell notifier
-            $message = 'Something went wrong in your dry run - '.$e->getTraceAsString();
+            // the client has already detached - not much we can do
         }
-
-        // notify
-        // TODO make this show in notifications instead of as an alert
-        $user   = $this->getUser();
-        $userId = $user->getId();
-        $bob    = new \Alaress\Async\Notification\Instance\Builder();
-        $bob->setTitle($message)
-            ->setSeverity(\Monolog\Logger::INFO)
-            ->setNamespace('ALERT')
-            ->setHref('#')
-            ->setIcon('/images/icon.php?icon=bolt&size=64')
-            ->addTopic("notify.user.$userId")
-//            ->putMeta('ttl', 30)
-            ->putMeta('title', 'Message from ' . $user->formatName());
-
-        $n = new \Schoolbox\Notif\Notif("instant.user.$userId");
-        $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
     }
 
     /**
@@ -249,6 +486,7 @@ class Controller extends Base {
         // TODO DI
         $mapper = Effect\Mapper::getInstance();
 
+        /** @var EffectTypeMapper $effectTypeMapper */
         $effectTypeMapper = $mapper->getJoinMapper('effect_type_id');
         $ruleMapper = $mapper->getJoinMapper('rule_id');
 
@@ -273,10 +511,20 @@ class Controller extends Base {
                      */
                     $arg = $effectData['arguments'];
 
+                    if ($fragmentFactory->isCollection($effectData['userProperty'])) {
+                        $to = [];
+                        foreach ($effectData['to'] as $k => $v) {
+                            $xpl = explode(',', $v);
+                            $to[$k] = count($xpl) == 1 ? $xpl[0] : $xpl;
+                        }
+                    } else {
+                        $to = $effectData['to'];
+                    }
+
                     /* Forge this into key/value pairs and ram that
                      * into $args as well
                      */
-                    $pairs = array_combine($effectData['from'], $effectData['to']);
+                    $pairs = array_combine($effectData['from'], $to);
 
                     /* array_filter filters out values that equate to false
                      * such as zero (which is valid data...). Use unset pears
@@ -297,6 +545,14 @@ class Controller extends Base {
                  */
                 else if ($fragmentFactory->isBoolean($effectData['userProperty'])) {
                     $arg = [(bool)$effectArgs[0]];
+                }
+                /*
+                 * Explode the collection type on comma
+                 */
+                elseif ($fragmentFactory->isCollection($effectData['userProperty'])) {
+                    $xpl = explode(',', $effectArgs[0]);
+                    $arg = [count($xpl) == 1 ? $xpl[0] : $xpl];
+
                 }
                 /* Otherwise just save it as given
                  */

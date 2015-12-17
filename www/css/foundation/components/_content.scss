@@ -1616,6 +1616,7 @@ dl {
 
         dt, dd {
 			@include grid-column($columns:false, $position:true);
+			margin-bottom: 0;
 		}
 
 		dt {

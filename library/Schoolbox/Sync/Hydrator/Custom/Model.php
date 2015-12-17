@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Sync\Hydrator\Custom;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\Sync;
 use Schoolbox\Sync\Hydrator\HydratorInterface;
 
@@ -165,6 +166,21 @@ class Model
     public function setHydrator($hydrator)
     {
         $this->hydrator = $hydrator;
+        return $this;
+    }
+
+
+    /**
+     * Pass a logger reference through to our hydrator, if possible
+     *
+     * @param LoggerInterface $log
+     * @return self
+     */
+    public function setLogger(LoggerInterface $log)
+    {
+        if (method_exists($this->hydrator, 'setLogger')) {
+            $this->hydrator->setLogger($log);
+        }
         return $this;
     }
 }

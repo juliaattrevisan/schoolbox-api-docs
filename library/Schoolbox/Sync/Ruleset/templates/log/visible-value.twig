@@ -1,0 +1,13 @@
+{%- if value is same as(true) -%}
+    <em>TRUE</em>
+{%- elseif value is same as(false) -%}
+    <em>FALSE</em>
+{%- elseif value is same as('') -%}
+    <span class="meta">(BLANK)</span>
+{%- elseif value is same as(null) -%}
+    <span class="meta">(NULL)</span>
+{%- elseif value is iterable -%}
+    [{{ value|join(', ') }}]
+{%- else -%}
+    {{ value }}
+{%- endif -%}

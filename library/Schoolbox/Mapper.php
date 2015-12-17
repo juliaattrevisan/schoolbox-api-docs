@@ -2512,6 +2512,7 @@ abstract class Mapper implements IMapper, Serializable
         return true;
     }
 
+
     /**
      * Compares two objects mapped by this mapper and returns an array of the differences between.
      * Does not traverse hydrations - it explicitly dehydrates and compares ID values only.
@@ -2522,10 +2523,11 @@ abstract class Mapper implements IMapper, Serializable
      * @param object $objectA
      * @param object $objectB
      *
-     * @throws Mapper\Exception
+     * @param array  $keys
      * @return array
+     * @throws Exception
      */
-    public function diff($objectA, $objectB = null)
+    public function diff($objectA, $objectB = null, $keys = [0, 1])
     {
         $a = trim(get_class($objectA), '\\');
         $c = trim($this->getModel(), '\\');
@@ -2554,7 +2556,7 @@ abstract class Mapper implements IMapper, Serializable
             $dhB = $hydrator->dehydrate($valueB, $this);
             // can now do primitive comparison on the dehydrated values (should be in the same type)
             if ($dhA !== $dhB) {
-                $diff[$property] = array($dhA, $dhB);
+                $diff[$property] = array_combine($keys, array($dhA, $dhB));
             }
         }
         return $diff;

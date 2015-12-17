@@ -31,8 +31,9 @@ class InstanceBundle {
 	 *
 	 * @param string $target
 	 * @param Instance $instance
+	 * @param bool $force
 	 */
-	protected function bind($target, $instance) {
+	protected function bind($target, $instance, $force = false) {
 
 		// If we accidentally passed a builder object (ie. forgot to call build()),
 		// just accept it and build the instance on the fly.
@@ -46,9 +47,12 @@ class InstanceBundle {
 
 		$topics = $this->splStore->offsetGet($instance);
 
+		// detect whether or not to force-send to the user ('instant' will bypass routing, 'notify' is more courteous)
+		$prefix = ($force && strpos($target, 'user.') === 0) ? 'instant' : 'notify';
+
 		// iterate the instance's topics, and prepend the given target
 		foreach($instance->getTopics() as $topic) {
-			$destination = "notify.$target.$topic";
+			$destination = "$prefix.$target.$topic";
 			$topics[sha1($destination)] = $destination;
 		}
 

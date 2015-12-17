@@ -39,6 +39,10 @@ class Map implements Construct
 
         $str .= implode("\n  ", array_map(function ($key, $value) {
 
+            if (is_array($value)) {
+                $value = '[' . implode(', ', $value) . ']';
+            }
+
             return "'$key' => $value";
 
         }, array_keys($this->map), $this->map));

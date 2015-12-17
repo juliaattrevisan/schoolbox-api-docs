@@ -788,7 +788,7 @@ class External_Synergetic_User implements External_UserInterface
             FROM SynergyOne.dbo.Constituencies Constituencies
             LEFT JOIN SynergyOne.dbo.Relationships Relationships ON Relationships.RelatedID = Constituencies.ID
             LEFT JOIN SynergyOne.dbo.Community Community ON Relationships.RelatedID = Community.ID
-            WHERE Relationships.ID = {$synergyID}
+            WHERE Relationships.ID = '{$synergyID}'
             AND Constituencies.ConstitCode='@SC'
             AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD')
             ORDER BY Community.BirthDate

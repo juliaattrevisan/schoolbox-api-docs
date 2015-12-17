@@ -10,14 +10,14 @@
 namespace Schoolbox\Sync\Hydrator\Custom;
 
 use External_User;
+use Monolog\Logger;
 use Schoolbox\Campus;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\External\Normalise\User\Guardian as ExternalParent;
-use Schoolbox\Sync\Hydrator\HydratorInterface;
 use Schoolbox\User as InternalUser;
 use Schoolbox\UserMapper;
 
-class AddParentToAllChildCampuses implements HydratorInterface
+class AddParentToAllChildCampuses extends AbstractLoggableHydrator
 {
     /**
      * @var External_User
@@ -48,20 +48,24 @@ class AddParentToAllChildCampuses implements HydratorInterface
             // Don't attempt to parse campuses of children from $input.
             // Just get all this parent's children, and their campi.
             $childIds = $this->externalUserHandler->getEnrolledStudents($previous->getExternalId());
-            foreach ($childIds as $childId) {
-                try {
-                    $childUser = $this->userMapper->findByExternalId($childId);
-                } catch (\Exception $e) {
-                    continue;
-                }
-                foreach ($childUser->getCampusCollection() as $campus) {
-                    $campusId = $campus->getId();
-                    if (empty($previous->getCampusCollection()->filterBy('id', $campusId))) {
-                        $campusCopy = new Campus();
-                        $campusCopy->setId($campusId);
-                        $previous->getCampusCollection()->add($campusCopy);
+
+            if (is_array($childIds)) {
+                foreach ($childIds as $childId) {
+                    try {
+                        $childUser = $this->userMapper->findByExternalId($childId);
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+                    foreach ($childUser->getCampusCollection() as $campus) {
+                        $campusId = $campus->getId();
+                        if (empty($previous->getCampusCollection()->filterBy('id', $campusId))) {
+                            $campusCopy = new Campus();
+                            $campusCopy->setId($campusId);
+                            $previous->getCampusCollection()->add($campusCopy);
+                        }
                     }
                 }
+                $this->log(Logger::INFO, "Assigning child campuses to parent", $input, $previous);
             }
         }
         return $previous;

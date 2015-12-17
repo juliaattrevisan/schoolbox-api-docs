@@ -108,12 +108,13 @@ class Envelope extends InstanceBundle {
 	/**
 	 * @param User|int $userId
 	 * @param Instance $instance
+	 * @param bool     $force
 	 */
-	public function targetToUser($userId, $instance) {
+	public function targetToUser($userId, $instance, $force = false) {
 		if($userId instanceof User) {
 			$userId = $userId->getId();
 		}
-		$this->bind("user.$userId", $instance);
+		$this->bind("user.$userId", $instance, $force);
 	}
 
 	/**
