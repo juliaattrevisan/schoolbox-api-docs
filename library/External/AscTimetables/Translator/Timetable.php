@@ -110,6 +110,7 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                                     $classCode = $subject['code'];
                                     break;
                                 case 'Urdu Debates':
+                                case 'Gym Display':
                                     $classCode = $subject['code'].' '.preg_replace('/\\D/', '', $class['code']);
                                     break;
                                 default:
