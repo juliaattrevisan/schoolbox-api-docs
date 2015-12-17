@@ -36,6 +36,15 @@ set upsConfig = {
     <div class="small-12 columns">
         <h1>User Provisioning System</h1>
 
+        {% if not logExtensionExists %}
+        <div class="alert-box alert">
+            <h2>You have no log extension file type!</h2>
+            <p>The User Provisioning System will not run if it cannot create logs.</p>
+            <p>Add a new file type with the "log" extension, or add this extension to an existing file type.</p>
+            <a href="/adminv2/allowed-file/" class="button icon-next">Fix this now</a>
+        </div>
+        {% endif %}
+
         {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
     </div>
 
