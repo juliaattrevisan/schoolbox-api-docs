@@ -71,6 +71,7 @@ abstract class Evaluation_Export_Xml {
 		$this->getPage()->setVar(array(
 			'ASSESS_TITLE' => htmlspecialchars($assess['title'], ENT_QUOTES),
 			'ASSESS_DESCRIPTION' => Scrub::HTML($assess['description']),
+			'ASSESS_COMPLETION_MESSAGE' => Scrub::HTML($assess['completion_message']),
 			'ASSESS_START' => $assess['start'],
 			'ASSESS_FINISH' => $assess['finish'],
 			'ASSESS_DURATION' => $assess['duration'],
