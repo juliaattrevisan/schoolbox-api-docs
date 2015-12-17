@@ -26,14 +26,19 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
 
                             var textInput = this.getDialog().getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url');
 
-                            $.post(url, data, function(responseText) {
-                                var content = '';
-                                var response = $.parseJSON(responseText);
-
-                                content = '/storage/image.php?hash='+response.hash;
-
-                                textInput.setValue(content);
-                            });
+                            $.fn.schoolboxMediaResourceBrowser();
+//
+//                            $.post(url, data, function(responseText) {
+//                                var content = '';
+//                                var response = $.parseJSON(responseText);
+//
+//
+//
+//
+//                                content = '/storage/image.php?hash='+response.hash;
+//
+//                                textInput.setValue(content);
+//                            });
                         }
                     },
                     {

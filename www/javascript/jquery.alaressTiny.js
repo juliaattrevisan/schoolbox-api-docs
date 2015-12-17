@@ -1,4 +1,145 @@
+(function() {
+    var modalCache = {};
+    var singletonModal = null;
+
+    /**
+     * Plugin
+     *
+     * @param options
+     */
+    $.fn.schoolboxMediaResourceBrowser = function(options) {
+        options = options || {};
+
+        var config = init(options, $(this));
+
+        cacheModal();
+
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            var defaults = {
+                element: element,
+
+                /* Comma-separated list of extensions to filter
+                 */
+                allowedFiles: null,
+
+                /* Url to get node information
+                 */
+                source: '/resources/attachment'
+            }
+
+            var derived = {
+            }
+
+            var merged = $.extend(defaults, derived, options);
+
+            return merged;
+        }
+
+        /**
+         * Augment url with parameters
+         *
+         * @returns {string}
+         */
+        function getQueryString() {
+            var qString = 'multi=0';
+
+            if (config.allowedFiles) {
+                qString += '&mime=' + config.allowedFiles;
+            }
+
+            return qString;
+        }
+
+        /**
+         * Unique identifier for modals
+         *
+         * @returns {string}
+         */
+        function getCacheKey() {
+            return config.source + '?' + getQueryString();
+        }
+
+        /**
+         * Respawn a modal from the cache if it already existed for
+         * a given url
+         */
+        function cacheModal() {
+            var key = getCacheKey();
+
+            if ('undefined' == typeof modalCache[key]) {
+                modalCache[key] = $.get(config.source, getQueryString()).promise();
+            }
+
+            modalCache[key].done(function(data) {
+                // ensure we retain ResourceAttache context
+                build(data);
+            });
+        }
+
+        /**
+         * Manufacture a modal
+         *
+         * @param data
+         */
+        function build(data) {
+            if (singletonModal) {
+                // you've got a modal; don't try to make another one
+                return;
+            }
+
+            var body = $('body');
+
+            // if the modal already exists, destroy it
+//            this.destroy();
+
+            singletonModal = $('<div data-reveal data-schoolboxmedia-reveal class="reveal-modal file-picker" />')
+                .data('content', data)
+                .data('rtn', this);
+
+            body.append(singletonModal);
+
+            singletonModal
+                .html(singletonModal.data('content'))
+                .foundation('reveal', 'open')
+                .off('closed.fndtn.reveal.attach');
+
+            /* Destroy two overlays and adjust a z-index so the
+             * Schoolbox Resource Browser appears on top of the
+             * ckeditor dialog (enormous sigh)
+             */
+            $('.cke_dialog_background_cover').remove();
+
+            /* ckeditor dialog appears at z-index 10010 so our
+             * Resource Browser needs to be more
+             */
+            $('[data-schoolboxmedia-reveal]').css({zIndex: 20000});
+
+            // reinit
+            $(document)
+                //.foundation('reveal', 'reflow')
+                .on('closed.fndtn.reveal', '[data-reveal]', function () {
+                    if (singletonModal) {
+                        singletonModal.detach();
+                        singletonModal = null;
+                    }
+                });
+
+            singletonModal.on('click', '.cancel[role=button]', function (e) {
+                window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
+            });
+        }
+    }
+}(jQuery));
+
 (function($) {
+    var listening = false;
 
 	/**
 	 * Unified TinyMCE interface
@@ -9,6 +150,33 @@
 		options = options || {};
 
 		var config = init(options);
+
+        if (!listening) {
+            $(window).on('message', function (e) {
+                var message,
+                    modal    = singletonModal,
+                    self     = modal.data('rtn'),
+                    explorer = modal.find('li.browsing').find('div.explorer');
+
+                try {
+                    message = JSON.parse(e.originalEvent.data);
+                } catch (err) {
+                    message = e.originalEvent.data;
+                }
+
+                console.log(message);
+
+//                if (message.text) {
+//                    explorer.attr('data-text', message.text);
+//                } else if (message.data) {
+//                    explorer.removeAttr('data-text');
+//                    var elems = self.attach(message.data);
+//                    $(elems).each(function() { this.addClass('dz-success') });
+//                }
+            });
+
+            listening = true;
+        }
 
 		start();
 
