@@ -31,6 +31,20 @@ class Controller extends Base {
     /** @var string */
     protected $basePath;
 
+    /**
+     * @var Schoolbox\File\MimetypeMapper
+     */
+    protected $mimetypeMapper;
+
+    /**
+     * Constructor
+     *
+     * @param Schoolbox\File\MimetypeMapper $mimetypeMapper
+     */
+    public function __construct(Schoolbox\File\MimetypeMapper $mimetypeMapper)
+    {
+        $this->mimetypeMapper = $mimetypeMapper;
+    }
 
     /**
      * @return bool|string
@@ -83,14 +97,22 @@ class Controller extends Base {
 
         /* Produce Twig template data based on Role
          */
-        $factory = new Factory();
-
-        /* Twig data
-         */
+        $factory  = new Factory();
         $twigData = $factory->produceTemplateData($rulesetId);
         if ($this->getSession()->getSegment(static::class)->getFlash('hasDryRun')) {
+            // Dry run flash msg
             $twigData['hasDryRun'] = true;
         }
+
+        // Obnoxious message if .log file type doesn't exist
+        $twigData['logExtensionExists'] = true;
+        try {
+            $this->mimetypeMapper->getByFilename('log.log');
+        } catch (\Schoolbox\File\Exception $e) {
+            // This mimetype don't exist
+            $twigData['logExtensionExists'] = false;
+        }
+
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/ruleset.twig',
             'data'     => $twigData,
