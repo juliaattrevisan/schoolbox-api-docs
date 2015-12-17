@@ -1,4 +1,5 @@
 (function() {
+
     var modalCache = {};
     var singletonModal = null;
 
@@ -11,6 +12,8 @@
         options = options || {};
 
         var config = init(options, $(this));
+
+        var message = {};
 
         cacheModal();
 
@@ -139,7 +142,6 @@
 }(jQuery));
 
 (function($) {
-    var listening = false;
 
 	/**
 	 * Unified TinyMCE interface
@@ -150,33 +152,6 @@
 		options = options || {};
 
 		var config = init(options);
-
-        if (!listening) {
-            $(window).on('message', function (e) {
-                var message,
-                    modal    = singletonModal,
-                    self     = modal.data('rtn'),
-                    explorer = modal.find('li.browsing').find('div.explorer');
-
-                try {
-                    message = JSON.parse(e.originalEvent.data);
-                } catch (err) {
-                    message = e.originalEvent.data;
-                }
-
-                console.log(message);
-
-//                if (message.text) {
-//                    explorer.attr('data-text', message.text);
-//                } else if (message.data) {
-//                    explorer.removeAttr('data-text');
-//                    var elems = self.attach(message.data);
-//                    $(elems).each(function() { this.addClass('dz-success') });
-//                }
-            });
-
-            listening = true;
-        }
 
 		start();
 
