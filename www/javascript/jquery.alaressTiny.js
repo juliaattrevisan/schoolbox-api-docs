@@ -13,8 +13,6 @@
 
         var config = init(options, $(this));
 
-        var message = {};
-
         cacheModal();
 
         /**
@@ -140,6 +138,23 @@
         }
     }
 }(jQuery));
+
+(function() {
+
+    /**
+     * Find out more information about a Schoolbox Rseource Browser
+     * message which you get when selecting an item from the Resource
+     * Browser modal
+     *
+     * @param options
+     */
+    $.fn.schoolboxMediaInfo = function(message) {
+
+        $.get
+
+    }
+}(jQuery));
+
 
 (function($) {
 

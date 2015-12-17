@@ -20,34 +20,36 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         id: 'schoolboxmedia-image-browse',
                         label: editorInstance.lang.common.browseServer,
                         onClick: function() {
+                            var self = this;
 
-                            var url = '/test.php?ajax=1';
-                            var data = {};
-
-                            var textInput = this.getDialog().getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url');
-
+                            /* Select something from the Resource Browser
+                             */
                             var message = $.fn.schoolboxMediaResourceBrowser();
 
-//                            var listening = false;
-//
-//                            if (!listening) {
-                                $(window).on('message', function(event) {
-                                    var message;
+                            $(window).on('message', function(event) {
+                                var message;
 
-                                    try {
-                                        message = JSON.parse(event.originalEvent.data);
-                                    } catch (err) {
-                                        message = event.originalEvent.data;
-                                    }
+                                try {
+                                    message = JSON.parse(event.originalEvent.data);
+                                } catch (err) {
+                                    message = event.originalEvent.data;
+                                }
 
-                                    console.log(message);
+                                /* Asynchronously find out more information
+                                 * Inject appropriate url into dialog
+                                 */
+                                var textInput = self.getDialog().getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url');
+
+                                /* The url from which to request more info
+                                 */
+                                var url = '/editor/nodeInfo.php';
+
+                                /* Find out how to render this file
+                                 */
+                                $.getJSON(url, { hash: message.data[0].hash }, function(responseText) {
+                                    console.log(responseText);
                                 });
-//
-//                                listening = true;
-//                            }
 
-//                            $.post(url, data, function(responseText) {
-//                                var content = '';
 //                                var response = $.parseJSON(responseText);
 //
 //
@@ -57,6 +59,10 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
 //
 //                                textInput.setValue(content);
 //                            });
+
+
+                            });
+
                         }
                     },
                     {
