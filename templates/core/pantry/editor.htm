@@ -4,6 +4,53 @@
 <script type="text/javascript">
     $(function() {
 
+        /* Round-Trip
+         */
+        $.fn.alaressTiny({
+            targetElements: $('#bart')
+//            start: function(element) {
+//
+//                /* Add special unique buttons
+//                 */
+//                CKEDITOR.instances['bart'].addCommand("insertMedia", { // create named command
+//                    exec: function(editorInstance) {
+//
+//                        var sel = editorInstance.getSelection();
+//                        var element = sel && sel.getSelectedElement();
+//
+//                        /* If an image is selected, edit its properties
+//                         */
+//                        if (element !== null) {
+//                        }
+//                        /* Otherwise, spawn a Resource Browzer picker
+//                         */
+//                        else {
+//                            var url = '/test.php?ajax=1';
+//                            var data = {};
+//
+//                            $.post(url, data, function(responseText) {
+//                                var content = '';
+//                                var response = $.parseJSON(responseText);
+//
+//                                if (response.type == 'image') {
+//                                    content = '<img src="/storage/image.php?hash='+response.hash+'" alt="'+response.name+'" />';
+//                                }
+//
+//                                editorInstance.insertHtml(content, 'html');
+//                            });
+//                        }
+//                    }
+//                });
+//
+//                CKEDITOR.instances['bart'].ui.addButton('AddMedia', { // add new button and bind our command
+//                    label: "Insert Media",
+//                    command: 'insertMedia',
+//                    toolbar: 'schoolbox',
+//                    icon: 'https://avatars1.githubusercontent.com/u/1073167?v=3&amp;s=460'
+//                });
+//            }
+        });
+
         /* You can try using jquery selectors to feed a
          * jquery collection to targetElements.
          *
@@ -46,6 +93,27 @@
     <li><a href="/pantry">Pantry</a></li>
     <li class="active"><a href="/pantry/editor">Editor</a></li>
 </ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Custom Plugin, Ajax Round Trip</h2>
+    </div>
+    <div class="small-12 island">
+        <form action="/testAjax.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            <textarea id='bart' name='bart' rows="10"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>
 
 <div class="row">
     <div class="small-12 columns">

@@ -41,10 +41,19 @@
                     {name: 'clipboard', groups: ['clipboard', 'undo']},
 
                     /* Custom schoolbox-specific plugin stuff can go here
+                     * This is a hole into which you may put once-off abilities
+                     * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
+                     * This is typically not used for anything else for now
                      */
                     {name: 'schoolbox', groups: []}
                 ],
 
+                /* Schoolbox Custom Plugins
+                 */
+                extraPlugins: 'schoolboxmedia',
+
+                /* Other settings
+                 */
                 toolbarCanCollapse: true,
                 removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent',
                 magicline_color: '#0000FF',
