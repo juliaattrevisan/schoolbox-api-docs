@@ -73,6 +73,9 @@
     .rb .hide-v:hover {
         cursor: pointer;
     }
+    table.rb label {
+        cursor:auto;
+    }
     .rb .hide-v:hover:before {
         content: 'Click to add descriptor';
         font-size: 0.75rem;
@@ -247,7 +250,7 @@
 
                     // don't replicate, just extend the colspan
                     if ($last.attr('colspan')) {
-                        $last.attr('colspan', $last.attr('colspan') + 1);
+                        $last.attr('colspan', parseInt($last.attr('colspan')) + 1);
 
                     } else {
                         var $td = $cells.eq(-2);
