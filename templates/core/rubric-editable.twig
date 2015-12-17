@@ -133,13 +133,20 @@
         border-top: solid 4px #ededed;
     }
 
+    @media only screen and (min-width: 64.0125em) {
+        .rb textarea {
+            min-height: 4rem;
+        }
+    }
+
     /* for medium down */
     @media only screen and (max-width: 64em) {
 
         table.rb tr.rb-group-header label {
-
             font-weight: bold;
-
+        }
+        .rb textarea {
+            min-height: 1rem;
         }
 
         table.rb td.hide-v {
@@ -359,19 +366,11 @@
             var h = 0;
 
             $areas.each(function() {
+                this.style.height = 'auto';
                 h = Math.max(h, this.scrollHeight - 16);
             });
 
             $areas.height(h);
-        });
-
-        $rb.on('blur', 'textarea', function () {
-
-            // get mah siblangs
-            var $areas = $(this).closest('tr').find('textarea');
-
-            // shink back down
-            $areas.outerHeight(100);
         });
 
         $rb.on('click', 'td.hide-v', function (e) {
