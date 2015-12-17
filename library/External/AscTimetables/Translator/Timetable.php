@@ -102,8 +102,22 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
 
                         // Go thru each class entry for this lesson, and add its classroom.
                         foreach ($classes as $class) {
+                            // Certain subjects are school specific or year level specific.
+                            // I can't figure out a better way to handle this other than hardcoding.
+                            // TODO move this somewhere LGSPK specific
+                            switch ($subject['code']) {
+                                case 'ASB':
+                                    $classCode = $subject['code'];
+                                    break;
+                                case 'Urdu Debates':
+                                    $classCode = $subject['code'].' '.preg_replace('/\\D/', '', $class['code']);
+                                    break;
+                                default:
+                                    $classCode = $subject['code'].' '.$class['code'];
+                                    break;
+                            }
                             $resultClass = [
-                                'Class Code'        => $subject['code'].' '.$class['code'],
+                                'Class Code'        => $classCode,
                                 'Class Title'       => $subject['name'],
                                 'Class Description' => '',
                             ];
