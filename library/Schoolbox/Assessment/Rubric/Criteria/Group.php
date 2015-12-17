@@ -1,0 +1,188 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Assessment\Rubric\Criteria;
+
+
+use Schoolbox\Assessment\Rubric\Calculable;
+use Schoolbox\Assessment\Rubric\CalculableAggregator;
+use Schoolbox\Assessment\Rubric\Twiggable;
+
+class Group implements Twiggable, Calculable
+{
+
+    /** @var int */
+    protected $id;
+
+    /** @var string */
+    protected $name;
+
+    /** @var Criterion[]|CalculableAggregator */
+    protected $criteria;
+
+
+    /**
+     * Insert convenience here
+     *
+     * @param int    $id
+     * @param string $name
+     */
+    public function __construct($id = null, $name = '')
+    {
+        $this->setName($name);
+        $this->setId($id);
+        $this->criteria = new CalculableAggregator();
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @param int $id
+     * @return static
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * @param string $name
+     * @return static
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+
+    /**
+     * @return Criterion[]
+     */
+    protected function getCriteria()
+    {
+        return $this->criteria;
+    }
+
+
+    /**
+     * @param Criterion $criterion
+     * @return $this
+     */
+    public function putCriterion($criterion)
+    {
+        if (!$this->contains($criterion)) {
+            $this->criteria->attach($criterion);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @param Criterion $criterion
+     * @return bool
+     */
+    public function contains($criterion)
+    {
+        return $this->criteria->contains($criterion);
+    }
+
+
+    /**
+     * Return the calculated sum value of this Calculable (NOT the total possible value)
+     *
+     * @return float
+     */
+    public function getSum()
+    {
+        $sum = 0;
+
+        foreach ($this->criteria as $crit) {
+            $sum += $crit->getSum();
+        }
+
+        return $sum;
+    }
+
+
+    /**
+     * Returns the total possible value of this Calculable
+     *
+     * @return float
+     */
+    public function getTotal()
+    {
+        $total = 0;
+
+        foreach ($this->criteria as $crit) {
+            $total += $crit->getTotal();
+        }
+
+        return $total;
+    }
+
+
+    /**
+     * @return float
+     */
+    public function getPercentage()
+    {
+        if ($total = $this->getTotal()) {
+            return $this->getSum() / $total;
+        }
+
+        return 0;
+    }
+
+
+    /**
+     * Convert yourself into a Twig context array
+     *
+     * @return array
+     */
+    public function toContext()
+    {
+        $context = [
+            'id'         => $this->getId(),
+            'name'       => $this->getName(),
+            'sum'        => $this->getSum(),
+            'total'      => $this->getTotal(),
+            'percentage' => $this->getPercentage(),
+            'criteria'   => [],
+        ];
+
+        foreach ($this->criteria as $criterion) {
+            $context['criteria'][$criterion->getId()] = $criterion->toContext();
+        }
+
+        return $context;
+    }
+
+
+}
