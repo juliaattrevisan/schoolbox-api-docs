@@ -7,36 +7,45 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+
+use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Permission\Access\UserAccess;
+
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
-$calendarHandler = new Calendar();
-$page = new SitePage();
-
-$event = $calendarHandler->getByID($_POST['eventId']);
-
-/* If event can't be found, exit
- */
-if(!is_numeric($event['id'])) {
+$calendarMapper = EventMapper::getInstance();
+try {
+    $event = $calendarMapper->findById($_POST['eventId']);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    /* If event can't be found, exit
+     */
     exit(1);
 }
 
-if(($sID = $calendarHandler->getSeriesID($event['id'])) != null) {
-
+/** @var Event[] $deletableEvents */
+$deletableEvents = [];
+if ($event->getSeriesId() != null) {
     // delete all in series
-    if($_POST['efficacy'] == 'series') {
-        $series = $calendarHandler->getAllInSeries($sID);
+    if ($_POST['efficacy'] == 'series') {
         // rather than wrapping into a single query batch delete, this deletion checks individual permissions on each event
         // (which may not necessarily be the same for each)
-        foreach($series as $currentEvent) {
-            $calendarHandler->delete($currentEvent['id']);
-        }
+        $deletableEvents = $calendarMapper->getAllInSeries($event);
     } else {
-        $calendarHandler->delete($event['id']);
+        $deletableEvents[] = $event;
     }
+} else {
+    // delete self
+    $deletableEvents[] = $event;
 }
-// delete self
-else {
-    $calendarHandler->delete($event['id']);
+
+// Regrettably I need both the calendar handler and mapper for now,
+// as handler contains permission handling methods.
+$calendarHandler = new Calendar();
+foreach ($deletableEvents as $currentEvent) {
+    if ($calendarHandler->getPerm($currentEvent->getId()) >= UserAccess::ACCESS_WRITE) {
+        $calendarHandler->delete($currentEvent->getId());
+    }
 }
 
 exit(1);
