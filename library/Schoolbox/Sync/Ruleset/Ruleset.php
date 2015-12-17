@@ -87,13 +87,11 @@ class Ruleset implements Hydrator\HydratorInterface
      */
     public function hydrate(ExternalUser $input, InternalUser $previous)
     {
-        if ($this->getConfig()->getEnabled()) {
-            // Previously: I used a grammar factory to create rules
-            // Now: the grammar class is embedded at construct time.
-            $this->grammar->hydrate($input, $previous);
-            foreach ($this->getCustomRules() as $rule) {
-                $previous = $rule->getHydrator()->hydrate($input, $previous);
-            }
+        // Previously: I used a grammar factory to create rules
+        // Now: the grammar class is embedded at construct time.
+        $this->grammar->hydrate($input, $previous);
+        foreach ($this->getCustomRules() as $rule) {
+            $previous = $rule->getHydrator()->hydrate($input, $previous);
         }
         return $previous;
     }
