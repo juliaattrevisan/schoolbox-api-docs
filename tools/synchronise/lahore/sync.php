@@ -61,47 +61,55 @@ $importCommand = function ($type) use ($getCommand) {
 };
 
 // Actually run the exports
-echo <<<OUTPUT
+if (file_exists($xmlImport)) {
+    echo <<<OUTPUT
 |
 | Starting timetable structure import
 | Reading from $xmlImport
 |
 
 OUTPUT;
-passthru($extractCommand('structure', $xmlImport).' | '.$importCommand('structure'), $returnCode);
-if ($returnCode > 0) {
-    echo "Something went wrong in timetable structure import - exiting\n";
-    exit($returnCode);
-}
+    passthru($extractCommand('structure', $xmlImport).' | '.$importCommand('structure'), $returnCode);
+    if ($returnCode > 0) {
+        echo "Something went wrong in timetable structure import - exiting\n";
+        exit($returnCode);
+    }
 
-echo <<<OUTPUT
+    echo <<<OUTPUT
 |
 | Timetable structure import done - starting timetable import
 | Reading from $xmlImport
 |
 
 OUTPUT;
-passthru($extractCommand('timetable', $xmlImport).' | '.$importCommand('timetable'), $returnCode);
-if ($returnCode > 0) {
-    echo "Something went wrong in timetable import - exiting\n";
-    exit($returnCode);
+    passthru($extractCommand('timetable', $xmlImport).' | '.$importCommand('timetable'), $returnCode);
+    if ($returnCode > 0) {
+        echo "Something went wrong in timetable import - exiting\n";
+        exit($returnCode);
+    }
+} else {
+    echo "$xmlImport does not exist - skipping timetable imports!\n";
 }
 
-echo <<<OUTPUT
+if (file_exists($enrolmentCsv)) {
+    echo <<<OUTPUT
 |
 | Timetable import done - starting enrolment import
 | Reading from $enrolmentCsv
 |
 
 OUTPUT;
-passthru($importCommand('enrolment').' < '.escapeshellarg($enrolmentCsv), $returnCode);
-if ($returnCode > 0) {
-    echo "Something went wrong in enrolment import - exiting\n";
-    exit($returnCode);
-}
-echo <<<OUTPUT
+    passthru($importCommand('enrolment').' < '.escapeshellarg($enrolmentCsv), $returnCode);
+    if ($returnCode > 0) {
+        echo "Something went wrong in enrolment import - exiting\n";
+        exit($returnCode);
+    }
+    echo <<<OUTPUT
 |
 | Import complete!
 |
 
 OUTPUT;
+} else {
+    echo "$enrolmentCsv does not exist - skipping timetable imports!\n";
+}
