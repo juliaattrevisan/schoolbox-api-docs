@@ -1,0 +1,229 @@
+<style type="text/css">
+    table.rb tr td {
+        padding: 0;
+    }
+    table.rb tr label {
+        padding:0.875rem;
+        margin:0;
+        transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
+        width: 100%;
+        font-weight: normal;
+    }
+    .rb input:checked + label {
+        background-color: greenyellow !important;
+    }
+    .rb-blank {
+        background-color: #FFEFEB !important;
+    }
+    .rb-group-summary {
+        background-color: lightyellow !important;
+    }
+    .rb-final-summary {
+        background-color: #e0d887 !important;
+    }
+    .rb-description, .rb-value {
+        display: block;
+    }
+    .rb-value {
+        font-family: monospace;
+        margin-top: 0.5rem;
+    }
+    tbody th:first-of-type {
+        border-right: solid 1px #ededed;
+    }
+    tbody th:last-of-type, thead th:first-of-type {
+        border-right: solid 2px #ededed;
+    }
+    thead th:first-of-type {
+        background-color: #ededed !important;
+    }
+    table.rb tr label:hover {
+        background: #003d7e !important;
+        color: white;
+    }
+</style>
+
+{% set formField = 'rubric' %}
+
+{% set inputType = rubric.multiSelect ? 'checkbox' : 'radio' %}
+
+{% set rubricId = 'rb-' ~ rubric.id %}
+
+<form>
+    <table class="rb" id="{{ rubricId }}">
+        <thead>
+        <tr>
+            <th colspan="2">&nbsp;</th>
+            {% for level in rubric.levels %}
+            <th>{{ level.name }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for groupIndex, group in rubric.groups %}
+
+            {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
+
+            {% for critIndex, crit in group.criteria %}
+        <tr data-group="{{ rubricId }}-{{ group.id }}">
+            {# yay html tables... -_-; #}
+            {% if rowspan %}
+                <th rowspan="{{ rowspan }}">{{ group.name|raw }}</th>
+                {% set rowspan = 0 %}
+            {% endif %}
+
+            <th>{{ crit.name|raw }}</th>
+
+                {% for levelIndex, level in rubric.levels %}
+
+                    {% set descriptor = rubric.descriptors[crit.id][level.id] %}
+
+                    {% if descriptor %}
+
+                        {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
+
+                        {% if inputType == 'checkbox' %}
+                            {% set inputName = inputId %}
+                        {% else %}
+                            {% set inputName %}{{ formField }}[{{ crit.id }}]{% endset %}
+                        {% endif %}
+
+                        <td>
+                            <input id="{{ inputId }}"
+                                   name="{{ inputName }}"
+                                   value="{{ descriptor.value }}"
+                                   type="{{ inputType }}"
+                                   data-rubric="{{ rubric.id }}"
+                                   data-rubric-group="{{ group.id }}"
+                                   {% if descriptor.selected %}checked="checked"{% endif %}
+                            />
+                            <label for="{{ inputId }}">
+                                <span class=rb-description>
+                                    {{- descriptor.text|raw -}}
+                                </span>
+                                {% if descriptor.value is not null %}
+                                <span class="rb-value">
+                                    {{- descriptor.value -}}
+                                </span>
+                                {% endif %}
+                            </label>
+                        </td>
+
+                    {% else %}
+                        <td class="rb-blank">&nbsp;</td>
+                    {% endif %}
+
+                {% endfor %}
+
+        </tr>
+            {% endfor %}
+
+            {% if group.total %}
+            <tr>
+                <th data-group-summary="{{ rubricId }}-{{ group.id }}"
+                    class="rb-group-summary"
+                    colspan="{{ rubric.levels|length + 1 }}"
+                    data-numerator="{{ group.sum }}"
+                    data-denominator="{{ group.total }}"
+                >
+                    {{ group.sum }} / {{ group.total }} ({{ (group.percentage * 100)|round }}%)
+                </th>
+            </tr>
+            {% endif %}
+
+        {% endfor %}
+
+        {% if rubric.total %}
+        <tr>
+            <th data-final-summary="{{ rubricId }}"
+                class="rb-final-summary"
+                colspan="{{ rubric.levels|length + 2 }}"
+                data-numerator="{{ rubric.sum }}"
+                data-denominator="{{ rubric.total }}"
+            >
+                {{ rubric.sum }} / {{ rubric.total }} ({{ (rubric.percentage * 100)|round }}%)
+            </th>
+        </tr>
+        {% endif %}
+        </tbody>
+
+    </table>
+</form>
+{# js specific to the rubric we just injected to...wherever we injected it #}
+<script type="text/javascript">
+    $(function () {
+
+        var $rb = $('#{{ rubricId }}');
+
+        $rb.on('change', '[data-rubric], [data-rubric-group]', function () {
+
+            var $changed = $(this);
+
+            var groupId  = $changed.data('rubric-group');
+            var rubricId = $changed.data('rubric');
+
+            var rowSelector = '[data-group="rb-' + rubricId + '-' + groupId + '"]';
+
+            var $groupRows = $(rowSelector);
+
+            if ($groupRows.length) {
+
+                var groupSum = 0;
+
+                // in lieu of a reduce() function
+                $groupRows.find('input').map(function () {
+                    groupSum += $(this).prop('checked') ? parseFloat(this.value) : 0;
+                });
+
+                var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
+
+                var groupSummary = $rb.find(groupSummarySelector);
+
+                groupSummary.attr('data-numerator', groupSum);
+
+                if (groupSummary.length) {
+                    parseFraction(groupSummary);
+                }
+
+            }
+
+            var rubricSum = 0;
+
+            $rb.find('[data-group-summary][data-numerator]').map(function () {
+                rubricSum += parseInt($(this).attr('data-numerator'));
+            });
+
+            var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
+
+            var rubricSummary = $rb.find(rubricSummarySelector);
+
+            rubricSummary.attr('data-numerator', rubricSum);
+
+            parseFraction(rubricSummary);
+
+        });
+
+        /**
+         *
+         * @param {jQuery} $elem
+         */
+        function parseFraction($elem)
+        {
+            $elem.each(function () {
+                if (this.hasAttribute('data-numerator') && this.hasAttribute('data-denominator')) {
+
+                    var elem = $(this);
+
+                    var num = elem.attr('data-numerator'),
+                        den = elem.attr('data-denominator'),
+                        prc = parseInt(num / den * 100);
+
+                    elem.text(num + ' / ' + den + ' (' + prc + '%)');
+                }
+            });
+
+        }
+
+    });
+</script>

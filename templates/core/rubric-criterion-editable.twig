@@ -1,0 +1,20 @@
+{%- set checkName    = 'crit[' ~ crit.id ~ '][on]' -%}
+{%- set checkChecked = crit.descriptors|length > 0 -%}
+{%- set cellClass    = checkChecked ? '' : 'hide-v' -%}
+
+<th>
+    <input  id="{{ checkName }}" data-criterion-name="{{ crit.name }}" name="{{ checkName }}" type="checkbox" value="{{ crit.id }}" {% if checkChecked %}checked="checked"{% endif %} />
+    <label for="{{ checkName }}" class="checkbox-label">{{ crit.name | raw }}</label>
+</th>
+
+{% for levelIndex, level in rubric.levels -%}
+    {%- set descriptor = rubric.descriptors[crit.id][level.id] -%}
+
+    <td class="{{ cellClass }}">
+        <textarea{% if not checkChecked %} disabled="disabled"{% endif %} placeholder="Descriptor" rows="5">{{ descriptor.text }}</textarea>
+        <input{% if not checkChecked %} disabled="disabled"{% endif %} class="rb-value" type="text" placeholder="Points" value="{{ descriptor.value }}" />
+    </td>
+
+{%- endfor %}
+
+<td class="{{ cellClass }}">&nbsp;</td>

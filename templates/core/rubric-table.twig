@@ -1,0 +1,103 @@
+<style type="text/css">
+    .rb-selected {
+        background-color: greenyellow !important;
+    }
+    .rb-blank {
+        background-color: #FFEFEB !important;
+    }
+    .rb-group-summary {
+        background-color: lightyellow !important;
+    }
+    .rb-final-summary {
+        background-color: #e0d887 !important;
+    }
+    tbody th:last-of-type, thead th:first-of-type {
+        border-right: solid 2px #ededed;
+    }
+    tbody th:first-of-type {
+        border-right: solid 1px #ededed;
+    }
+    thead th:first-of-type {
+        background-color: #ededed !important;
+    }
+    td, th {
+        transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
+    }
+    td:hover, th:hover {
+        background: #003d7e !important;
+        color: white;
+    }
+</style>
+
+
+<table>
+    <thead>
+    <tr>
+        <th colspan="2">&nbsp;</th>
+        {% for level in rubric.levels %}
+        <th>{{ level.name }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for groupIndex, group in rubric.groups %}
+
+        {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
+
+        {% for critIndex, crit in group.criteria %}
+    <tr>
+        {# yay html tables... -_-; #}
+        {% if rowspan %}
+            <th rowspan="{{ rowspan }}">{{ group.name|raw }}</th>
+            {% set rowspan = 0 %}
+        {% endif %}
+
+        <th>{{ crit.name|raw }}</th>
+
+            {% for levelIndex, level in rubric.levels %}
+
+                {% set descriptor = rubric.descriptors[crit.id][level.id] %}
+
+                {% if descriptor %}
+
+                    <td {% if descriptor.selected %}class="rb-selected"{% endif %}>
+                        <p>
+                            {{- descriptor.text|raw -}}
+                        </p>
+                        {% if descriptor.value is not null %}
+                        <aside>
+                            {{- descriptor.value -}}
+                        </aside>
+                        {% endif %}
+                    </td>
+
+                {% else %}
+                    <td class="rb-blank">&nbsp;</td>
+                {% endif %}
+
+            {% endfor %}
+
+
+
+    </tr>
+        {% endfor %}
+
+        {% if group.total %}
+        <tr>
+            <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">{{ group.sum }} / {{ group.total }} ({{ (group.percentage * 100)|round }}%)</th>
+        </tr>
+        {% endif %}
+
+    {% endfor %}
+
+
+    {% if rubric.total %}
+    <tr>
+        <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}" >{{ rubric.sum }} / {{ rubric.total }} ({{ (rubric.percentage * 100)|round }}%)</th>
+    </tr>
+    {% endif %}
+    </tbody>
+
+</table>
+<h2></h2>

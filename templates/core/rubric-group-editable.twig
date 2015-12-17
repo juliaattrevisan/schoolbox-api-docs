@@ -1,0 +1,25 @@
+{# ensure these are set #}
+{%- set rubricId  = rubricId ?: 'rb-' ~ rubric.id -%}
+{%- set groupId   = rubricId ~ '-' ~ group.id -%}
+{%- set groupName = group.name ? group.name|raw : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
+
+{%- for critIndex, crit in group.criteria -%}
+    {% include 'rubric-group-row-editable.twig' %}
+    {# this may seem bizarre, but we only ever want this applied the first time through an interation #}
+    {% set rowspan = null %}
+{%- endfor -%}
+
+{% if not group.criteria %}
+<tr data-group="{{ groupId }}" data-groupname="{{ groupName }}" class="rb-group-header">
+    {# no criteria specified, meaning this was an empty group (and the above iteration didn't run) #}
+    <th rowspan="2">
+        <label{% if not group.name %} class="meta"{% endif %}>{{ groupName }}</label>
+    </th>
+</tr>
+{% endif %}
+
+<tr data-group="{{ groupId }}">
+    <th colspan="{{ rubric.levels|length + 2 }}">
+        <input data-spawn="criterion" type="text" value="" placeholder="+ Type to add new {{ locale.translate('rubricCriterion') }} {{ group.name ? ('to ' ~ group.name) : ('with no ' ~ locale.translate('rubricGroup')) }}" />
+    </th>
+</tr>

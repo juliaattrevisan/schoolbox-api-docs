@@ -1,0 +1,16 @@
+{# ensure these are set #}
+{%- set rubricId  = rubricId ?: 'rb-' ~ rubric.id -%}
+{%- set groupId   = groupId ?: rubricId ~ '-' ~ group.id -%}
+{%- set groupName = groupName ? group.name ? group.name|raw : '(no ' ~ locale.rubricGroup ~ ')' -%}
+
+{%- if rowspan is not null -%}
+<tr data-group="{{ groupId }}" data-groupname="{{ group.name }}" class="rb-group-header">
+    <th rowspan="{{ rowspan ? rowspan : 2 }}">
+        <label{% if not group.name %} class="meta"{% endif %}>{{ groupName }}</label>
+    </th>
+</tr>
+{%- endif %}
+
+<tr data-group="{{ groupId }}">
+    {%- include 'rubric-criterion-editable.twig' -%}
+</tr>

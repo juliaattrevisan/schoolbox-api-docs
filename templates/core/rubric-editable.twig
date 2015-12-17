@@ -1,0 +1,406 @@
+<style type="text/css">
+    table.rb tr label {
+        transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
+        width: 100%;
+        font-weight: normal;
+    }
+    .rb a {
+        white-space: nowrap;
+        line-height: 2.75rem;
+    }
+    .rb-blank {
+        background-color: #FFEFEB !important;
+    }
+    .rb-group-summary {
+        background-color: lightyellow !important;
+    }
+    .rb-final-summary {
+        background-color: #e0d887 !important;
+    }
+    .rb-description, .rb-value {
+        display: block;
+    }
+    .rb-value {
+        font-family: monospace !important;
+        margin-top: 0.5rem !important;
+    }
+    .rb td input[type=text].rb-value {
+        width: 5rem;
+    }
+    .rb td {
+        overflow: hidden;
+
+        /*position: relative;*/
+    }
+    tbody th:first-of-type {
+        border-right: solid 1px #ededed;
+    }
+    tbody th:last-of-type, thead th:first-of-type {
+        border-right: solid 2px #ededed;
+    }
+    tbody tr.rb-group-header th {
+        border-right-width: 1px;
+    }
+    thead th:first-of-type {
+        /*background-color: #ededed !important;*/
+    }
+    .rb textarea {
+        font-size: 0.625rem;
+        resize: none;
+        overflow-y: auto;
+        height: 100px; /* yes, I used pixels. wanna fight about it? */
+    }
+    .rb input[type=text], .rb textarea {
+        border-color: transparent;
+        background-color: transparent;
+    }
+    .rb td:hover input[type=text], .rb td:hover textarea,
+    .rb th:hover input[type=text], .rb th:hover textarea
+    {
+        border-color: rgb(193, 229, 255);
+        background-color: white;
+    }
+    .rb input[type=text]:focus, .rb textarea:focus {
+        border-color: #0066b0 !important;
+        background-color: transparent;
+    }
+    .rb ::-webkit-input-placeholder {
+        color: gray;
+    }
+    .rb .hide-v {
+        background-color: #f9f9f9 !important;
+    }
+    .rb .hide-v:hover {
+        cursor: pointer;
+    }
+    .rb .hide-v:hover:before {
+        content: 'Click to add descriptor';
+        font-size: 0.75rem;
+        opacity: 0.5;
+        font-style: italic;
+    }
+    .rb .hide-v input[type=text],
+    .rb .hide-v textarea {
+        opacity: 0;
+
+        /* far out! */
+        height: 0 !important;
+        border-top-width: 0 !important;
+        border-bottom-width: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .rb .hide-h {
+        padding-left: 0;
+        padding-right: 0;
+        width: 0;
+    }
+
+    .rb .hide-h input[type=text],
+    .rb .hide-h textarea {
+        opacity: 0;
+
+        /* far out! */
+        width: 0 !important;
+        border-left-width: 0 !important;
+        border-right-width: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .rb textarea:focus {
+        background-color: white;
+    }
+
+    .rb-no-cell {
+        background-color: #ededed;
+        line-height: 2.875rem;
+    }
+
+    tr.rb-group-header,
+    tr.rb-group-header + tr {
+        border-top: solid 4px #ededed;
+    }
+
+    /* for medium down */
+    @media only screen and (max-width: 64em) {
+
+        table.rb tr.rb-group-header label {
+
+            font-weight: bold;
+
+        }
+
+        table.rb td.hide-v {
+            padding-top: 0;
+            padding-bottom: 0;
+            overflow-y: hidden;
+            height: 0;
+            border-bottom-width: 0;
+            border-top-width: 0;
+        }
+
+        table.rb td {
+            padding-left: 2rem;
+        }
+        table.rb tbody tr td:last-of-type {
+            height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            border-bottom-width: 1px;
+        }
+
+        .rb tbody th:last-of-type {
+            border-right-width: 0;
+        }
+
+        .rb tbody th:first-of-type {
+            border-right-width: 0;
+            border-bottom-width: 2px;
+        }
+
+        .rb tr:hover th,
+        .rb tr:hover td {
+            background-color: white;
+        }
+
+        table.rb thead {
+            display: block;
+        }
+
+        .rb .rb-no-cell {
+            display: none;
+        }
+
+    }
+
+
+
+
+</style>
+
+{% set formField = 'rubric' %}
+{% set inputType = rubric.multiSelect ? 'checkbox' : 'radio' %}
+{% set rubricId  = 'rb-' ~ rubric.id %}
+
+<form>
+    <h3 class="subheader show-for-medium-down">Levels</h3>
+    <table class="rb stack-for-medium-down" id="{{ rubricId }}">
+        <thead>
+        <tr>
+            <th class="rb-no-cell">{{ locale.translate('rubricGroup', true, true) }}</th>
+            <th class="rb-no-cell">{{ locale.translate('rubricCriterion', true, true) }}</th>
+            {% for level in rubric.levels -%}
+            <th class="rb-level">
+                <input data-level placeholder="{{ locale.translate('rubricLevel', false, true) }} name" type="text" value="{{ level.name }}" />
+            </th>
+            {%- endfor %}
+            <th><a href="#" data-spawn="level">&plus; {{ locale.translate('rubricLevel', false, true) }}</a></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for groupIndex, group in rubric.groups -%}
+            {%- include 'rubric-group-editable.twig' with { rowspan: rowspan ?: group.criteria|length + 2 } -%}
+        {%- endfor %}
+        <tr class="rb-group-header">
+            <th colspan="{{ rubric.levels|length + 3 }}">
+                <input data-spawn="group" type="text" value="" placeholder="+ Type to add new {{ locale.translate('rubricGroup') }}" />
+            </th>
+        </tr>
+        </tbody>
+    </table>
+</form>
+
+{# js specific to the rubric we just injected to...wherever we injected it #}
+<script type="text/javascript">
+
+    var hideHorizontalClass = 'hide-h';
+    var hideVerticalClass   = 'hide-v';
+    var inputSelector       = 'input[type=text],textarea';
+
+    $(function () {
+
+        var $rb = $('#{{ rubricId }}');
+
+        $rb.on('click', '[data-spawn]', function (e) {
+            e.preventDefault();
+
+            if ($(this).data('spawn') == 'level') {
+
+                // iterate all rows
+                $rb.find('tr').each(function () {
+                    // locate the second-from-right-most cell, and replicate it
+
+                    var $row = $(this);
+
+                    var $cells = $row.children('td,th');
+
+                    var $last = $cells.eq(-1);
+
+                    // don't replicate, just extend the colspan
+                    if ($last.attr('colspan')) {
+                        $last.attr('colspan', $last.attr('colspan') + 1);
+
+                    } else {
+                        var $td = $cells.eq(-2);
+
+                        var $clone = $td.clone();
+
+                        // start hidden away so we can all slide out together
+                        $clone.addClass(hideHorizontalClass).find(inputSelector).val('');
+
+                        $td.after($clone);
+
+                    }
+
+                });
+
+                // aaand meaningful-transition out
+                $rb.find('td.' + hideHorizontalClass + ', th.' + hideHorizontalClass).removeClass(hideHorizontalClass);
+            }
+
+        });
+
+        $rb.on('blur keydown', '[data-spawn]', function (e) {
+
+            // ignore anything except hitting return
+            if (e.type == 'keydown' && e.keyCode != 13) {
+                return true;
+            }
+
+            var $input = $(this),
+                type   = $input.data('spawn'),
+                name   = this.value ? this.value.trim() : '',
+                $row, groupId;
+
+            // prevent blank, but also prevent double-fire from keydown to blur
+            if (name.length == 0 || $input.prop('disabled')) {
+                return true;
+            }
+
+            $row = $input.closest('tr');
+
+            groupId = $row.data('group');
+
+            if (typeof groupId != 'undefined') {
+                groupId = groupId.split('-')[2];
+            } else {
+                groupId = null;
+            }
+
+            // prevent mods
+            $input.val('Creating "' + name + '"...').prop('disabled', true);
+
+            var payload = {
+                type: type,
+                rubricId: '{{ rubric.id }}',
+                groupId: groupId,
+                name: name,
+                levelCount: $rb.children('thead').find('input').length
+            };
+
+            $.post(window.location, payload, function (data) {
+
+                var $data = $(data);
+
+                // simple case: prepend the row
+                $row.before($data);
+
+                // clear and re-enable the input
+                $input.val('').prop('disabled', false);
+
+                if (type == 'criterion') {
+                    // just gotta extend that rowspan
+                    var $span = $row.parent().children('[data-group="'+$row.data('group')+'"][data-groupname]').children('[rowspan]');
+                    $span.attr('rowspan', parseInt($span.attr('rowspan')) + 1);
+
+//                    $data.find('[type=checkbox]').prop('checked', true).trigger('change');
+                }
+
+            });
+
+        });
+
+
+        $rb.on('change', '[type=checkbox]', function () {
+
+            var $input  = $(this),
+                $cells  = $input.closest('tr').children('td'),
+                checked = $input.prop('checked');
+
+            if (checked) {
+                $cells.removeClass(hideVerticalClass).find(inputSelector).prop('disabled', false);
+
+            } else {
+                $cells.addClass(hideVerticalClass).find(inputSelector).prop('disabled', true);
+            }
+
+        });
+
+        $rb.on('focus keyup paste', 'textarea', function () {
+
+            // get mah siblangs
+            var $areas = $(this).closest('tr').find('textarea');
+
+            var h = 0;
+
+            $areas.each(function() {
+                h = Math.max(h, this.scrollHeight - 16);
+            });
+
+            $areas.height(h);
+        });
+
+        $rb.on('blur', 'textarea', function () {
+
+            // get mah siblangs
+            var $areas = $(this).closest('tr').find('textarea');
+
+            // shink back down
+            $areas.outerHeight(100);
+        });
+
+        $rb.on('click', 'td.hide-v', function (e) {
+
+            var $cell     = $(this),
+                $check    = $cell.closest('tr').find('input[type=checkbox]'),
+                $textarea = $cell.find('textarea');
+
+            $check.prop('checked', true).trigger('change');
+            $textarea.focus();
+        });
+
+        $rb.on('change', 'th [data-level]', function () {
+
+            // locate all descriptors in column and update text
+
+            var $level      = $(this);
+            var levelText   = $level.val();
+            var columnIndex = $level.closest('th').index() - 2;
+
+            $rb.children('tbody').children('[data-group]').each(function () {
+
+                var $row = $(this);
+                var crit = $row.find('input[data-criterion-name]').data('criterion-name');
+
+                var $textarea = $row.children('td').eq(columnIndex).children('textarea');
+
+                $textarea.attr('placeholder', 'Descriptor for ' + levelText + ' ' + crit);
+
+            });
+
+        });
+
+        // TODO do this via twig
+        $rb.find('input[data-level]').trigger('change');
+
+    });
+</script>
