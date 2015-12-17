@@ -89,8 +89,8 @@ class Notifier extends AbstractModuleNotifier
             $storage = Storage\Mapper::getInstance()->findByHash($storage->getHash());
         }
 
-        $bob->setTitle("User provisioning dry-run has completed")
-            ->setIcon('http://192.168.36.10/images/icon.php?icon=tick&size=72') // TODO find some better image than a tick icon....
+        $bob->setTitle("User provisioning dry run has completed")
+            ->setIcon('/images/icon.php?icon=bolt&size=72') // TODO find some better image than a bolt icon....
             ->setHref('/adminv2/ups/log/'.$log->getId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
