@@ -1,10 +1,12 @@
 (function() {
-
     var modalCache = {};
     var singletonModal = null;
 
     /**
-     * Plugin
+     * Spawns a Schoolbox Resource Browser which allows you
+     * to choose a file of some sort
+     *
+     * Shamelessly cannibalised from Dropzone Resource Browser
      *
      * @param options
      */
@@ -135,6 +137,66 @@
             singletonModal.on('click', '.cancel[role=button]', function (e) {
                 window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
             });
+        }
+    }
+
+    /**
+     * A factory for producing Schoolbox Media Dialog panel contents in ckeditor
+     *
+     * @param responseText
+     * @param type
+     * @param dialog
+     */
+    $.fn.schoolboxMediaResourceBrowserRenderer = function(responseText, type, dialog) {
+
+        /* Render an image
+         */
+        if (type == 'image') {
+            renderImage(responseText, dialog);
+        }
+        else if (type == 'video') {
+        }
+        else if (type == 'audio') {
+        }
+        else {
+        }
+
+        /**
+         * Render an image into the Schoolbox Media Dialog
+         *
+         * @param responseText
+         * @param dialog
+         */
+        function renderImage(responseText, dialog) {
+            var input = {
+                url: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url'),
+                width: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-width'),
+                height: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-height')
+            };
+
+            /* Manufacture url to image
+             */
+            var content = '/storage/image.php?hash='+responseText.hash;
+
+            /* Find out width/height ratio
+             */
+            var temp = new Image();
+            temp.src = content;
+            temp.onload = applyDimensions;
+
+            /* Apply dimensions upon temp image spawn
+             */
+            function applyDimensions() {
+                var width = this.width;
+                var height = this.height;
+                var aspectRatio = this.width/this.height;
+
+                /* Set dialog input contents
+                 */
+                input.width.setValue(width);
+                input.height.setValue(height);
+                input.url.setValue(content);
+            }
         }
     }
 }(jQuery));

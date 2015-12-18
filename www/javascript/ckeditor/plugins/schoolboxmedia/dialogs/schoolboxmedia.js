@@ -35,21 +35,13 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                     message = event.originalEvent.data;
                                 }
 
-
                                 /* Find out how to render this file
                                  */
                                 $.getJSON('/editor/nodeInfo.php', { hash: message.data[0].hash }, function(responseText) {
-                                    var content = '';
 
-                                    /* Inject appropriate url into dialog
+                                    /* Renderer Strategy (I guess)
                                      */
-                                    if (responseText.type == 'image') {
-                                        var urlInput = self.getDialog().getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url');
-
-                                        content = '/storage/image.php?hash='+responseText.hash;
-
-                                        urlInput.setValue(content);
-                                    }
+                                    $.fn.schoolboxMediaResourceBrowserRenderer(responseText, responseText.type, self.getDialog());
 
                                     /* Shut modal, go back to Dialog
                                      */
