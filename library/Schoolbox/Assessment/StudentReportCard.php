@@ -39,13 +39,35 @@ class StudentReportCard
     const MANDATORY = 2;
 
     // vars that come from user input
+
+    /**
+     * @var int
+     */
     protected $targetUserId;
+
+    /**
+     * @var User
+     */
+    protected $targetUser;
+
     protected $targetYear;
     protected $targetSemester;
+
+
     protected $targetCategoryId;
 
     // 'session' vars
+
+    /**
+     * @var int
+     */
     protected $viewingUserId;
+
+    /**
+     * @var User
+     */
+    protected $viewingUser;
+
     protected $permissionSet = array();
     protected $minimumVisibility = 3;
 
@@ -84,6 +106,11 @@ class StudentReportCard
         // parse arguments
         $this->viewingUserId = $viewingAs == -1 ? $_SESSION['id'] : $viewingAs;
         $this->targetUserId  = $studentUserId;
+
+        //Convert to user objects TODO: pass user objects initially
+        $this->setViewingUser(UserMapper::getInstance()->findById($this->viewingUserId));
+        $this->setTargetUser(UserMapper::getInstance()->findById($this->targetUserId));
+
         // dependencies
         $this->submissionMapper = new SubmissionBoxMapper();
         $this->showcaseMapper   = new ShowcaseMapper();
@@ -113,11 +140,11 @@ class StudentReportCard
             $this->permissionSet     = array(true, true, true, $displayClassAverage, true, $showOverallGrade);
             $this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_STUDENT;
         } // if superuser, all permissions enabled
-        elseif ($this->groupHandler->isSuperuser($this->viewingUserId)) {
+        elseif ($this->getViewingUser()->isSuperuser()) {
             $this->permissionSet     = array(true, true, true, true, true, true);
             $this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PRIVATE;
         } // if staff, all READ permissions enabled
-        elseif ($this->groupHandler->isStaff($this->viewingUserId)) {
+        elseif ($this->getViewingUser()->getRole()->isStaff()) {
             $this->permissionSet     = array(false, false, true, true, true, true);
             $this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PRIVATE;
         } // if parent of child, use Cfg::get('restrict_student_submissions') for READ permissions (no WRITE)
@@ -225,15 +252,12 @@ class StudentReportCard
         $page->setBlock(TEMPLATE_content, 'subject_container', 'subject_container_block');
         $page->setBlock(TEMPLATE_content, 'no_subjects', 'no_subjects_block');
 
-        // global vars
-        /** @var $target User */
-        $target = UserMapper::getInstance()->findById($this->targetUserId);
         $page->setVar(
             array(
-                'WORK_USER_ID'     => $target->getId(),
-                'WORK_USER_NAME'   => $target->formatName(),
-                'WORK_USER_EXT_ID' => $target->getExternalId(),
-                'WORK_USER_BYLINE' => 'Year' . $target->getYear()
+                'WORK_USER_ID'     => $this->getTargetUser()->getId(),
+                'WORK_USER_NAME'   => $this->getTargetUser()->formatName(),
+                'WORK_USER_EXT_ID' => $this->getTargetUser()->getExternalId(),
+                'WORK_USER_BYLINE' => 'Year' . $this->getTargetUser()->getYear()
             )
         );
         $this->renderSemesterSelectors($page);
@@ -618,8 +642,7 @@ class StudentReportCard
         $page->setBlock('work', 'work_unclickable', 'work_unclickable_block');
         $work = $this->subjectData->getAssessments();
         if (count($work)) {
-            $userMapper = new \Schoolbox\UserMapper();
-            $user       = $userMapper->findById($this->targetUserId);
+            $user       = $this->getTargetUser();
             foreach ($work as $w) {
                 $object = $w['object'];
                 $marks  = $w['marks'];
@@ -881,7 +904,7 @@ class StudentReportCard
         }
 
         // sessionuser var
-        $sessionUser  = UserMapper::getInstance()->findById($this->viewingUserId);
+        $sessionUser  = $this->getViewingUser();
         $sessionRole  = $sessionUser->getRole()->getType();
         $conversation = new Conversation($this->getTargetUser(), $this->getTargetCategory());
         // show or hide the create comment form
@@ -1253,15 +1276,47 @@ class StudentReportCard
         }
     }
 
+    /**
+     * @return User
+     */
     public function getTargetUser()
     {
-        return UserMapper::getInstance()->findById($this->targetUserId);
+        return $this->targetUser;
     }
+
+    /**
+     * @param User $targetUser
+     */
+    public function setTargetUser($targetUser)
+    {
+        $this->targetUser = $targetUser;
+    }
+
+
 
     public function getTargetCategory()
     {
         return $this->folderMapper->findById($this->targetCategoryId);
     }
+
+
+    /**
+     * @return User
+     */
+    public function getViewingUser()
+    {
+        return $this->viewingUser;
+    }
+
+    /**
+     * @param User $viewingUser
+     */
+    public function setViewingUser($viewingUser)
+    {
+        $this->viewingUser = $viewingUser;
+    }
+
+
 
     public function getTargetYear()
     {
