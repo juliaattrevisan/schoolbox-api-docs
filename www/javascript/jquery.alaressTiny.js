@@ -143,16 +143,16 @@
     /**
      * A factory for producing Schoolbox Media Dialog panel contents in ckeditor
      *
-     * @param responseText
      * @param type
+     * @param responseText
      * @param dialog
      */
-    $.fn.schoolboxMediaResourceBrowserRenderer = function(responseText, type, dialog) {
+    $.fn.schoolboxMediaResourceBrowserRenderer = function(type, responseText,dialog) {
 
         /* Render an image
          */
         if (type == 'image') {
-            renderImage(responseText, dialog);
+            $.fn.schoolboxMediaResourceBrowserRenderImage('/storage/image.php?hash='+responseText.hash, dialog);
         }
         else if (type == 'video') {
         }
@@ -160,43 +160,40 @@
         }
         else {
         }
+    }
 
-        /**
-         * Render an image into the Schoolbox Media Dialog
-         *
-         * @param responseText
-         * @param dialog
+    /**
+     * Populate dialog fields with image data
+     *
+     * @param url
+     * @param dialog
+     */
+    $.fn.schoolboxMediaResourceBrowserRenderImage = function(url, dialog) {
+
+        var fields = {
+            url: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url'),
+            width: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-width'),
+            height: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-height')
+        };
+
+        /* Find out width/height ratio
          */
-        function renderImage(responseText, dialog) {
-            var input = {
-                url: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url'),
-                width: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-width'),
-                height: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-height')
-            };
+        var temp = new Image();
+        temp.src = url;
+        temp.onload = applyDimensions;
 
-            /* Manufacture url to image
+        /* Apply dimensions upon temp image spawn
+         */
+        function applyDimensions() {
+            var width = this.width;
+            var height = this.height;
+            var aspectRatio = this.width/this.height;
+
+            /* Set dialog input contents
              */
-            var content = '/storage/image.php?hash='+responseText.hash;
-
-            /* Find out width/height ratio
-             */
-            var temp = new Image();
-            temp.src = content;
-            temp.onload = applyDimensions;
-
-            /* Apply dimensions upon temp image spawn
-             */
-            function applyDimensions() {
-                var width = this.width;
-                var height = this.height;
-                var aspectRatio = this.width/this.height;
-
-                /* Set dialog input contents
-                 */
-                input.width.setValue(width);
-                input.height.setValue(height);
-                input.url.setValue(content);
-            }
+            fields.url.setValue(url);
+            fields.width.setValue(width);
+            fields.height.setValue(height);
         }
     }
 }(jQuery));

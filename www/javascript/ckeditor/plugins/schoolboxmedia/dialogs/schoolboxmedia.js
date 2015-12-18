@@ -13,7 +13,21 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         type: 'text',
                         id: 'schoolboxmedia-image-url',
                         label: 'Url',
-                        validate: CKEDITOR.dialog.validate.notEmpty( "Url cannot be empty." )
+                        validate: CKEDITOR.dialog.validate.notEmpty( "Url cannot be empty." ),
+
+                        /* When you type the url yourself, apply details
+                         */
+                        onBlur: function() {
+                            var self = this;
+
+                            var image = true;
+
+                            if (image) {
+                                var url = self.getDialog().getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url').getValue();
+
+                                $.fn.schoolboxMediaResourceBrowserRenderImage(url, self.getDialog());
+                            }
+                        }
                     },
                     {
                         type: 'button',
@@ -41,7 +55,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
 
                                     /* Renderer Strategy (I guess)
                                      */
-                                    $.fn.schoolboxMediaResourceBrowserRenderer(responseText, responseText.type, self.getDialog());
+                                    $.fn.schoolboxMediaResourceBrowserRenderer(responseText.type, responseText, self.getDialog());
 
                                     /* Shut modal, go back to Dialog
                                      */
