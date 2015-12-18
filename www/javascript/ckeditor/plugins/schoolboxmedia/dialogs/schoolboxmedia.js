@@ -85,6 +85,11 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 validate: CKEDITOR.dialog.validate.notEmpty( "Height cannot be empty." )
                             }
                         ]
+                    },
+                    {
+                        type: 'checkbox',
+                        id: 'schoobox-image-fullwidth',
+                        label: 'Fullwidth (this image will stretch horizontally to fill available space)'
                     }
                 ]
             }
