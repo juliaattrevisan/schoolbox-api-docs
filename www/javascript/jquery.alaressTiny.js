@@ -138,7 +138,7 @@
                 window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
             });
         }
-    }
+    };
 
     /**
      * A factory for producing Schoolbox Media Dialog panel contents in ckeditor
@@ -160,7 +160,7 @@
         }
         else {
         }
-    }
+    };
 
     /**
      * Populate dialog fields with image data
@@ -173,7 +173,8 @@
         var fields = {
             url: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url'),
             width: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-width'),
-            height: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-height')
+            height: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-height'),
+            preview: $('#schoolboxmedia-image-preview')
         };
 
         /* Find out width/height ratio
@@ -187,6 +188,7 @@
         function applyDimensions() {
             var width = this.width;
             var height = this.height;
+            var preview = '<img src="'+url+'" style="display:block;" />';
             var aspectRatio = this.width/this.height;
 
             /* Set dialog input contents
@@ -194,8 +196,9 @@
             fields.url.setValue(url);
             fields.width.setValue(width);
             fields.height.setValue(height);
+            fields.preview.html(preview);
         }
-    }
+    };
 }(jQuery));
 
 

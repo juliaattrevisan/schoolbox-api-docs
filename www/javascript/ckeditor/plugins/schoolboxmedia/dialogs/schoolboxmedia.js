@@ -65,6 +65,10 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         }
                     },
                     {
+                        type: 'html',
+                        html: '<label>Preview</label><div id="schoolboxmedia-image-preview" style="border:1px solid #ccc;width:400px;min-height:100px;overflow:hidden;"></div>',
+                    },
+                    {
                         type: 'hbox',
                         widths: ['50%', '50%'],
                         children: [
