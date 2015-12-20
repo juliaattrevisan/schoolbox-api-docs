@@ -67,6 +67,9 @@ class HardLinks extends DbCheck
             "SELECT background_image_hash FROM tile
              WHERE background_image_hash IS NOT NULL
              AND deleted_at IS NULL",
+
+            "SELECT hash FROM ups_log
+             WHERE hash IS NOT NULL",
         ];
 
         return sprintf("`hash` NOT IN (%s)", implode(' UNION ', $queries));
