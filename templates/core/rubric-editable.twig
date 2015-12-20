@@ -145,14 +145,20 @@
         top: 15px !important;
     }
 
-    @media only screen and (min-width: 64.0125em) {
+    @media only screen and (min-width: 59.4375em) {
         .rb textarea {
             min-height: 4rem;
+        }
+        .rb tbody td {
+            min-width: 5rem;
+        }
+        .rb tbody th {
+            min-width: 8rem;
         }
     }
 
     /* for medium down */
-    @media only screen and (max-width: 64em) {
+    @media only screen and (max-width: 59.375em) {
 
         table.rb tr.rb-group-header label {
             font-weight: bold;
@@ -209,12 +215,14 @@
 
 </style>
 
-{% set formField = 'rubric' %}
+{% set formField = formField ?: 'rb' %}
 {% set inputType = rubric.multiSelect ? 'checkbox' : 'radio' %}
 {% set rubricId  = 'rb-' ~ rubric.id %}
 
-<form>
+<form method="post">
+    <input type="submit" value="Mark This Rubric" />
     <h3 class="subheader show-for-medium-down">Levels</h3>
+    <div class="scrollable">
     <table class="rb stack-for-medium-down" id="{{ rubricId }}">
         <thead>
         <tr>
@@ -222,7 +230,7 @@
             <th class="rb-no-cell">{{ locale.translate('rubricCriterion', true, true) }}</th>
             {% for level in rubric.levels -%}
             <th class="rb-level">
-                <input data-level placeholder="{{ locale.translate('rubricLevel', false, true) }} name" type="text" value="{{ level.name }}" />
+                <input data-level placeholder="{{ locale.translate('rubricLevel', false, true) }} name" type="text" value="{{ level.name }}" name="{{ formField }}[{{ rubric.id }}][level][{{ level.id }}][name]" />
             </th>
             {%- endfor %}
             <th><a href="#" data-spawn="level">&plus; {{ locale.translate('rubricLevel', false, true) }}</a></th>
@@ -239,6 +247,7 @@
         </tr>
         </tbody>
     </table>
+    </div>
 </form>
 
 {# js specific to the rubric we just injected to...wherever we injected it #}
@@ -247,6 +256,7 @@
     var hideHorizontalClass = 'hide-h';
     var hideVerticalClass   = 'hide-v';
     var inputSelector       = 'input[type=text],textarea';
+    var levelLimit          = 11;
 
     $(function () {
 
@@ -277,7 +287,16 @@
                         var $clone = $td.clone();
 
                         // start hidden away so we can all slide out together
-                        $clone.addClass(hideHorizontalClass).find(inputSelector).val('');
+                        $clone.addClass(hideHorizontalClass).find(inputSelector).val('').each(function () {
+
+                            var split = this.name.split(/]\[/);
+
+                            // increment the level index in the name (second-last index)
+                            split[split.length - 2]++;
+
+                            this.name = split.join('][');
+
+                        });
 
                         $td.after($clone);
 
@@ -289,7 +308,13 @@
                 $rb.find('td.' + hideHorizontalClass + ', th.' + hideHorizontalClass).removeClass(hideHorizontalClass);
 
                 // focus on the newly-created level input
-                $rb.children('thead').find('input[data-level]').eq(-1).focus();
+                var $levels = $rb.children('thead').find('input[data-level]');
+                $levels.eq(-1).focus();
+
+                // permit up to 11 levels
+                if ($levels.length >= levelLimit) {
+                    $(this).detach();
+                }
             }
 
         });
@@ -379,7 +404,7 @@
 
             $areas.each(function() {
                 this.style.height = 'auto';
-                h = Math.max(h, this.scrollHeight - 16);
+                h = Math.max(h, this.scrollHeight - parseInt($(this).css('paddingTop')) - parseInt($(this).css('paddingBottom')));
             });
 
             $areas.height(h);

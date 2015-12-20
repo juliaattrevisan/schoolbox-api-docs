@@ -18,7 +18,7 @@
                 {%- if group.used -%}
                     {{ groupName | raw }}
                 {% else %}
-                    <input type="text" value="{{ groupName }}" />
+                    <input type="text" value="{{ groupName }}" name="{{ formField }}[{{ rubric.id }}][group][{{ group.id }}][name]" />
                 {% endif %}
             </label>
         {% else %}

@@ -1,14 +1,15 @@
-{%- set checkName    = 'crit[' ~ crit.id ~ '][on]' -%}
+{%- set checkName    = formField ~ '[' ~ rubric.id ~ '][criterion][' ~ crit.id ~ '][on]' -%}
 {%- set checkChecked = crit.descriptors|length > 0 -%}
 {%- set cellClass    = checkChecked ? '' : 'hide-v' -%}
 
 <th>
-    <input  id="{{ checkName }}" data-criterion-name="{{ crit.name }}" name="{{ checkName }}" type="checkbox" value="{{ crit.id }}" {% if checkChecked %}checked="checked"{% endif %} />
+    <input type="hidden" name="{{ formField }}[{{ rubric.id }}][criterion][{{ crit.id }}][groupId]" value="{{ group.id }}" />
+    <input  id="{{ checkName }}" data-criterion-name="{{ crit.name }}" name="{{ checkName }}" type="checkbox" value="1" {% if checkChecked %}checked="checked"{% endif %} />
     <label for="{{ checkName }}" class="checkbox-label rb-criterion">
         {%- if crit.used -%}
         {{ crit.name | raw }}
         {%- else -%}
-            <input type="text" value="{{ crit.name }}" />
+            <input type="text" value="{{ crit.name }}" name="{{ formField }}[{{ rubric.id }}][criterion][{{ crit.id }}][name]" />
         {%- endif -%}
     </label>
 
@@ -18,8 +19,8 @@
     {%- set descriptor = rubric.descriptors[crit.id][level.id] -%}
 
     <td class="{{ cellClass }}">
-        <textarea{% if not checkChecked %} disabled="disabled"{% endif %} placeholder="Descriptor" rows="2">{{ descriptor.text }}</textarea>
-        <input{% if not checkChecked %} disabled="disabled"{% endif %} class="rb-value" type="text" placeholder="Points" value="{{ descriptor.value }}" />
+        <textarea{% if not checkChecked %} disabled="disabled"{% endif %} placeholder="Descriptor" rows="2" name="{{ formField }}[{{ rubric.id }}][descriptor][{{ crit.id }}][{{ level.id }}][text]">{{ descriptor.text }}</textarea>
+        <input{% if not checkChecked %} disabled="disabled"{% endif %} class="rb-value" type="text" placeholder="Points" value="{{ descriptor.value }}" name="{{ formField }}[{{ rubric.id }}][descriptor][{{ crit.id }}][{{ level.id }}][points]" />
     </td>
 
 {%- endfor %}
