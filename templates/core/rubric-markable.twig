@@ -50,7 +50,7 @@
 {% set rubricId = 'rb-' ~ rubric.id %}
 
 <form>
-    <table class="rb" id="{{ rubricId }}">
+    <table class="rb stack-for-medium-down" id="{{ rubricId }}">
         <thead>
         <tr>
             <th colspan="2">&nbsp;</th>
@@ -173,7 +173,12 @@
 
                 // in lieu of a reduce() function
                 $groupRows.find('input').map(function () {
-                    groupSum += $(this).prop('checked') ? parseFloat(this.value) : 0;
+                    if ($(this).prop('checked')) {
+                        var fl = parseFloat(this.value);
+                        if (!isNaN(fl)) {
+                            groupSum += fl;
+                        }
+                    }
                 });
 
                 var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
