@@ -79,16 +79,19 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." ),
 
                                 /* If aspect ratio is active, recalculate dimensions upon change
+                                 * Ignore Tab key presses entirely
                                  */
-                                onKeyUp: function() {
-                                    var self = this;
+                                onKeyUp: function(event) {
+                                    if (event.data.$.keyCode != 9) {
+                                        var self = this;
 
-                                    var fields = $.fn.schoolboxMediaResourceBrowserDialogFields(self.getDialog());
+                                        var fields = $.fn.schoolboxMediaResourceBrowserDialogFields(self.getDialog());
 
-                                    if (fields.aspectRatio.getValue()) {
-                                        var newHeight = Math.round(fields.width.getValue() / fields.aspectRatioValue.getValue());
+                                        if (fields.aspectRatio.getValue()) {
+                                            var newHeight = Math.round(fields.width.getValue() / fields.aspectRatioValue.getValue());
 
-                                        fields.height.setValue(newHeight);
+                                            fields.height.setValue(newHeight);
+                                        }
                                     }
                                 }
                             },
@@ -99,16 +102,19 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 validate: CKEDITOR.dialog.validate.notEmpty( "Height cannot be empty."),
 
                                 /* If aspect ratio is active, recalculate dimensions upon change
+                                 * Ignore Tab key presses entirely
                                  */
-                                onKeyUp: function() {
-                                    var self = this;
+                                onKeyUp: function(event) {
+                                    if (event.data.$.keyCode != 9) {
+                                        var self = this;
 
-                                    var fields = $.fn.schoolboxMediaResourceBrowserDialogFields(self.getDialog());
+                                        var fields = $.fn.schoolboxMediaResourceBrowserDialogFields(self.getDialog());
 
-                                    if (fields.aspectRatio.getValue()) {
-                                        var newWidth = Math.round(fields.height.getValue() * fields.aspectRatioValue.getValue());
+                                        if (fields.aspectRatio.getValue()) {
+                                            var newWidth = Math.round(fields.height.getValue() * fields.aspectRatioValue.getValue());
 
-                                        fields.width.setValue(newWidth);
+                                            fields.width.setValue(newWidth);
+                                        }
                                     }
                                 }
                             }
