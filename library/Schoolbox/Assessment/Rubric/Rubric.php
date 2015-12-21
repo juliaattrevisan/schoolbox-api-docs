@@ -132,6 +132,17 @@ class Rubric implements Twiggable
 
 
     /**
+     * @param Criteria\Group $group
+     * @param Criteria\Criterion $criterion
+     */
+    public function putCriterion($group, $criterion)
+    {
+        $group->putCriterion($criterion);
+        $this->putGroup($group);
+    }
+
+
+    /**
      * @param Competency\Level $level
      * @return self
      */
