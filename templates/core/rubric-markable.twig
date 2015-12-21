@@ -41,6 +41,37 @@
         background: #003d7e !important;
         color: white;
     }
+
+    @media only screen and (max-width: 59.375em) {
+
+        table.rb td.rb-blank {
+            display: none;
+        }
+
+        table.rb th.rb-criterion-name,
+        table.rb th.rb-group-summary
+        {
+            border-top: solid 2px #ededed;
+            padding-left: 2rem;
+        }
+
+        .rb-group-name {
+            border-top: solid 4px #ededed;
+        }
+
+        table.rb tr label {
+            padding-left: 3rem;
+        }
+
+        .rb tbody th:last-of-type {
+            border-right-width: 0;
+        }
+
+        .rb tbody th:first-of-type {
+            border-right-width: 0;
+        }
+
+    }
 </style>
 
 {% set formField = 'rubric' %}
@@ -50,6 +81,7 @@
 {% set rubricId = 'rb-' ~ rubric.id %}
 
 <form>
+    <div class="scrollable">
     <table class="rb stack-for-medium-down" id="{{ rubricId }}">
         <thead>
         <tr>
@@ -69,11 +101,11 @@
         <tr data-group="{{ rubricId }}-{{ group.id }}">
             {# yay html tables... -_-; #}
             {% if rowspan %}
-                <th rowspan="{{ rowspan }}">{{ group.name|raw }}</th>
+                <th class="rb-group-name" rowspan="{{ rowspan }}">{{ group.name|raw }}</th>
                 {% set rowspan = 0 %}
             {% endif %}
 
-            <th>{{ crit.name|raw }}</th>
+            <th class="rb-criterion-name">{{ crit.name|raw }}</th>
 
                 {% for levelIndex, level in rubric.levels %}
 
@@ -149,6 +181,7 @@
         </tbody>
 
     </table>
+    </div>
 </form>
 {# js specific to the rubric we just injected to...wherever we injected it #}
 <script type="text/javascript">
