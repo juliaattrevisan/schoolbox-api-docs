@@ -76,7 +76,7 @@
     table.rb label {
         cursor:auto;
     }
-    .rb .hide-v:hover:before {
+    .rb .hide-v:not(:last-child):hover:before {
         content: 'Click to add descriptor';
         font-size: 0.75rem;
         opacity: 0.5;
@@ -137,12 +137,16 @@
         margin-bottom: 0;
     }
 
-    .rb-criterion:before {
+    .rb-editable:before {
         top: 13px !important;
     }
 
-    .rb-criterion:after {
+    .rb-editable:after {
         top: 15px !important;
+    }
+
+    table.rb input[type=checkbox] + label.rb-readonly {
+        padding-left: 2.6125rem;
     }
 
     @media only screen and (min-width: 59.4375em) {

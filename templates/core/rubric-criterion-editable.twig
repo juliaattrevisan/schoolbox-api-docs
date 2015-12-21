@@ -5,13 +5,17 @@
 <th>
     <input type="hidden" name="{{ formField }}[{{ rubric.id }}][criterion][{{ crit.id }}][groupId]" value="{{ group.id }}" />
     <input  id="{{ checkName }}" data-criterion-name="{{ crit.name }}" name="{{ checkName }}" type="checkbox" value="1" {% if checkChecked %}checked="checked"{% endif %} />
-    <label for="{{ checkName }}" class="checkbox-label rb-criterion">
-        {%- if crit.used -%}
-        {{ crit.name | raw }}
-        {%- else -%}
-            <input type="text" value="{{ crit.name }}" name="{{ formField }}[{{ rubric.id }}][criterion][{{ crit.id }}][name]" />
-        {%- endif -%}
+
+    {%- if crit.used -%}
+    <label for="{{ checkName }}" class="checkbox-label rb-criterion rb-readonly">
+        {{- crit.name | raw -}}
+        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This {{ locale.translate('rubricCriterion') }} cannot be modified because it is in use elsewhere">?</span>
     </label>
+    {%- else -%}
+    <label for="{{ checkName }}" class="checkbox-label rb-criterion rb-editable">
+        <input type="text" value="{{ crit.name }}" name="{{ formField }}[{{ rubric.id }}][criterion][{{ crit.id }}][name]" />
+    </label>
+    {%- endif -%}
 
 </th>
 
