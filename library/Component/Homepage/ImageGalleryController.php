@@ -87,7 +87,11 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             return false;
         }
 
-        $limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') * $this->getImagesPerRow() : 0;
+        $limit = is_numeric($this->getConfig('size'))
+            ? ($this->getConfig('size') > 0
+                ? min(($this->getConfig('size') * $this->getImagesPerRow()), $this->getConfig('size'))
+                : $this->getConfig('size'))
+            : 0;
 
         /* Template rendering
          */
