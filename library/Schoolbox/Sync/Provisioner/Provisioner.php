@@ -303,7 +303,7 @@ class Provisioner
      *
      * Throws validation exceptions if it isn't.
      *
-     * @todo consider moving to mapper object, and having it introspect mapper's properties for validation
+     * @todo consider moving to mapper object, and having it introspect mapper's properties for validation (logged as SB-10763)
      *
      * @param User $internalUser
      * @throws UnexpectedValueException if a value isn't what it should be
