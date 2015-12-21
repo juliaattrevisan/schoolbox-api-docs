@@ -158,8 +158,9 @@ sed -i 's/var\/log\/nginx/vagrant/g' /etc/nginx/conf.d/nginx-vhost-schoolbox-web
 echo "$vag Set up video cronjobs"
 cp -f /vagrant/tools/cron/schoolboxdev $cachedir/schoolboxdemo-latest-cron
 sed -i 's/usr\/share\/schoolboxdev/vagrant/g' $cachedir/schoolboxdemo-latest-cron
-sed -i 's/var\/log/vagrant\/data/g' $cachedir/schoolboxdemo-latest-cron
 sed -i 's/schoolboxdev/vagrant/g' $cachedir/schoolboxdemo-latest-cron
+sed -i 's/var\/log\/vagrant/vagrant\/data/g' $cachedir/schoolboxdemo-latest-cron
+sed -i 's/var\/lib\/vagrant/vagrant\/data/g' $cachedir/schoolboxdemo-latest-cron
 sed -i 's/www-data/root/g' $cachedir/schoolboxdemo-latest-cron
 cp -f $cachedir/schoolboxdemo-latest-cron /etc/cron.d/vagrant
 
