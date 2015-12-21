@@ -2,6 +2,7 @@
 {%- set rubricId  = rubricId ?: 'rb-' ~ rubric.id -%}
 {%- set groupId   = groupId ?: rubricId ~ '-' ~ group.id -%}
 {%- set groupName = groupName ? group.name ? group.name : '(no ' ~ locale.rubricGroup ~ ')' -%}
+{%- set groupInput = groupInput ?: formField ~ '[' ~ rubric.id ~ '][group]['  ~ group.id ~ ']' -%}
 
 {%- if rowspan is not null -%}
 <tr data-group="{{ groupId }}" data-groupname="{{ group.name }}" class="rb-group-header">
@@ -10,8 +11,14 @@
             <label>
                 {%- if group.used -%}
                     {{ groupName | raw }}
+                    <span data-tooltip
+                          class="hint has-tip tip-right"
+                          data-width="200"
+                          title="This {{ locale.translate('rubricGroup') }} cannot be modified because it contains one or more {{ locale.translate('rubricCriterion', true) }} that are in use elsewhere"
+                    >?</span>
+                    <input type="hidden" value="{{ groupName }}" name="{{ groupInput }}[name]" />
                 {% else %}
-                    <input type="text" value="{{ groupName }}" name="{{ formField }}[{{ rubric.id }}][group][{{ group.id }}][name]" />
+                    <input type="text" value="{{ groupName }}" name="{{ groupInput }}[name]" />
                 {% endif %}
             </label>
         {% else %}

@@ -2,6 +2,8 @@
 {%- set rubricId  = rubricId ?: 'rb-' ~ rubric.id -%}
 {%- set groupId   = rubricId ~ '-' ~ group.id -%}
 {%- set groupName = group.name ? group.name|raw : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
+{%- set levelLimit = levelLimit ?: 11 -%}
+{%- set groupInput = groupInput ?: formField ~ '[' ~ rubric.id ~ '][group]['  ~ group.id ~ ']' -%}
 
 {%- for critIndex, crit in group.criteria -%}
     {% include 'rubric-group-row-editable.twig' %}
@@ -17,8 +19,10 @@
             <label>
                 {%- if group.used -%}
                     {{ groupName | raw }}
+                    <span data-tooltip class="hint has-tip tip-right" data-width="200" title="This {{ locale.translate('rubricGroup') }} cannot be modified because it contains one or more {{ locale.translate('rubricCriterion', false, true) }} that are in use elsewhere">?</span>
+                    <input type="hidden" value="{{ groupName }}" name="{{ groupInput }}[name]" />
                 {% else %}
-                    <input type="text" value="{{ groupName }}" name="{{ formField }}[{{ rubric.id }}][group][{{ group.id }}][name]" />
+                    <input type="text" value="{{ groupName }}" name="{{ groupInput }}[name]" />
                 {% endif %}
             </label>
         {% else %}

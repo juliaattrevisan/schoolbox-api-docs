@@ -101,7 +101,7 @@
         <tr data-group="{{ rubricId }}-{{ group.id }}">
             {# yay html tables... -_-; #}
             {% if rowspan %}
-                <th class="rb-group-name" rowspan="{{ rowspan }}">{{ group.name|raw }}</th>
+                <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name|raw }}</span></th>
                 {% set rowspan = 0 %}
             {% endif %}
 

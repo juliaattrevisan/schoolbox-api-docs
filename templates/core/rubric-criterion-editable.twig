@@ -1,30 +1,37 @@
-{%- set checkName    = formField ~ '[' ~ rubric.id ~ '][criterion][' ~ crit.id ~ '][on]' -%}
+{%- set critInput    = formField ~ '[' ~ rubric.id ~ '][criterion]['  ~ crit.id ~ ']' -%}
+{%- set descInput    = formField ~ '[' ~ rubric.id ~ '][descriptor][' ~ crit.id ~ ']' -%}
 {%- set checkChecked = crit.descriptors|length > 0 -%}
 {%- set cellClass    = checkChecked ? '' : 'hide-v' -%}
+{%- set levelLimit   = levelLimit ?: 11 -%}
 
 <th>
-    <input type="hidden" name="{{ formField }}[{{ rubric.id }}][criterion][{{ crit.id }}][groupId]" value="{{ group.id }}" />
-    <input  id="{{ checkName }}" data-criterion-name="{{ crit.name }}" name="{{ checkName }}" type="checkbox" value="1" {% if checkChecked %}checked="checked"{% endif %} />
+    <input type="hidden" name="{{ critInput }}[groupId]" value="{{ group.id }}" />
+    <input  id="{{ critInput }}[on]" data-criterion-name="{{ crit.name }}" name="{{ critInput }}[on]" type="checkbox" value="1" {% if checkChecked %}checked="checked"{% endif %} />
 
     {%- if crit.used -%}
-    <label for="{{ checkName }}" class="checkbox-label rb-criterion rb-readonly">
+
+    <label for="{{ critInput }}[on]" class="checkbox-label rb-criterion rb-readonly">
         {{- crit.name | raw -}}
-        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This {{ locale.translate('rubricCriterion') }} cannot be modified because it is in use elsewhere">?</span>
+        <span data-tooltip class="hint has-tip tip-right" data-width="200" title="This {{ locale.translate('rubricCriterion') }} cannot be modified because it is in use elsewhere">?</span>
+        <input type="hidden" value="{{ crit.name }}" name="{{ critInput }}[name]" />
     </label>
+
     {%- else -%}
-    <label for="{{ checkName }}" class="checkbox-label rb-criterion rb-editable">
-        <input type="text" value="{{ crit.name }}" name="{{ formField }}[{{ rubric.id }}][criterion][{{ crit.id }}][name]" />
+
+    <label for="{{ critInput }}[on]" class="checkbox-label rb-criterion rb-editable">
+        <input type="text" value="{{ crit.name }}" name="{{ critInput }}[name]" />
     </label>
+
     {%- endif -%}
 
 </th>
 
 {% for levelIndex, level in rubric.levels -%}
-    {%- set descriptor = rubric.descriptors[crit.id][level.id] -%}
+    {%- set descriptor = rubric.descriptors[crit.id][levelIndex] -%}
 
     <td class="{{ cellClass }}">
-        <textarea{% if not checkChecked %} disabled="disabled"{% endif %} placeholder="Descriptor" rows="2" name="{{ formField }}[{{ rubric.id }}][descriptor][{{ crit.id }}][{{ level.id }}][text]">{{ descriptor.text }}</textarea>
-        <input{% if not checkChecked %} disabled="disabled"{% endif %} class="rb-value" type="text" placeholder="Points" value="{{ descriptor.value }}" name="{{ formField }}[{{ rubric.id }}][descriptor][{{ crit.id }}][{{ level.id }}][points]" />
+        <textarea{% if not checkChecked %} disabled="disabled"{% endif %} placeholder="Descriptor" rows="2" name="{{ descInput }}[{{ levelIndex }}][text]">{{ descriptor.text }}</textarea>
+        <input{% if not checkChecked %} disabled="disabled"{% endif %} class="rb-value" type="text" placeholder="Points" value="{{ descriptor.value }}" name="{{ descInput }}[{{ levelIndex }}][points]" />
     </td>
 
 {%- endfor %}
