@@ -76,20 +76,49 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 type: 'text',
                                 id: 'schoolboxmedia-image-width',
                                 label: 'Width',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." )
+                                validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." ),
+
+                                /* If aspect ratio is active, recalculate dimensions upon change
+                                 */
+                                onKeyUp: function() {
+                                    var self = this;
+
+                                    var fields = $.fn.schoolboxMediaResourceBrowserDialogFields(self.getDialog());
+
+                                    if (fields.aspectRatio.getValue()) {
+                                        var newHeight = Math.round(fields.width.getValue() / fields.aspectRatioValue.getValue());
+
+                                        fields.height.setValue(newHeight);
+                                    }
+                                }
                             },
                             {
                                 type: 'text',
                                 id: 'schoolboxmedia-image-height',
                                 label: 'Height',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Height cannot be empty." )
+                                validate: CKEDITOR.dialog.validate.notEmpty( "Height cannot be empty."),
+
+                                /* If aspect ratio is active, recalculate dimensions upon change
+                                 */
+                                onKeyUp: function() {
+                                    var self = this;
+
+                                    var fields = $.fn.schoolboxMediaResourceBrowserDialogFields(self.getDialog());
+
+                                    if (fields.aspectRatio.getValue()) {
+                                        var newWidth = Math.round(fields.height.getValue() * fields.aspectRatioValue.getValue());
+
+                                        fields.width.setValue(newWidth);
+                                    }
+                                }
                             }
                         ]
                     },
                     {
                         type: 'text',
                         id: 'schoolboxmedia-image-aspectratio-value',
-                        label: 'Aspect Ratio Value'
+                        label: 'Aspect Ratio Value',
+                        className: 'hide'
                     },
                     {
                         type: 'checkbox',
