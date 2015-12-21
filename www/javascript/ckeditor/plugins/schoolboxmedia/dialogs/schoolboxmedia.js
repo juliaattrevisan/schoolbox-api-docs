@@ -66,7 +66,11 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                     },
                     {
                         type: 'html',
-                        html: '<label>Preview</label><div id="schoolboxmedia-image-preview" class="schoolboxmedia-image-preview"></div>'
+                        html: '<label class="cke_label_separator">Preview</label><div id="schoolboxmedia-image-preview" class="schoolboxmedia-image-preview"></div>'
+                    },
+                    {
+                        type: 'html',
+                        html: '<label class="cke_label_separator">Image Dimensions</label>'
                     },
                     {
                         type: 'hbox',
@@ -145,7 +149,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                     {
                         type: 'checkbox',
                         id: 'schoolboxmedia-image-fullwidth',
-                        label: 'Fullwidth (this image will stretch horizontally to fill available space)'
+                        label: 'Fullwidth'
                     }
                 ]
             }
