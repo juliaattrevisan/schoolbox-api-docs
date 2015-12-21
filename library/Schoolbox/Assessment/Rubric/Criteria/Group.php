@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Rubric\Criteria;
 
 
+use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\Calculable;
 use Schoolbox\Assessment\Rubric\CalculableAggregator;
 use Schoolbox\Assessment\Rubric\Twiggable;
@@ -129,6 +130,10 @@ class Group implements Twiggable, Calculable
      */
     public function putCriterion($criterion)
     {
+        if (!$criterion instanceof Criterion) {
+            throw new InvalidArgumentException("Invalid Criterion given");
+        }
+
         if (!$this->contains($criterion)) {
             $this->criteria->attach($criterion);
         }

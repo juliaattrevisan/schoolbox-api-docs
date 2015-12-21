@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Rubric;
 
 
+use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\Competency;
 use Schoolbox\Assessment\Rubric\Criteria\Group;
 use SplObjectStorage;
@@ -105,6 +106,11 @@ class Rubric implements Twiggable
      */
     public function putDescriptor($group, $criterion, $level, $descriptor)
     {
+        // validation
+        if (!$descriptor instanceof Descriptor) {
+            throw new InvalidArgumentException("Invalid Descriptor given");
+        }
+
         // ensure both the group and the level exist
         $this->putGroup($group);
         $this->putLevel($level);
@@ -126,6 +132,10 @@ class Rubric implements Twiggable
      */
     public function putGroup($group)
     {
+        if (!$group instanceof Group) {
+            throw new InvalidArgumentException("Invalid Group given");
+        }
+
         $this->criteriaGroups->attach($group);
         return $this;
     }
@@ -148,6 +158,10 @@ class Rubric implements Twiggable
      */
     public function putLevel($level)
     {
+        if (!$level instanceof Competency\Level) {
+            throw new InvalidArgumentException("Invalid Level given");
+        }
+
         $this->levels->attach($level);
         return $this;
     }
