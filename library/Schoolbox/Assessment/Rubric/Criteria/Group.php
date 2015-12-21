@@ -26,17 +26,21 @@ class Group implements Twiggable, Calculable
     /** @var Criterion[]|CalculableAggregator */
     protected $criteria;
 
+    /** @var bool */
+    protected $readOnly;
 
     /**
      * Insert convenience here
      *
      * @param int    $id
      * @param string $name
+     * @param bool   $readOnly
      */
-    public function __construct($id = null, $name = '')
+    public function __construct($id = null, $name = '', $readOnly = false)
     {
         $this->setName($name);
         $this->setId($id);
+        $this->setReadOnly($readOnly);
         $this->criteria = new CalculableAggregator();
     }
 
@@ -77,6 +81,35 @@ class Group implements Twiggable, Calculable
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
+    }
+
+
+    /**
+     * @return boolean
+     */
+    public function isReadOnly()
+    {
+        return $this->readOnly;
+    }
+
+
+    /**
+     * @deprecated method for Mapper-use
+     * @return bool
+     */
+    public function getReadOnly()
+    {
+        return $this->isReadOnly();
+    }
+
+    /**
+     * @param boolean $readOnly
+     * @return static
+     */
+    public function setReadOnly($readOnly)
+    {
+        $this->readOnly = $readOnly;
         return $this;
     }
 
@@ -174,6 +207,7 @@ class Group implements Twiggable, Calculable
             'sum'        => $this->getSum(),
             'total'      => $this->getTotal(),
             'percentage' => $this->getPercentage(),
+            'used'       => $this->isReadOnly(),
             'criteria'   => [],
         ];
 

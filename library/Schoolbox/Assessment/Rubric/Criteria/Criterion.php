@@ -14,6 +14,8 @@ use Schoolbox\Assessment\Rubric\DescriptorList;
 
 class Criterion extends DescriptorList
 {
+    /** @var bool */
+    protected $readOnly = false;
 
     /**
      * Returns the total of the values of descriptors contained herein, irrespective of selection
@@ -31,5 +33,51 @@ class Criterion extends DescriptorList
         return $total;
 
     }
+
+
+    /**
+     * @return boolean
+     */
+    public function isReadOnly()
+    {
+        return $this->readOnly;
+    }
+
+
+    /**
+     * @deprecated method for Mapper-use
+     * @return bool
+     */
+    public function getReadOnly()
+    {
+        return $this->isReadOnly();
+    }
+
+
+    /**
+     * @param boolean $readOnly
+     * @return static
+     */
+    public function setReadOnly($readOnly)
+    {
+        $this->readOnly = $readOnly;
+        return $this;
+    }
+
+
+    /**
+     * Convert yourself into a Twig context array
+     *
+     * @return array
+     */
+    public function toContext()
+    {
+        $context = parent::toContext();
+
+        $context['used'] = $this->isReadOnly();
+
+        return $context;
+    }
+
 
 }
