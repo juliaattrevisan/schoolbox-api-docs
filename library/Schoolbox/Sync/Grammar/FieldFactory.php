@@ -46,8 +46,6 @@ class FieldFactory
 
             'campus[].code'          => 'Campus(es) Code(s)',
             'campus[].name'          => 'Campus(es) Name(s)',
-
-            'residentialHouse'       => 'Boarding House Code',
         ];
 
         switch($roleType) {
@@ -67,6 +65,7 @@ class FieldFactory
                     'form.level' => 'Form Level',
                     'house.code' => 'House Code',
                     'house.name' => 'House Name',
+                    'boardingHouse.code' => 'Boarding House Code',
                 ];
                 break;
             case Role::PARENT:
