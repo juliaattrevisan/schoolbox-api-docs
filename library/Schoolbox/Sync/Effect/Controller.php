@@ -228,10 +228,12 @@ class Controller extends Base {
     public function newMappedRow() {
         $queryData = $this->getRequest()->query;
 
+        $rule = Rule\Mapper::getInstance()->findById($queryData['ruleId']);
+
         $effect = [
             'id' => $queryData['effectId'],
             'rule' => [
-                'id' => $queryData['ruleId'],
+                'id' => $rule->getId(),
             ]
         ];
 
