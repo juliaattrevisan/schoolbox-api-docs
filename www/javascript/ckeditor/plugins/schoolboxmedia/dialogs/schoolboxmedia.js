@@ -10,67 +10,74 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                 label: 'Schoolbox Image',
                 elements: [
                     {
-                        type: 'text',
-                        id: 'schoolboxmedia-image-url',
-                        label: 'Url',
-                        validate: CKEDITOR.dialog.validate.notEmpty( "Url cannot be empty." ),
+                        type: 'hbox',
+                        widths: ['67%', '33%'],
+                        children: [
+                            {
+                                type: 'text',
+                                id: 'schoolboxmedia-image-url',
+                                label: 'Url',
+                                validate: CKEDITOR.dialog.validate.notEmpty( "Url cannot be empty." ),
 
-                        /* When you type the url yourself, apply details
-                         */
-                        onBlur: function() {
-                            var self = this;
-
-                            var image = true;
-
-                            if (image) {
-                                var url = self.getDialog().getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url').getValue();
-
-                                $.fn.schoolboxMediaResourceBrowserRenderImage(url, self.getDialog());
-                            }
-                        }
-                    },
-                    {
-                        type: 'button',
-                        id: 'schoolboxmedia-image-browse',
-                        label: editorInstance.lang.common.browseServer,
-                        onClick: function() {
-                            var self = this;
-
-                            /* Select something from the Resource Browser
-                             */
-                            var message = $.fn.schoolboxMediaResourceBrowser();
-
-                            $(window).on('message', function(event) {
-                                var message;
-
-                                try {
-                                    message = JSON.parse(event.originalEvent.data);
-                                } catch (err) {
-                                    message = event.originalEvent.data;
-                                }
-
-                                /* Find out how to render this file
+                                /* When you type the url yourself, apply details
                                  */
-                                $.getJSON('/editor/nodeInfo.php', { hash: message.data[0].hash }, function(responseText) {
+                                onBlur: function() {
+                                    var self = this;
 
-                                    /* Renderer Strategy (I guess)
-                                     */
-                                    $.fn.schoolboxMediaResourceBrowserRenderer(responseText.type, responseText, self.getDialog());
+                                    var image = true;
 
-                                    /* Shut modal, go back to Dialog
+                                    if (image) {
+                                        var url = self.getDialog().getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url').getValue();
+
+                                        $.fn.schoolboxMediaResourceBrowserRenderImage(url, self.getDialog());
+                                    }
+                                }
+                            },
+                            {
+                                type: 'button',
+                                id: 'schoolboxmedia-image-browse',
+                                label: editorInstance.lang.common.browseServer,
+                                className: 'schoolboxmedia-browse',
+                                onClick: function() {
+                                    var self = this;
+
+                                    /* Select something from the Resource Browser
                                      */
-                                    $('[data-schoolboxmedia-reveal]').foundation('reveal', 'close');
-                                });
-                            });
-                        }
+                                    var message = $.fn.schoolboxMediaResourceBrowser();
+
+                                    $(window).on('message', function(event) {
+                                        var message;
+
+                                        try {
+                                            message = JSON.parse(event.originalEvent.data);
+                                        } catch (err) {
+                                            message = event.originalEvent.data;
+                                        }
+
+                                        /* Find out how to render this file
+                                         */
+                                        $.getJSON('/editor/nodeInfo.php', { hash: message.data[0].hash }, function(responseText) {
+
+                                            /* Renderer Strategy (I guess)
+                                             */
+                                            $.fn.schoolboxMediaResourceBrowserRenderer(responseText.type, responseText, self.getDialog());
+
+                                            /* Shut modal, go back to Dialog
+                                             */
+                                            $('[data-schoolboxmedia-reveal]').foundation('reveal', 'close');
+                                        });
+                                    });
+                                }
+                            }
+                        ]
                     },
                     {
                         type: 'html',
-                        html: '<label class="cke_label_separator">Preview</label><div id="schoolboxmedia-image-preview" class="schoolboxmedia-image-preview"></div>'
+                        html: '<label class="schoolboxmedia-separator">Preview</label><div id="schoolboxmedia-image-preview" class="schoolboxmedia-image-preview"></div>'
                     },
                     {
                         type: 'html',
-                        html: '<label class="cke_label_separator">Image Dimensions</label>'
+                        html: '<label class="schoolboxmedia-separator">Image Dimensions</label>'
                     },
                     {
                         type: 'hbox',
