@@ -169,13 +169,7 @@
      * @param dialog
      */
     $.fn.schoolboxMediaResourceBrowserRenderImage = function(url, dialog) {
-
-        var fields = {
-            url: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url'),
-            width: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-width'),
-            height: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-height'),
-            preview: $('#schoolboxmedia-image-preview')
-        };
+        var fields = $.fn.schoolboxMediaResourceBrowserDialogFields(dialog);
 
         /* Find out width/height ratio
          */
@@ -198,6 +192,25 @@
             fields.height.setValue(height);
             fields.preview.html(preview);
         }
+    };
+
+    /**
+     * A macro to all the fields in the Dialog
+     * (because it's such a longwinded way to retrieve them)
+     *
+     * @param dialog
+     * @returns {{url: *, width: *, height: *, preview: (*|Mixed|jQuery|HTMLElement)}}
+     */
+    $.fn.schoolboxMediaResourceBrowserDialogFields = function(dialog) {
+        return {
+            url: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url'),
+            width: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-width'),
+            height: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-height'),
+            aspectRatio: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-aspectratio'),
+            aspectRatioValue: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-aspectratio-value'),
+            fullwidth: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-fullwidth'),
+            preview: $('#schoolboxmedia-image-preview')
+        };
     };
 }(jQuery));
 

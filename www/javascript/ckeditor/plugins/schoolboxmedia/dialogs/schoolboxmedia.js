@@ -76,15 +76,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 type: 'text',
                                 id: 'schoolboxmedia-image-width',
                                 label: 'Width',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." ),
-
-                                onBlur: function() {
-                                    var self = this;
-
-                                    var aspectRatio = self.getDialog().getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-aspectratio').getValue();
-
-                                    console.log(aspectRatio);
-                                }
+                                validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." )
                             },
                             {
                                 type: 'text',
@@ -95,9 +87,25 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         ]
                     },
                     {
+                        type: 'text',
+                        id: 'schoolboxmedia-image-aspectratio-value',
+                        label: 'Aspect Ratio Value'
+                    },
+                    {
                         type: 'checkbox',
                         id: 'schoolboxmedia-image-aspectratio',
-                        label: 'Constrain Aspect Ratio'
+                        label: 'Constrain Aspect Ratio',
+
+                        /* Remember the ratio so we can apply it when
+                         * Constrain Aspect Ratio is activated
+                         */
+                        onChange: function() {
+                            var self = this;
+
+                            var fields = $.fn.schoolboxMediaResourceBrowserDialogFields(self.getDialog());
+
+                            fields.aspectRatioValue.setValue(fields.width.getValue()/fields.height.getValue());
+                        }
                     },
                     {
                         type: 'checkbox',
