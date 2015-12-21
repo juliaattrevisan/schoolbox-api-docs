@@ -1,4 +1,4 @@
-<li id="effect-{{ currentEffect.id }}" class="actions-small-2 content" data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
+<li id="effect-{{ currentEffect.id }}" class="actions-small-1 content" data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
     <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" value="">
 
     <div class="list-item">
@@ -12,7 +12,6 @@
                         name: 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][userProperty]',
                         options: allEffectStructures.allUserField,
                         preselected: currentEffect.getUserProperty(),
-                        disabled: meta.effect[currentEffect.id].disabled,
                         selectData: {
                             'data-effect-userfield': currentEffect.id
                         }
@@ -28,7 +27,6 @@
                             2: 'Equals'
                         },
                         preselected: currentEffect.effectType.id,
-                        disabled: meta.effect[currentEffect.id].disabled,
                         selectData: {
                             'data-effect-mappingtype': currentEffect.id,
                             'data-effect-ruleid': currentEffect.rule.id
@@ -36,10 +34,6 @@
                     } %}
                 </label>
             </div>
-
-            {# Dynamically construct input names #}
-            {% set dynamicDisabled = meta.effect[currentEffect.id].disabled %}
-
             <div>
                 <div data-effect-fragment="{{ currentEffect.id }}">
                     {% include allEffectStructures.fragments[currentEffect.id].fragment.getFilename() %}
@@ -53,6 +47,5 @@
     </div>
     <nav>
         <a href="/adminv2/ups/effect/delete/{{ currentEffect.id }}" class="icon-delete" title="Delete" data-effect-delete="{{ currentEffect.id }}"></a>
-        <a href="" class="icon-{{ meta.effect[currentEffect.id].lock.icon }}" title='Toggle Readonly Mode' data-effect-modify-lock="effect-{{ currentEffect.id }}"></a>
     </nav>
 </li>

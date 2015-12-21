@@ -7,8 +7,7 @@
             {% include 'sub/select.twig' with {
                 name: 'rule[' ~ currentCondition.rule.id ~ '][condition][' ~ currentCondition.id ~ '][arguments][0]',
                 options: ['User Exists', "User Doesn't Exist"],
-                preselected: currentCondition.arguments[0],
-                disabled: meta.condition[currentCondition.id].disabled
+                preselected: currentCondition.arguments[0]
             } %}
         </div>
         <div class="small-12 columns">
