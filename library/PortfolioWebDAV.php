@@ -420,14 +420,13 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 'password' => $_SESSION['password'],
             );
 
-// Temp disabled since broken in v15.5
-//            if ($groupHandler->isStaff()) {
+            if ($groupHandler->isStaff()) {
                 $paths = array(
                     $settings['baseUri'] . 'KDrive/',
                     $settings['baseUri'] . 'staffhome/' . $_SESSION['username'] . '/',
                     $settings['baseUri'] . 'StudentShare/',
                 );
-//            }
+            }
 
         } elseif ($site_location=='meriden') {
             $settings = array(
