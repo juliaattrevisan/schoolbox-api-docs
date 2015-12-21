@@ -148,4 +148,83 @@ class Factory
     }
 
 
+    /**
+     * Construct a Rubric object based a form datum
+     *
+     * @param array $formData
+     * @param bool  $includeEmptyCriteria
+     * @return Rubric
+     */
+    public function buildFromPostData(array $formData, $includeEmptyCriteria)
+    {
+        // we're only going to take the first one... this could be converted to foreach easily enough
+        $rubricData = reset($formData);
+        $rubricId   = key($formData);
+
+        $levels      = $rubricData['level']      ?: [];
+        $groups      = $rubricData['group']      ?: [];
+        $criteria    = $rubricData['criterion']  ?: [];
+        $descriptors = $rubricData['descriptor'] ?: [];
+
+        $rubric = new Rubric($rubricId);
+
+        /** @var Level[] $levelCache */
+        $levelCache = [];
+
+        // cache levels and ensure all exist in the rubric
+        foreach ($levels as $levelId => $level) {
+            $levelName = $level['name'];
+
+            $levelCache[$levelId] = new Level($levelId, $levelName);
+
+            $rubric->putLevel($levelCache[$levelId]);
+        }
+
+        /** @var Group[] $groupCache */
+        $groupCache = [ 0 => new Group(null, '') ];
+
+        // cache groups
+        foreach ($groups as $groupId => $groupData) {
+            $groupName = $groupData['name'];
+            $groupCache[$groupId] = new Group($groupId, $groupName);
+        }
+
+        foreach ($criteria as $criterionId => $criterion) {
+
+            $groupId          = $criterion['groupId'];
+            $criterionEnabled = isset($criterion['on']) && $criterion['on'];
+            $criterionName    = $criterion['name'];
+
+            // spawn
+            $c = new Criterion($criterionId, $criterionName);
+
+            // retrieve from cache
+            $g = $groupCache[$groupId];
+
+            if ($includeEmptyCriteria) {
+                $rubric->putCriterion($g, $c);
+            }
+
+            if (!$criterionEnabled) {
+                continue;
+            }
+
+            foreach ($levelCache as $l) {
+
+                $descriptor      = $descriptors[$criterionId][$l->getId()];
+                $descriptorText  = $descriptor['text'];
+                $descriptorValue = $descriptor['points'];
+
+                if ($descriptorText || $descriptorValue) {
+                    $d = new Descriptor($descriptorText, $descriptorValue);
+                    $rubric->putDescriptor($g, $c, $l, $d);
+                }
+
+            }
+
+        }
+
+        return $rubric;
+    }
+
 }
