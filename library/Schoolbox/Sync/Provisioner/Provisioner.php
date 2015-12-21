@@ -310,13 +310,13 @@ class Provisioner
      */
     protected function sanityCheck(User $internalUser)
     {
-        if ($internalUser->getUsername() === null) {
+        if ($internalUser->getUsername() === null || !strlen($internalUser->getUsername())) {
             throw new UnexpectedValueException('Username cannot be null');
         }
-        if ($internalUser->getRole() === null) {
+        if (!$internalUser->getRole() instanceof Role) {
             throw new UnexpectedValueException('User role cannot be null');
         }
-        if ($internalUser->getFirstname() === null) {
+        if ($internalUser->getFirstname() === null || !strlen($internalUser->getFirstname())) {
             throw new UnexpectedValueException('Firstname cannot be null');
         }
         if ($internalUser->getLocalEmail() === null) {
