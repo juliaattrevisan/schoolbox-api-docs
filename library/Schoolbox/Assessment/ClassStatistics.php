@@ -241,6 +241,12 @@ class ClassStatistics {
 		return $marks;
 	}
 
+	/**
+	 * Given a user, will iterate through the entire work array for this class and return an array of user data
+	 *
+	 * @param User $user
+	 * @return array
+	 */
 	public function getHistoryIsolatingUser(User $user) {
 		$id = $user->getId();
 		$data = array();
@@ -311,4 +317,46 @@ class ClassStatistics {
 		ksort($works);
 		return array_values($works);
 	}
+
+	/**
+	 * Get all the students data for box and whisker averages
+	 */
+	public function getAllUsersMarks() {
+		$allData = array();
+		$i = 0;
+		foreach ($this->workMap as $dueDate => $current) {
+			$box = $current['object'];
+			$allMarks = $current['marks'];
+			$allData[$i] = array();
+			/* Stack results
+             */
+			foreach ($allMarks as $userId => $currentMark) {
+				if ($box instanceof OnlineAssessment) {
+					if ($userId !== 'avg') {
+						if (count($currentMark)) {
+							$latestAttempt = array_pop($currentMark);
+							$allData[$i][] = array(
+								'info' => null,
+								'uid' => null,
+								'value' => (float)$latestAttempt['mark']
+							);
+						}
+					}
+				}
+				elseif ($box instanceof SubmissionBox) {
+					if (strlen(trim($currentMark['mark']))) {
+						$allData[$i][] = array(
+							'info' => null,
+							'uid' => null,
+							'value' => (float)$currentMark['mark']
+						);
+					}
+				}
+			}
+
+			$i++;
+		}
+		return array_values($allData);
+	}
+
 }

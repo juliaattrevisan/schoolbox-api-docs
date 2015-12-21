@@ -266,6 +266,10 @@ class SubjectReportCard {
 		return $this->_fullClassHistory->extractUserMarks($this->getUser());
 	}
 
+	public function getAssessmentAverages() {
+		return $this->_fullClassHistory->getAllUsersMarks();
+	}
+
 	public function getComments($visibleTo = self::VISIBLE_TO_ALL) {
 		if(!is_array($this->_comments)) {
 			// populate cache
