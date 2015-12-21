@@ -76,7 +76,15 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 type: 'text',
                                 id: 'schoolboxmedia-image-width',
                                 label: 'Width',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." )
+                                validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." ),
+
+                                onBlur: function() {
+                                    var self = this;
+
+                                    var aspectRatio = self.getDialog().getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-aspectratio').getValue();
+
+                                    console.log(aspectRatio);
+                                }
                             },
                             {
                                 type: 'text',
@@ -88,7 +96,12 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                     },
                     {
                         type: 'checkbox',
-                        id: 'schoobox-image-fullwidth',
+                        id: 'schoolboxmedia-image-aspectratio',
+                        label: 'Constrain Aspect Ratio'
+                    },
+                    {
+                        type: 'checkbox',
+                        id: 'schoolboxmedia-image-fullwidth',
                         label: 'Fullwidth (this image will stretch horizontally to fill available space)'
                     }
                 ]
