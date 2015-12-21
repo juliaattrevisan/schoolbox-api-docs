@@ -408,11 +408,21 @@ class StudentReportCard
 
     protected function renderClassGraph(\SitePage $page)
     {
+        $page->setBlock('subject_container', 'grade_graph', 'grade_graph_block');
+        $page->setVar('GRAPH_ASSESSMENT_ITEM_VALUE',json_encode(array()));
+
         // Not showing graph? Output dummy data
         if (!\Config::get('display_grade_graph')) {
+            $page->setVar('grade_graph_block', '');
             return;
         }
 
+        if ($this->checkPermission(self::CAN_VIEW_CLASS_AVERAGE)) {
+            $boxWhisker = $this->subjectData->getAssessmentAverages();
+            $page->setVar('GRAPH_ASSESSMENT_ITEM_VALUE', json_encode($boxWhisker));
+        }
+
+        $page->parse('grade_graph_block', 'grade_graph');
     }
 
     protected function renderCriteria(\SitePage $page)
@@ -573,7 +583,6 @@ class StudentReportCard
         $page->setBlock('work', 'work_unclickable', 'work_unclickable_block');
         $work = $this->subjectData->getAssessments();
 
-        $boxWhisker = $this->subjectData->getAssessmentAverages();
 
         if (count($work)) {
             $user       = $this->getTargetUser();
@@ -711,18 +720,17 @@ class StudentReportCard
                 );
             }
 
+            /* Output graph json data */
+            $page->setVar('GRAPH_INFO_INDEX', json_encode($infoIndex));
+            $page->setVar('GRAPH_ASSESSMENT_NAMES', json_encode($allNames));
+            $page->setVar('YOUR_GRAPH_ASSESSMENT_ITEM_VALUE', json_encode($userMarks));
+
             $page->parse('has_work_block', 'has_work');
 
             $page->setVar(array(
                 'no_work_block' => '',
                 'work_publishable_label_block' => '',
             ));
-
-            /* Output graph json data */
-            $page->setVar('GRAPH_INFO_INDEX', json_encode($infoIndex));
-            $page->setVar('GRAPH_ASSESSMENT_NAMES', json_encode($allNames));
-            $page->setVar('YOUR_GRAPH_ASSESSMENT_ITEM_VALUE', json_encode($userMarks));
-            $page->setVar('GRAPH_ASSESSMENT_ITEM_VALUE', json_encode($boxWhisker));
         }
         else {
             $page->setVar(array(

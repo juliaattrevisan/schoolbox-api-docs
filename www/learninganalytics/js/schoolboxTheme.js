@@ -32,13 +32,29 @@ $(function () {
              */
             boxplot: {
                 color: '#0066b0',
-                fillColor: '#bcd7ea'
+                fillColor: '#bcd7ea',
+                animation: {
+                    duration: 300
+                }
+            },
+
+            bar: {
+                animation: {
+                    duration: 300
+                }
+            },
+
+            column: {
+                animation: {
+                    duration: 300
+                }
             },
 
             /* Effort
              */
             scatter: {
-                color: 'rgba(0,102,176, .5)'
+                color: 'rgba(0,102,176, .5)',
+                animation: false
             }
         },
 
