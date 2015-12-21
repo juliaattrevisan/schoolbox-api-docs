@@ -377,6 +377,10 @@
 
             });
 
+            // probability is high the user pressed return, so prevent form submission
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
         });
 
 
