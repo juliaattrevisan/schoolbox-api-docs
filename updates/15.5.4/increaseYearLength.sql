@@ -1,1 +1,1 @@
-ALTER TABLE `user` MODIFY `year` VARCHAR(14);
+ALTER TABLE `user` MODIFY `year` VARCHAR(255);
