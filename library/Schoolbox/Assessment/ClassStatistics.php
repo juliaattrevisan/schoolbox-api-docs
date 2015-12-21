@@ -242,61 +242,6 @@ class ClassStatistics {
 	}
 
 	/**
-	 * Given a user, will iterate through the entire work array for this class and return an array of user data
-	 *
-	 * @param User $user
-	 * @return array
-	 */
-	public function getHistoryIsolatingUser(User $user) {
-		$id = $user->getId();
-		$data = array();
-
-		foreach($this->workMap as $stamp => $work) {
-			$mark = null;
-
-			if($work['object'] instanceof SubmissionBox) {
-				$title = $work['object']->getName();
-				$visibility = $work['object']->getMarkVisibility();
-
-				// extract user mark if it exists
-				if(array_key_exists($id, $work['marks'])) {
-					$mark = $work['marks'][$id];
-				}
-			}
-			elseif($work['object'] instanceof OnlineAssessment) {
-				$title = $work['object']->getTitle();
-				$visibility = 2;
-
-				// extract user mark if it exists
-				if(array_key_exists($id, $work['marks'])) {
-					$mark = $work['marks'][$id][0];
-				}
-			}
-			else {
-				continue;
-			}
-
-			// extract average mark if it exists
-			if(array_key_exists('avg', $work['marks'])) {
-				$avg = $work['marks']['avg'];
-			}
-			else {
-				$avg = null;
-			}
-
-			$data[$stamp] = array(
-				'timestamp' => $stamp * 1000, // millis, for jsgraph
-				'title' => $title,
-				'user_mark' => $mark['mark'],
-				'average_mark' => $avg,
-				'visibility' => $visibility
-			);
-		}
-
-		return $data;
-	}
-
-	/**
 	 * Extracts the nominated user's marks for the category
 	 *
 	 * @param User $user
@@ -320,6 +265,7 @@ class ClassStatistics {
 
 	/**
 	 * Get all the students data for box and whisker averages
+	 * @return array
 	 */
 	public function getAllUsersMarks() {
 		$allData = array();

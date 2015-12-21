@@ -418,7 +418,7 @@ class StudentReportCard
         }
 
         if ($this->checkPermission(self::CAN_VIEW_CLASS_AVERAGE)) {
-            $boxWhisker = $this->subjectData->getAssessmentAverages();
+            $boxWhisker = $this->subjectData->getAllAssessmentMarks();
             $page->setVar('GRAPH_ASSESSMENT_ITEM_VALUE', json_encode($boxWhisker));
         }
 
