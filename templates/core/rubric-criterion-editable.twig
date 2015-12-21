@@ -24,5 +24,6 @@
     </td>
 
 {%- endfor %}
-
+{% if rubric.levels|length < levelLimit %}
 <td class="{{ cellClass }}">&nbsp;</td>
+{% endif %}

@@ -218,6 +218,7 @@
 {% set formField = formField ?: 'rb' %}
 {% set inputType = rubric.multiSelect ? 'checkbox' : 'radio' %}
 {% set rubricId  = 'rb-' ~ rubric.id %}
+{% set levelLimit = levelLimit ?: 11 %}
 
 <form method="post">
     <input type="submit" value="Mark This Rubric" />
@@ -233,7 +234,9 @@
                 <input data-level placeholder="{{ locale.translate('rubricLevel', false, true) }} name" type="text" value="{{ level.name }}" name="{{ formField }}[{{ rubric.id }}][level][{{ level.id }}][name]" />
             </th>
             {%- endfor %}
+            {% if rubric.levels|length < levelLimit %}
             <th><a href="#" data-spawn="level">&plus; {{ locale.translate('rubricLevel', false, true) }}</a></th>
+            {% endif %}
         </tr>
         </thead>
         <tbody>
@@ -256,7 +259,7 @@
     var hideHorizontalClass = 'hide-h';
     var hideVerticalClass   = 'hide-v';
     var inputSelector       = 'input[type=text],textarea';
-    var levelLimit          = 11;
+    var levelLimit          = {{ levelLimit }};
 
     $(function () {
 
