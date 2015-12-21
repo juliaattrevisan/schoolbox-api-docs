@@ -1,0 +1,1 @@
+ALTER TABLE `user` MODIFY `year` VARCHAR(14);
