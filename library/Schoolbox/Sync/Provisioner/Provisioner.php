@@ -224,9 +224,9 @@ class Provisioner
 
                     try {
                         $this->sanityCheck($internalUser);
-                        $this->logger->debug("User record passes sanity check");
+                        $this->logger->debug("User record passes sanity check", $commonContext);
                     } catch (UnexpectedValueException $e) {
-                        $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()));
+                        $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()), array_merge($commonContext, [ 'error' => $e ]));
                         continue;
                     }
 
