@@ -185,56 +185,8 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
          */
         onOk: function() {
             var dialog = this;
-            var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
-            var styles = [];
-
-            var element = editorInstance.document.createElement('img');
-            element.setAttribute('src', fields.url.getValue());
-
-            /* Determine width - if fullwidth checked, use 100%
-             * otherwise use specified values. Note that width:100%
-             * is not allowed, so use the usual class instead
-             */
-            if (fields.fullwidth.getValue()) {
-                styles.push('width:100%');
-            }
-            else {
-                styles.push('width:'+fields.width.getValue()+'px');
-                styles.push('height:'+fields.height.getValue()+'px');
-            }
-
-            /* Alignment
-             * Floats left and right;
-             * centered uses 0 auto;
-             * none is no floating, just display inline
-             */
-            switch (fields.alignment.getValue()) {
-                case 'center':
-                    styles.push('margin: 0 auto');
-                    styles.push('display: block');
-                    break;
-
-                case 'left':
-                case 'right':
-                    styles.push('float:' + fields.alignment.getValue());
-                    break;
-
-                default:
-                    break;
-            }
-
-            /* Border
-             */
-            if (fields.border.getValue()) {
-                styles.push('border: 1px solid #808080;');
-            }
-
-            /* Combine and inject
-             */
-            element.setAttribute('style', styles.join(';'));
-
-            editorInstance.insertElement(element);
+            editorInstance.insertElement($.fn.schoolboxMediaInjectImage(editorInstance, dialog));
         }
     };
 });
