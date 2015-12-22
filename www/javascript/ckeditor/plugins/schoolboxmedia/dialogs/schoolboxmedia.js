@@ -171,19 +171,30 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
             var dialog = this;
             var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
+            var styles = [];
+            var classes = [];
+
             var element = editorInstance.document.createElement('img');
             element.setAttribute('src', fields.url.getValue());
 
             /* Determine width - if fullwidth checked, use 100%
-             * otherwise use specified values
+             * otherwise use specified values. Note that width:100%
+             * is not allowed, so use the usual class instead
              */
             if (fields.fullwidth.getValue()) {
-                element.setAttribute('width', '100%');
+                styles.push('width:100%');
             }
             else {
-                element.setAttribute('width', fields.width.getValue());
-                element.setAttribute('height', fields.height.getValue());
+                styles.push('width:'+fields.width.getValue()+'px');
+                styles.push('height:'+fields.height.getValue()+'px');
             }
+
+            /* Border
+             */
+            styles.push('border: 1px solid #f00;');
+
+            element.setAttribute('style', styles.join(';'));
+            element.setAttribute('class', classes.join(' '));
 
             editorInstance.insertElement(element);
         }

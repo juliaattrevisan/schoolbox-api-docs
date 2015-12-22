@@ -266,7 +266,6 @@
                     {name: 'tools', groups: ['tools']},
                     {name: 'document', groups: ['mode', 'document', 'doctools']},
                     '/',
-                    {name: 'forms', groups: ['forms']},
                     {name: 'styles', groups: ['styles']},
                     {name: 'colors', groups: ['colors']},
                     {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph']},
@@ -282,8 +281,13 @@
                     {name: 'schoolbox', groups: []}
                 ],
 
-                /* Schoolbox Custom Plugins
+                /* Allow images to be styled using style attribute (they can use source if clever)
                  */
+                extraAllowedContent: 'img{width,height,border}',
+
+                /* Remove default plugins; add Schoolbox Custom Plugins
+                 */
+                removePlugins: 'image,image2',
                 extraPlugins: 'schoolboxmedia',
 
                 /* Other settings
