@@ -23,6 +23,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                  */
                                 onBlur: function() {
                                     var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
                                     var image = true;
 
@@ -30,9 +31,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                      * Reset aspect ratio in case it remembered from previous image
                                      */
                                     if (image) {
-                                        var url = dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url').getValue();
-
-                                        $.fn.schoolboxMediaRenderImage(url, dialog);
+                                        $.fn.schoolboxMediaRenderImage(fields.url.getValue(), dialog);
                                     }
                                 }
                             },
@@ -98,7 +97,6 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 onKeyUp: function(event) {
                                     if (event.data.$.keyCode != 9) {
                                         var dialog = this.getDialog();
-
                                         var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
                                         if (fields.aspectRatio.getValue()) {
