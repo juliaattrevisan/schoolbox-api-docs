@@ -10,7 +10,7 @@
      *
      * @param options
      */
-    $.fn.schoolboxMediaResourceBrowser = function(options) {
+    $.fn.schoolboxMedia = function(options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -147,12 +147,12 @@
      * @param responseText
      * @param dialog
      */
-    $.fn.schoolboxMediaResourceBrowserRenderer = function(type, responseText,dialog) {
+    $.fn.schoolboxMediaFactory = function(type, responseText, dialog) {
 
         /* Render an image
          */
         if (type == 'image') {
-            $.fn.schoolboxMediaResourceBrowserRenderImage('/storage/image.php?hash='+responseText.hash, dialog);
+            $.fn.schoolboxMediaRenderImage('/storage/image.php?hash='+responseText.hash, dialog);
         }
         else if (type == 'video') {
         }
@@ -168,8 +168,8 @@
      * @param url
      * @param dialog
      */
-    $.fn.schoolboxMediaResourceBrowserRenderImage = function(url, dialog) {
-        var fields = $.fn.schoolboxMediaResourceBrowserDialogFields(dialog);
+    $.fn.schoolboxMediaRenderImage = function(url, dialog) {
+        var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
         /* Find out width/height ratio
          */
@@ -193,7 +193,7 @@
 
             /* Reset aspect ratio value
              */
-            $.fn.schoolboxMediaResourceBrowserAspectRatioReset(dialog);
+            $.fn.schoolboxMediaAspectRatioReset(dialog);
         }
     };
 
@@ -205,8 +205,8 @@
      *
      * @param dialog
      */
-    $.fn.schoolboxMediaResourceBrowserAspectRatioReset = function(dialog) {
-        var fields = $.fn.schoolboxMediaResourceBrowserDialogFields(dialog);
+    $.fn.schoolboxMediaAspectRatioReset = function(dialog) {
+        var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
         fields.aspectRatioValue.setValue(fields.width.getValue()/fields.height.getValue());
     }
@@ -216,9 +216,9 @@
      * (because it's such a longwinded way to retrieve them)
      *
      * @param dialog
-     * @returns {{url: *, width: *, height: *, preview: (*|Mixed|jQuery|HTMLElement)}}
+     * @returns {{url: *, width: *, height: *, aspectRatio: *, aspectRatioValue: *, fullwidth: *, preview: (*|Mixed|jQuery|HTMLElement)}}
      */
-    $.fn.schoolboxMediaResourceBrowserDialogFields = function(dialog) {
+    $.fn.schoolboxMediaDialogFields = function(dialog) {
         return {
             url: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url'),
             width: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-width'),
