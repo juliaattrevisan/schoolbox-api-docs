@@ -182,7 +182,7 @@
         function applyDimensions() {
             var width = this.width;
             var height = this.height;
-            var preview = '<img src="'+url+'" style="display:block;" />';
+            var preview = '<img src="'+url+'" />';
 
             /* Set dialog input contents
              */
