@@ -226,6 +226,7 @@
             aspectRatio: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-aspectratio'),
             aspectRatioValue: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-aspectratio-value'),
             fullwidth: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-fullwidth'),
+            border: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-border'),
             preview: $('#schoolboxmedia-image-preview')
         };
     };

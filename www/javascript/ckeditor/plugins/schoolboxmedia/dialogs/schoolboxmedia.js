@@ -159,6 +159,11 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         type: 'checkbox',
                         id: 'schoolboxmedia-image-fullwidth',
                         label: 'Fullwidth'
+                    },
+                    {
+                        type: 'checkbox',
+                        id: 'schoolboxmedia-image-border',
+                        label: 'Border'
                     }
                 ]
             }
@@ -172,7 +177,6 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
             var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
             var styles = [];
-            var classes = [];
 
             var element = editorInstance.document.createElement('img');
             element.setAttribute('src', fields.url.getValue());
@@ -191,10 +195,13 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
 
             /* Border
              */
-            styles.push('border: 1px solid #f00;');
+            if (fields.border.getValue()) {
+                styles.push('border: 1px solid #808080;');
+            }
 
+            /* Combine and inject
+             */
             element.setAttribute('style', styles.join(';'));
-            element.setAttribute('class', classes.join(' '));
 
             editorInstance.insertElement(element);
         }
