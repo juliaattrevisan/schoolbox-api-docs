@@ -168,6 +168,13 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         type: 'checkbox',
                         id: 'schoolboxmedia-image-border',
                         label: 'Border'
+                    },
+                    {
+                        type: 'select',
+                        id: 'schoolboxmedia-image-alignment',
+                        label: 'Alignment',
+                        items: [ ['None', 'none'], ['Left', 'left'], ['Center', 'center'], ['Right', 'right']],
+                        'default': 'none'
                     }
                 ]
             }
@@ -195,6 +202,26 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
             else {
                 styles.push('width:'+fields.width.getValue()+'px');
                 styles.push('height:'+fields.height.getValue()+'px');
+            }
+
+            /* Alignment
+             * Floats left and right;
+             * centered uses 0 auto;
+             * none is no floating, just display inline
+             */
+            switch (fields.alignment.getValue()) {
+                case 'center':
+                    styles.push('margin: 0 auto');
+                    styles.push('display: block');
+                    break;
+
+                case 'left':
+                case 'right':
+                    styles.push('float:' + fields.alignment.getValue());
+                    break;
+
+                default:
+                    break;
             }
 
             /* Border

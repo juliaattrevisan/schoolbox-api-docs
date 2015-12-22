@@ -221,13 +221,14 @@
     $.fn.schoolboxMediaDialogFields = function(dialog) {
         return {
             url: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url'),
+            preview: $('#schoolboxmedia-image-preview'),
             width: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-width'),
             height: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-height'),
             aspectRatio: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-aspectratio'),
             aspectRatioValue: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-aspectratio-value'),
             fullwidth: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-fullwidth'),
-            border: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-border'),
-            preview: $('#schoolboxmedia-image-preview')
+            alignment: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-alignment'),
+            border: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-border')
         };
     };
 }(jQuery));
@@ -284,7 +285,7 @@
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
-                extraAllowedContent: 'img{width,height,border}',
+                extraAllowedContent: 'img{width,height,border,margin,display}',
 
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */
