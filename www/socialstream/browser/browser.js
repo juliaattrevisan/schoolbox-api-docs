@@ -122,7 +122,7 @@ try {
                 return;
             }
 
-            modal = $j('<div data-reveal class="reveal-modal file-picker" />')
+            modal = $j('<div data-reveal class="reveal-modal" />')
                 .append(config.element.children());
             $j('body').append(modal);
             $j(document)
