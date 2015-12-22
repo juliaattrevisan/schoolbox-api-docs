@@ -292,6 +292,25 @@
     };
 }(jQuery));
 
+/**
+ * Extract a particular css property's value from a style string
+ *
+ * @param property
+ * @param style
+ */
+function extractStyle(property, style) {
+    var allProperties = style.split(';');
+
+    for (var i = 0; i < allProperties.length; i++) {
+        var current = allProperties[i].split(':');
+
+        if (current[0] == property) {
+            return current[1];
+        }
+    }
+
+    return '';
+}
 
 (function($) {
 
