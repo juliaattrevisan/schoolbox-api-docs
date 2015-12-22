@@ -32,7 +32,7 @@
 </tr>
 {% endif %}
 
-<tr data-group="{{ groupId }}">
+<tr data-group="{{ groupId }}" class="rb-new-criterion">
     <th colspan="{{ rubric.levels|length + 2 }}">
         <input data-spawn="criterion" type="text" value="" placeholder="+ Type to add new {{ locale.translate('rubricCriterion') }} {{ group.name ? ('to ' ~ group.name) : ('with no ' ~ locale.translate('rubricGroup')) }}" />
     </th>
