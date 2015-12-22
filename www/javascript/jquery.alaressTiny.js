@@ -183,7 +183,6 @@
             var width = this.width;
             var height = this.height;
             var preview = '<img src="'+url+'" style="display:block;" />';
-            var aspectRatio = this.width/this.height;
 
             /* Set dialog input contents
              */
@@ -191,8 +190,26 @@
             fields.width.setValue(width);
             fields.height.setValue(height);
             fields.preview.html(preview);
+
+            /* Reset aspect ratio value
+             */
+            $.fn.schoolboxMediaResourceBrowserAspectRatioReset(dialog);
         }
     };
+
+    /**
+     * Reset the aspect ratio for an image
+     *
+     * Used when selecting a new image with constrain aspect ratio already activated
+     * because that remembers the aspect ratio from the previously-selected image
+     *
+     * @param dialog
+     */
+    $.fn.schoolboxMediaResourceBrowserAspectRatioReset = function(dialog) {
+        var fields = $.fn.schoolboxMediaResourceBrowserDialogFields(dialog);
+
+        fields.aspectRatioValue.setValue(fields.width.getValue()/fields.height.getValue());
+    }
 
     /**
      * A macro to all the fields in the Dialog
