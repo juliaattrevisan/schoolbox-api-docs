@@ -161,6 +161,10 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         label: 'Fullwidth'
                     },
                     {
+                        type: 'html',
+                        html: '<label class="schoolboxmedia-separator">Decorations</label>'
+                    },
+                    {
                         type: 'checkbox',
                         id: 'schoolboxmedia-image-border',
                         label: 'Border'
