@@ -4,6 +4,9 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
         minWidth: 400,
         minHeight: 200,
 
+        /**
+         * Tab Contents
+         */
         contents: [
             {
                 id: 'schoolboxmedia-image-tab',
@@ -159,6 +162,30 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                     }
                 ]
             }
-        ]
+        ],
+
+        /**
+         * Manufacture html and insert into editor
+         */
+        onOk: function() {
+            var dialog = this;
+            var fields = $.fn.schoolboxMediaDialogFields(dialog);
+
+            var element = editorInstance.document.createElement('img');
+            element.setAttribute('src', fields.url.getValue());
+
+            /* Determine width - if fullwidth checked, use 100%
+             * otherwise use specified values
+             */
+            if (fields.fullwidth.getValue()) {
+                element.setAttribute('width', '100%');
+            }
+            else {
+                element.setAttribute('width', fields.width.getValue());
+                element.setAttribute('height', fields.height.getValue());
+            }
+
+            editorInstance.insertElement(element);
+        }
     };
 });
