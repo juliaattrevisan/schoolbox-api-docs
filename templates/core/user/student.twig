@@ -297,11 +297,11 @@
                                         {% if contact.main %}
                                         <a href="/search/user/{{ contact.main.getId() }}">
                                             <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
-                                            {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
+                                            <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
                                         </a>
                                         {% else %}
                                         <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
-                                        {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
+                                        <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
                                         {% endif %}
                                         <p class="meta">{{ contact.StudentContactRelation }}</p>
                                     </div>
@@ -331,11 +331,11 @@
                                         {% if contact.spouse %}
                                         <a href="/search/user/{{ contact.spouse.getId() }}">
                                             <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
-                                            {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
+                                            <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
                                         </a>
                                         {% else %}
                                         <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
-                                        {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
+                                        <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
                                         {% endif %}
                                         <p class="meta">{{ contact.StudentContactSpouseRelation }}</p>
                                     </div>
@@ -453,11 +453,11 @@
                                         {% if subject.folder.getId() %}
                                         <a href="/homepage/code/{{ subject.code }}">
                                             <span class="icon-folder icon-32"></span>
-                                            {{ subject.name }}
+                                            <h3>{{ subject.name }}</h3>
                                         </a>
                                         {% else %}
                                         <span class="icon-folder icon-32"></span>
-                                        {{ subject.name }}
+                                        <h3>{{ subject.name }}</h3>
                                         {% endif %}
                                         <p class="meta">{{ subject.code }}</p>
                                     </div>
@@ -470,7 +470,7 @@
                                     <div class="avatar-card">
                                         <a href="/search/user/{{ teacher.getId() }}">
                                             <img src="/portrait.php?userId={{ teacher.getExternalId() }}&amp;size=square64" />
-                                            {{ teacher.formatName() }}
+                                            <h3>{{ teacher.formatName() }}</h3>
                                         </a>
                                         <p class="meta">{{ teacher.getRole().getName() }}</p>
                                     </div>
@@ -514,7 +514,7 @@
                                     <div class="small-12 avatar card">
                                         <a href="/homepage/{{ group.id }}">
                                             <span class="icon-folder icon-32"></span>
-                                            {{ group.name }}
+                                            <h3>{{ group.name }}</h3>
                                         </a>
                                     </div>
                                 </div>
@@ -525,7 +525,7 @@
                                     <div class="avatar-card">
                                         <a href="/search/user/{{ group.owner.getId() }}">
                                             <img src="/portrait.php?userId={{ group.owner.getExternalId() }}&amp;size=square64" />
-                                            {{ group.owner.formatName() }}
+                                            <h3>{{ group.owner.formatName() }}</h3>
                                         </a>
                                         <p class="meta">{{ group.owner.getRole().getName() }}</p>
                                     </div>

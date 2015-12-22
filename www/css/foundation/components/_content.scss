@@ -1439,6 +1439,7 @@ ul.flex-list {
 	// same definition as .column, minus the width:100%;
 	float: left;
 	position: relative;
+	width: 100%;
 
 	&.avatar {
 		img {
