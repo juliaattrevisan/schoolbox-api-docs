@@ -5,6 +5,11 @@
 {%- set levelLimit   = levelLimit ?: 11 -%}
 
 <th>
+    <span class="sequencer" data-sequencer-v="{{ groupId }}">
+        <a class="icon-up-arrow" data-sequencer-up title="Move up"></a>
+        <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
+    </span>
+
     <input type="hidden" name="{{ critInput }}[groupId]" value="{{ group.id }}" />
     <input  id="{{ critInput }}[on]" data-criterion-name="{{ crit.name }}" name="{{ critInput }}[on]" type="checkbox" value="1" {% if checkChecked %}checked="checked"{% endif %} />
 

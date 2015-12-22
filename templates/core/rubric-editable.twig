@@ -214,8 +214,52 @@
 
     }
 
+    tbody .sequencer {
+        margin-bottom: 0.5rem;
+    }
 
+    .sequencer {
+        color: #9a9a9a;
+        display: block;
+        text-align: right;
+    }
 
+    .sequencer a:hover {
+        text-decoration: none;
+    }
+
+    .sequencer a[disabled] {
+        opacity: 0.3;
+    }
+    .sequencer a[disabled]:hover {
+        color: inherit;
+    }
+
+    .sequencer [class*="icon-"]:before {
+        padding-right: 0;
+        color: inherit;
+    }
+    .sequencer [class*="icon-"]:hover:before {
+        color: #0066b0;
+    }
+
+    .sequencer .icon-up-arrow,
+    .sequencer .icon-down-arrow {
+        display: inline-block;
+        width: 2rem;
+        height: 1rem;
+        line-height: 1rem;
+        text-align: center;
+    }
+
+    .sequencer .icon-previous,
+    .sequencer .icon-next {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        line-height: 2rem;
+        text-align: center;
+    }
 
 </style>
 
@@ -234,8 +278,12 @@
             <th class="rb-no-cell">{{ locale.translate('rubricGroup', true, true) }}</th>
             <th class="rb-no-cell">{{ locale.translate('rubricCriterion', true, true) }}</th>
             {% for level in rubric.levels -%}
-            <th class="rb-level">
+            <th class="rb-level" data-sequencer-group="levels">
                 <input data-level placeholder="{{ locale.translate('rubricLevel', false, true) }} name" type="text" value="{{ level.name }}" name="{{ formField }}[{{ rubric.id }}][level][{{ level.id }}][name]" />
+                <span class="sequencer" data-sequencer-h="levels">
+                    <a class="icon-previous" data-sequencer-left title="Move left"></a>
+                    <a class="icon-next" data-sequencer-right title="Move right"></a>
+                </span>
             </th>
             {%- endfor %}
             {% if rubric.levels|length < levelLimit %}
@@ -257,6 +305,7 @@
     </div>
 </form>
 
+<script type="text/javascript" src="/javascript/shared/jquery.sequencer.js"></script>
 {# js specific to the rubric we just injected to...wherever we injected it #}
 <script type="text/javascript">
 
@@ -322,6 +371,9 @@
                 if ($levels.length >= levelLimit) {
                     $(this).detach();
                 }
+
+                // refresh the sequencer
+                $rb.sequencer('refresh');
             }
 
         });
@@ -382,6 +434,7 @@
 //                    $data.find('[type=checkbox]').prop('checked', true).trigger('change');
                 }
 
+                $rb.sequencer('refresh');
             });
 
             // probability is high the user pressed return, so prevent form submission
@@ -455,6 +508,32 @@
         // TODO do this via twig
         $rb.find('input[data-level]').trigger('change');
         $rb.find('textarea').trigger('keyup');
+
+        $rb.sequencer({
+            swap: function (axis, first, second) {
+
+                var move = first.index() > second.index() ? 'after' : 'before';
+
+                if (axis == 'horizontal') {
+                    // horizontal swap
+
+                    var rows = $(this).children('tbody').children('[data-sequencer-group]');
+
+                    var firstCells  = rows.children(':nth-child(' + first.index() + ')');
+                    var secondCells = rows.children(':nth-child(' + second.index() + ')');
+
+                    // iterate manually
+                    for (var i = 0; i < firstCells.length; ++i) {
+                        // too abstract? :P
+                        $(firstCells[i])[move](secondCells[i]);
+                    }
+                }
+
+                // finally, swap the elements themselves
+                first[move](second);
+
+            }
+        });
 
     });
 </script>
