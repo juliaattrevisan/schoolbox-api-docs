@@ -189,20 +189,12 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         type: 'text',
                         id: 'schoolboxmedia-image-aspectratio-value',
                         label: 'Aspect Ratio Value',
-                        className: 'hidex'
+                        className: 'hide'
                     },
                     {
                         type: 'checkbox',
                         id: 'schoolboxmedia-image-aspectratio',
                         label: 'Constrain Aspect Ratio',
-
-                        ///* Editing an existing element
-                        // */
-                        //setup: function(element) {
-                        //    var dialog = this.getDialog();
-                        //
-                        //    $.fn.schoolboxMediaAspectRatioReset(dialog);
-                        //},
 
                         /* Remember the ratio so we can apply it when
                          * Constrain Aspect Ratio is activated

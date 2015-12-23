@@ -196,8 +196,6 @@
              * This occurs when setup() runs, when editing an existing image
              * Or when an image was set to Fullwidth (it won't have a width/height style attribute)
              */
-            console.log(fields.width.getValue(), fields.height.getValue(), 'test');
-
             if (fields.width.getValue() == '' || fields.height.getValue() == '' || reset) {
                 fields.width.setValue(width);
                 fields.height.setValue(height);
