@@ -264,7 +264,21 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         /* Editing an existing element
                          */
                         setup: function(element) {
-                            console.log('getting style', element.getAttribute('style'));
+                            var dialog = this.getDialog();
+                            var fields = $.fn.schoolboxMediaDialogFields(dialog);
+
+                            var float = extractStyle('float', element.getAttribute('style'));
+                            var margin = extractStyle('margin', element.getAttribute('style'));
+
+                            if (float == 'left' || float == 'right') {
+                                fields.alignment.setValue(float);
+                            }
+                            else if (margin == '0 auto') {
+                                fields.alignment.setValue('center');
+                            }
+                            else {
+                                fields.alignment.setValue('none');
+                            }
                         }
                     }
                 ]

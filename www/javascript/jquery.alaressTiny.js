@@ -256,8 +256,8 @@
          */
         switch (fields.alignment.getValue()) {
             case 'center':
-                styles.push('margin: 0 auto');
-                styles.push('display: block');
+                styles.push('margin:0 auto');
+                styles.push('display:block');
                 break;
 
             case 'left':
@@ -272,7 +272,7 @@
         /* Border
          */
         if (fields.border.getValue()) {
-            styles.push('border: 1px solid #808080;');
+            styles.push('border:1px solid #808080;');
         }
 
         /* Combine and inject
