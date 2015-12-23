@@ -269,8 +269,15 @@
 
         /* Border
          */
-        if (fields.border.getValue()) {
+        if (fields.border.getValue() != '') {
             styles.push('border:1px solid #808080;');
+        }
+
+        /* Vertical Spacing (applies padding-top and padding-bottom)
+         */
+        if (fields.verticalPadding.getValue() != '') {
+            styles.push('padding-top:' + fields.verticalPadding.getValue() + 'px');
+            styles.push('padding-bottom:' + fields.verticalPadding.getValue() + 'px');
         }
 
         /* Combine and inject
@@ -297,7 +304,8 @@
             aspectRatioValue: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-aspectratio-value'),
             fullwidth: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-fullwidth'),
             alignment: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-alignment'),
-            border: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-border')
+            border: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-border'),
+            verticalPadding: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-verticalpadding')
         };
     };
 }(jQuery));
@@ -373,7 +381,7 @@ function extractStyle(property, style) {
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
-                extraAllowedContent: 'img{width,height,border,margin,display}',
+                extraAllowedContent: 'img{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding}',
 
                 /* Remove annoying dialog that always appears
                  */
