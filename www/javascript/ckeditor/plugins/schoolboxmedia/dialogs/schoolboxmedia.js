@@ -46,7 +46,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                      * event by programmatically assigning url value to this input field
                                      */
                                     if (image) {
-                                        $.fn.schoolboxMediaRenderImage(fields.url.getValue(), dialog);
+                                        $.fn.schoolboxMediaRenderImage(fields.url.getValue(), dialog, false);
                                     }
                                 }
                             },
@@ -98,7 +98,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                     },
                     {
                         type: 'hbox',
-                        widths: ['50%', '50%'],
+                        widths: ['40%', '40%', '20%'],
                         children: [
                             {
                                 type: 'text',
@@ -170,6 +170,18 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                             fields.width.setValue(newWidth);
                                         }
                                     }
+                                }
+                            },
+                            {
+                                type: 'button',
+                                id: 'schoolboxmedia-image-resetdimensions',
+                                label: 'Reset',
+                                className: 'schoolboxmedia-browse',
+                                onClick: function () {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+
+                                    $.fn.schoolboxMediaRenderImage(fields.url.getValue(), dialog, true);
                                 }
                             }
                         ]

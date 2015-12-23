@@ -171,7 +171,7 @@
      * @param url
      * @param dialog
      */
-    $.fn.schoolboxMediaRenderImage = function(url, dialog) {
+    $.fn.schoolboxMediaRenderImage = function(url, dialog, reset) {
         var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
         /* Find out width/height ratio
@@ -198,7 +198,7 @@
              */
             console.log(fields.width.getValue(), fields.height.getValue(), 'test');
 
-            if (fields.width.getValue() == '' || fields.height.getValue() == '') {
+            if (fields.width.getValue() == '' || fields.height.getValue() == '' || reset) {
                 fields.width.setValue(width);
                 fields.height.setValue(height);
             }
