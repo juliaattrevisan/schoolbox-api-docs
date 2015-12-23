@@ -100,7 +100,7 @@ class Bulk_User extends Bulk_Abstract
                             'username' => $newUser['username'] .
                                 ' (' . $newUser['firstname'] . ' ' . $newUser['lastname'] . ')',
                             'status'   => 'Not Added',
-                            'error'    9=> 'No known campuses',
+                            'error'    => 'No known campuses',
                         );
                         continue;
                     }
