@@ -280,6 +280,14 @@
             styles.push('padding-bottom:' + fields.verticalPadding.getValue() + 'px');
         }
 
+        /* Horizontal Spacing (applies padding-left and padding-right)
+         */
+        if (fields.horizontalPadding.getValue() != '') {
+            styles.push('padding-left:' + fields.horizontalPadding.getValue() + 'px');
+            styles.push('padding-right:' + fields.horizontalPadding.getValue() + 'px');
+        }
+
+
         /* Combine and inject
          */
         element.setAttribute('style', styles.join(';'));
@@ -305,7 +313,8 @@
             fullwidth: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-fullwidth'),
             alignment: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-alignment'),
             border: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-border'),
-            verticalPadding: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-verticalpadding')
+            verticalPadding: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-verticalpadding'),
+            horizontalPadding: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-horizontalpadding')
         };
     };
 }(jQuery));

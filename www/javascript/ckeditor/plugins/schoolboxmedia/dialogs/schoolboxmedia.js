@@ -273,7 +273,6 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                             }
                         }
                     },
-
                     {
                         type: 'text',
                         id: 'schoolboxmedia-image-verticalpadding',
@@ -292,6 +291,24 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                             }
                         }
                     },
+                    {
+                        type: 'text',
+                        id: 'schoolboxmedia-image-horizontalpadding',
+                        label: 'Horizontal Spacing',
+
+                        /* Editing an existing element
+                         */
+                        setup: function(element) {
+                            var dialog = this.getDialog();
+                            var fields = $.fn.schoolboxMediaDialogFields(dialog);
+
+                            var padding = extractStyle('padding-left', element.getAttribute('style')).replace('px', '');
+
+                            if (padding.length) {
+                                fields.horizontalPadding.setValue(padding);
+                            }
+                        }
+                    }
                 ]
             }
         ],
