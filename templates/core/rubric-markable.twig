@@ -83,6 +83,11 @@
 <form>
     <div class="scrollable">
     <table class="rb stack-for-medium-down" id="{{ rubricId }}">
+        {% set hasLevels = '' %}
+        {% for level in rubric.levels %}
+            {% set hasLevels = hasLevels ~ level.name %}
+        {% endfor %}
+        {% if hasLevels | length %}
         <thead>
         <tr>
             <th colspan="2">&nbsp;</th>
@@ -91,6 +96,7 @@
             {% endfor %}
         </tr>
         </thead>
+        {% endif %}
         <tbody>
 
         {% for groupIndex, group in rubric.groups %}
