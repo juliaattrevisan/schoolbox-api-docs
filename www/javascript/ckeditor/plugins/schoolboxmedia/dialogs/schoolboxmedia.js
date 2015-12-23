@@ -14,7 +14,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                 elements: [
                     {
                         type: 'hbox',
-                        widths: ['67%', '33%'],
+                        widths: ['80%', '20%'],
                         children: [
                             {
                                 type: 'text',
@@ -53,7 +53,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                             {
                                 type: 'button',
                                 id: 'schoolboxmedia-image-browse',
-                                label: editorInstance.lang.common.browseServer,
+                                label: 'Browse',
                                 className: 'schoolboxmedia-browse',
                                 onClick: function() {
                                     var dialog = this.getDialog();
