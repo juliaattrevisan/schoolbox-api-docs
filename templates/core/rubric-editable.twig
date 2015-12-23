@@ -522,7 +522,7 @@
                     var secondGroup = $(this).find('[data-group="' + second.data('group') + '"]');
 
                     // move the thing! and... the other thing! move it!
-                    firstElem[move](secondGroup);
+                    aniswap(move, firstElem, secondGroup);
 
                     return;
                 }
@@ -538,15 +538,19 @@
                     // iterate manually
                     for (var i = 0; i < firstCells.length; ++i) {
                         // too abstract? :P
-                        $(firstCells[i])[move](secondCells[i]);
+                        aniswap(move, $(firstCells[i]), $(secondCells[i]));
                     }
                 }
 
                 // finally, swap the elements themselves
-                first[move](second);
+                aniswap(move, first, second);
 
             }
         });
+
+        function aniswap(move, first, second) {
+            first[move](second);
+        }
 
     });
 </script>
