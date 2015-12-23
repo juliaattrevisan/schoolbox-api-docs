@@ -191,11 +191,18 @@
 
             /* Set dialog input contents
              */
-            console.log(width, height, schoolboxMediaStatus);
             fields.url.setValue(url);
-            fields.width.setValue(width);
-            fields.height.setValue(height);
             fields.preview.html(preview);
+
+            /* Don't change width or height if they were already set
+             *
+             * This occurs when setup() runs, when editing an existing image
+             * Or when an image was set to Fullwidth (it won't have a width/height style attribute)
+             */
+            if (fields.width.getValue() == '' || fields.height.getValue() == '') {
+                fields.width.setValue(width);
+                fields.height.setValue(height);
+            }
 
             /* Reset aspect ratio value
              */
@@ -374,6 +381,10 @@ function extractStyle(property, style) {
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
                 extraAllowedContent: 'img{width,height,border,margin,display}',
+
+                /* Remove annoying dialog that always appears
+                 */
+                dialog_noConfirmCancel: true,
 
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */

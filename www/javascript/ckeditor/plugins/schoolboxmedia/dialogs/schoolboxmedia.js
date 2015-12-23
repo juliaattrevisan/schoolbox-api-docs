@@ -121,7 +121,14 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
-                                    fields.width.setValue(extractStyle('width', element.getAttribute('style')));
+                                    /* Determine if Fullwidth should remain ticked
+                                     */
+                                    if (extractStyle('width', element.getAttribute('style')) != '100%') {
+                                        var width = extractStyle('width', element.getAttribute('style')).replace('px', '');
+
+                                        console.log(width);
+                                        fields.width.setValue(width);
+                                    }
                                 },
 
                                 /* If aspect ratio is active, recalculate dimensions upon change
@@ -152,7 +159,9 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
-                                    fields.height.setValue(extractStyle('height', element.getAttribute('style')));
+                                    var height = extractStyle('height', element.getAttribute('style')).replace('px', '');
+
+                                    fields.height.setValue(height);
                                 },
 
                                 /* If aspect ratio is active, recalculate dimensions upon change
