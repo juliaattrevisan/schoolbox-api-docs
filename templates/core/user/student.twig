@@ -293,7 +293,7 @@
                             {% for contact in contacts %}
                             <li class="actions-small-1">
                                 <div class="list-item">
-                                    <div class="avatar-card">
+                                    <div class="avatar-card small-12">
                                         {% if contact.main %}
                                         <a href="/search/user/{{ contact.main.getId() }}">
                                             <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
@@ -326,7 +326,7 @@
                             {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
                             <li class="actions-small-1">
                                 <div class="list-item">
-                                    <div class="avatar-card">
+                                    <div class="avatar-card small-12">
                                         {# need to know user's schoolbox info here #}
                                         {% if contact.spouse %}
                                         <a href="/search/user/{{ contact.spouse.getId() }}">
@@ -449,7 +449,7 @@
                         <ul class="subject-list">
                             <li>
                                 <div class="list-item">
-                                    <div class="small-12 avatar card">
+                                    <div class="avatar card small-12">
                                         {% if subject.folder.getId() %}
                                         <a href="/homepage/code/{{ subject.code }}">
                                             <span class="icon-folder icon-32"></span>
@@ -467,7 +467,7 @@
                             {% set teacherEmails = teacherEmails ~ teacher.getEmail() ~ ',' %}
                             <li class="actions-small-1">
                                 <div class="list-item">
-                                    <div class="avatar-card">
+                                    <div class="avatar-card small-12">
                                         <a href="/search/user/{{ teacher.getId() }}">
                                             <img src="/portrait.php?userId={{ teacher.getExternalId() }}&amp;size=square64" />
                                             <h3>{{ teacher.formatName() }}</h3>
@@ -511,7 +511,7 @@
                         <ul class="subject-list">
                             <li>
                                 <div class="list-item">
-                                    <div class="small-12 avatar card">
+                                    <div class="avatar card small-12">
                                         <a href="/homepage/{{ group.id }}">
                                             <span class="icon-folder icon-32"></span>
                                             <h3>{{ group.name }}</h3>
@@ -522,7 +522,7 @@
                             {% if group.owner %}
                             <li class="actions-small-1">
                                 <div class="list-item">
-                                    <div class="avatar-card">
+                                    <div class="avatar-card small-12">
                                         <a href="/search/user/{{ group.owner.getId() }}">
                                             <img src="/portrait.php?userId={{ group.owner.getExternalId() }}&amp;size=square64" />
                                             <h3>{{ group.owner.formatName() }}</h3>
