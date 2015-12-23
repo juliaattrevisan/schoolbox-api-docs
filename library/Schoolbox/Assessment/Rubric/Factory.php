@@ -10,9 +10,12 @@
 namespace Schoolbox\Assessment\Rubric;
 
 
+use InvalidArgumentException;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric as OldRubric;
 use Schoolbox\Assessment\Rubric\Competency\Level;
 use Schoolbox\Assessment\Rubric\Criteria\Criterion;
 use Schoolbox\Assessment\Rubric\Criteria\Group;
+use Schoolbox\Resource\Folder;
 
 class Factory
 {
@@ -198,8 +201,16 @@ class Factory
             // spawn
             $c = new Criterion($criterionId, $criterionName);
 
+            // set readonliness
+            $c->setReadOnly(isset($criterion['readonly']) && $criterion['readonly']);
+
             // retrieve from cache
             $g = $groupCache[$groupId];
+
+            // cascade readonliness into group
+            if ($c->isReadOnly()) {
+                $g->setReadOnly(true);
+            }
 
             if ($includeEmptyCriteria) {
                 $rubric->putCriterion($g, $c);
@@ -217,7 +228,11 @@ class Factory
 
                 if ($descriptorText || $descriptorValue) {
                     $d = new Descriptor($descriptorText, $descriptorValue);
-                    $rubric->putDescriptor($g, $c, $l, $d);
+                    try {
+                        $rubric->putDescriptor($g, $c, $l, $d);
+                    } catch (InvalidArgumentException $e) {
+                        echo "Unable to put descriptor";
+                    }
                 }
 
             }
