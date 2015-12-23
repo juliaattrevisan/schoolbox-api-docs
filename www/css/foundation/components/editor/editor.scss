@@ -19,7 +19,7 @@
     .schoolboxmedia-separator {
         font-weight: bold;
         margin-top: 1rem;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
         display: block;
     }
 
@@ -27,6 +27,11 @@
         margin-top: 0.875rem;
         display: block;
         padding: 0.75rem;
+    }
+
+    .cke_dialog_ui_input_select,
+    .cke_dialog_ui_input_select {
+        width: 100%;
     }
 }
 
