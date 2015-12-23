@@ -170,6 +170,7 @@
      *
      * @param url
      * @param dialog
+     * @param reset
      */
     $.fn.schoolboxMediaRenderImage = function(url, dialog, reset) {
         var fields = $.fn.schoolboxMediaDialogFields(dialog);
