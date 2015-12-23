@@ -261,6 +261,10 @@
         text-align: center;
     }
 
+    .rb .animating {
+        transition: transform 1s ease;
+    }
+
 </style>
 
 {% set formField = formField ?: 'rb' %}
@@ -549,7 +553,55 @@
         });
 
         function aniswap(move, first, second) {
+
+/*
+            // put these together for ease of code (apparently not as simple as it sounds...?)
+            var both = $.merge($(), first);
+            $.merge(both, second);
+
+            // cache the top and left positions of each element we're going to be moving around
+            both.each(function () {
+                var e = $(this),
+                        o = e.offset();
+
+                e.data('otop', o.top);
+                e.data('oleft', o.left);
+            });
+*/
+
+            // apply the DOM manipulation
             first[move](second);
+
+/*
+            // set the transform to visually "undo" the DOM respositioning
+            both.each(function () {
+                var e = $(this),
+                        o = e.offset(),
+                        t = {
+                            x: e.data('oleft') - o.left,
+                            y: e.data('otop') - o.top
+                        };
+
+                e.css({
+                    transform: [ 'translateX(', t.x, 'px) translateY(', t.y, 'px)' ].join('')
+                });
+            });
+
+            // set the animation class
+            both.addClass('animating');
+
+            setTimeout(function () {
+                // remove the transforms and let the animation glide them into their natural positions
+                both.css({ transform: '' });
+
+                // wait for the duration of the animation, then clear the animation class
+                setTimeout(function () {
+                    both.removeClass('animating');
+                }, 1000);
+
+            }, 10);
+*/
+
         }
 
     });
