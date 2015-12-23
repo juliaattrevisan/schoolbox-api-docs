@@ -104,6 +104,9 @@ class User implements JsonSerializable
     /** @var bool */
     private $enabled;
 
+    /** @var bool */
+    private $hideContacts;
+
     /**
      * @var SubjectCollection|Subject[]
      */
@@ -689,6 +692,15 @@ class User implements JsonSerializable
         return $this;
     }
 
+    /**
+     * @return self
+     */
+    public function setHideContacts($hideContacts)
+    {
+        // explicit cast
+        $this->hideContacts = $hideContacts ? true : false;
+        return $this;
+    }
 
     /**
      * @return bool
@@ -699,6 +711,14 @@ class User implements JsonSerializable
         return $this->enabled ? true : false;
     }
 
+    /**
+     * @return bool
+     */
+    public function getHideContacts()
+    {
+        // explicit cast
+        return $this->hideContacts ? true : false;
+    }
 
     /**
      * @param CampusCollection $campusCollection

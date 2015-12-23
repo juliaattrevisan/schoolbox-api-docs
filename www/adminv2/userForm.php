@@ -37,7 +37,7 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
             'su' => isset($_POST['superuser']) ? '1' : '0',
             'year' => $_POST['year'] == '' ? 'NULL' : $_POST['year'],
             'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
-            'hide_parents' => $_POST['hide_parents'] == 1 ? 1 : 0,
+            'hide_contacts' => $_POST['hide_contacts'] == 1 ? 1 : 0,
             'house' => $_POST['house'],
             'residential_house_id' => $_POST['residential_house'],
             'enabled' => $_POST['account_enabled']
@@ -77,7 +77,7 @@ elseif ($_POST['modusername']) {
         'su' => $_POST['superuser'],
         'year' => $_POST['year'] == '' ? 'NULL' : $_POST['year'],
         'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
-        'hide_parents' => $_POST['hide_parents'] == 1 ? 1 : 0,
+        'hide_contacts' => $_POST['hide_contacts'] == 1 ? 1 : 0,
         'house' => $_POST['house'],
         'residential_house_id' => $_POST['residential_house'],
         'enabled' => true,

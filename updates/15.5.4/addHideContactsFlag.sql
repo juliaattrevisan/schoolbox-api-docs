@@ -1,0 +1,1 @@
+ALTER TABLE `user` ADD `hide_contacts` TINYINT(1) DEFAULT 0;

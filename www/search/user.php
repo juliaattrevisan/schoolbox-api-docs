@@ -229,7 +229,7 @@ function renderStudent(
                 'user'           => $userObject,
                 'externalUser'   => $externalUser,
                 'eportfolioAuth' => $authenticator->canView(),
-                'showEmergency'  => $user['hide_parents'] == 1 ? 0 : 1,
+                'hideContacts'   => $user['hide_contacts'] == 1 ? 1 : 0,
                 'now'            => Alaress_Date_Format::now(),
                 'boarderType'    => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
                 'contacts'       => $contacts,

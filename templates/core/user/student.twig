@@ -14,7 +14,7 @@
 {% set showButtons = showDetails %}
 {# contacts: su, staff or parent #}
 {# Should a student see their own contact details? I think so #}
-{% set showContacts = isStaff or isParentOfStudent %}
+{% set showContacts = (isStaff or isParentOfStudent) and not hideContacts %}
 {% set showContactsAlert = showContacts and isStaff %}
 {% set showSubjects = showDetails %}
 {% set showGroups = showDetails %}
@@ -388,7 +388,7 @@
                 {# up to 3 emergency contact blocks
                  # show no header if no emergencies
                  #}
-                {% if showEmergency and (externalUser.StudentEmergencyName
+                {% if not hideContacts and (externalUser.StudentEmergencyName
                    or externalUser.StudentEmergency2Name
                    or externalUser.StudentEmergency3Name)
                 %}

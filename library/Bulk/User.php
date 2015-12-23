@@ -32,6 +32,7 @@ class Bulk_User extends Bulk_Abstract
      * 14. alt. email
      * 15. webmail tab
      * 16. eportfolio enabled
+     * 17. hide contacts
      *
      * @return array
      */
@@ -92,13 +93,14 @@ class Bulk_User extends Bulk_Abstract
                         'alt_email'          => $user[14],
                         'webmail'            => $user[15],
                         'eportfolio_enabled' => $user[16],
+                        'hide_contacts'      => $user[17]
                     );
                     if (empty($userCampus)) {
                         $output[] = array(
                             'username' => $newUser['username'] .
                                 ' (' . $newUser['firstname'] . ' ' . $newUser['lastname'] . ')',
                             'status'   => 'Not Added',
-                            'error'    => 'No known campuses',
+                            'error'    9=> 'No known campuses',
                         );
                         continue;
                     }

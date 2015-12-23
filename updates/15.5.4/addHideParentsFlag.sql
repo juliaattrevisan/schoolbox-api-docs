@@ -1,1 +1,0 @@
-ALTER TABLE `user` ADD `hide_parents` TINYINT(1);

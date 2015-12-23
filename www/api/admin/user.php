@@ -57,7 +57,7 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             'su'			 	 => $_GET['su'],
             'year'		 		 => $_GET['year'] == ''?'NULL':$_GET['year'],
             'eportfolio_enabled' => $_GET['eportfolio_enabled'] == 1?1:0,
-            'hide_parents'       => $_GET["hide_parents"] == 1?1:0,
+            'hide_contacts'       => $_GET["hide_contacts"] == 1?1:0,
 			'enabled'			 => 1
         );
 
@@ -152,8 +152,8 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             $user['eportfolio_enabled'] = $_GET['eportfolio_enabled'] == 1?1:0;
         }
 
-        if (is_numeric($_GET['hide_parents'])) {
-            $user['hide_parents'] = $_GET['hide_parents'] == 1?1:0;
+        if (is_numeric($_GET['hide_contacts'])) {
+            $user['hide_contacts'] = $_GET['hide_contacts'] == 1?1:0;
         }
 
         if (!empty($_GET['password'])) {
