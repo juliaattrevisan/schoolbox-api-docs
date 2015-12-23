@@ -1,3 +1,7 @@
+.cke {
+    border: 1px solid $content-ui-background !important;
+}
+
 .cke_dialog_body {
     input[type=checkbox], input[type=radio] {
         opacity: 1;
