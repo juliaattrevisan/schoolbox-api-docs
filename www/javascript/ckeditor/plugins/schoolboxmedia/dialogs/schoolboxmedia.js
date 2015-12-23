@@ -247,67 +247,73 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         }
                     },
                     {
-                        type: 'select',
-                        id: 'schoolboxmedia-image-alignment',
-                        label: 'Alignment',
-                        items: [['None', 'none'], ['Left', 'left'], ['Center', 'center'], ['Right', 'right']],
-                        'default': 'none',
+                        type: 'hbox',
+                        widths: ['33%', '33%', '33%'],
+                        children: [
+                            {
+                                type: 'select',
+                                id: 'schoolboxmedia-image-alignment',
+                                label: 'Alignment',
+                                items: [['None', 'none'], ['Left', 'left'], ['Center', 'center'], ['Right', 'right']],
+                                'default': 'none',
 
-                        /* Editing an existing element
-                         */
-                        setup: function(element) {
-                            var dialog = this.getDialog();
-                            var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                                /* Editing an existing element
+                                 */
+                                setup: function(element) {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
-                            var float = extractStyle('float', element.getAttribute('style'));
-                            var margin = extractStyle('margin', element.getAttribute('style'));
+                                    var float = extractStyle('float', element.getAttribute('style'));
+                                    var margin = extractStyle('margin', element.getAttribute('style'));
 
-                            if (float == 'left' || float == 'right') {
-                                fields.alignment.setValue(float);
+                                    if (float == 'left' || float == 'right') {
+                                        fields.alignment.setValue(float);
+                                    }
+                                    else if (margin == '0 auto') {
+                                        fields.alignment.setValue('center');
+                                    }
+                                    else {
+                                        fields.alignment.setValue('none');
+                                    }
+                                }
+                            },
+                            {
+                                type: 'text',
+                                id: 'schoolboxmedia-image-verticalpadding',
+                                label: 'Vertical Spacing',
+
+                                /* Editing an existing element
+                                 */
+                                setup: function(element) {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+
+                                    var padding = extractStyle('padding-top', element.getAttribute('style')).replace('px', '');
+
+                                    if (padding.length) {
+                                        fields.verticalPadding.setValue(padding);
+                                    }
+                                }
+                            },
+                            {
+                                type: 'text',
+                                id: 'schoolboxmedia-image-horizontalpadding',
+                                label: 'Horizontal Spacing',
+
+                                /* Editing an existing element
+                                 */
+                                setup: function(element) {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+
+                                    var padding = extractStyle('padding-left', element.getAttribute('style')).replace('px', '');
+
+                                    if (padding.length) {
+                                        fields.horizontalPadding.setValue(padding);
+                                    }
+                                }
                             }
-                            else if (margin == '0 auto') {
-                                fields.alignment.setValue('center');
-                            }
-                            else {
-                                fields.alignment.setValue('none');
-                            }
-                        }
-                    },
-                    {
-                        type: 'text',
-                        id: 'schoolboxmedia-image-verticalpadding',
-                        label: 'Vertical Spacing',
-
-                        /* Editing an existing element
-                         */
-                        setup: function(element) {
-                            var dialog = this.getDialog();
-                            var fields = $.fn.schoolboxMediaDialogFields(dialog);
-
-                            var padding = extractStyle('padding-top', element.getAttribute('style')).replace('px', '');
-
-                            if (padding.length) {
-                                fields.verticalPadding.setValue(padding);
-                            }
-                        }
-                    },
-                    {
-                        type: 'text',
-                        id: 'schoolboxmedia-image-horizontalpadding',
-                        label: 'Horizontal Spacing',
-
-                        /* Editing an existing element
-                         */
-                        setup: function(element) {
-                            var dialog = this.getDialog();
-                            var fields = $.fn.schoolboxMediaDialogFields(dialog);
-
-                            var padding = extractStyle('padding-left', element.getAttribute('style')).replace('px', '');
-
-                            if (padding.length) {
-                                fields.horizontalPadding.setValue(padding);
-                            }
-                        }
+                        ]
                     }
                 ]
             }
