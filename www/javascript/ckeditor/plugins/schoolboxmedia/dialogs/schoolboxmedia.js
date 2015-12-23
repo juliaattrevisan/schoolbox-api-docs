@@ -1,10 +1,3 @@
-/* Keep track of when to fire onChange events when
- * rendering images' information in Dialog
- */
-var schoolboxMediaStatus = {
-    isRendering: false
-}
-
 CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
     return {
         title: 'Schoolbox Media',
@@ -53,9 +46,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                      * event by programmatically assigning url value to this input field
                                      */
                                     if (image) {
-                                        if (!schoolboxMediaStatus.isRendering) {
-                                            $.fn.schoolboxMediaRenderImage(fields.url.getValue(), dialog);
-                                        }
+                                        $.fn.schoolboxMediaRenderImage(fields.url.getValue(), dialog);
                                     }
                                 }
                             },
