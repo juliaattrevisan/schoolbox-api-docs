@@ -213,7 +213,14 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                             var dialog = this.getDialog();
                             var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
-                            fields.width.setValue(extractStyle('width', element.getAttribute('style')));
+                            /* Determine if Fullwidth should remain ticked
+                             */
+                            if (extractStyle('width', element.getAttribute('style')) == '100%') {
+                                fields.fullwidth.setValue(true);
+                            }
+                            else {
+                                fields.fullwidth.setValue(false);
+                            }
                         }
                     },
                     {
