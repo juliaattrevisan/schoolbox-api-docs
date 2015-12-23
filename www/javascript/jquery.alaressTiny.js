@@ -169,6 +169,11 @@
      * @param dialog
      */
     $.fn.schoolboxMediaRenderImage = function(url, dialog) {
+
+        /* Bypass infinite loop
+         */
+        schoolboxMediaStatus.isRendering = true;
+
         var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
         /* Find out width/height ratio
@@ -186,6 +191,7 @@
 
             /* Set dialog input contents
              */
+            console.log(width, height, schoolboxMediaStatus);
             fields.url.setValue(url);
             fields.width.setValue(width);
             fields.height.setValue(height);
@@ -194,6 +200,10 @@
             /* Reset aspect ratio value
              */
             $.fn.schoolboxMediaAspectRatioReset(dialog);
+
+            /* Reset flag lol
+             */
+            schoolboxMediaStatus.isRendering = false;
         }
     };
 

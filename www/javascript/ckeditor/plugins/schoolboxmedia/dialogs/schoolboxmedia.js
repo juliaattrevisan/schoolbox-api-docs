@@ -1,3 +1,10 @@
+/* Keep track of when to fire onChange events when
+ * rendering images' information in Dialog
+ */
+var schoolboxMediaStatus = {
+    isRendering: false
+}
+
 CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
     return {
         title: 'Schoolbox Media',
@@ -22,9 +29,18 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 label: 'Url',
                                 validate: CKEDITOR.dialog.validate.notEmpty( "Url cannot be empty." ),
 
+                                /* Editing an existing element
+                                 */
+                                setup: function(element) {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+
+                                    fields.url.setValue(element.getAttribute('src'));
+                                },
+
                                 /* When you type the url yourself, apply details
                                  */
-                                onBlur: function() {
+                                onChange: function() {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
@@ -32,9 +48,14 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
 
                                     /* Render image
                                      * Reset aspect ratio in case it remembered from previous image
+                                     *
+                                     * Bypass infinite loop with flag, due to Browse button inflicting onChange
+                                     * event by programmatically assigning url value to this input field
                                      */
                                     if (image) {
-                                        $.fn.schoolboxMediaRenderImage(fields.url.getValue(), dialog);
+                                        if (!schoolboxMediaStatus.isRendering) {
+                                            $.fn.schoolboxMediaRenderImage(fields.url.getValue(), dialog);
+                                        }
                                     }
                                 }
                             },
@@ -94,6 +115,15 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 label: 'Width',
                                 validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." ),
 
+                                /* Editing an existing element
+                                 */
+                                setup: function(element) {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+
+                                    fields.width.setValue(extractStyle('width', element.getAttribute('style')));
+                                },
+
                                 /* If aspect ratio is active, recalculate dimensions upon change
                                  * Ignore Tab key presses entirely
                                  */
@@ -115,6 +145,15 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 id: 'schoolboxmedia-image-height',
                                 label: 'Height',
                                 validate: CKEDITOR.dialog.validate.notEmpty( "Height cannot be empty."),
+
+                                /* Editing an existing element
+                                 */
+                                setup: function(element) {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+
+                                    fields.height.setValue(extractStyle('height', element.getAttribute('style')));
+                                },
 
                                 /* If aspect ratio is active, recalculate dimensions upon change
                                  * Ignore Tab key presses entirely
@@ -139,12 +178,20 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         type: 'text',
                         id: 'schoolboxmedia-image-aspectratio-value',
                         label: 'Aspect Ratio Value',
-                        className: 'hide'
+                        className: 'hidex'
                     },
                     {
                         type: 'checkbox',
                         id: 'schoolboxmedia-image-aspectratio',
                         label: 'Constrain Aspect Ratio',
+
+                        ///* Editing an existing element
+                        // */
+                        //setup: function(element) {
+                        //    var dialog = this.getDialog();
+                        //
+                        //    $.fn.schoolboxMediaAspectRatioReset(dialog);
+                        //},
 
                         /* Remember the ratio so we can apply it when
                          * Constrain Aspect Ratio is activated
@@ -158,7 +205,16 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                     {
                         type: 'checkbox',
                         id: 'schoolboxmedia-image-fullwidth',
-                        label: 'Fullwidth'
+                        label: 'Fullwidth',
+
+                        /* Editing an existing element
+                         */
+                        setup: function(element) {
+                            var dialog = this.getDialog();
+                            var fields = $.fn.schoolboxMediaDialogFields(dialog);
+
+                            fields.width.setValue(extractStyle('width', element.getAttribute('style')));
+                        }
                     },
                     {
                         type: 'html',
@@ -167,14 +223,26 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                     {
                         type: 'checkbox',
                         id: 'schoolboxmedia-image-border',
-                        label: 'Border'
+                        label: 'Border',
+
+                        /* Editing an existing element
+                         */
+                        setup: function(element) {
+                            console.log('getting style', element.getAttribute('style'));
+                        }
                     },
                     {
                         type: 'select',
                         id: 'schoolboxmedia-image-alignment',
                         label: 'Alignment',
-                        items: [ ['None', 'none'], ['Left', 'left'], ['Center', 'center'], ['Right', 'right']],
-                        'default': 'none'
+                        items: [['None', 'none'], ['Left', 'left'], ['Center', 'center'], ['Right', 'right']],
+                        'default': 'none',
+
+                        /* Editing an existing element
+                         */
+                        setup: function(element) {
+                            console.log('getting style', element.getAttribute('style'));
+                        }
                     }
                 ]
             }
@@ -187,6 +255,31 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
             var dialog = this;
 
             editorInstance.insertElement($.fn.schoolboxMediaInjectImage(editorInstance, dialog));
+        },
+
+        /**
+         * Dialog startup
+         *
+         * Occurs when you click the Schoolbox Media button regardless
+         * of what you have currently selected
+         */
+        onShow: function() {
+            var selection = editorInstance.getSelection();
+            var element = selection.getStartElement();
+
+            if (!element || element.getName() != 'img') {
+                element = editorInstance.document.createElement('img');
+                this.insertMode = true;
+            }
+            else {
+                this.insertMode = false;
+            }
+
+            this.element = element;
+
+            if (!this.insertMode) {
+                this.setupContent(this.element);
+            }
         }
     };
 });
