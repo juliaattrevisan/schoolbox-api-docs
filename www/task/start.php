@@ -43,8 +43,20 @@ $group_handler = new Group();
 if (($permission = $group_handler->getPermission($component->getIdentifier())) < READ_ACCESS) {
     error(19);
 }
-// * Ensure task is open
-if (!$unit_instance->isOpen() && $permission < WRITE_ACCESS) {
+
+// * Ensure user has write access, unless it is due work in which case they only need read access
+if ($task->getType() == Task::TYPE_DUE_WORK) {
+    if ($permission < READ_ACCESS) {
+        error(2);
+    }
+} else {
+    if ($permission < WRITE_ACCESS) {
+        error(2);
+    }
+}
+
+// * Ensure task is open (except due work which we still want them to be able to view)
+if (!$unit_instance->isOpen() && $task->getType() != Task::TYPE_DUE_WORK) {
     error(2);
 }
 
