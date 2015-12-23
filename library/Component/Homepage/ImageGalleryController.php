@@ -32,13 +32,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     private $categoryMapper = null;
 
     /**
-     * Number of images per row
-     *
-     * @var int
-     */
-    private $imagesPerRow = 4;
-
-    /**
      * Template file to load
      *
      * @var string
@@ -87,8 +80,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             return false;
         }
 
-        $limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') * $this->getImagesPerRow() : 0;
-
         /* Template rendering
          */
         $this->setBlock($templateHandle, 'image_gallery', 'image_gallery_block');
@@ -130,7 +121,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             [$this->getSource()->getId()],
             [
                 'filter' => ['image'],
-                'size'   => $limit,
+                'size'   => $this->getConfig('size')
             ]
         );
 
@@ -173,26 +164,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     private function getCategoryMapper()
     {
         return $this->categoryMapper;
-    }
-
-    /**
-     * Set images per row
-     *
-     * @param int $imagesPerRow
-     */
-    private function setImagesPerRow($imagesPerRow)
-    {
-        $this->imagesPerRow = $imagesPerRow;
-    }
-
-    /**
-     * Get images per row
-     *
-     * @return int
-     */
-    private function getImagesPerRow()
-    {
-        return $this->imagesPerRow;
     }
 
     /**
