@@ -117,7 +117,6 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                     if (extractStyle('width', element.getAttribute('style')) != '100%') {
                                         var width = extractStyle('width', element.getAttribute('style')).replace('px', '');
 
-                                        console.log(width);
                                         fields.width.setValue(width);
                                     }
                                 },
@@ -247,7 +246,12 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         /* Editing an existing element
                          */
                         setup: function(element) {
-                            console.log('getting style', element.getAttribute('style'));
+                            var dialog = this.getDialog();
+                            var fields = $.fn.schoolboxMediaDialogFields(dialog);
+
+                            if (extractStyle('border', element.getAttribute('style')).length) {
+                                fields.border.setValue(true);
+                            }
                         }
                     },
                     {
