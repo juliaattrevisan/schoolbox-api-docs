@@ -514,12 +514,25 @@
 
                 var move = first.index() > second.index() ? 'after' : 'before';
 
+                // sigh... special case for moving groups
+                if (first.filter('[data-groupname]').length) {
+
+                    // figure out what we're moving
+                    var firstElem   = $(this).find('[data-group="' + first.data('group')  + '"]').eq(first.index() > second.index() ? -1 : 0);
+                    var secondGroup = $(this).find('[data-group="' + second.data('group') + '"]');
+
+                    // move the thing! and... the other thing! move it!
+                    firstElem[move](secondGroup);
+
+                    return;
+                }
+
                 if (axis == 'horizontal') {
                     // horizontal swap
 
                     var rows = $(this).children('tbody').children('[data-sequencer-group]');
 
-                    var firstCells  = rows.children(':nth-child(' + first.index() + ')');
+                    var firstCells  = rows.children(':nth-child(' + first.index()  + ')');
                     var secondCells = rows.children(':nth-child(' + second.index() + ')');
 
                     // iterate manually

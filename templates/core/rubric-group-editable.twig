@@ -12,9 +12,13 @@
 {%- endfor -%}
 
 {% if not group.criteria %}
-<tr data-group="{{ groupId }}" data-groupname="{{ groupName }}" class="rb-group-header">
+<tr data-group="{{ groupId }}" data-sequencer-group="{{ rubricId }}-groups" data-groupname="{{ groupName }}" class="rb-group-header">
     {# no criteria specified, meaning this was an empty group (and the above iteration didn't run) #}
     <th rowspan="2">
+        <span class="sequencer" data-sequencer-v="{{ rubricId }}-groups">
+            <a class="icon-up-arrow" data-sequencer-up title="Move up"></a>
+            <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
+        </span>
         {% if group.name %}
             <label>
                 {%- if group.used -%}
