@@ -944,6 +944,11 @@ class Controller extends Base
             $recurrence = $this->getEventRecurrenceMapper()->getSeriesRecurrence($event);
         }
 
+        // Retrieve resource category details for display in breadcrumb
+        $resId = $item->getResource()->getId();
+        $category = ($this->getResourceMapper()->findById($resId)->getCategory());
+        $item->getResource()->setCategory($category);
+
         // Cancel callback URL: point to the last page if it wasn't set.
         $this->getResponse()->content->set(
             array(
