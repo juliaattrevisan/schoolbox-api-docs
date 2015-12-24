@@ -58,8 +58,8 @@ class Guardian extends Base {
 
         foreach ($this->getAllPeople() as $currentPeople) {
             foreach ($currentPeople->getStudents() as $currentStudent) {
-                if (strlen($currentStudent->getHouse()->getName())) {
-                    $houses[$currentStudent->getHouse()->getName()] = $currentStudent->getHouse();
+                if (strlen($currentStudent->getHouse()->getCode())) {
+                    $houses[$currentStudent->getHouse()->getCode()] = $currentStudent->getHouse();
                 }
             }
         }

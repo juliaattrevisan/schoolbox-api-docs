@@ -476,7 +476,7 @@ class Adapter  implements \External_UserInterface {
         $student
             ->getHouse()
                 ->setId($currentResult['StudentHouse'])
-                ->setName($currentResult['StudentHouseDescription'])
+                ->setCode($currentResult['StudentHouseDescription'])
                 ->getHousemaster()
                     ->setId($currentResult['HeadOfHouseID'])
                     ->setPreferredName($currentResult['StudentHeadOfHouse'])
@@ -612,7 +612,7 @@ class Adapter  implements \External_UserInterface {
 
                 $student
                     ->getHouse()
-                    ->setName($currentResult['StudentHouse'])
+                    ->setCode($currentResult['StudentHouse'])
                 ;
 
                 // TODO: Refactor into adaptation layer
@@ -785,7 +785,7 @@ class Adapter  implements \External_UserInterface {
 
                 $student
                     ->getHouse()
-                        ->setName($currentResult['StudentHouse'])
+                        ->setCode($currentResult['StudentHouse'])
                 ;
 
                 // TODO: Refactor into adaptation layer
@@ -973,7 +973,7 @@ class Adapter  implements \External_UserInterface {
 
                 $student
                     ->getHouse()
-                        ->setName($currentResult['StudentHouse'])
+                        ->setCode($currentResult['StudentHouse'])
                 ;
 
                 // TODO: Refactor into adaptation layer
@@ -1030,7 +1030,7 @@ class Adapter  implements \External_UserInterface {
 
                 $student
                     ->getHouse()
-                        ->setName($currentResult['StudentHouse'])
+                        ->setCode($currentResult['StudentHouse'])
                 ;
 
                 /* Assign emails
@@ -1054,7 +1054,7 @@ class Adapter  implements \External_UserInterface {
                 if ($currentResult['StudentBoarder'] == 'Y') {
                     $boardingHouse = new Common\BoardingHouse();
                     $boardingHouse
-                        ->setName($currentResult['StudentBoardingHouse'])
+                        ->setCode($currentResult['StudentBoardingHouse'])
                     ;
 
                     $student

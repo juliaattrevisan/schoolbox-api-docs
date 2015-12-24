@@ -55,8 +55,8 @@ class Student extends Base {
         $houses = array();
 
         foreach ($this->getAllPeople() as $currentPeople) {
-            if (strlen($currentPeople->getHouse()->getName())) {
-                $houses[$currentPeople->getHouse()->getName()] = $currentPeople->getHouse();
+            if (strlen($currentPeople->getHouse()->getCode())) {
+                $houses[$currentPeople->getHouse()->getCode()] = $currentPeople->getHouse();
             }
         }
 

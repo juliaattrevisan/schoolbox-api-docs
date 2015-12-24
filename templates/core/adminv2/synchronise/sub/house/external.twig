@@ -7,14 +7,14 @@
     <thead>
         <tr>
             <th>ID</th>
-            <th>Name</th>
+            <th>Code</th>
         </tr>
     </thead>
     <tbody>
     {% for i in data.house.external %}
         <tr>
             <td>{{ i.getId() }}</td>
-            <td>{{ i.getName() }}</td>
+            <td>{{ i.getCode() }}</td>
         </tr>
     {% endfor %}
     </tbody>
