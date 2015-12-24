@@ -288,7 +288,6 @@
             styles.push('padding-right:' + fields.horizontalPadding.getValue() + 'px');
         }
 
-
         /* Combine and inject
          */
         element.setAttribute('style', styles.join(';'));

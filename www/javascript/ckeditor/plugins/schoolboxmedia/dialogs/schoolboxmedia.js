@@ -160,7 +160,6 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 onKeyUp: function(event) {
                                     if (event.data.$.keyCode != 9) {
                                         var dialog = this.getDialog();
-
                                         var fields = $.fn.schoolboxMediaDialogFields(dialog);
 
                                         if (fields.aspectRatio.getValue()) {
@@ -335,6 +334,17 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
          * of what you have currently selected
          */
         onShow: function() {
+            var fields = $.fn.schoolboxMediaDialogFields(this);
+
+            /* Clear any existing preview that might have been loaded
+             * This is required when you have inserted an image and
+             * then go to insert a new one; it remembers the preview
+             * from before
+             */
+            fields.preview.html('');
+
+            /* Deal with existing/inserting new elements
+             */
             var selection = editorInstance.getSelection();
             var element = selection.getStartElement();
 
