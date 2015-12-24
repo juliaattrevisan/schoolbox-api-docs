@@ -45,7 +45,6 @@ class FieldFactory
             'phoneMobile.silent'     => 'Mobile Phone Silent Status',
 
             'campus[].code'          => 'Campus(es) Code(s)',
-            'campus[].name'          => 'Campus(es) Name(s)',
         ];
 
         switch($roleType) {
@@ -64,7 +63,6 @@ class FieldFactory
                     'year.level' => 'Year Level',
                     'form.level' => 'Form Level',
                     'house.code' => 'House Code',
-                    'house.name' => 'House Name',
                     'boardingHouse.code' => 'Boarding House Code',
                 ];
                 break;

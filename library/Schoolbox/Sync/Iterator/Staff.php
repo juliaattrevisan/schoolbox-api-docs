@@ -72,7 +72,7 @@ class Staff extends IteratorIterator
          */
         $campus = new User\Common\Campus();
         $campus
-            ->setName($currentResult['staff_campus'])
+            ->setCode($currentResult['staff_campus'])
         ;
 
         $staff

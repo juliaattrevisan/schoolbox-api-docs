@@ -76,7 +76,7 @@ class Staff extends Base {
     }
 
     /**
-     * Get a concatenated string representation of all the emails everywhere
+     * Get a concatenated string representation of all the campuse codes everywhere
      *
      * @param $separator
      * @return string
@@ -85,7 +85,7 @@ class Staff extends Base {
         $output = array();
 
         foreach($this->getCampus() as $currentCampus) {
-            $output[] = $currentCampus->getName();
+            $output[] = $currentCampus->getCode();
         }
 
         return implode($separator, $output);

@@ -97,7 +97,7 @@ class Guardian extends Base {
         $campuses = array();
 
         foreach($this->getCampus() as $currentCampus) {
-            $campuses[] = $currentCampus->getName();
+            $campuses[] = $currentCampus->getCode();
         }
 
         return implode($separator, array_filter(array_unique($campuses)));
