@@ -66,7 +66,12 @@ class Student extends IteratorIterator
             }
         }
 
-        if ($currentResult['student_boarder'] == 'Y') {
+        /* Boarding House should be set if it has a value
+         * You can't actually rely on StudentBoarder field, because that
+         * is not strictly yes/no; sometimes it contains B, W, D, etc.
+         * It's really a Student Boarder Type, more than anything
+         */
+        if (strlen($currentResult['student_boarding_house'])) {
             $boardingHouse = new User\Common\BoardingHouse();
             $boardingHouse
                 ->setCode($currentResult['student_boarding_house'])
