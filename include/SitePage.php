@@ -1039,10 +1039,12 @@ class SitePage extends Page
     function getTemplate($template)
     {
         // Chrome/skin templates are always core if skin builder is on,
-        // even if there's a version for this site_location.
+        // except if the version in the skin is newer than 15.5 release date (this is determined if instant.html is included)
         if (Config::get('skin_builder')) {
             foreach ($this->chromePaths as $chromePath) {
-                if (fnmatch($chromePath, $template)) {
+                if (fnmatch($chromePath, $template) &&
+                    is_file($this->templateRoot . '/' . $this->site . '/include/instant.html' )
+                ) {
                     return 'core/' . $template;
                 }
             }
