@@ -149,6 +149,22 @@ class Student extends Base {
     }
 
     /**
+     * Get a concatenated string representation of all the campuse codes everywhere
+     *
+     * @param $separator
+     * @return string
+     */
+    public function getAllCampuses($separator = "\n") {
+        $output = array();
+
+        foreach($this->getCampus() as $currentCampus) {
+            $output[] = $currentCampus->getCode();
+        }
+
+        return implode($separator, $output);
+    }
+
+    /**
      * Set alert
      *
      * @param string $alert

@@ -32,8 +32,8 @@ class Staff extends Base {
 
         foreach($this->getAllPeople() as $currentPeople) {
             foreach($currentPeople->getCampus() as $currentCampus) {
-                if (strlen($currentCampus->getName())) {
-                    $campus[$currentCampus->getName()] = $currentCampus;
+                if (strlen($currentCampus->getCode())) {
+                    $campus[$currentCampus->getCode()] = $currentCampus;
                 }
             }
         }
