@@ -1,6 +1,6 @@
-CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
+CKEDITOR.dialog.add('schoolboxmediaImageDialog', function (editorInstance) {
     return {
-        title: 'Schoolbox Media',
+        title: 'Schoolbox Media Image',
         minWidth: 400,
         minHeight: 200,
 
@@ -10,7 +10,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
         contents: [
             {
                 id: 'schoolboxmedia-image-tab',
-                label: 'Schoolbox Image',
+                label: 'Schoolbox Media Image',
                 elements: [
                     {
                         type: 'hbox',
@@ -26,7 +26,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                  */
                                 setup: function(element) {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                                    var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
                                     fields.url.setValue(element.getAttribute('src'));
                                 },
@@ -35,7 +35,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                  */
                                 onChange: function() {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                                    var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
                                     var image = true;
 
@@ -46,7 +46,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                      * event by programmatically assigning url value to this input field
                                      */
                                     if (image) {
-                                        $.fn.schoolboxMediaRenderImage(fields.url.getValue(), dialog, false);
+                                        $.fn.schoolboxMedia_Image_Render(fields.url.getValue(), dialog, false);
                                     }
                                 }
                             },
@@ -57,6 +57,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 className: 'schoolboxmedia-button',
                                 onClick: function() {
                                     var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
                                     /* Select something from the Resource Browser
                                      */
@@ -77,7 +78,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
 
                                             /* Renderer Strategy (I guess)
                                              */
-                                            $.fn.schoolboxMediaFactory(responseText.type, responseText, dialog);
+                                            fields.url.setValue('/storage/image.php?hash='+responseText.hash);
 
                                             /* Shut modal, go back to Dialog
                                              */
@@ -110,12 +111,12 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                  */
                                 setup: function(element) {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                                    var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
                                     /* Determine if Fullwidth should remain ticked
                                      */
-                                    if (extractStyle('width', element.getAttribute('style')) != '100%') {
-                                        var width = extractStyle('width', element.getAttribute('style')).replace('px', '');
+                                    if ($.fn.schoolboxMedia_Image_ExtractStyle('width', element.getAttribute('style')) != '100%') {
+                                        var width = $.fn.schoolboxMedia_Image_ExtractStyle('width', element.getAttribute('style')).replace('px', '');
 
                                         fields.width.setValue(width);
                                     }
@@ -127,7 +128,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 onKeyUp: function(event) {
                                     if (event.data.$.keyCode != 9) {
                                         var dialog = this.getDialog();
-                                        var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                                        var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
                                         if (fields.aspectRatio.getValue()) {
                                             var newHeight = Math.round(fields.width.getValue() / fields.aspectRatioValue.getValue());
@@ -147,9 +148,9 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                  */
                                 setup: function(element) {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                                    var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
-                                    var height = extractStyle('height', element.getAttribute('style')).replace('px', '');
+                                    var height = $.fn.schoolboxMedia_Image_ExtractStyle('height', element.getAttribute('style')).replace('px', '');
 
                                     fields.height.setValue(height);
                                 },
@@ -160,7 +161,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 onKeyUp: function(event) {
                                     if (event.data.$.keyCode != 9) {
                                         var dialog = this.getDialog();
-                                        var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                                        var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
                                         if (fields.aspectRatio.getValue()) {
                                             var newWidth = Math.round(fields.height.getValue() * fields.aspectRatioValue.getValue());
@@ -177,9 +178,9 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 className: 'schoolboxmedia-button',
                                 onClick: function () {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                                    var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
-                                    $.fn.schoolboxMediaRenderImage(fields.url.getValue(), dialog, true);
+                                    $.fn.schoolboxMedia_Image_Render(fields.url.getValue(), dialog, true);
                                 }
                             }
                         ]
@@ -201,7 +202,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                         onChange: function() {
                             var dialog = this.getDialog();
 
-                            $.fn.schoolboxMediaAspectRatioReset(dialog);
+                            $.fn.schoolboxMedia_Image_AspectRatioReset(dialog);
                         }
                     },
                     {
@@ -213,11 +214,11 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                          */
                         setup: function(element) {
                             var dialog = this.getDialog();
-                            var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                            var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
                             /* Determine if Fullwidth should remain ticked
                              */
-                            if (extractStyle('width', element.getAttribute('style')) == '100%') {
+                            if ($.fn.schoolboxMedia_Image_ExtractStyle('width', element.getAttribute('style')) == '100%') {
                                 fields.fullwidth.setValue(true);
                             }
                             else {
@@ -244,10 +245,10 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                  */
                                 setup: function(element) {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                                    var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
-                                    var float = extractStyle('float', element.getAttribute('style'));
-                                    var margin = extractStyle('margin', element.getAttribute('style'));
+                                    var float = $.fn.schoolboxMedia_Image_ExtractStyle('float', element.getAttribute('style'));
+                                    var margin = $.fn.schoolboxMedia_Image_ExtractStyle('margin', element.getAttribute('style'));
 
                                     if (float == 'left' || float == 'right') {
                                         fields.alignment.setValue(float);
@@ -269,9 +270,9 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                  */
                                 setup: function(element) {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                                    var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
-                                    var padding = extractStyle('padding-top', element.getAttribute('style')).replace('px', '');
+                                    var padding = $.fn.schoolboxMedia_Image_ExtractStyle('padding-top', element.getAttribute('style')).replace('px', '');
 
                                     if (padding.length) {
                                         fields.verticalPadding.setValue(padding);
@@ -287,9 +288,9 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                  */
                                 setup: function(element) {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                                    var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
-                                    var padding = extractStyle('padding-left', element.getAttribute('style')).replace('px', '');
+                                    var padding = $.fn.schoolboxMedia_Image_ExtractStyle('padding-left', element.getAttribute('style')).replace('px', '');
 
                                     if (padding.length) {
                                         fields.horizontalPadding.setValue(padding);
@@ -307,9 +308,9 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                          */
                         setup: function(element) {
                             var dialog = this.getDialog();
-                            var fields = $.fn.schoolboxMediaDialogFields(dialog);
+                            var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
-                            if (extractStyle('border', element.getAttribute('style')).length) {
+                            if ($.fn.schoolboxMedia_Image_ExtractStyle('border', element.getAttribute('style')).length) {
                                 fields.border.setValue(true);
                             }
                         }
@@ -324,7 +325,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
         onOk: function() {
             var dialog = this;
 
-            editorInstance.insertElement($.fn.schoolboxMediaInjectImage(editorInstance, dialog));
+            editorInstance.insertElement($.fn.schoolboxMedia_Image_Inject(editorInstance, dialog));
         },
 
         /**
@@ -334,7 +335,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
          * of what you have currently selected
          */
         onShow: function() {
-            var fields = $.fn.schoolboxMediaDialogFields(this);
+            var fields = $.fn.schoolboxMedia_Image_DialogFields(this);
 
             /* Clear any existing preview that might have been loaded
              * This is required when you have inserted an image and

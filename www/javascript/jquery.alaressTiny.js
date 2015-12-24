@@ -139,32 +139,9 @@
             });
         }
     };
+}(jQuery));
 
-    /**
-     * A factory for producing Schoolbox Media Dialog panel contents in ckeditor
-     *
-     * @param type
-     * @param responseText
-     * @param dialog
-     */
-    $.fn.schoolboxMediaFactory = function(type, responseText, dialog) {
-
-        /* Render an image
-         * Take advantage of onChange already present on fields.url
-         */
-        if (type == 'image') {
-            var fields = $.fn.schoolboxMediaDialogFields(dialog);
-
-            fields.url.setValue('/storage/image.php?hash='+responseText.hash);
-        }
-        else if (type == 'video') {
-        }
-        else if (type == 'audio') {
-        }
-        else {
-        }
-    };
-
+(function() {
     /**
      * Populate dialog fields with image data
      *
@@ -172,8 +149,8 @@
      * @param dialog
      * @param reset
      */
-    $.fn.schoolboxMediaRenderImage = function(url, dialog, reset) {
-        var fields = $.fn.schoolboxMediaDialogFields(dialog);
+    $.fn.schoolboxMedia_Image_Render = function(url, dialog, reset) {
+        var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
         /* Find out width/height ratio
          */
@@ -204,7 +181,7 @@
 
             /* Reset aspect ratio value
              */
-            $.fn.schoolboxMediaAspectRatioReset(dialog);
+            $.fn.schoolboxMedia_Image_AspectRatioReset(dialog);
         }
     };
 
@@ -216,8 +193,8 @@
      *
      * @param dialog
      */
-    $.fn.schoolboxMediaAspectRatioReset = function(dialog) {
-        var fields = $.fn.schoolboxMediaDialogFields(dialog);
+    $.fn.schoolboxMedia_Image_AspectRatioReset = function(dialog) {
+        var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
 
         fields.aspectRatioValue.setValue(fields.width.getValue()/fields.height.getValue());
     }
@@ -229,8 +206,8 @@
      * @param dialog
      * @returns {*}
      */
-    $.fn.schoolboxMediaInjectImage = function(editorInstance, dialog) {
-        var fields = $.fn.schoolboxMediaDialogFields(dialog);
+    $.fn.schoolboxMedia_Image_Inject = function(editorInstance, dialog) {
+        var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
         var styles = [];
 
         var element = editorInstance.document.createElement('img');
@@ -302,7 +279,7 @@
      * @param dialog
      * @returns {{url: *, width: *, height: *, aspectRatio: *, aspectRatioValue: *, fullwidth: *, preview: (*|Mixed|jQuery|HTMLElement)}}
      */
-    $.fn.schoolboxMediaDialogFields = function(dialog) {
+    $.fn.schoolboxMedia_Image_DialogFields = function(dialog) {
         return {
             url: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url'),
             preview: $('#schoolboxmedia-image-preview'),
@@ -319,25 +296,27 @@
     };
 }(jQuery));
 
-/**
- * Extract a particular css property's value from a style string
- *
- * @param property
- * @param style
- */
-function extractStyle(property, style) {
-    var allProperties = style.split(';');
+(function() {
+    /**
+     * Extract a particular css property's value from a style string
+     *
+     * @param property
+     * @param style
+     */
+    $.fn.schoolboxMedia_Image_ExtractStyle = function(property, style) {
+        var allProperties = style.split(';');
 
-    for (var i = 0; i < allProperties.length; i++) {
-        var current = allProperties[i].split(':');
+        for (var i = 0; i < allProperties.length; i++) {
+            var current = allProperties[i].split(':');
 
-        if (current[0] == property) {
-            return current[1];
+            if (current[0] == property) {
+                return current[1];
+            }
         }
-    }
 
-    return '';
-}
+        return '';
+    }
+}(jQuery));
 
 (function($) {
 
@@ -399,7 +378,7 @@ function extractStyle(property, style) {
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */
                 removePlugins: 'image,image2',
-                extraPlugins: 'schoolboxmedia',
+                extraPlugins: 'schoolboxmediaimage',
 
                 /* Other settings
                  */
