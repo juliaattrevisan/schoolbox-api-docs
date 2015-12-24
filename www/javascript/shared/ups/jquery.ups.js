@@ -35,11 +35,9 @@
         initRuleReordering();
 
         initConditionCreate();
-        initConditionModifyLock();
         initConditionDelete();
 
         initEffectCreate();
-        initEffectModifyLock();
         initEffectUserfieldChange();
         initEffectMappingTypeChange();
         initEffectDelete();
@@ -107,12 +105,6 @@
                         fail: 'Could not delete Rule'
                     }
                 },
-
-                /* data-locked value when a Condition/Effect is locked
-                 * data-locked value when a Condition/Effect is unlocked
-                 */
-                locked: 1,
-                unlocked: 0,
 
                 /* Server response when an ajax transaction was successful
                  */
@@ -254,10 +246,6 @@
                         instance.find('['+element+']').attr(element, conditionId);
                     });
 
-                    /* Enable Modify Lock
-                     */
-                    instance.find('[data-condition-modify-lock]').attr('data-condition-modify-lock', conditionContainerId);
-
                     /* Make status indicator unique
                      */
                     $(instance)
@@ -276,33 +264,6 @@
                      */
                     latestConditionInstance++;
                 });
-            });
-        }
-
-        /**
-         * Condition Modify Lock
-         *
-         * Toggle input disability for modification
-         * Works on both Conditions and Effects
-         */
-        function initConditionModifyLock() {
-            $(config.element).on('click', '[data-condition-modify-lock]', function(event) {
-                event.preventDefault();
-
-                var id = '#' + $(this).attr('data-condition-modify-lock');
-
-                if ($(id).attr('data-locked') == config.locked) {
-                    $(id).find(config.validInputTypes).attr('disabled', false);
-                    $(id).attr('data-locked', config.unlocked);
-
-                    $(this).removeClass('icon-unlocked').addClass('icon-locked');
-                }
-                else {
-                    $(id).find(config.validInputTypes).attr('disabled', true);
-                    $(id).attr('data-locked', config.locked);
-
-                    $(this).removeClass('icon-locked').addClass('icon-unlocked');
-                }
             });
         }
 
@@ -401,10 +362,6 @@
                         instance.find('['+element+']').attr(element, effectId);
                     });
 
-                    /* Enable Modify Lock
-                     */
-                    instance.find('[data-effect-modify-lock]').attr('data-effect-modify-lock', effectContainerId);
-
                     /* Make status indicator unique
                      */
                     $(instance)
@@ -430,33 +387,6 @@
 
                     refreshUserFieldAvailability(ruleId);
                 });
-            });
-        }
-
-        /**
-         * Effect Modify Lock
-         *
-         * Toggle input disability for modification
-         * Works on both Conditions and Effects
-         */
-        function initEffectModifyLock() {
-            $(config.element).on('click', '[data-effect-modify-lock]', function(event) {
-                event.preventDefault();
-
-                var id = '#' + $(this).attr('data-effect-modify-lock');
-
-                if ($(id).attr('data-locked') == config.locked) {
-                    $(id).find(config.validInputTypes).attr('disabled', false);
-                    $(id).attr('data-locked', config.unlocked);
-
-                    $(this).removeClass('icon-unlocked').addClass('icon-locked');
-                }
-                else {
-                    $(id).find(config.validInputTypes).attr('disabled', true);
-                    $(id).attr('data-locked', config.locked);
-
-                    $(this).removeClass('icon-locked').addClass('icon-unlocked');
-                }
             });
         }
 
