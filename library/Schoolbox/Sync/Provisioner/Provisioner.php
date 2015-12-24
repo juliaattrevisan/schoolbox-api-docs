@@ -316,6 +316,9 @@ class Provisioner
         if (!$internalUser->getRole() instanceof Role) {
             throw new UnexpectedValueException('User role cannot be null');
         }
+        if ($internalUser->getCampusCollection()->count() < 1 ) {
+            throw new UnexpectedValueException('User must have at least one campus');
+        }
         if ($internalUser->getFirstname() === null || !strlen($internalUser->getFirstname())) {
             throw new UnexpectedValueException('Firstname cannot be null');
         }
