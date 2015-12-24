@@ -12,6 +12,7 @@ namespace Schoolbox;
 use Countable;
 use Database;
 use PDO;
+use PDOException;
 use PDOStatement;
 use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\Column\IColumnType;
@@ -972,11 +973,17 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
         $this->database->beginTransaction();
-        foreach ($collection as $model) {
-            $statement->bindValue(':identifierValue', $this->getModelProperty($model, $identifierProperty));
-            if (!$statement->execute()) {
-                return false;
+        try {
+            foreach ($collection as $model) {
+                $statement->bindValue(':identifierValue', $this->getModelProperty($model, $identifierProperty));
+                if (!$statement->execute()) {
+                    $this->database->rollBack();
+                    return false;
+                }
             }
+        } catch (PDOException $e) {
+            $this->database->rollBack();
+            throw $e;
         }
         $this->database->commit();
         foreach ($collection as $model) {
@@ -1141,7 +1148,15 @@ abstract class Mapper implements IMapper, Serializable
             $statement->bindValue($key, $id);
         }
         $this->database->beginTransaction();
-        $result = $statement->execute();
+        try {
+            if (!($result = $statement->execute())) {
+                $this->database->rollBack();
+                return $result;
+            }
+        } catch (PDOException $e) {
+            $this->database->rollBack();
+            throw $e;
+        }
         $this->database->commit();
         //
         // Trigger the post-trigger, if there is one.
@@ -1764,82 +1779,82 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
         $this->database->beginTransaction();
-        foreach ($collection as $i => $model) {
-//			$this->bindParamsForSave($model, $statement);
-            if ($statement->execute($this->dehydrate($model))) {
-                // take note of whether this was an insert or update
-                $m = $statement->rowCount();
-                switch ($m) {
-                    case self::PDO_RESULT_INSERT:
-                        $pdoMethods[$i] = self::METHOD_CREATE;
-                        break;
-                    case self::PDO_RESULT_UPDATE:
-                        $pdoMethods[$i] = self::METHOD_UPDATE;
-                        break;
-                    default:
-                        $pdoMethods[$i] = null;
-                        break;
-                }
-                if ($id_property) {
-                    if (!$this->getModelProperty($model, $id_property)) {
-                        $new_id = $this->database->lastInsertId();
-                        $this->setModelProperty($model, $id_property, $new_id);
+        try {
+            foreach ($collection as $i => $model) {
+                if ($statement->execute($this->dehydrate($model))) {
+                    // take note of whether this was an insert or update
+                    $m = $statement->rowCount();
+                    switch ($m) {
+                        case self::PDO_RESULT_INSERT:
+                            $pdoMethods[$i] = self::METHOD_CREATE;
+                            break;
+                        case self::PDO_RESULT_UPDATE:
+                            $pdoMethods[$i] = self::METHOD_UPDATE;
+                            break;
+                        default:
+                            $pdoMethods[$i] = null;
+                            break;
                     }
-                    $affectedIDs[] = $this->getModelProperty($model, $id_property);
-                }
-                // also update n:n relation tables if they exist
-                foreach ($this->getMap() as $map) {
-                    if (empty($map['join'])
-                        || empty($this->joins[$map['join']]['multi'])
-                        || $this->joins[$map['join']]['multi']['read_only']
-                    ) {
-                        // not interested
-                        continue;
+                    if ($id_property) {
+                        if (!$this->getModelProperty($model, $id_property)) {
+                            $new_id = $this->database->lastInsertId();
+                            $this->setModelProperty($model, $id_property, $new_id);
+                        }
+                        $affectedIDs[] = $this->getModelProperty($model, $id_property);
                     }
-                    $joinSchema = $this->joins[$map['join']];
-                    $joinMulti  = $joinSchema['multi'];
-                    $thisKey    = $this->getModelProperty($model, $this->getPropertyFromColumn($joinSchema['this_key']));
-                    // step 1: delete existing relations in join table
-                    $deleteRelationStatement = $this->database->prepare(
-                        "
-						DELETE FROM `{$joinMulti['via_table']}`
-						WHERE `{$joinMulti['this_key']}` = :this_key
-					"
-                    );
-                    $deleteRelationStatement->bindValue(':this_key', $thisKey);
-                    if (!$deleteRelationStatement->execute()) {
-                        $this->database->rollBack();
-                        return false;
-                    }
-                    // step 2: insert new relations in join table
-                    $insertRelationStatement = $this->database->prepare(
-                        "
-						INSERT IGNORE INTO `{$joinMulti['via_table']}`
-							(`{$joinMulti['this_key']}`,`{$joinMulti['other_key']}`)
-						VALUES
-							(:this_key, :other_key)
-					"
-                    );
-                    // should dehydrate to an array
-                    $propertyValue = (array)$this->getModelProperty($model, $map['property']);
-                    // iterate the values given and insert into join table
-                    foreach ($propertyValue as $otherKey) {
-                        $success = $insertRelationStatement->execute(
-                            array(
-                                'this_key'  => $thisKey,
-                                'other_key' => $otherKey
-                            )
-                        );
-                        if (!$success) {
+                    // also update n:n relation tables if they exist
+                    foreach ($this->getMap() as $map) {
+                        if (empty($map['join'])
+                            || empty($this->joins[$map['join']]['multi'])
+                            || $this->joins[$map['join']]['multi']['read_only']
+                        ) {
+                            // not interested
+                            continue;
+                        }
+                        $joinSchema = $this->joins[$map['join']];
+                        $joinMulti  = $joinSchema['multi'];
+                        $thisKey    = $this->getModelProperty($model, $this->getPropertyFromColumn($joinSchema['this_key']));
+                        // step 1: delete existing relations in join table
+                        $deleteRelationStatement = $this->database->prepare("
+                            DELETE FROM `{$joinMulti['via_table']}`
+                            WHERE `{$joinMulti['this_key']}` = :this_key
+                        ");
+                        $deleteRelationStatement->bindValue(':this_key', $thisKey);
+                        if (!$deleteRelationStatement->execute()) {
                             $this->database->rollBack();
                             return false;
                         }
+                        // step 2: insert new relations in join table
+                        $insertRelationStatement = $this->database->prepare("
+                            INSERT IGNORE INTO `{$joinMulti['via_table']}`
+                                (`{$joinMulti['this_key']}`,`{$joinMulti['other_key']}`)
+                            VALUES
+                                (:this_key, :other_key)
+                        ");
+                        // should dehydrate to an array
+                        $propertyValue = (array)$this->getModelProperty($model, $map['property']);
+                        // iterate the values given and insert into join table
+                        foreach ($propertyValue as $otherKey) {
+                            $success = $insertRelationStatement->execute(
+                                array(
+                                    'this_key'  => $thisKey,
+                                    'other_key' => $otherKey
+                                )
+                            );
+                            if (!$success) {
+                                $this->database->rollBack();
+                                return false;
+                            }
+                        }
                     }
+                } else {
+                    $this->database->rollBack();
+                    return false;
                 }
-            } else {
-                $this->database->rollBack();
-                return false;
             }
+        } catch (PDOException $e) {
+            $this->database->rollBack();
+            throw $e;
         }
         $this->database->commit();
         foreach ($collection as $i => $model) {
