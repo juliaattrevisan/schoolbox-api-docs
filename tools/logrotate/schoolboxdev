@@ -6,7 +6,7 @@
 	delaycompress
 }
 
-/var/log/schoolboxdev/binder*.log {
+/var/log/schoolboxdev/binder*.log /var/log/schoolboxdev/ups*.log {
 	daily
 	missingok
 	rotate 7

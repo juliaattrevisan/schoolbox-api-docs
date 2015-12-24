@@ -29,3 +29,6 @@ MAILTO="support@schoolbox.com.au"
 
 # Skin Builder - Every 2 minutes
 */2 * * * *	root	php /usr/share/schoolbox/tools/skin/builder.php >> /var/log/schoolbox/skin-builder.log 2>&1
+
+# UPS - Nightly at 10pm
+0 22 * * *	root	php /usr/share/schoolbox/tools/synchronise/userProvision.php -v --perform-update >> /var/log/schoolbox/ups.log 2>&1
