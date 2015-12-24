@@ -44,19 +44,20 @@ if (($permission = $group_handler->getPermission($component->getIdentifier())) <
     error(19);
 }
 
+// Allow viewing of due work and quizzes after the course has been closed
+$flag_allowed_view_closed = in_array($task->getType(), [Task::TYPE_DUE_WORK, Task::TYPE_ONLINE_ASSESS]);
+
 // * Ensure user has write access, unless it is due work in which case they only need read access
-if ($task->getType() == Task::TYPE_DUE_WORK) {
+if ($flag_allowed_view_closed) {
     if ($permission < READ_ACCESS) {
         error(2);
     }
-} else {
-    if ($permission < WRITE_ACCESS) {
-        error(2);
-    }
+} else if ($permission < WRITE_ACCESS) {
+    error(2);
 }
 
 // * Ensure task is open (except due work which we still want them to be able to view)
-if (!$unit_instance->isOpen() && $task->getType() != Task::TYPE_DUE_WORK) {
+if (!$unit_instance->isOpen() && !$flag_allowed_view_closed) {
     error(2);
 }
 
