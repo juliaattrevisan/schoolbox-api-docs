@@ -170,10 +170,6 @@ echo "$vag Installing grunt-cli if not already installed";
 echo "$vag Building CSS and JS";
 /vagrant/tools/pkg-build-css-js.sh --sass;
 
-echo "$vag Enabling modules";
-/vagrant/tools/module.sh enable boarder_leave_enabled;
-/vagrant/tools/module.sh enable resource_booking_enabled;
-
 echo "$vag Loading all demo data complete";
 
 echo "$vag Run Notifications binder";
