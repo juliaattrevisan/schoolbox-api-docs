@@ -44,7 +44,7 @@ class FieldFactory
             'phoneMobile.number'     => 'Mobile Phone Number',
             'phoneMobile.silent'     => 'Mobile Phone Silent Status',
 
-            'campus[].name'          => 'Campus(es) Name(s)',
+            'campus[].code'          => 'Campus(es) Code(s)',
         ];
 
         switch($roleType) {
@@ -62,7 +62,7 @@ class FieldFactory
                 $augment = [
                     'year.level' => 'Year Level',
                     'form.level' => 'Form Level',
-                    'house.name' => 'House Name',
+                    'house.code' => 'House Code',
                     'boardingHouse.code' => 'Boarding House Code',
                 ];
                 break;
