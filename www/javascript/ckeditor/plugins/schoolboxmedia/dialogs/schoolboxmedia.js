@@ -54,7 +54,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 type: 'button',
                                 id: 'schoolboxmedia-image-browse',
                                 label: 'Browse',
-                                className: 'schoolboxmedia-browse',
+                                className: 'schoolboxmedia-button',
                                 onClick: function() {
                                     var dialog = this.getDialog();
 
@@ -94,7 +94,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                     },
                     {
                         type: 'html',
-                        html: '<label class="schoolboxmedia-separator">Image Dimensions</label>'
+                        html: '<label class="schoolboxmedia-separator">Dimensions</label>'
                     },
                     {
                         type: 'hbox',
@@ -175,7 +175,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 type: 'button',
                                 id: 'schoolboxmedia-image-resetdimensions',
                                 label: 'Reset',
-                                className: 'schoolboxmedia-browse',
+                                className: 'schoolboxmedia-button',
                                 onClick: function () {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxMediaDialogFields(dialog);
@@ -228,23 +228,7 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                     },
                     {
                         type: 'html',
-                        html: '<label class="schoolboxmedia-separator">Decorations</label>'
-                    },
-                    {
-                        type: 'checkbox',
-                        id: 'schoolboxmedia-image-border',
-                        label: 'Border',
-
-                        /* Editing an existing element
-                         */
-                        setup: function(element) {
-                            var dialog = this.getDialog();
-                            var fields = $.fn.schoolboxMediaDialogFields(dialog);
-
-                            if (extractStyle('border', element.getAttribute('style')).length) {
-                                fields.border.setValue(true);
-                            }
-                        }
+                        html: '<label class="schoolboxmedia-separator">Appearance</label>'
                     },
                     {
                         type: 'hbox',
@@ -314,6 +298,22 @@ CKEDITOR.dialog.add('schoolboxmediaDialog', function (editorInstance) {
                                 }
                             }
                         ]
+                    },
+                    {
+                        type: 'checkbox',
+                        id: 'schoolboxmedia-image-border',
+                        label: 'Border',
+
+                        /* Editing an existing element
+                         */
+                        setup: function(element) {
+                            var dialog = this.getDialog();
+                            var fields = $.fn.schoolboxMediaDialogFields(dialog);
+
+                            if (extractStyle('border', element.getAttribute('style')).length) {
+                                fields.border.setValue(true);
+                            }
+                        }
                     }
                 ]
             }
