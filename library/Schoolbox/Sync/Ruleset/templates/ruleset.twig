@@ -257,13 +257,11 @@ set upsConfig = {
 
                     <p>
                         Note that you can use square brackets to reference nth elements.
-                        This applies to tokens for {:email.address}, {:campus.code}
-                        and {:campus.name}
+                        This applies to tokens for {:email.address} and {:campus.name}
                     </p>
                     <p>
                         For example, you can use them like this:<br />
                         {:email[0].address}<br />
-                        {:campus[1].code}<br />
                         {:campus[2].name}
                     </p>
                 </div>
@@ -283,6 +281,18 @@ set upsConfig = {
                         <dt class="small-6">alpha</dt>
                         <dd class="small-6">Strips all non-alpha characters</dd>
                     </dl>
+
+                    <p>
+                        Token with filter examples:
+                    </p>
+                    <p>
+                        {:lastname} = Allen-Smith<br />
+			{:lastname|uc} = ALLEN-SMITH<br />
+			{:lastname|lc} = allen-smith<br />
+			{:lastname|first} = A<br />
+			{:lastname|alpha} = AllenSmith<br />
+			{:lastname|alpha|lc} = allensmith
+                    </p>
                 </div>
             </div>
 
