@@ -41,7 +41,7 @@ class Student extends IteratorIterator
 
         $student
             ->getHouse()
-            ->setName($currentResult['student_house'])
+            ->setCode($currentResult['student_house'])
         ;
 
         $student
@@ -69,7 +69,7 @@ class Student extends IteratorIterator
         if ($currentResult['student_boarder'] == 'Y') {
             $boardingHouse = new User\Common\BoardingHouse();
             $boardingHouse
-                ->setName($currentResult['student_boarding_house'])
+                ->setCode($currentResult['student_boarding_house'])
             ;
 
             $student
@@ -81,7 +81,7 @@ class Student extends IteratorIterator
          */
         $campus = new User\Common\Campus();
         $campus
-            ->setName($currentResult['student_campus'])
+            ->setCode($currentResult['student_campus'])
         ;
 
         $student

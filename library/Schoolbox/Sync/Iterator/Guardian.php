@@ -102,7 +102,7 @@ class Guardian extends IteratorIterator
             /* Campus
              */
             $campus = new User\Common\Campus();
-            $campus->setName($row['student_campus']);
+            $campus->setCode($row['student_campus']);
             $student->getCampus()->add($campus);
             $guardian->addStudent($student);
         }
