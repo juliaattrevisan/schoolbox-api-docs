@@ -42,6 +42,21 @@
 }
 
 </style>
+
+<script type="text/javascript">
+    (function($) {
+        // Cheat's responsive text size:
+        // Constrain font size based on width of tile
+        $(function() {
+            var resizeTitles = function() {
+                $('#tile-{{ tile.id }}').tileResize({minSize: {{ tile.getTitleTextMinSize()/100 }}, maxSize: {{ tile.getTitleTextMaxSize()/100 }}, unit: 'rem'});
+            };
+            resizeTitles();
+            $(window).resize(resizeTitles);
+        });
+    })(jQuery);
+</script>
+
 <li data-tile
     class="tile {{ tile.getBackgroundPositionStyle() }} {% if tile.backgroundImageContained %}contained{% endif %}"
     id="tile-{{ tile.id|e('html_attr') }}">

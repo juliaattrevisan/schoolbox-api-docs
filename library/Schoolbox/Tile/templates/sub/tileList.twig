@@ -26,21 +26,9 @@
     {% endif %}
 }
 </style>
-    <script type="text/javascript" src="/javascript/shared/tiles/jquery.tile-resize.js"></script>
-<script type="text/javascript">
-    (function($) {
-        // Cheat's responsive text size:
-        // Constrain font size based on width of tile
-        $(function() {
-            var resizeTitles = function() {
-                $('#tileList-{{ layout.id }}').find('.tile').tileResize({minSize: 0.725, maxSize: 1.725, unit: 'rem'});
-            };
-            resizeTitles();
-            $(window).resize(resizeTitles);
-        });
-    })(jQuery);
-</script>
 {% endif %}
+
+<script type="text/javascript" src="/javascript/shared/tiles/jquery.tile-resize.js"></script>
 
 {# spaceless because spaces between inline-block elements split the element. WTF #}
 {% spaceless %}
