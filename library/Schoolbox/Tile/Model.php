@@ -114,6 +114,16 @@ class Model implements ISoftDeletable, \JsonSerializable
     protected $titleText;
 
     /**
+     * @var int
+     */
+    protected $titleTextMinSize;
+
+    /**
+     * @var int
+     */
+    protected $titleTextMaxSize;
+
+    /**
      * @var Color
      */
     protected $titleColor;
@@ -412,6 +422,42 @@ class Model implements ISoftDeletable, \JsonSerializable
     public function setTitleText($titleText)
     {
         $this->titleText = $titleText;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTitleTextMinSize()
+    {
+        return $this->titleTextMinSize;
+    }
+
+    /**
+     * @param  int   $titleTextMinSize
+     * @return $this
+     */
+    public function setTitleTextMinSize($titleTextMinSize)
+    {
+        $this->titleTextMinSize = $titleTextMinSize;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTitleTextMaxSize()
+    {
+        return $this->titleTextMaxSize;
+    }
+
+    /**
+     * @param  int   $titleTextMaxSize
+     * @return $this
+     */
+    public function setTitleTextMaxSize($titleTextMaxSize)
+    {
+        $this->titleTextMaxSize = $titleTextMaxSize;
         return $this;
     }
 
