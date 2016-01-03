@@ -6,9 +6,10 @@
  */
 class ZipFolder
 {
-
     function ZipFolder($folder)
     {
+        register_shutdown_function(array($this, 'onShutdown'));
+
         $this->db = DeprecatedDatabase::getInstance();
         $this->folder = $folder;
         $this->tmpName = tempnam(Cfg::get('zip_dir'), 'zip');
@@ -22,9 +23,6 @@ class ZipFolder
         $this->groupHandler = new Group;
         $this->folderMapper = new \Schoolbox\Resource\Folder\Mapper();
         $this->fileMapper = new \Schoolbox\Resource\File\Mapper();
-
-
-
         $this->folderDetails = $this->getFolderDetails($folder);
 
         if (is_numeric($this->folderDetails->getId())) {
@@ -36,6 +34,10 @@ class ZipFolder
         }
     }
 
+    private function onShutdown()
+    {
+        $this->cleanUp();
+    }
 
     function getResources($folder, $permission)
     {
