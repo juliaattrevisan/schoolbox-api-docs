@@ -300,6 +300,8 @@ class Controller extends Base
     {
         $item
             ->setTitleText($post['title_text'])
+            ->setTitleTextMinSize($post['title_text_min_size'])
+            ->setTitleTextMaxSize($post['title_text_max_size'])
             ->setTitleColor($post['title_color'] ?: '00000000')
             ->setTitleBackgroundColor($post['title_background_color'] ?: '00000000')
             ->setTitlePosition($post['title_position'])
