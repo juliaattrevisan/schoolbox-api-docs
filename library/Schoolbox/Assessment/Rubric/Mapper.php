@@ -12,9 +12,11 @@ namespace Schoolbox\Assessment\Rubric;
 use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Result;
 use Schoolbox\Assessment\Rubric\Competency\Level;
 use Schoolbox\Assessment\Rubric\Criteria\Criterion;
 use Schoolbox\Assessment\Rubric\Criteria\Group;
+use Schoolbox\Collection;
 
 /**
  * Umm. Not *exactly* a mapper... at the moment it's more like a handler...
@@ -205,6 +207,32 @@ class Mapper
             ];
 
             $levelList[$r['value']] = [ 'name' => '' ];
+        }
+
+        $descriptorStatement->closeCursor();
+
+        // mokay. so if at this point you've got no descriptors, check to see if there should be a resultSet we should use
+        if (count($descriptors) == 0) {
+            $resultSetId = $this->database->query('SELECT rubric_result_set FROM submission_box WHERE id = ?', [ $boxId ])->fetchColumn(0);
+
+            if ($resultSetId > 0) {
+                // got a resultSet - we're going to fake that into a descriptor grid
+
+                /** @var Collection|Result[] $results */
+                $results = SubmissionBox\Rubric\ResultMapper::getInstance()->findByColumn('resultset_id', $resultSetId, [ 'order' => [  ] ]);
+
+                foreach ($results as $result) {
+                    foreach ($criteria as $id => $crit) {
+                        $descriptors[$id][] = [
+                            'text' => $result->getLabel(),
+                            'points' => $result->getValue()
+                        ];
+                        // for legacy support, we leave the name blank
+                        $levelList[$result->getValue()] = [ 'name' => '' ];
+                    }
+                }
+
+            }
         }
 
         foreach ($descriptors as $criterionId => $descriptorData) {
