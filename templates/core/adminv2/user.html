@@ -127,30 +127,13 @@
             <p>Search for users based on a set of criteria, and apply settings en masse.</p>
             <a href="/adminv2/user/bulk/modify" class="button icon-modify">Bulk Modify</a>
         </section>
-        <h2 class="subheader">Upload Users</h2>
+        <h2 class="subheader">Add Users</h2>
         <section class="content">
-            <p>
-                Provide a file containing a list of users in the CSV format in the template below.
-                (You may remove fields that you do not wish to update.)
-            </p>
-            <a href="/adminv2/csv/{USER_UPLOAD_TEMPLATE}" class="button icon-download">Download Template</a>
-
-            <h3>Upload bulk users CSV</h3>
-            <form action="/adminv2/bulkAdd" method="post" enctype="multipart/form-data">
-                <input name="bulkadd" type="file">
-                <input type="submit" class="icon-add" value="Add Users" />
-            </form>
+            <p>The add users feature has been expanded and is now part of the <a href="/adminv2/import">Import</a> section.</p>
         </section>
         <h2 class="subheader">Remove Users</h2>
         <section class="content">
-            <p>Provide a file containing a list of usernames or School DB IDs.</p>
-            <a href="/adminv2/csv/userBulkRemove.csv" class="button icon-download">Download Template</a>
-
-            <h3>Upload bulk remove users CSV</h3>
-            <form action="/adminv2/bulkRemove" method="post" enctype="multipart/form-data">
-                <input name="bulkremove" type="file">
-                <input type="submit" class="icon-delete" value="Remove Users" />
-            </form>
+            <p>The remove users feature has been expanded and is now part of the <a href="/adminv2/import">Import</a> section.</p>
         </section>
         <h2 class="subheader">Clone Role</h2>
         <section class="content">
