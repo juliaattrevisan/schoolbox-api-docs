@@ -214,7 +214,6 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
                             $.fn.schoolboxResource_Media_AspectRatioReset(fields);
                         }
                     },
-
                     {
                         type: 'checkbox',
                         id: 'schoolboxresource-media-fullwidth',
@@ -236,6 +235,95 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
                             }
                         }
                     },
+                    {
+                        type: 'html',
+                        html: '<label class="schoolboxresource-separator">Appearance</label>'
+                    },
+                    {
+                        type: 'hbox',
+                        widths: ['33%', '33%', '33%'],
+                        children: [
+                            {
+                                type: 'select',
+                                id: 'schoolboxresource-media-alignment',
+                                label: 'Alignment',
+                                items: [['None', 'none'], ['Left', 'left'], ['Center', 'center'], ['Right', 'right']],
+                                'default': 'none',
+
+                                /* Editing an existing element
+                                 */
+                                setup: function(element) {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+
+                                    var float = $.fn.schoolboxResource_ExtractStyle('float', element.getAttribute('style'));
+                                    var margin = $.fn.schoolboxResource_ExtractStyle('margin', element.getAttribute('style'));
+
+                                    if (float == 'left' || float == 'right') {
+                                        fields.alignment.setValue(float);
+                                    }
+                                    else if (margin == '0 auto') {
+                                        fields.alignment.setValue('center');
+                                    }
+                                    else {
+                                        fields.alignment.setValue('none');
+                                    }
+                                }
+                            },
+                            {
+                                type: 'text',
+                                id: 'schoolboxresource-media-verticalpadding',
+                                label: 'Vertical Spacing',
+
+                                /* Editing an existing element
+                                 */
+                                setup: function(element) {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+
+                                    var padding = $.fn.schoolboxResource_ExtractStyle('padding-top', element.getAttribute('style')).replace('px', '');
+
+                                    if (padding.length) {
+                                        fields.verticalPadding.setValue(padding);
+                                    }
+                                }
+                            },
+                            {
+                                type: 'text',
+                                id: 'schoolboxresource-media-horizontalpadding',
+                                label: 'Horizontal Spacing',
+
+                                /* Editing an existing element
+                                 */
+                                setup: function(element) {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+
+                                    var padding = $.fn.schoolboxResource_ExtractStyle('padding-left', element.getAttribute('style')).replace('px', '');
+
+                                    if (padding.length) {
+                                        fields.horizontalPadding.setValue(padding);
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        type: 'checkbox',
+                        id: 'schoolboxresource-media-border',
+                        label: 'Border',
+
+                        /* Editing an existing element
+                         */
+                        setup: function(element) {
+                            var dialog = this.getDialog();
+                            var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+
+                            if ($.fn.schoolboxResource_ExtractStyle('border', element.getAttribute('style')).length) {
+                                fields.border.setValue(true);
+                            }
+                        }
+                    }
                 ]
             }
         ],

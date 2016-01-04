@@ -247,20 +247,20 @@
 
         /* Border
          */
-        if ((fields.border != undefined) && (fields.border.getValue() != '')) {
+        if (fields.border.getValue() != '') {
             styles.push('border:1px solid #808080;');
         }
 
         /* Vertical Spacing (applies padding-top and padding-bottom)
          */
-        if ((fields.verticalPadding != undefined) && (fields.verticalPadding.getValue() != '')) {
+        if (fields.verticalPadding.getValue() != '') {
             styles.push('padding-top:' + fields.verticalPadding.getValue() + 'px');
             styles.push('padding-bottom:' + fields.verticalPadding.getValue() + 'px');
         }
 
         /* Horizontal Spacing (applies padding-left and padding-right)
          */
-        if ((fields.horizontalPadding != undefined) && (fields.horizontalPadding.getValue() != '')) {
+        if (fields.horizontalPadding.getValue() != '') {
             styles.push('padding-left:' + fields.horizontalPadding.getValue() + 'px');
             styles.push('padding-right:' + fields.horizontalPadding.getValue() + 'px');
         }
@@ -415,7 +415,10 @@
             aspectRatio: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-aspectratio'),
             aspectRatioValue: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-aspectratio-value'),
             fullwidth: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-fullwidth'),
-            alignment: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-alignment')
+            alignment: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-alignment'),
+            border: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-border'),
+            verticalPadding: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-verticalpadding'),
+            horizontalPadding: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-horizontalpadding')
         };
     };
 }(jQuery));
