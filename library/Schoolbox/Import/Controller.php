@@ -85,11 +85,16 @@ class Controller extends Base
      */
     public function user()
     {
+        $csvTemplate = '/adminv2/import/userTemplate.csv';
+        if ($this->getDi()->get('config')->get('external_db') === 'schoolbox') {
+            $csvTemplate = '/adminv2/import/userTemplateWithProfile.csv';
+        }
         $this->getResponse()->content->set([
             'template' => '@adminImport/user.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation('user')->getAllNodes(),
+                'csvTemplate'    => $csvTemplate,
             ],
         ]);
     }
