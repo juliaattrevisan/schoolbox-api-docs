@@ -95,17 +95,6 @@ class Controller extends Base
     }
 
     /**
-     * Download user import template action
-     */
-    public function userTemplate()
-    {
-        $this->getResponse()->content->set([
-            'type' => 'file',
-            'file' => __DIR__ . '/templates/userTemplate.csv'
-        ]);
-    }
-
-    /**
      * Timetable structure import action
      */
     public function timetableStructure()
