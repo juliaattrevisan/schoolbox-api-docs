@@ -361,6 +361,7 @@
         var url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
 
         var dataVars = {
+            'data-schoolboxmedia-type': 'video/mp4',
             'data-schoolboxmedia-source': '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue()
         };
 
@@ -479,7 +480,7 @@
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
-                extraAllowedContent: 'img[data-schoolboxmedia-source]{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float};video[*]{*};source[*]',
+                extraAllowedContent: 'img[data-schoolboxmedia-source,data-schoolboxmedia-type]{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float};video[*]{*};source[*]',
 
                 /* Remove annoying dialog that always appears
                  */
