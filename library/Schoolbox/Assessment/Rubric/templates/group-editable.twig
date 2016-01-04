@@ -6,7 +6,7 @@
 {%- set groupInput = groupInput ?: formField ~ '[' ~ rubric.id ~ '][group]['  ~ group.id ~ ']' -%}
 
 {%- for critIndex, crit in group.criteria -%}
-    {% include 'rubric-group-row-editable.twig' %}
+    {% include '@rubric/group-row-editable.twig' %}
     {# this may seem bizarre, but we only ever want this applied the first time through an interation #}
     {% set rowspan = null %}
 {%- endfor -%}

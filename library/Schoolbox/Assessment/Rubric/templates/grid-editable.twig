@@ -297,7 +297,7 @@
         </thead>
         <tbody>
         {% for groupIndex, group in rubric.groups -%}
-            {%- include 'rubric-group-editable.twig' with { rowspan: rowspan ?: group.criteria|length + 2 } -%}
+            {%- include '@rubric/group-editable.twig' with { rowspan: rowspan ?: group.criteria|length + 2 } -%}
         {%- endfor %}
         <tr class="rb-group-header rb-new-group">
             <th colspan="{{ rubric.levels|length + 3 }}">
