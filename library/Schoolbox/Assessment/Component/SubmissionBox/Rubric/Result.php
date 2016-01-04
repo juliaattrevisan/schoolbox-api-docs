@@ -14,6 +14,11 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 class Result {
 
     /**
+     * @var int
+     */
+    protected $resultSetId;
+
+    /**
      * @var string
      */
     protected $label;
@@ -21,6 +26,24 @@ class Result {
      * @var int
      */
     protected $value;
+
+    /**
+     * @return int
+     */
+    public function getResultSetId()
+    {
+        return $this->resultSetId;
+    }
+
+    /**
+     * @param int $resultSetId
+     * @return static
+     */
+    public function setResultSetId($resultSetId)
+    {
+        $this->resultSetId = $resultSetId;
+        return $this;
+    }
 
     /**
      * @param $label
