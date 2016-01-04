@@ -188,28 +188,25 @@ class Mapper
         // umm... I have *never* had to do this before... how does the while() loop break if not EOF??
         $criteriaStatement->closeCursor();
 
-
-        $descriptorStatement = $this->database->query("
-            SELECT id, criterion_id, description, value
-            FROM rubric_descriptor
-            WHERE valid IS TRUE
-            AND submission_box_id = ?
-        ", [ $boxId ]);
+        /** @var Collection|SubmissionBox\Rubric\Descriptor[] $descriptorCollection */
+        $descriptorCollection = SubmissionBox\Rubric\DescriptorMapper::getInstance()->findByColumnList([
+            'submission_box_id' => $boxId,
+            'valid'             => true
+        ]);
 
         $levelList = [];
 
-        while ($r = $descriptorStatement->fetch(PDO::FETCH_ASSOC)) {
+        foreach ($descriptorCollection as $d) {
             // only populate if a description is given
 
-            $descriptors[$r['criterion_id']][$r['id']] = [
-                'text'   => $r['description'],
-                'points' => $r['value'] || $r['description']? $r['value'] : ''
+            $descriptors[$d->getCriterion()->getId()][$d->getId()] = [
+                'text'   => $d->getDescription(),
+                'points' => $d->getValue() || $d->getDescription() ? $d->getValue() : ''
             ];
 
-            $levelList[$r['value']] = [ 'name' => '' ];
+            // emulate empty levels
+            $levelList[$d->getValue()] = [ 'name' => '' ];
         }
-
-        $descriptorStatement->closeCursor();
 
         // mokay. so if at this point you've got no descriptors, check to see if there should be a resultSet we should use
         if (count($descriptors) == 0) {
@@ -219,7 +216,7 @@ class Mapper
                 // got a resultSet - we're going to fake that into a descriptor grid
 
                 /** @var Collection|Result[] $results */
-                $results = SubmissionBox\Rubric\ResultMapper::getInstance()->findByColumn('resultset_id', $resultSetId, [ 'order' => [  ] ]);
+                $results = SubmissionBox\Rubric\ResultMapper::getInstance()->findByColumn('resultset_id', $resultSetId, [ 'order' => [ 'value' => 'desc' ] ]);
 
                 foreach ($results as $result) {
                     foreach ($criteria as $id => $crit) {
