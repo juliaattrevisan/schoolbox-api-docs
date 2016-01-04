@@ -122,7 +122,7 @@ class Controller extends Base
     }
 
     /**
-     * Timetable structure import action
+     * Timetable structure import submit screen action
      */
     public function timetableStructure()
     {
@@ -136,7 +136,7 @@ class Controller extends Base
     }
 
     /**
-     * Timetable import action
+     * Timetable import submit screen action
      */
     public function timetable()
     {
@@ -150,7 +150,7 @@ class Controller extends Base
     }
 
     /**
-     * Enrolment import action
+     * Enrolment import submit screen action
      */
     public function enrolment()
     {
