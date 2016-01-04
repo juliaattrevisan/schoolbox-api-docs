@@ -438,7 +438,7 @@
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
-                extraAllowedContent: 'img{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float} video[*]{*};source[*]',
+                extraAllowedContent: 'img{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float};video[*]{*};source[*]',
 
                 /* Remove annoying dialog that always appears
                  */
