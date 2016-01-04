@@ -32,7 +32,7 @@ class ZipFolder
         }
     }
 
-    private function __destruct()
+    public function __destruct()
     {
         $this->cleanUp();
     }
