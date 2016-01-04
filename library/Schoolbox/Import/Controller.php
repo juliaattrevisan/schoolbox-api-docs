@@ -22,26 +22,44 @@ use Schoolbox\Sync\Navigator\Node;
 class Controller extends Base
 {
     /**
-     * Intro action
+     * Builds breadcrumbs for this page.
+     *
+     * @return Navigator
      */
-    public function intro()
+    protected function buildBreadcrumbs()
     {
-        $allBreadcrumbs = new Navigator(
+        return new Navigator(
             new Node('Home', '/adminv2/home', false),
             new Node('Importer', $this->getRouteIfAuthorized('adminImport.intro'), true)
         );
-        $allNavigation = new Navigator(
+    }
+
+    /**
+     * Builds navigation for this page.
+     *
+     * @return Navigator
+     */
+    protected function buildNavigation()
+    {
+        return new Navigator(
             new Node('User', $this->getRouteIfAuthorized('adminImport.user'), false),
             new Node('Timetable Structure', $this->getRouteIfAuthorized('adminImport.timetableStructure'), false),
             new Node('Timetable', $this->getRouteIfAuthorized('adminImport.timetable'), false),
             new Node('Enrolment', $this->getRouteIfAuthorized('adminImport.enrolment'), false)
         );
+    }
+
+    /**
+     * Intro action
+     */
+    public function intro()
+    {
         $this->getResponse()->content->set([
             'template' => '@adminImport/intro.twig',
-            'data' => [
-                'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
-                'allNavigation'  => $allNavigation->getAllNodes(),
-            ]
+            'data'     => [
+                'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
+                'allNavigation'  => $this->buildNavigation()->getAllNodes(),
+            ],
         ]);
     }
 
@@ -52,6 +70,10 @@ class Controller extends Base
     {
         $this->getResponse()->content->set([
             'template' => '@adminImport/user.twig',
+            'data'     => [
+                'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
+                'allNavigation'  => $this->buildNavigation()->getAllNodes(),
+            ],
         ]);
     }
 
@@ -62,6 +84,10 @@ class Controller extends Base
     {
         $this->getResponse()->content->set([
             'template' => '@adminImport/timetableStructure.twig',
+            'data'     => [
+                'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
+                'allNavigation'  => $this->buildNavigation()->getAllNodes(),
+            ],
         ]);
     }
 
@@ -72,6 +98,10 @@ class Controller extends Base
     {
         $this->getResponse()->content->set([
             'template' => '@adminImport/timetable.twig',
+            'data'     => [
+                'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
+                'allNavigation'  => $this->buildNavigation()->getAllNodes(),
+            ],
         ]);
     }
 
@@ -82,6 +112,10 @@ class Controller extends Base
     {
         $this->getResponse()->content->set([
             'template' => '@adminImport/enrolment.twig',
+            'data'     => [
+                'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
+                'allNavigation'  => $this->buildNavigation()->getAllNodes(),
+            ],
         ]);
     }
 }
