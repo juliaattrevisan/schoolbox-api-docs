@@ -420,7 +420,7 @@
                 levelCount: $rb.children('thead').find('input').length
             };
 
-            $.post(window.location, payload, function (data) {
+            $.post('{{ routeLookup("rubric.create") }}', payload, function (data) {
 
                 var $data = $(data);
 
