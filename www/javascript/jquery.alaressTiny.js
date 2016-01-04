@@ -338,6 +338,40 @@
     };
 
     /**
+     * Inject image into editor panel with modifiers applied
+     *
+     * @param editorInstance
+     * @param dialog
+     * @returns {*}
+     */
+    $.fn.schoolboxResource_Media_Inject = function(editorInstance, dialog) {
+        var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+        var styles = [];
+
+        var video = editorInstance.document.createElement('video');
+
+        video.setAttributes({
+            controls: 'controls',
+            preload: 'none',
+            poster: '/cms/videoThumb.php?type=sbfs&id=' + fields.id.getValue() + '&size=poster',
+            height: 400,
+            width: '100%'
+        });
+
+        var source = editorInstance.document.createElement('source');
+
+        source.setAttributes({
+            src: '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue(),
+            type: 'video/mp4'
+        });
+
+        video.append(source);
+
+        return video;
+    };
+
+
+    /**
      * A macro to all the fields in the Dialog
      * (because it's such a longwinded way to retrieve them)
      *
@@ -404,7 +438,7 @@
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
-                extraAllowedContent: 'img{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float}',
+                extraAllowedContent: 'img{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float} video[*]{*};source[*]',
 
                 /* Remove annoying dialog that always appears
                  */

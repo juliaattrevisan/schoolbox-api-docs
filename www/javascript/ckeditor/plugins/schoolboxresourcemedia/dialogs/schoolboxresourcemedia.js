@@ -98,7 +98,16 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
                     }
                 ]
             }
-        ]
+        ],
+
+        /**
+         * Manufacture html and insert into editor
+         */
+        onOk: function() {
+            var dialog = this;
+
+            editorInstance.insertElement($.fn.schoolboxResource_Media_Inject(editorInstance, dialog));
+        }
     }
 });
 
