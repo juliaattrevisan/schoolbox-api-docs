@@ -60,6 +60,8 @@ class FilesystemFactory
             !empty($otfs_s3_bucket) &&
             !empty($otfs_s3_prefix))
         {
+            // Use AWS S3 for storage
+
             $client = S3Client::factory([
                 'credentials' => [
                 'key'    => $otfs_s3_cred_key,
@@ -69,19 +71,18 @@ class FilesystemFactory
                 'version' => $otfs_s3_version,
             ]);
 
-            return new MountManager([
-                Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
-                Manager::FS_STORAGE => new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket, $otfs_s3_prefix . INSTANCE_ID))
-            ]);
+            $fs_storage = new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket, $otfs_s3_prefix . INSTANCE_ID));
         }
         else
         {
-            // Not all S3 config parameters were specified
+            // Use local storage
 
-            return new MountManager([
-                Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
-                Manager::FS_STORAGE => new Filesystem(new Local($storageDir))
-            ]);
+            $fs_storage = new Filesystem(new Local($storageDir));
         }
+
+        return new MountManager([
+            Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
+            Manager::FS_STORAGE => new $fs_storage
+        ]);
     }
 }
