@@ -145,12 +145,12 @@
     /**
      * Populate dialog fields with image data
      *
+     * @param fields
      * @param url
      * @param dialog
      * @param reset
      */
-    $.fn.schoolboxResource_Image_Render = function(url, dialog, reset) {
-        var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+    $.fn.schoolboxResource_Image_Render = function(fields, url, dialog, reset) {
 
         /* Find out width/height ratio
          */
@@ -203,15 +203,15 @@
      * Inject image into editor panel with modifiers applied
      *
      * @param editorInstance
-     * @param dialog
+     * @param fields
+     * @param url
      * @returns {*}
      */
-    $.fn.schoolboxResource_Image_Inject = function(editorInstance, dialog) {
-        var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+    $.fn.schoolboxResource_Image_Inject = function(editorInstance, fields, url) {
         var styles = [];
 
         var element = editorInstance.document.createElement('img');
-        element.setAttribute('src', fields.url.getValue());
+        element.setAttribute('src', url);
 
         /* Determine width - if fullwidth checked, use 100%
          * otherwise use specified values. Note that width:100%
@@ -230,37 +230,39 @@
          * centered uses 0 auto;
          * none is no floating, just display inline
          */
-        switch (fields.alignment.getValue()) {
-            case 'center':
-                styles.push('margin:0 auto');
-                styles.push('display:block');
-                break;
+        if (fields.alignment != undefined) {
+            switch (fields.alignment.getValue()) {
+                case 'center':
+                    styles.push('margin:0 auto');
+                    styles.push('display:block');
+                    break;
 
-            case 'left':
-            case 'right':
-                styles.push('float:' + fields.alignment.getValue());
-                break;
+                case 'left':
+                case 'right':
+                    styles.push('float:' + fields.alignment.getValue());
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+            }
         }
 
         /* Border
          */
-        if (fields.border.getValue() != '') {
+        if ((fields.border != undefined) && (fields.border.getValue() != '')) {
             styles.push('border:1px solid #808080;');
         }
 
         /* Vertical Spacing (applies padding-top and padding-bottom)
          */
-        if (fields.verticalPadding.getValue() != '') {
+        if ((fields.verticalPadding != undefined) && (fields.verticalPadding.getValue() != '')) {
             styles.push('padding-top:' + fields.verticalPadding.getValue() + 'px');
             styles.push('padding-bottom:' + fields.verticalPadding.getValue() + 'px');
         }
 
         /* Horizontal Spacing (applies padding-left and padding-right)
          */
-        if (fields.horizontalPadding.getValue() != '') {
+        if ((fields.horizontalPadding != undefined) && (fields.horizontalPadding.getValue() != '')) {
             styles.push('padding-left:' + fields.horizontalPadding.getValue() + 'px');
             styles.push('padding-right:' + fields.horizontalPadding.getValue() + 'px');
         }
@@ -323,90 +325,67 @@
     /**
      * Populate dialog fields with image data
      *
+     * Use an image in place of the video player because native <video>
+     * rendering makes this element unselectable for editing
+     *
+     * @param fields
      * @param id
      * @param dialog
      * @param reset
      */
-    $.fn.schoolboxResource_Media_Render = function(id, dialog, reset) {
-        var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+    $.fn.schoolboxResource_Media_Render = function(fields, dialog, reset) {
+        var url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
 
-        var url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + id;
-
-        /* Find out width/height ratio
-         */
-        var temp = new Image();
-        temp.src = url;
-        temp.onload = applyDimensions;
-
-        /* Apply dimensions upon temp image spawn
-         */
-        function applyDimensions() {
-            var width = this.width;
-            var height = this.height;
-            var preview = '<img src="' + url + '" />';
-
-            /* Set dialog input contents
-             */
-            fields.preview.html(preview);
-
-            /* Don't change width or height if they were already set
-             *
-             * This occurs when setup() runs, when editing an existing image
-             * Or when an image was set to Fullwidth (it won't have a width/height style attribute)
-             */
-            if (fields.width.getValue() == '' || fields.height.getValue() == '' || reset) {
-                fields.width.setValue(width);
-                fields.height.setValue(height);
-            }
-        }
+        $.fn.schoolboxResource_Image_Render(fields, url, dialog, reset);
     };
 
     /**
      * Inject image into editor panel with modifiers applied
      *
      * @param editorInstance
-     * @param dialog
+     * @param fields
      * @returns {*}
      */
-    $.fn.schoolboxResource_Media_Inject = function(editorInstance, dialog) {
-        var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
-        var styles = [];
+    $.fn.schoolboxResource_Media_Inject = function(editorInstance, fields) {
+        var url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
 
-        /* Determine width - if fullwidth checked, use 100%
-         * otherwise use specified values. Note that width:100%
-         * is not allowed, so use the usual class instead
-         */
-        if (fields.fullwidth.getValue()) {
-            styles.push('width:100%');
-            styles.push('height:400px');
-        }
-        else {
-            styles.push('width:' + fields.width.getValue() + 'px');
-            styles.push('height:' + fields.height.getValue() + 'px');
-        }
+        return $.fn.schoolboxResource_Image_Inject(editorInstance, fields, url);
 
-        var video = editorInstance.document.createElement('video');
-
-        video.setAttributes({
-            controls: 'controls',
-            preload: 'none',
-            poster: '/cms/videoThumb.php?type=sbfs&id=' + fields.id.getValue() + '&size=poster',
-        });
-
-        var source = editorInstance.document.createElement('source');
-
-        source.setAttributes({
-            src: '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue(),
-            type: 'video/mp4'
-        });
-
-        video.append(source);
-
-        /* Combine and inject
-         */
-        video.setAttribute('style', styles.join(';'));
-
-        return video;
+        ///* Determine width - if fullwidth checked, use 100%
+        // * otherwise use specified values. Note that width:100%
+        // * is not allowed, so use the usual class instead
+        // */
+        //if (fields.fullwidth.getValue()) {
+        //    styles.push('width:100%');
+        //    styles.push('height:400px');
+        //}
+        //else {
+        //    styles.push('width:' + fields.width.getValue() + 'px');
+        //    styles.push('height:' + fields.height.getValue() + 'px');
+        //}
+        //
+        //var video = editorInstance.document.createElement('video');
+        //
+        //video.setAttributes({
+        //    controls: 'controls',
+        //    preload: 'none',
+        //    poster: '/cms/videoThumb.php?type=sbfs&id=' + fields.id.getValue() + '&size=poster',
+        //});
+        //
+        //var source = editorInstance.document.createElement('source');
+        //
+        //source.setAttributes({
+        //    src: '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue(),
+        //    type: 'video/mp4'
+        //});
+        //
+        //video.append(source);
+        //
+        ///* Combine and inject
+        // */
+        //video.setAttribute('style', styles.join(';'));
+        //
+        //return video;
     };
 
     /**

@@ -50,7 +50,7 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
 
                                     /* Render media
                                      */
-                                    $.fn.schoolboxResource_Media_Render(fields.id.getValue(), dialog, false);
+                                    $.fn.schoolboxResource_Media_Render(fields, dialog, false);
                                 }
                             },
                             {
@@ -187,8 +187,9 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
          */
         onOk: function() {
             var dialog = this;
+            var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
 
-            editorInstance.insertElement($.fn.schoolboxResource_Media_Inject(editorInstance, dialog));
+            editorInstance.insertElement($.fn.schoolboxResource_Media_Inject(editorInstance, fields));
         },
 
         /**

@@ -46,7 +46,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                      * event by programmatically assigning url value to this input field
                                      */
                                     if (image) {
-                                        $.fn.schoolboxResource_Image_Render(fields.url.getValue(), dialog, false);
+                                        $.fn.schoolboxResource_Image_Render(fields, fields.url.getValue(), dialog, false);
                                     }
                                 }
                             },
@@ -180,7 +180,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
-                                    $.fn.schoolboxResource_Image_Render(fields.url.getValue(), dialog, true);
+                                    $.fn.schoolboxResource_Image_Render(fields, fields.url.getValue(), dialog, true);
                                 }
                             }
                         ]
@@ -324,8 +324,9 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
          */
         onOk: function() {
             var dialog = this;
+            var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
-            editorInstance.insertElement($.fn.schoolboxResource_Image_Inject(editorInstance, dialog));
+            editorInstance.insertElement($.fn.schoolboxResource_Image_Inject(editorInstance, fields, fields.url.getValue()));
         },
 
         /**
