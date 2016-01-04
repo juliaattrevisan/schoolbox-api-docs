@@ -272,7 +272,21 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
     } catch (Exception $e) {
     }
     outputResultSets($this, $resultSetID, $resultCount);
-    outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount, false, $is_task);
+
+
+    $map = \Schoolbox\Assessment\Rubric\Mapper::getInstance();
+
+    if ($submission->getId()) {
+        $grid = $map->findBySubmissionBoxId($submission->getId());
+    } else {
+        $fact = new \Schoolbox\Assessment\Rubric\Factory();
+        $grid = $fact->buildForFolder($submission->getCategory()->getId());
+    }
+
+    $this->setVar('CLASS_CRITERIA', $this->getTwig()->render('@rubric/grid-editable.twig', [ 'rubric' => $grid->toContext() ]));
+
+
+//    outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount, false, $is_task);
     if ($is_task) {
         outputCriteria($this, $category->getParent()->getId(), $criteria, $results, $resultCount, true, $is_task);
     }
@@ -463,6 +477,7 @@ function outputCriteria(
 ) {
 
     // Output this all as part of a single template, and inject into the block.
+    return;
 
     // get rubric details
     /** @var \Schoolbox\Collection|Criterion[] $criterionCollection */

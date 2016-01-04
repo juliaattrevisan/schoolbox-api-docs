@@ -42,6 +42,27 @@
 
         $.fn.alaressEditor();
 
+
+        // cache that
+        var inputRaw = $('[data-hide-watch-value="raw"]');
+
+        // this needs to override the show-hide watcher because the total mark option depends on both values
+        $('#marktype, #use-rubric').on('change', function () {
+            var mt = $('#marktype').children(':selected').data('slug'),
+                rb = $('#use-rubric').prop('checked');
+
+            // we don't want to show the total mark field if the rubric is being used, since the total mark will be calculated from the rubric itself
+            if (mt == 'raw') {
+                if (rb) {
+                    // hide that
+                    inputRaw.addClass('hide');
+                } else {
+                    // show that
+                    inputRaw.removeClass('hide');
+                }
+            }
+        });
+
         // When I change the number of assessment levels,
         // that means I want to use assessment specific descriptors.
         $('[data-relation="rubric-descriptor-count"]').on('change', function(){
@@ -577,19 +598,36 @@
                             </div>
                         </fieldset>
                     </div>
-
-                    <div class="small-12 columns"
-                         data-hide-watch="#marktype"
-                         data-hide-watch-value="rubric"
-                         data-hide-watch-option-attribute="data-slug"
-                    >
-                        <label>
-                            Assessment Specific Descriptors
-                        </label>
-                        {COURSE_CRITERIA}
-                        {CLASS_CRITERIA}
-                    </div>
                     <!-- END marktype -->
+                    <div class="small-6 column">
+                        <label for="use-rubric">Mark Against Rubric <span data-tooltip class="hint has-tip tip-right" title="Will you use a rubric to mark this work?">?</span></label>
+                        <div class="switch">
+                            <input type="hidden" name="use-rubric"  value="0" />
+                            <input type="checkbox" name="use-rubric" id="use-rubric" value="1" />
+                            <label for="use-rubric">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-6 column hide" data-hide-watch="#use-rubric">
+                        <label for="enable-group-marking">Mark Per-{TPL_LOCAL_RUBRICGROUP_PC} <span data-tooltip class="hint has-tip tip-right" title="Should marks be calculated on a per-{TPL_LOCAL_RUBRICGROUP} basis as well as overall?">?</span></label>
+                        <div class="switch">
+                            <input type="hidden" name="enable-group-marking" value="0" />
+                            <input type="checkbox" name="enable-group-marking" id="enable-group-marking" value="1" />
+                            <label for="enable-group-marking">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+                    <fieldset class="content hide" data-hide-watch="#use-rubric">
+                        <div style="clear:both;">
+                            {COURSE_CRITERIA}
+                            {CLASS_CRITERIA}
+                        </div>
+                    </fieldset>
+
                 </fieldset>
 
                 <!-- BEGIN curriculum_code_input -->
