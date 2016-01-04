@@ -17,6 +17,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
     protected function mapping() {
         $this->hasTable('rubric_descriptor');
         $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Rubric\\Descriptor');
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->hasMap(array(
             'column'     => 'criterion_id',
             'property'   => 'criterion',

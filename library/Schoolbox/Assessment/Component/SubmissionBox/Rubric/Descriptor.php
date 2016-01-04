@@ -14,6 +14,11 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 class Descriptor {
 
     /**
+     * @var int
+     */
+    protected $id;
+
+    /**
      * @var Criterion
      */
     protected $criterion;
@@ -37,6 +42,24 @@ class Descriptor {
      * @var bool
      */
     protected $valid;
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     * @return static
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
     /**
      * @param  Criterion $criterion
