@@ -323,18 +323,42 @@
     /**
      * Populate dialog fields with image data
      *
-     * @param url
+     * @param id
      * @param dialog
      * @param reset
      */
-    $.fn.schoolboxResource_Media_Render = function(url, dialog, reset) {
+    $.fn.schoolboxResource_Media_Render = function(id, dialog, reset) {
         var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
 
-        var preview = '<img src="/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue() + '" />';
+        var url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + id;
 
-        /* Set dialog input contents
+        /* Find out width/height ratio
          */
-        fields.preview.html(preview);
+        var temp = new Image();
+        temp.src = url;
+        temp.onload = applyDimensions;
+
+        /* Apply dimensions upon temp image spawn
+         */
+        function applyDimensions() {
+            var width = this.width;
+            var height = this.height;
+            var preview = '<img src="' + url + '" />';
+
+            /* Set dialog input contents
+             */
+            fields.preview.html(preview);
+
+            /* Don't change width or height if they were already set
+             *
+             * This occurs when setup() runs, when editing an existing image
+             * Or when an image was set to Fullwidth (it won't have a width/height style attribute)
+             */
+            if (fields.width.getValue() == '' || fields.height.getValue() == '' || reset) {
+                fields.width.setValue(width);
+                fields.height.setValue(height);
+            }
+        }
     };
 
     /**
@@ -348,14 +372,25 @@
         var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
         var styles = [];
 
+        /* Determine width - if fullwidth checked, use 100%
+         * otherwise use specified values. Note that width:100%
+         * is not allowed, so use the usual class instead
+         */
+        if (fields.fullwidth.getValue()) {
+            styles.push('width:100%');
+            styles.push('height:400px');
+        }
+        else {
+            styles.push('width:' + fields.width.getValue() + 'px');
+            styles.push('height:' + fields.height.getValue() + 'px');
+        }
+
         var video = editorInstance.document.createElement('video');
 
         video.setAttributes({
             controls: 'controls',
             preload: 'none',
             poster: '/cms/videoThumb.php?type=sbfs&id=' + fields.id.getValue() + '&size=poster',
-            height: 400,
-            width: '100%'
         });
 
         var source = editorInstance.document.createElement('source');
@@ -367,22 +402,29 @@
 
         video.append(source);
 
+        /* Combine and inject
+         */
+        video.setAttribute('style', styles.join(';'));
+
         return video;
     };
-
 
     /**
      * A macro to all the fields in the Dialog
      * (because it's such a longwinded way to retrieve them)
      *
-     * @param dialog
-     * @returns {{url: *, width: *, height: *, aspectRatio: *, aspectRatioValue: *, fullwidth: *, preview: (*|Mixed|jQuery|HTMLElement)}}
+      * @param dialog
+     * @returns {{url: *, id: *, preview: (*|Mixed|jQuery|HTMLElement), width: *, height: *, fullwidth: *, alignment: *}}
      */
     $.fn.schoolboxResource_Media_DialogFields = function(dialog) {
         return {
             url: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-url'),
             id: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-id'),
-            preview: $('#schoolboxresource-media-preview')
+            preview: $('#schoolboxresource-media-preview'),
+            width: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-width'),
+            height: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-height'),
+            fullwidth: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-fullwidth'),
+            alignment: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-alignment')
         };
     };
 }(jQuery));

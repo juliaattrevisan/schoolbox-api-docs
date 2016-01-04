@@ -50,7 +50,7 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
 
                                     /* Render media
                                      */
-                                    $.fn.schoolboxResource_Media_Render(fields.url.getValue(), dialog, false);
+                                    $.fn.schoolboxResource_Media_Render(fields.id.getValue(), dialog, false);
                                 }
                             },
                             {
@@ -96,7 +96,88 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
                     {
                         type: 'html',
                         html: '<label class="schoolboxresource-separator">Preview</label><div id="schoolboxresource-media-preview" class="schoolboxresource-media-preview"></div>'
-                    }
+                    },
+                    {
+                        type: 'html',
+                        html: '<label class="schoolboxresource-separator">Dimensions</label>'
+                    },
+                    {
+                        type: 'hbox',
+                        widths: ['40%', '40%', '20%'],
+                        children: [
+                            {
+                                type: 'text',
+                                id: 'schoolboxresource-media-width',
+                                label: 'Width',
+                                validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." ),
+
+                                /* Editing an existing element
+                                 */
+                                setup: function(element) {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+
+                                    /* Determine if Fullwidth should remain ticked
+                                     */
+                                    if ($.fn.schoolboxResource_Image_ExtractStyle('width', element.getAttribute('style')) != '100%') {
+                                        var width = $.fn.schoolboxResource_Image_ExtractStyle('width', element.getAttribute('style')).replace('px', '');
+
+                                        fields.width.setValue(width);
+                                    }
+                                }
+                            },
+                            {
+                                type: 'text',
+                                id: 'schoolboxresource-media-height',
+                                label: 'Height',
+                                validate: CKEDITOR.dialog.validate.notEmpty( "Height cannot be empty."),
+
+                                /* Editing an existing element
+                                 */
+                                setup: function(element) {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+
+                                    var height = $.fn.schoolboxResource_Image_ExtractStyle('height', element.getAttribute('style')).replace('px', '');
+
+                                    fields.height.setValue(height);
+                                }
+                            },
+                            {
+                                type: 'button',
+                                id: 'schoolboxresource-media-resetdimensions',
+                                label: 'Reset',
+                                className: 'schoolboxresource-button',
+                                onClick: function () {
+                                    var dialog = this.getDialog();
+                                    var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+
+                                    $.fn.schoolboxResource_Media_Render(fields.id.getValue(), dialog, true);
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        type: 'checkbox',
+                        id: 'schoolboxresource-media-fullwidth',
+                        label: 'Fullwidth',
+
+                        /* Editing an existing element
+                         */
+                        setup: function(element) {
+                            var dialog = this.getDialog();
+                            var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+
+                            /* Determine if Fullwidth should remain ticked
+                             */
+                            if ($.fn.schoolboxResource_Image_ExtractStyle('width', element.getAttribute('style')) == '100%') {
+                                fields.fullwidth.setValue(true);
+                            }
+                            else {
+                                fields.fullwidth.setValue(false);
+                            }
+                        }
+                    },
                 ]
             }
         ],
@@ -108,6 +189,42 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
             var dialog = this;
 
             editorInstance.insertElement($.fn.schoolboxResource_Media_Inject(editorInstance, dialog));
+        },
+
+        /**
+         * Dialog startup
+         *
+         * Occurs when you click the Schoolbox Media button regardless
+         * of what you have currently selected
+         */
+        onShow: function() {
+            var fields = $.fn.schoolboxResource_Media_DialogFields(this);
+
+            /* Clear any existing preview that might have been loaded
+             * This is required when you have inserted an image and
+             * then go to insert a new one; it remembers the preview
+             * from before
+             */
+            fields.preview.html('');
+
+            /* Deal with existing/inserting new elements
+             */
+            var selection = editorInstance.getSelection();
+            var element = selection.getStartElement();
+
+            if (!element || element.getName() != 'video') {
+                element = editorInstance.document.createElement('video');
+                this.insertMode = true;
+            }
+            else {
+                this.insertMode = false;
+            }
+
+            this.element = element;
+
+            if (!this.insertMode) {
+                this.setupContent(this.element);
+            }
         }
     }
 });
