@@ -29,6 +29,7 @@ class AdminV2_Nav
         'usage' => 'Usage',
         'engagement' => 'Engagement',
         'ups' => 'User Provisioning System',
+        'import' => 'Import',
     );
 
     public function parse(SitePage $page, $currentPage = 'home')
