@@ -129,6 +129,16 @@ class Controller extends Base
     }
 
     /**
+     * Timetable structure import action
+     */
+    public function timetableStructureImport()
+    {
+        $factory = new CollectorFactory();
+        $upload  = $factory->build($this->getRequest()->post->get('attachment'))->getFirst();
+        // Start parsing the upload
+    }
+
+    /**
      * Timetable import submit screen action
      */
     public function timetable()
@@ -144,6 +154,16 @@ class Controller extends Base
     }
 
     /**
+     * Timetable import action
+     */
+    public function timetableImport()
+    {
+        $factory = new CollectorFactory();
+        $upload  = $factory->build($this->getRequest()->post->get('attachment'))->getFirst();
+        // Start parsing the upload
+    }
+
+    /**
      * Enrolment import submit screen action
      */
     public function enrolment()
@@ -156,6 +176,16 @@ class Controller extends Base
                 'attachzone'     => $this->getAttachzone()->getTwigContext(),
             ],
         ]);
+    }
+
+    /**
+     * Enrolment import action
+     */
+    public function enrolmentImport()
+    {
+        $factory = new CollectorFactory();
+        $upload  = $factory->build($this->getRequest()->post->get('attachment'))->getFirst();
+        // Start parsing the upload
     }
 
     /**
