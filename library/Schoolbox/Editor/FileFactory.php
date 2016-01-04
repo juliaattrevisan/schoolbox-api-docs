@@ -40,6 +40,7 @@ class FileFactory {
         $data = [
             'type' => '',
             'hash' => '',
+            'id' => ''
         ];
 
         list($type, $id) = explode(':', $this->getHash());
@@ -51,7 +52,11 @@ class FileFactory {
 
                 $data = [
                     'type' => $file->getMimetype()->getType(),
-                    'hash' => $file->getHash()
+                    'hash' => $file->getHash(),
+
+                    /* Used for video, sadly
+                     */
+                    'id' => $file->getId()
                 ];
 
                 break;

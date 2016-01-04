@@ -329,6 +329,12 @@
      */
     $.fn.schoolboxResource_Media_Render = function(url, dialog, reset) {
         var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+
+        var preview = '<img src="/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue() + '" />';
+
+        /* Set dialog input contents
+         */
+        fields.preview.html(preview);
     };
 
     /**
@@ -341,6 +347,7 @@
     $.fn.schoolboxResource_Media_DialogFields = function(dialog) {
         return {
             url: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-url'),
+            id: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-id'),
             preview: $('#schoolboxresource-media-preview')
         };
     };

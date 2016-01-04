@@ -12,6 +12,16 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
                 id: 'schoolboxresource-media-tab',
                 label: 'Schoolbox Resource Media',
                 elements: [
+
+                    /* Store the file id here, because audio/video renders
+                     * with a numeric id, not a hash, and has multiple
+                     * urls for previews and content stream itself
+                     */
+                    {
+                        type: 'text',
+                        id: 'schoolboxresource-media-id',
+                        label: 'Id'
+                    },
                     {
                         type: 'hbox',
                         widths: ['80%', '20%'],
@@ -37,17 +47,9 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
 
-                                    var image = true;
-
-                                    /* Render image
-                                     * Reset aspect ratio in case it remembered from previous image
-                                     *
-                                     * Bypass infinite loop with flag, due to Browse button inflicting onChange
-                                     * event by programmatically assigning url value to this input field
+                                    /* Render media
                                      */
-                                    if (image) {
-                                        $.fn.schoolboxResource_Media_Render(fields.url.getValue(), dialog, false);
-                                    }
+                                    $.fn.schoolboxResource_Media_Render(fields.url.getValue(), dialog, false);
                                 }
                             },
                             {
@@ -78,7 +80,8 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
 
                                             /* Renderer Strategy (I guess)
                                              */
-                                            fields.url.setValue('/storage/image.php?hash=' + responseText.hash);
+                                            fields.id.setValue(responseText.id);
+                                            fields.url.setValue('/cms/videoThumb.php?type=sbfs&id=' + responseText.id);
 
                                             /* Shut modal, go back to Dialog
                                              */
