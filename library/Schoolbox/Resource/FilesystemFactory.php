@@ -44,21 +44,45 @@ class FilesystemFactory
     {
         $config = new \Schoolbox\Config\Loader();
 
-        $client = S3Client::factory([
-            'credentials' => [
-            'key'    => $config->get('otfs_s3_cred_key'),
-            'secret' => $config->get('otfs_s3_cred_secret'),
-        ],
-            'region' => $config->get('otfs_s3_region'),
-            'version' => $config->get('otfs_s3_version'),
-        ]);
+        // Enable S3 only if all of the variables have been set in the config
 
-        return new MountManager([
-            Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
-            Manager::FS_STORAGE => new Filesystem(new Local($storageDir)),
-            Manager::FS_STORAGE => new Filesystem(new AwsS3Adapter($client, $config->get('otfs_s3_bucket'), $config->get('otfs_s3_prefix') . INSTANCE_ID))
-        ]);
+        $otfs_s3_cred_key = trim($config->get('otfs_s3_cred_key'));
+        $otfs_s3_cred_secret = trim($config->get('otfs_s3_cred_secret'));
+        $otfs_s3_region = trim($config->get('otfs_s3_region'));
+        $otfs_s3_version = trim($config->get('otfs_s3_version'));
+        $otfs_s3_bucket = trim($config->get('otfs_s3_bucket'));
+        $otfs_s3_prefix = trim($config->get('otfs_s3_prefix'));
 
+        if (!empty($otfs_s3_cred_key) &&
+            !empty($otfs_s3_cred_secret) &&
+            !empty($otfs_s3_region) &&
+            !empty($otfs_s3_version) &&
+            !empty($otfs_s3_bucket) &&
+            !empty($otfs_s3_prefix))
+        {
+            $client = S3Client::factory([
+                'credentials' => [
+                'key'    => $otfs_s3_cred_key,
+                'secret' => $otfs_s3_cred_secret,
+            ],
+                'region' => $otfs_s3_region,
+                'version' => $otfs_s3_version,
+            ]);
+
+            return new MountManager([
+                Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
+                Manager::FS_STORAGE => new Filesystem(new Local($storageDir)),
+                Manager::FS_STORAGE => new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket, $otfs_s3_prefix . INSTANCE_ID))
+            ]);
+        }
+        else
+        {
+            // Not all S3 config parameters were specified
+
+            return new MountManager([
+                Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
+                Manager::FS_STORAGE => new Filesystem(new Local($storageDir))
+            ]);
+        }
     }
-
 }
