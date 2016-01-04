@@ -123,8 +123,8 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
 
                                     /* Determine if Fullwidth should remain ticked
                                      */
-                                    if ($.fn.schoolboxResource_Image_ExtractStyle('width', element.getAttribute('style')) != '100%') {
-                                        var width = $.fn.schoolboxResource_Image_ExtractStyle('width', element.getAttribute('style')).replace('px', '');
+                                    if ($.fn.schoolboxResource_ExtractStyle('width', element.getAttribute('style')) != '100%') {
+                                        var width = $.fn.schoolboxResource_ExtractStyle('width', element.getAttribute('style')).replace('px', '');
 
                                         fields.width.setValue(width);
                                     }
@@ -158,7 +158,7 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
 
-                                    var height = $.fn.schoolboxResource_Image_ExtractStyle('height', element.getAttribute('style')).replace('px', '');
+                                    var height = $.fn.schoolboxResource_ExtractStyle('height', element.getAttribute('style')).replace('px', '');
 
                                     fields.height.setValue(height);
                                 },
@@ -228,7 +228,7 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
 
                             /* Determine if Fullwidth should remain ticked
                              */
-                            if ($.fn.schoolboxResource_Image_ExtractStyle('width', element.getAttribute('style')) == '100%') {
+                            if ($.fn.schoolboxResource_ExtractStyle('width', element.getAttribute('style')) == '100%') {
                                 fields.fullwidth.setValue(true);
                             }
                             else {

@@ -303,7 +303,7 @@
      * @param property
      * @param style
      */
-    $.fn.schoolboxResource_Image_ExtractStyle = function(property, style) {
+    $.fn.schoolboxResource_ExtractStyle = function(property, style) {
         var allProperties = style.split(';');
 
         for (var i = 0; i < allProperties.length; i++) {

@@ -115,8 +115,8 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
 
                                     /* Determine if Fullwidth should remain ticked
                                      */
-                                    if ($.fn.schoolboxResource_Image_ExtractStyle('width', element.getAttribute('style')) != '100%') {
-                                        var width = $.fn.schoolboxResource_Image_ExtractStyle('width', element.getAttribute('style')).replace('px', '');
+                                    if ($.fn.schoolboxResource_ExtractStyle('width', element.getAttribute('style')) != '100%') {
+                                        var width = $.fn.schoolboxResource_ExtractStyle('width', element.getAttribute('style')).replace('px', '');
 
                                         fields.width.setValue(width);
                                     }
@@ -150,7 +150,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
-                                    var height = $.fn.schoolboxResource_Image_ExtractStyle('height', element.getAttribute('style')).replace('px', '');
+                                    var height = $.fn.schoolboxResource_ExtractStyle('height', element.getAttribute('style')).replace('px', '');
 
                                     fields.height.setValue(height);
                                 },
@@ -219,7 +219,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
 
                             /* Determine if Fullwidth should remain ticked
                              */
-                            if ($.fn.schoolboxResource_Image_ExtractStyle('width', element.getAttribute('style')) == '100%') {
+                            if ($.fn.schoolboxResource_ExtractStyle('width', element.getAttribute('style')) == '100%') {
                                 fields.fullwidth.setValue(true);
                             }
                             else {
@@ -248,8 +248,8 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
-                                    var float = $.fn.schoolboxResource_Image_ExtractStyle('float', element.getAttribute('style'));
-                                    var margin = $.fn.schoolboxResource_Image_ExtractStyle('margin', element.getAttribute('style'));
+                                    var float = $.fn.schoolboxResource_ExtractStyle('float', element.getAttribute('style'));
+                                    var margin = $.fn.schoolboxResource_ExtractStyle('margin', element.getAttribute('style'));
 
                                     if (float == 'left' || float == 'right') {
                                         fields.alignment.setValue(float);
@@ -273,7 +273,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
-                                    var padding = $.fn.schoolboxResource_Image_ExtractStyle('padding-top', element.getAttribute('style')).replace('px', '');
+                                    var padding = $.fn.schoolboxResource_ExtractStyle('padding-top', element.getAttribute('style')).replace('px', '');
 
                                     if (padding.length) {
                                         fields.verticalPadding.setValue(padding);
@@ -291,7 +291,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
-                                    var padding = $.fn.schoolboxResource_Image_ExtractStyle('padding-left', element.getAttribute('style')).replace('px', '');
+                                    var padding = $.fn.schoolboxResource_ExtractStyle('padding-left', element.getAttribute('style')).replace('px', '');
 
                                     if (padding.length) {
                                         fields.horizontalPadding.setValue(padding);
@@ -311,7 +311,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                             var dialog = this.getDialog();
                             var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
-                            if ($.fn.schoolboxResource_Image_ExtractStyle('border', element.getAttribute('style')).length) {
+                            if ($.fn.schoolboxResource_ExtractStyle('border', element.getAttribute('style')).length) {
                                 fields.border.setValue(true);
                             }
                         }
