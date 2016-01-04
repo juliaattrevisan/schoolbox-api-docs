@@ -10,7 +10,7 @@
      *
      * @param options
      */
-    $.fn.schoolboxMedia = function(options) {
+    $.fn.schoolboxResource = function(options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -102,7 +102,7 @@
             // if the modal already exists, destroy it
 //            this.destroy();
 
-            singletonModal = $('<div data-reveal data-schoolboxmedia-reveal class="reveal-modal file-picker" />')
+            singletonModal = $('<div data-reveal data-schoolboxresource-reveal class="reveal-modal file-picker" />')
                 .data('content', data)
                 .data('rtn', this);
 
@@ -122,7 +122,7 @@
             /* ckeditor dialog appears at z-index 10010 so our
              * Resource Browser needs to be more
              */
-            $('[data-schoolboxmedia-reveal]').css({zIndex: 20000});
+            $('[data-schoolboxresource-reveal]').css({zIndex: 20000});
 
             // reinit
             $(document)
@@ -149,8 +149,8 @@
      * @param dialog
      * @param reset
      */
-    $.fn.schoolboxMedia_Image_Render = function(url, dialog, reset) {
-        var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
+    $.fn.schoolboxResource_Image_Render = function(url, dialog, reset) {
+        var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
         /* Find out width/height ratio
          */
@@ -181,7 +181,7 @@
 
             /* Reset aspect ratio value
              */
-            $.fn.schoolboxMedia_Image_AspectRatioReset(dialog);
+            $.fn.schoolboxResource_Image_AspectRatioReset(dialog);
         }
     };
 
@@ -193,8 +193,8 @@
      *
      * @param dialog
      */
-    $.fn.schoolboxMedia_Image_AspectRatioReset = function(dialog) {
-        var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
+    $.fn.schoolboxResource_Image_AspectRatioReset = function(dialog) {
+        var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
         fields.aspectRatioValue.setValue(fields.width.getValue()/fields.height.getValue());
     }
@@ -206,8 +206,8 @@
      * @param dialog
      * @returns {*}
      */
-    $.fn.schoolboxMedia_Image_Inject = function(editorInstance, dialog) {
-        var fields = $.fn.schoolboxMedia_Image_DialogFields(dialog);
+    $.fn.schoolboxResource_Image_Inject = function(editorInstance, dialog) {
+        var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
         var styles = [];
 
         var element = editorInstance.document.createElement('img');
@@ -279,19 +279,19 @@
      * @param dialog
      * @returns {{url: *, width: *, height: *, aspectRatio: *, aspectRatioValue: *, fullwidth: *, preview: (*|Mixed|jQuery|HTMLElement)}}
      */
-    $.fn.schoolboxMedia_Image_DialogFields = function(dialog) {
+    $.fn.schoolboxResource_Image_DialogFields = function(dialog) {
         return {
-            url: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-url'),
-            preview: $('#schoolboxmedia-image-preview'),
-            width: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-width'),
-            height: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-height'),
-            aspectRatio: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-aspectratio'),
-            aspectRatioValue: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-aspectratio-value'),
-            fullwidth: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-fullwidth'),
-            alignment: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-alignment'),
-            border: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-border'),
-            verticalPadding: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-verticalpadding'),
-            horizontalPadding: dialog.getContentElement('schoolboxmedia-image-tab', 'schoolboxmedia-image-horizontalpadding')
+            url: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-url'),
+            preview: $('#schoolboxresource-image-preview'),
+            width: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-width'),
+            height: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-height'),
+            aspectRatio: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-aspectratio'),
+            aspectRatioValue: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-aspectratio-value'),
+            fullwidth: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-fullwidth'),
+            alignment: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-alignment'),
+            border: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-border'),
+            verticalPadding: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-verticalpadding'),
+            horizontalPadding: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-horizontalpadding')
         };
     };
 }(jQuery));
@@ -303,7 +303,7 @@
      * @param property
      * @param style
      */
-    $.fn.schoolboxMedia_Image_ExtractStyle = function(property, style) {
+    $.fn.schoolboxResource_Image_ExtractStyle = function(property, style) {
         var allProperties = style.split(';');
 
         for (var i = 0; i < allProperties.length; i++) {
@@ -378,7 +378,7 @@
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */
                 removePlugins: 'image,image2',
-                extraPlugins: 'schoolboxmediaimage',
+                extraPlugins: 'schoolboxresourceimage',
 
                 /* Other settings
                  */
