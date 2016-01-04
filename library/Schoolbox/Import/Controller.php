@@ -9,6 +9,7 @@ namespace Schoolbox\Import;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Navigator\Navigator;
@@ -89,12 +90,21 @@ class Controller extends Base
         if ($this->getDi()->get('config')->get('external_db') === 'schoolbox') {
             $csvTemplate = '/adminv2/import/userTemplateWithProfile.csv';
         }
+        $zone = new Zone('import');
+        $zone
+            ->setModalTitle('Select CSV')
+            ->setAttachmentsLabel('Upload CSV')
+            ->setAttachPrompt('upload CSV')
+            ->setMimeFilter('text/csv')
+            ->setReadOnly(false)
+            ->setMulti(false);
         $this->getResponse()->content->set([
             'template' => '@adminImport/user.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation('user')->getAllNodes(),
                 'csvTemplate'    => $csvTemplate,
+                'attachzone'     => $zone->getTwigContext(),
             ],
         ]);
     }

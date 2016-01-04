@@ -38,6 +38,15 @@
                 </li>
             </ul>
             <a href="{{ csvTemplate }}" class="button icon-download">Download Template</a>
+
+            <form action="{{ routeLookup('adminImport.userImport') }}" method="post">
+
+                {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+
+                <input type="submit" value="Import" />
+            </form>
+
         </section>
     </div>
 </div>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>

@@ -36,6 +36,7 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'intro', $basePath, "");
         $this->addGetRoute($router, 'user', $basePath, "/user");
+        $this->addPostRoute($router, 'userImport', $basePath, "/user/import");
         $this->addGetRoute($router, 'timetableStructure', $basePath, "/timetable-structure");
         $this->addGetRoute($router, 'timetable', $basePath, "/timetable");
         $this->addGetRoute($router, 'enrolment', $basePath, "/enrolment");
