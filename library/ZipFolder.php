@@ -8,6 +8,8 @@ class ZipFolder
 {
     function ZipFolder($folder)
     {
+        register_shutdown_function(array($this, 'onShutdown'));
+
         $this->db = DeprecatedDatabase::getInstance();
         $this->folder = $folder;
         $this->tmpName = tempnam(Cfg::get('zip_dir'), 'zip');
@@ -33,6 +35,11 @@ class ZipFolder
     }
 
     public function __destruct()
+    {
+        $this->cleanUp();
+    }
+
+    private function onShutdown()
     {
         $this->cleanUp();
     }
