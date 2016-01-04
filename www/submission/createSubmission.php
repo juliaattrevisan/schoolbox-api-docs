@@ -279,8 +279,7 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
     if ($submission->getId()) {
         $grid = $map->findBySubmissionBoxId($submission->getId());
     } else {
-        $fact = new \Schoolbox\Assessment\Rubric\Factory();
-        $grid = $fact->buildForFolder($submission->getCategory()->getId());
+        $grid = $map->findByFolderId($submission->getCategory()->getId());
     }
 
     $this->setVar('CLASS_CRITERIA', $this->getTwig()->render('@rubric/grid-editable.twig', [ 'rubric' => $grid->toContext() ]));

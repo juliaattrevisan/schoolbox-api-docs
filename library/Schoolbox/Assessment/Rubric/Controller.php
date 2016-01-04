@@ -319,7 +319,7 @@ class Controller extends BaseController
     }
     public function testFolder($folderId)
     {
-        $this->outputTest($this->getFactory()->buildForFolder($folderId));
+        $this->outputTest($this->getMapper()->findByFolderId($folderId));
     }
 
     protected function outputTest(Rubric $grid)
