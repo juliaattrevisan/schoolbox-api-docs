@@ -71,7 +71,6 @@ class FilesystemFactory
 
             return new MountManager([
                 Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
-                Manager::FS_STORAGE => new Filesystem(new Local($storageDir)),
                 Manager::FS_STORAGE => new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket, $otfs_s3_prefix . INSTANCE_ID))
             ]);
         }
