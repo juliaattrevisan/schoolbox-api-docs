@@ -273,7 +273,7 @@
 {% set levelLimit = levelLimit ?: 11 %}
 
 <form method="post">
-    <input type="submit" value="Mark This Rubric" />
+    <input type="hidden" name="formField" value="{{ formField }}" />
     <h3 class="subheader show-for-medium-down">Levels</h3>
     <div class="scrollable">
     <table class="rb stack-for-medium-down" id="{{ rubricId }}">
