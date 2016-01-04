@@ -210,7 +210,8 @@ class Mapper
 
         // mokay. so if at this point you've got no descriptors, check to see if there should be a resultSet we should use
         if (count($descriptors) == 0) {
-            $resultSetId = $this->database->query('SELECT rubric_result_set FROM submission_box WHERE id = ?', [ $box->getId() ])->fetchColumn(0);
+            // misnomer much
+            $resultSetId = $box->getRubricResultSet();
 
             if ($resultSetId > 0) {
                 // got a resultSet - we're going to fake that into a descriptor grid
