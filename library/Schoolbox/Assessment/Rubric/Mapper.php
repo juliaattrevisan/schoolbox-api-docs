@@ -235,6 +235,11 @@ class Mapper
             }
         }
 
+        // ensure there are ALWAYS at least 2 levels
+        while (count($levelList) < 2) {
+            $levelList[] = [ 'name' => '' ];
+        }
+
         foreach ($descriptors as $criterionId => $descriptorData) {
             $descriptors[$criterionId] = array_values($descriptorData);
         }
