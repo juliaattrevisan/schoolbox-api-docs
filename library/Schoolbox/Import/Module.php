@@ -35,6 +35,10 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'intro', $basePath, "");
+        $this->addGetRoute($router, 'user', $basePath, "/user");
+        $this->addGetRoute($router, 'timetableStructure', $basePath, "/timetable-structure");
+        $this->addGetRoute($router, 'timetable', $basePath, "/timetable");
+        $this->addGetRoute($router, 'enrolment', $basePath, "/enrolment");
     }
 
     /**
