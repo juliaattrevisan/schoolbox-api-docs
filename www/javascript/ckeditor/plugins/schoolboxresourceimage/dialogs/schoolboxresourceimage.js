@@ -201,8 +201,9 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                          */
                         onChange: function() {
                             var dialog = this.getDialog();
+                            var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
-                            $.fn.schoolboxResource_Image_AspectRatioReset(dialog);
+                            $.fn.schoolboxResource_Image_AspectRatioReset(fields);
                         }
                     },
                     {

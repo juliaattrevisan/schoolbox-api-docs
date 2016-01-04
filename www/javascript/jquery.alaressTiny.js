@@ -181,7 +181,7 @@
 
             /* Reset aspect ratio value
              */
-            $.fn.schoolboxResource_Image_AspectRatioReset(dialog);
+            $.fn.schoolboxResource_Image_AspectRatioReset(fields);
         }
     };
 
@@ -191,11 +191,9 @@
      * Used when selecting a new image with constrain aspect ratio already activated
      * because that remembers the aspect ratio from the previously-selected image
      *
-     * @param dialog
+     * @param fields
      */
-    $.fn.schoolboxResource_Image_AspectRatioReset = function(dialog) {
-        var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
-
+    $.fn.schoolboxResource_Image_AspectRatioReset = function(fields) {
         fields.aspectRatioValue.setValue(fields.width.getValue()/fields.height.getValue());
     };
 
@@ -340,6 +338,18 @@
     };
 
     /**
+     * Reset the aspect ratio for an image
+     *
+     * Used when selecting a new image with constrain aspect ratio already activated
+     * because that remembers the aspect ratio from the previously-selected image
+     *
+     * @param fields
+     */
+    $.fn.schoolboxResource_Media_AspectRatioReset = function(fields) {
+        fields.aspectRatioValue.setValue(fields.width.getValue()/fields.height.getValue());
+    };
+
+    /**
      * Inject image into editor panel with modifiers applied
      *
      * @param editorInstance
@@ -402,6 +412,8 @@
             preview: $('#schoolboxresource-media-preview'),
             width: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-width'),
             height: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-height'),
+            aspectRatio: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-aspectratio'),
+            aspectRatioValue: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-aspectratio-value'),
             fullwidth: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-fullwidth'),
             alignment: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-alignment')
         };

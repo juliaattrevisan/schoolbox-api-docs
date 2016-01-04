@@ -158,6 +158,28 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
                         ]
                     },
                     {
+                        type: 'text',
+                        id: 'schoolboxresource-media-aspectratio-value',
+                        label: 'Aspect Ratio Value',
+                        className: 'hide'
+                    },
+                    {
+                        type: 'checkbox',
+                        id: 'schoolboxresource-media-aspectratio',
+                        label: 'Constrain Aspect Ratio',
+
+                        /* Remember the ratio so we can apply it when
+                         * Constrain Aspect Ratio is activated
+                         */
+                        onChange: function() {
+                            var dialog = this.getDialog();
+                            var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+
+                            $.fn.schoolboxResource_Media_AspectRatioReset(fields);
+                        }
+                    },
+
+                    {
                         type: 'checkbox',
                         id: 'schoolboxresource-media-fullwidth',
                         label: 'Fullwidth',
