@@ -9,7 +9,8 @@
 
 namespace Schoolbox\Resource;
 
-
+use Aws\S3\S3Client;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
@@ -41,10 +42,23 @@ class FilesystemFactory
      */
     public function buildSpecific($storageDir, $tempDir)
     {
+        $config = new \Schoolbox\Config\Loader();
+
+        $client = S3Client::factory([
+            'credentials' => [
+            'key'    => $config->get('otfs_s3_cred_key'),
+            'secret' => $config->get('otfs_s3_cred_secret'),
+        ],
+            'region' => $config->get('otfs_s3_region'),
+            'version' => $config->get('otfs_s3_version'),
+        ]);
+
         return new MountManager([
             Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
-            Manager::FS_STORAGE => new Filesystem(new Local($storageDir))
+            Manager::FS_STORAGE => new Filesystem(new Local($storageDir)),
+            Manager::FS_STORAGE => new Filesystem(new AwsS3Adapter($client, $config->get('otfs_s3_bucket'), $config->get('otfs_s3_prefix') . INSTANCE_ID))
         ]);
+
     }
 
 }
