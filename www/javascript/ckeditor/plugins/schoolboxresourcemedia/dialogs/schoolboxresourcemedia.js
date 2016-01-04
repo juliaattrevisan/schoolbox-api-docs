@@ -39,6 +39,10 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
 
+                                    var bits = element.getAttribute('src').match(/id=(\d+)/);
+                                    var id = bits[1];
+
+                                    fields.id.setValue(id);
                                     fields.url.setValue(element.getAttribute('src'));
                                 },
 
@@ -267,8 +271,8 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
             var selection = editorInstance.getSelection();
             var element = selection.getStartElement();
 
-            if (!element || element.getName() != 'video') {
-                element = editorInstance.document.createElement('video');
+            if (!element || element.getName() != 'img') {
+                element = editorInstance.document.createElement('img');
                 this.insertMode = true;
             }
             else {
