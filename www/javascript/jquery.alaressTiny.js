@@ -197,7 +197,7 @@
         var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
         fields.aspectRatioValue.setValue(fields.width.getValue()/fields.height.getValue());
-    }
+    };
 
     /**
      * Inject image into editor panel with modifiers applied
@@ -270,7 +270,7 @@
         element.setAttribute('style', styles.join(';'));
 
         return element;
-    }
+    };
 
     /**
      * A macro to all the fields in the Dialog
@@ -316,6 +316,34 @@
 
         return '';
     }
+}(jQuery));
+
+(function() {
+
+    /**
+     * Populate dialog fields with image data
+     *
+     * @param url
+     * @param dialog
+     * @param reset
+     */
+    $.fn.schoolboxResource_Media_Render = function(url, dialog, reset) {
+        var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+    };
+
+    /**
+     * A macro to all the fields in the Dialog
+     * (because it's such a longwinded way to retrieve them)
+     *
+     * @param dialog
+     * @returns {{url: *, width: *, height: *, aspectRatio: *, aspectRatioValue: *, fullwidth: *, preview: (*|Mixed|jQuery|HTMLElement)}}
+     */
+    $.fn.schoolboxResource_Media_DialogFields = function(dialog) {
+        return {
+            url: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-url'),
+            preview: $('#schoolboxresource-media-preview')
+        };
+    };
 }(jQuery));
 
 (function($) {
@@ -378,7 +406,7 @@
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */
                 removePlugins: 'image,image2',
-                extraPlugins: 'schoolboxresourceimage',
+                extraPlugins: 'schoolboxresourceimage,schoolboxresourcemedia',
 
                 /* Other settings
                  */
