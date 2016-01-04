@@ -35,8 +35,12 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'intro', $basePath, "");
+        // User paths
         $this->addGetRoute($router, 'user', $basePath, "/user");
         $this->addPostRoute($router, 'userImport', $basePath, "/user/import");
+        // For now, download template directly
+//        $this->addGetRoute($router, 'userTemplate', $basePath, "/userTemplate.csv");
+
         $this->addGetRoute($router, 'timetableStructure', $basePath, "/timetable-structure");
         $this->addGetRoute($router, 'timetable', $basePath, "/timetable");
         $this->addGetRoute($router, 'enrolment', $basePath, "/enrolment");

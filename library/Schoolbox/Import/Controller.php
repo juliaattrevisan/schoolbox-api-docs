@@ -9,6 +9,7 @@ namespace Schoolbox\Import;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Sync\Log;
@@ -82,10 +83,11 @@ class Controller extends Base
     }
 
     /**
-     * User import action
+     * User import submit screen action
      */
     public function user()
     {
+        // Show a different template if using the Schoolbox connector
         $csvTemplate = '/adminv2/import/userTemplate.csv';
         if ($this->getDi()->get('config')->get('external_db') === 'schoolbox') {
             $csvTemplate = '/adminv2/import/userTemplateWithProfile.csv';
@@ -107,6 +109,16 @@ class Controller extends Base
                 'attachzone'     => $zone->getTwigContext(),
             ],
         ]);
+    }
+
+    /**
+     * User import action
+     */
+    public function userImport()
+    {
+        $factory = new CollectorFactory();
+        $upload  = $factory->build($this->getRequest()->post->get('attachment'))->getFirst();
+        // Start parsing the upload
     }
 
     /**
