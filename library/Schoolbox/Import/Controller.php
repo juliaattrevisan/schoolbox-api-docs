@@ -22,7 +22,7 @@ use Schoolbox\Sync\Navigator\Node;
 class Controller extends Base
 {
     /**
-     * Render intro
+     * Intro action
      */
     public function intro()
     {
@@ -42,6 +42,46 @@ class Controller extends Base
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation'  => $allNavigation->getAllNodes(),
             ]
+        ]);
+    }
+
+    /**
+     * User import action
+     */
+    public function user()
+    {
+        $this->getResponse()->content->set([
+            'template' => '@adminImport/user.twig',
+        ]);
+    }
+
+    /**
+     * Timetable structure import action
+     */
+    public function timetableStructure()
+    {
+        $this->getResponse()->content->set([
+            'template' => '@adminImport/timetableStructure.twig',
+        ]);
+    }
+
+    /**
+     * Timetable import action
+     */
+    public function timetable()
+    {
+        $this->getResponse()->content->set([
+            'template' => '@adminImport/timetable.twig',
+        ]);
+    }
+
+    /**
+     * Enrolment import action
+     */
+    public function enrolment()
+    {
+        $this->getResponse()->content->set([
+            'template' => '@adminImport/enrolment.twig',
         ]);
     }
 }
