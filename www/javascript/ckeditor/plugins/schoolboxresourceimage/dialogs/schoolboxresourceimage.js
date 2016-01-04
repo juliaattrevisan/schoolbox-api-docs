@@ -327,7 +327,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
             var dialog = this;
             var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
-            editorInstance.insertElement($.fn.schoolboxResource_Image_Inject(editorInstance, fields, fields.url.getValue()));
+            editorInstance.insertElement($.fn.schoolboxResource_Image_Inject(editorInstance, fields, fields.url.getValue(), {}));
         },
 
         /**

@@ -203,13 +203,15 @@
      * @param editorInstance
      * @param fields
      * @param url
+     * @param dataVars
      * @returns {*}
      */
-    $.fn.schoolboxResource_Image_Inject = function(editorInstance, fields, url) {
+    $.fn.schoolboxResource_Image_Inject = function(editorInstance, fields, url, dataVars) {
         var styles = [];
 
         var element = editorInstance.document.createElement('img');
         element.setAttribute('src', url);
+        element.setAttributes(dataVars);
 
         /* Determine width - if fullwidth checked, use 100%
          * otherwise use specified values. Note that width:100%
@@ -327,7 +329,6 @@
      * rendering makes this element unselectable for editing
      *
      * @param fields
-     * @param id
      * @param dialog
      * @param reset
      */
@@ -359,7 +360,11 @@
     $.fn.schoolboxResource_Media_Inject = function(editorInstance, fields) {
         var url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
 
-        return $.fn.schoolboxResource_Image_Inject(editorInstance, fields, url);
+        var dataVars = {
+            'data-schoolboxmedia-source': '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue()
+        };
+
+        return $.fn.schoolboxResource_Image_Inject(editorInstance, fields, url, dataVars);
 
         ///* Determine width - if fullwidth checked, use 100%
         // * otherwise use specified values. Note that width:100%
@@ -402,7 +407,7 @@
      * A macro to all the fields in the Dialog
      * (because it's such a longwinded way to retrieve them)
      *
-      * @param dialog
+     * @param dialog
      * @returns {{url: *, id: *, preview: (*|Mixed|jQuery|HTMLElement), width: *, height: *, fullwidth: *, alignment: *}}
      */
     $.fn.schoolboxResource_Media_DialogFields = function(dialog) {
@@ -474,7 +479,7 @@
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
-                extraAllowedContent: 'img{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float};video[*]{*};source[*]',
+                extraAllowedContent: 'img[data-schoolboxmedia-source]{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float};video[*]{*};source[*]',
 
                 /* Remove annoying dialog that always appears
                  */
