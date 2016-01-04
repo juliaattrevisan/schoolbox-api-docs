@@ -37,15 +37,32 @@ class Controller extends Base
     /**
      * Builds navigation for this page.
      *
+     * @param  string $currentPage
      * @return Navigator
      */
-    protected function buildNavigation()
+    protected function buildNavigation($currentPage = '')
     {
         return new Navigator(
-            new Node('User', $this->getRouteIfAuthorized('adminImport.user'), false),
-            new Node('Timetable Structure', $this->getRouteIfAuthorized('adminImport.timetableStructure'), false),
-            new Node('Timetable', $this->getRouteIfAuthorized('adminImport.timetable'), false),
-            new Node('Enrolment', $this->getRouteIfAuthorized('adminImport.enrolment'), false)
+            new Node(
+                'User',
+                $this->getRouteIfAuthorized('adminImport.user'),
+                ($currentPage == 'user')
+            ),
+            new Node(
+                'Timetable Structure',
+                $this->getRouteIfAuthorized('adminImport.timetableStructure'),
+                ($currentPage == 'timetableStructure')
+            ),
+            new Node(
+                'Timetable',
+                $this->getRouteIfAuthorized('adminImport.timetable'),
+                ($currentPage == 'timetable')
+            ),
+            new Node(
+                'Enrolment',
+                $this->getRouteIfAuthorized('adminImport.enrolment'),
+                ($currentPage == 'enrolment')
+            )
         );
     }
 
@@ -72,7 +89,7 @@ class Controller extends Base
             'template' => '@adminImport/user.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
-                'allNavigation'  => $this->buildNavigation()->getAllNodes(),
+                'allNavigation'  => $this->buildNavigation('user')->getAllNodes(),
             ],
         ]);
     }
@@ -86,7 +103,7 @@ class Controller extends Base
             'template' => '@adminImport/timetableStructure.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
-                'allNavigation'  => $this->buildNavigation()->getAllNodes(),
+                'allNavigation'  => $this->buildNavigation('timetableStructure')->getAllNodes(),
             ],
         ]);
     }
@@ -100,7 +117,7 @@ class Controller extends Base
             'template' => '@adminImport/timetable.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
-                'allNavigation'  => $this->buildNavigation()->getAllNodes(),
+                'allNavigation'  => $this->buildNavigation('timetable')->getAllNodes(),
             ],
         ]);
     }
@@ -114,7 +131,7 @@ class Controller extends Base
             'template' => '@adminImport/enrolment.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
-                'allNavigation'  => $this->buildNavigation()->getAllNodes(),
+                'allNavigation'  => $this->buildNavigation('enrolment')->getAllNodes(),
             ],
         ]);
     }
