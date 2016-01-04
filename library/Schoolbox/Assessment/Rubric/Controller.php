@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Rubric;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 class Controller extends BaseController
 {
@@ -315,7 +316,7 @@ class Controller extends BaseController
     }
     public function testBox($boxId)
     {
-        $this->outputTest($this->getMapper()->findBySubmissionBoxId($boxId));
+        $this->outputTest($this->getMapper()->findBySubmissionBox(SubmissionBoxMapper::getInstance()->findById($boxId)));
     }
     public function testFolder($folderId)
     {

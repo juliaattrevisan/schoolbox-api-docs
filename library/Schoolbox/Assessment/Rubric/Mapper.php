@@ -133,10 +133,10 @@ class Mapper
     /**
      * Given a box ID, return the rubric assigned to it, if any
      *
-     * @param int  $boxId
+     * @param SubmissionBox $box
      * @return Rubric
      */
-    public function findBySubmissionBoxId($boxId)
+    public function findBySubmissionBox($box)
     {
         $criteriaStatement = $this->database->query("
             SELECT COUNT(box_id) usages, COALESCE(selected, 0) selected, crit_id, `grouping`, `name`
@@ -152,7 +152,7 @@ class Mapper
             GROUP BY crit_id
             ORDER BY selected DESC, `sequence` DESC, `grouping` ASC, `name` ASC;
             /* ORDER BY u.sequence ASC */
-        ", [ 'boxId' => $boxId ]);
+        ", [ 'boxId' => $box->getId() ]);
 
 
         // why 20? because it's not 0.
@@ -190,7 +190,7 @@ class Mapper
 
         /** @var Collection|SubmissionBox\Rubric\Descriptor[] $descriptorCollection */
         $descriptorCollection = SubmissionBox\Rubric\DescriptorMapper::getInstance()->findByColumnList([
-            'submission_box_id' => $boxId,
+            'submission_box_id' => $box->getId(),
             'valid'             => true
         ]);
 
@@ -210,7 +210,7 @@ class Mapper
 
         // mokay. so if at this point you've got no descriptors, check to see if there should be a resultSet we should use
         if (count($descriptors) == 0) {
-            $resultSetId = $this->database->query('SELECT rubric_result_set FROM submission_box WHERE id = ?', [ $boxId ])->fetchColumn(0);
+            $resultSetId = $this->database->query('SELECT rubric_result_set FROM submission_box WHERE id = ?', [ $box->getId() ])->fetchColumn(0);
 
             if ($resultSetId > 0) {
                 // got a resultSet - we're going to fake that into a descriptor grid
@@ -242,7 +242,7 @@ class Mapper
         }
 
         // setup the data structure to match what the factory expects
-        $postdata = [ $boxId => [
+        $postdata = [$box->getId() => [
             'level'      => array_values($levelList),
             'group'      => $groups,
             'criterion'  => $criteria,
