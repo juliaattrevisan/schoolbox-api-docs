@@ -455,8 +455,6 @@
                 removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent',
                 magicline_color: '#0000FF',
                 format_tags: 'p;h3;h4;pre;address',
-                filebrowserBrowseUrl: '/resources/attachment',
-                filebrowserUploadUrl: '/storage/asyncUpload.php',
 
                 /* This used to be 'mode', a legacy setting from Tiny.
                  *
