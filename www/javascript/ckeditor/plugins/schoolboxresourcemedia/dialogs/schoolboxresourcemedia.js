@@ -20,7 +20,8 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
                     {
                         type: 'text',
                         id: 'schoolboxresource-media-id',
-                        label: 'Id'
+                        label: 'Id',
+                        className: 'hide'
                     },
                     {
                         type: 'hbox',
