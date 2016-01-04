@@ -124,6 +124,22 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
 
                                         fields.width.setValue(width);
                                     }
+                                },
+
+                                /* If aspect ratio is active, recalculate dimensions upon change
+                                 * Ignore Tab key presses entirely
+                                 */
+                                onKeyUp: function(event) {
+                                    if (event.data.$.keyCode != 9) {
+                                        var dialog = this.getDialog();
+                                        var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+
+                                        if (fields.aspectRatio.getValue()) {
+                                            var newHeight = Math.round(fields.width.getValue() / fields.aspectRatioValue.getValue());
+
+                                            fields.height.setValue(newHeight);
+                                        }
+                                    }
                                 }
                             },
                             {
@@ -141,6 +157,22 @@ CKEDITOR.dialog.add('schoolboxresourceMediaDialog', function (editorInstance) {
                                     var height = $.fn.schoolboxResource_Image_ExtractStyle('height', element.getAttribute('style')).replace('px', '');
 
                                     fields.height.setValue(height);
+                                },
+
+                                /* If aspect ratio is active, recalculate dimensions upon change
+                                 * Ignore Tab key presses entirely
+                                 */
+                                onKeyUp: function(event) {
+                                    if (event.data.$.keyCode != 9) {
+                                        var dialog = this.getDialog();
+                                        var fields = $.fn.schoolboxResource_Media_DialogFields(dialog);
+
+                                        if (fields.aspectRatio.getValue()) {
+                                            var newWidth = Math.round(fields.height.getValue() * fields.aspectRatioValue.getValue());
+
+                                            fields.width.setValue(newWidth);
+                                        }
+                                    }
                                 }
                             },
                             {
