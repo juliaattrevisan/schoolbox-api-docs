@@ -1,0 +1,1 @@
+UPDATE student_submission SET realname = SUBSTRING_INDEX(realname,'.',1) WHERE realname REGEXP '\[.][[:alnum:]]{1,4}$';
