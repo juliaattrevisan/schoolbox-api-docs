@@ -222,7 +222,7 @@ class User extends AbstractImporter
     {
         $result = [];
         foreach ($this->reader as $i => $row) {
-            $this->log->info("Parsing row $i...");
+            $this->log->info("Parsing row $i...", ['row' => $row]);
 
             // Step 1: identify user
             $user = $this->retrieveUser($row);
