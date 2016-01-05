@@ -75,7 +75,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
 
                                     /* Decide whether this is a video/audio resource
                                      */
-                                    if (url.match(/^\/cms\/videoThumb/)) {
+                                    if (url.match(/^\/cms\/sendVideo/)) {
                                         fields.id.setValue($.fn.schoolboxResource_ExtractResourceId(url));
 
                                         /* TODO: Audio detection
@@ -127,15 +127,17 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                              */
                                             if (fields.type.getValue() == 'video') {
                                                 fields.id.setValue(responseText.id);
-                                                fields.url.setValue('/cms/videoThumb.php?type=sbfs&id=' + responseText.id);
+                                                fields.url.setValue('/cms/sendVideo.php?type=sbfs&id=' + responseText.id);
                                             }
                                             else if (fields.type.getValue() == 'audio') {
                                                 fields.id.setValue(responseText.id);
-                                                fields.url.setValue('/images/core/component/audio-thumbnail-processing.gif');
+                                                fields.url.setValue('/cms/sendVideo.php?type=sbfs&id=' + responseText.id);
                                             }
                                             else if (fields.type.getValue() == 'image') {
                                                 fields.url.setValue('/storage/image.php?hash=' + responseText.hash);
                                             }
+
+                                            $.fn.schoolboxResource_Image_Render(fields, fields.url.getValue(), dialog, false);
 
                                             /* Shut modal, go back to Dialog
                                              */

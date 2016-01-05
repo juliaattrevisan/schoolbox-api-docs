@@ -157,6 +157,9 @@
         if (fields.type.getValue() == 'video') {
             url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
         }
+        if (fields.type.getValue() == 'audio') {
+            url = '/images/core/component/audio-thumbnail-processing.gif';
+        }
 
         /* Find out width/height ratio
          */
@@ -214,22 +217,32 @@
     $.fn.schoolboxResource_Image_Inject = function(editorInstance, fields, url) {
         var dataVars = {};
 
-        /* Images render with provided information
-         */
-        if (fields.type.getValue() == 'image') {
-            dataVars = {
-                'data-schoolboxresource-type': 'image',
-                'data-schoolboxresource-source': url
-            };
-        }
         /* Special case for video data
          */
-        else if (fields.type.getValue() == 'video') {
+        if (fields.type.getValue() == 'video') {
             url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
 
             dataVars = {
                 'data-schoolboxresource-type': 'video',
                 'data-schoolboxresource-source': '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue()
+            };
+        }
+        /* Special case for audio data
+         */
+        if (fields.type.getValue() == 'audio') {
+            url = '/images/core/component/audio-thumbnail-processing.gif';
+
+            dataVars = {
+                'data-schoolboxresource-type': 'audio',
+                'data-schoolboxresource-source': '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue()
+            };
+        }
+        /* Images render with provided information
+         */
+        else if (fields.type.getValue() == 'image') {
+            dataVars = {
+                'data-schoolboxresource-type': 'image',
+                'data-schoolboxresource-source': url
             };
         }
 
