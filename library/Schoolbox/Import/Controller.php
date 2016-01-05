@@ -218,7 +218,7 @@ class Controller extends Base
         $stream   = $log->readStream();
         $logLines = [];
         while ($line = fgets($stream)) {
-            if ($logLine = json_decode($line)) {
+            if ($logLine = json_decode($line, true)) {
                 $logLines[] = $logLine;
             }
         }
