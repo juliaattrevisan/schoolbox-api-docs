@@ -82,7 +82,7 @@ class FilesystemFactory
 
         return new MountManager([
             Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
-            Manager::FS_STORAGE => new $fs_storage
+            Manager::FS_STORAGE => $fs_storage
         ]);
     }
 }
