@@ -216,7 +216,7 @@ class User extends AbstractImporter
      * Reads all rows from the CSV reader, and loads them into an associative
      * array structure.
      *
-     * @return array
+     * @return array|User\Result[]
      */
     protected function parse()
     {
@@ -230,6 +230,8 @@ class User extends AbstractImporter
                 $this->log->warning('User could not be identified - skipping');
                 continue;
             }
+
+            $userResult = new User\Result($user);
             if ($user->getId()) {
                 $this->log->info(sprintf('User found (ID: #%d)', $user->getId()));
             } else {
@@ -239,25 +241,18 @@ class User extends AbstractImporter
             // Step 2: are they deleted?
             // Users aren't currently soft-deletable, so they stay deleted.
             if ($this->parseStringBoolean($row['Delete?'])) {
-                $result[] = [
-                    'user'   => $user,
-                    'delete' => true,
-                ];
-                continue;
+                $userResult->setIsUserDeleted(true);
             }
 
             // Step 3: update user based on fields
-            $user = $this->hydrateUser($row, $user);
-
-            $result[] = [
-                'user'   => $user,
-                'delete' => false,
-            ];
+            $userResult->setUser($this->hydrateUser($row, $user));
 
 //            // Step 4: update extended fields if using SB connector
 //            if ($this->isExtendedFormatUsed()) {
 //                // update
 //            }
+
+            $result[] = $userResult;
         }
         return $result;
     }
@@ -304,7 +299,8 @@ class User extends AbstractImporter
     public function save()
     {
         $result = $this->parse();
-        foreach ($result as $user) {
+        foreach ($result as $userResult) {
+            $user = $userResult->getUser();
             if ($this->performUpdate) {
                 $this->log->info('Saving user "%s"', $user->formatName());
                 if ($this->userMapper->save($user)) {
