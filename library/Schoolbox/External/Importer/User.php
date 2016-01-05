@@ -318,14 +318,14 @@ class User extends AbstractImporter
     {
         $user = $userResult->getUser();
         if ($this->performUpdate) {
-            $this->log->info('Saving user "%s"', $user->formatName());
+            $this->log->info(sprintf('Saving user "%s"', $user->formatName()));
             if ($this->userMapper->save($user)) {
                 $this->log->info(sprintf('User saved (ID: #%d)', $user->getId()));
             } else {
                 $this->log->error('Could not save user!');
             }
         } else {
-            $this->log->info('Pretending to save user "%s"', $user->formatName());
+            $this->log->info(sprintf('Pretending to save user "%s"', $user->formatName()));
         }
     }
 
@@ -338,17 +338,17 @@ class User extends AbstractImporter
     {
         $user = $userResult->getUser();
         if (!$user->getId()) {
-            $this->log->warning('Cannot delete user "%s" - they don\'t exist yet', $user->formatName());
+            $this->log->warning(sprintf('Cannot delete user "%s" - they don\'t exist yet', $user->formatName()));
         }
         if ($this->performUpdate) {
-            $this->log->info('Deleting user "%s"', $user->formatName());
+            $this->log->info(sprintf('Deleting user "%s"', $user->formatName()));
             if ($this->userMapper->delete($user)) {
                 $this->log->info('User deleted');
             } else {
                 $this->log->error('Could not delete user!');
             }
         } else {
-            $this->log->info('Pretending to delete user "%s"', $user->formatName());
+            $this->log->info(sprintf('Pretending to delete user "%s"', $user->formatName()));
         }
     }
 
