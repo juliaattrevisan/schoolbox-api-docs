@@ -1,4 +1,5 @@
 <?php
+use SitePage;
 use Alaress\File\Remote\FetcherInterface;
 use Schoolbox\Collection;
 use Schoolbox\File\MimetypeMapper;
@@ -498,7 +499,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         } /* Handle Sabre_DAV_Exception specifically
          */
         catch (Sabre\DAV\Exception\NotAuthenticated $e) {
-            Sitepage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
+            SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
         }
         catch (Sabre\DAV\Exception\NotFound $e) {
             /* In some cases we are told that something exists, only to be thrown a 404 error
@@ -710,7 +711,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             //
             // Sabre doesn't return any sort of useful exception, just send user to the network
             // drive login page if something goes wrong
-            Sitepage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
+            SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
         }
     }
 
