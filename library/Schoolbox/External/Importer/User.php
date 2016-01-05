@@ -8,6 +8,12 @@
 namespace Schoolbox\External\Importer;
 
 use Alaress\Csv\Reader;
+use House as HouseModel;
+use HouseMapper;
+use HouseResidential as HouseResidentialModel;
+use HouseResidentialMapper;
+use Schoolbox\Campus as CampusModel;
+use Schoolbox\CampusMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role as RoleModel;
 use Schoolbox\RoleMapper;
@@ -44,6 +50,21 @@ class User extends AbstractImporter
      * @var array|RoleModel[]
      */
     protected $roleList = [];
+
+    /**
+     * @var array|CampusModel[]
+     */
+    protected $campusList = [];
+
+    /**
+     * @var array|HouseModel[]
+     */
+    protected $houseList = [];
+
+    /**
+     * @var array|HouseResidentialModel[]
+     */
+    protected $residentialHouseList = [];
 
     /**
      * A list of user identifier classes - each one will in turn attempt to
@@ -137,10 +158,22 @@ class User extends AbstractImporter
         }
 
         // Campus list
+        foreach (CampusMapper::getInstance()->findAll() as $campus) {
+            /** @var CampusModel $campus */
+            $this->campusList[$campus->getName()] = $campus;
+        }
 
         // House list
+        foreach (HouseMapper::getInstance()->findAll() as $house) {
+            /** @var HouseModel $house */
+            $this->houseList[$house->getHouse()] = $house;
+        }
 
         // Residential House list
+        foreach (\HouseResidentialMapper::getInstance()->findAll() as $boardingHouse) {
+            /** @var HouseResidentialModel $boardingHouse */
+            $this->residentialHouseList[$boardingHouse->getHouse()] = $boardingHouse;
+        }
 
         $this->userIdentifiers[] = new User\Identifier\UserId($this->userMapper);
         $this->userIdentifiers[] = new User\Identifier\Username($this->userMapper);
