@@ -75,6 +75,14 @@ class User extends AbstractImporter
     protected $userIdentifiers = [];
 
     /**
+     * A list of user hydrator classes - each one will in turn attempt to
+     * update a UserModel based on the values in the row.
+     *
+     * @var array|User\Hydrator\HydratorInterface[]
+     */
+    protected $userHydrators = [];
+
+    /**
      * Is the extended format used?
      *
      * (It is used when using the Schoolbox "external" connector).
@@ -122,7 +130,8 @@ class User extends AbstractImporter
                 "Child External IDs"           => '',
                 // user_profile
                 "Date of Birth"                => '',
-                "Year Level"                   => '',
+                // Year Level should always be the same as Year
+//                "Year Level"                   => '',
                 "Guardian 1 Name"              => '',
                 "Guardian 1 Email"             => '',
                 "Guardian 1 Home Phone"        => '',
@@ -175,9 +184,23 @@ class User extends AbstractImporter
             $this->residentialHouseList[$boardingHouse->getHouse()] = $boardingHouse;
         }
 
+        // Identifiers
         $this->userIdentifiers[] = new User\Identifier\UserId($this->userMapper);
         $this->userIdentifiers[] = new User\Identifier\Username($this->userMapper);
         $this->userIdentifiers[] = new User\Identifier\ExternalId($this->userMapper, $this->roleList);
+
+        // Hydrators
+        $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Username', 'setUsername');
+        $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('External ID', 'setExternalId');
+        $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Password', 'setPassword');
+        $this->userHydrators[] = new User\Hydrator\ToggleField('E-Portfolio?', 'setEportfolioEnable');
+        $this->userHydrators[] = new User\Hydrator\ToggleField('Email Address From Username?', 'setLocalEmail');
+        // This one might have to be inverted
+        $this->userHydrators[] = new User\Hydrator\ToggleField('Use External Mail Client?', 'setUseInternalMail');
+        $this->userHydrators[] = new User\Hydrator\ToggleField('Enable Webmail Tab?', 'setWebmail');
+        // Not sure if superuser should be settable
+        $this->userHydrators[] = new User\Hydrator\ToggleField('Superuser?', 'setSuperuser');
+        $this->userHydrators[] = new User\Hydrator\ToggleField('Account Enabled?', 'setEnabled');
     }
 
     /**
@@ -218,12 +241,12 @@ class User extends AbstractImporter
 
             // Identifier fields and password:
             // set only if they are not blank
-            if (strlen($row['Username'])) {
-                $user->setUsername($row['Username']);
-            }
-            if (strlen($row['External ID'])) {
-                $user->setExternalId($row['External ID']);
-            }
+//            if (strlen($row['Username'])) {
+//                $user->setUsername($row['Username']);
+//            }
+//            if (strlen($row['External ID'])) {
+//                $user->setExternalId($row['External ID']);
+//            }
             if (strlen($row['Role'])) {
                 // Set model
                 if (!array_key_exists($row['Role'], $this->roleList)) {
@@ -232,37 +255,37 @@ class User extends AbstractImporter
                     $user->setRole($this->roleList[$row['Role']]);
                 }
             }
-            if (strlen($row['Password'])) {
-                // Does this need to be encoded?
-                $user->setPassword($row['Password']);
-            }
+//            if (strlen($row['Password'])) {
+//                // Does this need to be encoded?
+//                $user->setPassword($row['Password']);
+//            }
 
             // Toggle fields: set if not blank
-            $eportfolio = $this->parseStringBoolean($row['E-Portfolio?']);
-            if (isset($eportfolio)) {
-                $user->setEportfolioEnable($eportfolio);
-            }
-            $emailFromUsername = $this->parseStringBoolean($row['Email Address From Username?']);
-            if (isset($emailFromUsername)) {
-                $user->setLocalEmail($emailFromUsername);
-            }
-            $externalEmailClient = $this->parseStringBoolean($row['Use External Mail Client?']);
-            if (isset($externalEmailClient)) {
-                $user->setUseInternalMail(!$externalEmailClient);
-            }
-            $webmail = $this->parseStringBoolean($row['Enable Webmail Tab?']);
-            if (isset($webmail)) {
-                $user->setWebmail($webmail);
-            }
-            // Not sure if superuser should be settable
-            $superuser = $this->parseStringBoolean($row['Superuser?']);
-            if (isset($superuser)) {
-                $user->setSuperuser($superuser);
-            }
-            $enabled = $this->parseStringBoolean($row['Account Enabled?']);
-            if (isset($enabled)) {
-                $user->setEnabled($enabled);
-            }
+//            $eportfolio = $this->parseStringBoolean($row['E-Portfolio?']);
+//            if (isset($eportfolio)) {
+//                $user->setEportfolioEnable($eportfolio);
+//            }
+//            $emailFromUsername = $this->parseStringBoolean($row['Email Address From Username?']);
+//            if (isset($emailFromUsername)) {
+//                $user->setLocalEmail($emailFromUsername);
+////            }
+//            $externalEmailClient = $this->parseStringBoolean($row['Use External Mail Client?']);
+//            if (isset($externalEmailClient)) {
+//                $user->setUseInternalMail(!$externalEmailClient);
+//            }
+//            $webmail = $this->parseStringBoolean($row['Enable Webmail Tab?']);
+//            if (isset($webmail)) {
+//                $user->setWebmail($webmail);
+//            }
+//            // Not sure if superuser should be settable
+//            $superuser = $this->parseStringBoolean($row['Superuser?']);
+//            if (isset($superuser)) {
+//                $user->setSuperuser($superuser);
+//            }
+//            $enabled = $this->parseStringBoolean($row['Account Enabled?']);
+//            if (isset($enabled)) {
+//                $user->setEnabled($enabled);
+//            }
 
             // Campus: split and set
             // Default campus: first in list
@@ -327,10 +350,10 @@ class User extends AbstractImporter
                 'delete' => false,
             ];
 
-            // Step 4: update extended fields if using SB connector
-            if ($this->isExtendedFormatUsed()) {
-                // update
-            }
+//            // Step 4: update extended fields if using SB connector
+//            if ($this->isExtendedFormatUsed()) {
+//                // update
+//            }
         }
         return $result;
     }
@@ -364,14 +387,14 @@ class User extends AbstractImporter
         $result = $this->parse();
         foreach ($result as $user) {
             if ($this->performUpdate) {
-                $this->log->info('Saving user ');
+                $this->log->info('Saving user "%s"', $user->formatName());
                 if ($this->userMapper->save($user)) {
                     $this->log->info(sprintf('User saved (ID: #%d)', $user->getId()));
                 } else {
                     $this->log->error('Could not save user!');
                 }
             } else {
-                $this->log->info('Pretending to save user');
+                $this->log->info('Pretending to save user "%s"', $user->formatName());
             }
         }
     }
