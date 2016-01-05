@@ -192,6 +192,7 @@ class User extends AbstractImporter
         // Hydrators
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Username', 'setUsername');
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('External ID', 'setExternalId');
+        $this->userHydrators[] = new User\Hydrator\Lookup('Role', 'setRole', $this->roleList);
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Password', 'setPassword');
         $this->userHydrators[] = new User\Hydrator\ToggleField('E-Portfolio?', 'setEportfolioEnable');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Email Address From Username?', 'setLocalEmail');
@@ -201,6 +202,13 @@ class User extends AbstractImporter
         // Not sure if superuser should be settable
         $this->userHydrators[] = new User\Hydrator\ToggleField('Superuser?', 'setSuperuser');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Account Enabled?', 'setEnabled');
+        $this->userHydrators[] = new User\Hydrator\Field('Title', 'setTitle');
+        $this->userHydrators[] = new User\Hydrator\Field('First Name', 'setFirstname');
+        $this->userHydrators[] = new User\Hydrator\Field('Surname', 'setLastname');
+        $this->userHydrators[] = new User\Hydrator\Field('Alt Email', 'setAltEmail');
+        $this->userHydrators[] = new User\Hydrator\Field('Year', 'setYear');
+        $this->userHydrators[] = new User\Hydrator\Lookup('House', 'setSchoolHouse', $this->houseList);
+        $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
     }
 
     /**
@@ -247,14 +255,14 @@ class User extends AbstractImporter
 //            if (strlen($row['External ID'])) {
 //                $user->setExternalId($row['External ID']);
 //            }
-            if (strlen($row['Role'])) {
-                // Set model
-                if (!array_key_exists($row['Role'], $this->roleList)) {
-                    $this->log->warning(sprintf('Role "%s" does not exist', $row['Role']));
-                } else {
-                    $user->setRole($this->roleList[$row['Role']]);
-                }
-            }
+//            if (strlen($row['Role'])) {
+//                // Set model
+//                if (!array_key_exists($row['Role'], $this->roleList)) {
+//                    $this->log->warning(sprintf('Role "%s" does not exist', $row['Role']));
+//                } else {
+//                    $user->setRole($this->roleList[$row['Role']]);
+//                }
+//            }
 //            if (strlen($row['Password'])) {
 //                // Does this need to be encoded?
 //                $user->setPassword($row['Password']);
@@ -312,38 +320,38 @@ class User extends AbstractImporter
                 }
             }
 
-            // Other fields: set them if they exist at all
-            if (isset($row['Title'])) {
-                $user->setTitle($row['Title']);
-            }
-            if (isset($row['First Name'])) {
-                $user->setFirstname($row['First Name']);
-            }
-            if (isset($row['Surname'])) {
-                $user->setLastname($row['Surname']);
-            }
-            if (isset($row['Alt Email'])) {
-                $user->setAltEmail($row['Alt Email']);
-            }
-            if (isset($row['Year'])) {
-                $user->setYear($row['Year']);
-            }
-            if (isset($row['House'])) {
-                // Set model
-                if (!array_key_exists($row['House'], $this->houseList)) {
-                    $this->log->warning(sprintf('House "%s" does not exist', $row['House']));
-                } else {
-                    $user->setSchoolHouse($this->houseList[$row['House']]);
-                }
-            }
-            if (isset($row['Residential House'])) {
-                // Set model
-                if (!array_key_exists($row['Residential House'], $this->residentialHouseList)) {
-                    $this->log->warning(sprintf('Residential House "%s" does not exist', $row['Residential House']));
-                } else {
-                    $user->setResidentialHouse($this->residentialHouseList[$row['Residential House']]);
-                }
-            }
+//            // Other fields: set them if they exist at all
+//            if (isset($row['Title'])) {
+//                $user->setTitle($row['Title']);
+//            }
+//            if (isset($row['First Name'])) {
+//                $user->setFirstname($row['First Name']);
+//            }
+//            if (isset($row['Surname'])) {
+//                $user->setLastname($row['Surname']);
+//            }
+//            if (isset($row['Alt Email'])) {
+//                $user->setAltEmail($row['Alt Email']);
+//            }
+//            if (isset($row['Year'])) {
+//                $user->setYear($row['Year']);
+//            }
+//            if (isset($row['House'])) {
+//                // Set model
+//                if (!array_key_exists($row['House'], $this->houseList)) {
+//                    $this->log->warning(sprintf('House "%s" does not exist', $row['House']));
+//                } else {
+//                    $user->setSchoolHouse($this->houseList[$row['House']]);
+//                }
+//            }
+//            if (isset($row['Residential House'])) {
+//                // Set model
+//                if (!array_key_exists($row['Residential House'], $this->residentialHouseList)) {
+//                    $this->log->warning(sprintf('Residential House "%s" does not exist', $row['Residential House']));
+//                } else {
+//                    $user->setResidentialHouse($this->residentialHouseList[$row['Residential House']]);
+//                }
+//            }
 
             $result[] = [
                 'user'   => $user,
