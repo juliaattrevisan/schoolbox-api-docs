@@ -225,7 +225,12 @@ class User extends AbstractImporter
                 $user->setExternalId($row['External ID']);
             }
             if (strlen($row['Role'])) {
-                $user->setRole($row['Role']);
+                // Set model
+                if (!array_key_exists($row['Role'], $this->roleList)) {
+                    $this->log->warning(sprintf('Role "%s" does not exist', $row['Role']));
+                } else {
+                    $user->setRole($this->roleList[$row['Role']]);
+                }
             }
             if (strlen($row['Password'])) {
                 // Does this need to be encoded?
@@ -262,8 +267,26 @@ class User extends AbstractImporter
             // Campus: split and set
             // Default campus: first in list
             if (isset($row['Campus'])) {
-                $campusList = array_map('trim', explode(',', $row['Campus']));
                 // Set based on code or name? Maybe name.
+                $campusList = [];
+                foreach (explode(',', $row['Campus']) as $campusName) {
+                    $campusName = trim($campusName);
+                    if (strlen($campusName)) {
+                        if (!array_key_exists($campusName, $this->campusList)) {
+                            $this->log->warning(sprintf('Campus "%s" does not exist', $campusName));
+                        } else {
+                            $campusList[] = $this->campusList[$campusName];
+                        }
+                    }
+                }
+                if (!empty($campusList)) {
+                    $user->setCampusCollection($campusList);
+                    // set default campus to first in list
+                    foreach ($campusList as $campus) {
+                        $user->setDefaultCampus($campus);
+                        break;
+                    }
+                }
             }
 
             // Other fields: set them if they exist at all
@@ -283,12 +306,20 @@ class User extends AbstractImporter
                 $user->setYear($row['Year']);
             }
             if (isset($row['House'])) {
-                // get and set model
-                $user->setSchoolHouse($row['House']);
+                // Set model
+                if (!array_key_exists($row['House'], $this->houseList)) {
+                    $this->log->warning(sprintf('House "%s" does not exist', $row['House']));
+                } else {
+                    $user->setSchoolHouse($this->houseList[$row['House']]);
+                }
             }
             if (isset($row['Residential House'])) {
-                // get and set model
-                $user->setResidentialHouse($row['Residential House']);
+                // Set model
+                if (!array_key_exists($row['Residential House'], $this->residentialHouseList)) {
+                    $this->log->warning(sprintf('Residential House "%s" does not exist', $row['Residential House']));
+                } else {
+                    $user->setResidentialHouse($this->residentialHouseList[$row['Residential House']]);
+                }
             }
 
             $result[] = [
