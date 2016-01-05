@@ -101,6 +101,7 @@ class Controller extends Base
                 'allNavigation'  => $this->buildNavigation('user')->getAllNodes(),
                 'csvTemplate'    => $csvTemplate,
                 'attachzone'     => $this->getAttachzone()->getTwigContext(),
+                'logHash'        => $this->getSession()->getSegment(static::class)->getFlash('logHash'),
             ],
         ]);
     }
@@ -120,8 +121,10 @@ class Controller extends Base
         $reader->setLoadFromFirst(true);
         $parser = new \Schoolbox\External\Importer\User($reader, $logger, false);
         $parser->save();
-        $logger->flushToStorage();
-        // And do something else
+        $storage = $logger->flushToStorage();
+        // And do something else. Bounce back to the user page?
+        $this->getSession()->getSegment(static::class)->setFlash('logHash', $storage->getHash());
+        $this->getResponse()->redirect->to($this->getRouter()->generate('adminImport.user'));
     }
 
     /**

@@ -8,6 +8,13 @@
     </div>
 
     <div class="small-12 island">
+        {% if logHash %}
+            <div data-alert class="alert-box">
+                <h2>Your import has run</h2>
+                <a href="/storage/fetch.php?hash={{ logHash }}">View your log here</a>
+                <a href="" class="close">×</a>
+            </div>
+        {% endif %}
         <section class="content">
             <p>
                 Provide a file containing a list of users in the CSV format in the template below.
