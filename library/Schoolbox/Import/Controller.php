@@ -170,12 +170,11 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set([
-            'template' => '@adminImport/userPreview.twig',
+            'template' => '@adminImport/userImport.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation('user')->getAllNodes(),
                 'log'            => ['lines' => $logLines],
-//                'attachzone'     => $this->getAttachzone($upload->getHash())->getTwigContext(),
             ],
         ]);
     }
