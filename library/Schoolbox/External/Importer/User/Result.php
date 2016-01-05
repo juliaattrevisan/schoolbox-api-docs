@@ -24,6 +24,13 @@ class Result
     protected $user;
 
     /**
+     * The user before any changes were made.
+     *
+     * @var UserModel
+     */
+    protected $originalUser;
+
+    /**
      * @var UserRelation[]
      */
     protected $userRelations = [];
@@ -37,16 +44,6 @@ class Result
      * @var bool
      */
     protected $isUserDeleted = false;
-
-    /**
-     * Constructor
-     *
-     * @param UserModel $user
-     */
-    public function __construct(UserModel $user)
-    {
-        $this->user = $user;
-    }
 
     /**
      * @return UserModel
@@ -63,6 +60,24 @@ class Result
     public function setUser($user)
     {
         $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @return UserModel
+     */
+    public function getOriginalUser()
+    {
+        return $this->originalUser;
+    }
+
+    /**
+     * @param  UserModel $originalUser
+     * @return $this
+     */
+    public function setOriginalUser($originalUser)
+    {
+        $this->originalUser = $originalUser;
         return $this;
     }
 

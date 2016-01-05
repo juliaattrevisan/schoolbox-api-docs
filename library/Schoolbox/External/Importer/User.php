@@ -231,7 +231,8 @@ class User extends AbstractImporter
                 continue;
             }
 
-            $userResult = new User\Result($user);
+            $userResult = new User\Result();
+            $userResult->setOriginalUser(clone $user);
             if ($user->getId()) {
                 $this->log->info(sprintf('User found (ID: #%d)', $user->getId()));
             } else {
@@ -304,28 +305,54 @@ class User extends AbstractImporter
             if ($userResult->isUserDeleted()) {
                 $this->deleteUser($userResult);
             } else {
-                $this->saveUser($userResult);
+                $user = $userResult->getUser();
+                if (empty($user->getId())) {
+                    $this->createUser($userResult);
+                } else {
+                    $this->updateUser($userResult);
+                }
             }
         }
     }
 
     /**
-     * Saves this user record.
+     * Creates a user record.
      *
      * @param User\Result $userResult
      */
-    protected function saveUser(User\Result $userResult)
+    protected function createUser(User\Result $userResult)
     {
         $user = $userResult->getUser();
         if ($this->performUpdate) {
-            $this->log->info(sprintf('Saving user "%s"', $user->formatName()), ['user' => $user]);
+            $this->log->info(sprintf('Creating user "%s"', $user->formatName()), ['user' => $user]);
             if ($this->userMapper->save($user)) {
-                $this->log->info(sprintf('User saved (ID: #%d)', $user->getId()));
+                $this->log->info(sprintf('User created (ID: #%d)', $user->getId()));
             } else {
-                $this->log->error('Could not save user!');
+                $this->log->error('Could not create user!');
             }
         } else {
-            $this->log->info(sprintf('Pretending to save user "%s"', $user->formatName()), ['user' => $user]);
+            $this->log->info(sprintf('Pretending to create user "%s"', $user->formatName()), ['user' => $user]);
+        }
+    }
+
+    /**
+     * Updates a user record.
+     *
+     * @param User\Result $userResult
+     */
+    protected function updateUser(User\Result $userResult)
+    {
+        $user = $userResult->getUser();
+        $diff = $this->userMapper->diff($userResult->getOriginalUser(), $user);
+        if ($this->performUpdate) {
+            $this->log->info(sprintf('Updating user "%s"', $user->formatName()), ['diff' => $diff]);
+            if ($this->userMapper->save($user)) {
+                $this->log->info(sprintf('User updated (ID: #%d)', $user->getId()));
+            } else {
+                $this->log->error('Could not update user!');
+            }
+        } else {
+            $this->log->info(sprintf('Pretending to update user "%s"', $user->formatName()), ['diff' => $diff]);
         }
     }
 
