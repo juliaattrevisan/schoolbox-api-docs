@@ -7,10 +7,8 @@
 
 namespace Schoolbox\External\Importer\User\Identifier;
 
-use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role as RoleModel;
-use Schoolbox\RoleMapper;
 use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
 
@@ -27,20 +25,20 @@ class ExternalId implements IdentifierInterface
     protected $userMapper;
 
     /**
-     * @var RoleMapper
+     * @var array|RoleModel[]
      */
-    protected $roleMapper;
+    protected $roleList;
 
     /**
      * Constructor
      *
-     * @param UserMapper $userMapper
-     * @param RoleMapper $roleMapper
+     * @param UserMapper        $userMapper
+     * @param array|RoleModel[] $roleList
      */
-    public function __construct(UserMapper $userMapper, RoleMapper $roleMapper)
+    public function __construct(UserMapper $userMapper, array $roleList)
     {
         $this->userMapper = $userMapper;
-        $this->roleMapper = $roleMapper;
+        $this->roleList   = $roleList;
     }
 
     /**
@@ -56,10 +54,9 @@ class ExternalId implements IdentifierInterface
      */
     public function retrieve($row)
     {
-        try {
-            /** @var RoleModel $role */
-            $role = $this->roleMapper->findOneByColumn('name', $row['Role']);
-        } catch (MapperException $e) {
+        if (array_key_exists($row['Role'], $this->roleList)) {
+            $role = $this->roleList[$row['Role']];
+        } else {
             throw new \RuntimeException(sprintf('Role "%s" not found', $row['Role']));
         }
         try {

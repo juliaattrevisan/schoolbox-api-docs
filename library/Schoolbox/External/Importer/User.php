@@ -9,6 +9,7 @@ namespace Schoolbox\External\Importer;
 
 use Alaress\Csv\Reader;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role as RoleModel;
 use Schoolbox\RoleMapper;
 use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
@@ -40,9 +41,9 @@ class User extends AbstractImporter
     protected $userMapper;
 
     /**
-     * @var RoleMapper
+     * @var array|RoleModel[]
      */
-    protected $roleMapper;
+    protected $roleList = [];
 
     /**
      * A list of user identifier classes - each one will in turn attempt to
@@ -128,10 +129,22 @@ class User extends AbstractImporter
     protected function setup()
     {
         $this->userMapper = new UserMapper();
-        $this->roleMapper = new RoleMapper();
+
+        // Role list
+        foreach (RoleMapper::getInstance()->findAll() as $role) {
+            /** @var RoleModel $role */
+            $this->roleList[$role->getName()] = $role;
+        }
+
+        // Campus list
+
+        // House list
+
+        // Residential House list
+
         $this->userIdentifiers[] = new User\Identifier\UserId($this->userMapper);
         $this->userIdentifiers[] = new User\Identifier\Username($this->userMapper);
-        $this->userIdentifiers[] = new User\Identifier\ExternalId($this->userMapper, $this->roleMapper);
+        $this->userIdentifiers[] = new User\Identifier\ExternalId($this->userMapper, $this->roleList);
     }
 
     /**
