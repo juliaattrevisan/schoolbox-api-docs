@@ -7,8 +7,10 @@
 
 namespace Schoolbox\Import;
 
+use Alaress\Csv\Reader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\StoredisLogger;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage;
@@ -110,7 +112,18 @@ class Controller extends Base
     {
         $factory = new CollectorFactory();
         $upload  = $factory->build($this->getRequest()->post->get('attachment'))->getFirst();
-        // Start parsing the upload
+
+        // Try to make a CSV parser out of the upload
+        /** @var StoredisLogger $logger */
+        $logger = $this->getDi()->get('ups.logger');
+        $parser = new \Schoolbox\External\Importer\User(
+            new Reader($upload->readStream()),
+            $logger,
+            false
+        );
+        $parser->save();
+        $logger->flushToStorage();
+        // And do something else
     }
 
     /**
