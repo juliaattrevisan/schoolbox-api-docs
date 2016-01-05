@@ -85,6 +85,10 @@
                 });
             }
         });
+
+        /* Proxy Replacements
+         */
+        $.fn.schoolboxResource_ProxyReplacment();
     });
 </script>
 
@@ -93,6 +97,29 @@
     <li><a href="/pantry">Pantry</a></li>
     <li class="active"><a href="/pantry/editor">Editor</a></li>
 </ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Proxy Replacement Test</h2>
+    </div>
+    <div class="small-12 island">
+        <form action="/testAjax.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p><img data-schoolboxresource-source="/storage/image.php?hash=0e0137e694bc6f105631e854fc94a7c88396d808" data-schoolboxresource-type="image" src="/storage/image.php?hash=0e0137e694bc6f105631e854fc94a7c88396d808" style="border:1px solid #808080; height:450px; width:600px" /></p>
+
+                        <p><img data-schoolboxresource-source="/cms/sendVideo.php?type=sbfs&amp;id=346" data-schoolboxresource-thumbnail="/cms/videoThumb.php?type=sbfs&amp;size=poster&amp;id=346" data-schoolboxresource-type="video" src="/cms/videoThumb.php?type=sbfs&amp;size=poster&amp;id=346" style="width:233px;height:131px" /></p>
+
+                        <p><img data-schoolboxresource-source="/cms/sendVideo.php?type=sbfs&amp;id=347" data-schoolboxresource-thumbnail="/images/core/component/audio-thumbnail-processing.gif" data-schoolboxresource-type="audio" src="/images/core/component/audio-thumbnail-processing.gif" style="width:233px;height:131px" /></p>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>
 
 <div class="row">
     <div class="small-12 columns">

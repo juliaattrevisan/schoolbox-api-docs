@@ -224,6 +224,7 @@
 
             dataVars = {
                 'data-schoolboxresource-type': 'video',
+                'data-schoolboxresource-thumbnail': url,
                 'data-schoolboxresource-source': '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue()
             };
         }
@@ -234,6 +235,7 @@
 
             dataVars = {
                 'data-schoolboxresource-type': 'audio',
+                'data-schoolboxresource-thumbnail': url,
                 'data-schoolboxresource-source': '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue()
             };
         }
@@ -242,6 +244,7 @@
         else if (fields.type.getValue() == 'image') {
             dataVars = {
                 'data-schoolboxresource-type': 'image',
+                'data-schoolboxresource-thumbnail': url,
                 'data-schoolboxresource-source': url
             };
         }
@@ -339,9 +342,31 @@
             horizontalPadding: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-horizontalpadding')
         };
     };
+
+    /**
+     * Replace all placeholders with html elements
+     */
+    $.fn.schoolboxResource_ProxyReplacment = function() {
+        $.each($('[data-schoolboxresource-type]'), function(index, element) {
+            var type = $(element).attr('data-schoolboxresource-type');
+            var source = $(element).attr('data-schoolboxresource-source');
+            var thumbnail = $(element).attr('data-schoolboxresource-thumbnail');
+            var style = $(element).attr('style');
+
+            /* Replace video/audio placeholder elements
+             */
+            if (type == 'video') {
+                $(element).replaceWith('<video data-schoolboxmedia-replacement controls preload="none" poster="' + thumbnail + '" style="' + style + '"><source src="' + source + '" type="video/mp4"></video>');
+            }
+            else if (type == 'audio') {
+                $(element).replaceWith('<audio data-schoolboxmedia-replacement controls preload="none" style="' + style + '"><source src="' + source + '" type="audio/mpeg"></audio>');
+            }
+        });
+    }
 }(jQuery));
 
 (function() {
+
     /**
      * Extract a particular css property's value from a style string
      *
@@ -360,7 +385,7 @@
         }
 
         return '';
-    }
+    };
 
     /**
      * Extract resource id from a url
@@ -430,7 +455,7 @@
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
-                extraAllowedContent: 'img[data-schoolboxresource-source,data-schoolboxresource-type]{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float};video[*]{*};source[*]',
+                extraAllowedContent: 'img[data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float}',
 
                 /* Remove annoying dialog that always appears
                  */
@@ -489,86 +514,9 @@
             };
 
             var derived = {
-            }
+            };
 
-            var merged = $.extend(defaults, derived, options);
-
-            return merged;
-
-
-
-			/* Standard options across all tinyMCE instances
-			 */
-			/*
-			// Site location can be a global
-			var siteLocation = options.site_location || window.siteLocation || 'core';
-			var standard = {
-				theme: "advanced",
-				skin: "cirkuit",
-				plugins: "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker,noneditable",
-				browser_spellcheck: true,
-				content_css: "/css/"+siteLocation+"/chrome-foundation.css",
-				accessibility_warnings: false,
-				extended_valid_elements: "a[class|name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
-				theme_advanced_blockformats: "h3,h4,p,address,pre",
-				tabfocus_elements: ":prev,:next",
-				convert_urls: false,
-
-				// To prevent stripping of embed tags, presumably
-
-				media_strict: false
-			}*/
-
-			/* Default tinyMCE init choices which can be overridden
-			 */
-            /*
-			var defaults = {
-
-				// What to apply Tiny upon
-
-				mode: 'textareas',
-
-				// Used only with mode "specific_textareas"
-
-				editor_selector: '',
-
-				// Used only with mode "exact"
-
-				elements: '',
-
-				// Custom alaress file browser plugin
-
-				file_browser_callback: 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
-				file_browser_category_id: 0,
-				file_uploader_callback: 'tinyMCE.activeEditor.plugins.assetmanager.fileUploader',
-
-				// Available butonye
-
-				theme_advanced_buttons1: "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
-				theme_advanced_buttons2: "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,z,spellchecker",
-				theme_advanced_buttons3: "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
-				theme_advanced_buttons4: "tablecontrols",
-				pdw_toggle_on: 1,
-				pdw_toggle_toolbars: "2, 3, 4",
-
-				// Formatting stuff
-
-				force_br_newlines: false,
-				force_p_newlines: true,
-				removeformat_selector: '',
-
-				// Toolbar
-
-				theme_advanced_toolbar_location: 'top',
-				theme_advanced_toolbar_align: 'left',
-				theme_advanced_statusbar_location: 'bottom'
-			}
-            */
-
-			/* Combined init literal
-			 */
-			//var merged = $.extend(standard, defaults, derived, options);
-			//merged.file_browser_category_id = parseInt(merged.file_browser_category_id);
+            return $.extend(defaults, derived, options);
 		}
 
 		/**
