@@ -43,10 +43,6 @@ $group_handler = new Group();
 if (($permission = $group_handler->getPermission($component->getIdentifier())) < READ_ACCESS) {
     error(19);
 }
-// * Ensure task is open
-if (!$unit_instance->isOpen() && $permission < WRITE_ACCESS) {
-    error(2);
-}
 
 // Get student's most recent completion.
 
@@ -74,7 +70,7 @@ switch ($task->getType()) {
         // Redirect to the link if there is one, otherwise redirect back to the
         // homepage this is on.
         $homepageLink = '/homepage/'.$component->getIdentifier().'/#component'.$component_id;
-        if (!$task->getRequiresConfirmation()) {
+        if ($unit_instance->isOpen() && !$task->getRequiresConfirmation()) {
             if ($isUndo) {
                 Task\InstanceCompletionMapper::getInstance()->unmarkAsCompleted(
                     $task->getId(),
