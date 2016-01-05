@@ -1,4 +1,5 @@
 <?php
+use SitePage;
 use Alaress\File\Remote\FetcherInterface;
 use Schoolbox\Collection;
 use Schoolbox\File\MimetypeMapper;
@@ -498,7 +499,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         } /* Handle Sabre_DAV_Exception specifically
          */
         catch (Sabre\DAV\Exception\NotAuthenticated $e) {
-            Sitepage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
+            SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
         }
         catch (Sabre\DAV\Exception\NotFound $e) {
             /* In some cases we are told that something exists, only to be thrown a 404 error
@@ -677,33 +678,41 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
     public function getByID($id)
     {
+        try {
+            $response = $this->client->propFind($_SESSION['portfolioIdPathMap'][$id], array(
+                '{DAV:}getcontentlength',
+                '{DAV:}resourcetype',
+                '{DAV:}getlastmodified',
+                '{DAV:}creationdate',
+            ), 1);
 
-        $response = $this->client->propFind($_SESSION['portfolioIdPathMap'][$id], array(
-            '{DAV:}getcontentlength',
-            '{DAV:}resourcetype',
-            '{DAV:}getlastmodified',
-            '{DAV:}creationdate',
-        ), 1);
+            $response = array_shift($response);
 
-        $response = array_shift($response);
+            $parentID = $this->getParent($id);
 
-        $parentID = $this->getParent($id);
+            $filename = basename($_SESSION['portfolioIdPathMap'][$id]);
 
-        $filename = basename($_SESSION['portfolioIdPathMap'][$id]);
+            $temp = array(
+                'id' => $id,
+                'parent' => $parentID,
+                'path' => $_SESSION['portfolioIdPathMap'][$id],
+                'name' => $filename,
+                'description' => $filename,
+                'type' => $this->parseResourceType($response['{DAV:}resourcetype']),
+                'file_size' => $response['{DAV:}getcontentlength'],
+                'submitted' => $response['{DAV:}getlastmodified'],
+                'ctime' => $response['{DAV:}creationdate'],
+                'owner' => $_SESSION['id'],
+            );
 
-        $temp = array('id' => $id,
-            'parent' => $parentID,
-            'path' => $_SESSION['portfolioIdPathMap'][$id],
-            'name' => $filename,
-            'description' => $filename,
-            'type' => $this->parseResourceType($response['{DAV:}resourcetype']),
-            'file_size' => $response['{DAV:}getcontentlength'],
-            'submitted' => $response['{DAV:}getlastmodified'],
-            'ctime' => $response['{DAV:}creationdate'],
-            'owner' => $_SESSION['id'],
-        );
-
-        return $temp;
+            return $temp;
+        }
+        catch (Exception $e) {
+            //
+            // Sabre doesn't return any sort of useful exception, just send user to the network
+            // drive login page if something goes wrong
+            SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
+        }
     }
 
     /**
