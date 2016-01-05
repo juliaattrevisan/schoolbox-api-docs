@@ -52,7 +52,7 @@
 
                 if (simple) {
                     // if the string "true" is used, or no value, target the container
-                    component = $(this).closest(config.container).find('[data-collapsable=true]');
+                    component = $(this).closest(self.config.container).find('[data-collapsable="true"]');
                     icon      = $(this).closest('[data-collapser="true"]');
                 } else {
                     // otherwise, treat the value as the data-collapsable target value
