@@ -20,8 +20,16 @@ function kernel_load($name) {
 	$name = trim($name, '\\');
 
 	// locate the class
+	$shutFile = __DIR__ . '/../../library/' . str_replace('\\','/', $name) . '/ShutdownHandler.php';
 	$kernFile = __DIR__ . '/../../library/' . str_replace('\\','/', $name) . '/Kernel.php';
 	$bootFile = __DIR__ . '/../../library/' . str_replace('\\','/', $name) . '/Bootstrap.php';
+
+	if(file_exists($shutFile) && is_readable($shutFile)) {
+		require_once $shutFile;
+	}
+	else {
+		return false;
+	}
 
 	if(file_exists($kernFile) && is_readable($kernFile)) {
 		require_once $kernFile;

@@ -28,6 +28,7 @@ use Config;
 use Database;
 use DeprecatedDatabase;
 use PDO;
+use Schoolbox\Application\WebRequest;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
 use Scrub;
@@ -135,7 +136,7 @@ class Bootstrap implements BootstrapInterface {
 	 * @return void
 	 */
 	public function registerShutdownHandling() {
-		register_shutdown_function([$this, 'shutdownSafely']);
+		ShutdownHandler::instance()->registerFunction([$this, 'shutdownSafely']);
 	}
 
 

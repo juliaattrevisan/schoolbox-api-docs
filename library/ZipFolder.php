@@ -4,11 +4,17 @@
 /**
  * Puts all resources from a folder into a zip
  */
+use Schoolbox\Application\WebRequest\ShutdownHandler;
+
 class ZipFolder
 {
     function ZipFolder($folder)
     {
-        register_shutdown_function(array($this, 'onShutdown'));
+        // Register shutdown handler and assign a priority to ensure it executes before
+        // Schoolbox\Application\WebRequest\Bootstrap\shutdownSafely()
+        // and cleans up any failed ZIP files
+
+        ShutdownHandler::instance()->registerFunction([$this, 'onShutdown'], 10000);
 
         $this->db = DeprecatedDatabase::getInstance();
         $this->folder = $folder;
@@ -36,11 +42,15 @@ class ZipFolder
 
     public function __destruct()
     {
+        // Might be a bit redundant, but can't hurt anything
+
         $this->cleanUp();
     }
 
-    private function onShutdown()
+    public function onShutdown()
     {
+        // Last chance cleanup of failed ZIP files
+
         $this->cleanUp();
     }
 
@@ -163,9 +173,17 @@ class ZipFolder
 
     function cleanUp()
     {
-        unlink($this->tmpName);
-        unlink($this->tmpZip);
-        $this->removeDir($this->tmpFolder);
+        if (file_exists($this->tmpName)) {
+            unlink($this->tmpName);
+        }
+
+        if (file_exists($this->tmpZip)) {
+            unlink($this->tmpZip);
+        }
+
+        if (file_exists($this->tmpFolder)) {
+            $this->removeDir($this->tmpFolder);
+        }
     }
 
     function removeDir($path)
