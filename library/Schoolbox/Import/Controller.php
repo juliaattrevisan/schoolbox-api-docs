@@ -116,11 +116,9 @@ class Controller extends Base
         // Try to make a CSV parser out of the upload
         /** @var StoredisLogger $logger */
         $logger = $this->getDi()->get('ups.logger');
-        $parser = new \Schoolbox\External\Importer\User(
-            new Reader($upload->readStream()),
-            $logger,
-            false
-        );
+        $reader = new Reader($upload->readStream());
+        $reader->setLoadFromFirst(true);
+        $parser = new \Schoolbox\External\Importer\User($reader, $logger, false);
         $parser->save();
         $logger->flushToStorage();
         // And do something else
