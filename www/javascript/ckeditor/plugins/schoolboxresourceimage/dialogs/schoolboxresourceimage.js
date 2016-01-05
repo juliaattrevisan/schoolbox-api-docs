@@ -57,13 +57,20 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                      */
                                     fields.type.setValue(element.getAttribute('data-schoolboxresource-type'));
 
-                                    /* Remember url
+                                    /* Remember url of the image or video/audio stream
                                      */
-                                    fields.url.setValue(element.getAttribute('src'));
+                                    if (fields.type.getValue() == 'video') {
+                                        fields.url.setValue(element.getAttribute('data-schoolboxresource-source'));
+                                    }
+                                    else if (fields.type.getValue() == 'audio') {
+                                        fields.url.setValue(element.getAttribute('data-schoolboxresource-source'));
+                                    }
+                                    else {
+                                        fields.url.setValue(element.getAttribute('src'));
+                                    }
                                 },
 
                                 /* When you type the url yourself, apply details
-                                 * TODO: Fix when changing url to video/audio/image on otfs (call nodeinfo)
                                  */
                                 onChange: function() {
                                     var dialog = this.getDialog();
@@ -78,9 +85,11 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                     if (url.match(/^\/cms\/sendVideo/)) {
                                         fields.id.setValue($.fn.schoolboxResource_ExtractResourceId(url));
 
-                                        /* TODO: Audio detection
+                                        /* Detect difference between video and audio
                                          */
-                                        fields.type.setValue('video');
+                                        $.getJSON('/editor/nodeInfo.php', { identifier: fields.id.getValue() }, function(responseText) {
+                                            fields.type.setValue(responseText.type);
+                                        });
                                     }
                                     /* Or whether it's just a local image
                                      */
@@ -120,7 +129,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
 
                                         /* Find out how to render this file
                                          */
-                                        $.getJSON('/editor/nodeInfo.php', { hash: message.data[0].hash }, function(responseText) {
+                                        $.getJSON('/editor/nodeInfo.php', { identifier: message.data[0].hash }, function(responseText) {
                                             fields.type.setValue(responseText.type);
 
                                             /* Renderer Strategy (I guess)

@@ -23,12 +23,24 @@ class FileFactory {
     private $hash = '';
 
     /**
+     * An otfs numeric id
+     *
+     * @var string
+     */
+    private $id = '';
+
+    /**
      * Constructor
      *
-     * @param $hash
+     * @param $hashOrId
      */
-    public function __construct($hash) {
-        $this->setHash($hash);
+    public function __construct($hashOrId) {
+        if (is_numeric($hashOrId)) {
+            $this->setId($hashOrId);
+        }
+        else {
+            $this->setHash($hashOrId);
+        }
     }
 
     /**
@@ -43,7 +55,19 @@ class FileFactory {
             'id' => ''
         ];
 
-        list($type, $id) = explode(':', $this->getHash());
+        /* When identifying a storage file via browse:xxx which is
+         * a string used internally in resource browser messages
+         */
+        if ($this->getHash()) {
+            list($type, $id) = explode(':', $this->getHash());
+        }
+        /* When identifying the difference between a video and
+         * an audio via sendVideo.php?id=xxx
+         */
+        else {
+            $type = 'browse';
+            $id = $this->getId();
+        }
 
         switch($type) {
             case 'browse':
@@ -54,7 +78,7 @@ class FileFactory {
                     'type' => $file->getMimetype()->getType(),
                     'hash' => $file->getHash(),
 
-                    /* Used for video, sadly
+                    /* Used for video/audio, sadly
                      */
                     'id' => $file->getId()
                 ];
@@ -67,6 +91,9 @@ class FileFactory {
 
         return json_encode($data);
     }
+
+    /* Getters/Setters
+     */
 
     /**
      * Set hash
@@ -86,5 +113,25 @@ class FileFactory {
     private function getHash()
     {
         return $this->hash;
+    }
+
+    /**
+     * Get id
+     *
+     * @return string
+     */
+    private function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set id
+     *
+     * @param string $id
+     */
+    private function setId($id)
+    {
+        $this->id = $id;
     }
 }

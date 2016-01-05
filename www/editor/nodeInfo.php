@@ -19,7 +19,7 @@ if (isset($this)) {
     exit;
 }
 
-$factory = new \Schoolbox\Editor\FileFactory($_GET['hash']);
+$factory = new \Schoolbox\Editor\FileFactory($_GET['identifier']);
 
 header('Content-Type: application/json');
 echo $factory->produce();
