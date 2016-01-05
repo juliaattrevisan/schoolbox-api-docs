@@ -202,6 +202,7 @@ class User extends AbstractImporter
         // Not sure if superuser should be settable
         $this->userHydrators[] = new User\Hydrator\ToggleField('Superuser?', 'setSuperuser');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Account Enabled?', 'setEnabled');
+        $this->userHydrators[] = new User\Hydrator\Campus('Campus', $this->campusList);
         $this->userHydrators[] = new User\Hydrator\Field('Title', 'setTitle');
         $this->userHydrators[] = new User\Hydrator\Field('First Name', 'setFirstname');
         $this->userHydrators[] = new User\Hydrator\Field('Surname', 'setLastname');
@@ -294,32 +295,32 @@ class User extends AbstractImporter
 //            if (isset($enabled)) {
 //                $user->setEnabled($enabled);
 //            }
-
-            // Campus: split and set
-            // Default campus: first in list
-            if (isset($row['Campus'])) {
-                // Set based on code or name? Maybe name.
-                $campusList = [];
-                foreach (explode(',', $row['Campus']) as $campusName) {
-                    $campusName = trim($campusName);
-                    if (strlen($campusName)) {
-                        if (!array_key_exists($campusName, $this->campusList)) {
-                            $this->log->warning(sprintf('Campus "%s" does not exist', $campusName));
-                        } else {
-                            $campusList[] = $this->campusList[$campusName];
-                        }
-                    }
-                }
-                if (!empty($campusList)) {
-                    $user->setCampusCollection($campusList);
-                    // set default campus to first in list
-                    foreach ($campusList as $campus) {
-                        $user->setDefaultCampus($campus);
-                        break;
-                    }
-                }
-            }
-
+//
+//            // Campus: split and set
+//            // Default campus: first in list
+//            if (isset($row['Campus'])) {
+//                // Set based on code or name? Maybe name.
+//                $campusList = [];
+//                foreach (explode(',', $row['Campus']) as $campusName) {
+//                    $campusName = trim($campusName);
+//                    if (strlen($campusName)) {
+//                        if (!array_key_exists($campusName, $this->campusList)) {
+//                            $this->log->warning(sprintf('Campus "%s" does not exist', $campusName));
+//                        } else {
+//                            $campusList[] = $this->campusList[$campusName];
+//                        }
+//                    }
+//                }
+//                if (!empty($campusList)) {
+//                    $user->setCampusCollection($campusList);
+//                    // set default campus to first in list
+//                    foreach ($campusList as $campus) {
+//                        $user->setDefaultCampus($campus);
+//                        break;
+//                    }
+//                }
+//            }
+//
 //            // Other fields: set them if they exist at all
 //            if (isset($row['Title'])) {
 //                $user->setTitle($row['Title']);
