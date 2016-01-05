@@ -325,10 +325,14 @@ class User extends AbstractImporter
         $user = $userResult->getUser();
         if ($this->performUpdate) {
             $this->log->info(sprintf('Creating user "%s"', $user->formatName()), ['user' => $user]);
-            if ($this->userMapper->save($user)) {
-                $this->log->info(sprintf('User created (ID: #%d)', $user->getId()));
-            } else {
-                $this->log->error('Could not create user!');
+            try {
+                if ($this->userMapper->save($user)) {
+                    $this->log->info(sprintf('User created (ID: #%d)', $user->getId()));
+                } else {
+                    $this->log->error('Could not create user!');
+                }
+            } catch (\Exception $e) {
+                $this->log->error('Could not create user!', ['error' => $e->getMessage()]);
             }
         } else {
             $this->log->info(sprintf('Pretending to create user "%s"', $user->formatName()), ['user' => $user]);
@@ -346,10 +350,14 @@ class User extends AbstractImporter
         $diff = $this->userMapper->diff($userResult->getOriginalUser(), $user);
         if ($this->performUpdate) {
             $this->log->info(sprintf('Updating user "%s"', $user->formatName()), ['diff' => $diff]);
-            if ($this->userMapper->save($user)) {
-                $this->log->info(sprintf('User updated (ID: #%d)', $user->getId()));
-            } else {
-                $this->log->error('Could not update user!');
+            try {
+                if ($this->userMapper->save($user)) {
+                    $this->log->info(sprintf('User updated (ID: #%d)', $user->getId()));
+                } else {
+                    $this->log->error('Could not update user!');
+                }
+            } catch (\Exception $e) {
+                $this->log->error('Could not update user!', ['error' => $e->getMessage()]);
             }
         } else {
             $this->log->info(sprintf('Pretending to update user "%s"', $user->formatName()), ['diff' => $diff]);
@@ -375,10 +383,14 @@ class User extends AbstractImporter
         }
         if ($this->performUpdate) {
             $this->log->info(sprintf('Deleting user "%s"', $user->formatName()), ['user' => $user]);
-            if ($this->userMapper->delete($user)) {
-                $this->log->info('User deleted');
-            } else {
-                $this->log->error('Could not delete user!');
+            try {
+                if ($this->userMapper->delete($user)) {
+                    $this->log->info('User deleted');
+                } else {
+                    $this->log->error('Could not delete user!');
+                }
+            } catch (\Exception $e) {
+                $this->log->error('Could not delete user!', ['error' => $e->getMessage()]);
             }
         } else {
             $this->log->info(sprintf('Pretending to delete user "%s"', $user->formatName()), ['user' => $user]);
