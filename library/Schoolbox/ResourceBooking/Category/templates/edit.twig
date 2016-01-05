@@ -41,7 +41,7 @@
     </div>
     {% if item.id and isRouteAuthorized('resourceCategory.delete:post', {id: item.id, item: item}) %}
     <nav>
-        <a class="icon-more" title="" data-dropdown="header-options"></a>
+        <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li><a id="resourcecategory-delete" class="icon-delete" title="Delete" data-action="{{ routeLookup('resourceCategory.delete:post', {id: item.id}) }}">Delete</a></li>
