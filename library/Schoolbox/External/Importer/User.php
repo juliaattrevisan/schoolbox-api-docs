@@ -247,112 +247,7 @@ class User extends AbstractImporter
             }
 
             // Step 3: update user based on fields
-
-            // Identifier fields and password:
-            // set only if they are not blank
-//            if (strlen($row['Username'])) {
-//                $user->setUsername($row['Username']);
-//            }
-//            if (strlen($row['External ID'])) {
-//                $user->setExternalId($row['External ID']);
-//            }
-//            if (strlen($row['Role'])) {
-//                // Set model
-//                if (!array_key_exists($row['Role'], $this->roleList)) {
-//                    $this->log->warning(sprintf('Role "%s" does not exist', $row['Role']));
-//                } else {
-//                    $user->setRole($this->roleList[$row['Role']]);
-//                }
-//            }
-//            if (strlen($row['Password'])) {
-//                // Does this need to be encoded?
-//                $user->setPassword($row['Password']);
-//            }
-
-            // Toggle fields: set if not blank
-//            $eportfolio = $this->parseStringBoolean($row['E-Portfolio?']);
-//            if (isset($eportfolio)) {
-//                $user->setEportfolioEnable($eportfolio);
-//            }
-//            $emailFromUsername = $this->parseStringBoolean($row['Email Address From Username?']);
-//            if (isset($emailFromUsername)) {
-//                $user->setLocalEmail($emailFromUsername);
-////            }
-//            $externalEmailClient = $this->parseStringBoolean($row['Use External Mail Client?']);
-//            if (isset($externalEmailClient)) {
-//                $user->setUseInternalMail(!$externalEmailClient);
-//            }
-//            $webmail = $this->parseStringBoolean($row['Enable Webmail Tab?']);
-//            if (isset($webmail)) {
-//                $user->setWebmail($webmail);
-//            }
-//            // Not sure if superuser should be settable
-//            $superuser = $this->parseStringBoolean($row['Superuser?']);
-//            if (isset($superuser)) {
-//                $user->setSuperuser($superuser);
-//            }
-//            $enabled = $this->parseStringBoolean($row['Account Enabled?']);
-//            if (isset($enabled)) {
-//                $user->setEnabled($enabled);
-//            }
-//
-//            // Campus: split and set
-//            // Default campus: first in list
-//            if (isset($row['Campus'])) {
-//                // Set based on code or name? Maybe name.
-//                $campusList = [];
-//                foreach (explode(',', $row['Campus']) as $campusName) {
-//                    $campusName = trim($campusName);
-//                    if (strlen($campusName)) {
-//                        if (!array_key_exists($campusName, $this->campusList)) {
-//                            $this->log->warning(sprintf('Campus "%s" does not exist', $campusName));
-//                        } else {
-//                            $campusList[] = $this->campusList[$campusName];
-//                        }
-//                    }
-//                }
-//                if (!empty($campusList)) {
-//                    $user->setCampusCollection($campusList);
-//                    // set default campus to first in list
-//                    foreach ($campusList as $campus) {
-//                        $user->setDefaultCampus($campus);
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            // Other fields: set them if they exist at all
-//            if (isset($row['Title'])) {
-//                $user->setTitle($row['Title']);
-//            }
-//            if (isset($row['First Name'])) {
-//                $user->setFirstname($row['First Name']);
-//            }
-//            if (isset($row['Surname'])) {
-//                $user->setLastname($row['Surname']);
-//            }
-//            if (isset($row['Alt Email'])) {
-//                $user->setAltEmail($row['Alt Email']);
-//            }
-//            if (isset($row['Year'])) {
-//                $user->setYear($row['Year']);
-//            }
-//            if (isset($row['House'])) {
-//                // Set model
-//                if (!array_key_exists($row['House'], $this->houseList)) {
-//                    $this->log->warning(sprintf('House "%s" does not exist', $row['House']));
-//                } else {
-//                    $user->setSchoolHouse($this->houseList[$row['House']]);
-//                }
-//            }
-//            if (isset($row['Residential House'])) {
-//                // Set model
-//                if (!array_key_exists($row['Residential House'], $this->residentialHouseList)) {
-//                    $this->log->warning(sprintf('Residential House "%s" does not exist', $row['Residential House']));
-//                } else {
-//                    $user->setResidentialHouse($this->residentialHouseList[$row['Residential House']]);
-//                }
-//            }
+            $user = $this->hydrateUser($row, $user);
 
             $result[] = [
                 'user'   => $user,
@@ -386,6 +281,21 @@ class User extends AbstractImporter
             }
         }
         return null;
+    }
+
+    /**
+     * Retrieves a user to create or update.
+     *
+     * @param  array $row A row from the CSV import.
+     * @param  UserModel $user The user object to update
+     * @return UserModel An updated user object
+     */
+    protected function hydrateUser($row, UserModel $user)
+    {
+        foreach ($this->userHydrators as $hydrator) {
+            $user = $hydrator->hydrate($row, $user);
+        }
+        return $user;
     }
 
     /**
