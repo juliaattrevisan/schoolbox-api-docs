@@ -1,0 +1,71 @@
+<?php
+/**
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\External\Importer\User\Hydrator;
+
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User as UserModel;
+use Schoolbox\UserMapper;
+
+/**
+ * Sets a field value based on a lookup.
+ *
+ * @package Schoolbox\External\Importer\User\Hydrator
+ */
+class Lookup implements HydratorInterface
+{
+    /**
+     * The key in $row to set the value in the user to.
+     *
+     * @var string
+     */
+    protected $fieldname;
+
+    /**
+     * The set method of UserModel to call in order to set the field.
+     *
+     * @var string
+     */
+    protected $setMethod;
+
+    /**
+     * @var array
+     */
+    protected $lookupValues;
+
+    /**
+     * Constructor
+     *
+     * @param string $fieldname
+     * @param string $setMethod
+     * @param array  $lookupValues
+     */
+    public function __construct($fieldname, $setMethod, $lookupValues)
+    {
+        $this->fieldname    = $fieldname;
+        $this->setMethod    = $setMethod;
+        $this->lookupValues = $lookupValues;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hydrate($row, UserModel $user)
+    {
+        // Does the field exist in $row?
+        if (isset($row[$this->fieldname])) {
+            // Is the field value in the list of lookup values?
+            if (isset($this->lookupValues[$row[$this->fieldname]])) {
+                return call_user_func(
+                    [$user, $this->setMethod],
+                    $this->lookupValues[$row[$this->fieldname]]
+                );
+            }
+        }
+        return $user;
+    }
+}
