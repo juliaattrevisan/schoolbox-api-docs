@@ -13,6 +13,7 @@ use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Result;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Rubric\Competency\Level;
 use Schoolbox\Assessment\Rubric\Criteria\Criterion;
 use Schoolbox\Assessment\Rubric\Criteria\Group;
@@ -70,11 +71,12 @@ class Mapper
     /**
      * Given a folder ID, return the base rubric, including criteria inherited from parents
      *
-     * @param int    $folderId
-     * @param array  $levelNames
+     * @param int   $folderId
+     * @param bool  $forceTaskMode - if you need task-level criteria showing
+     * @param array $levelNames
      * @return Rubric
      */
-    public function findByFolderId($folderId, array $levelNames = [])
+    public function findByFolderId($folderId, $forceTaskMode = false, array $levelNames = [])
     {
 
         /** @var Group[] $groupCache */
@@ -92,6 +94,19 @@ class Mapper
             $rubric->putLevel(new Level($i, $level));
         }
 
+        $args = [ 'folderId' => $folderId ];
+        $in   = [ 'folderId' ];
+
+        if ($forceTaskMode) {
+            $key      = 'parentFolderId';
+            $parentId = Folder\Mapper::getInstance()->findCheaplyById($folderId)->getParent()->getId();
+
+            $args[$key] = $parentId;
+            $in[] = $key;
+        }
+
+        $in = implode(', :', $in);
+
 
         // TODO DI and mapperise
         $stmt = \Database::getInstance()->query("
@@ -99,10 +114,10 @@ class Mapper
             FROM rubric_criterion rc
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
             WHERE rc.parent_type = 'category'
-            AND rc.parent_id = ?
+            AND rc.parent_id IN (:$in)
             AND rc.deleted_at IS NULL
             GROUP BY rc.id
-        ", [ $folderId ]);
+        ", $args);
 
         $groupId = 21;
 
@@ -134,10 +149,35 @@ class Mapper
      * Given a box ID, return the rubric assigned to it, if any
      *
      * @param SubmissionBox $box
+     * @param bool          $forceTaskMode - if the box doesn't yet have a task, but you still need the task-level criteria showing
      * @return Rubric
      */
-    public function findBySubmissionBox($box)
+    public function findBySubmissionBox($box, $forceTaskMode = false)
     {
+        $args = [
+            'boxId' => $box->getId(),
+            'folderId' => $box->getCategory()->getId()
+        ];
+
+        $in = [ 'folderId' ];
+
+        // if the box has a task, include parent-folder criteria
+        if ($box->getTask()->getId() || $forceTaskMode) {
+
+            $key      = 'parentFolderId';
+            $parentId = $box->getCategory()->getParent()->getId();
+
+            if (!$parentId) {
+                // insufficient hydration
+                $parentId = Folder\Mapper::getInstance()->findCheaplyById($box->getCategory()->getId())->getParent()->getId();
+            }
+
+            $args[$key] = $parentId;
+            $in[] = $key;
+        }
+
+        $in = implode(', :', $in);
+
         $criteriaStatement = $this->database->query("
             SELECT COUNT(box_id) usages, COALESCE(selected, 0) selected, crit_id, `grouping`, `name`
             FROM (
@@ -145,14 +185,13 @@ class Mapper
               FROM rubric_usage u
               RIGHT JOIN rubric_criterion c ON u.criterion_id = c.id
               WHERE parent_type = 'category'
-              AND parent_id = (SELECT category FROM submission_box WHERE id = :boxId)
+              AND parent_id IN (:$in)
               AND deleted_at IS NULL
               ORDER BY selected DESC
             ) t
             GROUP BY crit_id
-            ORDER BY selected DESC, `sequence` DESC, `grouping` ASC, `name` ASC;
-            /* ORDER BY u.sequence ASC */
-        ", [ 'boxId' => $box->getId() ]);
+            ORDER BY selected DESC, `sequence` ASC, `grouping` ASC, `name` ASC;
+        ", $args);
 
 
         // why 20? because it's not 0.
