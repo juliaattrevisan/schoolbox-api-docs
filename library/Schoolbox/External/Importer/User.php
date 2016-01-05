@@ -140,14 +140,30 @@ class User extends AbstractImporter
             $user = $this->retrieveUser($row);
             if (!$user instanceof UserModel) {
                 $this->log->warning('User could not be identified - skipping');
+                continue;
             }
 
             // Step 2: are they deleted?
             // Users aren't currently soft-deletable, so they stay deleted.
+            if ($row['Deleted?']) {
+                $result[] = [
+                    'user'   => $user,
+                    'delete' => true,
+                ];
+                continue;
+            }
 
-            // Step 3: update user
+            // Step 3: update user based on fields
+            // Build a hydratorset for updating users here too
+            $result[] = [
+                'user'   => $user,
+                'delete' => false,
+            ];
 
-            // Step 4: update extended fields
+            // Step 4: update extended fields if using SB connector
+            if ($this->isExtendedFormatUsed()) {
+                // update
+            }
         }
         return $result;
     }
@@ -160,6 +176,7 @@ class User extends AbstractImporter
      */
     protected function retrieveUser($row)
     {
+        // TODO decompose into a COR for fetching user?
         if (strlen($userId = $row['Schoolbox User ID'])) {
             // Update user with this ID.
             // If they don't exist - skip
