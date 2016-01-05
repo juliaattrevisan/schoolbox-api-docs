@@ -8,7 +8,10 @@
 namespace Schoolbox\External\Importer;
 
 use Alaress\Csv\Reader;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role as RoleModel;
+use Schoolbox\RoleMapper;
+use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
 
 /**
@@ -36,6 +39,11 @@ class User extends AbstractImporter
      * @var UserMapper
      */
     protected $userMapper;
+
+    /**
+     * @var RoleMapper
+     */
+    protected $roleMapper;
 
     /**
      * Is the extended format used?
@@ -113,6 +121,7 @@ class User extends AbstractImporter
     protected function setup()
     {
         $this->userMapper = new UserMapper();
+        $this->roleMapper = new RoleMapper();
     }
 
     /**
@@ -126,8 +135,76 @@ class User extends AbstractImporter
         $result = [];
         foreach ($this->reader as $i => $row) {
             $this->log->info("Parsing row $i...");
+
+            // Step 1: identify user
+            $user = $this->retrieveUser($row);
+            if (!$user instanceof UserModel) {
+                $this->log->warning('User could not be identified - skipping');
+            }
+
+            // Step 2: are they deleted?
+            // Users aren't currently soft-deletable, so they stay deleted.
+
+            // Step 3: update user
+
+            // Step 4: update extended fields
         }
         return $result;
+    }
+
+    /**
+     * Retrieves a user to create or update.
+     *
+     * @param  array $row A row from the CSV import.
+     * @return UserModel or null if no user was retrievable from $row
+     */
+    protected function retrieveUser($row)
+    {
+        if (strlen($userId = $row['Schoolbox User ID'])) {
+            // Update user with this ID.
+            // If they don't exist - skip
+            try {
+                return $this->userMapper->findById($userId);
+            } catch (MapperException $e) {
+                $this->log->warning(sprintf('User with ID "%s" not found', $userId));
+                return null;
+            }
+        } elseif (strlen($username = $row['Username'])) {
+            // Update user with a this username.
+            // If they don't exist - create
+            try {
+                return $this->userMapper->findOneByColumn('username', $username);
+            } catch (MapperException $e) {
+                $this->log->info(sprintf('User with username "%s" not found - will create new', $username));
+                return $this->userMapper->createModel();
+            }
+        } elseif (strlen($externalId = $row['External ID']) && strlen($row['Role'])) {
+            // Update user who has this external ID, and this role type.
+            // If they don't exist - create
+            try {
+                /** @var RoleModel $role */
+                $role = $this->roleMapper->findOneByColumn('name', $row['Role']);
+            } catch (MapperException $e) {
+                $this->log->warning(sprintf('Role "%s" not found', $row['Role']));
+                return null;
+            }
+            try {
+                return $this->userMapper->findByExternalId($externalId, $role->getType());
+            } catch (MapperException $e) {
+                $this->log->info(
+                    sprintf(
+                        'User with external ID "%s" not found for role type "%s" - will create new',
+                        $externalId,
+                        $role->getType()
+                    )
+                );
+                return $this->userMapper->createModel();
+            }
+        } else {
+            // User could not be identified - skip
+            $this->log->warning('User has no identifying fields');
+            return null;
+        }
     }
 
     /**
