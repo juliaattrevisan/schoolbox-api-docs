@@ -39,6 +39,7 @@ class Module extends BaseModule
 
         // User paths
         $this->addGetRoute($router, 'user', $basePath, "/user");
+        $this->addPostRoute($router, 'userPreview', $basePath, "/user/preview");
         $this->addPostRoute($router, 'userImport', $basePath, "/user/import");
         // For now, download templates directly
 //        $this->addGetRoute($router, 'userTemplate', $basePath, "/userTemplate.csv");

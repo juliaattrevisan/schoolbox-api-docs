@@ -107,6 +107,43 @@ class Controller extends Base
     }
 
     /**
+     * User preview action
+     */
+    public function userPreview()
+    {
+        $factory = new CollectorFactory();
+        $upload  = $factory->build($this->getRequest()->post->get('attachment'))->getFirst();
+
+        // Try to make a CSV parser out of the upload
+        /** @var StoredisLogger $logger */
+        $logger = $this->getDi()->get('ups.logger');
+        $reader = new Reader($upload->readStream());
+        $reader->setLoadFromFirst(true);
+        $parser = new \Schoolbox\External\Importer\User($reader, $logger, false);
+        $parser->save();
+
+        // Try to use the UPS templates here
+        // Each line is json-decodable
+        $stream   = $logger->flushToStorage()->readStream();
+        $logLines = [];
+        while ($line = fgets($stream)) {
+            if ($logLine = json_decode($line, true)) {
+                $logLines[] = $logLine;
+            }
+        }
+
+        $this->getResponse()->content->set([
+            'template' => '@adminImport/userPreview.twig',
+            'data'     => [
+                'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
+                'allNavigation'  => $this->buildNavigation('user')->getAllNodes(),
+                'log'            => ['lines' => $logLines],
+                'attachzone'     => $this->getAttachzone($upload->getHash())->getTwigContext(),
+            ],
+        ]);
+    }
+
+    /**
      * User import action
      */
     public function userImport()
@@ -119,16 +156,28 @@ class Controller extends Base
         $logger = $this->getDi()->get('ups.logger');
         $reader = new Reader($upload->readStream());
         $reader->setLoadFromFirst(true);
-        $parser = new \Schoolbox\External\Importer\User($reader, $logger, false);
+        $parser = new \Schoolbox\External\Importer\User($reader, $logger, true);
         $parser->save();
-        $storage = $logger->flushToStorage();
-        // And do something else. Bounce back to the user page?
-        $this->getResponse()->redirect->to(
-            $this->getRouter()->generate(
-                'adminImport.log',
-                ['hash' => $storage->getHash()]
-            )
-        );
+
+        // Try to use the UPS templates here
+        // Each line is json-decodable
+        $stream   = $logger->flushToStorage()->readStream();
+        $logLines = [];
+        while ($line = fgets($stream)) {
+            if ($logLine = json_decode($line, true)) {
+                $logLines[] = $logLine;
+            }
+        }
+
+        $this->getResponse()->content->set([
+            'template' => '@adminImport/userPreview.twig',
+            'data'     => [
+                'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
+                'allNavigation'  => $this->buildNavigation('user')->getAllNodes(),
+                'log'            => ['lines' => $logLines],
+//                'attachzone'     => $this->getAttachzone($upload->getHash())->getTwigContext(),
+            ],
+        ]);
     }
 
     /**
@@ -235,17 +284,22 @@ class Controller extends Base
     /**
      * Gets an attachzone used to upload a file for import
      *
+     * @param  string $hash if set, the hash of the file to attach
      * @return Zone
      */
-    protected function getAttachzone()
+    protected function getAttachzone($hash = null)
     {
         $zone = new Zone('import');
-        return $zone
+        $zone
             ->setModalTitle('Select CSV')
             ->setAttachmentsLabel('Upload CSV')
             ->setAttachPrompt('upload CSV')
 //            ->setMimeFilter('text/csv')
             ->setReadOnly(false)
             ->setMulti(false);
+        if (isset($hash)) {
+            $zone->attachFiles([$hash]);
+        }
+        return $zone;
     }
 }
