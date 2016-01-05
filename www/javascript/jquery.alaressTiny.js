@@ -152,6 +152,12 @@
      */
     $.fn.schoolboxResource_Image_Render = function(fields, url, dialog, reset) {
 
+        /* Special case for video url
+         */
+        if (fields.type.getValue() == 'video') {
+            url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
+        }
+
         /* Find out width/height ratio
          */
         var temp = new Image();
@@ -203,10 +209,32 @@
      * @param editorInstance
      * @param fields
      * @param url
-     * @param dataVars
      * @returns {*}
      */
-    $.fn.schoolboxResource_Image_Inject = function(editorInstance, fields, url, dataVars) {
+    $.fn.schoolboxResource_Image_Inject = function(editorInstance, fields, url) {
+        var dataVars = {};
+
+        /* Images render with provided information
+         */
+        if (fields.type.getValue() == 'image') {
+            dataVars = {
+                'data-schoolboxresource-type': 'image',
+                'data-schoolboxresource-source': url
+            };
+        }
+        /* Special case for video data
+         */
+        else if (fields.type.getValue() == 'video') {
+            url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
+
+            dataVars = {
+                'data-schoolboxresource-type': 'video',
+                'data-schoolboxresource-source': '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue()
+            };
+        }
+
+        /* Render image
+         */
         var styles = [];
 
         var element = editorInstance.document.createElement('img');
@@ -283,6 +311,8 @@
      */
     $.fn.schoolboxResource_Image_DialogFields = function(dialog) {
         return {
+            id: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-id'),
+            type: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-type'),
             url: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-url'),
             preview: $('#schoolboxresource-image-preview'),
             width: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-width'),
@@ -318,115 +348,6 @@
 
         return '';
     }
-}(jQuery));
-
-(function() {
-
-    /**
-     * Populate dialog fields with image data
-     *
-     * Use an image in place of the video player because native <video>
-     * rendering makes this element unselectable for editing
-     *
-     * @param fields
-     * @param dialog
-     * @param reset
-     */
-    $.fn.schoolboxResource_Media_Render = function(fields, dialog, reset) {
-        var url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
-
-        $.fn.schoolboxResource_Image_Render(fields, url, dialog, reset);
-    };
-
-    /**
-     * Reset the aspect ratio for an image
-     *
-     * Used when selecting a new image with constrain aspect ratio already activated
-     * because that remembers the aspect ratio from the previously-selected image
-     *
-     * @param fields
-     */
-    $.fn.schoolboxResource_Media_AspectRatioReset = function(fields) {
-        fields.aspectRatioValue.setValue(fields.width.getValue()/fields.height.getValue());
-    };
-
-    /**
-     * Inject image into editor panel with modifiers applied
-     *
-     * @param editorInstance
-     * @param fields
-     * @returns {*}
-     */
-    $.fn.schoolboxResource_Media_Inject = function(editorInstance, fields) {
-        var url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
-
-        var dataVars = {
-            'data-schoolboxmedia-type': 'video/mp4',
-            'data-schoolboxmedia-source': '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue()
-        };
-
-        return $.fn.schoolboxResource_Image_Inject(editorInstance, fields, url, dataVars);
-
-        ///* Determine width - if fullwidth checked, use 100%
-        // * otherwise use specified values. Note that width:100%
-        // * is not allowed, so use the usual class instead
-        // */
-        //if (fields.fullwidth.getValue()) {
-        //    styles.push('width:100%');
-        //    styles.push('height:400px');
-        //}
-        //else {
-        //    styles.push('width:' + fields.width.getValue() + 'px');
-        //    styles.push('height:' + fields.height.getValue() + 'px');
-        //}
-        //
-        //var video = editorInstance.document.createElement('video');
-        //
-        //video.setAttributes({
-        //    controls: 'controls',
-        //    preload: 'none',
-        //    poster: '/cms/videoThumb.php?type=sbfs&id=' + fields.id.getValue() + '&size=poster',
-        //});
-        //
-        //var source = editorInstance.document.createElement('source');
-        //
-        //source.setAttributes({
-        //    src: '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue(),
-        //    type: 'video/mp4'
-        //});
-        //
-        //video.append(source);
-        //
-        ///* Combine and inject
-        // */
-        //video.setAttribute('style', styles.join(';'));
-        //
-        //return video;
-    };
-
-    /**
-     * A macro to all the fields in the Dialog
-     * (because it's such a longwinded way to retrieve them)
-     *
-     * @param dialog
-     * @returns {{url: *, id: *, preview: (*|Mixed|jQuery|HTMLElement), width: *, height: *, fullwidth: *, alignment: *}}
-     */
-    $.fn.schoolboxResource_Media_DialogFields = function(dialog) {
-        return {
-            url: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-url'),
-            id: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-id'),
-            preview: $('#schoolboxresource-media-preview'),
-            width: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-width'),
-            height: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-height'),
-            aspectRatio: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-aspectratio'),
-            aspectRatioValue: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-aspectratio-value'),
-            fullwidth: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-fullwidth'),
-            alignment: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-alignment'),
-            border: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-border'),
-            verticalPadding: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-verticalpadding'),
-            horizontalPadding: dialog.getContentElement('schoolboxresource-media-tab', 'schoolboxresource-media-horizontalpadding')
-        };
-    };
 }(jQuery));
 
 (function($) {
@@ -480,7 +401,7 @@
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
-                extraAllowedContent: 'img[data-schoolboxmedia-source,data-schoolboxmedia-type]{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float};video[*]{*};source[*]',
+                extraAllowedContent: 'img[data-schoolboxresource-source,data-schoolboxresource-type]{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float};video[*]{*};source[*]',
 
                 /* Remove annoying dialog that always appears
                  */
@@ -489,7 +410,7 @@
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */
                 removePlugins: 'image,image2',
-                extraPlugins: 'schoolboxresourceimage,schoolboxresourcemedia',
+                extraPlugins: 'schoolboxresourceimage',
 
                 /* Other settings
                  */

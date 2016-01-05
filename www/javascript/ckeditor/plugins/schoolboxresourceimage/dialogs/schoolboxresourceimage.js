@@ -10,8 +10,29 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
         contents: [
             {
                 id: 'schoolboxresource-image-tab',
-                label: 'Schoolbox Media Image',
+                label: 'Schoolbox Resource Image',
                 elements: [
+
+                    /* Store the file id here, because audio/video renders
+                     * with a numeric id, not a hash, and has multiple
+                     * urls for previews and content stream itself
+                     *
+                     * Not used for images
+                     */
+                    {
+                        type: 'text',
+                        id: 'schoolboxresource-image-id',
+                        label: 'Id'
+                    },
+
+                    /* Store string 'image', 'video', 'audio'
+                     * Used by various switch statements for rendering data
+                     */
+                    {
+                        type: 'text',
+                        id: 'schoolboxresource-image-type',
+                        label: 'Type'
+                    },
                     {
                         type: 'hbox',
                         widths: ['80%', '20%'],
@@ -28,26 +49,34 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
+                                    /* Remember numeric id (for video and audio)
+                                     */
+                                    var bits = element.getAttribute('src').match(/id=(\d+)/);
+
+                                    if ((bits != null) && bits.length) {
+                                        fields.id.setValue(bits[1]);
+                                    }
+
+                                    /* Remember type
+                                     */
+                                    fields.type.setValue(element.getAttribute('data-schoolboxresource-type'));
+
+                                    /* Remember url
+                                     */
                                     fields.url.setValue(element.getAttribute('src'));
                                 },
 
                                 /* When you type the url yourself, apply details
+                                 * TODO: Fix when changing url to video/audio/image on otfs (call nodeinfo)
                                  */
                                 onChange: function() {
                                     var dialog = this.getDialog();
                                     var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
-                                    var image = true;
-
                                     /* Render image
                                      * Reset aspect ratio in case it remembered from previous image
-                                     *
-                                     * Bypass infinite loop with flag, due to Browse button inflicting onChange
-                                     * event by programmatically assigning url value to this input field
                                      */
-                                    if (image) {
-                                        $.fn.schoolboxResource_Image_Render(fields, fields.url.getValue(), dialog, false);
-                                    }
+                                    $.fn.schoolboxResource_Image_Render(fields, fields.url.getValue(), dialog, false);
                                 }
                             },
                             {
@@ -75,10 +104,17 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                         /* Find out how to render this file
                                          */
                                         $.getJSON('/editor/nodeInfo.php', { hash: message.data[0].hash }, function(responseText) {
+                                            fields.type.setValue(responseText.type);
 
                                             /* Renderer Strategy (I guess)
                                              */
-                                            fields.url.setValue('/storage/image.php?hash='+responseText.hash);
+                                            if (fields.type.getValue() == 'video') {
+                                                fields.id.setValue(responseText.id);
+                                                fields.url.setValue('/cms/videoThumb.php?type=sbfs&id=' + responseText.id);
+                                            }
+                                            else if (fields.type.getValue() == 'image') {
+                                                fields.url.setValue('/storage/image.php?hash=' + responseText.hash);
+                                            }
 
                                             /* Shut modal, go back to Dialog
                                              */
@@ -327,7 +363,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
             var dialog = this;
             var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
-            editorInstance.insertElement($.fn.schoolboxResource_Image_Inject(editorInstance, fields, fields.url.getValue(), {}));
+            editorInstance.insertElement($.fn.schoolboxResource_Image_Inject(editorInstance, fields, fields.url.getValue()));
         },
 
         /**
