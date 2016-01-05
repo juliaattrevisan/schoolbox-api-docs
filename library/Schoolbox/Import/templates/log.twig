@@ -7,10 +7,9 @@
 
     <div class="small-12 island">
         <section class="content">
-            <p>
-                Log
-            </p>
-            <a href="/storage/fetch.php?hash={{ log.getHash() }}">View your log here</a>
+            <ul class="information-list">
+                {% include '@upsRuleset/log/lines.twig' %}
+            </ul>
         </section>
     </div>
 </div>

@@ -213,11 +213,21 @@ class Controller extends Base
      */
     public function log(Storage\Model $log)
     {
+        // Try to use the UPS templates here
+        // Each line is json-decodable
+        $stream   = $log->readStream();
+        $logLines = [];
+        while ($line = fgets($stream)) {
+            if ($logLine = json_decode($line)) {
+                $logLines[] = $logLine;
+            }
+        }
+
         $this->getResponse()->content->set([
             'template' => '@adminImport/log.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
-                'log'            => $log,
+                'log'            => ['lines' => $logLines],
             ],
         ]);
     }
