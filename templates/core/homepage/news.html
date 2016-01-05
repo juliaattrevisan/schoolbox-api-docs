@@ -1,0 +1,37 @@
+<ul class="breadcrumb">
+    <li><a href="/homepage/{ID}/">{CATEGORY_NAME}</a></li>
+    <li class="active"><a href="#">News</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{NEWS_HEADING}</h1>
+        <!-- BEGIN submit_news -->
+        <!-- END submit_news -->
+        <section>
+            <ul class="action-list">
+                <!-- BEGIN news -->
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <a href="/search/user/{AUTHOR_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64" alt="" />
+                            </a>
+                            <p class="meta">{AUTHOR}</p>
+                            <p class="meta">Posted {POSTED_DATE}</p>
+                        </div>
+                        <article>
+                            {NEWS_BODY}
+                        </article>
+                    </div>
+                    <nav>
+                        <!-- BEGIN can_modify -->
+                        <a class="icon-modify" href="/news/homepage/{NEWS_ID}" title="Modify News"></a>
+                        <!-- END can_modify -->
+                    </nav>
+                </li>
+                <!-- END news -->
+            </ul>
+        </section>
+    </div>
+</div>

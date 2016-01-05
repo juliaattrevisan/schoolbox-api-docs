@@ -228,4 +228,38 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 		return $c;
 	}
 
+	/**
+	 * @param $id
+	 * @return News
+	 */
+	public function findById($id) {
+
+		$stmt = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('n')},
+				{$this->getJoinColumnString('category', 'c')},
+				{$this->getJoinColumnString('owner', 'u')}
+			FROM
+				`{$this->getTable()}` `n`
+				INNER JOIN {$this->getJoinSql('category', 'n', 'c')}
+				LEFT JOIN {$this->getJoinSql('owner', 'n', 'u')}
+			WHERE
+				`n`.`deleted` = FALSE
+				AND `n`.`id` = :id
+		");
+
+		$stmt->execute(array(
+			'id' => $id
+		));
+
+		$r = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		/** @var News $news */
+		$news = $this->hydrate($r, 'n');
+		$news->setOwner($this->hydrateJoin($r, 'owner', 'u'));
+		$news->setCategory($this->hydrateJoin($r, 'category', 'c'));
+
+		return $news;
+	}
+
 }

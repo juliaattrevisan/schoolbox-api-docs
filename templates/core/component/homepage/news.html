@@ -8,30 +8,54 @@
             <section>
                 <ul class="information-list">
                     <!-- BEGIN news -->
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="avatar card small-12">
-                                <a href="/search/user/{AUTHOR_ID}">
-                                    <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile" />
-                                </a>
-                                <h3>{NEWS_HEADING}</h3>
-                                <p class="meta">Posted by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> {POSTED_DATE}</p>
 
-                                <!-- BEGIN has_publish_date -->
-                                <p class="meta">(Published on {NEWS_PUBLISH_DATE})</p>
-                                <!-- END has_publish_date -->
+                    <!-- BEGIN full -->
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="avatar card small-12">
+                                    <a href="/search/user/{AUTHOR_ID}">
+                                        <img src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square64" alt="View Profile" />
+                                    </a>
+                                    <h3>{NEWS_HEADING}</h3>
+                                    <p class="meta">Posted by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> {POSTED_DATE}</p>
+
+                                    <!-- BEGIN has_publish_date -->
+                                    <p class="meta">(Published on {NEWS_PUBLISH_DATE})</p>
+                                    <!-- END has_publish_date -->
+                                </div>
+
+                                <article>
+                                    {NEWS_BODY}
+                                </article>
                             </div>
+                            <nav>
+                                <!-- BEGIN can_modify_news -->
+                                <a class="icon-modify" href="/news/homepage/{NEWS_ID}" title="Modify News"></a>
+                                <!-- END can_modify_news -->
+                            </nav>
+                        </li>
+                    <!-- END full -->
 
-                            <article>
-                                {NEWS_BODY}
-                            </article>
-                        </div>
-                        <nav>
-                            <!-- BEGIN can_modify_news -->
-                            <a class="icon-modify" href="/news/homepage/{NEWS_ID}" title="Modify News"></a>
-                            <!-- END can_modify_news -->
-                        </nav>
-                    </li>
+                    <!-- BEGIN compact -->
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <h3><a href="/homepage/news/{NEWS_CATEGORY_ID}/{NEWS_ID}">{NEWS_HEADING}</a></h3>
+                                    <p class="meta">Posted by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> {POSTED_DATE}</p>
+
+                                    <!-- BEGIN has_publish_date -->
+                                    <p class="meta">(Published on {NEWS_PUBLISH_DATE})</p>
+                                    <!-- END has_publish_date -->
+                                </div>
+                            </div>
+                            <nav>
+                                <!-- BEGIN can_modify_news -->
+                                <a class="icon-modify" href="/news/homepage/{NEWS_ID}" title="Modify News"></a>
+                                <!-- END can_modify_news -->
+                            </nav>
+                        </li>
+                    <!-- END compact -->
+
                     <!-- END news -->
                 </ul>
 

@@ -75,6 +75,8 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         $this->setBlock($templateHandle, "submit_news", "submit_news_block");
         $this->setBlock('news', "has_publish_date", "has_publish_date_block");
         $this->setBlock('news', 'can_modify_news', 'can_modify_news_block');
+        $this->setBlock('news', "compact", "compact_block");
+        $this->setBlock('news', "full", "full_block");
 
         /* Set up component name
          */
@@ -180,6 +182,16 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
                 } else {
                     $this->setVar('has_publish_date_block', '');
+                }
+
+                if ($this->getConfig('compactMode') == '1') {
+                    // Compact mode
+                    $this->parse('compact_block', 'compact');
+                    $this->setVar('full_block', '');
+                } else {
+                    // Full mode
+                    $this->setVar('compact_block', '');
+                    $this->parse('full_block', 'full');
                 }
 
                 $this->parse("news_block", "news", true);
