@@ -34,7 +34,7 @@ class Controller extends Base
     {
         return new Navigator(
             new Node('Home', '/adminv2/home', false),
-            new Node('Importer', $this->getRouteIfAuthorized('adminImport.intro'), true)
+            new Node('Importer', $this->getRouter()->generate('adminImport.intro'), true)
         );
     }
 
@@ -49,22 +49,22 @@ class Controller extends Base
         return new Navigator(
             new Node(
                 'User',
-                $this->getRouteIfAuthorized('adminImport.user'),
+                $this->getRouter()->generate('adminImport.user'),
                 ($currentPage == 'user')
             ),
             new Node(
                 'Timetable Structure',
-                $this->getRouteIfAuthorized('adminImport.timetableStructure'),
+                $this->getRouter()->generate('adminImport.timetableStructure'),
                 ($currentPage == 'timetableStructure')
             ),
             new Node(
                 'Timetable',
-                $this->getRouteIfAuthorized('adminImport.timetable'),
+                $this->getRouter()->generate('adminImport.timetable'),
                 ($currentPage == 'timetable')
             ),
             new Node(
                 'Enrolment',
-                $this->getRouteIfAuthorized('adminImport.enrolment'),
+                $this->getRouter()->generate('adminImport.enrolment'),
                 ($currentPage == 'enrolment')
             )
         );
