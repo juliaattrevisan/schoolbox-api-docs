@@ -152,10 +152,15 @@ class User extends AbstractImporter
                 $this->log->warning('User could not be identified - skipping');
                 continue;
             }
+            if ($user->getId()) {
+                $this->log->info(sprintf('User found (ID: #%d)', $user->getId()));
+            } else {
+                $this->log->info('User not found - creating new user');
+            }
 
             // Step 2: are they deleted?
             // Users aren't currently soft-deletable, so they stay deleted.
-            if ($row['Deleted?']) {
+            if ($this->parseStringBoolean($row['Delete?'])) {
                 $result[] = [
                     'user'   => $user,
                     'delete' => true,
@@ -164,7 +169,82 @@ class User extends AbstractImporter
             }
 
             // Step 3: update user based on fields
-            // Build a hydratorset for updating users here too
+
+            // Identifier fields and password:
+            // set only if they are not blank
+            if (strlen($row['Username'])) {
+                $user->setUsername($row['Username']);
+            }
+            if (strlen($row['External ID'])) {
+                $user->setExternalId($row['External ID']);
+            }
+            if (strlen($row['Role'])) {
+                $user->setRole($row['Role']);
+            }
+            if (strlen($row['Password'])) {
+                // Does this need to be encoded?
+                $user->setPassword($row['Password']);
+            }
+
+            // Toggle fields: set if not blank
+            $eportfolio = $this->parseStringBoolean($row['E-Portfolio?']);
+            if (isset($eportfolio)) {
+                $user->setEportfolioEnable($eportfolio);
+            }
+            $emailFromUsername = $this->parseStringBoolean($row['Email Address From Username?']);
+            if (isset($emailFromUsername)) {
+                $user->setLocalEmail($emailFromUsername);
+            }
+            $externalEmailClient = $this->parseStringBoolean($row['Use External Mail Client?']);
+            if (isset($externalEmailClient)) {
+                $user->setUseInternalMail(!$externalEmailClient);
+            }
+            $webmail = $this->parseStringBoolean($row['Enable Webmail Tab?']);
+            if (isset($webmail)) {
+                $user->setWebmail($webmail);
+            }
+            // Not sure if superuser should be settable
+            $superuser = $this->parseStringBoolean($row['Superuser?']);
+            if (isset($superuser)) {
+                $user->setSuperuser($superuser);
+            }
+            $enabled = $this->parseStringBoolean($row['Account Enabled?']);
+            if (isset($enabled)) {
+                $user->setEnabled($enabled);
+            }
+
+            // Campus: split and set
+            // Default campus: first in list
+            if (isset($row['Campus'])) {
+                $campusList = array_map('trim', explode(',', $row['Campus']));
+                // Set based on code or name? Maybe name.
+            }
+
+            // Other fields: set them if they exist at all
+            if (isset($row['Title'])) {
+                $user->setTitle($row['Title']);
+            }
+            if (isset($row['First Name'])) {
+                $user->setFirstname($row['First Name']);
+            }
+            if (isset($row['Surname'])) {
+                $user->setLastname($row['Surname']);
+            }
+            if (isset($row['Alt Email'])) {
+                $user->setAltEmail($row['Alt Email']);
+            }
+            if (isset($row['Year'])) {
+                $user->setYear($row['Year']);
+            }
+            if (isset($row['House'])) {
+                // get and set model
+                $user->setSchoolHouse($row['House']);
+            }
+            if (isset($row['Residential House'])) {
+                // get and set model
+                $user->setResidentialHouse($row['Residential House']);
+            }
+
             $result[] = [
                 'user'   => $user,
                 'delete' => false,
@@ -216,6 +296,30 @@ class User extends AbstractImporter
             } else {
                 $this->log->info('Pretending to save user');
             }
+        }
+    }
+
+    /**
+     * Parses a string from a CSV field into a boolean value.
+     *
+     * @param string $value
+     * @return bool or null if it isn't understandable
+     */
+    protected function parseStringBoolean($value)
+    {
+        switch (strtolower(trim($value))) {
+            case 'y':
+            case 'on':
+            case 'true':
+            case 1:
+                return true;
+            case 'n':
+            case 'off':
+            case 'false':
+            case 0:
+                return false;
+            default:
+                return null;
         }
     }
 }
