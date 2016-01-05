@@ -68,5 +68,6 @@ class Campus implements HydratorInterface
                 }
             }
         }
+        return $user;
     }
 }
