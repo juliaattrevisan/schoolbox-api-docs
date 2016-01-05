@@ -11,6 +11,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Redis;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
@@ -53,6 +54,25 @@ class Module extends BaseModule
         // Enrolment paths
         $this->addGetRoute($router, 'enrolment', $basePath, "/enrolment");
         $this->addPostRoute($router, 'enrolmentImport', $basePath, "/enrolment/import");
+
+        // Generic log path
+        $this->addGetRoute($router, 'log', $basePath, "/user/log/{hash}");
+    }
+
+    /**
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $this->addRoutePreload(
+            $matcher,
+            'log',
+            function ($params) {
+                // TODO inject the storage mapper
+                $params['log'] = Storage\Mapper::getInstance()->findByHash($params['hash']);
+                return $params;
+            }
+        );
     }
 
     /**

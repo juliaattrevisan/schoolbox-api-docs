@@ -123,8 +123,12 @@ class Controller extends Base
         $parser->save();
         $storage = $logger->flushToStorage();
         // And do something else. Bounce back to the user page?
-        $this->getSession()->getSegment(static::class)->setFlash('logHash', $storage->getHash());
-        $this->getResponse()->redirect->to($this->getRouter()->generate('adminImport.user'));
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate(
+                'adminImport.log',
+                ['hash' => $storage->getHash()]
+            )
+        );
     }
 
     /**
@@ -200,6 +204,22 @@ class Controller extends Base
         $factory = new CollectorFactory();
         $upload  = $factory->build($this->getRequest()->post->get('attachment'))->getFirst();
         // Start parsing the upload
+    }
+
+    /**
+     * Generic log action
+     *
+     * @param Storage\Model $log A log in storage
+     */
+    public function log(Storage\Model $log)
+    {
+        $this->getResponse()->content->set([
+            'template' => '@adminImport/log.twig',
+            'data'     => [
+                'allBreadcrumbs' => $this->buildBreadcrumbs()->getAllNodes(),
+                'log'            => $log,
+            ],
+        ]);
     }
 
     /**

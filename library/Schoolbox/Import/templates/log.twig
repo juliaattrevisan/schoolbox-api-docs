@@ -1,0 +1,17 @@
+{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Result</h1>
+    </div>
+
+    <div class="small-12 island">
+        <section class="content">
+            <p>
+                Log
+            </p>
+            <a href="/storage/fetch.php?hash={{ log.getHash() }}">View your log here</a>
+        </section>
+    </div>
+</div>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
