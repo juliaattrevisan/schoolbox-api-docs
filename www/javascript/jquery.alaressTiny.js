@@ -348,6 +348,22 @@
 
         return '';
     }
+
+    /**
+     * Extract resource id from a url
+     *
+     * @param url
+     * @returns {*}
+     */
+    $.fn.schoolboxResource_ExtractResourceId = function(url) {
+        var bits = url.match(/id=(\d+)/);
+
+        if ((bits != null) && bits.length) {
+            return bits[1];
+        }
+
+        return '';
+    }
 }(jQuery));
 
 (function($) {

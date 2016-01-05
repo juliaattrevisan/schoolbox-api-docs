@@ -51,11 +51,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
 
                                     /* Remember numeric id (for video and audio)
                                      */
-                                    var bits = element.getAttribute('src').match(/id=(\d+)/);
-
-                                    if ((bits != null) && bits.length) {
-                                        fields.id.setValue(bits[1]);
-                                    }
+                                    fields.id.setValue($.fn.schoolboxResource_ExtractResourceId(element.getAttribute('src')));
 
                                     /* Remember type
                                      */
@@ -74,8 +70,29 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                     var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
 
                                     /* Render image
-                                     * Reset aspect ratio in case it remembered from previous image
                                      */
+                                    var url = fields.url.getValue();
+
+                                    /* Decide whether this is a video/audio resource
+                                     */
+                                    if (url.match(/^\/cms\/videoThumb/)) {
+                                        fields.id.setValue($.fn.schoolboxResource_ExtractResourceId(url));
+
+                                        /* TODO: Audio detection
+                                         */
+                                        fields.type.setValue('video');
+                                    }
+                                    /* Or whether it's just a local image
+                                     */
+                                    else if (url.match(/^\/storage\/image/)) {
+                                        fields.type.setValue('image');
+                                    }
+                                    /* Or some other arbitrary url assumed to be some kind of image
+                                     */
+                                    else {
+                                        fields.type.setValue('image');
+                                    }
+
                                     $.fn.schoolboxResource_Image_Render(fields, fields.url.getValue(), dialog, false);
                                 }
                             },
