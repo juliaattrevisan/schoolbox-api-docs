@@ -129,17 +129,6 @@ a.submit {
 	@extend input[type="submit"];
 }
 
-/* Expand buttons, for collapsable behaviours
- */
-.expand-link {
-	margin: 0 rem-calc(($base-font-size / 2)) 0 0;
-	padding: 0;
-	&:before{
-	    color: $content-ui-foreground;
-		padding: 0;
-	}
-}
-
 /* Flex List Action Buttons
  * This can be found in the meta-panel of Resource Browser
  * I don't think this should be such a strange number; maybe

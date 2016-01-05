@@ -86,23 +86,19 @@
                             <li class="list-item">
                                 <div class="card small small-12">
                                     <h3>
-                                        <a data-collapser="true" class="expand-link icon-down-arrow" title="{SUBJECT_RUBRIC_GROUP_NAME}"></a>
-                                        {SUBJECT_RUBRIC_GROUP_NAME}
+                                        <span data-collapser="true" class="icon-down-arrow" title="{SUBJECT_RUBRIC_GROUP_NAME}">
+                                            <a href="#">{SUBJECT_RUBRIC_GROUP_NAME}</a>
+                                        </span>
                                     </h3>
                                 </div>
                             </li>
-                        <!--</ul>-->
-                        <!--<ul class="information-list hide">-->
                             <!-- BEGIN subject_rubric_criterion -->
                             <li class="hide" data-collapsable="true" data-collapse-state='collapsed'>
-                                <div class="list-item">
-                                    <!--<div class="info card small-12">-->
-                                        <h4 class="content">{SUBJECT_RUBRIC_CRITERION_NAME}</h4>
-                                    <!--</div>-->
-
+                                <div class="content">
+                                    <h4>{SUBJECT_RUBRIC_CRITERION_NAME}</h4>
                                     <ul class="information-list">
                                         <!-- BEGIN subject_rubric_criterion_mark -->
-                                        <li class="content">
+                                        <li>
                                             <a href="/submission/submissionHistory/{SUBJECT_RUBRIC_SUBMISSIONBOX_ID}/{WORK_USER_ID}">{SUBJECT_RUBRIC_SUBMISSIONBOX_NAME}</a>: <em>{SUBJECT_RUBRIC_CRITERION_MARK}</em>
                                         </li>
                                         <!-- END subject_rubric_criterion_mark -->
