@@ -300,17 +300,55 @@ class User extends AbstractImporter
     {
         $result = $this->parse();
         foreach ($result as $userResult) {
-            $user = $userResult->getUser();
-            if ($this->performUpdate) {
-                $this->log->info('Saving user "%s"', $user->formatName());
-                if ($this->userMapper->save($user)) {
-                    $this->log->info(sprintf('User saved (ID: #%d)', $user->getId()));
-                } else {
-                    $this->log->error('Could not save user!');
-                }
+            // Delete or save
+            if ($userResult->isUserDeleted()) {
+                $this->deleteUser($userResult);
             } else {
-                $this->log->info('Pretending to save user "%s"', $user->formatName());
+                $this->saveUser($userResult);
             }
+        }
+    }
+
+    /**
+     * Saves this user record.
+     *
+     * @param User\Result $userResult
+     */
+    protected function saveUser(User\Result $userResult)
+    {
+        $user = $userResult->getUser();
+        if ($this->performUpdate) {
+            $this->log->info('Saving user "%s"', $user->formatName());
+            if ($this->userMapper->save($user)) {
+                $this->log->info(sprintf('User saved (ID: #%d)', $user->getId()));
+            } else {
+                $this->log->error('Could not save user!');
+            }
+        } else {
+            $this->log->info('Pretending to save user "%s"', $user->formatName());
+        }
+    }
+
+    /**
+     * Deletes this user record.
+     *
+     * @param User\Result $userResult
+     */
+    protected function deleteUser(User\Result $userResult)
+    {
+        $user = $userResult->getUser();
+        if (!$user->getId()) {
+            $this->log->warning('Cannot delete user "%s" - they don\'t exist yet', $user->formatName());
+        }
+        if ($this->performUpdate) {
+            $this->log->info('Deleting user "%s"', $user->formatName());
+            if ($this->userMapper->delete($user)) {
+                $this->log->info('User deleted');
+            } else {
+                $this->log->error('Could not delete user!');
+            }
+        } else {
+            $this->log->info('Pretending to delete user "%s"', $user->formatName());
         }
     }
 
