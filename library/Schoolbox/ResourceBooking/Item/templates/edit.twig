@@ -7,6 +7,7 @@
 <script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 
 <script type="text/javascript">
     (function($){
@@ -233,7 +234,7 @@
                             <span class="hint has-tip tip-top" data-tooltip title="Users in the selected roles will be able to book this resource. Moderators (whether for this item or the whole resource booking module) will be able to book this resource even if they aren't in a selected role.">?</span>
                         </label>
 
-                        <input type="checkbox" id='select-all' value="1" />
+                        <input type="checkbox" id='select-all' value="1" data-select-all data-select-all-for-group="role"/>
                         <label for="select-all" class="checkbox-label">Select All</label>
 
                         <div data-allowed-roles>
@@ -241,6 +242,7 @@
                             {# Default for new items: staff roles are selected, others are not #}
                             <input type="hidden" name="role[{{ role.id }}]" value="0" />
                             <input type="checkbox" name="role[{{ role.id }}]" id="role[{{ role.id }}]" value="1"
+                                   data-select-all-group="role"
                                 {% if item.id %}
                                     {% for resourceRole in item.roleList if resourceRole.role.id == role.id %}
                                         {% if resourceRole.allowed %}checked{% endif %}
