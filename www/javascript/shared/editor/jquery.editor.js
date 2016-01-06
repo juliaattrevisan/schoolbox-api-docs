@@ -252,6 +252,7 @@
         /* Render image
          */
         var styles = [];
+        var classes = [];
 
         var element = editorInstance.document.createElement('img');
         element.setAttribute('src', url);
@@ -260,8 +261,12 @@
         /* Determine width - if fullwidth checked, use 100%
          * otherwise use specified values. Note that width:100%
          * is not allowed, so use the usual class instead
+         *
+         * Include both styles and clases to display this; because
+         * of htmlpurifier and ckeditor iframe respectively
          */
         if (fields.fullwidth.getValue()) {
+            classes.push('full-width');
             styles.push('width:100%');
         }
         else {
@@ -313,6 +318,7 @@
 
         /* Combine and inject
          */
+        element.setAttribute('class', classes.join(' '));
         element.setAttribute('style', styles.join(';'));
 
         return element;
@@ -354,16 +360,18 @@
      * @param style
      */
     $.fn.schoolboxResource_ExtractStyle = function(property, style) {
-        var allProperties = style.split(';');
+        if (style != null) {
+            var allProperties = style.split(';');
 
-        for (var i = 0; i < allProperties.length; i++) {
-            var current = allProperties[i].split(':');
+            for (var i = 0; i < allProperties.length; i++) {
+                var current = allProperties[i].split(':');
 
-            /* Replace any spaces in the property name before checking
-             * as sometimes the style attribute is formatted
-             */
-            if (current[0].replace(' ', '') == property) {
-                return current[1];
+                /* Replace any spaces in the property name before checking
+                 * as sometimes the style attribute is formatted
+                 */
+                if (current[0].replace(' ', '') == property) {
+                    return current[1];
+                }
             }
         }
 
@@ -438,7 +446,7 @@
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
-                extraAllowedContent: 'img[data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float}',
+                extraAllowedContent: 'img(full-width)[data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float}',
 
                 /* Remove annoying dialog that always appears
                  */

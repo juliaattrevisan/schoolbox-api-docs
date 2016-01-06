@@ -287,7 +287,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
 
                             /* Determine if Fullwidth should remain ticked
                              */
-                            if ($.fn.schoolboxResource_ExtractStyle('width', element.getAttribute('style')) == '100%') {
+                            if (element.getAttribute('class') == 'full-width') {
                                 fields.fullwidth.setValue(true);
                             }
                             else {
