@@ -432,6 +432,28 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 );
             }
 
+        } elseif ($site_location == 'rlc') {
+            $settings = array(
+                'baseUri' => 'http://WebDavShareDrive.rlc.qld.edu.au',
+                'userName' => $_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+
+            if ($groupHandler->isStaff()) {
+                $paths = array(
+                    'http://WebDavShareDrive.rlc.qld.edu.au/',
+                    'http://WebDavMediaDrive.rlc.qld.edu.au/',
+                    'http://WebDavHomeStaff.rlc.qld.edu.au/'.$_SESSION['username'].'/',
+                    'http://WebDavHomeStudent.rlc.qld.edu.au'
+                );
+            } elseif ($groupHandler->isStudent()) {
+                $paths = array(
+                    'http://WebDavShareDrive.rlc.qld.edu.au',
+                    'http://WebDavMediaDrive.rlc.qld.edu.au',
+                    'http://WebDavHomeStudent.rlc.qld.edu.au'. $_SESSION['username'] . '/'
+                );
+            }
+
         } elseif (in_array($site_location, array('core', 'demo'))) {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
