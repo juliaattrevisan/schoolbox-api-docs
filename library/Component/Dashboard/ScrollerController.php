@@ -71,6 +71,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         }
 
         $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
+        $this->setBlock($templateHandle, 'has_header', 'has_header_block');
         $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
 
         /* Hide header bar if desired
