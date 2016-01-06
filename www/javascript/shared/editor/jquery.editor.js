@@ -359,7 +359,10 @@
         for (var i = 0; i < allProperties.length; i++) {
             var current = allProperties[i].split(':');
 
-            if (current[0] == property) {
+            /* Replace any spaces in the property name before checking
+             * as sometimes the style attribute is formatted
+             */
+            if (current[0].replace(' ', '') == property) {
                 return current[1];
             }
         }
