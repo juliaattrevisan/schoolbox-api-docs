@@ -8,8 +8,8 @@
 {% set showDetails = isSuperuser or isStaff or isSelf or(isParent and externalUser.DirectoryIncludeFlag) %}
 {# emails: staff may view emails #}
 {% set showEmail = showDetails or isStaff %}
-
 {% set showButtons = isStaff or isSelf %}
+{% set showTitle = user.hasPositionTitle() %}
 
 <div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
     <div class="list-item">
@@ -35,6 +35,13 @@
 
                     <div class="small-12 medium-6 large-8 columns no-pad">
                         <dl class="profile">
+                            {% if showTitle %}
+                                <dt class="no-margin small-6 medium-3">Position Title</dt>
+                                <dd class="no-margin small-6 medium-9">
+                                    {{ user.getPositionTitle() }}
+                                </dd>
+                            {% endif %}
+
                             {% if showEmail %}
                                 {% block details_email %}
                                     {% if user.getEmail() %}

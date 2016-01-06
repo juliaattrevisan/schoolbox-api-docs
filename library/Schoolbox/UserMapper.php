@@ -153,6 +153,15 @@ class UserMapper extends Mapper
                 'type' => Mapper::TYPE_STRING,
             )
         );
+
+        $this->hasMap(
+            array(
+                'column' => 'position_title',
+                'property' => 'positionTitle',
+                'type' => Mapper::TYPE_STRING,
+            )
+        );
+
         $this->hasMap(
             array(
                 'column' => 'webmail',

@@ -40,7 +40,8 @@ if (isset($_POST['updateUsers'])) {
                 $_POST['apply_webmail'],
                 $_POST['apply_accountenabled'],
                 $_POST['apply_hidecontacts'],
-                $_POST['apply_hidetimetable']
+                $_POST['apply_hidetimetable'],
+                $_POST['apply_position_title']
             );
 
             $modified->add($user);

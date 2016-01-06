@@ -34,6 +34,7 @@ class Bulk_User extends Bulk_Abstract
      * 16. eportfolio enabled
      * 17. hide contacts
      * 18. hide timetable
+     * 19. position title
      *
      * @return array
      */
@@ -95,7 +96,8 @@ class Bulk_User extends Bulk_Abstract
                         'webmail'            => $user[15],
                         'eportfolio_enabled' => $user[16],
                         'hide_contacts'      => $user[17],
-                        'hide_timetable'     => $user[18]
+                        'hide_timetable'     => $user[18],
+                        'position_title'     => $user[19]
                     );
                     if (empty($userCampus)) {
                         $output[] = array(

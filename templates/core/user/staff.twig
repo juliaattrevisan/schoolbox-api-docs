@@ -7,7 +7,7 @@
 {% set showDetails = isStaff or isSelf or session.user.getRole().isStudent() or (config.report_staff_access and session.user.getRole().isParent()) %}
 {# emails: students may view other student's emails #}
 {% set showEmail = showDetails %}
-
+{% set showTitle = user.hasPositionTitle() %}
 {% set showButtons = isStaff or isSelf %}
 
 <div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
@@ -34,6 +34,13 @@
 
                     <div class="small-12 medium-6 large-8 columns no-pad">
                         <dl class="profile">
+                            {% if showTitle %}
+                                <dt class="no-margin small-6 medium-3">Position Title</dt>
+                                <dd class="no-margin small-6 medium-9">
+                                    {{ user.getPositionTitle() }}
+                                </dd>
+                            {% endif %}
+
                             {% if showEmail %}
                                 {% block details_email %}
                                     {% if user.getEmail() %}

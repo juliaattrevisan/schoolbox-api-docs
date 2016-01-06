@@ -53,6 +53,8 @@ class Renderer extends Handler
             $this->getPage()->setBlock('user', 'pastoral', 'pastoral_block');
             $this->getPage()->setBlock('user', 'eportfolio', 'eportfolio_block');
             $this->getPage()->setBlock('user', 'modify', 'modify_block');
+            $this->getPage()->setBlock('user', 'position_title', 'position_title_block');
+            $this->getPage()->setBlock('user', 'normal_title', 'normal_title_block');
             $this->getPage()->setBlock('user', 'boarder_leave', 'boarder_leave_block');
             $this->getPage()->setBlock('user', 'user_calendar', 'user_calendar_block');
 
@@ -70,6 +72,7 @@ class Renderer extends Handler
                     'USER_SEARCH_USERNAME' => Scrub::text($user['username']),
                     'USER_SEARCH_COUNT' => $this->getCount($this->getType()),
                     'USER_SEARCH_YEAR' => empty($user['year']) ? '' : "Year {$user['year']}",
+                    'USER_POSITION_TITLE' => $user['position_title'],
                     'USER_SEARCH_CAMPUS' => Scrub::text(
                         stristr($user['group_name'], $user['campus_name']) ? '' : $user['campus_name']
                     ),
@@ -119,6 +122,15 @@ class Renderer extends Handler
                 }
 
 
+
+                    //Show student timetables to staff and parents of child
+                if (empty($user['position_title'])) {
+                    $this->getPage()->parse('normal_title_block', 'normal_title');
+                    $this->getPage()->setVar('position_title_block', '');
+                } else {
+                    $this->getPage()->parse('position_title_block', 'position_title');
+                    $this->getPage()->setVar('normal_title_block', '');
+                }
 
                 //Show student timetables to staff and parents of child
                 if ($groupHandler->isStudent($user['id'])) {

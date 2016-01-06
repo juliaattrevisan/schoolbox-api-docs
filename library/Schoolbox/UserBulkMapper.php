@@ -307,7 +307,8 @@ class UserBulkMapper extends UserMapper
         $webmail,
         $enabled,
         $hideContacts,
-        $hideTimetable
+        $hideTimetable,
+        $positionTitle
     ) {
 
         /* Update group settings
@@ -322,6 +323,14 @@ class UserBulkMapper extends UserMapper
 
         if (strlen($newYear)) {
             $user->setYear($newYear);
+        }
+
+        /* Update position title settings
+         */
+        $newPositionTitle = trim($positionTitle);
+
+        if (strlen($newPositionTitle)) {
+            $user->setPositionTitle($newPositionTitle);
         }
 
         /* Update eportfolio settings
@@ -405,7 +414,8 @@ class UserBulkMapper extends UserMapper
             $webmail,
             $enabled,
             $hideContacts,
-            $hideTimetable
+            $hideTimetable,
+            $positionTitle
         );
 
         $this->log($message, $data);
