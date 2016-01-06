@@ -9,15 +9,14 @@ namespace Schoolbox\Import;
 
 use Alaress\Csv\Reader;
 use Alaress\Web\Controller\Base;
-use Schoolbox\External\Importer\AbstractImporter;
+use Schoolbox\External\Importer;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\StoredisLogger;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Sync\Log;
-use Schoolbox\Sync\Navigator\Navigator;
-use Schoolbox\Sync\Navigator\Node;
+use Psr\Log\LoggerInterface;
 
 /**
  * Controller for admin importer.
@@ -33,11 +32,6 @@ class Subcontroller extends Base
      */
     protected $basename;
 
-//    /**
-//     * @var AbstractImporter
-//     */
-//    protected $importer;
-
     /**
      * Constructor
      *
@@ -46,7 +40,6 @@ class Subcontroller extends Base
     public function __construct($basename)
     {
         $this->basename = $basename;
-//        $this->importer = $importer;
     }
 
     /**
@@ -85,8 +78,8 @@ class Subcontroller extends Base
         $logger = $this->getDi()->get('ups.logger');
         $reader = new Reader($upload->readStream());
         $reader->setLoadFromFirst(true);
-        $parser = new \Schoolbox\External\Importer\User($reader, $logger, false);
-        $parser->save();
+        $importer = $this->buildImporter($reader, $logger, false);
+        $importer->save();
 
         // Try to use the UPS templates here
         // Each line is json-decodable
@@ -105,6 +98,7 @@ class Subcontroller extends Base
                 'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
                 'log'            => ['lines' => $logLines],
                 'attachzone'     => $this->getAttachzone($upload->getHash())->getTwigContext(),
+                'basename'       => $this->basename,
             ],
         ]);
     }
@@ -122,8 +116,8 @@ class Subcontroller extends Base
         $logger = $this->getDi()->get('ups.logger');
         $reader = new Reader($upload->readStream());
         $reader->setLoadFromFirst(true);
-        $parser = new \Schoolbox\External\Importer\User($reader, $logger, true);
-        $parser->save();
+        $importer = $this->buildImporter($reader, $logger, true);
+        $importer->save();
 
         // Try to use the UPS templates here
         // Each line is json-decodable
@@ -165,5 +159,30 @@ class Subcontroller extends Base
             $zone->attachFiles([$hash]);
         }
         return $zone;
+    }
+
+    /**
+     * Builds an importer object based on this subcontroller's basename.
+     *
+     * @param Reader          $reader
+     * @param LoggerInterface $log
+     * @param bool            $performUpdate
+     *
+     * @return Importer\AbstractImporter
+     */
+    protected function buildImporter(Reader $reader, LoggerInterface $log, $performUpdate = false)
+    {
+        switch ($this->basename) {
+            case 'adminImportUser':
+                return new Importer\User($reader, $log, $performUpdate);
+            case 'adminImportStructure':
+                return new Importer\TimetableStructure($reader, $log, $performUpdate);
+            case 'adminImportTimetable':
+                return new Importer\Timetable($reader, $log, $performUpdate);
+            case 'adminImportEnrolment':
+                return new Importer\Enrolment($reader, $log, $performUpdate);
+            default:
+                throw new \OutOfRangeException(sprintf('No importer matches basename "%s"', $this->basename));
+        }
     }
 }

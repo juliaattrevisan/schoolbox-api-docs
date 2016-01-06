@@ -13,7 +13,7 @@
                 {% include '@upsRuleset/log/lines.twig' %}
             </ul>
 
-            <form action="{{ routeLookup('adminImport.userImport') }}" method="post">
+            <form action="{{ routeLookup(basename ~ '.import') }}" method="post">
 
                 {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
 
