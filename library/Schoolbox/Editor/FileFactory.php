@@ -10,8 +10,7 @@
 
 namespace Schoolbox\Editor;
 
-use \Schoolbox\Resource\File\Mapper as FileMapper;
-
+use \Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class FileFactory {
 
@@ -23,24 +22,12 @@ class FileFactory {
     private $hash = '';
 
     /**
-     * An otfs numeric id
-     *
-     * @var string
-     */
-    private $id = '';
-
-    /**
      * Constructor
      *
-     * @param $hashOrId
+     * @param $hashTuple
      */
-    public function __construct($hashOrId) {
-        if (is_numeric($hashOrId)) {
-            $this->setId($hashOrId);
-        }
-        else {
-            $this->setHash($hashOrId);
-        }
+    public function __construct($hashTuple) {
+        $this->setHash(str_replace('sbfs', 'browse', $hashTuple));
     }
 
     /**
@@ -58,35 +45,20 @@ class FileFactory {
         /* When identifying a storage file via browse:xxx which is
          * a string used internally in resource browser messages
          */
+        list($filesystem, $id) = explode(':', $this->getHash());
+
         if ($this->getHash()) {
-            list($type, $id) = explode(':', $this->getHash());
-        }
-        /* When identifying the difference between a video and
-         * an audio via sendVideo.php?id=xxx
-         */
-        else {
-            $type = 'browse';
-            $id = $this->getId();
-        }
+            $collector = (new CollectorFactory())->build([$this->getHash()])->getFirst();
 
-        switch($type) {
-            case 'browse':
-                $mapper = new FileMapper();
-                $file = $mapper->findById($id);
+            $data = [
+                'filesystem' => $filesystem,
+                'type' => $collector->getMimetype()->getType(),
+                'hash' => $collector->getHash(),
 
-                $data = [
-                    'type' => $file->getMimetype()->getType(),
-                    'hash' => $file->getHash(),
-
-                    /* Used for video/audio, sadly
-                     */
-                    'id' => $file->getId()
-                ];
-
-                break;
-
-            default:
-                break;
+                /* Used for video/audio, sadly
+                 */
+                'id' => $id
+            ];
         }
 
         return json_encode($data);
@@ -113,25 +85,5 @@ class FileFactory {
     private function getHash()
     {
         return $this->hash;
-    }
-
-    /**
-     * Get id
-     *
-     * @return string
-     */
-    private function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Set id
-     *
-     * @param string $id
-     */
-    private function setId($id)
-    {
-        $this->id = $id;
     }
 }

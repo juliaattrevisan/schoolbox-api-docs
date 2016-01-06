@@ -11,7 +11,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
          */
         video: {
             thumbnail: '/cms/videoThumb.php?type=sbfs&size=poster&id=',
-            source: '/cms/sendVideo.php?type=sbfs&id=',
+            source: '/cms/sendVideo.php?&id=',
             regex: /^\/cms\/sendVideo/
         },
 
@@ -19,7 +19,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
          */
         audio: {
             thumbnail: '/images/core/component/audio-thumbnail-processing.gif',
-            source: '/cms/sendVideo.php?type=sbfs&id=',
+            source: '/cms/sendVideo.php?&id=',
             regex: /^\/cms\/sendVideo/
         },
 
@@ -114,7 +114,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             dataVars = {
                 'data-schoolboxresource-type': 'video',
                 'data-schoolboxresource-thumbnail': url,
-                'data-schoolboxresource-source': config.video.source + fields.id.getValue()
+                'data-schoolboxresource-source': config.video.source + fields.id.getValue() + '&type=' + fields.filesystem.getValue()
             };
         }
         /* Special case for audio data
@@ -125,7 +125,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             dataVars = {
                 'data-schoolboxresource-type': 'audio',
                 'data-schoolboxresource-thumbnail': url,
-                'data-schoolboxresource-source': config.audio.source + fields.id.getValue()
+                'data-schoolboxresource-source': config.audio.source + fields.id.getValue() + '&type=' + fields.filesystem.getValue()
             };
         }
         /* Images render with provided information
@@ -225,6 +225,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             id: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-id'),
             type: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-type'),
             url: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-url'),
+            filesystem: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-filesystem'),
             preview: $('#schoolboxresource-preview'),
             width: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-width'),
             height: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-height'),
@@ -278,7 +279,23 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
         return '';
     }
-    
+
+    /**
+     * Extract resource type from a url
+     *
+     * @param url
+     * @returns {*}
+     */
+    function extractResourceType(url) {
+        var bits = url.match(/type=(\w+)/);
+
+        if ((bits != null) && bits.length) {
+            return bits[1];
+        }
+
+        return '';
+    }
+
     return {
         title: 'Schoolbox Resource Image',
         minWidth: 400,
@@ -312,6 +329,14 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                         type: 'text',
                         id: 'schoolboxresource-type',
                         label: 'Type'
+                    },
+
+                    /* The filesystem where the resource was found
+                     */
+                    {
+                        type: 'text',
+                        id: 'schoolboxresource-filesystem',
+                        label: 'Filesystem'
                     },
                     {
                         type: 'hbox',
@@ -363,11 +388,15 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     /* Decide whether this is a video/audio resource
                                      */
                                     if (url.match(config.video.regex)) {
+                                        var type = extractResourceType(url);
+                                        var id = extractResourceId(url);
+                                        var tuple = type + ':' + id;
+
                                         fields.id.setValue(extractResourceId(url));
 
                                         /* Detect difference between video and audio
                                          */
-                                        $.getJSON(config.url.nodeinfo, { identifier: fields.id.getValue() }, function(responseText) {
+                                        $.getJSON(config.url.nodeinfo, { identifier: tuple }, function(responseText) {
                                             fields.type.setValue(responseText.type);
                                         });
                                     }
@@ -396,7 +425,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
                                     /* Select something from the Resource Browser
                                      */
-                                    var message = $.fn.schoolboxResource();
+                                    $.fn.schoolboxResource();
 
                                     $(window).on('message', function(event) {
                                         var message;
@@ -411,16 +440,17 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                          */
                                         $.getJSON(config.url.nodeinfo, { identifier: message.data[0].hash }, function(responseText) {
                                             fields.type.setValue(responseText.type);
+                                            fields.filesystem.setValue(responseText.filesystem);
 
                                             /* Renderer Strategy (I guess)
                                              */
                                             if (fields.type.getValue() == 'video') {
                                                 fields.id.setValue(responseText.id);
-                                                fields.url.setValue(config.video.source + responseText.id);
+                                                fields.url.setValue(config.video.source + responseText.id + '&type=' + fields.filesystem.getValue());
                                             }
                                             else if (fields.type.getValue() == 'audio') {
                                                 fields.id.setValue(responseText.id);
-                                                fields.url.setValue(config.audio.source + responseText.id);
+                                                fields.url.setValue(config.audio.source + responseText.id + '&type=' + fields.filesystem.getValue());
                                             }
                                             else if (fields.type.getValue() == 'image') {
                                                 fields.url.setValue(config.image.source + responseText.hash);
