@@ -166,6 +166,10 @@ input[type="radio"]{
 	min-height: 1.5rem;
 }
 
+input[type="number"]{
+  padding: 0 0 0 $form-spacing / 2;
+}
+
 input,
 textarea{
 	padding-left: 0.75rem;
