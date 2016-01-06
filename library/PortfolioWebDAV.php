@@ -435,7 +435,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         } elseif ($site_location == 'rlc') {
             $settings = array(
                 'baseUri' => 'http://WebDavShareDrive.rlc.qld.edu.au',
-                'userName' => $_SESSION['username'],
+                'userName' => 'redeemer/'.$_SESSION['username'],
                 'password' => $_SESSION['password'],
             );
 
