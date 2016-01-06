@@ -5,6 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
+use Schoolbox\Application\WebRequest\ShutdownHandler;
 
 SitePage::extendExecutionTime(300);
 
