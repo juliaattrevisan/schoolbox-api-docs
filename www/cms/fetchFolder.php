@@ -13,6 +13,9 @@
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+use Schoolbox\Application\WebRequest\ShutdownHandler;
+
 $page = new SitePage();
 $zip = new ZipFolder($_GET['folder']);
+ShutdownHandler::instance()->registerFunction([$zip, 'cleanUp'], 10000);
 $zip->sendZip();
