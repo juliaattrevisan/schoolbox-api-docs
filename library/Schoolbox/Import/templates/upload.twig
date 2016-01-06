@@ -46,7 +46,7 @@
             </ul>
             <a href="{{ csvTemplate }}" class="button icon-download">Download Template</a>
 
-            <form action="{{ routeLookup('adminImport.userPreview') }}" method="post">
+            <form action="{{ routeLookup(basename ~ '.preview') }}" method="post">
 
                 {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
 
