@@ -50,6 +50,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         // MVP: don't bother with any of this, Cornerstone doesn't.
         $timetableDays = $this->getDatabase()->getAll("
             SELECT
+                CODE,
                 HEADING,
                 TIME_START,
                 TIME_END,
@@ -67,6 +68,8 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             'periodCount' => count($timetableDays),
         ];
         foreach ($timetableDays as $timetableDay) {
+            // CODE isn't part of default definition, but I need it for matching
+            $result['code'][]     = $timetableDay['CODE'];
             $result['desc'][]     = $timetableDay['HEADING'];
             $result['start'][]    = $timetableDay['TIME_START'];
             $result['end'][]      = $timetableDay['TIME_END'];
@@ -285,6 +288,18 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             return [];
         }
 
+        // Mangle into the format getDayTimetable expects
+        $timetable           = [];
+        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campus);
+        foreach ($timetableDefinition['desc'] as $x => $name) {
+            $timetable[$x]['periodName']     = $timetableDefinition['desc'][$x];
+            $timetable[$x]['periodStart']    = $timetableDefinition['start'][$x];
+            $timetable[$x]['periodEnd']      = $timetableDefinition['end'][$x];
+            $timetable[$x]['periodNumber']   = $timetableDefinition['number'][$x];
+            $timetable[$x]['periodSequence'] = $timetableDefinition['sequence'][$x];
+            $timetable[$x]['class']          = array();
+        }
+
         // Use that dumb stored proc here
         $studentExternalId = '';
         $teacherExternalId = '';
@@ -294,50 +309,36 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             $teacherExternalId = $user->getExternalId();
         }
         $params = [
-            ['@DATE', $date->getDatabaseDate(), SQLVARCHAR, false, false, -1],
-            ['@TIMEPERIOD', '', SQLVARCHAR, false, false, -1],
+            ['@DATE', $date->getUsingFormat('Ymd'), SQLVARCHAR, false, false, -1],
+            ['@TIMEPERIOD', $campus->getExtTimetableCode(), SQLVARCHAR, false, false, -1],
             ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
             ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
         ];
         $response = $this->getDatabase()->executeProcedure('spSelTimetable', $params);
+        foreach ($response['result'] as $desc) {
+            foreach ($timetable as $x => $timetablePeriod) {
+                if ($desc['TIMEPDHDCODE'] == $timetablePeriod['periodNumber']
+                    && $timetablePeriod['periodSequence'] != 2
+                    && !isset($timetable[$x]['class'][$desc['ClassCode']])
+                ) {
+                    $timetable[$x]['class'][$desc['ClassCode']] = array(
+                        'description' => $desc['HEADING'],
+                        'code'        => $desc['CODE'],
+                        'campus'      => '',
+                        'room'        => '',
+                        'staffID'     => '',
+                    );
+                    break;
+                }
+            }
+        }
 
-//        $query = $this->getTimetableQuery($user);
-//        if (empty($query)) {
-//            return [];
-//        } else {
-//            $query .= 'AND TIMEFILE.DAY = '.$this->getDatabase()->smartQuote($dayNumber);
-//        }
-//
-//        // Mangle into the format getDayTimetable expects
-//        $timetable           = [];
-//        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campus);
-//        foreach ($timetableDefinition['desc'] as $x => $name) {
-//            $timetable[$x]['periodName']     = $timetableDefinition['desc'][$x];
-//            $timetable[$x]['periodStart']    = $timetableDefinition['start'][$x];
-//            $timetable[$x]['periodEnd']      = $timetableDefinition['end'][$x];
-//            $timetable[$x]['periodNumber']   = $timetableDefinition['number'][$x];
-//            $timetable[$x]['periodSequence'] = $timetableDefinition['sequence'][$x];
-//            $timetable[$x]['class']          = array();
-//        }
-//
+        // From SPSELTIMETABLE:
+        // TIMEPDHDCODE matches TIMEPDHD.CODE
+
 //        // Add classes into it
 //        $result = $this->getDatabase()->query($query);
 //        while ($desc = $this->getDatabase()->getNextArray($result)) {
-//            foreach ($timetable as $x => $timetablePeriod) {
-//                if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
-//                    && $timetablePeriod['periodSequence'] != 2
-//                    && !isset($timetable[$x]['class'][$desc['ClassCode']])
-//                ) {
-//                    $timetable[$x]['class'][$desc['ClassCode']] = array(
-//                        'description' => $desc['Description'],
-//                        'code'        => $desc['ClassCode'],
-//                        'campus'      => $desc['ClassCampus'],
-//                        'room'        => $desc['Room'],
-//                        'staffID'     => $desc['StaffID'],
-//                    );
-//                    break;
-//                }
-//            }
 //        }
 //        return $timetable;
 
