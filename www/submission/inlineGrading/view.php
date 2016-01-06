@@ -113,7 +113,17 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
 
         // parse template with PHPLib, shuck it out then put it into JSON? Whoa
         $this->parse('USER_HTML', 'studentNavTpl');
-        $studentNav[] = [
+
+		$this->setBlock('studentNavTpl', 'show_status', 'show_status_block');
+
+		if (!$submissionBox->getAcceptOnline()) {
+			$this->setVar('show_status_block', '');
+		} else {
+			$this->parse('show_status_block', 'show_status');
+		}
+
+
+		$studentNav[] = [
             'text'  => $currentStudent->formatName('{lastname}, {firstname}'),
             'value' => "/submission/inlineGrading/view/{$submissionBox->getId()}/{$currentStudent->getId()}",
             'html'  => $this->getVar('USER_HTML'),
