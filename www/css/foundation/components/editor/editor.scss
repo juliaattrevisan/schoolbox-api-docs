@@ -9,12 +9,11 @@
         height: auto;
     }
 
-    .schoolboxresource-image-preview,
-    .schoolboxresource-media-preview {
+    .schoolboxresource-preview {
         border: 1px solid #ccc;
         width: 100%;
-        min-height: 100px;
-        overflow: hidden;
+        height: 200px;
+        overflow: auto;
 
         img {
             display: block;
