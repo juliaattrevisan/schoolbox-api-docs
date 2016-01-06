@@ -39,6 +39,7 @@ $url->setQuery($query);
 
 if ($this->arg[1] == 'window') {
     header('Location: '.$url->toString());
+    exit;
 } else {
     $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
     $this->setVar(array(
