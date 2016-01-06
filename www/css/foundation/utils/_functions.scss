@@ -46,7 +46,6 @@
 
 	@if $luminance > 0.5 {
 		$text: $light;
-		$opacity: 1 - $opacity;
 	}
 
 	// apply the opacity given
