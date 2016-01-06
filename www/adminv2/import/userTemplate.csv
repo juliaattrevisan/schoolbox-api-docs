@@ -1,4 +1,4 @@
 Delete?,Schoolbox User ID,Username,External ID,Title,First Name,Surname,Role,Campus,Password,Alt Email,Year,House,Residential House,E-Portfolio?,Email Address From Username?,Use External Mail Client?,Enable Webmail Tab?,Superuser?,Account Enabled?
-,,jerome092,1256,Mr,Jerome,Spartan,Students,Senior,,,,,,,,,,,
-,,alice130,4562,Mrs,Alice,Spartan,Staff,"Junior, Senior",,,,,,,,,,,
-,,douglas042,2346,,Douglas,Spartan,Parents,"ELC, Senior",,douglasAlt@alaress.com.au,,,,,,,,,
+,,jerome092,1256,Mr,Jerome,Spartan,Senior Students,Senior,,,,,,Y,Y,N,Y,N,Y
+,,alice130,4562,Mrs,Alice,Spartan,Teachers,"Junior, Senior",,,,,,Y,Y,N,Y,N,Y
+,,douglas042,2346,,Douglas,Spartan,Parents,"ELC, Senior",,douglasAlt@alaress.com.au,,,,Y,N,N,Y,N,Y
