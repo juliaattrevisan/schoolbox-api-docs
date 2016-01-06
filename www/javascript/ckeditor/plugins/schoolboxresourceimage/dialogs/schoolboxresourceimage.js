@@ -1,4 +1,252 @@
 CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
+    
+    /**
+     * Populate dialog fields with image data
+     *
+     * @param fields
+     * @param url
+     * @param reset
+     */
+    function render(fields, url, reset) {
+
+        /* Special case for video url
+         */
+        if (fields.type.getValue() == 'video') {
+            url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
+        }
+        if (fields.type.getValue() == 'audio') {
+            url = '/images/core/component/audio-thumbnail-processing.gif';
+        }
+
+        /* Find out width/height ratio
+         */
+        var temp = new Image();
+        temp.src = url;
+        temp.onload = applyDimensions;
+
+        /* Apply dimensions upon temp image spawn
+         */
+        function applyDimensions() {
+            var width = this.width;
+            var height = this.height;
+            var preview = '<img src="'+url+'" />';
+
+            /* Set dialog input contents
+             */
+            fields.preview.html(preview);
+
+            /* Don't change width or height if they were already set
+             *
+             * This occurs when setup() runs, when editing an existing image
+             * Or when an image was set to Fullwidth (it won't have a width/height style attribute)
+             */
+            if (fields.width.getValue() == '' || fields.height.getValue() == '' || reset) {
+                fields.width.setValue(width);
+                fields.height.setValue(height);
+            }
+
+            /* Reset aspect ratio value
+             */
+            aspectRatioReset(fields);
+        }
+    }
+
+    /**
+     * Reset the aspect ratio for an image
+     *
+     * Used when selecting a new image with constrain aspect ratio already activated
+     * because that remembers the aspect ratio from the previously-selected image
+     *
+     * @param fields
+     */
+    function aspectRatioReset(fields) {
+        fields.aspectRatioValue.setValue(fields.width.getValue()/fields.height.getValue());
+    }
+    
+    /**
+     * Inject image into editor panel with modifiers applied
+     *
+     * @param editorInstance
+     * @param fields
+     * @param url
+     * @returns {*}
+     */
+     function inject(editorInstance, fields, url) {
+        var dataVars = {};
+
+        /* Special case for video data
+         */
+        if (fields.type.getValue() == 'video') {
+            url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
+
+            dataVars = {
+                'data-schoolboxresource-type': 'video',
+                'data-schoolboxresource-thumbnail': url,
+                'data-schoolboxresource-source': '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue()
+            };
+        }
+        /* Special case for audio data
+         */
+        if (fields.type.getValue() == 'audio') {
+            url = '/images/core/component/audio-thumbnail-processing.gif';
+
+            dataVars = {
+                'data-schoolboxresource-type': 'audio',
+                'data-schoolboxresource-thumbnail': url,
+                'data-schoolboxresource-source': '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue()
+            };
+        }
+        /* Images render with provided information
+         */
+        else if (fields.type.getValue() == 'image') {
+            dataVars = {
+                'data-schoolboxresource-type': 'image',
+                'data-schoolboxresource-thumbnail': url,
+                'data-schoolboxresource-source': url
+            };
+        }
+
+        /* Render image
+         */
+        var styles = [];
+        var classes = [];
+
+        var element = editorInstance.document.createElement('img');
+        element.setAttribute('src', url);
+        element.setAttributes(dataVars);
+
+        /* Determine width - if fullwidth checked, use 100%
+         * otherwise use specified values. Note that width:100%
+         * is not allowed, so use the usual class instead
+         *
+         * Include both styles and clases to display this; because
+         * of htmlpurifier and ckeditor iframe respectively
+         */
+        if (fields.fullwidth.getValue()) {
+            classes.push('full-width');
+            styles.push('width:100%');
+        }
+        else {
+            styles.push('width:' + fields.width.getValue() + 'px');
+            styles.push('height:' + fields.height.getValue() + 'px');
+        }
+
+        /* Alignment
+         * Floats left and right;
+         * centered uses 0 auto;
+         * none is no floating, just display inline
+         */
+        if (fields.alignment != undefined) {
+            switch (fields.alignment.getValue()) {
+                case 'center':
+                    styles.push('margin:0 auto');
+                    styles.push('display:block');
+                    break;
+
+                case 'left':
+                case 'right':
+                    styles.push('float:' + fields.alignment.getValue());
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        /* Border
+         */
+        if (fields.border.getValue() != '') {
+            styles.push('border:1px solid #808080;');
+        }
+
+        /* Vertical Spacing (applies padding-top and padding-bottom)
+         */
+        if (fields.verticalPadding.getValue() != '') {
+            styles.push('padding-top:' + fields.verticalPadding.getValue() + 'px');
+            styles.push('padding-bottom:' + fields.verticalPadding.getValue() + 'px');
+        }
+
+        /* Horizontal Spacing (applies padding-left and padding-right)
+         */
+        if (fields.horizontalPadding.getValue() != '') {
+            styles.push('padding-left:' + fields.horizontalPadding.getValue() + 'px');
+            styles.push('padding-right:' + fields.horizontalPadding.getValue() + 'px');
+        }
+
+        /* Combine and inject
+         */
+        element.setAttribute('class', classes.join(' '));
+        element.setAttribute('style', styles.join(';'));
+
+        return element;
+    }
+    
+    /**
+     * A macro to all the fields in the Dialog
+     * (because it's such a longwinded way to retrieve them)
+     *
+     * @param dialog
+     * @returns {{url: *, width: *, height: *, aspectRatio: *, aspectRatioValue: *, fullwidth: *, preview: (*|Mixed|jQuery|HTMLElement)}}
+     */
+    function dialogFields(dialog) {
+        return {
+            id: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-id'),
+            type: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-type'),
+            url: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-url'),
+            preview: $('#schoolboxresource-image-preview'),
+            width: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-width'),
+            height: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-height'),
+            aspectRatio: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-aspectratio'),
+            aspectRatioValue: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-aspectratio-value'),
+            fullwidth: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-fullwidth'),
+            alignment: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-alignment'),
+            border: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-border'),
+            verticalPadding: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-verticalpadding'),
+            horizontalPadding: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-horizontalpadding')
+        };
+    }
+
+    /**
+     * Extract a particular css property's value from a style string
+     *
+     * @param property
+     * @param style
+     */
+     function extractStyle(property, style) {
+        if (style != null) {
+            var allProperties = style.split(';');
+
+            for (var i = 0; i < allProperties.length; i++) {
+                var current = allProperties[i].split(':');
+
+                /* Replace any spaces in the property name before checking
+                 * as sometimes the style attribute is formatted
+                 */
+                if (current[0].replace(' ', '') == property) {
+                    return current[1];
+                }
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Extract resource id from a url
+     *
+     * @param url
+     * @returns {*}
+     */
+     function extractResourceId(url) {
+        var bits = url.match(/id=(\d+)/);
+
+        if ((bits != null) && bits.length) {
+            return bits[1];
+        }
+
+        return '';
+    }
+    
     return {
         title: 'Schoolbox Resource Image',
         minWidth: 400,
@@ -47,11 +295,11 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                  */
                                 setup: function(element) {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                                    var fields = dialogFields(dialog);
 
                                     /* Remember numeric id (for video and audio)
                                      */
-                                    fields.id.setValue($.fn.schoolboxResource_ExtractResourceId(element.getAttribute('src')));
+                                    fields.id.setValue(extractResourceId(element.getAttribute('src')));
 
                                     /* Remember type
                                      */
@@ -74,7 +322,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                  */
                                 onChange: function() {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                                    var fields = dialogFields(dialog);
 
                                     /* Render image
                                      */
@@ -83,7 +331,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                     /* Decide whether this is a video/audio resource
                                      */
                                     if (url.match(/^\/cms\/sendVideo/)) {
-                                        fields.id.setValue($.fn.schoolboxResource_ExtractResourceId(url));
+                                        fields.id.setValue(extractResourceId(url));
 
                                         /* Detect difference between video and audio
                                          */
@@ -102,7 +350,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                         fields.type.setValue('image');
                                     }
 
-                                    $.fn.schoolboxResource_Image_Render(fields, fields.url.getValue(), dialog, false);
+                                    render(fields, fields.url.getValue(), false);
                                 }
                             },
                             {
@@ -112,7 +360,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                 className: 'schoolboxresource-button',
                                 onClick: function() {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                                    var fields = dialogFields(dialog);
 
                                     /* Select something from the Resource Browser
                                      */
@@ -146,7 +394,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                                 fields.url.setValue('/storage/image.php?hash=' + responseText.hash);
                                             }
 
-                                            $.fn.schoolboxResource_Image_Render(fields, fields.url.getValue(), dialog, false);
+                                            render(fields, fields.url.getValue(), false);
 
                                             /* Shut modal, go back to Dialog
                                              */
@@ -179,12 +427,12 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                  */
                                 setup: function(element) {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                                    var fields = dialogFields(dialog);
 
                                     /* Determine if Fullwidth should remain ticked
                                      */
-                                    if ($.fn.schoolboxResource_ExtractStyle('width', element.getAttribute('style')) != '100%') {
-                                        var width = $.fn.schoolboxResource_ExtractStyle('width', element.getAttribute('style')).replace('px', '');
+                                    if (extractStyle('width', element.getAttribute('style')) != '100%') {
+                                        var width = extractStyle('width', element.getAttribute('style')).replace('px', '');
 
                                         fields.width.setValue(width);
                                     }
@@ -196,7 +444,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                 onKeyUp: function(event) {
                                     if (event.data.$.keyCode != 9) {
                                         var dialog = this.getDialog();
-                                        var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                                        var fields = dialogFields(dialog);
 
                                         if (fields.aspectRatio.getValue()) {
                                             var newHeight = Math.round(fields.width.getValue() / fields.aspectRatioValue.getValue());
@@ -216,9 +464,9 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                  */
                                 setup: function(element) {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                                    var fields = dialogFields(dialog);
 
-                                    var height = $.fn.schoolboxResource_ExtractStyle('height', element.getAttribute('style')).replace('px', '');
+                                    var height = extractStyle('height', element.getAttribute('style')).replace('px', '');
 
                                     fields.height.setValue(height);
                                 },
@@ -229,7 +477,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                 onKeyUp: function(event) {
                                     if (event.data.$.keyCode != 9) {
                                         var dialog = this.getDialog();
-                                        var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                                        var fields = dialogFields(dialog);
 
                                         if (fields.aspectRatio.getValue()) {
                                             var newWidth = Math.round(fields.height.getValue() * fields.aspectRatioValue.getValue());
@@ -246,9 +494,9 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                 className: 'schoolboxresource-button',
                                 onClick: function () {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                                    var fields = dialogFields(dialog);
 
-                                    $.fn.schoolboxResource_Image_Render(fields, fields.url.getValue(), dialog, true);
+                                    render(fields, fields.url.getValue(), true);
                                 }
                             }
                         ]
@@ -269,9 +517,9 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                          */
                         onChange: function() {
                             var dialog = this.getDialog();
-                            var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                            var fields = dialogFields(dialog);
 
-                            $.fn.schoolboxResource_Image_AspectRatioReset(fields);
+                            aspectRatioReset(fields);
                         }
                     },
                     {
@@ -283,7 +531,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                          */
                         setup: function(element) {
                             var dialog = this.getDialog();
-                            var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                            var fields = dialogFields(dialog);
 
                             /* Determine if Fullwidth should remain ticked
                              */
@@ -314,10 +562,10 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                  */
                                 setup: function(element) {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                                    var fields = dialogFields(dialog);
 
-                                    var float = $.fn.schoolboxResource_ExtractStyle('float', element.getAttribute('style'));
-                                    var margin = $.fn.schoolboxResource_ExtractStyle('margin', element.getAttribute('style'));
+                                    var float = extractStyle('float', element.getAttribute('style'));
+                                    var margin = extractStyle('margin', element.getAttribute('style'));
 
                                     if (float == 'left' || float == 'right') {
                                         fields.alignment.setValue(float);
@@ -339,9 +587,9 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                  */
                                 setup: function(element) {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                                    var fields = dialogFields(dialog);
 
-                                    var padding = $.fn.schoolboxResource_ExtractStyle('padding-top', element.getAttribute('style')).replace('px', '');
+                                    var padding = extractStyle('padding-top', element.getAttribute('style')).replace('px', '');
 
                                     if (padding.length) {
                                         fields.verticalPadding.setValue(padding);
@@ -357,9 +605,9 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                                  */
                                 setup: function(element) {
                                     var dialog = this.getDialog();
-                                    var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                                    var fields = dialogFields(dialog);
 
-                                    var padding = $.fn.schoolboxResource_ExtractStyle('padding-left', element.getAttribute('style')).replace('px', '');
+                                    var padding = extractStyle('padding-left', element.getAttribute('style')).replace('px', '');
 
                                     if (padding.length) {
                                         fields.horizontalPadding.setValue(padding);
@@ -377,9 +625,9 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                          */
                         setup: function(element) {
                             var dialog = this.getDialog();
-                            var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+                            var fields = dialogFields(dialog);
 
-                            if ($.fn.schoolboxResource_ExtractStyle('border', element.getAttribute('style')).length) {
+                            if (extractStyle('border', element.getAttribute('style')).length) {
                                 fields.border.setValue(true);
                             }
                         }
@@ -393,9 +641,9 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
          */
         onOk: function() {
             var dialog = this;
-            var fields = $.fn.schoolboxResource_Image_DialogFields(dialog);
+            var fields = dialogFields(dialog);
 
-            editorInstance.insertElement($.fn.schoolboxResource_Image_Inject(editorInstance, fields, fields.url.getValue()));
+            editorInstance.insertElement(inject(editorInstance, fields, fields.url.getValue()));
         },
 
         /**
@@ -405,7 +653,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
          * of what you have currently selected
          */
         onShow: function() {
-            var fields = $.fn.schoolboxResource_Image_DialogFields(this);
+            var fields = dialogFields(this);
 
             /* Clear any existing preview that might have been loaded
              * This is required when you have inserted an image and
