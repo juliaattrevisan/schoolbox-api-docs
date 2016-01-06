@@ -63,9 +63,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             'end'         => [],
             'number'      => [],
             'sequence'    => [],
-            'dayCount'    => $this->getDatabase()->getOne(
-                "SELECT MAX(DAY) FROM TIMEFILE WHERE TIME_PERIOD = (SELECT TIME_PERIOD from sysfile)"
-            ),
+            'dayCount'    => $this->getDayCount(),
             'periodCount' => count($timetableDays),
         ];
         foreach ($timetableDays as $timetableDay) {
@@ -76,6 +74,18 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             $result['sequence'][] = 1;
         }
         return $result;
+    }
+
+    /**
+     * Gets the number of days in this timetable.
+     *
+     * @return int
+     */
+    protected function getDayCount()
+    {
+        return $this->getDatabase()->getOne(
+            "SELECT MAX(DAY) FROM TIMEFILE WHERE TIME_PERIOD = (SELECT TIME_PERIOD from sysfile)"
+        );
     }
 
     /**
@@ -221,52 +231,22 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             $dayNumber = $this->getDayNumber($campus);
         }
 
-        // I need to know if $userId is a teacher or student
-        try {
-            $user = $this->userMapper->findById($userId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            return [];
-        }
+        // Get the closest date to today for this day number.
+        $date = $this->getClosestDateForDayNumber($campus, $dayNumber);
+        return $this->getTimetableForDate($externalUserId, $userId, $campus, $date);
 
-        $query = $this->getTimetableQuery($user);
-        if (empty($query)) {
-            return [];
-        } else {
-            $query .= 'AND TIMEFILE.DAY = '.$this->getDatabase()->smartQuote($dayNumber);
-        }
+    }
 
-        // Mangle into the format getDayTimetable expects
-        $timetable           = [];
-        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campus);
-        foreach ($timetableDefinition['desc'] as $x => $name) {
-            $timetable[$x]['periodName']     = $timetableDefinition['desc'][$x];
-            $timetable[$x]['periodStart']    = $timetableDefinition['start'][$x];
-            $timetable[$x]['periodEnd']      = $timetableDefinition['end'][$x];
-            $timetable[$x]['periodNumber']   = $timetableDefinition['number'][$x];
-            $timetable[$x]['periodSequence'] = $timetableDefinition['sequence'][$x];
-            $timetable[$x]['class']          = array();
-        }
-
-        // Add classes into it
-        $result = $this->getDatabase()->query($query);
-        while ($desc = $this->getDatabase()->getNextArray($result)) {
-            foreach ($timetable as $x => $timetablePeriod) {
-                if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
-                    && $timetablePeriod['periodSequence'] != 2
-                    && !isset($timetable[$x]['class'][$desc['ClassCode']])
-                ) {
-                    $timetable[$x]['class'][$desc['ClassCode']] = array(
-                        'description' => $desc['Description'],
-                        'code'        => $desc['ClassCode'],
-                        'campus'      => $desc['ClassCampus'],
-                        'room'        => $desc['Room'],
-                        'staffID'     => $desc['StaffID'],
-                    );
-                    break;
-                }
-            }
-        }
-        return $timetable;
+    protected function getClosestDateForDayNumber($campus, $dayNumber)
+    {
+//        $dayCount = $this->getDayCount();
+        $query = "
+            SELECT TOP 1 [DATE]
+            FROM CALENDAR
+            WHERE [TIMETABLE_DAY] = {$this->getDatabase()->smartQuote($dayNumber)}
+            ORDER BY ABS(DATEDIFF(day, [DATE], @CurrentDate))
+        ";
+        return $this->getDatabase()->getOne($query);
     }
 
     /**
@@ -298,12 +278,75 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
     {
-        return $this->getDayTimetable(
-            $externalUserId,
-            $userId,
-            $campus,
-            $this->getDayNumber($campus, $date->getUnixTimeStamp())
-        );
+        // I need to know if $userId is a teacher or student
+        try {
+            $user = $this->userMapper->findById($userId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return [];
+        }
+
+        // Use that dumb stored proc here
+        $studentExternalId = '';
+        $teacherExternalId = '';
+        if ($user->getRole()->isStudent()) {
+            $studentExternalId = $user->getExternalId();
+        } elseif ($user->getRole()->isStaff()) {
+            $teacherExternalId = $user->getExternalId();
+        }
+        $params = [
+            ['@DATE', $date->getDatabaseDate(), SQLVARCHAR, false, false, -1],
+            ['@TIMEPERIOD', '', SQLVARCHAR, false, false, -1],
+            ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
+            ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
+        ];
+        $response = $this->getDatabase()->executeProcedure('spSelTimetable', $params);
+
+//        $query = $this->getTimetableQuery($user);
+//        if (empty($query)) {
+//            return [];
+//        } else {
+//            $query .= 'AND TIMEFILE.DAY = '.$this->getDatabase()->smartQuote($dayNumber);
+//        }
+//
+//        // Mangle into the format getDayTimetable expects
+//        $timetable           = [];
+//        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campus);
+//        foreach ($timetableDefinition['desc'] as $x => $name) {
+//            $timetable[$x]['periodName']     = $timetableDefinition['desc'][$x];
+//            $timetable[$x]['periodStart']    = $timetableDefinition['start'][$x];
+//            $timetable[$x]['periodEnd']      = $timetableDefinition['end'][$x];
+//            $timetable[$x]['periodNumber']   = $timetableDefinition['number'][$x];
+//            $timetable[$x]['periodSequence'] = $timetableDefinition['sequence'][$x];
+//            $timetable[$x]['class']          = array();
+//        }
+//
+//        // Add classes into it
+//        $result = $this->getDatabase()->query($query);
+//        while ($desc = $this->getDatabase()->getNextArray($result)) {
+//            foreach ($timetable as $x => $timetablePeriod) {
+//                if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
+//                    && $timetablePeriod['periodSequence'] != 2
+//                    && !isset($timetable[$x]['class'][$desc['ClassCode']])
+//                ) {
+//                    $timetable[$x]['class'][$desc['ClassCode']] = array(
+//                        'description' => $desc['Description'],
+//                        'code'        => $desc['ClassCode'],
+//                        'campus'      => $desc['ClassCampus'],
+//                        'room'        => $desc['Room'],
+//                        'staffID'     => $desc['StaffID'],
+//                    );
+//                    break;
+//                }
+//            }
+//        }
+//        return $timetable;
+
+//        return $this->getDayTimetable(
+//            $externalUserId,
+//            $userId,
+//            $campus,
+//            $this->getDayNumber($campus, $date->getUnixTimeStamp())
+//        );
     }
 
     /**
