@@ -1,5 +1,37 @@
 CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
-    
+
+    var config = {
+        url: {
+            /* Find information about a node/resource
+             */
+            nodeinfo: '/editor/nodeInfo.php'
+        },
+
+        /* Video urls and regex
+         */
+        video: {
+            thumbnail: '/cms/videoThumb.php?type=sbfs&size=poster&id=',
+            source: '/cms/sendVideo.php?type=sbfs&id=',
+            regex: /^\/cms\/sendVideo/
+        },
+
+        /* Audio urls and regex
+         */
+        audio: {
+            thumbnail: '/images/core/component/audio-thumbnail-processing.gif',
+            source: '/cms/sendVideo.php?type=sbfs&id=',
+            regex: /^\/cms\/sendVideo/
+        },
+
+        /* Image urls and regex
+         * No thumbnails are used for images
+         */
+        image: {
+            source: '/storage/image.php?hash=',
+            regex: /^\/storage\/image/
+        }
+    };
+
     /**
      * Populate dialog fields with image data
      *
@@ -12,10 +44,10 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
         /* Special case for video url
          */
         if (fields.type.getValue() == 'video') {
-            url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
+            url = config.video.thumbnail + fields.id.getValue();
         }
         if (fields.type.getValue() == 'audio') {
-            url = '/images/core/component/audio-thumbnail-processing.gif';
+            url = config.audio.thumbnail;
         }
 
         /* Find out width/height ratio
@@ -77,23 +109,23 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
         /* Special case for video data
          */
         if (fields.type.getValue() == 'video') {
-            url = '/cms/videoThumb.php?type=sbfs&size=poster&id=' + fields.id.getValue();
+            url = config.video.thumbnail + fields.id.getValue();
 
             dataVars = {
                 'data-schoolboxresource-type': 'video',
                 'data-schoolboxresource-thumbnail': url,
-                'data-schoolboxresource-source': '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue()
+                'data-schoolboxresource-source': config.video.source + fields.id.getValue()
             };
         }
         /* Special case for audio data
          */
         if (fields.type.getValue() == 'audio') {
-            url = '/images/core/component/audio-thumbnail-processing.gif';
+            url = config.audio.thumbnail;
 
             dataVars = {
                 'data-schoolboxresource-type': 'audio',
                 'data-schoolboxresource-thumbnail': url,
-                'data-schoolboxresource-source': '/cms/sendVideo.php?type=sbfs&id=' + fields.id.getValue()
+                'data-schoolboxresource-source': config.audio.source + fields.id.getValue()
             };
         }
         /* Images render with provided information
@@ -330,18 +362,18 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
                                     /* Decide whether this is a video/audio resource
                                      */
-                                    if (url.match(/^\/cms\/sendVideo/)) {
+                                    if (url.match(config.video.regex)) {
                                         fields.id.setValue(extractResourceId(url));
 
                                         /* Detect difference between video and audio
                                          */
-                                        $.getJSON('/editor/nodeInfo.php', { identifier: fields.id.getValue() }, function(responseText) {
+                                        $.getJSON(config.url.nodeinfo, { identifier: fields.id.getValue() }, function(responseText) {
                                             fields.type.setValue(responseText.type);
                                         });
                                     }
                                     /* Or whether it's just a local image
                                      */
-                                    else if (url.match(/^\/storage\/image/)) {
+                                    else if (url.match(config.image.regex)) {
                                         fields.type.setValue('image');
                                     }
                                     /* Or some other arbitrary url assumed to be some kind of image
@@ -377,21 +409,21 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
                                         /* Find out how to render this file
                                          */
-                                        $.getJSON('/editor/nodeInfo.php', { identifier: message.data[0].hash }, function(responseText) {
+                                        $.getJSON(config.url.nodeinfo, { identifier: message.data[0].hash }, function(responseText) {
                                             fields.type.setValue(responseText.type);
 
                                             /* Renderer Strategy (I guess)
                                              */
                                             if (fields.type.getValue() == 'video') {
                                                 fields.id.setValue(responseText.id);
-                                                fields.url.setValue('/cms/sendVideo.php?type=sbfs&id=' + responseText.id);
+                                                fields.url.setValue(config.video.source + responseText.id);
                                             }
                                             else if (fields.type.getValue() == 'audio') {
                                                 fields.id.setValue(responseText.id);
-                                                fields.url.setValue('/cms/sendVideo.php?type=sbfs&id=' + responseText.id);
+                                                fields.url.setValue(config.audio.source + responseText.id);
                                             }
                                             else if (fields.type.getValue() == 'image') {
-                                                fields.url.setValue('/storage/image.php?hash=' + responseText.hash);
+                                                fields.url.setValue(config.image.source + responseText.hash);
                                             }
 
                                             render(fields, fields.url.getValue(), false);
