@@ -1,4 +1,4 @@
-CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
+CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
     
     /**
      * Populate dialog fields with image data
@@ -190,19 +190,19 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
      */
     function dialogFields(dialog) {
         return {
-            id: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-id'),
-            type: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-type'),
-            url: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-url'),
-            preview: $('#schoolboxresource-image-preview'),
-            width: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-width'),
-            height: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-height'),
-            aspectRatio: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-aspectratio'),
-            aspectRatioValue: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-aspectratio-value'),
-            fullwidth: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-fullwidth'),
-            alignment: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-alignment'),
-            border: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-border'),
-            verticalPadding: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-verticalpadding'),
-            horizontalPadding: dialog.getContentElement('schoolboxresource-image-tab', 'schoolboxresource-image-horizontalpadding')
+            id: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-id'),
+            type: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-type'),
+            url: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-url'),
+            preview: $('#schoolboxresource-preview'),
+            width: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-width'),
+            height: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-height'),
+            aspectRatio: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-aspectratio'),
+            aspectRatioValue: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-aspectratio-value'),
+            fullwidth: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-fullwidth'),
+            alignment: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-alignment'),
+            border: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-border'),
+            verticalPadding: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-verticalpadding'),
+            horizontalPadding: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-horizontalpadding')
         };
     }
 
@@ -257,7 +257,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
          */
         contents: [
             {
-                id: 'schoolboxresource-image-tab',
+                id: 'schoolboxresource-tab',
                 label: 'Schoolbox Resource Image',
                 elements: [
 
@@ -269,7 +269,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                      */
                     {
                         type: 'text',
-                        id: 'schoolboxresource-image-id',
+                        id: 'schoolboxresource-id',
                         label: 'Id'
                     },
 
@@ -278,7 +278,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                      */
                     {
                         type: 'text',
-                        id: 'schoolboxresource-image-type',
+                        id: 'schoolboxresource-type',
                         label: 'Type'
                     },
                     {
@@ -287,7 +287,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                         children: [
                             {
                                 type: 'text',
-                                id: 'schoolboxresource-image-url',
+                                id: 'schoolboxresource-url',
                                 label: 'Url',
                                 validate: CKEDITOR.dialog.validate.notEmpty( "Url cannot be empty." ),
 
@@ -355,7 +355,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                             },
                             {
                                 type: 'button',
-                                id: 'schoolboxresource-image-browse',
+                                id: 'schoolboxresource-browse',
                                 label: 'Browse',
                                 className: 'schoolboxresource-button',
                                 onClick: function() {
@@ -407,7 +407,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                     },
                     {
                         type: 'html',
-                        html: '<label class="schoolboxresource-separator">Preview</label><div id="schoolboxresource-image-preview" class="schoolboxresource-image-preview"></div>'
+                        html: '<label class="schoolboxresource-separator">Preview</label><div id="schoolboxresource-preview" class="schoolboxresource-preview"></div>'
                     },
                     {
                         type: 'html',
@@ -419,7 +419,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                         children: [
                             {
                                 type: 'text',
-                                id: 'schoolboxresource-image-width',
+                                id: 'schoolboxresource-width',
                                 label: 'Width',
                                 validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." ),
 
@@ -456,7 +456,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                             },
                             {
                                 type: 'text',
-                                id: 'schoolboxresource-image-height',
+                                id: 'schoolboxresource-height',
                                 label: 'Height',
                                 validate: CKEDITOR.dialog.validate.notEmpty( "Height cannot be empty."),
 
@@ -489,7 +489,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                             },
                             {
                                 type: 'button',
-                                id: 'schoolboxresource-image-resetdimensions',
+                                id: 'schoolboxresource-resetdimensions',
                                 label: 'Reset',
                                 className: 'schoolboxresource-button',
                                 onClick: function () {
@@ -503,13 +503,13 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                     },
                     {
                         type: 'text',
-                        id: 'schoolboxresource-image-aspectratio-value',
+                        id: 'schoolboxresource-aspectratio-value',
                         label: 'Aspect Ratio Value',
                         className: 'hide'
                     },
                     {
                         type: 'checkbox',
-                        id: 'schoolboxresource-image-aspectratio',
+                        id: 'schoolboxresource-aspectratio',
                         label: 'Constrain Aspect Ratio',
 
                         /* Remember the ratio so we can apply it when
@@ -524,7 +524,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                     },
                     {
                         type: 'checkbox',
-                        id: 'schoolboxresource-image-fullwidth',
+                        id: 'schoolboxresource-fullwidth',
                         label: 'Fullwidth',
 
                         /* Editing an existing element
@@ -553,7 +553,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                         children: [
                             {
                                 type: 'select',
-                                id: 'schoolboxresource-image-alignment',
+                                id: 'schoolboxresource-alignment',
                                 label: 'Alignment',
                                 items: [['None', 'none'], ['Left', 'left'], ['Center', 'center'], ['Right', 'right']],
                                 'default': 'none',
@@ -580,7 +580,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                             },
                             {
                                 type: 'text',
-                                id: 'schoolboxresource-image-verticalpadding',
+                                id: 'schoolboxresource-verticalpadding',
                                 label: 'Vertical Spacing',
 
                                 /* Editing an existing element
@@ -598,7 +598,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                             },
                             {
                                 type: 'text',
-                                id: 'schoolboxresource-image-horizontalpadding',
+                                id: 'schoolboxresource-horizontalpadding',
                                 label: 'Horizontal Spacing',
 
                                 /* Editing an existing element
@@ -618,7 +618,7 @@ CKEDITOR.dialog.add('schoolboxresourceImageDialog', function (editorInstance) {
                     },
                     {
                         type: 'checkbox',
-                        id: 'schoolboxresource-image-border',
+                        id: 'schoolboxresource-border',
                         label: 'Border',
 
                         /* Editing an existing element

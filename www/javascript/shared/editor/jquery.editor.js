@@ -35,14 +35,12 @@
                 /* Url to get node information
                  */
                 source: '/resources/attachment'
-            }
+            };
 
             var derived = {
-            }
+            };
 
-            var merged = $.extend(defaults, derived, options);
-
-            return merged;
+            return $.extend(defaults, derived, options);
         }
 
         /**
@@ -201,7 +199,7 @@
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */
                 removePlugins: 'image,image2',
-                extraPlugins: 'schoolboxresourceimage',
+                extraPlugins: 'schoolboxresource',
 
                 /* Other settings
                  */
