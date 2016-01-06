@@ -12,7 +12,6 @@ namespace Schoolbox\Assessment\Rubric;
 
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\Competency;
-use Schoolbox\Assessment\Rubric\Criteria\Group;
 use SplObjectStorage;
 
 class Rubric implements Twiggable
@@ -32,6 +31,8 @@ class Rubric implements Twiggable
 
 
     /**
+     * @param int  $id
+     * @param bool $multiSelect
      */
     public function __construct($id = null, $multiSelect = false)
     {
@@ -122,6 +123,12 @@ class Rubric implements Twiggable
         $criterion->putDescriptor($descriptor, $level->getId());
         $level->putDescriptor($descriptor, $criterion->getId());
 
+        // back-reference the level and crit on the descriptor, we need this for DB persistence.
+        $descriptor->setPosition($level, $criterion);
+
+        // back-reference the group onto the crit, we need this for DB persistence.
+        $criterion->setPosition($group);
+
         return $this;
     }
 
@@ -132,7 +139,7 @@ class Rubric implements Twiggable
      */
     public function putGroup($group)
     {
-        if (!$group instanceof Group) {
+        if (!$group instanceof Criteria\Group) {
             throw new InvalidArgumentException("Invalid Group given");
         }
 
@@ -168,7 +175,7 @@ class Rubric implements Twiggable
 
 
     /**
-     * @return SplObjectStorage|Group[]
+     * @return SplObjectStorage|Criteria\Group[]
      */
     public function getSumPerGroup()
     {
@@ -184,7 +191,7 @@ class Rubric implements Twiggable
 
 
     /**
-     * @return SplObjectStorage|Group[]
+     * @return SplObjectStorage|Criteria\Group[]
      */
     public function getTotalPerGroup()
     {
@@ -202,7 +209,7 @@ class Rubric implements Twiggable
     /**
      * Return the percentages of this rubric, grouped by group
      *
-     * @return SplObjectStorage|Group[]
+     * @return SplObjectStorage|Criteria\Group[]
      */
     public function getPercentagePerGroup()
     {
