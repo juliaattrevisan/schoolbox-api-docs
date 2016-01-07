@@ -179,25 +179,55 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
          */
         if (fields.alignment != undefined) {
             switch (fields.alignment.getValue()) {
+
+                /* Center aligned, no text wrapping
+                 */
                 case 'center':
                     styles.push('margin:0 auto');
                     styles.push('display:block');
                     break;
 
+                /* Left aligned, text wraps against right edge
+                 */
                 case 'left':
+                    styles.push('float:' + fields.alignment.getValue());
+
+                    /* Horizontal Spacing (applies margin-left and margin-right)
+                     * Ignore margin-left when left aligned
+                     */
+                    if (fields.horizontalMargin.getValue() != '') {
+                        styles.push('margin-right:' + fields.horizontalMargin.getValue() + 'px');
+                    }
+
+                    break;
+
+                /* Right aligned, text wraps against left edge
+                 */
                 case 'right':
                     styles.push('float:' + fields.alignment.getValue());
+
+                    /* Horizontal Spacing (applies margin-left and margin-right)
+                     * Ignore margin-right when right aligned
+                     */
+                    if (fields.horizontalMargin.getValue() != '') {
+                        styles.push('margin-left:' + fields.horizontalMargin.getValue() + 'px');
+                    }
+
                     break;
 
+                /* Left aligned, no text wrapping
+                 */
                 default:
+
+                    /* Horizontal Spacing (applies margin-left and margin-right)
+                     */
+                    if (fields.horizontalMargin.getValue() != '') {
+                        styles.push('margin-left:' + fields.horizontalMargin.getValue() + 'px');
+                        styles.push('margin-right:' + fields.horizontalMargin.getValue() + 'px');
+                    }
+
                     break;
             }
-        }
-
-        /* Border
-         */
-        if (fields.border.getValue() != '') {
-            styles.push('border:1px solid #808080;');
         }
 
         /* Vertical Spacing (applies margin-top and margin-bottom)
@@ -207,11 +237,10 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             styles.push('margin-bottom:' + fields.verticalMargin.getValue() + 'px');
         }
 
-        /* Horizontal Spacing (applies margin-left and margin-right)
+        /* Border
          */
-        if (fields.horizontalMargin.getValue() != '') {
-            styles.push('margin-left:' + fields.horizontalMargin.getValue() + 'px');
-            styles.push('margin-right:' + fields.horizontalMargin.getValue() + 'px');
+        if (fields.border.getValue() != '') {
+            styles.push('border:1px solid #808080;');
         }
 
         /* Combine and inject
