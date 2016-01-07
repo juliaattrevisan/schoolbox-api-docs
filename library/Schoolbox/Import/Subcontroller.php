@@ -53,7 +53,7 @@ class Subcontroller extends Base
             $csvTemplate = '/adminv2/import/userTemplateWithProfile.csv';
         }
         $this->getResponse()->content->set([
-            'template' => '@adminImport/upload.twig',
+            'template' => '@'.$this->basename.'/upload.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
@@ -92,7 +92,7 @@ class Subcontroller extends Base
         }
 
         $this->getResponse()->content->set([
-            'template' => '@adminImport/preview.twig',
+            'template' => '@'.$this->basename.'/preview.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
@@ -130,7 +130,7 @@ class Subcontroller extends Base
         }
 
         $this->getResponse()->content->set([
-            'template' => '@adminImport/import.twig',
+            'template' => '@'.$this->basename.'/import.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),

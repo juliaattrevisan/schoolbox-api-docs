@@ -2,7 +2,10 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>User Preview</h1>
+        <h1>
+            {% block title %}
+            {% endblock %}
+        </h1>
 
         {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
     </div>
@@ -17,7 +20,7 @@
 
                 {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
 
-                <input type="submit" value="Run (for real)" />
+                <input type="submit" value="Run)" />
             </form>
         </section>
     </div>

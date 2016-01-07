@@ -2,49 +2,18 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>User</h1>
+        <h1>
+            {% block title %}
+            {% endblock %}
+        </h1>
 
         {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
     </div>
 
     <div class="small-12 island">
-        {% if logHash %}
-            <div data-alert class="alert-box">
-                <h2>Your import has run</h2>
-                <a href="/storage/fetch.php?hash={{ logHash }}">View your log here</a>
-                <a href="" class="close">×</a>
-            </div>
-        {% endif %}
         <section class="content">
-            <p>
-                Provide a file containing a list of users in the CSV format in the template below.
-            </p>
-            <ul>
-                <li>You may remove columns that you do not wish to update.</li>
-                <li>Users can be identified in any of the following ways:
-                    <ul>
-                        <li>Schoolbox User ID</li>
-                        <li>Username</li>
-                        <li>External ID + Role</li>
-                    </ul>
-                </li>
-                <li>Any columns with a question mark are toggle fields.
-                    <ul>
-                        <li>If their value is "1" or "Y", they are switched on.</li>
-                        <li>If their value is "0" or "N", they are switched off.</li>
-                        <li>If their value is empty, they are left unchanged.</li>
-                        <li>The "Delete?" field is a toggle field as well - "1" or "Y" will delete that user!</li>
-                    </ul>
-                </li>
-                <li>The following fields will be left unchanged if they are blank.
-                    <ul>
-                        <li>All identifier fields</li>
-                        <li>All toggle fields</li>
-                        <li>Password</li>
-                    </ul>
-                </li>
-            </ul>
-            <a href="{{ csvTemplate }}" class="button icon-download">Download Template</a>
+            {% block helpText %}
+            {% endblock helpText %}
 
             <form action="{{ routeLookup(basename ~ '.preview') }}" method="post">
 

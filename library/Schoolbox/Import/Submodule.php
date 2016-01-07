@@ -56,6 +56,16 @@ class Submodule extends BaseModule
     }
 
     /**
+     * Template locations for this module
+     *
+     * {@inheritdoc}
+     */
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates/' . $this->basename);
+    }
+
+    /**
      * Set up controllers
      *
      * {@inheritdoc}
