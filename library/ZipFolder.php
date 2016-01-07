@@ -4,9 +4,9 @@
 /**
  * Puts all resources from a folder into a zip
  */
+
 class ZipFolder
 {
-
     function ZipFolder($folder)
     {
         $this->db = DeprecatedDatabase::getInstance();
@@ -22,9 +22,6 @@ class ZipFolder
         $this->groupHandler = new Group;
         $this->folderMapper = new \Schoolbox\Resource\Folder\Mapper();
         $this->fileMapper = new \Schoolbox\Resource\File\Mapper();
-
-
-
         $this->folderDetails = $this->getFolderDetails($folder);
 
         if (is_numeric($this->folderDetails->getId())) {
@@ -36,6 +33,12 @@ class ZipFolder
         }
     }
 
+    public function __destruct()
+    {
+        // Might be a bit redundant, but can't hurt anything
+
+        $this->cleanUp();
+    }
 
     function getResources($folder, $permission)
     {
@@ -154,11 +157,19 @@ class ZipFolder
 
     }
 
-    function cleanUp()
+    public function cleanUp()
     {
-        unlink($this->tmpName);
-        unlink($this->tmpZip);
-        $this->removeDir($this->tmpFolder);
+        if (file_exists($this->tmpName)) {
+            unlink($this->tmpName);
+        }
+
+        if (file_exists($this->tmpZip)) {
+            unlink($this->tmpZip);
+        }
+
+        if (file_exists($this->tmpFolder)) {
+            $this->removeDir($this->tmpFolder);
+        }
     }
 
     function removeDir($path)

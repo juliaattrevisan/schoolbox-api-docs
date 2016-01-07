@@ -89,10 +89,18 @@ class SubmissionZipFolder
             return $fileName;
     }
 
-    function cleanUp() {
-        unlink($this->tmpName);
-        unlink($this->tmpZip);
-        $this->removeDir($this->tmpFolder);
+    public function cleanUp() {
+        if (file_exists($this->tmpName)) {
+            unlink($this->tmpName);
+        }
+
+        if (file_exists($this->tmpZip)) {
+            unlink($this->tmpZip);
+        }
+
+        if (file_exists($this->tmpFolder)) {
+            $this->removeDir($this->tmpFolder);
+        }
     }
 
     function removeDir($path) {

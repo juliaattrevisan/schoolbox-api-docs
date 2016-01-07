@@ -5,6 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
+use Schoolbox\Application\WebRequest\ShutdownHandler;
 
 SitePage::extendExecutionTime(300);
 
@@ -41,6 +42,7 @@ if (is_numeric($_GET['id'])) {
         }
 
         $zip = new SubmissionZipFolder($zipName, $submissionList);
+        ShutdownHandler::instance()->registerFunction([$zip, 'cleanUp'], 10000);
         $zip->sendZip();
     } else {
         error(5);
