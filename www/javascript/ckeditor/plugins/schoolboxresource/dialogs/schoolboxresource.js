@@ -451,30 +451,37 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
                                         /* Find out how to render this file
                                          */
-                                        $.getJSON(config.url.nodeinfo, { identifier: message.data[0].hash }, function(responseText) {
-                                            fields.type.setValue(responseText.type);
-                                            fields.filesystem.setValue(responseText.filesystem);
+                                        if (message.data != undefined) {
+                                            $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
+                                                fields.type.setValue(responseText.type);
+                                                fields.filesystem.setValue(responseText.filesystem);
 
-                                            /* Renderer Strategy (I guess)
+                                                /* Renderer Strategy (I guess)
+                                                 */
+                                                if (fields.type.getValue() == 'video') {
+                                                    fields.id.setValue(responseText.id);
+                                                    fields.url.setValue(config.video.source(responseText.id, fields.filesystem.getValue()));
+                                                }
+                                                else if (fields.type.getValue() == 'audio') {
+                                                    fields.id.setValue(responseText.id);
+                                                    fields.url.setValue(config.audio.source(responseText.id, fields.filesystem.getValue()));
+                                                }
+                                                else if (fields.type.getValue() == 'image') {
+                                                    fields.url.setValue(config.image.source(responseText.hash));
+                                                }
+
+                                                render(fields, fields.url.getValue(), false);
+
+                                                /* Shut modal, go back to Dialog
+                                                 */
+                                                $('[data-schoolboxresource-reveal]').foundation('reveal', 'close');
+                                            });
+                                        }
+                                        else {
+
+                                            /* Connecting to your Google Drive
                                              */
-                                            if (fields.type.getValue() == 'video') {
-                                                fields.id.setValue(responseText.id);
-                                                fields.url.setValue(config.video.source(responseText.id, fields.filesystem.getValue()));
-                                            }
-                                            else if (fields.type.getValue() == 'audio') {
-                                                fields.id.setValue(responseText.id);
-                                                fields.url.setValue(config.audio.source(responseText.id, fields.filesystem.getValue()));
-                                            }
-                                            else if (fields.type.getValue() == 'image') {
-                                                fields.url.setValue(config.image.source(responseText.hash));
-                                            }
-
-                                            render(fields, fields.url.getValue(), false);
-
-                                            /* Shut modal, go back to Dialog
-                                             */
-                                            $('[data-schoolboxresource-reveal]').foundation('reveal', 'close');
-                                        });
+                                        }
                                     });
                                 }
                             }
