@@ -39,7 +39,7 @@ class External_Humanedge_User implements External_UserInterface
                 s.House AS StudentHouse,
                 '' AS HeadOfHouseID,
                 '' AS StudentHeadOfHouse,
-                s.BoarderType AS StudentBoarder
+                s.BoarderType AS StudentBoarder,
                 s.Form AS StudentForm,
                 '' AS FormDescription,
                 '' AS StudentFormStaffName,
