@@ -431,7 +431,8 @@ input[type=radio]:not(.plain):disabled:checked + label{
 select.visibility {
 	@extend %iconify;
 	&.show-icon-only {
-		width: 3.125rem !important;
+		width: 3rem !important;
+        padding: 0.5rem 1rem 0.5rem 0.3rem;
 	}
 }
 
