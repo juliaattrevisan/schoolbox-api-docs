@@ -31,9 +31,16 @@ class Result
     protected $originalUser;
 
     /**
-     * @var UserRelation[]
+     * @var UserModel[]
      */
-    protected $userRelations = [];
+    protected $children = [];
+
+    /**
+     * The user's children before any changes were made.
+     *
+     * @var UserModel[]
+     */
+    protected $originalChildren = [];
 
     /**
      * @var UserProfile
@@ -89,20 +96,38 @@ class Result
     }
 
     /**
-     * @return UserRelation
+     * @return UserModel[]
      */
-    public function getUserRelations()
+    public function getChildren()
     {
-        return $this->userRelations;
+        return $this->children;
     }
 
     /**
-     * @param  UserRelation $userRelations
+     * @param  UserModel[] $children
      * @return $this
      */
-    public function setUserRelations($userRelations)
+    public function setChildren($children)
     {
-        $this->userRelations = $userRelations;
+        $this->children = $children;
+        return $this;
+    }
+
+    /**
+     * @return UserModel[]
+     */
+    public function getOriginalChildren()
+    {
+        return $this->originalChildren;
+    }
+
+    /**
+     * @param  UserModel[] $originalChildren
+     * @return $this
+     */
+    public function setOriginalChildren($originalChildren)
+    {
+        $this->originalChildren = $originalChildren;
         return $this;
     }
 
