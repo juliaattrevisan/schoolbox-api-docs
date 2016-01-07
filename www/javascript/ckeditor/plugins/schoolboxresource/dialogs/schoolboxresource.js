@@ -160,7 +160,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
          * otherwise use specified values. Note that width:100%
          * is not allowed, so use the usual class instead
          *
-         * Include both styles and clases to display this; because
+         * Include both styles and classes to display this; because
          * of htmlpurifier and ckeditor iframe respectively
          */
         if (fields.fullwidth.getValue()) {
