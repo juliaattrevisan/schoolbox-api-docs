@@ -48,7 +48,7 @@ class ImportController extends Base
     public function upload()
     {
         $this->getResponse()->content->set([
-            'template' => '@'.$this->basename.'/upload.twig',
+            'template' => '@' . $this->basename . '/upload.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
@@ -63,33 +63,15 @@ class ImportController extends Base
      */
     public function preview()
     {
-        $factory = new CollectorFactory();
-        $upload  = $factory->build($this->getRequest()->post->get('attachment'))->getFirst();
-
-        // Try to make a CSV parser out of the upload
-        /** @var StoredisLogger $logger */
-        $logger = $this->getDi()->get('ups.logger');
-        $reader = new Reader($upload->readStream());
-        $reader->setLoadFromFirst(true);
-        $importer = $this->buildImporter($reader, $logger, false);
-        $importer->save();
-
-        // Try to use the UPS templates here
-        // Each line is json-decodable
-        $stream   = $logger->flushToStorage()->readStream();
-        $logLines = [];
-        while ($line = fgets($stream)) {
-            if ($logLine = json_decode($line, true)) {
-                $logLines[] = $logLine;
-            }
-        }
-
+        $logger = $this->buildLogger();
+        $reader = $this->buildReader($upload = $this->buildUpload());
+        $this->buildImporter($reader, $logger, false)->save();
         $this->getResponse()->content->set([
-            'template' => '@'.$this->basename.'/preview.twig',
+            'template' => '@' . $this->basename . '/preview.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
-                'log'            => ['lines' => $logLines],
+                'log'            => ['lines' => $this->parseLogLines($logger),],
                 'attachzone'     => $this->getAttachzone($upload->getHash())->getTwigContext(),
                 'basename'       => $this->basename,
             ],
@@ -101,33 +83,15 @@ class ImportController extends Base
      */
     public function import()
     {
-        $factory = new CollectorFactory();
-        $upload  = $factory->build($this->getRequest()->post->get('attachment'))->getFirst();
-
-        // Try to make a CSV parser out of the upload
-        /** @var StoredisLogger $logger */
-        $logger = $this->getDi()->get('ups.logger');
-        $reader = new Reader($upload->readStream());
-        $reader->setLoadFromFirst(true);
-        $importer = $this->buildImporter($reader, $logger, true);
-        $importer->save();
-
-        // Try to use the UPS templates here
-        // Each line is json-decodable
-        $stream   = $logger->flushToStorage()->readStream();
-        $logLines = [];
-        while ($line = fgets($stream)) {
-            if ($logLine = json_decode($line, true)) {
-                $logLines[] = $logLine;
-            }
-        }
-
+        $logger = $this->buildLogger();
+        $reader = $this->buildReader($this->buildUpload());
+        $this->buildImporter($reader, $logger, true)->save();
         $this->getResponse()->content->set([
-            'template' => '@'.$this->basename.'/import.twig',
+            'template' => '@' . $this->basename . '/import.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
-                'log'            => ['lines' => $logLines],
+                'log'            => ['lines' => $this->parseLogLines($logger),],
             ],
         ]);
     }
@@ -152,6 +116,62 @@ class ImportController extends Base
             $zone->attachFiles([$hash]);
         }
         return $zone;
+    }
+
+    /**
+     * Builds a logger for use in the importer.
+     *
+     * @return StoredisLogger eventually will return a more generic logger
+     * @throws \Aura\Di\Exception\ServiceNotFound if the logger wasn't found?
+     */
+    protected function buildLogger()
+    {
+        return $this->getDi()->get('ups.logger');
+    }
+
+    /**
+     * Builds a storage object out of what was uploaded.
+     *
+     * @return Storage\IStorage
+     * @throws \Schoolbox\Resource\Exception if nothing was uploaded
+     */
+    protected function buildUpload()
+    {
+
+        $factory = new CollectorFactory();
+        return $factory->build($this->getRequest()->post->get('attachment'))->getFirst();
+    }
+
+    /**
+     * Builds a CSV reader out of the uploaded file.
+     *
+     * @param  Storage\IStorage $upload
+     * @return Reader
+     * @throws \Schoolbox\Resource\Exception if nothing was uploaded
+     */
+    protected function buildReader(Storage\IStorage $upload)
+    {
+        $reader = new Reader($upload->readStream());
+        $reader->setLoadFromFirst(true);
+        return $reader;
+    }
+
+    /**
+     * Parses lines out of the logger.
+     *
+     * @param  StoredisLogger $logger
+     * @return array
+     */
+    protected function parseLogLines($logger)
+    {
+        $stream   = $logger->flushToStorage()->readStream();
+        $logLines = [];
+        while ($line = fgets($stream)) {
+            if ($logLine = json_decode($line, true)) {
+                $logLines[] = $logLine;
+            }
+        }
+        return $logLines;
     }
 
     /**
