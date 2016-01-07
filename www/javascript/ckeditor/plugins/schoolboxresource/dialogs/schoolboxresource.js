@@ -347,38 +347,6 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                 id: 'schoolboxresource-tab',
                 label: 'Schoolbox Resource Image',
                 elements: [
-
-                    /* Store the file id here, because audio/video renders
-                     * with a numeric id, not a hash, and has multiple
-                     * urls for previews and content stream itself
-                     *
-                     * Not used for images
-                     */
-                    {
-                        type: 'text',
-                        id: 'schoolboxresource-id',
-                        label: 'Id',
-                        className: 'hide'
-                    },
-
-                    /* Store string 'image', 'video', 'audio'
-                     * Used by various switch statements for rendering data
-                     */
-                    {
-                        type: 'text',
-                        id: 'schoolboxresource-type',
-                        label: 'Type',
-                        className: 'hide'
-                    },
-
-                    /* The filesystem where the resource was found
-                     */
-                    {
-                        type: 'text',
-                        id: 'schoolboxresource-filesystem',
-                        label: 'Filesystem',
-                        className: 'hide'
-                    },
                     {
                         type: 'hbox',
                         widths: ['80%', '20%'],
@@ -745,6 +713,42 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                 fields.border.setValue(true);
                             }
                         }
+                    },
+
+                    /* Metadata lives at the bottom because they occupy space
+                     * due to containing td element having padding
+                     */
+
+                    /* Store the file id here, because audio/video renders
+                     * with a numeric id, not a hash, and has multiple
+                     * urls for previews and content stream itself
+                     *
+                     * Not used for images
+                     */
+                    {
+                        type: 'text',
+                        id: 'schoolboxresource-id',
+                        label: 'Id',
+                        className: 'hide'
+                    },
+
+                    /* Store string 'image', 'video', 'audio'
+                     * Used by various switch statements for rendering data
+                     */
+                    {
+                        type: 'text',
+                        id: 'schoolboxresource-type',
+                        label: 'Type',
+                        className: 'hide'
+                    },
+
+                    /* The filesystem where the resource was found
+                     */
+                    {
+                        type: 'text',
+                        id: 'schoolboxresource-filesystem',
+                        label: 'Filesystem',
+                        className: 'hide'
                     }
                 ]
             }
