@@ -28,6 +28,12 @@ class Module extends BaseModule
 {
     protected $basename = 'adminImport';
 
+    /**
+     * Sets up the submodules for each import type.
+     *
+     * @param ContainerInterface $injector
+     * @param string             $basePath
+     */
     public function initSubmodules(ContainerInterface $injector, $basePath)
     {
         $userModule      = new Submodule($injector, $this->basename.'User');
@@ -49,45 +55,7 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'intro', $basePath, "");
-
-//        // User paths
-//        $this->addGetRoute($router, 'user', $basePath, "/user");
-//        $this->addPostRoute($router, 'userPreview', $basePath, "/user/preview");
-//        $this->addPostRoute($router, 'userImport', $basePath, "/user/import");
-//        // For now, download templates directly
-////        $this->addGetRoute($router, 'userTemplate', $basePath, "/userTemplate.csv");
-//
-//        // Structure paths
-//        $this->addGetRoute($router, 'timetableStructure', $basePath, "/timetable-structure");
-//        $this->addPostRoute($router, 'timetableStructureImport', $basePath, "/timetable-structure/import");
-//
-//        // Timetable paths
-//        $this->addGetRoute($router, 'timetable', $basePath, "/timetable");
-//        $this->addPostRoute($router, 'timetableImport', $basePath, "/timetable/import");
-//
-//        // Enrolment paths
-//        $this->addGetRoute($router, 'enrolment', $basePath, "/enrolment");
-//        $this->addPostRoute($router, 'enrolmentImport', $basePath, "/enrolment/import");
-//
-//        // Generic log path
-//        $this->addGetRoute($router, 'log', $basePath, "/user/log/{hash}");
     }
-
-//    /**
-//     * @param PathMatcher $matcher
-//     */
-//    public function initRoutePreloads(PathMatcher $matcher)
-//    {
-//        $this->addRoutePreload(
-//            $matcher,
-//            'log',
-//            function ($params) {
-//                // TODO inject the storage mapper
-//                $params['log'] = Storage\Mapper::getInstance()->findByHash($params['hash']);
-//                return $params;
-//            }
-//        );
-//    }
 
     /**
      * Only admins can use this
