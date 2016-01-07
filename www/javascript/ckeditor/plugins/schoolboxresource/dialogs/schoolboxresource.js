@@ -10,16 +10,20 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
         /* Video urls and regex
          */
         video: {
+            source: function(id, filesystem) {
+                return '/cms/sendVideo.php?&id=' + id + '&type=' + filesystem;
+            },
             thumbnail: '/cms/videoThumb.php?type=sbfs&size=poster&id=',
-            source: '/cms/sendVideo.php?&id=',
             regex: /^\/cms\/sendVideo/
         },
 
         /* Audio urls and regex
          */
         audio: {
+            source: function(id, filesystem) {
+                return '/cms/sendVideo.php?&id=' + id + '&type=' + filesystem;
+            },
             thumbnail: '/images/core/component/audio-thumbnail-processing.gif',
-            source: '/cms/sendVideo.php?&id=',
             regex: /^\/cms\/sendVideo/
         },
 
@@ -27,7 +31,9 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
          * No thumbnails are used for images
          */
         image: {
-            source: '/storage/image.php?hash=',
+            source: function(hash) {
+                return '/storage/image.php?hash=' + hash;
+            },
             regex: /^\/storage\/image/
         }
     };
@@ -114,18 +120,18 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             dataVars = {
                 'data-schoolboxresource-type': 'video',
                 'data-schoolboxresource-thumbnail': url,
-                'data-schoolboxresource-source': config.video.source + fields.id.getValue() + '&type=' + fields.filesystem.getValue()
+                'data-schoolboxresource-source': config.video.source(fields.id.getValue(), fields.filesystem.getValue())
             };
         }
         /* Special case for audio data
          */
-        if (fields.type.getValue() == 'audio') {
+        else if (fields.type.getValue() == 'audio') {
             url = config.audio.thumbnail;
 
             dataVars = {
                 'data-schoolboxresource-type': 'audio',
                 'data-schoolboxresource-thumbnail': url,
-                'data-schoolboxresource-source': config.audio.source + fields.id.getValue() + '&type=' + fields.filesystem.getValue()
+                'data-schoolboxresource-source': config.audio.source(fields.id.getValue(), fields.filesystem.getValue())
             };
         }
         /* Images render with provided information
@@ -446,14 +452,14 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                              */
                                             if (fields.type.getValue() == 'video') {
                                                 fields.id.setValue(responseText.id);
-                                                fields.url.setValue(config.video.source + responseText.id + '&type=' + fields.filesystem.getValue());
+                                                fields.url.setValue(config.video.source(responseText.id, fields.filesystem.getValue()));
                                             }
                                             else if (fields.type.getValue() == 'audio') {
                                                 fields.id.setValue(responseText.id);
-                                                fields.url.setValue(config.audio.source + responseText.id + '&type=' + fields.filesystem.getValue());
+                                                fields.url.setValue(config.audio.source(responseText.id, fields.filesystem.getValue()));
                                             }
                                             else if (fields.type.getValue() == 'image') {
-                                                fields.url.setValue(config.image.source + responseText.hash);
+                                                fields.url.setValue(config.image.source(responseText.hash));
                                             }
 
                                             render(fields, fields.url.getValue(), false);
