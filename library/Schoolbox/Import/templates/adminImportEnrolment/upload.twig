@@ -3,3 +3,14 @@
 {% block title %}
     Enrolment
 {% endblock %}
+
+{% block helpText %}
+    <p>
+        Provide a file containing your class enrolments in the CSV format in the template below.
+    </p>
+    <ul>
+        <li>You must upload your entire enrolment in one CSV - any existing enrolments will be deleted.</li>
+        <li>You must have first uploaded your timetable structure and timetable.</li>
+    </ul>
+    <a href="/adminv2/import/enrolmentTemplate.csv" class="button icon-download">Download Template</a>
+{% endblock helpText %}

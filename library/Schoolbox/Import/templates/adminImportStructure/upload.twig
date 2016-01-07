@@ -3,3 +3,19 @@
 {% block title %}
     Timetable Structure
 {% endblock %}
+
+{% block helpText %}
+    <p>
+        Provide a file containing your timetable structure (term start and end dates, timetable days and periods)
+        in the CSV format in the template below.
+    </p>
+    <ul>
+        <li>You must upload your entire timetable structure in one CSV - any existing structure will be deleted.</li>
+        <li>Any empty fields will be filled with the previous non-empty value in that column.</li>
+        <li>
+            <strong>Term Offset</strong> is the number of days to increment Term Start by -
+            e.g. if Term Offset is 2, then the term starts on Day 3.
+        </li>
+    </ul>
+    <a href="/adminv2/import/timetableStructureTemplate.csv" class="button icon-download">Download Template</a>
+{% endblock helpText %}
