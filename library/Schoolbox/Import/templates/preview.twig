@@ -16,12 +16,14 @@
                 {% include '@upsRuleset/log/lines.twig' %}
             </ul>
 
+            {% block form %}
             <form action="{{ routeLookup(basename ~ '.import') }}" method="post">
 
                 {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
 
                 <input type="submit" value="Run Import" />
             </form>
+            {% endblock form %}
         </section>
     </div>
 </div>

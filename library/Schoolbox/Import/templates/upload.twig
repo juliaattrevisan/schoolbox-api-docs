@@ -15,13 +15,14 @@
             {% block helpText %}
             {% endblock helpText %}
 
+            {% block form %}
             <form action="{{ routeLookup(basename ~ '.preview') }}" method="post">
 
                 {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
 
                 <input type="submit" value="Preview Import" />
             </form>
-
+            {% endblock form %}
         </section>
     </div>
 </div>
