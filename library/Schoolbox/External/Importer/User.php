@@ -14,6 +14,8 @@ use HouseResidential as HouseResidentialModel;
 use HouseResidentialMapper;
 use Schoolbox\Campus as CampusModel;
 use Schoolbox\CampusMapper;
+use Schoolbox\External\UserProfile As UserProfileModel;
+use Schoolbox\External\UserProfileMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role as RoleModel;
 use Schoolbox\RoleMapper;
@@ -45,6 +47,11 @@ class User extends AbstractImporter
      * @var UserMapper
      */
     protected $userMapper;
+
+    /**
+     * @var UserProfileMapper
+     */
+    protected $userProfileMapper;
 
     /**
      * @var array|RoleModel[]
@@ -81,6 +88,13 @@ class User extends AbstractImporter
      * @var array|User\Hydrator\HydratorInterface[]
      */
     protected $userHydrators = [];
+
+    /**
+     * Same as $userHydrators, but for the user profile table.
+     *
+     * @var array|UserProfile\Hydrator\HydratorInterface[]
+     */
+    protected $userProfileHydrators = [];
 
     /**
      * Does this Schoolbox have an external database?
@@ -158,7 +172,8 @@ class User extends AbstractImporter
      */
     protected function setup()
     {
-        $this->userMapper = new UserMapper();
+        $this->userMapper        = new UserMapper();
+        $this->userProfileMapper = new UserProfileMapper();
 
         // Role list
         foreach (RoleMapper::getInstance()->findAll() as $role) {
@@ -210,6 +225,28 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\Field('Year', 'setYear');
         $this->userHydrators[] = new User\Hydrator\Lookup('House', 'setSchoolHouse', $this->houseList);
         $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
+
+        // User Profile hydrators
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field('Date of Birth', 'setDob');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field('Year', 'setLevel');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Name", 'setGuardian1Name');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Email", 'setGuardian1Email');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Home Phone", 'setGuardian1HomePhone');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Mobile Phone", 'setGuardian1MobilePhone');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Work Phone", 'setGuardian1WorkPhone');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Address", 'setGuardian1Address');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Suburb", 'setGuardian1Suburb');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Postcode", 'setGuardian1Postcode');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Name", 'setGuardian2Name');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Email", 'setGuardian2Email');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Home Phone", 'setGuardian2HomePhone');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Mobile Phone", 'setGuardian2MobilePhone');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Work Phone", 'setGuardian2WorkPhone');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Address", 'setGuardian2Address');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Suburb", 'setGuardian2Suburb');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Postcode", 'setGuardian2Postcode');
+
+        // Parent-child relation hydrator
     }
 
     /**
@@ -248,10 +285,14 @@ class User extends AbstractImporter
             // Step 3: update user based on fields
             $userResult->setUser($this->hydrateUser($row, $user));
 
-//            // Step 4: update extended fields if using SB connector
-//            if (!$this->hasExternalDb()) {
-//                // update
-//            }
+            // Step 4: update extended fields if using SB connector
+            if (!$this->hasExternalDb()) {
+                $userProfile = $this->hydrateUserProfile(
+                    $row,
+                    $this->retrieveUserProfile($user)
+                );
+                $userResult->setUserProfile($userProfile);
+            }
 
             $result[] = $userResult;
         }
@@ -280,9 +321,9 @@ class User extends AbstractImporter
     }
 
     /**
-     * Retrieves a user to create or update.
+     * Updates a user based on the user hydrators.
      *
-     * @param  array $row A row from the CSV import.
+     * @param  array     $row  A row from the CSV import.
      * @param  UserModel $user The user object to update
      * @return UserModel An updated user object
      */
@@ -292,6 +333,40 @@ class User extends AbstractImporter
             $user = $hydrator->hydrate($row, $user);
         }
         return $user;
+    }
+
+    /**
+     * Retrieves a user profile to create or update.
+     *
+     * @param  UserModel $user
+     * @return UserProfileModel
+     */
+    protected function retrieveUserProfile(UserModel $user)
+    {
+        $userId = $user->getId();
+        if ($userId) {
+            try {
+                return $this->userProfileMapper->findById($userId);
+            } catch (MapperException $e) {
+                // noop - fall through to returning empty model
+            }
+        }
+        return $this->userProfileMapper->createModel();
+    }
+
+    /**
+     * Updates a user profile based on the user profile hydrators.
+     *
+     * @param  array            $row         A row from the CSV import.
+     * @param  UserProfileModel $userProfile The user object to update
+     * @return UserProfileModel An updated user object
+     */
+    protected function hydrateUserProfile($row, UserProfileModel $userProfile)
+    {
+        foreach ($this->userProfileHydrators as $hydrator) {
+            $userProfile = $hydrator->hydrate($row, $userProfile);
+        }
+        return $userProfile;
     }
 
     /**
