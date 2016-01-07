@@ -52,7 +52,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
         if (fields.type.getValue() == 'video') {
             url = config.video.thumbnail + fields.id.getValue();
         }
-        if (fields.type.getValue() == 'audio') {
+        else if (fields.type.getValue() == 'audio') {
             url = config.audio.thumbnail;
         }
 
