@@ -2,9 +2,20 @@
 
 use Zend\Uri\Uri;
 
+// Figure out if the URL ends with /window - and don't include it in the
+// decoded URL if it does.
+$isWindow        = false;
+$encodedUrlParts = $this->arg;
+$lastPart        = array_pop($encodedUrlParts);
+if ($lastPart === 'window') {
+    $isWindow = true;
+} else {
+    array_push($encodedUrlParts, $lastPart);
+}
+
 // It's not guaranteed that the base64 encoded string will be properly encoded.
 // Fortunately we can convert spaces to +, and directory splits to / chars.
-$remoteUrl = base64_decode(str_replace(' ', '+', implode('/', $this->arg)));
+$remoteUrl = base64_decode(str_replace(' ', '+', implode('/', $encodedUrlParts)));
 
 // is this specifying a height for the parent frame?
 $height = '460px';
@@ -37,7 +48,7 @@ $query['key'] = sha1($secret . $time . $externalUserId);
 
 $url->setQuery($query);
 
-if ($this->arg[1] == 'window') {
+if ($isWindow) {
     header('Location: '.$url->toString());
     exit;
 } else {
