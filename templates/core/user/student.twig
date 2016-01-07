@@ -6,6 +6,7 @@
 
 {# medical: if allowed in config, and user is staff or parent of this child #}
 {% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaff %}
+{% set showSpecialAlert = not config.protect_medicalspecial_profile and isStaff %}
 {# details: su, staff, self or parent #}
 {% set showDetails = isStaff or isSelf or isParentOfStudent %}
 {# emails: students may view other student's emails #}
@@ -43,12 +44,20 @@
                     </div>
 
                     <div class="small-12 medium-6 large-8 columns no-pad">
+                        {% block specialAlert %}
+                            {% if externalUser.StudentSpecialNeedsFlag and showSpecialAlert %}
+                                <div class="alert-box warning icon-bell no-margin">
+                                    Special Needs
+                                </div>
+                            {% endif %}
+                        {% endblock specialAlert %}
+
                         {% block medicalAlert %}
-                        {% if externalUser.StudentMedicalAlert and showMedicalAlert %}
-                        <div class="alert-box alert icon-alert no-margin">
-                            Medical Note: {{ externalUser.StudentMedicalAlert }}
-                        </div>
-                        {% endif %}
+                            {% if externalUser.StudentMedicalAlert and showMedicalAlert %}
+                                <div class="alert-box alert icon-alert no-margin">
+                                    Medical Note: {{ externalUser.StudentMedicalAlert }}
+                                </div>
+                            {% endif %}
                         {% endblock medicalAlert %}
 
                         {% block details %}
