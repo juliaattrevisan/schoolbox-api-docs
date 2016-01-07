@@ -1,0 +1,134 @@
+/**
+ * Plugin for dynamically calculating and displaying a grade based on a given markType
+ *
+ * Usage:
+ *  - initialise as per a normal plugin (either directly onto an element or, more likely, a parent container)
+ *  - trigger the event 'dynagrade' on the element you want to calculate. This element must have 2 data attributes:
+ *          * data-numerator
+ *          * data-denominator
+ *  -
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+;(function ($, window, document, undefined) {
+
+    var pluginName = 'dynagrade';
+
+    var defaults = {
+        // a submission_mark_type.slug value
+        mode: 'percent',
+
+        // the configuration data specific to the given marktype (presently only 'letter' uses a config)
+        conf: {},
+
+        // what to do once a calculation is performed, by default just set the element's text to match:
+        //  - `this` refers to the target element (wrapped in $);
+        //  - `text` is the calculated output intended for display
+        onCalculate: function (text) {
+            this.text(text);
+        }
+    };
+
+    function Dynagrade(element, options) {
+        var self = this;
+
+        this.element = element;
+        this.options = $.extend(true, {}, defaults, options);
+
+        var conf = this.options.conf;
+
+        $(element).on('dynagrade', function (e) {
+
+            var target = $(e.target);
+
+            switch (self.options.mode) {
+                case 'percent':
+                    calcPercent.call(target, self.options.onCalculate);
+                    break;
+                case 'letter':
+                    calcLetter.call(target, conf, self.options.onCalculate);
+                    break;
+                case 'none':
+                    calcNone.call(target, self.options.onCalculate);
+                    break;
+                case 'raw':
+                default:
+                    calcRaw.call(target, self.options.onCalculate);
+                    break;
+            }
+
+        });
+    }
+
+    function calcPercent(callback) {
+        var num = this.attr('data-numerator'),
+            den = this.attr('data-denominator'),
+            prc = parseInt(num / den * 100);
+
+        callback.call(this, prc + '%');
+    }
+
+    function calcLetter(conf, callback) {
+        // start by getting the percentage
+        var num = this.attr('data-numerator'),
+            den = this.attr('data-denominator'),
+            prc = parseInt(num / den * 100),
+            $el = this;
+
+        var rev = [];
+
+        // iterate the config and push the data into a reversible array
+        $.each(conf, function (lowerBound, caption) {
+
+            // assumptions: the keys represent the lower-bound,
+            //              the values represent the caption,
+            //              jquery will have decided to iterate the keys in ASCENDING order
+            rev.push([lowerBound, caption]);
+        });
+
+        rev.reverse();
+
+        // now we can iterate that list in reverse to map the percentage to a letter grade
+        $.each(rev, function (k, v) {
+
+            var lowerBound = v[0],
+                caption    = v[1];
+
+            // bound is too high, ignore this one
+            if (prc < lowerBound) {
+                return true; // jq:continue
+            }
+
+            // first bound that is below our percentage; apply it
+            callback.call($el, caption);
+
+            // aaand we're done
+            return false; // jq.break;
+        });
+
+        // there is a caveat here that if the lowest bottom-bound is above the percentage (ie. not zero), nothing will happen
+    }
+
+    function calcRaw(callback) {
+        var num = this.attr('data-numerator'),
+            den = this.attr('data-denominator');
+
+        callback.call(this, num + ' / ' + den);
+    }
+
+    function calcNone(callback) {
+        callback.call(this, '');
+    }
+
+
+    $.fn[pluginName] = function (options) {
+        return this.each(function () {
+            if (!$.data(this, 'plugin_' + pluginName)) {
+                $.data(this, 'plugin_' + pluginName, new Dynagrade(this, options));
+            }
+        });
+    }
+
+})(jQuery, window, document);
