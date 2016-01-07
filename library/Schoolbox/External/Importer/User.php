@@ -83,16 +83,16 @@ class User extends AbstractImporter
     protected $userHydrators = [];
 
     /**
-     * Is the extended format used?
+     * Does this Schoolbox have an external database?
      *
-     * (It is used when using the Schoolbox "external" connector).
+     * (The Schoolbox "external" connector is the only one that does not.)
      *
      * @return bool
      */
-    public static function isExtendedFormatUsed()
+    public static function hasExternalDb()
     {
         // Sigh
-        return \Config::get('external_db') === 'schoolbox';
+        return \Config::get('external_db') !== 'schoolbox';
     }
 
     /**
@@ -124,7 +124,7 @@ class User extends AbstractImporter
             "Superuser?"                   => '',
             "Account Enabled?"             => '',
         ];
-        if (self::isExtendedFormatUsed()) {
+        if (!self::hasExternalDb()) {
             $format += [
                 // user_relation
                 "Child External IDs"           => '',
@@ -249,7 +249,7 @@ class User extends AbstractImporter
             $userResult->setUser($this->hydrateUser($row, $user));
 
 //            // Step 4: update extended fields if using SB connector
-//            if ($this->isExtendedFormatUsed()) {
+//            if (!$this->hasExternalDb()) {
 //                // update
 //            }
 
