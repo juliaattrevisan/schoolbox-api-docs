@@ -382,15 +382,17 @@ class User extends AbstractImporter
      */
     protected function retrieveUserChildren(UserModel $user)
     {
-        $userId = $user->getId();
-        $users  = [];
+        $userId   = $user->getId();
+        $childIds = [];
         if ($userId) {
             foreach ($this->userRelationMapper->findByColumn('user_id', $userId) as $userRelation) {
                 /** @var UserRelationModel $userRelation */
-                $users[] = $userRelation->getRelation();
+                // Fully populate the user fields
+                $childIds[] = $userRelation->getRelation()->getId();
             }
+            return $this->userMapper->findByColumn('id', $childIds);
         }
-        return $users;
+        return [];
     }
 
     /**
@@ -448,12 +450,12 @@ class User extends AbstractImporter
             }
         }
 
-//        // Pass 2: save user relations (if using SB connector)
-//        if (!$this->hasExternalDb()) {
-//            foreach ($result as $userResult) {
-//                $this->updateUserRelations($userResult);
-//            }
-//        }
+        // Pass 2: save user relations (if using SB connector)
+        if (!$this->hasExternalDb()) {
+            foreach ($result as $userResult) {
+                $this->updateChildren($userResult);
+            }
+        }
     }
 
     /**
@@ -564,6 +566,57 @@ class User extends AbstractImporter
             $this->log->info(sprintf('Pretending to update user profile for "%s"', $user->formatName()), ['diff' => $diff]);
         }
     }
+
+    /**
+     * Updates a user profile record.
+     *
+     * @param User\Result $userResult
+     */
+    protected function updateChildren(User\Result $userResult)
+    {
+        $user             = $userResult->getUser();
+        $originalChildren = $userResult->getOriginalChildren();
+
+        // Load full child records.
+        // This must be done here, as child users aren't guaranteed to exist
+        // until users have been saved.
+        $newExternalIds = [];
+        foreach ($userResult->getChildren() as $newChild) {
+            $newExternalIds[] = $newChild->getExternalId();
+        }
+        $newChildren = $this->userMapper->findByColumn('synergy_id', $newExternalIds);
+
+        $context = [
+            'old' => $originalChildren,
+            'new' => $newChildren,
+        ];
+
+        // Diff the list
+        if ($this->performUpdate) {
+            $this->log->info(sprintf('Updating children for "%s"', $user->formatName()), $context);
+            try {
+                // Wipe and save the new users
+                $this->userRelationMapper->deleteByColumn('user_id', $user->getId());
+                $newRelations = [];
+                foreach ($newChildren as $newChild) {
+                    $newRelation = new UserRelationModel();
+                    $newRelation
+                        ->setUser($user)
+                        ->setRelation($newChild)
+                        ->setRelationType(UserRelationModel::RELATION_TYPE_PARENT)
+                    ;
+                    $newRelations[] = $newRelation;
+                }
+                $this->userRelationMapper->save($newRelations);
+                $this->log->info('Children updated');
+            } catch (\Exception $e) {
+                $this->log->error('Could not update children!', ['error' => $e->getMessage()]);
+            }
+        } else {
+            $this->log->info(sprintf('Pretending to update children for "%s"', $user->formatName()), $context);
+        }
+    }
+
 
     /**
      * Parses a string from a CSV field into a boolean value.
