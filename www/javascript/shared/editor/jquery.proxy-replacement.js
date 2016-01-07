@@ -17,7 +17,7 @@
                 $(element).replaceWith('<video data-schoolboxmedia-replacement controls preload="none" poster="' + thumbnail + '" class="' + classes + '" style="' + style + '"><source src="' + source + '" type="video/mp4"></video>');
             }
             else if (type == 'audio') {
-                $(element).replaceWith('<audio data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:1px;border:0px;"><source src="' + source + '" type="audio/mpeg"></audio>');
+                $(element).replaceWith('<audio data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:50px;border:0px;"><source src="' + source + '" type="audio/mpeg"></audio>');
             }
         });
     }
