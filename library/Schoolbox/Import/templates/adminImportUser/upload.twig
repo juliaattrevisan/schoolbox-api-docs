@@ -31,5 +31,6 @@
             </ul>
         </li>
     </ul>
-    <a href="{{ csvTemplate }}" class="button icon-download">Download Template</a>
+    <a href="/adminv2/import/{{ config.external_type == 'schoolbox' ? 'userTemplateWithProfile.csv' : 'userTemplate.csv' }}"
+       class="button icon-download">Download Template</a>
 {% endblock helpText %}

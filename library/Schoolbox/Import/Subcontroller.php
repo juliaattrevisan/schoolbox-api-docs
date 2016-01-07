@@ -47,20 +47,13 @@ class Subcontroller extends Base
      */
     public function upload()
     {
-        // Show a different template if using the Schoolbox connector
-        $csvTemplate = '/adminv2/import/userTemplate.csv';
-        if ($this->getDi()->get('config')->get('external_db') === 'schoolbox') {
-            $csvTemplate = '/adminv2/import/userTemplateWithProfile.csv';
-        }
         $this->getResponse()->content->set([
             'template' => '@'.$this->basename.'/upload.twig',
             'data'     => [
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
-                'csvTemplate'    => $csvTemplate,
                 'attachzone'     => $this->getAttachzone()->getTwigContext(),
                 'basename'       => $this->basename,
-//                'logHash'        => $this->getSession()->getSegment(static::class)->getFlash('logHash'),
             ],
         ]);
     }
