@@ -13,6 +13,7 @@ namespace Schoolbox\ResourceBooking\Item;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Collection;
+use Schoolbox\Role;
 
 class Mapper extends BaseMapper
 {
@@ -338,10 +339,21 @@ class Mapper extends BaseMapper
                 );
 
                 // populate role permissions
-                $roleMapper = $mapper->getJoinMapper('role');
-                $model->setRoleList(
-                    $roleMapper->findByColumn('resource_id', $model->getId())
-                );
+                // Role names are needed for display as well
+                $rolePermissionMapper = $mapper->getJoinMapper('role');
+                $roleList             = [];
+                $rolePermissionList   = $rolePermissionMapper->findByColumn('resource_id', $model->getId());
+                foreach ($mapper->getJoinMapper('role.role')->findAll() as $role) {
+                    /** @var Role $role */
+                    $roleList[$role->getId()] = $role;
+                }
+                foreach ($rolePermissionList as $rolePermission) {
+                    /** @var RolePermission\Model $rolePermission */
+                    if (array_key_exists($rolePermission->getRole()->getId(), $roleList)) {
+                        $rolePermission->setRole($roleList[$rolePermission->getRole()->getId()]);
+                    }
+                }
+                $model->setRoleList($rolePermissionList);
 
                 return $model;
             }

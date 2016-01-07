@@ -23,13 +23,35 @@
     {% endif %}
 
     {# Booking moderation status #}
-    {% if item.moderationType.open %}
-        <li>This item may be booked by anybody, and the booking will be automatically confirmed.</li>
-    {% endif %}
-    {% if item.moderationType.moderated %}
-        <li>This item may be booked by anybody, but the booking must be confirmed by a moderator.</li>
-    {% endif %}
-    {% if item.moderationType.managed %}
+
+    {# Are any roles allowed to book this? #}
+    {% set bookableByRole = false %}
+    {% for role in item.getRoleList() %}
+        {% if role.getAllowed() %}
+            {% set bookableByRole = true %}
+        {% endif %}
+    {% endfor %}
+
+    {% if item.moderationType.managed or not bookableByRole %}
         <li>This item may only be booked by its moderators.</li>
+    {% else %}
+        <li>
+            This item may be booked by any member of these roles:
+            <ul>
+                {% for role in item.getRoleList() %}
+                    {% if role.getAllowed() %}
+                        <li>{{ role.getRole().getName() }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </li>
+        <li>
+            {% if item.moderationType.open %}
+                Your booking will be automatically confirmed.
+            {% endif %}
+            {% if item.moderationType.moderated %}
+                Your booking must be confirmed by a moderator.
+            {% endif %}
+        </li>
     {% endif %}
 </ul>
