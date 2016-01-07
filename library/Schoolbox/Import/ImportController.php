@@ -43,17 +43,30 @@ class ImportController extends Base
     }
 
     /**
+     * Gets base template data. Actions should extend these template vars.
+     *
+     * @return array
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    protected function getBaseData()
+    {
+        return [
+            'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
+            'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
+            'basename'       => $this->basename,
+            'hasExternalDb'  => ($this->getDi()->get('config')->get('external_type') != 'schoolbox'),
+        ];
+    }
+
+    /**
      * User import submit screen action
      */
     public function upload()
     {
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/upload.twig',
-            'data'     => [
-                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
-                'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
-                'attachzone'     => $this->getAttachzone()->getTwigContext(),
-                'basename'       => $this->basename,
+            'data'     => $this->getBaseData() + [
+                'attachzone' => $this->getAttachzone()->getTwigContext(),
             ],
         ]);
     }
@@ -68,12 +81,9 @@ class ImportController extends Base
         $this->buildImporter($reader, $logger, false)->save();
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/preview.twig',
-            'data'     => [
-                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
-                'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
-                'log'            => ['lines' => $this->parseLogLines($logger),],
-                'attachzone'     => $this->getAttachzone($upload->getHash())->getTwigContext(),
-                'basename'       => $this->basename,
+            'data'     => $this->getBaseData() + [
+                'log'        => ['lines' => $this->parseLogLines($logger),],
+                'attachzone' => $this->getAttachzone($upload->getHash())->getTwigContext(),
             ],
         ]);
     }
@@ -88,10 +98,8 @@ class ImportController extends Base
         $this->buildImporter($reader, $logger, true)->save();
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/import.twig',
-            'data'     => [
-                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
-                'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
-                'log'            => ['lines' => $this->parseLogLines($logger),],
+            'data'     => $this->getBaseData() + [
+                'log' => ['lines' => $this->parseLogLines($logger),],
             ],
         ]);
     }
