@@ -11,7 +11,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
          */
         video: {
             source: function(id, filesystem) {
-                return '/cms/sendVideo.php?&id=' + id + '&type=' + filesystem;
+                return '/cms/sendVideo.php?id=' + id + '&type=' + filesystem;
             },
             thumbnail: '/cms/videoThumb.php?type=sbfs&size=poster&id=',
             regex: /^\/cms\/sendVideo/
@@ -21,7 +21,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
          */
         audio: {
             source: function(id, filesystem) {
-                return '/cms/sendVideo.php?&id=' + id + '&type=' + filesystem;
+                return '/cms/sendVideo.php?id=' + id + '&type=' + filesystem;
             },
             thumbnail: '/images/core/component/audio-thumbnail-processing.gif',
             regex: /^\/cms\/sendVideo/
