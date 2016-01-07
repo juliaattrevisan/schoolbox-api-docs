@@ -72,7 +72,7 @@ class ImportController extends Base
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
                 'log'            => ['lines' => $this->parseLogLines($logger),],
-                'attachzone'     => $this->getAttachzone($upload->getHash())->getTwigContext(),
+                'attachzone'     => $this->getAttachzone($upload->getHash(), true)->getTwigContext(),
                 'basename'       => $this->basename,
             ],
         ]);
@@ -100,9 +100,10 @@ class ImportController extends Base
      * Gets an attachzone used to upload a file for import
      *
      * @param  string $hash if set, the hash of the file to attach
+     * @param  bool   $readonly
      * @return Zone
      */
-    protected function getAttachzone($hash = null)
+    protected function getAttachzone($hash = null, $readonly = false)
     {
         $zone = new Zone('import');
         $zone
@@ -110,7 +111,7 @@ class ImportController extends Base
             ->setAttachmentsLabel('Upload CSV')
             ->setAttachPrompt('upload CSV')
 //            ->setMimeFilter('text/csv')
-            ->setReadOnly(false)
+            ->setReadOnly($readonly)
             ->setMulti(false);
         if (isset($hash)) {
             $zone->attachFiles([$hash]);
