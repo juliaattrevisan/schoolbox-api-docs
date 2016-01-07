@@ -23,7 +23,7 @@ use Psr\Log\LoggerInterface;
  *
  * @package Schoolbox\Import
  */
-class Subcontroller extends Base
+class ImportController extends Base
 {
     use ImportNavigation;
 

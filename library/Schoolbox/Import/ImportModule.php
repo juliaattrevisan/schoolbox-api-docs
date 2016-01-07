@@ -24,7 +24,7 @@ use Twig_Loader_Chain;
  *
  * @package Schoolbox\Import
  */
-class Submodule extends BaseModule
+class ImportModule extends BaseModule
 {
     public function __construct(ContainerInterface $injector, $basename)
     {
@@ -75,7 +75,7 @@ class Submodule extends BaseModule
         $injector->set(
             'controller:'.$this->basename,
             $injector->lazyNew(
-                Subcontroller::class,
+                ImportController::class,
                 ['basename' => $this->basename]
             )
         );
