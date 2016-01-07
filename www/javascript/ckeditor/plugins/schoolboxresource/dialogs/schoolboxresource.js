@@ -200,18 +200,18 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             styles.push('border:1px solid #808080;');
         }
 
-        /* Vertical Spacing (applies padding-top and padding-bottom)
+        /* Vertical Spacing (applies margin-top and margin-bottom)
          */
-        if (fields.verticalPadding.getValue() != '') {
-            styles.push('padding-top:' + fields.verticalPadding.getValue() + 'px');
-            styles.push('padding-bottom:' + fields.verticalPadding.getValue() + 'px');
+        if (fields.verticalMargin.getValue() != '') {
+            styles.push('margin-top:' + fields.verticalMargin.getValue() + 'px');
+            styles.push('margin-bottom:' + fields.verticalMargin.getValue() + 'px');
         }
 
-        /* Horizontal Spacing (applies padding-left and padding-right)
+        /* Horizontal Spacing (applies margin-left and margin-right)
          */
-        if (fields.horizontalPadding.getValue() != '') {
-            styles.push('padding-left:' + fields.horizontalPadding.getValue() + 'px');
-            styles.push('padding-right:' + fields.horizontalPadding.getValue() + 'px');
+        if (fields.horizontalMargin.getValue() != '') {
+            styles.push('margin-left:' + fields.horizontalMargin.getValue() + 'px');
+            styles.push('margin-right:' + fields.horizontalMargin.getValue() + 'px');
         }
 
         /* Combine and inject
@@ -243,8 +243,8 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             fullwidth: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-fullwidth'),
             alignment: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-alignment'),
             border: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-border'),
-            verticalPadding: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-verticalpadding'),
-            horizontalPadding: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-horizontalpadding')
+            verticalMargin: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-verticalmargin'),
+            horizontalMargin: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-horizontalmargin')
         };
     }
 
@@ -662,7 +662,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                             },
                             {
                                 type: 'text',
-                                id: 'schoolboxresource-verticalpadding',
+                                id: 'schoolboxresource-verticalmargin',
                                 label: 'Vertical Spacing',
 
                                 /* Editing an existing element
@@ -671,16 +671,16 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = dialogFields(dialog);
 
-                                    var padding = extractStyle('padding-top', element.getAttribute('style')).replace('px', '');
+                                    var margin = extractStyle('margin-top', element.getAttribute('style')).replace('px', '');
 
-                                    if (padding.length) {
-                                        fields.verticalPadding.setValue(padding);
+                                    if (margin.length) {
+                                        fields.verticalMargin.setValue(margin);
                                     }
                                 }
                             },
                             {
                                 type: 'text',
-                                id: 'schoolboxresource-horizontalpadding',
+                                id: 'schoolboxresource-horizontalmargin',
                                 label: 'Horizontal Spacing',
 
                                 /* Editing an existing element
@@ -689,10 +689,10 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = dialogFields(dialog);
 
-                                    var padding = extractStyle('padding-left', element.getAttribute('style')).replace('px', '');
+                                    var margin = extractStyle('margin-left', element.getAttribute('style')).replace('px', '');
 
-                                    if (padding.length) {
-                                        fields.horizontalPadding.setValue(padding);
+                                    if (margin.length) {
+                                        fields.horizontalMargin.setValue(margin);
                                     }
                                 }
                             }

@@ -190,7 +190,7 @@
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
-                extraAllowedContent: 'img(full-width)[data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,display,padding-top,padding-bottom,padding-left,padding-right,padding,float}',
+                extraAllowedContent: 'img(full-width)[data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float}',
 
                 /* Remove annoying dialog that always appears
                  */
