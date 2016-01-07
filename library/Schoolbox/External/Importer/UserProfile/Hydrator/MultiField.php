@@ -56,7 +56,7 @@ class MultiField implements HydratorInterface
                 return $user;
             }
         }
-        call_user_func([$user, $this->setMethod], implode(' ', $fieldValue));
+        call_user_func([$user, $this->setMethod], trim(implode(' ', $fieldValue)));
         return $user;
     }
 }
