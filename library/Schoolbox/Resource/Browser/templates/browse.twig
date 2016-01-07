@@ -79,6 +79,9 @@
                 case 'file':
                     draggedTypeGen = '{{ fileController }}';
                     break;
+                case 'link':
+                    draggedTypeGen = '{{ linkController }}' || '{{ folderController }}';
+                    break;
                 case 'folder':
                 default:
                     draggedTypeGen = '{{ folderController }}';
