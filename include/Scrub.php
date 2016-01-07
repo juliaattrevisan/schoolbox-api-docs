@@ -210,6 +210,7 @@ class Scrub
 
                 /* Allow SchoolboxResource data elements
                  */
+                $def->addAttribute('img', 'data-schoolboxresource-filesystem', 'Text');
                 $def->addAttribute('img', 'data-schoolboxresource-type', 'Text');
                 $def->addAttribute('img', 'data-schoolboxresource-thumbnail', 'Text');
                 $def->addAttribute('img', 'data-schoolboxresource-source', 'Text');

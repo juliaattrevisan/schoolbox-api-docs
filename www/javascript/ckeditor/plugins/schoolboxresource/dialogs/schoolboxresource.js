@@ -119,6 +119,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
             dataVars = {
                 'data-schoolboxresource-type': 'video',
+                'data-schoolboxresource-filesystem': fields.filesystem.getValue(),
                 'data-schoolboxresource-thumbnail': url,
                 'data-schoolboxresource-source': config.video.source(fields.id.getValue(), fields.filesystem.getValue())
             };
@@ -130,6 +131,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
             dataVars = {
                 'data-schoolboxresource-type': 'audio',
+                'data-schoolboxresource-filesystem': fields.filesystem.getValue(),
                 'data-schoolboxresource-thumbnail': url,
                 'data-schoolboxresource-source': config.audio.source(fields.id.getValue(), fields.filesystem.getValue())
             };
@@ -139,6 +141,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
         else if (fields.type.getValue() == 'image') {
             dataVars = {
                 'data-schoolboxresource-type': 'image',
+                'data-schoolboxresource-filesystem': fields.filesystem.getValue(),
                 'data-schoolboxresource-thumbnail': url,
                 'data-schoolboxresource-source': url
             };
@@ -287,12 +290,12 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
     }
 
     /**
-     * Extract resource type from a url
+     * Extract resource filesystem type from a url
      *
      * @param url
      * @returns {*}
      */
-    function extractResourceType(url) {
+    function extractResourceFilesystem(url) {
         var bits = url.match(/type=(\w+)/);
 
         if ((bits != null) && bits.length) {
@@ -364,6 +367,10 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                      */
                                     fields.id.setValue(extractResourceId(element.getAttribute('src')));
 
+                                    /* Remember filesystem from which this thing came
+                                     */
+                                    fields.filesystem.setValue(element.getAttribute('data-schoolboxresource-filesystem'));
+
                                     /* Remember type
                                      */
                                     fields.type.setValue(element.getAttribute('data-schoolboxresource-type'));
@@ -394,9 +401,9 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     /* Decide whether this is a video/audio resource
                                      */
                                     if (url.match(config.video.regex)) {
-                                        var type = extractResourceType(url);
+                                        var filesystem = extractResourceFilesystem(url);
                                         var id = extractResourceId(url);
-                                        var tuple = type + ':' + id;
+                                        var tuple = filesystem + ':' + id;
 
                                         fields.id.setValue(extractResourceId(url));
 
