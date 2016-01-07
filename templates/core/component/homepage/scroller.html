@@ -1,16 +1,27 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container" data-component>
     <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
     <script type="text/javascript">
+        // Expanded? init on load
+        // Collapsed? init on expand
         $(function(){
-            $("#component{COMPONENT_INSTANCE_ID}").find("[data-imageslider]").anyslider({
-                interval: {COMPONENT_CONFIG_TIMING_VALUE_MS},
-                prevLabel: '',
-                nextLabel: '',
-                showBullets: false,
-                showControls: true,
-                startSlide: {COMPONENT_RANDOM_SLIDE}
-            });
+            var component = $("#component{COMPONENT_INSTANCE_ID}");
+            var init = function() {
+                component.find("[data-imageslider]").anyslider({
+                    interval: {COMPONENT_CONFIG_TIMING_VALUE_MS},
+                    prevLabel: '',
+                    nextLabel: '',
+                    showBullets: false,
+                    showControls: true,
+                    startSlide: {COMPONENT_RANDOM_SLIDE}
+                });
+            };
 
+            var collapser = component.find('[data-collapsable="true"]');
+            if (collapser.data('collapseState') === 'uncollapsed') {
+                init();
+            } else {
+                collapser.one('expandStop.collapsable', init);
+            }
         });
     </script>
 
