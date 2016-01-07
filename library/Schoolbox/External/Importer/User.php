@@ -106,7 +106,7 @@ class User extends AbstractImporter
     public static function hasExternalDb()
     {
         // Sigh
-        return \Config::get('external_db') !== 'schoolbox';
+        return \Config::get('external_type') !== 'schoolbox';
     }
 
     /**
