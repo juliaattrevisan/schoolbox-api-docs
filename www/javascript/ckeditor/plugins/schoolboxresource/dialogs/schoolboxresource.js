@@ -13,7 +13,9 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             source: function(id, filesystem) {
                 return '/cms/sendVideo.php?id=' + id + '&type=' + filesystem;
             },
-            thumbnail: '/cms/videoThumb.php?type=sbfs&size=poster&id=',
+            thumbnail: function(id, filesystem) {
+                return '/cms/videoThumb.php?size=poster&id=' + id + '&type=' + filesystem;
+            },
             regex: /^\/cms\/sendVideo/
         },
 
@@ -50,7 +52,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
         /* Special case for video url
          */
         if (fields.type.getValue() == 'video') {
-            url = config.video.thumbnail + fields.id.getValue();
+            url = config.video.thumbnail(fields.id.getValue(), fields.filesystem.getValue());
         }
         else if (fields.type.getValue() == 'audio') {
             url = config.audio.thumbnail;
@@ -115,7 +117,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
         /* Special case for video data
          */
         if (fields.type.getValue() == 'video') {
-            url = config.video.thumbnail + fields.id.getValue();
+            url = config.video.thumbnail(fields.id.getValue(), fields.filesystem.getValue());
 
             dataVars = {
                 'data-schoolboxresource-type': 'video',
