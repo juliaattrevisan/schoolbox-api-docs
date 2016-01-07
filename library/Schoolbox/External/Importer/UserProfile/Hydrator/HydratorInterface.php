@@ -12,7 +12,7 @@ use Schoolbox\External\UserProfile as UserProfileModel;
 /**
  * Specialized hydrator interface for the import of user profiles.
  *
- * @package Schoolbox\External\Importer\User\Hydrator
+ * @package Schoolbox\External\Importer\UserProfile\Hydrator
  */
 interface HydratorInterface
 {

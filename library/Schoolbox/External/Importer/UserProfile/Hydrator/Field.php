@@ -13,7 +13,7 @@ use Schoolbox\External\UserProfile as UserProfileModel;
  * Sets a field in the user based on the value of a key in the imported row,
  * if that key exists in the row.
  *
- * @package Schoolbox\External\Importer\User\Hydrator
+ * @package Schoolbox\External\Importer\UserProfile\Hydrator
  */
 class Field implements HydratorInterface
 {
