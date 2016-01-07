@@ -14,8 +14,10 @@ use HouseResidential as HouseResidentialModel;
 use HouseResidentialMapper;
 use Schoolbox\Campus as CampusModel;
 use Schoolbox\CampusMapper;
-use Schoolbox\External\UserProfile As UserProfileModel;
+use Schoolbox\External\UserProfile as UserProfileModel;
 use Schoolbox\External\UserProfileMapper;
+use Schoolbox\External\UserRelation as UserRelationModel;
+use Schoolbox\External\UserRelationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role as RoleModel;
 use Schoolbox\RoleMapper;
@@ -52,6 +54,11 @@ class User extends AbstractImporter
      * @var UserProfileMapper
      */
     protected $userProfileMapper;
+
+    /**
+     * @var UserRelationMapper
+     */
+    protected $userRelationMapper;
 
     /**
      * @var array|RoleModel[]
@@ -95,6 +102,13 @@ class User extends AbstractImporter
      * @var array|UserProfile\Hydrator\HydratorInterface[]
      */
     protected $userProfileHydrators = [];
+
+    /**
+     * Same as $userHydrators, but for the user relation table.
+     *
+     * @var array|UserRelation\Hydrator\HydratorInterface[]
+     */
+    protected $userRelationHydrators = [];
 
     /**
      * Does this Schoolbox have an external database?
@@ -172,8 +186,9 @@ class User extends AbstractImporter
      */
     protected function setup()
     {
-        $this->userMapper        = new UserMapper();
-        $this->userProfileMapper = new UserProfileMapper();
+        $this->userMapper         = new UserMapper();
+        $this->userProfileMapper  = new UserProfileMapper();
+        $this->userRelationMapper = new UserRelationMapper();
 
         // Role list
         foreach (RoleMapper::getInstance()->findAll() as $role) {
@@ -247,6 +262,7 @@ class User extends AbstractImporter
         $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Postcode", 'setGuardian2Postcode');
 
         // Parent-child relation hydrator
+        $this->userRelationHydrators[] = new UserRelation\Hydrator\ExternalId("Child External IDs", $this->userMapper);
     }
 
     /**
@@ -287,9 +303,15 @@ class User extends AbstractImporter
 
             // Step 4: update extended fields if using SB connector
             if (!$this->hasExternalDb()) {
+                // User profile
                 $userProfile = $this->retrieveUserProfile($user);
                 $userResult->setOriginalUserProfile(clone $userProfile);
                 $userResult->setUserProfile($this->hydrateUserProfile($row, $userProfile));
+
+//                // User's children (identified by external ID)
+//                $userChildren = $this->retrieveUserChildren($user);
+//                $userResult->setOriginalUserChildren(clone $userChildren);
+//                $userResult->UserChildren($this->hydrateUserChildren($row, $userChildren));
             }
 
             $result[] = $userResult;
@@ -353,6 +375,25 @@ class User extends AbstractImporter
     }
 
     /**
+     * Retrieves users of whom this user is a guardian.
+     *
+     * @param  UserModel $user
+     * @return UserModel[]
+     */
+    protected function retrieveUserChildren(UserModel $user)
+    {
+        $userId = $user->getId();
+        $users  = [];
+        if ($userId) {
+            foreach ($this->userRelationMapper->findByColumn('user_id', $userId) as $userRelation) {
+                /** @var UserRelationModel $userRelation */
+                $users[] = $userRelation->getRelation();
+            }
+        }
+        return $users;
+    }
+
+    /**
      * Updates a user profile based on the user profile hydrators.
      *
      * @param  array            $row         A row from the CSV import.
@@ -373,8 +414,9 @@ class User extends AbstractImporter
     public function save()
     {
         $result = $this->parse();
+
+        // Pass 1: save users
         foreach ($result as $userResult) {
-            // Delete or save
             if ($userResult->isUserDeleted()) {
                 $this->deleteUser($userResult);
             } else {
@@ -389,6 +431,13 @@ class User extends AbstractImporter
                 }
             }
         }
+
+//        // Pass 2: save user relations (if using SB connector)
+//        if (!$this->hasExternalDb()) {
+//            foreach ($result as $userResult) {
+//                $this->updateUserRelations($userResult);
+//            }
+//        }
     }
 
     /**
