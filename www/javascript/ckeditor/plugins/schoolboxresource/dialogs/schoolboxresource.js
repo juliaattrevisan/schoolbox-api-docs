@@ -357,7 +357,8 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                     {
                         type: 'text',
                         id: 'schoolboxresource-id',
-                        label: 'Id'
+                        label: 'Id',
+                        className: 'hide'
                     },
 
                     /* Store string 'image', 'video', 'audio'
@@ -366,7 +367,8 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                     {
                         type: 'text',
                         id: 'schoolboxresource-type',
-                        label: 'Type'
+                        label: 'Type',
+                        className: 'hide'
                     },
 
                     /* The filesystem where the resource was found
@@ -374,7 +376,8 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                     {
                         type: 'text',
                         id: 'schoolboxresource-filesystem',
-                        label: 'Filesystem'
+                        label: 'Filesystem',
+                        className: 'hide'
                     },
                     {
                         type: 'hbox',
