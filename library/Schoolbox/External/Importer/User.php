@@ -308,10 +308,10 @@ class User extends AbstractImporter
                 $userResult->setOriginalUserProfile(clone $userProfile);
                 $userResult->setUserProfile($this->hydrateUserProfile($row, $userProfile));
 
-//                // User's children (identified by external ID)
-//                $userChildren = $this->retrieveUserChildren($user);
-//                $userResult->setOriginalUserChildren(clone $userChildren);
-//                $userResult->UserChildren($this->hydrateUserChildren($row, $userChildren));
+                // User's children (identified by external ID)
+                $userChildren = $this->retrieveUserChildren($user);
+                $userResult->setOriginalChildren(clone $userChildren);
+                $userResult->setChildren($this->hydrateChildren($row, $userChildren));
             }
 
             $result[] = $userResult;
@@ -406,6 +406,22 @@ class User extends AbstractImporter
             $userProfile = $hydrator->hydrate($row, $userProfile);
         }
         return $userProfile;
+    }
+
+
+    /**
+     * Updates a user profile based on the user profile hydrators.
+     *
+     * @param  array       $row      A row from the CSV import.
+     * @param  UserModel[] $children The child list to update
+     * @return UserModel[] An updated user object
+     */
+    protected function hydrateChildren($row, $children)
+    {
+        foreach ($this->userRelationHydrators as $hydrator) {
+            $children = $hydrator->hydrate($row, $children);
+        }
+        return $children;
     }
 
     /**
