@@ -134,6 +134,9 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         $page->setVar(array(
             'not_reviewed_block' => ''
         ));
+        $page->setVar(array(
+            'not_reviewed_checkbox_block' => ''
+        ));
 
         $page->parse('reviewed_block', 'reviewed');
     }
@@ -143,6 +146,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         ));
 
         $page->parse('not_reviewed_block', 'not_reviewed');
+        $page->parse('not_reviewed_checkbox_block', 'not_reviewed_checkbox');
     }
 
     /* Expandable attempts
@@ -177,6 +181,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
      */
     $page->setVar(array(
         'not_reviewed_block' => '',
+        'not_reviewed_checkbox_block' => '',
         'reviewed_block' => '',
         'submitted_block' => '',
         'unsubmitted_block' => '',
@@ -230,6 +235,7 @@ $this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
 $this->setBlock('attempt', 'attempted', 'attempted_block');
 $this->setBlock('attempt', 'reviewed', 'reviewed_block');
 $this->setBlock('attempt', 'not_reviewed', 'not_reviewed_block');
+$this->setBlock('attempt', 'not_reviewed_checkbox', 'not_reviewed_checkbox_block');
 $this->setBlock('attempt', 'submitted', 'submitted_block');
 $this->setBlock('attempt', 'unsubmitted', 'unsubmitted_block');
 $this->setBlock('attempt', 'has_review', 'has_review_block');
@@ -237,16 +243,18 @@ $this->setBlock('attempt', 'expand_attempts', 'expand_attempts_block');
 $this->setBlock('attempt', 'has_marks', 'has_marks_block');
 $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 $this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
+$this->setBlock(TEMPLATE_content, 'review', 'review_block');
 $this->setBlock(TEMPLATE_content, 'has_attempt', 'has_attempt_block');
 
 $this->setVar(array(
     'not_reviewed_block' => '',
+    'not_reviewed_checkbox_block' => '',
     'reviewed_block' => '',
     'submitted_block' => '',
     'unsubmitted_block' => '',
     'has_review_block' => '',
     'expand_attempts_block' => '',
-    'has_marks_block' => '',
+    'has_marks_block' => '&nbsp;',
 ));
 
 $this->setTitle('Results for: ' . $assess['title']);
@@ -326,7 +334,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
 } else {
     $this->setVar(array(
         'has_attempt_block' => '',
-        'has_marks_block' => '',
+        'has_marks_block' => '&nbsp;',
     ));
 }
 
@@ -398,8 +406,9 @@ if (is_array($allStudents) && count($allStudents)) {
                 'submitted_block' => '',
                 'reviewed_block' => '',
                 'has_review_block' => '',
-                'has_marks_block' => '',
+                'has_marks_block' => '&nbsp;',
                 'not_reviewed_block' => '',
+                'not_reviewed_checkbox_block' => '',
                 'attempted_block'  => '',
             ));
 
@@ -411,10 +420,11 @@ if (is_array($allStudents) && count($allStudents)) {
              */
             $this->setVar(array(
                 'not_reviewed_block' => '',
+                'not_reviewed_checkbox_block' => '',
                 'reviewed_block' => '',
                 'submitted_block' => '',
                 'unsubmitted_block' => '',
-                'has_marks_block' => '',
+                'has_marks_block' => '&nbsp;',
             ));
         }
 
@@ -433,7 +443,7 @@ if (is_array($allStudents) && count($allStudents)) {
         'attempt_block' => '',
         'assess_delete_block' => '',
         'user_attempts_block' => '',
-        'has_marks_block' => '',
+        'has_marks_block' => '&nbsp;',
     ));
 }
 
@@ -458,9 +468,11 @@ $this->parse('user_attempts_block', 'user_attempts', true);
 
 if ($readonly) {
     $this->setVar('delete_block', '');
+    $this->setVar('review_block', '');
     $this->setVar('modify_btn_block', '');
 } else {
     $this->parse('delete_block', 'delete');
+    $this->parse('review_block', 'review');
     $this->parse('modify_btn_block', 'modify_btn');
 }
 

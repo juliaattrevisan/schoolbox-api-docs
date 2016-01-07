@@ -8,6 +8,23 @@
 
             $('[data-user='+userId+'][data-expandable]').toggleClass('hide')
         })
+        $('[review-selected]').click(function(event) {
+            event.preventDefault();
+
+            if ($('input[name="reviewAttemptIds[]"]:checked').length === 0) {
+                alert('You must select at least at least one quiz to review');
+            } else {
+
+                var selectedIds = $('input[name="reviewAttemptIds[]"]:checked').map(function() {
+                    return $(this).val();
+                }).get();
+
+                $.post('/assess/reviewAttempt', {selectedIds: selectedIds})
+                    .always(function(status) {
+                        location.reload();
+                    });
+            }
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -81,7 +98,7 @@
                                     <!-- END has_marks -->
                                 </div>
 
-                                <div class="small-12 medium-5 columns">
+                                <div class="small-12 medium-4 columns">
                                     <!-- BEGIN submitted -->
                                     <span class="submitted label full-width">Finished<br />{ATTEMPT_FINISH}</span>
                                     <!-- END submitted -->
@@ -95,9 +112,21 @@
                                     <!-- END reviewed -->
 
                                     <!-- BEGIN not_reviewed -->
-                                    <span class="neutral submitted label full-width">Not Reviewed</span>
+                                    <span class="neutral submitted label full-width">
+                                        Not Reviewed
+                                    </span>
                                     <!-- END not_reviewed -->
                                 </div>
+
+                                <div class="small-12 medium-1 columns">
+                                    <!-- BEGIN not_reviewed_checkbox -->
+                                    <input id="review-{ATTEMPT_ATTEMPT_ID}" type="checkbox" name='reviewAttemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
+                                    <label for="review-{ATTEMPT_ATTEMPT_ID}" class="checkbox-toggle">
+                                        <span class="icon-tick" title="Mark As Reviewed"></span>
+                                    </label>
+                                    <!-- END not_reviewed_checkbox -->
+                                </div>
+
                             </div>
                             <nav>
                                 <!-- BEGIN has_review -->
@@ -113,6 +142,9 @@
                 <!-- END user_attempts -->
                 </ul>
             </section>
+            <!-- BEGIN review -->
+            <button class='expand' review-selected>Review selected</button>
+            <!-- END review -->
             <!-- BEGIN delete -->
             <input type='submit' value='Delete selected'/>
             <!-- END delete -->
