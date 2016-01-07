@@ -384,6 +384,9 @@ class User extends AbstractImporter
                 } else {
                     $this->updateUser($userResult);
                 }
+                if (!$this->hasExternalDb()) {
+                    $this->updateUserProfile($userResult);
+                }
             }
         }
     }
@@ -467,6 +470,33 @@ class User extends AbstractImporter
             }
         } else {
             $this->log->info(sprintf('Pretending to delete user "%s"', $user->formatName()), ['user' => $user]);
+        }
+    }
+
+    /**
+     * Updates a user profile record.
+     *
+     * @param User\Result $userResult
+     */
+    protected function updateUserProfile(User\Result $userResult)
+    {
+        $user        = $userResult->getUser();
+        $userProfile = $userResult->getUserProfile();
+        $diff        = $this->userProfileMapper->diff($userResult->getOriginalUserProfile(), $userProfile);
+        if ($this->performUpdate) {
+            $this->log->info(sprintf('Updating user profile for "%s"', $user->formatName()), ['diff' => $diff]);
+            try {
+                $userProfile->setUserId($user->getId());
+                if ($this->userProfileMapper->save($userProfile)) {
+                    $this->log->info('User profile updated');
+                } else {
+                    $this->log->error('Could not update user profile!');
+                }
+            } catch (\Exception $e) {
+                $this->log->error('Could not update user profile!', ['error' => $e->getMessage()]);
+            }
+        } else {
+            $this->log->info(sprintf('Pretending to update user profile for "%s"', $user->formatName()), ['diff' => $diff]);
         }
     }
 
