@@ -280,7 +280,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
      * @returns {*}
      */
      function extractResourceId(url) {
-        var bits = url.match(/id=(\d+)/);
+        var bits = url.match(/id=([\d\w]+)/);
 
         if ((bits != null) && bits.length) {
             return bits[1];
