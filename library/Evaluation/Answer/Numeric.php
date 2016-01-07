@@ -280,7 +280,9 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
             array(
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => Scrub::text($existing['response']),
-                'ANSWER_CORRECT' => $existing['response'] == $currentAnswer['answer'] ? 'correctAnswer' : 'inCorrectAnswer',
+                'ANSWER_CORRECT' => $existing['response'] == $currentAnswer['answer']
+                    ? 'evaluation-correct-answer-option'
+                    : 'evaluation-incorrect-answer-option',
                 'RESPONSE_ID' => $existing['response_id'],
                 'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
                 'REVIEWED_MARKS' => $existing['mark'],
