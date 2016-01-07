@@ -72,7 +72,7 @@ class ImportController extends Base
                 'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
                 'log'            => ['lines' => $this->parseLogLines($logger),],
-                'attachzone'     => $this->getAttachzone($upload->getHash(), true)->getTwigContext(),
+                'attachzone'     => $this->getAttachzone($upload->getHash())->getTwigContext(),
                 'basename'       => $this->basename,
             ],
         ]);
