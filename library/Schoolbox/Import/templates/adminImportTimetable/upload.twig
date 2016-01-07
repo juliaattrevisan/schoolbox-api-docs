@@ -5,18 +5,27 @@
 {% endblock %}
 
 {% block helpText %}
-    <p>
-        Provide a file containing your timetable in the CSV format in the template below.
-    </p>
-    <ul>
-        <li>You must upload your entire timetable in one CSV - any existing timetable will be deleted.</li>
-        <li>You must have first uploaded your timetable structure.</li>
-        <li>
-            The values you enter for <strong>Term Campus</strong>, <strong>Term Timetable</strong>,
-            <strong>Period Day</strong> and <strong>Term Timetable</strong> must exactly match a row
-            in your timetable structure.
-        </li>
-        <li>Any empty fields will be filled with the previous non-empty value in that column.</li>
-    </ul>
-    <a href="/adminv2/import/timetableTemplate.csv" class="button icon-download">Download Template</a>
+    {% if hasExternalDb %}
+        <p>Your timetable data is stored in your external database - you do not need to upload it here.</p>
+    {% else %}
+        <p>
+            Provide a file containing your timetable in the CSV format in the template below.
+        </p>
+        <ul>
+            <li>You must upload your entire timetable in one CSV - any existing timetable will be deleted.</li>
+            <li>You must have first uploaded your timetable structure.</li>
+            <li>
+                The values you enter for <strong>Term Campus</strong>, <strong>Term Timetable</strong>,
+                <strong>Period Day</strong> and <strong>Term Timetable</strong> must exactly match a row
+                in your timetable structure.
+            </li>
+            <li>Any empty fields will be filled with the previous non-empty value in that column.</li>
+        </ul>
+        <a href="/adminv2/import/timetableTemplate.csv" class="button icon-download">Download Template</a>
+    {% endif %}
 {% endblock helpText %}
+
+{% if hasExternalDb %}
+    {% block form %}
+    {% endblock form %}
+{% endif %}
