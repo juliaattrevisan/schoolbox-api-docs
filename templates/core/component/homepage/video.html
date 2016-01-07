@@ -17,6 +17,20 @@
                 video.setSrc($target);
                 video.setPoster($poster);
             });
+
+            $("[resource-delete]").on('click', function (event) {
+                event.preventDefault();
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this?',
+                    confirmEvent: function (anchor) {
+                        $.get('/cms/fileForm.php?ajax=1&delete=' + anchor.attr('id')).done(function() {
+                            $('.resource-' + anchor.attr('id')).remove();
+                        });
+                    }
+                });
+            });
+
         });
     </script>
 
@@ -50,7 +64,8 @@
                     </ul>
                     <ul class="information-list" data-dz-container>
                         <!-- BEGIN video_list -->
-                        <li>
+                        <li class="actions-small-1 resource-{VIDEO_LIST_ID}">
+                            <div class="list-item">
                             <div class="avatar card">
                                 <a data-videolink href="#" rel="{VIDEO_LIST_ID}">
                                     <img src="/cms/videoThumb.php?type=sbfs&id={VIDEO_LIST_ID}" />
@@ -61,8 +76,13 @@
                                     Posted by
                                     <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a>
                                 </p>
+                                </div>
+                                <p class="list-item-content">{VIDEO_LIST_COMMENT}</p>
                             </div>
-                            <p class="list-item-content">{VIDEO_LIST_COMMENT}</p>
+                            <nav>
+                                <a class="icon-modify no-text" href="/cms/file/{VIDEO_LIST_ID}" title="Modify"></a>
+                                <a class="icon-delete no-text" href="#" resource-delete title="Delete"></a>
+                            </nav>
                         </li>
                         <!-- END video_list -->
                         <!-- BEGIN video_pending_list -->
