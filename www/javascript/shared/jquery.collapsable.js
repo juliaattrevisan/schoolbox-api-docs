@@ -48,7 +48,8 @@
 
                 var component,
                     target = $(this).data('collapser'),
-                    simple = target === true || target.length === undefined;
+                    simple = target === true || target.length === undefined,
+                    icon   = '';
 
                 if (simple) {
                     // if the string "true" is used, or no value, target the container
