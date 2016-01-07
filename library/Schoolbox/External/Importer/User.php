@@ -244,22 +244,15 @@ class User extends AbstractImporter
         // User Profile hydrators
         $this->userProfileHydrators[] = new UserProfile\Hydrator\Field('Date of Birth', 'setDob');
         $this->userProfileHydrators[] = new UserProfile\Hydrator\Field('Year', 'setLevel');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Name", 'setGuardian1Name');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Email", 'setGuardian1Email');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Home Phone", 'setGuardian1HomePhone');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Mobile Phone", 'setGuardian1MobilePhone');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Work Phone", 'setGuardian1WorkPhone');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Address", 'setGuardian1Address');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Suburb", 'setGuardian1Suburb');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 1 Postcode", 'setGuardian1Postcode');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Name", 'setGuardian2Name');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Email", 'setGuardian2Email');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Home Phone", 'setGuardian2HomePhone');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Mobile Phone", 'setGuardian2MobilePhone');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Work Phone", 'setGuardian2WorkPhone');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Address", 'setGuardian2Address');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Suburb", 'setGuardian2Suburb');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Guardian 2 Postcode", 'setGuardian2Postcode');
+        // Join these fields together
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\MultiField(['Title', 'First Name', 'Surname'], 'setGuardian1Name');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Alt Email", 'setGuardian1Email');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Home Phone", 'setGuardian1HomePhone');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Mobile Phone", 'setGuardian1MobilePhone');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Work Phone", 'setGuardian1WorkPhone');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Address", 'setGuardian1Address');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Suburb", 'setGuardian1Suburb');
+        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Postcode", 'setGuardian1Postcode');
 
         // Parent-child relation hydrator
         $this->userRelationHydrators[] = new UserRelation\Hydrator\ExternalId("Child External IDs", $this->userMapper);
