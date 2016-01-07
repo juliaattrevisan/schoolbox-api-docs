@@ -162,7 +162,7 @@ h3 { @extend %h3; }
 h4 { @extend %h4; }
 h5 { @extend %h5; }
 h6 { @extend %h6; }
-p, td { @extend %p;  }
+p, td { @extend %p; }
 ul,
 ol,
 dl { @extend %sm; }
@@ -170,21 +170,14 @@ dl { @extend %sm; }
 // Heading 1
 h1{
 	font-weight: $font-weight-bold; // override
+    @include contrast-bg(0.855, $body-bg, 0%, $white, $black); // 0.855 = $jet
 }
-
-//@media #{$large-down} {
-//	h1{ font-size: 1.875rem; }
-//}
-
-//@media #{$small-only} {
-//	h1{ font-size: 1.375rem; }
-//}
 
 .subheader{
 	text-transform: uppercase;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h2, h3, h4, h5, h6 {
 	&.subheader {
 		@include contrast-bg();
 	}
@@ -197,7 +190,6 @@ a{
 .meta{
 	@include contrast-bg();
 	margin: 0 0 rem-calc(($base-font-size - 10)) 0;
-	//font-size: rem-calc(($base-font-size - 3));
 	font-style: italic;
 	&.title {
 	    color: $black !important;
@@ -230,9 +222,8 @@ blockquote{
     text-decoration: line-through;
 }
 
-// Typically descriptive text1
+// Typically descriptive text
 .desc{
-	//font-size: rem-calc(($base-font-size - 3));
 	margin-bottom: rem-calc(($base-font-size - 3));
 }
 

@@ -2,30 +2,22 @@
     <script type="text/javascript" src="/javascript/components/jquery.countdown/dist/jquery.countdown.js"></script>
     <script type='text/javascript'>
         $(function () {
-            var element       = $('#component{COMPONENT_INSTANCE_ID}-countdown');
-            var weekDisplay   = element.find('[data-countdown=weeks]   [data-countdown-digits]');
-            var dayDisplay    = element.find('[data-countdown=days]    [data-countdown-digits]');
-            var hourDisplay   = element.find('[data-countdown=hours]   [data-countdown-digits]');
-            var minuteDisplay = element.find('[data-countdown=minutes] [data-countdown-digits]');
-            var secondDisplay = element.find('[data-countdown=seconds] [data-countdown-digits]');
             var endTime = new Date({DEADLINE_YEAR}, ({DEADLINE_MONTH}-1), {DEADLINE_DAY}, {DEADLINE_HOUR}, {DEADLINE_MIN}, {DEADLINE_SEC});
 
-            $('#component{COMPONENT_INSTANCE_ID}-countdown').countdown(endTime)
-                .on('update.countdown', function(event) {
-                    // Parse time into weeks, days, hours, minutes, seconds
-                    weekDisplay.text(event.strftime('%w'));
-                    dayDisplay.text(event.strftime('%d'));
-                    hourDisplay.text(event.strftime('%H'));
-                    minuteDisplay.text(event.strftime('%M'));
-                    secondDisplay.text(event.strftime('%S'));
-                })
-                .on('finish.countdown', function() {
-                    weekDisplay.text('00');
-                    dayDisplay.text('00');
-                    hourDisplay.text('00');
-                    minuteDisplay.text('00');
-                    secondDisplay.text('00');
-                });
+            $('#component{COMPONENT_INSTANCE_ID}-countdown').countdown(endTime).on('update.countdown', function(event) {
+                    var format = '%-H:%M:%S';
+                    if(event.offset.days > 0) {
+                        format = '%-d day%!d ' + format;
+                    }
+                    if(event.offset.weeks > 0) {
+                        format = '%-w week%!w ' + format;
+                    }
+                $(this).html(event.strftime(format));
+            })
+            .on('finish.countdown', function(event) {
+                $(this).html('Countdown has been reached!').parent().addClass('disabled');
+            });
+
         });
     </script>
 
@@ -35,41 +27,7 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <div id='component{COMPONENT_INSTANCE_ID}-countdown'>
-                        <ul class="countdown small-block-grid-5">
-                            <li>
-                                <dl>
-                                    <dt>weeks</dt>
-                                    <dd data-countdown='weeks'><h1 data-countdown-digits>00</h1></dd>
-                                </dl>
-                            </li>
-
-                            <li>
-                                <dl>
-                                    <dt>days</dt>
-                                    <dd data-countdown='days'><h1 data-countdown-digits>00</h1></dd>
-                                </dl>
-                            </li>
-                            <li>
-                                <dl>
-                                    <dt>hours</dt>
-                                    <dd data-countdown='hours'><h1 data-countdown-digits>00</h1></dd>
-                                </dl>
-                            </li>
-                            <li>
-                                <dl>
-                                    <dt>minutes</dt>
-                                    <dd data-countdown='minutes'><h1 data-countdown-digits>00</h1></dd>
-                                </dl>
-                            </li>
-                            <li>
-                                <dl>
-                                    <dt>seconds</dt>
-                                    <dd data-countdown='seconds'><h1 data-countdown-digits>00</h1></dd>
-                                </dl>
-                            </li>
-                        </ul>
-                    </div>
+                    <div id='component{COMPONENT_INSTANCE_ID}-countdown'></div>
                 </div>
             </section>
         </div>
