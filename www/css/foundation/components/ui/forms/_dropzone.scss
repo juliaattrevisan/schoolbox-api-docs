@@ -39,7 +39,6 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
         padding: 0;
         opacity: 0;
         display: table;
@@ -182,19 +181,19 @@ ul.az-error-list {
         }
         @media #{$small-only} {
             background-size: 1.5rem;
-            min-height: 3rem;
+            height: 3rem;
             padding-left: 3.5rem;
             background-position: 0.75rem;
         }
         @media #{$medium-up} {
             background-size: 2rem;
-            min-height: 4rem;
+            height: 4rem;
             background-position: 0.875rem;
             padding-left: 4.5rem;
         }
     }
     .dz-upload {
-        height: 72px;
+        height: 4rem;
     }
     .button{
         float: right;
@@ -516,7 +515,7 @@ ul.az-error-list {
     border: 2px dashed $attachzone-resting-color;
     padding: rem-calc(($base-font-size - 6));
     position: relative;
-    min-height: 72px;
+    height: 4rem;
     margin-bottom: rem-calc(($base-font-size - 2));
 
     &.dz-drag-hover {
