@@ -26,7 +26,7 @@ use Schoolbox\Collection;
  *
  * @package Schoolbox\Assessment\Rubric
  */
-class Mapper
+class RubricMapper
 {
 
     /**
@@ -298,15 +298,16 @@ class Mapper
      * TODO decouple rubrics from submissions, but that requires some epic schema changes we don't have time for in 15.6
      *
      * @param Rubric $rubric
-     * @param SubmissionBox
+     * @param SubmissionBox $box
      * @return int
      */
-    public function save($rubric, $submissionBox)
+    public function save($rubric, $box)
     {
-
+        // TODO find some way to wrap this in a transaction
+        var_dump($rubric->getORMCriteria());
+        var_dump($rubric->getORMLevels());
+        var_dump($rubric->getORMDescriptors());
+        exit;
     }
-
-
-
 
 }
