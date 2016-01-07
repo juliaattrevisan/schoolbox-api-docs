@@ -8,7 +8,7 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
-use Schoolbox\Import\Module;
+use Schoolbox\Import\IntroModule;
 
 /**
  * Configuration for admin import module
@@ -26,7 +26,7 @@ class AdminImport implements ModuleConfigInterface
     public function configure($kernel)
     {
         $di = $kernel->getDependencyInjector();
-        $ruleset = new Module($di);
+        $ruleset = new IntroModule($di);
         $ruleset->init('/adminv2/import');
     }
 }

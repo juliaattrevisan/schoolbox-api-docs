@@ -10,21 +10,16 @@ namespace Schoolbox\Import;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Alaress\Redis;
-use Alaress\Web\Router\PathMatcher;
-use Aura\Di;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage;
 use Twig_Loader_Chain;
 
 /**
- * Module for admin importer.
+ * Module for admin importer introduction.
  *
  * @package Schoolbox\Import
  */
-class Module extends BaseModule
+class IntroModule extends BaseModule
 {
     protected $basename = 'adminImport';
 
@@ -84,6 +79,6 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set('controller:'.$this->basename, $injector->lazyNew(IntroController::class));
     }
 }

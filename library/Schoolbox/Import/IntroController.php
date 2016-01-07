@@ -10,11 +10,11 @@ namespace Schoolbox\Import;
 use Alaress\Web\Controller\Base;
 
 /**
- * Controller for admin importer.
+ * Controller for admin importer introduction.
  *
  * @package Schoolbox\Import
  */
-class Controller extends Base
+class IntroController extends Base
 {
     use ImportNavigation;
 
