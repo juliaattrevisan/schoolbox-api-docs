@@ -15,10 +15,10 @@ class External_Humanedge_Timetable implements External_TimetableInterface
      */
     private $database;
 
-    /**
-     * @var External_UserInterface
-     */
-    private $externalUser;
+//    /**
+//     * @var External_UserInterface
+//     */
+//    private $externalUser;
 
     /**
      * Constructor
@@ -26,7 +26,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
-        $this->externalUser = new External_User('humanedge');
+//        $this->externalUser = new External_User('humanedge');
     }
 
     /**
