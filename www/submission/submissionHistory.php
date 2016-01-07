@@ -21,6 +21,7 @@ $this->setBlock(TEMPLATE_content, 'action_publish', 'action_publish_block');
 $this->setBlock(TEMPLATE_content, 'recent_submission', 'recent_submission_block');
 $this->setBlock(TEMPLATE_content, 'confirm_terms', 'confirm_terms_block');
 $this->setBlock(TEMPLATE_content, 'show_owner', 'show_owner_block');
+$this->setBlock(TEMPLATE_content, 'show_status', 'show_status_block');
 $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
 $this->setBlock(TEMPLATE_content, 'has_rubric', 'has_rubric_block');
 $this->setBlock('has_rubric', 'rubric', 'rubric_block');
@@ -778,4 +779,10 @@ if ($user['eportfolio_enabled'] && (isset($recent_activity) || isset($recent_ret
     $this->parse('action_publish_block', 'action_publish');
 } else {
     $this->setVar('action_publish_block', '');
+}
+
+if (!$box->getAcceptOnline()) {
+    $this->setVar('show_status_block', '');
+} else {
+    $this->parse('show_status_block', 'show_status');
 }
