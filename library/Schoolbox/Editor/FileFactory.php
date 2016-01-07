@@ -27,6 +27,9 @@ class FileFactory {
      * @param $hashTuple
      */
     public function __construct($hashTuple) {
+
+        /* Ridiculous quick fix
+         */
         $this->setHash(str_replace('sbfs', 'browse', $hashTuple));
     }
 

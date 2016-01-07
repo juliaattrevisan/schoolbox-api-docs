@@ -6,10 +6,13 @@
     $.fn.schoolboxResource_ProxyReplacment = function () {
         $.each($('[data-schoolboxresource-type]'), function (index, element) {
             var type = $(element).attr('data-schoolboxresource-type');
-            var source = $(element).attr('data-schoolboxresource-source');
             var thumbnail = $(element).attr('data-schoolboxresource-thumbnail');
             var style = $(element).attr('style');
             var classes = $(element).attr('class');
+
+            /* Ridiculous quick fix
+             */
+            var source = $(element).attr('data-schoolboxresource-source').replace('type=browse', 'type=sbfs');
 
             /* Replace video/audio placeholder elements
              */
