@@ -154,6 +154,17 @@ class ImportController extends Base
     {
         $reader = new Reader($upload->readStream());
         $reader->setLoadFromFirst(true);
+        // User import does not fill down - the others do
+        switch ($this->basename) {
+            case 'adminImportStructure':
+            case 'adminImportTimetable':
+            case 'adminImportEnrolment':
+                $reader->setFillDown(true);
+                break;
+            case 'adminImportUser':
+            default:
+                break;
+        }
         return $reader;
     }
 
