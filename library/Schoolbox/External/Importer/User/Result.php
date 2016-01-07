@@ -41,6 +41,13 @@ class Result
     protected $userProfile = null;
 
     /**
+     * The user profile before any changes were made.
+     *
+     * @var UserProfile
+     */
+    protected $originalUserProfile = null;
+
+    /**
      * @var bool
      */
     protected $isUserDeleted = false;
@@ -114,6 +121,24 @@ class Result
     public function setUserProfile($userProfile)
     {
         $this->userProfile = $userProfile;
+        return $this;
+    }
+
+    /**
+     * @return UserProfile
+     */
+    public function getOriginalUserProfile()
+    {
+        return $this->originalUserProfile;
+    }
+
+    /**
+     * @param  UserProfile $originalUserProfile
+     * @return $this
+     */
+    public function setOriginalUserProfile($originalUserProfile)
+    {
+        $this->originalUserProfile = $originalUserProfile;
         return $this;
     }
 

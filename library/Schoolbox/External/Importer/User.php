@@ -287,11 +287,9 @@ class User extends AbstractImporter
 
             // Step 4: update extended fields if using SB connector
             if (!$this->hasExternalDb()) {
-                $userProfile = $this->hydrateUserProfile(
-                    $row,
-                    $this->retrieveUserProfile($user)
-                );
-                $userResult->setUserProfile($userProfile);
+                $userProfile = $this->retrieveUserProfile($user);
+                $userResult->setOriginalUserProfile(clone $userProfile);
+                $userResult->setUserProfile($this->hydrateUserProfile($row, $userProfile));
             }
 
             $result[] = $userResult;
