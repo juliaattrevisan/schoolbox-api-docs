@@ -41,6 +41,16 @@ These are its args, which is given for you
             <a data-plugin="preview" href="{{ send ~ file.id }}&width=1024&height=1024">
                 <img class="icon" src="{{ image ~ file.id }}&width=128&height=128" alt="{{ file.title }}" />
             </a>
+        {% elseif file.mimetype.isVideo %}
+            <video id="schoolbox_video_preview"
+                   data-videocomponent
+                   controls
+                   preload="none"
+                   poster="/cms/videoThumb.php?type=sbfs&id={{ file.id }}&size=poster"
+                   height="200"
+                   width="100%">
+                <source src="/cms/sendVideo.php?type=sbfs&id={{ file.id }}" type='video/mp4'>
+            </video>
         {% else %}
             <a href="{{ send ~ file.id }}" target="_blank">
                 <img class="icon" src="{{ mime ~ file.mimetype.iconFile }}" alt="{{ file.title }}" />
