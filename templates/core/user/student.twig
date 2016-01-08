@@ -525,7 +525,7 @@
                             <ul class="subject-list">
                                 <li>
                                     <div class="list-item">
-                                        <div class="small-12 avatar card">
+                                        <div class="avatar card small-12">
                                             <a href="/homepage/{{ group.id }}">
                                                 <span class="icon-folder icon-32"></span>
                                                 {{ group.name }}
@@ -536,7 +536,7 @@
                                 {% if group.owner %}
                                 <li class="actions-small-1">
                                     <div class="list-item">
-                                        <div class="avatar-card">
+                                        <div class="avatar-card small-12">
                                             <a href="/search/user/{{ group.owner.getId() }}">
                                                 <img src="/portrait.php?userId={{ group.owner.getExternalId() }}&amp;size=square64" />
                                                 {{ group.owner.formatName() }}
