@@ -348,24 +348,14 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     {
         // I need to know if $userId is a teacher or student
         try {
-            $user = $this->userMapper->findById($userId);
+            $user = $this->userMapper->findByExternalId($externalUserId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
 
-        // Mangle into the format getDayTimetable expects
-        $timetable           = [];
-        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campus);
-        foreach ($timetableDefinition['desc'] as $x => $name) {
-            $timetable[$x]['periodName']     = $timetableDefinition['desc'][$x];
-            $timetable[$x]['periodStart']    = $timetableDefinition['start'][$x];
-            $timetable[$x]['periodEnd']      = $timetableDefinition['end'][$x];
-            $timetable[$x]['periodNumber']   = $timetableDefinition['number'][$x];
-            $timetable[$x]['periodSequence'] = $timetableDefinition['sequence'][$x];
-            $timetable[$x]['class']          = array();
-        }
+        $this->getDatabase()->query('SET ANSI_PADDING ON');
+        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
 
-        // Use that dumb stored proc here
         $studentExternalId = '';
         $teacherExternalId = '';
         if ($user->getRole()->isStudent()) {
@@ -378,41 +368,58 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             ['@TIMEPERIOD', $campus->getExtTimetableCode(), SQLVARCHAR, false, false, -1],
             ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
             ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
+            ['@LOGIC_NO', 2, SQLINT1, false, false, -1],
         ];
-        $response = $this->getDatabase()->executeProcedure('spSelTimetable', $params);
-        foreach ($response['result'] as $desc) {
-            foreach ($timetable as $x => $timetablePeriod) {
-                if ($desc['TIMEPDHDCODE'] == $timetablePeriod['periodNumber']
-                    && $timetablePeriod['periodSequence'] != 2
-                    && !isset($timetable[$x]['class'][$desc['ClassCode']])
-                ) {
-                    $timetable[$x]['class'][$desc['ClassCode']] = array(
-                        'description' => $desc['HEADING'],
-                        'code'        => $desc['CODE'],
-                        'campus'      => '',
-                        'room'        => '',
-                        'staffID'     => '',
-                    );
-                    break;
-                }
+        $response = $this->getDatabase()->executeProcedure('spSelTimetable', $params, true);
+        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $response['result'];
+
+        $periodTimes = $this->getPeriodTimes();
+
+        // The $homeClasses definition is mostly included within dayPeriods
+        $timetable = [];
+        foreach ($dayPeriods as $period) {
+            // Order the list by sortOrder
+            $order = $period['SORT_ORDER'];
+            $code  = $period['CODE'];
+            $timetable[$order]['periodName']     = $period['HEADING'];
+            $timetable[$order]['periodStart']    = $periodTimes[$code]['start'];
+            $timetable[$order]['periodEnd']      = $periodTimes[$code]['end'];
+            $timetable[$order]['periodNumber']   = $order;
+            $timetable[$order]['periodSequence'] = 1;
+            $timetable[$order]['class']          = [];
+        }
+        ksort($timetable);
+
+        // What's the current day number?
+        $dayNumber    = 0;
+        $databaseDate = $date->getDatabaseDate();
+        foreach ($weekDays as $weekDay) {
+            try {
+                $adf = new Alaress_Date_Format($weekDay['DATE'], 'M d Y+|');
+            } catch (Exception $e) {
+                continue;
+            }
+            if ($adf->getDatabaseDate() == $databaseDate) {
+                $dayNumber = $weekDay['TIMETABLE_DAY'];
+                break;
             }
         }
 
-        // From SPSELTIMETABLE:
-        // TIMEPDHDCODE matches TIMEPDHD.CODE
-
-//        // Add classes into it
-//        $result = $this->getDatabase()->query($query);
-//        while ($desc = $this->getDatabase()->getNextArray($result)) {
-//        }
-//        return $timetable;
-
-//        return $this->getDayTimetable(
-//            $externalUserId,
-//            $userId,
-//            $campus,
-//            $this->getDayNumber($campus, $date->getUnixTimeStamp())
-//        );
+        // Add classes for each day into it
+        foreach ($dayClasses as $dayClass) {
+            $period = $dayClass['PERIOD'];
+            $code   = $dayClass['ABBREV'];
+            if ($dayNumber == $dayClass['DAY']) {
+                $timetable[$period]['class'][$code] = array(
+                    'description'        => $dayClass['DESC'],
+                    'code'               => $code,
+                    'campus'             => '',
+                    'room'               => $dayClass['ROOM'],
+                    'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
+                );
+            }
+        }
+        return $timetable;
     }
 
     /**
