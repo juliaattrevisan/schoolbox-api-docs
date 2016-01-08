@@ -92,6 +92,32 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     }
 
     /**
+     * Gets period start and end times.
+     *
+     * @return array
+     */
+    protected function getPeriodTimes()
+    {
+        $periods = $this->getDatabase()->getAll("
+            SELECT
+                CODE,
+                TIME_START,
+                TIME_END
+            FROM TIMEPDHD
+            ORDER BY SORT_ORDER ASC
+        ");
+        $result = [];
+        foreach ($periods as $period) {
+            // CODE isn't part of default definition, but I need it for matching
+            $result[$period['CODE']] = [
+                'start' => $period['TIME_START'],
+                'end'   => $period['TIME_END'],
+            ];
+        }
+        return $result;
+    }
+
+    /**
      * Get the current day number for a given campus
      *
      * @param Schoolbox\Campus $campus
@@ -426,20 +452,24 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $term = array_shift($terms);
 
+        $periodTimes = $this->getPeriodTimes();
+
         // The $homeClasses definition is mostly included within dayPeriods
         $timetable = [];
         $dayCount  = $term['TIMEDAYS'];
         foreach ($dayPeriods as $period) {
             // Order the list by sortOrder
             $order = $period['SORT_ORDER'];
+            $code  = $period['CODE'];
             $timetable[$order]['periodName']     = $period['HEADING'];
             // Where do periodStart and periodEnd come from?
-            $timetable[$order]['periodStart']    = '';
-            $timetable[$order]['periodEnd']      = '';
-            $timetable[$order]['periodNumber']   = 1;
-            $timetable[$order]['periodSequence'] = $order;
+            $timetable[$order]['periodStart']    = $periodTimes[$code]['start'];
+            $timetable[$order]['periodEnd']      = $periodTimes[$code]['end'];
+            $timetable[$order]['periodNumber']   = $order;
+            $timetable[$order]['periodSequence'] = 1;
             $timetable[$order]['day']            = array_fill(1, $dayCount, array());
         }
+        ksort($timetable);
 
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
