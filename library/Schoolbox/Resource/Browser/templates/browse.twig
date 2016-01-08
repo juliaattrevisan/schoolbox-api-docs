@@ -19,6 +19,7 @@
 {% else %}
     {% set fileController   = 'file' %}
     {% set folderController = 'category' %}
+    {% set linkController   = 'link' %}
     {% set folderVar = 'category' %}
 {% endif %}
 
@@ -64,15 +65,29 @@
 
         $(document).on('dnd_stop.vakata', function (event, data) {
 
+            // draggedTypeGen could also be a link
+            // {{ linkController }}
             var $dragged       = $(data.element).closest(listItem),
                 draggedType    = $dragged.data('type'),
-                draggedTypeGen = draggedType == 'file' ? '{{ fileController }}' : '{{ folderController }}',
+                draggedTypeGen = '',
                 draggedId      = $dragged.data('id'),
-
                 $dropTarget    = $(data.event.srcElement).closest(listItem),
                 dropTargetId   = $dropTarget.data('id'),
                 dropTargetType = $dropTarget.data('type'),
                 dropTargetPerm = $dropTarget.data('permission');
+
+            switch (draggedType) {
+                case 'file':
+                    draggedTypeGen = '{{ fileController }}';
+                    break;
+                case 'link':
+                    draggedTypeGen = '{{ linkController }}' || '{{ folderController }}';
+                    break;
+                case 'folder':
+                default:
+                    draggedTypeGen = '{{ folderController }}';
+                    break;
+            }
 
             if (dropTargetType == 'file' || (!(dropTargetPerm == 'write' || dropTargetPerm == 'full'))) {
                 return;
