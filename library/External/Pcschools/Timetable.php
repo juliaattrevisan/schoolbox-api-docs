@@ -256,26 +256,65 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
-        if (!$dayNumber) {
-            $dayNumber = $this->getDayNumber($campus);
+        // I need to know if $userId is a teacher or student
+        try {
+            $user = $this->userMapper->findByExternalId($externalUserId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return [];
         }
 
-        // Get the closest date to today for this day number.
-        $date = $this->getClosestDateForDayNumber($campus, $dayNumber);
-        return $this->getTimetableForDate($externalUserId, $userId, $campus, $date);
+        $this->getDatabase()->query('SET ANSI_PADDING ON');
+        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
 
-    }
+        $studentExternalId = '';
+        $teacherExternalId = '';
+        if ($user->getRole()->isStudent()) {
+            $studentExternalId = $user->getExternalId();
+        } elseif ($user->getRole()->isStaff()) {
+            $teacherExternalId = $user->getExternalId();
+        }
+        $params = [
+            ['@DATE', date('Ymd'), SQLVARCHAR, false, false, -1],
+            ['@TIMEPERIOD', $campus->getExtTimetableCode(), SQLVARCHAR, false, false, -1],
+            ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
+            ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
+            ['@LOGIC_NO', 2, SQLINT1, false, false, -1],
+        ];
+        $response = $this->getDatabase()->executeProcedure('spSelTimetable', $params, true);
+        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $response['result'];
 
-    protected function getClosestDateForDayNumber($campus, $dayNumber)
-    {
-//        $dayCount = $this->getDayCount();
-        $query = "
-            SELECT TOP 1 [DATE]
-            FROM CALENDAR
-            WHERE [TIMETABLE_DAY] = {$this->getDatabase()->smartQuote($dayNumber)}
-            ORDER BY ABS(DATEDIFF(day, [DATE], @CurrentDate))
-        ";
-        return $this->getDatabase()->getOne($query);
+        $periodTimes = $this->getPeriodTimes();
+
+        // The $homeClasses definition is mostly included within dayPeriods
+        $timetable = [];
+        foreach ($dayPeriods as $period) {
+            // Order the list by sortOrder
+            $order = $period['SORT_ORDER'];
+            $code  = $period['CODE'];
+            $timetable[$order]['periodName']     = $period['HEADING'];
+            $timetable[$order]['periodStart']    = $periodTimes[$code]['start'];
+            $timetable[$order]['periodEnd']      = $periodTimes[$code]['end'];
+            $timetable[$order]['periodNumber']   = $order;
+            $timetable[$order]['periodSequence'] = 1;
+            $timetable[$order]['class']          = [];
+        }
+        ksort($timetable);
+
+        // Add classes for each day into it
+        foreach ($dayClasses as $dayClass) {
+            $period = $dayClass['PERIOD'];
+            $code   = $dayClass['ABBREV'];
+            if ($dayNumber == $dayClass['DAY']) {
+                $timetable[$period]['class'][$code] = array(
+                    'description'        => $dayClass['DESC'],
+                    'code'               => $code,
+                    'campus'             => '',
+                    'room'               => $dayClass['ROOM'],
+                    'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
+                );
+            }
+        }
+        return $timetable;
     }
 
     /**
