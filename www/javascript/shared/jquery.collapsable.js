@@ -48,7 +48,8 @@
 
                 var component,
                     target = $(this).data('collapser'),
-                    simple = target === true || target.length === undefined;
+                    simple = target === true || target.length === undefined,
+                    icon   = '';
 
                 if (simple) {
                     // if the string "true" is used, or no value, target the container
@@ -85,12 +86,26 @@
          * This slides it up real fast so it can slide back down gracefully
          */
         if (component.attr('data-collapse-state') == 'collapsed') {
-            component.stop().removeClass('hide').slideUp(1).slideDown();
+            component.stop().removeClass('hide').slideUp(1).slideDown({
+                start: function() {
+                    component.trigger('expandStart.collapsable');
+                },
+                done:  function() {
+                    component.trigger('expandStop.collapsable');
+                }
+            });
             component.attr('data-collapse-state', 'uncollapsed');
         }
         else {
             component.attr('data-collapse-state', 'collapsed');
-            component.stop().slideUp();
+            component.stop().slideUp({
+                start: function() {
+                    component.trigger('collapseStart.collapsable');
+                },
+                done:  function() {
+                    component.trigger('collapseStop.collapsable');
+                }
+            });
         }
 
         $.fn.executeIconToggle.call(this, icon);
