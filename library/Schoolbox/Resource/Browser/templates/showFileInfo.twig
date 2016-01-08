@@ -11,21 +11,23 @@ These are its args, which is given for you
     {% set image  = '/cms/image.php?id=' %}
     {% set modify = '/cms/file/' %}
     {% set delete = '/cms/fileForm.php?ajax=1&delete=' %}
+    {% set type   = 'sbfs' %}
 
 {% elseif namespace == 'myFilesBrowser' %}
     {% set send   = '/cms/sendMyFile.php?id=' %}
     {% set image  = '/cms/myImage.php?id=' %}
     {% set modify = '/cms/myFile/' %}
     {% set delete = '/cms/myFileForm.php?ajax=1&delete=' %}
+    {% set type   = 'myfile' %}
 
 {% else %}
     {% set send   = '/cms/sendNetworkFile.php?id=' %}
     {% set image  = '/cms/networkImage.php?id=' %}
     {% set modify = '/cms/networkFile/' %}
     {% set delete = '/cms/networkFileForm.php?ajax=1&delete=' %}
+    {% set type   = 'storage' %}
 
 {% endif %}
-
 
 {% if access > 0 %}
 
@@ -46,17 +48,17 @@ These are its args, which is given for you
                    controls
                    preload="none"
                    width="100%">
-                <source src="/cms/sendVideo.php?type=sbfs&id={{ file.id }}" type='audio/mp3'>
+                <source src="/cms/sendVideo.php?type={{ type }}&id={{ file.id }}" type='audio/mp3'>
             </audio>
         {% elseif file.mimetype.isVideo %}
             <video id="schoolbox_video_preview"
                    data-videocomponent
                    controls
                    preload="none"
-                   poster="/cms/videoThumb.php?type=sbfs&id={{ file.id }}&size=poster"
+                   poster="/cms/videoThumb.php?type={{ type }}&id={{ file.id }}&size=poster"
                    height="200"
                    width="100%">
-                <source src="/cms/sendVideo.php?type=sbfs&id={{ file.id }}" type='video/mp4'>
+                <source src="/cms/sendVideo.php?type={{ type }}&id={{ file.id }}" type='video/mp4'>
             </video>
         {% else %}
             <a href="{{ send ~ file.id }}" target="_blank">
