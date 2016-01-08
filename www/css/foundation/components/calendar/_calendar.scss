@@ -29,4 +29,15 @@
             }
         }
     }
+    @media #{$small-only} {
+        .fc-left,
+        .fc-right,
+        .fc-button-group,
+        .fc-button-group button{
+            float: none;
+        }
+        .fc-button-group{
+            margin-bottom: 1rem;
+        }
+    }
 }
