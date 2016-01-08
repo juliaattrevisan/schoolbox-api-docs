@@ -399,50 +399,60 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     {
         // I need to know if $userId is a teacher or student
         try {
-            $user = $this->userMapper->findById($userId);
+            $user = $this->userMapper->findByExternalId($externalUserId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
 
-        $query = $this->getTimetableQuery($user);
-        if (empty($query)) {
-            return [];
-        }
+        $this->getDatabase()->query('SET ANSI_PADDING ON');
+        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
 
-        // Mangle into the format getDayTimetable expects
-        $timetable           = [];
-        $timetableDefinition = $this->getTimetableDefinition($externalUserId, $campus);
-        $dayCount            = $timetableDefinition['dayCount'];
-        foreach ($timetableDefinition['desc'] as $x => $name) {
-            $timetable[$x]['periodName']     = $timetableDefinition['desc'][$x];
-            $timetable[$x]['periodStart']    = $timetableDefinition['start'][$x];
-            $timetable[$x]['periodEnd']      = $timetableDefinition['end'][$x];
-            $timetable[$x]['periodNumber']   = $timetableDefinition['number'][$x];
-            $timetable[$x]['periodSequence'] = $timetableDefinition['sequence'][$x];
-            $timetable[$x]['day']            = array_fill(1, $dayCount, array());
+        $studentExternalId = '';
+        $teacherExternalId = '';
+        if ($user->getRole()->isStudent()) {
+            $studentExternalId = $user->getExternalId();
+        } elseif ($user->getRole()->isStaff()) {
+            $teacherExternalId = $user->getExternalId();
+        }
+        $params = [
+            ['@DATE', date('Ymd'), SQLVARCHAR, false, false, -1],
+            ['@TIMEPERIOD', $campus->getExtTimetableCode(), SQLVARCHAR, false, false, -1],
+            ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
+            ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
+            ['@LOGIC_NO', 2, SQLINT1, false, false, -1],
+        ];
+        $response = $this->getDatabase()->executeProcedure('spSelTimetable', $params, true);
+        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $response['result'];
+
+        $term = array_shift($terms);
+
+        // The $homeClasses definition is mostly included within dayPeriods
+        $timetable = [];
+        $dayCount  = $term['TIMEDAYS'];
+        foreach ($dayPeriods as $period) {
+            // Order the list by sortOrder
+            $order = $period['SORT_ORDER'];
+            $timetable[$order]['periodName']     = $period['HEADING'];
+            // Where do periodStart and periodEnd come from?
+            $timetable[$order]['periodStart']    = '';
+            $timetable[$order]['periodEnd']      = '';
+            $timetable[$order]['periodNumber']   = 1;
+            $timetable[$order]['periodSequence'] = $order;
+            $timetable[$order]['day']            = array_fill(1, $dayCount, array());
         }
 
         // Add classes for each day into it
-        $result = $this->getDatabase()->query($query);
-        while ($desc = $this->getDatabase()->getNextArray($result)) {
-            foreach ($timetable as $x => $timetablePeriod) {
-                if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
-                    && $timetablePeriod['periodSequence'] != 2
-                    && !isset($timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']])
-                ) {
-                    $timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']] = array(
-                        'description'    => $desc['Description'],
-                        'code'           => $desc['ClassCode'],
-                        'campus'         => $desc['ClassCampus'],
-                        'room'           => $desc['Room'],
-                        'staffID'        => $desc['StaffID'],
-//                        'staffFirstname' => $desc['StaffPreferredName'],
-//                        'staffSurname'   => $desc['StaffSurname'],
-//                        'staffTitle'     => $desc['StaffTitle'],
-                    );
-                    break;
-                }
-            }
+        foreach ($dayClasses as $dayClass) {
+            $period = $dayClass['PERIOD'];
+            $day    = $dayClass['DAY'];
+            $code   = $dayClass['ABBREV'];
+            $timetable[$period]['day'][$day][$code] = array(
+                'description'        => $dayClass['DESC'],
+                'code'               => $code,
+                'campus'             => '',
+                'room'               => $dayClass['ROOM'],
+                'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
+            );
         }
         return $timetable;
     }
