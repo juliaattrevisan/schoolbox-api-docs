@@ -22,7 +22,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
         'title'      => 'Title',
         'firstname'  => 'First Name',
         'lastname'   => 'Surname',
-//        'group'      => 'Role',
+        'role'       => 'Role',
         'campus'     => 'Campus',
         'alt_email'  => 'Alt Email',
         'year'       => 'Year',
@@ -122,10 +122,12 @@ class Report_Group extends Report_Abstract implements Report_IReport
         // bypass handlers because I need access to the mysql pointer resource
         $query = "
             SELECT `u`.*,
-            GROUP_CONCAT(`c`.`name` ORDER BY `uc`.`defaultCampus` DESC, `c`.`name` ASC SEPARATOR ', ') AS `campus`
+            GROUP_CONCAT(`c`.`name` ORDER BY `uc`.`defaultCampus` DESC, `c`.`name` ASC SEPARATOR ', ') AS `campus`,
+            `r`.`name` AS `role`
             FROM `user` `u`
             LEFT JOIN `userCampus` `uc` ON `u`.`id`=`uc`.`uid`
             LEFT JOIN `luCampus` `c` ON `uc`.`campus`=`c`.`id`
+            LEFT JOIN `groups` `r` ON `u`.`group_id`=`r`.`id`
             WHERE `u`.`group_id` = '$filterString'
             GROUP BY `u`.`id`
             ORDER BY $orderBy $orderDir
