@@ -33,6 +33,18 @@ class Report_Group extends Report_Abstract implements Report_IReport
         'mail_handler'       => 'Use External Mail Client?',
         'webmail'            => 'Enable Webmail Tab?',
         'enabled'            => 'Account Enabled?',
+        // Skip superuser field
+    );
+
+    private $userProfileFields = array(
+        'profile_child_ids'    => 'Child External IDs',
+        'profile_dob'          => 'Date of Birth',
+        'profile_home_phone'   => 'Home Phone',
+        'profile_mobile_phone' => 'Mobile Phone',
+        'profile_work_phone'   => 'Work Phone',
+        'profile_address'      => 'Address',
+        'profile_suburb'       => 'Suburb',
+        'profile_postcode'     => 'Postcode',
     );
 
     // fields that we will permit sorting on
@@ -64,6 +76,9 @@ class Report_Group extends Report_Abstract implements Report_IReport
         $this->getPage()->setVar(array('group_block' => ''));
         $this->getPage()->setTitle('Group Report');
 
+        if (Config::get('external_type') === 'schoolbox') {
+            $this->fields += $this->userProfileFields;
+        }
 
         $this->emailObj = new Email();
     }
@@ -132,13 +147,22 @@ class Report_Group extends Report_Abstract implements Report_IReport
             GROUP_CONCAT(`c`.`name` ORDER BY `uc`.`defaultCampus` DESC, `c`.`name` ASC SEPARATOR ', ') AS `campus`,
             `r`.`name` AS `role`,
             `h`.`house` AS `house`,
-            `rh`.`name` AS `res_house`
+            `rh`.`name` AS `res_house`,
+            -- GROUP_CONCAT(`child`.`synergy_id` SEPARATOR ', ') AS `profile_child_ids`,
+            p.dob AS profile_dob,
+            p.guardian1HomePhone AS profile_home_phone,
+            p.guardian1MobilePhone AS profile_mobile_phone,
+            p.guardian1WorkPhone profile_work_phone,
+            p.guardian1Address AS profile_address,
+            p.guardian1Suburb AS profile_suburb,
+            p.guardian1Postcode AS profile_postcode
             FROM `user` `u`
             LEFT JOIN `userCampus` `uc` ON `u`.`id`=`uc`.`uid`
             LEFT JOIN `luCampus` `c` ON `uc`.`campus`=`c`.`id`
             LEFT JOIN `groups` `r` ON `u`.`group_id`=`r`.`id`
             LEFT JOIN `house` `h` ON `u`.`house`=`h`.`id`
             LEFT JOIN `luResidentialHouse` `rh` ON `u`.`residential_house_id`=`rh`.`id`
+            LEFT JOIN `user_profile` `p` ON `u`.`id`=`p`.`user_id`
             WHERE `u`.`group_id` = '$filterString'
             GROUP BY `u`.`id`
             ORDER BY $orderBy $orderDir
