@@ -38,6 +38,7 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
             'year' => $_POST['year'] == '' ? 'NULL' : $_POST['year'],
             'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
             'hide_contacts' => $_POST['hide_contacts'] == 1 ? 1 : 0,
+            'hide_timetable' => $_POST['hide_timetable'] == 1 ? 1 : 0,
             'house' => $_POST['house'],
             'residential_house_id' => $_POST['residential_house'],
             'enabled' => $_POST['account_enabled']

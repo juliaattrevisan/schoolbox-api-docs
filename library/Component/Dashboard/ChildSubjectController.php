@@ -29,12 +29,22 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             return false;
         }
 
+        $user = $_SESSION['user'];
+        $userMapper = new \Schoolbox\UserMapper();
+        $userObject = $userMapper->findById($user->getId());
+
         $this->setBlock($templateHandle, "student_block", "student_subjects");
         $this->setBlock("student_block", "subject_block", "subject_item");
 		$this->setBlock('student_block', 'eportfolio', 'eportfolio_block');
 		$this->setBlock('student_block', 'due_work', 'due_work_block');
         $this->setBlock('student_block', 'grades_button', 'grades_button_block');
+        $this->setBlock('student_block', 'timetable', 'timetable_block');
 
+        if ($userObject->getHideTimetable()) {
+            $this->setVar('timetable_block', '');
+        } else {
+            $this->parse('timetable_block', 'timetable');
+        }
 
         $groupHandler = new Group();
 		$isParent = $groupHandler->isParent();

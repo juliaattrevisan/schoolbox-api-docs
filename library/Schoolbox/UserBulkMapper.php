@@ -306,7 +306,8 @@ class UserBulkMapper extends UserMapper
         $externalMailClient,
         $webmail,
         $enabled,
-        $hideContacts
+        $hideContacts,
+        $hideTimetable
     ) {
 
         /* Update group settings
@@ -359,6 +360,12 @@ class UserBulkMapper extends UserMapper
             $user->setHideContacts($hideContacts);
         }
 
+        /* Update hide timetable settings
+         */
+        if ($hideTimetable != $this->getUnchanged()) {
+            $user->setHideTimetable($hideTimetable);
+        }
+
         $this->save($user);
 
         /* Override the joined model persist, in $this->save()
@@ -397,7 +404,8 @@ class UserBulkMapper extends UserMapper
             $externalMailClient,
             $webmail,
             $enabled,
-            $hideContacts
+            $hideContacts,
+            $hideTimetable
         );
 
         $this->log($message, $data);

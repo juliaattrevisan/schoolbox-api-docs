@@ -107,6 +107,9 @@ class User implements JsonSerializable
     /** @var bool */
     private $hideContacts;
 
+    /** @var bool */
+    private $hideTimetable;
+
     /**
      * @var SubjectCollection|Subject[]
      */
@@ -703,6 +706,16 @@ class User implements JsonSerializable
     }
 
     /**
+     * @return self
+     */
+    public function setHideTimetable($hideTimetable)
+    {
+        // explicit cast
+        $this->hideTimetable = $hideTimetable ? true : false;
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function getEnabled()
@@ -718,6 +731,15 @@ class User implements JsonSerializable
     {
         // explicit cast
         return $this->hideContacts ? true : false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getHideTimetable()
+    {
+        // explicit cast
+        return $this->hideTimetable ? true : false;
     }
 
     /**

@@ -330,12 +330,22 @@
                         </select>
                     </div>
 
-                    <div class="small-12 medium-6 columns end">
+                    <div class="small-12 medium-6 columns">
                         <label for="apply_hidecontacts">Hide Contact Details From Parents</label>
                         <select id="apply_hidecontacts" name="apply_hidecontacts">
                             <option value="-1">Unchanged</option>
                             <!-- BEGIN apply_hidecontacts -->
                             <option value="{APPLY_HIDECONTACTS_ID}">{APPLY_HIDECONTACTS_NAME}</option>
+                            <!-- END apply_hidecontacts -->
+                        </select>
+                    </div>
+
+                    <div class="small-12 medium-6 columns end">
+                        <label for="apply_hidecontacts">Hide Timetable</label>
+                        <select id="apply_hidecontacts" name="apply_hidetimetable">
+                            <option value="-1">Unchanged</option>
+                            <!-- BEGIN apply_hidecontacts -->
+                            <option value="{APPLY_HIDETIMETABLES_ID}">{APPLY_HIDETIMETABLE_NAME}</option>
                             <!-- END apply_hidecontacts -->
                         </select>
                     </div>

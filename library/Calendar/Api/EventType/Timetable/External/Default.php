@@ -41,6 +41,11 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
+        if ($this->getUser()->getHideTimetable()) {
+            $stack = new Collection();
+            return $stack;
+        }
+
         $dayTimetable     = array();
         $currentTimestamp = $startTimestamp;
 

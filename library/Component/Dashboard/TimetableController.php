@@ -86,6 +86,14 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
     public function renderTemplate($templateHandle)
     {
+        $user = $_SESSION['user'];
+        $userMapper = new \Schoolbox\UserMapper();
+        $userObject = $userMapper->findById($user->getId());
+
+        if ($userObject->getHideTimetable()) {
+            return false;
+        }
+
         if (!$this->loadTemplate($templateHandle, $this->getTemplateFile())) {
             return false;
         }
