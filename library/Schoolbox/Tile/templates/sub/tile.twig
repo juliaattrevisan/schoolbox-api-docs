@@ -43,7 +43,7 @@
 
 </style>
 
-{% if tile.link != '/timetable/' or not hideTimetable %}
+{% if not (tile.link starts with '/timetable') or not hideTimetable %}
     <li data-tile
         class="tile {{ tile.getBackgroundPositionStyle() }} {% if tile.backgroundImageContained %}contained{% endif %}"
         id="tile-{{ tile.id|e('html_attr') }}">
