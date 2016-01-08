@@ -148,7 +148,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
             `r`.`name` AS `role`,
             `h`.`house` AS `house`,
             `rh`.`name` AS `res_house`,
-            -- GROUP_CONCAT(`child`.`synergy_id` SEPARATOR ', ') AS `profile_child_ids`,
+            GROUP_CONCAT(`child`.`synergy_id` SEPARATOR ', ') AS `profile_child_ids`,
             p.dob AS profile_dob,
             p.guardian1HomePhone AS profile_home_phone,
             p.guardian1MobilePhone AS profile_mobile_phone,
@@ -163,6 +163,8 @@ class Report_Group extends Report_Abstract implements Report_IReport
             LEFT JOIN `house` `h` ON `u`.`house`=`h`.`id`
             LEFT JOIN `luResidentialHouse` `rh` ON `u`.`residential_house_id`=`rh`.`id`
             LEFT JOIN `user_profile` `p` ON `u`.`id`=`p`.`user_id`
+            LEFT JOIN `user_relation` `ur` ON `u`.`id`=`ur`.`user_id`
+            LEFT JOIN `user` `child` ON `ur`.`relation_id`=`child`.`id`
             WHERE `u`.`group_id` = '$filterString'
             GROUP BY `u`.`id`
             ORDER BY $orderBy $orderDir
