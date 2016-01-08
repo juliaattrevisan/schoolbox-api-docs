@@ -16,14 +16,16 @@ class Report_Group extends Report_Abstract implements Report_IReport
 
     // csv field mapping: index => humanreadable
     private $fields = array(
-        'title'      => 'title',
-        'firstname'  => 'firstname',
-        'lastname'   => 'lastname',
-        'username'   => 'username',
-        'synergy_id' => 'external id',
-        'campus'     => 'campus',
-        'year'       => 'year',
-        'alt_email'  => 'email'
+        'id'         => 'Schoolbox User ID',
+        'username'   => 'Username',
+        'synergy_id' => 'External ID',
+        'title'      => 'Title',
+        'firstname'  => 'First Name',
+        'lastname'   => 'Surname',
+//        'group'      => 'Role',
+        'campus'     => 'Campus',
+        'alt_email'  => 'Alt Email',
+        'year'       => 'Year',
     );
 
     // fields that we will permit sorting on
