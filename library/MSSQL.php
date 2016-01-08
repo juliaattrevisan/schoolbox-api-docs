@@ -229,13 +229,18 @@ class MSSQL {
 	 *                        Each array in this list should contain parameters
 	 *                        to mssql_bind in order, minus the first (the stored
 	 *                        procedure resource is created by this method)
+	 * @param bool    $multipleResultSets
+	 *                        Does this procedure return multiple result sets?
+	 *                        (Yes, it is possible for a stored proc to do this!)
 	 *
 	 * @return array success: Did the procedure run successfully?
 	 *               output:  output vars from the procedure
 	 *               result:  if the procedure returned a result set, the results
-	 *                        from the procedure (untested)
+	 *                        from the procedure.
+	 *                        If $multipleResultSets is on, then each set is a
+	 *                        separate array in this key.
 	 */
-	public function executeProcedure($name, $params)
+	public function executeProcedure($name, $params, $multipleResultSets = false)
 	{
 		$bound_outputs = array();
 		$proc          = $this->buildProcedure($name, $params, $bound_outputs);
@@ -248,12 +253,22 @@ class MSSQL {
 			$message = mssql_get_last_message();
 
 			if (is_resource($result)) {
-				while ($row = mssql_fetch_assoc($result)) {
-                    $return[] = $row;
+				if ($multipleResultSets) {
+					$resultSetNo = 0;
+					do {
+						$return[$resultSetNo] = [];
+						while ($row = mssql_fetch_assoc($result)) {
+							$return[$resultSetNo][] = $row;
+						}
+						$resultSetNo++;
+					} while (mssql_next_result($result));
+				} else {
+					while ($row = mssql_fetch_assoc($result)) {
+						$return[] = $row;
+					}
+					/* This fixes issue where output params were not available after resultset was returned */
+					mssql_next_result($result);
 				}
-                /* This fixes issue where output params were not available after resultset was returned */
-                mssql_next_result($result);
-
             }
 			elseif ($result === false) {
 				// Did the procedure error out? Return nothing instead.
