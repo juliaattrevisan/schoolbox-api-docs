@@ -1,0 +1,59 @@
+<ul class="breadcrumb">
+   <li><a href="/news">{TPL_LOCAL_NEWS_PLURAL_PC}</a></li>
+   <li><a href="/news/{TOPIC_CLEAN}">{TOPIC_NAME}</a></li>
+   <li class="active"><a href="/news/item/{NEWS_ID}">{NEWS_TITLE}</a></li>
+</ul>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{NEWS_TITLE}</h1>
+        </div>
+    </div>
+    <nav>
+        <!-- BEGIN modify_news -->
+        <a class="icon-modify" href="/news/modify/{NEWS_ID}" title="Modify News"></a>
+        <!-- END modify_news -->
+    </nav>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        
+        <section>
+            <div class="row content">
+                <!-- BEGIN featured_image -->
+                <div class="large-3 columns">
+                    <img src="/storage/image.php?hash={NEWS_IMAGE}&size=constrain200"/>
+                </div>
+                <!-- END featured_image -->
+                <div class="large-9 columns">
+                    <article>
+                        {NEWS_BODY}
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <div class="row">
+            <!-- BEGIN previous_article -->
+            <div class="small-6 columns">
+                <a class="button icon-previous expand" href="/news/item/{PREVIOUS_ARTICLE_ID}" title="Previous">{PREVIOUS_ARTICLE_TITLE}</a>
+            </div>
+            <!-- END previous_article -->
+            <!-- BEGIN next_article -->
+            <div class="small-6 columns">
+                <a class="button icon-next expand" href="/news/item/{NEXT_ARTICLE_ID}" title="Next">{NEXT_ARTICLE_TITLE}</a>
+            </div>
+            <!-- END next_article -->
+        </div>
+    </div>
+</div>
+
+    <!-- BEGIN add_news -->
+    <!-- END add_news -->
+    <!-- BEGIN topic_list -->
+    <!-- END topic_list -->
+    <!-- BEGIN allnews_button -->
+    <!-- END allnews_button -->
+
+
