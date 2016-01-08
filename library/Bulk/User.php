@@ -95,7 +95,7 @@ class Bulk_User extends Bulk_Abstract
                         'webmail'            => $user[15],
                         'eportfolio_enabled' => $user[16],
                         'hide_contacts'      => $user[17],
-                        'hide_contacts'      => $user[18]
+                        'hide_timetable'     => $user[18]
                     );
                     if (empty($userCampus)) {
                         $output[] = array(
