@@ -43,6 +43,8 @@
 
 </style>
 
+{# If the user should not see timetables, hide any tiles that start with '/timetable' #}
+
 {% if not (tile.link starts with '/timetable') or not hideTimetable %}
     <li data-tile
         class="tile {{ tile.getBackgroundPositionStyle() }} {% if tile.backgroundImageContained %}contained{% endif %}"
