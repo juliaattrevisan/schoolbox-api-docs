@@ -26,6 +26,8 @@ class Report_Group extends Report_Abstract implements Report_IReport
         'campus'     => 'Campus',
         'alt_email'  => 'Alt Email',
         'year'       => 'Year',
+        'house'      => 'House',
+        'res_house'  => 'Residential House',
     );
 
     // fields that we will permit sorting on
@@ -123,11 +125,15 @@ class Report_Group extends Report_Abstract implements Report_IReport
         $query = "
             SELECT `u`.*,
             GROUP_CONCAT(`c`.`name` ORDER BY `uc`.`defaultCampus` DESC, `c`.`name` ASC SEPARATOR ', ') AS `campus`,
-            `r`.`name` AS `role`
+            `r`.`name` AS `role`,
+            `h`.`house` AS `house`,
+            `rh`.`name` AS `res_house`
             FROM `user` `u`
             LEFT JOIN `userCampus` `uc` ON `u`.`id`=`uc`.`uid`
             LEFT JOIN `luCampus` `c` ON `uc`.`campus`=`c`.`id`
             LEFT JOIN `groups` `r` ON `u`.`group_id`=`r`.`id`
+            LEFT JOIN `house` `h` ON `u`.`house`=`h`.`id`
+            LEFT JOIN `luResidentialHouse` `rh` ON `u`.`residential_house_id`=`rh`.`id`
             WHERE `u`.`group_id` = '$filterString'
             GROUP BY `u`.`id`
             ORDER BY $orderBy $orderDir
