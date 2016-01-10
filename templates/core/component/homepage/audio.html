@@ -30,14 +30,14 @@
                 }
             });
 
-            $("[resource-delete]").on('click', function (event) {
+            $("[audio-delete]").on('click', function (event) {
                 event.preventDefault();
 
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this?',
                     confirmEvent: function (anchor) {
                         $.get('/cms/fileForm.php?ajax=1&delete=' + anchor.attr('id')).done(function() {
-                            $('.resource-' + anchor.attr('id')).remove();
+                            location.reload();
                         });
                     }
                 });
@@ -82,7 +82,7 @@
                         <li class="actions-small-1 resource-{AUDIO_LIST_ID}">
                             <div class="list-item">
                                 <div class="avatar card" >
-                                    <a href="/cms/sendVideo.php?type=sbfs&id={AUDIO_LIST_ID}" data-role="media-playlist-track">
+                                    <a href="/cms/sendVideo.php?type=sbfs&id={AUDIO_LIST_ID}" data-audiolink data-role="media-playlist-track">
                                         <div class="icon-audio icon-32"></div>
                                         <h3>{AUDIO_LIST_TITLE}</h3>
                                     </a>
@@ -97,7 +97,7 @@
                             <!-- BEGIN audio_edit -->
                             <nav>
                                 <a class="icon-modify no-text" href="/cms/file/{AUDIO_LIST_ID}" title="Modify"></a>
-                                <a class="icon-delete no-text" href="#" resource-delete id="{AUDIO_LIST_ID}" title="Delete"></a>
+                                <a class="icon-delete no-text" href="#" audio-delete id="{AUDIO_LIST_ID}" title="Delete"></a>
                             </nav>
                             <!-- END audio_edit -->
                         </li>

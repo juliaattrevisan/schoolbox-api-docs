@@ -18,14 +18,14 @@
                 video.setPoster($poster);
             });
 
-            $("[resource-delete]").on('click', function (event) {
+            $("[video-delete]").on('click', function (event) {
                 event.preventDefault();
 
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this?',
                     confirmEvent: function (anchor) {
                         $.get('/cms/fileForm.php?ajax=1&delete=' + anchor.attr('id')).done(function() {
-                            $('.resource-' + anchor.attr('id')).remove();
+                            location.reload();
                         });
                     }
                 });
@@ -82,7 +82,7 @@
                             <!-- BEGIN video_edit -->
                             <nav>
                                 <a class="icon-modify no-text" href="/cms/file/{VIDEO_LIST_ID}" title="Modify"></a>
-                                <a class="icon-delete no-text" href="#" resource-delete id="{VIDEO_LIST_ID}" title="Delete"></a>
+                                <a class="icon-delete no-text" href="#" video-delete id="{VIDEO_LIST_ID}" title="Delete"></a>
                             </nav>
                             <!-- END video_edit -->
                         </li>

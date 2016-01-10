@@ -128,14 +128,13 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                         'ON_OFF'               => ++$j % 2 ? '' : 'dark'
                     );
 
-                    if ($this->permission > READ_ACCESS) {
-                        $this->parse('audio_edit_block', 'audio_edit', true);
-                    } else {
-                        $this->setVar('audio_edit_block', '');
-                    }
-
                     $this->setVar($output);
                     if ($audio->getStatus() == "completed") {
+                        if ($this->permission > READ_ACCESS) {
+                            $this->parse('audio_edit_block', 'audio_edit', true);
+                        } else {
+                            $this->setVar('audio_edit_block', '');
+                        }
                         $this->parse('audio_list_block', 'audio_list', true);
                     } elseif ($this->permission >= WRITE_ACCESS) {
                         $this->setVar(
