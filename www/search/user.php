@@ -220,9 +220,6 @@ function renderStudent(
     $userObject = $userMapper->findById($user['uid']);
     $userObject->loadParents();
 
-    $userCurrent = $_SESSION['user'];
-    $userCurrentObject = $userMapper->findById($userCurrent->getId());
-
     $page->setFile(TEMPLATE_content, 'output.html');
 
     $page->setVar(
@@ -235,7 +232,7 @@ function renderStudent(
                 'externalUser'   => $externalUser,
                 'eportfolioAuth' => $authenticator->canView(),
                 'hideContacts'   => $user['hide_contacts'] == 1 ? 1 : 0,
-                'showClasses'    => $userCurrentObject->getHideTimetable() ? 0 : 1,
+                'showClasses'    => $userObject->getHideTimetable() ? 0 : 1,
                 'now'            => Alaress_Date_Format::now(),
                 'boarderType'    => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
                 'contacts'       => $contacts,
