@@ -14,7 +14,7 @@ use Schoolbox;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
 
-class RoleMapper extends Schoolbox\External\Mapper
+class RoleMapper extends Schoolbox\Mapper
 {
 
     /**

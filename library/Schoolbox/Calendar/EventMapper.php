@@ -21,7 +21,7 @@ use Schoolbox\User;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 
-class EventMapper extends Schoolbox\External\Mapper
+class EventMapper extends Schoolbox\Mapper
 {
     const ACCESS_PERSONAL = 1;
     const ACCESS_GROUP = 2;

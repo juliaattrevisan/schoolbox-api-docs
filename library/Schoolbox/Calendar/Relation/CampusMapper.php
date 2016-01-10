@@ -15,7 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
 
-class CampusMapper extends Schoolbox\External\Mapper
+class CampusMapper extends Schoolbox\Mapper
 {
 
     /**
