@@ -280,7 +280,7 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
             array(
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => Scrub::text($existing['response']),
-                'ANSWER_CORRECT' => $existing['response'] == $currentAnswer['answer']
+                'ANSWER_CORRECT' => $this->compareStrings($existing['response'], $currentAnswer['answer'])
                     ? 'evaluation-correct-answer-option'
                     : 'evaluation-incorrect-answer-option',
                 'RESPONSE_ID' => $existing['response_id'],
@@ -358,4 +358,28 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
 
 		$page->parse('answerTop_block', 'answerTop', true);
 	}
+
+    /**
+     * Compares to strings for the purposes of marking exact answer
+     */
+    protected function compareStrings($str1, $str2) {
+         if(strcmp($this->normalizeForComparison($str1),$this->normalizeForComparison($str2)) == 0) {
+             return true;
+         } else {
+             return false;
+         }
+    }
+
+    /**
+     * Normalizes response and answer for comparison - replaces all spaces,
+     * and converts to lower case.
+     *
+     * @param string $response
+     *
+     * @return string
+     */
+    protected function normalizeForComparison($response)
+    {
+        return mb_strtolower(trim(preg_replace('/\\s+/', ' ', $response)), 'UTF-8');
+    }
 }
