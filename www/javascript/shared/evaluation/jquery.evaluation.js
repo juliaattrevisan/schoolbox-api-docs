@@ -44,12 +44,80 @@
 	$.fn.evaluation.saveAll = function(href) {
 		init();
 
-		/* Allow display of saving indicator before locking browser up
-		 * by using a delayed response
-		 *
-		 * http://stackoverflow.com/questions/4971062/jquery-ajax-synchronous-call-beforesend
-		 */
-		setTimeout(saveForms, 2500);
+		// Don't need to wait 2500ms now that AJAX calls are asynchronous
+		var saving    = $('#evaluation-saving');
+		var label     = saving.find('[data-evaluation-progress-saved]');
+		var questions = $('[data-question]');
+		saveForms(questions)
+			.fail(function() {
+				saving.removeClass('loader');
+				label.labelActivate({text: 'Progress Save Failed!', css: 'alert'});
+			})
+			.done(function() {
+				var errors = false;
+				questions.each(function(index, element) {
+					var pluginName = $(element).data('plugin');
+
+					/* Extract validation ruleset for this particular question type
+					 */
+					var configuration = $.fn[pluginName].getValidationRules();
+
+					/* If configuration exists for this question type, apply settings
+					 * otherwise ignore it
+					 */
+					if (configuration != undefined) {
+
+						/* If the question is mandatory, apply validation requirements
+						 */
+						if ($(element).find('span[data-mandatory="required"]').length) {
+
+							/* If a custom error location is desired
+							 */
+							if (configuration.errorContainer != undefined) {
+								$(element).alaressValidate({
+									onfocusout: false,
+									errorPlacement: function(error, inputElement) {
+										$(element).find(configuration.errorContainer).html(error);
+									},
+									ignore: ':hidden:not(:checkbox):not(:radio)'
+								});
+							}
+							else {
+								$(element).alaressValidate({
+									onfocusout: false,
+									ignore: ':hidden:not(:checkbox):not(:radio)'
+								});
+							}
+
+							/* Apply custom rules if validation is required, in accordance with
+							 * http://jquery.bassistance.de/validate/demo/
+							 */
+							$(element).find(configuration.element).rules('add', configuration.rules);
+
+							/* If any aren't valid, mark as bad
+							 */
+							if (!$(element).valid()) {
+								errors = true;
+							}
+						}
+					}
+				});
+				/* Remove loading gif; show success label
+				 */
+				saving.removeClass('loader');
+				label.removeClass('hide').labelTimeout({text: 'Progress Saved'});
+					//.find('[data-evaluation-progress-saved]').removeClass('hide');
+
+				/* Detect errors, prevent redirection if any were made
+				 * and hide that Saving box
+				 */
+				if (!errors) {
+					location.href = href;
+				}
+				else {
+					saving.addClass('loader hide');
+				}
+			});
 
 		/**
 		 * Init - show loading div
@@ -61,80 +129,19 @@
 		/**
 		 * Save each question form
 		 */
-		function saveForms() {
-			var errors = false;
-
-			$('[data-question]').each(function(index, element) {
+		function saveForms(questions) {
+			// Run all AJAX calls asynchronously now, and wait for them all to finish before continuing.
+			var ajaxes = [];
+			questions.each(function(index, element) {
 				var id = $(element).data('question');
-
-				var prefix = "$.fn." + $(element).data('plugin');
-
-				/* Run saveOne() multiple times
-				 */
-				var plugin = prefix + ".saveOne($('#questionForm-" + id + "'))";
-				var hadoken = new Function(plugin);
-				hadoken();
-
-				/* Extract validation ruleset for this particular question type
-				 */
-				var method = prefix + ".getValidationRules()";
-				var shoryuken = new Function('return ' + method);
-				var configuration = shoryuken();
-
-				/* If configuration exists for this question type, apply settings
-				 * otherwise ignore it
-				 */
-				if (configuration != undefined) {
-
-					/* If the question is mandatory, apply validation requirements
-					 */
-					if ($(element).find('span[data-mandatory="required"]').length) {
-
-						/* If a custom error location is desired
-						 */
-						if (configuration.errorContainer != undefined) {
-							$(element).alaressValidate({
-								onfocusout: false,
-								errorPlacement: function(error, inputElement) {
-									$(element).find(configuration.errorContainer).html(error);
-								},
-								ignore: ':hidden:not(:checkbox):not(:radio)'
-							});
-						}
-						else {
-							$(element).alaressValidate({
-								onfocusout: false,
-								ignore: ':hidden:not(:checkbox):not(:radio)'
-							});
-						}
-
-						/* Apply custom rules if validation is required, in accordance with
-						 * http://jquery.bassistance.de/validate/demo/
-						 */
-						$(element).find(configuration.element).rules('add', configuration.rules);
-
-						/* If any aren't valid, mark as bad
-						 */
-						if (!$(element).valid()) {
-							errors = true;
-						}
-					}
-				}
+				var pluginName = $(element).data('plugin');
+				ajaxes.push(
+					$.retryPromise(function() {
+						return $.fn[pluginName].saveOne($('#questionForm-'+id))
+					})
+				);
 			});
-
-            /* Remove loading gif; show success label
-             */
-            $('#evaluation-saving').removeClass('loader').find('[data-evaluation-progress-saved]').removeClass('hide');
-
-			/* Detect errors, prevent redirection if any were made
-			 * and hide that Saving box
-			 */
-			if (!errors) {
-				location.href = href;
-			}
-			else {
-				$('#evaluation-saving').addClass('loader hide').find('[data-evaluation-progress-saved]').addClass('hide');
-			}
+			return $.when.apply(null, ajaxes);
 		}
 	}
 
