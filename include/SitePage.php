@@ -656,10 +656,8 @@ class SitePage extends Page
         //if the have a timetable or their children have a timetable
 
         $user = $_SESSION['user'];
-        $userMapper = new \Schoolbox\UserMapper();
-        $userObject = $userMapper->findById($user->getId());
 
-        if (($_SESSION['timetable'] || is_array($_SESSION['children'][0]['subjects'])) && !$userObject->getHideTimetable()) {
+        if (($_SESSION['timetable'] || is_array($_SESSION['children'][0]['subjects'])) && !$user->getHideTimetable()) {
             $this->parse('tt_tab', 'timetable_tab');
         } else {
             $this->setVar('tt_tab', '');

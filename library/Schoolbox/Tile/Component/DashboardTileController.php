@@ -72,10 +72,6 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
      */
     public function renderTemplate($templateHandle)
     {
-        $user = $_SESSION['user'];
-        $userMapper = new \Schoolbox\UserMapper();
-        $userObject = $userMapper->findById($user->getId());
-
         if ($this->getLayout()->getTileList()->count()) {
             return $this->renderTwigTemplate(
                 $templateHandle,
@@ -83,7 +79,6 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
                 array(
                     'component'                  => $this,
                     'showButtons'                => false,
-                    'hideTimetable'              => $userObject->getHideTimetable(),
                     'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
                 ),
                 !$this->getConfig('compactMode'),

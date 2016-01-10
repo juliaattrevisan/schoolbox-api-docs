@@ -42,34 +42,29 @@
 }
 
 </style>
+<li data-tile
+    class="tile {{ tile.getBackgroundPositionStyle() }} {% if tile.backgroundImageContained %}contained{% endif %}"
+    id="tile-{{ tile.id|e('html_attr') }}">
+    <span class="title {{ tile.getTitlePositionStyle() }}">{{ tile.titleText }}</span>
 
-{# If the user should not see timetables, hide any tiles that start with '/timetable' #}
+    {% if tile.link %}
+    <a href="{{ tile.link|e('html_attr') }}" target="{{ tile.getLinkTarget()|e('html_attr') }}" class="tile-link"></a>
+    {% else %}
+    <span class="tile-link"></span>
+    {% endif %}
 
-{% if not (tile.link starts with '/timetable') or not hideTimetable %}
-    <li data-tile
-        class="tile {{ tile.getBackgroundPositionStyle() }} {% if tile.backgroundImageContained %}contained{% endif %}"
-        id="tile-{{ tile.id|e('html_attr') }}">
-        <span class="title {{ tile.getTitlePositionStyle() }}">{{ tile.titleText }}</span>
-
-        {% if tile.link %}
-        <a href="{{ tile.link|e('html_attr') }}" target="{{ tile.getLinkTarget()|e('html_attr') }}" class="tile-link"></a>
-        {% else %}
-        <span class="tile-link"></span>
-        {% endif %}
-
-        {% if editable and tile.id %}
-        <div class="edit">
-            <span class="button left icon-grip" data-tile-grip></span>
-            {# Hidden form input for this tile - used in sorting #}
-            <input type="hidden" name="tile[]" value="{{ tile.id|e('html_attr') }}" />
-            <a href="{{ routeLookup('tile.delete:post', {id: tile.id}) }}"
-               class="button icon-delete no-text right"
-               data-role="delete"
-               title="Delete"></a>
-            <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}"
-               class="button icon-modify no-text right"
-               title="Modify"></a>
-        </div>
-        {% endif %}
-    </li>
-{% endif %}
+    {% if editable and tile.id %}
+    <div class="edit">
+        <span class="button left icon-grip" data-tile-grip></span>
+        {# Hidden form input for this tile - used in sorting #}
+        <input type="hidden" name="tile[]" value="{{ tile.id|e('html_attr') }}" />
+        <a href="{{ routeLookup('tile.delete:post', {id: tile.id}) }}"
+           class="button icon-delete no-text right"
+           data-role="delete"
+           title="Delete"></a>
+        <a href="{{ routeLookup('tile.edit', {id: tile.id}) }}"
+           class="button icon-modify no-text right"
+           title="Modify"></a>
+    </div>
+    {% endif %}
+</li>

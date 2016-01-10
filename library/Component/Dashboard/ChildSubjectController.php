@@ -25,13 +25,11 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
     }
 
     public function renderTemplate ($templateHandle) {
+        $userMapper = new \Schoolbox\UserMapper();
+
         if ( !$this->loadTemplate($templateHandle, 'childSubject') ) {
             return false;
         }
-
-        $user = $_SESSION['user'];
-        $userMapper = new \Schoolbox\UserMapper();
-        $userObject = $userMapper->findById($user->getId());
 
         $this->setBlock($templateHandle, "student_block", "student_subjects");
         $this->setBlock("student_block", "subject_block", "subject_item");
@@ -40,18 +38,23 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         $this->setBlock('student_block', 'grades_button', 'grades_button_block');
         $this->setBlock('student_block', 'timetable', 'timetable_block');
 
-        if ($userObject->getHideTimetable()) {
-            $this->setVar('timetable_block', '');
-        } else {
-            $this->parse('timetable_block', 'timetable');
-        }
-
         $groupHandler = new Group();
 		$isParent = $groupHandler->isParent();
 
         $i = 0;
 
         foreach ( $this->children as $child ) {
+
+            // Check if the current childs timetable is viewable and hide if necessary
+
+            $userChild = $userMapper->findById($child['id']);
+
+            if ($userChild->getHideTimetable()) {
+                $this->setVar('timetable_block', '');
+            } else {
+                $this->parse('timetable_block', 'timetable');
+            }
+
             if ( !( Cfg::get('site_location') == 'wenona' && $child['gid'] == 3 ) ) {
                 $i++;
                 $query = "SELECT title, firstname, lastname, year, synergy_id FROM user WHERE id = {$child['id']}";

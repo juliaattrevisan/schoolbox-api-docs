@@ -44,10 +44,6 @@ class Renderer extends Handler
 
         $result = $this->getResult($this->getType());
 
-        $user = $_SESSION['user'];
-        $userMapper = new \Schoolbox\UserMapper();
-        $userObject = $userMapper->findById($user->getId());
-
         if (!empty($result)) {
             $this->getPage()->setFile('user_t', 'user/search/results.html');
             $this->getPage()->setBlock('user_t', 'user', 'user_block');
@@ -102,9 +98,8 @@ class Renderer extends Handler
                 //Show student timetables to staff and parents of child
                 if ($groupHandler->isStudent($user['id'])) {
                     if ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
-/* Timetable shouldn't appear if synergy is disabled in the conf
-                         */
-                        if (Cfg::get('external_enable') && $user['synergy_id'] && !$userObject->getHideTimetable()) {
+                        // Timetable shouldn't appear if synergy is disabled in the conf, or the students timetable is marked as hidden
+                        if (Cfg::get('external_enable') && $user['synergy_id'] && !$user['hide_timetable']) {
                             $this->getPage()->parse('timetable_block', 'timetable');
                         } else {
                             $this->getPage()->setVar('timetable_block', '');
