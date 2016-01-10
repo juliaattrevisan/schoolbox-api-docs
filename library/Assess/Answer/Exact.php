@@ -20,18 +20,6 @@ class Assess_Answer_Exact extends Evaluation_Answer_Exact
         $this->setResponseHandler(new Assess_Response());
     }
 
-    /**
-    * Normalizes response and answer for comparison - replaces all spaces,
-    * and converts to lower case.
-    *
-    * @param string $response
-    *
-    * @return string
-    */
-    protected function normalizeForComparison($response)
-    {
-        return mb_strtolower(trim(preg_replace('/\\s+/', ' ', $response)), 'UTF-8');
-    }
 
     /**
     * Automatically marks a response. Customised to be applicable to the way in
@@ -43,10 +31,7 @@ class Assess_Answer_Exact extends Evaluation_Answer_Exact
     public function mark($currentResponse)
     {
         // Normalize both response and answer for comparison
-        if (
-            $this->normalizeForComparison($currentResponse['response'])
-            === $this->normalizeForComparison($currentResponse['answer'])
-        ) {
+        if ( $this->compareStrings($currentResponse['response'], $currentResponse['answer']) ) {
             $totalMarks = $currentResponse['marks'];
         } else {
             $totalMarks = 0;
