@@ -39,5 +39,13 @@
         .fc-button-group{
             margin-bottom: 1rem;
         }
+        .fc-icon {
+            line-height: 0.6rem;
+            font-size: 0.8rem;
+            height: 1.1em;
+            &:after{
+                top: 0;
+            }
+        }
     }
 }
