@@ -14,7 +14,7 @@ namespace Schoolbox\External;
 use Schoolbox;
 use Schoolbox\Campus;
 
-class TimetableCampusMapper extends Schoolbox\External\Mapper {
+class TimetableCampusMapper extends Schoolbox\Mapper {
 
     /**
      * {@inheritdoc}
@@ -115,6 +115,37 @@ class TimetableCampusMapper extends Schoolbox\External\Mapper {
                 ->setCampus($campus_mapper->hydrate($row, 'ca'))
             ;
             return $timetable_campus;
+        }
+        throw new Schoolbox\Mapper\Exception('Instance of object not found');
+    }
+
+    /**
+     * Get a single entry by its name and campus code.
+     *
+     * @param string $name
+     * @param string $campusCode
+     *
+     * @throws Schoolbox\Mapper\Exception if no timetable is found
+     * @return TimetableCampus
+     */
+    public function findOneByNameAndCampusCode($name, $campusCode)
+    {
+        $query = "
+            SELECT {$this->getColumnString('tc')}
+            FROM   {$this->getTable()} `tc`
+            INNER JOIN {$this->getJoinSql('cycle',  'tc', 'ty')}
+            INNER JOIN {$this->getJoinSql('campus', 'tc', 'ca')}
+            WHERE `ca`.`ext_timetable_code` = :campusCode
+            AND   `ty`.`title`              = :name
+        ";
+        $statement = $this->database->prepare($query);
+
+        $statement->bindValue('campusCode', $campusCode);
+        $statement->bindValue('name',       $name);
+        $statement->execute();
+
+        if ($row = $statement->fetch()) {
+            return $this->hydrate($row, 'tc');
         }
         throw new Schoolbox\Mapper\Exception('Instance of object not found');
     }

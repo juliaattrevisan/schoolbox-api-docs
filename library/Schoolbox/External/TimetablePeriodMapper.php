@@ -12,7 +12,7 @@
 namespace Schoolbox\External;
 use Schoolbox;
 
-class TimetablePeriodMapper extends Schoolbox\External\Mapper {
+class TimetablePeriodMapper extends Schoolbox\Mapper {
 
     /**
      * {@inheritdoc}

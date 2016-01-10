@@ -12,7 +12,7 @@
 namespace Schoolbox\External;
 use Schoolbox;
 
-class UserProfileMapper extends Schoolbox\External\Mapper {
+class UserProfileMapper extends Schoolbox\Mapper {
 
     /**
      * {@inheritdoc}

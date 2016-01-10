@@ -54,17 +54,34 @@ class Reader implements \Iterator {
      */
     protected $escape = '\\';
 
-    protected $fp          = null;
-    protected $current_key = 0;
-    protected $current_row = array();
+    /**
+     * Are empty cells filled with the first non-empty value above them?
+     *
+     * @var bool
+     */
+    protected $fill_down = false;
+
+    protected $fp           = null;
+    protected $current_key  = 0;
+    protected $current_row  = array();
+    protected $previous_row = array();
 
     /**
      * Sets up the reader to read from the current file name.
      *
-     * @param string $filename
+     * @param string|resource $filename
+     *
+     * @throws \RuntimeException if file isn't found or readable
      */
     public function __construct($filename) {
-        $this->filename = $filename;
+        if (is_resource($filename)) {
+            $this->filename = null;
+            $this->fp       = $filename;
+        } elseif (is_readable($filename)) {
+            $this->filename = $filename;
+        } else {
+            throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
+        }
     }
 
     /**
@@ -81,13 +98,25 @@ class Reader implements \Iterator {
         $parsed_row  = array();
         $column_list = $this->getColumnList();
         if (empty($column_list)) {
-            return $this->current_row;
-        }
-        foreach ($column_list as $i => $column) {
-            if (isset($column)) {
-                $parsed_row[$column] = isset($this->current_row[$i]) ? $this->current_row[$i] : null;
+            $parsed_row = $this->current_row;
+        } else {
+            foreach ($column_list as $i => $column) {
+                if (isset($column)) {
+                    $parsed_row[$column] = isset($this->current_row[$i]) ? $this->current_row[$i] : null;
+                }
             }
         }
+
+        // Fill down
+        if ($this->getFillDown()) {
+            foreach ($parsed_row as $i => $value) {
+                if (strlen($value) === 0 && isset($this->previous_row[$i])) {
+                    $parsed_row[$i] = $this->previous_row[$i];
+                }
+            }
+        }
+
+        $this->previous_row = $parsed_row;
         return $parsed_row;
     }
 
@@ -118,7 +147,9 @@ class Reader implements \Iterator {
      */
     public function rewind() {
         $this->cleanup();
-        $this->fp = fopen($this->filename, 'r');
+        if (!is_resource($this->fp)) {
+            $this->fp = fopen($this->filename, 'r');
+        }
 
         // Am I loading the column list from the first column?
         // If so, load that and set it as the column list.
@@ -129,7 +160,7 @@ class Reader implements \Iterator {
     }
 
     protected function cleanup() {
-        if (is_resource($this->fp)) {
+        if (is_resource($this->fp) && $this->filename) {
             fclose($this->fp);
             unset($this->fp);
         }
@@ -227,4 +258,21 @@ class Reader implements \Iterator {
         return $this->escape;
     }
 
+    /**
+     * @return bool
+     */
+    public function getFillDown()
+    {
+        return $this->fill_down;
+    }
+
+    /**
+     * @param  bool  $fill_down
+     * @return $this
+     */
+    public function setFillDown($fill_down)
+    {
+        $this->fill_down = $fill_down;
+        return $this;
+    }
 }
