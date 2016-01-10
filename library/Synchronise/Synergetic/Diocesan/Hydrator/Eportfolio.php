@@ -50,7 +50,11 @@ class Eportfolio implements Synchronise_Base_IHydrator
             Student::ROLE_YR_6,
             Student::ROLE_YR_7,
             Student::ROLE_YR_8,
-            Student::ROLE_YR_9
+            Student::ROLE_YR_9,
+            Student::ROLE_YR_10,
+            Student::ROLE_YR_11,
+            Student::ROLE_YR_12,
+            Student::ROLE_YR_13
         );
 
         $newUser['eportfolio_enabled'] = in_array($newUser['group_id'], $enable);
