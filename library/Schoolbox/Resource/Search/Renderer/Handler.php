@@ -301,6 +301,12 @@ abstract class Handler
         return $this->page;
     }
 
+    protected function getTabId()
+    {
+        // wat
+        return $_GET['type'];
+    }
+
     /**
      * Set result
      *
