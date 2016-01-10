@@ -25,6 +25,8 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
     }
 
     public function renderTemplate ($templateHandle) {
+        $userMapper = new \Schoolbox\UserMapper();
+
         if ( !$this->loadTemplate($templateHandle, 'childSubject') ) {
             return false;
         }
@@ -34,7 +36,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 		$this->setBlock('student_block', 'eportfolio', 'eportfolio_block');
 		$this->setBlock('student_block', 'due_work', 'due_work_block');
         $this->setBlock('student_block', 'grades_button', 'grades_button_block');
-
+        $this->setBlock('student_block', 'timetable', 'timetable_block');
 
         $groupHandler = new Group();
 		$isParent = $groupHandler->isParent();
@@ -42,6 +44,17 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         $i = 0;
 
         foreach ( $this->children as $child ) {
+
+            // Check if the current childs timetable is viewable and hide if necessary
+
+            $userChild = $userMapper->findById($child['id']);
+
+            if ($userChild->getHideTimetable()) {
+                $this->setVar('timetable_block', '');
+            } else {
+                $this->parse('timetable_block', 'timetable');
+            }
+
             if ( !( Cfg::get('site_location') == 'wenona' && $child['gid'] == 3 ) ) {
                 $i++;
                 $query = "SELECT title, firstname, lastname, year, synergy_id FROM user WHERE id = {$child['id']}";

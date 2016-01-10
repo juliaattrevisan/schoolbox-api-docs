@@ -23,6 +23,8 @@ $this->setBlock('has_results', 'apply_role', 'apply_role_block');
 $this->setBlock('has_results', 'apply_eportfolio', 'apply_eportfolio_block');
 $this->setBlock('has_results', 'apply_webmail', 'apply_webmail_block');
 $this->setBlock('has_results', 'apply_accountenabled', 'apply_accountenabled_block');
+$this->setBlock('has_results', 'apply_hidecontacts', 'apply_hidecontacts_block');
+$this->setBlock('has_results', 'apply_hidetimetable', 'apply_hidetimetable_block');
 $this->setBlock('has_results', 'apply_emailfromusername', 'apply_emailfromusername_block');
 $this->setBlock('has_results', 'apply_externalmailclient', 'apply_externalmailclient_block');
 
@@ -182,6 +184,28 @@ foreach ($allBoolean as $currentAccountEnabled) {
     );
 
     $this->parse('apply_accountenabled_block', 'apply_accountenabled', true);
+}
+
+foreach ($allBoolean as $currentHideContacts) {
+    $this->setVar(
+        array(
+            'APPLY_HIDECONTACTS_ID' => $currentHideContacts['key'],
+            'APPLY_HIDECONTACTS_NAME' => $currentHideContacts['label'],
+        )
+    );
+
+    $this->parse('apply_hidecontacts_block', 'apply_hidecontacts', true);
+}
+
+foreach ($allBoolean as $currentHideTimetable) {
+    $this->setVar(
+        array(
+            'APPLY_HIDETIMETABLE_ID' => $currentHideTimetable['key'],
+            'APPLY_HIDETIMETABLE_NAME' => $currentHideTimetable['label'],
+        )
+    );
+
+    $this->parse('apply_hidetimetable_block', 'apply_hidetimetable', true);
 }
 
 /* If there were any search results, display control options

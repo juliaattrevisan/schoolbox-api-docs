@@ -320,7 +320,7 @@
                         </select>
                     </div>
 
-                    <div class="small-12 medium-6 columns end">
+                    <div class="small-12 medium-6 columns">
                         <label for="apply_accountenabled">Account Enabled</label>
                         <select id="apply_accountenabled" name="apply_accountenabled">
                             <option value="-1">Unchanged</option>
@@ -329,6 +329,28 @@
                             <!-- END apply_accountenabled -->
                         </select>
                     </div>
+
+                    <div class="small-12 medium-6 columns">
+                        <label for="apply_hidecontacts">Hide Contact Details From Parents</label>
+                        <select id="apply_hidecontacts" name="apply_hidecontacts">
+                            <option value="-1">Unchanged</option>
+                            <!-- BEGIN apply_hidecontacts -->
+                            <option value="{APPLY_HIDECONTACTS_ID}">{APPLY_HIDECONTACTS_NAME}</option>
+                            <!-- END apply_hidecontacts -->
+                        </select>
+                    </div>
+
+                    <div class="small-12 medium-6 columns end">
+                        <label for="apply_hidetimetable">Hide Timetable</label>
+                        <select id="apply_hidetimetable" name="apply_hidetimetable">
+                            <option value="-1">Unchanged</option>
+                            <!-- BEGIN apply_hidetimetable -->
+                            <option value="{APPLY_HIDETIMETABLE_ID}">{APPLY_HIDETIMETABLE_NAME}</option>
+                            <!-- END apply_hidetimetable -->
+                        </select>
+                    </div>
+
+
                 </div>
             </section>
             <input name='updateUsers' type="submit" value="Apply To Selected" />

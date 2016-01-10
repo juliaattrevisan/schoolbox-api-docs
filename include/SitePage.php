@@ -651,11 +651,13 @@ class SitePage extends Page
 
     function renderTabBar()
     {
-
         //this section hanldes the display of the timetable tab
         $this->setBlock('tabTpl', 'timetable_tab', 'tt_tab');
         //if the have a timetable or their children have a timetable
-        if ($_SESSION['timetable'] || is_array($_SESSION['children'][0]['subjects'])) {
+
+        $user = $_SESSION['user'];
+
+        if (($_SESSION['timetable'] || is_array($_SESSION['children'][0]['subjects'])) && !$user->getHideTimetable()) {
             $this->parse('tt_tab', 'timetable_tab');
         } else {
             $this->setVar('tt_tab', '');

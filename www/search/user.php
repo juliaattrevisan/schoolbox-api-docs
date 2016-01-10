@@ -219,7 +219,9 @@ function renderStudent(
     // TODO make $now available to Twig by default
     $userObject = $userMapper->findById($user['uid']);
     $userObject->loadParents();
+
     $page->setFile(TEMPLATE_content, 'output.html');
+
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
@@ -229,6 +231,8 @@ function renderStudent(
                 'user'           => $userObject,
                 'externalUser'   => $externalUser,
                 'eportfolioAuth' => $authenticator->canView(),
+                'hideContacts'   => $user['hide_contacts'] == 1 ? 1 : 0,
+                'showClasses'    => $userObject->getHideTimetable() ? 0 : 1,
                 'now'            => Alaress_Date_Format::now(),
                 'boarderType'    => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
                 'contacts'       => $contacts,

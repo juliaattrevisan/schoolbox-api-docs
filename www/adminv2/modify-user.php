@@ -65,6 +65,8 @@ if(is_numeric($this->arg[0])) {
                         'DATABASE_ID'       => $user['synergy_id'],
                         'SUPERUSER_CHECKED' => $user['su']==1?'checked="checked"':'',
                         'LASTNAME'          => $user['lastname'],
+                        'HIDE_CONTACTS_CHECKED'=> $user['hide_contacts']==1?'checked="checked"':'',
+                        'HIDE_TIMETABLE_CHECKED'=> $user['hide_timetable']==1?'checked="checked"':'',
                         'EPORTFOLIO_CHECKED'=> $user['eportfolio_enabled']==1?'checked="checked"':'',
                         'LOCAL_EMAIL_CHECKED'=> $user['local_email']==1?'checked="checked"':'',
                         'WEBMAIL_CHECKED'   => $user['webmail']==1?'checked="checked"':'',

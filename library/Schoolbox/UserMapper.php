@@ -199,6 +199,22 @@ class UserMapper extends Mapper
             )
         );
 
+        $this->hasMap(
+            array(
+                'column' => 'hide_contacts',
+                'property' => 'hideContacts',
+                'type' => Mapper::TYPE_BOOLEAN,
+            )
+        );
+
+        $this->hasMap(
+            array(
+                'column' => 'hide_timetable',
+                'property' => 'hideTimetable',
+                'type' => Mapper::TYPE_BOOLEAN,
+            )
+        );
+
         //
         // Boarder leave field is only there if the boarder leave module is
         // enabled.

@@ -104,6 +104,12 @@ class User implements JsonSerializable
     /** @var bool */
     private $enabled;
 
+    /** @var bool */
+    private $hideContacts;
+
+    /** @var bool */
+    private $hideTimetable;
+
     /**
      * @var SubjectCollection|Subject[]
      */
@@ -689,6 +695,25 @@ class User implements JsonSerializable
         return $this;
     }
 
+    /**
+     * @return self
+     */
+    public function setHideContacts($hideContacts)
+    {
+        // explicit cast
+        $this->hideContacts = $hideContacts ? true : false;
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
+    public function setHideTimetable($hideTimetable)
+    {
+        // explicit cast
+        $this->hideTimetable = $hideTimetable ? true : false;
+        return $this;
+    }
 
     /**
      * @return bool
@@ -699,6 +724,23 @@ class User implements JsonSerializable
         return $this->enabled ? true : false;
     }
 
+    /**
+     * @return bool
+     */
+    public function getHideContacts()
+    {
+        // explicit cast
+        return $this->hideContacts ? true : false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getHideTimetable()
+    {
+        // explicit cast
+        return $this->hideTimetable ? true : false;
+    }
 
     /**
      * @param CampusCollection $campusCollection

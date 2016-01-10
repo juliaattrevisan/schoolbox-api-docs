@@ -42,10 +42,15 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
     public function execute()
     {
-        if (!($_SESSION['timetable'] && Cfg::get('external_enable'))) {
+        $user = $_SESSION['user'];
+
+        if ($user->getHideTimetable()) {
             return false;
         }
 
+        if (!($_SESSION['timetable'] && Cfg::get('external_enable'))) {
+           return false;
+        }
 
         $timetableHandler = $this->externalTimetable;
 
