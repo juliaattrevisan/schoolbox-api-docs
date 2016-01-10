@@ -22,86 +22,65 @@ $timetableHandler = new External_Timetable;
 $categoryMapper   = new \Schoolbox\Resource\CategoryMapper();
 $userMapper       = new \Schoolbox\UserMapper();
 
-$user = $_SESSION['user'];
-$userMapper = new \Schoolbox\UserMapper();
-$userObject = $userMapper->findById($user->getId());
 
-if ($userObject->getHideTimetable()) {
+$this->setFile(TEMPLATE_content, 'class/timetable.html');
+$this->setTitle('Timetable');
+$this->setTab('timetable');
 
-    $this->setFile(TEMPLATE_content, 'class/timetable.html');
-    $this->setTitle('Timetable');
+$this->setBlock(TEMPLATE_content, "no_timetable", "no_timetable_block");
+$this->setBlock(TEMPLATE_content, "timetable", "timetable_listing");
+$this->setBlock(TEMPLATE_content, 'timetable_person', 'timetable_person_block');
+$this->setBlock("timetable", "period", "period_listing");
+$this->setBlock("period", "day", "day_listing");
+$this->setBlock('day', 'period_class', 'period_class_block');
+$this->setBlock('day', 'period_class_link', 'period_class_link_block');
+$this->setBlock("timetable", "day_header", "day_header_listing");
 
-    $this->setBlock(TEMPLATE_content, "no_timetable", "no_timetable_block");
-    $this->setBlock(TEMPLATE_content, "timetable", "timetable_listing");
-    $this->setBlock(TEMPLATE_content, 'timetable_person', 'timetable_person_block');
-    $this->setBlock("timetable", "period", "period_listing");
-    $this->setBlock("period", "day", "day_listing");
-    $this->setBlock('day', 'period_class', 'period_class_block');
-    $this->setBlock('day', 'period_class_link', 'period_class_link_block');
-    $this->setBlock("timetable", "day_header", "day_header_listing");
+/* Fetch list of homepage colours for use */
+$colourList = Timetable_ColourMapper::getInstance()->findAll();
 
-    $this->parse('no_timetable_block', 'no_timetable');
-    $this->setVar('timetable_listing', '');
-    $this->setVar('timetable_person_block', '');
+/** @var Schoolbox\User[] $userList */
+$userList = [];
+$numTimetables = 0;
+$child_id = $this->arg[0];
 
-}
-else {
-
-    $this->setFile(TEMPLATE_content, 'class/timetable.html');
-    $this->setTitle('Timetable');
-    $this->setTab('timetable');
-
-    $this->setBlock(TEMPLATE_content, "no_timetable", "no_timetable_block");
-    $this->setBlock(TEMPLATE_content, "timetable", "timetable_listing");
-    $this->setBlock(TEMPLATE_content, 'timetable_person', 'timetable_person_block');
-    $this->setBlock("timetable", "period", "period_listing");
-    $this->setBlock("period", "day", "day_listing");
-    $this->setBlock('day', 'period_class', 'period_class_block');
-    $this->setBlock('day', 'period_class_link', 'period_class_link_block');
-    $this->setBlock("timetable", "day_header", "day_header_listing");
-
-    /* Fetch list of homepage colours for use */
-    $colourList = Timetable_ColourMapper::getInstance()->findAll();
-
-    /** @var Schoolbox\User[] $userList */
-    $userList = [];
-    $numTimetables = 0;
-    $child_id = $this->arg[0];
-
-    if ($groupHandler->isParent()) {
-        if (is_array($_SESSION['children'])) {
-            foreach ($_SESSION['children'] as $child) {
-                //
-                // Was a specific child ID requested? show them only, otherwise
-                // show everyone.
-                $checked_campus_list = array();
-                if (!$child_id || ($child_id == $child['id'])) {
-                    $userList[] = $userMapper->findById($child['id']);
-                }
+if ($groupHandler->isParent()) {
+    if (is_array($_SESSION['children'])) {
+        foreach ($_SESSION['children'] as $child) {
+            //
+            // Was a specific child ID requested? show them only, otherwise
+            // show everyone.
+            $checked_campus_list = array();
+            if (!$child_id || ($child_id == $child['id'])) {
+                $userList[] = $userMapper->findById($child['id']);
             }
         }
-        //
-        // Requesting a child that isn't yours? Access Denied
-        if (empty($userList)) {
+    }
+    //
+    // Requesting a child that isn't yours? Access Denied
+    if (empty($userList)) {
+        error(19);
+    }
+} else {
+    if ($child_id) {
+        if ($groupHandler->isStaff() || $child_id == $_SESSION['id']) {
+            //Output a timetable for each campus user is involved in
+            $userList[] = $userMapper->findById($child_id);
+        } else {
             error(19);
         }
     } else {
-        if ($child_id) {
-            if ($groupHandler->isStaff() || $child_id == $_SESSION['id']) {
-                //Output a timetable for each campus user is involved in
-                $userList[] = $userMapper->findById($child_id);
-            } else {
-                error(19);
-            }
-        } else {
-            // Output my own timetable (all campuses)
-            /** @var Schoolbox\User $userObject **/
-            $userList[] = $_SESSION['user'];
-        }
+        // Output my own timetable (all campuses)
+        /** @var Schoolbox\User $userObject **/
+        $userList[] = $_SESSION['user'];
     }
+}
 
-    foreach ($userList as $user) {
-        $checkedCampusList = [];
+foreach ($userList as $user) {
+    $checkedCampusList = [];
+
+    if(!$user->getHideTimetable()) {
+
         foreach ($user->getCampusCollection() as $campus) {
             $campusCode = $campus->getExtTimetableCode();
             if (isset($checkedCampusList[$campusCode])) {
@@ -111,11 +90,11 @@ else {
 
             /* Setup colour map */
             $subjectColourMap = array();
-            $colourIndex      = 0;
+            $colourIndex = 0;
 
             $outputUser = array(
-                'PERSON' => $user->formatName(),
-                'YEAR'   => $user->getYear() ? ', Year ' . $user->getYear() : '',
+                'PERSON'  => $user->formatName(),
+                'YEAR'    => $user->getYear() ? ', Year ' . $user->getYear() : '',
                 'USER_ID' => $user->getId(),
             );
 
@@ -125,7 +104,7 @@ else {
             $staffFlag = $user->getRole()->isStaff();
 
             $periodCurrent = $timetableHandler->getPeriodNumber($campus);
-            $dayCurrent    = $timetableHandler->getDayNumber($campus);
+            $dayCurrent = $timetableHandler->getDayNumber($campus);
 
             try {
                 $timetable = $timetableHandler->getFullTimetable($user->getExternalId(), $user->getId(), $campus);
@@ -162,7 +141,7 @@ else {
                 //for each period
                 foreach ($timetable as $row) {
                     if ($row['periodSequence'] == 1) {
-                        $is_current_period      =
+                        $is_current_period =
                             $row['periodNumber'] == $periodCurrent['PeriodNumber']
                             && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq'];
                         $outputPeriodDefinition = array(
@@ -268,7 +247,7 @@ else {
                                     /* Lookup subject code and check permissions, if read access provide a link to the user */
                                     if (!isset($catCache[$class['code']])) {
                                         try {
-                                            $cat                      = $categoryMapper->findByCode($class['code']);
+                                            $cat = $categoryMapper->findByCode($class['code']);
                                             $catCache[$class['code']] = $cat->getId();
 
                                         } catch (\Schoolbox\Mapper\Exception $e) {
@@ -319,26 +298,26 @@ else {
             }
         }
     }
+}
 
-    if (count($userList) > 1) {
-        $this->setVar(array(
-            'NUM_PEOPLE_CLASS' => ''
-        ));
-    }
-    else {
-        $this->setVar(array(
-            'NUM_PEOPLE_CLASS' => 'hide'
-        ));
-    }
+if (count($userList) > 1) {
+    $this->setVar(array(
+        'NUM_PEOPLE_CLASS' => ''
+    ));
+}
+else {
+    $this->setVar(array(
+        'NUM_PEOPLE_CLASS' => 'hide'
+    ));
+}
 
-    if ($numTimetables) {
-        $this->setVar(array(
-            'no_timetable_block' => ''
-        ));
-    }
-    else {
-        $this->parse('no_timetable_block', 'no_timetable');
-    }
-
+if ($numTimetables) {
+    $this->setVar(array(
+    'no_timetable_block' => ''
+    ));
+}
+else {
+    $this->setVar('timetable_listing', '');
+    $this->parse('no_timetable_block', 'no_timetable');
 }
 
