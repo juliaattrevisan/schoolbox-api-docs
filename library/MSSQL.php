@@ -376,9 +376,9 @@ class MSSQL {
 		if ($result === true) {
 			// mssql_query returns true for an empty result set :/
 			return false;
-		} elseif ($result) {
+		} elseif (is_resource($result)) {
 			$return_array = mssql_fetch_assoc($result);
-		} elseif ($this->result) {
+		} elseif ($result == 0 && $this->result) {
 			$return_array = mssql_fetch_assoc($this->result);
 		} else {
 			return false;
