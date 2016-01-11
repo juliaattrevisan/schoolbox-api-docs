@@ -81,6 +81,21 @@ function init(){
                 </div>
             </div>
             <div class="row collapse">
+                <!-- BEGIN terms_acceptance -->
+                <div class="small-12 column">
+                    <input required
+                           class="required"
+                           id="tandc"
+                           name="tandc"
+                           type="checkbox"
+                           title="You must agree to the Terms and Conditions before proceeding" />
+                    <label for="tandc" class="tandc">
+                        <p>
+                            I agree to be legally bound by the <a href="/policy.php">Terms and Conditions</a> of use for this website.
+                        </p>
+                    </label>
+                </div>
+                <!-- END terms_acceptance -->
                 <div class="small-7 medium-12 column">
                     <!-- BEGIN remember_me -->
                     <input id="rememberme" type="checkbox" name="rememberme" value="1" />
@@ -90,27 +105,6 @@ function init(){
                 <div class="small-5 medium-12 column">
                     <input type="submit" name="Submit" value="Sign in" alt="Sign in" />
                 </div>
-                <!-- BEGIN terms_acceptance --><!--
-                <div class="small-12 column">
-                    <input required class="required" id="tandc" name="tandc" type="checkbox" title="You must agree to the Terms and Conditions before proceeding" />
-                    <label for="tandc" class="tandc">
-                        I agree to be legally bound by the <a href="/policy.php"> Terms and Conditions</a> of use for this website.
-                    </label>
-                </div>
-                <script type="text/javascript">
-                    $(function () {
-                        $('#login').alaressValidate({
-                            errorPlacement: function(error, element) {
-                                if (element.attr("name") == "tandc") {
-                                    error.appendTo("#error-msg");
-                                } else {
-                                    error.appendTo(element);
-                                }
-                            }
-                        });
-                    });
-                </script>
-                --><!-- END terms_acceptance -->
             </div>
             <div class="row collapse">
                 <div class="small-12 column">
@@ -142,10 +136,19 @@ function init(){
             l.css('top', Math.max(0, ($(window).height() - l.height() - fy) / 2));
         }).trigger('resize');
 
-        l.on('submit', function () {
-            $(this).find('input[type=submit]').prop('disabled', true);
+        l.alaressValidate({
+            submitHandler: function(form) {
+                form.submit();
+                l.find('input[type=submit]').prop('disabled', true);
+            },
+            errorPlacement: function(error, element) {
+                if (element.attr("name") == "tandc") {
+                    error.appendTo("#error-msg");
+                } else {
+                    error.appendTo(element);
+                }
+            }
         });
-
     });
 </script>
 {SITE_ANALYTICS}
