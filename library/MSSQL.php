@@ -378,7 +378,7 @@ class MSSQL {
 			return false;
 		} elseif (is_resource($result)) {
 			$return_array = mssql_fetch_assoc($result);
-		} elseif ($result == 0 && $this->result) {
+		} elseif ($result == 0 && is_resource($this->result)) {
 			$return_array = mssql_fetch_assoc($this->result);
 		} else {
 			return false;
