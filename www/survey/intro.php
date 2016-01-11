@@ -104,6 +104,7 @@ $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 $this->setFile(TEMPLATE_content, 'survey/intro.html');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
+$this->setBlock(TEMPLATE_content, 'has_assess_description', 'has_assess_description_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 $this->setVar(array(
@@ -122,6 +123,14 @@ $this->setVar(array(
     'ASSESS_FOLDER_CODES' => $folder->getCodeString() ?: '',
     'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
+
+$assess['description'] = trim($assess['description']);
+
+if (empty($assess['description'])) {
+    $this->setVar('has_assess_description_block', '');
+} else {
+    $this->parse('has_assess_description_block', 'has_assess_description', true);
+}
 
 /* Section list and question count
  */

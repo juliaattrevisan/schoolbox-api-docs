@@ -132,6 +132,7 @@ abstract class Evaluation_Main extends DeprecatedModel
     {
         $page->setBlock('assessContentsFragment', 'section', 'section_block');
         $page->setBlock('section', 'question', 'question_block');
+        $page->setBlock('section', 'has_section_description', 'has_section_description_block');
         $page->setBlock('question', 'has_mark', 'has_mark_block');
 
         $allQuestions = $this->getContents($assess_id);
