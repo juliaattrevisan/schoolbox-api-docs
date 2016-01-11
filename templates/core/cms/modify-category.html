@@ -41,6 +41,16 @@
             });
         });
 
+        $('[data-template-warning]').hide();
+
+        $('[data-template]').change(function(event) {
+            if ($('[data-template]').val() != 0) {
+                $('[data-template-warning]').show();
+            } else {
+                $('[data-template-warning]').hide();
+            }
+        });
+
     });
 </script>
 <!-- END custom_head -->
@@ -86,12 +96,15 @@
 						<label>
                             Homepage Template
 							<span data-tooltip class="hint has-tip tip-top" data-width="200" title="If you would like a homepage associated with this folder select a basic layout to get started with">?</span>
-							<select name="template">
+							<select data-template name="template">
 								<!-- BEGIN template_list -->
 								<option value="{TEMPLATE_ID}" {TEMPLATE_ID_SELECTED}>{TEMPLATE_NAME}</option>
 								<!-- END template_list -->
 							</select>
 						</label>
+                        <div class="alert-box warning" data-template-warning>
+                            Warning! Changing the folders template will remove all existing components and content.
+                        </div>
 					</div>
 				</fieldset>
 
