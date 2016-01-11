@@ -308,7 +308,3 @@
         }
 	}
 })(jQuery);
-
-/* Proxy Replacements
- */
-$.fn.schoolboxResource_ProxyReplacment();
