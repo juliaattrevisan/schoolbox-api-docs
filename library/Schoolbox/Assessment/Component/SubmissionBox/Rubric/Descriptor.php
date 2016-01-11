@@ -28,6 +28,9 @@ class Descriptor {
      */
     protected $submission_box;
 
+    /** @var Level */
+    protected $level;
+
     /**
      * @var int
      */
@@ -108,6 +111,27 @@ class Descriptor {
     public function getSubmissionBox() {
         return $this->submission_box;
     }
+
+
+    /**
+     * @return Level
+     */
+    public function getLevel()
+    {
+        return $this->level;
+    }
+
+
+    /**
+     * @param Level $level
+     * @return static
+     */
+    public function setLevel($level)
+    {
+        $this->level = $level;
+        return $this;
+    }
+
 
     /**
      * @param  boolean $valid

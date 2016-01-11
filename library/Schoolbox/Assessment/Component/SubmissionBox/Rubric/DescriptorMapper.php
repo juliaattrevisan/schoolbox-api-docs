@@ -12,6 +12,13 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox;
 
+/**
+ * Class DescriptorMapper
+ *
+ * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
+ * @method Descriptor createModel()
+ * @method Descriptor findOneByColumnList($columnList, $order = [])
+ */
 class DescriptorMapper extends Schoolbox\Mapper {
 
     protected function mapping() {
@@ -30,6 +37,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
             'type'       => self::TYPE_MODEL,
             'join'       => 'submission_box',
         ));
+        $this->joins('level_id', LevelMapper::class);
         $this->hasMap(array(
             'column'     => 'value',
             'property'   => 'value',

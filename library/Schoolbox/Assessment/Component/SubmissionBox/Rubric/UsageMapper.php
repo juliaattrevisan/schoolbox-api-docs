@@ -12,11 +12,18 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox;
 
+/**
+ * Class UsageMapper
+ *
+ * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
+ * @method Usage createModel()
+ */
 class UsageMapper extends Schoolbox\Mapper {
 
     protected function mapping() {
         $this->hasTable('rubric_usage');
         $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Rubric\\Usage');
+        $this->uses('sequence', self::TYPE_INTEGER);
         $this->hasMap(array(
             'column'     => 'criterion_id',
             'property'   => 'criterion',
