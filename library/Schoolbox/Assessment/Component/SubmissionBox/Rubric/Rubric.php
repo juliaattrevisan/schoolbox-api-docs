@@ -8,10 +8,12 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric as Core;
 use Schoolbox\Mapper;
 use Schoolbox\Collection;
+use Schoolbox\User;
 
 class Rubric extends Core\Rubric
 {
@@ -238,6 +240,46 @@ class Rubric extends Core\Rubric
         }
 
         return $c;
+    }
+
+
+    /**
+     * @param User $student
+     * @param Alaress_Date_Format $timestamp
+     * @return Collection|Mark[]
+     */
+    public function getORMMarks($student, $timestamp)
+    {
+        $c = new Collection();
+
+        foreach ($this->getAllDescriptors() as $descr) {
+            if ($descr->isSelected()) {
+                $c->add($this->createORMMark($descr, $timestamp, $student));
+            }
+        }
+
+        return $c;
+    }
+
+
+    /**
+     * @param Core\Descriptor         $descriptor
+     * @param Alaress_Date_Format     $timestamp
+     * @param User                    $student
+     * @return Mark
+     */
+    protected function createORMMark($descriptor, $timestamp, $student)
+    {
+        return MarkMapper::getInstance()
+            ->createModel()
+            ->setCreatedAt($timestamp)
+            ->setSubmissionBox($this->getSubmissionBox())
+            ->setDescriptor($this->createORMDescriptor($descriptor, $descriptor->getLevel(), 0))
+            ->setValid(true)
+            ->setMark(0)
+            ->setStudent($student)
+            ->setCriterion($this->createORMCriterion($descriptor->getCriterion()))
+        ;
     }
 
 

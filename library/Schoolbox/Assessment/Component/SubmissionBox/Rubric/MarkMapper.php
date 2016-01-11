@@ -36,7 +36,7 @@ class MarkMapper extends Mapper
         $this->hasPrototype(new Mark());
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('tstamp', self::TYPE_TIMESTAMP, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
+        $this->uses('tstamp', self::TYPE_DATETIME, null, 'createdAt'); // this cannot be self::COLUMN_CREATED_TIMESTAMP because the mapper will then ignore input values when saving
         $this->uses('mark', self::TYPE_DECIMAL);
         $this->uses('valid', self::TYPE_BOOLEAN);
 
