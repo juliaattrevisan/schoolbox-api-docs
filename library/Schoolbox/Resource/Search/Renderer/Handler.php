@@ -309,7 +309,11 @@ abstract class Handler
      */
     protected function getCurrentTab()
     {
-        return $_GET['type'];
+        // Only the "all" tab has seymour links on.
+        if ($this->getUseSeymourLinks()) {
+            return 'all';
+        }
+        return $this->getType();
     }
 
     /**
