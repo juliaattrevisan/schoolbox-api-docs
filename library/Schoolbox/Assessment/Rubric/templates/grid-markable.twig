@@ -82,115 +82,113 @@
 
 {% set markType = markType ?: { mode: 'raw' } %}
 
-<form>
-    <div class="scrollable">
-    <table class="rb stack-for-medium-down" id="{{ rubricId }}">
-        {% set hasLevels = '' %}
+<div class="scrollable">
+<table class="rb stack-for-medium-down" id="{{ rubricId }}">
+    {% set hasLevels = '' %}
+    {% for level in rubric.levels %}
+        {% set hasLevels = hasLevels ~ level.name %}
+    {% endfor %}
+    {% if hasLevels | length %}
+    <thead>
+    <tr>
+        <th colspan="2">&nbsp;</th>
         {% for level in rubric.levels %}
-            {% set hasLevels = hasLevels ~ level.name %}
+        <th>{{ level.name }}</th>
         {% endfor %}
-        {% if hasLevels | length %}
-        <thead>
-        <tr>
-            <th colspan="2">&nbsp;</th>
-            {% for level in rubric.levels %}
-            <th>{{ level.name }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
+    </tr>
+    </thead>
+    {% endif %}
+    <tbody>
+
+    {% for groupIndex, group in rubric.groups %}
+
+        {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
+
+        {% for critIndex, crit in group.criteria %}
+    <tr data-group="{{ rubricId }}-{{ group.id }}">
+        {# yay html tables... -_-; #}
+        {% if rowspan %}
+            <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name|raw }}</span></th>
+            {% set rowspan = 0 %}
         {% endif %}
-        <tbody>
 
-        {% for groupIndex, group in rubric.groups %}
+        <th class="rb-criterion-name">{{ crit.name|raw }}</th>
 
-            {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
+            {% for levelIndex, level in rubric.levels %}
 
-            {% for critIndex, crit in group.criteria %}
-        <tr data-group="{{ rubricId }}-{{ group.id }}">
-            {# yay html tables... -_-; #}
-            {% if rowspan %}
-                <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name|raw }}</span></th>
-                {% set rowspan = 0 %}
-            {% endif %}
+                {% set descriptor = rubric.descriptors[crit.id][level.id] %}
 
-            <th class="rb-criterion-name">{{ crit.name|raw }}</th>
+                {% if descriptor %}
 
-                {% for levelIndex, level in rubric.levels %}
+                    {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
 
-                    {% set descriptor = rubric.descriptors[crit.id][level.id] %}
-
-                    {% if descriptor %}
-
-                        {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
-
-                        {% if inputType == 'checkbox' %}
-                            {% set inputName = inputId %}
-                        {% else %}
-                            {% set inputName %}{{ formField }}[{{ crit.id }}]{% endset %}
-                        {% endif %}
-
-                        <td>
-                            <input id="{{ inputId }}"
-                                   name="{{ inputName }}"
-                                   value="{{ descriptor.value }}"
-                                   type="{{ inputType }}"
-                                   data-rubric="{{ rubric.id }}"
-                                   data-rubric-group="{{ group.id }}"
-                                   {% if descriptor.selected %}checked="checked"{% endif %}
-                            />
-                            <label for="{{ inputId }}">
-                                <span class=rb-description>
-                                    {{- descriptor.text|raw -}}
-                                </span>
-                                {% if descriptor.value is not null %}
-                                <span class="rb-value">
-                                    {{- descriptor.value -}}
-                                </span>
-                                {% endif %}
-                            </label>
-                        </td>
-
+                    {% if inputType == 'checkbox' %}
+                        {% set inputName = inputId %}
                     {% else %}
-                        <td class="rb-blank">&nbsp;</td>
+                        {% set inputName %}{{ formField }}[{{ crit.id }}]{% endset %}
                     {% endif %}
 
-                {% endfor %}
+                    <td>
+                        <input id="{{ inputId }}"
+                               name="{{ inputName }}"
+                               value="{{ descriptor.value }}"
+                               type="{{ inputType }}"
+                               data-rubric="{{ rubric.id }}"
+                               data-rubric-group="{{ group.id }}"
+                               {% if descriptor.selected %}checked="checked"{% endif %}
+                        />
+                        <label for="{{ inputId }}">
+                            <span class=rb-description>
+                                {{- descriptor.text|raw -}}
+                            </span>
+                            {% if descriptor.value is not null %}
+                            <span class="rb-value">
+                                {{- descriptor.value -}}
+                            </span>
+                            {% endif %}
+                        </label>
+                    </td>
 
-        </tr>
+                {% else %}
+                    <td class="rb-blank">&nbsp;</td>
+                {% endif %}
+
             {% endfor %}
 
-            {% if group.total %}
-            <tr>
-                <th data-group-summary="{{ rubricId }}-{{ group.id }}"
-                    class="rb-group-summary"
-                    colspan="{{ rubric.levels|length + 1 }}"
-                    data-numerator="{{ group.sum }}"
-                    data-denominator="{{ group.total }}"
-                >
-                    {{ group.sum }} / {{ group.total }} ({{ (group.percentage * 100)|round }}%)
-                </th>
-            </tr>
-            {% endif %}
-
+    </tr>
         {% endfor %}
 
-        {% if rubric.total %}
+        {% if group.total %}
         <tr>
-            <th data-final-summary="{{ rubricId }}"
-                class="rb-final-summary"
-                colspan="{{ rubric.levels|length + 2 }}"
-                data-numerator="{{ rubric.sum }}"
-                data-denominator="{{ rubric.total }}"
+            <th data-group-summary="{{ rubricId }}-{{ group.id }}"
+                class="rb-group-summary"
+                colspan="{{ rubric.levels|length + 1 }}"
+                data-numerator="{{ group.sum }}"
+                data-denominator="{{ group.total }}"
             >
-                {{ rubric.sum }} / {{ rubric.total }} ({{ (rubric.percentage * 100)|round }}%)
+                {{ group.sum }} / {{ group.total }} ({{ (group.percentage * 100)|round }}%)
             </th>
         </tr>
         {% endif %}
-        </tbody>
 
-    </table>
-    </div>
-</form>
+    {% endfor %}
+
+    {% if rubric.total %}
+    <tr>
+        <th data-final-summary="{{ rubricId }}"
+            class="rb-final-summary"
+            colspan="{{ rubric.levels|length + 2 }}"
+            data-numerator="{{ rubric.sum }}"
+            data-denominator="{{ rubric.total }}"
+        >
+            {{ rubric.sum }} / {{ rubric.total }} ({{ (rubric.percentage * 100)|round }}%)
+        </th>
+    </tr>
+    {% endif %}
+    </tbody>
+
+</table>
+</div>
 {# js specific to the rubric we just injected to...wherever we injected it #}
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.dynagrade.js"></script>
 <script type="text/javascript">
