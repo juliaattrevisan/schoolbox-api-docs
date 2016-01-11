@@ -284,17 +284,43 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getSubjectList($externalUserId, $userId)
     {
-        $query = "
-            SELECT
-                (su.Code+'-'+cl.ClassGroup) AS ClassCode,
-                '' AS ClassCampus,
-                su.Name AS name,
-                '' AS classType
-            FROM Class cl
-            INNER JOIN ClassDetail cd ON cl.ID = cd.ClassID
-            INNER JOIN Subject su ON cl.SubjectID = su.ID
-            WHERE cd.StudentID = {$this->getDatabase()->smartQuote($externalUserId)}
-        ";
+        try {
+            $user = \Schoolbox\UserMapper::getInstance()->findByExternalId($externalUserId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return [];
+        }
+        $year  = date('Y');
+        if ($user->getRole()->isStudent()) {
+            $query = "
+                SELECT
+                    (su.Code+'-'+cl.ClassGroup) AS ClassCode,
+                    '' AS ClassCampus,
+                    su.Name AS name,
+                    '' AS classType
+                FROM Class cl
+                INNER JOIN ClassDetail cd ON cl.ID = cd.ClassID
+                INNER JOIN Subject su ON cl.SubjectID = su.ID
+                INNER JOIN SchoolPeriod sp ON cl.SchoolPeriodID = sp.ID
+                WHERE cd.StudentID = {$this->getDatabase()->smartQuote($externalUserId)}
+                AND   sp.Year = {$this->getDatabase()->smartQuote($year)}
+            ";
+        } elseif ($user->getRole()->isStaff()) {
+            $query = "
+                SELECT
+                    (su.Code+'-'+cl.ClassGroup) AS ClassCode,
+                    '' AS ClassCampus,
+                    su.Name AS name,
+                    '' AS classType
+                FROM Class cl
+                INNER JOIN ClassStaff cs ON cl.ID = cs.ClassID
+                INNER JOIN Subject su ON cl.SubjectID = su.ID
+                INNER JOIN SchoolPeriod sp ON cl.SchoolPeriodID = sp.ID
+                WHERE cs.StaffID = {$this->getDatabase()->smartQuote($externalUserId)}
+                AND   sp.Year = {$this->getDatabase()->smartQuote($year)}
+            ";
+        } else {
+            return [];
+        }
         return $this->getDatabase()->getAll($query);
     }
 
