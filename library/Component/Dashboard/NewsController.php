@@ -37,6 +37,8 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
         $this->setBlock('topic', "news", "news_block");
         $this->setBlock('news', "news_image", "news_image_block");
         $this->setBlock('news', "news_no_image", "news_no_image_block");
+        $this->setBlock('news', "compact", "compact_block");
+        $this->setBlock('news', "full", "full_block");
 
         $this->setVar("topic_block", "");
         $this->setVar("topic_header_block", "");
@@ -90,6 +92,17 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                     'TOPIC_ACTIVE' => ($i++ == 0 ? 'active' : ''),
                 ]);
                 foreach ($headlineList as $item) {
+
+                    if ($this->getConfig('compactMode') == '1') {
+                        // Compact mode
+                        $this->parse('compact_block', 'compact');
+                        $this->setVar('full_block', '');
+                    } else {
+                        // Full mode
+                        $this->setVar('compact_block', '');
+                        $this->parse('full_block', 'full');
+                    }
+
                     $newsTime = new Alaress_Date_Format($item['item_datetime_posted'], 'Y-m-d H:i:s');
                     $output = array(
                         'NEWS_TITLE' => $item['item_heading'],
@@ -110,6 +123,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                         $this->parse('news_no_image_block', 'news_no_image');
                         $this->setVar('news_image_block', '');
                     }
+
                     $this->parse("news_block", "news", true);
                 }
                 $this->parse('topic_block', 'topic', true);
