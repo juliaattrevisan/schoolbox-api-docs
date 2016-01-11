@@ -221,6 +221,14 @@ abstract class Evaluation_Main extends DeprecatedModel
             );
 
             $page->parse('section_block', 'section', true);
+
+            $currentQuestion['description'] = trim($currentQuestion['description']);
+
+            if (empty($currentQuestion['description'])) {
+                $page->setVar('has_section_description_block', '');
+            } else {
+                $page->parse('has_section_description_block', 'has_section_description', true);
+            }
         } else {
             $page->setVar('section_block', '');
         }
