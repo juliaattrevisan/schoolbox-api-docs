@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Role;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
@@ -79,7 +80,7 @@ class Module extends BaseModule
 
         // dependencies
         $injector->setters[Controller::class]['setFactory'] = $injector->lazyNew(Factory::class);
-        $injector->setters[Controller::class]['setMapper']  = $injector->lazyNew(Mapper::class);
+        $injector->setters[Controller::class]['setMapper']  = $injector->lazyNew(RubricMapper::class);
 
     }
 

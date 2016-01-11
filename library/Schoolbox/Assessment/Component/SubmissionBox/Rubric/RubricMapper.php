@@ -7,17 +7,19 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Assessment\Rubric;
+namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Result;
+use Schoolbox\Assessment\Rubric\Factory;
+use Schoolbox\IMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Rubric\Competency\Level;
 use Schoolbox\Assessment\Rubric\Criteria\Criterion;
 use Schoolbox\Assessment\Rubric\Criteria\Group;
 use Schoolbox\Collection;
+use Schoolbox\User;
 
 /**
  * Umm. Not *exactly* a mapper... at the moment it's more like a handler...
@@ -38,7 +40,7 @@ class RubricMapper
 
 
     /**
-     * Retreives the singleton instance of this class.
+     * Retrieves the singleton instance of this class.
      *
      * @return static
      */
@@ -64,7 +66,7 @@ class RubricMapper
     public function __construct()
     {
         $this->database = Database::getInstance();
-        $this->factory  = new Factory();
+        $this->factory  = new Factory(new Rubric());
     }
 
 
@@ -150,10 +152,19 @@ class RubricMapper
      *
      * @param SubmissionBox $box
      * @param bool          $forceTaskMode - if the box doesn't yet have a task, but you still need the task-level criteria showing
+     * @param bool          $editMode
      * @return Rubric
      */
-    public function findBySubmissionBox($box, $forceTaskMode = false)
+    public function findBySubmissionBox($box, $forceTaskMode = false, $editMode = false)
     {
+        $levelCollection = LevelMapper::getInstance()->findByColumn('box_id', $box->getId(), [ 'order' => [ 'sequence' => 'ASC' ] ]);
+
+        $levelList = [];
+
+        foreach ($levelCollection as $level) {
+            $levelList[$level->getId()] = [ 'name' => $level->getName() ];
+        }
+
         $args = [
             'boxId' => $box->getId(),
             'folderId' => $box->getCategory()->getId()
@@ -233,18 +244,13 @@ class RubricMapper
             'valid'             => true
         ]);
 
-        $levelList = [];
-
         foreach ($descriptorCollection as $d) {
             // only populate if a description is given
-
-            $descriptors[$d->getCriterion()->getId()][$d->getId()] = [
+            $descriptors[$d->getCriterion()->getId()][$d->getLevel()->getId()] = [
+                'id'     => $d->getId(),
                 'text'   => $d->getDescription(),
                 'points' => $d->getValue() || $d->getDescription() ? $d->getValue() : ''
             ];
-
-            // emulate empty levels
-            $levelList[$d->getValue()] = [ 'name' => '' ];
         }
 
         // mokay. so if at this point you've got no descriptors, check to see if there should be a resultSet we should use
@@ -277,37 +283,140 @@ class RubricMapper
             $levelList[] = [ 'name' => '' ];
         }
 
-        foreach ($descriptors as $criterionId => $descriptorData) {
-            $descriptors[$criterionId] = array_values($descriptorData);
-        }
-
         // setup the data structure to match what the factory expects
         $postdata = [$box->getId() => [
-            'level'      => array_values($levelList),
+            'level'      => $levelList,
             'group'      => $groups,
             'criterion'  => $criteria,
             'descriptor' => $descriptors,
         ]];
 
         // use the factory to produce the rubric object
-        return $this->factory->buildFromPostData($postdata, true);
+        return $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode)->setSubmissionBox($box);
     }
 
 
     /**
-     * TODO decouple rubrics from submissions, but that requires some epic schema changes we don't have time for in 15.6
+     * @param Rubric $grid
+     * @param User   $student
+     * @return Rubric
+     */
+    public function applyStudentMark($grid, $student)
+    {
+        if (!$grid->getSubmissionBox() instanceof SubmissionBox) {
+            throw new \InvalidArgumentException("Cannot apply marks without a submission box");
+        }
+
+        // retrieve marks (descriptor selections for student)
+        $stmt = $this->database->query("
+            SELECT descriptor_id
+            FROM rubric_mark
+            WHERE submission_box_id = :boxId
+            AND student_id = :userId
+            AND tstamp = (
+              SELECT MAX(tstamp)
+              FROM rubric_mark
+              WHERE submission_box_id = :boxId
+              AND student_id = :userId
+              AND valid = TRUE
+            )
+        ", [
+            'boxId'  => $grid->getSubmissionBox()->getId(),
+            'userId' => $student->getId()
+        ]);
+
+        $descriptorIds = [];
+
+        while ($id = $stmt->fetchColumn()) {
+            $descriptorIds[$id] = true;
+        }
+
+        foreach ($grid->getAllDescriptors() as $descriptor) {
+            $selected = isset($descriptorIds[$descriptor->getId()]);
+            $descriptor->setSelected($selected);
+//            var_dump($descriptor);
+        }
+
+        return $grid;
+    }
+
+
+    /**
+     * Convenience (or safety) method wrapping grid fetch and mark application
      *
-     * @param Rubric $rubric
      * @param SubmissionBox $box
+     * @param User $student
+     * @return Rubric
+     */
+    public function findBySubmissionBoxAndStudent($box, $student)
+    {
+        $grid = $this->findBySubmissionBox($box, false, false);
+        return $this->applyStudentMark($grid, $student);
+    }
+
+
+    /**
+     * @param Rubric $rubric
+     * @param SubmissionBox $submissionBox
      * @return int
      */
-    public function save($rubric, $box)
+    public function save($rubric, $submissionBox)
     {
-        // TODO find some way to wrap this in a transaction
-        var_dump($rubric->getORMCriteria());
-        var_dump($rubric->getORMLevels());
-        var_dump($rubric->getORMDescriptors());
-        exit;
+        // juuust in case
+        $rubric->setSubmissionBox($submissionBox);
+
+        // TODO some way to wrap all this in a transaction would be nice... -_-;
+
+        // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
+        UsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
+        UsageMapper::getInstance()->save($usages = $rubric->getORMUsages());
+
+        CriterionMapper::getInstance()->save($rubric->getORMCriteria());
+        LevelMapper::getInstance()->save($rubric->getORMLevels());
+        $descIds  = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
+
+        // wash up before dinner, kids
+
+        // remove all levels that have zero descriptors attached - extract from the descriptors
+        $seenLevels = [];
+        foreach ($descs as $desc) {
+            $seenLevels[$desc->getLevel()->getId()] = true;
+        }
+        $seenLevels   = array_keys($seenLevels);
+
+        $this->tidyUp(LevelMapper::getInstance(), ['box_id' => $submissionBox->getId()], $seenLevels);
+
+        // remove all descriptors that are on this box, but are not among the descriptors we just saved (it indicates blankness / unused-ness)
+        $this->tidyUp(DescriptorMapper::getInstance(), ['submission_box_id' => $submissionBox->getId()], $descIds);
+    }
+
+
+    /**
+     * @param IMapper $mapper
+     * @param array $search
+     * @param array $exclude
+     * @return Collection
+     */
+    protected function tidyUp($mapper, $search, $exclude)
+    {
+        return $mapper->delete(
+            $mapper->findByColumnList($search)->filter(
+                function ($model) use ($exclude) {
+                    return !in_array($model->getId(), $exclude);
+                }
+            )
+        );
+    }
+
+
+    /**
+     * @param IMapper    $mapper
+     * @param Collection $collection
+     * @return array
+     */
+    protected function foo($mapper, $collection)
+    {
+        return $mapper->save($collection);
     }
 
 }

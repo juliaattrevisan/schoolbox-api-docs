@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 
 class Controller extends BaseController
 {
@@ -18,7 +19,7 @@ class Controller extends BaseController
     /** @var Factory */
     protected $factory;
 
-    /** @var Mapper */
+    /** @var RubricMapper */
     protected $mapper;
 
 
@@ -43,7 +44,7 @@ class Controller extends BaseController
 
 
     /**
-     * @return Mapper
+     * @return RubricMapper
      */
     public function getMapper()
     {
@@ -52,7 +53,7 @@ class Controller extends BaseController
 
 
     /**
-     * @param Mapper $mapper
+     * @param RubricMapper $mapper
      * @return self
      */
     public function setMapper($mapper)
