@@ -570,10 +570,10 @@
             $(settings.list).on('click', 'a', function(e) {
 
                 var $a     = $(this);
-                var $aData = $a.data();
                 var $item  = $a.closest('[data-' + settings.tplItem + ']');
-                var pip    = settings.tplItemAck in $aData;
-                var action = settings.tplItemHref in $aData && settings.itemUnread in $item.data();
+                var pip    = (typeof $a.data(settings.tplItemAck) != 'undefined');
+                var action = (typeof $a.data(settings.tplItemHref) != 'undefined')
+                             && (typeof $item.data(settings.itemUnread) != 'undefined');
 
                 if (pip || action) {
                     var msgId = $item.attr('id').split('-')[1];
