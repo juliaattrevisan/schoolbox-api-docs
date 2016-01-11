@@ -105,21 +105,24 @@ abstract class Base {
 		$this->getPage()->setFile('injectableUpload', $this->getUploadFile());
 		$this->getPage()->setBlock('injectableUpload', 'returned_work', 'returned_work_block');
         $this->getPage()->setVar('returned_work_block', '');
-        foreach ($this->getReturnedWorkCollection() as $return) {
-            if ($return->getStorage()->getFilename() != null) {
-                $storage = $return->getStorage();
 
-                $this->getPage()->setVar(array(
-                    'MOST_RECENT_RETURN_FILE_ID'    => $return->getId(),
-                    'MOST_RECENT_RETURN_FILE_NAME'  => $storage->getBasename(),
-                    'MOST_RECENT_RETURN_FILE_SIZE'  => \Alaress_Byte_Format::bytesToString($storage->getSize()),
-                    'MOST_RECENT_RETURN_FILE_THUMB' => $storage->getMimeType()->getIconFile(),
-                    'MOST_RECENT_RETURN_FILE_DATE'  => $return->getReturned()->getRelativeTime(),
-                ));
+		if ($this->getReturnedWorkCollection() != null) {
+			foreach ($this->getReturnedWorkCollection() as $return) {
+				if ($return->getStorage()->getFilename() != null) {
+					$storage = $return->getStorage();
 
-                $this->getPage()->parse('returned_work_block', 'returned_work', true);
-            }
-        }
+					$this->getPage()->setVar(array(
+						'MOST_RECENT_RETURN_FILE_ID' => $return->getId(),
+						'MOST_RECENT_RETURN_FILE_NAME' => $storage->getBasename(),
+						'MOST_RECENT_RETURN_FILE_SIZE' => \Alaress_Byte_Format::bytesToString($storage->getSize()),
+						'MOST_RECENT_RETURN_FILE_THUMB' => $storage->getMimeType()->getIconFile(),
+						'MOST_RECENT_RETURN_FILE_DATE' => $return->getReturned()->getRelativeTime(),
+					));
+
+					$this->getPage()->parse('returned_work_block', 'returned_work', true);
+				}
+			}
+		}
 
 		$this->getPage()->parse('INJECTED_MARK_TEMPLATE', 'injectableUpload');
 	}
