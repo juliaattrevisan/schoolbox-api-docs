@@ -81,21 +81,19 @@ function init(){
                 </div>
             </div>
             <div class="row collapse">
-                <!-- BEGIN terms_acceptance -->
+                <!-- BEGIN login_terms -->
                 <div class="small-12 column">
                     <input required
                            class="required"
                            id="tandc"
                            name="tandc"
                            type="checkbox"
-                           title="You must agree to the Terms and Conditions before proceeding" />
+                           title="{LOGIN_TERMS_AND_CONDITIONS_ERROR}" />
                     <label for="tandc" class="tandc">
-                        <p>
-                            I agree to be legally bound by the <a href="/policy.php">Terms and Conditions</a> of use for this website.
-                        </p>
+                        {LOGIN_TERMS_AND_CONDITIONS}
                     </label>
                 </div>
-                <!-- END terms_acceptance -->
+                <!-- END login_terms -->
                 <div class="small-7 medium-12 column">
                     <!-- BEGIN remember_me -->
                     <input id="rememberme" type="checkbox" name="rememberme" value="1" />
