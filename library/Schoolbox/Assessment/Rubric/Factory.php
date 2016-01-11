@@ -26,6 +26,20 @@ class Factory
     /** @var bool */
     protected $multiSelect = false;
 
+    /** @var Rubric */
+    protected $prototype;
+
+
+    /**
+     * Factory constructor.
+     *
+     * @param Rubric $prototype
+     */
+    public function __construct(Rubric $prototype = null)
+    {
+        $this->prototype = $prototype ?: new Rubric();
+    }
+
 
     /**
      * @param int $rubricId
@@ -110,7 +124,7 @@ class Factory
         }
 
 
-        $rubric = new Rubric($this->rubricId, $this->multiSelect);
+        $rubric = $this->spawn($this->rubricId, $this->multiSelect);
 
         // ensure we put the levels independently of the criteria
         foreach ($levelList as $levelIndex => $level) {
@@ -169,7 +183,7 @@ class Factory
         $criteria    = $rubricData['criterion']  ?: [];
         $descriptors = $rubricData['descriptor'] ?: [];
 
-        $rubric = new Rubric($rubricId);
+        $rubric = $this->spawn($rubricId);
 
         /** @var Level[] $levelCache */
         $levelCache = [];
@@ -223,11 +237,12 @@ class Factory
             foreach ($levelCache as $l) {
 
                 $descriptor      = $descriptors[$criterionId][$l->getId()];
+                $descriptorId    = isset($descriptor['id']) ? $descriptor['id'] : null;
                 $descriptorText  = $descriptor['text'];
                 $descriptorValue = $descriptor['points'];
 
                 if ($descriptorText || $descriptorValue) {
-                    $d = new Descriptor($descriptorText, $descriptorValue);
+                    $d = new Descriptor($descriptorText, $descriptorValue, $descriptorId);
                     try {
                         $rubric->putDescriptor($g, $c, $l, $d);
                     } catch (InvalidArgumentException $e) {
@@ -240,6 +255,24 @@ class Factory
         }
 
         return $rubric;
+    }
+
+
+    /**
+     * Welcome to the `new`
+     *
+     * @param int $id
+     * @param bool $multi
+     * @return Rubric
+     */
+    protected function spawn($id = null, $multi = null)
+    {
+        $clone = clone $this->prototype;
+
+        $clone->setId($id ?: $this->rubricId)
+              ->setMultiSelect($multi ?: $this->multiSelect);
+
+        return $clone;
     }
 
 }
