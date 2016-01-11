@@ -37,8 +37,10 @@ if (isset($_POST['current_password'])) {
         }
     }
 
-    if (!$userHandler->setPassword($_SESSION['id'], $_POST['current_password'], $_POST['new_password'])) {
-        error(105, "Your current password did not match what is stored in the database.");
+    $response = $userHandler->setPassword($_SESSION['id'], $_POST['current_password'], $_POST['new_password']);
+
+    if (!$response["result"]) {
+        error(105, $response["error"]);
     } else {
             $result = $userHandler->sendChangePasswordEmail($_SESSION['id']);
             $myconf = ConfigMapper::getInstance();
