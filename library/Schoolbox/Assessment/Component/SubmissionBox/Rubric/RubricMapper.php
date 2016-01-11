@@ -298,6 +298,21 @@ class RubricMapper
 
     /**
      * @param Rubric $grid
+     * @param array  $selectedDescriptorIds
+     * @return Rubric
+     */
+    public function applyMark($grid, $selectedDescriptorIds)
+    {
+        foreach ($grid->getAllDescriptors() as $descriptor) {
+            $selected = in_array($descriptor->getId(), $selectedDescriptorIds);
+            $descriptor->setSelected($selected);
+        }
+
+        return $grid;
+    }
+
+    /**
+     * @param Rubric $grid
      * @param User   $student
      * @return Rubric
      */
@@ -331,13 +346,7 @@ class RubricMapper
             $descriptorIds[$id] = true;
         }
 
-        foreach ($grid->getAllDescriptors() as $descriptor) {
-            $selected = isset($descriptorIds[$descriptor->getId()]);
-            $descriptor->setSelected($selected);
-//            var_dump($descriptor);
-        }
-
-        return $grid;
+        return $this->applyMark($grid, array_keys($descriptorIds));
     }
 
 
