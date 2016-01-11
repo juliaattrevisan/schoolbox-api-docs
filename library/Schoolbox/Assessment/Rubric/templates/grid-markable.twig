@@ -131,8 +131,9 @@
                     <td>
                         <input id="{{ inputId }}"
                                name="{{ inputName }}"
-                               value="{{ descriptor.value }}"
+                               value="{{ level.id }}"
                                type="{{ inputType }}"
+                               data-value="{{ descriptor.value }}"
                                data-rubric="{{ rubric.id }}"
                                data-rubric-group="{{ group.id }}"
                                {% if descriptor.selected %}checked="checked"{% endif %}
@@ -249,7 +250,7 @@
             // in lieu of a reduce() function
             elements.map(function () {
                 if ($(this).prop('checked')) {
-                    var fl = parseFloat(this.value);
+                    var fl = parseFloat($(this).data('value'));
                     if (!isNaN(fl)) {
                         groupSum += fl;
                     }
