@@ -286,4 +286,25 @@ class Rubric implements Twiggable
 
     }
 
+
+    /**
+     * @return float
+     */
+    public function getSum()
+    {
+        return $this->criteriaGroups->getSum();
+    }
+
+
+    /**
+     * @return float
+     */
+    public function getPercentage()
+    {
+        if ($total = $this->getTotal()) {
+            return $this->getSum() / $this->getTotal();
+        }
+        return 0;
+    }
+
 }
