@@ -138,6 +138,13 @@ class SubmissionBox implements ISoftDeletable
      */
     protected $rubric_result_set;
 
+    /** @var bool */
+    protected $useRubric;
+
+    /** @var bool */
+    protected $markedPerRubricGroup;
+
+
     /**
      * @var int
      */
@@ -173,11 +180,7 @@ class SubmissionBox implements ISoftDeletable
      */
     public function isRubric()
     {
-        if ($this->getMarkType()->getId() == MarkType::TYPE_RUBRIC) {
-            return true;
-        }
-
-        return false;
+        return $this->useRubric;
     }
 
 
@@ -237,6 +240,7 @@ class SubmissionBox implements ISoftDeletable
             case self::MARK_VISIBILITY_PARENT_STUDENT:
                 return 'Staff, Students and Parents';
         }
+        return '';
     }
 
     /**
@@ -588,6 +592,58 @@ class SubmissionBox implements ISoftDeletable
         return $this->rubric_result_set;
     }
 
+
+    /**
+     * @deprecated mapper method
+     * @return boolean
+     */
+    public function getUseRubric()
+    {
+        return $this->isRubric();
+    }
+
+
+    /**
+     * @param boolean $useRubric
+     * @return static
+     */
+    public function setUseRubric($useRubric)
+    {
+        $this->useRubric = $useRubric;
+        return $this;
+    }
+
+
+    /**
+     * @deprecated mapper method
+     * @return boolean
+     */
+    public function getMarkedPerRubricGroup()
+    {
+        return $this->isMarkedPerRubricGroup();
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isMarkedPerRubricGroup()
+    {
+        return $this->markedPerRubricGroup;
+    }
+
+
+    /**
+     * @param boolean $markedPerRubricGroup
+     * @return static
+     */
+    public function setMarkedPerRubricGroup($markedPerRubricGroup)
+    {
+        $this->markedPerRubricGroup = $markedPerRubricGroup;
+        return $this;
+    }
+
+
     /**
      * @param  int $mark_visibility
      * @return $this
@@ -723,7 +779,6 @@ class SubmissionBox implements ISoftDeletable
      * this submission box
      *
      * @param User $user
-     * @internal param $box
      * @return bool
      */
     public function canViewRubric(User $user)
