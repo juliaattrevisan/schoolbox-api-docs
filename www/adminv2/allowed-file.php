@@ -51,7 +51,7 @@ if ($mimes->count()) {
             $this->parse('enabled_block', 'enabled');
         }
 
-        $max_size_output = Alaress_Byte_Format::bytesToString($mime->getMaxFileSize());
+        $max_size_output = Alaress_Byte_Format::bytesToString($mime->getActualMaxFileSize());
         $output = array(
             'FILE_ID'                  => $mime->getId(),
             'FILE_ENABLED'             => $mime->isEnabled() ? 'true'    : 'false',
@@ -62,8 +62,8 @@ if ($mimes->count()) {
             'FILE_MIME'                => $mime->getMime(),
             'FILE_EXTENSION_CSV'       => $extensionCSV,
             'FILE_ICON'                => $mime->getIconFile(),
-            'FILE_MAXSIZE'             => $mime->getStoredMaxFileSize() ? $max_size_output : "<em>$placeholder</em>",
-            'FILE_MAXSIZE_INPUT'       => $mime->getStoredMaxFileSize() ? $max_size_output : '',
+            'FILE_MAXSIZE'             => $mime->getMaxFileSize() ? $max_size_output : "<em>$placeholder</em>",
+            'FILE_MAXSIZE_INPUT'       => $mime->getMaxFileSize() ? $max_size_output : '',
             'FILE_MAXSIZE_PLACEHOLDER' => htmlspecialchars($placeholder, ENT_QUOTES),
             'FILE_INLINE'              => $mime->getInline() ? 'Inline' : 'External',
             'FILE_EXTERN_CHECKED'      => $mime->getInline() ? '' : 'selected="selected"',
