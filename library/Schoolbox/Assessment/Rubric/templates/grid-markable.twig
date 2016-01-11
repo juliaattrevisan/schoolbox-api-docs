@@ -80,6 +80,8 @@
 
 {% set rubricId = 'rb-' ~ rubric.id %}
 
+{% set markType = markType ?: { mode: 'raw' } %}
+
 <form>
     <div class="scrollable">
     <table class="rb stack-for-medium-down" id="{{ rubricId }}">
@@ -190,10 +192,14 @@
     </div>
 </form>
 {# js specific to the rubric we just injected to...wherever we injected it #}
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.dynagrade.js"></script>
 <script type="text/javascript">
     $(function () {
 
         var $rb = $('#{{ rubricId }}');
+
+        // initialise dynamic mark display
+        $rb.dynagrade({{ markType | json_encode | raw }});
 
         $rb.on('change', '[data-rubric], [data-rubric-group]', function () {
 
@@ -206,19 +212,11 @@
 
             var $groupRows = $(rowSelector);
 
+            var rubricSum = 0;
+
             if ($groupRows.length) {
 
-                var groupSum = 0;
-
-                // in lieu of a reduce() function
-                $groupRows.find('input').map(function () {
-                    if ($(this).prop('checked')) {
-                        var fl = parseFloat(this.value);
-                        if (!isNaN(fl)) {
-                            groupSum += fl;
-                        }
-                    }
-                });
+                var groupSum = getSum($groupRows.find('input'));
 
                 var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
 
@@ -230,13 +228,8 @@
                     parseFraction(groupSummary);
                 }
 
+                rubricSum = getSum($rb.find('input'));
             }
-
-            var rubricSum = 0;
-
-            $rb.find('[data-group-summary][data-numerator]').map(function () {
-                rubricSum += parseInt($(this).attr('data-numerator'));
-            });
 
             var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
 
@@ -246,7 +239,30 @@
 
             parseFraction(rubricSummary);
 
+            $('[data-role=rubric-sum]').text(rubricSummary.text());
+
         });
+
+
+        function getSum(elements)
+        {
+            var groupSum = 0;
+
+            // in lieu of a reduce() function
+            elements.map(function () {
+                if ($(this).prop('checked')) {
+                    var fl = parseFloat(this.value);
+                    if (!isNaN(fl)) {
+                        groupSum += fl;
+                    }
+                }
+            });
+
+            return groupSum;
+        }
+
+        // initial display
+        $('[data-rubric]').trigger('change');
 
         /**
          *
@@ -256,14 +272,7 @@
         {
             $elem.each(function () {
                 if (this.hasAttribute('data-numerator') && this.hasAttribute('data-denominator')) {
-
-                    var elem = $(this);
-
-                    var num = elem.attr('data-numerator'),
-                        den = elem.attr('data-denominator'),
-                        prc = parseInt(num / den * 100);
-
-                    elem.text(num + ' / ' + den + ' (' + prc + '%)');
+                    $(this).trigger('dynagrade');
                 }
             });
 
