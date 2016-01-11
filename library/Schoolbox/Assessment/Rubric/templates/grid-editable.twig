@@ -272,7 +272,6 @@
 {% set rubricId  = 'rb-' ~ rubric.id %}
 {% set levelLimit = levelLimit ?: 11 %}
 
-<form method="post">
     <input type="hidden" name="formField" value="{{ formField }}" />
     <h3 class="subheader show-for-medium-down">Levels</h3>
     <div class="scrollable">
@@ -307,7 +306,6 @@
         </tbody>
     </table>
     </div>
-</form>
 
 <script type="text/javascript" src="/javascript/shared/jquery.sequencer.js"></script>
 {# js specific to the rubric we just injected to...wherever we injected it #}
