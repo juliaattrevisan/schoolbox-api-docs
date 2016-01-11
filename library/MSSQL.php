@@ -376,12 +376,16 @@ class MSSQL {
 	 */
 	function getNextArray($result = 0)
 	{
-		if($result)
-				$return_array = mssql_fetch_assoc($result);
-		else if($this->result)
-			$return_array = mssql_fetch_assoc($this->result);
-		else
+		if ($result === true) {
+			// mssql_query returns true for an empty result set :/
 			return false;
+		} elseif (is_resource($result)) {
+			$return_array = mssql_fetch_assoc($result);
+		} elseif ($result == 0 && is_resource($this->result)) {
+			$return_array = mssql_fetch_assoc($this->result);
+		} else {
+			return false;
+		}
 
 		if ($this->getConvertEncoding() && is_array($return_array)) {
 			$return_array = array_map(array($this, 'convertEncoding'), $return_array);
