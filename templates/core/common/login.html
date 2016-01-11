@@ -136,6 +136,7 @@ function init(){
             l.css('top', Math.max(0, ($(window).height() - l.height() - fy) / 2));
         }).trigger('resize');
 
+        // Validation of terms and conditions
         l.alaressValidate({
             submitHandler: function(form) {
                 form.submit();
@@ -147,6 +148,12 @@ function init(){
                 } else {
                     error.appendTo(element);
                 }
+            }
+        });
+        // T&C: remove error message completely on check
+        l.find('#tandc').on('change', function () {
+            if (this.checked) {
+                $('label.error[for="tandc"]').remove();
             }
         });
     });
