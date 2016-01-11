@@ -696,10 +696,14 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = dialogFields(dialog);
 
-                                    var margin = extractStyle('margin-left', element.getAttribute('style')).replace('px', '');
+                                    var marginLeft = extractStyle('margin-left', element.getAttribute('style')).replace('px', '');
+                                    var marginRight = extractStyle('margin-right', element.getAttribute('style')).replace('px', '');
 
-                                    if (margin.length) {
-                                        fields.horizontalMargin.setValue(margin);
+                                    if (marginLeft.length) {
+                                        fields.horizontalMargin.setValue(marginLeft);
+                                    }
+                                    else if (marginRight.length) {
+                                        fields.horizontalMargin.setValue(marginRight);
                                     }
                                 }
                             }
