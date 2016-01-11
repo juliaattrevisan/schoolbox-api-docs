@@ -17,6 +17,9 @@ class Criterion extends DescriptorList
     /** @var bool */
     protected $readOnly = false;
 
+    /** @var Group */
+    protected $group;
+
     /**
      * Returns the total of the values of descriptors contained herein, irrespective of selection
      *
@@ -62,6 +65,26 @@ class Criterion extends DescriptorList
     {
         $this->readOnly = $readOnly;
         return $this;
+    }
+
+
+    /**
+     * @param Group $group
+     * @return self
+     */
+    public function setPosition($group)
+    {
+        $this->group = $group;
+        return $this;
+    }
+
+
+    /**
+     * @return Group
+     */
+    public function getGroup()
+    {
+        return $this->group;
     }
 
 

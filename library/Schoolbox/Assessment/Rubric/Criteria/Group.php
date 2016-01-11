@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\Calculable;
 use Schoolbox\Assessment\Rubric\CalculableAggregator;
 use Schoolbox\Assessment\Rubric\Twiggable;
+use Schoolbox\Collection;
 
 class Group implements Twiggable, Calculable
 {
@@ -223,5 +224,21 @@ class Group implements Twiggable, Calculable
         return $context;
     }
 
+
+    /**
+     * Returns a collection containing all the criteria in this grid, for DB persistence.
+     *
+     * @return Collection|Criterion[]
+     */
+    public function getAllCriteria()
+    {
+        $c = new Collection();
+
+        foreach ($this->criteria as $crit) {
+            $c->add($crit);
+        }
+
+        return $c;
+    }
 
 }

@@ -10,6 +10,8 @@
 namespace Schoolbox\Assessment\Rubric;
 
 
+use Schoolbox\Collection;
+
 abstract class DescriptorList implements Twiggable, Calculable
 {
 
@@ -130,7 +132,6 @@ abstract class DescriptorList implements Twiggable, Calculable
     }
 
 
-
     /**
      * Return the calculated sum value of this Calculable (NOT the total possible value)
      *
@@ -145,6 +146,23 @@ abstract class DescriptorList implements Twiggable, Calculable
         }
 
         return $sum;
+    }
+
+
+    /**
+     * Returns a collection containing all the descriptors in this container, for DB persistence.
+     *
+     * @return Collection|Descriptor[]
+     */
+    public function getAllDescriptors()
+    {
+        $c = new Collection();
+
+        foreach ($this->descriptors as $descriptor) {
+            $c->add($descriptor);
+        }
+
+        return $c;
     }
 
 }
