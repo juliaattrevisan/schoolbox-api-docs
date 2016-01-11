@@ -36,6 +36,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Assessment\Rubric;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
@@ -117,10 +118,35 @@ if (!$is_task) {
 
 $markMax = !$_POST['markvalue'] ? '100' : $_POST['markvalue']; // if not set, default to 100
 
-// if Total Mark selected, mark value must be specified
-if ($markTypeID == SubmissionBox\MarkType::TYPE_TOTAL && empty($_POST['markvalue'])) {
-    error(2);
-} // if Rubric selected, generate the objects needed
+// intercept rubric handling
+$useRubric    = (bool)$_POST['use-rubric'];
+$groupMarking = (bool)$_POST['enable-group-marking'];
+
+if ($useRubric) {
+
+    // build rubric grid from POST data
+    $grid    = (new Schoolbox\Assessment\Rubric\Factory(new SubmissionBox\Rubric\Rubric()))->buildFromPostData($_POST[$_POST['formField']], false);
+    $markMax = $grid->getTotal();
+
+    if (isset($grid)) {
+        try {
+            Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper::getInstance()->save($grid, $submission);
+        } catch (Schoolbox\Mapper\Exception $e) {
+            error(105);
+        }
+    }
+
+
+} else {
+    // no rubric, validate total mark
+
+    // if Total Mark selected, mark value must be specified
+    if ($markTypeID == SubmissionBox\MarkType::TYPE_TOTAL && empty($_POST['markvalue'])) {
+        error(2);
+    }
+}
+
+/* // if Rubric selected, generate the objects needed
 elseif ($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
     $rubricFactory = new DueWork_Rubric_Factory($criteria);
 
@@ -148,7 +174,7 @@ elseif ($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
 
     $markMax = $rubric->getCriteriaCount() * ($rubric->getResultCount() - 1);
 }
-
+*/
 
 // define submissionBox 'object': elements common to both scenarios
 $submission->setAcceptOnline(!empty($_POST['accept_submission']) ? true : false);
@@ -165,6 +191,7 @@ $submission->getWorkType()->setId($_POST['type']);
 $submission->getMarkType()->setId($markTypeID);
 $submission->getGradeGroup()->setId($_POST['gradegroup']);
 $submission->setRubricResultSet($resultSetID ?: 0);
+$submission->setMarkedPerRubricGroup($groupMarking);
 $submission->setMaxMark($markMax);
 $submission->setMarkVisibility($_POST['mark_visibility']);
 $submission->setWeight(max(intval($_POST['weight']), 0));
@@ -260,6 +287,7 @@ try {
     }
 }
 
+/*
 // persist rubric data
 if (isset($rubric)) {
     $rubricHandler = new DueWork_Rubric_Handler();
@@ -269,6 +297,7 @@ if (isset($rubric)) {
         $submissionBoxID
     );
 }
+*/
 
 $page->localRedir($is_task ? "/homepage/$categoryID" : "/submission/listSubmission/{$submission->getDueDate()->getYear()}/{$submission->getDueDate()->getYearHalf()}");
 

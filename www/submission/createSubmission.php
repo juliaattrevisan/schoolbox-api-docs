@@ -1,9 +1,6 @@
 <?php
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Descriptor;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -42,6 +39,8 @@ $this->setVar('category_select_block', '');
 $this->setVar('existing_marks_warning_block', '');
 $this->setVar('COURSE_CRITERIA', '');
 $this->setVar('CLASS_CRITERIA', '');
+$this->setVar('USE_RUBRIC_CHECKED', '');
+$this->setVar('GROUP_MARKING_CHECKED', '');
 
 if (Config::get('curriculum_tagging_enabled')) {
     $this->parse('curriculum_code_input_block', 'curriculum_code_input');
@@ -200,6 +199,12 @@ $widgets->outputVisibilityDropdown($this, $submission->getMarkVisibility());
 // Output marktype drop down
 // (If it's an old style free mark, then output nothing)
 $mark_type = $submission->getMarkType()->getId();
+
+// cast rubric to "total mark" (this is a legacy hack, RUBRIC is no longer an explicit marktype)
+if ($mark_type == SubmissionBox\MarkType::TYPE_RUBRIC) {
+    $mark_type = SubmissionBox\MarkType::TYPE_TOTAL;
+}
+
 if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
     $this->setVar('marktype_block', '');
 } else {
@@ -249,45 +254,35 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
         $this->parse('gradegroup_explanation_block', 'gradegroup_explanation', true);
     }
 
-
-    // if the rubric creation fails it will throw an exception, in which case just output the empty sets
-    // Default values for criteria
-    $criteria    = array();
-    $results     = array();
-    $resultCount = 2;
-    $resultSetID = -1;
     try {
-        if ($mark_type == SubmissionBox\MarkType::TYPE_RUBRIC) {
-            $rubric      = $rubricHandler->getRubric($submission->getId());
-            $resultSetID = $submission->getRubricResultSet();
+        if ($submission->isRubric()) {
+            // We're using rubric? Check the rubric checkbox? Check.
+            $this->setVar('USE_RUBRIC_CHECKED', 'checked="checked"');
+
+            if ($submission->isMarkedPerRubricGroup()) {
+                $this->setVar('GROUP_MARKING_CHECKED', 'checked="checked"');
+            }
 
             if ($rubricHandler->marksAlreadyGiven($submission->getId())) {
                 $this->parse('existing_marks_warning_block', 'existing_marks_warning');
             }
-
-            $criteria    = $rubric->getCriteriaIndices();
-            $results     = $rubric->getResults();
-            $resultCount = $rubric->getResultCount();
         }
+
+        $map = Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper::getInstance();
+
+        if ($submission->getId()) {
+            // if the submission box exists, retrieve the rubric based on it
+            $grid = $map->findBySubmissionBox($submission, $is_task, true);
+        } else {
+            // otherwise, just collect all the criteria for the folder the box is about to be created in
+            $grid = $map->findByFolderId($submission->getCategory()->getId(), $is_task);
+        }
+
+        // output the grid
+        $this->setVar('CLASS_CRITERIA', $this->getTwig()->render('@rubric/grid-editable.twig', [ 'rubric' => $grid->toContext() ]));
+
     } catch (Exception $e) {
-    }
-    outputResultSets($this, $resultSetID, $resultCount);
-
-
-    $map = \Schoolbox\Assessment\Rubric\Mapper::getInstance();
-
-    if ($submission->getId()) {
-        $grid = $map->findBySubmissionBoxId($submission->getId());
-    } else {
-        $grid = $map->findByFolderId($submission->getCategory()->getId());
-    }
-
-    $this->setVar('CLASS_CRITERIA', $this->getTwig()->render('@rubric/grid-editable.twig', [ 'rubric' => $grid->toContext() ]));
-
-
-//    outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount, false, $is_task);
-    if ($is_task) {
-        outputCriteria($this, $category->getParent()->getId(), $criteria, $results, $resultCount, true, $is_task);
+        // noop...?
     }
     $this->parse('marktype_block', 'marktype');
 }
@@ -395,51 +390,6 @@ $output['USER_CAMPUS_LIST'] = json_encode($campusList);
 
 $this->setVar($output);
 
-/**
- * @param SitePage  $page
- * @param int       $checkedIndex
- * @param int       $descriptorCount
- */
-function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount = 2)
-{
-    $rubricHandler = new DueWork_Rubric_Handler();
-    $rs            = $rubricHandler->getResultSets();
-
-    $page->setVar('resultset_block', '');
-
-    if (count($rs)) {
-        foreach ($rs as $i => $set) {
-            $page->setVar('result_block', '');
-            $j = 1;
-            foreach ($set as $item) {
-                $page->setVar(
-                    array(
-                        'RS_ID'           => $i,
-                        'RS_RESULT_LABEL' => $item,
-                        'RS_RESULT_COMMA' => ($j++) < count($set) ? ', ' : '',
-                        'RS_CHECKED'      => $i == $checkedIndex ? 'checked="checked"' : ''
-                    )
-                );
-                $page->parse('result_block', 'result', true);
-            }
-            $page->parse('resultset_block', 'resultset', true);
-        }
-    }
-
-    // Output descriptor count drop down from 2-11.
-    $desCounts = array();
-    for ($i = 2; $i <= 11; ++$i) {
-        $desCounts[] = array('value' => $i);
-    }
-    $page->dropdown(
-        'des_count', $desCounts, [ $descriptorCount ], 'marktype', array(
-            'value' => 'DES_COUNT_VALUE',
-        )
-    );
-
-    $page->setVar('RS_0_CHECKED', $checkedIndex == 0 ? 'checked="checked"' : '');
-}
-
 /* Render out breadcrumbs
  */
 $trail = new \Schoolbox\Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
@@ -455,131 +405,3 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => 'active',
     ]
 ]);
-
-/**
- * @param SitePage $page
- * @param int      $catID
- * @param array    $checkedIDs
- * @param array    $descriptors
- * @param int      $descriptorCount
- * @param bool     $is_course
- * @param bool     $is_for_task
- */
-function outputCriteria(
-    SitePage $page,
-    $catID,
-    $checkedIDs,
-    $descriptors,
-    $descriptorCount = 2,
-    $is_course = false,
-    $is_for_task = false
-) {
-
-    // Output this all as part of a single template, and inject into the block.
-    return;
-
-    // get rubric details
-    /** @var \Schoolbox\Collection|Criterion[] $criterionCollection */
-    $criterionCollection = CriterionMapper::getInstance()->findByColumnList(
-        array(
-            'parent_id'   => $catID,
-            'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-        ),
-        array('order' => array('grouping' => 'ASC', 'name' => 'ASC'))
-    );
-
-    $page->setVar(
-        array(
-            'RUBRIC_CAT_ID'         => $catID,
-            'LABEL'                 => ($is_course ? 'Course-level criteria' : 'Unit-level criteria'),
-            'MANAGE_CRITERIA_LABEL' => ($is_course ? 'Manage course-level criteria' : 'Manage unit-level criteria'),
-        )
-    );
-
-    $page->setVar(
-        array(
-            'rubric_type_label_block'   => '',
-            'criteria_allowed_block'    => '',
-            'no_criteria_allowed_block' => '',
-        )
-    );
-    if ($is_for_task) {
-        $page->parse('rubric_type_label_block', 'rubric_type_label');
-    } else {
-        $page->setVar('MANAGE_CRITERIA_LABEL', 'Manage available criteria');
-    }
-
-    if ($catID) {
-        // Display the criteria for this category, if there are any
-        $page->setVar(
-            array(
-                'no_crit_group_block' => '',
-                'crit_group_block'    => '',
-                'criterion_block'     => ''
-            )
-        );
-
-        $hasCritGroup = false;
-        if ($criterionCollection->count()) {
-            $hasCritGroup = true;
-            $currentGrouping = $criterionCollection->first()->getGrouping();
-
-            foreach ($criterionCollection as $criterion) {
-                if ($criterion->getGrouping() != $currentGrouping) {
-                    $page->parse('crit_group_block', 'crit_group', true);
-                    $page->setVar('criterion_block', '');
-                }
-
-                $page->setVar('crit_input_block', '');
-                $page->setVar(
-                    array(
-                        'CRIT_ID'      => $criterion->getId(),
-                        'CRIT_SLUG'    => "crit[{$criterion->getId()}]",
-                        'CRIT_GROUP'   => Scrub::text($criterion->getGrouping()),
-                        'CRIT_NAME'    => Scrub::text($criterion->getName()),
-                        'CRIT_CHECKED' => in_array($criterion->getId(), $checkedIDs) ? 'checked="checked"' : ''
-                    )
-                );
-
-                if (is_array($descriptors[$criterion->getId()])) {
-                    foreach ($descriptors[$criterion->getId()] as $descriptor) {
-                        /** @var Descriptor $descriptor */
-                        $page->setVar(
-                            array(
-                                'CRIT_INPUT_VALUE'  => $descriptor->getDescription(),
-                                'CRIT_INPUT_WEIGHT' => $descriptor->getValue()
-                            )
-                        );
-                        $page->parse('crit_input_block', 'crit_input', true);
-                    }
-                } else {
-                    // disply blank inputs, they weren't used
-                    for ($i = 0; $i < $descriptorCount; ++$i) {
-                        $page->setVar('CRIT_INPUT_VALUE', '');
-                        $page->setVar('CRIT_INPUT_WEIGHT', $i);
-                        $page->parse('crit_input_block', 'crit_input', true);
-                    }
-                }
-                $page->parse('criterion_block', 'criterion', true);
-
-                $currentGrouping = $criterion->getGrouping();
-            }
-            $page->parse('crit_group_block', 'crit_group', true);
-            $page->setVar('no_crit_group_block', '');
-        }
-
-        if (!$hasCritGroup) {
-            $page->parse('no_crit_group_block', 'no_crit_group');
-        }
-        $page->parse('criteria_allowed_block', 'criteria_allowed');
-    } else {
-        // There is no category.
-        // If you're seeing this then you created a course builder in a
-        // category without a parent, and we're viewing the non-existent
-        // parent category.
-        $page->parse('no_criteria_allowed_block', 'no_criteria_allowed');
-    }
-
-    $handle = $is_course ? 'COURSE_CRITERIA' : 'CLASS_CRITERIA';
-    $page->parse($handle, 'rubricTpl', true);
-}
