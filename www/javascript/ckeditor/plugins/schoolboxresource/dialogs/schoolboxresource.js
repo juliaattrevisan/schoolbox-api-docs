@@ -14,6 +14,11 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                 return '/cms/sendVideo.php?id=' + id + '&type=' + filesystem;
             },
             thumbnail: function(id, filesystem) {
+
+                /* Ridiculous quick fix
+                 */
+                filesystem = filesystem.replace('browse', 'sbfs');
+
                 return '/cms/videoThumb.php?size=poster&id=' + id + '&type=' + filesystem;
             },
             regex: /^\/cms\/sendVideo/
