@@ -301,9 +301,14 @@ abstract class Handler
         return $this->page;
     }
 
-    protected function getTabId()
+    /**
+     * Gets the tab the user is currently on, as opposed to the tab these
+     * search results are in.
+     *
+     * @return string
+     */
+    protected function getCurrentTab()
     {
-        // wat
         return $_GET['type'];
     }
 
