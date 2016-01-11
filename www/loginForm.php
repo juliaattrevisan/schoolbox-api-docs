@@ -17,16 +17,18 @@ if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
         $remember = false;
     }
 
-    //first check for brute force attempt
     if ($sessionHandler->checkBruteForce()) {
+        // first check for brute force attempt
         $message =
             'You have attempted more than ' .
             Config::get('login_allowed') . ' logins in ' .
             Config::get('login_grace') . ' seconds.<br>'.
             'Please try again in a short while.'
         ;
-    }
-    else {
+    } elseif (strlen(Config::get('login_terms_and_conditions')) && empty($_POST['tandc'])) {
+        // then check if they checked the terms and conditions checkbox
+        $message = Config::get('login_terms_and_conditions_error');
+    } else {
         try {
             $authenticated =
                 $sessionHandler->authenticate(trim($_POST['username']), $_POST['password'])
