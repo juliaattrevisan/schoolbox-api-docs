@@ -240,12 +240,27 @@ class Mimetype {
     }
 
     /**
-     * Get the max file size allowed for this particular mime type
+     * Get the max file size allowed for this particular mime type.
+     *
+     * If the max file size for this mimetype is empty, this returns the global
+     * default max file size.
      *
      * @return int
      */
     public function getMaxFileSize()  {
         return ($this->maxFileSize > 0) ? $this->maxFileSize : Config::get('max_file_size');
+    }
+
+    /**
+     * Get the max file size that is stored for this mimetype.
+     *
+     * Unlike `getMaxFileSize()`, this does not return the global default max
+     * file size if this mimetype has none.
+     *
+     * @return int
+     */
+    public function getStoredMaxFileSize()  {
+        return $this->maxFileSize;
     }
 
     /**
