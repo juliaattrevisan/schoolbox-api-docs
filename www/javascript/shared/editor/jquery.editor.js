@@ -142,7 +142,7 @@
 (function($) {
 
 	/**
-	 * Unified TinyMCE interface
+	 * Unified Editor interface
 	 *
 	 * @param options
 	 */
