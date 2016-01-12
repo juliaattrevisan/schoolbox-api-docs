@@ -203,6 +203,18 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
                                 fields.height.setValue(matches[2]);
                                 fields.url.setValue(matches[3]);
                             }
+                            /* Try reformatting non-iframeable url
+                             */
+                            else {
+                                var regex = /watch\?v\=/;
+                                var matches = regex.exec(url);
+
+                                if ((matches != null) && matches.length) {
+                                    url = url.replace('watch?v=', '/v/');
+
+                                    fields.url.setValue(url);
+                                }
+                            }
                         }
                     },
                     {
