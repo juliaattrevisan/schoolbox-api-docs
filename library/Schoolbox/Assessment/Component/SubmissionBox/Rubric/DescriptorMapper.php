@@ -9,8 +9,11 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use PDO;
+use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Collection;
 
 /**
  * Class DescriptorMapper
@@ -71,6 +74,47 @@ class DescriptorMapper extends Schoolbox\Mapper {
             )
         );
     }
+
+
+    /**
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT  {$this->getColumnString()},
+                    {$this->getJoinColumnString('level_id', 'l')},
+                    {$this->getJoinColumnString('criterion', 'c')},
+                    {$this->getJoinColumnString('submission_box', 'b')}
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('level_id', '', 'l')}
+            LEFT JOIN {$this->getJoinSql('criterion', '', 'c')}
+            LEFT JOIN {$this->getJoinSql('submission_box', '', 'b')}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = $this->createCollection();
+
+        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $model = $this->hydrate($r);
+
+            $model->setLevel($this->hydrateJoin($r, 'level_id', 'l'));
+            $model->setCriterion($this->hydrateJoin($r, 'criterion', 'c'));
+            $model->setSubmissionBox($this->hydrateJoin($r, 'submission_box', 'b'));
+
+            $c->add($model);
+        }
+
+        return $c;
+    }
+
 
     /**
      * Clones descriptors from one submission box to another.
