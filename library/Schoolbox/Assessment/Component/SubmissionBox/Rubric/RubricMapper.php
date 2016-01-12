@@ -376,12 +376,15 @@ class RubricMapper
 
         // TODO some way to wrap all this in a transaction would be nice... -_-;
 
+        // first, persist the row and column headers (criteria and levels, respectively)
+        CriterionMapper::getInstance()->save($criteria = $rubric->getORMCriteria());
+        LevelMapper::getInstance()->save($levels = $rubric->getORMLevels());
+
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
         UsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
         UsageMapper::getInstance()->save($usages = $rubric->getORMUsages());
 
-        CriterionMapper::getInstance()->save($rubric->getORMCriteria());
-        LevelMapper::getInstance()->save($rubric->getORMLevels());
+        // finally, now that everything else is saved, save the descriptors
         $descIds  = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
 
         // wash up before dinner, kids
