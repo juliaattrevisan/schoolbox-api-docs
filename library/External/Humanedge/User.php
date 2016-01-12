@@ -296,9 +296,9 @@ class External_Humanedge_User implements External_UserInterface
                     CASE WHEN cl.ClassGroup IS NULL
                         THEN su.Code
                         ELSE su.Code+'-'+cl.ClassGroup
-                    END AS ClassCode,
-                    '' AS ClassCampus,
+                    END AS code,
                     su.Name AS name,
+                    '' AS campusCode,
                     '' AS classType
                 FROM Class cl
                 INNER JOIN ClassDetail cd ON cl.ID = cd.ClassID
@@ -313,9 +313,9 @@ class External_Humanedge_User implements External_UserInterface
                     CASE WHEN cl.ClassGroup IS NULL
                         THEN su.Code
                         ELSE su.Code+'-'+cl.ClassGroup
-                    END AS ClassCode,
-                    '' AS ClassCampus,
+                    END AS code,
                     su.Name AS name,
+                    '' AS campusCode,
                     '' AS classType
                 FROM Class cl
                 INNER JOIN ClassStaff cs ON cl.ID = cs.ClassID
