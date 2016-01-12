@@ -439,7 +439,7 @@ class Report_Parent extends Report_Abstract
                             'CONTACT_FIRSTNAME'       => Scrub::text($firstname),
                             'CONTACT_SURNAME'         => Scrub::text($currentContact['StudentContactSurname']),
                             'CONTACT_PHONE'           => $currentContact['StudentContactSilentPhoneFlag'] ? '' : Scrub::text($currentContact['StudentContactPhoneActual']),
-                            'CONTACT_MOBILE'          => Scrub::text($currentContact['StudentContactMobilePhone']),
+                            'CONTACT_MOBILE'          => $currentContact['StudentContactSilentMobilePhoneFlag'] ? '' : Scrub::text($currentContact['StudentContactMobilePhone']),
                             'CONTACT_EMAIL'           => Scrub::text($currentContact['StudentContactDefaultEmail']),
 
                             'CONTACT_POSTAL_STREET'   => $postalAddress,
