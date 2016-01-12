@@ -185,7 +185,7 @@
                      * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
                      * This is typically not used for anything else for now
                      */
-                    {name: 'schoolbox', groups: []}
+                    {name: 'schoolbox', groups: ['schoolboxresource', 'schoolboxiframe']}
                 ],
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
