@@ -8,6 +8,8 @@
  */
 
 
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Renderer;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -361,8 +363,8 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
 $this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
 
 if ($submissionBox->isRubric()) {
-    $rb = new DueWork_Rubric_Lightbox($this);
-    $rb->render('INJECTED_MARK_RUBRIC', $submissionBox->getId(), $user->getId(), $submissionBox->canViewRubric($_SESSION['user']), true);
+    $context = [ 'rubric' => RubricMapper::getInstance()->findBySubmissionBoxAndStudent($submissionBox, $user)->toContext() ];
+    $this->setVar('INJECTED_MARK_RUBRIC', $this->getTwig()->render('@rubric/grid-markable.twig', $context));
 } else {
     $this->setVar('INJECTED_MARK_RUBRIC', '');
 }
