@@ -189,12 +189,12 @@ class Factory
         $levelCache = [];
 
         // cache levels and ensure all exist in the rubric
-        foreach ($levels as $levelId => $level) {
+        foreach ($levels as $levelSequence => $level) {
             $levelName = $level['name'];
 
-            $levelCache[$levelId] = new Level($levelId, $levelName);
+            $levelCache[$levelSequence] = new Level(null, $levelName);
 
-            $rubric->putLevel($levelCache[$levelId]);
+            $rubric->putLevel($levelCache[$levelSequence]);
         }
 
         /** @var Group[] $groupCache */
@@ -234,9 +234,9 @@ class Factory
                 continue;
             }
 
-            foreach ($levelCache as $l) {
+            foreach ($levelCache as $levelSequence => $l) {
 
-                $descriptor      = $descriptors[$criterionId][$l->getId()];
+                $descriptor      = $descriptors[$criterionId][$levelSequence];
                 $descriptorId    = isset($descriptor['id']) ? $descriptor['id'] : null;
                 $descriptorText  = $descriptor['text'];
                 $descriptorValue = $descriptor['points'];

@@ -187,10 +187,22 @@ class Rubric extends Core\Rubric
     protected function createORMLevel($level, $sequence)
     {
         if (!$this->lCache->contains($level)) {
-            $this->lCache->attach($level,
-                LevelMapper::getInstance()
-                  ->createModel()
-                  ->setId($level->getId())
+
+            if ($level->getId()) {
+                $model = LevelMapper::getInstance()->findById($level->getId());
+
+            } else {
+                try {
+                    $model = LevelMapper::getInstance()->findOneByColumnList([
+                        'box_id' => $this->getSubmissionBox()->getId(),
+                        'sequence' => $sequence
+                    ]);
+                } catch (Mapper\Exception $e) {
+                    $model = LevelMapper::getInstance()->createModel();
+                }
+            }
+
+            $this->lCache->attach($level, $model
                   ->setName($level->getName())
                   ->setSubmissionBox($this->box)
             );
