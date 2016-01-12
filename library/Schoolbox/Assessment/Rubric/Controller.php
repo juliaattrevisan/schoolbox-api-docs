@@ -10,8 +10,9 @@
 namespace Schoolbox\Assessment\Rubric;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 class Controller extends BaseController
 {
@@ -90,12 +91,7 @@ class Controller extends BaseController
             $context['group'] = [
                 'id' => $post->get('groupId')
             ];
-            $context['crit'] = [
-                'name' => $post->get('name'),
-                'id'   => rand(1, PHP_INT_MAX),
-                'descriptors' => [],
-                'used' => false,
-            ];
+            $context['crit'] = $this->saveNewCriterion($post->get('folderId'), $post->get('groupName'), $post->get('name'));
 
             $template = 'group-row-editable';
 
@@ -105,7 +101,7 @@ class Controller extends BaseController
 
             $context['rowspan'] = 1;
             $context['group'] = [
-                'id'   => rand(1, PHP_INT_MAX),
+                'id'   => rand(1, PHP_INT_MAX), // this is just so the inputs on the page are unique
                 'name' => $post->get('name'),
                 'used' => false,
             ];
@@ -124,6 +120,33 @@ class Controller extends BaseController
         ]);
 
     }
+
+
+    /**
+     * @param int    $folderId
+     * @param string $grouping
+     * @param string $name
+     * @return array
+     */
+    protected function saveNewCriterion($folderId, $grouping, $name)
+    {
+        $model = CriterionMapper::getInstance()
+            ->createModel()
+            ->setParentType('category')
+            ->setParentId($folderId)
+            ->setGrouping($grouping)
+            ->setName($name);
+
+        CriterionMapper::getInstance()->save($model);
+
+        return [
+            'name'        => $model->getName(),
+            'id'          => $model->getId(),
+            'descriptors' => [],
+            'used'        => false,
+        ];
+    }
+
 
     public function testGeneric()
     {
