@@ -289,7 +289,10 @@ class External_Humanedge_User implements External_UserInterface
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
-//        $year = $this->getCurrentYear($externalUserId);
+//        $year     = $this->getCurrentYear($externalUserId);
+//        $semester = $this->getCurrentSemester($externalUserId);
+        $year     = 2015;
+        $semester = 2;
         if ($user->getRole()->isStudent()) {
             $query = "
                 SELECT
@@ -305,7 +308,9 @@ class External_Humanedge_User implements External_UserInterface
                 INNER JOIN Subject su ON cl.SubjectID = su.ID
                 INNER JOIN SchoolPeriod sp ON cl.SchoolPeriodID = sp.ID
                 WHERE cd.StudentID = {$this->getDatabase()->smartQuote($externalUserId)}
-                AND   sp.IsCurrent = 'Y'
+                AND   sp.Year = {$this->getDatabase()->smartQuote($year)}
+                AND   sp.Semester = {$this->getDatabase()->smartQuote($semester)}
+                -- AND   sp.IsCurrent = 'Y'
             ";
         } elseif ($user->getRole()->isStaff()) {
             $query = "
@@ -322,7 +327,9 @@ class External_Humanedge_User implements External_UserInterface
                 INNER JOIN Subject su ON cl.SubjectID = su.ID
                 INNER JOIN SchoolPeriod sp ON cl.SchoolPeriodID = sp.ID
                 WHERE cs.StaffID = {$this->getDatabase()->smartQuote($externalUserId)}
-                AND   sp.IsCurrent = 'Y'
+                AND   sp.Year = {$this->getDatabase()->smartQuote($year)}
+                AND   sp.Semester = {$this->getDatabase()->smartQuote($semester)}
+                -- AND   sp.IsCurrent = 'Y'
             ";
         } else {
             return [];
