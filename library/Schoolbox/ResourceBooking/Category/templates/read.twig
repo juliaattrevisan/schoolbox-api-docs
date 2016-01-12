@@ -146,6 +146,8 @@
                         eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
                     }
 
+                    $('#calendar-create').find('[data-event-modal-resourcename]').html(resource.title);
+
                     $('#calendar-create').foundation('reveal','open');
 
                     // Mangled action unavoidable
@@ -265,6 +267,7 @@
         <input type="hidden" name="startTime" />
 
         {# I can't tell if this item is bookable from here or not, because I don't know the URL #}
+        <h3 data-event-modal-resourcename></h3>
         <p>Create booking for: <span data-event-modal-field="displayDate"></span></p>
         <input type="submit" class='expand' value="Create Booking" />
         {#<p>This resource may only be booked by a resource moderator.</p>#}
