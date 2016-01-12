@@ -4,7 +4,7 @@
      * Replace all placeholders with html elements
      */
     $.fn.schoolboxResource_ProxyReplacment = function () {
-        $.each($('[data-schoolboxresource-type]'), function (index, element) {
+        $.each($('#content').find('[data-schoolboxresource-type]'), function (index, element) {
             var type = $(element).attr('data-schoolboxresource-type');
             var thumbnail = $(element).attr('data-schoolboxresource-thumbnail');
             var style = $(element).attr('style');
