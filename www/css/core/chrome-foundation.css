@@ -6091,3 +6091,7 @@ th.hide-for-touch {
     display: table-cell !important; } }
 
 /*# sourceMappingURL=chrome-foundation.css.map */
+
+.no-pointer-events {
+  pointer-events: none;
+}
