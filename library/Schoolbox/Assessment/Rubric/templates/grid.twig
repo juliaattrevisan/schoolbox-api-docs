@@ -63,7 +63,7 @@
 
             {% for levelIndex, level in rubric.levels %}
 
-                {% set descriptor = rubric.descriptors[crit.id][level.id] %}
+                {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
 
                 {% if descriptor %}
 
