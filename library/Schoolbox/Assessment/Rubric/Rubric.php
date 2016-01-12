@@ -242,7 +242,7 @@ class Rubric implements Twiggable
         ];
 
         foreach ($this->levels as $level) {
-            $context['levels'][$level->getId()] = $level->toContext();
+            $context['levels'][] = $level->toContext();
         }
 
         foreach ($this->criteriaGroups as $group) {
@@ -253,11 +253,11 @@ class Rubric implements Twiggable
         // (I apologise that this isn't as efficient as it should be - if you can think of how to improve it, by all means please do)
         foreach ($context['groups'] as $groupId => $group) {
             foreach ($group['criteria'] as $critId => $crit) {
-                foreach ($context['levels'] as $levelId => $level) {
+                foreach ($context['levels'] as $levelSequence => $level) {
                     foreach ($level['descriptors'] as $crossRefCritId => $descriptor1) {
                         foreach ($crit['descriptors'] as $crossRefLevelId => $descriptor2) {
-                            if ($crossRefCritId == $critId && $crossRefLevelId == $levelId) {
-                                $context['descriptors'][$critId][$levelId] = $descriptor1;
+                            if ($crossRefCritId == $critId && $crossRefLevelId == $level['id']) {
+                                $context['descriptors'][$critId][$levelSequence] = $descriptor1;
                             }
                         }
                     }
