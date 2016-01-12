@@ -285,7 +285,7 @@ class External_Humanedge_User implements External_UserInterface
     public function getSubjectList($externalUserId, $userId)
     {
         try {
-            $user = \Schoolbox\UserMapper::getInstance()->findByExternalId($externalUserId);
+            $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
