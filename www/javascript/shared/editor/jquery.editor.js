@@ -146,7 +146,7 @@
 	 *
 	 * @param options
 	 */
-	$.fn.alaressTiny = function(options) {
+	$.fn.alaressEditor = function(options) {
 		options = options || {};
 
 		var config = init(options);

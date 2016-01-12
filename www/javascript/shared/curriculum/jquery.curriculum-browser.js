@@ -147,7 +147,7 @@
             }
         });
 
-        $.fn.alaressTiny({
+        $.fn.alaressEditor({
             targetElements: $('#curriculumDescription')
         });
     };

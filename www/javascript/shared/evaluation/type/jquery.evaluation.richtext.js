@@ -33,7 +33,7 @@
 		 * Initialise tiny
 		 */
 		function initChange() {
-            $.fn.alaressTiny({
+            $.fn.alaressEditor({
                 targetElements: $('#' + config.editorSelector),
                 blur: function(element) {
                     $.fn.evaluationRichText.saveOne(config.editorSelector, config.questionForm);

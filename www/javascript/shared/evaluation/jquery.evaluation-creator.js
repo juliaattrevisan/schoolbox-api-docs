@@ -528,7 +528,7 @@
          * Set everything up
          */
         function start() {
-            $.fn.alaressTiny({
+            $.fn.alaressEditor({
                 targetElements: config.targetElements,
                 file_browser_category_id: config.file_browser_category_id,
 
