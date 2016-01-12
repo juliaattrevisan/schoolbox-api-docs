@@ -114,6 +114,11 @@ class Scrub
 
             $config = HTMLPurifier_Config::createDefault();
 
+            /* TODO: Repair the terrible piece of software known as htmlpurifier
+             * Remove this line to re-enable some sort of stupid caching it tries to do
+             */
+            $config->set('Cache.DefinitionImpl', null);
+
             /* http://htmlpurifier.org/phorum/read.php?3,6724
              */
             $config->set('CSS.AllowTricky', true);
@@ -124,7 +129,7 @@ class Scrub
             // Allow Iframe
             $config->set('HTML.SafeIframe', true);
             $safeIframeSources = array(
-                'www.youtube.com/embed/',
+                'www.youtube.com/',
                 'player.vimeo.com/video/',
                 'www.slideshare.net/slideshow/embed_code/',
                 '(?:www|edu).glogster.com/glog(?:/|.php)',
@@ -199,11 +204,6 @@ class Scrub
             // logical manner.
             $config->set('HTML.DefinitionID', 'HTML + Extended Embeds + Extended Objects');
             $config->set('HTML.DefinitionRev', 1);
-
-            /* TODO: Repair the terrible piece of software known as htmlpurifier
-             * Remove this line to re-enable some sort of stupid caching it tries to do
-             */
-            $config->set('Cache.DefinitionImpl', null);
 
             if ($def = $config->maybeGetRawHTMLDefinition()) {
                 $max = $config->get('HTML.MaxImgLength');
