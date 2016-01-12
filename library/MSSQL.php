@@ -196,6 +196,10 @@ class MSSQL {
      */
     function query($sql_q)
 	{
+		if (!$this->isConnected()) {
+			$this->connect();
+		}
+
 		// SB-6907: Cathedral's SQL server won't accept long query strings, so
 		// strip any leading space from each line of the query.
 		// (I can't guarantee that this won't change the meaning of any query,
@@ -246,6 +250,10 @@ class MSSQL {
 	 */
 	public function executeProcedure($name, $params, $multipleResultSets = false)
 	{
+		if (!$this->isConnected()) {
+			$this->connect();
+		}
+
 		$bound_outputs = array();
 		$proc          = $this->buildProcedure($name, $params, $bound_outputs);
 
