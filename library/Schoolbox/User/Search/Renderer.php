@@ -57,7 +57,8 @@ class Renderer extends Handler
 
             $this->getPage()->setVar(array(
                 'USER_DISP_COUNT' => count($this->getResult($this->getType())),
-                'USER_COUNT' => $this->getCount($this->getType()),
+                'USER_COUNT'      => $this->getCount($this->getType()),
+                'CURRENT_TAB'     => $this->getCurrentTab(),
             ));
 
             foreach ($result as $user) {

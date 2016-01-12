@@ -302,6 +302,21 @@ abstract class Handler
     }
 
     /**
+     * Gets the tab the user is currently on, as opposed to the tab these
+     * search results are in.
+     *
+     * @return string
+     */
+    protected function getCurrentTab()
+    {
+        // Only the "all" tab has seymour links on.
+        if ($this->getUseSeymourLinks()) {
+            return 'all';
+        }
+        return $this->getType();
+    }
+
+    /**
      * Set result
      *
      * @param array $result
