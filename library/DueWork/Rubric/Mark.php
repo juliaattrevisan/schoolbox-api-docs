@@ -6,11 +6,23 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DueWork_Rubric_Mark
+ * @deprecated use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Mark
+ */
 class DueWork_Rubric_Mark {
 
     private $rubric;
     private $markArray;
 
+
+    /**
+     * DueWork_Rubric_Mark constructor.
+     * @deprecated
+     *
+     * @param DueWork_Rubric_Abstract $rubric
+     */
     public function __construct(DueWork_Rubric_Abstract $rubric) {
         $this->rubric = $rubric;
 

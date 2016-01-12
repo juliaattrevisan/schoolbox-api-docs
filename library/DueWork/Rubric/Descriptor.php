@@ -6,11 +6,24 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DueWork_Rubric_Descriptor
+ * @deprecated use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Descriptor
+ */
 class DueWork_Rubric_Descriptor {
 
     private $description;   // string
     private $value;         // int
 
+
+    /**
+     * DueWork_Rubric_Descriptor constructor.
+     * @deprecated
+     *
+     * @param $desc
+     * @param $value
+     */
     public function __construct($desc, $value) {
         $this->description = $desc;
         $this->value = $value;

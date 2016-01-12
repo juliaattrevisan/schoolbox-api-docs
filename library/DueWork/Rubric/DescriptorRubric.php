@@ -6,10 +6,22 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DueWork_Rubric_DescriptorRubric
+ * @deprecated use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper
+ */
 class DueWork_Rubric_DescriptorRubric extends DueWork_Rubric_Abstract {
 
     private $descriptors;   // Descriptor[]
 
+
+    /**
+     * DueWork_Rubric_DescriptorRubric constructor.
+     * @deprecated
+     *
+     * @param $submissionBoxID
+     */
     public function __construct($submissionBoxID) {
         parent::__construct($submissionBoxID, 0);
     }

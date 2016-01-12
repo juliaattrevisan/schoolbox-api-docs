@@ -6,12 +6,19 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DueWork_Rubric_ResultSet
+ * @deprecated concept is entirely deprecated, no equivalent class exists
+ */
 class DueWork_Rubric_ResultSet {
 
     private $results; // Result[]
 
     /**
      * If specified, the resultSetID will be used to populate the resultset from the database
+     * @deprecated
+     *
      * @param int $resultSetID
      */
     public function __construct($resultSetID = 0) {

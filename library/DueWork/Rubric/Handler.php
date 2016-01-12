@@ -7,11 +7,21 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DueWork_Rubric_Handler
+ * @deprecated use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper
+ */
 class DueWork_Rubric_Handler
 {
 
     private $db;
 
+
+    /**
+     * DueWork_Rubric_Handler constructor.
+     * @deprecated
+     */
     public function __construct()
     {
         $this->db = Database::getInstance();

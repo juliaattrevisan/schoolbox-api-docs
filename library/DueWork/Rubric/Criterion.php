@@ -6,12 +6,26 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DueWork_Rubric_Criterion
+ * @deprecated use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion
+ */
 class DueWork_Rubric_Criterion {
 
     private $id;        // int
     private $grouping;  // string
     private $name;      // string
 
+
+    /**
+     * DueWork_Rubric_Criterion constructor.
+     * @deprecated
+     *
+     * @param $id
+     * @param $grouping
+     * @param $name
+     */
     public function __construct($id, $grouping, $name) {
         $this->id = $id;
         $this->grouping = $grouping;
