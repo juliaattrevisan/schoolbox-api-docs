@@ -376,13 +376,13 @@ class User extends DeprecatedModel
                         $this->setPasswordInternal($userID, $oldPassword);
                         $this->logUserPasswordChange($username, 'change_pwd_syn_fail', 'warn', $api->getLastError());
                         $this->sendPasswordChangeFailureEmail($userID, true);
-                        throw new Exception_User("The system was unable to reset your Synergetic password as it is no longer in sync with Schoolbox. Your Schoolbox password has been updated, however you will manually need to update your Synergetic password to match this new password.");
+                        throw new Exception("The system was unable to reset your Synergetic password as it is no longer in sync with Schoolbox. Your Schoolbox password has been updated, however you will manually need to update your Synergetic password to match this new password.");
                     }
 
                 } catch (SoapFault $ex) {
                     $this->logUserPasswordChange($username, 'change_pwd_syn_broken', 'warn', $ex);
                     $this->sendPasswordChangeFailureEmail($userID, true);
-                    throw new Exception_User("An unexpected error occurred while attempting to update your Synergetic password.");
+                    throw new Exception("An unexpected error occurred while attempting to update your Synergetic password.");
                 }
             }
             $this->logUserPasswordChange($username, 'change_pwd', 'info');
@@ -390,7 +390,7 @@ class User extends DeprecatedModel
         }
         $this->logUserPasswordChange($username, 'change_pwd_fail', 'warn');
         $this->sendPasswordChangeFailureEmail($userID);
-        throw new Exception_User("Your current password did not match what is stored in the database.");
+        throw new Exception("Your current password did not match what is stored in the database.");
     }
 
 

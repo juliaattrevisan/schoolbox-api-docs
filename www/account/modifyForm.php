@@ -57,7 +57,7 @@ if (isset($_POST['current_password'])) {
         $_SESSION['password'] = $_POST['new_password'];
 
         SitePage::localRedir('/account/modify/success');
-    } catch (Exception_User $e) {
+    } catch (Exception $e) {
         error(105, $e->getMessage());
     }
 }
