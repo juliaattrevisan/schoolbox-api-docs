@@ -179,16 +179,22 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h1 id="clearing">Clearing</h1>
+        <h1 id="clearing">Clearing/Lightbox</h1>
         <section class="content">
-            <ul class="clearing-thumbs" data-clearing>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/comet.jpg"><img data-caption="Nulla vitae elit libero, a pharetra augue. Cras mattis consectetur purus sit amet fermentum." src="http://foundation.zurb.com/docs/assets/img/examples/comet-th-sm.jpg" alt=""></a></li>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/earth.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt=""></a></li>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg"><img data-caption="Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus." src="http://foundation.zurb.com/docs/assets/img/examples/launch-th-sm.jpg" alt=""></a></li>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/satelite.jpg"><img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-th-sm.jpg" alt=""></a></li>
-                <li><a class="th" href="http://foundation.zurb.com/docs/assets/img/examples/space.jpg"><img data-caption="Integer posuere erat a ante venenatis dapibus posuere velit aliquet." src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt=""></a></li>
+            <ul class="clearing-thumbs" data-image-gallery>
+                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/comet.jpg" title="Image 1" rel="lightbox-1"><img src="http://foundation.zurb.com/docs/assets/img/examples/comet-th-sm.jpg" alt="Image 1"></a></li>
+                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/earth.jpg" title="Image 2" rel="lightbox-2"><img src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt="Image 2"></a></li>
+                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg" title="Image 3" rel="lightbox-3"><img src="http://foundation.zurb.com/docs/assets/img/examples/launch-th-sm.jpg" alt="Image 3"></a></li>
+                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/satelite.jpg" title="Image 4" rel="lightbox-4"><img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-th-sm.jpg" alt="Image 4"></a></li>
+                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/space.jpg" title="Image 5" rel="lightbox-5"><img src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt="Image 5"></a></li>
             </ul>
         </section>
+        <script type="text/javascript">
+            $('[data-image-gallery] li').magnificPopup({
+                delegate: 'a',
+                type: 'image'
+            });
+        </script>
     </div>
 </div>
 
