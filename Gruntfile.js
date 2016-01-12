@@ -120,6 +120,7 @@ module.exports = function(grunt) {
 
                     // CKEditor
                     'www/javascript/shared/editor/jquery.proxy-replacement.js',
+                    'www/javascript/components/mediaelement/build/mediaelement-and-player.min.js',
 
                     // DateTime
                     'www/javascript/components/moment/moment.js',

@@ -3,7 +3,7 @@
     /**
      * Replace all placeholders with html elements
      */
-    $.fn.schoolboxResource_ProxyReplacment = function () {
+    $.fn.schoolboxResource_ProxyReplacment = function() {
         $.each($('#content').find('[data-schoolboxresource-type]'), function (index, element) {
             var type = $(element).attr('data-schoolboxresource-type');
             var thumbnail = $(element).attr('data-schoolboxresource-thumbnail');
@@ -23,5 +23,9 @@
                 $(element).replaceWith('<audio data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:50px;border:0px;"><source src="' + source + '" type="audio/mpeg"></audio>');
             }
         });
+
+        /* Replace all with mejs
+         */
+        $('#content').find('[data-schoolboxmedia-replacement]').mediaelementplayer();
     }
 }(jQuery));
