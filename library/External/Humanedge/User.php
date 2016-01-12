@@ -289,11 +289,14 @@ class External_Humanedge_User implements External_UserInterface
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
-        $year  = date('Y');
+        $year = $this->getCurrentYear($externalUserId);
         if ($user->getRole()->isStudent()) {
             $query = "
                 SELECT
-                    (su.Code+'-'+cl.ClassGroup) AS ClassCode,
+                    CASE WHEN cl.ClassGroup IS NULL
+                        THEN su.Code
+                        ELSE su.Code+'-'+cl.ClassGroup
+                    END AS ClassCode,
                     '' AS ClassCampus,
                     su.Name AS name,
                     '' AS classType
@@ -307,7 +310,10 @@ class External_Humanedge_User implements External_UserInterface
         } elseif ($user->getRole()->isStaff()) {
             $query = "
                 SELECT
-                    (su.Code+'-'+cl.ClassGroup) AS ClassCode,
+                    CASE WHEN cl.ClassGroup IS NULL
+                        THEN su.Code
+                        ELSE su.Code+'-'+cl.ClassGroup
+                    END AS ClassCode,
                     '' AS ClassCampus,
                     su.Name AS name,
                     '' AS classType
