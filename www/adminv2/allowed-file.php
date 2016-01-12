@@ -51,7 +51,7 @@ if ($mimes->count()) {
             $this->parse('enabled_block', 'enabled');
         }
 
-        $max_size_output = Alaress_Byte_Format::bytesToString($mime->getMaxFileSize());
+        $max_size_output = Alaress_Byte_Format::bytesToString($mime->getActualMaxFileSize());
         $output = array(
             'FILE_ID'                  => $mime->getId(),
             'FILE_ENABLED'             => $mime->isEnabled() ? 'true'    : 'false',

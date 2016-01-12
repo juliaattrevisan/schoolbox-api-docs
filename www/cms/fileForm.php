@@ -240,7 +240,7 @@ function outputException(Exception $e, IFile $file, $ajax = false) {
     } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
         $code = 10;
         $msg  = 'The size of the uploaded file exceeds the file size restrictions of '
-            . Alaress_Byte_Format::bytesToString($file->getMimetype()->getMaxFileSize()) . '.';
+            . Alaress_Byte_Format::bytesToString($file->getMimetype()->getActualMaxFileSize()) . '.';
 
     } else {
         $code = 9;

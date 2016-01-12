@@ -69,8 +69,8 @@ class Manager
         }
 
         // assert: acceptable size
-        if ($mime->getMaxFileSize() < $storage->getSize()) {
-            $humanSize = $this->abf->bytesToString($mime->getMaxFileSize());
+        if ($mime->getActualMaxFileSize() < $storage->getSize()) {
+            $humanSize = $this->abf->bytesToString($mime->getActualMaxFileSize());
             throw new File\Exception("The size of the uploaded file, '$base', exceeds the file size restriction of $humanSize. $suff", File\Exception::CODE_FILE_TOO_LARGE);
         }
 
