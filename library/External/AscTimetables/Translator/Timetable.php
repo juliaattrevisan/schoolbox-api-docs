@@ -136,11 +136,13 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                                 $classClassroomIds = [''];
                             }
                             foreach ($classClassroomIds as $classroomId) {
-                                $resultClassroom = [
-                                    'Class Room' => isset($result['classrooms'][$classroomId])
-                                        ? $result['classrooms'][$classroomId]['code']
-                                        : '',
-                                ];
+                                // Disable classrooms for now
+                                $resultClassroom = [];
+//                                $resultClassroom = [
+//                                    'Class Room' => isset($result['classrooms'][$classroomId])
+//                                        ? $result['classrooms'][$classroomId]['code']
+//                                        : '',
+//                                ];
 
                                 // We finally have a result
                                 $endResult[] = array_merge(
