@@ -31,8 +31,8 @@ sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
 
 # Collect minify cache dir location
 minifydir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='minify_dir' \G;" | grep 'value' | cut -d' ' -f2`
-
 zipdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='zip_dir' \G;" | grep 'value' | cut -d' ' -f2`
+xmldir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='xml_dir' \G;" | grep 'value' | cut -d' ' -f2`
 streamdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='stream_dir' \G;" | grep 'value' | cut -d' ' -f2`
 
 if [ -z $minifydir ];
@@ -47,6 +47,19 @@ then
 	exit;
 fi
 
+if [ -z $xmldir ];
+then
+	echo "Unable to find xml cache directory in config table. Please check your database credentials.";
+	exit;
+else
+	purifierdir="$xmldir/../purifier/";
+	if [ -z $purifierdir ];
+	then
+		echo "Unable to find purifier cache directory in config table. Please check your database credentials.";
+		exit;
+	fi
+fi
+
 if [ -z $streamdir ];
 then
 	echo "Unable to find cache file directory in config table. Please check your database credentials.";
@@ -59,7 +72,7 @@ then
 	rm -f $minifydir/minify*;
 	echo "Minify cache directory cleaned ($minifydir)";
 else
-	echo "No cache directories cleaned";
+	echo "No minify cache directories cleaned";
 fi
 
 if [ -d $zipdir ];
@@ -67,7 +80,15 @@ then
 	rm -rf $zipdir/zip*;
 	echo "Zip cache directory cleaned ($zipdir)";
 else
-	echo "No cache directories cleaned";
+	echo "No zip cache directories cleaned";
+fi
+
+if [ -d $purifierdir ];
+then
+	rm -rf $purifierdir/*;
+	echo "Purifier cache directory cleaned ($purifierdir)";
+else
+	echo "No purifier cache directories cleaned";
 fi
 
 if [ -d $streamdir ];
@@ -77,7 +98,7 @@ then
 	rm -fR $streamdir/templates/*;
 	echo "Twig templates cache cleaned ($streamdir/templates)";
 else
-	echo "No cache directories cleaned";
+	echo "No stream cache directories cleaned";
 fi
 
 
