@@ -280,9 +280,9 @@
         <tr>
             <th class="rb-no-cell">{{ locale.translate('rubricGroup', true, true) }}</th>
             <th class="rb-no-cell">{{ locale.translate('rubricCriterion', true, true) }}</th>
-            {% for level in rubric.levels -%}
+            {% for levelSequence, level in rubric.levels -%}
             <th class="rb-level" data-sequencer-group="levels">
-                <input data-level placeholder="{{ locale.translate('rubricLevel', false, true) }} name" type="text" value="{{ level.name }}" name="{{ formField }}[{{ rubric.id }}][level][{{ level.id }}][name]" />
+                <input data-level placeholder="{{ locale.translate('rubricLevel', false, true) }} name" type="text" value="{{ level.name }}" name="{{ formField }}[{{ rubric.id }}][level][{{ levelSequence }}][name]" />
                 <span class="sequencer" data-sequencer-h="levels">
                     <a class="icon-previous" data-sequencer-left title="Move left"></a>
                     <a class="icon-next" data-sequencer-right title="Move right"></a>
@@ -325,6 +325,9 @@
 
             if ($(this).data('spawn') == 'level') {
 
+                // determine the new index
+                var nextIndex = $rb.find('th[data-sequencer-group=levels]').length;
+
                 // iterate all rows
                 $rb.find('tr').each(function () {
                     // locate the second-from-right-most cell, and replicate it
@@ -350,7 +353,7 @@
                             var split = this.name.split(/]\[/);
 
                             // increment the level index in the name (second-last index)
-                            split[split.length - 2]++;
+                            split[split.length - 2] = nextIndex;
 
                             this.name = split.join('][');
 
@@ -417,6 +420,11 @@
                 name: name,
                 levelCount: $rb.children('thead').find('input').length
             };
+
+            if (type == 'criterion') {
+                payload.groupName = $rb.find('input[name="' + ( '{{ formField }}[' + [ payload.rubricId, 'group', groupId, 'name' ].join('][') + ']' ) + '"]').val();
+                payload.folderId  = $('input[name=category]').val();
+            }
 
             $.post('{{ routeLookup("rubric.create") }}', payload, function (data) {
 
