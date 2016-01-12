@@ -14,6 +14,7 @@ use Schoolbox\Assessment\Rubric as Core;
 use Schoolbox\Mapper;
 use Schoolbox\Collection;
 use Schoolbox\User;
+use SplObjectStorage;
 
 class Rubric extends Core\Rubric
 {
@@ -31,6 +32,13 @@ class Rubric extends Core\Rubric
 
         parent::__construct($id, false);
         $this->setSubmissionBox($submissionBox);
+
+        // setup caching
+        $this->cCache = new SplObjectStorage();
+        $this->dCache = new SplObjectStorage();
+        $this->lCache = new SplObjectStorage();
+        $this->uCache = new SplObjectStorage();
+        $this->mCache = new SplObjectStorage();
     }
 
 
@@ -74,6 +82,9 @@ class Rubric extends Core\Rubric
     }
 
 
+    /** @var SplObjectStorage|Core\Criteria\Criterion[] */
+    protected $cCache;
+
     /**
      * @param Core\Criteria\Criterion $criterion
      * @param string                  $groupName
@@ -81,21 +92,24 @@ class Rubric extends Core\Rubric
      */
     protected function createORMCriterion($criterion, $groupName = '')
     {
-        try {
-            $model    = CriterionMapper::getInstance()->findById($criterion->getId());
-            $parentId = $model->getParentId();
+        if (!$this->cCache->contains($criterion)) {
+            try {
+                $model    = CriterionMapper::getInstance()->findById($criterion->getId());
+                $parentId = $model->getParentId();
 
-        } catch (Mapper\Exception $e) {
-            $model    = CriterionMapper::getInstance()->createModel();
-            $parentId = $this->box->getCategory()->getId();
+            } catch (Mapper\Exception $e) {
+                $model    = CriterionMapper::getInstance()->createModel();
+                $parentId = $this->box->getCategory()->getId();
+            }
+
+            $model->setName($criterion->getName())
+                  ->setParentType('category')
+                  ->setParentId($parentId);
+
+            $this->cCache->attach($criterion, $model);
         }
 
-        $model->setName($criterion->getName())
-              ->setGrouping($groupName ?: $criterion->getGroup()->getName())
-              ->setParentType('category')
-              ->setParentId($parentId);
-
-        return $model;
+        return $this->cCache->offsetGet($criterion)->setGrouping($groupName ?: $criterion->getGroup()->getName());
     }
 
 
@@ -121,6 +135,9 @@ class Rubric extends Core\Rubric
     }
 
 
+    /** @var SplObjectStorage|Core\Criteria\Criterion[] */
+    protected $uCache;
+
     /**
      * @param Criterion $criterion
      * @param int $sequence
@@ -128,11 +145,16 @@ class Rubric extends Core\Rubric
      */
     protected function createORMUsage($criterion, $sequence)
     {
-        return UsageMapper::getInstance()
-            ->createModel()
-            ->setCriterion($criterion)
-            ->setSubmissionBox($this->box)
-            ->setSequence($sequence);
+        if (!$this->uCache->contains($criterion)) {
+            $this->uCache->attach($criterion,
+                UsageMapper::getInstance()
+                  ->createModel()
+                  ->setCriterion($criterion)
+                  ->setSubmissionBox($this->box)
+            );
+        }
+
+        return $this->uCache->offsetGet($criterion)->setSequence($sequence);
     }
 
 
@@ -154,6 +176,9 @@ class Rubric extends Core\Rubric
     }
 
 
+    /** @var SplObjectStorage|Core\Competency\Level[] */
+    protected $lCache;
+
     /**
      * @param Core\Competency\Level $level
      * @param int              $sequence
@@ -161,12 +186,16 @@ class Rubric extends Core\Rubric
      */
     protected function createORMLevel($level, $sequence)
     {
-        return LevelMapper::getInstance()
-            ->createModel()
-            ->setId($level->getId())
-            ->setName($level->getName())
-            ->setSubmissionBox($this->box)
-            ->setSequence($sequence);
+        if (!$this->lCache->contains($level)) {
+            $this->lCache->attach($level,
+                LevelMapper::getInstance()
+                  ->createModel()
+                  ->setId($level->getId())
+                  ->setName($level->getName())
+                  ->setSubmissionBox($this->box)
+            );
+        }
+        return $this->lCache->offsetGet($level)->setSequence($sequence);
     }
 
 
@@ -189,6 +218,9 @@ class Rubric extends Core\Rubric
     }
 
 
+    /** @var SplObjectStorage|Core\Descriptor[] */
+    protected $dCache;
+
     /**
      * @param Core\Descriptor       $descriptor
      * @param Core\Competency\Level $level
@@ -197,32 +229,38 @@ class Rubric extends Core\Rubric
      */
     protected function createORMDescriptor($descriptor, $level, $sequence)
     {
-        // models we need
-        $critModel = $this->createORMCriterion($descriptor->getCriterion());
-        $lvlModel  = $this->createORMLevel($level, $sequence);
+        if (!$this->dCache->contains($descriptor)) {
+            // models we need
+            $critModel = $this->createORMCriterion($descriptor->getCriterion());
+            $lvlModel  = $this->createORMLevel($level, $sequence);
 
-        $map = DescriptorMapper::getInstance();
+            $map = DescriptorMapper::getInstance();
 
-        try {
-            // this is a unique index
-            $model = $map->findOneByColumnList([
-                'criterion_id'      => $critModel->getId(),
-                'submission_box_id' => $this->getSubmissionBox()->getId(),
-                'level_id'          => $lvlModel->getId()
-            ]);
+            try {
+                // this is a unique index
+                $model = $map->findOneByColumnList([
+                    'criterion_id'      => $critModel->getId(),
+                    'submission_box_id' => $this->getSubmissionBox()->getId(),
+                    'level_id'          => $lvlModel->getId()
+                ]);
 
-        } catch (Mapper\Exception $e) {
-            // that intersection doesn't exist, so we'll use a fresh model
-            $model = $map->createModel();
+            } catch (Mapper\Exception $e) {
+                // that intersection doesn't exist, so we'll use a fresh model
+                $model = $map->createModel();
+            }
+
+            $model
+                ->setCriterion($critModel)
+                ->setSubmissionBox($this->box)
+                ->setDescription($descriptor->getText())
+                ->setValue($descriptor->getValue())
+                ->setLevel($lvlModel)
+                ->setValid(true);
+
+            $this->dCache->attach($descriptor, $model);
         }
 
-        return $model
-            ->setCriterion($critModel)
-            ->setSubmissionBox($this->box)
-            ->setDescription($descriptor->getText())
-            ->setValue($descriptor->getValue())
-            ->setLevel($lvlModel)
-            ->setValid(true);
+        return $this->dCache->offsetGet($descriptor);
     }
 
 
@@ -262,6 +300,9 @@ class Rubric extends Core\Rubric
     }
 
 
+    /** @var SplObjectStorage|Core\Descriptor[] */
+    protected $mCache;
+
     /**
      * @param Core\Descriptor         $descriptor
      * @param Alaress_Date_Format     $timestamp
@@ -270,16 +311,21 @@ class Rubric extends Core\Rubric
      */
     protected function createORMMark($descriptor, $timestamp, $student)
     {
-        return MarkMapper::getInstance()
-            ->createModel()
+        if (!$this->mCache->contains($descriptor)) {
+            $this->mCache->attach($descriptor,
+                MarkMapper::getInstance()
+                 ->createModel()
+                 ->setSubmissionBox($this->getSubmissionBox())
+                 ->setDescriptor($this->createORMDescriptor($descriptor, $descriptor->getLevel(), 0))
+                 ->setValid(true)
+                 ->setMark(0)
+                 ->setCriterion($this->createORMCriterion($descriptor->getCriterion()))
+            );
+        }
+
+        return $this->mCache->offsetGet($descriptor)
             ->setCreatedAt($timestamp)
-            ->setSubmissionBox($this->getSubmissionBox())
-            ->setDescriptor($this->createORMDescriptor($descriptor, $descriptor->getLevel(), 0))
-            ->setValid(true)
-            ->setMark(0)
-            ->setStudent($student)
-            ->setCriterion($this->createORMCriterion($descriptor->getCriterion()))
-        ;
+            ->setStudent($student);
     }
 
 
