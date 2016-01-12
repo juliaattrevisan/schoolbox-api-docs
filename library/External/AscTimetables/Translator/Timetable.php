@@ -73,7 +73,11 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                     $lesson = $result['lessons'][$lessonId];
 
                     // Pluck out teachers from lesson
+                    // Allow an empty teacher record
                     $teacherIds = $lesson['teacherIds'];
+                    if (empty($teacherIds)) {
+                        $teacherIds = [''];
+                    }
 
                     // Pluck out subject from lesson
                     $subjectId = $lesson['subjectId'];
@@ -90,15 +94,22 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                     }
 
                     // Add an entry for every teacher/classCode
-                    foreach (array_filter(array_unique($teacherIds)) as $teacherId) {
-                        if (!isset($result['teachers'][$teacherId])) {
+                    foreach (array_unique($teacherIds) as $teacherId) {
+                        if (empty($teacherId)) {
+                            $resultTeacher = [
+                                'Teacher Code'      => '',
+                                'Teacher Firstname' => '',
+                                'Teacher Lastname'  => '',
+                            ];
+                        } elseif (isset($result['teachers'][$teacherId])) {
+                            $resultTeacher = [
+                                'Teacher Code'      => $result['teachers'][$teacherId]['short'],
+                                'Teacher Firstname' => $result['teachers'][$teacherId]['firstname'],
+                                'Teacher Lastname'  => $result['teachers'][$teacherId]['lastname'],
+                            ];
+                        } else {
                             continue;
                         }
-                        $resultTeacher = [
-                            'Teacher Code'      => $result['teachers'][$teacherId]['short'],
-                            'Teacher Firstname' => $result['teachers'][$teacherId]['firstname'],
-                            'Teacher Lastname'  => $result['teachers'][$teacherId]['lastname'],
-                        ];
 
                         // Go thru each class entry for this lesson, and add its classroom.
                         foreach ($classes as $class) {
