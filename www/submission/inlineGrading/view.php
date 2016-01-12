@@ -63,6 +63,7 @@ $stack = array();
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 
 $this->setFile('studentNavTpl', 'submission/inlineGrading/injectables/controls/navigation-option.html');
+$this->setBlock('studentNavTpl', 'marked_submitted', 'marked_submitted_block');
 $studentNav = [];
 
 $dueWorkDetail = new DueWork_Detail($submissionBox);
@@ -111,17 +112,22 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
             'USER_SUBMISSION_TEXT'     => $submit ? ($ontime ? 'Submitted on Time' : 'Submitted Late') : 'Not Submitted',
         ));
 
+        if (!$marked) {
+            $this->setVar('marked_submitted_block', '');
+        } else {
+            $this->parse('marked_submitted_block', 'marked_submitted');
+        }
+
+        $this->setBlock('studentNavTpl', 'show_status', 'show_status_block');
+
+        if (!$submissionBox->getAcceptOnline()) {
+            $this->setVar('show_status_block', '');
+        } else {
+            $this->parse('show_status_block', 'show_status');
+        }
+
         // parse template with PHPLib, shuck it out then put it into JSON? Whoa
         $this->parse('USER_HTML', 'studentNavTpl');
-
-		$this->setBlock('studentNavTpl', 'show_status', 'show_status_block');
-
-		if (!$submissionBox->getAcceptOnline()) {
-			$this->setVar('show_status_block', '');
-		} else {
-			$this->parse('show_status_block', 'show_status');
-		}
-
 
 		$studentNav[] = [
             'text'  => $currentStudent->formatName('{lastname}, {firstname}'),
