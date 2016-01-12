@@ -8,8 +8,8 @@
 // $inline-list-top-margin: 0;
 // $inline-list-opposite-margin: 0;
 // $inline-list-bottom-margin: rem-calc(17);
-// $inline-list-default-float-margin: rem-calc(-22);
-// $inline-list-default-float-list-margin: rem-calc(22);
+$inline-list-default-float-margin: rem-calc(-$base-font-size);
+$inline-list-default-float-list-margin: rem-calc($base-font-size);
 
 // $inline-list-padding: 0;
 
@@ -1677,8 +1677,4 @@ article {
 
 .alert-box:empty {
 	display: none;
-}
-
-.clearing-thumbs {
-	margin-bottom: 1rem;
 }
