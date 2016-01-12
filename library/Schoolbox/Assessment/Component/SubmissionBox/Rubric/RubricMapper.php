@@ -162,7 +162,10 @@ class RubricMapper
         $levelList = [];
 
         foreach ($levelCollection as $level) {
-            $levelList[$level->getId()] = [ 'name' => $level->getName() ];
+            $levelList[$level->getSequence()] = [
+                'id'   => $level->getId(),
+                'name' => $level->getName()
+            ];
         }
 
         $args = [
@@ -246,7 +249,7 @@ class RubricMapper
 
         foreach ($descriptorCollection as $d) {
             // only populate if a description is given
-            $descriptors[$d->getCriterion()->getId()][$d->getLevel()->getId()] = [
+            $descriptors[$d->getCriterion()->getId()][$d->getLevel()->getSequence()] = [
                 'id'     => $d->getId(),
                 'text'   => $d->getDescription(),
                 'points' => $d->getValue() || $d->getDescription() ? $d->getValue() : ''

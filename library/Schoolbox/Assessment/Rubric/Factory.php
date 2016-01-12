@@ -191,8 +191,9 @@ class Factory
         // cache levels and ensure all exist in the rubric
         foreach ($levels as $levelSequence => $level) {
             $levelName = $level['name'];
+            $levelId   = isset($level['id']) ? $level['id'] : null;
 
-            $levelCache[$levelSequence] = new Level(null, $levelName);
+            $levelCache[$levelSequence] = new Level($levelId, $levelName);
 
             $rubric->putLevel($levelCache[$levelSequence]);
         }
