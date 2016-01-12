@@ -341,8 +341,8 @@ class Factory
              */
             if ($this->getRubric()) {
 
-                $normalisedMark = $this->getRubric()->getPercentage();
-                $returnedWork->setMark($this->getMarksheet()->convertRawMark($normalisedMark));
+                $normalisedMark = $this->getRubric()->getPercentage() * 100;
+                $returnedWork->setMark($this->getMarksheet()->convertRawMark($normalisedMark, $this->getRubric()->getTotal(), true));
                 $returnedWork->setNormalizedMark($normalisedMark);
             }
         } elseif ((trim($this->getMark()) === '') || ($this->getMark() < 0)) {
