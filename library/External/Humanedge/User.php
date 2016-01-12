@@ -268,7 +268,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getCurrentSemester($externalUserId = null)
     {
-        return date('Y');
+        return $this->database->getOne("SELECT Semester FROM SchoolPeriod WHERE IsCurrent = 'Y'");
     }
 
     /**
@@ -276,7 +276,7 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getCurrentYear($externalUserId = null)
     {
-        return date('m') < 6 ? 1 : 2;
+        return $this->database->getOne("SELECT Year FROM SchoolPeriod WHERE IsCurrent = 'Y'");
     }
 
     /**
