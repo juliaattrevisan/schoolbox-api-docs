@@ -1,0 +1,258 @@
+<script type="text/javascript">
+
+    $(function () {
+
+        $('#filter_type_id').change(function(event) {
+            $('.record').each(function(index, record) {
+                if ($('#filter_type_id').val() === '') {
+                    $(record).show();
+                } else {
+                    if ($(record).attr('record-type') != $('#filter_type_id').val()) {
+                        $(record).hide();
+                    } else {
+                        $(record).show();
+                    }
+                }
+            });
+        });
+
+        $('[data-delete]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this record?',
+                confirmEvent: function() {
+                    $.post('/pastoral/delete', {
+                        id: event.target.id
+                    })
+                    .done(function() {
+                        $('#pastoral-' + event.target.id).remove();
+                        if ($('[data-pastoral]').length == 0) {
+                            $('[data-no-records]').show();
+                        } else {
+                            $('[data-no-records]').hide();
+                        }
+                    });
+                }
+            });
+        });
+
+        if ($('[data-pastoral]').length == 0) {
+            $('[data-no-records]').show();
+        } else {
+            $('[data-no-records]').hide();
+        }
+    });
+
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="/search/user/{{ user.getId }}">{{ user.formatName() }}</a></li>
+    <li class="active"><a href="/pastoral/{{ user.getId }}">Pastoral Care</a></li>
+</ul>
+
+{% if role != 'parent' %}
+
+    <div class="actions-small-1 row">
+        <div class="list-item">
+            <div class="small-12 column">
+                <h2>Student Details</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 island">
+            <section class="no-pad">
+                <div class="content no-pad">
+                    <div class="row no-margin">
+                        <div class="small-12 medium-4 large-2 columns no-pad">
+                            <img src="/portrait.php?userId={{ user.getExternalId() }}" class="full-width"/>
+                        </div>
+                        <div class="small-12 medium-8 large-10 columns">
+                            <dl class="profile">
+                                <dt class="no-margin small-6 medium-4">Student Name</dt>
+                                <dd class="no-margin small-6 medium-8">{{ user.formatName() }}</dd>
+
+                                <dt class="no-margin small-6 medium-4">Student Age</dt>
+                                <dd class="no-margin small-6 medium-8">{{ student.age }} Years Old</dd>
+
+                                <dt class="no-margin small-6 medium-4">Student Year Level</dt>
+                                <dd class="no-margin small-6 medium-8">{{ student.StudentYearLevel }} {{ student.FormDescription }}</dd>
+
+                                <dt class="no-margin small-6 medium-4">Homeroom/Form Teacher</dt>
+                                <dd class="no-margin small-6 medium-8">{{ student.StudentFormStaffName }}</dd>
+
+                                <dt class="no-margin small-6 medium-4">Year Level Co-ordinator</dt>
+                                <dd class="no-margin small-6 medium-8">{{ student.StudentYearLevelCoordinator }}</dd>
+
+                                <dt class="no-margin small-6 medium-4">House</dt>
+                                <dd class="no-margin small-6 medium-8">{{ student.StudentYearLevelCoordinator }}</dd>
+
+                                {% for contact in contacts if not user.hideContacts %}
+                                    <dt class="no-margin small-6 medium-4">{{ contact.StudentContactRelation }}</dt>
+                                    <dd class="no-margin small-6 medium-8">
+                                        {{ contact.main.getFullName() }}
+                                        {% if contact.StudentContactMobilePhone %}
+                                            ({{ contact.StudentContactMobilePhone }})
+                                        {% endif %}
+                                    </dd>
+                                    {% if contact.spouse %}
+                                        <dt class="no-margin small-6 medium-4">{{ contact.StudentContactSpouseRelation }}</dt>
+                                        <dd class="no-margin small-6 medium-8">
+                                            {{ contact.spouse.getFullName() }}
+                                            {% if contact.StudentContactSpouseMobilePhone %}
+                                                ({{ contact.StudentContactSpouseMobilePhone }})
+                                            {% endif %}
+                                        </dd>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <a class="button expand spaced" href="/pastoral/insert/{{ user.getId() }}">Add Pastoral Comment</a>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12">
+            <section>
+                <select id="filter_type_id">
+                    <option value="">Show All Record Types</option>
+                    {% for type in types %}
+                        <option value="{{ type.id }}">{{ type.name }}</option>
+                    {% endfor %}
+                </select>
+            </section>
+        </div>
+    </div>
+
+{% endif %}
+
+<div data-no-records class="row" {% if records.count() != 0 %} style="display:none;" {% endif %}>
+    <div class="small-12 column">
+        <div class="alert-box">There are currently no pastoral care records for this student.</div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <ul class="information-list">
+                {% for record in records if not record.hidden %}
+                    {% if
+                        record.private and
+                        record.owner.getId() != session.user.getId() and
+                        not record.access and
+                        not record.hidden
+                    %}
+                        {% if role != 'parent' %}
+                            <li record-type="{{ record.getTypeId }}" data-pastoral class="record actions-small-1" id="pastoral-{{ record.getId() }}">
+                                <div class="list-item">
+                                    <div class="avatar card small-12 wrap-down">
+                                        <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
+                                        <h3>{{ record.getHeading() }}</h3>
+                                        <p class="spaced meta">
+                                            Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getPostDate().getShort() }}
+                                        </p>
+                                        {% if record.tags | length > 0 %}
+                                            <p class="spaced">
+                                                {% for tag in record.tags %}
+                                                    <span class="neutral label">{{ tag.name }}</span>
+                                                {% endfor %}
+                                            </p>
+                                        {% endif %}
+                                        <p class="spaced alert">
+                                            This contents of this record have been marked as private, please contact the author for additional information.
+                                        </p>
+                                        <p class="spaced meta">
+                                            {{ record.getTypeName() }} | {{ record.getSeverityName() }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        <li record-type="{{ record.getTypeId }}" data-pastoral class="record actions-small-1" id="pastoral-{{ record.getId() }}">
+                            <div class="list-item">
+                                <div class="avatar card small-12 wrap-down">
+                                    <a href="/search/user/{{ record.owner.getId() }}">
+                                        <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
+                                    </a>
+                                    <a href="/pastoral/{{ user.getId() }}/{{ record.getId() }}">
+                                        <h3>
+                                            {{  record.getHeading() }}
+                                            {% if record.comments | length > 0 %}
+                                                ({{ record.comments | length }} Comment{% if record.comments | length > 1 %}s{% endif %})
+                                            {% endif %}
+                                        </h3>
+
+                                    </a>
+                                    <p class="spaced meta">
+                                        Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getPostDate().getShort() }}
+                                    </p>
+                                    {% if record.tags | length > 0 %}
+                                        <p class="spaced">
+                                            {% for tag in record.tags %}
+                                                <span class="neutral label">{{ tag.name }}</span>
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                    <article>
+                                        <p class="spaced">
+                                           {{ record.getBodyText() | cutSentence(375, true) }}
+                                        </p>
+                                        {% if record.attachments.count() > 0 %}
+                                            <p class="spaced meta">
+                                                {% for attachment in record.attachments %}
+                                                    Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{  attachment.getFilename() }}</a><br>
+                                                {% endfor %}
+                                            </p>
+                                        {% endif %}
+                                    </article>
+
+                                    {% if role != 'parent' %}
+                                        <p class="spaced meta">
+                                            {{ record.getTypeName() }}
+                                            {% if session.user.getRole().isStaff() %}
+                                                |
+                                                {{ record.getSeverityName() }} |
+                                                {% if record.private %}Contents Private | {% endif %}
+                                                {% if record.roles | length + record.users | length == 0 %}No Audience Set{% endif %}
+                                                {% if record.roles | length > 0 %}
+                                                    {% for role in record.roles %}
+                                                        {{ role.getName() }}{% if not loop.last %}, {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                                {% if record.users | length > 0 %}
+                                                    {% if record.roles | length > 0 %}|{% endif %}
+                                                    {% for user in record.users %}
+                                                        <a href="/search/user/{{ user.getId() }}">{{ user.firstname }} {{ user.lastname }}</a>{% if not loop.last %}, {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endif %}
+                                        </p>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+
+                            {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or session.user.getPastoralModerator %}
+                                <nav>
+                                    <a class="icon-modify no-text" href="/pastoral/update/{{ user.getId() }}/{{ record.getId() }}" title="Modify"></a>
+                                    <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+                                </nav>
+                            {% endif %}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>

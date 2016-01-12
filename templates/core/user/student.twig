@@ -198,7 +198,7 @@
             </div>
             
             {% block buttons_island %}
-            <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8">
+            <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-7 xlarge-block-grid-7">
 
                 {% block buttons %}
                     {% if showButtons %}
@@ -233,6 +233,16 @@
                                   >ePortfolio</a>
                             </li>
                         {% endblock buttons_eportfolio %}
+                    {% endif %}
+
+                    {% if showButtons and showPastoral %}
+                        {% if isStaff or isParentOfStudent %}
+                        <li class="no-pad">
+                            <a href="/pastoral/{{ user.getId() }}"
+                               class="no-margin fat icon-fat button icon-chat icon-32 icon-chat"
+                            >Pastoral Care</a>
+                        </li>
+                        {% endif %}
                     {% endif %}
 
                     {% if showButtons %}

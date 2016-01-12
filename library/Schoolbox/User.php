@@ -123,6 +123,9 @@ class User implements JsonSerializable
     /** @var bool */
     private $hideTimetable;
 
+    /** @var bool */
+    private $pastoralModerator;
+
     /**
      * Hide notifications tray
      *
@@ -747,6 +750,16 @@ class User implements JsonSerializable
     /**
      * @return self
      */
+    public function setPastoralModerator($pastoralModerator)
+    {
+        // explicit cast
+        $this->pastoralModerator = $pastoralModerator ? true : false;
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
     public function setHideTimetable($hideTimetable)
     {
         // explicit cast
@@ -770,6 +783,15 @@ class User implements JsonSerializable
     {
         // explicit cast
         return $this->hideContacts ? true : false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPastoralModerator()
+    {
+        // explicit cast
+        return $this->pastoralModerator ? true : false;
     }
 
     /**

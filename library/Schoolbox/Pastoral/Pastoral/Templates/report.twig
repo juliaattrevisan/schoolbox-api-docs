@@ -1,0 +1,86 @@
+<ul class="breadcrumb">
+    <li><a href="/pastoral/dashboard">Pastoral Care Dashboard</a></li>
+    <li class="active"><a href="#">Report</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Pastoral Care Report</h1>
+        <section>
+            <ul class="information-list">
+                {% for record in results %}
+                    <li>
+                        <div class="list-item">
+                            <div class="avatar card small-12 wrap-down">
+                                <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
+                                <h2>{{ record.student.firstname }} {{ record.student.lastname }}</h2>
+                                <h3>{{  record.getHeading() }}</h3>
+                                <p class="spaced meta">
+                                    Posted by {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}
+                                </p>
+                                {% if record.tags | length > 0 %}
+                                    <p class="spaced">
+                                        {% for tag in record.tags %}
+                                            <span class="neutral label">{{ tag.name }}</span>
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                                <article>
+                                    <p class="spaced">
+                                        {{ record.getBodyText() }}
+                                    </p>
+                                    {% if record.attachments.count() > 0 %}
+                                        <p class="meta">
+                                            {% for attachment in record.attachments %}
+                                                Attached: {{  attachment.getFilename() }}<br>
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                </article>
+                                <p class="meta">
+                                    Severity: {{ record.getSeverityName() }}
+                                </p>
+                                <p class="meta">
+                                    Incident Type:
+                                    {{ record.getTypeName() }}
+                                </p>
+                                {% if record.private %}
+                                    <p class="meta">
+                                        Contents Private
+                                    </p>
+                                {% endif %}
+                                <p class="spaced meta">
+                                    Audience:
+                                    {% if record.roles | length + record.users | length == 0 %}No Audience Set{% endif %}
+                                    {% if record.roles | length > 0 %}
+                                        {% for role in record.roles %}
+                                            {{ role.getName() }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if record.users | length > 0 %}
+                                        {% if record.roles | length > 0 %}|{% endif %}
+                                        {% for user in record.users %}
+                                            {{ user.firstname }} {{ user.lastname }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                    {% for comment in record.comments %}
+                        <li>
+                            <div class="list-item">
+                                <div class="small-12 avatar card wrap-down">
+                                    <p class="meta">Comment By <a href="/search/user/{{ comment.owner.getId() }}">{{ comment.owner.firstName }} {{ comment.owner.lastName }}</a> {{ comment.getPostDate().getShort() }}</p>
+                                    <p class="spaced">
+                                        {{ comment.body | raw }}
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>

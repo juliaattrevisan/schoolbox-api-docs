@@ -50,6 +50,7 @@ class Renderer extends Handler
             $this->getPage()->setBlock('user', 'due_work', 'due_work_block');
             $this->getPage()->setBlock('user', 'grades_button', 'grades_button_block');
             $this->getPage()->setBlock('user', 'timetable', 'timetable_block');
+            $this->getPage()->setBlock('user', 'pastoral', 'pastoral_block');
             $this->getPage()->setBlock('user', 'eportfolio', 'eportfolio_block');
             $this->getPage()->setBlock('user', 'modify', 'modify_block');
             $this->getPage()->setBlock('user', 'boarder_leave', 'boarder_leave_block');
@@ -75,6 +76,7 @@ class Renderer extends Handler
                 ));
 
                 $this->getPage()->setVar('timetable_block');
+                $this->getPage()->setVar('pastoral_block');
                 $this->getPage()->setVar('eportfolio_block');
                 $this->getPage()->setVar('boarder_leave_block');
 
@@ -96,7 +98,20 @@ class Renderer extends Handler
                     $this->getPage()->parse('grades_button_block', 'grades_button');
                 }
 
-                //Show student timetables to staff and parents of child
+
+                // Show pastoral to staff and parents
+                if ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
+                    $this->getPage()->parse('pastoral_block', 'pastoral');
+                } else {
+                    $this->getPage()->setVar('pastoral_block', '');
+                }
+
+                if (\Config::get('pastoral_enabled') != 1) {
+                    $this->getPage()->setVar('pastoral_block', '');
+                }
+
+
+                    //Show student timetables to staff and parents of child
                 if ($groupHandler->isStudent($user['id'])) {
                     if ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
                         // Timetable shouldn't appear if synergy is disabled in the conf, or the students timetable is marked as hidden

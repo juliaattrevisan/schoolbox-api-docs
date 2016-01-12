@@ -50,6 +50,26 @@ $tableList = array(
         ),
     ),
     array(
+        'name' => 'luPastoralType',
+        'title' => 'Pastoral Event Types',
+        'index' => 'id',
+        'fields' => array(
+            'id' => array('readonly' => '1'),
+            'name' => array('caption' => 'Name'),
+            'external_code' => array('caption' => 'External Type Code'),
+        )
+    ),
+    array(
+        'name' => 'luPastoralSeverity',
+        'title' => 'Pastoral Event Severity',
+        'index' => 'id',
+        'fields' => array(
+            'id' => array('readonly' => '1'),
+            'name' => array('caption' => 'Name'),
+            'order' => array('caption' => 'Order'),
+        )
+    ),
+    array(
         'name' => 'house',
         'title' => 'Houses',
         'index' => 'id'

@@ -146,4 +146,20 @@ class External_DatabaseFactory
         }
     }
 
+    /**
+     * Builds a pastoral connector. If its enabled
+     *
+     * @param  string $databaseName
+     * @return External_PastoralInterface
+     */
+    public function buildPastoralConnector($databaseName = '')
+    {
+        if(Config::get('external_pastoral')) {
+            return $this->buildConnector('Pastoral', $databaseName);
+        }
+        else {
+            return $this->buildConnector('Pastoral', 'Offline');
+        }
+    }
+
 }

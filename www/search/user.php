@@ -235,6 +235,7 @@ function renderStudent(
                 'session'        => $_SESSION,
                 'user'           => $userObject,
                 'externalUser'   => $externalUser,
+                'showPastoral'   => Config::get('pastoral_enabled'),
                 'eportfolioAuth' => $authenticator->canView(),
                 'hideContacts'   => $userObject->getHideContacts() ? 1 : 0,
                 'showClasses'    => $userObject->getHideTimetable() ? 0 : 1,
