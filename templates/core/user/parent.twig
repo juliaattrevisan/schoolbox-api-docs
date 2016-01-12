@@ -54,7 +54,7 @@
                                 {% endif %}
                             {% endif %}
 
-                            {% if showDetails %}
+                            {% if showDetails and not externalUser.SilentMobilePhoneFlag %}
                                 {% if externalUser.MobilePhone %}
                                     <dt class="no-margin small-6 medium-3">Mobile Phone</dt>
                                     <dd class="no-margin small-6 medium-9">

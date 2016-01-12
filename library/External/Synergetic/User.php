@@ -149,6 +149,7 @@ class External_Synergetic_User implements External_UserInterface
                 Contact.DefaultEmailCode,
                 Addresses.Phone AS HomePhone,
                 Addresses.SilentPhoneFlag,
+                Contact.SilentMobilePhoneFlag,
                 Contact.MobilePhone,
                 Contact.DirectoryIncludeFlag,
                 Contact.SpouseID,
@@ -427,6 +428,7 @@ class External_Synergetic_User implements External_UserInterface
                 StudentContactSpouseDefaultEmail,
                 StudentContactType,
                 StudentContactSilentPhoneFlag,
+                Contact.SilentMobilePhoneFlag as StudentContactSilentMobilePhoneFlag,
                 Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
                 Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
                 ContactAddress.SilentHomeAddressFlag SilentHomeAddressFlag,
@@ -570,6 +572,7 @@ class External_Synergetic_User implements External_UserInterface
                 StudentContactSpouseDefaultEmail,
                 StudentContactType,
                 StudentContactSilentPhoneFlag,
+                Contact.SilentMobilePhoneFlag AS StudentContactSilentMobilePhoneFlag,
                 Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
                 Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
                 StudentParentsSeparatedFlag
