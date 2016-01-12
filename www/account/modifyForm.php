@@ -37,27 +37,27 @@ if (isset($_POST['current_password'])) {
         }
     }
 
-    $response = $userHandler->setPassword($_SESSION['id'], $_POST['current_password'], $_POST['new_password']);
+    try {
+        $response = $userHandler->setPassword($_SESSION['id'], $_POST['current_password'], $_POST['new_password']);
 
-    if (!$response["result"]) {
-        error(105, $response["error"]);
-    } else {
-            $result = $userHandler->sendChangePasswordEmail($_SESSION['id']);
-            $myconf = ConfigMapper::getInstance();
-            $core = new CoreContext($myconf);
-            $email = new TwigEmail('passwordchanged.twig');
-            $email->setCoreContext($core->getContext());
-            $email->setFrom(Cfg::get('password_change_email_from'), Cfg::get('mail_from_name'));
-            $email->setSubject(Cfg::get('title') . ' Password Changed');
-            $context['recipient'] = $result['FIRSTNAME'];
-            $context['date'] = $result['DATE'];
-            $context['time'] = $result['TIME'];
-            $email->setContext($context)->send(array(
-                                'name' => $result['FULLNAME'],
-                                'email' => $result['EMAIL']
-                        ));
-            $_SESSION['password'] = $_POST['new_password'];
+        $result = $userHandler->sendChangePasswordEmail($_SESSION['id']);
+        $myconf = ConfigMapper::getInstance();
+        $core = new CoreContext($myconf);
+        $email = new TwigEmail('passwordchanged.twig');
+        $email->setCoreContext($core->getContext());
+        $email->setFrom(Cfg::get('password_change_email_from'), Cfg::get('mail_from_name'));
+        $email->setSubject(Cfg::get('title') . ' Password Changed');
+        $context['recipient'] = $result['FIRSTNAME'];
+        $context['date'] = $result['DATE'];
+        $context['time'] = $result['TIME'];
+        $email->setContext($context)->send(array(
+            'name' => $result['FULLNAME'],
+            'email' => $result['EMAIL']
+        ));
+        $_SESSION['password'] = $_POST['new_password'];
+
+        SitePage::localRedir('/account/modify/success');
+    } catch (Exception_User $e) {
+        error(105, $e->getMessage());
     }
-
-    SitePage::localRedir('/account/modify/success');
 }
