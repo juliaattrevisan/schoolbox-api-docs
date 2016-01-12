@@ -38,6 +38,7 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Assessment\Rubric;
 use Schoolbox\Collection;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 $mapper = new SubmissionBoxMapper();
@@ -128,15 +129,6 @@ if ($useRubric) {
     $grid    = (new Schoolbox\Assessment\Rubric\Factory(new SubmissionBox\Rubric\Rubric()))->buildFromPostData($_POST[$_POST['formField']], false);
     $markMax = $grid->getTotal();
 
-    if (isset($grid)) {
-        try {
-            Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper::getInstance()->save($grid, $submission);
-        } catch (Schoolbox\Mapper\Exception $e) {
-            error(105);
-        }
-    }
-
-
 } else {
     // no rubric, validate total mark
 
@@ -191,6 +183,7 @@ $submission->getWorkType()->setId($_POST['type']);
 $submission->getMarkType()->setId($markTypeID);
 $submission->getGradeGroup()->setId($_POST['gradegroup']);
 $submission->setRubricResultSet($resultSetID ?: 0);
+$submission->setUseRubric($useRubric);
 $submission->setMarkedPerRubricGroup($groupMarking);
 $submission->setMaxMark($markMax);
 $submission->setMarkVisibility($_POST['mark_visibility']);
@@ -214,7 +207,8 @@ if (isset($_POST['attachment'])) {
 // create new
 try {
     if ($action == 'create') {
-        $submission->setCategory($categoryID);
+        $folder = Folder\Mapper::getInstance()->findCheaplyById($categoryID);
+        $submission->setCategory($folder);
         $submission->setOwner($_SESSION['id']);
 
         // If a task, save the task entry first and then attach to submission.
@@ -287,17 +281,15 @@ try {
     }
 }
 
-/*
 // persist rubric data
-if (isset($rubric)) {
-    $rubricHandler = new DueWork_Rubric_Handler();
-    $rubricHandler->persistRubric(
-        $rubric,
-        isset($invalidateExistingMarks) ? $invalidateExistingMarks : false,
-        $submissionBoxID
-    );
+// this must happen AFTER the box has been persisted (we need the reference)
+if (isset($grid)) {
+    try {
+        Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper::getInstance()->save($grid, $submission);
+    } catch (Schoolbox\Mapper\Exception $e) {
+        error(105);
+    }
 }
-*/
 
 $page->localRedir($is_task ? "/homepage/$categoryID" : "/submission/listSubmission/{$submission->getDueDate()->getYear()}/{$submission->getDueDate()->getYearHalf()}");
 
