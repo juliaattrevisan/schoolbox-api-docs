@@ -321,23 +321,19 @@ class External_Humanedge_User implements External_UserInterface
             ";
         } elseif ($user->getRole()->isStaff()) {
             $query = "
-                SELECT
-                    CASE WHEN cl.ClassGroup IS NULL
-                        THEN su.Code
-                        ELSE su.Code+'-'+cl.ClassGroup
-                    END AS code,
-                    su.Name AS name,
+                SELECT DISTINCT
+                    s.[Code] as code,
+                    s.[Name] as name,
                     '' AS campusCode,
                     '' AS classType
-                FROM Class cl
-                INNER JOIN ClassStaff cs ON cl.ID = cs.ClassID
-                INNER JOIN Subject su ON cl.SubjectID = su.ID
-                INNER JOIN SchoolPeriod sp ON cl.SchoolPeriodID = sp.ID
-                WHERE cs.StaffID = {$this->getDatabase()->smartQuote($externalUserId)}
-                AND   sp.Year = {$this->getDatabase()->smartQuote($year)}
-                AND   sp.Semester = {$this->getDatabase()->smartQuote($semester)}
-                -- AND   sp.IsCurrent = 'Y'
+                FROM [tblSubject] s
+                left join [tblBlockItem] b on s.ID = b.SubjectID
+                left join [tblTeacher] t on b.TeacherID = t.ID
+                Where t.deleted = 0
+                AND t.code = {$this->getDatabase()->smartQuote($externalUserId)}
+                Order by s.code asc
             ";
+            return $this->loadAPlusDatabase()->getAll($query);
         } else {
             return [];
         }
