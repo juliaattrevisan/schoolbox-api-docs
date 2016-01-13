@@ -275,7 +275,7 @@
     <input type="hidden" name="formField" value="{{ formField }}" />
     <h3 class="subheader show-for-medium-down">Levels</h3>
     <div class="scrollable">
-    <table class="rb stack-for-medium-down" id="{{ rubricId }}">
+    <table data-rubric="{{ rubric.id }}" class="rb stack-for-medium-down" id="{{ rubricId }}">
         <thead>
         <tr>
             <th class="rb-no-cell">{{ locale.translate('rubricGroup', true, true) }}</th>

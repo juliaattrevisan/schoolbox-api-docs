@@ -102,6 +102,20 @@
                         }
                     }
                 });
+
+        $('#dl-csv').on('click', function (e) {
+            e.preventDefault();
+
+            var frm = $('<form/>').attr('action', '/rubric/csv').attr('method', 'post').append($('table[data-rubric]').clone());
+
+            frm.on('submit', function () {
+                // might be too soon?
+                frm.detach();
+            });
+
+            frm.appendTo($('body')).submit();
+
+        })
     });
 </script>
 <!-- END custom_head -->
@@ -627,7 +641,9 @@
                             {CLASS_CRITERIA}
                         </div>
                     </fieldset>
-
+                    <div class="small-12 column">
+                        <a type="button" class="icon-download button" id="dl-csv">Download Rubric as CSV</a>
+                    </div>
                 </fieldset>
 
                 <!-- BEGIN curriculum_code_input -->
