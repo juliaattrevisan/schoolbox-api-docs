@@ -209,11 +209,16 @@ class Scrub
                 $max = $config->get('HTML.MaxImgLength');
 
                 /* Allow SchoolboxResource data elements
+                 *
+                 * data-schoolboxresource-width and -height vars are for mejs initial
+                 * state rendering upon load ><
                  */
                 $def->addAttribute('img', 'data-schoolboxresource-filesystem', 'Text');
                 $def->addAttribute('img', 'data-schoolboxresource-type', 'Text');
                 $def->addAttribute('img', 'data-schoolboxresource-thumbnail', 'Text');
                 $def->addAttribute('img', 'data-schoolboxresource-source', 'Text');
+                $def->addAttribute('img', 'data-schoolboxresource-width', 'Text');
+                $def->addAttribute('img', 'data-schoolboxresource-height', 'Text');
 
                 //
                 // Definition of customised elements, copied directly out of modules.

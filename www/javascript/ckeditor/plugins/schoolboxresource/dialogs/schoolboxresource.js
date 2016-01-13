@@ -120,6 +120,9 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
         var dataVars = {};
 
         /* Special case for video data
+         *
+         * data-schoolboxresource-width and -height correspond to the initial state
+         * of the video
          */
         if (fields.type.getValue() == 'video') {
             url = config.video.thumbnail(fields.id.getValue(), fields.filesystem.getValue());
@@ -128,7 +131,9 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                 'data-schoolboxresource-type': 'video',
                 'data-schoolboxresource-filesystem': fields.filesystem.getValue(),
                 'data-schoolboxresource-thumbnail': url,
-                'data-schoolboxresource-source': config.video.source(fields.id.getValue(), fields.filesystem.getValue())
+                'data-schoolboxresource-source': config.video.source(fields.id.getValue(), fields.filesystem.getValue()),
+                'data-schoolboxresource-width': fields.width.getValue(),
+                'data-schoolboxresource-height': fields.height.getValue()
             };
         }
         /* Special case for audio data
@@ -140,7 +145,9 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                 'data-schoolboxresource-type': 'audio',
                 'data-schoolboxresource-filesystem': fields.filesystem.getValue(),
                 'data-schoolboxresource-thumbnail': url,
-                'data-schoolboxresource-source': config.audio.source(fields.id.getValue(), fields.filesystem.getValue())
+                'data-schoolboxresource-source': config.audio.source(fields.id.getValue(), fields.filesystem.getValue()),
+                'data-schoolboxresource-width': fields.width.getValue(),
+                'data-schoolboxresource-height': fields.height.getValue()
             };
         }
         /* Images render with provided information
@@ -150,7 +157,9 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                 'data-schoolboxresource-type': 'image',
                 'data-schoolboxresource-filesystem': fields.filesystem.getValue(),
                 'data-schoolboxresource-thumbnail': url,
-                'data-schoolboxresource-source': url
+                'data-schoolboxresource-source': url,
+                'data-schoolboxresource-width': fields.width.getValue(),
+                'data-schoolboxresource-height': fields.height.getValue()
             };
         }
 
