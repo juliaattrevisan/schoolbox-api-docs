@@ -29,7 +29,7 @@ class External_AscTimetables_Translator_Structure_Map extends IteratorIterator
                 return [
                     'type'      => 'day',
                     'id'        => $name,
-                    'day'       => (int)$attrs->day,
+                    'day'       => (int)$attrs->day + 1,
                     'startDate' => Alaress_Date_Format::now()->setTime(0, 0, 0)->setDay(intval($monthDay)),
                 ];
             }

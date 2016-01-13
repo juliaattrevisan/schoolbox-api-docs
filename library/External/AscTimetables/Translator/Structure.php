@@ -50,7 +50,7 @@ class External_AscTimetables_Translator_Structure extends External_AscTimetables
                             'Term Start'    => $termStart,
                             'Term Finish'   => $termFinish,
                             'Term Offset'   => 0,
-                            'Period Day'    => $day['day']+1,
+                            'Period Day'    => $day['day'],
                             'Period Title'  => $period['number'],
                             'Period Start'  => $period['start'],
                             'Period Finish' => $period['finish'],
