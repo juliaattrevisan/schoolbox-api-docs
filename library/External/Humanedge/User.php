@@ -322,7 +322,7 @@ class External_Humanedge_User implements External_UserInterface
         } elseif ($user->getRole()->isStaff()) {
             $query = "
                 SELECT DISTINCT
-                    s.[Code] as code,
+                    s.[Code] + ISNULL(b.Suffix, '') as code,
                     s.[Name] as name,
                     '' AS campusCode,
                     '' AS classType
