@@ -90,21 +90,21 @@
          * @param data
          */
         function build(data) {
+
             if (singletonModal) {
                 // you've got a modal; don't try to make another one
                 return;
             }
+            else if($('#attachment-browser').length) {
+                singletonModal = $('#attachment-browser').parent();
+            }
+            else {
+                singletonModal = $('<div data-reveal class="reveal-modal file-picker" />')
+                    .data('content', data);
+            }
 
             var body = $('body');
 
-            // if the modal already exists, destroy it
-//            this.destroy();
-
-            singletonModal = $('<div data-reveal data-schoolboxresource-reveal class="reveal-modal file-picker" />')
-                .data('content', data)
-                .data('rtn', this);
-
-            body.append(singletonModal);
 
             singletonModal
                 .html(singletonModal.data('content'))
@@ -120,7 +120,7 @@
             /* ckeditor dialog appears at z-index 10010 so our
              * Resource Browser needs to be more
              */
-            $('[data-schoolboxresource-reveal]').css({zIndex: 20000});
+            $('[data-reveal]').css({zIndex: 20000});
 
             // reinit
             $(document)

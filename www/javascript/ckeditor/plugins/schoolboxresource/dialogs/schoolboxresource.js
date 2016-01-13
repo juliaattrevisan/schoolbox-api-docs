@@ -460,7 +460,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                      */
                                     $.fn.schoolboxResource();
 
-                                    $(window).on('message', function(event) {
+                                    $(window).unbind('message').on('message', function(event) {
                                         var message;
 
                                         try {
@@ -494,7 +494,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
                                                 /* Shut modal, go back to Dialog
                                                  */
-                                                $('[data-schoolboxresource-reveal]').foundation('reveal', 'close');
+                                                $('[data-reveal]').foundation('reveal', 'close');
                                             });
                                         }
                                         else {

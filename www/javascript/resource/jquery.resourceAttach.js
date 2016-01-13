@@ -191,30 +191,6 @@ if(typeof window.location.origin == 'undefined') {
             }
         });
 
-        // for iframe communication
-        if(!listening) {
-            $(window).on('message', function (e) {
-                var message,
-                    modal    = singletonModal,
-                    self     = modal.data('rtn'),
-                    explorer = modal.find('li.browsing').find('div.explorer');
-
-                try {
-                    message = JSON.parse(e.originalEvent.data);
-                } catch (err) {
-                    message = e.originalEvent.data;
-                }
-
-                if (message.text) {
-                    explorer.attr('data-text', message.text);
-                } else if (message.data) {
-                    explorer.removeAttr('data-text');
-                    var elems = self.attach(message.data);
-                    $(elems).each(function() { this.addClass('dz-success') });
-                }
-            });
-            listening = true;
-        }
 
         // check for existing attachments and push them into the dropzone's list
         azone.find(opt.previewsContainerSelector).find(opt.attachmentTag).each(function() {
@@ -339,6 +315,7 @@ if(typeof window.location.origin == 'undefined') {
 
     ResourceAttach.prototype.build = function (data) {
 
+
         if (singletonModal) {
             // you've got a modal; don't try to make another one
             return;
@@ -373,7 +350,10 @@ if(typeof window.location.origin == 'undefined') {
 
 
     ResourceAttach.prototype.open = function () {
+
+
         var self = this;
+
         if (singletonModal == null) {
             // this will construct a modal VIA the cache
             this.cacheModal(function () {
@@ -384,6 +364,7 @@ if(typeof window.location.origin == 'undefined') {
                     .on('closed.fndtn.reveal.attach', self.reopenParentReveal.bind(self));
             });
         } else {
+
             // ensure the return points to the right element
             singletonModal
                 .data('rtn', this)
@@ -392,6 +373,29 @@ if(typeof window.location.origin == 'undefined') {
                 .off('closed.fndtn.reveal.attach')
                 .on('closed.fndtn.reveal.attach', self.reopenParentReveal.bind(self));
         }
+
+        // for iframe communication
+
+        $(window).unbind('message').on('message', function (e) {
+            var message,
+                modal    = singletonModal,
+                self     = modal.data('rtn'),
+                explorer = modal.find('li.browsing').find('div.explorer');
+
+            try {
+                message = JSON.parse(e.originalEvent.data);
+            } catch (err) {
+                message = e.originalEvent.data;
+            }
+
+            if (message.text) {
+                explorer.attr('data-text', message.text);
+            } else if (message.data) {
+                explorer.removeAttr('data-text');
+                var elems = self.attach(message.data);
+                $(elems).each(function() { this.addClass('dz-success') });
+            }
+        });
     };
 
 
