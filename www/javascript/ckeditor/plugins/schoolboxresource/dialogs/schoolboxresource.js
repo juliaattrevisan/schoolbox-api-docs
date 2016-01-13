@@ -133,7 +133,11 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                 'data-schoolboxresource-thumbnail': url,
                 'data-schoolboxresource-source': config.video.source(fields.id.getValue(), fields.filesystem.getValue()),
                 'data-schoolboxresource-width': fields.width.getValue(),
-                'data-schoolboxresource-height': fields.height.getValue()
+                'data-schoolboxresource-height': fields.height.getValue(),
+
+                /* Faux percentage setting used in mejs
+                 */
+                'data-schoolboxresource-fullwidth': fields.fullwidth.getValue()
             };
         }
         /* Special case for audio data

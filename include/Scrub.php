@@ -219,6 +219,7 @@ class Scrub
                 $def->addAttribute('img', 'data-schoolboxresource-source', 'Text');
                 $def->addAttribute('img', 'data-schoolboxresource-width', 'Text');
                 $def->addAttribute('img', 'data-schoolboxresource-height', 'Text');
+                $def->addAttribute('img', 'data-schoolboxresource-fullwidth', 'Text');
 
                 //
                 // Definition of customised elements, copied directly out of modules.
