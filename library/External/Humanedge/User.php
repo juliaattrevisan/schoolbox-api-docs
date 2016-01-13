@@ -296,28 +296,20 @@ class External_Humanedge_User implements External_UserInterface
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
-//        $year     = $this->getCurrentYear($externalUserId);
-//        $semester = $this->getCurrentSemester($externalUserId);
-        $year     = 2015;
-        $semester = 2;
+
         if ($user->getRole()->isStudent()) {
             $query = "
-                SELECT
-                    CASE WHEN cl.ClassGroup IS NULL
-                        THEN su.Code
-                        ELSE su.Code+'-'+cl.ClassGroup
-                    END AS code,
-                    su.Name AS name,
+                SELECT DISTINCT
+                    s.[Code] + ISNULL(b.Suffix, '') as code,
+                    s.[Name] as name,
                     '' AS campusCode,
                     '' AS classType
-                FROM Class cl
-                INNER JOIN ClassDetail cd ON cl.ID = cd.ClassID
-                INNER JOIN Subject su ON cl.SubjectID = su.ID
-                INNER JOIN SchoolPeriod sp ON cl.SchoolPeriodID = sp.ID
-                WHERE cd.StudentID = {$this->getDatabase()->smartQuote($externalUserId)}
-                AND   sp.Year = {$this->getDatabase()->smartQuote($year)}
-                AND   sp.Semester = {$this->getDatabase()->smartQuote($semester)}
-                -- AND   sp.IsCurrent = 'Y'
+                FROM [tblSubject] s
+                left join [tblAllocation] a on s.ID = a.SubjectID
+                left join [tblStudent] st on a.FormID = st.FormID
+                Where st.deleted = 0
+                AND st.code = {$this->getDatabase()->smartQuote($externalUserId)}
+                Order by s.code asc
             ";
         } elseif ($user->getRole()->isStaff()) {
             $query = "
@@ -333,11 +325,10 @@ class External_Humanedge_User implements External_UserInterface
                 AND t.code = {$this->getDatabase()->smartQuote($externalUserId)}
                 Order by s.code asc
             ";
-            return $this->loadAPlusDatabase()->getAll($query);
         } else {
             return [];
         }
-        return $this->getDatabase()->getAll($query);
+        return $this->loadAPlusDatabase()->getAll($query);
     }
 
     /**
