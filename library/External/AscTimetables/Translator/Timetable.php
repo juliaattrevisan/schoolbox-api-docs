@@ -116,12 +116,12 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                             // Certain subjects are school specific or year level specific.
                             // I can't figure out a better way to handle this other than hardcoding.
                             // TODO move this somewhere LGSPK specific
-                            switch ($subject['code']) {
-                                case 'ASB':
+                            switch (strtolower($subject['code'])) {
+                                case 'asb':
                                     $classCode = $subject['code'];
                                     break;
-                                case 'Urdu Debates':
-                                case 'Gym Display':
+                                case 'urdu debates':
+                                case 'gym display':
                                     $classCode = $subject['code'].' '.preg_replace('/\\D/', '', $class['code']);
                                     break;
                                 default:
