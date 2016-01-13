@@ -93,16 +93,6 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                 ]);
                 foreach ($headlineList as $item) {
 
-                    if ($this->getConfig('compactMode') == '1') {
-                        // Compact mode
-                        $this->parse('compact_block', 'compact');
-                        $this->setVar('full_block', '');
-                    } else {
-                        // Full mode
-                        $this->setVar('compact_block', '');
-                        $this->parse('full_block', 'full');
-                    }
-
                     $newsTime = new Alaress_Date_Format($item['item_datetime_posted'], 'Y-m-d H:i:s');
                     $output = array(
                         'NEWS_TITLE' => $item['item_heading'],
@@ -122,6 +112,16 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                     } else {
                         $this->parse('news_no_image_block', 'news_no_image');
                         $this->setVar('news_image_block', '');
+                    }
+
+                    if ($this->getConfig('compactMode') == '1') {
+                        // Compact mode
+                        $this->parse('compact_block', 'compact');
+                        $this->setVar('full_block', '');
+                    } else {
+                        // Full mode
+                        $this->setVar('compact_block', '');
+                        $this->parse('full_block', 'full');
                     }
 
                     $this->parse("news_block", "news", true);
