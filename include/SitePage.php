@@ -1184,6 +1184,7 @@ class SitePage extends Page
     {
         $this->setSite();
         $this->setFile(TEMPLATE_body, 'common/login.html');
+        $this->setBlock(TEMPLATE_body, 'login_terms', 'login_terms_block');
         $this->setBlock(TEMPLATE_body, 'remember_me', 'remember_me_block');
         $this->setVar('TITLE', Cfg::get('title') . " - Login");
         if ($page && preg_match('#^[\w_=\-:\/.\&\?]+$#i', $page)) {
@@ -1192,6 +1193,17 @@ class SitePage extends Page
             $this->setVar('HIDDEN', htmlspecialchars($_GET['page'], ENT_QUOTES));
         } else {
             $this->setVar('HIDDEN', '');
+        }
+
+        $loginTerms = Config::get('login_terms_and_conditions');
+        if ($loginTerms) {
+            $this->setVar([
+                'LOGIN_TERMS_AND_CONDITIONS'       => $loginTerms,
+                'LOGIN_TERMS_AND_CONDITIONS_ERROR' => Config::get('login_terms_and_conditions_error'),
+            ]);
+            $this->parse('login_terms_block', 'login_terms');
+        } else {
+            $this->setVar('login_terms_block', '');
         }
 
         if (\Config::get('session_remember')) {
