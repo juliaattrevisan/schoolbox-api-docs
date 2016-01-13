@@ -300,21 +300,22 @@ class External_Humanedge_User implements External_UserInterface
         if ($user->getRole()->isStudent()) {
             $query = "
                 SELECT DISTINCT
-                    s.[Code] + ISNULL(b.Suffix, '') as code,
+                    (s.[Code] + ISNULL(b.Suffix, '')) as code,
                     s.[Name] as name,
                     '' AS campusCode,
                     '' AS classType
                 FROM [tblSubject] s
+                left join [tblBlockItem] b on s.ID = b.SubjectID
                 left join [tblAllocation] a on s.ID = a.SubjectID
                 left join [tblStudent] st on a.FormID = st.FormID
                 Where st.deleted = 0
                 AND st.code = {$this->getDatabase()->smartQuote($externalUserId)}
-                Order by s.code asc
+                Order by (s.[Code] + ISNULL(b.Suffix, '')) ASC
             ";
         } elseif ($user->getRole()->isStaff()) {
             $query = "
                 SELECT DISTINCT
-                    s.[Code] + ISNULL(b.Suffix, '') as code,
+                    (s.[Code] + ISNULL(b.Suffix, '')) as code,
                     s.[Name] as name,
                     '' AS campusCode,
                     '' AS classType
@@ -323,7 +324,7 @@ class External_Humanedge_User implements External_UserInterface
                 left join [tblTeacher] t on b.TeacherID = t.ID
                 Where t.deleted = 0
                 AND t.code = {$this->getDatabase()->smartQuote($externalUserId)}
-                Order by s.code asc
+                Order by (s.[Code] + ISNULL(b.Suffix, '')) ASC
             ";
         } else {
             return [];
