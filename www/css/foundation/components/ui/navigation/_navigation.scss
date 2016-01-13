@@ -189,76 +189,75 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             }
         }
 
+        .tab-bar-section {
+            position: relative;
+        }
+
+        .icon-nav{
+            @include inline-list;
+            margin: 0;
+            height: inherit;
+            padding: 0 0 0 rem-calc(($base-font-size - 2));
+
+            li:nth-child(n+5){
+                @extend .show-for-large-up;
+            }
+            li:nth-child(n+7){
+                @extend .show-for-xlarge-up;
+            }
+
+            li {
+                margin: 0;
+                width: 5rem;
+                a {
+                    height: 5rem;
+                    padding: rem-calc(($base-font-size - 2)) 0;
+                    text-align: center;
+                    @extend .icon-32;
+                    @extend .no-text;
+
+                    &.navthis {
+                        background-color: calc-text-color(
+                                        $tabbar-bg,
+                                        tint($tabbar-bg, 4%),
+                                        darken($tabbar-bg, 4%)
+                        );
+                        &:before, span {
+                            color: $icon-nav-highlight-color;
+                        }
+                    }
+
+                    &:hover {
+                        background-color: $navigation-hover;
+                    }
+
+                    &:before {
+                        @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+                        text-align: center;
+                        float: none;
+                        color: $navigation-foreground;
+                    }
+                }
+
+                span {
+                    @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+                    color: $navigation-foreground;
+                    font-weight: $font-weight-normal;
+                    line-height: rem-calc($base-font-size);
+                    display: block;
+                }
+            }
+        }
         @media #{$small-only} {
             height: $tabbar-height * 2;
             .icon-nav{
+                padding: 0;
                 position: absolute;
                 left: -5rem;
                 top: 80px;
                 width: 100%;
                 li{
                     width: 25%;
-                }
-            }
-        }
-
-        .tab-bar-section {
-            position: relative;
-
-            .icon-nav{
-                @include inline-list;
-                margin: 0;
-                height: inherit;
-                padding: 0 0 0 rem-calc(($base-font-size - 2));
-
-                li:nth-child(n+5){
-                    @extend .show-for-large-up;
-                }
-                li:nth-child(n+7){
-                    @extend .show-for-xlarge-up;
-                }
-
-                //@extend .no-pad;
-                li {
-                    margin: 0;
-                    width: 5rem;
-                    a {
-                        height: 5rem;
-                        padding: rem-calc(($base-font-size - 2)) 0;
-                        text-align: center;
-                        @extend .icon-32;
-                        @extend .no-text;
-
-                        &.navthis {
-                            background-color: calc-text-color(
-                                    $tabbar-bg,
-                                    tint($tabbar-bg, 4%),
-                                    darken($tabbar-bg, 4%)
-                            );
-                            &:before, span {
-                                color: $icon-nav-highlight-color;
-                            }
-                        }
-
-                        &:hover {
-                            background-color: $navigation-hover;
-                        }
-
-                        &:before {
-                            @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
-                            text-align: center;
-                            float: none;
-                            color: $navigation-foreground;
-                        }
-                    }
-
-                    span {
-                        @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
-                        color: $navigation-foreground;
-                        font-weight: $font-weight-normal;
-                        line-height: rem-calc($base-font-size);
-                        display: block;
-                    }
                 }
             }
         }
@@ -274,8 +273,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 }
 
 .right-off-canvas-toggle{
-	//@extend .hide-for-xlarge-up;
-
 	&:before{
         text-align: center;
         display: block;
