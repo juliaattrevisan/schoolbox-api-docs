@@ -73,7 +73,7 @@ class Scrub
         }
 
         // squeeze it plaintextification, smart quotation, kill newlines, and escape quotes
-        return str_replace('"', '\"', preg_replace("`\s+`", ' ', self::smartQuotes(self::text($text))));
+        return str_replace('"', '\"', preg_replace("`\s+`", ' ', self::smartQuotes(self::text(trim($text)))));
     }
 
     /**
