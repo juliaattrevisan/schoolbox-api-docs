@@ -339,7 +339,8 @@ class User extends DeprecatedModel
      * @param $oldPassword
      * @param $newPassword
      *
-     * @return array
+     * @return bool
+     * @throws Exception
      */
     public function setPassword($userID, $oldPassword, $newPassword)
     {
