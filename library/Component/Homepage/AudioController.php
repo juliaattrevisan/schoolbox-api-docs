@@ -61,6 +61,8 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             )
         );
 
+        $this->setBlock('audio_list', 'audio_edit', 'audio_edit_block');
+
         // There's not (yet) any default for the audio player.
         // Just use the first in the list
         $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
@@ -112,7 +114,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                     );
                     $this->parse('default_audio_block', 'default_audio');
                 }
-                if (count($this->outputList) > 1) {
+                if (count($this->outputList) >= 1) {
                     $output = array(
                         'AUDIO_LIST_ID'        => $file->getId(),
                         'AUDIO_LIST_TITLE'     => Scrub::text($file->getTitle()),
@@ -128,6 +130,11 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
                     $this->setVar($output);
                     if ($audio->getStatus() == "completed") {
+                        if ($this->permission > READ_ACCESS) {
+                            $this->parse('audio_edit_block', 'audio_edit', true);
+                        } else {
+                            $this->setVar('audio_edit_block', '');
+                        }
                         $this->parse('audio_list_block', 'audio_list', true);
                     } elseif ($this->permission >= WRITE_ACCESS) {
                         $this->setVar(

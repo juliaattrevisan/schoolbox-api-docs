@@ -125,7 +125,9 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         $this->setVar('video_pending_list_block', '');
         $this->setVar('default_video_block', '');
 
-        if ($this->getConfig('size') != 1 && count($this->outputList)) {
+        $this->setBlock('video_list', 'video_edit', 'video_edit_block');
+
+        if (count($this->outputList) >= 1) {
             $j = 0;
             foreach ($this->outputList as $video) {
                 $this->setVar(
@@ -142,6 +144,13 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                         'ON_OFF'               => ++$j % 2 ? '' : 'dark'
                     )
                 );
+
+                if ($this->permission > READ_ACCESS) {
+                    $this->parse('video_edit_block', 'video_edit', true);
+                } else {
+                    $this->setVar('video_edit_block', '');
+                }
+
                 if ($video->getStatus() == "completed") {
                     $this->parse('video_list_block', 'video_list', true);
                 } elseif ($this->permission >= WRITE_ACCESS) {
