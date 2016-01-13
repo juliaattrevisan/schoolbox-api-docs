@@ -8,3 +8,19 @@ CREATE TABLE `rubric_level`(
   INDEX (`box_id`),
   INDEX (`sequence`)
 ) CHARSET=utf8 COLLATE=utf8_bin;
+
+/* copy the existing "level data" across into the new level table */
+INSERT INTO rubric_level (box_id, `name`, sequence)
+  SELECT submission_box_id, '', `value`
+  FROM rubric_descriptor
+  GROUP BY submission_box_id, `value`
+  ORDER BY submission_box_id ASC, `value` DESC;
+
+/* now the IDs are injected, reverse those values back onto the descriptor table */
+UPDATE rubric_descriptor d
+LEFT JOIN rubric_level l ON d.value = l.sequence AND d.submission_box_id = l.box_id
+  SET d.level_id = l.id;
+
+/* apply the unique constraint to descriptors now the data is injected */
+ALTER TABLE `rubric_descriptor`
+  ADD UNIQUE INDEX (`criterion_id`, `submission_box_id`, `level_id`);
