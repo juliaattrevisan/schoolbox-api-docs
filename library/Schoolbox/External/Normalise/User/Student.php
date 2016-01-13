@@ -142,7 +142,13 @@ class Student extends Base {
      */
     public function isBoarder() {
         if ($this->getBoardingHouse() instanceof BoardingHouse) {
-            return true;
+
+            // To get around the issue where students without boarding houses generate a
+            // "Failed to retrieve Schoolbox\External\Normalise\User\Student->getBoardinghouse(), does not exist" error
+            // when doing UPS provision, we instantiate an empty boarding house. So now we need to test if the ID
+            // is blank to determine if the student is a boarder.
+
+            return (!empty($this->getBoardingHouse()->getId()));
         }
 
         return false;
@@ -401,6 +407,10 @@ class Student extends Base {
      */
     public function getBoardingHouse()
     {
-        return $this->boardingHouse;
+        // This is to get around the issue where students without boarding houses generate a
+        // "Failed to retrieve Schoolbox\External\Normalise\User\Student->getBoardinghouse(), does not exist" error
+        // during UPS provisioning
+
+        return $this->boardingHouse == null ? new BoardingHouse() : $this->boardingHouse;
     }
 }
