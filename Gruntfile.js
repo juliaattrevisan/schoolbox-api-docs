@@ -102,7 +102,6 @@ module.exports = function(grunt) {
                     'www/javascript/components/foundation/js/foundation/foundation.js',
                     'www/javascript/components/foundation/js/foundation/foundation.accordion.js',
                     'www/javascript/components/foundation/js/foundation/foundation.alert.js',
-                    'www/javascript/components/foundation/js/foundation/foundation.clearing.js',
                     'www/javascript/components/foundation/js/foundation/foundation.dropdown.js',
                     'www/javascript/components/foundation/js/foundation/foundation.equalizer.js',
                     'www/javascript/components/foundation/js/foundation/foundation.offcanvas.js',

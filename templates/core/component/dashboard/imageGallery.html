@@ -7,22 +7,23 @@
         <div class="small-12 island">
             <h2 class="subheader">{COMPONENT_NAME}</h2>
             <section class="content">
-                <ul class="clearing-thumbs" data-clearing>
+                <ul class="inline-list" data-image-gallery>
                     <!-- BEGIN image_gallery -->
                     <li>
-                        <a class="th"
-                           href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800"
-                           title="{THUMBNAIL_DESCRIPTION}"
-
-                        >
-                            <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0"
-                                 alt="{THUMBNAIL_DESCRIPTION}"
-                                 data-caption="{THUMBNAIL_DESCRIPTION}"
-                            />
+                        <a href="/cms/image.php?id={THUMBNAIL_ID}&height=1024&width=1024"
+                           rel="lightbox[homepage-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px;"
+                           alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
+                            <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" />
                         </a>
                     </li>
                     <!-- END image_gallery -->
                 </ul>
+                <script type="text/javascript">
+                    $('[data-image-gallery] li').magnificPopup({
+                        delegate: 'a',
+                        type: 'image'
+                    });
+                </script>
             </section>
         </div>
     </div>

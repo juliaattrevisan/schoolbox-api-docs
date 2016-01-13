@@ -17,10 +17,10 @@
                                 </div>
                             </li>
                         </ul>
-                        <ul class="clearing-thumbs" data-dz-container>
+                        <ul class="inline-list" data-dz-container data-image-gallery>
                             <!-- BEGIN image_gallery -->
                             <li>
-                                <a class="th" href="/cms/image.php?id={THUMBNAIL_ID}&height=1024&width=1024"
+                                <a href="/cms/image.php?id={THUMBNAIL_ID}&height=1024&width=1024"
                                    rel="lightbox[homepage-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px;"
                                    alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
                                     <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" />
@@ -53,6 +53,10 @@
                                 complete: function (file) {
                                     $(file.previewElement).find('img.dz-pending').remove();
                                 }
+                            });
+                            $('[data-image-gallery] li').magnificPopup({
+                                delegate: 'a',
+                                type: 'image'
                             });
                         </script>
                     </div>
