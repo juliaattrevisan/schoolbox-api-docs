@@ -9,6 +9,9 @@ $url = new \Zend\Uri\Uri(Cfg::get('external_portal'));
 if($_SESSION['communityLogin']) {
 	if($_GET['page']){
 		$url->setPath('/'.$_GET['page'].'.aspx');
+	} else {
+		// This seems to be the default post-login landing page
+		$url->setPath('/stures.aspx');
 	}
 
 	$query = $url->getQueryAsArray();
