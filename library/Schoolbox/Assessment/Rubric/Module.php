@@ -32,6 +32,7 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addPostRoute($router, 'create', $basePath, "");
+        $this->addPostRoute($router, 'download', $basePath, "/csv");
 
         $this->addGetRoute($router, 'testGeneric', $basePath, "/test");
         $this->addGetRoute($router, 'testEmpty',   $basePath, "/test/empty");

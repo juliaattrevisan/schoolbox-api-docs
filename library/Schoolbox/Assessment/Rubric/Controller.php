@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Url;
 
 class Controller extends BaseController
 {
@@ -119,6 +120,53 @@ class Controller extends BaseController
             'template' => "@rubric/$template.twig"
         ]);
 
+    }
+
+
+    /**
+     * Download the given rubric as a CSV
+     *
+     * @api POST /rubric/csv
+     * @level 156
+     */
+    public function download()
+    {
+        $post     = $this->getRequest()->post->get('rb');
+        $boxId    = key($post);
+        $grid     = (new Factory())->buildFromPostData($post, false);
+        $basename = (new Url(SubmissionBoxMapper::getInstance()->findById($boxId)->getName()))->getSlug();
+        $content  = $this->array2csv($grid->toGrid());
+
+        $headers  = $this->getResponse()->headers;
+
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', strlen($content));
+        $headers->set('Content-Disposition', "attachment; filename=\"$basename-rubric.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $content
+        ]);
+    }
+
+
+    /**
+     * The array data should obviously be in a CSV-compatible format (ie. rectangle)
+     *
+     * @param array $array
+     * @return string
+     */
+    protected function array2csv(array $array)
+    {
+        $rows = [];
+
+        foreach ($array as $row) {
+            $rows[] = '"' . implode('","', $row) . '"';
+        }
+
+        return implode("\n", $rows);
     }
 
 
