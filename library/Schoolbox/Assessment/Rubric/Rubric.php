@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Rubric;
 
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\Competency;
+use Scrub;
 use SplObjectStorage;
 
 class Rubric implements Twiggable
@@ -267,6 +268,62 @@ class Rubric implements Twiggable
 
         return $context;
     }
+
+
+    /**
+     * Return a CSV-compatible (ie. rectangular) array representation of the data structure this rubric contains
+     *
+     * @return array
+     */
+    public function toGrid()
+    {
+        // start by generating a rectangle which is (w+2 x 2h+1)
+        $width  = $this->levels->count();
+        $height = 0;
+
+        foreach ($this->criteriaGroups as $group) {
+            $height += $group->getAllCriteria()->count();
+        }
+
+        // rows contain columns
+        $square = array_fill(0, (2 * $height) + 1, array_fill(0, $width + 2, ''));
+
+
+        // first row is level names
+        foreach ($this->levels as $i => $level) {
+            $square[0][$i + 2] = $level->getName();
+        }
+
+        $currentDRow = 1;
+        foreach ($this->criteriaGroups as $group) {
+            $groupRendered = false;
+            foreach ($group->getAllCriteria() as $criterion) {
+
+                $square[$currentDRow][0] = $groupRendered ? '' : Scrub::csv($group->getName());
+                $square[$currentDRow][1] = Scrub::csv($criterion->getName());
+
+                $groupRendered = true;
+
+                $currentVRow = $currentDRow + 1;
+
+                foreach ($this->levels as $currentColumn => $level) {
+                    foreach ($level->getAllDescriptors() as $levelD) {
+                        foreach ($criterion->getAllDescriptors() as $critD) {
+                            if ($levelD === $critD) {
+                                $square[$currentDRow][$currentColumn + 2] = Scrub::csv($critD->getText());
+                                $square[$currentVRow][$currentColumn + 2] = Scrub::csv($critD->getValue());
+                            }
+                        }
+                    }
+                }
+
+                $currentDRow += 2;
+            }
+        }
+
+        return $square;
+    }
+
 
 
     /**
