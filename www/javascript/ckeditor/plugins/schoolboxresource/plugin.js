@@ -9,7 +9,7 @@ CKEDITOR.plugins.add('schoolboxresource', {
         editorInstance.ui.addButton('SchoolboxResource', {
             label: 'Schoolbox Resource',
             command: 'schoolboxresource',
-            toolbar: 'schoolbox'
+            toolbar: 'schoolbox,0'
         });
 
         CKEDITOR.dialog.add('schoolboxresourceDialog', this.path + 'dialogs/schoolboxresource.js');
