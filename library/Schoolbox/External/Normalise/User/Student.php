@@ -411,6 +411,6 @@ class Student extends Base {
         // "Failed to retrieve Schoolbox\External\Normalise\User\Student->getBoardinghouse(), does not exist" error
         // during UPS provisioning
 
-        return ($this->getBoardingHouse() instanceof BoardingHouse) ? $this->boardingHouse : new BoardingHouse();
+        return ($this->boardingHouse instanceof BoardingHouse) ? $this->boardingHouse : new BoardingHouse();
     }
 }
