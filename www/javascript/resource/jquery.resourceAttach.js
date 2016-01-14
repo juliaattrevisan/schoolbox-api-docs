@@ -139,6 +139,7 @@ if(typeof window.location.origin == 'undefined') {
                         previewElement: file.previewElement,
                         type: file.type
                     });
+                    azone.trigger('addedfile.attachzone', [ file ]);
                 });
 
                 this.on('success', function (file, response) {
@@ -157,26 +158,31 @@ if(typeof window.location.origin == 'undefined') {
                     self.attach(data);
 
 
+                    azone.trigger('success.attachzone', [ data ]);
                 });
 
                 this.on('error', function (file, errMsg, xhr) {
                     self.rejectFile(file, errMsg, this);
+                    azone.trigger('error.attachzone', [ file, errMsg ]);
                 });
 
             },
 
             removedfile: function (file) {
                 self.detach(file.previewElement);
+                azone.trigger('removedfile.attachzone', [ file ]);
             },
 
             maxfilesexceeded: function (file) {
                 this.removeFile(file);
+                azone.trigger('maxfilesexceeded.attachzone', [ file ]);
             },
 
             accept: function (file, done) {
                 // no hash yet: treat as normal dz upload
                 if(file.hash === undefined) {
                     done();
+                    azone.trigger('accept.attachzone', [ file ]);
                     return;
                 }
 
@@ -188,6 +194,7 @@ if(typeof window.location.origin == 'undefined') {
                 file.status   = Dropzone.SUCCESS;
 
                 this._updateMaxFilesReachedClass();
+                azone.trigger('accept.attachzone', [ file ]);
             }
         });
 
