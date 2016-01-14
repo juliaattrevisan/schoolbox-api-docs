@@ -68,7 +68,7 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS AlertMessage
             FROM Student s
             LEFT JOIN StudentContact sc ON s.ID = sc.StudentID
-            LEFT JOIN Contact c ON sc.ContactID = c.ID
+            LEFT JOIN Contact c ON sc.StudentID = c.ID
             WHERE s.Code = {$this->getDatabase()->smartQuote($externalUserId)}
         ";
         $result = [];
@@ -119,7 +119,7 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS StudentContactSpouseRelation
             FROM Contact c
             INNER JOIN StudentContact sc ON c.ID = sc.ContactID
-            INNER JOIN Student s ON sc.ContactID = s.ID
+            INNER JOIN Student s ON sc.StudentID = s.ID
             -- LEFT JOIN ContactFamily cf ON c.ID = cf.ContactID
             -- LEFT JOIN Family f ON cf.FamilyID = f.ID
             LEFT JOIN vw_Contact_Addresses ca ON c.ID = ca.ContactID
