@@ -313,6 +313,8 @@ $tooltip-font-color: $white;
 // $icon-bar-active-color: $primary-color;
 // $icon-bar-item-padding: 1.25rem;
 
+$container-bg: white !default;
+
 @import "../../../javascript/components/foundation/scss/foundation/components/inline-lists";
 @import "../../../javascript/components/foundation/scss/foundation/components/labels";
 @import "../../../javascript/components/foundation/scss/foundation/components/progress-bars";
@@ -562,7 +564,7 @@ $rotate-th-width: $square-grid-td-size;
 }
 
 %container {
-	background-color: $white;
+	background-color: $container-bg;
 	margin-bottom: rem-calc(($base-font-size));
 }
 
