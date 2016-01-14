@@ -156,6 +156,7 @@ class Scrub
                 'online.clickview.com.au/MyLibrary/PlayEmbed',
                 'online.clickview.com.au/Share/PlayEmbed',
                 'www.khanacademy.org/embed_video',
+                'cdn.iframe.ly/api',
             );
 
             // Add any additional iframe sources as configured
@@ -220,6 +221,10 @@ class Scrub
                 $def->addAttribute('img', 'data-schoolboxresource-width', 'Text');
                 $def->addAttribute('img', 'data-schoolboxresource-height', 'Text');
                 $def->addAttribute('img', 'data-schoolboxresource-fullwidth', 'Text');
+                $def->addAttribute('div', 'data-oembed-url', 'Text');
+                $def->addAttribute('a', 'data-iframely-url', 'Text');
+                $def->addAttribute('a', 'data-template', 'Text');
+                $def->addAttribute('blockquote', 'data-id', 'Text');
 
                 //
                 // Definition of customised elements, copied directly out of modules.
