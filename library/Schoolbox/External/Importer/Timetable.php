@@ -73,7 +73,7 @@ class Timetable extends AbstractImporter
             'Class Code'        => 'The code for the class',
             'Class Title'       => 'The display name for the class',
             'Class Room'        => '(optional) The room that this class is in',
-            'Class Description' => '(optional) A description for this class',
+            'Class Description' => '(optional, currently unused) A description for this class',
             'Teacher Code'      => 'The code for the teacher of this class (must correspond to a teacher\'s external ID)',
         ];
     }
