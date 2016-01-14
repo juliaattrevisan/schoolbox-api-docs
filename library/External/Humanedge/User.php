@@ -59,7 +59,7 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS YearLevelCoordID,
                 '' AS StudentYearLevelCoordinator,
                 '' AS StudentLockerBook,
-                (c.PreferredName + ' ' + c.LastName) AS StudentEmergencyName,
+                (c.FirstName + ' ' + c.LastName) AS StudentEmergencyName,
                 c.PhoneHome AS StudentEmergencyPhone,
                 c.PhoneWork AS StudentEmergencyPhoneAlt,
                 '' AS StudentMedicalAlert,
@@ -68,11 +68,12 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS AlertMessage
             FROM Student s
             LEFT JOIN StudentContact sc ON s.ID = sc.StudentID
-            LEFT JOIN Contact c ON sc.StudentID = c.ID
+            LEFT JOIN Contact c ON sc.ContactID = c.ID
             WHERE s.Code = {$this->getDatabase()->smartQuote($externalUserId)}
         ";
         $result = [];
-        foreach ($this->getDatabase()->getAll($query) as $i => $row) {
+        $i = 1;
+        foreach ($this->getDatabase()->getAll($query) as $row) {
             if (empty($result)) {
                 $result = $row;
             } else {
@@ -80,6 +81,7 @@ class External_Humanedge_User implements External_UserInterface
                 $result["StudentEmergency{$i}PhoneAlt"] = $row['StudentEmergencyPhoneAlt'];
                 $result["StudentEmergency{$i}Phone"]    = $row['StudentEmergencyPhone'];
             }
+            $i++;
         }
         return $result;
     }
