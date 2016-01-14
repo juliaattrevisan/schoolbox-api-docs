@@ -44,7 +44,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
         $this->hasMap(array(
             'column'     => 'value',
             'property'   => 'value',
-            'type'       => self::TYPE_INTEGER,
+            'type'       => self::TYPE_DECIMAL,
         ));
         $this->hasMap(array(
             'column'     => 'description',
