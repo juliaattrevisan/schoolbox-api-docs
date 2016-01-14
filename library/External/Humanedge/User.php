@@ -39,7 +39,7 @@ class External_Humanedge_User implements External_UserInterface
         $query = "
             SELECT
                 s.Code AS StudentID,
-                s.PreferredName AS StudentGiven1,
+                s.FirstName AS StudentGiven1,
                 s.LastName AS StudentSurname,
                 s.DOB AS StudentBirthDate,
                 '' AS StudentHouseDescription,
@@ -93,7 +93,7 @@ class External_Humanedge_User implements External_UserInterface
             SELECT
                 c.Code AS StudentContactID,
                 c.Title AS StudentContactTitle,
-                c.PreferredName AS StudentContactPreferred,
+                c.FirstName AS StudentContactPreferred,
                 c.LastName AS StudentContactSurname,
                 c.Email AS StudentContactDefaultEmail,
                 '' AS ValidAddressFlag,
@@ -177,7 +177,7 @@ class External_Humanedge_User implements External_UserInterface
         $query = "
             SELECT
                 c.Title AS Title,
-                c.PreferredName AS Preferred,
+                c.FirstName AS Preferred,
                 c.LastName AS Surname,
                 c.Email AS Email,
                 c.WorkEmail as OccupEmail,
