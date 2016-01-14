@@ -14,6 +14,7 @@ use HouseResidential as HouseResidentialModel;
 use HouseResidentialMapper;
 use Schoolbox\Campus as CampusModel;
 use Schoolbox\CampusMapper;
+use Schoolbox\Collection;
 use Schoolbox\External\UserProfile as UserProfileModel;
 use Schoolbox\External\UserProfileMapper;
 use Schoolbox\External\UserRelation as UserRelationModel;
@@ -385,7 +386,7 @@ class User extends AbstractImporter
             }
             return $this->userMapper->findByColumn('id', $childIds);
         }
-        return [];
+        return new Collection();
     }
 
     /**
