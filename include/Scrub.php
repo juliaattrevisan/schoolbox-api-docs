@@ -114,11 +114,6 @@ class Scrub
 
             $config = HTMLPurifier_Config::createDefault();
 
-            /* TODO: Repair the terrible piece of software known as htmlpurifier
-             * Remove this line to re-enable some sort of stupid caching it tries to do
-             */
-            $config->set('Cache.DefinitionImpl', null);
-
             /* http://htmlpurifier.org/phorum/read.php?3,6724
              */
             $config->set('CSS.AllowTricky', true);
@@ -348,18 +343,13 @@ class Scrub
      */
     static public function html($html)
     {
-        /* TODO: Repair the terrible piece of software known as htmlpurifier
-         * Remove this line and uncomment the rest to restore intended behaviours
-         */
-        return self::htmlDomModify(self::getHtmlPurifierInstance()->purify($html));
-
-//        return Alaress\Redis::getInstance()->cacheFunctionCall(
-//            'scrub.html',
-//            function ($param) {
-//                return self::htmlDomModify(self::getHtmlPurifierInstance()->purify($param));
-//            },
-//            "$html",
-//            Config::get('scrub_html_cache_timeout')
-//        );
+        return Alaress\Redis::getInstance()->cacheFunctionCall(
+            'scrub.html',
+            function ($param) {
+                return self::htmlDomModify(self::getHtmlPurifierInstance()->purify($param));
+            },
+            "$html",
+            Config::get('scrub_html_cache_timeout')
+        );
     }
 }
