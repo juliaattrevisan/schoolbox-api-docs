@@ -278,8 +278,14 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
             $grid = $map->findByFolderId($submission->getCategory()->getId(), $is_task)->setSubmissionBox($submission);
         }
 
+        $rubricZone = new Zone('rubric');
+        $rubricZone->setAttachPrompt('Import a rubric')->setMimeFilter('text/csv');
+
         // output the grid
-        $this->setVar('CLASS_CRITERIA', $this->getTwig()->render('@rubric/grid-editable.twig', [ 'rubric' => $grid->toContext() ]));
+        $this->setVar('CLASS_CRITERIA', $this->getTwig()->render('@rubric/grid-csv.twig', [
+            'rubric'     => $grid->toContext(),
+            'attachzone' => $rubricZone->getTwigContext()
+        ]));
 
     } catch (Exception $e) {
         // noop...?

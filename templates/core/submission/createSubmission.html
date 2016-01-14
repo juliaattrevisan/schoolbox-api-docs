@@ -636,11 +636,20 @@
                             </label>
                         </div>
                     </div>
-                    <fieldset class="content hide" data-hide-watch="#use-rubric">
+                    <fieldset id="rubric-section" class="small-12 content hide" data-hide-watch="#use-rubric">
+                        <span class="header-actions">
+                            <a href="#" class="button icon-more" data-dropdown="rubric-more"></a>
+                        </span>
+                        <ul class="f-dropdown" data-dropdown-content id="rubric-more">
+                            <li><a href="/rubric/csv" class="icon-download" id="dl-csv">Download Rubric as CSV</a></li>
+                            <li><a href="/rubric/upload" class="icon-upload" id="up-csv">Import CSV</a></li>
+                        </ul>
                         <div style="clear:both; margin-bottom: 1rem;">
                             {CLASS_CRITERIA}
                         </div>
-                        <a type="button" class="icon-download button" id="dl-csv">Download Rubric as CSV</a>
+                        <div>
+                            {RUBRIC_ATTACHZONE}
+                        </div>
                     </fieldset>
                 </fieldset>
 
