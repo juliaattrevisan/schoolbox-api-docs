@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\Factory;
 use Schoolbox\IMapper;
 use Schoolbox\Resource\Folder;
@@ -19,6 +20,7 @@ use Schoolbox\Assessment\Rubric\Competency\Level;
 use Schoolbox\Assessment\Rubric\Criteria\Criterion;
 use Schoolbox\Assessment\Rubric\Criteria\Group;
 use Schoolbox\Collection;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 
 /**
@@ -364,6 +366,126 @@ class RubricMapper
     {
         $grid = $this->findBySubmissionBox($box, false, false);
         return $this->applyStudentMark($grid, $student);
+    }
+
+    /**
+     * @param IStorage $file
+     * @param int      $folderId
+     * @param bool     $taskMode
+     * @return Rubric
+     */
+    public function buildFromCSV(IStorage $file, $folderId, $taskMode)
+    {
+        $square = [];
+
+        $fp = $file->readStream();
+
+        $square[] = fgetcsv($fp);
+
+        // list of levels
+        $levelNames = array_slice($square[0], 2);
+
+        $workingGroupName = '';
+
+        $criteria = [];
+
+        // build the square, extracting data as we go
+        while ($row = fgetcsv($fp)) {
+
+            // list of criteria, grouped by... uh, group
+            if ($row[0]) {
+                $workingGroupName = trim($row[0]);
+            }
+
+            if ($row[1]) {
+
+                // copy the groupname into the row
+                $row[0] = $workingGroupName;
+
+                // extract the criterion uniquely
+                $workingCritName = trim($row[1]);
+                $criteria[$workingGroupName][$workingCritName] = [
+                    'id'   => null,
+                    'name' => $workingCritName
+                ];
+            }
+
+            $square[] = $row;
+        }
+
+        // ensure all given criteria exist: create new ones if necessary
+        foreach ($criteria as $group => $crits) {
+            foreach ($crits as $crit) {
+
+                $name = $crit['name'];
+
+                try {
+                    // if the crit exists, just use that
+                    $model = CriterionMapper::getInstance()->findOneByColumnList([
+                        'grouping' => $group,
+                        'name'     => $name
+                    ]);
+
+                } catch (\Schoolbox\Mapper\Exception $e) {
+
+                    // if the crit doesn't exist, create and save
+                    $model = CriterionMapper::getInstance()
+                                                      ->createModel()
+                                                      ->setName($name)
+                                                      ->setGrouping($group)
+                                                      ->setParentType('category')
+                                                      ->setParentId($folderId);
+
+                    CriterionMapper::getInstance()->save($model);
+                }
+
+                // yank that ID
+                $criteria[$group][$name]['id'] = $model->getId();
+            }
+
+        }
+
+        // get a new rubric in array form
+        $postdata = $this->findByFolderId($folderId, $taskMode, $levelNames)->toPostData();
+
+        // overlay descriptor data
+        for ($i = 1; $i < count($square); $i += 2) {
+
+            $gLookup = $square[$i][0];
+            $cLookup = $square[$i][1];
+
+            $crit = $criteria[$gLookup][$cLookup];
+
+            if (!$crit) {
+                // given the way we're working with data we've expressly set up just above, this should be impossible...
+                continue;
+            }
+
+            $critId = $crit['id'];
+
+            for ($j = 2; $j < count($square[$i]); ++$j) {
+
+                $levelSequence = $j - 2;
+
+                $dText = trim($square[$i][$j]);
+                $dVal  = trim($square[$i + 1][$j]);
+
+                if ($dText || $dVal) {
+
+                    // turn this criterion on
+                    $postdata['criterion'][$critId]['on'] = true;
+
+                    // assign the descriptor data to the appropriate cell
+                    $postdata['descriptor'][$critId][$levelSequence] = [
+                        'id'     => null,
+                        'text'   => $dText,
+                        'points' => $dVal
+                    ];
+                }
+            }
+        }
+
+        return $this->factory->buildFromPostData([ 0 => $postdata ], true);
     }
 
 
