@@ -168,7 +168,14 @@ class TimetableStructure extends AbstractImporter
                 )
             );
             $dayCount    = max(array_keys($timetable['periods']));
-            $periodCount = max(array_map('count', $timetable['periods']));
+            $periodNames = [];
+            foreach ($timetable['periods'] as $day => $periods) {
+                /** @var Collection|TimetablePeriod[] $periods */
+                foreach ($periods as $period) {
+                    $periodNames[$period->getTitle()] = true;
+                }
+            }
+            $periodCount = count($periodNames);
             $this->log->info(sprintf('Day count: %d, period count: %d', $dayCount, $periodCount));
             $timetable['cycle']->setCycleLength($dayCount)->setDayLength($periodCount);
 
