@@ -10,6 +10,27 @@
     // Do stuff here
     $(function() {
         var calendarLoadingElement = $('#calendar-loading');
+        var calendarView = {{ calendar.view|json_encode|raw }};
+        var calendarDate = moment({{ calendar.date|json_encode|raw }});
+
+        if (calendarDate.isValid()) {
+            calendarDate = calendarDate.toDate();
+        } else {
+            calendarDate = new Date();
+        }
+        switch (calendarView) {
+            case 'day':
+                calendarView = 'timelineDay';
+                break;
+            case 'month':
+                calendarView = 'timelineMonth';
+                break;
+            case 'week':
+            default:
+                calendarView = 'timelineWeek';
+                break;
+        }
+
         c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
                 enabled: true,
@@ -24,6 +45,7 @@
             fullCalendar: {
                 firstHour: 9,
                 allDaySlot: false,
+                defaultDate: calendarDate,
                 columnFormat: {
                     timelineMonth: 'ddd',
                     timelineWeek:  'ddd D/M',
@@ -35,7 +57,7 @@
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
                 firstDay: Number({{ config.calendar_start_day }}),
                 schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-                defaultView: 'timelineWeek',
+                defaultView: calendarView,
                 header: {
                     left: 'prev,today,next',
                     center: 'title',

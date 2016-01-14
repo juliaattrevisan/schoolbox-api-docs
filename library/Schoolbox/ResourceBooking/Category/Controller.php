@@ -95,7 +95,13 @@ class Controller extends Base {
      *
      * @param Model $item
      */
-    public function read(Model $item) {
+    public function read(Model $item)
+    {
+        try {
+            $calendarDate = \Alaress_Date_Format::newUrlDate($this->request->query->get('date'));
+        } catch (\Exception $e) {
+            $calendarDate = \Alaress_Date_Format::now();
+        }
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceCategory/read.twig',
@@ -105,6 +111,10 @@ class Controller extends Base {
                         'resource_category_id',
                         $item->getId(),
                         ['order' => ['name' => 'asc',]]
+                    ),
+                    'calendar' => array(
+                        'date' => $calendarDate->getDatabaseDate(),
+                        'view' => $this->request->query->get('view', 'week'),
                     ),
                 ),
             )
