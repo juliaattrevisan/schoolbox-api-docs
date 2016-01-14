@@ -124,7 +124,7 @@ abstract class DescriptorList implements Twiggable, Calculable
         ];
 
         foreach ($this->descriptors as $descriptor) {
-            $crossReferenceId = $this->descriptors->offsetGet($descriptor);
+            $crossReferenceId                          = $this->descriptors->offsetGet($descriptor);
             $context['descriptors'][$crossReferenceId] = $descriptor->toContext();
         }
 
@@ -163,6 +163,17 @@ abstract class DescriptorList implements Twiggable, Calculable
         }
 
         return $c;
+    }
+
+
+    /**
+     * @return Collection|Descriptor[]
+     */
+    public function getSelectedDescriptors()
+    {
+        return $this->getAllDescriptors()->filter(function ($item){
+            return $item->isSelected();
+        });
     }
 
 }

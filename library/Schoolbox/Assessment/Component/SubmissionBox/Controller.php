@@ -45,7 +45,7 @@ class Controller extends BaseController
 
             foreach ($rubric->getSumPerGroup() as $group) {
                 foreach ($group->getAllCriteria() as $criterion) {
-                    $marks[$studentId][$criterion->getId()] = $criterion->getSum();
+                    $marks[$studentId][$criterion->getId()] = $criterion->getSelectedDescriptors()->first();
                 }
             }
         }
