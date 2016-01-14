@@ -113,6 +113,7 @@ if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration
 /* Set up template
  */
 $this->setFile(TEMPLATE_content, 'assess/attempt.html');
+$this->setBlock(TEMPLATE_content, 'sectionDescription', 'sectionDescription_block');
 $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
@@ -136,6 +137,13 @@ $this->setVar(array(
     'SECTION_DESCRIPTION' => Scrub::html($section['description']),
     'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
 ));
+
+if($section['description']) {
+    $this->parse('sectionDescription_block', 'sectionDescription');
+}
+else {
+    $this->setVar('sectionDescription_block', '');
+}
 
 /* Load questions
  */
