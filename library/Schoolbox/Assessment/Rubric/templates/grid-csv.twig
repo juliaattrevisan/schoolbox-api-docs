@@ -21,7 +21,7 @@
             // detect our lookup reference
             boxIdInput = body.find('input[name="id"]');
 
-            if (boxIdInput.length == 1 && boxIdInput.val()) {
+            if (boxIdInput.length == 1 && boxIdInput.val() > 0) {
                 postdata = {
                     boxId: boxIdInput.val()
                 };
@@ -29,7 +29,7 @@
             } else {
                 catIdInput = body.find('input[name="category"]');
 
-                if (catIdInput.length == 1 && catIdInput.val()) {
+                if (catIdInput.length == 1 && catIdInput.val() > 0) {
                     postdata = {
                         folderId: catIdInput.val()
                     };
@@ -44,7 +44,7 @@
 
             isTaskInput = body.find('input[name="is_task"]');
 
-            if (isTaskInput.length == 1 && isTaskInput.val()) {
+            if (isTaskInput.length == 1 && isTaskInput.val() > 0) {
                 postdata.task = 1;
             }
 
