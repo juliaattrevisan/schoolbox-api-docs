@@ -81,7 +81,7 @@ then
 			fi
 		done < buildcache-sha1-cached.txt;
 		cd ~/schoolbox;
-		cp -vf $cachedir/cache.txt tools/browscap/cache.php;
+		cp -vf $cachedir/cache-2016-01-14.txt tools/browscap/cache.php;
 		git add -f tools/browscap;
 		git commit -a -m "update changelog for building";
 		git branch -D upstream;

@@ -77,7 +77,7 @@ echo "$vag Setting up browscap cache";
 mkdir -p /vagrant/tools/browscap;
 rm -f /vagrant/tools/browscap/browscap.ini;
 touch /vagrant/tools/browscap/browscap.ini;
-cp -f $cachedir/cache.txt /vagrant/tools/browscap/cache.php;
+cp -f $cachedir/cache-2016-01-14.txt /vagrant/tools/browscap/cache.php;
 
 echo "$vag Loading Schoolbox MySQL Demo data";
 mysql -u root -ptnp879 -e "create database schoolbox";
