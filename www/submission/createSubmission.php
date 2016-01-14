@@ -114,7 +114,11 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $category_id = $this->arg[1];
     $title       = 'Post Due Work';
     $heading     = 'Post';
-    $category    = CategoryMapper::getInstance()->findById($category_id);
+    try {
+        $category = CategoryMapper::getInstance()->findById($category_id);
+    } catch (Schoolbox\Mapper\Exception $e) {
+        $this->error(13);
+    }
     $submission
         ->setCategory($category)
         ->setPublishDate(new Alaress_Date_Format(new DateTime('00:00:00')))
