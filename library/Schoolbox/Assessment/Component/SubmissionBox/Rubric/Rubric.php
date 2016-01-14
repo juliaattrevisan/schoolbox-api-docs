@@ -28,7 +28,7 @@ class Rubric extends Core\Rubric
      */
     public function __construct($submissionBox = null)
     {
-        $id = $submissionBox ? $submissionBox->getId() : null;
+        $id = $submissionBox ? $submissionBox->getId() : 0;
 
         parent::__construct($id, false);
         $this->setSubmissionBox($submissionBox);
@@ -49,6 +49,10 @@ class Rubric extends Core\Rubric
     public function setSubmissionBox($box)
     {
         $this->box = $box;
+        // bind my ID to the box's ID
+        if ($box) {
+            $this->setId($box->getId());
+        }
         return $this;
     }
 

@@ -146,7 +146,7 @@ class Controller extends BaseController
                 $taskMode = $box->getTask()->getId() > 0;
 
             } elseif ($folderId = $post->get('folderId')) {
-                $box = SubmissionBoxMapper::getInstance()->createModel();
+                $box = SubmissionBoxMapper::getInstance()->createModel()->setId(0);
                 $taskMode = $post->get('task', false);
 
             } else {
