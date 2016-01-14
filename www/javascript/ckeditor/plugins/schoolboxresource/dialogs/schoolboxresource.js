@@ -355,7 +355,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
     }
 
     return {
-        title: 'Schoolbox Resource Image',
+        title: 'Embed Resource',
         minWidth: 400,
         minHeight: 200,
 
@@ -365,7 +365,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
         contents: [
             {
                 id: 'schoolboxresource-tab',
-                label: 'Schoolbox Resource Image',
+                label: 'Embed Resource',
                 elements: [
                     {
                         type: 'hbox',
