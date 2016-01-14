@@ -79,12 +79,6 @@ a[disabled], a.disabled {
 	}
 }
 
-/* Anchor tags pretending to be input elements
- */
-a[role="button"] {
-	@extend .button;
-}
-
 /* Arbitrary <button> element
  */
 button {

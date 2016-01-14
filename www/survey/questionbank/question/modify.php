@@ -139,7 +139,7 @@ else {
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text'  => 'Quiz Questionbank',
+            'text'  => 'Survey Questionbank',
             'href'  => '#',
             'class' => ''
         ],

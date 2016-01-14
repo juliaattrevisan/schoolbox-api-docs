@@ -481,4 +481,105 @@
             });
         }
     }
+
+    /**
+     * Fillgap Creator
+     *
+     * @param options
+     */
+    $.fn.fillgapCreate = function(options) {
+        options = options || {};
+
+        var config = init(options, $(this));
+
+        start();
+
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            var defaults = {
+                element: element,
+                targetElements: $('#answerBox'),
+                file_browser_category_id: 0
+            }
+
+            var derived = {
+
+                /* CSS for indicating which data to "make blank"
+                 */
+                css: 'span.selected-word { background: #cae9b9; }',
+
+                /* Icon for the Make Blank Button
+                 */
+                icon: '/images/core/assess/fillgap.png'
+            }
+
+            var merged = $.extend(defaults, derived, options);
+
+            return merged;
+        }
+
+        /**
+         * Set everything up
+         */
+        function start() {
+            $.fn.alaressEditor({
+                targetElements: config.targetElements,
+                file_browser_category_id: config.file_browser_category_id,
+
+                toolbarGroups: [
+                    {name: 'schoolbox', groups: []},
+                    {name: 'basicstyles', groups: ['cleanup']}
+                ],
+
+                allowedContent: {
+                    span: {
+                        classes: 'selected-word'
+                    }
+                },
+
+                /* Words to "make blank" in fillgap
+                 */
+                load: function() {
+                    CKEDITOR.addCss(config.css);
+                },
+
+                start: function(element) {
+                    var instance = CKEDITOR.instances['answerBox'];
+
+                    /* Add special unique buttons
+                     */
+                    instance.addCommand("makeBlank", {
+                        exec: function(editorInstance) {
+                            var selectedContent = editorInstance.getSelection().getSelectedText();
+                            var updatedContent = '<span class="selected-word">' + selectedContent + '</span>'
+
+                            /* Replace selected content in editor
+                             */
+                            editorInstance.insertHtml(updatedContent, 'html');
+                        }
+                    });
+
+                    instance.ui.addButton('MakeBlank', { // add new button and bind our command
+                        label: "Make Blank",
+                        command: 'makeBlank',
+                        toolbar: 'schoolbox',
+                        icon: config.icon
+                    });
+                }
+            });
+
+            $('#createQuestionForm').shortCreate({
+                customValidationRules: function(config) {
+                    $.fn.addCustomRules_greaterThanZero(config);
+                    $.fn.addCustomRules_emptyAnswer(config);
+                }
+            });
+        }
+    }
 }(jQuery));

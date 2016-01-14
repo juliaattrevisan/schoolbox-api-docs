@@ -427,6 +427,4 @@ if ($campusList->count()) {
     $page->setVar('event_campus_list_block', '');
 }
 
-if ($render) {
-    $page->outputPage();
-}
+$page->outputPage();

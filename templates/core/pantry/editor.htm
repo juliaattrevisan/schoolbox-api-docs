@@ -1,0 +1,209 @@
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+
+        /* Round-Trip
+         */
+        $.fn.alaressEditor({
+            targetElements: $('#bart')
+//            start: function(element) {
+//
+//                /* Add special unique buttons
+//                 */
+//                CKEDITOR.instances['bart'].addCommand("insertMedia", { // create named command
+//                    exec: function(editorInstance) {
+//
+//                        var sel = editorInstance.getSelection();
+//                        var element = sel && sel.getSelectedElement();
+//
+//                        /* If an image is selected, edit its properties
+//                         */
+//                        if (element !== null) {
+//                        }
+//                        /* Otherwise, spawn a Resource Browzer picker
+//                         */
+//                        else {
+//                            var url = '/test.php?ajax=1';
+//                            var data = {};
+//
+//                            $.post(url, data, function(responseText) {
+//                                var content = '';
+//                                var response = $.parseJSON(responseText);
+//
+//                                if (response.type == 'image') {
+//                                    content = '<img src="/storage/image.php?hash='+response.hash+'" alt="'+response.name+'" />';
+//                                }
+//
+//                                editorInstance.insertHtml(content, 'html');
+//                            });
+//                        }
+//                    }
+//                });
+//
+//                CKEDITOR.instances['bart'].ui.addButton('AddMedia', { // add new button and bind our command
+//                    label: "Insert Media",
+//                    command: 'insertMedia',
+//                    toolbar: 'schoolbox',
+//                    icon: 'https://avatars1.githubusercontent.com/u/1073167?v=3&amp;s=460'
+//                });
+//            }
+        });
+
+        /* You can try using jquery selectors to feed a
+         * jquery collection to targetElements.
+         *
+         * Each textarea or element must have an id or name
+         * attribute - it checks the id first, then the name
+         */
+        $.fn.alaressEditor({
+            targetElements: $('textarea[name=green]')
+        });
+
+        /* Spawn a pseudo plugin
+         * http://stackoverflow.com/questions/1957156/how-to-add-a-custom-button-to-the-toolbar-that-calls-a-javascript-function
+         * http://docs.ckeditor.com/#!/api/CKEDITOR.ui-method-addButton
+         */
+        $.fn.alaressEditor({
+            targetElements: $('#mort'),
+            start: function(element) {
+
+                /* Add special unique buttons
+                 */
+                CKEDITOR.instances['mort'].addCommand("exampleCommand", { // create named command
+                    exec: function(editorInstance) {
+                        alert(editorInstance.getData());
+                    }
+                });
+
+                CKEDITOR.instances['mort'].ui.addButton('SomeGenericIdentifier', { // add new button and bind our command
+                    label: "Example Label",
+                    command: 'exampleCommand',
+                    toolbar: 'schoolbox',
+                    icon: 'https://avatars1.githubusercontent.com/u/1073167?v=3&amp;s=460'
+                });
+            }
+        });
+    });
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="/">Schoolbox</a></li>
+    <li><a href="/pantry">Pantry</a></li>
+    <li class="active"><a href="/pantry/editor">Editor</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Proxy Replacement Test</h2>
+    </div>
+    <div class="small-12 island">
+        <form action="/testAjax.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p><img data-schoolboxresource-source="/storage/image.php?hash=0e0137e694bc6f105631e854fc94a7c88396d808" data-schoolboxresource-type="image" src="/storage/image.php?hash=0e0137e694bc6f105631e854fc94a7c88396d808" style="border:1px solid #808080; height:450px; width:600px" /></p>
+
+                        <p><img data-schoolboxresource-source="/cms/sendVideo.php?type=sbfs&amp;id=346" data-schoolboxresource-thumbnail="/cms/videoThumb.php?type=sbfs&amp;size=poster&amp;id=346" data-schoolboxresource-type="video" src="/cms/videoThumb.php?type=sbfs&amp;size=poster&amp;id=346" style="width:233px;height:131px" /></p>
+
+                        <p><img data-schoolboxresource-source="/cms/sendVideo.php?type=sbfs&amp;id=347" data-schoolboxresource-thumbnail="/images/core/component/audio-thumbnail-processing.gif" data-schoolboxresource-type="audio" src="/images/core/component/audio-thumbnail-processing.gif" style="width:233px;height:131px" /></p>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Custom Plugin, Ajax Round Trip</h2>
+    </div>
+    <div class="small-12 island">
+        <form action="/testAjax.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            <textarea id='bart' name='bart' rows="10"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">"Plugins"</h2>
+    </div>
+    <div class="small-12 island">
+        <form action="/test.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            <textarea id='mort' name='mort' rows="10"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Generic Usage</h2>
+    </div>
+    <div class="small-12 island">
+        <form action="/test.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            id='cat', name='red'
+                            <textarea id='cat' name="red" rows="10"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            id='dog', name='blue'
+                            <textarea id='dog' name="blue" rows="10"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            id='horse', name='green'
+                            <textarea id='horse' name="green" rows="10"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            id='komodo' name='gold'
+                            <textarea id="komodo" name="gold" rows="10"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>

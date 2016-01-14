@@ -36,7 +36,7 @@ abstract class Kernel {
 	 *
 	 * @var callable[]
 	 */
-	protected $exceptionCallbacks;
+	protected $exceptionCallbacks = [];
 
 	/**
 	 * Load the boot loader, returning success or failure

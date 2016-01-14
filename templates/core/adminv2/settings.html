@@ -2,8 +2,8 @@
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
 <script type="text/javascript" src="/javascript/components/spectrum/spectrum.js"></script>
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 
 <script type="text/javascript">
     $(function() {
@@ -19,9 +19,8 @@
             }
         });
 
-        $.fn.alaressTiny({
-            mode: "specific_textareas",
-            editor_selector: "mceEditor"
+        $.fn.alaressEditor({
+            targetElements: $('#settings').find('[data-html-editor]')
         });
 
         /**
@@ -137,7 +136,7 @@
                         <!-- END setting_type_textarea -->
 
                         <!-- BEGIN setting_type_html -->
-                        <textarea id="{SETTING_NAME}" class="mceEditor {OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
+                        <textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" {OPTION_REQUIRED} name="{SETTING_NAME}" data-html-editor>{SETTING_VALUE}</textarea>
                         <!-- END setting_type_html -->
 
                         <!-- BEGIN setting_type_resource -->

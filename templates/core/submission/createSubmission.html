@@ -1,9 +1,9 @@
 
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.timetable-day-selector.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
@@ -40,10 +40,7 @@
         var form = $('#createSubmissionForm');
         form.submissionFormValidate();
 
-        $.fn.alaressTiny({
-            mode: 'exact',
-            elements: 'description-box'
-        });
+        $.fn.alaressEditor();
 
         // When I change the number of assessment levels,
         // that means I want to use assessment specific descriptors.
@@ -131,7 +128,7 @@
                     <div class="small-12 columns">
                         <label>
                             Description
-                            <textarea id="description-box" name="description">{DESCRIPTION}</textarea>
+                            <textarea name="description">{DESCRIPTION}</textarea>
                         </label>
                     </div>
 

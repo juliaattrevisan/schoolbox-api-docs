@@ -1,15 +1,11 @@
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type='text/javascript' src="/javascript/shared/evaluation/jquery.evaluation-creator.js"></script>
 <script type='text/javascript' src="/javascript/shared/evaluation/jquery.evaluation.validation.js"></script>
 <script type="text/javascript">
     $(function() {
-        $.fn.alaressTiny({
-            mode: 'exact',
-            elements: 'richtext-answer',
-            file_browser_category_id: '{ASSESS_CATEGORY_ID}',
-            removeformat_selector: 'b,strong,em,i,span,ins',
-            width: "100%",
-            disable_toolbars: [2, 3, 4]
+        $.fn.alaressEditor({
+            targetElements: $('#richtext-answer'),
+            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
         });
 
         $('#createQuestionForm').shortCreate({

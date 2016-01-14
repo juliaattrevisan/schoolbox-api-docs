@@ -103,3 +103,11 @@
         display: inline;
     }
 }
+
+/* "Make Blank" custom button
+ * This value is used in javascript so you can't use
+ * sass vars or skin builder ones - it's totally unique
+ */
+.cke_reset_all .cke_button__makeblank {
+    background-color: #cae9b9;
+}

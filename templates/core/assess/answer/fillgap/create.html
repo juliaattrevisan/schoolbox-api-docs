@@ -1,37 +1,9 @@
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type='text/javascript' src="/javascript/shared/evaluation/jquery.evaluation-creator.js"></script>
 <script type='text/javascript' src="/javascript/shared/evaluation/jquery.evaluation.validation.js"></script>
 <script type="text/javascript">
     $(function() {
-        $.fn.alaressTiny({
-            mode: 'exact',
-            elements: 'answerBox',
-            theme_advanced_buttons1: "addSpans,removeformat",
-            file_browser_category_id: '{ASSESS_CATEGORY_ID}',
-            removeformat_selector: 'b,strong,em,i,span,ins',
-            width: "100%",
-            disable_toolbars: [2, 3, 4],
-            setup: function(ed) {
-                ed.addButton('addSpans', {
-                    title : 'wraps selected text with custom tag',
-                    image : '/javascript/tiny_mce/themes/advanced/img/icons.gif',
-                    class : 'make-blank',
-                    onclick : (function() {
-                        var sel = ed.selection.getContent();
-                        if (sel !== '') {
-                            ed.selection.setContent('<span class="selected-word">' + sel + '</span>');
-                        }
-                    })
-                });
-            }
-        });
-
-        $('#createQuestionForm').shortCreate({
-            customValidationRules: function(config) {
-                $.fn.addCustomRules_greaterThanZero(config);
-                $.fn.addCustomRules_emptyAnswer(config);
-            }
-        });
+        $.fn.fillgapCreate();
     });
 </script>
 

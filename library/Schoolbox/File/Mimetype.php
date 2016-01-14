@@ -343,6 +343,22 @@ class Mimetype {
 
 
     /**
+     * Decide whether this is image, video or audio,
+     * encompassing separate filetypes for each
+     */
+    public function getType() {
+        if ($this->isImage()) {
+            return 'image';
+        }
+        else if ($this->isAudio()) {
+            return 'audio';
+        }
+        else if ($this->isVideo()) {
+            return 'video';
+        }
+    }
+
+    /**
      * Compares this mimetype against the given filter. Returns true if ANY are matched.
      *
      * @param string $mimeFilter in the format:

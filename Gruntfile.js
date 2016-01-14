@@ -117,6 +117,10 @@ module.exports = function(grunt) {
                     'www/javascript/shared/sidemenu/jquery.touch-menu.js',
                     'www/javascript/shared/sidemenu/jquery.scroll-to.js',
 
+                    // CKEditor
+                    'www/javascript/shared/editor/jquery.proxy-replacement.js',
+                    'www/javascript/components/mediaelement/build/mediaelement-and-player.min.js',
+
                     // DateTime
                     'www/javascript/components/moment/moment.js',
 

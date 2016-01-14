@@ -114,6 +114,11 @@ class Scrub
 
             $config = HTMLPurifier_Config::createDefault();
 
+            /* TODO: Repair the terrible piece of software known as htmlpurifier
+             * Remove this line to re-enable some sort of stupid caching it tries to do
+             */
+            $config->set('Cache.DefinitionImpl', null);
+
             /* http://htmlpurifier.org/phorum/read.php?3,6724
              */
             $config->set('CSS.AllowTricky', true);
@@ -124,7 +129,7 @@ class Scrub
             // Allow Iframe
             $config->set('HTML.SafeIframe', true);
             $safeIframeSources = array(
-                'www.youtube.com/embed/',
+                'www.youtube.com/',
                 'player.vimeo.com/video/',
                 'www.slideshare.net/slideshow/embed_code/',
                 '(?:www|edu).glogster.com/glog(?:/|.php)',
@@ -151,6 +156,7 @@ class Scrub
                 'online.clickview.com.au/MyLibrary/PlayEmbed',
                 'online.clickview.com.au/Share/PlayEmbed',
                 'www.khanacademy.org/embed_video',
+                'cdn.iframe.ly/api',
             );
 
             // Add any additional iframe sources as configured
@@ -199,8 +205,26 @@ class Scrub
             // logical manner.
             $config->set('HTML.DefinitionID', 'HTML + Extended Embeds + Extended Objects');
             $config->set('HTML.DefinitionRev', 1);
+
             if ($def = $config->maybeGetRawHTMLDefinition()) {
                 $max = $config->get('HTML.MaxImgLength');
+
+                /* Allow SchoolboxResource data elements
+                 *
+                 * data-schoolboxresource-width and -height vars are for mejs initial
+                 * state rendering upon load ><
+                 */
+                $def->addAttribute('img', 'data-schoolboxresource-filesystem', 'Text');
+                $def->addAttribute('img', 'data-schoolboxresource-type', 'Text');
+                $def->addAttribute('img', 'data-schoolboxresource-thumbnail', 'Text');
+                $def->addAttribute('img', 'data-schoolboxresource-source', 'Text');
+                $def->addAttribute('img', 'data-schoolboxresource-width', 'Text');
+                $def->addAttribute('img', 'data-schoolboxresource-height', 'Text');
+                $def->addAttribute('img', 'data-schoolboxresource-fullwidth', 'Text');
+                $def->addAttribute('div', 'data-oembed-url', 'Text');
+                $def->addAttribute('a', 'data-iframely-url', 'Text');
+                $def->addAttribute('a', 'data-template', 'Text');
+                $def->addAttribute('blockquote', 'data-id', 'Text');
 
                 //
                 // Definition of customised elements, copied directly out of modules.
@@ -324,13 +348,18 @@ class Scrub
      */
     static public function html($html)
     {
-        return Alaress\Redis::getInstance()->cacheFunctionCall(
-            'scrub.html',
-            function ($param) {
-                return self::htmlDomModify(self::getHtmlPurifierInstance()->purify($param));
-            },
-            "$html",
-            Config::get('scrub_html_cache_timeout')
-        );
+        /* TODO: Repair the terrible piece of software known as htmlpurifier
+         * Remove this line and uncomment the rest to restore intended behaviours
+         */
+        return self::htmlDomModify(self::getHtmlPurifierInstance()->purify($html));
+
+//        return Alaress\Redis::getInstance()->cacheFunctionCall(
+//            'scrub.html',
+//            function ($param) {
+//                return self::htmlDomModify(self::getHtmlPurifierInstance()->purify($param));
+//            },
+//            "$html",
+//            Config::get('scrub_html_cache_timeout')
+//        );
     }
 }

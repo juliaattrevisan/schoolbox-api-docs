@@ -1,0 +1,42 @@
+.cke {
+    border: 1px solid $content-ui-background !important;
+}
+
+.cke_dialog_body {
+    input[type=checkbox], input[type=radio] {
+        opacity: 1;
+        width: auto;
+        height: auto;
+    }
+
+    .schoolboxresource-preview {
+        border: 1px solid #ccc;
+        width: 100%;
+        height: 200px;
+        overflow: auto;
+
+        img {
+            display: block;
+        }
+    }
+
+    .schoolboxresource-separator {
+        font-weight: bold;
+        margin-top: 1rem;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .schoolboxresource-button {
+        margin-top: 0.875rem;
+        display: block;
+        padding: 0.75rem;
+    }
+
+    .cke_dialog_ui_input_select,
+    .cke_dialog_ui_input_select {
+        width: 100%;
+    }
+}
+
+

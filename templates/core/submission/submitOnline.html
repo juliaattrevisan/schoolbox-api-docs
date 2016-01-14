@@ -1,87 +1,91 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
-<script type="text/javascript" src="/javascript/jquery.alaressTiny.js"></script>
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
-
-    // Autosave
-    // On type, ensure that change gets saved.
-    var autosaveTimeout = null
-    var textBoxContent  = ''
-
-    // Method for setting up autosave - clears existing event, and creates new one.
-    var initAutosave = function() {
-        clearTimeout(autosaveTimeout)
-        autosaveTimeout = setTimeout(autosavePresubmit, 5*1000)
-    }
-
-    // The autosave pre-submit method - called by the autosave method.
-    // Calls the actual submit method if the textbox has changed.
-    var autosavePresubmit = function() {
-        // Has the text box changed? If not check again later
-        // (re-init the autosave counter)
-        var currentContent = tinyMCE.get('editor-body').getContent()
-        if (currentContent === textBoxContent) {
-            initAutosave()
-        }
-        else {
-            textBoxContent = currentContent
-            autosaveAjaxSubmit()
-        }
-    }
-
-    // The autosave submit method
-    var autosaveAjaxSubmit = function() {
-        var form = $('#editor-form')
-
-        // Change button's text, but keep its width the same.
-        // Change it back once done.
-        var formSaveLabel = form.find('[data-save-draft]')
-
-        // Submit form via AJAX
-        var formContents = form.serializeArray()
-        formContents.push({name: 'save_draft', value: '1'})
-        formContents.push({name: 'body',       value: tinyMCE.get('editor-body').getContent()})
-
-        formSaveLabel.labelActivate({
-            text: 'Autosaving'
-        });
-
-        $.ajax({
-            type: "POST",
-            url:  '/submission/submitOnlineForm.php',
-            data: formContents,
-            complete: function() {
-                // Re-init the autosave
-                initAutosave();
-
-            },
-            success: function() {
-                formSaveLabel.labelTimeout({
-                    text: 'Draft Saved',
-                    css: 'success'
-                });
-            },
-            error: function() {
-                formSaveLabel.labelTimeout({
-                    text: 'Error!',
-                    css: 'alert'
-                });
-            },
-            dataType: 'json'
-        });
-    }
-
     $(function() {
-        $.fn.alaressTiny({
-            mode : "exact",
-            elements: "editor-body",
-            setup: function(ed) {
-                initAutosave()
-                ed.onChange.add(function() {
-                    autosavePresubmit()
-                })
+
+        // Autosave
+        // On type, ensure that change gets saved.
+        var autosaveTimeout = null
+        var textBoxContent  = ''
+
+        // Method for setting up autosave - clears existing event, and creates new one.
+        var initAutosave = function() {
+            clearTimeout(autosaveTimeout);
+
+            autosaveTimeout = setTimeout(function() {
+                autosavePresubmit();
+            }, 5*1000);
+        }
+
+        // The autosave pre-submit method - called by the autosave method.
+        // Calls the actual submit method if the textbox has changed.
+        var autosavePresubmit = function() {
+
+            // Has the text box changed? If not check again later
+            // (re-init the autosave counter)
+            var currentContent = CKEDITOR.instances['editor-body'].getData();
+
+            if (currentContent === textBoxContent) {
+                initAutosave();
+            }
+            else {
+                textBoxContent = currentContent;
+                autosaveAjaxSubmit();
+            }
+        }
+
+        // The autosave submit method
+        var autosaveAjaxSubmit = function() {
+            var form = $('#editor-form');
+
+            // Change button's text, but keep its width the same.
+            // Change it back once done.
+            var formSaveLabel = form.find('[data-save-draft]')
+
+            // Submit form via AJAX
+            var formContents = form.serializeArray()
+            formContents.push({name: 'save_draft', value: '1'})
+            formContents.push({name: 'body',       value: CKEDITOR.instances['editor-body'].getData()})
+
+            formSaveLabel.labelActivate({
+                text: 'Autosaving'
+            });
+
+            $.ajax({
+                type: "POST",
+                url:  '/submission/submitOnlineForm.php',
+                data: formContents,
+                complete: function() {
+                    // Re-init the autosave
+                    initAutosave();
+
+                },
+                success: function() {
+                    formSaveLabel.labelTimeout({
+                        text: 'Draft Saved',
+                        css: 'success'
+                    });
+                },
+                error: function() {
+                    formSaveLabel.labelTimeout({
+                        text: 'Error!',
+                        css: 'alert'
+                    });
+                },
+                dataType: 'json'
+            });
+        }
+
+        /* Spawn editors
+         */
+        $.fn.alaressEditor({
+            targetElements: $('textarea[name=body]'),
+            start: function(element) {
+                initAutosave(element);
+                autosavePresubmit(element);
             }
         });
 
@@ -95,7 +99,7 @@
             var form      = $(this).closest('form'),
                     dialog    = $('#confirm-dialog'),
                     submit    = form.find(':submit'),
-                    inlineLen = tinyMCE.get('editor-body').getContent().length,
+                    inlineLen = CKEDITOR.instances['editor-body'].getData().length,
                     filesLen  = $('#submission-file-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
 
             if (!inlineLen && !filesLen) {
