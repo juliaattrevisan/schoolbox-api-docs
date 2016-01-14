@@ -1,0 +1,250 @@
+table.rb {
+    a {
+        white-space: nowrap;
+        line-height: 2.75rem;
+    }
+    input[type=text] {
+        + label.rb-readonly {
+            padding-left: 2.6125rem;
+        }
+    }
+    label {
+        cursor: auto;
+    }
+    tbody {
+        th:first-of-type {
+            border-right: solid 1px $body-bg;
+        }
+    }
+    tbody th:last-of-type, thead th:first-of-type {
+        border-right: solid 2px $body-bg;
+    }
+    td, th {
+        transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
+        &:hover {
+            input[type=text], textarea {
+                border-color: $input-border-color;
+                background-color: white;
+            }
+        }
+    }
+    td {
+        overflow: hidden;
+        input[type=text].rb-value {
+            width: 5rem;
+        }
+    }
+    textarea {
+        font-size: 0.625rem;
+        resize: none;
+        overflow-y: auto;
+        height: 100px; /* yes, I used pixels. wanna fight about it? */
+        &:focus {
+            background-color: white;
+        }
+    }
+    textarea, input[type=text] {
+        border-color: transparent;
+        background-color: transparent;
+        &:focus {
+            border-color: $input-focus-border-color !important;
+            background-color: transparent;
+        }
+    }
+    tr {
+        label {
+            transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
+            width: 100%;
+            font-weight: normal;
+        }
+    }
+    .hide-h {
+        padding-left: 0;
+        padding-right: 0;
+        width: 0;
+        input[type=text], textarea {
+            opacity: 0;
+            /* far out! */
+            width: 0 !important;
+            border-left-width: 0 !important;
+            border-right-width: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            overflow: hidden !important;
+        }
+    }
+    .hide-v {
+        background-color: #f9f9f9 !important;
+        &:not(:last-child):hover:before {
+            content: 'Click to add descriptor';
+            font-size: 0.75rem;
+            opacity: 0.5;
+            font-style: italic;
+        }
+        &:hover {
+            cursor: pointer;
+        }
+        input[type=text], textarea {
+            opacity: 0;
+            /* far out! */
+            height: 0 !important;
+            border-top-width: 0 !important;
+            border-bottom-width: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+        }
+    }
+    tr.rb-group-header {
+        border-top: solid 4px $body-bg;
+    }
+    .rb-group-header {
+        + tr {
+            border-top: solid 4px $body-bg;
+        }
+        th {
+            border-right-width: 1px;
+        }
+    }
+    @include placeholder-color(gray, normal);
+}
+.rb-criterion {
+    margin-bottom: 0;
+}
+.rb-editable {
+    &:before {
+        top: 13px !important;
+    }
+    &:after {
+        top: 15px !important;
+    }
+}
+.rb-no-cell {
+    background-color: $body-bg;
+    color: contrast-bg();
+    line-height: 2.875rem;
+}
+.rb-selected {
+    background-color: greenyellow !important;
+}
+.rb-blank {
+    background-color: #FFEFEB !important;
+}
+.rb-group-summary {
+    background-color: lightyellow !important;
+}
+.rb-final-summary {
+    background-color: #e0d887 !important;
+}
+.rb-description, .rb-value {
+    display: block;
+}
+.rb-value {
+    font-family: monospace !important;
+    margin-top: 0.5rem !important;
+}
+.sequencer {
+    color: #9a9a9a;
+    display: block;
+    text-align: right;
+    [class*="icon-"] {
+        &:before {
+            padding-right: 0;
+            color: inherit;
+        }
+        &:hover:before {
+            color: #0066b0;
+        }
+    }
+    a {
+        &[disabled] {
+            opacity: 0.3;
+            &:hover {
+                color: inherit;
+            }
+        }
+        &:hover {
+            text-decoration: none;
+        }
+    }
+    .icon-up-arrow,
+    .icon-down-arrow {
+        display: inline-block;
+        width: 2rem;
+        height: 1rem;
+        line-height: 1rem;
+        text-align: center;
+    }
+    .icon-previous,
+    .icon-next {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        line-height: 2rem;
+        text-align: center;
+    }
+}
+
+@media #{$medium-down} {
+
+    table.rb {
+        tbody {
+            tr td:last-of-type {
+                height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                border-bottom-width: 1px;
+            }
+            th {
+                &:last-of-type {
+                    border-right-width: 0;
+                }
+                &:first-of-type {
+                    border-right-width: 0;
+                    border-bottom-width: 2px;
+                }
+            }
+        }
+        td {
+            padding-left: 2rem;
+            &.hide-v {
+                padding-top: 0;
+                padding-bottom: 0;
+                overflow-y: hidden;
+                height: 0;
+                border-bottom-width: 0;
+                border-top-width: 0;
+            }
+        }
+        thead {
+            display: block;
+        }
+        tr {
+            &:hover {
+                th, td {
+                    background-color: white;
+                }
+            }
+            .rb-group-header {
+                label {
+                    font-weight: bold;
+                }
+            }
+        }
+        textarea {
+            min-height: 1rem;
+        }
+        .rb-no-cell {
+            display: none;
+        }
+        .sequencer {
+            margin-bottom: 0.5rem;
+        }
+    }
+
+}
