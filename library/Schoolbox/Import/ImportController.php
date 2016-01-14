@@ -66,7 +66,8 @@ class ImportController extends Base
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/upload.twig',
             'data'     => $this->getBaseData() + [
-                'attachzone' => $this->getAttachzone()->getTwigContext(),
+                'attachzone'    => $this->getAttachzone()->getTwigContext(),
+                'uploadMissing' => $this->getSession()->getSegment(static::class)->getFlash('uploadMissing', false)
             ],
         ]);
     }
@@ -77,7 +78,13 @@ class ImportController extends Base
     public function preview()
     {
         $logger = $this->buildLogger();
-        $reader = $this->buildReader($upload = $this->buildUpload());
+        try {
+            $reader = $this->buildReader($upload = $this->buildUpload());
+        } catch (\Schoolbox\Resource\Exception $e) {
+            $this->getSession()->getSegment(static::class)->setFlash('uploadMissing', true);
+            $this->getResponse()->redirect->to($this->getRouter()->generate($this->basename.'.upload'));
+            return;
+        }
         $this->buildImporter($reader, $logger, false)->save();
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/preview.twig',
@@ -94,7 +101,13 @@ class ImportController extends Base
     public function import()
     {
         $logger = $this->buildLogger();
-        $reader = $this->buildReader($this->buildUpload());
+        try {
+            $reader = $this->buildReader($upload = $this->buildUpload());
+        } catch (\Schoolbox\Resource\Exception $e) {
+            $this->getSession()->getSegment(static::class)->setFlash('uploadMissing', true);
+            $this->getResponse()->redirect->to($this->getRouter()->generate($this->basename.'.upload'));
+            return;
+        }
         $this->buildImporter($reader, $logger, true)->save();
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/import.twig',
@@ -146,9 +159,13 @@ class ImportController extends Base
      */
     protected function buildUpload()
     {
-
         $factory = new CollectorFactory();
-        return $factory->build($this->getRequest()->post->get('attachment'))->getFirst();
+        $attach  = $this->getRequest()->post->get('attachment');
+        if (is_array($attach)) {
+            return $factory->build($attach)->getFirst();
+        } else {
+            throw new \Schoolbox\Resource\Exception('No file was uploaded');
+        }
     }
 
     /**

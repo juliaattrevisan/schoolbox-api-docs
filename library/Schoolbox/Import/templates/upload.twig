@@ -7,6 +7,13 @@
             {% endblock %}
         </h1>
 
+        {% if uploadMissing %}
+            <div class="alert-box alert">
+                <h2>You must upload a file!</h2>
+                <p>Download the template below, enter your data, and upload it when done.</p>
+            </div>
+        {% endif %}
+
         {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
     </div>
 
