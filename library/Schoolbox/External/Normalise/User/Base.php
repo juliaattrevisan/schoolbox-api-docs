@@ -13,6 +13,7 @@ use Schoolbox\External\Normalise\User\Common\Account;
 use Schoolbox\External\Normalise\User\Common\Address;
 use Schoolbox\External\Normalise\User\Common\Phone;
 use Schoolbox\External\Normalise\User\Common\Email;
+use Schoolbox\External\Normalise\User\Common\BoardingHouse;
 use Schoolbox\Collection;
 
 abstract class Base {
@@ -131,6 +132,12 @@ abstract class Base {
      */
     protected $campus = null;
 
+    /**
+     * Boarding House
+     * @var BoardingHouse
+     */
+    protected $boardingHouse = null;
+
     /* Publicity
      */
 
@@ -141,6 +148,17 @@ abstract class Base {
      * @var bool
      */
     protected $publiclyVisible = true;
+
+    /**
+     * This student is a boarder
+     *
+     * Determined by presence of an ID in the BoardingHouse instance
+     *
+     * @return bool
+     */
+    public function isBoarder() {
+        return (!empty($this->getBoardingHouse()->getId()));
+    }
 
     /**
      * Delegate method
@@ -511,5 +529,29 @@ abstract class Base {
     public function getTitle()
     {
         return $this->title;
+    }
+
+    /**
+     * Set boarding house
+     *
+     * @param BoardingHouse $boardingHouse
+     */
+    public function setBoardingHouse($boardingHouse)
+    {
+        $this->boardingHouse = $boardingHouse;
+    }
+
+    /**
+     * Get boarding house
+     *
+     * @return BoardingHouse
+     */
+    public function getBoardingHouse()
+    {
+        // This is to get around the issue where students without boarding houses generate a
+        // "Failed to retrieve Schoolbox\External\Normalise\User\Student->getBoardinghouse(), does not exist" error
+        // during UPS provisioning
+
+        return ($this->boardingHouse instanceof BoardingHouse) ? $this->boardingHouse : new BoardingHouse();
     }
 }

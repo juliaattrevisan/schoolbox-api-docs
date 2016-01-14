@@ -16,7 +16,6 @@ use Schoolbox\External\Normalise\User\Common\Phone;
 use Schoolbox\External\Normalise\User\Student\Year;
 use Schoolbox\External\Normalise\User\Student\Form;
 use Schoolbox\External\Normalise\User\Common\House;
-use Schoolbox\External\Normalise\User\Common\BoardingHouse;
 
 class Student extends Base {
 
@@ -103,12 +102,6 @@ class Student extends Base {
     protected $house = null;
 
     /**
-     * Boarding House
-     * @var BoardingHouse
-     */
-    protected $boardingHouse = null;
-
-    /**
      * Constructor
      */
     public function __construct() {
@@ -131,27 +124,6 @@ class Student extends Base {
         $this->setPhoneMobile(new Phone());
         $this->setGuardians(new Collection());
         $this->setCampus(new Collection());
-    }
-
-    /**
-     * This student is a boarder
-     *
-     * Determined by presence of a BoardingHouse instance
-     *
-     * @return bool
-     */
-    public function isBoarder() {
-        if ($this->getBoardingHouse() instanceof BoardingHouse) {
-
-            // To get around the issue where students without boarding houses generate a
-            // "Failed to retrieve Schoolbox\External\Normalise\User\Student->getBoardinghouse(), does not exist" error
-            // when doing UPS provision, we instantiate an empty boarding house. So now we need to test if the ID
-            // is blank to determine if the student is a boarder.
-
-            return (!empty($this->getBoardingHouse()->getId()));
-        }
-
-        return false;
     }
 
     /**
@@ -388,29 +360,5 @@ class Student extends Base {
     public function getYear()
     {
         return $this->year;
-    }
-
-    /**
-     * Set boarding house
-     *
-     * @param BoardingHouse $boardingHouse
-     */
-    public function setBoardingHouse($boardingHouse)
-    {
-        $this->boardingHouse = $boardingHouse;
-    }
-
-    /**
-     * Get boarding house
-     *
-     * @return BoardingHouse
-     */
-    public function getBoardingHouse()
-    {
-        // This is to get around the issue where students without boarding houses generate a
-        // "Failed to retrieve Schoolbox\External\Normalise\User\Student->getBoardinghouse(), does not exist" error
-        // during UPS provisioning
-
-        return ($this->boardingHouse instanceof BoardingHouse) ? $this->boardingHouse : new BoardingHouse();
     }
 }
