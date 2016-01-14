@@ -518,7 +518,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                     },
                     {
                         type: 'html',
-                        html: '<label class="schoolboxresource-separator">Dimensions</label><p>Note: Audio resources always display at full width and thus ignore<br />all width/height dimensions.</p>'
+                        html: '<label class="schoolboxresource-separator">Dimensions</label>'
                     },
                     {
                         type: 'hbox',
