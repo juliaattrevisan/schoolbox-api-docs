@@ -368,4 +368,64 @@ class Rubric extends Core\Rubric
     }
 
 
+    /**
+     * Return the POST-data representation of the data structure this rubric contains
+     * This should be the exact inverse of Factory::buildFromPostData()
+     *
+     * @return array
+     */
+    public function toPostData()
+    {
+        $post = [
+            'level'      => [],
+            'group'      => [],
+            'criterion'  => [],
+            'descriptor' => []
+        ];
+
+        foreach ($this->levels as $levelSequence => $level) {
+            $post['level'][$levelSequence] = [
+                'id' => $level->getId(),
+                'name' => $level->getName()
+            ];
+        }
+
+        foreach ($this->criteriaGroups as $group) {
+            $post['group'][$group->getId()] = [
+                'name' => $group->getName()
+            ];
+
+            foreach ($group->getAllCriteria() as $criterion) {
+
+                $descriptors = $criterion->getAllDescriptors();
+
+                $post['criterion'][$criterion->getId()] = [
+                    'groupId'  => $group->getId(),
+                    'on'       => $descriptors->count() > 0,
+                    'name'     => $criterion->getName(),
+                    'readonly' => $criterion->isReadOnly()
+                ];
+
+                foreach ($descriptors as $dCrit) {
+                    foreach ($this->levels as $levelSequence => $level) {
+                        foreach ($level->getAllDescriptors() as $dLevel) {
+
+                            if ($dCrit == $dLevel) {
+                                $post['descriptor'][$criterion->getId()][$levelSequence] = [
+                                    'id'     => $dCrit->getId(),
+                                    'text'   => $dCrit->getText(),
+                                    'points' => $dCrit->getValue()
+                                ];
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+        return $post;
+    }
+
+
 }
