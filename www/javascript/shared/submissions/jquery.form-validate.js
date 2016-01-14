@@ -7,14 +7,14 @@
         // Load the form and that
         var form           = $(this);
         var acceptSubmit   = form.find('input:checkbox[name="accept_submission"]');
-        var rubricCriteria = form.find('[data-role="rubric-criterion-selector"]');
+        var rubricCriteria = form.find('[data-rubric]');
 
         // Options for whether form options are validatable.
         var isAcceptSubmit = function() {
             return acceptSubmit.is(':checked');
         };
-        var isMarkTypeRubric = function() {
-            return form.find('[name="marktype"] :selected').data('slug') == 'rubric';
+        var isUsingRubric = function() {
+            return form.find('[name="use-rubric"]').is(':checked');
         };
         var isMarkTypeTotal = function() {
             return form.find('[name="marktype"] :selected').data('slug') == 'raw' && !(form.find('[name=use-rubric]').is(':checked'));
@@ -29,39 +29,6 @@
         $.validator.addMethod('markTypeRubricCriteriaCheck', function() {
             return rubricCriteria.find('input:checked').length >= 1;
         }, 'Please select at least one criterion');
-
-        // Are rubric form values checked?
-        var isRubricValueChecked = function(element) {
-            if (!isMarkTypeRubric()) {
-                return false;
-            }
-            // Only check if using assess specific descriptors
-            if (!form.find('[data-relation="rubric-use-assessment-specific"]').prop('checked')) {
-                return false;
-            }
-            // Is this rubric selected? Validate if so
-            return $(element).closest('[data-role="criterion"]')
-                    .find('[data-role="criterion-selector"]')
-                    .prop('checked') === true;
-        };
-
-        // Validator for rubric values - they cannot be the same in the same criterion
-        $.validator.addMethod(
-            'markTypeRubricValuesCheck',
-            function (value, element) {
-                // All value inputs that aren't the currently validated one
-                var criterion       = $(element).closest('[data-role="criterion"]');
-                var duplicateValues = criterion.find('[data-role="criterion-value"]').not(element).filter(
-                    function() {
-                        // Filter out inputs that aren't in the same criterion,
-                        // and don't have the same value
-                        return this.name === element.name && this.value === element.value;
-                    }
-                );
-                return duplicateValues.length === 0;
-            },
-            'Rubric values cannot be the same'
-        );
 
         // Depend options
         var publish_date_valid = { dateValid: true };
@@ -105,17 +72,12 @@
                         depends: isMarkTypeTotal
                     }
                 },
-                resultset: {
-                    required: {
-                        depends: isMarkTypeRubric
-                    }
-                },
                 criteria: {
                     markTypeRubricCriteriaExists: {
-                        depends: isMarkTypeRubric
+                        depends: isUsingRubric
                     },
                     markTypeRubricCriteriaCheck: {
-                        depends: isMarkTypeRubric
+                        depends: isUsingRubric
                     }
                 },
                 publish_date:   publish_date_valid,
@@ -136,7 +98,6 @@
                 late_period: late_date_valid
             },
             messages: {
-                resultset:   {required: 'Please select a result set'},
                 open_date:   {dateNotBefore: open_date_valid.dateNotBefore.message},
                 open_hour:   {dateNotBefore: open_date_valid.dateNotBefore.message},
                 open_minute: {dateNotBefore: open_date_valid.dateNotBefore.message},
@@ -186,21 +147,8 @@
         });
 
         // Rubric values validation - add dynamically
-        form.find('[data-role="criterion-value"]').each(function() {
-            $(this).rules(
-                'add',
-                {
-                    required: {
-                        depends: isRubricValueChecked
-                    },
-                    digits: {
-                        depends: isRubricValueChecked
-                    },
-                    markTypeRubricValuesCheck: {
-                        depends: isRubricValueChecked
-                    }
-                }
-            );
+        form.find('[data-rubric] tbody td input[type="text"]').each(function () {
+            $(this).rules('add', { number: true });
         });
 
         // Open/due/late date change triggers validation on other date fields.
