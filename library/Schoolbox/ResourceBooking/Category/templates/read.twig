@@ -1,21 +1,378 @@
-{# I need some way of adding custom_head #}
+{# Let's put the resource calendar view here for now #}
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.min.css" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar/dist/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
+
+<script type="text/javascript" src="/javascript/shared/calendar/jquery.fullcalendar.js"></script>
+<script type="text/javascript" src="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
+<script type="text/javascript">
+    // Do stuff here
+    $(function() {
+        var calendarLoadingElement = $('#calendar-loading');
+        var calendarView = {{ calendar.view|json_encode|raw }};
+        var calendarDate = moment({{ calendar.date|json_encode|raw }});
+
+        if (calendarDate.isValid()) {
+            calendarDate = calendarDate.toDate();
+        } else {
+            calendarDate = new Date();
+        }
+        switch (calendarView) {
+            case 'day':
+                calendarView = 'timelineDay';
+                break;
+            case 'month':
+                calendarView = 'timelineMonth';
+                break;
+            case 'week':
+            default:
+                calendarView = 'timelineWeek';
+                break;
+        }
+
+        c = new Calendar('calendar', 'calendar-bubble', {
+            filter: {
+                enabled: true,
+                ajax: false,
+                // This AJAX lookup should always be a GET request
+                parentSelector: '#calendar-controls',
+                exportButtonSelector: false,
+                checkboxSelector: false,
+                applyFiltersSelector: false,
+                listViewButton: false
+            },
+            fullCalendar: {
+                firstHour: 9,
+                allDaySlot: false,
+                defaultDate: calendarDate,
+                columnFormat: {
+                    timelineMonth: 'ddd',
+                    timelineWeek:  'ddd D/M',
+                    timelineDay:   'ddd D/M',
+                    '':            'ddd D/M'
+                },
+                height: 'auto',
+                timeFormat: 'h(:mm)a',
+                eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
+                firstDay: Number({{ config.calendar_start_day }}),
+                schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+                defaultView: calendarView,
+                header: {
+                    left: 'prev,today,next',
+                    center: 'title',
+                    right: 'timelineMonth,timelineWeek,timelineDay'
+                },
+                events: function(start, end, timezone, callback) {
+                    var data = [
+                        {name: 'start', value: Calendar.reOffsetTimestamp(start.unix())},
+                        {name: 'end',   value: Calendar.reOffsetTimestamp(end.unix())}
+                    ];
+                    $.ajax({
+                        data:     data,
+                        dataType: 'json',
+                        url:      {{ routeLookup('resourceCategory.calendar', {id: item.id})|json_encode|raw }},
+                        success: function(data) {
+                            callback(data.filter(function(v) {
+                                return 'start' in v;
+                            }));
+                        },
+                        cache: false
+                    });
+                },
+                resourceColumns: [{
+                    labelText: 'Resource',
+                    render: function(resource, el) {
+                        var href = $('<a />').attr('href', '/resource-booking/item/'+resource.id);
+                        el.find('.fc-cell-text').empty().append(href.text(resource.name));
+                    }
+                }],
+                resources: {{ resources|json_encode|raw }},
+                loading: function(isLoading) {
+                    /* Show loading div right in the middle
+                     */
+                    if (isLoading === true) {
+                        calendarLoadingElement
+                                .data('opened', false)
+                                .foundation('reveal', 'open')
+                                .one('opened.fndtn.reveal', function() {
+                                    calendarLoadingElement.data('opened', true);
+                                });
+                    }
+                    /* Has finished loading
+                     */
+                    else {
+                        /* Hide loading div
+                         * Is it open? close it
+                         * Is it not yet open? close it when it is open
+                         */
+                        if (calendarLoadingElement.data('opened')) {
+                            calendarLoadingElement.foundation('reveal', 'close');
+                        } else {
+                            calendarLoadingElement.one('opened.fndtn.reveal', function() {
+                                calendarLoadingElement.foundation('reveal', 'close');
+                            });
+                        }
+                    }
+                },
+                /**
+                 * Event rendering: put the event's start and end time into data
+                 */
+                eventRender: function(event, element) {
+                    if (!event.data) {
+                        return false;
+                    }
+                    // Set data as attributes, that way selectors can query them
+                    // End of event might not be defined if it's the same as
+                    // start, too.
+                    element.attr({
+                        'data-start':  event.start.format(),
+                        'data-end':    (event.end || event.start).format(),
+                        'data-allday': event.allDay ? 1 : 0
+                    })
+
+                    // Add booking styles
+                    element.addClass('booking');
+                    if ('booking' in event.data) {
+                        if (event.data.booking.status.isRejected) {
+                            element.addClass('rejected');
+                        }
+                        if (event.data.booking.status.isApproved) {
+                            element.addClass('approved');
+                        }
+                        if (event.data.booking.status.isPending) {
+                            element.addClass('pending');
+                        }
+                    }
+                    return element
+                },
+
+                /**
+                 * Event that is triggered when clicking on a calendar day or time.
+                 *
+                 * @param date
+                 * @param jsEvent
+                 * @param view
+                 * @param resource
+                 */
+                dayClick: function(date, jsEvent, view, resource) {
+                    // Bookings may not be made in the past.
+                    var allDay = !date.hasTime();
+                    var eventData = {
+                        allDay:    allDay ? 1 : 0,
+                        startDate: date.format('YYYY-MM-DD')
+                    };
+                    if (allDay) {
+                        eventData.displayDate = date.format('ddd, Do MMMM')
+                    } else {
+                        eventData.startTime   = date.format('HH:mm');
+                        eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
+                    }
+
+                    $('#calendar-create').find('[data-event-modal-resourcename]').html(resource.name);
+
+                    $('#calendar-create').foundation('reveal','open');
+
+                    // Mangled action unavoidable
+                    $('#createEvent')
+                        .attr('action', '/resource-booking/booking/bookItem/'+resource.id)
+                        .find('input[name="callbackUrl"]')
+                            .val(
+                                window.location.pathname
+                                + '?date=' + encodeURIComponent(date.format('DD-MM-YYYY'))
+                                + '&view=' + encodeURIComponent(c.dom.fullCalendar('getView').name)
+                            );
+
+                    c.bubble.display('create', eventData, jsEvent, this)
+                },
+                eventStartEditable: false
+            },
+            x: false
+        }).init()
+
+        // Event filter - reload events when the filter button is pressed.
+        $('#calendar-controls').on('click', '#applyFilters', function(event) {
+            event.preventDefault()
+            c.dom.fullCalendar('refetchEvents')
+            $('#calendar-controls').foundation('reveal','close');
+        })
+
+        // Approve, Reject, Cancel: all AJAX events
+        // Modify: not AJAX
+        // For any AJAX event - open a dialog if this is a series event
+        $('#calendar-bubble').find('#editEvent').on(
+                'click',
+                '[data-booking-button=booking-approve], [data-booking-button=booking-reject], [data-booking-button=booking-cancel]',
+                function(event) {
+                    event.preventDefault()
+                    var href     = this.href
+                    var callback = function(data) {
+                        return $.ajax(href, {data: data})
+                                .done(function() {
+                                    c.dom.fullCalendar('refetchEvents')
+                                })
+                                .fail(function() {
+                                    // fail in some way, not yet sure how
+                                });
+                    }
+                    var seriesId = $(this).data('seriesId')
+                    if (seriesId) {
+                        // Remove all previous change status events, and reapply to this
+                        // dialog box.
+                        updateSeriesDialog.find('[data-booking-action-text]').text($(this).text().toLowerCase());
+                        updateSeriesDialog.foundation('reveal', 'open');
+                        updateSeriesDialog.off('click', '[data-efficacy="self"]');
+                        updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
+                            e.preventDefault();
+                            updateSeriesDialog.foundation('reveal', 'close');
+                            callback({efficacy: 'self'});
+                        });
+                        updateSeriesDialog.off('click', '[data-efficacy="series"]');
+                        updateSeriesDialog.on('click', '[data-efficacy="series"]', function(e) {
+                            e.preventDefault();
+                            updateSeriesDialog.foundation('reveal', 'close');
+                            callback({efficacy: 'series', seriesId: seriesId});
+                        });
+                    } else if ($(this).hasClass('booking-cancel')) {
+                        $(this).confirmDialog({
+                            text: 'Are you sure you want to delete this booking?',
+                            confirmEvent: function() {
+                                callback({});
+                            }
+                        });
+                    } else {
+                        c.bubble.hide()
+                        callback()
+                    }
+                }
+        )
+
+        $('#fc-button-filter').click(function() { $('#calendar-controls').foundation('reveal','open') });
+    });
+</script>
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Resource Category - View</h1>
+        <h1>Resource Category - View {{ item.name }}</h1>
     </div>
 </div>
 
 <div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <dl>
-                <dt>ID</dt>
-                <dd>{{ item.id }}</dd>
+    <div class="small-12 columns">
+        <h2 class="subheader">
+            Bookings
+            <span class="hint has-tip tip-top" data-tooltip title="Click the calendar to add a booking for that time.">?</span>
+        </h2>
 
-                <dt>Title</dt>
-                <dd>{{ item.name }}</dd>
-            </dl>
-        </section>
+        <div id="calendar"></div>
     </div>
+</div>
+
+<div id="calendar-loading" class="reveal-modal tiny no-pad" data-reveal aria-hidden="true" role="dialog">
+    <div class='loader'></div>
+    <p>
+        <span class="label neutral full-width">
+        Loading events
+        </span>
+    </p>
+</div>
+
+<div class="reveal-modal small" data-reveal aria-hidden="true" role="dialog" id="calendar-create">
+    <form id="createEvent" data-no-calendar-listener="" method="get" action="">
+        <input type="hidden" name="startDate" />
+        <input type="hidden" name="startTime" />
+        <input type="hidden" name="callbackUrl" />
+
+        {# I can't tell if this item is bookable from here or not, because I don't know the URL #}
+        <h3 data-event-modal-resourcename></h3>
+        <p>Create booking for: <span data-event-modal-field="displayDate"></span></p>
+        <input type="submit" class='expand' value="Create Booking" />
+        {#<p>This resource may only be booked by a resource moderator.</p>#}
+    </form>
+
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble" >
+    <!-- Edit Event Form -->
+    <form id="editEvent">
+        <input type="hidden" name="eventId" />
+
+        <div class="row">
+            <div class="small-12">
+                <h3 class="note"></h3>
+                <ul class="meta">
+                    <li class="icon-resource-booking" data-event-modal-field="bookingStatus"></li>
+                    <li class="icon-calendar date"></li>
+                    <li class="icon-location"></li>
+                    <li class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></li>
+                    <li class="icon-staff-students" data-event-modal-field="reviewedBy">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></li>
+                </ul>
+
+                <article class="detail" data-is-html="1"></article>
+
+                <ul class="relatedBookings"></ul>
+
+                <div class="attendance">
+                    <dl>
+                        <dd><p class="attendanceIcon"></p></dd>
+                        <dd class="rm"><p class="attendanceStatus"></p></dd>
+                    </dl>
+                </div>
+                <div>
+                    <dl>
+                        <dd>
+                            <span class="modifyLink" data-is-html="1"></span>
+                            <span class="attendanceListButton" data-is-html="1"></span>
+                            <span class="attendanceRequestButton" data-is-html="1"></span>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="bookingActions" data-is-html="1"></div>
+            </div>
+        </div>
+    </form>
+
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+{##
+ # Calendar controls
+ # Add the popup event
+ #}
+<div id="calendar-controls" class="reveal-modal tiny" data-reveal aria-hidden="true" role="dialog">
+    <form>
+        <section>
+            <fieldset class="content">
+                <legend>Status</legend>
+                <div class="small-12 columns">
+                    <label title="Pending">
+                        <input type="checkbox" id='status-1' name="status[]" value="1" class="checkbox" checked />
+                        <label for="status-1" class="checkbox-label">Pending</label>
+                    </label>
+                    <label title="Approved">
+                        <input type="checkbox" id='status-2' name="status[]" value="2" class="checkbox" checked />
+                        <label for="status-2" class="checkbox-label">Approved</label>
+                    </label>
+                    <label title="Rejected">
+                        <input type="checkbox" id='status-3' name="status[]" value="3" class="checkbox"/>
+                        <label for="status-3" class="checkbox-label">Rejected</label>
+                    </label>
+                </div>
+            </fieldset>
+        </section>
+    </form>
+    <a href="#" id="applyFilters" class="button">Apply Filters</a>
+</div>
+
+{# Dialog for changing bookings in series #}
+<div class="reveal-modal" data-reveal aria-labelledby="dialog-booking-bulk-update-title" aria-hidden="true" role="dialog" id="dialog-bulk-update">
+    <h2 id="dialog-booking-bulk-update-title">This booking is part of a series</h2>
+    <p>Would you like to <span data-booking-action-text></span> only this booking, or all in the series?</p>
+    <ul class="flex-list buttons">
+        <li><a href="#" class="button" data-efficacy="self">Only this booking</a></li>
+        <li><a href="#" class="button" data-efficacy="series">All bookings in the series</a></li>
+        <li><a href="#" class="button" data-interaction="close">Cancel</a></li>
+    </ul>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>

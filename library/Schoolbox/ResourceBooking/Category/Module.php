@@ -29,6 +29,7 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->attachResourceRoutes($router, $basePath);
+        $this->addGetRoute($router, 'calendar', $basePath, '/{id}/calendar');
     }
 
     /**
