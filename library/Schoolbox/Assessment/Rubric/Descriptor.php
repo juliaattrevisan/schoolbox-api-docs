@@ -154,6 +154,15 @@ class Descriptor implements Calculable, Twiggable
 
 
     /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getText();
+    }
+
+
+    /**
      * Convert yourself into a Twig context array
      *
      * @return array
