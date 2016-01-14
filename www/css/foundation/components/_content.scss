@@ -333,6 +333,10 @@ $container-bg: white !default;
 
 @include selection;
 
+.align-bottom {
+	vertical-align: bottom;
+}
+
 // Deleting Components
 .delete-it{
 	background-color: tint($warning-color, 74%);
