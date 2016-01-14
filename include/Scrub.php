@@ -153,6 +153,9 @@ class Scrub
                 'www.khanacademy.org/embed_video',
                 'cdn.iframe.ly/api',
                 'vine.co/',
+                'widgets.itunes.apple.com/',
+                'embed-ssl.ted.com/',
+                'giphy.com/embed/',
             );
 
             // Add any additional iframe sources as configured
