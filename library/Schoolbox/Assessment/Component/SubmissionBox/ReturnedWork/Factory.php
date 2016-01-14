@@ -336,10 +336,9 @@ class Factory
             $returnedWork->setNormalizedMark($errors[$this->getMark()]->getNormaliseAs());
         } elseif ($this->getSubmissionBox()->isRubric()) {
             /* If it's a rubric, it normalises in a special way
-             * However: if I submitted this from the view submission page there's no rubric set.
-             * Don't change the norm mark if this happened.
+             * However: if I submitted a mark override, I still want to give that precedence
              */
-            if ($this->getRubric()) {
+            if ($this->getRubric() && !$this->getMark()) {
 
                 $normalisedMark = $this->getRubric()->getPercentage() * 100;
                 $returnedWork->setMark($this->getMarksheet()->convertRawMark($normalisedMark, $this->getRubric()->getTotal(), true));

@@ -69,7 +69,6 @@ $mark = $_POST['mark'][$_POST['uid']];
 // If the mark gets passed at the same time as rubrics,
 // then rubrics get clobbered. We don't want that.
 if (is_array($_POST['rubric'])) {
-    $mark = null;
 
     $desMap = DescriptorMapper::getInstance();
     $rubMap = RubricMapper::getInstance();
