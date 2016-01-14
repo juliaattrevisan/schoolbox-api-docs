@@ -345,6 +345,11 @@ class Factory
                 $returnedWork->setMark($this->getMarksheet()->convertRawMark($normalisedMark, $this->getRubric()->getTotal(), true));
                 $returnedWork->setNormalizedMark($normalisedMark);
             }
+            else {
+                $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark());
+                $returnedWork->setMark($normalisedMarkArray['mark']);
+                $returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
+            }
         } elseif ((trim($this->getMark()) === '') || ($this->getMark() < 0)) {
             /* Empty mark (not zero) - treat as null
              */

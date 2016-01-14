@@ -40,7 +40,7 @@
         var form = $('#createSubmissionForm');
         form.submissionFormValidate();
 
-        $.fn.alaressEditor();
+        $.fn.alaressEditor({targetElements: $('#description') });
 
 
         // cache that
@@ -150,7 +150,7 @@
                     <div class="small-12 columns">
                         <label>
                             Description
-                            <textarea name="description">{DESCRIPTION}</textarea>
+                            <textarea name="description" id="description">{DESCRIPTION}</textarea>
                         </label>
                     </div>
 
@@ -587,16 +587,18 @@
                     </div>
 
                     <!-- BEGIN existing_marks_warning -->
-                    <div class="alert-box warning">
-                        <strong>Warning:</strong>
-                        you have already marked some students' work.
-                        <ul>
-                            <li>Changing the number of descriptors&mdash;or the result set&mdash;will invalidate
-                                any existing marks given;
-                            </li>
-                            <li>If you add/remove criteria, students who have been marked will be automatically remarked;</li>
-                            <li>You can safely change wordings and orders of descriptors.</li>
-                        </ul>
+                    <div class="small-12 column">
+                        <div class="alert-box warning">
+                            <strong>Warning:</strong>
+                            you have already marked some students' work.
+                            <ul>
+                                <li>Changing the number of descriptors&mdash;or the result set&mdash;will invalidate
+                                    any existing marks given;
+                                </li>
+                                <li>If you add/remove criteria, students who have been marked will be automatically remarked;</li>
+                                <li>You can safely change wordings and orders of descriptors.</li>
+                            </ul>
+                        </div>
                     </div>
                     <!-- END existing_marks_warning -->
 
