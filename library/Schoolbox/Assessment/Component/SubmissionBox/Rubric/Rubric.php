@@ -363,6 +363,7 @@ class Rubric extends Core\Rubric
 
         }
 
+        $context['boxId'] = $this->box->getId();
 
         return $context;
     }
