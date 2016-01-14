@@ -490,7 +490,12 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                                     fields.url.setValue(config.image.source(responseText.hash));
                                                 }
 
-                                                render(fields, fields.url.getValue(), false);
+                                                /* Prevent rendering attempt for uploaded files that
+                                                 * aren't actually renderable
+                                                 */
+                                                if (fields.type.getValue().length) {
+                                                    render(fields, fields.url.getValue(), false);
+                                                }
 
                                                 /* Shut modal, go back to Dialog
                                                  */

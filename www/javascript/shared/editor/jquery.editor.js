@@ -90,6 +90,7 @@
          * @param data
          */
         function build(data) {
+            var body = $('body');
 
             if (singletonModal) {
                 // you've got a modal; don't try to make another one
@@ -101,10 +102,9 @@
             else {
                 singletonModal = $('<div data-reveal class="reveal-modal file-picker" />')
                     .data('content', data);
+
+                body.append(singletonModal);
             }
-
-            var body = $('body');
-
 
             singletonModal
                 .html(singletonModal.data('content'))
