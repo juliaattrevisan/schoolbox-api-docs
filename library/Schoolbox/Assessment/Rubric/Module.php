@@ -12,9 +12,11 @@ namespace Schoolbox\Assessment\Rubric;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Role;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
@@ -33,10 +35,12 @@ class Module extends BaseModule
     {
         $this->addPostRoute($router, 'create', $basePath, "");
         $this->addPostRoute($router, 'download', $basePath, "/csv");
+        $this->addPostRoute($router, 'import', $basePath, "/csv/{storageTuple}");
 
         $this->addGetRoute($router, 'testGeneric', $basePath, "/test");
         $this->addGetRoute($router, 'testEmpty',   $basePath, "/test/empty");
         $this->addGetRoute($router, 'testBox',     $basePath, "/test/box/{boxId}");
+        $this->addGetRoute($router, 'testCSV',     $basePath, "/test/csv/{boxId}");
         $this->addGetRoute($router, 'testFolder',  $basePath, "/test/folder/{folderId}");
     }
 
@@ -55,7 +59,31 @@ class Module extends BaseModule
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF)
                 )
-            );
+            ));
+    }
+
+
+    /**
+     * Initializes any preloads on routes for this module.
+     *
+     * Preloads adjust route params before they are passed to the controller.
+     * Usually, they're used to load a single item into the route's params,
+     * which is then passed directly as a parameter to the action.
+     *
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        // Add the item to params, if ID is in the route.
+        $this->addRoutePreload(
+            $matcher, 'import',
+            function ($params) {
+                return array(
+                    'file' => (new CollectorFactory())->build([ $params['storageTuple'] ])->getFirst()
+                );
+            }
+        );
+
     }
 
 
