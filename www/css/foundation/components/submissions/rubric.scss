@@ -160,16 +160,20 @@ table.rb {
     line-height: 2.875rem;
 }
 .rb-selected {
-    background-color: greenyellow !important;
+    background-color: $input-focus-border-color !important;
+    color: calc-text-color($input-focus-border-color);
 }
 .rb-blank {
     background-color: #FFEFEB !important;
+    color: calc-text-color(#FFEFEB);
 }
 .rb-group-summary {
-    background-color: lightyellow !important;
+    background-color: lighten($input-border-color, 10%) !important;
+    color: calc-text-color(lighten($input-border-color, 10%));
 }
 .rb-final-summary {
-    background-color: #e0d887 !important;
+    background-color: $input-border-color !important;
+    color: calc-text-color($input-border-color);
 }
 .rb-description, .rb-value {
     display: block;
@@ -188,7 +192,7 @@ table.rb {
             color: inherit;
         }
         &:hover:before {
-            color: #0066b0;
+            color: $input-focus-border-color;
         }
     }
     a {
