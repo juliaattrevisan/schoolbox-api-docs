@@ -257,7 +257,10 @@ class StudentReportCard
                 'WORK_USER_ID'     => $this->getTargetUser()->getId(),
                 'WORK_USER_NAME'   => $this->getTargetUser()->formatName(),
                 'WORK_USER_EXT_ID' => $this->getTargetUser()->getExternalId(),
-                'WORK_USER_BYLINE' => 'Year' . $this->getTargetUser()->getYear()
+                'WORK_USER_BYLINE' => 'Year' . $this->getTargetUser()->getYear(),
+                'GRAPH_INFO_INDEX'                 => json_encode([]),
+                'GRAPH_ASSESSMENT_NAMES'           => json_encode([]),
+                'YOUR_GRAPH_ASSESSMENT_ITEM_VALUE' => json_encode([]),
             )
         );
         $this->renderSemesterSelectors($page);
@@ -410,15 +413,19 @@ class StudentReportCard
     {
         $page->setBlock('subject_container', 'grade_graph', 'grade_graph_block');
         $page->setVar('GRAPH_ASSESSMENT_ITEM_VALUE',json_encode(array()));
+        $page->setVar('grade_graph_block', '');
 
         // Not showing graph? Output dummy data
         if (!\Config::get('display_grade_graph')) {
-            $page->setVar('grade_graph_block', '');
             return;
         }
 
         if ($this->checkPermission(self::CAN_VIEW_CLASS_AVERAGE)) {
             $boxWhisker = $this->subjectData->getAllAssessmentMarks();
+            // don't render the section if there's no data to render
+            if (!$boxWhisker) {
+                return;
+            }
             $page->setVar('GRAPH_ASSESSMENT_ITEM_VALUE', json_encode($boxWhisker));
         }
 
