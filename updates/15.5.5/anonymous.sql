@@ -20,6 +20,6 @@ VALUES (
   '',
   (select id from lu_config_type where type='Security'),
   'true',
-  'false',
+  'true',
   'false'
 );
