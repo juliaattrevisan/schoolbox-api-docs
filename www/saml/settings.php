@@ -153,6 +153,9 @@ function useSAMLKerberos() {
                 case 'IE':
                     return true;
 
+                case 'Edge':
+                    return true;
+
                 case 'Chrome':
                     if (Config::get('saml_krb_chrome')) { return true; } else { return false; }
 
