@@ -152,6 +152,7 @@ class Scrub
                 'online.clickview.com.au/Share/PlayEmbed',
                 'www.khanacademy.org/embed_video',
                 'cdn.iframe.ly/api',
+                'vine.co/',
             );
 
             // Add any additional iframe sources as configured
