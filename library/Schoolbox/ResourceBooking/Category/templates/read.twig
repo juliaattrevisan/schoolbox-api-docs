@@ -174,7 +174,14 @@
                     $('#calendar-create').foundation('reveal','open');
 
                     // Mangled action unavoidable
-                    $('#createEvent').attr('action', '/resource-booking/booking/bookItem/'+resource.id);
+                    $('#createEvent')
+                        .attr('action', '/resource-booking/booking/bookItem/'+resource.id)
+                        .find('input[name="callbackUrl"]')
+                            .val(
+                                window.location.pathname
+                                + '?date=' + encodeURIComponent(date.format('DD-MM-YYYY'))
+                                + '&view=' + encodeURIComponent(c.dom.fullCalendar('getView').name)
+                            );
 
                     c.bubble.display('create', eventData, jsEvent, this)
                 },
@@ -288,6 +295,7 @@
     <form id="createEvent" data-no-calendar-listener="" method="get" action="">
         <input type="hidden" name="startDate" />
         <input type="hidden" name="startTime" />
+        <input type="hidden" name="callbackUrl" />
 
         {# I can't tell if this item is bookable from here or not, because I don't know the URL #}
         <h3 data-event-modal-resourcename></h3>
