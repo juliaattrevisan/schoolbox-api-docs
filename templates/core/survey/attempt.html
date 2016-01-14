@@ -57,9 +57,11 @@
 <div class="row">
 	<div class="small-12 island">
 		<h2 class="subheader">{SECTION_TITLE}</h2>
+		<!-- BEGIN sectionDescription -->
 		<section class="content">
 			<article>{SECTION_DESCRIPTION}</article>
 		</section>
+		<!-- END sectionDescription -->
 		<!-- BEGIN question -->
 		<section>
 			<form id="questionForm-{QUESTION_QUESTION_ID}" data-plugin="{QUESTION_PLUGIN}" action="/survey/saveResponse/{QUESTION_QUESTION_ID}" method="post" data-question="{QUESTION_QUESTION_ID}">

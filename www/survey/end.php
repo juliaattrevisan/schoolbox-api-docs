@@ -61,6 +61,8 @@ catch (\Exception $e) {
 $this->setFile(TEMPLATE_content, 'survey/end.html');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
+$this->setBlock(TEMPLATE_content, 'completionMessage', 'completionMessage_block');
+
 $this->setTitle('Survey: ' . $survey['title']);
 
 $this->setVar(
@@ -70,6 +72,12 @@ $this->setVar(
         'ASSESS_CATEGORY_ID'        => $survey['category_id'],
     )
 );
+
+if($survey['completion_message']) {
+    $this->parse('completionMessage_block','completionMessage');
+} else {
+    $this->setVar('completionMessage_block', '');
+}
 
 if (!$attempt['finish']) {
     $finishDate = Alaress_Date_Format::now();

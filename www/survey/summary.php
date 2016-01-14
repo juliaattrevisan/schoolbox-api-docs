@@ -57,10 +57,18 @@ $this->setVar(array(
 
 $this->setFile(TEMPLATE_content, 'assess/summary.html');
 $this->setFile('assessContentsFragment', 'assess/contents.html');
+$this->setBlock(TEMPLATE_content, 'has_description', 'has_description_block');
 $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
+$assess['description'] = trim($assess['description']);
+
+if (empty($assess['description'])) {
+    $this->setVar('has_description_block', '');
+} else {
+    $this->parse('has_description_block', 'has_description', true);
+}
 $assessHandler->renderAssessContents($assess['assess_id'], $this);
 $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
