@@ -3,7 +3,7 @@
     <li class="active"><a href="#">{{  category.getName() }}</a></li>
 </ul>
 
-<div class="actions-small-1 row">
+<div class="actions-small-2 row">
     <div class="list-item">
         <div class="small-12 columns">
             <h1>Resources</h1>
@@ -15,6 +15,7 @@
             <a id="resource-create" rel="create-form" class="icon-add" href="{{ routeLookup('resourceItem.add') }}" title="Add Resource"></a>
         {% endif %}
         <a class="icon-search" data-reveal-id="search-modal" title="Search Resources"></a>
+        <a class="icon-calendar" href="{{  routeLookup('resourceCategory.read', {id: categoryId}) }}" title="Availability Report"></a>
     </nav>
 </div>
 
