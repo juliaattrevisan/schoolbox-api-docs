@@ -177,6 +177,9 @@ table.rb {
 }
 .rb-description, .rb-value {
     display: block;
+    &.error {
+        border-color: $alert-color !important;
+    }
 }
 .rb-value {
     font-family: monospace !important;
