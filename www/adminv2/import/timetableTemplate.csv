@@ -1,5 +1,5 @@
-Term Campus,Term Title,Period Day,Period Title,Class Code,Class Title,Class Description,Class Room,Teacher Code,Teacher Firstname,Teacher Lastname
-SEN,Term 1 2014,1,Period 1,ENX11,English X11,,3,T111,,
-,,2,Period 1,,,,3,T111,,
-,,,,,,,,T112,,
-,,1,Period 2,ENX12,English X12,,1,T112,,
+Term Campus,Term Title,Period Day,Period Title,Class Code,Class Title,Class Description,Class Room,Teacher Code
+SEN,Term 1 2014,1,Period 1,ENX11,English X11,,3,T111
+,,2,Period 1,,,,3,T111
+,,,,,,,,T112
+,,1,Period 2,ENX12,English X12,,1,T112
