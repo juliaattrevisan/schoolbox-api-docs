@@ -378,6 +378,13 @@ class RubricMapper
     {
         $square = [];
 
+        $folderLookup = [ $folderId ];
+
+        // if we're looking at a task, be observant of the parent folder as well
+        if ($taskMode) {
+            $folderLookup[] = \Schoolbox\Resource\Folder\Mapper::getInstance()->findCheaplyById($folderId)->getParent()->getId();
+        }
+
         $fp = $file->readStream();
 
         $square[] = fgetcsv($fp);
@@ -422,8 +429,10 @@ class RubricMapper
                 try {
                     // if the crit exists, just use that
                     $model = CriterionMapper::getInstance()->findOneByColumnList([
-                        'grouping' => $group,
-                        'name'     => $name
+                        'grouping'    => $group,
+                        'name'        => $name,
+                        'parent_type' => 'category',
+                        'parent_id'   => $folderLookup
                     ]);
 
                 } catch (\Schoolbox\Mapper\Exception $e) {
