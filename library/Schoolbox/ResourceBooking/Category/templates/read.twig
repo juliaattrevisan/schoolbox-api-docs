@@ -251,9 +251,15 @@
     });
 </script>
 
+<ul class="breadcrumb">
+    <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
+    <li><a href="{{ routeLookup('resourceCategory.browse') }}">Categories</a></li>
+    <li class="active"><a href="{{ routeLookup('resourceCategory.browse') }}?category={{ item.id|e('url') }}" >{{ item.name }}</a></li>
+</ul>
+
 <div class="row">
     <div class="small-12 columns">
-        <h1>Resource Category - View {{ item.name }}</h1>
+        <h1>{{ item.name }} Availability</h1>
     </div>
 </div>
 
