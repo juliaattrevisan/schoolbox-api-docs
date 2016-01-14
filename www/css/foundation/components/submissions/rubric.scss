@@ -12,25 +12,25 @@ table.rb {
                 }
             }
         }
+        input[type=checkbox], input[type=radio] {
+            &:checked {
+                + label {
+                    background-color: $input-border-color;
+                    color: calc-text-color($input-border-color);
+                }
+            }
+            + label {
+                &:hover {
+                    background: $input-focus-border-color;
+                    color: calc-text-color($input-focus-border-color);
+                    cursor: pointer;
+                }
+            }
+        }
     }
     a {
         white-space: nowrap;
         line-height: 2.75rem;
-    }
-    input[type=checkbox], input[type=radio] {
-        &:checked {
-            + label {
-                background-color: $input-border-color;
-                color: calc-text-color($input-border-color);
-            }
-        }
-        + label {
-            &:hover {
-                background: $input-focus-border-color;
-                color: calc-text-color($input-focus-border-color);
-                cursor: pointer;
-            }
-        }
     }
     input[type=text] {
         + label.rb-readonly {
