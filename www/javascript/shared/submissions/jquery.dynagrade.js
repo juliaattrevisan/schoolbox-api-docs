@@ -39,7 +39,7 @@
 
         var conf = this.options.conf;
 
-        $(element).on('dynagrade', function (e) {
+        $(element).on('dynagrade dynagrade.preload', function (e) {
 
             var target = $(e.target);
 

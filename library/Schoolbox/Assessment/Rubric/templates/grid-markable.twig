@@ -121,7 +121,7 @@
         // initialise dynamic mark display
         $rb.dynagrade({{ markType | json_encode | raw }});
 
-        $rb.on('change', '[data-rubric], [data-rubric-group]', function () {
+        $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
 
             var $changed = $(this);
 
@@ -157,7 +157,7 @@
 
             rubricSummary.attr('data-numerator', rubricSum);
 
-            parseFraction(rubricSummary);
+            parseFraction(rubricSummary, e.namespace);
 
             $('[data-role=rubric-sum]').text(rubricSummary.text());
 
@@ -182,17 +182,23 @@
         }
 
         // initial display
-        $('[data-rubric]').trigger('change');
+        $('[data-rubric]').trigger('change.preload');
 
         /**
          *
          * @param {jQuery} $elem
+         * @param {string} namespace
          */
-        function parseFraction($elem)
+        function parseFraction($elem, namespace)
         {
+            var ev = 'dynagrade';
+            if (namespace) {
+                ev = ev + '.' + namespace;
+            }
+
             $elem.each(function () {
                 if (this.hasAttribute('data-numerator') && this.hasAttribute('data-denominator')) {
-                    $(this).trigger('dynagrade');
+                    $(this).trigger(ev);
                 }
             });
 
