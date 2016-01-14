@@ -241,55 +241,6 @@ class ClassStatistics {
 		return $marks;
 	}
 
-	public function getHistoryIsolatingUser(User $user) {
-		$id = $user->getId();
-		$data = array();
-
-		foreach($this->workMap as $stamp => $work) {
-			$mark = null;
-
-			if($work['object'] instanceof SubmissionBox) {
-				$title = $work['object']->getName();
-				$visibility = $work['object']->getMarkVisibility();
-
-				// extract user mark if it exists
-				if(array_key_exists($id, $work['marks'])) {
-					$mark = $work['marks'][$id];
-				}
-			}
-			elseif($work['object'] instanceof OnlineAssessment) {
-				$title = $work['object']->getTitle();
-				$visibility = 2;
-
-				// extract user mark if it exists
-				if(array_key_exists($id, $work['marks'])) {
-					$mark = $work['marks'][$id][0];
-				}
-			}
-			else {
-				continue;
-			}
-
-			// extract average mark if it exists
-			if(array_key_exists('avg', $work['marks'])) {
-				$avg = $work['marks']['avg'];
-			}
-			else {
-				$avg = null;
-			}
-
-			$data[$stamp] = array(
-				'timestamp' => $stamp * 1000, // millis, for jsgraph
-				'title' => $title,
-				'user_mark' => $mark['mark'],
-				'average_mark' => $avg,
-				'visibility' => $visibility
-			);
-		}
-
-		return $data;
-	}
-
 	/**
 	 * Extracts the nominated user's marks for the category
 	 *
@@ -311,4 +262,47 @@ class ClassStatistics {
 		ksort($works);
 		return array_values($works);
 	}
+
+	/**
+	 * Get all the students data for box and whisker averages
+	 * @return array
+	 */
+	public function getAllUsersMarks() {
+		$allData = array();
+		$i = 0;
+		foreach ($this->workMap as $dueDate => $current) {
+			$box = $current['object'];
+			$allMarks = $current['marks'];
+			$allData[$i] = array();
+			/* Stack results
+             */
+			foreach ($allMarks as $userId => $currentMark) {
+				if ($box instanceof OnlineAssessment) {
+					if ($userId !== 'avg') {
+						if (count($currentMark)) {
+							$latestAttempt = array_pop($currentMark);
+							$allData[$i][] = array(
+								'info' => null,
+								'uid' => null,
+								'value' => (float)$latestAttempt['mark']
+							);
+						}
+					}
+				}
+				elseif ($box instanceof SubmissionBox) {
+					if (strlen(trim($currentMark['mark']))) {
+						$allData[$i][] = array(
+							'info' => null,
+							'uid' => null,
+							'value' => (float)$currentMark['mark']
+						);
+					}
+				}
+			}
+
+			$i++;
+		}
+		return array_values($allData);
+	}
+
 }

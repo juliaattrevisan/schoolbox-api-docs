@@ -39,13 +39,35 @@ class StudentReportCard
     const MANDATORY = 2;
 
     // vars that come from user input
+
+    /**
+     * @var int
+     */
     protected $targetUserId;
+
+    /**
+     * @var User
+     */
+    protected $targetUser;
+
     protected $targetYear;
     protected $targetSemester;
+
+
     protected $targetCategoryId;
 
     // 'session' vars
+
+    /**
+     * @var int
+     */
     protected $viewingUserId;
+
+    /**
+     * @var User
+     */
+    protected $viewingUser;
+
     protected $permissionSet = array();
     protected $minimumVisibility = 3;
 
@@ -84,6 +106,11 @@ class StudentReportCard
         // parse arguments
         $this->viewingUserId = $viewingAs == -1 ? $_SESSION['id'] : $viewingAs;
         $this->targetUserId  = $studentUserId;
+
+        //Convert to user objects TODO: pass user objects initially
+        $this->setViewingUser(UserMapper::getInstance()->findById($this->viewingUserId));
+        $this->setTargetUser(UserMapper::getInstance()->findById($this->targetUserId));
+
         // dependencies
         $this->submissionMapper = new SubmissionBoxMapper();
         $this->showcaseMapper   = new ShowcaseMapper();
@@ -113,11 +140,11 @@ class StudentReportCard
             $this->permissionSet     = array(true, true, true, $displayClassAverage, true, $showOverallGrade);
             $this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_STUDENT;
         } // if superuser, all permissions enabled
-        elseif ($this->groupHandler->isSuperuser($this->viewingUserId)) {
+        elseif ($this->getViewingUser()->isSuperuser()) {
             $this->permissionSet     = array(true, true, true, true, true, true);
             $this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PRIVATE;
         } // if staff, all READ permissions enabled
-        elseif ($this->groupHandler->isStaff($this->viewingUserId)) {
+        elseif ($this->getViewingUser()->getRole()->isStaff()) {
             $this->permissionSet     = array(false, false, true, true, true, true);
             $this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PRIVATE;
         } // if parent of child, use Cfg::get('restrict_student_submissions') for READ permissions (no WRITE)
@@ -225,15 +252,15 @@ class StudentReportCard
         $page->setBlock(TEMPLATE_content, 'subject_container', 'subject_container_block');
         $page->setBlock(TEMPLATE_content, 'no_subjects', 'no_subjects_block');
 
-        // global vars
-        /** @var $target User */
-        $target = UserMapper::getInstance()->findById($this->targetUserId);
         $page->setVar(
             array(
-                'WORK_USER_ID'     => $target->getId(),
-                'WORK_USER_NAME'   => $target->formatName(),
-                'WORK_USER_EXT_ID' => $target->getExternalId(),
-                'WORK_USER_BYLINE' => 'Year' . $target->getYear()
+                'WORK_USER_ID'     => $this->getTargetUser()->getId(),
+                'WORK_USER_NAME'   => $this->getTargetUser()->formatName(),
+                'WORK_USER_EXT_ID' => $this->getTargetUser()->getExternalId(),
+                'WORK_USER_BYLINE' => 'Year' . $this->getTargetUser()->getYear(),
+                'GRAPH_INFO_INDEX'                 => json_encode([]),
+                'GRAPH_ASSESSMENT_NAMES'           => json_encode([]),
+                'YOUR_GRAPH_ASSESSMENT_ITEM_VALUE' => json_encode([]),
             )
         );
         $this->renderSemesterSelectors($page);
@@ -289,7 +316,7 @@ class StudentReportCard
     protected function renderSubject(\SitePage $page, $components = array())
     {
         if (empty($components)) {
-            $components = array('teachers', 'gradeAverage', 'classGraph', 'criteria', 'assessments', 'comments');
+            $components = array('teachers', 'gradeAverage', 'criteria', 'assessments','classGraph', 'comments');
         }
         if (!$this->subjectData instanceof SubjectReportCard) {
             throw new \InvalidArgumentException("No subject selected");
@@ -384,80 +411,25 @@ class StudentReportCard
 
     protected function renderClassGraph(\SitePage $page)
     {
+        $page->setBlock('subject_container', 'grade_graph', 'grade_graph_block');
+        $page->setVar('GRAPH_ASSESSMENT_ITEM_VALUE',json_encode(array()));
+        $page->setVar('grade_graph_block', '');
+
         // Not showing graph? Output dummy data
         if (!\Config::get('display_grade_graph')) {
-            $page->setVar(
-                array(
-                    'GRAPH_IS_DISPLAYED' => 0,
-                    'GRAPH_JSON'         => json_encode(array()),
-                    'GRAPH_COLOURS'      => json_encode(array()),
-                    'GRAPH_XMIN'         => 0,
-                    'GRAPH_XMAX'         => 100
-                )
-            );
             return;
         }
-        // Otherwise calculate graph data
-        $colours       = array(
-            'user'    => '#579DCF',
-            'average' => '#E99D12',
-//            'trend'   => '#3DB114',
-        );
-        $averageSeries = array();
-        $userSeries    = array();
-        $data          = $this->subjectData->getFullClassHistory();
-        // split into separate series, and mess around with php's loose typing
-        foreach ($data as $stamp => $d) {
-            if ($this->canViewMark($d['visibility'])) {
-                if (!is_null($d['average_mark'])) {
-                    $averageSeries[] = array($stamp * 1000, sprintf("%0.2f", $d['average_mark']) * 1);
-                }
-                if (!is_null($d['user_mark'])) {
-                    $userSeries[] = array($stamp * 1000, sprintf("%0.2f", $d['user_mark']) * 1);
-                }
-            }
-        }
-        usort(
-            $averageSeries,
-            function ($a, $b) {
-                return $a[0] < $b[0] ? $a[0] > $b[0] ? -1 : 1 : 0;
-            }
-        );
-        usort(
-            $userSeries,
-            function ($a, $b) {
-                return $a[0] < $b[0] ? $a[0] > $b[0] ? -1 : 1 : 0;
-            }
-        );
-        $graph = array();
-        // if permission to see class average, include the data series
+
         if ($this->checkPermission(self::CAN_VIEW_CLASS_AVERAGE)) {
-            $graph[] = array(
-                'name' => 'Class',
-                'data'  => $averageSeries
-            );
-        } // otherwise, remove the colour from the map (so the graph doesn't get confused)
-        else {
-            unset($colours['average']);
+            $boxWhisker = $this->subjectData->getAllAssessmentMarks();
+            // don't render the section if there's no data to render
+            if (!$boxWhisker) {
+                return;
+            }
+            $page->setVar('GRAPH_ASSESSMENT_ITEM_VALUE', json_encode($boxWhisker));
         }
-        // add the user to the graph second, so it appears on top
-        $graph[] = array(
-            'name' => 'You',
-            'data'  => $userSeries
-        );
-        // display the graph for the semester
-        $start = mktime(0, 0, 0, ($this->targetSemester - 1) * 6 + 1, 0, $this->targetYear) * 1000;
-        // add 6 months - 1 day
-        $end = $start + ((365 / 2 - 1) * 86400000);
-        $page->setVar(
-            array(
-                'GRAPH_IS_DISPLAYED' => 1,
-                'GRAPH_JSON'         => json_encode($graph),
-                'GRAPH_COLOURS'      => json_encode(array_values($colours)),
-                'GRAPH_XMIN'         => $start,
-                'GRAPH_XMAX'         => $end
-            )
-        );
+
+        $page->parse('grade_graph_block', 'grade_graph');
     }
 
     protected function renderCriteria(\SitePage $page)
@@ -617,9 +589,10 @@ class StudentReportCard
         $page->setBlock('work', 'work_clickable', 'work_clickable_block');
         $page->setBlock('work', 'work_unclickable', 'work_unclickable_block');
         $work = $this->subjectData->getAssessments();
+
+
         if (count($work)) {
-            $userMapper = new \Schoolbox\UserMapper();
-            $user       = $userMapper->findById($this->targetUserId);
+            $user       = $this->getTargetUser();
             foreach ($work as $w) {
                 $object = $w['object'];
                 $marks  = $w['marks'];
@@ -649,6 +622,7 @@ class StudentReportCard
                         'work_unclickable_block'       => '',
                     )
                 );
+
                 $existingShowcasedItem = null;
                 if ($object instanceof SubmissionBox) {
                     // Don't output to students if it's not published yet?
@@ -661,6 +635,16 @@ class StudentReportCard
                             continue;
                         }
                     }
+
+                    /* Gather JSON data for graph */
+                    $allNames[] = $object->getName();
+                    $userMarks[] = (float)($marks['mark']);
+                    $infoIndex[] = array(
+                        'displayMark' => $marks['display_mark'],
+                        'gradientMark' => (int)($marks['mark'] / 10),
+                        'info' => $marks['comment']
+                    );
+
                     $rowData = $this->outputDueWorkRow($object, $marks);
                     $page->setVar($rowData);
                     /* Hide related buttons if eportfolio is not enabled
@@ -710,6 +694,15 @@ class StudentReportCard
                     }
                     $page->parse('work_clickable_block', 'work_clickable', true);
                 } elseif ($object instanceof OnlineAssessment) {
+
+                    $allNames[] = $object->getTitle();
+                    $userMarks[] = (float)($marks[0]['mark']);
+                    $infoIndex[] = array(
+                        'displayMark' => $marks[0]['display_mark'],
+                        'gradientMark' => (int)($marks[0]['mark'] / 10),
+                        'info' => $marks[0]['comment']
+                    );
+
                     // Quizzes that aren't open shouldn't show here either?
                     $rowData = $this->outputOnlineAssessRow($object, $marks, $page);
                     // OA's cannot be published at the moment, refactor DueWork publish code if they become publishable
@@ -733,6 +726,11 @@ class StudentReportCard
                     )
                 );
             }
+
+            /* Output graph json data */
+            $page->setVar('GRAPH_INFO_INDEX', json_encode($infoIndex));
+            $page->setVar('GRAPH_ASSESSMENT_NAMES', json_encode($allNames));
+            $page->setVar('YOUR_GRAPH_ASSESSMENT_ITEM_VALUE', json_encode($userMarks));
 
             $page->parse('has_work_block', 'has_work');
 
@@ -881,7 +879,7 @@ class StudentReportCard
         }
 
         // sessionuser var
-        $sessionUser  = UserMapper::getInstance()->findById($this->viewingUserId);
+        $sessionUser  = $this->getViewingUser();
         $sessionRole  = $sessionUser->getRole()->getType();
         $conversation = new Conversation($this->getTargetUser(), $this->getTargetCategory());
         // show or hide the create comment form
@@ -1253,15 +1251,47 @@ class StudentReportCard
         }
     }
 
+    /**
+     * @return User
+     */
     public function getTargetUser()
     {
-        return UserMapper::getInstance()->findById($this->targetUserId);
+        return $this->targetUser;
     }
+
+    /**
+     * @param User $targetUser
+     */
+    public function setTargetUser($targetUser)
+    {
+        $this->targetUser = $targetUser;
+    }
+
+
 
     public function getTargetCategory()
     {
         return $this->folderMapper->findById($this->targetCategoryId);
     }
+
+
+    /**
+     * @return User
+     */
+    public function getViewingUser()
+    {
+        return $this->viewingUser;
+    }
+
+    /**
+     * @param User $viewingUser
+     */
+    public function setViewingUser($viewingUser)
+    {
+        $this->viewingUser = $viewingUser;
+    }
+
+
 
     public function getTargetYear()
     {

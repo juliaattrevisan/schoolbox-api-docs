@@ -234,12 +234,6 @@ class SubjectReportCard {
 		return $this->_userHistory;
 	}
 
-	/**
-	 * @return array
-	 */
-	public function getFullClassHistory() {
-		return $this->_fullClassHistory->getHistoryIsolatingUser($this->getUser());
-	}
 
 	public function getCriteria() {
 		if(!is_array($this->_criteria)) {
@@ -264,6 +258,15 @@ class SubjectReportCard {
 
 	public function getAssessments($sortBy = self::SORT_BY_DATE) {
 		return $this->_fullClassHistory->extractUserMarks($this->getUser());
+	}
+
+	/**
+	 * Fetches all marks for all assessments this is useful to calculate ranges
+	 *
+	 * @return array
+	 */
+	public function getAllAssessmentMarks() {
+		return $this->_fullClassHistory->getAllUsersMarks();
 	}
 
 	public function getComments($visibleTo = self::VISIBLE_TO_ALL) {

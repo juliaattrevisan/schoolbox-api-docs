@@ -1,3 +1,84 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts/highcharts-more.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/reportCardBoxplot.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.all-work.js"></script>
+<script type="text/javascript" src="/learninganalytics/js/schoolboxTheme.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+
+        var infoIndex = {GRAPH_INFO_INDEX}
+        /**
+         *  Boxplots for each Task in the Unit
+         */
+        $.fn.reportCardBoxplotRender({
+            element: '#subject-graph',
+            /* Title of the graph
+             */
+            title: '',
+            /* Orientation of the box plots
+             */
+            orientation: 'vertical',
+            /* A list of all the assessment names that are being graphed
+             * These correspond to a series of data and their respective
+             * five-point summaries
+             */
+
+            allAssessments: {GRAPH_ASSESSMENT_NAMES},
+            /* All the raw data
+             */
+            allData: $.fn.reportCardBoxplotCalculateAllSeriesData({GRAPH_ASSESSMENT_ITEM_VALUE}),
+            /* You
+             */
+            additionalSeries: [
+                {
+                    type: 'scatter',
+                    name: 'You',
+                    color: 'rgb(255, 87, 87)',
+                    marker: {
+                        radius: 6,
+                    },
+                    data: {YOUR_GRAPH_ASSESSMENT_ITEM_VALUE},
+                    tooltip: {
+                        headerFormat: '',
+                        borderColor: '#000000',
+                        pointFormatter: function() {
+                            /* Basic template for each outlier
+                             */
+                            var template =
+                                    '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
+                                    '<p class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></p>' +
+                                    '<p class="comment">{INFO}</p>' +
+                                    '</div>';
+                            /* Concatenate everything
+                             */
+                            tooltipContent = template;
+                            tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, infoIndex[this.x].displayMark);
+                            tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, infoIndex[this.x].gradientMark);
+                            tooltipContent = tooltipContent.replace(/{INFO}/, infoIndex[this.x].info);
+                            return tooltipContent;
+                        }
+                    }
+                }
+            ]
+        });
+
+
+        /* Set up comment abilities: post
+         */
+        $.fn.allWork.commentSetup({
+            data: {
+                year: '{WORK_YEAR}',
+                semester: '{WORK_SEMESTER}',
+                studentId: '{WORK_USER_ID}',
+                folderId: '{SUBJ_ID}'
+            }
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Grades for {RC_TITLE}</h1>
@@ -57,6 +138,7 @@
     </div>
 </div>
 
+<!-- BEGIN grade_graph -->
 <div class="row">
     <div class="small-12 island">
         <section class="content">
@@ -64,6 +146,7 @@
         </section>
     </div>
 </div>
+<!-- END grade_graph -->
 
 <!-- BEGIN subject_rubric -->
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
@@ -280,57 +363,6 @@
 </div>
 <!-- END subject_comments -->
 
-<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
-<script type="text/javascript" src="/javascript/shared/submissions/jquery.all-work.js"></script>
-<script type="text/javascript">
-$(function () {
-
-    /* Graph (to be replaced one day, hence not plugin'd)
-     */
-    var graphElement = $('#subject-graph');
-    var displayGraph = {GRAPH_IS_DISPLAYED}
-
-    if (graphElement.length) {
-		if (displayGraph) {
-            $('#subject-graph').highcharts({
-                title: {
-                    text: ''
-                },
-                colors: {GRAPH_COLOURS},
-                xAxis: {
-                    title: '',
-                    min: {GRAPH_XMIN},
-                    max: {GRAPH_XMAX},
-                    type: 'datetime'
-                },
-                yAxis: {
-                    title: '',
-                    min: 0,
-                    max: 100
-                },
-                series: {GRAPH_JSON},
-                credits: {
-                    enabled: false
-                }
-            });
-		}
-		else {
-			graphElement.hide();
-		}
-	}
-
-    /* Set up comment abilities: post
-     */
-    $.fn.allWork.commentSetup({
-        data: {
-            year: '{WORK_YEAR}',
-            semester: '{WORK_SEMESTER}',
-            studentId: '{WORK_USER_ID}',
-            folderId: '{SUBJ_ID}'
-        }
-    });
-});
-</script>
 <!-- END subject_container -->
 
 <!-- BEGIN no_subjects -->
