@@ -17,7 +17,7 @@
             return form.find('[name="marktype"] :selected').data('slug') == 'rubric';
         };
         var isMarkTypeTotal = function() {
-            return form.find('[name="marktype"] :selected').data('slug') == 'raw';
+            return form.find('[name="marktype"] :selected').data('slug') == 'raw' && !(form.find('[name=use-rubric]').is(':checked'));
         };
 
         // Rubric validator: do any exist?
