@@ -283,7 +283,7 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
         }
 
         $rubricZone = new Zone('rubric');
-        $rubricZone->setAttachPrompt('Import a rubric')->setMimeFilter('text/csv');
+        $rubricZone->setFileVar('rb_attach[]')->setAttachPrompt('Import a rubric')->setMimeFilter('text/csv');
 
         // output the grid
         $this->setVar('CLASS_CRITERIA', $this->getTwig()->render('@rubric/grid-csv.twig', [
