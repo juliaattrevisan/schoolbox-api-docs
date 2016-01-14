@@ -51,6 +51,19 @@
             });
 
         });
+
+        $('#dl-csv').on('click', function (e) {
+            e.preventDefault();
+
+            var frm = $('<form/>').attr('action', '/rubric/csv').attr('method', 'post').append($('table[data-rubric]').clone());
+
+            frm.on('submit', function () {
+                // might be too soon?
+                frm.detach();
+            });
+
+            frm.appendTo($('body')).submit();
+        });
     });
 </script>
 <div id="rubric-attachable{{ idSuffix }}">
@@ -62,6 +75,7 @@
         <div>
             {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
         </div>
+        <a href="{{ routeLookup('rubric.download') }}" class="icon-download button" id="dl-csv">Download Rubric as CSV</a>
     </div>
     <div data-waiting-msg class="hide">
         <h2>Importing Rubric Data...</h2>
