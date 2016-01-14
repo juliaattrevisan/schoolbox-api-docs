@@ -97,6 +97,7 @@ if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
     $cmd     = sprintf('sass --style compressed %s %s', escapeshellarg($infile), escapeshellarg($tmpfile));
     $logger->info("Building SASS...");
     exec($cmd, $output, $outputCode);
+
     if ($outputCode === 0) {
         $logger->info("SASS built - copying to CSS location");
         if (!is_dir($outdir)) {
@@ -117,6 +118,16 @@ if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
                     file_get_contents($outfile)
                 )
             );
+        }
+
+        $logger->info("Building stripped down CSS for editor");
+        $editorIn = SITE_root . '/www/css/foundation/editor.scss';
+        $editorOut = SITE_root . '/www/css/'.$siteLocation.'/editor.scss';
+        $cmd     = sprintf('sass --style compressed %s %s', escapeshellarg($editorIn), escapeshellarg($editorOut));
+        exec($cmd, $output, $outputCode);
+
+        if ($outputCode !== 0) {
+            $logger->warning("Something went wrong building editor CSS (exit code: $outputCode)");
         }
 
         $logger->info("Splitting for IE < 10 using blessc...");
