@@ -1,0 +1,31 @@
+<div id='component{COMPONENT_INSTANCE_ID}' class='component-container' data-component>
+    <!-- Custom javascript -->
+    <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            $("#component{COMPONENT_INSTANCE_ID}").find("[data-imageslider]").anyslider({
+                interval: {COMPONENT_CONFIG_TIMING_VALUE_MS},
+                prevLabel: '',
+                nextLabel: ''
+            });
+        });
+    </script>
+
+    <!-- BEGIN has_header -->
+    {CONFIGURATION}
+    <!-- END has_header -->
+
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 columns">
+            <section class="dashboard-imageslider imageslider-container">
+                <div data-imageslider class="imageslider">
+                    <!-- BEGIN image_scroller -->
+                    <a href="{IMAGE_URL}">
+                        <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
+                    </a>
+                    <!-- END image_scroller -->
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
