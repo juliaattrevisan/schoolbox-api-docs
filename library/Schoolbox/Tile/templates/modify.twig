@@ -98,6 +98,29 @@
                     </div>
                 </fieldset>
                 <fieldset class="content">
+                    <legend>Size<span class='hint has-tip tip-top' data-tooltip title="The font will scale between these percentages depending on the viewers screen size">?</span></legend>
+                    <div class="small-5 columns">
+                        <label for="title_text_min_size">From</label>
+                        <input type="number"
+                               id="title_text_min_size"
+                               name="title_text_min_size"
+                               value="{{ item.getTitleTextMinSize()|e('html_attr') }}" />
+                    </div>
+                    <div class="small-1 columns">
+                        <label for="title_text_min_size">&nbsp;</label> %
+                    </div>
+                    <div class="small-5 columns">
+                        <label for="title_text_max_size">To</label>
+                        <input type="number"
+                               id="title_text_max_size"
+                               name="title_text_max_size"
+                               value="{{ item.getTitleTextMaxSize()|e('html_attr') }}" />
+                    </div>
+                    <div class="small-1 columns">
+                        <label for="title_text_max_size">&nbsp;</label> %
+                    </div>
+                </fieldset>
+                <fieldset class="content">
                     <legend>
                         Colour
                     </legend>

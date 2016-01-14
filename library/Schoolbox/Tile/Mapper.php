@@ -48,6 +48,20 @@ class Mapper extends BaseMapper
         );
         $this->hasMap(
             array(
+                'column'   => 'title_text_min_size',
+                'property' => 'titleTextMinSize',
+                'type'     => self::TYPE_INTEGER,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'title_text_max_size',
+                'property' => 'titleTextMaxSize',
+                'type'     => self::TYPE_INTEGER,
+            )
+        );
+        $this->hasMap(
+            array(
                 'column'   => 'title_color',
                 'property' => 'titleColor',
                 'type'     => self::TYPE_COLOR,
