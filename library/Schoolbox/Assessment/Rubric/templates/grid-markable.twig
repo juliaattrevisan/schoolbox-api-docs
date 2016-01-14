@@ -1,89 +1,10 @@
-<style type="text/css">
-    table.rb tr td {
-        padding: 0;
-    }
-    table.rb tr label {
-        padding:0.875rem;
-        margin:0;
-        transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
-        width: 100%;
-        font-weight: normal;
-    }
-    .rb input:checked + label {
-        background-color: greenyellow !important;
-    }
-    .rb-blank {
-        background-color: #FFEFEB !important;
-    }
-    .rb-group-summary {
-        background-color: lightyellow !important;
-    }
-    .rb-final-summary {
-        background-color: #e0d887 !important;
-    }
-    .rb-description, .rb-value {
-        display: block;
-    }
-    .rb-value {
-        font-family: monospace;
-        margin-top: 0.5rem;
-    }
-    tbody th:first-of-type {
-        border-right: solid 1px #ededed;
-    }
-    tbody th:last-of-type, thead th:first-of-type {
-        border-right: solid 2px #ededed;
-    }
-    thead th:first-of-type {
-        background-color: #ededed !important;
-    }
-    table.rb tr label:hover {
-        background: #003d7e !important;
-        color: white;
-    }
-
-    @media only screen and (max-width: 59.375em) {
-
-        table.rb td.rb-blank {
-            display: none;
-        }
-
-        table.rb th.rb-criterion-name,
-        table.rb th.rb-group-summary
-        {
-            border-top: solid 2px #ededed;
-            padding-left: 2rem;
-        }
-
-        .rb-group-name {
-            border-top: solid 4px #ededed;
-        }
-
-        table.rb tr label {
-            padding-left: 3rem;
-        }
-
-        .rb tbody th:last-of-type {
-            border-right-width: 0;
-        }
-
-        .rb tbody th:first-of-type {
-            border-right-width: 0;
-        }
-
-    }
-</style>
-
 {% set formField = 'rubric' %}
-
 {% set inputType = rubric.multiSelect ? 'checkbox' : 'radio' %}
-
 {% set rubricId = 'rb-' ~ rubric.id %}
-
 {% set markType = markType ?: { mode: 'raw' } %}
 
 <div class="scrollable">
-<table class="rb stack-for-medium-down" id="{{ rubricId }}">
+<table class="rb markable stack-for-medium-down" id="{{ rubricId }}">
     {% set hasLevels = '' %}
     {% for level in rubric.levels %}
         {% set hasLevels = hasLevels ~ level.name %}

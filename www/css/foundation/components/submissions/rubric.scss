@@ -1,7 +1,36 @@
 table.rb {
+    &.markable {
+        td {
+            padding: 0;
+            label {
+                box-sizing: content-box;
+                width: 100%;
+                height: 100%;
+                position: relative;
+                span {
+                    margin: $table-row-padding;
+                }
+            }
+        }
+    }
     a {
         white-space: nowrap;
         line-height: 2.75rem;
+    }
+    input[type=checkbox], input[type=radio] {
+        &:checked {
+            + label {
+                background-color: $input-border-color;
+                color: calc-text-color($input-border-color);
+            }
+        }
+        + label {
+            &:hover {
+                background: $input-focus-border-color;
+                color: calc-text-color($input-focus-border-color);
+                cursor: pointer;
+            }
+        }
     }
     input[type=text] {
         + label.rb-readonly {
@@ -10,6 +39,7 @@ table.rb {
     }
     label {
         cursor: auto;
+        margin: 0;
     }
     tbody {
         th:first-of-type {
@@ -24,7 +54,7 @@ table.rb {
         &:hover {
             input[type=text], textarea {
                 border-color: $input-border-color;
-                background-color: white;
+                background-color: $container-bg;
             }
         }
     }
@@ -40,7 +70,7 @@ table.rb {
         overflow-y: auto;
         height: 100px; /* yes, I used pixels. wanna fight about it? */
         &:focus {
-            background-color: white;
+            background-color: $container-bg;
         }
     }
     textarea, input[type=text] {
@@ -227,7 +257,7 @@ table.rb {
         tr {
             &:hover {
                 th, td {
-                    background-color: white;
+                    background-color: $container-bg;
                 }
             }
             .rb-group-header {
