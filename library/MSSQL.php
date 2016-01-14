@@ -146,16 +146,16 @@ class MSSQL {
 		}
 
 		if ($this->dbf == false) {
-			throw new \Schoolbox\External\Exception("External database is offline.");
+			throw new \Schoolbox\External\Exception("Schoolbox was unable to connect to your schools external database.\nIf this problem persists, please contact your system administrator.");
+		} else {
+			if (!$this->changeDb($this->db)) {
+				throw new \Schoolbox\External\Exception("Schoolbox was unable to connect to your schools external database.\nThe server was online, however the database could not be accessed. If this problem persists, please contact your system administrator.");
+			} else {
+				/* Set Default NULL ON, due to stored procs requiring this */
+				mssql_query('SET ANSI_NULL_DFLT_ON ON', $this->dbf);
+				mssql_query('SET CONCAT_NULL_YIELDS_NULL ON', $this->dbf);
+			}
 		}
-
-		if (!$this->changeDb($this->db)) {
-			throw new \Schoolbox\External\Exception("External database is online, but unable to connect.");
-		}
-
-        /* Set Default NULL ON, due to stored procs requiring this */
-        mssql_query('SET ANSI_NULL_DFLT_ON ON',$this->dbf);
-        mssql_query('SET CONCAT_NULL_YIELDS_NULL ON', $this->dbf);
 	}
 
     /**
