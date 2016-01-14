@@ -67,7 +67,7 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS StudentStudiesCode,
                 '' AS AlertMessage
             FROM Student s
-            LEFT JOIN StudentContact sc ON s.ID = sc.StudentID
+            LEFT JOIN StudentContact sc ON s.ID = sc.StudentID AND sc.EmergencyContact = 'Y'
             LEFT JOIN Contact c ON sc.ContactID = c.ID
             WHERE s.Code = {$this->getDatabase()->smartQuote($externalUserId)}
         ";
@@ -105,9 +105,9 @@ class External_Humanedge_User implements External_UserInterface
                 '' AS StudentContactSuburb,
                 ca.PostCode AS StudentContactPostCode,
                 '' AS StudentContactState,
-                '' AS StudentContactPhoneActual,
+                c.PhoneHome AS StudentContactPhoneActual,
                 '' AS StudentContactMobilePhone,
-                '' AS StudentContactOccupPhone,
+                c.PhoneWork AS StudentContactOccupPhone,
                 '' AS StudentContactRelation,
                 -- No speese
                 '' AS StudentContactSpouseID,
