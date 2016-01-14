@@ -10,9 +10,13 @@
 namespace Schoolbox\Assessment\Rubric;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Storage\IStorage;
 use Url;
 
 class Controller extends BaseController
@@ -122,6 +126,56 @@ class Controller extends BaseController
 
     }
 
+
+    /**
+     * Return a Twigged shard generated from the file ref given
+     *
+     * @api POST /rubric/import/{storageTuple}
+     * @level 156
+     *
+     * @param IStorage      $file
+     */
+    public function import($file)
+    {
+        $post = $this->getRequest()->post;
+
+        try {
+            if ($boxId = $post->get('boxId')) {
+                $box = SubmissionBoxMapper::getInstance()->findById($boxId);
+                $folderId = $box->getCategory()->getId();
+                $taskMode = $box->getTask()->getId() > 0;
+
+            } elseif ($folderId = $post->get('folderId')) {
+                $box = SubmissionBoxMapper::getInstance()->createModel();
+                $taskMode = $post->get('task', false);
+
+            } else {
+                // can't work with that
+                throw new \Schoolbox\Mapper\Exception('No folder or box ID set');
+            }
+        } catch (\Schoolbox\Mapper\Exception $e) {
+
+            $this->getResponse()->status->setCode(400);
+            $this->getResponse()->content->set([
+                'format' => 'json',
+                'data'   => $e->getMessage()
+            ]);
+            return;
+        }
+
+        $grid = $this->getMapper()->buildFromCSV($file, $folderId, $taskMode)->setSubmissionBox($box);
+
+        $context = [
+            'formField' => $post->get('formField', 'rb'),
+            'rubric'    => $grid->toContext()
+        ];
+
+        $this->getResponse()->content->set([
+            'data'     => $context,
+            'format'   => 'nochrome',
+            'template' => '@rubric/grid-editable.twig'
+        ]);
+    }
 
     /**
      * Download the given rubric as a CSV
@@ -389,6 +443,27 @@ class Controller extends BaseController
     public function testBox($boxId)
     {
         $this->outputTest($this->getMapper()->findBySubmissionBox(SubmissionBoxMapper::getInstance()->findById($boxId)));
+    }
+    public function testCSV($boxId)
+    {
+        $formField = 'rubberick';
+
+        $grid = $this->getMapper()->findBySubmissionBox(SubmissionBoxMapper::getInstance()->findById($boxId));
+
+        $zone = new Zone($formField);
+        $zone->setAttachPrompt('Import a rubric CSV')
+            ->setMimeFilter('text/csv');
+
+        $this->getResponse()->content->set([
+            'data' => [
+                'formField'  => $formField,
+                'rubric'     => $grid->toContext(),
+                'attachzone' => $zone->getTwigContext(),
+                'test'       => $boxId
+            ],
+            'template' => "@rubric/grid-csv.twig"
+        ]);
+
     }
     public function testFolder($folderId)
     {

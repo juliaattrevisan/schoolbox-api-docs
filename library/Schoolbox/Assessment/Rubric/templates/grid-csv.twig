@@ -1,0 +1,69 @@
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript">
+    $(function () {
+        // listen for the attachzone doing its thing
+        $('#rubric-attachable{{ idSuffix }}').on('success.attachzone', function (e, data) {
+
+            var wrap   = $(this),
+                target = wrap.find('[data-replaceable]'),
+                body   = $('body'),
+                boxIdInput, catIdInput, postdata;
+
+            // show/hide appropriate things
+            wrap.find('[data-hideable]').addClass('hide');
+            wrap.find('[data-waiting-msg]').removeClass('hide');
+
+            // perform an ajax-replace of the target via the hash we've been given
+            var url = '{{ routeLookup('rubric.import') }}' + data.hash;
+
+            // detect our lookup reference
+            boxIdInput = body.find('input[name="id"]');
+
+            if (boxIdInput.length) {
+                postdata = {
+                    boxId: boxIdInput.val()
+                };
+
+            } else {
+                catIdInput = body.find('input[name="id"]');
+
+                if (catIdInput.length) {
+                    postdata = {
+                        folderId: catIdInput.val()
+                    };
+
+                } else {
+
+                    // nothing available: bug out
+                    // TODO detach the file
+                    return;
+                }
+            }
+
+            $.post(url, postdata, function (data) {
+
+                // dump in the new data
+                target.html(data);
+
+                wrap.find('[data-hideable]').removeClass('hide');
+                wrap.find('[data-waiting-msg]').addClass('hide');
+
+            });
+
+        });
+    });
+</script>
+<div id="rubric-attachable{{ idSuffix }}">
+    {% if test %}<input type="hidden" name="id" value="{{ test }}" />{% endif %}
+    <div data-hideable>
+        <div data-replaceable>
+            {% include '@rubric/grid-editable.twig' %}
+        </div>
+        <div>
+            {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+        </div>
+    </div>
+    <div data-waiting-msg class="hide">
+        <h2>Importing Rubric Data...</h2>
+    </div>
+</div>
