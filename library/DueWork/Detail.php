@@ -393,7 +393,7 @@ class DueWork_Detail
         }
 
         // show or hide the report button, based on rubricality
-        if ($this->marksheet->getSlug() == 'rubric') {
+        if ($this->submissionBox->isRubric()) {
             $page->parse('report_btn_block', 'report_btn');
         } else {
             $page->setVar('report_btn_block', '');
