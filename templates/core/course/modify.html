@@ -55,14 +55,14 @@
                     <legend>
                         Units
                         <span data-tooltip class="hint has-tip tip-top" title="
-                            Changing the open or due date of a unit will not change
+                            Changing the open or close date of a unit will not change
                             the open or due date of any assessments in the unit,
                             unless you check the <strong>Update Assessments</strong> checkbox.">?</span>
                     </legend>
                     <div class="small-12 columns no-pad">
                         <ul class="information-list">
                             <!-- BEGIN unit -->
-                            <li class="actions-small-1">
+                            <li>
                                 <input name="unit[{UNIT_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
                                 <input name="unit[{UNIT_COUNT}][unit_instance_id]" type="hidden" value="{UNIT_INSTANCE_ID}" />
                                 <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
@@ -100,7 +100,7 @@
                                         <!-- END unit_update_open_date -->
                                     </div>
                                     <div class="small-12 medium-3 columns" data-hide-watch="#import-{UNIT_COUNT}">
-                                        <label for="due_date-{UNIT_COUNT}">Due</label>
+                                        <label for="due_date-{UNIT_COUNT}">Close</label>
                                         <input id="due_date-{UNIT_COUNT}"
                                                name="unit[{UNIT_COUNT}][due_date]"
                                                type="text"
