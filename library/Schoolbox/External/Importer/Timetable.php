@@ -111,6 +111,8 @@ class Timetable extends AbstractImporter
                 continue;
             }
 
+            $key = trim($key);
+
             if (!isset($result[$key])) {
                 // Class
                 $this->log->info(sprintf('Class "%s" has not been parsed: parsing now', $key));
