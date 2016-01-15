@@ -12,7 +12,7 @@ INSERT INTO `config`(
 )
 VALUES (
     'fullcalendar_scheduler_license_key',
-    'CC-Attribution-NonCommercial-NoDerivatives',
+    '0220474696-fcs-1452833916',
     'FullCalendar Scheduler License Key',
     'FullCalendar Scheduler License Key',
     (SELECT `id` FROM lu_config_field WHERE field = 'input'),
