@@ -387,7 +387,7 @@ class RubricMapper
 
         $fp = $file->readStream();
 
-        $square[] = fgetcsv($fp);
+        $square[] = array_slice(fgetcsv($fp), 0, 13);
 
         // list of levels
         $levelNames = array_slice($square[0], 2);
@@ -397,7 +397,7 @@ class RubricMapper
         $criteria = [];
 
         // build the square, extracting data as we go
-        while ($row = fgetcsv($fp)) {
+        while ($row = array_slice(fgetcsv($fp), 0, 13)) {
 
             // list of criteria, grouped by... uh, group
             if ($row[0]) {
