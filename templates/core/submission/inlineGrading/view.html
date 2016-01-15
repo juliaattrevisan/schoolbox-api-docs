@@ -22,7 +22,7 @@
 
         var navNext = $('a[rel="next"]');
         var navPrev = $('a[rel="prev"]');
-        var markInput = $('#mark');
+        var markInput = $('[name^="mark"]').not('[type=hidden]').eq(0);
 
         var tgt = $('select[name=student-select]'), ize,
                 skipUnsubmitted = $('#skipUnsubmitted'),
@@ -103,7 +103,7 @@
             if (markInput.is('select')) {
                 markValue = markInput.find('option').filter(function () { return $(this).text() == gradeValue; }).val();
             } else {
-                markValue = gradeValue;
+                markValue = gradeValue.replace(markInput.attr('placeholder'), '').trim();
             }
 
             markInput.val(markValue);
