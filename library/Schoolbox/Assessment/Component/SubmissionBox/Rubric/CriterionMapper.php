@@ -10,6 +10,13 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox;
 
+/**
+ * Class CriterionMapper
+ *
+ * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
+ * @method Criterion createModel()
+ * @method Criterion findById($id)
+ */
 class CriterionMapper extends Schoolbox\Mapper {
 
     protected function mapping() {

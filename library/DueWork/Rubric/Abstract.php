@@ -6,11 +6,24 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DueWork_Rubric_Abstract
+ *
+ * @deprecated use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper
+ */
 abstract class DueWork_Rubric_Abstract {
 
     protected $submissionBoxID; // int
     protected $criteria;        // Criterion[]
 
+
+    /**
+     * DueWork_Rubric_Abstract constructor.
+     * @deprecated
+     *
+     * @param $submissionBoxID
+     */
     public function __construct($submissionBoxID) {
         $this->submissionBoxID = $submissionBoxID;
     }

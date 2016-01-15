@@ -32,10 +32,18 @@ class Decimal implements IColumnType {
 	}
 
 	public function hydrate($value, $mapper = null) {
+		// number format gets upset about empty strings
+		if ($value === '') {
+			$value = null;
+		}
 		return isset($value) ? number_format($value, $this->places, '.', '') : null;
 	}
 
 	public function dehydrate($value, $mapper = null) {
+		// number format gets upset about empty strings
+		if ($value === '') {
+			$value = null;
+		}
 		return isset($value) ? number_format($value, $this->places, '.', '') : null;
 	}
 }

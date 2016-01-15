@@ -40,7 +40,28 @@
         var form = $('#createSubmissionForm');
         form.submissionFormValidate();
 
-        $.fn.alaressEditor();
+        $.fn.alaressEditor({targetElements: $('#description') });
+
+
+        // cache that
+        var inputRaw = $('[data-hide-watch-value="raw"]');
+
+        // this needs to override the show-hide watcher because the total mark option depends on both values
+        $('#marktype, #use-rubric').on('change', function () {
+            var mt = $('#marktype').children(':selected').data('slug'),
+                rb = $('#use-rubric').prop('checked');
+
+            // we don't want to show the total mark field if the rubric is being used, since the total mark will be calculated from the rubric itself
+            if (mt == 'raw') {
+                if (rb) {
+                    // hide that
+                    inputRaw.addClass('hide');
+                } else {
+                    // show that
+                    inputRaw.removeClass('hide');
+                }
+            }
+        });
 
         // When I change the number of assessment levels,
         // that means I want to use assessment specific descriptors.
@@ -81,6 +102,7 @@
                         }
                     }
                 });
+
     });
 </script>
 <!-- END custom_head -->
@@ -128,7 +150,7 @@
                     <div class="small-12 columns">
                         <label>
                             Description
-                            <textarea name="description">{DESCRIPTION}</textarea>
+                            <textarea name="description" id="description">{DESCRIPTION}</textarea>
                         </label>
                     </div>
 
@@ -529,20 +551,6 @@
                          data-hide-watch-value="rubric"
                          data-hide-watch-option-attribute="data-slug"
                     >
-                        <!-- BEGIN existing_marks_warning -->
-                        <div class="alert-box warning">
-                            <strong>Warning:</strong>
-                            you have already marked some students' work.
-                            <ul>
-                                <li>Changing the number of descriptors&mdash;or the result set&mdash;will invalidate
-                                    any existing marks given;
-                                </li>
-                                <li>If you add/remove criteria, students who have been marked will be automatically remarked;</li>
-                                <li>You can safely change wordings and orders of descriptors.</li>
-                            </ul>
-                        </div>
-                        <!-- END existing_marks_warning -->
-
                         <fieldset>
                             <legend>
                                 Result Set
@@ -578,18 +586,50 @@
                         </fieldset>
                     </div>
 
-                    <div class="small-12 columns"
-                         data-hide-watch="#marktype"
-                         data-hide-watch-value="rubric"
-                         data-hide-watch-option-attribute="data-slug"
-                    >
-                        <label>
-                            Assessment Specific Descriptors
-                        </label>
-                        {COURSE_CRITERIA}
-                        {CLASS_CRITERIA}
+                    <!-- BEGIN existing_marks_warning -->
+                    <div class="small-12 column">
+                        <div class="alert-box warning">
+                            <strong>Warning:</strong>
+                            you have already marked some students' work.
+                            <ul>
+                                <li>Changing the number of descriptors&mdash;or the result set&mdash;will invalidate
+                                    any existing marks given;
+                                </li>
+                                <li>If you add/remove criteria, students who have been marked will be automatically remarked;</li>
+                                <li>You can safely change wordings and orders of descriptors.</li>
+                            </ul>
+                        </div>
                     </div>
+                    <!-- END existing_marks_warning -->
+
                     <!-- END marktype -->
+                    <div class="small-6 column">
+                        <label for="use-rubric">Mark Against Rubric <span data-tooltip class="hint has-tip tip-right" title="Will you use a rubric to mark this work?">?</span></label>
+                        <div class="switch">
+                            <input type="hidden" name="use-rubric"  value="0" />
+                            <input type="checkbox" {USE_RUBRIC_CHECKED} name="use-rubric" id="use-rubric" value="1" />
+                            <label for="use-rubric">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-6 column hide" data-hide-watch="#use-rubric">
+                        <label for="enable-group-marking">Mark Per-{TPL_LOCAL_RUBRICGROUP_PC} <span data-tooltip class="hint has-tip tip-right" title="Should marks be calculated on a per-{TPL_LOCAL_RUBRICGROUP} basis as well as overall?">?</span></label>
+                        <div class="switch">
+                            <input type="hidden" name="enable-group-marking" value="0" />
+                            <input type="checkbox" {GROUP_MARKING_CHECKED} name="enable-group-marking" id="enable-group-marking" value="1" />
+                            <label for="enable-group-marking">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+                    <fieldset id="rubric-section" class="small-12 content hide" data-hide-watch="#use-rubric">
+                        <div style="clear:both; margin-bottom: 1rem;">
+                            {CLASS_CRITERIA}
+                        </div>
+                    </fieldset>
                 </fieldset>
 
                 <!-- BEGIN curriculum_code_input -->

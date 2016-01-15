@@ -22,6 +22,7 @@
 
         var navNext = $('a[rel="next"]');
         var navPrev = $('a[rel="prev"]');
+        var markInput = $('[name^="mark"]').not('[type=hidden]').eq(0);
 
         var tgt = $('select[name=student-select]'), ize,
                 skipUnsubmitted = $('#skipUnsubmitted'),
@@ -94,6 +95,19 @@
             refreshNav(navPrev, ize.getAdjacentOption(val, -1));
 
         }).trigger('change');
+
+        $('body').on('dynagrade', function (e) {
+            var gradeValue = $(e.target).text(),
+                markValue;
+
+            if (markInput.is('select')) {
+                markValue = markInput.find('option').filter(function () { return $(this).text() == gradeValue; }).val();
+            } else {
+                markValue = gradeValue.replace(markInput.attr('placeholder'), '').trim();
+            }
+
+            markInput.val(markValue);
+        });
     });
 </script>
 <!-- END custom_head -->

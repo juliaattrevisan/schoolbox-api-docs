@@ -36,7 +36,9 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Assessment\Rubric;
 use Schoolbox\Collection;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 $mapper = new SubmissionBoxMapper();
@@ -117,10 +119,26 @@ if (!$is_task) {
 
 $markMax = !$_POST['markvalue'] ? '100' : $_POST['markvalue']; // if not set, default to 100
 
-// if Total Mark selected, mark value must be specified
-if ($markTypeID == SubmissionBox\MarkType::TYPE_TOTAL && empty($_POST['markvalue'])) {
-    error(2);
-} // if Rubric selected, generate the objects needed
+// intercept rubric handling
+$useRubric    = (bool)$_POST['use-rubric'];
+$groupMarking = (bool)$_POST['enable-group-marking'];
+
+if ($useRubric) {
+
+    // build rubric grid from POST data
+    $grid    = (new Schoolbox\Assessment\Rubric\Factory(new SubmissionBox\Rubric\Rubric()))->buildFromPostData($_POST[$_POST['formField']], false);
+    $markMax = $grid->getTotal();
+
+} else {
+    // no rubric, validate total mark
+
+    // if Total Mark selected, mark value must be specified
+    if ($markTypeID == SubmissionBox\MarkType::TYPE_TOTAL && empty($_POST['markvalue'])) {
+        error(2);
+    }
+}
+
+/* // if Rubric selected, generate the objects needed
 elseif ($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
     $rubricFactory = new DueWork_Rubric_Factory($criteria);
 
@@ -148,7 +166,7 @@ elseif ($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
 
     $markMax = $rubric->getCriteriaCount() * ($rubric->getResultCount() - 1);
 }
-
+*/
 
 // define submissionBox 'object': elements common to both scenarios
 $submission->setAcceptOnline(!empty($_POST['accept_submission']) ? true : false);
@@ -165,6 +183,8 @@ $submission->getWorkType()->setId($_POST['type']);
 $submission->getMarkType()->setId($markTypeID);
 $submission->getGradeGroup()->setId($_POST['gradegroup']);
 $submission->setRubricResultSet($resultSetID ?: 0);
+$submission->setUseRubric($useRubric);
+$submission->setMarkedPerRubricGroup($groupMarking);
 $submission->setMaxMark($markMax);
 $submission->setMarkVisibility($_POST['mark_visibility']);
 $submission->setWeight(max(intval($_POST['weight']), 0));
@@ -187,7 +207,8 @@ if (isset($_POST['attachment'])) {
 // create new
 try {
     if ($action == 'create') {
-        $submission->setCategory($categoryID);
+        $folder = Folder\Mapper::getInstance()->findCheaplyById($categoryID);
+        $submission->setCategory($folder);
         $submission->setOwner($_SESSION['id']);
 
         // If a task, save the task entry first and then attach to submission.
@@ -261,13 +282,13 @@ try {
 }
 
 // persist rubric data
-if (isset($rubric)) {
-    $rubricHandler = new DueWork_Rubric_Handler();
-    $rubricHandler->persistRubric(
-        $rubric,
-        isset($invalidateExistingMarks) ? $invalidateExistingMarks : false,
-        $submissionBoxID
-    );
+// this must happen AFTER the box has been persisted (we need the reference)
+if (isset($grid)) {
+    try {
+        Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper::getInstance()->save($grid, $submission);
+    } catch (Schoolbox\Mapper\Exception $e) {
+        error(105);
+    }
 }
 
 $page->localRedir($is_task ? "/homepage/$categoryID" : "/submission/listSubmission/{$submission->getDueDate()->getYear()}/{$submission->getDueDate()->getYearHalf()}");

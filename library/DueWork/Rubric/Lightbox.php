@@ -6,6 +6,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DueWork_Rubric_Lightbox
+ * @deprecated use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric::toContext() in Twig
+ */
 class DueWork_Rubric_Lightbox {
 
     private $page;
@@ -15,6 +20,13 @@ class DueWork_Rubric_Lightbox {
     const RUBRIC_DESCRIPTOR = 0;
     const RUBRIC_RESULTSET = 1;
 
+
+    /**
+     * DueWork_Rubric_Lightbox constructor.
+     * @deprecated
+     *
+     * @param SitePage $page
+     */
     public function __construct(SitePage $page) {
         $this->page = $page;
         $this->rubricHandler = new DueWork_Rubric_Handler();

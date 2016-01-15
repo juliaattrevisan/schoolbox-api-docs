@@ -6,11 +6,24 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DueWork_Rubric_Result
+ * @deprecated concept is entirely deprecated, no equivalent class exists
+ */
 class DueWork_Rubric_Result {
 
     private $label; // string
     private $value; // int
 
+
+    /**
+     * DueWork_Rubric_Result constructor.
+     * @deprecated
+     *
+     * @param $label
+     * @param $value
+     */
     public function __construct($label, $value) {
         $this->label = $label;
         $this->value = $value;

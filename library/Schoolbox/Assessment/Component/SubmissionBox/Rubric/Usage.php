@@ -24,6 +24,11 @@ class Usage {
     protected $submission_box;
 
     /**
+     * @var int
+     */
+    protected $sequence;
+
+    /**
      * @param  Criterion $criterion
      * @return $this
      */
@@ -53,6 +58,26 @@ class Usage {
      */
     public function getSubmissionBox() {
         return $this->submission_box;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getSequence()
+    {
+        return $this->sequence;
+    }
+
+
+    /**
+     * @param int $sequence
+     * @return static
+     */
+    public function setSequence($sequence)
+    {
+        $this->sequence = $sequence;
+        return $this;
     }
 
 }

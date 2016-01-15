@@ -29,31 +29,24 @@ class Controller extends BaseController
     /**
      * Warning: handlers in use!
      *
-     * @param DueWork_Rubric_Abstract $rubric
-     * @param Collection|User[]       $students
+     * @param SubmissionBox\Rubric\Rubric $rubric
+     * @param Collection|User[]           $students
      * @return array
      */
     protected function getMarks($rubric, $students)
     {
-        $markHandler = new \DueWork_Rubric_Mark($rubric);
-
         $marks = [];
 
         foreach ($students as $student) {
             $studentId = $student->getId();
 
-            $hasMarks = $markHandler->populateMarks($studentId);
+            // this will modify the "selection" of descriptors in the grid
+            SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($rubric, $student);
 
-            if (!$hasMarks) {
-                $marks[$studentId] = [];
-                continue;
-            }
-
-            $data = $markHandler->toArray();
-
-            foreach ($data['criteria'] as $crit) {
-                $value = $crit['results'][$crit['value']];
-                $marks[$studentId][$crit['id']] = $value;
+            foreach ($rubric->getSumPerGroup() as $group) {
+                foreach ($group->getAllCriteria() as $criterion) {
+                    $marks[$studentId][$criterion->getId()] = $criterion->getSelectedDescriptors()->first();
+                }
             }
         }
 
@@ -77,16 +70,12 @@ class Controller extends BaseController
 
 
     /**
-     * Warning: handlers in use!
-     *
      * @param SubmissionBox $box
-     * @return DueWork_Rubric_Abstract
+     * @return SubmissionBox\Rubric\Rubric
      */
     protected function getRubric(SubmissionBox $box)
     {
-        $handRub = new \DueWork_Rubric_Handler();
-
-        return $handRub->getRubric($box->getId());
+        return SubmissionBox\Rubric\RubricMapper::getInstance()->findBySubmissionBox($box);
     }
 
 
@@ -104,16 +93,17 @@ class Controller extends BaseController
 
 
     /**
-     * @param DueWork_Rubric_Abstract $rubric
+     * @param SubmissionBox\Rubric\Rubric $rubric
      * @return array
      */
-    protected function getRubricHeaders(DueWork_Rubric_Abstract $rubric)
+    protected function getRubricHeaders(SubmissionBox\Rubric\Rubric $rubric)
     {
         $headers  = [];
 
-        foreach ($rubric->getCriteriaIndices() as $id) {
-            $criterion = $rubric->getCriterion($id);
-            $headers[$criterion->getGrouping()][$criterion->getID()] = $criterion->getName();
+        foreach ($rubric->getTotalPerGroup() as $group) {
+            foreach ($group->getAllCriteria() as $criterion) {
+                $headers[$group->getName()][$criterion->getId()] = $criterion->getName();
+            }
         }
 
         return $headers;
@@ -190,15 +180,17 @@ class Controller extends BaseController
         $students = $this->getStudents($box);
         $rubric   = $this->getRubric($box);
 
+        $data = [
+            'box'      => $box,
+            'students' => $students,
+            'headers'  => $this->getRubricHeaders($rubric),
+            'marks'    => $this->getMarks($rubric, $students)
+        ];
+
         $this->getResponse()->content->set([
             'title'    => 'Overview',
             'template' => '@submission/overview.twig',
-            'data'     => [
-                'box'      => $box,
-                'students' => $students,
-                'headers'  => $this->getRubricHeaders($rubric),
-                'marks'    => $this->getMarks($rubric, $students)
-            ]
+            'data'     => $data
         ]);
     }
 

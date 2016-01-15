@@ -1,0 +1,77 @@
+<table>
+    {% set hasLevels = '' %}
+    {% for level in rubric.levels %}
+        {% set hasLevels = hasLevels ~ level.name %}
+    {% endfor %}
+    {% if hasLevels | length %}
+    <thead>
+    <tr>
+        <th colspan="2" class="rb-no-cell">&nbsp;</th>
+        {% for level in rubric.levels %}
+        <th>{{ level.name }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    {% endif %}
+    <tbody>
+
+    {% for groupIndex, group in rubric.groups %}
+
+        {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
+
+        {% for critIndex, crit in group.criteria %}
+    <tr>
+        {# yay html tables... -_-; #}
+        {% if rowspan %}
+            <th rowspan="{{ rowspan }}">{{ group.name|raw }}</th>
+            {% set rowspan = 0 %}
+        {% endif %}
+
+        <th>{{ crit.name|raw }}</th>
+
+            {% for levelIndex, level in rubric.levels %}
+
+                {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
+
+                {% if descriptor %}
+
+                    <td {% if descriptor.selected %}class="rb-selected"{% endif %}>
+                        <p>
+                            {{- descriptor.text|raw -}}
+                        </p>
+                        {% if descriptor.value is not null %}
+                        <aside>
+                            {{- descriptor.value -}}
+                        </aside>
+                        {% endif %}
+                    </td>
+
+                {% else %}
+                    <td class="rb-blank">&nbsp;</td>
+                {% endif %}
+
+            {% endfor %}
+
+
+
+    </tr>
+        {% endfor %}
+
+        {% if group.total %}
+        <tr>
+            <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">{{ group.sum }} / {{ group.total }} ({{ (group.percentage * 100)|round }}%)</th>
+        </tr>
+        {% endif %}
+
+    {% endfor %}
+
+
+    {% if rubric.total %}
+    <tr>
+        <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}" >{{ rubric.sum }} / {{ rubric.total }} ({{ (rubric.percentage * 100)|round }}%)</th>
+    </tr>
+    {% endif %}
+    </tbody>
+
+</table>
+<h2></h2>

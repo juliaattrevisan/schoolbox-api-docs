@@ -1,0 +1,436 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+
+use Alaress_Date_Format;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Rubric as Core;
+use Schoolbox\Mapper;
+use Schoolbox\Collection;
+use Schoolbox\User;
+use SplObjectStorage;
+
+class Rubric extends Core\Rubric
+{
+
+    /** @var SubmissionBox */
+    protected $box;
+
+
+    /**
+     * @param SubmissionBox $submissionBox
+     */
+    public function __construct($submissionBox = null)
+    {
+        $id = $submissionBox ? $submissionBox->getId() : 0;
+
+        parent::__construct($id, false);
+        $this->setSubmissionBox($submissionBox);
+
+        // setup caching
+        $this->cCache = new SplObjectStorage();
+        $this->dCache = new SplObjectStorage();
+        $this->lCache = new SplObjectStorage();
+        $this->uCache = new SplObjectStorage();
+        $this->mCache = new SplObjectStorage();
+    }
+
+
+    /**
+     * @param SubmissionBox $box
+     * @return self
+     */
+    public function setSubmissionBox($box)
+    {
+        $this->box = $box;
+        // bind my ID to the box's ID
+        if ($box) {
+            $this->setId($box->getId());
+        }
+        return $this;
+    }
+
+
+    /**
+     * @return SubmissionBox
+     */
+    public function getSubmissionBox()
+    {
+        return $this->box;
+    }
+
+
+    /**
+     * Returns a collection containing all the criteria in this grid, for DB persistence.
+     *
+     * @return Criterion[]|Collection
+     */
+    public function getORMCriteria()
+    {
+        $c = new Collection();
+
+        // cast our object hierarchy into the flattened ORM-style models
+        foreach ($this->criteriaGroups as $group) {
+            foreach ($group->getAllCriteria() as $criterion) {
+                $c->add($this->createORMCriterion($criterion, $group->getName()));
+            }
+        }
+
+        return $c;
+    }
+
+
+    /** @var SplObjectStorage|Core\Criteria\Criterion[] */
+    protected $cCache;
+
+    /**
+     * @param Core\Criteria\Criterion $criterion
+     * @param string                  $groupName
+     * @return Criterion
+     */
+    protected function createORMCriterion($criterion, $groupName = '')
+    {
+        if (!$this->cCache->contains($criterion)) {
+            try {
+                $model    = CriterionMapper::getInstance()->findById($criterion->getId());
+                $parentId = $model->getParentId();
+
+            } catch (Mapper\Exception $e) {
+                $model    = CriterionMapper::getInstance()->createModel();
+                $parentId = $this->box->getCategory()->getId();
+            }
+
+            $model->setName($criterion->getName())
+                  ->setParentType('category')
+                  ->setParentId($parentId);
+
+            $this->cCache->attach($criterion, $model);
+        }
+
+        return $this->cCache->offsetGet($criterion)->setGrouping($groupName ?: $criterion->getGroup()->getName());
+    }
+
+
+    /**
+     * Returns a collection containing all the criteria in this grid, for DB persistence.
+     *
+     * @return Usage[]|Collection
+     */
+    public function getORMUsages()
+    {
+        $c = new Collection();
+
+        $sequence = 0;
+        foreach ($this->criteriaGroups as $group) {
+            foreach ($group->getAllCriteria() as $criterion) {
+                if ($criterion->getAllDescriptors()->count()) {
+                    $c->add($this->createORMUsage($criterion, ++$sequence));
+                }
+            }
+        }
+
+        return $c;
+    }
+
+
+    /** @var SplObjectStorage|Core\Criteria\Criterion[] */
+    protected $uCache;
+
+    /**
+     * @param Criterion $criterion
+     * @param int $sequence
+     * @return Usage
+     */
+    protected function createORMUsage($criterion, $sequence)
+    {
+        if (!$this->uCache->contains($criterion)) {
+            $this->uCache->attach($criterion,
+                UsageMapper::getInstance()
+                  ->createModel()
+                  ->setCriterion($criterion)
+                  ->setSubmissionBox($this->box)
+            );
+        }
+
+        return $this->uCache->offsetGet($criterion)->setSequence($sequence);
+    }
+
+
+    /**
+     * Returns a collection containing all the levels in this grid, for DB persistence.
+     *
+     * @return Collection|Level[]
+     */
+    public function getORMLevels()
+    {
+        $c = new Collection();
+
+        $sequence = 0;
+        foreach ($this->levels as $level) {
+            $c->add($this->createORMLevel($level, ++$sequence));
+        }
+
+        return $c;
+    }
+
+
+    /** @var SplObjectStorage|Core\Competency\Level[] */
+    protected $lCache;
+
+    /**
+     * @param Core\Competency\Level $level
+     * @param int              $sequence
+     * @return Level
+     */
+    protected function createORMLevel($level, $sequence)
+    {
+        if (!$this->lCache->contains($level)) {
+
+            if ($level->getId()) {
+                $model = LevelMapper::getInstance()->findById($level->getId());
+
+            } else {
+                try {
+                    $model = LevelMapper::getInstance()->findOneByColumnList([
+                        'box_id' => $this->getSubmissionBox()->getId(),
+                        'sequence' => $sequence
+                    ]);
+                } catch (Mapper\Exception $e) {
+                    $model = LevelMapper::getInstance()->createModel();
+                }
+            }
+
+            $this->lCache->attach($level, $model
+                  ->setName($level->getName())
+                  ->setSubmissionBox($this->box)
+            );
+        }
+        return $this->lCache->offsetGet($level)->setSequence($sequence);
+    }
+
+
+    /**
+     * Returns a collection containing all the descriptors in this grid, for DB persistence.
+     *
+     * @return Descriptor[]|Collection
+     */
+    public function getORMDescriptors()
+    {
+        $c = new Collection();
+
+        foreach ($this->levels as $sequence => $level) {
+            foreach ($level->getAllDescriptors() as $descriptor) {
+                $c->add($this->createORMDescriptor($descriptor, $level, $sequence));
+            }
+        }
+
+        return $c;
+    }
+
+
+    /** @var SplObjectStorage|Core\Descriptor[] */
+    protected $dCache;
+
+    /**
+     * @param Core\Descriptor       $descriptor
+     * @param Core\Competency\Level $level
+     * @param int                   $sequence
+     * @return Descriptor
+     */
+    protected function createORMDescriptor($descriptor, $level, $sequence)
+    {
+        if (!$this->dCache->contains($descriptor)) {
+            // models we need
+            $critModel = $this->createORMCriterion($descriptor->getCriterion());
+            $lvlModel  = $this->createORMLevel($level, $sequence);
+
+            $map = DescriptorMapper::getInstance();
+
+            try {
+                // this is a unique index
+                $model = $map->findOneByColumnList([
+                    'criterion_id'      => $critModel->getId(),
+                    'submission_box_id' => $this->getSubmissionBox()->getId(),
+                    'level_id'          => $lvlModel->getId()
+                ]);
+
+            } catch (Mapper\Exception $e) {
+                // that intersection doesn't exist, so we'll use a fresh model
+                $model = $map->createModel();
+            }
+
+            $model
+                ->setCriterion($critModel)
+                ->setSubmissionBox($this->box)
+                ->setDescription($descriptor->getText())
+                ->setValue($descriptor->getValue())
+                ->setLevel($lvlModel)
+                ->setValid(true);
+
+            $this->dCache->attach($descriptor, $model);
+        }
+
+        return $this->dCache->offsetGet($descriptor);
+    }
+
+
+    /**
+     * Be careful with this. Any manipulations you make to the descriptors will be reflected INSIDE the grid
+     *
+     * @return Collection|Core\Descriptor[]
+     */
+    public function getAllDescriptors()
+    {
+        $c = new Collection();
+
+        foreach ($this->levels as $level) {
+            $c->merge($level->getAllDescriptors());
+        }
+
+        return $c;
+    }
+
+
+    /**
+     * @param User $student
+     * @param Alaress_Date_Format $timestamp
+     * @return Collection|Mark[]
+     */
+    public function getORMMarks($student, $timestamp)
+    {
+        $c = new Collection();
+
+        foreach ($this->getAllDescriptors() as $descr) {
+            if ($descr->isSelected()) {
+                $c->add($this->createORMMark($descr, $timestamp, $student));
+            }
+        }
+
+        return $c;
+    }
+
+
+    /** @var SplObjectStorage|Core\Descriptor[] */
+    protected $mCache;
+
+    /**
+     * @param Core\Descriptor         $descriptor
+     * @param Alaress_Date_Format     $timestamp
+     * @param User                    $student
+     * @return Mark
+     */
+    protected function createORMMark($descriptor, $timestamp, $student)
+    {
+        if (!$this->mCache->contains($descriptor)) {
+            $this->mCache->attach($descriptor,
+                MarkMapper::getInstance()
+                 ->createModel()
+                 ->setSubmissionBox($this->getSubmissionBox())
+                 ->setDescriptor($this->createORMDescriptor($descriptor, $descriptor->getLevel(), 0))
+                 ->setValid(true)
+                 ->setMark(0)
+                 ->setCriterion($this->createORMCriterion($descriptor->getCriterion()))
+            );
+        }
+
+        return $this->mCache->offsetGet($descriptor)
+            ->setCreatedAt($timestamp)
+            ->setStudent($student);
+    }
+
+
+    /**
+     * Return the Twig representation of the data structure this rubric contains
+     *
+     * @return array
+     */
+    public function toContext()
+    {
+        $context = parent::toContext();
+
+        // if the box doesn't mark by group, then we need to remove the group subtotals from the context
+        if (!$this->getSubmissionBox()->isMarkedPerRubricGroup()) {
+
+            foreach ($context['groups'] as $groupId => $group) {
+                unset(
+                    $context['groups'][$groupId]['sum'],
+                    $context['groups'][$groupId]['total'],
+                    $context['groups'][$groupId]['percentage']
+                );
+            }
+
+        }
+
+        $context['boxId'] = $this->box->getId();
+
+        return $context;
+    }
+
+
+    /**
+     * Return the POST-data representation of the data structure this rubric contains
+     * This should be the exact inverse of Factory::buildFromPostData()
+     *
+     * @return array
+     */
+    public function toPostData()
+    {
+        $post = [
+            'level'      => [],
+            'group'      => [],
+            'criterion'  => [],
+            'descriptor' => []
+        ];
+
+        foreach ($this->levels as $levelSequence => $level) {
+            $post['level'][$levelSequence] = [
+                'id' => $level->getId(),
+                'name' => $level->getName()
+            ];
+        }
+
+        foreach ($this->criteriaGroups as $group) {
+            $post['group'][$group->getId()] = [
+                'name' => $group->getName()
+            ];
+
+            foreach ($group->getAllCriteria() as $criterion) {
+
+                $descriptors = $criterion->getAllDescriptors();
+
+                $post['criterion'][$criterion->getId()] = [
+                    'groupId'  => $group->getId(),
+                    'on'       => $descriptors->count() > 0,
+                    'name'     => $criterion->getName(),
+                    'readonly' => $criterion->isReadOnly()
+                ];
+
+                foreach ($descriptors as $dCrit) {
+                    foreach ($this->levels as $levelSequence => $level) {
+                        foreach ($level->getAllDescriptors() as $dLevel) {
+
+                            if ($dCrit == $dLevel) {
+                                $post['descriptor'][$criterion->getId()][$levelSequence] = [
+                                    'id'     => $dCrit->getId(),
+                                    'text'   => $dCrit->getText(),
+                                    'points' => $dCrit->getValue()
+                                ];
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+        return $post;
+    }
+
+
+}

@@ -1,6 +1,7 @@
 <?php
 
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Breadcrumbs;
@@ -119,8 +120,48 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
 //$this->setBlock(TEMPLATE_content, 'mark_type_rubric', 'mark_type_rubric_block');
 
 if ($submissionBox->isRubric()) {
-    $rb = new DueWork_Rubric_Lightbox($this);
-    $rb->render('RUBRIC', $submissionBox->getId(), $user->getId(), $submissionBox->canViewRubric($_SESSION['user']), true);
+
+    $grid = RubricMapper::getInstance()->findBySubmissionBoxAndStudent($submissionBox, $user);
+
+    $markTypeSlug = $submissionBox->getMarkType()->getSlug();
+
+    $context = [
+        'rubric' => $grid->toContext(),
+        'markType' => [
+            'mode' => $markTypeSlug
+        ]
+    ];
+
+    // retrieve the submission grade data
+    if ($markTypeSlug == 'letter') {
+
+        $group = $submissionBox->getGradeGroup();
+
+        if (!$group->getGradeLevels()->count()) {
+            // insufficient hydration
+            $group->setGradeLevels(
+                Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper::getInstance()
+                    ->findByColumn(
+                        'submission_grade_group_id',
+                        $group->getId(),
+                        [ 'order' => [ 'lower_bound' => 'ASC' ] ]
+                    )
+            );
+        }
+
+        $levels = [];
+
+        foreach ($group->getGradeLevels() as $level) {
+            $levels[$level->getLowerBound()] = $level->getCaption();
+        }
+
+        $context['markType']['conf'] = $levels;
+    }
+
+    $this->setVar('RUBRIC', $this->getTwig()->render('@rubric/grid-markable.twig', $context));
+
+//    $rb = new DueWork_Rubric_Lightbox($this);
+//    $rb->render('RUBRIC', $submissionBox->getId(), $user->getId(), $submissionBox->canViewRubric($_SESSION['user']), true);
 } else {
     $this->setVar('RUBRIC', '');
 }

@@ -20,7 +20,7 @@ class ResultMapper extends Schoolbox\Mapper {
         $this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox\\Rubric\\Result');
         $this->hasMap(array(
                 'column'     => 'resultset_id',
-                'property'   => 'resultset_id',
+                'property'   => 'resultSetId',
                 'type'       => self::TYPE_INTEGER,
             ));
         $this->hasMap(array(

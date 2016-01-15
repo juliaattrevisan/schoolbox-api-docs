@@ -2,8 +2,10 @@
 
 use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\Component;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\UserMapper;
 
 // not in sitepage context, redirect
 if (!isset($this)) {
@@ -726,9 +728,8 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
 
 // do fun rubric things
 if ($box->isRubric()) {
-    $rb = new DueWork_Rubric_Lightbox($this);
-    $rb->render('rubric_block', $box->getId(), $user['uid'], $box->canViewRubric($_SESSION['user']), false);
-
+    $context = [ 'rubric' => RubricMapper::getInstance()->findBySubmissionBoxAndStudent($box, UserMapper::getInstance()->findById($userID))->toContext() ];
+    $this->setVar('rubric_block', $this->getTwig()->render('@rubric/grid.twig', $context));
     $this->parse('has_rubric_block', 'has_rubric');
 }
 else {

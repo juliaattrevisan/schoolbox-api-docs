@@ -6,10 +6,23 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DueWork_Rubric_ResultSetRubric
+ * @deprecated concept is entirely deprecated, no equivalent class exists
+ */
 class DueWork_Rubric_ResultSetRubric extends DueWork_Rubric_Abstract {
 
     protected $resultSet;     // ResultSet
 
+
+    /**
+     * DueWork_Rubric_ResultSetRubric constructor.
+     * @deprecated
+     *
+     * @param                          $submissionBoxID
+     * @param DueWork_Rubric_ResultSet $resultSet
+     */
     public function __construct($submissionBoxID, DueWork_Rubric_ResultSet $resultSet) {
         $this->submissionBoxID = $submissionBoxID;
         $this->resultSet = $resultSet;

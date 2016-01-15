@@ -8,6 +8,8 @@
  */
 
 
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Renderer;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -361,8 +363,42 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
 $this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
 
 if ($submissionBox->isRubric()) {
-    $rb = new DueWork_Rubric_Lightbox($this);
-    $rb->render('INJECTED_MARK_RUBRIC', $submissionBox->getId(), $user->getId(), $submissionBox->canViewRubric($_SESSION['user']), true);
+
+	$mtSlug = $submissionBox->getMarkType()->getSlug();
+
+    $context = [
+	    'rubric'   => RubricMapper::getInstance()->findBySubmissionBoxAndStudent($submissionBox, $user)->toContext(),
+	    'markType' => [
+		    'mode' => $mtSlug
+	    ]
+    ];
+
+
+	if ($mtSlug == 'letter') {
+		$group = $submissionBox->getGradeGroup();
+
+		if (!$group->getGradeLevels()->count()) {
+			// insufficient hydration
+			$group->setGradeLevels(
+				Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper::getInstance()
+                  ->findByColumn(
+                      'submission_grade_group_id',
+                      $group->getId(),
+                      [ 'order' => [ 'lower_bound' => 'ASC' ] ]
+                  )
+			);
+		}
+
+		$levels = [];
+
+		foreach ($group->getGradeLevels() as $level) {
+			$levels[$level->getLowerBound()] = $level->getCaption();
+		}
+
+		$context['markType']['conf'] = $levels;
+	}
+
+    $this->setVar('INJECTED_MARK_RUBRIC', $this->getTwig()->render('@rubric/grid-markable.twig', $context));
 } else {
     $this->setVar('INJECTED_MARK_RUBRIC', '');
 }

@@ -7,11 +7,21 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+/**
+ * Class DueWork_Rubric_Handler
+ * @deprecated use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper
+ */
 class DueWork_Rubric_Handler
 {
 
     private $db;
 
+
+    /**
+     * DueWork_Rubric_Handler constructor.
+     * @deprecated
+     */
     public function __construct()
     {
         $this->db = Database::getInstance();
@@ -215,7 +225,7 @@ class DueWork_Rubric_Handler
                 SELECT
                     sb.id AS box_id,
                     rm.criterion_id,
-                    rm.mark,
+                    rd.value mark,
                     rc.name,
                     (
                         SELECT MAX(rd.value)
@@ -231,13 +241,14 @@ class DueWork_Rubric_Handler
                     ) AS rmax_mark,
                     rm.tstamp
                 FROM rubric_mark rm
+                LEFT JOIN rubric_descriptor rd
+                    ON rm.descriptor_id = rd.id
                 LEFT JOIN rubric_criterion rc
                     ON rm.criterion_id = rc.id
                 LEFT JOIN
                     submission_box sb
                     ON rm.submission_box_id = sb.id
                 WHERE rm.valid = 1
-                    AND sb.mark_type = :mark_type
                     AND rm.student_id = :student_id
                     AND sb.category = :category_id
                     AND sb.deleted IS FALSE
@@ -250,7 +261,6 @@ class DueWork_Rubric_Handler
         );
         $stmt->execute(
             array(
-                'mark_type'   => \Schoolbox\Assessment\Component\SubmissionBox\MarkType::TYPE_RUBRIC,
                 'student_id'  => $studentID,
                 'category_id' => $categoryID
             )

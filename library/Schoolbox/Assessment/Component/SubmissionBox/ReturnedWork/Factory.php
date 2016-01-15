@@ -10,11 +10,13 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 
+use Alaress_Date_Format;
 use DueWork_Error;
 use Marksheet_Abstract;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
@@ -52,7 +54,7 @@ class Factory
     /**
      * An array of rubric values selected by the marker
      *
-     * @var array
+     * @var Collection|SubmissionBox\Rubric\Descriptor[]
      */
     private $rubric = array();
 
@@ -114,21 +116,21 @@ class Factory
      * $user is the person who submitted the item for marking
      * and is also synonymous with 'owner' column in the db
      *
-     * @param User $user
-     * @param SubmissionBox $submissionBox
-     * @param string $mark
-     * @param string $comment
-     * @param array $rubric
-     * @param array $attachments
-     * @param bool $removeUnsetAttachments
-     * @param string $uuid
+     * @param User                        $user
+     * @param SubmissionBox               $submissionBox
+     * @param string                      $mark
+     * @param string                      $comment
+     * @param SubmissionBox\Rubric\Rubric $grid
+     * @param array                       $attachments
+     * @param bool                        $removeUnsetAttachments
+     * @param string                      $uuid
      */
     public function __construct(
         User $user,
         SubmissionBox $submissionBox,
         $mark,
         $comment,
-        $rubric,
+        $grid,
         $attachments,
         $removeUnsetAttachments,
         $uuid
@@ -137,7 +139,7 @@ class Factory
         $this->setSubmissionBox($submissionBox);
         $this->setMark($mark);
         $this->setComment($comment);
-        $this->setRubric($rubric);
+        $this->setRubric($grid);
         $this->setAttachments($attachments);
         $this->setRemoveUnsetAttachments($removeUnsetAttachments);
         $this->setUuid($uuid);
@@ -221,35 +223,14 @@ class Factory
             try {
                 $this->getReturnedWorkMapper()->save($returnedWork);
 
-                // Rubrics have no mappers yet, so handle them the old-fashioned way.
-                if (is_array($this->getRubric())) {
-                    $rubric_handler = new \DueWork_Rubric_Handler();
-                    $rubric_handler->saveMarks(
-                        $this->getRubric(),
-                        $this->getUser()->getId(),
-                        $this->getSubmissionBox()->getId(),
-                        $returnedWork->getReturned()->getDatabase()
-                    );
-
-                    /* wat...?
-                     *
-                     * What is the point of this? Why isn't it just the same as the $returnedWork->getReturned()
-                     * value (that is, the timestamp when the Returned Work was last modified)
-                     *
-                     * Why would you want to preserve the timestamp for when this rubric_mark value
-                     * was first created?
-                     *
-                        $stamp = null;
-                        if ($update_existing) {
-                            $stamp = $rubric_handler->getLatestMarkTimestamp($student_id, $box_id);
-                        }
-                        $rubric_handler->saveMarks($rubric, $student_id, $box_id, $stamp);
-                     */
+                // save the rubric if there is one
+                if ($this->getSubmissionBox()->isRubric() && $this->getRubric()) {
+                    $marks = $this->getRubric()->getORMMarks($this->getUser(), Alaress_Date_Format::now());
+                    SubmissionBox\Rubric\MarkMapper::getInstance()->save($marks);
                 }
-            } catch (\Exception $e) {
+            } catch (Mapper\Exception $e) {
                 // noop
-                // Not sure why this exception got swallowed.
-                // Possibly because `saveMarks()` can fail?
+                die($e);
             }
         }
         return $returnedItems;
@@ -297,14 +278,14 @@ class Factory
              */
             // Is this outside of the update window? if so, create a new one.
             $return_time = $returnedWork->getReturned();
-            $window_ago = new \Alaress_Date_Format(time() - $this->getUpdateWindow(), 'U');
+            $window_ago = new Alaress_Date_Format(time() - $this->getUpdateWindow(), 'U');
 
             /* Use the existing returned work record - it was created a short time ago or the marks are not yet visible
              */
             if ($this->getSubmissionBox()->getMarkVisibility() == SubmissionBox::MARK_VISIBILITY_PRIVATE
                 || $return_time->getUnixTimestamp() >= $window_ago->getUnixTimestamp()
             ) {
-                $returnedWork->setReturned(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+                $returnedWork->setReturned(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
             } /* Spawn a new returned work record, so pump in a returned date
 			 * and all the ownership stuff
 			 */
@@ -331,7 +312,7 @@ class Factory
         $returnedWork = $this->getReturnedWorkMapper()->createModel();
         $returnedWork->setOwner($this->getUser());
         $returnedWork->setSubmissionBox($this->getSubmissionBox());
-        $returnedWork->setReturned(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+        $returnedWork->setReturned(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
         $returnedWork->setUuid($this->getUuid());
 
         return $returnedWork;
@@ -355,11 +336,16 @@ class Factory
             $returnedWork->setNormalizedMark($errors[$this->getMark()]->getNormaliseAs());
         } elseif ($this->getSubmissionBox()->isRubric()) {
             /* If it's a rubric, it normalises in a special way
-             * However: if I submitted this from the view submission page there's no rubric set.
-             * Don't change the norm mark if this happened.
+             * However: if I submitted a mark override, I still want to give that precedence
              */
-            if ($this->getRubric()) {
-                $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getRubric());
+            if ($this->getRubric() && !$this->getMark()) {
+
+                $normalisedMark = $this->getRubric()->getPercentage() * 100;
+                $returnedWork->setMark($this->getMarksheet()->convertRawMark($normalisedMark, $this->getRubric()->getTotal(), true));
+                $returnedWork->setNormalizedMark($normalisedMark);
+            }
+            else {
+                $normalisedMarkArray = $this->getMarksheet()->normaliseMark($this->getMark());
                 $returnedWork->setMark($normalisedMarkArray['mark']);
                 $returnedWork->setNormalizedMark($normalisedMarkArray['norm_mark']);
             }
@@ -570,7 +556,7 @@ class Factory
     /**
      * Set rubric
      *
-     * @param array $rubric
+     * @param SubmissionBox\Rubric\Rubric $rubric
      */
     private function setRubric($rubric)
     {
@@ -580,7 +566,7 @@ class Factory
     /**
      * Get rubric
      *
-     * @return array
+     * @return SubmissionBox\Rubric\Rubric
      */
     private function getRubric()
     {

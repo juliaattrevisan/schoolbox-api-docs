@@ -917,7 +917,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * This was used to cheaply manufacture breadcrumb trails
      *
      * @param $folderId
-     * @return \Schoolbox\Resource\Category
+     * @return \Schoolbox\Resource\Folder\Model
      */
     public function findCheaplyById($folderId) {
         $query = "

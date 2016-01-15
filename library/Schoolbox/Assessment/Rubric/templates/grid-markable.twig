@@ -1,0 +1,208 @@
+{% set formField = 'rubric' %}
+{% set inputType = rubric.multiSelect ? 'checkbox' : 'radio' %}
+{% set rubricId = 'rb-' ~ rubric.id %}
+{% set markType = markType ?: { mode: 'raw' } %}
+
+<div class="scrollable">
+<table class="rb markable stack-for-medium-down" id="{{ rubricId }}">
+    {% set hasLevels = '' %}
+    {% for level in rubric.levels %}
+        {% set hasLevels = hasLevels ~ level.name %}
+    {% endfor %}
+    {% if hasLevels | length %}
+    <thead>
+    <tr>
+        <th colspan="2">&nbsp;</th>
+        {% for level in rubric.levels %}
+        <th>{{ level.name }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    {% endif %}
+    <tbody>
+
+    {% for groupIndex, group in rubric.groups %}
+
+        {% set rowspan = group.criteria|length + (group.total ? 1 : 0) %}
+
+        {% for critIndex, crit in group.criteria %}
+    <tr data-group="{{ rubricId }}-{{ group.id }}">
+        {# yay html tables... -_-; #}
+        {% if rowspan %}
+            <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ group.name|raw }}</span></th>
+            {% set rowspan = 0 %}
+        {% endif %}
+
+        <th class="rb-criterion-name">{{ crit.name|raw }}</th>
+
+            {% for levelIndex, level in rubric.levels %}
+
+                {% set descriptor = rubric.descriptors[crit.id][levelIndex] %}
+
+                {% if descriptor %}
+
+                    {% set inputId %}{{ formField }}[{{ crit.id }}][{{ level.id }}]{% endset %}
+
+                    {% if inputType == 'checkbox' %}
+                        {% set inputName = inputId %}
+                    {% else %}
+                        {% set inputName %}{{ formField }}[{{ crit.id }}]{% endset %}
+                    {% endif %}
+
+                    <td>
+                        <input id="{{ inputId }}"
+                               name="{{ inputName }}"
+                               value="{{ level.id }}"
+                               type="{{ inputType }}"
+                               data-value="{{ descriptor.value }}"
+                               data-rubric="{{ rubric.id }}"
+                               data-rubric-group="{{ group.id }}"
+                               {% if descriptor.selected %}checked="checked"{% endif %}
+                        />
+                        <label for="{{ inputId }}">
+                            <span class=rb-description>
+                                {{- descriptor.text|raw -}}
+                            </span>
+                            {% if descriptor.value is not null %}
+                            <span class="rb-value">
+                                {{- descriptor.value -}}
+                            </span>
+                            {% endif %}
+                        </label>
+                    </td>
+
+                {% else %}
+                    <td class="rb-blank">&nbsp;</td>
+                {% endif %}
+
+            {% endfor %}
+
+    </tr>
+        {% endfor %}
+
+        {% if group.total %}
+        <tr>
+            <th data-group-summary="{{ rubricId }}-{{ group.id }}"
+                class="rb-group-summary"
+                colspan="{{ rubric.levels|length + 1 }}"
+                data-numerator="{{ group.sum }}"
+                data-denominator="{{ group.total }}"
+            >
+                {{ group.sum }} / {{ group.total }} ({{ (group.percentage * 100)|round }}%)
+            </th>
+        </tr>
+        {% endif %}
+
+    {% endfor %}
+
+    {% if rubric.total %}
+    <tr>
+        <th data-final-summary="{{ rubricId }}"
+            class="rb-final-summary"
+            colspan="{{ rubric.levels|length + 2 }}"
+            data-numerator="{{ rubric.sum }}"
+            data-denominator="{{ rubric.total }}"
+        >
+            {{ rubric.sum }} / {{ rubric.total }} ({{ (rubric.percentage * 100)|round }}%)
+        </th>
+    </tr>
+    {% endif %}
+    </tbody>
+
+</table>
+</div>
+{# js specific to the rubric we just injected to...wherever we injected it #}
+<script type="text/javascript" src="/javascript/shared/submissions/jquery.dynagrade.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        var $rb = $('#{{ rubricId }}');
+
+        // initialise dynamic mark display
+        $rb.dynagrade({{ markType | json_encode | raw }});
+
+        $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
+
+            var $changed = $(this);
+
+            var groupId  = $changed.data('rubric-group');
+            var rubricId = $changed.data('rubric');
+
+            var rowSelector = '[data-group="rb-' + rubricId + '-' + groupId + '"]';
+
+            var $groupRows = $(rowSelector);
+
+            var rubricSum = 0;
+
+            if ($groupRows.length) {
+
+                var groupSum = getSum($groupRows.find('input'));
+
+                var groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]';
+
+                var groupSummary = $rb.find(groupSummarySelector);
+
+                groupSummary.attr('data-numerator', groupSum);
+
+                if (groupSummary.length) {
+                    parseFraction(groupSummary);
+                }
+
+                rubricSum = getSum($rb.find('input'));
+            }
+
+            var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
+
+            var rubricSummary = $rb.find(rubricSummarySelector);
+
+            rubricSummary.attr('data-numerator', rubricSum);
+
+            parseFraction(rubricSummary, e.namespace);
+
+            $('[data-role=rubric-sum]').text(rubricSummary.text());
+
+        });
+
+
+        function getSum(elements)
+        {
+            var groupSum = 0;
+
+            // in lieu of a reduce() function
+            elements.map(function () {
+                if ($(this).prop('checked')) {
+                    var fl = parseFloat($(this).data('value'));
+                    if (!isNaN(fl)) {
+                        groupSum += fl;
+                    }
+                }
+            });
+
+            return groupSum;
+        }
+
+        // initial display
+        $('[data-rubric]').trigger('change.preload');
+
+        /**
+         *
+         * @param {jQuery} $elem
+         * @param {string} namespace
+         */
+        function parseFraction($elem, namespace)
+        {
+            var ev = 'dynagrade';
+            if (namespace) {
+                ev = ev + '.' + namespace;
+            }
+
+            $elem.each(function () {
+                if (this.hasAttribute('data-numerator') && this.hasAttribute('data-denominator')) {
+                    $(this).trigger(ev);
+                }
+            });
+
+        }
+
+    });
+</script>

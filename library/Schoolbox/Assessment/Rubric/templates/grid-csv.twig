@@ -1,0 +1,118 @@
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript">
+    $(function () {
+        // listen for the attachzone doing its thing
+        $('#rubric-attachable{{ idSuffix }}').on('addedfile.attachzone success.attachzone', function (e, data) {
+
+            // do nothing
+            if (typeof data.hash === 'undefined') {
+                return;
+            }
+
+            var wrap   = $(this),
+                target = wrap.find('[data-replaceable]'),
+                body   = $('body'),
+                boxIdInput, catIdInput, isTaskInput, postdata;
+
+
+            // perform an ajax-replace of the target via the hash we've been given
+            var url = '{{ routeLookup('rubric.import') }}' + data.hash;
+
+            // detect our lookup reference
+            boxIdInput = body.find('input[name="id"]');
+
+            if (boxIdInput.length == 1 && boxIdInput.val() > 0) {
+                postdata = {
+                    boxId: boxIdInput.val()
+                };
+
+            } else {
+                catIdInput = body.find('input[name="category"]');
+
+                if (catIdInput.length == 1 && catIdInput.val() > 0) {
+                    postdata = {
+                        folderId: catIdInput.val()
+                    };
+
+                } else {
+
+                    // nothing available: bug out
+                    // TODO detach the file
+                    return;
+                }
+            }
+
+            isTaskInput = body.find('input[name="is_task"]');
+
+            if (isTaskInput.length == 1 && isTaskInput.val() > 0) {
+                postdata.task = 1;
+            }
+
+            // show/hide appropriate things
+            wrap.find('[data-hideable]').addClass('hide');
+            wrap.find('[data-waiting-msg]').removeClass('hide');
+
+            // scroll to where you can see that something is going on
+            window.scrollTo(0, $('[data-waiting-msg]').offset()['top']);
+
+            // prevent departure or premature submission
+            var submits = body.find('[type=submit]:not(:disabled)');
+            submits.prop('disabled', true);
+
+            // get the new grid markup
+            $.post(url, postdata).done(function (data) {
+
+                // dump in the new data
+                target.html(data);
+
+            }).fail(function (data) {
+
+                // explain that something broke
+                console.log(data);
+
+            }).always(function () {
+                // restore the grid
+                wrap.find('[data-hideable]').removeClass('hide');
+                wrap.find('[data-waiting-msg]').addClass('hide');
+
+                // you're free to leave now
+                submits.prop('disabled', false);
+            });
+
+        });
+
+        {% if rubric.boxId %}
+        $('#dl-csv').on('click', function (e) {
+            e.preventDefault();
+
+            var frm = $('<form/>').attr('action', '/rubric/csv').attr('method', 'post').append($('table[data-rubric]').clone());
+
+            frm.on('submit', function () {
+                frm.detach();
+            });
+
+            frm.appendTo($('body')).submit();
+        });
+        {% endif %}
+    });
+</script>
+<div id="rubric-attachable{{ idSuffix }}">
+    {% if test %}<input type="hidden" name="id" value="{{ test }}" />{% endif %}
+    <div data-hideable>
+        <div data-replaceable>
+            {% include '@rubric/grid-editable.twig' %}
+        </div>
+        <div>
+            {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+        </div>
+        {% if rubric.boxId %}
+        <a href="{{ routeLookup('rubric.download') }}" class="icon-download button" id="dl-csv">Download Rubric as CSV</a>
+        {% endif %}
+    </div>
+    <div data-waiting-msg class="hide">
+        <h2>
+            <img class="align-bottom" src="/javascript/components/alloyeditor/api/assets/img/spinner.gif" />
+            Importing Rubric Data...
+        </h2>
+    </div>
+</div>

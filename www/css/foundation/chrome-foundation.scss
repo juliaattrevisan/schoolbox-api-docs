@@ -70,6 +70,7 @@
 @import "components/evaluation/evaluation";
 @import "components/submissions/inline-grading";
 @import "components/submissions/submissions";
+@import "components/submissions/rubric";
 @import "components/wiki/wiki";
 @import "components/timetable/timetable";
 @import "components/calendar/calendar";
@@ -89,6 +90,7 @@
 @import "components/editor/mejs";
 
 // Boarder Leave
+@import "components/boarder-leave/boarder-leave";
 @import "components/boarder-leave/boarder-leave";
 
 // Needs to be included outside of container in order to work

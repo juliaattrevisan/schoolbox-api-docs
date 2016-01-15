@@ -1,0 +1,45 @@
+{%- set critInput    = formField ~ '[' ~ rubric.id ~ '][criterion]['  ~ crit.id ~ ']' -%}
+{%- set descInput    = formField ~ '[' ~ rubric.id ~ '][descriptor][' ~ crit.id ~ ']' -%}
+{%- set checkChecked = crit.descriptors|length > 0 -%}
+{%- set cellClass    = checkChecked ? '' : 'hide-v' -%}
+{%- set levelLimit   = levelLimit ?: 11 -%}
+
+<th>
+    <span class="sequencer" data-sequencer-v="{{ groupId }}">
+        <a class="icon-up-arrow" data-sequencer-up title="Move up"></a>
+        <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
+    </span>
+
+    <input type="hidden" name="{{ critInput }}[groupId]" value="{{ group.id }}" />
+    <input  id="{{ critInput }}[on]" data-criterion-name="{{ crit.name }}" name="{{ critInput }}[on]" type="checkbox" value="1" {% if checkChecked %}checked="checked"{% endif %} />
+
+    {%- if crit.used -%}
+
+    <label for="{{ critInput }}[on]" class="checkbox-label rb-criterion rb-readonly">
+        {{- crit.name | raw -}}
+        <span data-tooltip class="hint has-tip tip-right" data-width="200" title="This {{ locale.translate('rubricCriterion') }} cannot be modified because it is in use elsewhere">?</span>
+        <input type="hidden" value="{{ crit.name }}" name="{{ critInput }}[name]" />
+    </label>
+
+    {%- else -%}
+
+    <label for="{{ critInput }}[on]" class="checkbox-label rb-criterion rb-editable">
+        <input type="text" value="{{ crit.name }}" name="{{ critInput }}[name]" />
+    </label>
+
+    {%- endif -%}
+
+</th>
+
+{% for levelIndex, level in rubric.levels -%}
+    {%- set descriptor = rubric.descriptors[crit.id][levelIndex] -%}
+
+    <td class="{{ cellClass }}">
+        <textarea{% if not checkChecked %} disabled="disabled"{% endif %} placeholder="Descriptor" rows="2" name="{{ descInput }}[{{ levelIndex }}][text]">{{ descriptor.text }}</textarea>
+        <input{% if not checkChecked %} disabled="disabled"{% endif %} class="rb-value" type="text" placeholder="Points" value="{{ descriptor.value }}" name="{{ descInput }}[{{ levelIndex }}][points]" />
+    </td>
+
+{%- endfor %}
+{% if rubric.levels|length < levelLimit %}
+<td class="{{ cellClass }}">&nbsp;</td>
+{% endif %}

@@ -1,0 +1,37 @@
+{# ensure these are set #}
+{%- set rubricId  = rubricId ?: 'rb-' ~ rubric.id -%}
+{%- set groupId   = groupId ?: rubricId ~ '-' ~ group.id -%}
+{%- set groupName = groupName ? group.name ? group.name : '(no ' ~ locale.rubricGroup ~ ')' -%}
+{%- set groupInput = groupInput ?: formField ~ '[' ~ rubric.id ~ '][group]['  ~ group.id ~ ']' -%}
+
+{%- if rowspan is not null -%}
+<tr data-group="{{ groupId }}" data-sequencer-group="{{ rubricId }}-groups" data-groupname="{{ group.name }}" class="rb-group-header">
+    <th rowspan="{{ rowspan ? rowspan : 2 }}">
+        <span class="sequencer" data-sequencer-v="{{ rubricId }}-groups">
+            <a class="icon-up-arrow" data-sequencer-up title="Move up"></a>
+            <a class="icon-down-arrow" data-sequencer-down title="Move down"></a>
+        </span>
+        {% if group.name %}
+            <label>
+                {%- if group.used -%}
+                    {{ groupName | raw }}
+                    <span data-tooltip
+                          class="hint has-tip tip-right"
+                          data-width="200"
+                          title="This {{ locale.translate('rubricGroup') }} cannot be modified because it contains one or more {{ locale.translate('rubricCriterion', true) }} that are in use elsewhere"
+                    >?</span>
+                    <input type="hidden" value="{{ groupName }}" name="{{ groupInput }}[name]" />
+                {% else %}
+                    <input type="text" value="{{ groupName }}" name="{{ groupInput }}[name]" />
+                {% endif %}
+            </label>
+        {% else %}
+            <label class="meta">{{ groupName | raw }}</label>
+        {% endif %}
+    </th>
+</tr>
+{%- endif %}
+
+<tr data-group="{{ groupId }}" data-sequencer-group="{{ groupId }}">
+    {%- include '@rubric/criterion-editable.twig' -%}
+</tr>

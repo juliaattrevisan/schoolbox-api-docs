@@ -7,6 +7,12 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\DescriptorMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\Factory;
+use Schoolbox\Collection;
+
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 /* Start a session -_-
@@ -60,11 +66,30 @@ $mark = $_POST['mark'][$_POST['uid']];
 
 /* Optional rubric
  */
-$rubric = $_POST['rubric'];
 // If the mark gets passed at the same time as rubrics,
 // then rubrics get clobbered. We don't want that.
-if ($rubric) {
-    $mark = null;
+if (is_array($_POST['rubric'])) {
+
+    $desMap = DescriptorMapper::getInstance();
+    $rubMap = RubricMapper::getInstance();
+
+    $descriptorIds = [];
+
+    foreach ($_POST['rubric'] as $criterionId => $levelId) {
+        // do this the least expensive way Mappers make possible (a custom query would improve this... just saying...)
+        $descriptorIds[] = $desMap->findIdsByColumnList([
+            'submission_box_id' => $submissionBox->getId(),
+            'criterion_id'      => $criterionId,
+            'level_id'          => $levelId
+        ])[0];
+    }
+
+    $grid = $rubMap->findBySubmissionBox($submissionBox);
+    $rubMap->applyMark($grid, $descriptorIds);
+
+} else {
+    // no rubric
+    $grid = null;
 }
 
 /* The usual comment
@@ -104,7 +129,7 @@ $returnedWorkFactory = new \Schoolbox\Assessment\Component\SubmissionBox\Returne
     $submissionBox,
     $mark,
     $comment,
-    $rubric,
+    $grid,
     $attachments,
     $removeUnsetAttachments,
     $crocodoc

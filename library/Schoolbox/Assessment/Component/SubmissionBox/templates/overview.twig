@@ -26,7 +26,7 @@
             <table>
                 <tbody>
                     <tr>
-                        {% if box.markType.slug == 'rubric' %}
+                    {% if box.isRubric %}
                         <th rowspan="2"></th>
                         {% for group, criteria in headers %}
                             <th colspan="{{ criteria | length }}">{{ group }}</th>
@@ -38,10 +38,10 @@
                                 <th>{{ criterion }}</th>
                             {% endfor %}
                         {% endfor %}
-                        {% else %}
-                            <th></th>
-                            <th>Marks</th>
-                        {% endif %}
+                    {% else %}
+                        <th></th>
+                        <th>Marks</th>
+                    {% endif %}
                     </tr>
                     {% for student in students %}
                     <tr>
@@ -53,10 +53,14 @@
                                 </a>
                             </div>
                         </td>
-                        {% if box.markType.slug == 'rubric' %}
+                        {% if box.isRubric %}
                             {% for criteria in headers %}
                                 {% for id, criterion in criteria %}
-                                    <td>{{ marks[student.id][id] }}</td>
+                                    {% set mark = marks[student.id][id] %}
+                                    <td>
+                                        <p>{{ mark.text }}</p>
+                                        <p>{{ mark.value }}</p>
+                                    </td>
                                 {% endfor %}
                             {% endfor %}
                         {% else %}
