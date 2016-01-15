@@ -1,0 +1,33 @@
+{% extends '@adminImport/upload.twig' %}
+
+{% block title %}
+    Timetable Structure
+{% endblock %}
+
+{% block helpText %}
+    {% if hasExternalDb %}
+        <p>Your timetable structure data is stored in your external database - you do not need to upload it here.</p>
+    {% else %}
+        <p>
+            Provide a file containing your timetable structure (term start and end dates, timetable days and periods)
+            in the CSV format in the template below.
+        </p>
+        <ul>
+            <li>You must upload your entire timetable structure in one CSV - any existing structure will be deleted.</li>
+            <li>You must ensure that you specify all periods for all days prior to import.</li>
+            <li>Periods will be imported in the order specified, regardless of their start/finish times.</li>
+            <li>Any empty fields will be filled with the previous non-empty value in that column.</li>
+            <li>
+                <strong>Term Offset</strong> is the number of days to increment Term Start by -
+                e.g. if Term Offset is 2, then the term starts on Day 3.
+            </li>
+        </ul>
+        <a href="/adminv2/import/timetableStructureTemplate.csv" class="button icon-download">Download Template</a>
+    {% endif %}
+{% endblock helpText %}
+
+{% block form %}
+    {% if not hasExternalDb %}
+        {{ parent() }}
+    {% endif %}
+{% endblock form %}

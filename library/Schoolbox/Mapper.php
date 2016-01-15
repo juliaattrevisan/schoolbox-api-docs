@@ -1834,7 +1834,18 @@ abstract class Mapper implements IMapper, Serializable
                         // should dehydrate to an array
                         $propertyValue = (array)$this->getModelProperty($model, $map['property']);
                         // iterate the values given and insert into join table
-                        foreach ($propertyValue as $otherKey) {
+                        $otherMapper       = $this->getJoinMapper($map['join']);
+                        $otherModelExample = $otherMapper->createModel();
+                        foreach ($propertyValue as $value) {
+                            // Is $otherKey a model? If so I need its identifier.
+                            if ($value instanceof $otherModelExample) {
+                                $otherKey = $otherMapper->getModelProperty(
+                                    $value,
+                                    $otherMapper->getIdentifier()['property']
+                                );
+                            } else {
+                                $otherKey = $value;
+                            }
                             $success = $insertRelationStatement->execute(
                                 array(
                                     'this_key'  => $thisKey,

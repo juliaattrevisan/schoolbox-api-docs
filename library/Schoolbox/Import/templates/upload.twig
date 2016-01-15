@@ -1,0 +1,36 @@
+{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>
+            {% block title %}
+            {% endblock %}
+        </h1>
+
+        {% if uploadMissing %}
+            <div class="alert-box alert">
+                <h2>You must upload a file!</h2>
+                <p>Download the template below, enter your data, and upload it when done.</p>
+            </div>
+        {% endif %}
+
+        {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
+    </div>
+
+    <div class="small-12 island">
+        <section class="content">
+            {% block helpText %}
+            {% endblock helpText %}
+
+            {% block form %}
+            <form action="{{ routeLookup(basename ~ '.preview') }}" method="post">
+
+                {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+
+                <input type="submit" value="Preview Import" />
+            </form>
+            {% endblock form %}
+        </section>
+    </div>
+</div>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>

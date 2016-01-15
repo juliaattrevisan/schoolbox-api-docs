@@ -40,6 +40,13 @@ if(is_array($superuserList)) {
     }
 }
 
+// Which modify template gets used?
+if (Config::get('external_db') === 'schoolbox') {
+    $this->setVar('USER_UPLOAD_TEMPLATE', 'userBulkUploadProfile.csv');
+} else {
+    $this->setVar('USER_UPLOAD_TEMPLATE', 'userBulkUpload.csv');
+}
+
 // cloner code
 $this->setBlock(TEMPLATE_content, 'select_clone', 'select_clone_block');
 $this->setBlock('select_clone', 'select_clone_opt', 'select_clone_opt_block');
