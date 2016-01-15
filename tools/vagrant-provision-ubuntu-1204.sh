@@ -233,6 +233,12 @@ service schoolbox-digestd restart > /dev/null 2>/dev/null &
 service schoolbox-rerouted restart > /dev/null 2>/dev/null &
 service schoolbox-belld restart > /dev/null 2>/dev/null &
 
+# call custom provisioning
+if [ -f /vagrant/post-provision.sh ];
+	echo "$vag Running custom post provisioning";
+	/vagrant/post-provision.sh 2>&1;
+fi
+
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
 	echo "$vag Website URL => http://$eth/";
