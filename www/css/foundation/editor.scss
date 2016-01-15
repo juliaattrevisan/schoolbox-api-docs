@@ -4,8 +4,6 @@
 @import "utils/functions";
 @import "utils/variables";
 
-$body-bg: $white;
-
 @import "settings";
 @import "utils/fonts";
 
@@ -17,6 +15,7 @@ $body-bg: $white;
 @import "utils/custom";
 
 body {
+  background-color: $white;
   margin: 1rem;
   height: auto;
 }
