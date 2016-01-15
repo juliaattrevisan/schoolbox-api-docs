@@ -333,18 +333,35 @@ class External_Humanedge_User implements External_UserInterface
                 ORDER BY code ASC
             ";
         } elseif ($user->getRole()->isStaff()) {
+            // Statement 1: core subjects
+            // Statement 2: electives
             $query = "
                 SELECT DISTINCT
-                    (s.[Code] + ISNULL(b.Suffix, '')) as code,
-                    s.[Name] as name,
+                    s.Code + ISNULL(b.Suffix, '') as code,
+                    s.Name as name,
                     '' AS campusCode,
                     '' AS classType
-                FROM [tblSubject] s
-                left join [tblBlockItem] b on s.ID = b.SubjectID
-                left join [tblTeacher] t on b.TeacherID = t.ID
-                Where t.deleted = 0
+                FROM tblSubject s
+                INNER JOIN tblAllocation a on s.ID = a.SubjectID
+                INNER JOIN tblTeacher t on a.TeacherID = t.ID
+                LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
+                WHERE t.deleted = 0
                 AND t.code = $quotedId
-                Order by (s.[Code] + ISNULL(b.Suffix, '')) ASC
+
+                UNION ALL
+
+                SELECT DISTINCT
+                    s.Code + ISNULL(b.Suffix, '') as code,
+                    s.Name as name,
+                    '' AS campusCode,
+                    '' AS classType
+                FROM tblSubject s
+                INNER JOIN tblBlockItem b on s.ID = b.SubjectID
+                INNER JOIN tblTeacher t on b.TeacherID = t.ID
+                WHERE t.deleted = 0
+                AND t.code = $quotedId
+
+                ORDER BY code ASC
             ";
         } else {
             return [];
