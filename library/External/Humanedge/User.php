@@ -325,7 +325,6 @@ class External_Humanedge_User implements External_UserInterface
                     '' AS classType
                 FROM tblSubject s
                 INNER JOIN tblBlockItem b on s.ID = b.SubjectID
-                INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
                 INNER JOIN tblStudent st ON sc.StudentID = st.ID
                 WHERE st.deleted = 0
