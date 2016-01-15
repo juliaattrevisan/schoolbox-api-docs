@@ -58,10 +58,9 @@
                     <div class="small-12 columns no-pad">
                         <ul class="information-list">
                             <!-- BEGIN unit -->
-                            <li class="actions-small-1 no-pad">
+                            <li>
                                 <input name="unit[{UNIT_COUNT}][unit_id]" type="hidden" value="{UNIT_ID}" />
                                 <input name="unit[{UNIT_COUNT}][import]" type="hidden" value="0" />
-
                                 <div class="list-item" data-type="unit_row">
                                     <div class="avatar card small-12 medium-6">
                                         <input id="import-{UNIT_COUNT}" name="unit[{UNIT_COUNT}][import]" type="checkbox" value="1" data-interaction="enable" {UNIT_ENABLED_CHECKED} />
@@ -79,7 +78,7 @@
                                                data-datepicker-sync-enddate="#due_date-{UNIT_COUNT}" />
                                     </div>
                                     <div class="small-12 medium-3 columns" data-hide-watch="#import-{UNIT_COUNT}">
-                                        <label for="due_date-{UNIT_COUNT}">Due</label>
+                                        <label for="due_date-{UNIT_COUNT}">Close</label>
                                         <input id="due_date-{UNIT_COUNT}"
                                                name="unit[{UNIT_COUNT}][due_date]"
                                                type="text"
@@ -88,9 +87,6 @@
                                                data-datepicker />
                                     </div>
                                 </div>
-                                <nav>
-                                    <a href="/homepage/{UNIT_ID}" title="View Unit Homepage" class="icon icon-view"></a>
-                                </nav>
                             </li>
                             <!-- END unit -->
                         </ul>
