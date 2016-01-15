@@ -16,7 +16,6 @@ use Schoolbox\External\Normalise\User\Common\Phone;
 use Schoolbox\External\Normalise\User\Student\Year;
 use Schoolbox\External\Normalise\User\Student\Form;
 use Schoolbox\External\Normalise\User\Common\House;
-use Schoolbox\External\Normalise\User\Common\BoardingHouse;
 
 class Student extends Base {
 
@@ -103,12 +102,6 @@ class Student extends Base {
     protected $house = null;
 
     /**
-     * Boarding House
-     * @var BoardingHouse
-     */
-    protected $boardingHouse = null;
-
-    /**
      * Constructor
      */
     public function __construct() {
@@ -131,21 +124,6 @@ class Student extends Base {
         $this->setPhoneMobile(new Phone());
         $this->setGuardians(new Collection());
         $this->setCampus(new Collection());
-    }
-
-    /**
-     * This student is a boarder
-     *
-     * Determined by presence of a BoardingHouse instance
-     *
-     * @return bool
-     */
-    public function isBoarder() {
-        if ($this->getBoardingHouse() instanceof BoardingHouse) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -382,25 +360,5 @@ class Student extends Base {
     public function getYear()
     {
         return $this->year;
-    }
-
-    /**
-     * Set boarding house
-     *
-     * @param BoardingHouse $boardingHouse
-     */
-    public function setBoardingHouse($boardingHouse)
-    {
-        $this->boardingHouse = $boardingHouse;
-    }
-
-    /**
-     * Get boarding house
-     *
-     * @return BoardingHouse
-     */
-    public function getBoardingHouse()
-    {
-        return $this->boardingHouse;
     }
 }
