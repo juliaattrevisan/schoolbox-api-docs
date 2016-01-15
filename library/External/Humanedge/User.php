@@ -299,20 +299,38 @@ class External_Humanedge_User implements External_UserInterface
             return [];
         }
 
+        $quotedId = $this->getDatabase()->smartQuote($externalUserId);
         if ($user->getRole()->isStudent()) {
+            // Statement 1: core subjects
+            // Statement 2: electives
             $query = "
                 SELECT DISTINCT
-                    (s.[Code] + ISNULL(b.Suffix, '')) as code,
-                    s.[Name] as name,
+                    s.Code as code,
+                    s.Name as name,
                     '' AS campusCode,
                     '' AS classType
-                FROM [tblSubject] s
-                left join [tblBlockItem] b on s.ID = b.SubjectID
-                left join [tblAllocation] a on s.ID = a.SubjectID
-                left join [tblStudent] st on a.FormID = st.FormID
-                Where st.deleted = 0
-                AND st.code = {$this->getDatabase()->smartQuote($externalUserId)}
-                Order by (s.[Code] + ISNULL(b.Suffix, '')) ASC
+                FROM tblSubject s
+                INNER JOIN tblAllocation a on s.ID = a.SubjectID
+                INNER JOIN tblStudent st on a.FormID = st.FormID
+                WHERE st.deleted = 0
+                AND st.code = $quotedId
+
+                UNION ALL
+
+                SELECT DISTINCT
+                    s.Code + ISNULL(b.Suffix, '') AS code,
+                    s.Name AS name,
+                    '' AS campusCode,
+                    '' AS classType
+                FROM tblAllocation a
+                INNER JOIN tblBlockItem b ON a.BlockID = b.BlockID
+                INNER JOIN tblSubject s ON s.ID = b.SubjectID
+                INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
+                INNER JOIN tblStudent st ON sc.StudentID = st.ID
+                WHERE st.deleted = 0
+                AND st.code = $quotedId
+
+                ORDER BY code ASC
             ";
         } elseif ($user->getRole()->isStaff()) {
             $query = "
@@ -325,7 +343,7 @@ class External_Humanedge_User implements External_UserInterface
                 left join [tblBlockItem] b on s.ID = b.SubjectID
                 left join [tblTeacher] t on b.TeacherID = t.ID
                 Where t.deleted = 0
-                AND t.code = {$this->getDatabase()->smartQuote($externalUserId)}
+                AND t.code = $quotedId
                 Order by (s.[Code] + ISNULL(b.Suffix, '')) ASC
             ";
         } else {
