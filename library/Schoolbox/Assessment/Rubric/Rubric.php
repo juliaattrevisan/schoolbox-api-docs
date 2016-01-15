@@ -233,7 +233,7 @@ class Rubric implements Twiggable
     public function toContext()
     {
         $context = [
-            'id'          => $this->getId(),
+            'id'          => $this->getId() ?: 0,
             'multiSelect' => $this->isMultiSelect(),
             'sum'         => $this->criteriaGroups->getSum(),
             'total'       => $this->getTotal(),
