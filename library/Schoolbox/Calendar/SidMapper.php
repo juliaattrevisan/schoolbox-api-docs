@@ -14,7 +14,7 @@ use Schoolbox;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
 
-class SidMapper extends Schoolbox\External\Mapper {
+class SidMapper extends Schoolbox\Mapper {
 
 	/**
 	 * Mapping

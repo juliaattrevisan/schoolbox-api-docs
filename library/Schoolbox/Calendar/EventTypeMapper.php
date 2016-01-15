@@ -13,7 +13,7 @@ namespace Schoolbox\Calendar;
 use Schoolbox;
 
 
-class EventTypeMapper extends Schoolbox\External\Mapper
+class EventTypeMapper extends Schoolbox\Mapper
 {
 
     protected function mapping()
