@@ -122,7 +122,7 @@ if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
 
         $logger->info("Building stripped down CSS for editor");
         $editorIn = SITE_root . '/www/css/foundation/editor.scss';
-        $editorOut = SITE_root . '/www/css/'.$siteLocation.'/editor.scss';
+        $editorOut = SITE_root . '/www/css/'.$siteLocation.'/editor.css';
         $cmd     = sprintf('sass --style compressed %s %s', escapeshellarg($editorIn), escapeshellarg($editorOut));
         exec($cmd, $output, $outputCode);
 
