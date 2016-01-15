@@ -157,7 +157,7 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
     }
 
     return {
-        title: 'Schoolbox IFrame',
+        title: 'Embed IFrame',
         minWidth: 400,
         minHeight: 200,
 
@@ -167,7 +167,7 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
         contents: [
             {
                 id: 'schoolboxiframe-tab',
-                label: 'Schoolbox IFrame',
+                label: 'Embed IFrame',
                 elements: [
                     {
                         type: 'text',

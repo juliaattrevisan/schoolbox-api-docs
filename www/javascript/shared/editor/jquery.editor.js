@@ -168,25 +168,24 @@
                 toolbarGroups: [
                     {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                     {name: 'links', groups: ['links']},
-
                     /* Custom schoolbox-specific plugin stuff can go here
                      * This is a hole into which you may put once-off abilities
                      * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
                      * This is typically not used for anything else for now
                      */
                     {name: 'schoolbox', groups: ['schoolboxresource', 'schoolboxiframe']},
-
                     {name: 'insert', groups: ['insert']},
-                    {name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing']},
-                    {name: 'tools', groups: ['tools']},
                     '/',
                     {name: 'styles', groups: ['styles']},
                     {name: 'colors', groups: ['colors']},
                     {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph']},
                     {name: 'others', groups: ['others']},
+                    {name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing']},
                     '/',
                     {name: 'clipboard', groups: ['clipboard', 'undo']},
-                    {name: 'document', groups: ['mode', 'document', 'doctools']}
+                    {name: 'document', groups: ['mode', 'document', 'doctools']},
+                    {name: 'tools', groups: ['tools']}
+
                 ],
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
@@ -199,15 +198,16 @@
 
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */
-                removePlugins: 'image,image2',
+                removePlugins: 'image,image2,stylescombo,uploadimage',
                 extraPlugins: 'schoolboxresource,schoolboxiframe',
 
                 /* Other settings
                  */
                 toolbarCanCollapse: true,
                 removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent,Embed',
-                magicline_color: '#0000FF',
-                format_tags: 'p;h3;h4;pre;address',
+                magicline_color: '#0066b0',
+                format_tags: 'p;h2;h3;h4;pre',
+                contentsCss: '/css/'+siteLocation+'/editor.css',
 
                 /* set to use our iframely API key for oEmbed calls
                  */
