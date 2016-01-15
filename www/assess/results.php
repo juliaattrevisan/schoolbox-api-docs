@@ -67,6 +67,19 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
     else {
         $percentageReviewed = 100;
     }
+
+    if ($percentage <= 10) { $percentage_text = "<span class='gradient-1'>{$percentage}%</span>"; }
+    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-2'>{$percentage}%</span>"; }
+    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-3'>{$percentage}%</span>"; }
+    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-4'>{$percentage}%</span>"; }
+    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-5'>{$percentage}%</span>"; }
+    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-6'>{$percentage}%</span>"; }
+    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-7'>{$percentage}%</span>"; }
+    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-8'>{$percentage}%</span>"; }
+    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-9'>{$percentage}%</span>"; }
+    else { $percentage_text = "<span class='gradient-10'>{$percentage}%</span>"; }
+
+
     $page->setVar(array(
         'ASSESS_ASSESS_ID' => $page->arg[0],
         'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
@@ -77,7 +90,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         'ATTEMPT_SURNAME' => $currentAttempt['lastname'],
         'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
         'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-        'ATTEMPT_PERCENTAGE' => $percentage,
+        'ATTEMPT_PERCENTAGE' => $percentage_text,
         'ATTEMPT_GRADIENT'  => (int) ($percentage / 10),
         'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
         'ATTEMPT_UNMARKED_RESPONSES' => $percentageReviewed,
@@ -90,12 +103,13 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
     if ($currentAttempt['finish']) {
         $attemptFinishDate = new Alaress_Date_Format($currentAttempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 
-        $finish = $attemptFinishDate->getShort();
+        $finish =  $attemptFinishDate->getShort();
         $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
 
         $page->setVar(array(
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
-            'ATTEMPT_FINISH' => $finish,
+            'ATTEMPT_FINISH' => "<span class='show-for-xlarge'>{$finish}</span><span class='show-for-large-down'>{$finish}</span>",
+            'ATTEMPT_NOT_FINISH' => '',
             'unsubmitted_block' => ''
         ));
 
@@ -107,7 +121,8 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 
         if (empty($finish)) {
             $page->setVar(array(
-                'ATTEMPT_FINISH' => 'Incomplete',
+                'ATTEMPT_FINISH' => '<div>Incomplete</div>',
+                'ATTEMPT_NOT_FINISH' => '',
                 'submitted_block' => '',
                 'has_marks_block' => '',
             ));
@@ -120,7 +135,8 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 
             $page->setVar(array(
                 'ATTEMPT_TIME_TAKEN' => $timeTaken,
-                'ATTEMPT_FINISH' => $attemptFinishDate->getShort(),
+                'ATTEMPT_FINISH' =>$attemptFinishDate->getShort(),
+                'ATTEMPT_NOT_FINISH' => '',
                 'unsubmitted_block' => ''
             ));
 
@@ -129,6 +145,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
     }
 
     $page->parse('has_review_block', 'has_review');
+    $page->parse('has_review_2_block', 'has_review_2');
 
     if ($reviewedAt) {
         $page->setVar(array(
@@ -186,6 +203,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         'submitted_block' => '',
         'unsubmitted_block' => '',
         'has_review_block' => '',
+        'has_review_2_block' => '',
         'expand_attempts_block' => '',
         'has_marks_block' => '',
     ));
@@ -239,6 +257,7 @@ $this->setBlock('attempt', 'not_reviewed_checkbox', 'not_reviewed_checkbox_block
 $this->setBlock('attempt', 'submitted', 'submitted_block');
 $this->setBlock('attempt', 'unsubmitted', 'unsubmitted_block');
 $this->setBlock('attempt', 'has_review', 'has_review_block');
+$this->setBlock('attempt', 'has_review_2', 'has_review_2_block');
 $this->setBlock('attempt', 'expand_attempts', 'expand_attempts_block');
 $this->setBlock('attempt', 'has_marks', 'has_marks_block');
 $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
@@ -253,8 +272,9 @@ $this->setVar(array(
     'submitted_block' => '',
     'unsubmitted_block' => '',
     'has_review_block' => '',
+    'has_review_2_block' => '',
     'expand_attempts_block' => '',
-    'has_marks_block' => '&nbsp;',
+    'has_marks_block' => '',
 ));
 
 $this->setTitle('Results for: ' . $assess['title']);
@@ -334,7 +354,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
 } else {
     $this->setVar(array(
         'has_attempt_block' => '',
-        'has_marks_block' => '&nbsp;',
+        'has_marks_block' => '',
     ));
 }
 
@@ -389,7 +409,8 @@ if (is_array($allStudents) && count($allStudents)) {
                 'ATTEMPT_EXTERNAL_ID' => $currentStudent['synergy_id'],
                 'ATTEMPT_FIRSTNAME' => $currentStudent['firstname'],
                 'ATTEMPT_SURNAME' => $currentStudent['lastname'],
-                'ATTEMPT_FINISH' => 'Not Attempted',
+                'ATTEMPT_FINISH' => '',
+                'ATTEMPT_NOT_FINISH' => 'Not Submitted<br><span class="label alert">Not Submitted</span>',
                 'ATTEMPT_TIME_TAKEN' => '',
                 'ATTEMPT_TOTAL_MARKS' => '',
                 'ATTEMPT_TOTAL_AVAILABLE_MARKS' => '',
@@ -406,7 +427,8 @@ if (is_array($allStudents) && count($allStudents)) {
                 'submitted_block' => '',
                 'reviewed_block' => '',
                 'has_review_block' => '',
-                'has_marks_block' => '&nbsp;',
+                'has_review_2_block' => '',
+                'has_marks_block' => '',
                 'not_reviewed_block' => '',
                 'not_reviewed_checkbox_block' => '',
                 'attempted_block'  => '',
@@ -424,7 +446,7 @@ if (is_array($allStudents) && count($allStudents)) {
                 'reviewed_block' => '',
                 'submitted_block' => '',
                 'unsubmitted_block' => '',
-                'has_marks_block' => '&nbsp;',
+                'has_marks_block' => '',
             ));
         }
 
@@ -443,7 +465,7 @@ if (is_array($allStudents) && count($allStudents)) {
         'attempt_block' => '',
         'assess_delete_block' => '',
         'user_attempts_block' => '',
-        'has_marks_block' => '&nbsp;',
+        'has_marks_block' => '',
     ));
 }
 
