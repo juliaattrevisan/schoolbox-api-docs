@@ -305,11 +305,12 @@ class External_Humanedge_User implements External_UserInterface
             // Statement 2: electives
             $query = "
                 SELECT DISTINCT
-                    s.Code as code,
+                    s.Code + ISNULL(b.Suffix, '') AS code,
                     s.Name as name,
                     '' AS campusCode,
                     '' AS classType
                 FROM tblSubject s
+                INNER JOIN tblBlockItem b on s.ID = b.SubjectID
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 INNER JOIN tblStudent st on a.FormID = st.FormID
                 WHERE st.deleted = 0
