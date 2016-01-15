@@ -221,7 +221,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $periodListAdaption = array();
 
         foreach ($periodList as $period) {
-            $periodSequence = $period['sequence'];
+            $periodSequence = $period['start'].'-'.$period['finish'];
 
             if (!isset($periodListAdaption[$periodSequence])) {
                 $periodListAdaption[$periodSequence] = array(
