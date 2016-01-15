@@ -188,6 +188,13 @@
 
                 ],
 
+                /* Quicktable config for best table defaults
+                 */
+                qtBorder: '0', // Border of inserted table
+                qtWidth: '100%', // Width of inserted table
+                qtCellPadding: '0', // Cell padding table
+                qtCellSpacing: '0', // Cell spacing table
+
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
                 extraAllowedContent: 'img(full-width)[data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float};iframe(full-width)[src,allowfullscreen]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float}',
