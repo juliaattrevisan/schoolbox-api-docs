@@ -368,6 +368,24 @@ class RubricMapper
         return $this->applyStudentMark($grid, $student);
     }
 
+    protected function getcsv($fp, $limit = 13)
+    {
+        $line = fgetcsv($fp);
+
+        if (is_null($line)) {
+            // EOF
+            return null;
+        }
+
+        if (is_array($line)) {
+            // normal data
+            return array_slice($line, 0, $limit);
+        }
+
+        // bad data, but not EOF
+        return [];
+    }
+
     /**
      * @param IStorage $file
      * @param int      $folderId
@@ -387,7 +405,7 @@ class RubricMapper
 
         $fp = $file->readStream();
 
-        $square[] = array_slice(fgetcsv($fp), 0, 13);
+        $square[] = $this->getcsv($fp);
 
         // list of levels
         $levelNames = array_slice($square[0], 2);
@@ -397,7 +415,7 @@ class RubricMapper
         $criteria = [];
 
         // build the square, extracting data as we go
-        while ($row = array_slice(fgetcsv($fp), 0, 13)) {
+        while ($row = $this->getcsv($fp)) {
 
             // list of criteria, grouped by... uh, group
             if ($row[0]) {
