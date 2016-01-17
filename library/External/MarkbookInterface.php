@@ -39,6 +39,14 @@ interface External_MarkbookInterface
     public function updateAssessment(Activity $assessment);
 
     /**
+     * Deletes an existing markbook assessment
+     *
+     * @param Activity $assessment
+     * @return bool
+     */
+    public function deleteAssessment(Activity $assessment);
+
+    /**
      * Creates or updates the mark for a student in the remote markbook
      *
      * @param ReturnedWork|Attempt  $returnedWork
