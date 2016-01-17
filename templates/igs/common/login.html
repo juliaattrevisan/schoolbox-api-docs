@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<!--  Copyright 2013 Alaress Pty Ltd, Schoolbox -->
+<!--  Visit us at www.schoolbox.com.au -->
+<head>
+<title>{TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="en-au" />
+<meta name="author" content="Alaress Pty Ltd"/>
+<meta name="application-name" content="Schoolbox" />
+<meta name="msapplication-TileColor" content="#0066b0" />
+<meta name="msapplication-square70x70logo" content="/images/logo.php?logo=skin_logo_square&size=tile70" />
+<meta name="msapplication-square150x150logo" content="/images/logo.php?logo=skin_logo_square&size=tile150" />
+<meta name="msapplication-wide310x150logo" content="/images/logo.php?logo=skin_logo_login&size=tile310" />
+<meta name="msapplication-square310x310logo" content="/images/logo.php?logo=skin_logo_large&size=tile310" />
+<meta name="viewport" content="initial-scale=1, maximum-scale=1">
+<link rel="apple-touch-icon" sizes="57x57" href="/images/logo.php?logo=skin_logo_square&size=apple57">
+<link rel="apple-touch-icon" sizes="60x60" href="/images/logo.php?logo=skin_logo_square&size=apple60">
+<link rel="apple-touch-icon" sizes="72x72" href="/images/logo.php?logo=skin_logo_square&size=apple72">
+<link rel="apple-touch-icon" sizes="76x76" href="/images/logo.php?logo=skin_logo_square&size=apple76">
+<link rel="apple-touch-icon" sizes="114x114" href="/images/logo.php?logo=skin_logo_square&size=apple114">
+<link rel="apple-touch-icon" sizes="120x120" href="/images/logo.php?logo=skin_logo_square&size=apple120">
+<link rel="apple-touch-icon" sizes="144x144" href="/images/logo.php?logo=skin_logo_square&size=apple144">
+<link rel="apple-touch-icon" sizes="152x152" href="/images/logo.php?logo=skin_logo_square&size=apple152">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/logo.php?logo=skin_logo_square&size=apple180">
+<link rel="Shortcut Icon" href="/images/logo.php?logo=skin_logo_square&size=favicon" type="image/x-icon" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_CHROME_LOCATION}/chrome.css?v={SITE_VERSION}" />
+<!--[if lt IE 10]>
+<link rel="stylesheet" type="text/css" href="/css/{SITE_LOCATION}/chrome-foundation-ie9.css?v={SITE_VERSION}" />
+<![endif]-->
+<!--[if gte IE 10]> -->
+<link rel="stylesheet" type="text/css" href="/css/{SITE_LOCATION}/chrome-foundation.css?v={SITE_VERSION}" />
+<!-- <![endif]-->
+<style type="text/css">
+    body.login {
+        background-image: url({LOGIN_BG});
+    }
+</style>
+<script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={SITE_VERSION}"></script>
+<script type="text/javascript">
+window.onload = init;
+function init(){
+	document.getElementById('username').focus();
+}
+</script>
+<!--[if lt IE 9]>
+<script type="text/javascript">
+    // Upgrade your browser
+    window.location.href = "/upgrade.php";
+</script>
+<![endif]-->
+</head>
+<body class="login {SIDE}">
+<div id="container">
+	<div id="content">
+		<form id="login" method="post" action="/loginForm.php?{GET_PARAMS}">
+            <input type="hidden" name="page" value="{HIDDEN}" />
+            <div class="row collapse">
+                <div class="small-12 column">
+                    <div class="logo">
+                        <img src="/images/logo.php?logo=skin_logo_login&size=normal" alt="{SITE_NAME}" />
+                    </div>
+                </div>
+                <div class="small-12 column">
+                    <!-- BEGIN terms --><!--
+                    <p>Use of {SITE_TITLE} is governed by School policy which is deemed to be accepted at login time. A summary of the policy can be found <a href="/policy.php">here</a>. Staff and Students are expected to keep themselves informed of the full policy requirements which are available in {SITE_TITLE}.</p>
+                    --><!-- END terms -->
+                    <p id="error-msg" class="alert-box alert">{ERROR}</p>
+                </div>
+                <div class="small-12 column">
+                    <!--[if lt IE 10]>
+                    <label for="username">Username</label>
+                    <![endif]-->
+                    <input type="text" name="username" id="username" placeholder="Username" />
+                </div>
+                <div class="small-12 column">
+                    <!--[if lt IE 10]>
+                    <label for="password">Password</label>
+                    <![endif]-->
+                    <input type="password" name="password" id="password" placeholder="Password" />
+                </div>
+            </div>
+            <div class="row collapse">
+                <!-- BEGIN login_terms -->
+                <div class="small-12 column">
+                    <input required
+                           class="required"
+                           id="tandc"
+                           name="tandc"
+                           value="1"
+                           type="checkbox"
+                           title="{LOGIN_TERMS_AND_CONDITIONS_ERROR}" />
+                    <label for="tandc" class="tandc">
+                        {LOGIN_TERMS_AND_CONDITIONS}
+                    </label>
+                </div>
+                <!-- END login_terms -->
+                <div class="small-7 medium-12 column">
+                    <!-- BEGIN remember_me -->
+                    <input id="rememberme" type="checkbox" name="rememberme" value="1" />
+                    <label for="rememberme">Remember me</label>
+                    <!-- END remember_me -->
+                </div>
+                <div class="small-5 medium-12 column">
+                    <input type="submit" name="Submit" value="Sign in" alt="Sign in" />
+                </div>
+            </div>
+            <div class="row collapse">
+                <div class="small-12 column">
+                    <a href="/forgotten-password.php">Forgot your Password?</a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="footer">
+        <ul>
+            <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
+            <li><a href="/policy.php">Terms of Use and Privacy Policy</a></li>
+            <li>Powered by <a href="http://www.schoolbox.com.au" title="Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a></li>
+            <li><a href="/feedback.php">Feedback and Support</a></li>
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+
+    var l, fy;
+
+    $(function () {
+
+        l = $('#login');
+
+        fy = $('#footer').height();
+
+        $(window).on('resize', function () {
+            l.css('top', Math.max(0, ($(window).height() - l.height() - fy) / 2));
+        }).trigger('resize');
+
+        // Validation of terms and conditions
+        l.alaressValidate({
+            submitHandler: function(form) {
+                form.submit();
+                l.find('input[type=submit]').prop('disabled', true);
+            },
+            errorPlacement: function(error, element) {
+                if (element.attr("name") == "tandc") {
+                    error.appendTo("#error-msg");
+                } else {
+                    error.appendTo(element);
+                }
+            }
+        });
+        // T&C: remove error message completely on check
+        l.find('#tandc').on('change', function () {
+            if (this.checked) {
+                $('label.error[for="tandc"]').remove();
+            }
+        });
+    });
+</script>
+{SITE_ANALYTICS}
+</body>
+</html>
