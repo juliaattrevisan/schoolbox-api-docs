@@ -200,12 +200,20 @@ class InstanceMapper extends Mapper {
      *
      * @param Instance $object
      */
-    public function postDelete(Instance $object) {
+    public function postDelete(Instance $object)
+    {
+        // Need to fully load assessment or box, to create an activity out of it
         if ($object->getAssessment()->getId()) {
-            OnlineAssessmentMapper::getInstance()->delete($object->getAssessment());
+            /** @var OnlineAssessmentMapper $mapper */
+            $mapper = $this->getJoinMapper('assessment');
+            $object->setAssessment($mapper->findById($object->getAssessment()->getId()));
+            $mapper->delete($object->getAssessment());
         }
         if ($object->getSubmissionBox()->getId()) {
-            SubmissionBoxMapper::getInstance()->delete($object->getSubmissionBox());
+            /** @var SubmissionBoxMapper $mapper */
+            $mapper = $this->getJoinMapper('submission_box');
+            $object->setSubmissionBox($mapper->findById($object->getSubmissionBox()->getId()));
+            $mapper->delete($object->getSubmissionBox());
         }
     }
 
@@ -214,12 +222,20 @@ class InstanceMapper extends Mapper {
      *
      * @param Instance $object
      */
-    public function postRestore(Instance $object) {
+    public function postRestore(Instance $object)
+    {
+        // Need to fully load assessment or box, to create an activity out of it
         if ($object->getAssessment()->getId()) {
-            OnlineAssessmentMapper::getInstance()->restoreSoftDeleted($object->getAssessment());
+            /** @var OnlineAssessmentMapper $mapper */
+            $mapper = $this->getJoinMapper('assessment');
+            $object->setAssessment($mapper->findById($object->getAssessment()->getId()));
+            $mapper->restoreSoftDeleted($object->getAssessment());
         }
         if ($object->getSubmissionBox()->getId()) {
-            SubmissionBoxMapper::getInstance()->restoreSoftDeleted($object->getSubmissionBox());
+            /** @var SubmissionBoxMapper $mapper */
+            $mapper = $this->getJoinMapper('submission_box');
+            $object->setSubmissionBox($mapper->findById($object->getSubmissionBox()->getId()));
+            $mapper->restoreSoftDeleted($object->getSubmissionBox());
         }
     }
 
