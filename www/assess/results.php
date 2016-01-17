@@ -79,6 +79,11 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
     else if ($percentage <= 10) { $percentage_text = "<span class='gradient-9'>{$percentage}%</span>"; }
     else { $percentage_text = "<span class='gradient-10'>{$percentage}%</span>"; }
 
+    if (trim($percentage_text) != "") {
+        $checkbox_text = '<input id="review-'.$currentAttempt['attempt_id'].'" name="review[]" type="checkbox" name=\'reviewAttemptIds[]\' value=\''.$currentAttempt['attempt_id'].'\'><label for="review-'.$currentAttempt['attempt_id'].'" class="checkbox-toggle"><span class="icon-tick" title="Mark As Reviewed"></span></label>';
+    } else {
+        $checkbox_text = '';
+    }
 
     $page->setVar(array(
         'ASSESS_ASSESS_ID' => $page->arg[0],
@@ -91,6 +96,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
         'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
         'ATTEMPT_PERCENTAGE' => $percentage_text,
+        'ATTEMPT_CHECKBOX' => $checkbox_text,
         'ATTEMPT_GRADIENT'  => (int) ($percentage / 10),
         'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
         'ATTEMPT_UNMARKED_RESPONSES' => $percentageReviewed,
@@ -145,14 +151,10 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
     }
 
     $page->parse('has_review_block', 'has_review');
-    $page->parse('has_review_2_block', 'has_review_2');
 
     if ($reviewedAt) {
         $page->setVar(array(
             'not_reviewed_block' => ''
-        ));
-        $page->setVar(array(
-            'not_reviewed_checkbox_block' => ''
         ));
 
         $page->parse('reviewed_block', 'reviewed');
@@ -163,7 +165,6 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         ));
 
         $page->parse('not_reviewed_block', 'not_reviewed');
-        $page->parse('not_reviewed_checkbox_block', 'not_reviewed_checkbox');
     }
 
     /* Expandable attempts
@@ -186,10 +187,8 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 
     if ($readonly) {
         $page->setVar('assess_delete_block', '');
-        $page->setVar('attempt_delete_block', '');
     } else {
         $page->parse('assess_delete_block', 'delete', false);
-        $page->parse('attempt_delete_block', 'attempt_delete', false);
     }
 
     $page->parse('attempt_block', 'attempt', true);
@@ -198,12 +197,10 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
      */
     $page->setVar(array(
         'not_reviewed_block' => '',
-        'not_reviewed_checkbox_block' => '',
         'reviewed_block' => '',
         'submitted_block' => '',
         'unsubmitted_block' => '',
         'has_review_block' => '',
-        'has_review_2_block' => '',
         'expand_attempts_block' => '',
         'has_marks_block' => '',
     ));
@@ -249,15 +246,12 @@ catch (\Exception $e) {
 $this->setFile(TEMPLATE_content, 'assess/results.html');
 $this->setBlock(TEMPLATE_content, 'user_attempts', 'user_attempts_block');
 $this->setBlock('user_attempts', 'attempt', 'attempt_block');
-$this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
 $this->setBlock('attempt', 'attempted', 'attempted_block');
 $this->setBlock('attempt', 'reviewed', 'reviewed_block');
 $this->setBlock('attempt', 'not_reviewed', 'not_reviewed_block');
-$this->setBlock('attempt', 'not_reviewed_checkbox', 'not_reviewed_checkbox_block');
 $this->setBlock('attempt', 'submitted', 'submitted_block');
 $this->setBlock('attempt', 'unsubmitted', 'unsubmitted_block');
 $this->setBlock('attempt', 'has_review', 'has_review_block');
-$this->setBlock('attempt', 'has_review_2', 'has_review_2_block');
 $this->setBlock('attempt', 'expand_attempts', 'expand_attempts_block');
 $this->setBlock('attempt', 'has_marks', 'has_marks_block');
 $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
@@ -267,12 +261,10 @@ $this->setBlock(TEMPLATE_content, 'has_attempt', 'has_attempt_block');
 
 $this->setVar(array(
     'not_reviewed_block' => '',
-    'not_reviewed_checkbox_block' => '',
     'reviewed_block' => '',
     'submitted_block' => '',
     'unsubmitted_block' => '',
     'has_review_block' => '',
-    'has_review_2_block' => '',
     'expand_attempts_block' => '',
     'has_marks_block' => '',
 ));
@@ -366,7 +358,6 @@ if (is_array($allStudents) && count($allStudents)) {
       */
     foreach ($allStudents as $currentStudent) {
         $previousAttempt = null;
-        $this->setVar('attempt_delete_block', '');
 
         // need to append uid if synergetic
         if ($currentStudent['synergy_id'] && !$currentStudent['uid']) {
@@ -410,6 +401,7 @@ if (is_array($allStudents) && count($allStudents)) {
                 'ATTEMPT_FIRSTNAME' => $currentStudent['firstname'],
                 'ATTEMPT_SURNAME' => $currentStudent['lastname'],
                 'ATTEMPT_FINISH' => '',
+                'ATTEMPT_CHECKBOX' => '',
                 'ATTEMPT_NOT_FINISH' => 'Not Submitted<br><span class="label alert">Not Submitted</span>',
                 'ATTEMPT_TIME_TAKEN' => '',
                 'ATTEMPT_TOTAL_MARKS' => '',
@@ -418,7 +410,6 @@ if (is_array($allStudents) && count($allStudents)) {
                 'ATTEMPT_REVIEW_STATUS' => '',
                 'ATTEMPT_UNMARKED_RESPONSES' => '',
                 'ATTEMPT_REVIEW_LINK' => '',
-                'ATTEMPT_DELETE_LINK' => '',
                 'ATTEMPT_EXPANDABLE' => '',
                 'ATTEMPT_HIDDEN' => '',
             ));
@@ -427,10 +418,8 @@ if (is_array($allStudents) && count($allStudents)) {
                 'submitted_block' => '',
                 'reviewed_block' => '',
                 'has_review_block' => '',
-                'has_review_2_block' => '',
                 'has_marks_block' => '',
                 'not_reviewed_block' => '',
-                'not_reviewed_checkbox_block' => '',
                 'attempted_block'  => '',
             ));
 
@@ -442,7 +431,6 @@ if (is_array($allStudents) && count($allStudents)) {
              */
             $this->setVar(array(
                 'not_reviewed_block' => '',
-                'not_reviewed_checkbox_block' => '',
                 'reviewed_block' => '',
                 'submitted_block' => '',
                 'unsubmitted_block' => '',
