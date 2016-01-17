@@ -1,5 +1,5 @@
 <?php
-use SitePage;
+
 use Alaress\File\Remote\FetcherInterface;
 use Schoolbox\Collection;
 use Schoolbox\File\MimetypeMapper;
