@@ -173,7 +173,6 @@
                                         <!-- BEGIN not_reviewed -->
                                             <span class="label neutral"><b>Not Reviewed</b></span>
                                         <!-- END not_reviewed -->
-
                                     </div>
                                     <div class="medium-3 large-3 xlarge-4 columns show-for-medium-up">
                                         <div class="avatar card small-12">
@@ -183,29 +182,14 @@
                                     </div>
                                     <div class="xlarge-2 columns text-right show-for-xlarge">
                                         <div class="avatar card small-12">
-                                            <h2><b>{ATTEMPT_PERCENTAGE}</b></h2>
+                                            <h2><b><span class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</span></b></h2>
                                         </div>
                                     </div>
                                 </div>
                                 <nav>
-
-                                    <span class="show-for-medium-up">
-                                        <!-- BEGIN expand_attempts -->
-                                            <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}" class="icon-view" title="View Submission"></a>
-                                            <a href="#" class="icon-history" title="View Submission History"></a>
-                                        <!-- END expand_attempts -->
-                                        {ATTEMPT_CHECKBOX}
-                                    </span>
-                                    <!-- BEGIN has_review -->
-                                        <span class="show-for-small-only">
-                                            <a href="#" class="icon-more" data-dropdown="row-options-{ATTEMPT_ATTEMPT_ID}" title="Actions" aria-expanded="false"></a>
-                                        </span>
-                                    <!-- END has_review -->
+                                    {ATTEMPT_REVIEW}
+                                    {ATTEMPT_CHECKBOX}
                                 </nav>
-                                <ul class="f-dropdown" data-dropdown-content="" id="row-options-{ATTEMPT_ATTEMPT_ID}">
-                                    <li><a href="#" class="icon-view">View Submission</a></li>
-                                    <li><a href="#" class="icon-history">View History</a></li>
-                                </ul>
                             </div>
                         </li>
                     <!-- END attempt -->

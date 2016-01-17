@@ -32,10 +32,8 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 {
     $firstSection = $sectionHandler->getFirst($page->arg[0]);
 
+    // The total available marks for this attempt
 
-
-    /* The total available marks for this attempt
-     */
     $totalAvailableMarks = $attemptHandler->getTotalMarks($page->arg[0], $currentAttempt['attempt_id']);
 
     if ($totalAvailableMarks > 0) {
@@ -44,8 +42,8 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         $percentage = 0;
     }
 
-    /* Check when the test was reviewed
-      */
+    // Check when the test was reviewed
+
     if ($currentAttempt['reviewed_at'] != '') {
         $reviewedDate = new Alaress_Date_Format($currentAttempt['reviewed_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
@@ -55,34 +53,17 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         $reviewedAt = false;
     }
 
-    /* Count how many responses haven't been automarked
-     */
+    // Count how many responses haven't been automarked
+
     $numNotAutomarked = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
     $numAutomarked = $responseHandler->numAutomarked($currentAttempt['attempt_id']);
     $totalQuestions = $numAutomarked + $numNotAutomarked;
 
-    if($numNotAutomarked) {
+    if ($numNotAutomarked) {
         $percentageReviewed = round(($totalQuestions / $numNotAutomarked) * 100);
     }
     else {
         $percentageReviewed = 100;
-    }
-
-    if ($percentage <= 10) { $percentage_text = "<span class='gradient-1'>{$percentage}%</span>"; }
-    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-2'>{$percentage}%</span>"; }
-    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-3'>{$percentage}%</span>"; }
-    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-4'>{$percentage}%</span>"; }
-    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-5'>{$percentage}%</span>"; }
-    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-6'>{$percentage}%</span>"; }
-    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-7'>{$percentage}%</span>"; }
-    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-8'>{$percentage}%</span>"; }
-    else if ($percentage <= 10) { $percentage_text = "<span class='gradient-9'>{$percentage}%</span>"; }
-    else { $percentage_text = "<span class='gradient-10'>{$percentage}%</span>"; }
-
-    if (trim($percentage_text) != "") {
-        $checkbox_text = '<input id="review-'.$currentAttempt['attempt_id'].'" name="review[]" type="checkbox" name=\'reviewAttemptIds[]\' value=\''.$currentAttempt['attempt_id'].'\'><label for="review-'.$currentAttempt['attempt_id'].'" class="checkbox-toggle"><span class="icon-tick" title="Mark As Reviewed"></span></label>';
-    } else {
-        $checkbox_text = '';
     }
 
     $page->setVar(array(
@@ -95,9 +76,9 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         'ATTEMPT_SURNAME' => $currentAttempt['lastname'],
         'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
         'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-        'ATTEMPT_PERCENTAGE' => $percentage_text,
-        'ATTEMPT_CHECKBOX' => $checkbox_text,
-        'ATTEMPT_GRADIENT'  => (int) ($percentage / 10),
+        'ATTEMPT_PERCENTAGE' => "{$percentage}%",
+        'ATTEMPT_CHECKBOX' => '<input id="review-'.$currentAttempt['attempt_id'].'" name="review[]" type="checkbox" name=\'reviewAttemptIds[]\' value=\''.$currentAttempt['attempt_id'].'\'><label for="review-'.$currentAttempt['attempt_id'].'" class="checkbox-toggle"><span class="icon-tick" title="Mark As Reviewed"></span></label>',
+        'ATTEMPT_GRADIENT'  => (int)($percentage / 10),
         'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
         'ATTEMPT_UNMARKED_RESPONSES' => $percentageReviewed,
     ));
@@ -116,6 +97,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
             'ATTEMPT_FINISH' => "<span class='show-for-xlarge'>{$finish}</span><span class='show-for-large-down'>{$finish}</span>",
             'ATTEMPT_NOT_FINISH' => '',
+            'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
             'unsubmitted_block' => ''
         ));
 
@@ -129,6 +111,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
             $page->setVar(array(
                 'ATTEMPT_FINISH' => '<div>Incomplete</div>',
                 'ATTEMPT_NOT_FINISH' => '',
+                'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
                 'submitted_block' => '',
                 'has_marks_block' => '',
             ));
@@ -143,14 +126,13 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
                 'ATTEMPT_TIME_TAKEN' => $timeTaken,
                 'ATTEMPT_FINISH' =>$attemptFinishDate->getShort(),
                 'ATTEMPT_NOT_FINISH' => '',
+                'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
                 'unsubmitted_block' => ''
             ));
 
             $page->parse('submitted_block', 'submitted');
         }
     }
-
-    $page->parse('has_review_block', 'has_review');
 
     if ($reviewedAt) {
         $page->setVar(array(
@@ -165,24 +147,6 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         ));
 
         $page->parse('not_reviewed_block', 'not_reviewed');
-    }
-
-    /* Expandable attempts
-     */
-    if (($previousAttempt == null) || ($previousAttempt['user_id'] != $currentAttempt['user_id'])) {
-        $page->setVar(array(
-            'ATTEMPT_EXPANDABLE' => '',
-            'ATTEMPT_HIDDEN' => ''
-        ));
-
-        $page->parse('expand_attempts_block', 'expand_attempts');
-    }
-    else {
-        $page->setVar(array(
-            'ATTEMPT_EXPANDABLE' => 'data-expandable',
-            'ATTEMPT_HIDDEN' => 'hide',
-            'expand_attempts_block' => '',
-        ));
     }
 
     if ($readonly) {
@@ -200,8 +164,6 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         'reviewed_block' => '',
         'submitted_block' => '',
         'unsubmitted_block' => '',
-        'has_review_block' => '',
-        'expand_attempts_block' => '',
         'has_marks_block' => '',
     ));
 }
@@ -251,8 +213,6 @@ $this->setBlock('attempt', 'reviewed', 'reviewed_block');
 $this->setBlock('attempt', 'not_reviewed', 'not_reviewed_block');
 $this->setBlock('attempt', 'submitted', 'submitted_block');
 $this->setBlock('attempt', 'unsubmitted', 'unsubmitted_block');
-$this->setBlock('attempt', 'has_review', 'has_review_block');
-$this->setBlock('attempt', 'expand_attempts', 'expand_attempts_block');
 $this->setBlock('attempt', 'has_marks', 'has_marks_block');
 $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 $this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
@@ -264,8 +224,6 @@ $this->setVar(array(
     'reviewed_block' => '',
     'submitted_block' => '',
     'unsubmitted_block' => '',
-    'has_review_block' => '',
-    'expand_attempts_block' => '',
     'has_marks_block' => '',
 ));
 
@@ -403,6 +361,7 @@ if (is_array($allStudents) && count($allStudents)) {
                 'ATTEMPT_FINISH' => '',
                 'ATTEMPT_CHECKBOX' => '',
                 'ATTEMPT_NOT_FINISH' => 'Not Submitted<br><span class="label alert">Not Submitted</span>',
+                'ATTEMPT_REVIEW' => '',
                 'ATTEMPT_TIME_TAKEN' => '',
                 'ATTEMPT_TOTAL_MARKS' => '',
                 'ATTEMPT_TOTAL_AVAILABLE_MARKS' => '',
@@ -411,13 +370,11 @@ if (is_array($allStudents) && count($allStudents)) {
                 'ATTEMPT_UNMARKED_RESPONSES' => '',
                 'ATTEMPT_REVIEW_LINK' => '',
                 'ATTEMPT_EXPANDABLE' => '',
-                'ATTEMPT_HIDDEN' => '',
             ));
 
             $this->setVar(array(
                 'submitted_block' => '',
                 'reviewed_block' => '',
-                'has_review_block' => '',
                 'has_marks_block' => '',
                 'not_reviewed_block' => '',
                 'attempted_block'  => '',
