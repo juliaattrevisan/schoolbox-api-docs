@@ -52,6 +52,15 @@ class External_Offline_Markbook implements External_MarkbookInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function deleteAssessment(Activity $assessment)
+    {
+        // NOOP
+        return false;
+    }
+
+    /**
      * Creates or updates the mark for a student in the remote markbook
      *
      * @param ReturnedWork|Attempt $returnedWork

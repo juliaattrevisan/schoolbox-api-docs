@@ -172,6 +172,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function deleteAssessment(Activity $assessment)
+    {
+        return false;
+    }
+
+    /**
      * Gets database field values out of an assessment. Gets the following fields:
      * * Heading
      * * HdgAbbrev1
