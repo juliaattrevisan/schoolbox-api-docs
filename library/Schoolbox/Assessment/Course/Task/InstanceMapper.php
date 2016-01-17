@@ -206,13 +206,21 @@ class InstanceMapper extends Mapper {
         if ($object->getAssessment()->getId()) {
             /** @var OnlineAssessmentMapper $mapper */
             $mapper = $this->getJoinMapper('assessment');
-            $object->setAssessment($mapper->findById($object->getAssessment()->getId()));
+            try {
+                $object->setAssessment($mapper->findById($object->getAssessment()->getId()));
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // Item probably doesn't exist - noop
+            }
             $mapper->delete($object->getAssessment());
         }
         if ($object->getSubmissionBox()->getId()) {
             /** @var SubmissionBoxMapper $mapper */
             $mapper = $this->getJoinMapper('submission_box');
-            $object->setSubmissionBox($mapper->findById($object->getSubmissionBox()->getId()));
+            try {
+                $object->setSubmissionBox($mapper->findById($object->getSubmissionBox()->getId()));
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // Item probably doesn't exist - noop
+            }
             $mapper->delete($object->getSubmissionBox());
         }
     }
@@ -228,13 +236,21 @@ class InstanceMapper extends Mapper {
         if ($object->getAssessment()->getId()) {
             /** @var OnlineAssessmentMapper $mapper */
             $mapper = $this->getJoinMapper('assessment');
-            $object->setAssessment($mapper->findById($object->getAssessment()->getId()));
+            try {
+                $object->setAssessment($mapper->findById($object->getAssessment()->getId()));
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // Item probably doesn't exist - noop
+            }
             $mapper->restoreSoftDeleted($object->getAssessment());
         }
         if ($object->getSubmissionBox()->getId()) {
             /** @var SubmissionBoxMapper $mapper */
             $mapper = $this->getJoinMapper('submission_box');
-            $object->setSubmissionBox($mapper->findById($object->getSubmissionBox()->getId()));
+            try {
+                $object->setSubmissionBox($mapper->findById($object->getSubmissionBox()->getId()));
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // Item probably doesn't exist - noop
+            }
             $mapper->restoreSoftDeleted($object->getSubmissionBox());
         }
     }
