@@ -187,6 +187,8 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
         $this->registerCallback('postSave', array($this, 'postSave'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteTask'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
 	}
 
 	/**
@@ -288,6 +290,22 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
                 );
             }
         }
+    }
+
+    /**
+     * Removes this assessment from the markbook.
+     *
+     * This is used as a post-delete hook.
+     *
+     * @param OnlineAssessment $object
+     */
+    public function deleteFromMarkbook(OnlineAssessment $object)
+    {
+        $externalMarkbook = new \External_Markbook();
+        $activityFactory  = new \Schoolbox\Assessment\ActivityFactory();
+        $externalMarkbook->deleteAssessment(
+            $activityFactory->buildFromOnlineAssessment($object, 'upcoming')
+        );
     }
 
 	/**

@@ -106,6 +106,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'postSave'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteTask'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteTask'));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
     }
 
     /**
@@ -315,6 +317,22 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
                 );
             }
         }
+    }
+
+    /**
+     * Removes this box from the markbook.
+     *
+     * This is used as a post-delete hook.
+     *
+     * @param SubmissionBox $object
+     */
+    public function deleteFromMarkbook(SubmissionBox $object)
+    {
+        $externalMarkbook = new \External_Markbook();
+        $activityFactory  = new \Schoolbox\Assessment\ActivityFactory();
+        $externalMarkbook->deleteAssessment(
+            $activityFactory->buildFromSubmissionBox($object, 'upcoming')
+        );
     }
 
     /**
