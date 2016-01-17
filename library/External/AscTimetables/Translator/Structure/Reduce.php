@@ -23,9 +23,10 @@ class External_AscTimetables_Translator_Structure_Reduce
         switch ($item['type']) {
             case 'day':
                 $carry['dayCount']++;
-                if ($item['day'] == 0) {
+                if ($item['day'] == 1) {
                     $carry['termStart'] = $item['startDate'];
                 }
+                $carry['days'][$item['day']] = $item;
                 break;
             case 'period':
                 $carry['periods'][] = [

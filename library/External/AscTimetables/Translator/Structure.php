@@ -21,6 +21,7 @@ class External_AscTimetables_Translator_Structure extends External_AscTimetables
             'termStart' => null,
             'dayCount'  => 0,
             'termTitle' => 'Whole Year',
+            'days'      => [],
             'periods'   => [],
         ];
         foreach (
@@ -42,14 +43,14 @@ class External_AscTimetables_Translator_Structure extends External_AscTimetables
             foreach (\Schoolbox\CampusMapper::getInstance()->findAll() as $campus) {
                 /** @var \Schoolbox\Campus $campus */
                 foreach ($result['periods'] as $period) {
-                    foreach (range(1, $result['dayCount']) as $day) {
+                    foreach ($result['days'] as $day) {
                         $endResult[] = [
                             'Term Campus'   => $campus->getExtTimetableCode(),
                             'Term Title'    => $result['termTitle'],
                             'Term Start'    => $termStart,
                             'Term Finish'   => $termFinish,
                             'Term Offset'   => 0,
-                            'Period Day'    => $day,
+                            'Period Day'    => $day['day'],
                             'Period Title'  => $period['number'],
                             'Period Start'  => $period['start'],
                             'Period Finish' => $period['finish'],

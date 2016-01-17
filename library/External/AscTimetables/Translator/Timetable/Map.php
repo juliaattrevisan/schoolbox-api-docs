@@ -25,7 +25,7 @@ class External_AscTimetables_Translator_Timetable_Map extends IteratorIterator
                 'type'         => 'card',
                 'lessonId'     => (string)$attrs->lessonid,
                 'classroomIds' => explode(',', (string)$attrs->classroomids),
-                'day'          => (int)$attrs->day,
+                'day'          => (int)$attrs->day + 1,
                 'period'       => (string)$attrs->period,
             ];
         } elseif ($current->matches('//lessons/lesson')) {
