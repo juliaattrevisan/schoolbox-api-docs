@@ -177,10 +177,20 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     public function deleteAssessment(Activity $assessment)
     {
         $identifier = $this->getMarkbookIdentifier($assessment);
-        $query      = "
-            DELETE FROM StaffAssessmentMarkBook
-            WHERE HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}";
-        $this->getDatabase()->query($query);
+        $queries[]  = "
+            DELETE studentBook
+            FROM StudentAssessmentMarkBook studentBook
+            INNER JOIN StaffAssessmentMarkBook staffBook ON studentBook.MarkBookSeq = staffBook.MarkBookSeq
+            WHERE staffBook.HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}
+        ";
+        $queries[]  = "
+            DELETE staffBook
+            FROM StaffAssessmentMarkBook staffBook
+            WHERE staffBook.HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}
+        ";
+        foreach ($queries as $query) {
+            $this->getDatabase()->query($query);
+        }
     }
 
     /**
