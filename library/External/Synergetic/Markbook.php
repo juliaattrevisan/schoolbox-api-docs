@@ -176,7 +176,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     public function deleteAssessment(Activity $assessment)
     {
-        return false;
+        $identifier = $this->getMarkbookIdentifier($assessment);
+        $query      = "
+            DELETE FROM StaffAssessmentMarkBook
+            WHERE HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}";
+        $this->getDatabase()->query($query);
     }
 
     /**
