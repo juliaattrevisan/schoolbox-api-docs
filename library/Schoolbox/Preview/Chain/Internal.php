@@ -53,7 +53,7 @@ class Internal extends Base {
         else if($id = $this->isSubmission($uriObject)) {
             try {
                 $item = SubmissionBox\Submission\FileMapper::getInstance()->findById($id);
-                $this->processStorage($url, $item->getStorage());
+                $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
             } catch (\Schoolbox\Mapper\Exception $e ) {
                 //noop
             }
@@ -61,7 +61,7 @@ class Internal extends Base {
         else if($id = $this->isReturn($uriObject)) {
             try {
                 $item = SubmissionBox\ReturnedWorkMapper::getInstance()->findById($id);
-                $this->processStorage($url, $item->getStorage());
+                $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
             } catch (\Schoolbox\Mapper\Exception $e ) {
                 //noop
             }
