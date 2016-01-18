@@ -180,7 +180,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $queries[]  = "
             DELETE studentBook
             FROM StudentAssessmentMarkBook studentBook
-            INNER JOIN StaffAssessmentMarkBook staffBook ON studentBook.MarkBookSeq = staffBook.MarkBookSeq
+            INNER JOIN StaffAssessmentMarkBook staffBook
+                ON  studentBook.MarkBookSeq  = staffBook.MarkBookSeq
+                AND studentBook.FileType     = staffBook.FileType
+                AND studentBook.FileYear     = staffBook.FileYear
+                AND studentBook.FileSemester = staffBook.FileSemester
+                AND studentBook.ClassCampus  = staffBook.ClassCampus
+                AND studentBook.ClassCode    = staffBook.ClassCode
             WHERE staffBook.HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}
         ";
         $queries[]  = "
