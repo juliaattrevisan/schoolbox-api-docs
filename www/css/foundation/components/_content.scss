@@ -1295,8 +1295,10 @@ ul.flex-list {
             }
         }
 
+		/* Compact Mode Avatar Cards
+		 */
 		&.compact {
-			img, [class*="icon-"] {
+			[class*="icon-"] {
 				width: 2rem;
 				margin-top: 0;
 				padding: 0 0 0 1rem;
@@ -1306,8 +1308,16 @@ ul.flex-list {
 			p {
 				margin-left: 1.5rem;
 			}
-			img.mime {
-				padding: 0.25rem !important;
+
+			img {
+				width: 2rem;
+
+				&.mime {
+					padding: 0.25rem !important;
+					margin-top: 0;
+					margin-left: -0.5rem;
+					margin-right: 0.5rem;
+				}
 			}
 
 			.progress {
