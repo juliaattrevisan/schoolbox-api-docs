@@ -11,7 +11,9 @@ use \Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
 
 class External_Markbook implements External_MarkbookInterface
 {
-
+    /**
+     * @var External_MarkbookInterface
+     */
     private $database;
 
     /**
@@ -56,6 +58,14 @@ class External_Markbook implements External_MarkbookInterface
     public function updateAssessment(Activity $assessment)
     {
         return $this->getDatabase()->updateAssessment($assessment);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteAssessment(Activity $assessment)
+    {
+        return $this->getDatabase()->deleteAssessment($assessment);
     }
 
     /**

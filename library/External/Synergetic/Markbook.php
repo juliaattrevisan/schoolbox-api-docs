@@ -172,6 +172,34 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function deleteAssessment(Activity $assessment)
+    {
+        $identifier = $this->getMarkbookIdentifier($assessment);
+        $queries[]  = "
+            DELETE studentBook
+            FROM StudentAssessmentMarkBook studentBook
+            INNER JOIN StaffAssessmentMarkBook staffBook
+                ON  studentBook.MarkBookSeq  = staffBook.MarkBookSeq
+                AND studentBook.FileType     = staffBook.FileType
+                AND studentBook.FileYear     = staffBook.FileYear
+                AND studentBook.FileSemester = staffBook.FileSemester
+                AND studentBook.ClassCampus  = staffBook.ClassCampus
+                AND studentBook.ClassCode    = staffBook.ClassCode
+            WHERE staffBook.HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}
+        ";
+        $queries[]  = "
+            DELETE staffBook
+            FROM StaffAssessmentMarkBook staffBook
+            WHERE staffBook.HdgAbbrev2 = {$this->getDatabase()->smartQuote($identifier)}
+        ";
+        foreach ($queries as $query) {
+            $this->getDatabase()->query($query);
+        }
+    }
+
+    /**
      * Gets database field values out of an assessment. Gets the following fields:
      * * Heading
      * * HdgAbbrev1
