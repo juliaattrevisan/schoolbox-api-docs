@@ -360,7 +360,7 @@ if (is_array($allStudents) && count($allStudents)) {
                 'ATTEMPT_SURNAME' => $currentStudent['lastname'],
                 'ATTEMPT_FINISH' => '',
                 'ATTEMPT_CHECKBOX' => '',
-                'ATTEMPT_NOT_FINISH' => 'Not Submitted<br><span class="label alert">Not Submitted</span>',
+                'ATTEMPT_NOT_FINISH' => 'Not Submitted',
                 'ATTEMPT_REVIEW' => '',
                 'ATTEMPT_TIME_TAKEN' => '',
                 'ATTEMPT_TOTAL_MARKS' => '',
