@@ -116,12 +116,12 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @var int
      */
-    protected $titleTextMinSize;
+    protected $titleTextMinSize = 75;
 
     /**
      * @var int
      */
-    protected $titleTextMaxSize;
+    protected $titleTextMaxSize = 175;
 
     /**
      * @var Color
