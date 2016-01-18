@@ -33,10 +33,8 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 {
     $firstSection = $sectionHandler->getFirst($page->arg[0]);
 
+    // The total available marks for this attempt
 
-
-    /* The total available marks for this attempt
-     */
     $totalAvailableMarks = $attemptHandler->getTotalMarks($page->arg[0], $currentAttempt['attempt_id']);
 
     if ($totalAvailableMarks > 0) {
@@ -45,8 +43,8 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         $percentage = 0;
     }
 
-    /* Check when the test was reviewed
-      */
+    // Check when the test was reviewed
+
     if ($currentAttempt['reviewed_at'] != '') {
         $reviewedDate = new Alaress_Date_Format($currentAttempt['reviewed_at'], Alaress_Date_Format::DATABASE_FORMAT);
 
@@ -56,18 +54,19 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         $reviewedAt = false;
     }
 
-    /* Count how many responses haven't been automarked
-     */
+    // Count how many responses haven't been automarked
+
     $numNotAutomarked = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
     $numAutomarked = $responseHandler->numAutomarked($currentAttempt['attempt_id']);
     $totalQuestions = $numAutomarked + $numNotAutomarked;
 
-    if($numNotAutomarked) {
+    if ($numNotAutomarked) {
         $percentageReviewed = round(($totalQuestions / $numNotAutomarked) * 100);
     }
     else {
         $percentageReviewed = 100;
     }
+
     $page->setVar(array(
         'ASSESS_ASSESS_ID' => $page->arg[0],
         'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
@@ -78,8 +77,9 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         'ATTEMPT_SURNAME' => $currentAttempt['lastname'],
         'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
         'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-        'ATTEMPT_PERCENTAGE' => $percentage,
-        'ATTEMPT_GRADIENT'  => (int) ($percentage / 10),
+        'ATTEMPT_PERCENTAGE' => "{$percentage}%",
+        'ATTEMPT_CHECKBOX' => '<input id="review-'.$currentAttempt['attempt_id'].'" name="review[]" type="checkbox" name=\'reviewAttemptIds[]\' value=\''.$currentAttempt['attempt_id'].'\'><label for="review-'.$currentAttempt['attempt_id'].'" class="checkbox-toggle"><span class="icon-tick" title="Mark As Reviewed"></span></label>',
+        'ATTEMPT_GRADIENT'  => (int)($percentage / 10),
         'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
         'ATTEMPT_UNMARKED_RESPONSES' => $percentageReviewed,
     ));
@@ -91,12 +91,14 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
     if ($currentAttempt['finish']) {
         $attemptFinishDate = new Alaress_Date_Format($currentAttempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 
-        $finish = $attemptFinishDate->getShort();
+        $finish =  $attemptFinishDate->getShort();
         $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
 
         $page->setVar(array(
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
-            'ATTEMPT_FINISH' => $finish,
+            'ATTEMPT_FINISH' => "<span class='show-for-xlarge'>{$finish}</span><span class='show-for-large-down'>{$finish}</span>",
+            'ATTEMPT_NOT_FINISH' => '',
+            'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
             'unsubmitted_block' => ''
         ));
 
@@ -110,7 +112,9 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
             // Has the end time of the quiz passed? If so, say they finished at that time.
 
             $page->setVar(array(
-                'ATTEMPT_FINISH' => 'Incomplete',
+                'ATTEMPT_FINISH' => '<div>Incomplete</div>',
+                'ATTEMPT_NOT_FINISH' => '',
+                'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
                 'submitted_block' => '',
                 'has_marks_block' => '',
             ));
@@ -123,15 +127,15 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 
             $page->setVar(array(
                 'ATTEMPT_TIME_TAKEN' => $timeTaken,
-                'ATTEMPT_FINISH' => $attemptFinishDate->getShort(),
+                'ATTEMPT_FINISH' =>$attemptFinishDate->getShort(),
+                'ATTEMPT_NOT_FINISH' => '',
+                'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
                 'unsubmitted_block' => ''
             ));
 
             $page->parse('submitted_block', 'submitted');
         }
     }
-
-    $page->parse('has_review_block', 'has_review');
 
     if ($reviewedAt) {
         $page->setVar(array(
@@ -148,30 +152,10 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         $page->parse('not_reviewed_block', 'not_reviewed');
     }
 
-    /* Expandable attempts
-     */
-    if (($previousAttempt == null) || ($previousAttempt['user_id'] != $currentAttempt['user_id'])) {
-        $page->setVar(array(
-            'ATTEMPT_EXPANDABLE' => '',
-            'ATTEMPT_HIDDEN' => ''
-        ));
-
-        $page->parse('expand_attempts_block', 'expand_attempts');
-    }
-    else {
-        $page->setVar(array(
-            'ATTEMPT_EXPANDABLE' => 'data-expandable',
-            'ATTEMPT_HIDDEN' => 'hide',
-            'expand_attempts_block' => '',
-        ));
-    }
-
     if ($readonly) {
         $page->setVar('assess_delete_block', '');
-        $page->setVar('attempt_delete_block', '');
     } else {
         $page->parse('assess_delete_block', 'delete', false);
-        $page->parse('attempt_delete_block', 'attempt_delete', false);
     }
 
     $page->parse('attempt_block', 'attempt', true);
@@ -183,8 +167,6 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         'reviewed_block' => '',
         'submitted_block' => '',
         'unsubmitted_block' => '',
-        'has_review_block' => '',
-        'expand_attempts_block' => '',
         'has_marks_block' => '',
     ));
 }
@@ -229,17 +211,15 @@ catch (\Exception $e) {
 $this->setFile(TEMPLATE_content, 'assess/results.html');
 $this->setBlock(TEMPLATE_content, 'user_attempts', 'user_attempts_block');
 $this->setBlock('user_attempts', 'attempt', 'attempt_block');
-$this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
 $this->setBlock('attempt', 'attempted', 'attempted_block');
 $this->setBlock('attempt', 'reviewed', 'reviewed_block');
 $this->setBlock('attempt', 'not_reviewed', 'not_reviewed_block');
 $this->setBlock('attempt', 'submitted', 'submitted_block');
 $this->setBlock('attempt', 'unsubmitted', 'unsubmitted_block');
-$this->setBlock('attempt', 'has_review', 'has_review_block');
-$this->setBlock('attempt', 'expand_attempts', 'expand_attempts_block');
 $this->setBlock('attempt', 'has_marks', 'has_marks_block');
 $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 $this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
+$this->setBlock(TEMPLATE_content, 'review', 'review_block');
 $this->setBlock(TEMPLATE_content, 'has_attempt', 'has_attempt_block');
 
 $this->setVar(array(
@@ -247,8 +227,6 @@ $this->setVar(array(
     'reviewed_block' => '',
     'submitted_block' => '',
     'unsubmitted_block' => '',
-    'has_review_block' => '',
-    'expand_attempts_block' => '',
     'has_marks_block' => '',
 ));
 
@@ -341,7 +319,6 @@ if (is_array($allStudents) && count($allStudents)) {
       */
     foreach ($allStudents as $currentStudent) {
         $previousAttempt = null;
-        $this->setVar('attempt_delete_block', '');
 
         // need to append uid if synergetic
         if ($currentStudent['synergy_id'] && !$currentStudent['uid']) {
@@ -384,7 +361,10 @@ if (is_array($allStudents) && count($allStudents)) {
                 'ATTEMPT_EXTERNAL_ID' => $currentStudent['synergy_id'],
                 'ATTEMPT_FIRSTNAME' => $currentStudent['firstname'],
                 'ATTEMPT_SURNAME' => $currentStudent['lastname'],
-                'ATTEMPT_FINISH' => 'Not Attempted',
+                'ATTEMPT_FINISH' => '',
+                'ATTEMPT_CHECKBOX' => '',
+                'ATTEMPT_NOT_FINISH' => 'Not Submitted',
+                'ATTEMPT_REVIEW' => '',
                 'ATTEMPT_TIME_TAKEN' => '',
                 'ATTEMPT_TOTAL_MARKS' => '',
                 'ATTEMPT_TOTAL_AVAILABLE_MARKS' => '',
@@ -392,15 +372,12 @@ if (is_array($allStudents) && count($allStudents)) {
                 'ATTEMPT_REVIEW_STATUS' => '',
                 'ATTEMPT_UNMARKED_RESPONSES' => '',
                 'ATTEMPT_REVIEW_LINK' => '',
-                'ATTEMPT_DELETE_LINK' => '',
                 'ATTEMPT_EXPANDABLE' => '',
-                'ATTEMPT_HIDDEN' => '',
             ));
 
             $this->setVar(array(
                 'submitted_block' => '',
                 'reviewed_block' => '',
-                'has_review_block' => '',
                 'has_marks_block' => '',
                 'not_reviewed_block' => '',
                 'attempted_block'  => '',
@@ -461,9 +438,11 @@ $this->parse('user_attempts_block', 'user_attempts', true);
 
 if ($readonly) {
     $this->setVar('delete_block', '');
+    $this->setVar('review_block', '');
     $this->setVar('modify_btn_block', '');
 } else {
     $this->parse('delete_block', 'delete');
+    $this->parse('review_block', 'review');
     $this->parse('modify_btn_block', 'modify_btn');
 }
 
