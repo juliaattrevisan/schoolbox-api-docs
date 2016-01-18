@@ -9,7 +9,7 @@
                 <li class="actions-small-2">
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <a href="/submission/send.php?id={MOST_RECENT_RETURN_FILE_ID}&return=1" title="Download Returned Work">
+                            <a href="/submission/send.php?id={MOST_RECENT_RETURN_FILE_ID}&return=1" data-plugin="preview" title="View Returned Work">
                                 <img src="/images/mime/60x60/{MOST_RECENT_RETURN_FILE_THUMB}" class="content" alt="{MOST_RECENT_RETURN_FILE_NAME}" />
                                 <p>{MOST_RECENT_RETURN_FILE_NAME}</p>
                             </a>
@@ -18,7 +18,7 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="/submission/send.php?id={MOST_RECENT_RETURN_FILE_ID}&return=1" class="icon-download" title="Download"></a>
+                        <a href="/submission/send.php?id={MOST_RECENT_RETURN_FILE_ID}&return=1&save=1" class="icon-download" title="Download"></a>
                         <a href="/submission/returnWorkForm.php?delete={MOST_RECENT_RETURN_FILE_ID}" class="icon-delete" title="Delete Return"></a>
                     </nav>
                 </li>
