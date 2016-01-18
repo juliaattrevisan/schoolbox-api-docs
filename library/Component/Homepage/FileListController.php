@@ -130,6 +130,10 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setBlock('files', 'file_no_url', 'file_no_url_block');
         $this->setBlock('files', 'modify_file', 'modify_file_block');
 
+        /* Need title injected here
+         */
+        $this->parseConfig();
+
         $fileList = $this->fileMapper->findForFolders(
             [ $this->source->getId() ],
             array(
@@ -172,6 +176,12 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 );
                 $this->setVar($output);
 
+                if ($this->getConfig('compactMode')) {
+                    $this->setVar(array(
+                        'FILE_COMPACT' => 'compact'
+                    ));
+                }
+
                 //set name
                 if ($file->getFilename() != "") {
                     $this->setVar('FILE_URL', '/send.php?id=' . $file->getId());
@@ -204,9 +214,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             $this->parse("submit_file_block", "submit_file");
         }
 
-        /* Need title injected here
-         */
-        $this->parseConfig();
+
 
         return true;
     }
