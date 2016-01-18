@@ -53,11 +53,13 @@ class Report_Staff extends Report_Abstract
     {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/report/staff.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'staff', 'staff_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'department', 'department_block');
         $this->getPage()->setTitle('Staff Contact info');
 
         $this->getPage()->setVar(
             array(
                 'staff_block' => '',
+                'department_block' => '',
             )
         );
     }
@@ -95,7 +97,54 @@ class Report_Staff extends Report_Abstract
         );
 
         if (is_array($allStaff) && count($allStaff)) {
+
+            $previousDepartment = "";
+
+            foreach ($allStaff as $key => $currentStaff) {
+                $description = trim(Scrub::text($currentStaff['StaffDepartmentDescription']));
+
+                // Push unknown departments to the bottom of the sort order
+
+                if ($description == '' || strtolower($description) == 'not selected') {
+                    $description = 'zzzz';
+                }
+
+                $allStaff[$key]['StaffDepartmentDescription'] = $description;
+            }
+
+            $sort = array();
+
+            foreach ($allStaff as $k=>$v) {
+                $sort['StaffDepartmentDescription'][$k] = $v['StaffDepartmentDescription'];
+                $sort['StaffSurname'][$k] = $v['StaffSurname'];
+                $sort['StaffPreferredName'][$k] = $v['StaffPreferredName'];
+            }
+
+            array_multisort(
+                $sort['StaffDepartmentDescription'], SORT_ASC,
+                $sort['StaffSurname'], SORT_ASC,
+                $sort['StaffPreferredName'], SORT_ASC,
+                $allStaff
+            );
+
             foreach ($allStaff as $currentStaff) {
+
+                if ($previousDepartment != $currentStaff['StaffDepartmentDescription']) {
+                    if ($previousDepartment != '') {
+                        $this->getPage()->parse('department_block', 'department', true);
+                        $this->getPage()->setVar('staff_block', '');
+                    }
+                    $previousDepartment = $currentStaff['StaffDepartmentDescription'];
+                }
+
+                // Fix up the name on unknown departments
+
+                if ($currentStaff['StaffDepartmentDescription'] == 'zzzz') {
+                    $currentStaff['StaffDepartmentDescription'] = 'Other Departments';
+                }
+
+                $extensionText = Scrub::text($currentStaff['StaffExtension']) == '' ? '' : '(x' . Scrub::text($currentStaff['StaffExtension']) . ')';
+
                 $this->getPage()->setVar(
                     array(
                         'STAFF_STAFFID'    => Scrub::text($currentStaff['StaffID']),
@@ -104,17 +153,20 @@ class Report_Staff extends Report_Abstract
                         'STAFF_FIRSTNAME'  => Scrub::text($currentStaff['StaffPreferredName']),
                         'STAFF_SURNAME'    => Scrub::text($currentStaff['StaffSurname']),
                         'STAFF_ROLE'       => Scrub::text(implode(', ', $currentStaff['JobPositionDescription'])),
-                        'STAFF_DEPARTMENT' => Scrub::text($currentStaff['StaffDepartmentDescription']),
+                        'STAFF_DEPARTMENT' => $currentStaff['StaffDepartmentDescription'],
                         'STAFF_CAMPUS'     => Scrub::text($currentStaff['StaffCampusDescription']),
-                        'STAFF_EXTENSION'  => Scrub::text($currentStaff['StaffExtension']),
+                        'STAFF_EXTENSION'  => $extensionText,
                         'STAFF_MOBILE'     => Scrub::text($currentStaff['StaffDefaultMobilePhone']),
                         'STAFF_VOICEMAIL'  => Scrub::text($currentStaff['StaffVoiceMail']),
                         'STAFF_PHONE'      => Scrub::text($currentStaff['StaffOccupPhone']),
                         'STAFF_EMAIL'      => Scrub::text($currentStaff['StaffOccupEmail']),
                     )
                 );
+
                 $this->getPage()->parse('staff_block', 'staff', true);
             }
+
+            $this->getPage()->parse('department_block', 'department', true);
         }
     }
 
