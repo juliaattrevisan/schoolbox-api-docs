@@ -208,20 +208,20 @@ class InstanceMapper extends Mapper {
             $mapper = $this->getJoinMapper('assessment');
             try {
                 $object->setAssessment($mapper->findById($object->getAssessment()->getId()));
+                $mapper->delete($object->getAssessment());
             } catch (\Schoolbox\Mapper\Exception $e) {
                 // Item probably doesn't exist - noop
             }
-            $mapper->delete($object->getAssessment());
         }
         if ($object->getSubmissionBox()->getId()) {
             /** @var SubmissionBoxMapper $mapper */
             $mapper = $this->getJoinMapper('submission_box');
             try {
                 $object->setSubmissionBox($mapper->findById($object->getSubmissionBox()->getId()));
+                $mapper->delete($object->getSubmissionBox());
             } catch (\Schoolbox\Mapper\Exception $e) {
                 // Item probably doesn't exist - noop
             }
-            $mapper->delete($object->getSubmissionBox());
         }
     }
 
