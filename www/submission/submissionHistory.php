@@ -660,6 +660,7 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
     $this->setVar(
         array(
             'RETURNED_WORK_OWNER_ID'   => $return->getOwner()->getId(),
+            'RETURNED_WORK_ID'         => $return->getId(),
             'RETURNED_WORK_COMMENT'    => Scrub::Text($recentComment),
             'RETURNED_WORK_MARK'       => $mark,
             'RETURNED_WORK_MARK_TIP'   => $mark == $recentMark ? '' : $recentMark,

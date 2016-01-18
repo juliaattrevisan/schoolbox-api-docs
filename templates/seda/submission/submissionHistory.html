@@ -13,7 +13,7 @@
             $(this).confirmDialog({
                 text: 'Are you sure you wish to confirm this grade?',
                 confirmEvent: function () {
-                    $.ajax('/modules/accept_work/{BOX_ID}')
+                    $.ajax('/modules/accept_work/{RETURNED_WORK_ID}')
                 }
             });
         });

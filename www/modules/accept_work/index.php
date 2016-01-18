@@ -11,13 +11,35 @@
  *
  */
 
+use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+
 
 if(is_numeric($this->arg[0])) {
-    $db = Database::getInstance();
 
-    $st = $db->prepare("INSERT INTO seda_accept_work (`uid`, `box_id`, accepted) VALUES (:uid,:box_id,NOW())");
-    $st->execute(array(':uid'=>$_SESSION['id'],':box_id'=> $this->arg[0]));
+    $returnMapper = ReturnedWorkMapper::getInstance();
 
-    print "success";
+    try {
+        $staffReturn = $returnMapper->findById($this->arg[0]);
+
+        if( $staffReturn->getNormalizedMark() > 0 &&
+            $staffReturn->getOwner()->getId() == $_SESSION['user']->getId() ) {
+
+            $db = Database::getInstance();
+
+            $st = $db->prepare("INSERT INTO seda_accept_work (`uid`, `box_id`, accepted) VALUES (:uid,:box_id,NOW())");
+            $st->execute(array(':uid'=>$_SESSION['user']->getId(),':box_id'=> $this->arg[0]));
+
+            print "success";
+
+        }
+        else {
+            print "not owner, or mark not set";
+        }
+
+
+    } catch (Schoolbox\Mapper\Exception $e) {
+        print "return not found";
+    }
+
 }
 exit;
