@@ -106,8 +106,7 @@ $policy    = $conf->get('lms_student_policy');
 $html2text = new \Html2Text\Html2Text($policy);
 // Ensure that a policy that contains ONLY an image still displays,
 // by allowing img tags through unmolested
-//$html2text->set_allowed_tags('<img>');
-if (strlen(trim($html2text->getText())) > 0) {
+if (strlen(trim($html2text->getText())) > 0 || mb_stripos($policy, '<img') !== false) {
     $this->setVar('STUDENT_SUBMIT_TERMS', Scrub::html($policy));
     $this->parse('confirm_terms_block', 'confirm_terms');
 } else {
