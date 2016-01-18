@@ -142,8 +142,15 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
                 );
 
                 if ($this->getConfig('compactMode')) {
-                    $this->setVar('compact_hide_block', '');
+                    $this->setVar(array(
+                        'compact_hide_block' => '',
+                        'WIKI_COMPACT' => 'compact'
+                    ));
                 } else {
+                    $this->setVar(array(
+                        'WIKI_COMPACT' => ''
+                    ));
+
                     $this->parse('compact_hide_block', 'compact_hide');
                 }
 
