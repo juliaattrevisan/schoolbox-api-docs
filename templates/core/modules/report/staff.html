@@ -26,32 +26,38 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island">
-        <!-- BEGIN department -->
-            <h2>{STAFF_DEPARTMENT}</h2>
-
-            <section>
-
-            <ul class="information-list">
-                <!-- BEGIN staff -->
-
-                <li>
-                    <div class="list-item">
-                        <div class="avatar card small-4 columns">
-                            <img src="/portrait.php?userId={STAFF_STAFFID}&size=square32">
-                            <a href="/search/user/{STAFF_STAFFID}">{STAFF_SURNAME}, {STAFF_FIRSTNAME}</a>
-                            <p class="meta">{STAFF_ROLE}</p>
-                        </div>
-                        <div class="card small-4 columns">{STAFF_CAMPUS}&nbsp;</div>
-                        <div class="card small-4 columns text-right">
-                            <div><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></div>
-                            <div><a href="tel:{STAFF_PHONE}">{STAFF_PHONE}</a> {STAFF_EXTENSION}</div>
-                        </div>
-                    </div>
-                </li>
-                <!-- END staff -->
-            </ul>
-            </section>
-        <!-- END department -->
+    <div class="small-12 columns">
+        <div class="scrollable">
+            <table data-tablesorter>
+                <thead>
+                    <tr>
+                        <th class="hide-for-small" data-orderable="false">Image</th>
+                        <th>First name</th>
+                        <th>Surname</th>
+                        <th class="hide-for-medium-down">Department</th>
+                        <th class="hide-for-small">Role</th>
+                        <th class="hide-for-medium-down">Campus</th>
+                        <th>Phone</th>
+                        <th>Ext</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN staff -->
+                    <tr>
+                        <td class="hide-for-small"><img src="/portrait.php?userId={STAFF_STAFFID}&size=square32"></td>
+                        <td>{STAFF_FIRSTNAME}</td>
+                        <td>{STAFF_SURNAME}</td>
+                        <td class="hide-for-medium-down">{STAFF_DEPARTMENT}</td>
+                        <td class="hide-for-small">{STAFF_ROLE}</td>
+                        <td class="hide-for-medium-down">{STAFF_CAMPUS}</td>
+                        <td><a href="tel:{STAFF_PHONE}">{STAFF_PHONE}</a></td>
+                        <td>{STAFF_EXTENSION}</td>
+                        <td><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></td>
+                    </tr>
+                    <!-- END staff -->
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
