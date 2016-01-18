@@ -19,6 +19,7 @@ class Config extends DeprecatedModel {
     const FIELD_SELECTLOOKUP = 10;
     const FIELD_COLOUR    = 11;
     const FIELD_FILE      = 12;
+    const FIELD_FILEMULTI = 13;
 
     const TYPE_SITE         = 1;
     const TYPE_SECURITY     = 2;

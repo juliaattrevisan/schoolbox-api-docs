@@ -209,6 +209,27 @@ if(is_array($optionList)) {
                     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
                     $this->parse('setting_type_file_block', 'setting_type_file', true);
                     break;
+
+                case 'fileMulti':
+                    $zone = new \Schoolbox\Resource\Attachment\Zone(Scrub::text($option['name']));
+                    $zone->setThumbnailSize(64);
+                    $zone->setAttachPrompt('Attach '. Scrub::text(strtolower($option['title'])));
+                    $zone->setAttachmentsLabel('');
+                    $zone->setMulti(true);
+                    $zone->setFileVar(Scrub::text($option['name'])."[]");
+                    $zone->setMimeFilter('image/*');
+                    $zone->setModalTitle('Select '. Scrub::text(strtolower($option['title'])));
+
+                    $backgrounds = explode(",", Config::get('skin_login_bg'));
+
+                    if (count($backgrounds)) {
+                        if ($zone->attachFiles($backgrounds));
+                    }
+
+                    $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+                    $this->parse('setting_type_file_block', 'setting_type_file', true);
+
+                    break;
             }
         }
 

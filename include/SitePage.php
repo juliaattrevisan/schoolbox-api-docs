@@ -1240,11 +1240,11 @@ class SitePage extends Page
         }
 
         // choose a background picture
-        $options = array(Config::get('skin_login_bg'));
 
-        if (count($options) && $options[0] ) {
-            $bg = $options[array_rand($options)];
-            $this->setVar('LOGIN_BG', '/images/logo.php?logo=skin_login_bg&size=normal');
+        $backgrounds = explode(",", Config::get('skin_login_bg'));
+
+        if (count($backgrounds) && $backgrounds[0] ) {
+            $this->setVar('LOGIN_BG', '/storage/image.php?hash=' . $backgrounds[array_rand($backgrounds)]);
         } else {
             $this->setVar('LOGIN_BG', '/images/core/login-bg.jpg');
         }
