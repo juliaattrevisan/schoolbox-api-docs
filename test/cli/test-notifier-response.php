@@ -71,6 +71,6 @@ foreach ($envelope->getAll() as $instance) {
 
     $html2text = new Html2Text($pageArray['title']);
 
-    printf(" ** [%s] '%s'\n", $pageArray['href'], str_replace("\n","",$html2text->get_text()));
+    printf(" ** [%s] '%s'\n", $pageArray['href'], str_replace("\n","",$html2text->getText()));
 }
 

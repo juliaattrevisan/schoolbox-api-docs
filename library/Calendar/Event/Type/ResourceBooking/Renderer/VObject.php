@@ -36,8 +36,8 @@ class VObject extends VObjectBase
             $vevent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
             $vevent->add('CATEGORIES', $this->getEvent()->getCategory());
 
-            $this->getTextConverter()->set_html($this->getEvent()->getDetail());
-            $vevent->add('DESCRIPTION', $this->getTextConverter()->get_text());
+            $this->getTextConverter()->setHtml($this->getEvent()->getDetail());
+            $vevent->add('DESCRIPTION', $this->getTextConverter()->getText());
 
             $start_time = $this->getEvent()->getStartTime()->getDateTimeObject();
             if (!($start_time instanceof DateTime)) {

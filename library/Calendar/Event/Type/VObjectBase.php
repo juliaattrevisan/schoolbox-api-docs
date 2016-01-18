@@ -55,8 +55,8 @@ class VObjectBase extends RendererBase
             $vevent->add('CATEGORIES', $this->getEvent()->getEventType());
             $vevent->add('LOCATION', $this->getEvent()->getLocation());
 
-            $this->getTextConverter()->set_html($this->getEvent()->getDetail());
-            $vevent->add('DESCRIPTION', $this->getTextConverter()->get_text());
+            $this->getTextConverter()->setHtml($this->getEvent()->getDetail());
+            $vevent->add('DESCRIPTION', $this->getTextConverter()->getText());
 
             $start_time = $this->getEvent()->getStartTime()->getDateTimeObject();
             if (!($start_time instanceof DateTime)) {

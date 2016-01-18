@@ -102,7 +102,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     }
 
     $converter = new \Html2Text\Html2Text($message);
-    $mail->setBody($converter->get_text(), null, 'utf-8');
+    $mail->setBody($converter->getText(), null, 'utf-8');
     $mail->addPart($message, 'text/html', 'utf-8');
 
     $factory = new CollectorFactory();

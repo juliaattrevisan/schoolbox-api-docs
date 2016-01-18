@@ -257,8 +257,8 @@ SPARQL
         }
 
         // Convert the name from HTML to text (and strip out newlines)
-        $this->getHtmlConverter()->set_html($node->getName());
-        $node->setName(preg_replace('/\\s+/', ' ', $this->getHtmlConverter()->get_text()));
+        $this->getHtmlConverter()->setHtml($node->getName());
+        $node->setName(preg_replace('/\\s+/', ' ', $this->getHtmlConverter()->getText()));
 
         // Set the timetable code if there is one
         if ($json->asn_statementNotation && $json->asn_statementNotation->literal) {

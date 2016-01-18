@@ -72,7 +72,7 @@ class Mailer extends \Alaress\Mail\AbstractMailer {
 
 	function composePlain() {
 		$converter = new \Html2Text\Html2Text($this->composeHTML());
-		return $converter->get_text();
+		return $converter->getText();
 	}
 
     function printEmail () {
