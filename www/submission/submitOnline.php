@@ -102,11 +102,8 @@ if ($drafts->count()) {
 }
 
 $this->setBlock(TEMPLATE_content, 'confirm_terms', 'confirm_terms_block');
-$policy    = $conf->get('lms_student_policy');
-$html2text = new \Html2Text\Html2Text($policy);
-// Ensure that a policy that contains ONLY an image still displays,
-// by allowing img tags through unmolested
-if (strlen(trim($html2text->getText())) > 0 || mb_stripos($policy, '<img') !== false) {
+$policy = $conf->get('lms_student_policy');
+if (strlen(trim($policy) > 0)) {
     $this->setVar('STUDENT_SUBMIT_TERMS', Scrub::html($policy));
     $this->parse('confirm_terms_block', 'confirm_terms');
 } else {
