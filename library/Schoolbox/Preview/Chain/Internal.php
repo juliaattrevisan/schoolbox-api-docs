@@ -115,7 +115,7 @@ class Internal extends Base {
     {
         if ($url->getPath() == '/submission/send.php') {
             $query = $url->getQueryAsArray();
-            if (empty($query['return'])) {
+            if (empty($query['save']) && empty($query['return'])) {
                 return $query['id'];
             }
         }
@@ -132,7 +132,7 @@ class Internal extends Base {
     {
         if ($url->getPath() == '/submission/send.php') {
             $query = $url->getQueryAsArray();
-            if (!empty($query['return'])) {
+            if (empty($query['save']) && !empty($query['return'])) {
                 return $query['id'];
             }
         }
