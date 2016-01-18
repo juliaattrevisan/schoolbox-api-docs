@@ -1294,6 +1294,28 @@ ul.flex-list {
                 left: 4rem;
             }
         }
+
+		&.compact {
+			img, [class*="icon-"] {
+				width: 2rem;
+				margin-top: 0;
+				padding: 0 0 0 1rem;
+				@extend .text-center;
+			}
+
+			p {
+				margin-left: 1.5rem;
+			}
+			img.mime {
+				padding: 0.25rem !important;
+			}
+
+			.progress {
+				width: calc(100% - 2.5rem);
+				left: 3.5rem;
+				height: 0.3125rem;
+			}
+		}
     }
 
     /* Marksheet Input Card
@@ -1335,30 +1357,6 @@ ul.flex-list {
 		min-height: 2.5rem;
 		padding-top: 0.5rem;
 		padding-bottom: 0.375rem;
-
-		&.avatar {
-
-			img, [class*="icon-"] {
-				width: 2rem;
-				margin-top: 0;
-				padding: 0 0 0 1rem;
-				@extend .text-center;
-			}
-
-			p {
-				margin-left: 1.5rem;
-			}
-			img.mime {
-				padding: 0.25rem !important;
-			}
-
-			.progress {
-				width: calc(100% - 2.5rem);
-				left: 3.5rem;
-				height: 0.3125rem;
-			}
-		}
-
 	}
 
 	// forcibly tiny: 24x24 (1.5rem)
