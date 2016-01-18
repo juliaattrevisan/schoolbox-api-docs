@@ -723,7 +723,7 @@ nav {
 		@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
 		@include responsive-sides(-1, margin);
 		border-bottom: 1px solid $body-bg;
-		//position: relative;
+		position: relative;
 		overflow: visible;
 		list-style: none;
 		@include single-transition(background-color, 0.3s, ease-in);
