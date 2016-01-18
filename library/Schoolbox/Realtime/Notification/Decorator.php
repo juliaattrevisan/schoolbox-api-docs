@@ -221,7 +221,7 @@ class Decorator extends NotificationBundle
             // if meta.body is set, convert it to plaintext and truncate it
             if (isset($result[$id]['meta']['body'])) {
                 $plain = new Html2Text($result[$id]['meta']['body']);
-                $result[$id]['meta']['body'] = TextFormatter::cutSentence($plain->get_text(), 48);
+                $result[$id]['meta']['body'] = TextFormatter::cutSentence($plain->getText(), 48);
             }
         }
 

@@ -187,7 +187,7 @@ class Instance implements JsonSerializable
             if (strlen($value) > self::MAX_FIELD_SIZE) {
                 // convert to plaintext first as a precaution
                 $plain = new Html2Text($value);
-                $value = TextFormatter::cutSentence($plain->get_text(), self::MAX_FIELD_SIZE);
+                $value = TextFormatter::cutSentence($plain->getText(), self::MAX_FIELD_SIZE);
             }
 
             $this->meta[$key] = $value;

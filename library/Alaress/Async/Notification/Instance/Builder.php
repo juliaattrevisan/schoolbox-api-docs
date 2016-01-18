@@ -119,7 +119,7 @@ class Builder {
 	public function setBody($body) {
         // totally strip links
         $plain = new Html2Text($body, false, array('do_links' => 'none'));
-        return $this->putMeta('body', $plain->get_text());
+        return $this->putMeta('body', $plain->getText());
 	}
 
 

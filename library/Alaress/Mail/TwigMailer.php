@@ -116,10 +116,10 @@ class TwigMailer extends AbstractMailer {
 	protected function composePlain() {
 		if($this->rendercache) {
 			$converter = new Html2Text($this->rendercache);
-			return $converter->get_text();
+			return $converter->getText();
 		}
 		$converter = new Html2Text($this->composeHTML());
-		return $converter->get_text();
+		return $converter->getText();
 	}
 
 
