@@ -194,8 +194,8 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             INNER JOIN {$this->getJoinSql('level.source', 'nl', 'nls')}
             INNER JOIN {$this->getJoinSql('area', 'n', 'na')}
             INNER JOIN {$this->getJoinSql('area.source', 'na', 'nas')}
-            WHERE n.code LIKE :codeLike
-            OR (n.code != '' AND n.name LIKE :nameLike)
+            WHERE n.deleted_at IS NULL
+            AND   (n.code LIKE :codeLike OR (n.code != '' AND n.name LIKE :nameLike))
         ";
         $quotedLike = $this->getDatabase()->quoteForLike($keyword);
         $params     = [
