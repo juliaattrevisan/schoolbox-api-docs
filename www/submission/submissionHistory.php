@@ -660,6 +660,7 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
     $this->setVar(
         array(
             'RETURNED_WORK_OWNER_ID'   => $return->getOwner()->getId(),
+            'RETURNED_WORK_ID'         => $return->getId(),
             'RETURNED_WORK_COMMENT'    => Scrub::Text($recentComment),
             'RETURNED_WORK_MARK'       => $mark,
             'RETURNED_WORK_MARK_TIP'   => $mark == $recentMark ? '' : $recentMark,
@@ -717,6 +718,19 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
                 } catch (Schoolbox\Mapper\Exception $e) {
                 }
             }
+        }
+    }
+
+    /** Customisation for SEDA */
+    if(Config::get('site_location' == 'seda') ) {
+
+        $this->setBlock('returned_work', 'approve_mark', 'approve_mark_block');
+
+        if($recent_return->getReturnedNormalizedMark() > 0) {
+            $this->parse('approve_mark_block','approve_mark');
+        }
+        else {
+            $this->setVar('approve_mark_block','');
         }
     }
 
