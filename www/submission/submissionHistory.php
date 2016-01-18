@@ -720,6 +720,19 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
         }
     }
 
+    /** Customisation for SEDA */
+    if(Config::get('site_location' == 'seda') ) {
+
+        $this->setBlock('returned_work', 'approve_mark', 'approve_mark_block');
+
+        if($recent_return->getReturnedNormalizedMark() > 0) {
+            $this->parse('approve_mark_block','approve_mark');
+        }
+        else {
+            $this->setVar('approve_mark_block','');
+        }
+    }
+
     $this->parse('returned_work_block', 'returned_work');
 
 } else {
