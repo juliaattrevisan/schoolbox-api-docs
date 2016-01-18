@@ -319,6 +319,8 @@ class Scrub
 
         // Now try loading into a document
         $domDocument = new DOMDocument();
+        // Silence noisy DomDocument errors
+        $xmlErrors = libxml_use_internal_errors(true);
         if ($domDocument->loadHTML('<?xml encoding="UTF-8">'.$html)) {
             $touched = false;
 
@@ -352,6 +354,8 @@ class Scrub
                 }
             }
         }
+        libxml_clear_errors();
+        libxml_use_internal_errors($xmlErrors);
         return $html;
     }
 
