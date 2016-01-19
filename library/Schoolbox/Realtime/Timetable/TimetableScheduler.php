@@ -24,6 +24,7 @@ use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\EndTrigger;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\StartTrigger;
+use Schoolbox\Realtime\Schedule\Trigger\Timetable\WarnTrigger;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\TimetableTrigger;
 
 class TimetableScheduler extends CronScheduler {
@@ -80,11 +81,12 @@ class TimetableScheduler extends CronScheduler {
 
         // read each campus, and schedule the next event based on it
         foreach($this->campuses as $campus) {
-            // one each for start and end
+            // one each for start, start warning, end
             $id = $campus->getId();
             try {
                 $this->triggers["$id.start"] = new StartTrigger($campus, $this->clock);
                 $this->triggers["$id.end"]   = new EndTrigger($campus, $this->clock);
+                $this->triggers["$id.warn"] = new WarnTrigger($campus, $this->clock);
             }
             catch(InvalidArgumentException $e) {
                 $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage());
