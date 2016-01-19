@@ -224,7 +224,7 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Username', 'setUsername');
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('External ID', 'setExternalId');
         $this->userHydrators[] = new User\Hydrator\Lookup('Role', 'setRole', $this->roleList);
-        $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Password', 'setPassword');
+        $this->userHydrators[] = new User\Hydrator\Password('Password', 'setPassword', $this->userMapper);
         $this->userHydrators[] = new User\Hydrator\ToggleField('E-Portfolio?', 'setEportfolioEnable');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Email Address From Username?', 'setLocalEmail');
         // This one might have to be inverted
