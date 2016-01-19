@@ -457,7 +457,7 @@
         {% endif %}
     </div>
 
-    <div class="small-12 xlarge-6 xlarge-pull-6 columns">
+    <div class="small-12 {% if showContacts %}xlarge-6 xlarge-pull-6{% else %}xlarge-12{% endif %} columns">
         {% if showClasses %}
             {% if showSubjects %}
             {% for group, subjectGroup in subjects %}
