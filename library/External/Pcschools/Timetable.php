@@ -191,45 +191,6 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Gets the query for fetching a user's timetable.
-     *
-     * @param \Schoolbox\User $user
-     *
-     * @return string
-     */
-    protected function getTimetableQuery(\Schoolbox\User $user)
-    {
-        $query = "
-            SELECT
-                TIMEPDHD.SORT_ORDER AS PeriodSequence,
-                SUB.TEACHER AS StaffID,
-                TIMEFILE.ROOM AS Room,
-                [SUBJECT].[DESC] AS Description,
-                TIMEFILE.DAY AS DayNumber,
-                TIMEPDHD.SORT_ORDER AS PeriodNumber,
-                [SUBJECT].ABBREV AS ClassCode
-            FROM SUB
-            INNER JOIN TIMEFILE
-                ON SUB.SUBJECT_NO = TIMEFILE.SUBJECT
-                AND SUB.[YEAR] = TIMEFILE.[YEAR]
-                AND SUB.CLASS = TIMEFILE.CLASS
-            INNER JOIN [SUBJECT]
-                ON SUB.SUBJECT_NO = [SUBJECT].NO
-            INNER JOIN TIMEPDHD
-                ON TIMEFILE.PERIOD = TIMEPDHD.RECNUM
-            WHERE SUB.PERIOD_ID = (SELECT TIME_PERIOD from sysfile)
-        ";
-        if ($user->getRole()->isStudent()) {
-            $query .= 'AND SUB.STUDKEY = '.$this->getDatabase()->smartQuote($user->getExternalId());
-        } elseif ($user->getRole()->isStaff()) {
-            $query .= 'AND SUB.TEACHER = '.$this->getDatabase()->smartQuote($user->getExternalId());
-        } else {
-            return '';
-        }
-        return $query;
-    }
-
-    /**
      * Return a user's timetable for a specific day
      * Depending on the role for $userId (staff or student) this summons the respective
      * method to spawn associated timetable
