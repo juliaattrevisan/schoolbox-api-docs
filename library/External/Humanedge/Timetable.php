@@ -25,7 +25,19 @@ class External_Humanedge_Timetable implements External_TimetableInterface
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->setDatabase(
+            new MSSQL(
+                Config::get('external_humanedge_aplus_db_db'),
+                [
+                    'host'     => Config::get('external_humanedge_aplus_db_host'),
+                    'user'     => Config::get('external_humanedge_aplus_db_user'),
+                    'passwd'   => Config::get('external_humanedge_aplus_db_passwd'),
+                    'db'       => Config::get('external_humanedge_aplus_db_db'),
+                    'encoding' => Config::get('external_db_encoding'),
+                ],
+                true
+            )
+        );
 //        $this->externalUser = new External_User('humanedge');
     }
 
@@ -66,7 +78,26 @@ class External_Humanedge_Timetable implements External_TimetableInterface
      */
     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
-        // TODO: Implement getDayTimetable() method.
+        // If a student: only allocated classes can be retrieved
+        $query = "
+            SELECT DISTINCT
+                s.Code + ISNULL(b.Suffix, '') AS code,
+                d.dayNumber as day,
+                a.PeriodID as period,
+                pd.StartTime,
+                pd.EndTime,
+                t.Code as TeacherCode
+            FROM tblSubject s
+            INNER JOIN tblAllocation a on s.ID = a.SubjectID
+            INNER JOIN tblStudent st on a.FormID = st.FormID
+            INNER JOIN tblTeacher t on a.TeacherID = t.ID
+            LEFT  JOIN tblBlockItem b on s.ID = b.SubjectID
+            INNER JOIN tblFixedDayList fd ON a.DayID = fd.DayID
+            INNER JOIN tblDayOfWeek d ON fd.DayOfWeekId = d.ID
+            INNER JOIN tblPeriodTimesByDay pd ON a.DayID = pd.DayID AND a.PeriodID = pd.PeriodID
+            WHERE st.deleted = 0
+            AND st.code = {$this->getDatabase()->smartQuote($externalUserId)}
+        ";
     }
 
     /**
