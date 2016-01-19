@@ -458,7 +458,9 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
                                     /* Select something from the Resource Browser
                                      */
-                                    $.fn.schoolboxResource();
+                                    $.fn.schoolboxResource({
+                                        allowedFiles: 'image/*,audio/*,video/*'
+                                    });
 
                                     $(window).unbind('message').on('message', function(event) {
                                         var message;
