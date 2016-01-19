@@ -1025,7 +1025,6 @@ ul.flex-list {
 // Show & Hide Task List
 .task-list{
 	clear: both;
-	overflow: hidden;
 	@include single-transition(max-height, 0.3s, ease-out);
 }
 
