@@ -449,7 +449,7 @@ abstract class Component_ControllerAbstract
             /* Special case for componentname default value when empty
              */
             if ($key == 'componentname') {
-                if (!strlen(trim($params['value']))) {
+                if (!strlen($params['value'])) {
                     $componentname = $this->getComponentName();
                 }
                 else {
@@ -769,7 +769,7 @@ abstract class Component_ControllerAbstract
         /* Return db version of the name if class var is empty
         * or not set
         */
-        if (!strlen(trim($this->componentName))) {
+        if (!strlen($this->componentName)) {
             return $this->instance->getDefinition()->getName();
         }
 
