@@ -2,7 +2,6 @@
 
 use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
-use Schoolbox\ResourceBooking\Item\Model as ResourceModel;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 
@@ -25,31 +24,27 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     protected $externalTimetable = null;
 
     /**
-     * The code or codes for the room to show events for.
+     * A map of codes to resource IDs for the room to show events for.
      *
-     * @var array|string
+     * * key:   the room code
+     * * value: the resource ID
+     *
+     * @var array
      */
     protected $roomCodes;
-
-    /**
-     * The model to assoicate this event with, if any.
-     *
-     * @var ResourceModel
-     */
-    protected $resource;
 
     /**
      * Constructor
      *
      * @param \Schoolbox\User $user
      * @param array           $config
-     * @param ResourceModel   $resource
+     * @param array           $roomCodes
      */
-    public function __construct(\Schoolbox\User $user, $config, ResourceModel $resource = null)
+    public function __construct(\Schoolbox\User $user, $config, $roomCodes = [])
     {
         $this->setUser($user);
         $this->externalTimetable = new External_Timetable();
-        $this->resource          = $resource;
+        $this->roomCodes         = $roomCodes;
     }
 
     /**
@@ -63,7 +58,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     {
         $stack = new Collection();
 
-        $roomTimetable = $this->externalTimetable->getRoomTimetable($this->roomCodes);
+        $roomTimetable = $this->externalTimetable->getRoomTimetable(array_keys($this->roomCodes));
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
@@ -137,10 +132,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $event->setPublishDate(null);
                 $event->setTitle($room['Description']);
                 $event->setCampusList($campusId);
-
-                if ($this->getResource() instanceof ResourceModel) {
-                    $event->setResourceId($this->getResource()->getId());
-                }
+                $event->setResourceId($this->roomCodes[$room['RoomCode']]);
 
                 // Load room and category if they aren't already there.
                 $userExternalId = $room['StaffID'];
@@ -232,13 +224,5 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     public function getRoomCodes()
     {
         return $this->roomCodes;
-    }
-
-    /**
-     * @return ResourceModel
-     */
-    public function getResource()
-    {
-        return $this->resource;
     }
 }
