@@ -757,9 +757,10 @@ class Controller extends Base
             // Check if there's a timetabled class here, too.
             $roomSource = new \Calendar_Api_EventType_Timetable_Room(
                 $this->getUser(),
-                array()
+                array(),
+                [$roomCode => $resource->getId()]
             );
-            $roomSource->setRoomCodes($roomCode);
+//            $roomSource->setRoomCodes($roomCode);
             $roomEvents = $roomSource->getEvents(
                 $startDate->getTimestamp() + 1,
                 $endDate->getTimestamp() - 1
@@ -904,9 +905,10 @@ class Controller extends Base
         if (strlen($roomCode)) {
             $roomSource = new \Calendar_Api_EventType_Timetable_Room(
                 $this->getUser(),
-                array()
+                array(),
+                [$item->getRoomCode() => $item->getId()]
             );
-            $roomSource->setRoomCodes($item->getRoomCode());
+//            $roomSource->setRoomCodes($item->getRoomCode());
             $roomEvents   = $roomSource->getEvents(
                 $this->getRequest()->query['start'],
                 $this->getRequest()->query['end']

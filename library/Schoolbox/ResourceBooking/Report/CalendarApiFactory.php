@@ -63,9 +63,10 @@ class CalendarApiFactory
         if ($roomCode = $resource->getRoomCode()) {
             $timetableApi = new \Calendar_Api_EventType_Timetable_Room(
                 $this->getUser(),
-                array()
+                array(),
+                [$roomCode => $resource->getId()]
             );
-            $timetableApi->setRoomCodes($roomCode)->setExternalTimetable($this->getTimetable());
+            $timetableApi->setExternalTimetable($this->getTimetable());
             $api->add($timetableApi);
         }
         return $api;
@@ -90,7 +91,7 @@ class CalendarApiFactory
             $resourceIds[] = $resource->getId();
             $roomCode      = trim($resource->getRoomCode());
             if (strlen($roomCode) > 0) {
-                $roomCodes[] = $roomCode;
+                $roomCodes[$roomCode] = $resource->getId();
             }
         }
 
@@ -107,9 +108,10 @@ class CalendarApiFactory
         if ($getTimetabledRooms && !empty($roomCodes)) {
             $timetableApi = new \Calendar_Api_EventType_Timetable_Room(
                 $this->getUser(),
-                array()
+                array(),
+                $roomCodes
             );
-            $timetableApi->setRoomCodes($roomCodes)->setExternalTimetable($this->getTimetable());
+            $timetableApi->setExternalTimetable($this->getTimetable());
             $api->add($timetableApi);
         }
         return $api;
