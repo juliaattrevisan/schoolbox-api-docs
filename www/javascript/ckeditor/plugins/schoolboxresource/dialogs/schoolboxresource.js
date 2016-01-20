@@ -458,7 +458,9 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
                                     /* Select something from the Resource Browser
                                      */
-                                    $.fn.schoolboxResource();
+                                    $.fn.schoolboxResource({
+                                        allowedFiles: 'image/*,audio/*,video/*'
+                                    });
 
                                     $(window).unbind('message').on('message', function(event) {
                                         var message;
@@ -472,35 +474,40 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                         /* Find out how to render this file
                                          */
                                         if (message.data != undefined) {
-                                            $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
-                                                fields.type.setValue(responseText.type);
-                                                fields.filesystem.setValue(responseText.filesystem);
+                                            if (0 in message.data && 'hash' in message.data[0]) {
+                                                $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
+                                                    fields.type.setValue(responseText.type);
+                                                    fields.filesystem.setValue(responseText.filesystem);
 
-                                                /* Renderer Strategy (I guess)
-                                                 */
-                                                if (fields.type.getValue() == 'video') {
-                                                    fields.id.setValue(responseText.id);
-                                                    fields.url.setValue(config.video.source(responseText.id, fields.filesystem.getValue()));
-                                                }
-                                                else if (fields.type.getValue() == 'audio') {
-                                                    fields.id.setValue(responseText.id);
-                                                    fields.url.setValue(config.audio.source(responseText.id, fields.filesystem.getValue()));
-                                                }
-                                                else if (fields.type.getValue() == 'image') {
-                                                    fields.url.setValue(config.image.source(responseText.hash));
-                                                }
+                                                    /* Renderer Strategy (I guess)
+                                                     */
+                                                    if (fields.type.getValue() == 'video') {
+                                                        fields.id.setValue(responseText.id);
+                                                        fields.url.setValue(config.video.source(responseText.id, fields.filesystem.getValue()));
+                                                    }
+                                                    else if (fields.type.getValue() == 'audio') {
+                                                        fields.id.setValue(responseText.id);
+                                                        fields.url.setValue(config.audio.source(responseText.id, fields.filesystem.getValue()));
+                                                    }
+                                                    else if (fields.type.getValue() == 'image') {
+                                                        fields.url.setValue(config.image.source(responseText.hash));
+                                                    }
 
-                                                /* Prevent rendering attempt for uploaded files that
-                                                 * aren't actually renderable
-                                                 */
-                                                if (fields.type.getValue().length) {
-                                                    render(fields, fields.url.getValue(), false);
-                                                }
+                                                    /* Prevent rendering attempt for uploaded files that
+                                                     * aren't actually renderable
+                                                     */
+                                                    if (fields.type.getValue().length) {
+                                                        render(fields, fields.url.getValue(), false);
+                                                    }
 
-                                                /* Shut modal, go back to Dialog
-                                                 */
-                                                $('[data-reveal]').foundation('reveal', 'close');
-                                            });
+                                                    /* Shut modal, go back to Dialog
+                                                     */
+                                                    $('[data-reveal]').foundation('reveal', 'close');
+                                                });
+                                            } else {
+                                                // The file was rejected, probably cause it was the wrong mimetype.
+                                                // Do nothing
+                                            }
                                         }
                                         else {
 

@@ -13,37 +13,14 @@ if (empty($this)) {
 }
 
 /** @var SitePage $this */
-
-// /ajax/resource/internal/browse[/multi[/image[/jpeg]]]
-//               /$0      /$1     /$?2   /$?3   /$?4
-
-$mime  = null;
-$multi = false;
-
-switch(count($this->arg)) {
-
-    /** @noinspection PhpMissingBreakStatementInspection */
-    case 4:
-        // cheating, but whatever
-        $this->arg[4] = '*';
-
-    /** @noinspection PhpMissingBreakStatementInspection */
-    case 5:
-        $mime     = $this->arg[3] . '/' . $this->arg[4];
-
-    /** @noinspection PhpMissingBreakStatementInspection */
-    case 3:
-        $multi    = $this->arg[2] == 'multi';
-
-    case 2:
-        $source   = $this->arg[1];
-        $location = $this->arg[0];
-        break;
-
-    default:
-        error(2);
-        exit;
+if (count($this->arg) < 3) {
+    error(2);
+    exit;
 }
+$location = $this->arg[0];
+$source   = $this->arg[1];
+$multi    = $this->arg[2] == 'multi';
+$mime     = $_GET['mime'];
 
 $factory = new Schoolbox\Resource\Attachment\Factory();
 
