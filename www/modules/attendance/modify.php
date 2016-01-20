@@ -108,6 +108,7 @@ if ($class) {
     /* Get the attendance record for this class
      */
     $externalUserHandler = new External_User();
+    $allStudents         = [];
     try {
         $attendanceHandler   = new External_Synergetic_Attendance(
             $class,
@@ -125,8 +126,11 @@ if ($class) {
 
     /* Dish out each row
      */
+    $attendanceCount = 0;
+    $attendanceTotal = 0;
     if (is_array($allStudents) && count($allStudents)) {
-        $userHandler = new User();
+        $attendanceCount = $attendanceTotal = count($allStudents);
+        $userHandler     = new User();
 
         /* Dropdown options
          */
@@ -144,6 +148,10 @@ if ($class) {
             preg_match('/([0-9]+):([0-5])([0-9]):00:000(AM|PM)/', $currentStudent['LateArrivalTime'], $arrivalTime);
             preg_match('/([0-9]+):([0-5])([0-9]):00:000(AM|PM)/', $currentStudent['EarlyDepartureTime'], $deptTime);
 
+            $isAbsent = $currentStudent['AttendedFlag'] == 0;
+            if ($isAbsent) {
+                $attendanceCount--;
+            }
             $this->setVar(
                 array(
                     'STUDENT_UID'                => $user['uid'],
@@ -156,7 +164,7 @@ if ($class) {
                     'STUDENT_NONATTENDREASON'    => Scrub::text($currentStudent['PossibleNonAttendReason']),
                     'STUDENT_ARRIVAL_TIME'       => isset($arrivalTime[3]) ? date('g:ia', strtotime($arrivalTime[0])) : '',
                     'STUDENT_DEPT_TIME'          => isset($deptTime[3]) ? date('g:ia', strtotime($deptTime[0])) : '',
-                    'IS_ABSENT'                  => $currentStudent['AttendedFlag'] == 0 ? 'checked="checked"' : '',
+                    'IS_ABSENT'                  => $isAbsent ? 'checked="checked"' : '',
                     'ON_OFF'                     => ++$i % 2 ? 'dark' : '',
                 )
             );
@@ -186,6 +194,8 @@ if ($class) {
     } else {
         $this->setVar('student_block', '');
     }
+    $this->setVar('ATTENDANCE_COUNT', $attendanceCount);
+    $this->setVar('ATTENDANCE_TOTAL', $attendanceTotal);
 } else {
     error(148);
 }
