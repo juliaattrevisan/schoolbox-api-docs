@@ -24,6 +24,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
+        // Required, as using @LOGIC_NO
+        $this->getDatabase()->query('SET ANSI_PADDING ON');
+        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
         $this->userMapper = new \Schoolbox\UserMapper();
     }
 
@@ -224,9 +227,6 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             return [];
         }
 
-        $this->getDatabase()->query('SET ANSI_PADDING ON');
-        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
-
         $studentExternalId = '';
         $teacherExternalId = '';
         if ($user->getRole()->isStudent()) {
@@ -313,9 +313,6 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
-
-        $this->getDatabase()->query('SET ANSI_PADDING ON');
-        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
 
         $studentExternalId = '';
         $teacherExternalId = '';
@@ -436,9 +433,6 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
-
-        $this->getDatabase()->query('SET ANSI_PADDING ON');
-        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
 
         $studentExternalId = '';
         $teacherExternalId = '';
