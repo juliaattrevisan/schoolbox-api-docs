@@ -4,7 +4,8 @@
 <script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('#folderForm').alaressValidate({
+        var form = $('#folderForm');
+        form.alaressValidate({
             submitHandler: function(form) {
                 var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
                 var individualPerms = $('input[name=groupcheck]').is(':checked');
@@ -41,16 +42,16 @@
             });
         });
 
-        $('[data-template-warning]').hide();
-
-        $('[data-template]').change(function(event) {
-            if ($('[data-template]').val() != 0) {
-                $('[data-template-warning]').show();
-            } else {
-                $('[data-template-warning]').hide();
-            }
-        });
-
+        var categoryId = form.find('input[name="categoryID"]').val();
+        if (categoryId) {
+            $('[data-template]').change(function(event) {
+                if ($('[data-template]').val() != 0) {
+                    $('[data-template-warning]').removeClass('hide');
+                } else {
+                    $('[data-template-warning]').addClass('hide');
+                }
+            });
+        }
     });
 </script>
 <!-- END custom_head -->
@@ -102,7 +103,7 @@
 								<!-- END template_list -->
 							</select>
 						</label>
-                        <div class="alert-box warning" data-template-warning>
+                        <div class="alert-box warning hide" data-template-warning>
                             Warning! Changing the folders template will remove all existing components and content.
                         </div>
 					</div>
