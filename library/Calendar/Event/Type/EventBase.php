@@ -49,7 +49,12 @@ abstract class EventBase implements EventInterface
      */
     protected $publishDate = null;
 
-
+    /**
+     * A resource identifier, for the FullCalendar scheduler plugin
+     *
+     * @var mixed
+     */
+    protected $resourceId = null;
 
     /**
      * Event description, typically
@@ -606,4 +611,21 @@ abstract class EventBase implements EventInterface
         }
     }
 
+    /**
+     * @return mixed
+     */
+    public function getResourceId()
+    {
+        return $this->resourceId;
+    }
+
+    /**
+     * @param  mixed $resourceId
+     * @return $this
+     */
+    public function setResourceId($resourceId)
+    {
+        $this->resourceId = $resourceId;
+        return $this;
+    }
 }
