@@ -264,7 +264,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
             $period = $dayClass['PERIOD'];
-            $code   = $dayClass['ABBREV'];
+            $code   = $dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
             if ($dayNumber == $dayClass['DAY']) {
                 $timetable[$period]['class'][$code] = array(
                     'description'        => $dayClass['DESC'],
@@ -369,7 +369,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
             $period = $dayClass['PERIOD'];
-            $code   = $dayClass['ABBREV'];
+            $code   = $dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
             if ($dayNumber == $dayClass['DAY']) {
                 $timetable[$period]['class'][$code] = array(
                     'description'        => $dayClass['DESC'],
@@ -482,7 +482,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         foreach ($dayClasses as $dayClass) {
             $period = $dayClass['PERIOD'];
             $day    = $dayClass['DAY'];
-            $code   = $dayClass['ABBREV'];
+            $code   = $dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
             $timetable[$period]['day'][$day][$code] = array(
                 'description'        => $dayClass['DESC'],
                 'code'               => $code,
