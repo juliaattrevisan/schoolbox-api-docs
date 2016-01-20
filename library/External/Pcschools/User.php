@@ -868,7 +868,7 @@ class External_Pcschools_User implements External_UserInterface
                 'campusCode' => '',
             ];
         }
-        return $classes;
+        return array_values($classes);
     }
 
     /**
