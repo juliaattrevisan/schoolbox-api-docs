@@ -344,6 +344,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
         .accordion-navigation {
             >a{
                 background: transparent;
+                color: $off-canvas-foreground;
                 padding: 0;
                 font-size: 0.875rem;
                 span {
