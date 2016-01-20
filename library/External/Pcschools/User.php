@@ -14,11 +14,20 @@ class External_Pcschools_User implements External_UserInterface
     private $database;
 
     /**
+     * @var \Schoolbox\UserMapper
+     */
+    private $userMapper;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
+        // Required, as using @LOGIC_NO
+        $this->getDatabase()->query('SET ANSI_PADDING ON');
+        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
+        $this->userMapper = new \Schoolbox\UserMapper();
     }
 
     /**
@@ -822,22 +831,44 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getSubjectList($externalUserId, $userId)
     {
-        // As far as I can tell:
-        // SUB stores enrolments AND class info in a denormalized form.
-        return $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll("
-                SELECT DISTINCT
-                    S.YEAR + SU.ABBREV + S.CLASS AS code,
-                    SU.[DESC] AS name,
-                    K.[DESC] AS classType,
-                    ST.CAMPUS AS campusCode
-                FROM SUB S
-                INNER JOIN STUDENT ST ON S.STUDENT# = ST.STUDENT# AND S.YEAR = ST.CURRENT_YEAR
-                INNER JOIN [SUBJECT] SU ON S.SUBJECT_NO = SU.NO
-                INNER JOIN KEYAREA K ON SU.KEYAREA = K.KEYAREA
-                WHERE ST.STUDKEY = {$this->getDatabase()->smartQuote($externalUserId)}
-            ")
-        );
+        try {
+            $user = $this->userMapper->findById($userId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return [];
+        }
+
+        $studentExternalId = '';
+        $teacherExternalId = '';
+        if ($user->getRole()->isStudent()) {
+            $studentExternalId = $user->getExternalId();
+        } elseif ($user->getRole()->isStaff()) {
+            $teacherExternalId = $user->getExternalId();
+        } else {
+            return [];
+        }
+        $params = [
+            ['@DATE', date('Ymd'), SQLVARCHAR, false, false, -1],
+            // Will eventually need to query all classes
+            ['@TIMEPERIOD', $user->getDefaultCampus()->getExtTimetableCode(), SQLVARCHAR, false, false, -1],
+            ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
+            ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
+            ['@LOGIC_NO', 2, SQLINT1, false, false, -1],
+        ];
+        $response = $this->getDatabase()->executeProcedure('spSelTimetable', $params, true);
+        list($dayPeriods, $dayClasses, $homeClasses, $weekDays, $terms) = $response['result'];
+
+        // Add classes for each day into it
+        $classes = [];
+        foreach ($dayClasses as $dayClass) {
+            $code = $dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
+            $classes[$code] = [
+                'code'       => $code,
+                'name'       => $dayClass['DESC'],
+                'classType'  => '',
+                'campusCode' => '',
+            ];
+        }
+        return $classes;
     }
 
     /**
