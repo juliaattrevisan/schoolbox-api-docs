@@ -193,7 +193,7 @@ if ($virtualPermission >= WRITE_ACCESS) {
                 'HOMEPAGE_COMPONENT_NAME' => Scrub::text($component->getName()),
                 'HOMEPAGE_COMPONENT_COUNT' => $component->getInstanceCount(),
                 'HOMEPAGE_COMPONENT_DESCRIPTION' => Scrub::text($component->getDescription()),
-                'HOMEPAGE_COMPONENT_CLASS' => str_replace('\\', '_', $component->getClass()),
+                'HOMEPAGE_COMPONENT_CLASS' => $component->getCssClass(),
                 'HOMEPAGE_COMPONENT_MULTIPLE_STATE' => $class,
                 'HOMEPAGE_COMPONENT_CATEGORY_ID' => $previous->getComponentCategory(),
                 'HOMEPAGE_COMPONENT_CATEGORY_CLASS' => $tabNumber === 0 ? 'active' : '',

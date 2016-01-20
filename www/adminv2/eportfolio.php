@@ -112,7 +112,7 @@ foreach ($definitionCollection as $definition) {
     $this->setVar([
         'COMPONENT_ID'             => $definitionId,
         'COMPONENT_DESCRIPTION'    => $definition->getDescription(),
-        'COMPONENT_CLASS'          => str_replace('\\', '_', $definition->getClass()),
+        'COMPONENT_CLASS'          => $definition->getCssClass(),
         'COMPONENT_MULTIPLE_STATE' => $multiState,
         'COMPONENT_NAME'           => $definition->getName(),
         'COMPONENT_CATEGORY_NAME'  => $definition->getComponentCategoryName(),

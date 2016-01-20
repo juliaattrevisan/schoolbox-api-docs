@@ -180,7 +180,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             foreach ($instanceCollection as $component) {
                 /** @var Component_Instance $component */
                 ++$i;
-                $class = str_replace('\\', '_', $component->getDefinition()->getClass());
+                $class = $component->getDefinition()->getCssClass();
                 $multipleClass = '';
 
                 if ($component->getDefinition()->getMultiple() == 'false') {
