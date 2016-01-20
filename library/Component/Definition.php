@@ -82,6 +82,16 @@ class Component_Definition {
 	}
 
 	/**
+	 * Gets this component's class, usable as a CSS class.
+	 *
+	 * @return string
+	 */
+	public function getCssClass()
+	{
+		return str_replace('\\', '_', $this->getClass());
+	}
+
+	/**
 	 * @param  string $componentCategory
 	 *
 	 * @return $this
