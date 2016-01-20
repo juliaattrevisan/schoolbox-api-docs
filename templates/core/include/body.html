@@ -75,42 +75,48 @@
 
                 <!-- BEGIN banner_logged_in -->
                 <div class="row">
-                    <a href="/search/user/{USER_ID}" class="account-menu button dropdown" title="View Profile" data-menu="account-menu" data-dropdown="avatar2">
-                        <img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square80"/>
-                        <span>{SITE_LOGINNAME}</span>
-                    </a>
-                    <ul class="flyout-menu f-dropdown" id="avatar2" data-dropdown-content>
-                        <li><a class="icon-staff-students" href="/search/user/{USER_ID}">Profile</a></li>
-                        <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
-                        <!-- BEGIN admin_only_menu -->
-                        <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
-                        <!-- END admin_only_menu -->
-                        <li><a class="icon-logout" href="/logout.php">Logout</a></li>
-                        <!-- BEGIN can_switch -->
-                        <li class="separator">Switch User</li>
-                        <!-- END can_switch -->
-                        <!-- BEGIN switch_user -->
-                        <li class="switch-user">
-                            <div class="avatar card">
-                                <a class="no-pad" href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to {MENU_SWITCH_USER_FULLNAME}">
-                                    <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
-                                    <p>{MENU_SWITCH_USER_FULLNAME}</p>
-                                    <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
-                                </a>
+                    <ul class="account-menu accordion" data-accordion>
+                        <li class="accordion-navigation">
+                            <a href="#accountContent">
+                                <img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square80"/>
+                                <span>{SITE_LOGINNAME}</span>
+                            </a>
+                            <div id="accountContent" class="content">
+                                <ul id="avatar2">
+                                    <li><a class="icon-staff-students" href="/search/user/{USER_ID}">Profile</a></li>
+                                    <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
+                                    <!-- BEGIN admin_only_menu -->
+                                    <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
+                                    <!-- END admin_only_menu -->
+                                    <li><a class="icon-logout" href="/logout.php">Logout</a></li>
+                                    <!-- BEGIN can_switch -->
+                                    <li class="separator">Switch User</li>
+                                    <!-- END can_switch -->
+                                    <!-- BEGIN switch_user -->
+                                    <li class="switch-user">
+                                        <div class="avatar card">
+                                            <a class="no-pad" href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to {MENU_SWITCH_USER_FULLNAME}">
+                                                <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
+                                                <p>{MENU_SWITCH_USER_FULLNAME}</p>
+                                                <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
+                                            </a>
+                                        </div>
+                                    </li>
+                                    <!-- END switch_user -->
+                                    <!-- BEGIN recover_user -->
+                                    <li class="switch-user">
+                                        <div class="avatar card">
+                                            <a class="no-pad" href="/user/recoverSession" title="Return to {MENU_SWITCH_USER_FULLNAME}">
+                                                <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
+                                                <p>{MENU_SWITCH_USER_FULLNAME}</p>
+                                                <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
+                                            </a>
+                                        </div>
+                                    </li>
+                                    <!-- END recover_user -->
+                                </ul>
                             </div>
                         </li>
-                        <!-- END switch_user -->
-                        <!-- BEGIN recover_user -->
-                        <li class="switch-user">
-                            <div class="avatar card">
-                                <a class="no-pad" href="/user/recoverSession" title="Return to {MENU_SWITCH_USER_FULLNAME}">
-                                    <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
-                                    <p>{MENU_SWITCH_USER_FULLNAME}</p>
-                                    <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
-                                </a>
-                            </div>
-                        </li>
-                        <!-- END recover_user -->
                     </ul>
                 </div>
                 <!-- END banner_logged_in -->
