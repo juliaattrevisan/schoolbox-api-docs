@@ -530,4 +530,17 @@ class UserMapper extends Mapper
         $statement->execute($params);
         return $this->hydrateList($statement, 'u');
     }
+
+    /**
+     * Don't even ask what a password hashing method is doing in a mapper.
+     *
+     * @param  string $password
+     * @return string
+     */
+    public function hashPassword($password)
+    {
+        $statement = $this->getDatabase()->prepare('SELECT PASSWORD(?)');
+        $statement->execute([$password]);
+        return $statement->fetchColumn();
+    }
 }
