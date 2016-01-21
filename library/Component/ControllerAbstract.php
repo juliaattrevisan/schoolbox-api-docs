@@ -424,6 +424,7 @@ abstract class Component_ControllerAbstract
              */
             'COMPONENT_NAME' => $this->getComponentName(),
             'COMPONENT_HREF' => $this->getComponentHref(),
+            'COMPONENT_CLASS' => $this->getInstance()->getDefinition()->getCssClass(),
         ));
     }
 
