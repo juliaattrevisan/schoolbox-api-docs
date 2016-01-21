@@ -348,13 +348,6 @@
                 submitHandler: function() {
                     var theForm = $(config.element);
 
-                    /* Form preprocessing
-                     */
-                    //tinyMCE.triggerSave();
-
-                    //var content = tinyMCE.activeEditor.getContent(); // get the content
-                    //$('#question').val(content); // put it in the textarea
-
                     /* Collate possible answers and their correctness status
                      */
                     var answerCollection = [];
@@ -385,7 +378,7 @@
                      * Common data
                      */
                     var data = {
-                        question: content,
+                        question: CKEDITOR.instances.question.getData(),
                         sequence: theForm.find('input[name=sequence]').val(),
                         allAnswers: JSON.stringify(answerCollection),
                         configuration: JSON.stringify($(config.configuration).find('input, textarea, select').serializeArray())
