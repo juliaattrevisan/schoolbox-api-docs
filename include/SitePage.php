@@ -1244,7 +1244,7 @@ class SitePage extends Page
         $backgrounds = explode(",", Config::get('skin_login_bg'));
 
         if (count($backgrounds) && $backgrounds[0] ) {
-            $this->setVar('LOGIN_BG', '/storage/image.php?hash=' . $backgrounds[array_rand($backgrounds)]);
+            $this->setVar('LOGIN_BG', '/storage/image.php?hash=' . $backgrounds[array_rand($backgrounds)] . '&size=maxsize');
         } else {
             $this->setVar('LOGIN_BG', '/images/core/login-bg.jpg');
         }
