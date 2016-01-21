@@ -102,7 +102,7 @@
         function applyValidator() {
             $(config.element).submit(function() {
                 // update underlying textarea before submit validation
-                tinyMCE.triggerSave();
+                //tinyMCE.triggerSave();
             }).alaressValidate({
                 onfocusout: false,
                 rules: config.rules,
@@ -342,7 +342,7 @@
         function applyValidator() {
             $(config.element).submit(function() {
                 // update underlying textarea before submit validation
-                tinyMCE.triggerSave();
+                //tinyMCE.triggerSave();
             }).alaressValidate({
                 onfocusout: false,
                 submitHandler: function() {
@@ -350,10 +350,10 @@
 
                     /* Form preprocessing
                      */
-                    tinyMCE.triggerSave();
+                    //tinyMCE.triggerSave();
 
-                    var content = tinyMCE.activeEditor.getContent(); // get the content
-                    $('#question').val(content); // put it in the textarea
+                    //var content = tinyMCE.activeEditor.getContent(); // get the content
+                    //$('#question').val(content); // put it in the textarea
 
                     /* Collate possible answers and their correctness status
                      */
@@ -435,7 +435,7 @@
                         window.location = redirect;
                     });
 
-                    tinyMCE.triggerSave();
+                    //tinyMCE.triggerSave();
 
                     return false;
                 },
