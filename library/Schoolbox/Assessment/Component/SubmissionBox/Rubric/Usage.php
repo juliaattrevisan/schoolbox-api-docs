@@ -26,7 +26,7 @@ class Usage {
     /**
      * @var int
      */
-    protected $sequence;
+    protected $sequence = 0;
 
     /**
      * @param  Criterion $criterion
