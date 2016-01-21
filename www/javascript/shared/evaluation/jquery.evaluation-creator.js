@@ -100,7 +100,10 @@
          * Apply the validator to the form
          */
         function applyValidator() {
-            $(config.element).alaressValidate({
+            $(config.element).submit(function() {
+                // update underlying textarea before submit validation
+                CKEDITOR.instances.question.updateElement();
+            }).alaressValidate({
                 onfocusout: false,
                 rules: config.rules,
                 messages: config.messages,
@@ -337,7 +340,10 @@
          * Apply the validator to the form
          */
         function applyValidator() {
-            $(config.element).alaressValidate({
+            $(config.element).submit(function() {
+                // update underlying textarea before submit validation
+                CKEDITOR.instances.question.updateElement();
+            }).alaressValidate({
                 onfocusout: false,
                 submitHandler: function() {
                     var theForm = $(config.element);
