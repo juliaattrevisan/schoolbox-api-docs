@@ -108,6 +108,14 @@ div.jstree-default, ul.jstree-default {
 
 }
 
+// override throbber.gif
+.jstree-default > .jstree-container-ul{
+    .jstree-loading > .jstree-ocl {
+        background: url("/images/foundation/preloader.gif") center center no-repeat;
+        background-size: 16px 16px;
+    }
+}
+
 .resource-browser {
     max-width: 100%;
     padding-top: 1rem;
