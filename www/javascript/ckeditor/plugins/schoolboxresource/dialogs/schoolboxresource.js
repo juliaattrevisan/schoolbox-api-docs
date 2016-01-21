@@ -500,6 +500,10 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                                         render(fields, fields.url.getValue(), false);
                                                     }
 
+                                                    /* Always enable Constrain Aspect Ratio
+                                                     */
+                                                    fields.aspectRatio.setValue(true);
+
                                                     /* Shut modal, go back to Dialog
                                                      */
                                                     $('[data-reveal]').foundation('reveal', 'close');
@@ -625,6 +629,15 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                         type: 'checkbox',
                         id: 'schoolboxresource-aspectratio',
                         label: 'Constrain Aspect Ratio',
+
+                        /* Editing an existing element
+                         */
+                        setup: function(element) {
+                            var dialog = this.getDialog();
+                            var fields = dialogFields(dialog);
+
+                            fields.aspectRatio.setValue(true);
+                        },
 
                         /* Remember the ratio so we can apply it when
                          * Constrain Aspect Ratio is activated
