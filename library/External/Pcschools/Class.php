@@ -39,9 +39,11 @@ class External_Pcschools_Class implements External_ClassInterface
     public function getStudents($classCode)
     {
         // Class code format: S.YEAR + SU.ABBREV + S.CLASS
+        // May also need to take TIME_PERIOD into account
         return $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll("
-                SELECT DISTINCT
+                SELECT
+                    tf.TIME_PERIOD,
                     ST.LEGAL_SURNAME AS lastname,
                     ST.GIVEN_NAME AS firstname,
                     ST.CURRENT_YEAR AS yearlevel,
@@ -50,10 +52,15 @@ class External_Pcschools_Class implements External_ClassInterface
                     '' AS StudentSpecialNeedsFlag,
                     ST.STUDKEY AS synergy_id,
                     ST.CAMPUS AS campusCode
-                FROM SUB S
-                INNER JOIN STUDENT ST ON S.STUDENT# = ST.STUDENT# AND S.YEAR = ST.CURRENT_YEAR
-                INNER JOIN [SUBJECT] SU ON S.SUBJECT_NO = SU.NO
-                WHERE (S.YEAR + SU.ABBREV + S.CLASS) = {$this->getDatabase()->smartQuote($classCode)}
+                FROM TIMEFILE tf
+                INNER JOIN SUB su
+                    ON  tf.[YEAR]      = su.[YEAR]
+                    AND tf.SUBJECT     = su.SUBJECT_NO
+                    AND tf.CLASS       = su.CLASS
+                    AND tf.TIME_PERIOD = su.PERIOD_ID
+                INNER JOIN SUBJECT s  ON tf.SUBJECT = s.NO
+                INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
+                WHERE (TF.YEAR + TF.ABBREV + TF.CLASS) = {$this->getDatabase()->smartQuote($classCode)}
             ")
         );
     }
@@ -69,13 +76,14 @@ class External_Pcschools_Class implements External_ClassInterface
     public function getTeacherName($classCode)
     {
         return array_map(
-            function($v) { return $v['TEACHER']; },
+            function($v) { return $v; /*['TEACHER']; */},
             $this->getDatabase()->trimAll(
                 $this->getDatabase()->getAll("
-                    SELECT DISTINCT S.TEACHER
-                    FROM SUB S
-                    INNER JOIN [SUBJECT] SU ON S.SUBJECT_NO = SU.NO
-                    WHERE (S.YEAR + SU.ABBREV + S.CLASS) = {$this->getDatabase()->smartQuote($classCode)}
+                    SELECT DISTINCT
+                        tf.TIME_PERIOD,
+                        tf.TEACHER
+                    FROM TIMEFILE tf
+                    WHERE (TF.YEAR + TF.ABBREV + TF.CLASS) = {$this->getDatabase()->smartQuote($classCode)}
                 ")
             )
         );
