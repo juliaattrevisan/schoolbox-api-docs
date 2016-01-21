@@ -85,6 +85,18 @@
         }
 
         /**
+         * Resize picker dimensions dynamically
+         */
+        function resizePicker() {
+            var pickerWidth = $(window).width() * 0.67;
+
+            $('.reveal-modal.file-picker.open').css({
+                width: pickerWidth + 'px',
+                left: Math.floor($(window).width()/2 - pickerWidth/2) + 'px'
+            });
+        }
+
+        /**
          * Manufacture a modal
          *
          * @param data
@@ -110,6 +122,24 @@
                 .html(singletonModal.data('content'))
                 .foundation('reveal', 'open')
                 .off('closed.fndtn.reveal.attach');
+
+            /* If you're opening the modal in cke_maximised,
+             * you have to wrangle styles around so it doesn't
+             * appear in a stupid layout
+             *
+             * For some reason cke fights foundation and kills responsiveness
+             * so dynamically assign a pixel width upon initiation and
+             * also aupon resization
+             */
+            if ($('.cke_maximized').length) {
+                $(window).resize(function() {
+                    resizePicker();
+                });
+
+                $(document).on('opened.fndtn.reveal', '.file-picker', function() {
+                    resizePicker();
+                });
+            }
 
             /* Destroy two overlays and adjust a z-index so the
              * Schoolbox Resource Browser appears on top of the
