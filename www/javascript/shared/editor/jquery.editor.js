@@ -185,7 +185,6 @@
                     {name: 'clipboard', groups: ['clipboard', 'undo']},
                     {name: 'document', groups: ['mode', 'document', 'doctools']},
                     {name: 'tools', groups: ['tools']}
-
                 ],
 
                 /* Quicktable config for best table defaults
@@ -194,6 +193,11 @@
                 qtWidth: '100%', // Width of inserted table
                 qtCellPadding: '0', // Cell padding table
                 qtCellSpacing: '0', // Cell spacing table
+
+                /* Maximum height of editing panel is half the viewport height
+                 * due to navigation panel, other elements on the page, etc.
+                 */
+                autoGrow_maxHeight: 0.5 * $(window).height(),
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
