@@ -38,9 +38,6 @@ grunt bower build.deps;
 # Building JS files via UglifyJS
 grunt build.js;
 
-# Building CSS files via LessCSS
-grunt build.css;
-
 # Build SASS files (Vagrant provision only, not package build)
 if [ $sass = 1 ]; then
     grunt sass;

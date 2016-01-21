@@ -2,29 +2,6 @@ var glob  = require('glob');
 var shell = require('shelljs');
 
 module.exports = function(grunt) {
-
-    var cssDirs = glob.sync('www/css/*/');
-    var buildTasks = {};
-
-    // Create build tasks for each CSS directory.
-    for (var i in cssDirs) {
-        var dir     = cssDirs[i];
-        var matches = dir.match(/^www\/css\/(.*?)\/$/)
-        if (!matches) {
-            continue;
-        }
-        var cssDir = matches[1];
-        buildTasks[cssDir] = {
-            files: [{
-                expand: true,
-                cwd: 'www/css',
-                src: [cssDir+'/chrome.less'],
-                dest: 'www/css/',
-                ext: '.css'
-            }]
-        };
-    }
-
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -161,8 +138,7 @@ module.exports = function(grunt) {
         clean: {
             js: ['www/javascript/components/schoolbox.{min,map}.js'],
             css: ['www/css/*/chrome.css']
-        },
-        less: buildTasks
+        }
     });
 
     require('jit-grunt')(grunt, {bower: 'grunt-bower-task'})
@@ -172,15 +148,6 @@ module.exports = function(grunt) {
         'shell:jqueryui.install', 'shell:jqueryui.build'
     ]);
     grunt.registerTask('build.js',   ['uglify']);
-    grunt.registerTask('build.css', 'Builds CSS (build.css:$skin builds for $skin only)', function(skin) {
-        // Run less:main task.
-        // For skin-specific builds: run less:main, but for that skin only.
-        var task = 'less';
-        if (skin) {
-            task += ':'+skin;
-        }
-        grunt.task.run(task)
-    });
     grunt.registerTask('sass', 'Builds SASS stylesheet (through tools/skin/builder.php)', function() {
         // Run sass build
         var result = shell.exec('php ./tools/skin/builder.php --force');
@@ -190,11 +157,6 @@ module.exports = function(grunt) {
             grunt.fail.warn("Skin may not have been built successfully! (error code: "+String(result.code)+')');
         }
     });
-    grunt.registerTask('build.css.current', 'Builds CSS for current skin', function() {
-        var task = 'less';
-        var currentSkin = shell.exec('./tools/school.sh', {silent: true}).output
-        grunt.task.run((task+':'+currentSkin).trim())
-    });
-    grunt.registerTask('build',      ['bower', 'build.deps', 'build.js', 'build.css']);
+    grunt.registerTask('build',      ['bower', 'build.deps', 'build.js', 'sass']);
     grunt.registerTask('default',    ['build']);
 };
