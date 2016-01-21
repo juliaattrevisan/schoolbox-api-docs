@@ -100,10 +100,7 @@
          * Apply the validator to the form
          */
         function applyValidator() {
-            $(config.element).submit(function() {
-                // update underlying textarea before submit validation
-                //tinyMCE.triggerSave();
-            }).alaressValidate({
+            $(config.element).alaressValidate({
                 onfocusout: false,
                 rules: config.rules,
                 messages: config.messages,
@@ -340,10 +337,7 @@
          * Apply the validator to the form
          */
         function applyValidator() {
-            $(config.element).submit(function() {
-                // update underlying textarea before submit validation
-                //tinyMCE.triggerSave();
-            }).alaressValidate({
+            $(config.element).alaressValidate({
                 onfocusout: false,
                 submitHandler: function() {
                     var theForm = $(config.element);
@@ -427,8 +421,6 @@
                     $.post(theForm.attr('action'), data, function(responseText) {
                         window.location = redirect;
                     });
-
-                    //tinyMCE.triggerSave();
 
                     return false;
                 },
