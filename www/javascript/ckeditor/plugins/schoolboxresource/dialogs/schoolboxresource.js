@@ -74,11 +74,11 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
         function applyDimensions() {
             var width = this.width;
             var height = this.height;
-            var preview = '<img src="'+url+'" />';
+            var preview = '<img src="'+url+'" style="width:100%;" />';
 
             /* Set dialog input contents
              */
-            fields.preview.html(preview);
+            fields.preview.contents().find('html').html(preview);
 
             /* Don't change width or height if they were already set
              *
@@ -521,7 +521,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                     },
                     {
                         type: 'html',
-                        html: '<label class="schoolboxresource-separator">Preview</label><div id="schoolboxresource-preview" class="schoolboxresource-preview"></div>'
+                        html: '<label class="schoolboxresource-separator">Preview</label><iframe id="schoolboxresource-preview" class="schoolboxresource-preview" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0"></iframe>'
                     },
                     {
                         type: 'html',
@@ -814,7 +814,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
              * then go to insert a new one; it remembers the preview
              * from before
              */
-            fields.preview.html('');
+            fields.preview.contents().find('html').html('');
 
             /* Deal with existing/inserting new elements
              */
