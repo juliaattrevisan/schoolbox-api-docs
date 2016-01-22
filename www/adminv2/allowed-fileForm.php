@@ -14,14 +14,6 @@ if (!$groupHandler->isSuperuser()) {
     error(19);
 }
 
-/* Check that all the required fields were submitted
- */
-foreach (['description', 'mime', 'extension', 'inline'] as $current) {
-    if (!strlen(trim($_POST[$current]))) {
-        error(2);
-    }
-}
-
 $tableIndex = 'fileTypeID';
 
 $mimeMapper = MimetypeMapper::getInstance();
@@ -40,6 +32,15 @@ if (is_numeric($_GET['delete'])) {
     }
 
     $page->backToTheFuture(1);
+}
+
+
+/* Check that all the required fields were submitted
+ */
+foreach (['description', 'mime', 'extension', 'inline'] as $current) {
+    if (!strlen(trim($_POST[$current]))) {
+        error(2);
+    }
 }
 
 $allExtensions = [];

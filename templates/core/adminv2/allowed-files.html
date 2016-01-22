@@ -88,11 +88,8 @@
             $(this).confirmDialog({
                 text: "Are you sure you want to delete?",
                 confirmEvent: function(element) {
-                    var form = element.closest('form');
-                    var nearestAction = form.attr('action');
-                    var nearestFID = form.find('input[name=fileTypeId]').val();
-                    form.attr('action', nearestAction + "?delete=" + nearestFID);
-                    form.submit();
+                    var deleteId = event.target.getAttribute('data-interaction-delete');
+                    window.location.href = '/adminv2/allowed-fileForm.php?delete=' + deleteId
                 }
             });
             return false;
@@ -247,7 +244,7 @@
                     <nav data-interaction-display>
                         <a href="/adminv2/allowed-file/{FILE_ID}/{FILE_ENABLED_ACTION}" class="icon-{FILE_ENABLED_ICON}" title="{FILE_ENABLED_TITLE}" data-interaction-{FILE_ENABLED_ACTION}></a>
                         <a href="/adminv2/allowed-file/{FILE_ID}/modify" class="icon-modify" title="Modify" data-interaction-modify></a>
-                        <a href="/adminv2/allowed-file/{FILE_ID}/delete" class="icon-delete" title="Delete" data-interaction-delete></a>
+                        <a href="/adminv2/allowed-file/{FILE_ID}/delete" class="icon-delete" title="Delete" data-interaction-delete="{FILE_ID}"></a>
                     </nav>
 
                     <form data-action="updateFileType" id="allowed-file{FILE_ID}" method="post" action="/adminv2/allowed-fileForm.php">
