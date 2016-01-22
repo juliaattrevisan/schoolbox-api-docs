@@ -102,7 +102,7 @@
         function applyValidator() {
             $(config.element).submit(function() {
                 // update underlying textarea before submit validation
-                tinyMCE.triggerSave();
+                CKEDITOR.instances.question.updateElement();
             }).alaressValidate({
                 onfocusout: false,
                 rules: config.rules,
@@ -342,18 +342,11 @@
         function applyValidator() {
             $(config.element).submit(function() {
                 // update underlying textarea before submit validation
-                tinyMCE.triggerSave();
+                CKEDITOR.instances.question.updateElement();
             }).alaressValidate({
                 onfocusout: false,
                 submitHandler: function() {
                     var theForm = $(config.element);
-
-                    /* Form preprocessing
-                     */
-                    tinyMCE.triggerSave();
-
-                    var content = tinyMCE.activeEditor.getContent(); // get the content
-                    $('#question').val(content); // put it in the textarea
 
                     /* Collate possible answers and their correctness status
                      */
@@ -385,7 +378,7 @@
                      * Common data
                      */
                     var data = {
-                        question: content,
+                        question: CKEDITOR.instances.question.getData(),
                         sequence: theForm.find('input[name=sequence]').val(),
                         allAnswers: JSON.stringify(answerCollection),
                         configuration: JSON.stringify($(config.configuration).find('input, textarea, select').serializeArray())
@@ -434,8 +427,6 @@
                     $.post(theForm.attr('action'), data, function(responseText) {
                         window.location = redirect;
                     });
-
-                    tinyMCE.triggerSave();
 
                     return false;
                 },

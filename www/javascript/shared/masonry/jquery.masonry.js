@@ -3,7 +3,7 @@
  * This plugin handles the drag and drop of re-arrangable layouts,
  * as well as the palettes of items from which they can be instantiated.
  *
- * @require     jquery, jquery.qtip, tinyMCE v3.x
+ * @require     jquery, jquery.qtip
  * @optional    jquery.slider, jquery.sortable, jquery.spectrum, jquery.tabs
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -12,7 +12,7 @@
  * @version     SVN: $Id$
  */
 ;
-(function ($, window, document, tinyMCE, undefined) {
+(function ($, window, document, undefined) {
 
     var pluginName = 'masonry',
 
@@ -400,13 +400,6 @@
             tolerance: 'pointer',
             zIndex: 2000,
             start: function () {
-                // intentionally not cached, since we can AJAX components in/out
-                if ('execCommand' in tinyMCE) {
-                    $(masonry.element).find('.' + comOpt.mceEditorClass).each(function () {
-                        tinyMCE.execCommand('mceRemoveControl', false, this.id);
-                    });
-                }
-
                 masonry.refreshColumns();
             },
             stop: function (event, ui) {
@@ -492,13 +485,6 @@
      */
     Masonry.prototype.saveSorting = function () {
         var page = $(this.element);
-
-        // intentionally not cached, since we can AJAX components in/out
-        if ('execCommand' in tinyMCE) {
-            page.find('.' + this.options.component.mceEditorClass).each(function () {
-                tinyMCE.execCommand('mceAddControl', false, this.id);
-            });
-        }
 
         this.columns.sortable('refresh');
 
@@ -880,4 +866,4 @@
         });
     };
 
-})(jQuery, window, document, (typeof tinymce === 'object' ? tinymce : {}));
+})(jQuery, window, document);
