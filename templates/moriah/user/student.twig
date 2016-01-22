@@ -1,0 +1,13 @@
+{% extends '@core/user/student.twig' %}
+
+{% block buttons_grades %}
+    {% if not (config.restrict_parent_grades and session.user.isParent()) %}
+        <li class="no-pad">
+            <a href="/submission/allWork/{{ user.getId() }}"
+               class="no-margin fat button icon-fat icon-32 icon-tick"
+            >Grades</a>
+        </li>
+    {% endif %}
+    <li class="no-pad"><a href="/synergetic/Docs/?id={{ user.getExternalId() }}" class="no-margin fat button icon-fat icon-32 icon-files">Reports</a></li>
+    <li class="no-pad"><a href="/synergetic/pti/?id={{ user.getExternalId() }}" class="no-margin fat button icon-fat icon-32 icon-group">PT Interviews</a></li>
+{% endblock buttons_grades %}
