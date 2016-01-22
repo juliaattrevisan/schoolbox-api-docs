@@ -51,18 +51,20 @@
                     <ul class="information-list" data-dz-container>
                         <!-- BEGIN video_list -->
                         <li>
-                            <div class="avatar card">
-                                <a data-videolink href="#" data-media-id="{VIDEO_LIST_ID}">
-                                    <img src="/cms/videoThumb.php?type=myfile&id={VIDEO_LIST_ID}" />
-                                    <h3>{VIDEO_LIST_TITLE}</h3>
-                                </a>
-                                <p class="meta">{VIDEO_LIST_DURATION}</p>
-                                <p class="meta">
-                                    Posted by
-                                    <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a>
-                                </p>
+                            <div class="list-item">
+                                <div class="avatar card small-12">
+                                    <a data-videolink href="#" data-media-id="{VIDEO_LIST_ID}">
+                                        <img src="/cms/videoThumb.php?type=myfile&id={VIDEO_LIST_ID}" />
+                                        <h3>{VIDEO_LIST_TITLE}</h3>
+                                    </a>
+                                    <p class="meta">{VIDEO_LIST_DURATION}</p>
+                                    <p class="meta">
+                                        Posted by
+                                        <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a>
+                                    </p>
+                                </div>
                             </div>
-                            <p class="list-item-content">{VIDEO_LIST_COMMENT}</p>
+                            <article>{VIDEO_LIST_COMMENT}</article>
                         </li>
                         <!-- END video_list -->
                         <!-- BEGIN video_pending_list -->
@@ -75,7 +77,7 @@
                                     <a href="/search/user/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a>
                                 </p>
                             </div>
-                            <p class="list-item-content">{VIDEO_LIST_COMMENT}</p>
+                            <article>{VIDEO_LIST_COMMENT}</article>
                         </li>
                         <!-- END video_pending_list -->
                     </ul>
