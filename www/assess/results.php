@@ -84,6 +84,9 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         'ATTEMPT_UNMARKED_RESPONSES' => $percentageReviewed,
     ));
 
+    $page->parse('buttons_block', 'buttons');
+    $page->parse('checkbox_block', 'checkbox');
+
     /* Finish time. Show the datetime when the person clicked Finish.
      * Otherwise, show the last time their responses were updated, or that
      * they never even attempted the test.
@@ -221,11 +224,15 @@ $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 $this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
 $this->setBlock(TEMPLATE_content, 'review', 'review_block');
 $this->setBlock(TEMPLATE_content, 'has_attempt', 'has_attempt_block');
+$this->setBlock(TEMPLATE_content, 'buttons', 'buttons_block');
+$this->setBlock(TEMPLATE_content, 'checkbox', 'checkbox_block');
 
 $this->setVar(array(
     'not_reviewed_block' => '',
     'reviewed_block' => '',
     'submitted_block' => '',
+    'buttons_block' => '',
+    'checkbox_block' => '',
     'unsubmitted_block' => '',
     'has_marks_block' => '',
 ));
