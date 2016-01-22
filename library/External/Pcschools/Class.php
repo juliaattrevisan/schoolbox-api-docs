@@ -38,8 +38,6 @@ class External_Pcschools_Class implements External_ClassInterface
      */
     public function getStudents($classCode)
     {
-        // Class code format: S.YEAR + SU.ABBREV + S.CLASS
-        // May also need to take TIME_PERIOD into account
         return $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll("
                 SELECT
@@ -60,7 +58,7 @@ class External_Pcschools_Class implements External_ClassInterface
                     AND tf.TIME_PERIOD = su.PERIOD_ID
                 INNER JOIN SUBJECT s  ON tf.SUBJECT = s.NO
                 INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
-                WHERE (tf.YEAR + tf.ABBREV + tf.CLASS) = {$this->getDatabase()->smartQuote($classCode)}
+                WHERE {$this->getTimefileFilter($classCode)}
             ")
         );
     }
@@ -76,17 +74,37 @@ class External_Pcschools_Class implements External_ClassInterface
     public function getTeacherName($classCode)
     {
         return array_map(
-            function($v) { return $v; /*['TEACHER']; */},
+            function($v) { return $v['TEACHER']; },
             $this->getDatabase()->trimAll(
                 $this->getDatabase()->getAll("
                     SELECT DISTINCT
                         tf.TIME_PERIOD,
                         tf.TEACHER
                     FROM TIMEFILE tf
-                    WHERE (tf.YEAR + tf.ABBREV + tf.CLASS) = {$this->getDatabase()->smartQuote($classCode)}
+                    WHERE {$this->getTimefileFilter($classCode)}
                 ")
             )
         );
+    }
+
+    /**
+     * Gets a where part for the timefile query in `getTeacherName()` and `getStudents()`.
+     *
+     * @param string $classCode
+     *
+     * @return string
+     */
+    private function getTimefileFilter($classCode)
+    {
+        $parts = explode('/', $classCode);
+        if (count($parts) > 1) {
+            list($timePeriod, $classCode) = $parts;
+        }
+        $filter = "(tf.YEAR + tf.ABBREV + tf.CLASS) = {$this->getDatabase()->smartQuote($classCode)}";
+        if (isset($timePeriod)) {
+            $filter .= " AND tf.TIME_PERIOD = {$this->getDatabase()->smartQuote($timePeriod)}";
+        }
+        return $filter;
     }
 
     /**
