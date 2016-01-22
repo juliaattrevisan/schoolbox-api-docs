@@ -147,7 +147,7 @@ function useSAMLKerberos() {
 
     $current_browser = $bc->getBrowser();
     SAMLDebugLog(json_encode($current_browser));
-    if ($current_browser->Device_Type == 'Desktop') {
+    if ($current_browser->Device_Type == 'Desktop' || $current_browser->Device_Type == 'Tablet') {
         if (substr($current_browser->Platform,0,3)=='Win' || $current_browser->Platform == 'MacOSX') {
             switch($current_browser->Browser) {
                 case 'IE':
