@@ -869,7 +869,7 @@ class External_Pcschools_User implements External_UserInterface
                     'code'       => $code,
                     'name'       => $dayClass['DESC'],
                     'classType'  => '',
-                    'campusCode' => '',
+                    'campusCode' => $timePeriod,
                 ];
             }
         }

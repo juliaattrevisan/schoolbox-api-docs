@@ -270,7 +270,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                 $timetable[$period]['class'][$code] = array(
                     'description'        => $dayClass['DESC'],
                     'code'               => $code,
-                    'campus'             => '',
+                    'campus'             => $timePeriod,
                     'room'               => $dayClass['ROOM'],
                     'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
                 );
@@ -373,7 +373,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                 $timetable[$period]['class'][$code] = array(
                     'description'        => $dayClass['DESC'],
                     'code'               => $code,
-                    'campus'             => '',
+                    'campus'             => $timePeriod,
                     'room'               => $dayClass['ROOM'],
                     'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
                 );
@@ -483,7 +483,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             $timetable[$period]['day'][$day][$code] = array(
                 'description'        => $dayClass['DESC'],
                 'code'               => $code,
-                'campus'             => '',
+                'campus'             => $timePeriod,
                 'room'               => $dayClass['ROOM'],
                 'StaffPreferredName' => $dayClass['NAME_FOR_REPORT'],
             );
