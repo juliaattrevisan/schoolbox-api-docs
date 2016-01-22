@@ -41,7 +41,6 @@ class External_Pcschools_Class implements External_ClassInterface
         return $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll("
                 SELECT DISTINCT
-                    tf.TIME_PERIOD,
                     st.LEGAL_SURNAME AS lastname,
                     st.GIVEN_NAME AS firstname,
                     st.CURRENT_YEAR AS yearlevel,
@@ -78,7 +77,6 @@ class External_Pcschools_Class implements External_ClassInterface
             $this->getDatabase()->trimAll(
                 $this->getDatabase()->getAll("
                     SELECT DISTINCT
-                        tf.TIME_PERIOD,
                         tf.TEACHER
                     FROM TIMEFILE tf
                     WHERE {$this->getTimefileFilter($classCode)}
