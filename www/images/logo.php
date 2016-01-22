@@ -17,7 +17,6 @@ require_once __DIR__.'/../../include/Bootstrap.php';
 
 $placeholders = array(
     'skin_logo_login' => '/core/logo.png',
-    'skin_login_bg' => '/core/login-bg.jpg',
     'skin_logo_square' => '/core/m-hercules.png',
     'skin_logo_large' => '/core/hercules.png',
 );
@@ -47,11 +46,6 @@ $logoSizes = array('skin_logo_square' => array(
                                             'normal' => array(296,400),
                                             'hidpi' => array(592, 800),
                                             'tile310' => array(310,150),
-              ),
-              'skin_login_bg' => array(
-                       'normal' => array(1024,768),
-                       'hidpi' => array(2048, 1440),
-                       'mobile' => array(512,384),
               ),
 );
 
