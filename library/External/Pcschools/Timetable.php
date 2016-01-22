@@ -229,6 +229,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $studentExternalId = '';
         $teacherExternalId = '';
+        $timePeriod        = $campus->getExtTimetableCode();
         if ($user->getRole()->isStudent()) {
             $studentExternalId = $user->getExternalId();
         } elseif ($user->getRole()->isStaff()) {
@@ -236,7 +237,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         }
         $params = [
             ['@DATE', date('Ymd'), SQLVARCHAR, false, false, -1],
-            ['@TIMEPERIOD', $campus->getExtTimetableCode(), SQLVARCHAR, false, false, -1],
+            ['@TIMEPERIOD', $timePeriod, SQLVARCHAR, false, false, -1],
             ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
             ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
             ['@LOGIC_NO', 2, SQLINT1, false, false, -1],
@@ -264,7 +265,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
             $period = $dayClass['PERIOD'];
-            $code   = $dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
+            $code   = $timePeriod.'/'.$dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
             if ($dayNumber == $dayClass['DAY']) {
                 $timetable[$period]['class'][$code] = array(
                     'description'        => $dayClass['DESC'],
@@ -316,6 +317,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $studentExternalId = '';
         $teacherExternalId = '';
+        $timePeriod        = $campus->getExtTimetableCode();
         if ($user->getRole()->isStudent()) {
             $studentExternalId = $user->getExternalId();
         } elseif ($user->getRole()->isStaff()) {
@@ -323,7 +325,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         }
         $params = [
             ['@DATE', $date->getUsingFormat('Ymd'), SQLVARCHAR, false, false, -1],
-            ['@TIMEPERIOD', $campus->getExtTimetableCode(), SQLVARCHAR, false, false, -1],
+            ['@TIMEPERIOD', $timePeriod, SQLVARCHAR, false, false, -1],
             ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
             ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
             ['@LOGIC_NO', 2, SQLINT1, false, false, -1],
@@ -366,7 +368,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         // Add classes for each day into it
         foreach ($dayClasses as $dayClass) {
             $period = $dayClass['PERIOD'];
-            $code   = $dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
+            $code   = $timePeriod.'/'.$dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
             if ($dayNumber == $dayClass['DAY']) {
                 $timetable[$period]['class'][$code] = array(
                     'description'        => $dayClass['DESC'],
@@ -436,6 +438,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
         $studentExternalId = '';
         $teacherExternalId = '';
+        $timePeriod        = $campus->getExtTimetableCode();
         if ($user->getRole()->isStudent()) {
             $studentExternalId = $user->getExternalId();
         } elseif ($user->getRole()->isStaff()) {
@@ -443,7 +446,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         }
         $params = [
             ['@DATE', date('Ymd'), SQLVARCHAR, false, false, -1],
-            ['@TIMEPERIOD', $campus->getExtTimetableCode(), SQLVARCHAR, false, false, -1],
+            ['@TIMEPERIOD', $timePeriod, SQLVARCHAR, false, false, -1],
             ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
             ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
             ['@LOGIC_NO', 2, SQLINT1, false, false, -1],
@@ -476,7 +479,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         foreach ($dayClasses as $dayClass) {
             $period = $dayClass['PERIOD'];
             $day    = $dayClass['DAY'];
-            $code   = $dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
+            $code   = $timePeriod.'/'.$dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
             $timetable[$period]['day'][$day][$code] = array(
                 'description'        => $dayClass['DESC'],
                 'code'               => $code,

@@ -839,6 +839,7 @@ class External_Pcschools_User implements External_UserInterface
 
         $studentExternalId = '';
         $teacherExternalId = '';
+        $timePeriod        = $user->getDefaultCampus()->getExtTimetableCode();
         if ($user->getRole()->isStudent()) {
             $studentExternalId = $user->getExternalId();
         } elseif ($user->getRole()->isStaff()) {
@@ -848,8 +849,8 @@ class External_Pcschools_User implements External_UserInterface
         }
         $params = [
             ['@DATE', date('Ymd'), SQLVARCHAR, false, false, -1],
-            // Will eventually need to query all classes
-            ['@TIMEPERIOD', $user->getDefaultCampus()->getExtTimetableCode(), SQLVARCHAR, false, false, -1],
+            // Will eventually need to query all time periods
+            ['@TIMEPERIOD', $timePeriod, SQLVARCHAR, false, false, -1],
             ['@STUDKEY', $studentExternalId, SQLVARCHAR, false, false, -1],
             ['@TEACHERCODE', $teacherExternalId, SQLVARCHAR, false, false, -1],
             ['@LOGIC_NO', 2, SQLINT1, false, false, -1],
@@ -860,7 +861,7 @@ class External_Pcschools_User implements External_UserInterface
         // Add classes for each day into it
         $classes = [];
         foreach ($dayClasses as $dayClass) {
-            $code = $dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
+            $code = $timePeriod.'/'.$dayClass['YEAR'].$dayClass['ABBREV'].$dayClass['CLASS'];
             $classes[$code] = [
                 'code'       => $code,
                 'name'       => $dayClass['DESC'],
