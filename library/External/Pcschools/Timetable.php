@@ -222,7 +222,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     {
         // I need to know if $userId is a teacher or student
         try {
-            $user = $this->userMapper->findByExternalId($externalUserId);
+            $user = $this->userMapper->findById($userId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
@@ -309,7 +309,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     {
         // I need to know if $userId is a teacher or student
         try {
-            $user = $this->userMapper->findByExternalId($externalUserId);
+            $user = $this->userMapper->findById($userId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
@@ -429,7 +429,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     {
         // I need to know if $userId is a teacher or student
         try {
-            $user = $this->userMapper->findByExternalId($externalUserId);
+            $user = $this->userMapper->findById($userId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
