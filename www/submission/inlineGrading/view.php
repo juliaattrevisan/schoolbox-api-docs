@@ -63,6 +63,8 @@ $processed = array();
 $stack = array();
 
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
+$this->setBlock(TEMPLATE_content, 'download_annotated', 'download_annotated_block');
+$this->setVar('download_annotated_block', '');
 
 $this->setFile('studentNavTpl', 'submission/inlineGrading/injectables/controls/navigation-option.html');
 $this->setBlock('studentNavTpl', 'marked_submitted', 'marked_submitted_block');
@@ -216,6 +218,12 @@ foreach ($returnedActivities as $activity) {
  */
 if ($currentAugmented['submission'] != null) {
 	$submissionId = $currentAugmented['submission']->getId();
+
+	$api_token = trim(Config::get('crocodoc_api_token'));
+
+	if (!empty($submissionId) && !empty($api_token)) {
+		$this->parse('download_annotated_block', 'download_annotated');
+	}
 }
 
 /* Data for the navigation selector
