@@ -111,10 +111,17 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
         $this->setBlock($templateHandle, 'default_video', 'default_video_block');
         $this->setBlock($templateHandle, 'video_list', 'video_list_block');
         $this->setBlock($templateHandle, 'video_pending_list', 'video_pending_list_block');
+        $this->setBlock('video_list', 'video_list_comment', 'video_list_comment_block');
+        $this->setBlock('video_pending_list', 'video_pending_comment', 'video_pending_comment_block');
 
         $this->setVar('video_list_block', '');
         $this->setVar('video_pending_list_block', '');
         $this->setVar('default_video_block', '');
+
+        $this->setVar(array(
+            'video_list_comment_block' => '',
+            'video_pending_comment_block' => ''
+        ));
 
         if (count($this->outputList)) {
             $j = 0;
@@ -125,17 +132,44 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                         'VIDEO_LIST_ID'        => $video->getFile()->getId(),
                         'VIDEO_LIST_TITLE'     => Scrub::text($video->getFile()->getTitle()),
                         'VIDEO_LIST_DURATION'  => $video->getDuration() >= 3600 ? gmdate('H:i:s', $video->getDuration()) : gmdate('i:s', $video->getDuration()),
-                        'VIDEO_LIST_COMMENT'   => Scrub::text($video->getFile()->getDescription()),
                         'VIDEO_LIST_POSTER_ID' => $video->getFile()->getOwner()->getId(),
                         'VIDEO_LIST_POSTER'    => $video->getFile()->getOwner()->getFullName(),
                         'ON_OFF'               => ++$j % 2 ? '' : 'dark'
                     )
                 );
 
+                $comment = Scrub::text($video->getFile()->getDescription());
+
                 if ($video->getStatus() == "completed") {
+                    if (strlen($comment)) {
+                        $this->setVar(array(
+                            'VIDEO_LIST_COMMENT' => $comment
+                        ));
+
+                        $this->parse('video_list_comment_block', 'video_list_comment');
+                    }
+                    else {
+                        $this->setVar(array(
+                            'video_list_comment_block' => ''
+                        ));
+                    }
+
                     $this->parse('video_list_block', 'video_list', true);
                 } else {
                     if ($this->permission >= WRITE_ACCESS) {
+                        if (strlen($comment)) {
+                            $this->setVar(array(
+                                'VIDEO_PENDING_COMMENT' => $comment
+                            ));
+
+                            $this->parse('video_pending_comment_block', 'video_pending_comment');
+                        }
+                        else {
+                            $this->setVar(array(
+                                'video_pending_comment_block' => ''
+                            ));
+                        }
+
                         $this->setVar(
                             array(
                                 'VIDEO_LIST_STATUS'    => $video->getStatus(),
@@ -146,6 +180,13 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                         $this->parse('video_pending_list_block', 'video_pending_list', true);
                     }
                 }
+
+                /* Clear children after parsing out the parent
+                 */
+                $this->setVar(array(
+                    'video_list_comment_block' => '',
+                    'video_pending_comment_block' => ''
+                ));
             }
         }
 
