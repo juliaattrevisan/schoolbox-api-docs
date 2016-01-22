@@ -83,10 +83,6 @@ if(is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, 'reveal_password','reveal_password_block');
         $this->setVar('reveal_password_block','');
 
-        if(Cfg::get('reveal_password') && $user['email_pass']) {
-            $this->parse('reveal_password_block','reveal_password');
-        }
-
         /* Output title list */
         $this->dropDown('title', $userHandler->getTitleList(), $user['title'], TEMPLATE_content, array('titleName'=>'NAME_TITLE'));
 

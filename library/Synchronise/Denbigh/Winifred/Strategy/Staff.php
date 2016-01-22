@@ -34,7 +34,6 @@ class Synchronise_Denbigh_Winifred_Strategy_Staff extends Synchronise_Denbigh_Wi
         $newUser['title']               = $currentUser['title'];
         $newUser['firstname']           = $currentUser['preferred_name'];
         $newUser['lastname']            = $currentUser['surname'];
-//        $newuser['email_pass']          = 'abc123';
         $newUser['synergy_id']          = $currentUser['denbighID']; // change this to denbighID, requires SQL modification
         $newUser['campus']              = array(self::DEFAULT_CAMPUS_ID);
         $newUser['year']                = '';

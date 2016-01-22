@@ -70,7 +70,7 @@ class User extends DeprecatedModel
     public function getByID($id)
     {
         $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, `key`, hash, eportfolio_enabled,
-                        hide_timetable, hide_contacts, synergy_id, local_email, alt_email, webmail, email_pass, userCampus.campus, luCampus.name as campusName,
+                        hide_timetable, hide_contacts, synergy_id, local_email, alt_email, webmail, userCampus.campus, luCampus.name as campusName,
                         IF(superusers.id, 1, 0) as su, house, residential_house_id as residential_house, mail_handler, enabled
                 FROM user
                     LEFT JOIN groups ON user.group_id = groups.id
@@ -84,7 +84,7 @@ class User extends DeprecatedModel
     public function getByUsername($username)
     {
         $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, eportfolio_enabled,`key`, hash,
-                        hide_timetable, hide_contacts, synergy_id, local_email, alt_email, webmail, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler, calendar_view, enabled
+                        hide_timetable, hide_contacts, synergy_id, local_email, alt_email, webmail, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler, calendar_view, enabled
                 FROM user
                     LEFT JOIN groups ON user.group_id = groups.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
@@ -444,7 +444,7 @@ class User extends DeprecatedModel
     public function setPasswordInternal($userID, $newPassword)
     {
         $newPassword = $this->db->quote($newPassword);
-        $query       = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID";
+        $query       = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword') WHERE `" . $this->_index . "` = $userID";
         $this->db->query($query);
         return $this->db->affectedRows();
     }
@@ -523,7 +523,6 @@ class User extends DeprecatedModel
                 if ($user['enabled'] && $user['email_pass'] != '') {
                     $result['NAME'] = $user['firstname'];
                     $result['USERNAME'] = $user['username'];
-                    $result['PASSWORD'] = $user['email_pass'];
                     $result['EMAIL'] = $user['alt_email'];
                     $result['FULLNAME'] = $user['firstname']." ".$user['lastname'];
                     $result['FIRSTNAME'] = $user['firstname'];

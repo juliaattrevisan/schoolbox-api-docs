@@ -47,7 +47,6 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
         //Do not change password if its the default output value
         if ($_POST['modpassword'] != 'donotchange') {
             $user['password'] = $_POST['modpassword'];
-            $user['email_pass'] = $_POST['modpassword'];
         }
 
         if ($userHandler->update($user) === false) {
@@ -72,7 +71,6 @@ elseif ($_POST['modusername']) {
         'webmail' => $_POST['webmail'],
         'group_id' => $_POST['group'],
         'password' => $_POST['modpassword'],
-        'email_pass' => $_POST['modpassword'],
         'campus' => $_POST['campus'],
         'defaultCampus' => $_POST['defaultCampus'],
         'su' => $_POST['superuser'],
