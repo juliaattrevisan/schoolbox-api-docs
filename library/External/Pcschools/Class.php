@@ -44,14 +44,14 @@ class External_Pcschools_Class implements External_ClassInterface
             $this->getDatabase()->getAll("
                 SELECT
                     tf.TIME_PERIOD,
-                    ST.LEGAL_SURNAME AS lastname,
-                    ST.GIVEN_NAME AS firstname,
-                    ST.CURRENT_YEAR AS yearlevel,
-                    ST.HOUSE AS house,
-                    ST.ALERT AS StudentMedicalAlert,
+                    st.LEGAL_SURNAME AS lastname,
+                    st.GIVEN_NAME AS firstname,
+                    st.CURRENT_YEAR AS yearlevel,
+                    st.HOUSE AS house,
+                    st.ALERT AS StudentMedicalAlert,
                     '' AS StudentSpecialNeedsFlag,
-                    ST.STUDKEY AS synergy_id,
-                    ST.CAMPUS AS campusCode
+                    st.STUDKEY AS synergy_id,
+                    st.CAMPUS AS campusCode
                 FROM TIMEFILE tf
                 INNER JOIN SUB su
                     ON  tf.[YEAR]      = su.[YEAR]
@@ -60,7 +60,7 @@ class External_Pcschools_Class implements External_ClassInterface
                     AND tf.TIME_PERIOD = su.PERIOD_ID
                 INNER JOIN SUBJECT s  ON tf.SUBJECT = s.NO
                 INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
-                WHERE (TF.YEAR + TF.ABBREV + TF.CLASS) = {$this->getDatabase()->smartQuote($classCode)}
+                WHERE (tf.YEAR + tf.ABBREV + tf.CLASS) = {$this->getDatabase()->smartQuote($classCode)}
             ")
         );
     }
@@ -83,7 +83,7 @@ class External_Pcschools_Class implements External_ClassInterface
                         tf.TIME_PERIOD,
                         tf.TEACHER
                     FROM TIMEFILE tf
-                    WHERE (TF.YEAR + TF.ABBREV + TF.CLASS) = {$this->getDatabase()->smartQuote($classCode)}
+                    WHERE (tf.YEAR + tf.ABBREV + tf.CLASS) = {$this->getDatabase()->smartQuote($classCode)}
                 ")
             )
         );
