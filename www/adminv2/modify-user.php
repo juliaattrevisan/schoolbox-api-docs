@@ -61,7 +61,6 @@ if(is_numeric($this->arg[0])) {
                         'FULLNAME'          => $userHandler->formatName($user),
                         'ALT_EMAIL'         => $user['alt_email'],
                         'PASSWORD'          => 'donotchange',  // set to foreign string to avoid reveals and to indicate password has not been changed
-                        'CLEAR_PASSWORD'     => $user['email_pass'],
                         'DATABASE_ID'       => $user['synergy_id'],
                         'SUPERUSER_CHECKED' => $user['su']==1?'checked="checked"':'',
                         'LASTNAME'          => $user['lastname'],
@@ -78,10 +77,6 @@ if(is_numeric($this->arg[0])) {
                         'ASSUME_CLASS'      => $user['enabled'] ? 'submit' : 'disabled' // doesn't affect admin ability to assume user
             );
         $this->setVar($output);
-
-
-        $this->setBlock(TEMPLATE_content, 'reveal_password','reveal_password_block');
-        $this->setVar('reveal_password_block','');
 
         /* Output title list */
         $this->dropDown('title', $userHandler->getTitleList(), $user['title'], TEMPLATE_content, array('titleName'=>'NAME_TITLE'));
