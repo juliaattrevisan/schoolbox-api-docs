@@ -118,16 +118,16 @@
                     /* Add pagination again
                      */
                     paginate();
-
                     updateStyles();
+                    reflow();
                 });
             }
             else {
                 /* Add pagination again
                  */
                 paginate();
-
                 updateStyles();
+                reflow();
             }
         }
 
@@ -155,6 +155,7 @@
                 $(config.targetDiv).load(config.url, "keyword=" + config.keyword + "&type=" + config.section + "&p=" + config.pageNumber, function() {
                     paginate();
                     updateStyles();
+                    reflow();
                 });
             });
 
@@ -200,6 +201,14 @@
             /* Add active class to the thing you clicked on
              */
             config.sectionElement.parent().addClass('active');
+        }
+
+        /**
+         * Reflow Foundation UI elements
+         */
+        function reflow()
+        {
+            $(config.targetDiv).foundation('dropdown', 'reflow');
         }
 
         /**
