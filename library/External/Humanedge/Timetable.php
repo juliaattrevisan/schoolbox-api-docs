@@ -46,6 +46,9 @@ class External_Humanedge_Timetable implements External_TimetableInterface
         if (!$day) {
             $day = $this->getDayNumber($campus);
         }
+        if (!$day) {
+            $day = 1;
+        }
         $db         = $this->loadAPlusDatabase();
         $dayCount   = $db->getOne("SELECT COUNT(*) FROM tblDay WHERE deleted = 0");
         if ($day) {
