@@ -45,7 +45,16 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     {
         $db         = $this->loadAPlusDatabase();
         $dayCount   = $db->getOne("SELECT COUNT(*) FROM tblDay WHERE deleted = 0");
-        $periods    = $db->getAll("SELECT * FROM tblPeriod WHERE deleted = 0 ORDER BY SortOrder ASC");
+        $periods    = $db->getAll("
+            SELECT
+                Name,
+                CAST(StartTime AS TIME) AS StartTime,
+                CAST(EndTime AS TIME) AS EndTime,
+                SortOrder
+            FROM tblPeriod
+            WHERE deleted = 0
+            ORDER BY SortOrder ASC
+        ");
         $definition = [
             'desc'        => [],
             'start'       => [],
@@ -151,8 +160,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     s.Name AS ClassName,
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
-                    ISNULL(pd.StartTime, p.StartTime) as StartTime,
-                    ISNULL(pd.EndTime, p.EndTime) as EndTime,
+                    CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
+                    CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
                     r.Code AS Room
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
@@ -170,8 +179,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     s.Name AS ClassName,
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
-                    ISNULL(pd.StartTime, p.StartTime) as StartTime,
-                    ISNULL(pd.EndTime, p.EndTime) as EndTime,
+                    CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
+                    CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
                     r.Code AS Room
                 FROM tblSubject s
                 INNER JOIN tblBlockItem b on s.ID = b.SubjectID
