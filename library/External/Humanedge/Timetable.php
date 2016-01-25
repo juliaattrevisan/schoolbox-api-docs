@@ -88,11 +88,14 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
     {
         $db   = $this->loadAPlusDatabase();
-        $time = new Alaress_Date_Format($now, Alaress_Date_Format::TIMESTAMP);
+        $time = $now
+            ? new Alaress_Date_Format($now, Alaress_Date_Format::TIMESTAMP)
+            : Alaress_Date_Format::now()
+        ;
         return $db->getOne("
             SELECT [SortOrder]
             FROM tblPeriod
-            WHERE CAST({$db->smartQuote($time->getUsingFormat('H:i'))} AS TIME)
+            WHERE CAST({$db->smartQuote($time->getDatabase())} AS TIME)
                 BETWEEN CAST(StartTime AS TIME) AND CAST(EndTime AS TIME)
             AND deleted = 0
         ");
