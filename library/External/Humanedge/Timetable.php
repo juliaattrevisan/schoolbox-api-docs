@@ -49,36 +49,22 @@ class External_Humanedge_Timetable implements External_TimetableInterface
         if (!$day) {
             $day = 1;
         }
-        $db         = $this->loadAPlusDatabase();
-        $dayCount   = $db->getOne("SELECT COUNT(*) FROM tblDay WHERE deleted = 0");
-        if ($day) {
-            $periods = $db->getAll("
-                SELECT
-                    p.Name,
-                    CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
-                    CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
-                    p.SortOrder
-                FROM tblPeriod p
-                LEFT JOIN tblPeriodTimesByDay pd ON p.ID = pd.PeriodID
-                LEFT JOIN tblDay d ON pd.DayID = d.ID
-                WHERE p.deleted = 0
-                AND   ISNULL(d.Deleted, 0) = 0
-                AND   ISNULL(d.SortOrder, 0) = {$db->smartQuote($day)}
-                ORDER BY p.SortOrder ASC
-            ");
-        } else {
-            // Still no day: get default times
-            $periods = $db->getAll("
-                SELECT
-                    Name,
-                    CAST(StartTime AS TIME) AS StartTime,
-                    CAST(EndTime AS TIME) AS EndTime,
-                    SortOrder
-                FROM tblPeriod
-                WHERE deleted = 0
-                ORDER BY SortOrder ASC
-            ");
-        }
+        $db       = $this->loadAPlusDatabase();
+        $dayCount = $db->getOne("SELECT COUNT(*) FROM tblDay WHERE deleted = 0");
+        $periods  = $db->getAll("
+            SELECT
+                p.Name,
+                CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
+                CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
+                p.SortOrder
+            FROM tblPeriod p
+            LEFT JOIN tblPeriodTimesByDay pd ON p.ID = pd.PeriodID
+            LEFT JOIN tblDay d ON pd.DayID = d.ID
+            WHERE p.deleted = 0
+            AND   ISNULL(d.Deleted, 0) = 0
+            AND   ISNULL(d.SortOrder, 0) = {$db->smartQuote($day)}
+            ORDER BY p.SortOrder ASC
+        ");
         $definition = [
             'desc'        => [],
             'start'       => [],
