@@ -159,6 +159,12 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             LEFT  JOIN tblPeriodTimesByDay pd ON a.PeriodID = pd.PeriodID AND a.DayID = pd.DayID
             LEFT  JOIN tblRoom r ON a.RoomID = r.ID
         ';
+        $teacherSelect = "
+            t.Code          AS StaffID,
+            t.FamilyName    AS StaffPreferredName,
+            t.PreferredName AS StaffSurname,
+            ''              AS StaffTitle
+        ";
 
         $db        = $this->loadAPlusDatabase();
         $quotedId  = $db->smartQuote($externalUserId);
@@ -174,9 +180,11 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     p.SortOrder as PeriodNumber,
                     CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
                     CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
-                    r.Code AS Room
+                    r.Code AS Room,
+                    $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
+                LEFT JOIN tblTeacher t on a.TeacherID = t.ID
                 $periodJoin
                 INNER JOIN tblStudent st on a.FormID = st.FormID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
@@ -193,10 +201,12 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     p.SortOrder as PeriodNumber,
                     CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
                     CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
-                    r.Code AS Room
+                    r.Code AS Room,
+                    $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblBlockItem b on s.ID = b.SubjectID
                 INNER JOIN tblAllocation a ON b.BlockID = a.BlockID
+                LEFT JOIN tblTeacher t on a.TeacherID = t.ID
                 $periodJoin
                 INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
                 INNER JOIN tblStudent st ON sc.StudentID = st.ID
@@ -217,7 +227,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     p.SortOrder as PeriodNumber,
                     CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
                     CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
-                    r.Code AS Room
+                    r.Code AS Room,
+                    $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 $periodJoin
@@ -236,7 +247,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     p.SortOrder as PeriodNumber,
                     CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
                     CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
-                    r.Code AS Room
+                    r.Code AS Room,
+                    $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblBlockItem b on s.ID = b.SubjectID
                 INNER JOIN tblTeacher t on b.TeacherID = t.ID
@@ -287,10 +299,10 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                             'code'           => $timetabledClass['ClassCode'],
 //                            'campus'         => $timetabledClass['ClassCampus'],
                             'room'           => $timetabledClass['Room'],
-//                            'staffID'        => $timetabledClass['StaffID'],
-//                            'staffFirstname' => $timetabledClass['StaffPreferredName'],
-//                            'staffSurname'   => $timetabledClass['StaffSurname'],
-//                            'staffTitle'     => $timetabledClass['StaffTitle'],
+                            'staffID'        => $timetabledClass['StaffID'],
+                            'staffFirstname' => $timetabledClass['StaffPreferredName'],
+                            'staffSurname'   => $timetabledClass['StaffSurname'],
+                            'staffTitle'     => $timetabledClass['StaffTitle'],
                         );
                         break;
                     }
@@ -330,6 +342,12 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             LEFT  JOIN tblPeriodTimesByDay pd ON a.PeriodID = pd.PeriodID AND a.DayID = pd.DayID
             LEFT  JOIN tblRoom r ON a.RoomID = r.ID
         ';
+        $teacherSelect = "
+            t.Code          AS StaffID,
+            t.FamilyName    AS StaffPreferredName,
+            t.PreferredName AS StaffSurname,
+            ''              AS StaffTitle
+        ";
 
         $db = $this->loadAPlusDatabase();
         $quotedId = $db->smartQuote($externalUserId);
@@ -342,9 +360,11 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     s.Name AS ClassName,
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
-                    r.Code AS Room
+                    r.Code AS Room,
+                    $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
+                LEFT JOIN tblTeacher t on a.TeacherID = t.ID
                 $periodJoin
                 INNER JOIN tblStudent st on a.FormID = st.FormID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
@@ -358,10 +378,12 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     s.Name AS ClassName,
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
-                    r.Code AS Room
+                    r.Code AS Room,
+                    $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblBlockItem b on s.ID = b.SubjectID
                 INNER JOIN tblAllocation a ON b.BlockID = a.BlockID
+                LEFT JOIN tblTeacher t on a.TeacherID = t.ID
                 $periodJoin
                 INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
                 INNER JOIN tblStudent st ON sc.StudentID = st.ID
@@ -379,7 +401,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     s.Name AS ClassName,
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
-                    r.Code AS Room
+                    r.Code AS Room,
+                    $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 $periodJoin
@@ -395,7 +418,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     s.Name AS ClassName,
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
-                    r.Code AS Room
+                    r.Code AS Room,
+                    $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblBlockItem b on s.ID = b.SubjectID
                 INNER JOIN tblTeacher t on b.TeacherID = t.ID
@@ -433,10 +457,10 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                             'code'           => $timetabledClass['ClassCode'],
 //                            'campus'         => $timetabledClass['ClassCampus'],
                             'room'           => $timetabledClass['Room'],
-//                            'staffID'        => $timetabledClass['StaffID'],
-//                            'staffFirstname' => $timetabledClass['StaffPreferredName'],
-//                            'staffSurname'   => $timetabledClass['StaffSurname'],
-//                            'staffTitle'     => $timetabledClass['StaffTitle'],
+                            'staffID'        => $timetabledClass['StaffID'],
+                            'staffFirstname' => $timetabledClass['StaffPreferredName'],
+                            'staffSurname'   => $timetabledClass['StaffSurname'],
+                            'staffTitle'     => $timetabledClass['StaffTitle'],
                         );
                         break;
                     }
