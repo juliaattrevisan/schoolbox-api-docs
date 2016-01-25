@@ -75,9 +75,11 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             'dayCount'    => $dayCount,
         ];
         foreach ($periods as $period) {
+            $startTime = new Alaress_Date_Format($period['StartTime'], 'H:i:s+');
+            $endTime   = new Alaress_Date_Format($period['EndTime'], 'H:i:s+');
             $definition['desc'][]     = $period['Name'];
-            $definition['start'][]    = $period['StartTime'];
-            $definition['end'][]      = $period['EndTime'];
+            $definition['start'][]    = $startTime->getUsingFormat('H:i');
+            $definition['end'][]      = $endTime->getUsingFormat('H:i');
             $definition['number'][]   = intval($period['SortOrder']);
             $definition['sequence'][] = 1;
         }
@@ -267,8 +269,19 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     $classCode = $timetabledClass['ClassCode'];
                     if (!isset($timetable[$x]['class'][$classCode])) {
                         // Period start/end isn't always the same as the base class period
-                        $timetable[$x]['periodStart']       = $timetabledClass['StartTime'];
-                        $timetable[$x]['periodEnd']         = $timetabledClass['EndTime'];
+                        try {
+                            $startTime = new Alaress_Date_Format($timetabledClass['StartTime'], 'H:i:s+');
+                            $timetable[$x]['periodStart'] = $startTime->getUsingFormat('H:i');
+                        } catch (Exception $e) {
+                            // noop
+                        }
+                        try {
+                            $endTime = new Alaress_Date_Format($timetabledClass['EndTime'], 'H:i:s+');
+                            $timetable[$x]['periodStart'] = $endTime->getUsingFormat('H:i');
+                        } catch (Exception $e) {
+                            // noop
+                        }
+
                         $timetable[$x]['class'][$classCode] = array(
                             'description'    => $timetabledClass['ClassName'],
                             'code'           => $timetabledClass['ClassCode'],
@@ -305,9 +318,6 @@ class External_Humanedge_Timetable implements External_TimetableInterface
      */
     public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
-        // Statement 1: core subjects
-        // Statement 2: electives
-
         try {
             $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
         } catch (\Schoolbox\Mapper\Exception $e) {
