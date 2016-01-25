@@ -10,17 +10,12 @@
  */
 class External_Humanedge_User implements External_UserInterface
 {
+    use External_Humanedge_APlusDatabaseTrait;
+
     /**
      * @var MSSQL $database
      */
     private $database;
-
-    /**
-     * A database connection for the A+ database (if required).
-     *
-     * @var MSSQL
-     */
-    private $aPlusDatabase;
 
     /**
      * Constructor
@@ -457,28 +452,5 @@ class External_Humanedge_User implements External_UserInterface
     private function getDatabase()
     {
         return $this->database;
-    }
-
-    /**
-     * Lazy-load A+ database connection
-     *
-     * @return MSSQL
-     */
-    private function loadAPlusDatabase()
-    {
-        if (!($this->aPlusDatabase instanceof MSSQL)) {
-            $this->aPlusDatabase = new MSSQL(
-                Config::get('external_humanedge_aplus_db_db'),
-                [
-                    'host'     => Config::get('external_humanedge_aplus_db_host'),
-                    'user'     => Config::get('external_humanedge_aplus_db_user'),
-                    'passwd'   => Config::get('external_humanedge_aplus_db_passwd'),
-                    'db'       => Config::get('external_humanedge_aplus_db_db'),
-                    'encoding' => Config::get('external_db_encoding'),
-                ],
-                true
-            );
-        }
-        return $this->aPlusDatabase;
     }
 }
