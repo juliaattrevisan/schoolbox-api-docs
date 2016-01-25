@@ -230,8 +230,6 @@ class External_Humanedge_Timetable implements External_TimetableInterface
         $timetable = [];
         foreach ($timetabledef['desc'] as $x => $name) {
             $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
-            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
-            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
             $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
             $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
             $timetable[$x]['class']          = [];
@@ -241,6 +239,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 if ($timetabledClass['PeriodNumber'] == $timetablePeriod['periodNumber']) {
                     $classCode = $timetabledClass['ClassCode'];
                     if (!isset($timetable[$x]['class'][$classCode])) {
+                        $timetable[$x]['periodStart']       = $timetabledClass['StartTime'];
+                        $timetable[$x]['periodEnd']         = $timetabledClass['EndTime'];
                         $timetable[$x]['class'][$classCode] = array(
                             'description'    => $timetabledClass['ClassName'],
                             'code'           => $timetabledClass['ClassCode'],
