@@ -193,6 +193,42 @@ class External_Humanedge_Timetable implements External_TimetableInterface
 
                 ORDER BY DayNumber ASC, PeriodNumber ASC
             ";
+        } elseif ($user->getRole()->isStaff()) {
+            // Statement 1: core subjects
+            // Statement 2: electives
+            $query = "
+                SELECT
+                    s.Code + ISNULL(b.Suffix, '') AS ClassCode,
+                    s.Name AS ClassName,
+                    d.SortOrder as DayNumber,
+                    p.SortOrder as PeriodNumber,
+                    r.Code AS Room
+                FROM tblSubject s
+                INNER JOIN tblAllocation a on s.ID = a.SubjectID
+                $periodJoin
+                INNER JOIN tblTeacher t on a.TeacherID = t.ID
+                LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
+                WHERE t.deleted = 0
+                AND t.code = $quotedId
+
+                UNION ALL
+
+                SELECT
+                    s.Code + ISNULL(b.Suffix, '') AS ClassCode,
+                    s.Name AS ClassName,
+                    d.SortOrder as DayNumber,
+                    p.SortOrder as PeriodNumber,
+                    r.Code AS Room
+                FROM tblSubject s
+                INNER JOIN tblBlockItem b on s.ID = b.SubjectID
+                INNER JOIN tblTeacher t on b.TeacherID = t.ID
+                INNER JOIN tblAllocation a ON b.BlockID = a.BlockID
+                $periodJoin
+                WHERE t.deleted = 0
+                AND t.code = $quotedId
+
+                ORDER BY DayNumber ASC, PeriodNumber ASC
+            ";
         } else {
             return [];
         }
