@@ -20,8 +20,6 @@
                                     <a href="/search/user/{WIKI_AUTHOR_ID}" title="View Profile">{WIKI_AUTHOR}</a>
                                     {WIKI_MODIFIED}
                                 </p>
-                                <!-- BEGIN compact_hide -->
-                                <!-- END compact_hide -->
                             </div>
                         </div>
                         <nav>
@@ -29,6 +27,11 @@
                             <a class="icon-modify" href="/wiki/modify/{WIKI_ID}" title="Modify Wiki"></a>
                             <!-- END modify_wiki -->
                         </nav>
+                        <!-- BEGIN compact_hide -->
+                        <article>
+                            {WIKI_BODY}
+                        </article>
+                        <!-- END compact_hide -->
                     </li>
                     <!-- END wiki_row -->
                 </ul>
