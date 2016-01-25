@@ -144,7 +144,12 @@ class External_Humanedge_Timetable implements External_TimetableInterface
      */
     public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
     {
-        // TODO: Implement getTimetableForDate() method.
+        return $this->getDayTimetable(
+            $externalUserId,
+            $userId,
+            $campus,
+            $this->getDayNumber($campus, $date->getUnixTimeStamp())
+        );
     }
 
     /**
