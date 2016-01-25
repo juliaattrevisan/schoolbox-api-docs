@@ -75,15 +75,10 @@
                             <!-- END has_image -->
 
                             <!-- BEGIN no_image -->
-                            <div class="small info card" data-content-row="{LIST_ITEM_ID}">
+                            <div class="compact info card" data-content-row="{LIST_ITEM_ID}">
                                 <h3>{LIST_ITEM_TITLE}</h3>
                             </div>
                             <!-- END no_image -->
-                            <article>
-                                <p>
-                                    {LIST_ITEM_CONTENT}
-                                </p>
-                            </article>
 
                             <!-- BEGIN has_modify_form -->
                             <div class="content hide" data-create-panel="{LIST_ITEM_ID}">
@@ -126,6 +121,9 @@
                             <a class='icon-modify' title="Edit item" data-list-item-id="{LIST_ITEM_ID}" ></a>
                             <!-- END has_modify_button -->
                         </nav>
+                        <article>
+                            {LIST_ITEM_CONTENT}
+                        </article>
                     </li>
                     <!-- END list_item -->
                 </ul>
