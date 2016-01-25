@@ -59,7 +59,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             $definition['desc'][]     = $period['Name'];
             $definition['start'][]    = $period['StartTime'];
             $definition['end'][]      = $period['EndTime'];
-            $definition['number'][]   = intval($period['Number']);
+            $definition['number'][]   = intval($period['SortOrder']);
             $definition['sequence'][] = 1;
         }
         return $definition;
