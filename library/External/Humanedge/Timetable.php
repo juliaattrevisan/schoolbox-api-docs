@@ -78,7 +78,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
      */
     function getDayName($dayNumber)
     {
-        // TODO: Implement getDayName() method.
+        $db = $this->loadAPlusDatabase();
+        return $db->getOne("SELECT [Name] FROM tblDay WHERE SortOrder = {$db->smartQuote($dayNumber)} AND deleted = 0");
     }
 
     /**
