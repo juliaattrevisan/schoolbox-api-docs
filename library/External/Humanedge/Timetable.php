@@ -10,43 +10,59 @@
  */
 class External_Humanedge_Timetable implements External_TimetableInterface
 {
+    use External_Humanedge_APlusDatabaseTrait;
+
     /**
      * @var MSSQL $database
      */
     private $database;
 
 //    /**
-//     * @var External_UserInterface
+//     * Constructor
 //     */
-//    private $externalUser;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->setDatabase(
-            new MSSQL(
-                Config::get('external_humanedge_aplus_db_db'),
-                [
-                    'host'     => Config::get('external_humanedge_aplus_db_host'),
-                    'user'     => Config::get('external_humanedge_aplus_db_user'),
-                    'passwd'   => Config::get('external_humanedge_aplus_db_passwd'),
-                    'db'       => Config::get('external_humanedge_aplus_db_db'),
-                    'encoding' => Config::get('external_db_encoding'),
-                ],
-                true
-            )
-        );
-//        $this->externalUser = new External_User('humanedge');
-    }
+//    public function __construct()
+//    {
+//        $this->setDatabase(
+//            new MSSQL(
+//                Config::get('external_humanedge_aplus_db_db'),
+//                [
+//                    'host'     => Config::get('external_humanedge_aplus_db_host'),
+//                    'user'     => Config::get('external_humanedge_aplus_db_user'),
+//                    'passwd'   => Config::get('external_humanedge_aplus_db_passwd'),
+//                    'db'       => Config::get('external_humanedge_aplus_db_db'),
+//                    'encoding' => Config::get('external_db_encoding'),
+//                ],
+//                true
+//            )
+//        );
+////        $this->externalUser = new External_User('humanedge');
+//    }
 
     /**
      * @inheritDoc
      */
     public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
     {
-        // TODO: Implement getTimetableDefinition() method.
+        $db         = $this->loadAPlusDatabase();
+        $dayCount   = $db->getOne("SELECT COUNT(*) FROM tblDay WHERE deleted = 0");
+        $periods    = $db->getAll("SELECT * FROM tblPeriod WHERE deleted = 0 ORDER BY SortOrder ASC");
+        $definition = [
+            'desc'        => [],
+            'start'       => [],
+            'end'         => [],
+            'number'      => [],
+            'sequence'    => [],
+            'periodCount' => count($periods),
+            'dayCount'    => $dayCount,
+        ];
+        foreach ($periods as $period) {
+            $definition['desc'][]     = $period['Name'];
+            $definition['start'][]    = $period['StartTime'];
+            $definition['end'][]      = $period['EndTime'];
+            $definition['number'][]   = intval($period['Number']);
+            $definition['sequence'][] = 1;
+        }
+        return $definition;
     }
 
     /**
