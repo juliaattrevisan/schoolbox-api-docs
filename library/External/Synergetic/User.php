@@ -924,9 +924,50 @@ class External_Synergetic_User implements External_UserInterface
             $scWhere = "AND StaffCategory NOT IN ($staffCategoryString)";
         }
 
+        // Check if the custom staff position table exists, and if so use this to override position titles [SB-10813]
 
-        $query = "
-            SELECT
+        $statement = $this->getDatabase()->query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'uStaffPosition'");
+
+        if ($this->getDatabase()->countRows($statement) > 0) {
+
+            // If the custom table exists, override the 'JobPositionDescription' field
+
+            $query = "
+                SELECT
+                    vStaff.StaffID,
+                    vStaff.SchoolStaffCode,
+                    vStaff.StaffTitle,
+                    vStaff.StaffPreferredName,
+                    vStaff.StaffSurname,
+                    vStaff.StaffOccupPhone,
+                    vStaff.StaffOccupEmail,
+                    vStaff.StaffExtension,
+                    vStaff.StaffCampusDescription,
+                    vStaff.StaffCategory,
+                    vStaff.StaffCategoryType,
+                    vStaff.StaffDefaultMobilePhone,
+                    vStaff.StaffVoiceMail,
+                    StaffDepartmentDescription,
+                    uStaffPosition.JobTitle AS JobPositionDescription,
+                    JobPositions.StaffJobPositionStartDate,
+                    JobPositions.StaffJobPositionEndDate
+                FROM SynergyOne.dbo.vStaff vStaff
+                LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
+                LEFT JOIN SynergyOne.dbo.uStaffPosition ON vStaff.StaffID = uStaffPosition.StaffID
+                WHERE vStaff.ActiveFlag = 1
+                AND StaffCategoryDescription != 'Staff on leave'
+                $scWhere
+                AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
+                OR    JobPositions.StaffJobPositionStartDate IS NULL )
+                AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
+                OR    JobPositions.StaffJobPositionEndDate IS NULL )
+                ORDER BY vStaff.StaffSurname
+            ";
+
+        } else {
+
+            $query = "
+                SELECT
                 vStaff.StaffID,
                 vStaff.SchoolStaffCode,
                 vStaff.StaffTitle,
@@ -955,6 +996,7 @@ class External_Synergetic_User implements External_UserInterface
             OR    JobPositions.StaffJobPositionEndDate IS NULL )
             ORDER BY vStaff.StaffSurname
         ";
+        }
 
         return $this->getDatabase()->getAll($query);
     }

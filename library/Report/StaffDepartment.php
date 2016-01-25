@@ -103,13 +103,13 @@ class Report_StaffDepartment extends Report_Abstract
             foreach ($allStaff as $key => $currentStaff) {
                 $description = trim(Scrub::text($currentStaff['StaffDepartmentDescription']));
 
-                // Push unknown departments to the bottom of the sort order
+                // Remove staff with unknown departments
 
                 if ($description == '' || strtolower($description) == 'not selected') {
-                    $description = 'zzzz';
+                    unset($allStaff[$key]);
+                } else {
+                    $allStaff[$key]['StaffDepartmentDescription'] = $description;
                 }
-
-                $allStaff[$key]['StaffDepartmentDescription'] = $description;
             }
 
             $sort = array();
@@ -135,12 +135,6 @@ class Report_StaffDepartment extends Report_Abstract
                         $this->getPage()->setVar('staff_block', '');
                     }
                     $previousDepartment = $currentStaff['StaffDepartmentDescription'];
-                }
-
-                // Fix up the name on unknown departments
-
-                if ($currentStaff['StaffDepartmentDescription'] == 'zzzz') {
-                    $currentStaff['StaffDepartmentDescription'] = 'Other Departments';
                 }
 
                 $extensionText = Scrub::text($currentStaff['StaffExtension']) == '' ? '' : '(x' . Scrub::text($currentStaff['StaffExtension']) . ')';
