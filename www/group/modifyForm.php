@@ -42,7 +42,7 @@ if($groupHandler->getPermission($categoryId) < FULL_ACCESS) {
 
 // Handle disbandment before anything else
 if (isset($_GET['disband'])) {
-	$groupHandler->disbandGroup($_GET['categoryID']);
+	$groupHandler->disbandGroup($categoryId);
 	SitePage::localRedir('/');
 }
 
@@ -257,8 +257,8 @@ if(isset($_POST['bulkAdd'])) {
 // Once all else is done
 // re-check permissions, redirect user changing ownership to homepage if they have lost ownership
 $groupHandler->clearPermissionsCache();
-if ($groupHandler->getPermission($_GET['categoryID']) < FULL_ACCESS) {
-	SitePage::localRedir("/homepage/" . $_GET['categoryID']);
+if ($groupHandler->getPermission($categoryId) < FULL_ACCESS) {
+	SitePage::localRedir("/homepage/" . $categoryId);
 } else {
 	SitePage::localRedir('/group/modify/' . $categoryId);
 }
