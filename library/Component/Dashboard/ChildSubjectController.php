@@ -49,12 +49,6 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             $userChild = $userMapper->findById($child['id']);
 
-            if ($userChild->getHideTimetable()) {
-                $this->setVar('timetable_block', '');
-            } else {
-                $this->parse('timetable_block', 'timetable');
-            }
-
             if ( !( Cfg::get('site_location') == 'wenona' && $child['gid'] == 3 ) ) {
                 $i++;
                 $query = "SELECT title, firstname, lastname, year, synergy_id FROM user WHERE id = {$child['id']}";
@@ -92,7 +86,11 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                     $this->parse('grades_button_block', 'grades_button');
                 }
 
-
+                if ($userChild->getHideTimetable()) {
+                    $this->setVar('timetable_block', '');
+                } else {
+                    $this->parse('timetable_block', 'timetable');
+                }
 
 				/* ePortfolio link
 				 */
