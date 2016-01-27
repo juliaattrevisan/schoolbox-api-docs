@@ -45,7 +45,7 @@ class Sync implements SyncInterface
         $query = "
             SELECT
                 s.stud_code      AS student_id,
-                ''               AS network_login,
+                s.alt_id         AS network_login,
                 ''               AS student_title,
                 s.preferred_name AS student_preferred,
                 s.surname        AS student_surname,
@@ -54,8 +54,10 @@ class Sync implements SyncInterface
                 ''               AS student_occup_email,
                 s.year_grp       AS student_year_level,
                 s.house          AS student_house,
-                (IF ((sb.resid_code IS NOT NULL), 'Y', 'N'))
-                                 AS student_boarder,
+                CASE
+                    WHEN (sb.resid_code) IS NOT NULL THEN 'Y'
+                    ELSE 'N'
+                END              AS student_boarder,
                 sb.resid_code    AS student_boarding_house,
                 s.campus_code    AS student_campus
             FROM student AS s
