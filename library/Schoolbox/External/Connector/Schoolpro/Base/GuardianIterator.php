@@ -47,6 +47,24 @@ class GuardianIterator extends IteratorIterator
         $email->setAddress($currentResult['email']);
         $guardian->addEmail($email);
 
+        /* Find assorted children
+         *
+         * For some reason I can't run a stored procedure while
+         * I am currently iterating the resultset of a previous
+         * stored procedure, like this scenario
+         *
+         * Calls to getEnrolledStudents() returns false while iterating
+         * the resultset of another stored proc
+         *
+         * Orvad 6067 has one child
+         *
+         * This forces you to have Skip Parents With No Enrolled Children
+         * custom hydrator to be off
+         *
+        $userHandler = new \External_User();
+        $children    = $userHandler->getParent((int)$currentResult['ID']);
+         */
+
         return $guardian;
     }
 }
