@@ -91,7 +91,13 @@ class Ruleset implements Hydrator\HydratorInterface
         // Now: the grammar class is embedded at construct time.
         $this->grammar->hydrate($input, $previous);
         foreach ($this->getCustomRules() as $rule) {
-            $previous = $rule->getHydrator()->hydrate($input, $previous);
+
+            /* Only execute Custom Rules that have been switched on
+             * Otherwise ignore them
+             */
+            if ($rule->getEnabled()) {
+                $previous = $rule->getHydrator()->hydrate($input, $previous);
+            }
         }
         return $previous;
     }
