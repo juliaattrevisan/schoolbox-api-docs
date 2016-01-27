@@ -50,7 +50,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
             if ($row = $this->getDatabase()->getNextArray()) {
                 $overrideDay = trim(substr($row["CalendarType"], 3));
-                if (!empty($overrideDay)) {
+                if (!empty($overrideDay) && is_numeric($overrideDay)) {
 
                     // Yep, found overriding day number. Use this instead
 
