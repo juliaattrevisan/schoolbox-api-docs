@@ -44,7 +44,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      *
      * @return array|bool
      */
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
         $this->setCycleLength($campus->getTimetableDay());
         $vars = array(

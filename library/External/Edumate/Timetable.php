@@ -23,7 +23,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
 
         $definition = array();

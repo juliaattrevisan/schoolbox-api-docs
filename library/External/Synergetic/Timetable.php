@@ -40,8 +40,24 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $this->campusMapper = new \Schoolbox\CampusMapper();
     }
 
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
+        // check if there is a calendar event remapping the day number for this specific date
+
+        if ($date != null)
+        {
+            $this->getDatabase()->query("SELECT CalendarType FROM CalendarEvents WHERE CalendarDate = '{$date}' AND CalendarType LIKE 'D=D%'");
+
+            if ($row = $this->getDatabase()->getNextArray()) {
+                $overrideDay = trim(substr($row["CalendarType"], 3));
+                if (!empty($overrideDay)) {
+
+                    // Yep, found overriding day number. Use this instead
+
+                    $day = $overrideDay;
+                }
+            }
+        }
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));

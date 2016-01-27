@@ -9,7 +9,7 @@
 
 class External_Offline_Timetable implements External_TimetableInterface
 {
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
         // Noop
     }

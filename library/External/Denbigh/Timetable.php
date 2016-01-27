@@ -35,7 +35,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         $this->setGroup(new Group);
     }
 
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
         $statement = $this->getInternalDatabase()->prepare(
             "

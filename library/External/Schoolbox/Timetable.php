@@ -16,7 +16,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $this->setdatabase(Database::getInstance());
     }
 
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
         $statement = $this->getDatabase()->prepare(
             "

@@ -42,7 +42,7 @@ class External_Denbigh2_Timetable implements External_TimetableInterface {
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
         $maxPeriodsPerDay = 6;
         $maxDays = $campus->getTimetableDay();

@@ -38,7 +38,7 @@ class External_Timetable implements External_TimetableInterface
      * @param Integer $day
      * @return Array
      */
-    function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
+    function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
