@@ -80,7 +80,21 @@ class TimetableNotifier extends WorkNotifier {
     public function processStart($campus)
     {
         if ($name = $this->process($campus, TimetableTrigger::TARGET_START)) {
-            return $this->sendAlert($campus, "$name is now beginning");
+            return $this->sendAlert($campus, "Start of {$name}");
+        }
+        return 0;
+    }
+
+    /**
+     * This method is executed by a worker
+     *
+     * @param Campus $campus
+     * @return int the number of actions taken
+     */
+    public function processWarn($campus)
+    {
+        if ($name = $this->process($campus, TimetableTrigger::TARGET_WARN)) {
+            return $this->sendAlert($campus, "{$name} starts in 5 minutes");
         }
         return 0;
     }
@@ -94,10 +108,18 @@ class TimetableNotifier extends WorkNotifier {
      */
     public function processEnd($campus)
     {
+        // According to the brief in [SB-7500] they don't want period end notifications.
+        // They want "Start of Period X", and not "Period Y has now completed", so just bombing out here to suppress
+        // the alert. Leaving this here in case they change their mind.
+
+        return 0;
+
+        /*
         if ($name = $this->process($campus, TimetableTrigger::TARGET_END)) {
             return $this->sendAlert($campus, "$name has now completed");
         }
         return 0;
+        */
     }
 
 
@@ -127,33 +149,60 @@ class TimetableNotifier extends WorkNotifier {
             $inPast   = $stamp > $end;
 
             if ($inPast) {
-//                $this->log()->debug($defn['desc'][$i] . " is in the past, continuing");
+                // $this->log()->debug($defn['desc'][$i] . " is in the past, continuing");
                 continue;
             }
 
             if ($target == TimetableTrigger::TARGET_END) {
                 // if we're inside this period (excepting margin for error)
                 if ($inside) {
-                    // only return classes, don't tell us about breaks
+                    // Apparently they care about breaks now, this should probably be an option in the config
+                    // (although the whole module should be a config option).
+
+                    return $defn['desc'][$i];
+
+                    /*// only return classes, don't tell us about breaks
                     if ($defn['sequence'][$i] < 2) {
                         $this->log()->info("Alerting $target of ".$defn['desc'][$i]);
                         return $defn['desc'][$i];
                     } else {
                         $this->log()->debug("Suppressed alert of $target of ".$defn['desc'][$i]);
                         return '';
-                    }
+                    }*/
                 }
             } elseif ($target == TimetableTrigger::TARGET_START) {
                 // if we're within the MOE window ahead of the start of this period
                 if ($inFuture) {
-                    // only return classes, don't tell us about breaks
+                    // Apparently they care about breaks now, this should probably be an option in the config
+                    // (although the whole module should be a config option).
+
+                    return $defn['desc'][$i];
+
+                    /*// only return classes, don't tell us about breaks
                     if ($defn['sequence'][$i] < 2) {
                         $this->log()->info("Alerting $target of ".$defn['desc'][$i]);
                         return $defn['desc'][$i];
                     } else {
                         $this->log()->debug("Suppressed alert of $target of ".$defn['desc'][$i]);
                         return '';
-                    }
+                    }*/
+                }
+            } elseif ($target == TimetableTrigger::TARGET_WARN) {
+                // if we're within the warning period
+                if ($inFuture) {
+                    // Apparently they care about breaks now, this should probably be an option in the config
+                    // (although the whole module should be a config option).
+
+                    return $defn['desc'][$i];
+
+                    /*// only return classes, don't tell us about breaks
+                    if ($defn['sequence'][$i] < 2) {
+                        $this->log()->info("Alerting $target of ".$defn['desc'][$i]);
+                        return $defn['desc'][$i];
+                    } else {
+                        $this->log()->debug("Suppressed alert of $target of ".$defn['desc'][$i]);
+                        return '';
+                    }*/
                 }
             }
         }
@@ -195,7 +244,7 @@ class TimetableNotifier extends WorkNotifier {
                     ->setTitle($body)
                     ->setTopics(array("notify.campus.$campusId"))
                     ->putMeta('title', $title ?: 'Timetable')
-                    ->setIcon($icon ?: "/images/icon.php?icon=clock&size={$this->iconSize}");
+                    ->setIcon($icon ?: "/images/icon.php?icon=clock&size=64"); // {$this->iconSize}
 
         $json = $bob->build()->jsonSerialize();
 

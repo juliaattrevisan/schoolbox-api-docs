@@ -66,7 +66,6 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
         // TODO: for now, this is just hardcoded to Senior for MGGS: the scheduler will accept any Collection of Campuses to schedule
         $campusList = \Schoolbox\CampusMapper::getInstance()->findByColumn('ext_timetable_code', 'SEN');
-
         new TimetableScheduler($loop, new DefaultDispatchStrategy($opts['flags']), $client, $log, $campusList, $conf, $clock);
     }
     catch(AMQPRuntimeException $e) {

@@ -21,8 +21,8 @@ use Schoolbox\Realtime\WorkNotifier;
 
 abstract class TimetableTrigger extends AbstractTrigger
 {
-//    const START_WARNING_WINDOW = 300; // 5 minutes
-    const START_WARNING_WINDOW = 0;
+    const START_WARNING_WINDOW = 300; // 5 minutes
+    const TARGET_WARN = 'warn';
     const TARGET_START = 'start';
     const TARGET_END   = 'end';
 
@@ -72,31 +72,60 @@ abstract class TimetableTrigger extends AbstractTrigger
         $definition = $this->getTimetableDefinition($timestamp);
         $len  = count($definition['number']);
 
-        // before the day starts
+        // Before the day starts
+
         if (strtotime($definition['start'][0], $timestamp) > $timestamp) {
             return $this->beforeSchool($definition, $timestamp);
         }
 
-        // hunt down the next start or end time, accounting for being *between* classes
+        // Give a separate warning message 5 minutes before the start next period
+
+        for ($i = 1; $i < $len; ++$i) {
+            $start = strtotime($definition['start'][$i], $timestamp);
+
+            if ($x = $this->testPeriod($start, $end, $timestamp)) {
+                $warning_time = $x;
+                break;
+            }
+        }
+
+        // Hunt down the next start or end time, accounting for being *between* classes
+
         for ($i = 1; $i < $len; ++$i) {
             $start = strtotime($definition['start'][$i], $timestamp);
             $end   = strtotime($definition['end'][$i], $timestamp);
 
             if ($x = $this->testPeriod($start, $end, $timestamp)) {
-                return $x;
+                $start_end_time = $x;
+                break;
             }
-
-            // we're off the end of this period? NEEEXT!
         }
 
-        // You're off the edge of the map here, matey. Here there be monsters.
+        // Work out of we should return the the period start/end time or the 5 minute warning time (whichever is earlier)
+        // This could probably be truncated somehow
+
+        if (isset($start_end_time ) && isset($warning_time)) {
+            if ($warning_time < $start_end_time ) {
+                return $warning_time;
+            } else {
+                return $start_end_time;
+            }
+        } else if (isset($start_end_time )) {
+            return $start_end_time ;
+        } else if (isset($warning_time)) {
+            return $warning_time;
+        }
+
+        // You're off the edge of the map here, matey. Here there be monsters. Are they big scary monsters, or more
+        // Monsters Inc. style monsters?
+
         if (!$lookAhead) {
             return PHP_INT_MAX;
         }
 
-        // try again with the new time, but do not attempt to look ahead next time
-        return $this->getTimetable($this->nextValidTimestamp($timestamp), false);
+        // Try again with the new time, but do not attempt to look ahead next time
 
+        return $this->getTimetable($this->nextValidTimestamp($timestamp), false);
     }
 
 

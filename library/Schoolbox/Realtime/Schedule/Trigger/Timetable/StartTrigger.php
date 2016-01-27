@@ -43,7 +43,7 @@ class StartTrigger extends TimetableTrigger {
      */
     protected function beforeSchool($definition, $timestamp)
     {
-        return strtotime($definition['start'][0], $timestamp) - self::START_WARNING_WINDOW;
+        return strtotime($definition['start'][0], $timestamp);
     }
 
 
@@ -56,8 +56,8 @@ class StartTrigger extends TimetableTrigger {
     protected function testPeriod($start, $end, $timestamp)
     {
         // if we're not yet inside this period, return its start time
-        if ($timestamp <= $start - self::START_WARNING_WINDOW) {
-            return $start - self::START_WARNING_WINDOW;
+        if ($timestamp <= $start) {
+            return $start;
         }
 
         return 0;
