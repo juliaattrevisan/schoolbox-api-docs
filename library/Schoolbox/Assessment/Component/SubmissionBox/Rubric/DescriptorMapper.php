@@ -169,7 +169,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
                 // Add this to the list of exceptions somewhere but don't do anything.
             }
         }
-        return $this->save($toList);
+        return $this->create($toList);
     }
 
 }
