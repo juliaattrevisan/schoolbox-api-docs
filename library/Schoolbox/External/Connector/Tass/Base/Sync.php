@@ -156,9 +156,9 @@ class Sync implements SyncInterface
     public function findAllStaff()
     {
         $query = "
-            SELECT
+            SELECT DISTINCT
                 te.tch_code         AS staff_id,
-                ''                  AS network_login,
+                p.username          AS network_login,
                 CASE
                     WHEN (t.term_date) IS NULL THEN 0
                     ELSE 1
@@ -176,7 +176,8 @@ class Sync implements SyncInterface
             FROM tel_vw_telemf AS t
             LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
             LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
-            WHERE t.cmpy_code = {$this->database->smartQuote($this->companyCode)}
+            LEFT JOIN portalusers AS p ON prodcode='TIA' AND te.cmpy_code = p.cmpy_code AND (te.emp_code = p.portal_code OR te.tch_code = p.portal_code)
+            WHERE te.cmpy_code = {$this->database->smartQuote($this->companyCode)}
         ";
         return new Iterator\Staff(
             $this->database->getIterator($query)->addMap([$this->database, 'trimRow'])
