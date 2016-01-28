@@ -143,6 +143,7 @@ class Healthcheck
         $list[] = 'parent';
         $list[] = 'pia_sfaccess';
         $list[] = 'tchdept';
+        $list[] = 'portalusers';
         sort($list);
 
         foreach ($list as $table) {
