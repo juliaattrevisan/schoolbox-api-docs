@@ -83,8 +83,9 @@ class MSSQL {
     /**
      * @param bool $db
      * @param bool $optionalConfig
+     * @param bool $newConnection Enforces a new connection, even if already connected with these credentials.
      */
-    function MSSQL($db = false, $optionalConfig = false) {
+    function MSSQL($db = false, $optionalConfig = false, $newConnection = false) {
 
 		/* Blasphemy (heresy unavoidable)
 		 * Hijack these settings for alternative config
@@ -95,7 +96,7 @@ class MSSQL {
 			$this->passwd = $optionalConfig['passwd'];
 			$this->db = $optionalConfig['db'];
 
-			$this->connect();
+			$this->connect($newConnection);
 			$encoding = $optionalConfig['encoding'];
 		}
 		else {
@@ -106,7 +107,7 @@ class MSSQL {
 			$this->db = $db?$db:Cfg::get('external_db_db');
 
 			if(Cfg::get('external_enable') == 1) {
-				$this->connect();
+				$this->connect($newConnection);
 			}
 			$encoding = Cfg::get('external_db_encoding');
 		}
@@ -130,15 +131,18 @@ class MSSQL {
 
     /**
      * Connect to database
+     *
+     * @param bool $newConnection Enforces a new connection, even if already connected with these credentials.
+     *
      * @throws Schoolbox\External\Exception
      */
-    function connect() {
+    function connect($newConnection = false) {
 		if (!isset($this->dbf)) {
 			// mssql.charset not already set? set it to UTF-8 here.
 			if (strlen(ini_get('mssql.charset')) === 0) {
 				ini_set('mssql.charset', 'UTF-8');
 			}
-			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd);
+			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd, $newConnection);
 		}
 
 		if ($this->dbf == false) {
