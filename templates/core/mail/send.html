@@ -9,7 +9,9 @@
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript">
 $(function() {
-    $.fn.alaressEditor();
+    $.fn.alaressEditor({
+        targetElements: $('#body')
+    });
 
     var options = {
         ajax: {
