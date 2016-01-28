@@ -83,8 +83,12 @@
                 resourceColumns: [{
                     labelText: 'Resource',
                     render: function(resource, el) {
+                        var name = resource.name;
+                        if (resource.room_code) {
+                            name = name + ' [' + resource.room_code + ']';
+                        }
                         var href = $('<a />').attr('href', '/resource-booking/item/'+resource.id);
-                        el.find('.fc-cell-text').empty().append(href.text(resource.name));
+                        el.find('.fc-cell-text').empty().append(href.text(name));
                     }
                 }],
                 resources: {{ resources|json_encode|raw }},

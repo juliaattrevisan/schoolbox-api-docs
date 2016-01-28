@@ -1,4 +1,5 @@
 <?php
+
 use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
 use Calendar\Event\Collection;
@@ -23,9 +24,12 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     protected $externalTimetable = null;
 
     /**
-     * The code or codes for the room to show events for.
+     * A map of codes to resource IDs for the room to show events for.
      *
-     * @var array|string
+     * * key:   the room code
+     * * value: the resource ID
+     *
+     * @var array
      */
     protected $roomCodes;
 
@@ -33,12 +37,14 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      * Constructor
      *
      * @param \Schoolbox\User $user
-     * @param $config
+     * @param array           $config
+     * @param array           $roomCodes
      */
-    public function __construct(\Schoolbox\User $user, $config)
+    public function __construct(\Schoolbox\User $user, $config, $roomCodes = [])
     {
         $this->setUser($user);
         $this->externalTimetable = new External_Timetable();
+        $this->roomCodes         = $roomCodes;
     }
 
     /**
@@ -52,7 +58,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
     {
         $stack = new Collection();
 
-        $roomTimetable = $this->externalTimetable->getRoomTimetable($this->roomCodes);
+        $roomTimetable = $this->externalTimetable->getRoomTimetable(array_keys($this->roomCodes));
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
@@ -126,6 +132,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $event->setPublishDate(null);
                 $event->setTitle($room['Description']);
                 $event->setCampusList($campusId);
+                $event->setResourceId($this->roomCodes[$room['RoomCode']]);
 
                 // Load room and category if they aren't already there.
                 $userExternalId = $room['StaffID'];
