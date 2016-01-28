@@ -125,11 +125,13 @@ class External_Maze_Timetable implements External_TimetableInterface
 
                     /* Ram it in
                      */
-                    $timetableDef['desc'][] = $definition[$periodTempKey];
-                    $timetableDef['start'][] = $this->getHelper()->mazeTime($result[$i - 1]['TIME_START']);
-                    $timetableDef['end'][] = $this->getHelper()->mazeTime($result[$i - 1]['TIME_END']);
-                    $timetableDef['number'][] = $i;
-                    $timetableDef['sequence'][] = $i;
+                    if ($definition[$periodTempKey]) {
+                        $timetableDef['desc'][] = $definition[$periodTempKey];
+                        $timetableDef['start'][] = $this->getHelper()->mazeTime($result[$i - 1]['TIME_START']);
+                        $timetableDef['end'][] = $this->getHelper()->mazeTime($result[$i - 1]['TIME_END']);
+                        $timetableDef['number'][] = $i;
+                        $timetableDef['sequence'][] = $i;
+                    }
                 }
             }
         }
