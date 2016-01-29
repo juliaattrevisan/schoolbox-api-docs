@@ -375,6 +375,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             }
             .content{
                 display: block;
+                overflow: hidden;
                 height:0;
                 opacity: 0;
                 @include transition(ease, 0.3s, all);
