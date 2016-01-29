@@ -119,12 +119,13 @@ class DescriptorMapper extends Schoolbox\Mapper {
     /**
      * Clones descriptors from one submission box to another.
      *
-     * @param int $from_id The ID of the submission box to copy from.
-     * @param int $to_id   The ID of the submission box to copy to.
+     * @param int  $from_id         The ID of the submission box to copy from.
+     * @param int  $to_id           The ID of the submission box to copy to.
+     * @param bool $createCriterion If true, create missing criteria
      *
      * @return int[] A list of new rubric descriptors
      */
-    public function copyFromCopiedSubmissionBox($from_id, $to_id) {
+    public function copyFromCopiedSubmissionBox($from_id, $to_id, $createCriterion = false) {
 
         // Get all descriptors and criteria for the from box
         $query = "
@@ -164,6 +165,9 @@ class DescriptorMapper extends Schoolbox\Mapper {
                 $toCriterion = $this->getJoinMapper('criterion')->findOneByColumnList($params);
             } catch (Schoolbox\Mapper\Exception $e) {
                 // Try creating a new one?
+                if (!$createCriterion) {
+                    continue;
+                }
                 $toCriterion = $this->getJoinMapper('criterion')->createModel();
                 $toCriterion
                     ->setParentId($toBox->getCategory()->getId())

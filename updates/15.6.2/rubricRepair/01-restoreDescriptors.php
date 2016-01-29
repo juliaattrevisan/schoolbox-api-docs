@@ -60,7 +60,7 @@ foreach ($taskQuery as $row) {
 
             $logger->info('Copying descriptors back from imported box to base box');
             SubmissionBox\Rubric\DescriptorMapper::getInstance()
-                ->copyFromCopiedSubmissionBox($row['importedBoxId'], $row['baseBoxId']);
+                ->copyFromCopiedSubmissionBox($row['importedBoxId'], $row['baseBoxId'], true);
 
             $logger->info('Copying usages from base box to imported box');
             SubmissionBox\Rubric\UsageMapper::getInstance()
