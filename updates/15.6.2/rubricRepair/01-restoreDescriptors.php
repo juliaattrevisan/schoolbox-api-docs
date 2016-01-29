@@ -21,7 +21,9 @@ $logger = new Alaress\Lumberjack\Logger();
 $taskQuery = $db->prepare("
     SELECT
         importedBox.id AS importedBoxId,
+        importedBox.category AS importedBoxFolderId,
         baseBox.id AS baseBoxId,
+        baseBox.category AS baseBoxFolderId,
         importedBox.created,
         COUNT(DISTINCT importedDescriptor.id) AS importedDescriptorCount,
         COUNT(DISTINCT baseDescriptor.id) AS baseDescriptorCount,
@@ -37,7 +39,7 @@ $taskQuery = $db->prepare("
     LEFT  JOIN rubric_level      baseLevel          ON baseBox.id = baseLevel.box_id
     WHERE importedBox.task_instance_id IS NOT NULL
     AND   importedBox.created >= '2016-01-01'
-    GROUP BY importedBoxId, baseBoxId, importedBox.created
+    GROUP BY importedBoxId, baseBoxId, importedBoxFolderId, baseBoxFolderId, importedBox.created
     ORDER BY importedBox.created DESC
 ");
 $taskQuery->execute();
@@ -69,10 +71,19 @@ foreach ($taskQuery as $row) {
                 'importedBoxId' => $row['importedBoxId'],
             ]);
 
+            $logger->info('Copying criteria from base folder to imported folder');
+            SubmissionBox\Rubric\CriterionMapper::getInstance()
+                ->copyFromCategory($row['baseBoxFolderId'], $row['importedBoxFolderId']);
+
+            $logger->info('Copying usages from base box to imported box');
             SubmissionBox\Rubric\UsageMapper::getInstance()
                 ->copyFromCopiedSubmissionBox($row['baseBoxId'], $row['importedBoxId']);
+
+            $logger->info('Copying descriptors from base box to imported box');
             SubmissionBox\Rubric\DescriptorMapper::getInstance()
                 ->copyFromCopiedSubmissionBox($row['baseBoxId'], $row['importedBoxId']);
+
+            $logger->info('Copying levels from base box to imported box');
             SubmissionBox\Rubric\LevelMapper::getInstance()
                 ->copyFromCopiedSubmissionBox($row['baseBoxId'], $row['importedBoxId']);
 
