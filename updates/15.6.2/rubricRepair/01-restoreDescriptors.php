@@ -71,10 +71,6 @@ foreach ($taskQuery as $row) {
                 'importedBoxId' => $row['importedBoxId'],
             ]);
 
-            $logger->info('Copying criteria from base folder to imported folder');
-            SubmissionBox\Rubric\CriterionMapper::getInstance()
-                ->copyFromCategory($row['baseBoxFolderId'], $row['importedBoxFolderId']);
-
             $logger->info('Copying usages from base box to imported box');
             SubmissionBox\Rubric\UsageMapper::getInstance()
                 ->copyFromCopiedSubmissionBox($row['baseBoxId'], $row['importedBoxId']);
