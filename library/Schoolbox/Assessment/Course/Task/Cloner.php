@@ -161,6 +161,8 @@ class Cloner
                 ->copyFromCopiedSubmissionBox($box_id, $box->getId());
             SubmissionBox\Rubric\DescriptorMapper::getInstance()
                 ->copyFromCopiedSubmissionBox($box_id, $box->getId());
+            SubmissionBox\Rubric\LevelMapper::getInstance()
+                ->copyFromCopiedSubmissionBox($box_id, $box->getId());
 
             return $box;
         }
