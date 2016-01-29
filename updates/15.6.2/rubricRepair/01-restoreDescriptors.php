@@ -72,6 +72,8 @@ $fixedLevels      = [];
 $logger->info(sprintf('%d submission boxes imported from a course in 2016', $taskQuery->rowCount()));
 foreach ($taskQuery as $row) {
     $logger->info(sprintf('Checking imported box #%d (base box #%d)...', $row['importedBoxId'], $row['baseBoxId']));
+
+    // Check descriptors
     if ($row['baseDescriptorCount'] == $row['importedDescriptorCount']) {
         $logger->info(sprintf('Base and imported box both have %d descriptors - no change required', $row['baseDescriptorCount']));
     } else {
@@ -87,11 +89,33 @@ foreach ($taskQuery as $row) {
             $logger->warning('Base box already has descriptors - no repair will be attempted!');
         }
     }
+
+    // Check levels
+    if ($row['baseLevelCount'] == $row['importedLevelCount']) {
+        $logger->info(sprintf('Base and imported box both have %d levels - no change required', $row['baseLevelCount']));
+    } else {
+        $logger->warning('Base and imported box level counts do not match - attempting repair!');
+        if ($row['importedLevelCount'] == 0) {
+            $logger->info('Imported box has no levels - copying from base box');
+            $fixLevelQuery->execute([
+                'baseBoxId'     => $row['baseBoxId'],
+                'importedBoxId' => $row['importedBoxId'],
+            ]);
+            $fixedLevels[] = $row['importedBoxId'];
+        } else {
+            $logger->warning('Imported box already has levels - no repair will be attempted!');
+        }
+    }
 }
 
 // Tell them how to undo this
 $logger->info('Cleanup completed!');
-if (!empty($fixedDescriptors)) {
+if (!empty($fixedDescriptors) || !empty($fixedLevels)) {
     $logger->info('If you need to undo, run the following query:');
-    $logger->info('DELETE FROM rubric_descriptor WHERE submission_box_id IN ('.implode(',', $fixedDescriptors).')');
+    if (!empty($fixedDescriptors)) {
+        $logger->info('DELETE FROM rubric_descriptor WHERE submission_box_id IN ('.implode(',', $fixedDescriptors).')');
+    }
+    if (!empty($fixedLevels)) {
+        $logger->info('DELETE FROM rubric_level WHERE box_id IN ('.implode(',', $fixedLevels).')');
+    }
 };
