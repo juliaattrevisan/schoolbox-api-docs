@@ -375,16 +375,16 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             }
             .content{
                 display: block;
+                max-height: 0;
+                visibility: hidden;
                 overflow: hidden;
-                height:0;
-                opacity: 0;
-                @include transition(ease, 0.3s, all);
+                @include transition(ease-out, 0.2s, max-height);
 
                 &.active {
-                    overflow-y: auto;
-                    height: auto;
-                    opacity: 1;
-                    @include transition(ease, 0.3s, all);
+                    display: block;
+                    max-height: 1000px;
+                    visibility: visible;
+                    @include transition(ease-in, 0.2s, max-height);
                 }
             }
         }
