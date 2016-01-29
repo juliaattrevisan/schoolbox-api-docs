@@ -919,8 +919,8 @@ class User implements JsonSerializable
                             'group_id'   => $parentRoles
                         )
                     );
-                    if ($parentCollection->count()) {
-                        $this->parent_collection->add($parentCollection->first());
+                    foreach ($parentCollection as $parent) {
+                        $this->parent_collection->add($parent);
                     }
                 }
                 /* Add speece
