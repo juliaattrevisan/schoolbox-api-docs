@@ -8,6 +8,8 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\Assessment\Component\SubmissionBox;
+
 require_once __DIR__ . '/../../../include/Bootstrap.php';
 
 $db     = Database::getInstance();
@@ -40,31 +42,13 @@ $taskQuery = $db->prepare("
 ");
 $taskQuery->execute();
 
-// This query copies all descriptors from importedBoxId into baseBoxId.
+// How to handle this:
+// Move descriptors back to where they belong, then use
+// copyFromCopiedSubmissionBox to repair properly.
 $fixDescriptorQuery = $db->prepare("
-    INSERT INTO rubric_descriptor
-        (submission_box_id, criterion_id, level_id, value, description, valid)
-    SELECT
-        :baseBoxId,
-        rd.criterion_id,
-        rd.level_id,
-        rd.value,
-        rd.description,
-        rd.valid
-    FROM rubric_descriptor rd
-    WHERE rd.submission_box_id = :importedBoxId
-");
-
-// This query copies all levels from baseBoxId to importedBoxId.
-$fixLevelQuery = $db->prepare("
-    INSERT INTO rubric_level
-        (box_id, name, sequence)
-    SELECT
-        :importedBoxId,
-        rl.name,
-        rl.sequence
-    FROM rubric_level rl
-    WHERE rl.box_id = :baseBoxId
+    UPDATE rubric_descriptor
+    SET    submission_box_id = :baseBoxId
+    WHERE  submission_box_id = :importedBoxId
 ");
 
 $fixedDescriptors = [];
@@ -79,43 +63,24 @@ foreach ($taskQuery as $row) {
     } else {
         $logger->warning('Base and imported box descriptor counts do not match - attempting repair!');
         if ($row['baseDescriptorCount'] == 0) {
-            $logger->info('Base box has no descriptors - copying back from imported box');
+            $logger->info('Base box has no descriptors - moving them from imported box');
             $fixDescriptorQuery->execute([
                 'baseBoxId'     => $row['baseBoxId'],
                 'importedBoxId' => $row['importedBoxId'],
             ]);
-            $fixedDescriptors[] = $row['baseBoxId'];
+
+            SubmissionBox\Rubric\UsageMapper::getInstance()
+                ->copyFromCopiedSubmissionBox($row['baseBoxId'], $row['importedBoxId']);
+            SubmissionBox\Rubric\DescriptorMapper::getInstance()
+                ->copyFromCopiedSubmissionBox($row['baseBoxId'], $row['importedBoxId']);
+            SubmissionBox\Rubric\LevelMapper::getInstance()
+                ->copyFromCopiedSubmissionBox($row['baseBoxId'], $row['importedBoxId']);
+
         } else {
             $logger->warning('Base box already has descriptors - no repair will be attempted!');
-        }
-    }
-
-    // Check levels
-    if ($row['baseLevelCount'] == $row['importedLevelCount']) {
-        $logger->info(sprintf('Base and imported box both have %d levels - no change required', $row['baseLevelCount']));
-    } else {
-        $logger->warning('Base and imported box level counts do not match - attempting repair!');
-        if ($row['importedLevelCount'] == 0) {
-            $logger->info('Imported box has no levels - copying from base box');
-            $fixLevelQuery->execute([
-                'baseBoxId'     => $row['baseBoxId'],
-                'importedBoxId' => $row['importedBoxId'],
-            ]);
-            $fixedLevels[] = $row['importedBoxId'];
-        } else {
-            $logger->warning('Imported box already has levels - no repair will be attempted!');
         }
     }
 }
 
 // Tell them how to undo this
 $logger->info('Cleanup completed!');
-if (!empty($fixedDescriptors) || !empty($fixedLevels)) {
-    $logger->info('If you need to undo, run the following query:');
-    if (!empty($fixedDescriptors)) {
-        $logger->info('DELETE FROM rubric_descriptor WHERE submission_box_id IN ('.implode(',', $fixedDescriptors).')');
-    }
-    if (!empty($fixedLevels)) {
-        $logger->info('DELETE FROM rubric_level WHERE box_id IN ('.implode(',', $fixedLevels).')');
-    }
-};
