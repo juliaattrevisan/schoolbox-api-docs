@@ -44,34 +44,6 @@ $taskQuery = $db->prepare("
 ");
 $taskQuery->execute();
 
-// How to handle this:
-// Move descriptors back to where they belong (including criteria)
-// then use copyFromCopiedSubmissionBox to repair properly.
-$fixDescriptorQuery = $db->prepare("
-    UPDATE rubric_descriptor
-    SET    submission_box_id = :baseBoxId,
-           criterion_id      = :baseCriterionId
-    WHERE  submission_box_id = :importedBoxId
-    AND    criterion_id      = :importedCriterionId
-");
-
-// This query fetches the base criterion's ID.
-$getCriteriaQuery = $db->prepare("
-    SELECT
-        baseCriterion.id     AS baseCriterionId,
-        importedCriterion.id AS importedCriterionId
-    FROM   rubric_criterion baseCriterion
-    INNER JOIN rubric_criterion importedCriterion
-        ON  importedCriterion.parent_id = :importedFolderId
-        AND importedCriterion.parent_type = 'category'
-        AND baseCriterion.grouping = importedCriterion.grouping
-        AND baseCriterion.name     = importedCriterion.name
-    WHERE baseCriterion.parent_id = :baseFolderId
-    AND   baseCriterion.parent_type = 'category'
-");
-
-$fixedDescriptors = [];
-$fixedLevels      = [];
 $logger->info(sprintf('%d submission boxes imported from a course in 2016', $taskQuery->rowCount()));
 foreach ($taskQuery as $row) {
     $logger->info(sprintf('Checking imported box #%d (base box #%d)...', $row['importedBoxId'], $row['baseBoxId']));
@@ -83,21 +55,6 @@ foreach ($taskQuery as $row) {
         $logger->warning('Base and imported box descriptor counts do not match - attempting repair!');
         if ($row['baseDescriptorCount'] == 0) {
             $logger->info('Base box has no descriptors - moving them from imported box');
-
-//            // Move criteria
-//            $getCriteriaQuery->execute([
-//                'baseFolderId'     => $row['baseBoxFolderId'],
-//                'importedFolderId' => $row['importedBoxFolderId'],
-//            ]);
-//            foreach ($getCriteriaQuery as $crit) {
-//                $criteriaMap[$crit['importedCriterionId']] = $crit['baseCriterionId'];
-//                $fixDescriptorQuery->execute([
-//                    'baseBoxId'           => $row['baseBoxId'],
-//                    'importedBoxId'       => $row['importedBoxId'],
-//                    'baseCriterionId'     => $crit['importedCriterionId'],
-//                    'importedCriterionId' => $crit['baseCriterionId'],
-//                ]);
-//            }
 
             $logger->info('Copying descriptors back from imported box to base box');
             SubmissionBox\Rubric\DescriptorMapper::getInstance()
