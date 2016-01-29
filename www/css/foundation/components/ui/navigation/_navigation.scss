@@ -381,6 +381,20 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             &.active > a:after {
                 content: "\e900";
             }
+            .content{
+                display: block;
+                max-height: 0;
+                visibility: hidden;
+                overflow: hidden;
+                @include transition(ease-out, 0.2s, max-height);
+
+                &.active {
+                    display: block;
+                    max-height: 1000px;
+                    visibility: visible;
+                    @include transition(ease-in, 0.2s, max-height);
+                }
+            }
         }
 
         .content{
