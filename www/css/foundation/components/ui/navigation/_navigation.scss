@@ -342,16 +342,23 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
         }
 
         .accordion-navigation {
-            >a{
+            .profile-drop{
                 background: transparent;
                 color: $off-canvas-foreground;
+                display: table;
                 padding: 0;
                 font-size: 0.875rem;
+                width: $off-canvas-width;
+                img{
+                    display: table-cell;
+                    vertical-align: middle;
+                }
                 span {
                     overflow: hidden;
                     text-overflow: ellipsis;
-                    display: inline-block;
+                    display: table-cell;
                     padding-left: 0.5rem;
+                    vertical-align: middle;
 
                     /* Different viewports have different dimensions
                      * Also, the presence of a scrollbar further restricts you
@@ -364,11 +371,12 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
                     }
                 }
             }
-            >a:after {
+            .profile-drop:after {
                 content: "\e901";
                 color: $off-canvas-foreground;
-                padding: 28px 16px;
-                float: right;
+                display: table-cell;
+                padding: 27px 10px;
+                vertical-align: middle;
             }
             &.active > a:after {
                 content: "\e900";
