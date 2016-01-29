@@ -29,18 +29,18 @@
                                 </a>
                                 <p class="meta">Posted by <a href="/search/user/{BLOG_AUTHOR_ID}">{BLOG_AUTHOR_NAME}</a> {BLOG_CREATED}</p>
                             </div>
-                            <article>{BLOG_BODY}</article>
-
-                            <div class="content">
-                                <a data-interaction="showcomments" class="button icon-chat" data-numcomments="{BLOG_TOTAL_COMMENTS}">Show Comments ({BLOG_TOTAL_COMMENTS})</a>
-                                <a data-toggle="commentform-{BLOG_ID}" class='button icon-add'>Add Comment</a>
-                            </div>
                         </div>
                         <nav>
                             <!-- BEGIN modify_blog -->
                             <a class="icon-modify" href="/blog/modify/{BLOG_ID}" title="Modify Blog post"></a>
                             <!-- END modify_blog -->
                         </nav>
+                        <article>{BLOG_BODY}</article>
+
+                        <div class="content">
+                            <a data-interaction="showcomments" class="button icon-chat" data-numcomments="{BLOG_TOTAL_COMMENTS}">Show Comments ({BLOG_TOTAL_COMMENTS})</a>
+                            <a data-toggle="commentform-{BLOG_ID}" class='button icon-add'>Add Comment</a>
+                        </div>
 
                         <ul class="information-list reply" id="blogComment_{BLOG_ID}">
                             <!-- BEGIN has_comments -->
@@ -54,15 +54,15 @@
                                         </a>
                                         <p class="meta">Commented {COMMENT_CREATED}</p>
                                     </div>
-                                    <article>
-                                        <p class="list-item-content">{COMMENT_BODY}</p>
-                                    </article>
                                 </div>
                                 <nav>
                                     <!-- BEGIN has_comment_delete -->
                                     <a data-interaction="deletecomment" class="icon-delete" href="/blog/comment/delete/{COMMENT_COMMENT_ID}"></a>
                                     <!-- END has_comment_delete -->
                                 </nav>
+                                <article>
+                                    <p>{COMMENT_BODY}</p>
+                                </article>
                             </li>
                             <!-- END comment -->
                             <!-- END has_comments -->

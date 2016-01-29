@@ -9,9 +9,9 @@
     {CONFIGURATION}
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="small-12 island">
+        <article class="small-12 island">
             <section>
-                <div class="dropzone-wrap">
+                <article class="dropzone-wrap">
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post"></form>
                     <ul data-dz-template class="hide">
                         <li>
@@ -47,19 +47,19 @@
                                         {FILE_POSTED_RELATIVE}
                                     </p>
                                 </div>
-                                <div class="list-item-content {COMPONENT_COMPACTMODE}">
-                                    <p>{FILE_COMMENT}</p>
-                                </div>
                             </div>
                             <nav>
                                 <!-- BEGIN modify_file -->
                                 <a class="icon-modify" href="/cms/file/{FILE_ID}" title="Modify File"></a>
                                 <!-- END modify_file -->
                             </nav>
+                            <article class="{COMPONENT_COMPACTMODE}">
+                                <p>{FILE_COMMENT}</p>
+                            </article>
                         </li>
                         <!-- END files -->
                     </ul>
-                </div>
+                </article>
 
                 <div class="content">
                     <a href="/resources/{FILE_CAT_ID}" class="button icon-view">View All Files</a>

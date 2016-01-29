@@ -88,9 +88,6 @@
                                         ({AUDIO_LIST_DURATION}) Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a>
                                     </p>
                                 </div>
-                                <article class="{COMPONENT_COMPACTMODE}">
-                                    <p>{AUDIO_LIST_COMMENT}</p>
-                                </article>
                             </div>
                             <!-- BEGIN audio_edit -->
                             <nav>
@@ -98,15 +95,20 @@
                                 <a class="icon-delete no-text" href="#" audio-delete id="{AUDIO_LIST_ID}" title="Delete"></a>
                             </nav>
                             <!-- END audio_edit -->
+                            <article class="{COMPONENT_COMPACTMODE}">
+                                <p>{AUDIO_LIST_COMMENT}</p>
+                            </article>
                         </li>
                         <!-- END audio_list -->
 
                         <!-- BEGIN audio_pending_list -->
                         <li>
-                            <div class="avatar card small-12" >
-                                <img src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />
-                                <h3>{AUDIO_LIST_TITLE}</h3>
-                                <p class="meta">Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
+                            <div class="list-item">
+                                <div class="avatar card small-12" >
+                                    <img src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />
+                                    <h3>{AUDIO_LIST_TITLE}</h3>
+                                    <p class="meta">Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
+                                </div>
                             </div>
                             <article class="{COMPONENT_COMPACTMODE}">
                                 <p>{AUDIO_LIST_COMMENT}</p>
