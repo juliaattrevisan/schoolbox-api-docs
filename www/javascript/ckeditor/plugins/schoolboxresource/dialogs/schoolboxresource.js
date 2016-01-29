@@ -90,6 +90,18 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                 fields.height.setValue(height);
             }
 
+            /* Only allow using Constrain Aspect Ratio if a width
+             * and a height has been provided
+             */
+            if (fields.width.getValue() && fields.height.getValue()) {
+                fields.aspectRatio.enable();
+                fields.aspectRatio.setValue(true);
+            }
+            else {
+                fields.aspectRatio.disable();
+                fields.aspectRatio.setValue(false);
+            }
+
             /* Reset aspect ratio value
              */
             aspectRatioReset(fields);
@@ -309,6 +321,15 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
     }
 
     /**
+     * Enable Constrain once both values provided
+     */
+    function enableConstrain(fields) {
+        if (fields.width.getValue() && fields.height.getValue()) {
+            fields.aspectRatio.enable();
+        }
+    }
+
+    /**
      * Extract a particular css property's value from a style string
      *
      * @param property
@@ -511,9 +532,16 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                                         render(fields, fields.url.getValue(), false);
                                                     }
 
-                                                    /* Always enable Constrain Aspect Ratio
+                                                    /* Enable Constrain Aspect Ratio only if a width
+                                                     * and height are provided (both are now optional)
+                                                     *
+                                                     * If optional, to re-activate Constrain, you must untick
+                                                     * then re-tick the Constrain checkbox. Save some hassle
+                                                     * by leaving it unticked when you don't specify a dimension
                                                      */
-                                                    fields.aspectRatio.setValue(true);
+                                                    if (fields.width.getValue() && fields.height.getValue()) {
+                                                        fields.aspectRatio.setValue(true);
+                                                    }
 
                                                     /* Shut modal, go back to Dialog
                                                      */
@@ -583,6 +611,10 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
                                             fields.height.setValue(newHeight);
                                         }
+
+                                        /* Enable Constrain once both values provided
+                                         */
+                                        enableConstrain(fields);
                                     }
                                 }
                             },
@@ -653,7 +685,16 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                             var dialog = this.getDialog();
                             var fields = dialogFields(dialog);
 
-                            fields.aspectRatio.setValue(true);
+                            /* Enable Constrain Aspect Ratio only if a width
+                             * and height are provided (both are now optional)
+                             *
+                             * If optional, to re-activate Constrain, you must untick
+                             * then re-tick the Constrain checkbox. Save some hassle
+                             * by leaving it unticked when you don't specify a dimension
+                             */
+                            if (fields.width.getValue() && fields.height.getValue()) {
+                                fields.aspectRatio.setValue(true);
+                            }
                         },
 
                         /* Remember the ratio so we can apply it when
