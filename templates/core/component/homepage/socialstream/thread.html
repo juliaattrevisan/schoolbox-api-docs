@@ -26,7 +26,7 @@
 
                 <!-- BEGIN socialstream_post_has_thumbnail -->
                 <div class="avatar card">
-                    <a href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox" alt="" title="">
+                    <a href="{SOCIALSTREAM_POST_URL}">
                         <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64" />
                         <p>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</p>
                     </a>
@@ -121,7 +121,7 @@
 
                         <!-- BEGIN socialstream_comment_has_thumbnail -->
                         <div class="avatar card">
-                            <a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                            <a href="{SOCIALSTREAM_POST_URL}">
                                 <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64" />
                                 <p>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</p>
                             </a>
@@ -210,7 +210,7 @@
 
                                 <!-- BEGIN socialstream_reply_has_thumbnail -->
                                 <div class="avatar card">
-                                    <a href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                                    <a href="{SOCIALSTREAM_POST_URL}">
                                         <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64" />
                                         <p>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</p>
                                     </a>
