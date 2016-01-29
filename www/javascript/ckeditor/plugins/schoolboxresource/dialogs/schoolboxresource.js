@@ -105,7 +105,13 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
      * @param fields
      */
     function aspectRatioReset(fields) {
-        fields.aspectRatioValue.setValue(fields.width.getValue()/fields.height.getValue());
+
+        /* Only do something useful if the width and height are both set
+         * Otherwise results are not sane
+         */
+        if (fields.width.getValue() && fields.height.getValue()) {
+            fields.aspectRatioValue.setValue(fields.width.getValue() / fields.height.getValue());
+        }
     }
     
     /**
@@ -568,7 +574,11 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                         var dialog = this.getDialog();
                                         var fields = dialogFields(dialog);
 
-                                        if (fields.aspectRatio.getValue()) {
+                                        /* Can no longer rely on there being an aspect ratio because
+                                         * you can now leave either width or height empty; this causes
+                                         * a non-numeric aspectRatioValue to exist
+                                         */
+                                        if (fields.aspectRatio.getValue() && fields.aspectRatioValue.getValue() && fields.width.getValue().length && fields.height.getValue().length) {
                                             var newHeight = Math.round(fields.width.getValue() / fields.aspectRatioValue.getValue());
 
                                             fields.height.setValue(newHeight);
@@ -600,7 +610,11 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                         var dialog = this.getDialog();
                                         var fields = dialogFields(dialog);
 
-                                        if (fields.aspectRatio.getValue()) {
+                                        /* Can no longer rely on there being an aspect ratio because
+                                         * you can now leave either width or height empty; this causes
+                                         * a non-numeric aspectRatioValue to exist
+                                         */
+                                        if (fields.aspectRatio.getValue() && fields.aspectRatioValue.getValue() && fields.width.getValue().length && fields.height.getValue().length) {
                                             var newWidth = Math.round(fields.height.getValue() * fields.aspectRatioValue.getValue());
 
                                             fields.width.setValue(newWidth);
