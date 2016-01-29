@@ -45,7 +45,7 @@ class Sync implements SyncInterface
         $query = "
             SELECT
                 s.stud_code      AS student_id,
-                ''               AS network_login,
+                s.alt_id         AS network_login,
                 ''               AS student_title,
                 s.preferred_name AS student_preferred,
                 s.surname        AS student_surname,
@@ -54,8 +54,10 @@ class Sync implements SyncInterface
                 ''               AS student_occup_email,
                 s.year_grp       AS student_year_level,
                 s.house          AS student_house,
-                (IF ((sb.resid_code IS NOT NULL), 'Y', 'N'))
-                                 AS student_boarder,
+                CASE
+                    WHEN (sb.resid_code) IS NOT NULL THEN 'Y'
+                    ELSE 'N'
+                END              AS student_boarder,
                 sb.resid_code    AS student_boarding_house,
                 s.campus_code    AS student_campus
             FROM student AS s
@@ -154,9 +156,9 @@ class Sync implements SyncInterface
     public function findAllStaff()
     {
         $query = "
-            SELECT
+            SELECT DISTINCT
                 te.tch_code         AS staff_id,
-                ''                  AS network_login,
+                p.username          AS network_login,
                 CASE
                     WHEN (t.term_date) IS NULL THEN 0
                     ELSE 1
@@ -174,7 +176,8 @@ class Sync implements SyncInterface
             FROM tel_vw_telemf AS t
             LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
             LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
-            WHERE t.cmpy_code = {$this->database->smartQuote($this->companyCode)}
+            LEFT JOIN portalusers AS p ON prodcode='TIA' AND te.cmpy_code = p.cmpy_code AND (te.emp_code = p.portal_code OR te.tch_code = p.portal_code)
+            WHERE te.cmpy_code = {$this->database->smartQuote($this->companyCode)}
         ";
         return new Iterator\Staff(
             $this->database->getIterator($query)->addMap([$this->database, 'trimRow'])
