@@ -22,13 +22,17 @@ $taskQuery = $db->prepare("
         baseBox.id AS baseBoxId,
         importedBox.created,
         COUNT(DISTINCT importedDescriptor.id) AS importedDescriptorCount,
-        COUNT(DISTINCT baseDescriptor.id) AS baseDescriptorCount
+        COUNT(DISTINCT baseDescriptor.id) AS baseDescriptorCount,
+        COUNT(DISTINCT importedLevel.id) AS importedLevelCount,
+        COUNT(DISTINCT baseLevel.id) AS baseLevelCount
     FROM submission_box importedBox
-    INNER JOIN rubric_descriptor importedDescriptor ON importedBox.id = importedDescriptor.submission_box_id
+    LEFT  JOIN rubric_descriptor importedDescriptor ON importedBox.id = importedDescriptor.submission_box_id
+    LEFT  JOIN rubric_level      importedLevel      ON importedBox.id = importedLevel.box_id
     INNER JOIN task_instance     importedTask       ON importedBox.task_instance_id = importedTask.id
     INNER JOIN task              baseTask           ON importedTask.task_id = baseTask.id
     INNER JOIN submission_box    baseBox            ON baseTask.id = baseBox.task_id
     LEFT  JOIN rubric_descriptor baseDescriptor     ON baseBox.id = baseDescriptor.submission_box_id
+    LEFT  JOIN rubric_level      baseLevel          ON baseBox.id = baseLevel.box_id
     WHERE importedBox.task_instance_id IS NOT NULL
     AND   importedBox.created >= '2016-01-01'
     GROUP BY importedBoxId, baseBoxId, importedBox.created
@@ -37,7 +41,7 @@ $taskQuery = $db->prepare("
 $taskQuery->execute();
 
 // This query copies all descriptors from importedBoxId into baseBoxId.
-$repopulateQuery = $db->prepare("
+$fixDescriptorQuery = $db->prepare("
     INSERT INTO rubric_descriptor
         (submission_box_id, criterion_id, level_id, value, description, valid)
     SELECT
@@ -51,7 +55,20 @@ $repopulateQuery = $db->prepare("
     WHERE rd.submission_box_id = :importedBoxId
 ");
 
-$repopulatedIds = [];
+// This query copies all levels from baseBoxId to importedBoxId.
+$fixLevelQuery = $db->prepare("
+    INSERT INTO rubric_level
+        (box_id, name, sequence)
+    SELECT
+        :importedBoxId,
+        rl.name,
+        rl.sequence
+    FROM rubric_level rl
+    WHERE rl.box_id = :baseBoxId
+");
+
+$fixedDescriptors = [];
+$fixedLevels      = [];
 $logger->info(sprintf('%d submission boxes imported from a course in 2016', $taskQuery->rowCount()));
 foreach ($taskQuery as $row) {
     $logger->info(sprintf('Checking imported box #%d (base box #%d)...', $row['importedBoxId'], $row['baseBoxId']));
@@ -61,11 +78,11 @@ foreach ($taskQuery as $row) {
         $logger->warning('Base and imported box descriptor counts do not match - attempting repair!');
         if ($row['baseDescriptorCount'] == 0) {
             $logger->info('Base box has no descriptors - copying back from imported descriptor');
-            $repopulateQuery->execute([
+            $fixDescriptorQuery->execute([
                 'baseBoxId'     => $row['baseBoxId'],
                 'importedBoxId' => $row['importedBoxId'],
             ]);
-            $repopulatedIds[] = $row['baseBoxId'];
+            $fixedDescriptors[] = $row['baseBoxId'];
         } else {
             $logger->warning('Base box already has descriptors - no repair will be attempted!');
         }
@@ -74,7 +91,7 @@ foreach ($taskQuery as $row) {
 
 // Tell them how to undo this
 $logger->info('Cleanup completed!');
-if (!empty($repopulatedIds)) {
+if (!empty($fixedDescriptors)) {
     $logger->info('If you need to undo, run the following query:');
-    $logger->info('DELETE FROM rubric_descriptor WHERE submission_box_id IN ('.implode(',', $repopulatedIds).')');
+    $logger->info('DELETE FROM rubric_descriptor WHERE submission_box_id IN ('.implode(',', $fixedDescriptors).')');
 };
