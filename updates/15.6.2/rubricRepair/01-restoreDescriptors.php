@@ -77,7 +77,7 @@ foreach ($taskQuery as $row) {
     } else {
         $logger->warning('Base and imported box descriptor counts do not match - attempting repair!');
         if ($row['baseDescriptorCount'] == 0) {
-            $logger->info('Base box has no descriptors - copying back from imported descriptor');
+            $logger->info('Base box has no descriptors - copying back from imported box');
             $fixDescriptorQuery->execute([
                 'baseBoxId'     => $row['baseBoxId'],
                 'importedBoxId' => $row['importedBoxId'],
