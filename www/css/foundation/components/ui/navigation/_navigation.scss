@@ -502,16 +502,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 }
 
-// Equal height columns aka One True Layout
-// http://www.positioniseverything.net/articles/onetruelayout/equalheight
-.left-off-canvas-menu,
-.right-off-canvas-menu,
-.main-section{
-    margin: 0 0 -99999px 0;
-    padding: 0 0 99999px 0;
-}
-
-
 // Only show notifications sidebar on x-large-up screens
 // 1440px >
 @media #{$xlarge-up} {
