@@ -322,22 +322,15 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
     /**
      * Enable Constrain once both values provided
-     *
-     * @param fields
-     */
-    function enableConstrain(fields) {
-        if (fields.width.getValue() && fields.height.getValue()) {
-            fields.aspectRatio.enable();
-        }
-    }
-
-    /**
      * Disable Constrain once one dimension is omitted
      *
      * @param fields
      */
-    function disableConstrain(fields) {
-        if (!fields.width.getValue() || !fields.height.getValue()) {
+    function toggleConstrain(fields) {
+        if (fields.width.getValue() && fields.height.getValue()) {
+            fields.aspectRatio.enable();
+        }
+        else {
             fields.aspectRatio.disable();
         }
     }
@@ -627,7 +620,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
                                         /* Enable Constrain once both values provided
                                          */
-                                        enableConstrain(fields);
+                                        toggleConstrain(fields);
                                     }
                                 },
 
@@ -637,8 +630,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = dialogFields(dialog);
 
-                                    enableConstrain(fields);
-                                    disableConstrain(fields);
+                                    toggleConstrain(fields);
                                 }
                             },
                             {
@@ -683,8 +675,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     var dialog = this.getDialog();
                                     var fields = dialogFields(dialog);
 
-                                    enableConstrain(fields);
-                                    disableConstrain(fields);
+                                    toggleConstrain(fields);
                                 }
                             },
                             {
