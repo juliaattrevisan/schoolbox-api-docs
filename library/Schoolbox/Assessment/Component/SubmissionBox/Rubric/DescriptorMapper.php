@@ -145,29 +145,40 @@ class DescriptorMapper extends Schoolbox\Mapper {
         });
 
         // And copy each descriptor in the from box into the to box
+        /** @var SubmissionBox $toBox */
         $toBox  = $this->getJoinMapper('submission_box')->findById($to_id);
         $toList = new Schoolbox\Collection();
         foreach ($fromList as $fromItem) {
             // The to box descriptor's criterion:
             // has the same name, type and grouping as the to box, but instead
             // belongs to the to box's category.
+            $params = array(
+                'parent_id'   => $toBox->getCategory()->getId(),
+                'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
+                'name'        => $fromItem->getCriterion()->getName(),
+                'grouping'    => $fromItem->getCriterion()->getGrouping(),
+            );
+
+            /** @var Criterion $toCriterion */
             try {
-                $params = array(
-                    'parent_id'   => $toBox->getCategory()->getId(),
-                    'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
-                    'name'        => $fromItem->getCriterion()->getName(),
-                    'grouping'    => $fromItem->getCriterion()->getGrouping(),
-                );
                 $toCriterion = $this->getJoinMapper('criterion')->findOneByColumnList($params);
-                $toItem = clone $fromItem;
-                $toItem
-                    ->setSubmissionBox($toBox)
-                    ->setCriterion($toCriterion);
-                $toList->add($toItem);
+            } catch (Schoolbox\Mapper\Exception $e) {
+                // Try creating a new one?
+                $toCriterion = $this->getJoinMapper('criterion')->createModel();
+                $toCriterion
+                    ->setParentId($toBox->getCategory()->getId())
+                    ->setParentType(Criterion::PARENT_TYPE_CATEGORY)
+                    ->setName($fromItem->getCriterion()->getName())
+                    ->setGrouping($fromItem->getCriterion()->getGrouping())
+                ;
+                $this->getJoinMapper('criterion')->save($toCriterion);
             }
-            catch (Schoolbox\Mapper\Exception $e) {
-                // Add this to the list of exceptions somewhere but don't do anything.
-            }
+
+            $toItem = clone $fromItem;
+            $toItem
+                ->setSubmissionBox($toBox)
+                ->setCriterion($toCriterion);
+            $toList->add($toItem);
         }
         return $this->create($toList);
     }
