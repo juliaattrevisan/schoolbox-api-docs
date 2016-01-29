@@ -85,7 +85,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
              * This occurs when setup() runs, when editing an existing image
              * Or when an image was set to Fullwidth (it won't have a width/height style attribute)
              */
-            if (fields.width.getValue() == '' || fields.height.getValue() == '' || reset) {
+            if (reset) {
                 fields.width.setValue(width);
                 fields.height.setValue(height);
             }
@@ -188,8 +188,13 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             styles.push('width:100%');
         }
         else {
-            styles.push('width:' + fields.width.getValue() + 'px');
-            styles.push('height:' + fields.height.getValue() + 'px');
+            if (fields.width.getValue()) {
+                styles.push('width:' + fields.width.getValue() + 'px');
+            }
+
+            if (fields.height.getValue()) {
+                styles.push('height:' + fields.height.getValue() + 'px');
+            }
         }
 
         /* Alignment
@@ -539,7 +544,6 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                 type: 'text',
                                 id: 'schoolboxresource-width',
                                 label: 'Width',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." ),
 
                                 /* Editing an existing element
                                  */
@@ -576,7 +580,6 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                 type: 'text',
                                 id: 'schoolboxresource-height',
                                 label: 'Height',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Height cannot be empty."),
 
                                 /* Editing an existing element
                                  */
