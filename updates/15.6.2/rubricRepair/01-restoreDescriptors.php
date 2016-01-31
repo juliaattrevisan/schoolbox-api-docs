@@ -3,6 +3,30 @@
  * Restores rubric descriptors to submission boxes in course builders that had
  * them stripped.
  *
+ * 15.6 rubrics have the following issues when imported from course builder:
+ *
+ * Course builder submission box:
+ * * rubric_descriptor:
+ *   * does not exist (moved from outline to builder)
+ * * rubric_criterion
+ *   * not touched
+ * * rubric_level
+ *   * not touched
+ *
+ * Course outline submission box:
+ * * rubric_descriptor:
+ *   * criterion_id: points to the outline's criterion
+ *   * level_id:     points to the builder's level
+ * * rubric_criterion:
+ *   * imported okay
+ * * rubric_level:
+ *   * does not exist
+ *
+ * Fix:
+ * # update rubric_descriptor.submission_box_id to point to builder instead of outline
+ * # update rubric_descriptor.criterion_id to point to builder criterion
+ * # re-copy descriptors and levels from builder to outline
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -45,6 +69,22 @@ $taskQuery = $db->prepare("
     ORDER BY importedBox.created ASC
 ");
 $taskQuery->execute();
+
+$updateDescriptorQuery = $db->prepare("
+    UPDATE rubric_descriptor
+    SET    submission_box_id = :baseBoxId,
+           criterion_id      = (
+            SELECT baseCriterion.id
+            FROM rubric_criterion baseCriterion
+            LEFT JOIN rubric_criterion importedCriterion
+                   ON baseCriterion.grouping = importedCriterion.grouping
+                  AND baseCriterion.name     = importedCriterion.name
+            WHERE baseCriterion.parent_id     IN (:baseBoxFolderId, :baseBoxParentFolderId)
+            AND   importedCriterion.parent_id = :importedBoxFolderId
+            LIMIT 1
+           )
+    WHERE  submission_box_id = :importedBoxId
+");
 
 $logger->info(sprintf('%d submission boxes imported from a course in 2016', $taskQuery->rowCount()));
 foreach ($taskQuery as $row) {
