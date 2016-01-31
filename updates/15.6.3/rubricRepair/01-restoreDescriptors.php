@@ -48,6 +48,7 @@ $taskQuery = $db->prepare("
         importedBox.category AS importedBoxFolderId,
         baseBox.id AS baseBoxId,
         baseBox.category AS baseBoxFolderId,
+        baseFolder.parent AS baseBoxParentFolderId,
         importedBox.created,
         COUNT(DISTINCT importedDescriptor.id) AS importedDescriptorCount,
         COUNT(DISTINCT baseDescriptor.id) AS baseDescriptorCount,
@@ -59,6 +60,7 @@ $taskQuery = $db->prepare("
     INNER JOIN task_instance     importedTask       ON importedBox.task_instance_id = importedTask.id
     INNER JOIN task              baseTask           ON importedTask.task_id = baseTask.id
     INNER JOIN submission_box    baseBox            ON baseTask.id = baseBox.task_id
+    INNER JOIN category          baseFolder         ON baseBox.category = baseFolder.id
     LEFT  JOIN rubric_descriptor baseDescriptor     ON baseBox.id = baseDescriptor.submission_box_id
     LEFT  JOIN rubric_level      baseLevel          ON baseBox.id = baseLevel.box_id
     WHERE importedBox.task_instance_id IS NOT NULL
