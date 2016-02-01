@@ -88,9 +88,17 @@ class LevelMapper extends Mapper
      */
     public function copyFromCopiedSubmissionBox($fromId, $toId)
     {
-        $levels = $this->findByColumn('box_id', $fromId);
-        foreach ($levels as $level) {
-            $level->getSubmissionBox()->setId($toId);
+        $levels = new Collection();
+        foreach ($this->findByColumn('box_id', $fromId) as $level) {
+            // Don't recopy a level that already exists in $toId
+            $levelCount = $this->countByColumnList([
+                'box_id'   => $toId,
+                'sequence' => $level->getSequence()
+            ]);
+            if (!$levelCount) {
+                $level->getSubmissionBox()->setId($toId);
+                $levels->add($level);
+            }
         }
         $this->create($levels);
     }
