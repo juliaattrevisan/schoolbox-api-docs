@@ -147,16 +147,20 @@ abstract class AbstractNode implements NodeInterface
             );
 
             for ($i = 0; ($folder->getParent()->getId() > 0) && ($i < self::MAX_DEPTH); $i++) {
+                $currentFolder = $this->getFolderLocator()->findById($folder->getParent()->getId());
+
+                $crumb = array(
+                    'categoryId' => $currentFolder->getId(),
+                    'name'       => $currentFolder->getName(),
+                );
+
+                $folder = $currentFolder;
+
                 if ($this->hasPermission($folder->getParent()->getId(), READ_ACCESS)) {
-                    $currentFolder = $this->getFolderLocator()->findById($folder->getParent()->getId());
-
-                    $breadcrumbs[] = array(
-                        'categoryId' => $currentFolder->getId(),
-                        'name'       => $currentFolder->getName(),
-                    );
-
-                    $folder = $currentFolder;
+                    $crumb['disabled'] = 'disabled';
                 }
+
+                $breadcrumbs[] = $crumb;
             }
         } catch(\Exception $e) {
             // we'll let this go, and just return whatever we got up to

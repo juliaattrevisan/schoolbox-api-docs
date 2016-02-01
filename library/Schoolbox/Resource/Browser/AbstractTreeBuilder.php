@@ -89,7 +89,7 @@ abstract class AbstractTreeBuilder
         foreach ($parentList as $parentCategoryId) {
             $partialTree = array_merge(
                 $partialTree,
-                $this->buildChildNodes($parentCategoryId)
+                $this->buildChildNodes($parentCategoryId, $parentList)
             );
         }
 
@@ -108,10 +108,11 @@ abstract class AbstractTreeBuilder
      * Builds a list of child nodes for $categoryId
      *
      * @param  mixed $folderId
+     * @param  array $mustInclude
      *
      * @return array
      */
-    public function buildChildNodes($folderId)
+    public function buildChildNodes($folderId, $mustInclude = [])
     {
         $output = [];
 
@@ -133,7 +134,7 @@ abstract class AbstractTreeBuilder
             // Child nodes
             foreach ($this->getNodeFolders($folderId) as $folder) {
                 try {
-                    $output[] = $this->buildFolderNode($folder);
+                    $output[] = $this->buildFolderNode($folder, $mustInclude);
                 } catch (Resource\Exception $e) {
                     continue;
                 }
@@ -163,22 +164,31 @@ abstract class AbstractTreeBuilder
 
     /**
      * @param IFolder $folder
+     * @param array   $mustInclude
      * @throws Resource\Exception
      * @return array
      */
-    protected function buildFolderNode(IFolder $folder)
+    protected function buildFolderNode(IFolder $folder, $mustInclude = [])
     {
         // Get the permission this user has on this folder.
         // No permission: don't show it at all!
         $permission = $this->getFolderPermission($folder->getId());
-        if (empty($permission)) {
-            throw new Resource\Exception("No permission for this node");
-        }
 
         // this seems so trivial, but it's so these can be overridden
         $type = $this->getFolderIcon($folder);
         $name = $this->getFolderName($folder);
         $href = $this->getFolderHref($folder);
+
+        if (empty($permission)) {
+            // ensure that the direct tree to the selected node is available by generating ghost nodes
+            if (in_array($folder->getId(), $mustInclude)) {
+                $type = 'noaccess';
+                $href = '#';
+                $name = '(' . $folder->getName() . ')';
+            } else {
+                throw new Resource\Exception("No permission for this node");
+            }
+        }
 
         // Output something.
         return $this->generateFolderArray($folder, $type, $name,
