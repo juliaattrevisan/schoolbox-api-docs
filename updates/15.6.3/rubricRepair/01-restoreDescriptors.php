@@ -90,7 +90,7 @@ $updateDescriptorQuery = $db->prepare("
 
 $updatedBoxes = [];
 $logger->info(sprintf('%d submission boxes imported from a course in 2016', $taskQuery->rowCount()));
-foreach ($taskQuery as $row) {
+foreach ($taskQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
     $logger->info(
         sprintf(
             'Checking imported box #%d, folder #%d (base box #%d, folder #%d)...',
