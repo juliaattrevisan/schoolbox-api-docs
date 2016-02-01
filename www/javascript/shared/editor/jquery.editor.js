@@ -233,7 +233,7 @@
                  */
                 extraAllowedContent: 'img(full-width)[data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float}; '+
                     'iframe(full-width)[src,allowfullscreen]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float}; '+
-                    'div(scrollable); '+
+                    'div(scrollable,highlighted-note); '+
                     'object[id,name,width,height]; '+
                     'param[name,value]; '+
                     'embed[src,type,allowscriptaccess,allowfullscreen,wmode,width,height]'
@@ -245,7 +245,7 @@
 
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */
-                removePlugins: 'image,image2,stylescombo,uploadimage',
+                removePlugins: 'image,image2,uploadimage',
                 extraPlugins: 'schoolboxresource,schoolboxiframe',
 
                 /* Other settings
@@ -259,6 +259,10 @@
                 /* set to use our iframely API key for oEmbed calls
                  */
                 embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28&omit_script=1',
+
+                styleSet: [
+                    {name: 'Blue Title', element: 'h3', styles: {'color': 'Blue'}}
+                ],
 
                 /* This used to be 'mode', a legacy setting from Tiny.
                  *
