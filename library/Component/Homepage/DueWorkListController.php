@@ -61,7 +61,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         if ($this->getConfig('compactMode') == 1) {
             $this->setVar(
                 array(
-                    'COMPONENT_COMPACTMODE'                 => 'compact-mode',
+                    'COMPONENT_COMPACTMODE'                 => 'hide',
                     'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => 'checked="checked"'
                 )
             );
