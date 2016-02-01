@@ -152,7 +152,7 @@
                     }
                 },
                 conditionalselect: function (node, e) {
-                    return typeof node.li_attr['data-id'] != 'undefined';
+                    return typeof node.li_attr['data-id'] != 'undefined' && node.li_attr['data-type'] != 'noaccess';
                 },
                 types: {
                     root: {
@@ -178,6 +178,9 @@
                     },
                     course: {
                         icon: 'icon-course-builder'
+                    },
+                    noaccess: {
+                        icon: 'icon-close'
                     }
                 },
                 sort: function(a, b) {
