@@ -88,34 +88,58 @@ $updateDescriptorQuery = $db->prepare("
     WHERE  submission_box_id = :importedBoxId
 ");
 
+$updatedBoxes = [];
 $logger->info(sprintf('%d submission boxes imported from a course in 2016', $taskQuery->rowCount()));
 foreach ($taskQuery as $row) {
-    $logger->info(sprintf('Checking imported box #%d (base box #%d)...', $row['importedBoxId'], $row['baseBoxId']));
+    $logger->info(
+        sprintf(
+            'Checking imported box #%d, folder #%d (base box #%d, folder #%d)...',
+            $row['importedBoxId'],
+            $row['importedBoxFolderId'],
+            $row['baseBoxId'],
+            $row['baseBoxFolderId']
+        )
+    );
 
-    // Check descriptors
     if ($row['baseDescriptorCount'] == $row['importedDescriptorCount']) {
         $logger->info(sprintf('Base and imported box both have %d descriptors - no change required', $row['baseDescriptorCount']));
     } else {
         $logger->warning('Base and imported box descriptor counts do not match - attempting repair!');
         if ($row['baseDescriptorCount'] == 0) {
             $logger->info('Base box has no descriptors - moving them from imported box');
-
-            $logger->info('Copying descriptors back from imported box to base box');
-            SubmissionBox\Rubric\DescriptorMapper::getInstance()
-                ->copyFromCopiedSubmissionBox($row['importedBoxId'], $row['baseBoxId'], true);
-
-            $logger->info('Copying usages from base box to imported box');
-            SubmissionBox\Rubric\UsageMapper::getInstance()
-                ->copyFromCopiedSubmissionBox($row['baseBoxId'], $row['importedBoxId']);
-
-            $logger->info('Copying levels from base box to imported box');
-            SubmissionBox\Rubric\LevelMapper::getInstance()
-                ->copyFromCopiedSubmissionBox($row['baseBoxId'], $row['importedBoxId']);
-
+            $updateDescriptorQuery->execute([
+                'baseBoxId'             => $row['baseBoxId'],
+                'importedBoxId'         => $row['importedBoxId'],
+                'importedBoxFolderId'   => $row['importedBoxFolderId'],
+                'baseBoxFolderId'       => $row['baseBoxFolderId'],
+                'baseBoxParentFolderId' => $row['baseBoxParentFolderId'],
+            ]);
+            $updatedBoxes[] = $row;
         } else {
             $logger->warning('Base box already has descriptors - no repair will be attempted!');
         }
     }
+}
+
+foreach ($updatedBoxes as $row) {
+    $logger->info(
+        sprintf(
+            'Copying descriptors from base box #%d to imported box #%d...',
+            $row['baseBoxId'],
+            $row['importedBoxId']
+        )
+    );
+    $logger->info('Copying descriptors back from imported box to base box');
+    SubmissionBox\Rubric\DescriptorMapper::getInstance()
+        ->copyFromCopiedSubmissionBox($row['baseBoxId'], $row['importedBoxId'], true);
+
+    $logger->info('Copying usages from base box to imported box');
+    SubmissionBox\Rubric\UsageMapper::getInstance()
+        ->copyFromCopiedSubmissionBox($row['baseBoxId'], $row['importedBoxId']);
+
+    $logger->info('Copying levels from base box to imported box');
+    SubmissionBox\Rubric\LevelMapper::getInstance()
+        ->copyFromCopiedSubmissionBox($row['baseBoxId'], $row['importedBoxId']);
 }
 
 // Tell them how to undo this
