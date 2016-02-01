@@ -73,9 +73,9 @@ $taskQuery = $db->prepare("
 $taskQuery->execute();
 
 $updateDescriptorQuery = $db->prepare("
-    UPDATE rubric_descriptor
-    SET    submission_box_id = :baseBoxId,
-           criterion_id      = (
+    UPDATE rubric_descriptor importedDescriptor
+    SET    importedDescriptor.submission_box_id = :baseBoxId,
+           importedDescriptor.criterion_id      = (
             SELECT baseCriterion.id
             FROM rubric_criterion baseCriterion
             LEFT JOIN rubric_criterion importedCriterion
@@ -83,9 +83,10 @@ $updateDescriptorQuery = $db->prepare("
                   AND baseCriterion.name     = importedCriterion.name
             WHERE baseCriterion.parent_id     IN (:baseBoxFolderId, :baseBoxParentFolderId)
             AND   importedCriterion.parent_id = :importedBoxFolderId
+            AND   importedCriterion.id        = importedDescriptor.criterion_id
             LIMIT 1
            )
-    WHERE  submission_box_id = :importedBoxId
+    WHERE  importedDescriptor.submission_box_id = :importedBoxId
 ");
 
 $updatedBoxes = [];
@@ -107,14 +108,26 @@ foreach ($taskQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $logger->warning('Base and imported box descriptor counts do not match - attempting repair!');
         if ($row['baseDescriptorCount'] == 0) {
             $logger->info('Base box has no descriptors - moving them from imported box');
-            $updateDescriptorQuery->execute([
-                'baseBoxId'             => $row['baseBoxId'],
-                'importedBoxId'         => $row['importedBoxId'],
-                'importedBoxFolderId'   => $row['importedBoxFolderId'],
-                'baseBoxFolderId'       => $row['baseBoxFolderId'],
-                'baseBoxParentFolderId' => $row['baseBoxParentFolderId'],
-            ]);
-            $updatedBoxes[] = $row;
+            // Does this fail? If so, the descriptors are already there.
+            try {
+                $updateDescriptorQuery->execute([
+                    'baseBoxId'             => $row['baseBoxId'],
+                    'importedBoxId'         => $row['importedBoxId'],
+                    'importedBoxFolderId'   => $row['importedBoxFolderId'],
+                    'baseBoxFolderId'       => $row['baseBoxFolderId'],
+                    'baseBoxParentFolderId' => $row['baseBoxParentFolderId'],
+                ]);
+                $logger->info(
+                    sprintf(
+                        'Descriptors and criteria moved (%d rows affected)',
+                        $updateDescriptorQuery->rowCount()
+                    )
+                );
+                $updatedBoxes[] = $row;
+            } catch (PDOException $e) {
+                $logger->warning('Move of descriptors and criteria failed - they are probably already there!');
+                $logger->warning('The following error was raised: '.$e->getMessage());
+            }
         } else {
             $logger->warning('Base box already has descriptors - no repair will be attempted!');
         }
