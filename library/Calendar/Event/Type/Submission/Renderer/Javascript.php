@@ -87,7 +87,9 @@ class Javascript extends Base
                     'listButton'    => false,
                 ),
                 'custom' => array(
-                    'modifyLink' => '/submission/createSubmission/modify/' . $this->getEvent()->getEventId(),
+                    'modifyLink' => $this->getEvent()->getIsAssessment()
+                        ? ('/assess/modify/' . $this->getEvent()->getEventId())
+                        : ('/submission/createSubmission/modify/' . $this->getEvent()->getEventId()),
                 )
             )
         );
