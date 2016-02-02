@@ -491,12 +491,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     }
 
 
-     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber, $date = null)
     {
         if (empty($externalUserId)) {
             return array();
         }
-        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
+        $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date);
 
         if (!is_array($timetabledef)) {
             return false;
