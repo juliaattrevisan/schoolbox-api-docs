@@ -140,6 +140,11 @@ class Controller extends BaseController
         $post = $this->getRequest()->post;
 
         try {
+            if ($file->getMime(true) != 'text/plain') {
+                throw new \Schoolbox\Resource\Exception("Not a plaintext CSV file, cannot parse");
+            }
+
+
             if ($boxId = $post->get('boxId')) {
                 $box = SubmissionBoxMapper::getInstance()->findById($boxId);
                 $folderId = $box->getCategory()->getId();
