@@ -108,8 +108,7 @@ if(typeof window.location.origin == 'undefined') {
             clickable: false,
             maxFiles: opt.multi ? null : 1,
             maxFilesize: opt.maxFilesize,
-            // Accepted files setting disabled for now because Windows browsers don't know WTF to do
-            //acceptedFiles: opt.allowedFiles === '*/*' ? null : opt.allowedFiles,
+            acceptedFiles: opt.allowedFiles === '*/*' ? null : opt.allowedFiles,
             thumbnailWidth: opt.thumbnailSize,
             thumbnailHeight: opt.thumbnailSize,
             dictDefaultMessage: prompt,
