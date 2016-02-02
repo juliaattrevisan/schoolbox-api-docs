@@ -315,7 +315,7 @@ class Report_Parent extends Report_Abstract
         $showContact = false;
 
         if (is_array($allContacts) && count($allContacts)) {
-            for ($lastID = -1, $i = 0; $i < count($allContacts); $i++) {
+            for ($lastID = -1, $i = 0; $i <= count($allContacts); $i++) {
                 $currentContact = $allContacts[$i];
 
                 /* New student, or first student
