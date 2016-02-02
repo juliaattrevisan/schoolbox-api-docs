@@ -44,7 +44,7 @@ else {
 		$zone->setThumbnailSize(64);
 		$zone->setAttachPrompt('Upload calendar file');
 		$zone->setAttachmentsLabel('');
-		$zone->setMimeFilter('text/csv,text/calendar');
+//		$zone->setMimeFilter('text/csv,text/calendar');
 		$zone->setModalTitle('Select zip file');
 
 		$zone->renderIntoSitePage($this, 'ATTACHZONE');
