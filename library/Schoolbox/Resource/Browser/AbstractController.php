@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Config;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Mapper;
@@ -144,15 +145,26 @@ abstract class AbstractController extends BaseController
     /**
      * @param int $folderId
      * @return array
+     * @throws Resource\Exception
      */
     protected function getFolderData($folderId)
     {
+        // find out if we have access to the requested folder
+        $access = $this->getAccess([ $folderId ]);
+
+        // special case for root, just let that through to the keeper
+        if ($access < UserAccess::ACCESS_READ && $folderId != 0) {
+            throw new Resource\Exception("No access to requested folder");
+        }
+
         // Redirect to this folder next time page gets reloaded
         $this->getSession()->set('resourcesID', $folderId, $this->namespace);
 
+        // retrieve folder data
         $folder = $this->getFolder($folderId);
 
         try {
+            // attempt to compile an ancestry for this folder, but if it doesn't work, that's ok
             $tree = $folder->getParent() instanceof IFolder ? $this->getBreadcrumbs($folder->getParent()) : [];
         } catch (Resource\Exception $e) {
             $tree = [];
@@ -162,7 +174,7 @@ abstract class AbstractController extends BaseController
             'tree'      => $tree,
             'folder'    => $folder,
             'icon'      => $this->treeBuilder->getFolderIcon($folder),
-            'access'    => $this->getAccess([ $folderId ]),
+            'access'    => $access,
             'user'      => $this->getUser(),
             'conf'      => $this->conf,
             'namespace' => $this->namespace,
