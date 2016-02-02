@@ -2,7 +2,13 @@
 
 <ul class="breadcrumb">
     {% for node in tree %}
-        <li><a data-selectnode="{{ node.categoryId }}" href="/resources/{{ node.categoryId }}">{{ node.name }}</a></li>
+        <li>
+        {%- if node.disabled -%}
+            <a class="disabled" data-selectnode="{{ node.categoryId }}">{{ node.name }}</a>
+        {%- else -%}
+            <a data-selectnode="{{ node.categoryId }}" href="/resources/{{ node.categoryId }}">{{ node.name }}</a>
+        {%- endif -%}
+        </li>
     {% endfor %}
 </ul>
 
