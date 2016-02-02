@@ -246,7 +246,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
 
             if ($groupHandler->isStaff()) {
-                $settings['baseUri'] = 'http://mggs-fs01/';
+                $settings['baseUri'] = 'http://mggs-webdav/';
 
                 $paths = array(
                     '/STAFF/' . $_SESSION['username'] . '/',
