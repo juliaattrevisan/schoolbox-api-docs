@@ -154,9 +154,7 @@
                             {% if booking is empty %}
                                 &nbsp;
                             {% else %}
-                            <article>
-                                {{ booking.getNotes()|purify }}
-                            </article>
+                            <article>{{ booking.getNotes()|purify }}</article>
                             {% endif %}
                         </td>
                     </tr>

@@ -835,6 +835,13 @@ nav {
 		padding: 1rem 2rem 1rem 1rem;
 		clear: both;
 
+		/* Zero padding article, if it is empty
+		 * Whitespaces and empty elements inside <article> don't count
+		 */
+		&:empty {
+			padding: 0;
+		}
+
 		@media #{$small-only} {
 			p {
 				font-size: (0.8125 * rem-calc($base-font-size));
