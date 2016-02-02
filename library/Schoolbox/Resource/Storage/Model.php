@@ -155,10 +155,14 @@ class Model extends File implements IStorage
     /**
      * Returns the full mime string for the file
      *
+     * @param  bool   $detect
      * @return string
      */
-    public function getMime()
+    public function getMime($detect = false)
     {
+        if ($detect) {
+            return parent::getMimetype();
+        }
         return $this->getMimetype()->getMime();
     }
 
