@@ -10,12 +10,12 @@
 @import "base/reset";
 @import "base/typography";
 @import "components/content";
-
+@import "components/editor/custom-styles.scss";
 
 @import "utils/custom";
 
 body {
-  background-color: $white;
-  margin: 1rem;
-  height: auto;
+    background-color: $white;
+    margin: 1rem;
+    height: auto;
 }
