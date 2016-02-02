@@ -260,10 +260,6 @@
                  */
                 embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28&omit_script=1',
 
-                styleSet: [
-                    {name: 'Blue Title', element: 'h3', styles: {'color': 'Blue'}}
-                ],
-
                 /* This used to be 'mode', a legacy setting from Tiny.
                  *
                  * Instead of using its broken interface design, I levelled it up
