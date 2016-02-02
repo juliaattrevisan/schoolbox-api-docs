@@ -152,7 +152,11 @@ abstract class AbstractController extends BaseController
 
         $folder = $this->getFolder($folderId);
 
-        $tree = $folder->getParent() instanceof IFolder ? $this->getBreadcrumbs($folder->getParent()) : [];
+        try {
+            $tree = $folder->getParent() instanceof IFolder ? $this->getBreadcrumbs($folder->getParent()) : [];
+        } catch (Resource\Exception $e) {
+            $tree = [];
+        }
 
         return [
             'tree'      => $tree,
@@ -201,6 +205,7 @@ abstract class AbstractController extends BaseController
             $this->getResponse()->redirect->to(
                 $this->getRouter()->generate("{$this->namespace}.browse", array())
             );
+            return;
         }
 
         $folderId = $this->getSession()->get('resourcesID', 0, $this->namespace);
