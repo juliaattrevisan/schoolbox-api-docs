@@ -92,14 +92,17 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         /* To edit someone else's textbox, you need write access to both homepages.
          * To just edit one homepage's textbox, you need write access to that homepage.
          */
+        $editing = false;
         if ($this->permission >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
             if ($this->sitepage->arg[1] == 'textBoxModify') {
+                $editing = true;
                 $this->setVar(
                     array(
                         'TEXTBOX_BODY' => Scrub::text($this->getTextbox()->getBody()),
                     )
                 );
             } elseif ($this->sitepage->arg[1] == 'textBoxCreate') {
+                $editing = true;
                 $this->setVar(
                     array(
                         'TEXTBOX_HEADING'     => '',
@@ -126,6 +129,9 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
         /* Need title injected here
          */
+        if ($editing) {
+            $this->config['collapse']['value'] = false;
+        }
         $this->parseConfig();
 
         return true; // everything went according to plan
