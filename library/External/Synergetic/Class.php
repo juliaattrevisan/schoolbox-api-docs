@@ -37,6 +37,27 @@ class External_Synergetic_Class implements External_ClassInterface
     }
 
     /**
+     * Gets the class code part of a query.
+     *
+     * @param  string $subCode
+     * @return string
+     */
+    protected function getClassCodeQuery($subCode)
+    {
+        $classQuery = '(';
+        $subCodeArray = explode(',', $subCode);
+        foreach ($subCodeArray as $code) {
+            if (strpos($code, '/') !== false) {
+                $codeArray = explode('/', $code);
+                $classQuery .= "( ClassCode = '{$codeArray[1]}' AND ClassCampus = '{$codeArray[0]}' ) OR ";
+            } else {
+                $classQuery .= "ClassCode = '$code' OR ";
+            }
+        }
+        return substr($classQuery, 0, -3) . ')';
+    }
+
+    /**
      * Returns the details of a class based on its code
      * This function is Synergetic only, not included in the interface and used for attendances
      *
