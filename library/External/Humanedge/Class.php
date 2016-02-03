@@ -10,10 +10,7 @@
  */
 class External_Humanedge_Class implements External_ClassInterface
 {
-    /**
-     * @var MSSQL $database
-     */
-    private $database;
+    use External_Humanedge_APlusDatabaseTrait;
 
 //    /**
 //     * @var External_UserInterface
@@ -34,23 +31,43 @@ class External_Humanedge_Class implements External_ClassInterface
      */
     public function getStudents($classCode)
     {
+        $db    = $this->loadAPlusDatabase();
         $query = "
             SELECT
-                s.PreferredName AS firstname,
-                s.LastName AS lastname,
-                s.Year AS StudentYearLevel,
+                st.FirstName AS firstname,
+                st.FamilyName AS lastname,
+                '' AS StudentYearLevel,
                 '' AS StudentHouseDescription,
                 '' AS StudentMedicalAlert,
-                s.SpecialNeeds AS StudentSpecialNeedsFlag,
-                s.Code AS synergy_id,
+                '' AS StudentSpecialNeedsFlag,
+                st.Code AS synergy_id,
                 '' AS ClassCampus
-            FROM Student s
-            INNER JOIN ClassDetail cd ON s.ID = cd.StudentID
-            INNER JOIN Class cl ON cd.ClassID = cl.ID
-            INNER JOIN Subject su ON cl.SubjectID = su.ID
-            WHERE (su.Code+'-'+cl.ClassGroup) = {$this->getDatabase()->smartQuote($classCode)}
+            FROM tblSubject s
+            LEFT  JOIN tblBlockItem b on s.ID = b.SubjectID
+            INNER JOIN tblAllocation a on s.ID = a.SubjectID
+            INNER JOIN tblStudent st on a.FormID = st.FormID
+            WHERE st.deleted = 0
+            AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
+
+            UNION ALL
+
+            SELECT
+                st.FirstName AS firstname,
+                st.FamilyName AS lastname,
+                '' AS StudentYearLevel,
+                '' AS StudentHouseDescription,
+                '' AS StudentMedicalAlert,
+                '' AS StudentSpecialNeedsFlag,
+                st.Code AS synergy_id,
+                '' AS ClassCampus
+            FROM tblSubject s
+            INNER JOIN tblBlockItem b on s.ID = b.SubjectID
+            INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
+            INNER JOIN tblStudent st ON sc.StudentID = st.ID
+            WHERE st.deleted = 0
+            AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
         ";
-        return $this->getDatabase()->getAll($query);
+        return $db->getAll($query);
     }
 
     /**
@@ -58,16 +75,29 @@ class External_Humanedge_Class implements External_ClassInterface
      */
     public function getTeacherName($classCode)
     {
+        $db    = $this->loadAPlusDatabase();
         $query = "
-            SELECT t.Code
-            FROM Staff t
-            INNER JOIN ClassStaff ct ON t.ID = ct.StaffID
-            INNER JOIN Class cl ON ct.ClassID = cl.ID
-            INNER JOIN Subject su ON cl.SubjectID = su.ID
-            WHERE (su.Code+'-'+cl.ClassGroup) = {$this->getDatabase()->smartQuote($classCode)}
+            SELECT
+                t.Code AS Code
+            FROM tblSubject s
+            LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
+            INNER JOIN tblAllocation a on s.ID = a.SubjectID
+            INNER JOIN tblTeacher t on a.TeacherID = t.ID
+            WHERE t.deleted = 0
+            AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
+
+            UNION ALL
+
+            SELECT
+                t.Code AS Code
+            FROM tblSubject s
+            INNER JOIN tblBlockItem b on s.ID = b.SubjectID
+            INNER JOIN tblTeacher t on b.TeacherID = t.ID
+            WHERE t.deleted = 0
+            AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
         ";
         $result = [];
-        foreach ($this->getDatabase()->getAll($query) as $row) {
+        foreach ($db->getAll($query) as $row) {
             $result[] = $row['Code'];
         }
         return $result;
