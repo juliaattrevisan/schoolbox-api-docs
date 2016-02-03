@@ -1,0 +1,2 @@
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `editable`, `type_id`) VALUES ('forgotten_password_url', '/forgotten-password.php', 'Forgotten Password Url', 'The url to visit when parents request their forgotten password', '1', 'true', 5);
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `editable`, `type_id`) VALUES ('forgotten_password_text', 'Parents, forgotten your password?', 'Forgotten Password Text', 'The text contained within the link for the parents\' forgotten password', '1', 'true', 5);

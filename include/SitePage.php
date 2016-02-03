@@ -1212,6 +1212,29 @@ class SitePage extends Page
             $this->setVar('remember_me_block', '');
         }
 
+        /* Custom text for Parents' Forgotten Password link
+         */
+        $this->setBlock(TEMPLATE_body, 'forgotten_password', 'forgotten_password_block');
+
+        $config = new \Schoolbox\Config\Loader();
+
+        $forgottenPasswordText = $config->get('forgotten_password_text');
+        $forgottenPasswordUrl = $config->get('forgotten_password_url');
+
+        if (strlen($forgottenPasswordText) && strlen($forgottenPasswordUrl)) {
+            $this->setVar(array(
+                'LOGIN_FORGOTTEN_PASSWORD_URL' => $forgottenPasswordUrl,
+                'LOGIN_FORGOTTEN_PASSWORD_TEXT' => $forgottenPasswordText
+            ));
+
+            $this->parse('forgotten_password_block', 'forgotten_password');
+        }
+        else {
+            $this->setVar(array(
+                'forgotten_password_block' => ''
+            ));
+        }
+
         // Shove GET params (samlAuth and page at least) into the form
         $getParams = array_intersect_key($_GET, array('page' => true, 'samlAuth' => true));
         $this->setVar('GET_PARAMS', htmlspecialchars(http_build_query($getParams), ENT_QUOTES));
