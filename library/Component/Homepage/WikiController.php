@@ -136,6 +136,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
                         'WIKI_AUTHOR'     => $userHandler->formatName($wiki),
                         'WIKI_AUTHOR_ID'  => $wiki['userID'],
                         'WIKI_MODIFIED'   => $modifiedTime->getRelativeTime(),
+                        'WIKI_BODY'       => TextFormatter::cutSentence(Scrub::html($wiki['body']), 500),
                         'ON_OFF'          => ++$j % 2 ? '' : 'dark',
                     )
                 );

@@ -36,7 +36,7 @@
             <ul class="information-list">
                 <!-- BEGIN chat -->
                 <li>
-                    <div class="large-12 columns no-pad">
+                    <div class="list-item">
                         <div class="avatar card">
                             <a href="/search/user/{BLOG_AUTHOR_ID}" title="View Profile">
                                 <img src="/portrait.php?userId={CHAT_USER_SYNERGY_ID}&size=square64" alt="View Profile" />
@@ -44,11 +44,9 @@
                             </a>
                             <p class="meta">Posted {DATETIME}</p>
                         </div>
-
-                        <article>
-                            {CHAT_BODY}
-                        </article>
                     </div>
+
+                    <article>{CHAT_BODY}</article>
                 </li>
                 <!-- END chat -->
             </ul>

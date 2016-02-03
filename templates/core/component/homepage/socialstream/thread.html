@@ -8,69 +8,6 @@
                 <p class="meta">Posted {SOCIALSTREAM_POST_CREATED_AT}</p>
             </a>
         </div>
-        <article data-body class="body">
-            <p>{SOCIALSTREAM_POST_BODY}</p>
-
-            <!-- BEGIN socialstream_post_has_attachment -->
-            <div class="socialstream-attachment">
-                <!-- BEGIN socialstream_post_has_icon -->
-                <div class="avatar card">
-                    <a href='{SOCIALSTREAM_POST_URL}' target="_blank">
-                        <img src="/images/mime/60x60/{SOCIALSTREAM_POST_ICON}" />
-                        <p>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</p>
-                    </a>
-                </div>
-                <article>{SOCIALSTREAM_POST_EXTERNAL_BODY}</article>
-
-                <!-- END socialstream_post_has_icon -->
-
-                <!-- BEGIN socialstream_post_has_thumbnail -->
-                <div class="avatar card">
-                    <a href="{SOCIALSTREAM_POST_URL}">
-                        <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64" />
-                        <p>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</p>
-                    </a>
-                </div>
-                <article>{SOCIALSTREAM_POST_EXTERNAL_BODY}</article>
-                <!-- END socialstream_post_has_thumbnail -->
-
-                <!-- BEGIN socialstream_post_has_image -->
-                <a href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
-                    <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=constrain200" />
-                </a>
-                <!-- END socialstream_post_has_image -->
-
-                <!-- BEGIN socialstream_post_has_metadata -->
-                <!-- END socialstream_post_has_metadata -->
-
-                <!-- BEGIN socialstream_post_has_player -->
-                <div class="flex-video">
-                    <iframe width="560" height="315" src="{SOCIALSTREAM_POST_URL}" frameborder="0" allowfullscreen seamless></iframe>
-                </div>
-                <!-- END socialstream_post_has_player -->
-
-                <!-- BEGIN socialstream_post_has_video -->
-                <video id="socialstream_video{SOCIALSTREAM_POST_POST_ID}"
-                       controls
-                       preload="none"
-                       poster="{SOCIALSTREAM_POST_VIDEO_POSTER}"
-                       width="100%"
-                       height="400"
-                        >
-                    <source src="{SOCIALSTREAM_POST_VIDEO_SRC}" type='video/mp4'>
-                </video>
-                <script>
-                    $("#socialstream_video{SOCIALSTREAM_POST_POST_ID}").mediaelementplayer();
-                </script>
-                <!-- END socialstream_post_has_video -->
-
-                <!-- BEGIN socialstream_post_has_video_pending -->
-                <img src="{SOCIALSTREAM_POST_VIDEO_STATUS_IMG}" title="Currently processing video" />
-                This video is currently processing - when it has finished, it will display for all users.
-                <!-- END socialstream_post_has_video_pending -->
-            </div>
-            <!-- END socialstream_post_has_attachment -->
-        </article>
     </div>
     <nav>
         <!-- BEGIN socialstream_post_has_delete -->
@@ -81,6 +18,69 @@
         <a href="#" class="icon-comment no-text" title="Add Reply" data-parentid="{SOCIALSTREAM_POST_POST_ID}" data-reveal-id="socialstream-reply-{COMPONENT_INSTANCE_ID}" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-add-post-link></a>
         <!-- END socialstream_post_has_add -->
     </nav>
+    <article data-body>
+        <p>{SOCIALSTREAM_POST_BODY}</p>
+
+        <!-- BEGIN socialstream_post_has_attachment -->
+        <div class="socialstream-attachment">
+            <!-- BEGIN socialstream_post_has_icon -->
+            <div class="avatar card">
+                <a href='{SOCIALSTREAM_POST_URL}' target="_blank">
+                    <img src="/images/mime/60x60/{SOCIALSTREAM_POST_ICON}" />
+                    <p>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</p>
+                </a>
+            </div>
+            <article>{SOCIALSTREAM_POST_EXTERNAL_BODY}</article>
+
+            <!-- END socialstream_post_has_icon -->
+
+            <!-- BEGIN socialstream_post_has_thumbnail -->
+            <div class="avatar card">
+                <a href="{SOCIALSTREAM_POST_URL}">
+                    <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=square64" />
+                    <p>{SOCIALSTREAM_POST_EXTERNAL_TITLE}</p>
+                </a>
+            </div>
+            <article>{SOCIALSTREAM_POST_EXTERNAL_BODY}</article>
+            <!-- END socialstream_post_has_thumbnail -->
+
+            <!-- BEGIN socialstream_post_has_image -->
+            <a href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=constrain200" />
+            </a>
+            <!-- END socialstream_post_has_image -->
+
+            <!-- BEGIN socialstream_post_has_metadata -->
+            <!-- END socialstream_post_has_metadata -->
+
+            <!-- BEGIN socialstream_post_has_player -->
+            <div class="flex-video">
+                <iframe width="560" height="315" src="{SOCIALSTREAM_POST_URL}" frameborder="0" allowfullscreen seamless></iframe>
+            </div>
+            <!-- END socialstream_post_has_player -->
+
+            <!-- BEGIN socialstream_post_has_video -->
+            <video id="socialstream_video{SOCIALSTREAM_POST_POST_ID}"
+                   controls
+                   preload="none"
+                   poster="{SOCIALSTREAM_POST_VIDEO_POSTER}"
+                   width="100%"
+                   height="400"
+            >
+                <source src="{SOCIALSTREAM_POST_VIDEO_SRC}" type='video/mp4'>
+            </video>
+            <script>
+                $("#socialstream_video{SOCIALSTREAM_POST_POST_ID}").mediaelementplayer();
+            </script>
+            <!-- END socialstream_post_has_video -->
+
+            <!-- BEGIN socialstream_post_has_video_pending -->
+            <img src="{SOCIALSTREAM_POST_VIDEO_STATUS_IMG}" title="Currently processing video" />
+            This video is currently processing - when it has finished, it will display for all users.
+            <!-- END socialstream_post_has_video_pending -->
+        </div>
+        <!-- END socialstream_post_has_attachment -->
+    </article>
 
     <!-------------------------->
     <!-- Socialstream Comment -->
@@ -96,70 +96,6 @@
                         <p class="meta">Posted {SOCIALSTREAM_COMMENT_CREATED_AT}</p>
                     </a>
                 </div>
-
-                <article data-body class="body">
-                    <p>{SOCIALSTREAM_COMMENT_BODY}</p>
-
-                    <!-- BEGIN socialstream_comment_has_attachment -->
-                    <div class="socialstream-attachment">
-
-                        <!-- BEGIN socialstream_comment_has_icon -->
-                        <div class="avatar card">
-                            <a href="{SOCIALSTREAM_COMMENT_URL}" target="_blank">
-                                <img src="/images/mime/60x60/{SOCIALSTREAM_COMMENT_ICON}" />
-                                <p>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</p>
-                            </a>
-                        </div>
-                        <article>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</article>
-                        <!-- END socialstream_comment_has_icon -->
-
-                        <!-- BEGIN socialstream_comment_has_image -->
-                        <a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
-                            <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=constrain200" />
-                        </a>
-                        <!-- END socialstream_comment_has_image -->
-
-                        <!-- BEGIN socialstream_comment_has_thumbnail -->
-                        <div class="avatar card">
-                            <a href="{SOCIALSTREAM_POST_URL}">
-                                <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64" />
-                                <p>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</p>
-                            </a>
-                        </div>
-                        <article>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</article>
-                        <!-- END socialstream_comment_has_thumbnail -->
-
-                        <!-- BEGIN socialstream_comment_has_player -->
-                        <div class="flex-video">
-                            <iframe width="560" height="315" src="{SOCIALSTREAM_COMMENT_URL}" frameborder="0" allowfullscreen seamless></iframe>
-                        </div>
-                        <!-- END socialstream_comment_has_player -->
-
-                        <!-- BEGIN socialstream_comment_has_video -->
-                        <video id="socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}"
-                               controls
-                               preload="none"
-                               poster="{SOCIALSTREAM_COMMENT_VIDEO_POSTER}"
-                               width="100%"
-                               height="400"
-                                >
-                            <source src="{SOCIALSTREAM_COMMENT_VIDEO_SRC}" type='video/mp4'>
-                        </video>
-                        <script>
-                            $("#socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}").mediaelementplayer();
-                        </script>
-                        <!-- END socialstream_comment_has_video -->
-
-                        <!-- BEGIN socialstream_comment_has_video_pending -->
-                        <img src="{SOCIALSTREAM_COMMENT_VIDEO_STATUS_IMG}" title="Currently processing video" />
-                        This video is currently processing - when it has finished, it will display for all users.
-                        <!-- END socialstream_comment_has_video_pending -->
-
-                        <!-- BEGIN socialstream_comment_has_metadata -->
-                        <!-- END socialstream_comment_has_metadata -->
-                    </div>
-                    <!-- END socialstream_comment_has_attachment -->
-                </article>
             </div>
             <nav>
                 <!-- BEGIN socialstream_comment_has_delete -->
@@ -170,6 +106,69 @@
                 <a class="icon-comment" href="#" title="Add Reply" data-rootid="{SOCIALSTREAM_POST_POST_ID}" data-parentid="{SOCIALSTREAM_COMMENT_POST_ID}" data-reveal-id="socialstream-reply-{COMPONENT_INSTANCE_ID}" data-add-post-link></a>
                 <!-- END socialstream_comment_has_add -->
             </nav>
+            <article data-body>
+                <p>{SOCIALSTREAM_COMMENT_BODY}</p>
+
+                <!-- BEGIN socialstream_comment_has_attachment -->
+                <div class="socialstream-attachment">
+
+                    <!-- BEGIN socialstream_comment_has_icon -->
+                    <div class="avatar card">
+                        <a href="{SOCIALSTREAM_COMMENT_URL}" target="_blank">
+                            <img src="/images/mime/60x60/{SOCIALSTREAM_COMMENT_ICON}" />
+                            <p>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</p>
+                        </a>
+                    </div>
+                    <article>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</article>
+                    <!-- END socialstream_comment_has_icon -->
+
+                    <!-- BEGIN socialstream_comment_has_image -->
+                    <a href="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                        <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=constrain200" />
+                    </a>
+                    <!-- END socialstream_comment_has_image -->
+
+                    <!-- BEGIN socialstream_comment_has_thumbnail -->
+                    <div class="avatar card">
+                        <a href="{SOCIALSTREAM_POST_URL}">
+                            <img src="/socialstream/image.php?id={SOCIALSTREAM_COMMENT_POST_ID}&size=square64" />
+                            <p>{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</p>
+                        </a>
+                    </div>
+                    <article>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</article>
+                    <!-- END socialstream_comment_has_thumbnail -->
+
+                    <!-- BEGIN socialstream_comment_has_player -->
+                    <div class="flex-video">
+                        <iframe width="560" height="315" src="{SOCIALSTREAM_COMMENT_URL}" frameborder="0" allowfullscreen seamless></iframe>
+                    </div>
+                    <!-- END socialstream_comment_has_player -->
+
+                    <!-- BEGIN socialstream_comment_has_video -->
+                    <video id="socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}"
+                           controls
+                           preload="none"
+                           poster="{SOCIALSTREAM_COMMENT_VIDEO_POSTER}"
+                           width="100%"
+                           height="400"
+                    >
+                        <source src="{SOCIALSTREAM_COMMENT_VIDEO_SRC}" type='video/mp4'>
+                    </video>
+                    <script>
+                        $("#socialstream_video{SOCIALSTREAM_COMMENT_POST_ID}").mediaelementplayer();
+                    </script>
+                    <!-- END socialstream_comment_has_video -->
+
+                    <!-- BEGIN socialstream_comment_has_video_pending -->
+                    <img src="{SOCIALSTREAM_COMMENT_VIDEO_STATUS_IMG}" title="Currently processing video" />
+                    This video is currently processing - when it has finished, it will display for all users.
+                    <!-- END socialstream_comment_has_video_pending -->
+
+                    <!-- BEGIN socialstream_comment_has_metadata -->
+                    <!-- END socialstream_comment_has_metadata -->
+                </div>
+                <!-- END socialstream_comment_has_attachment -->
+            </article>
 
             <!------------------------>
             <!-- Socialstream Reply -->
@@ -186,69 +185,68 @@
                                 <p class="meta">Posted {SOCIALSTREAM_REPLY_CREATED_AT}</p>
                             </a>
                         </div>
-
-                        <article data-body class="body">
-                            <p>{SOCIALSTREAM_REPLY_BODY}</p>
-
-                            <!-- BEGIN socialstream_reply_has_attachment -->
-                            <div data-socialstream-attachment>
-                                <!-- BEGIN socialstream_reply_has_icon -->
-                                <div class="avatar card">
-                                    <a href="{SOCIALSTREAM_REPLY_URL}" target="_blank">
-                                        <img src="/images/mime/60x60/{SOCIALSTREAM_REPLY_ICON}" />
-                                        <p>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</p>
-                                    </a>
-                                </div>
-                                <article>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</article>
-                                <!-- END socialstream_reply_has_icon -->
-
-                                <!-- BEGIN socialstream_reply_has_image -->
-                                <a href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
-                                    <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=constrain200" />
-                                </a>
-                                <!-- END socialstream_reply_has_image -->
-
-                                <!-- BEGIN socialstream_reply_has_thumbnail -->
-                                <div class="avatar card">
-                                    <a href="{SOCIALSTREAM_POST_URL}">
-                                        <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64" />
-                                        <p>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</p>
-                                    </a>
-                                </div>
-                                <article>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</article>
-                                <!-- END socialstream_reply_has_thumbnail -->
-
-                                <!-- BEGIN socialstream_reply_has_player -->
-                                <div class="flex-video">
-                                    <iframe width="560" height="315" src="{SOCIALSTREAM_REPLY_URL}" frameborder="0" allowfullscreen seamless></iframe>
-                                </div>
-                                <!-- END socialstream_reply_has_player -->
-
-                                <!-- BEGIN socialstream_reply_has_video -->
-                                <video id="socialstream_video{SOCIALSTREAM_REPLY_POST_ID}" controls preload="none" poster="{SOCIALSTREAM_REPLY_VIDEO_POSTER}" width="100%" height="400">
-                                    <source src="{SOCIALSTREAM_REPLY_VIDEO_SRC}" type='video/mp4'>
-                                </video>
-                                <script>
-                                    $("#socialstream_video{SOCIALSTREAM_REPLY_POST_ID}").mediaelementplayer();
-                                </script>
-                                <!-- END socialstream_reply_has_video -->
-
-                                <!-- BEGIN socialstream_reply_has_video_pending -->
-                                <img src="{SOCIALSTREAM_REPLY_VIDEO_STATUS_IMG}" title="Currently processing video" />
-                                This video is currently processing - when it has finished, it will display for all users.
-                                <!-- END socialstream_reply_has_video_pending -->
-
-                                <!-- BEGIN socialstream_reply_has_metadata -->
-                                <!-- END socialstream_reply_has_metadata -->
-                            </div>
-                            <!-- END socialstream_reply_has_attachment -->
-                        </article>
                     </div>
                     <nav>
                         <!-- BEGIN socialstream_reply_has_delete -->
                         <a class="icon-delete" href="/socialstream/modifyForm.php?delete={SOCIALSTREAM_REPLY_POST_ID}" title="Delete Reply" data-socialstream-delete></a>
                         <!-- END socialstream_reply_has_delete -->
                     </nav>
+                    <article data-body>
+                        <p>{SOCIALSTREAM_REPLY_BODY}</p>
+
+                        <!-- BEGIN socialstream_reply_has_attachment -->
+                        <div data-socialstream-attachment>
+                            <!-- BEGIN socialstream_reply_has_icon -->
+                            <div class="avatar card">
+                                <a href="{SOCIALSTREAM_REPLY_URL}" target="_blank">
+                                    <img src="/images/mime/60x60/{SOCIALSTREAM_REPLY_ICON}" />
+                                    <p>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</p>
+                                </a>
+                            </div>
+                            <article>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</article>
+                            <!-- END socialstream_reply_has_icon -->
+
+                            <!-- BEGIN socialstream_reply_has_image -->
+                            <a href="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
+                                <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=constrain200" />
+                            </a>
+                            <!-- END socialstream_reply_has_image -->
+
+                            <!-- BEGIN socialstream_reply_has_thumbnail -->
+                            <div class="avatar card">
+                                <a href="{SOCIALSTREAM_POST_URL}">
+                                    <img src="/socialstream/image.php?id={SOCIALSTREAM_REPLY_POST_ID}&size=square64" />
+                                    <p>{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</p>
+                                </a>
+                            </div>
+                            <article>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</article>
+                            <!-- END socialstream_reply_has_thumbnail -->
+
+                            <!-- BEGIN socialstream_reply_has_player -->
+                            <div class="flex-video">
+                                <iframe width="560" height="315" src="{SOCIALSTREAM_REPLY_URL}" frameborder="0" allowfullscreen seamless></iframe>
+                            </div>
+                            <!-- END socialstream_reply_has_player -->
+
+                            <!-- BEGIN socialstream_reply_has_video -->
+                            <video id="socialstream_video{SOCIALSTREAM_REPLY_POST_ID}" controls preload="none" poster="{SOCIALSTREAM_REPLY_VIDEO_POSTER}" width="100%" height="400">
+                                <source src="{SOCIALSTREAM_REPLY_VIDEO_SRC}" type='video/mp4'>
+                            </video>
+                            <script>
+                                $("#socialstream_video{SOCIALSTREAM_REPLY_POST_ID}").mediaelementplayer();
+                            </script>
+                            <!-- END socialstream_reply_has_video -->
+
+                            <!-- BEGIN socialstream_reply_has_video_pending -->
+                            <img src="{SOCIALSTREAM_REPLY_VIDEO_STATUS_IMG}" title="Currently processing video" />
+                            This video is currently processing - when it has finished, it will display for all users.
+                            <!-- END socialstream_reply_has_video_pending -->
+
+                            <!-- BEGIN socialstream_reply_has_metadata -->
+                            <!-- END socialstream_reply_has_metadata -->
+                        </div>
+                        <!-- END socialstream_reply_has_attachment -->
+                    </article>
                 </li>
                 <!-- END socialstream_reply -->
             </ul>

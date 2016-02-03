@@ -51,9 +51,6 @@
                             <!-- END modified -->
                         </div>
                     </div>
-                    <article class="small-12 columns">
-                        {POST_BODY}
-                    </article>
                     <nav>
                         <!-- BEGIN reply_post -->
                         <a class="icon-reply no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}"title="Reply" ></a>
@@ -63,6 +60,7 @@
                         <a class="icon-delete no-text" href="/forum/modifyForm.php?deletePost={POST_ID}" data-action="delete" data-relation="post" title="Delete Post"></a>
                         <!-- END modify -->
                     </nav>
+                    <article>{POST_BODY}</article>
                 </li>
                 <!-- END post -->
             </ul>

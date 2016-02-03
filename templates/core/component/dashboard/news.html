@@ -19,7 +19,8 @@
                         <!-- BEGIN news -->
 
                             <!-- BEGIN full -->
-                                <li>
+                            <li>
+                                <div class="list-item">
                                     <div class="avatar card small-12">
                                         <a href="{NEWS_URL}" title="{NEWS_TITLE}">
                                             <!-- BEGIN news_image -->
@@ -33,25 +34,26 @@
                                             Posted by <a href="/search/user/{NEWS_AUTHOR_ID}">{NEWS_AUTHOR_NAME}</a> {NEWS_TIME}
                                         </p>
                                     </div>
-                                    <article>
-                                        <p>
-                                            {NEWS_SHORT}
-                                        </p>
-                                    </article>
-                                </li>
+                                </div>
+                                <article>
+                                    <p>
+                                        {NEWS_SHORT}
+                                    </p>
+                                </article>
+                            </li>
                             <!-- END full -->
 
                             <!-- BEGIN compact -->
-                                <li>
-                                    <div class="card small-12">
-                                        <a href="{NEWS_URL}" title="{NEWS_TITLE}">
-                                            <h3>{NEWS_TITLE}</h3>
-                                        </a>
-                                        <p class="meta">
-                                            Posted by <a href="/search/user/{NEWS_AUTHOR_ID}">{NEWS_AUTHOR_NAME}</a> {NEWS_TIME}
-                                        </p>
-                                    </div>
-                                </li>
+                            <li>
+                                <div class="card small-12">
+                                    <a href="{NEWS_URL}" title="{NEWS_TITLE}">
+                                        <h3>{NEWS_TITLE}</h3>
+                                    </a>
+                                    <p class="meta">
+                                        Posted by <a href="/search/user/{NEWS_AUTHOR_ID}">{NEWS_AUTHOR_NAME}</a> {NEWS_TIME}
+                                    </p>
+                                </div>
+                            </li>
                             <!-- END compact -->
 
                         <!-- END news -->

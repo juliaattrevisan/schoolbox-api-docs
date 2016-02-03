@@ -21,9 +21,6 @@
                                 <p class="meta">Posted by <a href="/search/user/{LIST_ITEM_AUTHOR_ID}" title="View Profile">{LIST_ITEM_AUTHOR_FULLNAME}</a></p>
                                 <p class="meta">Updated on {LIST_ITEM_UPDATED_AT}</p>
                             </div>
-                            <article>
-                                {LIST_ITEM_CONTENT}
-                            </article>
                         </div>
                         <nav>
                             <!-- BEGIN modify_text -->
@@ -31,6 +28,7 @@
                             <a href="/eportfolio/{ID}/{PAGE_ID}/blog/modify/{LIST_ITEM_ID}#modify_blog_form_{LIST_ITEM_ID}" class="icon-modify" title="Modify Blog post"></a>
                             <!-- END modify_text -->
                         </nav>
+                        <article>{LIST_ITEM_CONTENT}</article>
 
                         <div class="small-12 columns">
                             <p>
@@ -51,14 +49,13 @@
                                         </a>
                                         <p class="meta">Commented {COMMENT_CREATED_AT}</p>
                                     </div>
-
-                                    <article>{COMMENT_CONTENT}</article>
                                 </div>
                                 <nav>
                                     <!-- BEGIN has_delete_comment_form -->
                                     <a data-interaction="deletecomment" class="icon-delete" href="/eportfolio/component/blogcomment/modifyForm.php?action=removeComment&userId={LIST_ITEM_AUTHOR_ID}&pageId={PAGE_ID}&commentId={COMMENT_ID}" title="Delete Comment" onclick="return confirm('Do you want to delete this comment?');"></a>
                                     <!-- END has_delete_comment_form -->
                                 </nav>
+                                <article>{COMMENT_CONTENT}</article>
                             </li>
                             <!-- END comment -->
                             <!-- END has_comments -->

@@ -77,9 +77,6 @@
                                 {% endif %}
                             </p>
                         </div>
-                        <article>
-                            {{ item.description|e("purify")|raw }}
-                        </article>
                     </div>
                     <nav>
                         {#
@@ -95,6 +92,7 @@
                         <a class="icon-modify resource-name resource-edit-link" id="resource-edit-{{item.id}}" title="Edit" rel="edit-form" href="{{ routeLookup('resourceItem.edit', {id: item.id}) }}"></a>
                         {% endif %}
                     </nav>
+                    <article>{{ item.description|e("purify")|raw }}</article>
                 </li>
                 {% endfor %}
             </ul>

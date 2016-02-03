@@ -297,7 +297,6 @@
         <h2 class="subheader">Comments</h2>
         <section>
             <!-- BEGIN create_comment -->
-
             <form class="no-margin clearfix" id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
                 <input type="hidden" name="year" value="{WORK_YEAR}"/>
                 <input type="hidden" name="semester" value="{WORK_SEMESTER}"/>
@@ -335,19 +334,11 @@
                             </a>
                             <p class="meta">{COMMENT_USER_BYLINE}</p>
                             <p class="meta">{COMMENT_DATE}</p>
-
                         </div>
                         <div class="small-2 column content">
                             <span class="icon-staff-students {COMMENT_VIS_STUDENT}" title="{COMMENT_VIS_STUDENT_TITLE}"></span>
                             <span class="icon-staff {COMMENT_VIS_PARENT}" title="{COMMENT_VIS_PARENT_TITLE}"></span>
-
                         </div>
-
-                        <article>
-                            <p>
-                                {COMMENT_BODY}
-                            </p>
-                        </article>
                     </div>
                     <nav>
                         <!-- BEGIN comment_modify -->
@@ -355,6 +346,11 @@
                         <a class="icon-modify" title="Modify" data-comment-modify></a>
                         <!-- END comment_modify -->
                     </nav>
+                    <article>
+                        <p>
+                            {COMMENT_BODY}
+                        </p>
+                    </article>
                 </li>
                 <!-- END comment -->
             </ul>
