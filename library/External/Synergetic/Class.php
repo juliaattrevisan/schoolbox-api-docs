@@ -96,20 +96,7 @@ class External_Synergetic_Class implements External_ClassInterface
             return false;
         }
 
-        $classQuery = '(';
-
-        $subCodeArray = explode(',', $subCode);
-        foreach ($subCodeArray as $code) {
-            if (strpos($code, '/') !== false) {
-                $codeArray = explode('/', $code);
-                $classQuery .= "( ClassCode = '{$codeArray[1]}' AND ClassCampus = '{$codeArray[0]}' ) OR ";
-            } else {
-                $classQuery .= "ClassCode = '$code' OR ";
-            }
-        }
-
-        $classQuery = substr($classQuery, 0, -3) . ')';
-
+        $classQuery   = $this->getClassCodeQuery($subCode);
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
         $query = "
@@ -137,19 +124,7 @@ class External_Synergetic_Class implements External_ClassInterface
     {
         $teachers = array();
 
-        $classQuery   = '(';
-        $subCodeArray = explode(',', $subCode);
-        foreach ($subCodeArray as $code) {
-            if (strpos($code, '/') !== false) {
-                $codeArray = explode('/', $code);
-                $classQuery .= "( ClassCode = '{$codeArray[1]}' AND ClassCampus = '{$codeArray[0]}' ) OR ";
-            } else {
-                $classQuery .= "ClassCode = '$code' OR ";
-            }
-        }
-
-        $classQuery = substr($classQuery, 0, -3) . ')';
-
+        $classQuery   = $this->getClassCodeQuery($subCode);
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
         $msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM vSubjectClassesStaff
