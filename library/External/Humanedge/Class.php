@@ -16,15 +16,15 @@ class External_Humanedge_Class implements External_ClassInterface
 //     * @var External_UserInterface
 //     */
 //    private $externalUser;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->setDatabase(MSSQL::getInstance());
-//        $this->externalUser = new External_User('humanedge');
-    }
+//
+//    /**
+//     * Constructor
+//     */
+//    public function __construct()
+//    {
+//        $this->setDatabase(MSSQL::getInstance());
+////        $this->externalUser = new External_User('humanedge');
+//    }
 
     /**
      * @inheritDoc
