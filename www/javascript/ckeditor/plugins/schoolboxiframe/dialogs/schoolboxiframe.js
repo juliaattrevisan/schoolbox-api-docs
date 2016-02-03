@@ -229,7 +229,6 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
                                 type: 'text',
                                 id: 'schoolboxiframe-width',
                                 label: 'Width',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." ),
 
                                 /* Editing an existing element
                                  */
@@ -250,7 +249,6 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
                                 type: 'text',
                                 id: 'schoolboxiframe-height',
                                 label: 'Height',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Height cannot be empty."),
 
                                 /* Editing an existing element
                                  */
