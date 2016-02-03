@@ -85,9 +85,21 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
              * This occurs when setup() runs, when editing an existing image
              * Or when an image was set to Fullwidth (it won't have a width/height style attribute)
              */
-            if (fields.width.getValue() == '' || fields.height.getValue() == '' || reset) {
+            if (reset) {
                 fields.width.setValue(width);
                 fields.height.setValue(height);
+            }
+
+            /* Only allow using Constrain Aspect Ratio if a width
+             * and a height has been provided
+             */
+            if (fields.width.getValue() && fields.height.getValue()) {
+                fields.aspectRatio.enable();
+                fields.aspectRatio.setValue(true);
+            }
+            else {
+                fields.aspectRatio.disable();
+                fields.aspectRatio.setValue(false);
             }
 
             /* Reset aspect ratio value
@@ -105,7 +117,13 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
      * @param fields
      */
     function aspectRatioReset(fields) {
-        fields.aspectRatioValue.setValue(fields.width.getValue()/fields.height.getValue());
+
+        /* Only do something useful if the width and height are both set
+         * Otherwise results are not sane
+         */
+        if (fields.width.getValue() && fields.height.getValue()) {
+            fields.aspectRatioValue.setValue(fields.width.getValue() / fields.height.getValue());
+        }
     }
     
     /**
@@ -188,8 +206,13 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             styles.push('width:100%');
         }
         else {
-            styles.push('width:' + fields.width.getValue() + 'px');
-            styles.push('height:' + fields.height.getValue() + 'px');
+            if (fields.width.getValue()) {
+                styles.push('width:' + fields.width.getValue() + 'px');
+            }
+
+            if (fields.height.getValue()) {
+                styles.push('height:' + fields.height.getValue() + 'px');
+            }
         }
 
         /* Alignment
@@ -295,6 +318,21 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             verticalMargin: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-verticalmargin'),
             horizontalMargin: dialog.getContentElement('schoolboxresource-tab', 'schoolboxresource-horizontalmargin')
         };
+    }
+
+    /**
+     * Enable Constrain once both values provided
+     * Disable Constrain once one dimension is omitted
+     *
+     * @param fields
+     */
+    function toggleConstrain(fields) {
+        if (fields.width.getValue() && fields.height.getValue()) {
+            fields.aspectRatio.enable();
+        }
+        else {
+            fields.aspectRatio.disable();
+        }
     }
 
     /**
@@ -500,9 +538,16 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                                         render(fields, fields.url.getValue(), false);
                                                     }
 
-                                                    /* Always enable Constrain Aspect Ratio
+                                                    /* Enable Constrain Aspect Ratio only if a width
+                                                     * and height are provided (both are now optional)
+                                                     *
+                                                     * If optional, to re-activate Constrain, you must untick
+                                                     * then re-tick the Constrain checkbox. Save some hassle
+                                                     * by leaving it unticked when you don't specify a dimension
                                                      */
-                                                    fields.aspectRatio.setValue(true);
+                                                    if (fields.width.getValue() && fields.height.getValue()) {
+                                                        fields.aspectRatio.setValue(true);
+                                                    }
 
                                                     /* Shut modal, go back to Dialog
                                                      */
@@ -539,7 +584,6 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                 type: 'text',
                                 id: 'schoolboxresource-width',
                                 label: 'Width',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." ),
 
                                 /* Editing an existing element
                                  */
@@ -564,19 +608,35 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                         var dialog = this.getDialog();
                                         var fields = dialogFields(dialog);
 
-                                        if (fields.aspectRatio.getValue()) {
+                                        /* Can no longer rely on there being an aspect ratio because
+                                         * you can now leave either width or height empty; this causes
+                                         * a non-numeric aspectRatioValue to exist
+                                         */
+                                        if (fields.aspectRatio.getValue() && fields.aspectRatioValue.getValue() && fields.width.getValue().length && fields.height.getValue().length) {
                                             var newHeight = Math.round(fields.width.getValue() / fields.aspectRatioValue.getValue());
 
                                             fields.height.setValue(newHeight);
                                         }
+
+                                        /* Enable Constrain once both values provided
+                                         */
+                                        toggleConstrain(fields);
                                     }
+                                },
+
+                                /* Enable/Disable Constrain feature upon change
+                                 */
+                                onChange: function(event) {
+                                    var dialog = this.getDialog();
+                                    var fields = dialogFields(dialog);
+
+                                    toggleConstrain(fields);
                                 }
                             },
                             {
                                 type: 'text',
                                 id: 'schoolboxresource-height',
                                 label: 'Height',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Height cannot be empty."),
 
                                 /* Editing an existing element
                                  */
@@ -597,12 +657,25 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                         var dialog = this.getDialog();
                                         var fields = dialogFields(dialog);
 
-                                        if (fields.aspectRatio.getValue()) {
+                                        /* Can no longer rely on there being an aspect ratio because
+                                         * you can now leave either width or height empty; this causes
+                                         * a non-numeric aspectRatioValue to exist
+                                         */
+                                        if (fields.aspectRatio.getValue() && fields.aspectRatioValue.getValue() && fields.width.getValue().length && fields.height.getValue().length) {
                                             var newWidth = Math.round(fields.height.getValue() * fields.aspectRatioValue.getValue());
 
                                             fields.width.setValue(newWidth);
                                         }
                                     }
+                                },
+
+                                /* Enable/Disable Constrain feature upon change
+                                 */
+                                onChange: function(event) {
+                                    var dialog = this.getDialog();
+                                    var fields = dialogFields(dialog);
+
+                                    toggleConstrain(fields);
                                 }
                             },
                             {
@@ -636,7 +709,16 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                             var dialog = this.getDialog();
                             var fields = dialogFields(dialog);
 
-                            fields.aspectRatio.setValue(true);
+                            /* Enable Constrain Aspect Ratio only if a width
+                             * and height are provided (both are now optional)
+                             *
+                             * If optional, to re-activate Constrain, you must untick
+                             * then re-tick the Constrain checkbox. Save some hassle
+                             * by leaving it unticked when you don't specify a dimension
+                             */
+                            if (fields.width.getValue() && fields.height.getValue()) {
+                                fields.aspectRatio.setValue(true);
+                            }
                         },
 
                         /* Remember the ratio so we can apply it when
