@@ -67,8 +67,13 @@
 
             }).fail(function (data) {
 
+                var elem = $(e.target);
+                var az   = elem.data('plugin_resourceAttach');
+                var dz   = az.dropzone;
+                var file = dz.files[0];
+
                 // explain that something broke
-                console.log(data);
+                az.rejectFile(file, data.responseText);
 
             }).always(function () {
                 // restore the grid

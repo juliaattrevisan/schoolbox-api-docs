@@ -140,6 +140,11 @@ class Controller extends BaseController
         $post = $this->getRequest()->post;
 
         try {
+            if ($file->getMime(true) != 'text/plain') {
+                throw new \Schoolbox\Resource\Exception("Not a plaintext CSV file, cannot parse");
+            }
+
+
             if ($boxId = $post->get('boxId')) {
                 $box = SubmissionBoxMapper::getInstance()->findById($boxId);
                 $folderId = $box->getCategory()->getId();
@@ -153,7 +158,11 @@ class Controller extends BaseController
                 // can't work with that
                 throw new \Schoolbox\Mapper\Exception('No folder or box ID set');
             }
-        } catch (\Schoolbox\Mapper\Exception $e) {
+
+            // attempt to build the grid
+            $grid = $this->getMapper()->buildFromCSV($file, $folderId, $taskMode)->setSubmissionBox($box);
+
+        } catch (\Exception $e) {
 
             $this->getResponse()->status->setCode(400);
             $this->getResponse()->content->set([
@@ -162,8 +171,6 @@ class Controller extends BaseController
             ]);
             return;
         }
-
-        $grid = $this->getMapper()->buildFromCSV($file, $folderId, $taskMode)->setSubmissionBox($box);
 
         $context = [
             'formField' => $post->get('formField', 'rb'),

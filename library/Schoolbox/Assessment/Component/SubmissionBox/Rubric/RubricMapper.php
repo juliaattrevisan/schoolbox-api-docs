@@ -390,6 +390,7 @@ class RubricMapper
      * @param IStorage $file
      * @param int      $folderId
      * @param bool     $taskMode
+     * @throws \Schoolbox\Resource\Exception
      * @return Rubric
      */
     public function buildFromCSV(IStorage $file, $folderId, $taskMode)
@@ -405,7 +406,19 @@ class RubricMapper
 
         $fp = $file->readStream();
 
-        $square[] = $this->getcsv($fp);
+        $headerRow = $this->getcsv($fp);
+
+        // must be an array, and must have at least 3 "cells"
+        if (!is_array($headerRow) || count($headerRow) < 3) {
+            throw new \Schoolbox\Resource\Exception("Not a valid rubric CSV file");
+        }
+
+        // first 2 "cells" must be blank
+        if ($headerRow[0] || $headerRow[1]) {
+            throw new \Schoolbox\Resource\Exception("Not a valid rubric CSV file");
+        }
+
+        $square[] = $headerRow;
 
         // list of levels
         $levelNames = array_slice($square[0], 2);
