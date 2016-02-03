@@ -67,17 +67,9 @@ class External_Synergetic_Class implements External_ClassInterface
      */
     public function getClass($classCode)
     {
+        $classQuery   = $this->getClassCodeQuery($classCode);
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
-        $classQuery = '';
-
-        if (strpos($classCode, '/') !== false) {
-            $codeArray = explode('/', $classCode);
-            $classQuery .= "( ClassCode = '{$codeArray[1]}' AND ClassCampus = '{$codeArray[0]}' ) ";
-        } else {
-            $classQuery .= "ClassCode = '$classCode'";
-        }
-
         $query = "
             SELECT *
             FROM SynergyOne.dbo.SubjectClasses
