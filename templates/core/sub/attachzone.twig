@@ -26,7 +26,9 @@ $data = {
             <div class="list-item">
                 <div class="avatar card small-12">
                     <img {% if not attachment.isImage %}class="mime"{% endif %} alt="{{ attachment.name }}" src="{{ attachment.preview }}" />
-                    <p class="filename" data-dz-name>{{ attachment.name }}</p>
+                    <p class="filename" data-dz-name>
+                        <a href="/storage/fetch.php?save=1&hash={{ attachment.hash|split(':')[1] }}">{{ attachment.name }}</a>
+                    </p>
                 </div>
             </div>
             {% if not attachzone.readonly %}
