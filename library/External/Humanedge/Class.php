@@ -33,7 +33,7 @@ class External_Humanedge_Class implements External_ClassInterface
     {
         $db    = $this->loadAPlusDatabase();
         $query = "
-            SELECT
+            SELECT DISTINCT
                 st.FirstName AS firstname,
                 st.FamilyName AS lastname,
                 '' AS StudentYearLevel,
@@ -51,7 +51,7 @@ class External_Humanedge_Class implements External_ClassInterface
 
             UNION ALL
 
-            SELECT
+            SELECT DISTINCT
                 st.FirstName AS firstname,
                 st.FamilyName AS lastname,
                 '' AS StudentYearLevel,
@@ -77,7 +77,7 @@ class External_Humanedge_Class implements External_ClassInterface
     {
         $db    = $this->loadAPlusDatabase();
         $query = "
-            SELECT
+            SELECT DISTINCT
                 t.Code AS Code
             FROM tblSubject s
             LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
@@ -88,7 +88,7 @@ class External_Humanedge_Class implements External_ClassInterface
 
             UNION ALL
 
-            SELECT
+            SELECT DISTINCT
                 t.Code AS Code
             FROM tblSubject s
             INNER JOIN tblBlockItem b on s.ID = b.SubjectID
