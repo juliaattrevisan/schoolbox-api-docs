@@ -159,6 +159,7 @@ class External_Humanedge_User implements External_UserInterface
             INNER JOIN Student s ON sc.ContactID = s.ID
             WHERE c.Code IN (%s)
         ";
+        $query  = sprintf($query, implode(',', array_map([$this->getDatabase(), 'smartQuote'], $synergyIds)));
         $result = [];
         foreach ($this->getDatabase()->getAll($query) as $row) {
             $result[$row['StudentID'].'-'.$row['ContactID']] = $row['Email'];
