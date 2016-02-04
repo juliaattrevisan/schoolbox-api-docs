@@ -173,7 +173,6 @@ else {
 		'ASSESS_START' => $openDate->getShort(),
 		'ASSESS_FINISH' => $dueDate->getShort(),
 		'SECTION_TITLE' => Scrub::text($section['title']),
-		'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
 		'QUESTION_TITLE' => Scrub::text($question['title']),
 		'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
 		'ASSESS_CATEGORY_ID' => $category->getId(),
