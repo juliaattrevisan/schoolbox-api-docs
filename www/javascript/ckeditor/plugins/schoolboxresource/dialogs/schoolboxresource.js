@@ -358,6 +358,16 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
     }
 
     /**
+     * The keypress was a tab character
+     *
+     * @param event
+     * @returns {boolean}
+     */
+    function isTabCharacter(event) {
+        return (event.data.$.keyCode == 9);
+    }
+
+    /**
      * Extract a particular css property's value from a style string
      *
      * @param property
@@ -636,7 +646,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                  * Ignore Tab key presses entirely
                                  */
                                 onKeyUp: function(event) {
-                                    if ((event.data.$.keyCode != 9) && numericOnly(event.data.$.keyCode)) {
+                                    if (!isTabCharacter(event) && numericOnly(event.data.$.keyCode)) {
                                         var dialog = this.getDialog();
                                         var fields = dialogFields(dialog);
 
@@ -691,7 +701,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                  * Ignore Tab key presses entirely
                                  */
                                 onKeyUp: function(event) {
-                                    if (event.data.$.keyCode != 9) {
+                                    if (!isTabCharacter(event)) {
                                         var dialog = this.getDialog();
                                         var fields = dialogFields(dialog);
 
