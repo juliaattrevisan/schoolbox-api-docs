@@ -101,7 +101,9 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
             array(
                 'bookingsByResource' => $this->bookings,
                 'component'          => $this,
-            ), false, false
+            ),
+            true,
+            false
         );
         return true;
 
