@@ -66,7 +66,7 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 /* Find out which attempt was made
  */
 if (is_numeric($this->arg[2])) {
-    $_SESSION['attempt_id'] = $this->arg[2];
+    $attemptId = $this->arg[2];
 } else {
     error(114);
 }
@@ -119,7 +119,7 @@ $this->setVar(
         'ASSESS_TITLE'                         => Scrub::text($assess['title']),
         'ASSESS_START'                         => $openDate->getShort(),
         'ASSESS_FINISH'                        => $dueDate->getShort(),
-        'ATTEMPT_ATTEMPT_ID'                   => $_SESSION['attempt_id'],
+        'ATTEMPT_ATTEMPT_ID'                   => $attemptId,
         'ATTEMPT_START'                        => $attemptDate->getShort(),
         'ATTEMPT_FINISH'                       => $attemptFinish->getShort(),
         'ATTEMPT_TIME_TAKEN'                   => $assessHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
@@ -181,7 +181,7 @@ $readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['f
 /* Load all the questions for this section.
  * Note: only show the randomly-selected ones
  */
-$allQuestions = $sectionHandler->getQuestions($_SESSION['attempt_id'], $section['section_id']);
+$allQuestions = $sectionHandler->getQuestions($attempt_id, $section['section_id']);
 
 if ($allQuestions) {
     $randomQuestionNumber = 1;
@@ -227,7 +227,7 @@ if ($allQuestions) {
 
         /* Load individual answers
          */
-        $answerHandler->reviewResponse($this, $currentQuestion['question_id']);
+        $answerHandler->reviewResponse($this, $attemptId, $currentQuestion['question_id']);
 
         //
         // Mark and comment blocks must be parsed before the answerInputs block
