@@ -45,10 +45,6 @@ UPDATE `config` SET `value` = IF(@sitelocation = 'scc', '', value) WHERE `name` 
 UPDATE `config` SET `value` = IF(@sitelocation = 'spags', '', value) WHERE `name` = 'forgotten_password_url';
 UPDATE `config` SET `value` = IF(@sitelocation = 'spags', '', value) WHERE `name` = 'forgotten_password_text';
 
-/* St Kevins */
-UPDATE `config` SET `value` = IF(@sitelocation = 'stkevins', '', value) WHERE `name` = 'forgotten_password_url';
-UPDATE `config` SET `value` = IF(@sitelocation = 'stkevins', '', value) WHERE `name` = 'forgotten_password_text';
-
 /* Wadhurst */
 UPDATE `config` SET `value` = IF(@sitelocation = 'wadhurst', '', value) WHERE `name` = 'forgotten_password_url';
 UPDATE `config` SET `value` = IF(@sitelocation = 'wadhurst', '', value) WHERE `name` = 'forgotten_password_text';
