@@ -1,0 +1,2 @@
+UPDATE `config` SET `value` = 'http://pwportal.ipswichgrammar.com:65535/' WHERE `name` = 'forgotten_password_url';
+UPDATE `config` SET `value` = 'Forgot your Password?' WHERE `name` = 'forgotten_password_text';
