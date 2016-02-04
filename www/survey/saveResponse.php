@@ -9,6 +9,7 @@
  */
 
 $assessHandler = new Survey_Main();
+$attemptHandler = new Survey_Attempt();
 $questionHandler = new Survey_Question();
 $sectionHandler = new Survey_Section();
 $groupHandler = new Group();
@@ -52,6 +53,11 @@ $answerHandler = $factory->createAnswerModel($question['type_id']);
 $data = $_POST;
 $data['section_id'] = $question['section_id'];
 $data['question_id'] = $this->arg[0];
+
+// Infer attempt from user and section.
+// (It should maybe be passed through the form?)
+$attempt = $attemptHandler->getLatestResumableForUser($section['assess_id'], $_SESSION['user']->getId());
+$data['attempt_id'] = $attempt['attempt_id'];
 
 $result = $answerHandler->saveResponse($data);
 

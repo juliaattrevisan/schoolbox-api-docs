@@ -291,7 +291,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             $processedResponse = serialize($data['answer']);
         }
 
-        return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
+        return parent::saveResponse($data['attempt_id'], $data['section_id'], $data['question_id'], $processedResponse);
     }
 
     /**

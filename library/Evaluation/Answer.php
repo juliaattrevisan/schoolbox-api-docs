@@ -163,16 +163,17 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * handler so you can serialize it, store it in native format, or in
      * whatever format is required.
      *
+     * @param  $attemptId
      * @param  $section_id
      * @param  $question_id
      * @param  $processedResponse
      *
      * @return array
      */
-    public function saveResponse($section_id, $question_id, $processedResponse)
+    public function saveResponse($attemptId, $section_id, $question_id, $processedResponse)
     {
         $response = array(
-            'attempt_id' => $_SESSION['attempt_id'],
+            'attempt_id' => $attemptId,
             'section_id' => $section_id,
             'question_id' => $question_id,
             'response' => $processedResponse,
@@ -182,7 +183,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
         /* If they have already responded to this question in this attempt,
          * then update existing row; otherwise create a new one
          */
-        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
         $response_id = $existing['response_id'];
 
         if (is_numeric($response_id)) {
