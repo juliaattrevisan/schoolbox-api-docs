@@ -174,18 +174,17 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
      * prefill it.
      *
      * @param  $page
+     * @param  $attemptId
      * @param  $question_id
-     *
      * @return void
      */
-    public function prepareResponse($page, $question_id)
+    public function prepareResponse($page, $attemptId, $question_id)
     {
-
         /* Optional configuration hook
          */
         $this->configureResponse($page, $question_id);
 
-        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
         /* Define special blocks to handle this special answerOptions scenario,
          * because we have two columns to parse per iteration.

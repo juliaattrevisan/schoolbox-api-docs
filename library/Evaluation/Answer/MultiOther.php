@@ -193,16 +193,17 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
      * the test.
      *
      * @param  $page
+     * @param  $attemptId
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $question_id) {
+    public function prepareResponse($page, $attemptId, $question_id)
+    {
+        /* Optional configuration hook
+         */
+        $this->configureResponse($page, $question_id);
 
-		/* Optional configuration hook
-		 */
-		$this->configureResponse($page, $question_id);
-
-        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
         $answerGroup = $this->getByQuestionID($question_id);
 
