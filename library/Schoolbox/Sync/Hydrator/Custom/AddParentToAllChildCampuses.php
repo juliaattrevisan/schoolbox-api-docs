@@ -12,6 +12,7 @@ namespace Schoolbox\Sync\Hydrator\Custom;
 use External_User;
 use Monolog\Logger;
 use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\External\Normalise\User\Guardian as ExternalParent;
 use Schoolbox\User as InternalUser;
@@ -50,22 +51,41 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
             $childIds = $this->externalUserHandler->getEnrolledStudents($previous->getExternalId());
 
             if (is_array($childIds)) {
+
+                $oldCampuses = $newCampuses = $previous->getCampusCollection()->getColumnValues('id');
+
                 foreach ($childIds as $childId) {
                     try {
-                        $childUser = $this->userMapper->findByExternalId($childId);
+                        $childUser = $this->userMapper->findByExternalId($childId['RelatedID']);
                     } catch (\Exception $e) {
+                        // noop
                         continue;
                     }
                     foreach ($childUser->getCampusCollection() as $campus) {
                         $campusId = $campus->getId();
-                        if (empty($previous->getCampusCollection()->filterBy('id', $campusId))) {
-                            $campusCopy = new Campus();
-                            $campusCopy->setId($campusId);
-                            $previous->getCampusCollection()->add($campusCopy);
+                        if (!in_array($campusId, $newCampuses)) {
+                            $newCampuses[] = $campusId;
                         }
                     }
                 }
-                $this->log(Logger::INFO, "Assigning child campuses to parent", $input, $previous);
+
+                $previous->setCampusCollection(CampusMapper::getInstance()->findByColumn('id', $newCampuses));
+
+                if (empty($newCampuses)) {
+                    $message = "No child campuses found to assign to parent";
+                    $context = [];
+                } else {
+                    $message = "Assigning child campuses to parent";
+                    $context = [
+                        'diff' => [
+                            'old' => $oldCampuses,
+                            'new' => $newCampuses
+                        ]
+                    ];
+                }
+
+                $this->log(Logger::INFO, $message, $input, $previous, $context);
+
             }
         }
         return $previous;
