@@ -1,1 +1,0 @@
-UPDATE `config` SET `value` = 'http://intranet.wenona.nsw.edu.au/ContentPages/ICT/AccountManagement/ForgotPassword/' WHERE `name` = 'forgotten_password_url';

@@ -1,1 +1,0 @@
-UPDATE `config` SET `value` = 'https://webapp.elthamcollege.vic.edu.au/forgotpassword' WHERE `name` = 'forgotten_password_url';

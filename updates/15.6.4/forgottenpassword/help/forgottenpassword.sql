@@ -1,1 +1,0 @@
-UPDATE `config` SET `value` = 'Forgotten your username or password?' WHERE `name` = 'forgotten_password_text';
