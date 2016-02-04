@@ -17,9 +17,10 @@ $responseHandler = new Survey_Response();
 $groupHandler    = new Group();
 
 // End the most recent resumable attempt.
-$survey  = $surveyHandler->getByID($this->arg[0]);
-$attempt = $attemptHandler->getLatestResumableForUser($survey['assess_id'], $_SESSION['user']->getId());
-if (!is_numeric($attempt['attempt_id'])) {
+$survey    = $surveyHandler->getByID($this->arg[0]);
+$attempt   = $attemptHandler->getLatestResumableForUser($survey['assess_id'], $_SESSION['user']->getId());
+$attemptId = $attempt['attempt_id'];
+if (!is_numeric($attemptId)) {
     SitePage::localRedir('/survey/intro/' . $this->arg[0]);
 }
 
@@ -84,7 +85,7 @@ if (!$attempt['finish']) {
 
     $attemptHandler->update(
         array(
-            'attempt_id' => $attempt['attempt_id'],
+            'attempt_id' => $attemptId,
             'finish'     => $finishDate->getDatabase(),
         )
     );

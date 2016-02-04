@@ -20,9 +20,10 @@ $responseHandler = new Assess_Response();
 $sectionHandler  = new Assess_Section();
 $groupHandler    = new Group();
 
-$assess  = $assessHandler->getByID($this->arg[0]);
-$attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['user']->getId());
-if (!is_numeric($attempt['attempt_id'])) {
+$assess    = $assessHandler->getByID($this->arg[0]);
+$attempt   = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['user']->getId());
+$attemptId = $attempt['attempt_id'];
+if (!is_numeric($attemptId)) {
     SitePage::localRedir('/assess/intro/' . $this->arg[0]);
 }
 
@@ -72,7 +73,7 @@ if (!$attempt['finish']) {
     $attemptFinishDate = Alaress_Date_Format::now();
 
     /** @var Attempt $attempt */
-    $attempt = AttemptMapper::getInstance()->findById($attempt['attempt_id']);
+    $attempt = AttemptMapper::getInstance()->findById($attemptId);
 
     $attempt->setFinish($attemptFinishDate);
 
@@ -105,13 +106,13 @@ if (!$attempt['finish']) {
  * Once automated marking has been performed, remember which responses were
  * affected so we don't refetch them the next time the page loads.
  */
-$allAttempts = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $attempt['attempt_id']);
+$allAttempts = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $attemptId);
 
 $factory = new Assess_Factory();
 
 if ($allAttempts) {
     foreach ($allAttempts as $currentAttempt) {
-        $allResponses = $responseHandler->getAutomarkableResponses($attempt['attempt_id']);
+        $allResponses = $responseHandler->getAutomarkableResponses($attemptId);
 
         if (is_array($allResponses)) {
             foreach ($allResponses as $currentResponse) {
@@ -129,8 +130,8 @@ $responseHandler->updatedAutomatedMarks($markedResponseIDs);
 
 /* Show mark for the attempt you just did
  */
-$marks = $attemptHandler->getMarksForAttempt($attempt['attempt_id']);
-$total = $attemptHandler->getTotalMarks($this->arg[0], $attempt['attempt_id']);
+$marks = $attemptHandler->getMarksForAttempt($attemptId);
+$total = $attemptHandler->getTotalMarks($this->arg[0], $attemptId);
 
 if ($total > 0) {
     $percentage = 100 * number_format($marks / $total, 2);
@@ -138,9 +139,9 @@ if ($total > 0) {
     $percentage = 0;
 }
 
-$numMarkedQuestions     = $responseHandler->numAutomarked($attempt['attempt_id']);
-$numUnmarkedQuestions   = $responseHandler->numNotAutomarked($attempt['attempt_id']);
-$valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($attempt['attempt_id']);
+$numMarkedQuestions     = $responseHandler->numAutomarked($attemptId);
+$numUnmarkedQuestions   = $responseHandler->numNotAutomarked($attemptId);
+$valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($attemptId);
 
 $this->setVar(
     array(
@@ -170,7 +171,7 @@ $this->setVar(
     array(
         'ASSESS_ID'  => $assess['assess_id'],
         'SECTION_ID' => $firstSection['section_id'],
-        'ATTEMPT_ID' => $attempt['attempt_id']
+        'ATTEMPT_ID' => $attemptId,
     )
 );
 
