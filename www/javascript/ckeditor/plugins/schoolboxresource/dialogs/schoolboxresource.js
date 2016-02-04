@@ -321,6 +321,28 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
     }
 
     /**
+     * Ignore non-numeric key presses
+     * Allows (9) Tab character for field switching
+     * Allows (8) Backspace character for modification
+     *
+     * @param event
+     */
+    function disableNonNumeric(event) {
+        var allowedControlKeys = [8, 9];
+
+        /* Allow control keys
+         */
+        if (allowedControlKeys.indexOf(event.data.$.keyCode) > -1) {
+            return;
+        }
+        /* Disallow non-numerics
+         */
+        else if (!numericOnly(event.data.$.keyCode)) {
+            event.data.preventDefault();
+        }
+    }
+
+    /**
      * Enable Constrain once both values provided
      * Disable Constrain once one dimension is omitted
      *
@@ -390,6 +412,16 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
         }
 
         return '';
+    }
+
+    /**
+     * The keyCode pressed was a number
+     *
+     * @param keyCode
+     * @returns {boolean}
+     */
+    function numericOnly(keyCode) {
+        return ([48,49,50,51,52,53,54,55,56,57].indexOf(keyCode) > -1);
     }
 
     return {
@@ -604,7 +636,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                  * Ignore Tab key presses entirely
                                  */
                                 onKeyUp: function(event) {
-                                    if (event.data.$.keyCode != 9) {
+                                    if ((event.data.$.keyCode != 9) && numericOnly(event.data.$.keyCode)) {
                                         var dialog = this.getDialog();
                                         var fields = dialogFields(dialog);
 
@@ -631,6 +663,12 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     var fields = dialogFields(dialog);
 
                                     toggleConstrain(fields);
+                                },
+
+                                /* Disable non-numeric characters
+                                 */
+                                onKeyDown: function(event) {
+                                    disableNonNumeric(event);
                                 }
                             },
                             {
@@ -676,6 +714,12 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     var fields = dialogFields(dialog);
 
                                     toggleConstrain(fields);
+                                },
+
+                                /* Disable non-numeric characters
+                                 */
+                                onKeyDown: function(event) {
+                                    disableNonNumeric(event);
                                 }
                             },
                             {
@@ -803,6 +847,12 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     if (margin.length) {
                                         fields.verticalMargin.setValue(margin);
                                     }
+                                },
+
+                                /* Disable non-numeric characters
+                                 */
+                                onKeyDown: function(event) {
+                                    disableNonNumeric(event);
                                 }
                             },
                             {
@@ -825,6 +875,12 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     else if (marginRight.length) {
                                         fields.horizontalMargin.setValue(marginRight);
                                     }
+                                },
+
+                                /* Disable non-numeric characters
+                                 */
+                                onKeyDown: function(event) {
+                                    disableNonNumeric(event);
                                 }
                             }
                         ]
