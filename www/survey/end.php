@@ -16,12 +16,12 @@ $questionHandler = new Survey_Question();
 $responseHandler = new Survey_Response();
 $groupHandler    = new Group();
 
-if (!is_numeric($_SESSION['attempt_id'])) {
+// End the most recent resumable attempt.
+$survey  = $surveyHandler->getByID($this->arg[0]);
+$attempt = $attemptHandler->getLatestResumableForUser($survey['assess_id'], $_SESSION['user']->getId());
+if (!is_numeric($attempt['attempt_id'])) {
     SitePage::localRedir('/survey/intro/' . $this->arg[0]);
 }
-
-$survey  = $surveyHandler->getByID($this->arg[0]);
-$attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
 
 if (!$survey) {
     error(112);
@@ -84,7 +84,7 @@ if (!$attempt['finish']) {
 
     $attemptHandler->update(
         array(
-            'attempt_id' => $_SESSION['attempt_id'],
+            'attempt_id' => $attempt['attempt_id'],
             'finish'     => $finishDate->getDatabase(),
         )
     );
@@ -123,8 +123,3 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => 'active'
     ],
 ]);
-
-
-/* Clear attempt
- */
-$_SESSION['attempt_id'] = '';
