@@ -1,0 +1,1 @@
+UPDATE `config` SET `value` = 'Parents, for log in details and assistance please press here.' WHERE `name` = 'forgotten_password_text';
