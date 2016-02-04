@@ -426,7 +426,7 @@ if(typeof window.location.origin == 'undefined') {
 
 
     ResourceAttach.prototype.close = function () {
-        if (singletonModal) {
+        if (singletonModal.is(':visible')) {
             singletonModal.foundation('reveal', 'close');
         }
     };
