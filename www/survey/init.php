@@ -72,35 +72,29 @@ if ($assessHandler->isOwner($this->arg[0])) {
  *
  * Set up Attempt vars
  */
-$numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
+$userId      = $_SESSION['user']->getId();
+$numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $userId);
 
-$attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
+$attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $userId);
 
 /* If there is a resumable attempt, resume it.
+ * Otherwise start a new attempt if there is a limit
  */
-if ($attempt) {
-	$_SESSION['attempt_id'] = $attempt['attempt_id'];
-}
-/* Otherwise start a new attempt if there is a limit
- */
-else {
+if (!$attempt) {
 	if (($assess['max_attempts'] > 0) && ($numAttempts + 1 > $assess['max_attempts'])) {
-
 		/* Clear and exit when you attempt to make more than is allowed
 		 */
-		$_SESSION['attempt_id'] = '';
-
 		error(146);
 	}
 	else {
-		$_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
+		$attemptId = $attemptHandler->start($userId, $this->arg[0]);
         // Assign all questions on init, not starting a section.
         $responseHandler = new Survey_Response();
         $sectionHandler  = new Survey_Section();
         foreach ($sectionHandler->getList($assess['assess_id']) as $section) {
             // Randomized questions aren't available for surveys
             $responseHandler->assignQuestions(
-                $_SESSION['attempt_id'],
+                $attemptId,
                 $section['section_id'],
                 0,
                 false
