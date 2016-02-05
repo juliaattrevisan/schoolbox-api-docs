@@ -120,16 +120,23 @@ class CriterionMapper extends Schoolbox\Mapper {
      */
     public function verifyUniqueness(Criterion $object)
     {
+        // remove any newlines and consecutive/leading/trailing spaces from input
+        $object->setName(preg_replace('`\s+`', ' ', trim($object->getName())));
+        $object->setGrouping(preg_replace('`\s+`', ' ', trim($object->getGrouping())));
+
         try {
+            // attempt lookup
             $existingObject = $this->findOneByColumnList([
                 'grouping'    => $object->getGrouping(),
                 'name'        => $object->getName(),
                 'parent_id'   => $object->getParentId(),
                 'parent_type' => $object->getParentType(),
             ]);
+
+            // found something! sweet. assign that ID.
             $object->setId($existingObject->setId());
         } catch (Schoolbox\Mapper\Exception $e) {
-            // noop
+            // noop, new object. leave it as-is
         }
         return true;
     }
