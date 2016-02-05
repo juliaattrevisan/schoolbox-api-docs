@@ -165,7 +165,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 		elseif($target == 'parent' && $this->parentCanView($box)) {
 			// If parent can't view results for this grade:
 			// target to student's grades page
-			if ($box->isMarkShownToParents()) {
+			if (!$box->isMarkShownToParents()) {
 				$href = "/submission/allWork/$studentId";
 			}
 			$msg = new Message(":teacher has marked :student's work for :boxname in :catname", $icon, $href);
