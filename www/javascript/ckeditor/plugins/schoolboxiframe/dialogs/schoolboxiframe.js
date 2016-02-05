@@ -1,6 +1,38 @@
 CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
 
     /**
+     * Ignore non-numeric key presses
+     * Allows (9) Tab character for field switching
+     * Allows (8) Backspace character for modification
+     *
+     * @param event
+     */
+    function disableNonNumeric(event) {
+        var allowedControlKeys = [8, 9];
+
+        /* Allow control keys
+         */
+        if (allowedControlKeys.indexOf(event.data.$.keyCode) > -1) {
+            return;
+        }
+        /* Disallow non-numerics
+         */
+        else if (!numericOnly(event.data.$.keyCode)) {
+            event.data.preventDefault();
+        }
+    }
+
+    /**
+     * The keyCode pressed was a number
+     *
+     * @param keyCode
+     * @returns {boolean}
+     */
+    function numericOnly(keyCode) {
+        return ([48,49,50,51,52,53,54,55,56,57].indexOf(keyCode) > -1);
+    }
+
+    /**
      * Inject image into editor panel with modifiers applied
      *
      * @param editorInstance
@@ -244,6 +276,12 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
 
                                         fields.width.setValue(width);
                                     }
+                                },
+
+                                /* Disable non-numeric characters
+                                 */
+                                onKeyDown: function(event) {
+                                    disableNonNumeric(event);
                                 }
                             },
                             {
@@ -261,6 +299,12 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
                                     var height = extractStyle('height', element.getAttribute('style')).replace('px', '');
 
                                     fields.height.setValue(height);
+                                },
+
+                                /* Disable non-numeric characters
+                                 */
+                                onKeyDown: function(event) {
+                                    disableNonNumeric(event);
                                 }
                             }
                         ]
@@ -337,6 +381,12 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
                                     if (margin.length) {
                                         fields.verticalMargin.setValue(margin);
                                     }
+                                },
+
+                                /* Disable non-numeric characters
+                                 */
+                                onKeyDown: function(event) {
+                                    disableNonNumeric(event);
                                 }
                             },
                             {
@@ -359,6 +409,12 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
                                     else if (marginRight.length) {
                                         fields.horizontalMargin.setValue(marginRight);
                                     }
+                                },
+
+                                /* Disable non-numeric characters
+                                 */
+                                onKeyDown: function(event) {
+                                    disableNonNumeric(event);
                                 }
                             }
                         ]
