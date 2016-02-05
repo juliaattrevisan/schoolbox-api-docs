@@ -135,7 +135,13 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
         } else {
             $ssoCode = $this->getUser()->getUsername();
         }
+
+        if ($this->getUser()->getRole()->isStaff()) {
+            $ssoCode = $this->getUser()->getExternalId();
+        }
+
         $config['sso_code'] = $ssoCode;
+
         return $this->sso->getUserToken($config);
     }
 }
