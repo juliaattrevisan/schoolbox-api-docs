@@ -26,7 +26,7 @@
                     <span data-tooltip class="hint has-tip tip-right" data-width="200" title="This {{ locale.translate('rubricGroup') }} cannot be modified because it contains one or more {{ locale.translate('rubricCriterion', false, true) }} that are in use elsewhere">?</span>
                     <input type="hidden" value="{{ groupName }}" name="{{ groupInput }}[name]" />
                 {% else %}
-                    <input type="text" value="{{ groupName }}" name="{{ groupInput }}[name]" />
+                    <textarea name="{{ groupInput }}[name]" >{{ groupName }}</textarea>
                 {% endif %}
             </label>
         {% else %}
