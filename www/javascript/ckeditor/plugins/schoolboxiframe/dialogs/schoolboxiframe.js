@@ -28,8 +28,13 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
             styles.push('width:100%');
         }
         else {
-            styles.push('width:' + fields.width.getValue() + 'px');
-            styles.push('height:' + fields.height.getValue() + 'px');
+            if (fields.width.getValue()) {
+                styles.push('width:' + fields.width.getValue() + 'px');
+            }
+
+            if (fields.height.getValue()) {
+                styles.push('height:' + fields.height.getValue() + 'px');
+            }
         }
 
         /* Alignment
