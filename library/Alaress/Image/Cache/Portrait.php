@@ -61,11 +61,13 @@ class Portrait extends BrokenFS
             throw new Exception_Schoolbox_NotFound('Portrait not found');
         }
 
+        $portraitDir = realpath($this->getConfig()->get('portrait_dir'));
+
         // truncate the dir for Flysystem
-        $portraitPath = str_replace($this->getConfig()->get('portrait_dir'), '', $portraitPath);
+        $portraitPath = str_replace($portraitDir, '', $portraitPath);
 
         try {
-            parent::__construct($this->getConfig()->get('portrait_dir'), $portraitPath, $key);
+            parent::__construct($portraitDir, $portraitPath, $key);
         } catch (Exception $e) {
             throw new Exception_Schoolbox_NotFound('Portrait not found');
         }
