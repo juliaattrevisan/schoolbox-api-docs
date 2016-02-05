@@ -230,6 +230,7 @@ class Threads
         $page->setBlock('socialstream_post', 'socialstream_post_has_attachment', 'socialstream_post_has_attachment_block');
         $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_icon', 'socialstream_post_has_icon_block');
         $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_thumbnail', 'socialstream_post_has_thumbnail_block');
+        $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_link', 'socialstream_post_has_link_block');
         $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_player', 'socialstream_post_has_player_block');
         $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_video', 'socialstream_post_has_video_block');
         $page->setBlock('socialstream_post_has_attachment', 'socialstream_post_has_video_pending', 'socialstream_post_has_video_pending_block');
@@ -241,6 +242,7 @@ class Threads
         $page->setBlock('socialstream_comment', 'socialstream_comment_has_attachment', 'socialstream_comment_has_attachment_block');
         $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_icon', 'socialstream_comment_has_icon_block');
         $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_thumbnail', 'socialstream_comment_has_thumbnail_block');
+        $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_link', 'socialstream_comment_has_link_block');
         $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_player', 'socialstream_comment_has_player_block');
         $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_video', 'socialstream_comment_has_video_block');
         $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_video_pending', 'socialstream_comment_has_video_pending_block');
@@ -252,6 +254,7 @@ class Threads
         $page->setBlock('socialstream_reply', 'socialstream_reply_has_attachment', 'socialstream_reply_has_attachment_block');
         $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_icon', 'socialstream_reply_has_icon_block');
         $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_thumbnail', 'socialstream_reply_has_thumbnail_block');
+        $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_link', 'socialstream_reply_has_link_block');
         $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_player', 'socialstream_reply_has_player_block');
         $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_video', 'socialstream_reply_has_video_block');
         $page->setBlock('socialstream_reply_has_attachment', 'socialstream_reply_has_video_pending', 'socialstream_reply_has_video_pending_block');
@@ -268,6 +271,7 @@ class Threads
                 'socialstream_post_has_icon_block'             => '',
                 'socialstream_post_has_image_block'            => '',
                 'socialstream_post_has_thumbnail_block'        => '',
+                'socialstream_post_has_link_block'             => '',
                 'socialstream_post_has_player_block'           => '',
                 'socialstream_post_has_video_block'            => '',
                 'socialstream_post_has_video_pending_block'    => '',
@@ -277,6 +281,7 @@ class Threads
                 'socialstream_comment_has_icon_block'          => '',
                 'socialstream_comment_has_image_block'         => '',
                 'socialstream_comment_has_thumbnail_block'     => '',
+                'socialstream_comment_has_link_block'             => '',
                 'socialstream_comment_has_player_block'        => '',
                 'socialstream_comment_has_video_block'         => '',
                 'socialstream_comment_has_video_pending_block' => '',
@@ -286,6 +291,7 @@ class Threads
                 'socialstream_reply_has_icon_block'            => '',
                 'socialstream_reply_has_image_block'           => '',
                 'socialstream_reply_has_thumbnail_block'       => '',
+                'socialstream_reply_has_link_block'             => '',
                 'socialstream_reply_has_player_block'          => '',
                 'socialstream_reply_has_video_block'           => '',
                 'socialstream_reply_has_video_pending_block'   => '',
@@ -348,6 +354,7 @@ class Threads
                     'socialstream_post_has_icon_block'          => '',
                     'socialstream_post_has_image_block'         => '',
                     'socialstream_post_has_thumbnail_block'     => '',
+                    'socialstream_post_has_link_block'          => '',
                     'socialstream_post_has_player_block'        => '',
                     'socialstream_post_has_video_block'         => '',
                     'socialstream_post_has_video_pending_block' => '',
@@ -410,6 +417,7 @@ class Threads
                         'socialstream_comment_has_icon_block'          => '',
                         'socialstream_comment_has_image_block'         => '',
                         'socialstream_comment_has_thumbnail_block'     => '',
+                        'socialstream_comment_has_link_block'          => '',
                         'socialstream_comment_has_player_block'        => '',
                         'socialstream_comment_has_video_block'         => '',
                         'socialstream_comment_has_video_pending_block' => '',
@@ -460,6 +468,7 @@ class Threads
                             'socialstream_reply_has_icon_block'          => '',
                             'socialstream_reply_has_image_block'         => '',
                             'socialstream_reply_has_thumbnail_block'     => '',
+                            'socialstream_reply_has_link_block'          => '',
                             'socialstream_reply_has_player_block'        => '',
                             'socialstream_reply_has_video_block'         => '',
                             'socialstream_reply_has_video_pending_block' => '',
@@ -482,6 +491,7 @@ class Threads
                             'socialstream_reply_has_attachment_block'    => '',
                             'socialstream_reply_has_icon_block'          => '',
                             'socialstream_reply_has_thumbnail_block'     => '',
+                            'socialstream_reply_has_link_block'          => '',
                             'socialstream_reply_has_image_block'         => '',
                             'socialstream_reply_has_player_block'        => '',
                             'socialstream_reply_has_video_block'         => '',
@@ -503,6 +513,7 @@ class Threads
                         'socialstream_comment_has_icon_block'          => '',
                         'socialstream_comment_has_image_block'         => '',
                         'socialstream_comment_has_thumbnail_block'     => '',
+                        'socialstream_comment_has_link_block'          => '',
                         'socialstream_comment_has_player_block'        => '',
                         'socialstream_comment_has_video_block'         => '',
                         'socialstream_comment_has_video_pending_block' => '',
@@ -524,6 +535,7 @@ class Threads
                     'socialstream_post_has_icon_block'          => '',
                     'socialstream_post_has_image_block'         => '',
                     'socialstream_post_has_thumbnail_block'     => '',
+                    'socialstream_post_has_link_block'          => '',
                     'socialstream_post_has_player_block'        => '',
                     'socialstream_post_has_video_block'         => '',
                     'socialstream_post_has_video_pending_block' => '',
