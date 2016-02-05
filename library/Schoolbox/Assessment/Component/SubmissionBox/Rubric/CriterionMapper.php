@@ -58,6 +58,7 @@ class CriterionMapper extends Schoolbox\Mapper {
         ));
 
         $this->hasSoftDeleteDateField('deleted_at');
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
     }
 
     /**
@@ -106,4 +107,30 @@ class CriterionMapper extends Schoolbox\Mapper {
         return $this->save($new_rubric_list);
     }
 
+    /**
+     * Pre-save callback - if a copy of this criterion already exists, then
+     * update it instead of saving a new one.
+     *
+     * This replaces the unique index on this table, which needs to be removed
+     * because MySQL max index size doesn't allow more than about ~330 UTF-8
+     * characters.
+     *
+     * @param  Criterion $object
+     * @return bool      Always true
+     */
+    public function verifyUniqueness(Criterion $object)
+    {
+        try {
+            $existingObject = $this->findOneByColumnList([
+                'grouping'    => $object->getGrouping(),
+                'name'        => $object->getName(),
+                'parent_id'   => $object->getParentId(),
+                'parent_type' => $object->getParentType(),
+            ]);
+            $object->setId($existingObject->setId());
+        } catch (Schoolbox\Mapper\Exception $e) {
+            // noop
+        }
+        return true;
+    }
 }
