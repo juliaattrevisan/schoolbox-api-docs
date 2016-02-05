@@ -28,8 +28,13 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
             styles.push('width:100%');
         }
         else {
-            styles.push('width:' + fields.width.getValue() + 'px');
-            styles.push('height:' + fields.height.getValue() + 'px');
+            if (fields.width.getValue()) {
+                styles.push('width:' + fields.width.getValue() + 'px');
+            }
+
+            if (fields.height.getValue()) {
+                styles.push('height:' + fields.height.getValue() + 'px');
+            }
         }
 
         /* Alignment
@@ -229,7 +234,6 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
                                 type: 'text',
                                 id: 'schoolboxiframe-width',
                                 label: 'Width',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Width cannot be empty." ),
 
                                 /* Editing an existing element
                                  */
@@ -250,7 +254,6 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
                                 type: 'text',
                                 id: 'schoolboxiframe-height',
                                 label: 'Height',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Height cannot be empty."),
 
                                 /* Editing an existing element
                                  */
