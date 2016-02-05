@@ -44,6 +44,11 @@
             <article>{SOCIALSTREAM_POST_EXTERNAL_BODY}</article>
             <!-- END socialstream_post_has_thumbnail -->
 
+            <!-- BEGIN socialstream_post_has_link -->
+            <a href="{SOCIALSTREAM_POST_URL}">{SOCIALSTREAM_POST_EXTERNAL_TITLE}</a>
+            <article>{SOCIALSTREAM_POST_EXTERNAL_BODY}</article>
+            <!-- END socialstream_post_has_link -->
+
             <!-- BEGIN socialstream_post_has_image -->
             <a href="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=maxsize" rel="socialstream-{COMPONENT_INSTANCE_ID}-lightbox">
                 <img src="/socialstream/image.php?id={SOCIALSTREAM_POST_POST_ID}&size=constrain200" />
@@ -138,6 +143,11 @@
                     <article>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</article>
                     <!-- END socialstream_comment_has_thumbnail -->
 
+                    <!-- BEGIN socialstream_comment_has_link -->
+                    <a href="{SOCIALSTREAM_COMMENT_URL}">{SOCIALSTREAM_COMMENT_EXTERNAL_TITLE}</a>
+                    <article>{SOCIALSTREAM_COMMENT_EXTERNAL_BODY}</article>
+                    <!-- END socialstream_comment_has_link -->
+
                     <!-- BEGIN socialstream_comment_has_player -->
                     <div class="flex-video">
                         <iframe width="560" height="315" src="{SOCIALSTREAM_COMMENT_URL}" frameborder="0" allowfullscreen seamless></iframe>
@@ -221,6 +231,11 @@
                             </div>
                             <article>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</article>
                             <!-- END socialstream_reply_has_thumbnail -->
+
+                            <!-- BEGIN socialstream_reply_has_link -->
+                            <a href="{SOCIALSTREAM_REPLY_URL}">{SOCIALSTREAM_REPLY_EXTERNAL_TITLE}</a>
+                            <article>{SOCIALSTREAM_REPLY_EXTERNAL_BODY}</article>
+                            <!-- END socialstream_reply_has_link -->
 
                             <!-- BEGIN socialstream_reply_has_player -->
                             <div class="flex-video">
