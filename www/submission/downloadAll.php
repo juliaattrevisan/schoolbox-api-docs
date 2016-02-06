@@ -28,7 +28,10 @@ if (is_numeric($_GET['id'])) {
     $group = new Group();
     if ($group->getPermission($submissionBox->getCategory()->getId()) >= WRITE_ACCESS) {
         /** @var SubmissionBox\Submission\File[] $submissionList */
-        $submissionList = $submissionMapper->findByColumn('box_id', $box_id, ['order' => ['submitted' => 'desc']]);
+        $submissionList = $submissionMapper->findByColumnList(
+            ['box_id' => $box_id, 'draft' => false,],
+            ['order' => ['submitted' => 'desc']]
+        );
         // Does this box support multiple files?
         // If not, only allow most recent submission for each student.
         if (!$submissionBox->getAcceptMultiple()) {
