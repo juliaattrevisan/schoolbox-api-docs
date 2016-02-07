@@ -932,36 +932,8 @@ class User implements JsonSerializable
                             'group_id'   => $parentRoles
                         )
                     );
-                    foreach ($spouseCollection as $spouse) {
-                        $this->parent_collection->add($spouse);
-                    }
-                }
-                else if (!empty($currentParent['StudentContactSpousePreferred']))
-                {
-                    // This is a kludge for TASS which does not have a spouse ID
-
-                    $spouseCollection = UserMapper::getInstance()->findByColumnList(
-                        array(
-                            'synergy_id' => $currentParent['StudentContactID'],
-                            'group_id' => $parentRoles
-                        )
-                    );
-                    foreach ($spouseCollection as $spouse) {
-                        $this->parent_collection->add($spouse);
-                    }
-
-                    // Seems like split families prefix the secondary parents family ID with an 'S' instead of a 'P'
-                    // lets look for these as well just to be sure we get everybody
-
-                    $spouseCollection = UserMapper::getInstance()->findByColumnList(
-                        array(
-                            'synergy_id' => str_replace("P", "S", $currentParent['StudentContactID']),
-                            'group_id' => $parentRoles
-                        )
-                    );
-
-                    foreach ($spouseCollection as $spouse) {
-                        $this->parent_collection->add($spouse);
+                    if ($spouseCollection->count()) {
+                        $this->parent_collection->add($spouseCollection->first());
                     }
                 }
             }
