@@ -134,7 +134,7 @@ class CriterionMapper extends Schoolbox\Mapper {
             ]);
 
             // found something! sweet. assign that ID.
-            $object->setId($existingObject->setId());
+            $object->setId($existingObject->getId());
         } catch (Schoolbox\Mapper\Exception $e) {
             // noop, new object. leave it as-is
         }
