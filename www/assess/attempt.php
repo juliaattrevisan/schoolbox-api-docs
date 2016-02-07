@@ -125,6 +125,7 @@ $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
+    'ATTEMPT_ID' => $attempt['attempt_id'],
     'ATTEMPT_START' => $attemptStartDate->getShort(),
     'ATTEMPT_END' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEndDate->getShort(),
     'SECTION_TITLE' => Scrub::text($section['title']),

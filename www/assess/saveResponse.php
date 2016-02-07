@@ -57,18 +57,19 @@ $data = $_POST;
 $data['section_id'] = $question['section_id'];
 $data['question_id'] = $this->arg[0];
 
-// Infer attempt from user and section.
-// (It should maybe be passed through the form?)
-$attempt = $attemptHandler->getLatestResumableForUser($section['assess_id'], $_SESSION['user']->getId());
-$data['attempt_id'] = $attempt['attempt_id'];
+if($attemptHandler->checkAttemptIsValid($section['assess_id'], $_SESSION['user']->getId(), $data['attempt_id'])) {
 
-$result = $answerHandler->saveResponse($data);
+    $result = $answerHandler->saveResponse($data);
 
-/* Find out how many questions were completed in this section already
- */
-$result['percentageComplete'] = $sectionHandler->sectionPercentageComplete($question['section_id']);
+    /* Find out how many questions were completed in this section already
+     */
+    $result['percentageComplete'] = $sectionHandler->sectionPercentageComplete($question['section_id']);
 
-echo json_encode($result);
+    echo json_encode($result);
+}
+else {
+    header('HTTP/1.1 403 Forbidden, invalid attempt');
+}
 
 /* Prevent rendering of template
  */

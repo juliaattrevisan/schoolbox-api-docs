@@ -323,6 +323,32 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     }
 
     /**
+     * Ensure attempt is still valid and active for user
+     *
+     * @param $assess_id
+     * @param $user_id
+     * @param $attempt_id
+     * @return bool
+     */
+    public function checkAttemptIsValid($assess_id, $user_id, $attempt_id) {
+        $query = "
+			SELECT {$this->_table}.*
+			FROM {$this->_table}
+			WHERE {$this->_table}.assess_id = " . $this->db->smartQuote($assess_id) . "
+			AND {$this->_table}.user_id = " . $this->db->smartQuote($user_id) ."
+			AND {$this->_table}.attempt_id =  " . $this->db->smartQuote($attempt_id) ."
+			AND {$this->_table}.deleted_at IS NULL
+			AND {$this->_table}.finish IS NULL
+		";
+
+        if($this->db->getRow($query))
+            return true;
+        else
+            return false;
+    }
+
+
+    /**
      * Get the marks given to an attempt
      *
      * @param  $attempt_id
