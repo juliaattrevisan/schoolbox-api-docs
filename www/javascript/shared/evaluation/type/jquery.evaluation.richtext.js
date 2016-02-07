@@ -36,7 +36,7 @@
             $.fn.alaressEditor({
                 targetElements: $('#' + config.editorSelector),
                 blur: function(element) {
-                    $.fn.evaluationRichText.saveOne(config.editorSelector, config.questionForm);
+                    $.fn.evaluationRichText.saveOne(config.questionForm);
                 }
             });
 		}
@@ -45,12 +45,16 @@
 	/**
 	 * Save individual form contents
 	 *
-     * @param identifier
 	 * @param element
 	 * @returns jqXHR
 	 */
-	$.fn.evaluationRichText.saveOne = function(identifier, element) {
-		CKEDITOR.instances[identifier].updateElement();
+	$.fn.evaluationRichText.saveOne = function(element) {
+		element.find('textarea[id]').each(function() {
+			var identifier = this.id;
+			if (identifier in CKEDITOR.instances) {
+				CKEDITOR.instances[identifier].updateElement();
+			}
+		});
 
 		return $.ajax({
 			type: 'post',
