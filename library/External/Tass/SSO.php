@@ -75,7 +75,6 @@ class External_Tass_SSO
         $cString = $this->array2qstring($conf);
 
         $target = $this->server . '?' . $cString;
-
         // attempt sso authentication
         $responseString = @file_get_contents($target);
 
@@ -85,10 +84,18 @@ class External_Tass_SSO
             header('Content-Type: text/plain');
             die("SEND : $target\nRECV : $responseString\n");
         }
-
         if (isset($response['sso_token'])) {
             return $response['sso_token'];
         }
+
+        $response_error['2'] = "URL parameters missing.";
+        $response_error['3'] = "Invalid SSO Application Code or SSO User Mapping";
+        $response_error['4'] = "Invalid Portal User";
+        $response_error['5'] = "Invalid sfa_num";
+        if (isset($response['response_code']) && array_key_exists($response['response_code'],$response_error)) {
+            throw new UnexpectedValueException('TASS SSO Error: "'.$response_error[$response['response_code']].'" for SSO for user "'.$userConf[sso_code].'"');
+        }
+
         return '';
     }
 

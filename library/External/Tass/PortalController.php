@@ -132,10 +132,15 @@ class External_Tass_PortalController extends Alaress\Web\Controller\Base
         if ($this->getUser()->getRole()->isParent() && \Cfg::get('external_tass_sso_parent_code') == "TASS ID") {
             // remove any non-numeric characters so it's the proper TASS id
             $ssoCode = preg_replace('/[^0-9]/s', '', $this->getUser()->getExternalId());
+        }
+        else if ($this->getUser()->getRole()->isStaff() && \Cfg::get('external_tass_sso_staff_code') == "TASS ID") {
+            $ssoCode = $this->getUser()->getExternalId();
         } else {
             $ssoCode = $this->getUser()->getUsername();
         }
+
         $config['sso_code'] = $ssoCode;
+
         return $this->sso->getUserToken($config);
     }
 }
