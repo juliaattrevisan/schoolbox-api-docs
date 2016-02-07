@@ -66,7 +66,11 @@ function init(){
                 <label class="remember-me"><input type="checkbox" name="rememberme" value="1" />Remember me</label>
                 <!-- END remember_me -->
         </form>
-        <p class="forgotten"><a href="/forgotten-password.php">Parents, forgotten your password?</a></p>
+        <p class="forgotten">
+            <!-- BEGIN forgotten_password -->
+            <a href="{LOGIN_FORGOTTEN_PASSWORD_URL}">{LOGIN_FORGOTTEN_PASSWORD_TEXT}</a>
+            <!-- END forgotten_password -->
+        </p>
         <div id="footer" class="login">
           <ul>
               <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
