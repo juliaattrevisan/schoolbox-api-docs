@@ -135,12 +135,17 @@ class Enrolment extends AbstractImporter
             );
             if ($this->performUpdate) {
                 if (!$class->getId()) {
-                    // This same class might have been created in an earlier enrolment update
-                    if (!isset($createdClasses[$class->getCode()])) {
+                    // This same class might have been created in an earlier enrolment update.
+                    // I still need the ID regardless.
+                    try {
+                        $class = $this->classMapper->findOneByColumn('code', $class->getCode());
+                        $this->log->info(sprintf('Class "%s" has already been created', $class->getCode()));
+                    } catch (Mapper\Exception $e) {
                         $createdClasses[$class->getCode()] = true;
                         $this->log->info(sprintf('Creating class "%s"', $class->getCode()));
                         $this->classMapper->save($class);
                     }
+                    $enrolment->setClass($class);
                 }
                 $this->log->info('Saving enrolment of student ' . $identifier);
                 if ($this->enrolmentMapper->save($enrolment)) {
@@ -153,6 +158,8 @@ class Enrolment extends AbstractImporter
                     if (!isset($createdClasses[$class->getCode()])) {
                         $createdClasses[$class->getCode()] = true;
                         $this->log->info(sprintf('Pretending to create class "%s"', $class->getCode()));
+                    } else {
+                        $this->log->info(sprintf('Class "%s" has already been pretend created', $class->getCode()));
                     }
                 }
                 $this->log->info('Pretending to save enrolment of student ' . $identifier);
