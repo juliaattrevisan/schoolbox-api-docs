@@ -1,3 +1,54 @@
+{% if useInlineCSS %}
+    {# this is a super-minimal, stripped out version of the css to make it readable, for use when the ENTIRE logfile is being displayed in HTML #}
+    <style type="text/css">
+        .card > a {
+            display: block;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+        a.level-100 { color: #98CDD2; }
+        a.level-200 { color: #338042; }
+        a.level-250 { color: #69502C; }
+        a.level-300 { color: #3d1405; }
+        .card a span.meta {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-weight: normal;
+            color: gray;
+            font-size: small;
+        }
+        .card {
+            position: relative;
+            border-bottom: solid 1px #eee;
+            list-style: none;
+            padding: 8px;
+        }
+        .card:after {
+            display: block;
+            content: " ";
+            clear: both;
+        }
+        dt {
+            width: 25%;
+            float: left;
+            clear: both;
+        }
+        dd {
+            width: 75%;
+            float: right;
+            margin: 0;
+        }
+        pre {
+            margin: 0;
+        }
+        .row > div {
+            width: 33%;
+            float: left;
+        }
+    </style>
+{% endif %}
 {%- for lineNumber, line in log.lines -%}
     <li class="info card tiny" data-level="{{ line.level }}">
         <a href="#" class="level-{{ line.level }}" data-collapser="line-{{ lineNumber }}">
