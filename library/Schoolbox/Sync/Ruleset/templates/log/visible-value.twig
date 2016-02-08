@@ -9,5 +9,5 @@
 {%- elseif value is iterable -%}
     [{{ value|join(', ') }}]
 {%- else -%}
-    {{ value }}
+    {{ value | raw }}
 {%- endif -%}
