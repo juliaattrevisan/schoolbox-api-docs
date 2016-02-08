@@ -113,7 +113,7 @@ class QueueSorter implements FilterInterface {
                 $method = UserQueue::Q_LISTED;
 
             } else {
-                throw new FilterException("Reroute level is unacceptable ($outputLevels)");
+                throw new FilterException("Reroute level is unacceptable: " . json_encode($outputLevels));
             }
 
             // put the instance in redis: it will always end up being stored in one queue or the other
