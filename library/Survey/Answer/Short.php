@@ -46,12 +46,13 @@ class Survey_Answer_Short extends Evaluation_Answer_Short
      * Provide an option for the teacher to review the mark and adjust.
      *
      * @param  $page
+     * @param  $attemptId
      * @param  $question_id
      * @return void
      */
-    public function reviewResponse($page, $question_id)
-    {
-        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
+	public function reviewResponse($page, $attemptId, $question_id)
+	{
+		$existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
         $currentAnswer = $this->getByQuestionID($question_id);
 

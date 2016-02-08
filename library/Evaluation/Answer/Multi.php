@@ -208,17 +208,17 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * the test.
      *
      * @param  $page
+     * @param  $attemptId
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $question_id)
+    public function prepareResponse($page, $attemptId, $question_id)
     {
-
         /* Optional configuration hook
-		 */
+         */
         $this->configureResponse($page, $question_id);
 
-        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
         $answerGroup = $this->getByQuestionID($question_id);
 
@@ -291,7 +291,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             $processedResponse = serialize($data['answer']);
         }
 
-        return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
+        return parent::saveResponse($data['attempt_id'], $data['section_id'], $data['question_id'], $processedResponse);
     }
 
     /**
@@ -456,12 +456,13 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Provide an option for the teacher to review the mark and adjust.
      *
      * @param  $page
+     * @param  $attemptId
      * @param  $question_id
      * @return void
      */
-    public function reviewResponse($page, $question_id)
+    public function reviewResponse($page, $attemptId, $question_id)
     {
-        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
         if ($existing) {
             $existingAnswer = $this->getAnswersFromResponse($existing['response']);

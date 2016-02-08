@@ -77,6 +77,7 @@
 						<!-- END answerInputs -->
 					</li>
 				</ul>
+				<input type="hidden" name="attempt_id" value="{ATTEMPT_ID}">
 			</form>
 		</section>
 		<!-- END question -->
@@ -96,7 +97,7 @@
 
             <!-- BEGIN endAssess -->
             <li>
-                <a href="/survey/end/{ASSESS_ASSESS_ID}" class="button icon-approve submit expand" data-evaluation-finish>Finish</a>
+                <a href="/survey/end/{ASSESS_ASSESS_ID}/{ATTEMPT_ID}" class="button icon-approve submit expand" data-evaluation-finish>Finish</a>
             </li>
             <!-- END endAssess -->
         </ul>

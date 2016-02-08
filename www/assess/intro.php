@@ -67,18 +67,11 @@ $attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
 $attemptEndTime = $attemptStartTime + $assess['duration'];
 
 /* If there is a resumable attempt, resume it.
+ * Otherwise start a new attempt if there is a limit
  */
-if ($attempt) {
-    $_SESSION['attempt_id'] = $attempt['attempt_id'];
-}
-/* Otherwise start a new attempt if there is a limit
- */
-else {
-
+if (!$attempt) {
     /* Clear and exit when you attempt to make more than is allowed
       */
-    $_SESSION['attempt_id'] = '';
-
     if (($assess['max_attempts'] > 0) && ($numAttempts + 1 > $assess['max_attempts'])) {
         error(146);
     }

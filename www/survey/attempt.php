@@ -83,12 +83,6 @@ $attemptStartTime     = ($attempt['start'] ? strtotime($attempt['start']) : $_SE
 $attemptTimeRemaining = $attemptStartTime + $assess['duration'] - $_SERVER['REQUEST_TIME'];
 $attemptEndTime = $attemptStartTime + $assess['duration'];
 
-/* If there is a resumable attempt, resume it.
- */
-if ($attempt) {
-    $_SESSION['attempt_id'] = $attempt['attempt_id'];
-}
-
 /* Redirect back to the homepage if you've reached the end, or had
  * your attempt_id cleared from the session
  *
@@ -100,7 +94,7 @@ if ($attempt) {
  * This should only redirect you back to the homepage if you have no resumable
  * attempts waiting for you to complete and you don't have an attempt_id
  */
-if (!is_numeric($_SESSION['attempt_id'])) {
+if (!is_numeric($attempt['attempt_id'])) {
 	SitePage::localRedir('/homepage/' . $assess['category_id']);
 }
 
@@ -131,7 +125,8 @@ $this->setVar(array(
 	'ASSESS_ASSESS_ID' => $assess['assess_id'],
 	'ASSESS_TITLE' => Scrub::text($assess['title']),
 	'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
-	'ATTEMPT_START' => $attemptStart->getShort(),
+    'ATTEMPT_ID' => $attempt['attempt_id'],
+    'ATTEMPT_START' => $attemptStart->getShort(),
 	'ATTEMPT_END' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEnd->getShort(),
 	'SECTION_TITLE' => Scrub::text($section['title']),
 	'SECTION_DESCRIPTION' => Scrub::html($section['description']),
@@ -147,7 +142,7 @@ else {
 
 /* Load questions
  */
-$allQuestions = $sectionHandler->getQuestions($_SESSION['attempt_id'], $section['section_id']);
+$allQuestions = $sectionHandler->getQuestions($attempt['attempt_id'], $section['section_id']);
 
 /* Process questions now that we've got a list of 'em
  */
@@ -197,7 +192,7 @@ if ($allQuestions) {
 
         /* Load individual answers
          */
-        $answerHandler->prepareResponse($this, $currentQuestion['question_id']);
+        $answerHandler->prepareResponse($this, $attempt['attempt_id'], $currentQuestion['question_id']);
 
         $this->parse('answerInputs_block', 'answerFormFragment', true);
         $this->parse('question_block', 'question', true);

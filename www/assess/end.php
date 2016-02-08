@@ -20,12 +20,12 @@ $responseHandler = new Assess_Response();
 $sectionHandler  = new Assess_Section();
 $groupHandler    = new Group();
 
-if (!is_numeric($_SESSION['attempt_id'])) {
+$assess    = $assessHandler->getByID($this->arg[0]);
+$attempt   = $attemptHandler->getByID($this->arg[1]);
+$attemptId = $attempt['attempt_id'];
+if (!is_numeric($attemptId)) {
     SitePage::localRedir('/assess/intro/' . $this->arg[0]);
 }
-
-$assess  = $assessHandler->getByID($this->arg[0]);
-$attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
 
 if (!$assess) {
     error(112);
@@ -33,6 +33,11 @@ if (!$assess) {
 
 if ($assessHandler->isDeleted($assess['assess_id'])) {
     error(112);
+}
+
+// Sanity check on attempt - does it belong to the current user and quiz?
+if (!($attempt['user_id'] == $_SESSION['user']->getId() && $attempt['assess_id'] == $assess['assess_id'])) {
+    error(123);
 }
 
 /* Disabled: doing so will allow teachers to give their test a "dry run" and
@@ -73,7 +78,7 @@ if (!$attempt['finish']) {
     $attemptFinishDate = Alaress_Date_Format::now();
 
     /** @var Attempt $attempt */
-    $attempt = AttemptMapper::getInstance()->findById($_SESSION['attempt_id']);
+    $attempt = AttemptMapper::getInstance()->findById($attemptId);
 
     $attempt->setFinish($attemptFinishDate);
 
@@ -106,13 +111,13 @@ if (!$attempt['finish']) {
  * Once automated marking has been performed, remember which responses were
  * affected so we don't refetch them the next time the page loads.
  */
-$allAttempts = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $_SESSION['attempt_id']);
+$allAttempts = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $attemptId);
 
 $factory = new Assess_Factory();
 
 if ($allAttempts) {
     foreach ($allAttempts as $currentAttempt) {
-        $allResponses = $responseHandler->getAutomarkableResponses($_SESSION['attempt_id']);
+        $allResponses = $responseHandler->getAutomarkableResponses($attemptId);
 
         if (is_array($allResponses)) {
             foreach ($allResponses as $currentResponse) {
@@ -130,8 +135,8 @@ $responseHandler->updatedAutomatedMarks($markedResponseIDs);
 
 /* Show mark for the attempt you just did
  */
-$marks = $attemptHandler->getMarksForAttempt($_SESSION['attempt_id']);
-$total = $attemptHandler->getTotalMarks($this->arg[0], $_SESSION['attempt_id']);
+$marks = $attemptHandler->getMarksForAttempt($attemptId);
+$total = $attemptHandler->getTotalMarks($this->arg[0], $attemptId);
 
 if ($total > 0) {
     $percentage = 100 * number_format($marks / $total, 2);
@@ -139,9 +144,9 @@ if ($total > 0) {
     $percentage = 0;
 }
 
-$numMarkedQuestions     = $responseHandler->numAutomarked($_SESSION['attempt_id']);
-$numUnmarkedQuestions   = $responseHandler->numNotAutomarked($_SESSION['attempt_id']);
-$valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($_SESSION['attempt_id']);
+$numMarkedQuestions     = $responseHandler->numAutomarked($attemptId);
+$numUnmarkedQuestions   = $responseHandler->numNotAutomarked($attemptId);
+$valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($attemptId);
 
 $this->setVar(
     array(
@@ -171,7 +176,7 @@ $this->setVar(
     array(
         'ASSESS_ID'  => $assess['assess_id'],
         'SECTION_ID' => $firstSection['section_id'],
-        'ATTEMPT_ID' => $_SESSION['attempt_id']
+        'ATTEMPT_ID' => $attemptId,
     )
 );
 
@@ -223,6 +228,3 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => 'active'
     ],
 ]);
-/* Clear attempt
- */
-$_SESSION['attempt_id'] = '';

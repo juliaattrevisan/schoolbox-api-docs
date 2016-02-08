@@ -259,13 +259,23 @@ abstract class Evaluation_Attempt extends DeprecatedModel
      */
     public function getTotalMarks($assess_id, $attempt_id)
     {
-        $query = "SELECT COALESCE(SUM(marks),0) AS totalMarks
-                  FROM assess_attempt
-                  LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
-                  LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
-                  WHERE assess_attempt.assess_id = " . $this->db->smartQuote($assess_id) . "
-                  AND assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
-                  AND assess_question.deleted_at IS NULL";
+        // Get only marks that are actually in $assess_id.
+        // (No idea how responses to questions in different assessments get
+        //  into the same attempt!)
+        $query = "
+            SELECT COALESCE(SUM(aq.marks),0) AS totalMarks
+            FROM assess_attempt aa
+            LEFT JOIN assess_response ar  ON aa.attempt_id = ar.attempt_id
+            LEFT JOIN assess_section  ars ON ar.section_id = ars.section_id
+            LEFT JOIN assess_question aq  ON ar.question_id = aq.question_id
+            LEFT JOIN assess_section  aqs ON aq.section_id = aqs.section_id
+            WHERE aa.assess_id   = " . $this->db->smartQuote($assess_id) . "
+            AND   aa.attempt_id  = " . $this->db->smartQuote($attempt_id) . "
+            AND   ars.section_id = aqs.section_id
+            AND   ars.assess_id  = aa.assess_id
+            AND   aqs.assess_id  = aa.assess_id
+            AND   aq.deleted_at  IS NULL
+        ";
 
         return $this->db->getOne($query);
     }
@@ -311,6 +321,32 @@ abstract class Evaluation_Attempt extends DeprecatedModel
 
         return $this->db->getRow($query);
     }
+
+    /**
+     * Ensure attempt is still valid and active for user
+     *
+     * @param $assess_id
+     * @param $user_id
+     * @param $attempt_id
+     * @return bool
+     */
+    public function checkAttemptIsValid($assess_id, $user_id, $attempt_id) {
+        $query = "
+			SELECT {$this->_table}.*
+			FROM {$this->_table}
+			WHERE {$this->_table}.assess_id = " . $this->db->smartQuote($assess_id) . "
+			AND {$this->_table}.user_id = " . $this->db->smartQuote($user_id) ."
+			AND {$this->_table}.attempt_id =  " . $this->db->smartQuote($attempt_id) ."
+			AND {$this->_table}.deleted_at IS NULL
+			AND {$this->_table}.finish IS NULL
+		";
+
+        if($this->db->getRow($query))
+            return true;
+        else
+            return false;
+    }
+
 
     /**
      * Get the marks given to an attempt

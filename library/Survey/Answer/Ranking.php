@@ -303,15 +303,14 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
      * Provide an option for the teacher to review the mark and adjust.
      *
      * @param  $page
+     * @param  $attemptId
      * @param  $question_id
-     *
      * @return void
      */
-    public function reviewResponse($page, $question_id)
+    public function reviewResponse($page, $attemptId, $question_id)
     {
         $right = array();
-
-        $existing = $this->getResponseHandler()->isResponseExists($_SESSION['attempt_id'], $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
         if ($existing['response']) {
             $right = unserialize($existing['response']);

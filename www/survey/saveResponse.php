@@ -9,6 +9,7 @@
  */
 
 $assessHandler = new Survey_Main();
+$attemptHandler = new Survey_Attempt();
 $questionHandler = new Survey_Question();
 $sectionHandler = new Survey_Section();
 $groupHandler = new Group();
@@ -53,13 +54,19 @@ $data = $_POST;
 $data['section_id'] = $question['section_id'];
 $data['question_id'] = $this->arg[0];
 
-$result = $answerHandler->saveResponse($data);
+if($attemptHandler->checkAttemptIsValid($section['assess_id'], $_SESSION['user']->getId(), $data['attempt_id'])) {
 
-/* Find out how many questions were completed in this section already
- */
-$result['percentageComplete'] = $sectionHandler->sectionPercentageComplete($question['section_id']);
+    $result = $answerHandler->saveResponse($data);
 
-echo json_encode($result);
+    /* Find out how many questions were completed in this section already
+     */
+    $result['percentageComplete'] = $sectionHandler->sectionPercentageComplete($question['section_id']);
+
+    echo json_encode($result);
+}
+else {
+    header('HTTP/1.1 403 Forbidden, invalid attempt');
+}
 
 /* Prevent rendering of template
  */

@@ -15,6 +15,7 @@
 		 */
 		function init(options, element) {
 			var defaults = {
+				attemptId: 0,
 				evaluationId: 0,
 				evaluationType: 'assess',
 				element: element,
@@ -23,7 +24,7 @@
 			var mergedOptions = $j.extend({}, defaults, options);
 
 			var derived = {
-				endUrl: '/' + mergedOptions.evaluationType + '/end/' + mergedOptions.evaluationId
+				endUrl: '/' + mergedOptions.evaluationType + '/end/' + mergedOptions.evaluationId + '/' + mergedOptions.attemptId
 			}
 
 			var merged = $j.extend({}, defaults, derived, mergedOptions);
