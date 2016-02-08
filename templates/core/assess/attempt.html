@@ -26,6 +26,7 @@ $(function() {
 	/* Pass necessary values
 	 */
 	$('#evaluation-countdown').evaluationCountdown({
+		attemptId: '{ATTEMPT_ID}',
 		evaluationId: '{ASSESS_ASSESS_ID}',
 		timeLeft: '{ASSESS_TIME_REMAINING}'
 	});
@@ -103,7 +104,7 @@ $(function() {
             <!-- END nextSection -->
             <!-- BEGIN endAssess -->
             <li>
-                <a href="/assess/end/{ASSESS_ASSESS_ID}" class="button icon-approve submit expand" data-evaluation-finish>Finish</a>
+                <a href="/assess/end/{ASSESS_ASSESS_ID}/{ATTEMPT_ID}" class="button icon-approve submit expand" data-evaluation-finish>Finish</a>
             </li>
             <!-- END endAssess -->
         </ul>
