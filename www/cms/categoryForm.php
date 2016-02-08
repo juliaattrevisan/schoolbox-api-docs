@@ -2,6 +2,7 @@
 
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\CategoryCodeMapper;
+use Schoolbox\Resource\Category as CategoryModel;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
@@ -167,10 +168,19 @@ if ($_POST['name']) {
         exit;
     }
 
-    $categoryMapper->save(
-        $categoryMapper->findById($_POST['move'])
-            ->setParent($categoryMapper->createModel()->setId($_POST['categoryID']))
-    );
+    $movedFolder  = $categoryMapper->findById($_POST['move']);
+    $parentFolder = $categoryMapper->findById($_POST['categoryID']);
+
+    // Make sure $movedFolder isn't now its own ancestor
+    foreach ($categoryMapper->findParents($parentFolder) as $ancestor) {
+        /** @var CategoryModel $ancestor */
+        if ($ancestor->getId() == $movedFolder->getId()) {
+            echo "Cannot move a folder into itself";
+            exit;
+        }
+    }
+
+    $categoryMapper->save($movedFolder->setParent($parentFolder));
 } elseif (is_numeric($_GET['delete'])) {
     try {
         $category = $categoryMapper->findById($_GET['delete']);
