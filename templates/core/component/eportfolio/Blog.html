@@ -1,10 +1,18 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
     <script type="text/javascript" src="/javascript/shared/jquery.blog-commentary.js"></script>
+    <script type="text/javascript" src="/javascript/shared/jquery.editor.js"></script>
+
     <script type='text/javascript'>
         $(function() {
+
+            $.fn.alaressEditor({
+                targetElements: $('[data-html-editor]')
+            });
+
             $('#component{COMPONENT_INSTANCE_ID}').blogCommentary();
         });
     </script>
+
 
     {CONFIGURATION}
 
@@ -93,7 +101,7 @@
 
                                 <label>
                                     Blog Content
-                                    <textarea type='text' name='content' class='mceEditor' style="width:100%" rows="20" />{LIST_ITEM_CONTENT}</textarea>
+                                    <textarea id="contentModify" type='text' name='content' data-html-editor />{LIST_ITEM_CONTENT}</textarea>
                                 </label>
 
                                 <input type='submit' value='Update' />
@@ -121,7 +129,7 @@
 
                         <label>
                             Blog Content
-                            <textarea type='text' name='content' class='mceEditor' rows="20" /></textarea>
+                            <textarea id="contentCreate" type='text' name='content' data-html-editor /></textarea>
                         </label>
 
                         <input type='submit' value='Add item' />
