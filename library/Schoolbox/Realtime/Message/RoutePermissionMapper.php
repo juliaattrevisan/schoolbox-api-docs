@@ -137,7 +137,7 @@ class RoutePermissionMapper extends Mapper {
 
         // if no record matches, this message is not appropriate to this user/role, so dismiss
         if (!$r) {
-            return [];
+            return [ 'MU' ];
         }
 
         $mask     = $r['mask']         ? explode(',', $r['mask'])         : [];
