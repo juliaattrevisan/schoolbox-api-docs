@@ -52,6 +52,7 @@ class Enrolment extends AbstractImporter
     {
         return [
             'Class Code'   => 'The code for the class',
+            'Class Title'  => 'The display name for the class (only used if Class Code is not an existing class)',
             'Student Code' => 'The code for the student (must correspond to a student\'s external ID)',
         ];
     }
@@ -89,12 +90,16 @@ class Enrolment extends AbstractImporter
             }
 
             // Load student and class from DB
+            /** @var ClassEntry $class */
             try {
-                /** @var ClassEntry $class */
                 $class = $this->classMapper->findOneByColumn('code', $classCode);
             } catch (Mapper\Exception $e) {
-                $this->log->warning(sprintf('Class "%s" not found: skipping!', $classCode));
-                continue;
+                $this->log->warning(sprintf('Class "%s" not found: creating a new class', $classCode));
+                $class = $this->classMapper->createModel();
+                $class
+                    ->setCode($classCode)
+                    ->setName($row['Class Title'] ?: '')
+                ;
             }
             try {
                 $student = $this->userMapper->findOneByColumn('synergy_id', $studentCode);
@@ -119,14 +124,24 @@ class Enrolment extends AbstractImporter
     {
         // Eventual override rules:
         // * Enrolment: delete all existing and re-insert
-        $result = $this->parse();
+        $result         = $this->parse();
+        $createdClasses = [];
         foreach ($result as $enrolment) {
+            $class = $enrolment->getClass();
             $identifier = sprintf(
                 '"%s" for class "%s"',
                 $enrolment->getUser()->getExternalId(),
-                $enrolment->getClass()->getCode()
+                $class->getCode()
             );
             if ($this->performUpdate) {
+                if (!$class->getId()) {
+                    // This same class might have been created in an earlier enrolment update
+                    if (!isset($createdClasses[$class->getCode()])) {
+                        $createdClasses[$class->getCode()] = true;
+                        $this->log->info(sprintf('Creating class "%s"', $class->getCode()));
+                        $this->classMapper->save($class);
+                    }
+                }
                 $this->log->info('Saving enrolment of student ' . $identifier);
                 if ($this->enrolmentMapper->save($enrolment)) {
                     $this->log->info(sprintf('Enrolment saved (ID: #%d)', $enrolment->getId()));
@@ -134,6 +149,12 @@ class Enrolment extends AbstractImporter
                     $this->log->error('Could not save enrolment!');
                 }
             } else {
+                if (!$class->getId()) {
+                    if (!isset($createdClasses[$class->getCode()])) {
+                        $createdClasses[$class->getCode()] = true;
+                        $this->log->info(sprintf('Pretending to create class "%s"', $class->getCode()));
+                    }
+                }
                 $this->log->info('Pretending to save enrolment of student ' . $identifier);
             }
         }
