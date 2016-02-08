@@ -188,9 +188,31 @@ class Controller extends Base {
      */
     public function log($logId)
     {
+        $this->logFormat($logId);
+    }
+
+
+    /**
+     * @api   /adminv2/ups/log/{logId}.{format}
+     * @level 156
+     *
+     * @param int    $logId
+     * @param string $format
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function logFormat($logId, $format = '')
+    {
+        $linesPerPage = 50;
+
         if ($this->getRequest()->isXhr()) {
             $template = 'lines';
             $format   = 'nochrome';
+        } elseif ($format == 'html') {
+            // no limit
+            $linesPerPage = PHP_INT_MAX;
+            $template = 'lines';
+            $format   = 'nochrome';
+            $useInlineCSS = true;
         } else {
             $template = 'detail';
             $format   = 'html';
@@ -211,7 +233,7 @@ class Controller extends Base {
                 'created'   => $model->getUsersCreated(),
                 'updated'   => $model->getUsersUpdated(),
                 'skipped'   => $model->getUsersSkipped(),
-                'lines'     => $this->getLogPartial($model->getStorage(), $page, $this->parseFilterString($filter))
+                'lines'     => $this->getLogPartial($model->getStorage(), $page, $this->parseFilterString($filter), $linesPerPage)
             ];
 
             $allBreadcrumbs = new Navigator(
@@ -228,6 +250,10 @@ class Controller extends Base {
                 'allBreadcrumbs'  => $allBreadcrumbs->getAllNodes(),
                 'filterSummary'   => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
             ];
+
+            if (isset($useInlineCSS) && $useInlineCSS) {
+                $data['useInlineCSS'] = true;
+            }
 
             $this->getResponse()->content->set([
                 'template' => $template,

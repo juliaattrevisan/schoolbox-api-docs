@@ -34,6 +34,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath) {
         $this->addGetRoute($router, 'logs', $basePath, "/logs");
+        $this->addGetRoute($router, 'logFormat', $basePath, "/log/{logId}\.{format}");
         $this->addGetRoute($router, 'log', $basePath, "/log/{logId}");
         $this->addGetRoute($router, 'intro', $basePath, "");
         $this->addGetRoute($router, 'read', $basePath, "/{rulesetId}");
