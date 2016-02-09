@@ -266,7 +266,7 @@ class UserMapper extends Mapper
                 $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_location') . ':' . $model->getPassword())));
             }
 
-            return $model;
+            return true;
         });
     }
 
