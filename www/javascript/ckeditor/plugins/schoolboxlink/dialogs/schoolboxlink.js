@@ -27,6 +27,8 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
     function inject(editorInstance, fields, url) {
         var element = editorInstance.document.createElement('a');
         element.setAttribute('href', url);
+        element.setAttribute('target', fields.target.getValue());
+
         element.setText(fields.text.getValue());
 
         return element;
@@ -45,6 +47,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
             type: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-type'),
             url: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-url'),
             text: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-text'),
+            target: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-target'),
             filesystem: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-filesystem')
         };
     }
@@ -155,6 +158,20 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                         type: 'text',
                         id: 'schoolboxlink-text',
                         label: 'Link Text',
+
+                        /* Editing an existing element
+                         */
+                        setup: function(element) {
+                            var dialog = this.getDialog();
+                            var fields = dialogFields(dialog);
+                        }
+                    },
+                    {
+                        type: 'select',
+                        id: 'schoolboxlink-target',
+                        label: 'Opens in',
+                        items: [['Same window', '_self'], ['New window', '_blank']],
+                        'default': '_self',
 
                         /* Editing an existing element
                          */
