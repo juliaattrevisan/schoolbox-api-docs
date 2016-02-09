@@ -1,4 +1,7 @@
 table.rb {
+    [colspan] {
+        border-right-width: 0 !important;
+    }
     &.markable {
         td {
             padding: 0;
