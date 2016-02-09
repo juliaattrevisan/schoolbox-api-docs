@@ -1261,7 +1261,7 @@ ul.flex-list {
             }
         }
 
-		p {
+		p, ul {
             line-height: 1.25rem;
             margin: 0 0 0 (3 * rem-calc($base-font-size));
             @media #{$medium-up} {
@@ -1404,7 +1404,7 @@ ul.flex-list {
 		}
 	}
 
-	p{
+	p, ul{
         margin: 0;
 		&.spaced {
             padding-bottom: (0.2 * rem-calc($base-font-size));
