@@ -116,9 +116,11 @@ class RubricMapper
             SELECT rc.id, rc.grouping, rc.name, COUNT(ru.submission_box_id) usage_count
             FROM rubric_criterion rc
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
+            LEFT JOIN submission_box b ON ru.submission_box_id = b.id
             WHERE rc.parent_type = 'category'
             AND rc.parent_id IN (:$in)
             AND rc.deleted_at IS NULL
+            AND b.deleted IS NOT TRUE
             GROUP BY rc.id
         ", $args);
 
@@ -196,9 +198,10 @@ class RubricMapper
         $criteriaStatement = $this->database->query("
             SELECT COUNT(box_id) usages, COALESCE(selected, 0) selected, crit_id, `grouping`, `name`
             FROM (
-              SELECT submission_box_id box_id, submission_box_id = :boxId selected, c.id crit_id, `sequence`, `grouping`, `name`
+              SELECT b.id box_id, submission_box_id = :boxId selected, c.id crit_id, `sequence`, `grouping`, `name`
               FROM rubric_usage u
               RIGHT JOIN rubric_criterion c ON u.criterion_id = c.id
+              LEFT JOIN submission_box b ON u.submission_box_id = b.id AND b.deleted IS NOT TRUE
               WHERE parent_type = 'category'
               AND parent_id IN (:$in)
               AND deleted_at IS NULL
