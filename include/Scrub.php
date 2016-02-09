@@ -135,6 +135,9 @@ class Scrub
             /* http://htmlpurifier.org/phorum/read.php?3,6724
              */
             $config->set('CSS.AllowTricky', true);
+            // Trusted style properties are:
+            // position, top/left/right/bottom, z-index
+            $config->set('CSS.Trusted', true);
 
             $config->set('Cache.SerializerPath', Cfg::get('xml_dir') . '/../purifier/');
             $config->set('AutoFormat.Linkify', true);
