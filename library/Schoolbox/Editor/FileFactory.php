@@ -11,6 +11,7 @@
 namespace Schoolbox\Editor;
 
 use \Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class FileFactory {
 
@@ -45,23 +46,49 @@ class FileFactory {
             'id' => ''
         ];
 
-        /* When identifying a storage file via browse:xxx which is
-         * a string used internally in resource browser messages
-         */
-        list($filesystem, $id) = explode(':', $this->getHash());
-
         if ($this->getHash()) {
-            $collector = (new CollectorFactory())->build([$this->getHash()])->getFirst();
 
-            $data = [
-                'filesystem' => $filesystem,
-                'type' => $collector->getMimetype()->getType(),
-                'hash' => $collector->getHash(),
+            /* When identifying a storage file via browse:xxx which is
+             * a string used internally in resource browser messages
+             */
+            list($filesystem, $id) = explode(':', $this->getHash());
 
-                /* Used for video/audio, sadly
+            /* Folders treated uniquely
+             */
+            if ($filesystem == 'browse.folder') {
+                $folderMapper = new FolderMapper();
+
+                /* Check that it hasn't been deleted or otherwise
+                 * made unavailable in the meantime
                  */
-                'id' => $id
-            ];
+                try {
+                    $folder = $folderMapper->findById($id);
+
+                    $data = [
+                        'filesystem' => '',
+                        'type'       => 'folder',
+                        'hash'       => '',
+                        'id'         => $folder->getId()
+                    ];
+                }
+                catch (\Exception $e) {
+                }
+            }
+            /* Other files
+             */
+            else {
+                $collector = (new CollectorFactory())->build([$this->getHash()])->getFirst();
+
+                $data = [
+                    'filesystem' => $filesystem,
+                    'type'       => $collector->getMimetype()->getType(),
+                    'hash'       => $collector->getHash(),
+
+                    /* Used for video/audio, sadly
+                     */
+                    'id'         => $id
+                ];
+            }
         }
 
         return json_encode($data);
