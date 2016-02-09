@@ -127,6 +127,11 @@ class Report_StaffDepartment extends Report_Abstract
                 $allStaff
             );
 
+            // Get all the schoolbox users
+
+            $userMapper = \Schoolbox\UserMapper::getInstance();
+            $users = $userMapper->findAll();
+
             foreach ($allStaff as $currentStaff) {
 
                 if ($previousDepartment != $currentStaff['StaffDepartmentDescription']) {
@@ -139,9 +144,14 @@ class Report_StaffDepartment extends Report_Abstract
 
                 $extensionText = Scrub::text($currentStaff['StaffExtension']) == '' ? '' : '(x' . Scrub::text($currentStaff['StaffExtension']) . ')';
 
+                // Find the match schoolbox user so we can link to their profile page
+
+                $user = $users->filterBy('externalId', $currentStaff['StaffID']);
+
                 $this->getPage()->setVar(
                     array(
                         'STAFF_STAFFID'    => Scrub::text($currentStaff['StaffID']),
+                        'STAFF_EXTERNALID' => $user->first()->getId(),
                         'STAFF_STAFFCODE'  => Scrub::text($currentStaff['SchoolStaffCode']),
                         'STAFF_TITLE'      => Scrub::text($currentStaff['StaffTitle']),
                         'STAFF_FIRSTNAME'  => Scrub::text($currentStaff['StaffPreferredName']),
