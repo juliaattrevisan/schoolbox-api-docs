@@ -25,8 +25,9 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
      * @returns {*}
      */
     function inject(editorInstance, fields, url) {
-        var element = editorInstance.document.createElement('iframe');
-        element.setAttribute('src', url);
+        var element = editorInstance.document.createElement('a');
+        element.setAttribute('href', url);
+        element.setText('mort');
 
         return element;
     }
