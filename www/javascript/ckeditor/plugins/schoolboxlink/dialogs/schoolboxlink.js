@@ -210,7 +210,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                         type: 'text',
                         id: 'schoolboxlink-id',
                         label: 'Id',
-                        className: 'xhide'
+                        className: 'hide'
                     },
 
                     /* Store string 'image', 'video', 'audio'
@@ -220,7 +220,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                         type: 'text',
                         id: 'schoolboxlink-type',
                         label: 'Type',
-                        className: 'xhide'
+                        className: 'hide'
                     },
 
                     /* The filesystem where the resource was found
@@ -229,7 +229,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                         type: 'text',
                         id: 'schoolboxlink-filesystem',
                         label: 'Filesystem',
-                        className: 'xhide'
+                        className: 'hide'
                     }
                 ]
             }
