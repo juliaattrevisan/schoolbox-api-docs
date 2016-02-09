@@ -33,16 +33,26 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
         element.setAttribute('href', fields.url.getValue());
         element.setAttribute('target', fields.target.getValue());
 
-        /* Inserting a new link; use the url as the link text
+        /* No selection.
+
+         * TODO: Hmm I'm not sure when this occurs, as an empty
+         * selection (or, placement of caret) is equivalent to
+         * CKEDITOR.SELECTION_TEXT anyway...
          */
         if (selection.getType() == CKEDITOR.SELECTION_NONE) {
             element.setText(fields.url.getValue());
         }
         /* Applying link to selected text; use the selected text
-         * as the link text itself
+         * as the link text itself. Or, if nothing was selected,
+         * just insert a new string with the url as link text
          */
         else if (selection.getType() == CKEDITOR.SELECTION_TEXT) {
-            element.setText(selection.getSelectedText());
+            if (selection.getSelectedText().length) {
+                element.setText(selection.getSelectedText());
+            }
+            else {
+                element.setText(fields.url.getValue());
+            }
         }
         /* Applying link to some kind of element like an img
          * Use the element as children of element
