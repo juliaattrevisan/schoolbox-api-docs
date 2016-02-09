@@ -564,10 +564,10 @@ class UserMapper extends Mapper
         }
         $query = "
             UPDATE {$this->getTable()}
-            SET    email_pass = ?
-            WHERE  id = ?
+            SET    email_pass = :password
+            WHERE  id = :id
         ";
         $statement = $this->getDatabase()->prepare($query);
-        return $statement->execute([$user->getId(), $password,]);
+        return $statement->execute(['id' => $user->getId(), 'password' => $password,]);
     }
 }
