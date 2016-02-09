@@ -24,14 +24,32 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
      * Inject link into editor panel with modifiers applied
      *
      * @param editorInstance
+     * @param selection
      * @param fields
-     * @param url
      * @returns {*}
      */
-    function inject(editorInstance, fields, url) {
+    function inject(editorInstance, selection, fields) {
         var element = editorInstance.document.createElement('a');
-        element.setAttribute('href', url);
+        element.setAttribute('href', fields.url.getValue());
         element.setAttribute('target', fields.target.getValue());
+
+        /* Inserting a new link; use the url as the link text
+         */
+        if (selection.getType() == CKEDITOR.SELECTION_NONE) {
+            element.setText(fields.url.getValue());
+        }
+        /* Applying link to selected text; use the selected text
+         * as the link text itself
+         */
+        else if (selection.getType() == CKEDITOR.SELECTION_TEXT) {
+            element.setText(selection.getSelectedText());
+        }
+        /* Applying link to some kind of element like an img
+         * Use the element as children of element
+         */
+        else if (selection.getType() == CKEDITOR.SELECTION_ELEMENT) {
+            element.append(selection.getSelectedElement());
+        }
 
         return element;
     }
@@ -214,7 +232,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
             var dialog = this;
             var fields = dialogFields(dialog);
 
-            editorInstance.insertElement(inject(editorInstance, fields, fields.url.getValue()));
+            editorInstance.insertElement(inject(editorInstance, this.selection, fields));
         },
 
         /**
@@ -239,6 +257,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
             }
 
             this.element = element;
+            this.selection = selection;
 
             if (!this.insertMode) {
                 this.setupContent(this.element);
