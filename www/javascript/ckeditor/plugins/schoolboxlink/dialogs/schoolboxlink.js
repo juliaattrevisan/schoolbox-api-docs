@@ -4,7 +4,15 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
         url: {
             /* Find information about a node/resource
              */
-            nodeinfo: '/editor/nodeInfo.php'
+            nodeinfo: '/editor/nodeInfo.php',
+
+            /* Prefix for linking to Folders
+             */
+            folder: '/homepage/',
+
+            /* Prefix for linking to Files
+             */
+            file: '/send.php?id='
         }
     };
 
@@ -103,8 +111,16 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                         if (message.data != undefined) {
                                             if (0 in message.data && 'hash' in message.data[0]) {
                                                 $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
+                                                    fields.id.setValue(responseText.id);
                                                     fields.type.setValue(responseText.type);
                                                     fields.filesystem.setValue(responseText.filesystem);
+
+                                                    if (fields.type.getValue() == 'folder') {
+                                                        fields.url.setValue(config.url.folder + fields.id.getValue());
+                                                    }
+                                                    else {
+                                                        fields.url.setValue(config.url.file + fields.id.getValue());
+                                                    }
 
                                                     /* Shut modal, go back to Dialog
                                                      */
