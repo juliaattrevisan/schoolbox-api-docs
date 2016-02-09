@@ -86,3 +86,11 @@ $timetable-cell-border: $body-bg;
     color: $accent-foreground;
     background-color: $accent-background;
 }
+
+@media print {
+    .timetable td .timetable-subject,
+    .timetable-small td .timetable-subject,
+    .timetable tr th {
+        padding: 0.25rem;
+    }
+}
