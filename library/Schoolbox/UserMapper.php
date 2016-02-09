@@ -532,7 +532,8 @@ class UserMapper extends Mapper
     }
 
     /**
-     * Don't even ask what a password hashing method is doing in a mapper.
+     * @deprecated Don't even ask what a password hashing method is doing in a mapper.
+     *             (this will be removed in 16 and replaced with `password_hash`)
      *
      * @param  string $password
      * @return string
