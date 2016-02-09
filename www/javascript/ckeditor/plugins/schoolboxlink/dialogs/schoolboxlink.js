@@ -27,7 +27,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
     function inject(editorInstance, fields, url) {
         var element = editorInstance.document.createElement('a');
         element.setAttribute('href', url);
-        element.setText('mort');
+        element.setText(fields.text.getValue());
 
         return element;
     }
@@ -44,6 +44,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
             id: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-id'),
             type: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-type'),
             url: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-url'),
+            text: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-text'),
             filesystem: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-filesystem')
         };
     }
@@ -116,11 +117,19 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                                     fields.type.setValue(responseText.type);
                                                     fields.filesystem.setValue(responseText.filesystem);
 
+                                                    /* Manufacture link url based on whether it was
+                                                     * a file or a folder
+                                                     *
+                                                     * Assign link text to be same as url for now
+                                                     * User can change it to whatever they want
+                                                     */
                                                     if (fields.type.getValue() == 'folder') {
                                                         fields.url.setValue(config.url.folder + fields.id.getValue());
+                                                        fields.text.setValue(fields.url.getValue());
                                                     }
                                                     else {
                                                         fields.url.setValue(config.url.file + fields.id.getValue());
+                                                        fields.text.setValue(fields.url.getValue());
                                                     }
 
                                                     /* Shut modal, go back to Dialog
@@ -141,6 +150,18 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                 }
                             }
                         ]
+                    },
+                    {
+                        type: 'text',
+                        id: 'schoolboxlink-text',
+                        label: 'Link Text',
+
+                        /* Editing an existing element
+                         */
+                        setup: function(element) {
+                            var dialog = this.getDialog();
+                            var fields = dialogFields(dialog);
+                        }
                     },
 
                     /* Metadata lives at the bottom because they occupy space
