@@ -953,7 +953,7 @@ class External_Synergetic_User implements External_UserInterface
                     JobPositions.StaffJobPositionEndDate
                 FROM SynergyOne.dbo.vStaff vStaff
                 LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
-                LEFT JOIN SynergyOne.dbo.uStaffPosition ON vStaff.StaffID = uStaffPosition.StaffID
+                LEFT JOIN SynergyOne.dbo.uStaffPosition ON vStaff.StaffID = uStaffPosition.ID
                 WHERE vStaff.ActiveFlag = 1
                 AND StaffCategoryDescription != 'Staff on leave'
                 $scWhere
