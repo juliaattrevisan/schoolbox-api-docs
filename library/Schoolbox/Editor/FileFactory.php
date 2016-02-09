@@ -12,6 +12,7 @@ namespace Schoolbox\Editor;
 
 use \Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
 
 class FileFactory {
 
@@ -40,6 +41,9 @@ class FileFactory {
      * @return string
      */
     public function produce() {
+        $folderMapper = false;
+        $type = false;
+
         $data = [
             'type' => '',
             'hash' => '',
@@ -54,24 +58,35 @@ class FileFactory {
             list($filesystem, $id) = explode(':', $this->getHash());
 
             /* Folders treated uniquely
+             * Regular folders and My Folder are also treated uniquely
              */
-            if ($filesystem == 'browse.folder') {
-                $folderMapper = new FolderMapper();
-
-                /* Check that it hasn't been deleted or otherwise
-                 * made unavailable in the meantime
-                 */
-                try {
-                    $folder = $folderMapper->findById($id);
-
-                    $data = [
-                        'filesystem' => '',
-                        'type'       => 'folder',
-                        'hash'       => '',
-                        'id'         => $folder->getId()
-                    ];
+            if (strstr($filesystem, '.folder')) {
+                if ($filesystem == 'browse.folder') {
+                    $folderMapper = new FolderMapper();
+                    $type = 'folder';
                 }
-                catch (\Exception $e) {
+                else if ($filesystem == 'myfile.folder') {
+                    $folderMapper = new MyFolderMapper();
+                    $type = 'myfolder';
+                }
+
+                /* If it understood what kind of folder was chose,
+                 * continue and check that it hasn't been deleted
+                 * or otherwise made unavailable in the meantime
+                 */
+                if ($folderMapper) {
+                    try {
+                        $folder = $folderMapper->findById($id);
+
+                        $data = [
+                            'filesystem' => '',
+                            'type'       => $type,
+                            'hash'       => '',
+                            'id'         => $folder->getId()
+                        ];
+                    }
+                    catch (\Exception $e) {
+                    }
                 }
             }
             /* Other files

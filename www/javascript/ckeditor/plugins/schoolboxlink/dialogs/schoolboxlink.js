@@ -10,6 +10,10 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
              */
             folder: '/homepage/',
 
+            /* Prefix for linking to MyFolders
+             */
+            myfolder: '/my-files/',
+
             /* Prefix for linking to Files
              */
             file: '/send.php?id='
@@ -123,6 +127,10 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                                      */
                                                     if (fields.type.getValue() == 'folder') {
                                                         fields.url.setValue(config.url.folder + fields.id.getValue());
+                                                        fields.text.setValue(fields.url.getValue());
+                                                    }
+                                                    else if (fields.type.getValue() == 'myfolder') {
+                                                        fields.url.setValue(config.url.myfolder + fields.id.getValue());
                                                         fields.text.setValue(fields.url.getValue());
                                                     }
                                                     else {
