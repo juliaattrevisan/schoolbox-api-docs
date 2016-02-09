@@ -225,6 +225,7 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('External ID', 'setExternalId');
         $this->userHydrators[] = new User\Hydrator\Lookup('Role', 'setRole', $this->roleList);
         $this->userHydrators[] = new User\Hydrator\Password('Password', 'setPassword', $this->userMapper);
+        $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Password', 'setRetrievablePassword');
         $this->userHydrators[] = new User\Hydrator\ToggleField('E-Portfolio?', 'setEportfolioEnable');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Email Address From Username?', 'setLocalEmail');
         // This one might have to be inverted
@@ -464,6 +465,7 @@ class User extends AbstractImporter
             $this->log->info(sprintf('Creating user "%s"', $user->formatName()), ['user' => $user]);
             try {
                 if ($this->userMapper->save($user)) {
+                    $this->userMapper->saveRetrievablePassword($user);
                     $this->log->info(sprintf('User created (ID: #%d)', $user->getId()));
                 } else {
                     $this->log->error('Could not create user!');
@@ -489,6 +491,7 @@ class User extends AbstractImporter
             $this->log->info(sprintf('Updating user "%s"', $user->formatName()), ['diff' => $diff]);
             try {
                 if ($this->userMapper->save($user)) {
+                    $this->userMapper->saveRetrievablePassword($user);
                     $this->log->info(sprintf('User updated (ID: #%d)', $user->getId()));
                 } else {
                     $this->log->error('Could not update user!');
