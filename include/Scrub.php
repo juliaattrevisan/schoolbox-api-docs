@@ -135,6 +135,9 @@ class Scrub
             /* http://htmlpurifier.org/phorum/read.php?3,6724
              */
             $config->set('CSS.AllowTricky', true);
+            // Trusted style properties are:
+            // position, top/left/right/bottom, z-index
+            $config->set('CSS.Trusted', true);
 
             $config->set('Cache.SerializerPath', Cfg::get('xml_dir') . '/../purifier/');
             $config->set('AutoFormat.Linkify', true);
@@ -305,7 +308,6 @@ class Scrub
      *
      * Currently:
      * * adds "allowfullscreen=true" to iframes
-     * * wraps iframes in "div.flex-video"
      *
      * @param string $html
      * @return string
@@ -327,26 +329,8 @@ class Scrub
             // Mangle iframes: add allowfullscreen, and wrap in div
             foreach ($domDocument->getElementsByTagName('iframe') as $iframe) {
                 /** @var DOMElement $iframe */
-
-                // Is a height style set anywhere? If so, don't apply flex-video.
-                // (This parser is far from perfect but it is good enough for finding height attributes)
-                $hasHeight = false;
-                $styles    = array_filter(explode(';', trim($iframe->getAttribute('style'))), 'strlen');
-                foreach ($styles as $style) {
-                    list($property,) = explode(':', $style);
-                    if (trim(strtolower($property)) === 'height') {
-                        $hasHeight = true;
-                        break;
-                    }
-                }
-                if (!$hasHeight) {
-                    $touched = true;
-                    $iframe->setAttribute('allowfullscreen', 'true');
-                    $container = $domDocument->createElement('div');
-                    $container->setAttribute('class', 'flex-video');
-                    $container->appendChild(clone $iframe);
-                    $iframe->parentNode->replaceChild($container, $iframe);
-                }
+                $touched = true;
+                $iframe->setAttribute('allowfullscreen', 'true');
             }
 
             // I only want the fragment content, but saveHTML loads doc into a
