@@ -93,4 +93,7 @@ $timetable-cell-border: $body-bg;
     .timetable tr th {
         padding: 0.25rem;
     }
+    .timetable-small{
+        display: none;
+    }
 }
