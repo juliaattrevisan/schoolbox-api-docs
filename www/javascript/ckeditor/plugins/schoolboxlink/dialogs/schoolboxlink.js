@@ -33,8 +33,6 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
         element.setAttribute('href', url);
         element.setAttribute('target', fields.target.getValue());
 
-        element.setText(fields.text.getValue());
-
         return element;
     }
 
@@ -50,7 +48,6 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
             id: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-id'),
             type: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-type'),
             url: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-url'),
-            text: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-text'),
             target: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-target'),
             filesystem: dialog.getContentElement('schoolboxlink-tab', 'schoolboxlink-filesystem')
         };
@@ -127,15 +124,12 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                                      */
                                                     if (fields.type.getValue() == 'folder') {
                                                         fields.url.setValue(config.url.folder + fields.id.getValue());
-                                                        fields.text.setValue(fields.url.getValue());
                                                     }
                                                     else if (fields.type.getValue() == 'myfolder') {
                                                         fields.url.setValue(config.url.myfolder + fields.id.getValue());
-                                                        fields.text.setValue(fields.url.getValue());
                                                     }
                                                     else {
                                                         fields.url.setValue(config.url.file + fields.id.getValue());
-                                                        fields.text.setValue(fields.url.getValue());
                                                     }
 
                                                     /* Shut modal, go back to Dialog
@@ -156,20 +150,6 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                 }
                             }
                         ]
-                    },
-                    {
-                        type: 'text',
-                        id: 'schoolboxlink-text',
-                        label: 'Link Text',
-
-                        /* Editing an existing element
-                         */
-                        setup: function(element) {
-                            var dialog = this.getDialog();
-                            var fields = dialogFields(dialog);
-
-                            fields.text.setValue(element.getText());
-                        }
                     },
                     {
                         type: 'select',
