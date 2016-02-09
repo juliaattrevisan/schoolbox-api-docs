@@ -466,7 +466,7 @@ class External_Schoolpro_User implements External_UserInterface
         /* Find the last updated datetime
          */
         if ($result['success'] && count($result['result'])) {
-            $photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
+            $photoPath = realpath(Config::get('portrait_dir') . '/' . $externalUserId . '.jpg');
 
             //TODO: delete photos on rollover
 

@@ -101,7 +101,7 @@ class External_Synergetic_User implements External_UserInterface
             WHERE vPhotos.ID = '" . $this->getDatabase()->quote($externalUserId) . "'
         ";
         if ($photo = $this->getDatabase()->getRow($query)) {
-            $photoPath = Config::get('portrait_dir') . '/' . $externalUserId . '.jpg';
+            $photoPath = realpath(Config::get('portrait_dir') . '/' . $externalUserId . '.jpg');
             //TODO: delete photos on rollover
             /* If the cached file doesn't exist, or the synergetic image is more recent than our
                       * last known cached version, regenerate cached version.
