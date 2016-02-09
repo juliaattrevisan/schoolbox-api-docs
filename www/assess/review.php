@@ -181,7 +181,7 @@ $readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['f
 /* Load all the questions for this section.
  * Note: only show the randomly-selected ones
  */
-$allQuestions = $sectionHandler->getQuestions($attempt_id, $section['section_id']);
+$allQuestions = $sectionHandler->getQuestions($attemptId, $section['section_id']);
 
 if ($allQuestions) {
     $randomQuestionNumber = 1;
