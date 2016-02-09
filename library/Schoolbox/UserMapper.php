@@ -252,6 +252,22 @@ class UserMapper extends Mapper
         $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUser');
 
         $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
+
+            /** @var User $model */
+
+            if (!$model->getKey()) {
+                // ensure a key is set when persisting users
+                $model->setKey(substr(md5(uniqid() . time()), 0, 25));
+            }
+
+            if (!$model->getHash() && $model->getPassword()) {
+                $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_location') . ':' . $model->getPassword())));
+            }
+
+            return $model;
+        });
     }
 
 
