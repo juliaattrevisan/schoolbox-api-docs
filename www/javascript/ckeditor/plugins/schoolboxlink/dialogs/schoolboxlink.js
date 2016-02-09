@@ -80,13 +80,6 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                 setup: function(element) {
                                     var dialog = this.getDialog();
                                     var fields = dialogFields(dialog);
-                                },
-
-                                /* When you type the url yourself, apply details
-                                 */
-                                onChange: function() {
-                                    var dialog = this.getDialog();
-                                    var fields = dialogFields(dialog);
                                 }
                             },
                             {
