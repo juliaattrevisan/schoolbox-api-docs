@@ -80,6 +80,8 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                 setup: function(element) {
                                     var dialog = this.getDialog();
                                     var fields = dialogFields(dialog);
+
+                                    fields.url.setValue(element.getAttribute('href'));
                                 }
                             },
                             {
@@ -157,6 +159,8 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                         setup: function(element) {
                             var dialog = this.getDialog();
                             var fields = dialogFields(dialog);
+
+                            fields.text.setValue(element.getText());
                         }
                     },
                     {
@@ -171,6 +175,8 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                         setup: function(element) {
                             var dialog = this.getDialog();
                             var fields = dialogFields(dialog);
+
+                            fields.target.setValue(element.getAttribute('target'));
                         }
                     },
 
