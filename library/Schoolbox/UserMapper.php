@@ -544,4 +544,30 @@ class UserMapper extends Mapper
         $statement->execute([$password]);
         return $statement->fetchColumn();
     }
+
+    /**
+     * @deprecated Don't even ask why I'm saving a cleartext password either.
+     *             (this will be removed in 16 as existing password should
+     *              not be needed when changing Synweb password)
+     *
+     * @param  User   $user
+     * @return bool   Was the password set?
+     */
+    public function saveRetrievablePassword(User $user)
+    {
+        if (!$user->getId()) {
+            return false;
+        }
+        $password = $user->getRetrievablePassword();
+        if (!strlen($password)) {
+            return false;
+        }
+        $query = "
+            UPDATE {$this->getTable()}
+            SET    email_pass = ?
+            WHERE  id = ?
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        return $statement->execute([$user->getId(), $password,]);
+    }
 }
