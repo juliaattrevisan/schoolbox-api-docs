@@ -29,6 +29,7 @@ $log             = new Logger(STDOUT, null, Monolog\Logger::INFO, [], true);
 $attemptMapper   = new AttemptMapper();
 $taskMapper      = new Task\InstanceCompletionMapper();
 $expiredAttempts = $attemptMapper->findUnfinishedExpiredAttempts();
+$updatedAttempts = [];
 
 $log->notice(sprintf("Auto-completing %d expired attempts", count($expiredAttempts)));
 foreach ($expiredAttempts as $attempt) {
@@ -48,16 +49,28 @@ foreach ($expiredAttempts as $attempt) {
             $attempt->getUser()->formatName()
         )
     );
-    // Figure out what the finish date ought to be
+    // Figure out what the finish date ought to be.
+    // If it's less than 5 minutes ago, allow some leeway.
     $attemptFinishDate = clone $attempt->getStart();
     $attemptFinishDate = $attemptFinishDate->addSeconds($attempt->getAssessment()->getDuration());
-    $log->notice(sprintf("Setting finish time to %s", $attemptFinishDate->getDatabase()));
-    $attempt->setFinish($attemptFinishDate);
+    if ($attemptFinishDate->diffInMinutes(Alaress_Date_Format::now(), true) <= 5) {
+        $log->notice(
+            sprintf(
+                "Finish time %s is less than 5 minutes ago - not auto-finishing yet",
+                $attemptFinishDate->getDatabase()
+            )
+        );
+    } else {
+        $log->notice(sprintf("Setting finish time to %s", $attemptFinishDate->getDatabase()));
+        $attempt->setFinish($attemptFinishDate);
+        $updatedAttempts[] = $attempt;
+    }
+
 }
 
-if (count($expiredAttempts) > 0) {
+if (count($updatedAttempts) > 0) {
     $log->notice("Saving expired attempts...");
-    $attemptMapper->save($expiredAttempts);
+    $attemptMapper->save($updatedAttempts);
 }
 
 // Complete associated tasks as well
