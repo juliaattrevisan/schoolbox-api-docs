@@ -7,8 +7,8 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Resource\Attachment\External;
-use Schoolbox\Resource\Attachment\Internal;
+use Schoolbox\Resource\Attachment\Factory as ResourceAttachmentFactory;
+use Schoolbox\Resource\Attachment\Context\Factory as ResourceContextFactory;
 
 if (empty($this)) {
     require_once __DIR__ . '/../../include/Bootstrap.php';
@@ -27,73 +27,13 @@ $multi            = empty($_GET['multi']) ? false : !!($_GET['multi']);
 $mimeFilter       = empty($_GET['mime']) ? false : $_GET['mime'];
 $filesystemContext = empty($_GET['fs']) ? false : $_GET['fs'];
 
-/* Filter the options so you can enable/disable
- * certain kinds of filesystems
- *
- * ?fs=internal.upload,internal.usermedia,internal.browse
+/* Figger out which filesystem options to show
  */
-$defaultOptions = [
-    'internal' => [
-        'upload'    => Internal\UploadController::class,
-        'usermedia' => Internal\UsermediaController::class,
-        'browse'    => Internal\BrowseController::class,
-        'myfile'    => Internal\MyfileController::class,
-    ],
-    'external' => [
-        'webdav' => External\WebdavController::class,
-        'google' => External\GoogleController::class,
-        'office' => External\Office365Controller::class
-    ]
-];
-
-/* Manufacture a restricted set of filesystemType/filesystem options
- * before passing it into Factory. I still need the classnames mapped
- * by $defaultOptions only to truncate them out later...thus, maybe
- * all this should be done inside the Attachment Factory instead.
- */
-if (!$filesystemContext) {
-    $filteredOptions = $defaultOptions;
-}
-else {
-
-    /* Selective usage context
-     * Display nothing if you try an unlisted context
-     */
-    switch($filesystemContext) {
-        case 'internal':
-            $filesystemFilter = 'internal.upload,internal.usermedia,internal.browse';
-            break;
-
-        case 'internal-myfile':
-            $filesystemFilter = 'internal.upload,internal.usermedia,internal.browse,internal.myfile';
-            break;
-
-        case 'external':
-            $filesystemFilter = 'external.webdav,external.google,external.office';
-            break;
-
-        default:
-            $filesystemFilter = '';
-            break;
-    }
-
-    /* Interpret context string
-     */
-    $filteredOptions = array();
-
-    $allFilesystemFilters = explode(',', $filesystemFilter);
-
-    /* Manufacture a restricted set
-     */
-    foreach ($allFilesystemFilters as $currentFilter) {
-        list($filesystemType, $filesystem) = explode('.', $currentFilter);
-
-        $filteredOptions[$filesystemType][$filesystem] = $defaultOptions[$filesystemType][$filesystem];
-    }
-}
+$context = new ResourceContextFactory($filesystemContext);
+$filteredOptions = $context->produce();
 
 // register our known defaults
-$factory = new \Schoolbox\Resource\Attachment\Factory($filteredOptions);
+$factory = new ResourceAttachmentFactory($filteredOptions);
 
 $factory->allowMulti($multi)
         ->setMimeFilter($mimeFilter)
