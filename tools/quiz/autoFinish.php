@@ -53,7 +53,7 @@ foreach ($expiredAttempts as $attempt) {
     // If it's less than 5 minutes ago, allow some leeway.
     $attemptFinishDate = clone $attempt->getStart();
     $attemptFinishDate = $attemptFinishDate->addSeconds($attempt->getAssessment()->getDuration());
-    if ($attemptFinishDate->diffInMinutes(Alaress_Date_Format::now(), true) <= 5) {
+    if (Alaress_Date_Format::now()->diffInSeconds($attemptFinishDate) <= 300) {
         $log->warning(
             sprintf(
                 "Finish time %s is less than 5 minutes ago - skipping this attempt",
