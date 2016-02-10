@@ -160,7 +160,7 @@ class Event_Attendance_Controller extends Controller
 	 * @param $data
 	 */
 	public function renderExportCSV($data) {
-		$name = new Url($data['event']['note']);
+		$name = new Url($data['event']['title']);
 
 		$headings = array(
 			'External ID',
@@ -235,7 +235,8 @@ class Event_Attendance_Controller extends Controller
                     $this->getPage()->setVar( array(
                         'USER_NAME' => $this->getUserHandler()->formatName($attendee),
                         'USER_ROLE' => $attendee['groupName'],
-                        'ATTENDANCE_ID' => $attendee['id']
+                        'ATTENDANCE_ID' => $attendee['id'],
+                        'ATTENDING_USER_ID' => $attendee['user_id'],
                     ) );
 
                     if ( $attendee['status'] == Calendar::ATTENDANCE_STATUS_PENDING ) {

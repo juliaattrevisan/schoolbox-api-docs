@@ -132,7 +132,7 @@ class Calendar extends DeprecatedModel
     {
         $query = "
             SELECT u.*, g.name as groupName,
-                ea.id, ea.status, ea.intention
+                ea.id, ea.user_id, ea.status, ea.intention
             FROM event_attendance ea
             JOIN `user` u ON u.id = ea.user_id
             JOIN `groups` g ON g.id = u.group_id
