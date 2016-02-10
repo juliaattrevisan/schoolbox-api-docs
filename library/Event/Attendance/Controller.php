@@ -235,7 +235,8 @@ class Event_Attendance_Controller extends Controller
                     $this->getPage()->setVar( array(
                         'USER_NAME' => $this->getUserHandler()->formatName($attendee),
                         'USER_ROLE' => $attendee['groupName'],
-                        'ATTENDANCE_ID' => $attendee['id']
+                        'ATTENDANCE_ID' => $attendee['id'],
+                        'ATTENDING_USER_ID' => $attendee['user_id'],
                     ) );
 
                     if ( $attendee['status'] == Calendar::ATTENDANCE_STATUS_PENDING ) {
