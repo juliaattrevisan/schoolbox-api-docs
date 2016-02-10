@@ -34,7 +34,14 @@
 
                 /* Url to get node information
                  */
-                source: '/resources/attachment'
+                source: '/resources/attachment',
+
+                /* Allowed Filesystems for choosing resources
+                 * in the format:
+                 *
+                 * filesystemType.filesystem,filesystemType.filesystem ...
+                 */
+                allowedFilesystems: false
             };
 
             var derived = {
@@ -53,6 +60,10 @@
 
             if (config.allowedFiles) {
                 qString += '&mime=' + config.allowedFiles;
+            }
+
+            if (config.allowedFilesystems) {
+                qString += '&fs=' + config.allowedFilesystems;
             }
 
             return qString;

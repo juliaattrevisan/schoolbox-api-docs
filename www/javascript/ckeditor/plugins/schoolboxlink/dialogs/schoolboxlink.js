@@ -124,7 +124,9 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
 
                                     /* Select something from the Resource Browser
                                      */
-                                    $.fn.schoolboxResource();
+                                    $.fn.schoolboxResource({
+                                        allowedFilesystems: 'internal.upload,internal.usermedia,internal.browse'
+                                    });
 
                                     $(window).unbind('message').on('message', function(event) {
                                         var message;
