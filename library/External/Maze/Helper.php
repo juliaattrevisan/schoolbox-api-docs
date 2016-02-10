@@ -177,20 +177,20 @@ class External_Maze_Helper
             foreach (str_getcsv($schoolboxClassCode) as $currentClassCode) {
                 list($classCode, $classNumber) = explode('-', $currentClassCode);
 
-                $allClassCodes["'{$classCode}'"] = null;
-                $allClassNumbers["'{$classNumber}'"] = null;
+                $allClassCodes[] = "'{$classCode}'";
+                $allClassNumbers[] = "'{$classNumber}'";
             }
         }
         else {
             list($classCode, $classNumber) = explode('-', $schoolboxClassCode);
 
-            $allClassCodes["'{$classCode}'"] = null;
-            $allClassNumbers["'{$classNumber}'"] = null;
+            $allClassCodes[] = "'{$classCode}'";
+            $allClassNumbers[] = "'{$classNumber}'";
         }
 
         return [
-            'ClassCode'   => implode(',', array_keys($allClassCodes)),
-            'ClassNumber' => implode(',', array_keys($allClassNumbers)),
+            'ClassCode'   => $allClassCodes,
+            'ClassNumber' => $allClassNumbers,
         ];
     }
 
