@@ -166,12 +166,32 @@ class External_Maze_Helper
      */
     public function degenerateClassCode($schoolboxClassCode)
     {
-        list($classCode, $classNumber) = explode('-', $schoolboxClassCode);
+        $allClassCodes = [];
+        $allClassNumbers = [];
 
-        return array(
-            'ClassCode'   => $classCode,
-            'ClassNumber' => $classNumber,
-        );
+        /* Also understand when many classcodes are specified in an array,
+         * or just one as a string. Manufacture a unique list of classCodes
+         * and classNumbers
+         */
+        if (strstr($schoolboxClassCode, ',')) {
+            foreach (str_getcsv($schoolboxClassCode) as $currentClassCode) {
+                list($classCode, $classNumber) = explode('-', $currentClassCode);
+
+                $allClassCodes["'{$classCode}'"] = null;
+                $allClassNumbers["'{$classNumber}'"] = null;
+            }
+        }
+        else {
+            list($classCode, $classNumber) = explode('-', $schoolboxClassCode);
+
+            $allClassCodes["'{$classCode}'"] = null;
+            $allClassNumbers["'{$classNumber}'"] = null;
+        }
+
+        return [
+            'ClassCode'   => implode(',', array_keys($allClassCodes)),
+            'ClassNumber' => implode(',', array_keys($allClassNumbers)),
+        ];
     }
 
     /**

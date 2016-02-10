@@ -57,8 +57,8 @@ class External_Maze_Class implements External_ClassInterface {
 			LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
 			LEFT JOIN ST ON STMA.SKEY = ST.STKEY
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
-			WHERE SU.SUKEY = '{$ingredients['ClassCode']}'
-			AND STMA.CLASS = '{$ingredients['ClassNumber']}'
+			WHERE SU.SUKEY IN ({$ingredients['ClassCode']})
+			AND STMA.CLASS IN ({$ingredients['ClassNumber']})
 			AND TTPERIOD = '{$ttPeriod}'
 			AND ST.STATUS != 'LEFT'
 		";
@@ -82,7 +82,7 @@ class External_Maze_Class implements External_ClassInterface {
 			FROM ST
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
-			WHERE KGC.ROLL_GROUP = '{$classCode}'
+			WHERE KGC.ROLL_GROUP IN ({$ingredients['ClassCode']})
 			AND ST.STATUS != 'LEFT'
 		";
 
@@ -139,8 +139,8 @@ class External_Maze_Class implements External_ClassInterface {
 			FROM TT
 			LEFT JOIN TTTG ON TT.TTKEY = TTTG.GKEY
 			WHERE TT.TTPERIOD = '{$ttPeriod}'
-			AND TTTG.SUBJ = '{$ingredients['ClassCode']}'
-			AND CLASS = '{$ingredients['ClassNumber']}'
+			AND TTTG.SUBJ IN ({$ingredients['ClassCode']})
+			AND CLASS IN ({$ingredients['ClassNumber']})
 		";
 
 		$part1 = $this->getDb()->getAll($query);
@@ -155,7 +155,7 @@ class External_Maze_Class implements External_ClassInterface {
 				'' AS T2TEACH,
 				'' AS T3TEACH
 			FROM KGC
-			WHERE KGC.ROLL_GROUP = '{$classCode}'
+			WHERE KGC.ROLL_GROUP IN ({$ingredients['ClassCode']})
 			";
 
 		$part2 = $this->getDb()->getAll($query);
