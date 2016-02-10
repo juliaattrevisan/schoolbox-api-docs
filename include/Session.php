@@ -207,7 +207,17 @@ class Session
             throw new Exception_Schoolbox_AccessDenied();
         } else {
             // Store password as hash for DAV authentication later
-            $this->db->update('user', 'username', array('username' => $username, 'hash' => md5($username . ':' . Cfg::get('site_location') . ':' . $password)));
+            $save = [
+                'username' => $username,
+                'hash'     => md5($username . ':' . Cfg::get('site_location') . ':' . $password)
+            ];
+
+            // ensure a key is set on login
+            if (!$user->getKey()) {
+                $save['key'] = substr(md5(uniqid() . time()), 0, 25);
+            }
+
+            $this->db->update('user', 'username', $save);
         }
 
         return $result;

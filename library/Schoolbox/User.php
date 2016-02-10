@@ -48,6 +48,20 @@ class User implements JsonSerializable
     /** @var string */
     private $password;
 
+    /**
+     * Retrievable version of the user's password.
+     *
+     * Intentionally not mapped - I don't want this field to be passed around.
+     *
+     * @deprecated This field only exists for compatibility with pre-16
+     *             password retrieval methods.
+     *
+     * @see \Schoolbox\UserMapper::saveRetrievablePassword
+     *
+     * @var string
+     */
+    private $retrievablePassword;
+
     /** @var string */
     private $year;
 
@@ -543,6 +557,25 @@ class User implements JsonSerializable
         return $this->password;
     }
 
+    /**
+     * @deprecated
+     * @return string
+     */
+    public function getRetrievablePassword()
+    {
+        return $this->retrievablePassword;
+    }
+
+    /**
+     * @deprecated
+     * @param  string $retrievablePassword
+     * @return $this
+     */
+    public function setRetrievablePassword($retrievablePassword)
+    {
+        $this->retrievablePassword = $retrievablePassword;
+        return $this;
+    }
 
     /**
      * @param HouseResidential $residentialHouse

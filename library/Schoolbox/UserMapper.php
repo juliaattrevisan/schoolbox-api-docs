@@ -252,6 +252,22 @@ class UserMapper extends Mapper
         $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUser');
 
         $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
+
+            /** @var User $model */
+
+            if (!$model->getKey()) {
+                // ensure a key is set when persisting users
+                $model->setKey(substr(md5(uniqid() . time()), 0, 25));
+            }
+
+            if (!$model->getHash() && $model->getRetrievablePassword()) {
+                $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_location') . ':' . $model->getRetrievablePassword()));
+            }
+
+            return true;
+        });
     }
 
 
@@ -532,7 +548,8 @@ class UserMapper extends Mapper
     }
 
     /**
-     * Don't even ask what a password hashing method is doing in a mapper.
+     * @deprecated Don't even ask what a password hashing method is doing in a mapper.
+     *             (this will be removed in 16 and replaced with `password_hash`)
      *
      * @param  string $password
      * @return string
@@ -542,5 +559,31 @@ class UserMapper extends Mapper
         $statement = $this->getDatabase()->prepare('SELECT PASSWORD(?)');
         $statement->execute([$password]);
         return $statement->fetchColumn();
+    }
+
+    /**
+     * @deprecated Don't even ask why I'm saving a cleartext password either.
+     *             (this will be removed in 16 as existing password should
+     *              not be needed when changing Synweb password)
+     *
+     * @param  User   $user
+     * @return bool   Was the password set?
+     */
+    public function saveRetrievablePassword(User $user)
+    {
+        if (!$user->getId()) {
+            return false;
+        }
+        $password = $user->getRetrievablePassword();
+        if (!strlen($password)) {
+            return false;
+        }
+        $query = "
+            UPDATE {$this->getTable()}
+            SET    email_pass = :password
+            WHERE  id = :id
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        return $statement->execute(['id' => $user->getId(), 'password' => $password,]);
     }
 }
