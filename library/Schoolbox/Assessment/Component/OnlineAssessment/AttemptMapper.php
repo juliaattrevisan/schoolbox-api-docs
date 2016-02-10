@@ -301,9 +301,11 @@ class AttemptMapper extends Mapper
         $query = "
             SELECT
                 {$this->getColumnString('aa')},
-                {$this->getJoinColumnString('assessment', 'as')}
+                {$this->getJoinColumnString('assessment', 'as')},
+                {$this->getJoinColumnString('user', 'u')}
             FROM {$this->getTable()} aa
             INNER JOIN {$this->getJoinSql('assessment', 'aa', 'as')}
+            LEFT  JOIN {$this->getJoinSql('user', 'aa', 'u')}
             WHERE `as`.`availability` = 'assess'
             AND   `as`.`duration` > 0
             AND   TIMESTAMPADD(SECOND, `as`.`duration`, `aa`.`start`) < :expiry
@@ -320,8 +322,10 @@ class AttemptMapper extends Mapper
             'aa',
             function ($mapper, $model, $row) {
                 /** @var Attempt $model */
-                $model->setAssessment($this->hydrateJoin($row, 'assessment', 'as'));
-                return $model;
+                return $model
+                    ->setAssessment($this->hydrateJoin($row, 'assessment', 'as'))
+                    ->setUser($this->hydrateJoin($row, 'user', 'u'))
+                ;
             }
         );
     }
