@@ -14,6 +14,10 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
              */
             myfolder: '/my-files/',
 
+            /* Prefix for link to Storage hash
+             */
+            storage: '/storage/fetch.php?hash=',
+
             /* Prefix for linking to Files
              */
             file: '/send.php?id='
@@ -157,6 +161,9 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                                     }
                                                     else if (fields.type.getValue() == 'myfolder') {
                                                         fields.url.setValue(config.url.myfolder + fields.id.getValue());
+                                                    }
+                                                    else if (fields.filesystem.getValue() == 'store') {
+                                                        fields.url.setValue(config.url.storage + fields.id.getValue());
                                                     }
                                                     else {
                                                         fields.url.setValue(config.url.file + fields.id.getValue());
