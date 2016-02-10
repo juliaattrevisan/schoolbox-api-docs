@@ -147,7 +147,7 @@
                 {# TODO cache this #}
                 .load(uri, function () {
                     $(this).removeClass('loading');
-                    $('#container').foundation('tooltip', 'reflow');
+                    $('#preview-container').foundation('tooltip', 'reflow').foundation('dropdown', 'reflow');
                     rs();
                 });
 
