@@ -23,23 +23,53 @@ $this->setFile(TEMPLATE_content, '/resources/attach-browser.html');
 
 $this->setBlock(TEMPLATE_content, 'source', 'source_block');
 
-$multi       = empty($_GET['multi']) ? false : !!($_GET['multi']);
-$mimeFilter  = empty($_GET['mime'])  ? false : $_GET['mime'];
+$multi            = empty($_GET['multi']) ? false : !!($_GET['multi']);
+$mimeFilter       = empty($_GET['mime']) ? false : $_GET['mime'];
+$filesystemFilter = empty($_GET['fs']) ? false : $_GET['fs'];
 
-// register our known defaults
-$factory = new \Schoolbox\Resource\Attachment\Factory(array(
-    'internal' => array(
+/* Filter the options so you can enable/disable
+ * certain kinds of filesystems
+ *
+ * ?fs=internal.upload,internal.usermedia,internal.browse
+ */
+$defaultOptions = [
+    'internal' => [
         'upload'    => Internal\UploadController::class,
         'usermedia' => Internal\UsermediaController::class,
         'browse'    => Internal\BrowseController::class,
         'myfile'    => Internal\MyfileController::class,
-    ),
-    'external' => array(
+    ],
+    'external' => [
         'webdav' => External\WebdavController::class,
         'google' => External\GoogleController::class,
         'office' => External\Office365Controller::class
-    )
-));
+    ]
+];
+
+/* Manufacture a restricted set of filesystemType/filesystem options
+ * before passing it into Factory. I still need the classnames mapped
+ * by $defaultOptions only to truncate them out later...thus, maybe
+ * all this should be done inside the Attachment Factory instead.
+ */
+if (!$filesystemFilter) {
+    $filteredOptions = $defaultOptions;
+}
+else {
+    $filteredOptions = array();
+
+    $allFilesystemFilters = explode(',', $filesystemFilter);
+
+    /* Manufacture a restricted set
+     */
+    foreach ($allFilesystemFilters as $currentFilter) {
+        list($filesystemType, $filesystem) = explode('.', $currentFilter);
+
+        $filteredOptions[$filesystemType][$filesystem] = $defaultOptions[$filesystemType][$filesystem];
+    }
+}
+
+// register our known defaults
+$factory = new \Schoolbox\Resource\Attachment\Factory($filteredOptions);
 
 $factory->allowMulti($multi)
         ->setMimeFilter($mimeFilter)
