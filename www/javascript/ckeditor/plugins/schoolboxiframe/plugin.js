@@ -9,7 +9,7 @@ CKEDITOR.plugins.add('schoolboxiframe', {
         editorInstance.ui.addButton('schoolboxIframe', {
             label: 'Embed Iframe',
             command: 'schoolboxiframe',
-            toolbar: 'schoolbox,1'
+            toolbar: 'schoolbox,4'
         });
 
         CKEDITOR.dialog.add('schoolboxiframeDialog', this.path + 'dialogs/schoolboxiframe.js');

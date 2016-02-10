@@ -34,7 +34,11 @@
 
                 /* Url to get node information
                  */
-                source: '/resources/attachment'
+                source: '/resources/attachment',
+
+                /* Allowed Filesystems for choosing resources
+                 */
+                allowedFilesystems: false
             };
 
             var derived = {
@@ -53,6 +57,10 @@
 
             if (config.allowedFiles) {
                 qString += '&mime=' + config.allowedFiles;
+            }
+
+            if (config.allowedFilesystems) {
+                qString += '&fs=' + config.allowedFilesystems;
             }
 
             return qString;
@@ -203,17 +211,17 @@
                      * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
                      * This is typically not used for anything else for now
                      */
-                    {name: 'schoolbox', groups: ['schoolboxresource', 'schoolboxiframe']},
+                    {name: 'schoolbox', groups: ['schoolboxlink','schoolboxresource', 'schoolboxiframe']},
                     {name: 'insert', groups: ['insert']},
                     '/',
                     {name: 'styles', groups: ['styles']},
                     {name: 'colors', groups: ['colors']},
                     {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph']},
                     {name: 'others', groups: ['others']},
-                    {name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing']},
                     '/',
                     {name: 'clipboard', groups: ['clipboard', 'undo']},
                     {name: 'document', groups: ['mode', 'document', 'doctools']},
+                    {name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing']},
                     {name: 'tools', groups: ['tools']}
                 ],
 
@@ -231,12 +239,13 @@
 
                 /* Allow images to be styled using style attribute (they can use source if clever)
                  */
-                extraAllowedContent: 'img(full-width)[data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float}; '+
+                extraAllowedContent: 'img(full-width)[data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float};' +
                     'iframe(full-width)[src,allowfullscreen]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float}; '+
-                    'div(scrollable,highlighted-note); '+
-                    'object[id,name,width,height]; '+
-                    'param[name,value]; '+
-                    'embed[src,type,allowscriptaccess,allowfullscreen,wmode,width,height]'
+                    'div(scrollable,highlighted-note);' +
+                    'object[id,name,width,height];' +
+                    'param[name,value];' +
+                    'embed[src,type,allowscriptaccess,allowfullscreen,wmode,width,height];' +
+                    'a[href,target];'
                 ,
 
                 /* Remove annoying dialog that always appears
@@ -245,8 +254,8 @@
 
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */
-                removePlugins: 'image,image2,uploadimage',
-                extraPlugins: 'schoolboxresource,schoolboxiframe',
+                removePlugins: 'image,image2,uploadimage,link',
+                extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink',
 
                 /* Other settings
                  */

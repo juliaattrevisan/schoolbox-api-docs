@@ -7,8 +7,8 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Resource\Attachment\External;
-use Schoolbox\Resource\Attachment\Internal;
+use Schoolbox\Resource\Attachment\Factory as ResourceAttachmentFactory;
+use Schoolbox\Resource\Attachment\Context\Factory as ResourceContextFactory;
 
 if (empty($this)) {
     require_once __DIR__ . '/../../include/Bootstrap.php';
@@ -23,23 +23,17 @@ $this->setFile(TEMPLATE_content, '/resources/attach-browser.html');
 
 $this->setBlock(TEMPLATE_content, 'source', 'source_block');
 
-$multi       = empty($_GET['multi']) ? false : !!($_GET['multi']);
-$mimeFilter  = empty($_GET['mime'])  ? false : $_GET['mime'];
+$multi            = empty($_GET['multi']) ? false : !!($_GET['multi']);
+$mimeFilter       = empty($_GET['mime']) ? false : $_GET['mime'];
+$filesystemContext = empty($_GET['fs']) ? false : $_GET['fs'];
+
+/* Figger out which filesystem options to show
+ */
+$context = new ResourceContextFactory($filesystemContext);
+$filteredOptions = $context->produce();
 
 // register our known defaults
-$factory = new \Schoolbox\Resource\Attachment\Factory(array(
-    'internal' => array(
-        'upload'    => Internal\UploadController::class,
-        'usermedia' => Internal\UsermediaController::class,
-        'browse'    => Internal\BrowseController::class,
-        'myfile'    => Internal\MyfileController::class,
-    ),
-    'external' => array(
-        'webdav' => External\WebdavController::class,
-        'google' => External\GoogleController::class,
-        'office' => External\Office365Controller::class
-    )
-));
+$factory = new ResourceAttachmentFactory($filteredOptions);
 
 $factory->allowMulti($multi)
         ->setMimeFilter($mimeFilter)
