@@ -52,12 +52,16 @@ class Report_StaffDepartment extends Report_Abstract
     protected function setup()
     {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/report/staffDepartment.html');
+        $this->getPage()->setBlock(TEMPLATE_content, 'link', 'link_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'nolink', 'nolink_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'staff', 'staff_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'department', 'department_block');
         $this->getPage()->setTitle('Staff Contact info');
 
         $this->getPage()->setVar(
             array(
+                'nolink_block' => '',
+                'link_block' => '',
                 'staff_block' => '',
                 'department_block' => '',
             )
@@ -141,12 +145,16 @@ class Report_StaffDepartment extends Report_Abstract
 
                 // Find the match schoolbox user so we can link to their profile page
 
-                $user = \Schoolbox\UserMapper::getInstance()->findByExternalId($currentStaff['StaffID']);
+                try {
+                    $userId = \Schoolbox\UserMapper::getInstance()->findByExternalId($currentStaff['StaffID'])->getId();
+                } catch (Exception $e) {
+                    $userId = -1;
+                }
 
                 $this->getPage()->setVar(
                     array(
                         'STAFF_STAFFID'    => Scrub::text($currentStaff['StaffID']),
-                        'STAFF_EXTERNALID' => $user->getId(),
+                        'STAFF_EXTERNALID' => $userId,
                         'STAFF_STAFFCODE'  => Scrub::text($currentStaff['SchoolStaffCode']),
                         'STAFF_TITLE'      => Scrub::text($currentStaff['StaffTitle']),
                         'STAFF_FIRSTNAME'  => Scrub::text($currentStaff['StaffPreferredName']),
@@ -162,7 +170,16 @@ class Report_StaffDepartment extends Report_Abstract
                     )
                 );
 
+                if ($user_id != -1) {
+                    $this->getPage()->parse('link_block', 'link', true);
+                } else {
+                    $this->getPage()->parse('nolink_block', 'nolink', true);
+                }
+
                 $this->getPage()->parse('staff_block', 'staff', true);
+
+                $this->getPage()->setVar('link_block', '');
+                $this->getPage()->setVar('nolink_block', '');
             }
 
             $this->getPage()->parse('department_block', 'department', true);
