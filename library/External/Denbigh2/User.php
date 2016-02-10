@@ -1014,7 +1014,7 @@ class External_Denbigh2_User implements External_UserInterface
      */
     public function getPortrait($externalUserId)
     {
-        $photoPath = realpath(Config::get('portrait_dir') . '/' . $externalUserId . '.jpg');
+        $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
 
         if(is_readable($photoPath)) {
             return $photoPath;

@@ -833,7 +833,7 @@ class External_Maze_User implements External_UserInterface {
 		}
 
 		if ($photo = $this->getDb()->getRow($query)) {
-			$photoPath = realpath(Config::get('portrait_dir') . '/' . $externalUserId . '.jpg');
+			$photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
 
 			//TODO: delete photos on rollover
 
