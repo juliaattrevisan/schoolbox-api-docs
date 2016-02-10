@@ -158,9 +158,9 @@ class External_Tass_User implements External_UserInterface
 
         // Kludge to add spouse ID
 
-        foreach ($parents as $parent) {
+        foreach ($parents as $key => $parent) {
             if (!empty($parent['StudentContactSpousePreferred'])) {
-                $parent['StudentContactSpouseID'] = $parent['StudentContactID'];
+                $parents[$key]['StudentContactSpouseID'] = str_replace("P", "S", $parent['StudentContactID']);
             }
         }
 
