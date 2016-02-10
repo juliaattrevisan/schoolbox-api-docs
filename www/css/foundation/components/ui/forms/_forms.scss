@@ -647,7 +647,9 @@ section > fieldset {
 			width: auto;
 
 			&:before {
-				@extend a;
+                color: $content-ui-foreground;
+                line-height: inherit;
+                text-decoration: none;
 				font-size: 1rem; // lock this to 16px;
 			}
 			&:hover:before {
