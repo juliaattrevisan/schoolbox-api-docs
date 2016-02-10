@@ -16,20 +16,6 @@ use Schoolbox\Resource\Attachment\Internal;
 class Factory {
 
     /**
-     * Default configuration of resource picker filesystems
-     *
-     * @var array
-     */
-    private $defaultOptions = [];
-
-    /**
-     * Context macro
-     *
-     * @var string
-     */
-    private $context = '';
-
-    /**
      * internal
      * Publicly-accessible filesystems
      */
@@ -48,6 +34,32 @@ class Factory {
     const EXTERNAL = 'external.webdav,external.google,external.office';
 
     /**
+     * Default configuration of resource picker filesystems
+     *
+     * @var array
+     */
+    private $defaultOptions = [
+        'internal' => [
+            'upload'    => Internal\UploadController::class,
+            'usermedia' => Internal\UsermediaController::class,
+            'browse'    => Internal\BrowseController::class,
+            'myfile'    => Internal\MyfileController::class,
+        ],
+        'external' => [
+            'webdav' => External\WebdavController::class,
+            'google' => External\GoogleController::class,
+            'office' => External\Office365Controller::class
+        ]
+    ];
+
+    /**
+     * Context macro
+     *
+     * @var string
+     */
+    private $context = '';
+
+    /**
      * Constructor
      *
      * Factory constructor.
@@ -55,27 +67,6 @@ class Factory {
      */
     public function __construct($context) {
         $this->setContext($context);
-
-        /* Filter the options so you can enable/disable
-         * certain kinds of filesystems
-         *
-         * ?fs=internal.upload,internal.usermedia,internal.browse
-         */
-        $defaultOptions = [
-            'internal' => [
-                'upload'    => Internal\UploadController::class,
-                'usermedia' => Internal\UsermediaController::class,
-                'browse'    => Internal\BrowseController::class,
-                'myfile'    => Internal\MyfileController::class,
-            ],
-            'external' => [
-                'webdav' => External\WebdavController::class,
-                'google' => External\GoogleController::class,
-                'office' => External\Office365Controller::class
-            ]
-        ];
-
-        $this->setDefaultOptions($defaultOptions);
     }
 
     /**
