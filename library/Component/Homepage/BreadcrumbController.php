@@ -43,6 +43,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
         }
     }
 
+
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
@@ -55,6 +56,16 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
         }
 
         $this->parseConfig();
+
+        if ($this->permission < WRITE_ACCESS && $this->getConfig('compactMode') ) {
+            /* Remove headers */
+            $this->setVar('CONFIGURATION', '');
+            $this->setBlock($templateHandle, 'header', 'header_block');
+            $this->setBlock($templateHandle, 'dashboard_header', 'dashboard_header_block');
+            $this->setVar('header_block', '');
+            $this->setVar('dashboard_header_block', '');
+        }
+
 
         $this->setBlock($templateHandle, 'category_breadcrumb', 'category_breadcrumb_block');
         $this->setVar('category_breadcrumb_block', '');
