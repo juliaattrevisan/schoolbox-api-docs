@@ -157,29 +157,27 @@ class DueWork_Rubric_Handler
      * Gets an array representing the marks given by the rubric marking in question
      * Includes description
      *
-     * @param     $studentID
-     * @param     $boxID
-     * @param int $set
+     * @param int $studentID
+     * @param int $boxID
      *
      * @return array
      */
-    public function getStudentMarksWithDescription($studentID, $boxID, $set = 0)
+    public function getStudentMarksWithDescription($studentID, $boxID)
     {
         // Search both rubric_descriptor and rubric_result for description
         $stmt = Database::getInstance()->prepare("
             SELECT
-                rm.criterion_id,
-                rm.mark,
-                COALESCE(rd.description, rr.label) AS description,
-                UNIX_TIMESTAMP(rm.tstamp) AS tstamp
-            FROM rubric_mark rm
-            LEFT JOIN rubric_descriptor rd ON rm.criterion_id = rd.criterion_id AND rm.mark = rd.value
-            LEFT JOIN submission_box sb ON rm.submission_box_id = sb.id
-            LEFT JOIN rubric_result rr ON sb.rubric_result_set = rr.resultset_id AND rm.mark = rr.value
-            WHERE rm.student_id = :sid
-            AND rm.submission_box_id = :sbid
-            AND rm.valid = 1
-            ORDER BY rm.tstamp DESC, rm.criterion_id ASC
+              m.criterion_id,
+              COALESCE(d.value, m.mark) mark,
+              d.description,
+              UNIX_TIMESTAMP(m.tstamp) tstamp
+            FROM rubric_mark m
+            LEFT JOIN rubric_descriptor d ON m.`descriptor_id` = d.id
+            WHERE m.submission_box_id = :sbid
+            AND m.student_id = :sid
+            AND m.valid IS TRUE
+            AND d.valid IS TRUE
+            ORDER BY tstamp DESC, m.criterion_id ASC
         ");
 
         $stmt->execute(
