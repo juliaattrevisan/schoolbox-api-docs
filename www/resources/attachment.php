@@ -25,7 +25,7 @@ $this->setBlock(TEMPLATE_content, 'source', 'source_block');
 
 $multi            = empty($_GET['multi']) ? false : !!($_GET['multi']);
 $mimeFilter       = empty($_GET['mime']) ? false : $_GET['mime'];
-$filesystemFilter = empty($_GET['fs']) ? false : $_GET['fs'];
+$filesystemContext = empty($_GET['fs']) ? false : $_GET['fs'];
 
 /* Filter the options so you can enable/disable
  * certain kinds of filesystems
@@ -51,10 +51,34 @@ $defaultOptions = [
  * by $defaultOptions only to truncate them out later...thus, maybe
  * all this should be done inside the Attachment Factory instead.
  */
-if (!$filesystemFilter) {
+if (!$filesystemContext) {
     $filteredOptions = $defaultOptions;
 }
 else {
+
+    /* Selective usage context
+     * Display nothing if you try an unlisted context
+     */
+    switch($filesystemContext) {
+        case 'internal':
+            $filesystemFilter = 'internal.upload,internal.usermedia,internal.browse';
+            break;
+
+        case 'internal-myfile':
+            $filesystemFilter = 'internal.upload,internal.usermedia,internal.browse,internal.myfile';
+            break;
+
+        case 'external':
+            $filesystemFilter = 'external.webdav,external.google,external.office';
+            break;
+
+        default:
+            $filesystemFilter = '';
+            break;
+    }
+
+    /* Interpret context string
+     */
     $filteredOptions = array();
 
     $allFilesystemFilters = explode(',', $filesystemFilter);

@@ -37,9 +37,6 @@
                 source: '/resources/attachment',
 
                 /* Allowed Filesystems for choosing resources
-                 * in the format:
-                 *
-                 * filesystemType.filesystem,filesystemType.filesystem ...
                  */
                 allowedFilesystems: false
             };
