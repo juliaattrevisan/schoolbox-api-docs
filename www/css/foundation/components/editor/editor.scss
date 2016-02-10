@@ -36,10 +36,8 @@
 
 /* Icons for our custom plugins
  */
-.cke_editor_body {
-    a.cke_button {
-        .cke_button__schoolboxlink_icon {
-            background: url('/javascript/ckeditor/skins/flat/icons.png') 0px -888px no-repeat;
-        }
+a.cke_button {
+    .cke_button__schoolboxlink_icon {
+        background: url('/javascript/ckeditor/skins/flat/icons.png') 0px -888px no-repeat;
     }
 }

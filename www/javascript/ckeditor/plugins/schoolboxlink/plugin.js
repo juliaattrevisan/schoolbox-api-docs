@@ -9,13 +9,13 @@ CKEDITOR.plugins.add('schoolboxlink', {
         editorInstance.ui.addButton('schoolboxLink', {
             label: 'Link',
             command: 'schoolboxlink',
-            toolbar: 'schoolbox,3'
+            toolbar: 'schoolbox,0'
         });
 
         editorInstance.ui.addButton('Unlink', {
             label: 'Unlink',
             command: 'unlink',
-            toolbar: 'schoolbox,4'
+            toolbar: 'schoolbox,1'
         });
 
         editorInstance.addCommand('unlink', new CKEDITOR.unlinkCommand());

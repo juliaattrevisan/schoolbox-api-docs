@@ -35,7 +35,10 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
     function inject(editorInstance, selection, fields) {
         var element = editorInstance.document.createElement('a');
         element.setAttribute('href', fields.url.getValue());
-        element.setAttribute('target', fields.target.getValue());
+
+        if (fields.target.getValue() == '_blank') {
+            element.setAttribute('target', fields.target.getValue());
+        }
 
         /* No selection.
 
@@ -193,7 +196,7 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                         id: 'schoolboxlink-target',
                         label: 'Opens in',
                         items: [['Same window', '_self'], ['New window', '_blank']],
-                        'default': '_self',
+                        'default': '',
 
                         /* Editing an existing element
                          */

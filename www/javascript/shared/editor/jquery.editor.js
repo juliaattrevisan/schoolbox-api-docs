@@ -211,17 +211,17 @@
                      * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
                      * This is typically not used for anything else for now
                      */
-                    {name: 'schoolbox', groups: ['schoolboxresource', 'schoolboxiframe', 'schoolboxlink']},
+                    {name: 'schoolbox', groups: ['schoolboxlink','schoolboxresource', 'schoolboxiframe']},
                     {name: 'insert', groups: ['insert']},
                     '/',
                     {name: 'styles', groups: ['styles']},
                     {name: 'colors', groups: ['colors']},
                     {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph']},
                     {name: 'others', groups: ['others']},
-                    {name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing']},
                     '/',
                     {name: 'clipboard', groups: ['clipboard', 'undo']},
                     {name: 'document', groups: ['mode', 'document', 'doctools']},
+                    {name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing']},
                     {name: 'tools', groups: ['tools']}
                 ],
 
