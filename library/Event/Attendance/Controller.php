@@ -160,7 +160,7 @@ class Event_Attendance_Controller extends Controller
 	 * @param $data
 	 */
 	public function renderExportCSV($data) {
-		$name = new Url($data['event']['note']);
+		$name = new Url($data['event']['title']);
 
 		$headings = array(
 			'External ID',
