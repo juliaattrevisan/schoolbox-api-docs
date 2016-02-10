@@ -35,8 +35,8 @@ class External_Maze_Loreto_Class extends External_Maze_Class {
 			FROM TT
 			LEFT JOIN TTTG ON TT.TTKEY = TTTG.GKEY
 			WHERE TT.TTPERIOD = '{$ttPeriod}'
-			AND TTTG.SUBJ = '{$ingredients['ClassCode']}'
-			AND CLASS = '{$ingredients['ClassNumber']}'
+			AND TTTG.SUBJ IN ({$ingredients['ClassCode']})
+			AND CLASS IN ({$ingredients['ClassNumber']})
 		";
 
 		$part1 = $this->getDb()->getAll($query);
@@ -51,7 +51,7 @@ class External_Maze_Loreto_Class extends External_Maze_Class {
 				TEACHERB AS T2TEACH,
 				TEACHERC AS T3TEACH
 			FROM KGC
-			WHERE KGC.ROLL_GROUP = '{$classCode}'
+			WHERE KGC.ROLL_GROUP IN ({$ingredients['ClassCode']})
 		";
 
 		$part2 = $this->getDb()->getAll($query);
