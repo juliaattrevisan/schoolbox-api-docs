@@ -474,7 +474,7 @@
                                     <div class="list-item">
                                         <div class="avatar card small-12">
                                             {% if subject.folder.getId() %}
-                                            <a href="/homepage/code/{{ subject.code }}">
+                                            <a href="/homepage/code/{{ subject.code|e('url') }}">
                                                 <span class="icon-folder icon-32"></span>
                                                 <h3>{{ subject.name }}</h3>
                                             </a>
@@ -492,7 +492,7 @@
                                     <div class="list-item">
                                         <div class="avatar card small-12">
                                             <a href="/search/user/{{ teacher.getId() }}">
-                                                <img src="/portrait.php?userId={{ teacher.getExternalId() }}&amp;size=square64" />
+                                                <img src="/portrait.php?userId={{ teacher.getExternalId()|e('url') }}&amp;size=square64" />
                                                 <h3>{{ teacher.formatName() }}</h3>
                                             </a>
                                             <p class="meta">{{ teacher.getRole().getName() }}</p>
