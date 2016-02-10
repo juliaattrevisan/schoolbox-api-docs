@@ -427,6 +427,9 @@ class DueWork_Detail
      */
     private function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray, $location, $tabindex)
     {
+        // should we show the link to the dedicated mark-rubric page?
+        $showRubricLink = $location != self::INLINE_GRADER && $this->submissionBox->isRubric() ? 1 : 0;
+
         $templateFile = $this->isReadOnly() ? 'readonly' : 'writable';
         $page->setFile('markTpl', "submission/marktype/$templateFile.html");
         $page->setVar('UFID', $htmlFormID);
@@ -439,6 +442,7 @@ class DueWork_Detail
                 "mark_type_{$type['slug']}_block" => '',
             ));
         }
+        $page->setBlock('markTpl', 'can_mark_rubric', 'can_mark_rubric_block');
 
         // each strategy knows how to output itself
         $this->marksheet->outputUI($page, $markArray);
@@ -467,8 +471,14 @@ class DueWork_Detail
         $page->setVar(array(
             'COLUMN_DIMENSIONS_WRITABLE' => $columnDimensionsWritable,
             'COLUMN_DIMENSIONS_READONLY' => $columnDimensionsReadonly,
-            'COLUMN_NAV_BUTTON_COUNT'    => $this->marksheet->getActionButtonCount(),
+            'COLUMN_NAV_BUTTON_COUNT'    => $showRubricLink,
         ));
+
+        if ($showRubricLink) {
+            $page->parse('can_mark_rubric_block', 'can_mark_rubric');
+        } else {
+            $page->setVar('can_mark_rubric_block', '');
+        }
 
         /* Comment Tabindex
          */
