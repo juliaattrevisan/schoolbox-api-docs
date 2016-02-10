@@ -31,9 +31,9 @@ $taskMapper      = new Task\InstanceCompletionMapper();
 $expiredAttempts = $attemptMapper->findUnfinishedExpiredAttempts();
 $updatedAttempts = [];
 
-$log->notice(sprintf("Auto-completing %d expired attempts", count($expiredAttempts)));
+$log->notice(sprintf("Processing %d expired attempts", count($expiredAttempts)));
 foreach ($expiredAttempts as $attempt) {
-    $log->notice(sprintf("Auto-completing attempt #%d...", $attempt->getId()));
+    $log->notice(sprintf("Processing attempt #%d...", $attempt->getId()));
     $log->info(
         sprintf(
             "Attempt quiz #%d (%s), homepage #%d",
@@ -54,9 +54,9 @@ foreach ($expiredAttempts as $attempt) {
     $attemptFinishDate = clone $attempt->getStart();
     $attemptFinishDate = $attemptFinishDate->addSeconds($attempt->getAssessment()->getDuration());
     if ($attemptFinishDate->diffInMinutes(Alaress_Date_Format::now(), true) <= 5) {
-        $log->notice(
+        $log->warning(
             sprintf(
-                "Finish time %s is less than 5 minutes ago - not auto-finishing yet",
+                "Finish time %s is less than 5 minutes ago - skipping this attempt",
                 $attemptFinishDate->getDatabase()
             )
         );
@@ -69,7 +69,7 @@ foreach ($expiredAttempts as $attempt) {
 }
 
 if (count($updatedAttempts) > 0) {
-    $log->notice("Saving expired attempts...");
+    $log->notice(sprintf("Saving %d expired attempts", count($updatedAttempts)));
     $attemptMapper->save($updatedAttempts);
 }
 
