@@ -71,7 +71,7 @@
                 draggedType    = $dragged.data('type'),
                 draggedTypeGen = '',
                 draggedId      = $dragged.data('id'),
-                $dropTarget    = $(data.event.srcElement).closest(listItem),
+                $dropTarget    = $(data.event.target).closest(listItem),
                 dropTargetId   = $dropTarget.data('id'),
                 dropTargetType = $dropTarget.data('type'),
                 dropTargetPerm = $dropTarget.data('permission');
