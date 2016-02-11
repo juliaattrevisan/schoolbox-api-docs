@@ -76,6 +76,30 @@ class Sync implements SyncInterface
      */
     public function findAllStaff()
     {
-        return [];
+        $query = "
+            SELECT
+                u.synergy_id         AS staff_id,
+                u.username           AS network_login,
+                u.enabled            AS active_flag,
+                u.title              AS staff_title,
+                u.firstname          AS staff_preferred_name,
+                u.lastname           AS staff_surname,
+                ''                   AS default_email_code,
+                ''                   AS occup_email,
+                ''                   AS email,
+                c.ext_timetable_code AS staff_campus,
+                ''                   AS staff_category_type,
+                ''                   AS staff_category,
+                ''                   AS staff_department
+            FROM `user` `u`
+            INNER JOIN userCampus uc        ON u.id = uc.uid
+            INNER JOIN luCampus c           ON uc.campus = c.id
+            INNER JOIN `groups` g           ON u.group_id = g.id
+            WHERE g.group_type = 'staff'
+            ORDER BY u.synergy_id ASC
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->execute();
+        return new Iterator\Staff($statement);
     }
 }
