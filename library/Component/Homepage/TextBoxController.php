@@ -134,6 +134,16 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         }
         $this->parseConfig();
 
+        if ($this->permission < WRITE_ACCESS && $this->getConfig('compactMode') ) {
+            /* Remove headers */
+            $this->setVar('CONFIGURATION', '');
+            $this->setBlock($templateHandle, 'header', 'header_block');
+            $this->setBlock($templateHandle, 'dashboard_header', 'dashboard_header_block');
+            $this->setVar('header_block', '');
+            $this->setVar('dashboard_header_block', '');
+        }
+
+
         return true; // everything went according to plan
     }
 
