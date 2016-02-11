@@ -238,6 +238,7 @@ class Rubric implements Twiggable
             'sum'         => $this->criteriaGroups->getSum(),
             'total'       => $this->getTotal(),
             'percentage'  => $this->getPercentage(),
+            'humanReadableMark' => $this->getHumanReadableMark(),
             'levels'      => [],
             'groups'      => [],
         ];
@@ -364,4 +365,12 @@ class Rubric implements Twiggable
         return 0;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getHumanReadableMark()
+    {
+        return sprintf("%0.2d / %0.2d (%0.2d%%)", $this->getSum(), $this->getTotal(), round($this->getPercentage() * 100));
+    }
 }
