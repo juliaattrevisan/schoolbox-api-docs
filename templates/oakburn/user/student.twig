@@ -1,5 +1,14 @@
 {% extends '@core/user/student.twig' %}
 
+{% block details_studentForm %}
+    {% if showClasses %}
+        {% if externalUser.StudentForm %}
+            <dt class="no-margin small-6 medium-3">Tutor Group</dt>
+            <dd class="no-margin small-6 medium-9">{{ externalUser.StudentForm }}</dd>
+        {% endif %}
+    {% endif %}
+{% endblock details_studentForm %}
+
 {% block details_studiesCode %}
     {% if externalUser.StudentStudiesCode %}
     <dt class="no-margin small-6 medium-3">TQA Code:</dt>

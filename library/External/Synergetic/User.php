@@ -343,6 +343,9 @@ class External_Synergetic_User implements External_UserInterface
 				array_unique(array_filter($student['AlertMessage']))
 			);
 		}
+
+            $student = array_map(function($value) { return trim(str_replace('Not Selected', '', $value)); }, $student);
+
             return $student;
         }
 
