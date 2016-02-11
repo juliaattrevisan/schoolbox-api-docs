@@ -46,11 +46,16 @@
                 firstHour: 9,
                 allDaySlot: false,
                 defaultDate: calendarDate,
-                columnFormat: {
-                    timelineMonth: 'ddd',
-                    timelineWeek:  'ddd D/M',
-                    timelineDay:   'ddd D/M',
-                    '':            'ddd D/M'
+                views: {
+                    timelineMonth: {
+                        slotLabelFormat: ['ddd D']
+                    },
+                    timelineWeek: {
+                        slotLabelFormat: ['ddd D/M', 'ha']
+                    },
+                    timelineDay: {
+                        slotLabelFormat: ['ha']
+                    }
                 },
                 height: 'auto',
                 timeFormat: 'h(:mm)a',
