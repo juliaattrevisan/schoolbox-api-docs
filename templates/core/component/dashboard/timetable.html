@@ -1,9 +1,17 @@
 <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
     <script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-resize.js"></script>
     <script type="text/javascript" src="/javascript/shared/timetable/jquery.timetable-dashboard.js"></script>
+    <script type="text/javascript" src="/javascript/shared/jquery.scroll-to.js"></script>
     <script type="text/javascript">
         $(function() {
             $.fn.timetableStart();
+
+            // Scroll to current period
+            var timetable = $('#component{COMPONENT_INSTANCE_ID}').find('[data-timetable]');
+            timetable.closest('.scrollable').scrollTo(
+                timetable.find('.timetable-subject-active'),
+                {scrollX: true, scrollY: false, duration: 0, offsetLeft: 0}
+            );
         });
     </script>
     <!-- Probably doesn't have a configuration -->
