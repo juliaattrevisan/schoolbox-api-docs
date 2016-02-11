@@ -59,7 +59,7 @@
 
         {% if group.total %}
         <tr>
-            <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">{{ group.sum }} / {{ group.total }} ({{ (group.percentage * 100)|round }}%)</th>
+            <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">{{ group.humanReadableMark }}</th>
         </tr>
         {% endif %}
 
@@ -68,7 +68,7 @@
 
     {% if rubric.total %}
     <tr>
-        <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}" >{{ rubric.sum }} / {{ rubric.total }} ({{ (rubric.percentage * 100)|round }}%)</th>
+        <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}" >{{ rubric.humanReadableMark }}</th>
     </tr>
     {% endif %}
     </tbody>
