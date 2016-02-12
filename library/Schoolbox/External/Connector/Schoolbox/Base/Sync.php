@@ -68,7 +68,34 @@ class Sync implements SyncInterface
      */
     public function findAllParents()
     {
-        return [];
+        $query = "
+            SELECT
+                p.username           AS student_contact_network_login,
+                p.synergy_id         AS student_contact_id,
+                p.title              AS student_contact_title,
+                p.firstname          AS student_contact_preferred,
+                p.lastname           AS student_contact_surname,
+                ''                   AS student_contact_default_email,
+                s.synergy_id         AS student_id,
+                s.year               AS student_year_level,
+                c.ext_timetable_code AS student_campus,
+                ''                   AS student_gender,
+                s.firstname          AS student_preferred,
+                s.lastname           AS student_surname
+            FROM `user` `p`
+            INNER JOIN `groups` pg        ON p.group_id = pg.id
+            LEFT  JOIN user_relation `ur` ON p.id = ur.user_id
+            LEFT  JOIN `user` `s`         ON ur.relation_id = s.id
+            LEFT  JOIN userCampus uc      ON s.id = uc.uid
+            LEFT  JOIN luCampus c         ON uc.campus = c.id
+            WHERE p.enabled IS TRUE
+            AND   s.enabled IS TRUE
+            AND   pg.group_type = 'parent'
+            ORDER BY p.synergy_id ASC
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->execute();
+        return new Iterator\Guardian($statement);
     }
 
     /**
