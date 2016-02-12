@@ -30,7 +30,8 @@ $conf              = ConfigMapper::getInstance();
 
 //
 // Submission mapper - will get the most recent submission for this student.
-$user_id = $_SESSION['id'];
+/** @var \Schoolbox\User $user */
+$user = $_SESSION['user'];
 $box_id  = $this->arg[0];
 
 //
@@ -53,7 +54,7 @@ if (!$submission_box->getAcceptOnline()) {
 if (!$submission_box->getAcceptMultiple()) {
     $submitCount = $submission_mapper->findByColumnList([
         'draft'  => 0,
-        'owner'  => $user_id,
+        'owner'  => $user->getId(),
         'box_id' => $submission_box->getId()
 
     ])->count();
@@ -65,10 +66,8 @@ if (!$submission_box->getAcceptMultiple()) {
 
 // get a list of folders the user has perms to (yes... handlers... -_-)
 $groupHandler = new Group;
-$userHandler  = new User;
-$user         = $userHandler->getByID($user_id);
 
-$categoryList = $groupHandler->involvedInCategoryList($user['uid']);
+$categoryList = $groupHandler->involvedInCategoryList($user->getId());
 
 $categoryIDList = [];
 
@@ -87,7 +86,7 @@ if (!in_array($submission_box->getCategory()->getId(), $categoryIDList)) {
 //
 // Find most recent submissions for this user - later, consider showing drafts
 // across side of screen.
-$drafts = $submission_mapper->getDrafts($user_id, $box_id, 10);
+$drafts = $submission_mapper->getDrafts($user->getId(), $box_id, 10);
 
 if ($drafts->count()) {
     /** @var Submission\File $draft */
