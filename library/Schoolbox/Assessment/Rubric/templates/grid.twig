@@ -59,7 +59,9 @@
 
         {% if group.total %}
         <tr>
+            {% if group.humanReadableMark %}
             <th class="rb-group-summary" colspan="{{ rubric.levels|length + 1 }}">{{ group.humanReadableMark }}</th>
+            {% endif %}
         </tr>
         {% endif %}
 
@@ -68,7 +70,9 @@
 
     {% if rubric.total %}
     <tr>
+        {% if rubric.humanReadableMark %}
         <th class="rb-final-summary" colspan="{{ rubric.levels|length + 2 }}" >{{ rubric.humanReadableMark }}</th>
+        {% endif %}
     </tr>
     {% endif %}
     </tbody>
