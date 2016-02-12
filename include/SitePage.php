@@ -297,8 +297,6 @@ class SitePage extends Page
             $this->saveHistory();
         }
 
-        $userHandler = new User();
-
         $debug_bar_head = '';
         $debug_bar_body = '';
 
