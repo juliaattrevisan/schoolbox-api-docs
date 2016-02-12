@@ -46,12 +46,6 @@ Depends: schoolbox, ${misc:Depends}
 Description: Leave module for the Schoolbox LMS
  Leave module for the Schoolbox LMS
 
-Package: schoolbox-mgssport
-Architecture: all
-Depends: schoolbox, ${misc:Depends}
-Description: MGS Sports module for the Schoolbox LMS
- Provides old to new template system links unique to MGS to allow the
- Sports module to work correctly.
 
 Package: schoolbox-resource
 Architecture: all

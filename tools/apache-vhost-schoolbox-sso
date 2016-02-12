@@ -41,11 +41,6 @@
                 php_value max_execution_time 300
         </Directory>
 
-        # MGS Sport Module Exceptions
-        <Directory /usr/share/schoolbox/www/modules/sport>
-                php_flag apc.enabled off
-        </Directory>
-
         # Force IE to not use compatibility mode
         <IfModule mod_headers.c>
                   Header set X-UA-Compatible "IE=Edge,chrome=1"

@@ -273,9 +273,6 @@ class Session
                                     // site-specific handling for how to go about resetting a password
                                     switch (Cfg::get('site_location')) {
 
-                                        case 'mgs':
-                                            $errMsg .= 'Please visit <a href="https://owa.mgs.vic.edu.au/owa">owa.mgs.vic.edu.au/owa</a> to reset your password.';
-                                            break;
                                         case 'bialik':
                                             $errMsg .= 'Please visit the school email system with this link:- <a href="https://webmail.bialik.vic.edu.au/owa">webmail.bialik.vic.edu.au</a> to reset your password.';
                                             break;

@@ -217,27 +217,6 @@ class SitePage extends Page
                 $this->site = $match[1];
                 return true;
             }
-        } elseif (Cfg::get('site_detect') == 'campus') {
-            //Get site template via users campus
-            // MGS-specific code
-            if (Cfg::get('site_location') == 'mgs') {
-                // all staff are shown default MGS skin
-                // exception: teachers (gid 1), who get their campus skin.
-                $group = new Group();
-                if ($_SESSION['gid'] != 1 && $group->isStaff()) {
-                    $this->site = 'mgs-staff';
-                } elseif ($_SESSION['campus'][0] == 3) {
-                    $this->site = 'grimwade';
-                } elseif ($_SESSION['campus'][0] == 2) {
-                    $this->site = 'wadhurst';
-                } else {
-                    $this->site = 'mgs-senior';
-                }
-
-                return true;
-            } else {
-                $this->site = Cfg::get('site_location');
-            }
         }
 
         $this->site = Cfg::get('site_location');
@@ -317,8 +296,6 @@ class SitePage extends Page
             $this->buildPage();
             $this->saveHistory();
         }
-
-        $userHandler = new User();
 
         $debug_bar_head = '';
         $debug_bar_body = '';
