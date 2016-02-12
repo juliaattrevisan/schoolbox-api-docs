@@ -49,6 +49,7 @@ class Sync implements SyncInterface
                 s.BoarderType AS student_boarding_house,
                 ''            AS student_campus
             FROM Student s
+            WHERE s.DateLeft IS NULL
             ORDER BY s.Code ASC
         ";
         return new Iterator\Student($this->database->getIterator($query));
@@ -77,6 +78,7 @@ class Sync implements SyncInterface
             LEFT JOIN StudentContact sc ON c.ID = sc.ContactID
             LEFT JOIN Student         s ON sc.StudentID = s.ID
             WHERE sc.ResidentialGuardian = 'Y'
+            AND   s.DateLeft IS NULL
         ";
         return new Iterator\Guardian($this->database->getIterator($query));
     }
@@ -101,6 +103,7 @@ class Sync implements SyncInterface
                 ''            AS staff_category,
                 ''            AS staff_department
             FROM Staff t
+            WHERE t.DateLeft IS NULL
             ORDER BY s.Code ASC
         ";
         return new Iterator\Staff($this->database->getIterator($query));
