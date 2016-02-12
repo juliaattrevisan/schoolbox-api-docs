@@ -68,11 +68,7 @@ $groupHandler = new Group;
 $userHandler  = new User;
 $user         = $userHandler->getByID($user_id);
 
-if ($user['synergy_id'] || $user['synergy_id'] === 0) {
-    $categoryList = $groupHandler->involvedInCategoryList($user['uid']);
-} else {
-    $categoryList = [];
-}
+$categoryList = $groupHandler->involvedInCategoryList($user['uid']);
 
 $categoryIDList = [];
 
