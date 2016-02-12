@@ -67,6 +67,23 @@ class Sync implements SyncInterface
      */
     public function findAllStaff()
     {
-        return [];
+        $query = "
+            SELECT
+                t.Code        AS staff_id,
+                ''            AS network_login,
+                t.Active      AS active_flag,
+                t.Title       AS staff_title,
+                t.FirstName   AS staff_preferred_name,
+                t.LastName    AS staff_surname,
+                ''            AS default_email_code,
+                ''            AS occup_email,
+                ''            AS staff_campus,
+                ''            AS staff_category_type,
+                ''            AS staff_category,
+                ''            AS staff_department
+            FROM Staff t
+            ORDER BY s.Code ASC
+        ";
+        return new Iterator\Staff($this->database->getIterator($query));
     }
 }
