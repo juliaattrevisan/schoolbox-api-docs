@@ -59,7 +59,26 @@ class Sync implements SyncInterface
      */
     public function findAllParents()
     {
-        return [];
+        $query = "
+            SELECT
+                ''                                           AS student_contact_network_login,
+                c.Code                                       AS student_contact_id,
+                c.Title                                      AS student_contact_title,
+                c.FirstName                                  AS student_contact_preferred,
+                c.LastName                                   AS student_contact_surname,
+                IF(c.EmailCorrespondence = 'Y', c.Email, '') AS student_contact_default_email,
+                s.Code                                       AS student_id,
+                s.Year                                       AS student_year_level,
+                ''                                           AS student_campus,
+                ''                                           AS student_gender,
+                s.FirstName                                  AS student_preferred,
+                s.LastName                                   AS student_surname
+            FROM Contact c
+            LEFT JOIN StudentContact sc ON c.ID = sc.ContactID
+            LEFT JOIN Student         s ON sc.StudentID = s.ID
+            WHERE sc.ResidentialGuardian = 'Y'
+        ";
+        return new Iterator\Guardian($this->database->getIterator($query));
     }
 
     /**
