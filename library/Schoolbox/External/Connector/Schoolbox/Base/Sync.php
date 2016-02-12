@@ -10,6 +10,7 @@
 namespace Schoolbox\External\Connector\Schoolbox\Base;
 
 use Database;
+use IteratorIterator;
 use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\Sync\Iterator;
 
@@ -60,7 +61,7 @@ class Sync implements SyncInterface
         ";
         $statement = $this->database->prepare($query);
         $statement->execute();
-        return new Iterator\Student($statement);
+        return new Iterator\Student(new IteratorIterator($statement));
     }
 
     /**
@@ -95,7 +96,7 @@ class Sync implements SyncInterface
         ";
         $statement = $this->database->prepare($query);
         $statement->execute();
-        return new Iterator\Guardian($statement);
+        return new Iterator\Guardian(new IteratorIterator($statement));
     }
 
     /**
@@ -127,6 +128,6 @@ class Sync implements SyncInterface
         ";
         $statement = $this->database->prepare($query);
         $statement->execute();
-        return new Iterator\Staff($statement);
+        return new Iterator\Staff(new IteratorIterator($statement));
     }
 }
