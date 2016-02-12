@@ -180,7 +180,7 @@
                         icon: 'icon-course-builder'
                     },
                     noaccess: {
-                        icon: 'icon-close'
+                        icon: 'icon-locked'
                     }
                 },
                 sort: function(a, b) {
