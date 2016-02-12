@@ -15,6 +15,8 @@ use Schoolbox\External\Normalise\User;
 
 class Student extends IteratorIterator
 {
+    use IteratorConstructorTrait;
+
     /**
      * Return the current element
      *

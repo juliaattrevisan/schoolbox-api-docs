@@ -19,6 +19,8 @@ use Schoolbox\External\Normalise\User;
 
 class Guardian extends IteratorIterator
 {
+    use IteratorConstructorTrait;
+
     /**
      * @var int
      */

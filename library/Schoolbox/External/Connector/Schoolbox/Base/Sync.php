@@ -96,7 +96,7 @@ class Sync implements SyncInterface
         ";
         $statement = $this->database->prepare($query);
         $statement->execute();
-        return new Iterator\Guardian(new IteratorIterator($statement));
+        return new Iterator\Guardian($statement);
     }
 
     /**
