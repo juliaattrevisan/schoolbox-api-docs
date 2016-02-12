@@ -61,7 +61,7 @@ class Sync implements SyncInterface
         ";
         $statement = $this->database->prepare($query);
         $statement->execute();
-        return new Iterator\Student(new IteratorIterator($statement));
+        return new Iterator\Student($statement);
     }
 
     /**
@@ -128,6 +128,6 @@ class Sync implements SyncInterface
         ";
         $statement = $this->database->prepare($query);
         $statement->execute();
-        return new Iterator\Staff(new IteratorIterator($statement));
+        return new Iterator\Staff($statement);
     }
 }
