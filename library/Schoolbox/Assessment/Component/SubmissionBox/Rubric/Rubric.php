@@ -355,9 +355,14 @@ class Rubric extends Core\Rubric
         $context = parent::toContext();
 
         // if the box doesn't mark by group, then we need to remove the group subtotals from the context
-        if (!$this->getSubmissionBox()->isMarkedPerRubricGroup()) {
+        foreach ($context['groups'] as $groupId => $group) {
 
-            foreach ($context['groups'] as $groupId => $group) {
+            if ($this->getSubmissionBox()->isMarkedPerRubricGroup()) {
+                $context['groups'][$groupId]['humanReadableMark'] = $this->calculateHumanReadable(
+                    $context['groups'][$groupId]['percentage'],
+                    $context['groups'][$groupId]['total']
+                );
+            } else {
                 unset(
                     $context['groups'][$groupId]['sum'],
                     $context['groups'][$groupId]['total'],
@@ -430,6 +435,30 @@ class Rubric extends Core\Rubric
         }
 
         return $post;
+    }
+
+
+    /**
+     * @param $percentage
+     * @param $total
+     * @return string
+     */
+    protected function calculateHumanReadable($percentage, $total)
+    {
+        // ugh. handlers...
+        $marksheet = \Marksheet_Factory::build($this->box->getMarkType()->getSlug(), $this->box);
+        $value = $marksheet->convertRawMark($percentage * 100, $total, true, false);
+
+        return $value;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getHumanReadableMark()
+    {
+        return $this->calculateHumanReadable($this->getPercentage(), $this->getTotal());
     }
 
 
