@@ -94,17 +94,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             )
         );
 
-        // Controls such as Post News
-        if ($this->permission < WRITE_ACCESS) {
-            $this->setVar(
-                array(
-                    'submit_image_block' => ''
-                )
-            );
-        } else {
-            $this->parse('submit_image_block', 'submit_image');
-        }
-
         /* Set up component name
          *
          * Have update form point to the gallery's homepage, not this page (if this is from an alt source)
@@ -115,6 +104,17 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
                 'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
             )
         );
+
+        // Controls such as Post News
+        if ($this->permission < WRITE_ACCESS) {
+            $this->setVar(
+                array(
+                    'submit_image_block' => ''
+                )
+            );
+        } else {
+            $this->parse('submit_image_block', 'submit_image');
+        }
 
         // Load images for the requested homepage
         $allImages = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
