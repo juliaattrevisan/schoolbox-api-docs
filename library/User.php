@@ -502,7 +502,7 @@ class User extends DeprecatedModel
         $result = array();
         if (!empty($user_list)) {
             foreach ($user_list as $user) {
-                if ($user['enabled']) {
+                if ($user['enabled'] && $user['email_pass'] != '') {
                     $result['NAME'] = $user['firstname'];
                     $result['USERNAME'] = $user['username'];
                     $result['PASSWORD'] = $user['email_pass'];
