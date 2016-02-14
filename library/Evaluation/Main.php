@@ -182,10 +182,11 @@ abstract class Evaluation_Main extends DeprecatedModel
             if (isset($currentQuestion)) {
                 $page->setVar(
                     array(
-                        'SECTION_TITLE'       => Scrub::text($currentQuestion['title']),
-                        'SECTION_DESCRIPTION' => Scrub::html($currentQuestion['description']),
-                        'SECTION_SEQUENCE'    => $currentQuestion['sectionSequence'],
-                        'SECTION_SECTION_ID'  => $currentQuestion['section_id'],
+                        'SECTION_TITLE'        => Scrub::text($currentQuestion['title']),
+                        'SECTION_DESCRIPTION'  => Scrub::html($currentQuestion['description']),
+                        'SECTION_SEQUENCE'     => $currentQuestion['sectionSequence'],
+                        'SECTION_SECTION_ID'   => $currentQuestion['section_id'],
+                        'SECTION_NUMQUESTIONS' => count($sectionQuestions),
                     )
                 );
                 if (empty(trim($currentQuestion['description']))) {
