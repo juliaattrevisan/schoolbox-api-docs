@@ -16,6 +16,34 @@ $(document).ready(function() {
         });
     });
 
+    var deleteMembers = function(event) {
+        event.preventDefault();
+
+        if ($('input[name="delete[]"]:checked').length === 0) {
+            alert('You must select at least at least one member to remove');
+        } else {
+            $(this).confirmDialog({
+                text: 'Are you sure you want to remove the selected members from the group.',
+                confirmEvent: function () {
+                    var deleteIds = $('input[name="delete[]"]:checked').map(function() {
+                        return $(this).val();
+                    }).get();
+
+                    $.post('/group/deleteMembers.php', {
+                        deleteIds: deleteIds,
+                        categoryID: {CATEGORY_ID}
+                    })
+                    .always(function(data) {
+                        console.log(data);
+                        location.reload();
+                    });
+                }
+            });
+        }
+    };
+
+    $('[data-delete-members]').click(deleteMembers);
+
     // On accept/reject: ajax new group list in
     var waitingList = $('#waitingList');
     var memberList  = $('#members');
@@ -37,6 +65,7 @@ $(document).ready(function() {
                     var $response = $(response);
                     waitingList.empty().append($response.find('#waitingList').children());
                     memberList.empty().append($response.find('#members').children());
+                    $('[data-delete-members]').off('click').click(deleteMembers);
                 });
             })
             .fail(function() {
@@ -97,6 +126,7 @@ $(document).ready(function() {
                     var $response = $(response);
                     waitingList.empty().append($response.find('#waitingList').children());
                     memberList.empty().append($response.find('#members').children());
+                    $('[data-delete-members]').off('click').click(deleteMembers);
                 });
             })
             .fail(function() {
@@ -202,7 +232,7 @@ $(document).ready(function() {
                                         <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
                                         {GROUP_OWNER}
                                     </a>
-                                    <p class="meta icon-favourite">Group Admin</p>
+                                    <p class="meta icon-favourite">Group Admins</p>
                                 </div>
                             </div>
                             <div class="small-12 medium-6 columns no-pad">
@@ -221,6 +251,10 @@ $(document).ready(function() {
                                             <input id="accessLevel-{OWNER_ID}-3" type="radio" name="accessLevel[{OWNER_ID}]" value="3" checked />
                                             <label for="accessLevel-{OWNER_ID}-3" class="radio-toggle">
                                                 <span class="icon-favourite" title="Make Admin"></span>
+                                            </label>
+                                            <input id="delete-{OWNER_ID}" name="delete[]" type="checkbox" value="{OWNER_ID}">
+                                            <label for="delete-{OWNER_ID}" class="checkbox-toggle">
+                                                <span class="icon-tick" title="Remove From Group"></span>
                                             </label>
                                             <input id="accessLevel-{OWNER_ID}-0" type="radio" name="accessLevel[{OWNER_ID}]" value="0" disabled />
                                             <label for="accessLevel-{OWNER_ID}-0" class="radio-toggle">
@@ -268,6 +302,10 @@ $(document).ready(function() {
                                             <label for="accessLevel-{USER_ID}-3" class="radio-toggle">
                                                 <span class="icon-favourite" title="Make Admin"></span>
                                             </label>
+                                            <input id="delete-{USER_ID}" name="delete[]" type="checkbox" value="{USER_ID}">
+                                            <label for="delete-{USER_ID}" class="checkbox-toggle">
+                                                <span class="icon-tick" title="Remove From Group"></span>
+                                            </label>
                                             <input id="accessLevel-{USER_ID}-0" type="radio" name="accessLevel[{USER_ID}]" value="0" />
                                             <label for="accessLevel-{USER_ID}-0" class="radio-toggle">
                                                 <span class="icon-close alert" title="Remove From Group"></span>
@@ -290,6 +328,8 @@ $(document).ready(function() {
                         </li>
                         <!-- END member -->
                     </ul>
+                    <hr>
+                    <button data-delete-members class="expand">Remove Selected Members From Group</button>
                 </div>
 
                 <div class="content" id="waitingList">
