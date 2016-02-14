@@ -76,23 +76,6 @@ $this->setVar(array(
     'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
-/* Section list and question count
- */
-//if (is_array($allSummary) && count($allSummary)) {
-//    foreach ($allSummary as $currentSummary) {
-//        $this->setVar(array(
-//            'SECTION_SECTION_ID' => $currentSummary['section_id'],
-//            'SECTION_SEQUENCE' => $currentSummary['sequence'],
-//            'SECTION_TITLE' => Scrub::text($currentSummary['title']),
-//            'SECTION_NUMQUESTIONS' => $currentSummary['numQuestions'],
-//        ));
-//
-//        $this->parse('section_block', 'section', 'true');
-//    }
-//} else {
-//    $this->setVar('section_block', '');
-//}
-
 /* Render out breadcrumbs
  */
 $trail = new Breadcrumbs();
