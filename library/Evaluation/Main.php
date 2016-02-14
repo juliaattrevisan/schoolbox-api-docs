@@ -141,97 +141,61 @@ abstract class Evaluation_Main extends DeprecatedModel
 
         /* If there are no questions, remove template variable
            */
-        $page->setVar('question_block', '');
+        $page->setVar('section_block', '');
 
-        $j = 0;
-        for ($i = 0, $questionNumber = 1; $i < count($allQuestions); $i++) {
-            $currentQuestion = $allQuestions[$i];
+        // Group questions by section
+        $questionsBySection = [];
+        foreach ($allQuestions as $question) {
+            $questionsBySection[$question['section_id']][] = $question;
+        }
+        foreach ($questionsBySection as $sectionId => $sectionQuestions) {
+            $questionNumber = 1;
+            $page->setVar('question_block', '');
+            foreach ($sectionQuestions as $currentQuestion) {
+                if ($currentQuestion['questionDeletedAt'] == null) {
+                    if (is_numeric($currentQuestion['question_id'])) {
+                        $page->setVar(
+                            array(
+//                                'ON_OFF'               => ++$j % 2 ? '' : 'dark',
+                                'QUESTION_SEQUENCE'    => $questionNumber,
+                                'QUESTION_QUESTION'    => Scrub::html($currentQuestion['question']),
+                                'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+                                'QUESTION_MARKS'       =>
+                                    floor($currentQuestion['marks']) < $currentQuestion['marks']
+                                        ? $currentQuestion['marks']
+                                        : floor($currentQuestion['marks']),
+                            )
+                        );
 
-            /* Parse out the previous Section's info if we're entering a new Section
-             */
-            if ($currentQuestion['section_id'] != $currentSection) {
-                $questionNumber = 1;
+                        if ($page->getVar('ASSESS_KIND_LC') == 'survey') {
+                            $page->setVar('has_mark_block', '');
+                        } else {
+                            $page->parse('has_mark_block', 'has_mark');
+                        }
 
-                $page->setVar(
-                    array(
-                        'SECTION_TITLE'       => Scrub::text($allQuestions[$i - 1]['title']),
-                        'SECTION_DESCRIPTION' => Scrub::html($allQuestions[$i - 1]['description']),
-                        'SECTION_SEQUENCE'    => $allQuestions[$i - 1]['sectionSequence'],
-                        'SECTION_SECTION_ID'  => $allQuestions[$i - 1]['section_id'],
-                    )
-                );
+                        $page->parse('question_block', 'question', true);
 
-                $page->parse('section_block', 'section', true);
-                $page->setVar('question_block', '');
-
-                $currentSection = $currentQuestion['section_id'];
-            }
-
-            /* If section contains a deleted question, $allQuestions query is
-             * empty. So we actually need to include the deleted questions to
-             * get all the sections contained deleted questions.
-             */
-
-            /* Put the current Question into a new Section and parse it out. If
-             * it's empty, just do nothing
-             */
-            if ($currentQuestion['questionDeletedAt'] == null) {
-                if (is_numeric($currentQuestion['question_id'])) {
-                    $page->setVar(
-                        array(
-                            'ON_OFF'               => ++$j % 2 ? '' : 'dark',
-                            'QUESTION_SEQUENCE'    => $questionNumber,
-                            'QUESTION_QUESTION'    => Scrub::html($currentQuestion['question']),
-                            'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-                            'QUESTION_MARKS'       =>
-                                floor($currentQuestion['marks']) < $currentQuestion['marks']
-                                    ? $currentQuestion['marks']
-                                    : floor($currentQuestion['marks']),
-                        )
-                    );
-
-                    if ($page->getVar('ASSESS_KIND_LC') == 'survey') {
-                        $page->setVar('has_mark_block', '');
-                    } else {
-                        $page->parse('has_mark_block', 'has_mark');
+                        $questionNumber++;
                     }
-
-                    $page->parse('question_block', 'question', true);
-
-                    $questionNumber++;
                 }
             }
-
-            /* A section with no questions in
-             */
-            if (!is_numeric($currentQuestion['question_id'])) {
+            if (isset($currentQuestion)) {
+                $page->setVar(
+                    array(
+                        'SECTION_TITLE'       => Scrub::text($currentQuestion['title']),
+                        'SECTION_DESCRIPTION' => Scrub::html($currentQuestion['description']),
+                        'SECTION_SEQUENCE'    => $currentQuestion['sectionSequence'],
+                        'SECTION_SECTION_ID'  => $currentQuestion['section_id'],
+                    )
+                );
+                if (empty(trim($currentQuestion['description']))) {
+                    $page->setVar('has_section_description_block', '');
+                } else {
+                    $page->parse('has_section_description_block', 'has_section_description');
+                }
+                $page->parse('section_block', 'section', true);
                 $page->setVar('question_block', '');
             }
-        }
-
-        /* Finally, parse out this Section's info
-         */
-        if (is_numeric($currentQuestion['section_id'])) {
-            $page->setVar(
-                array(
-                    'SECTION_TITLE'       => Scrub::text($currentQuestion['title']),
-                    'SECTION_DESCRIPTION' => Scrub::html($currentQuestion['description']),
-                    'SECTION_SEQUENCE'    => $currentQuestion['sectionSequence'],
-                    'SECTION_SECTION_ID'  => $currentQuestion['section_id'],
-                )
-            );
-
-            $page->parse('section_block', 'section', true);
-
-            $currentQuestion['description'] = trim($currentQuestion['description']);
-
-            if (empty($currentQuestion['description'])) {
-                $page->setVar('has_section_description_block', '');
-            } else {
-                $page->parse('has_section_description_block', 'has_section_description', true);
-            }
-        } else {
-            $page->setVar('section_block', '');
         }
     }
 
