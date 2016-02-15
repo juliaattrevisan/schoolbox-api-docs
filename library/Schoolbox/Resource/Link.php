@@ -231,19 +231,6 @@ class Link implements ISoftDeletable
         return $this->url->getSlug();
     }
 
-    /**
-     * Get url target
-     *
-     * @return string
-     */
-    public function getTarget()
-    {
-        if ($this->isLocalUrl()) {
-            return '';
-        }
-
-        return 'external';
-    }
 
     /**
      * Get link url
@@ -342,6 +329,32 @@ class Link implements ISoftDeletable
     public function getHidden()
     {
         return $this->hidden;
+    }
+
+
+    /**
+     * Set target
+     *
+     * @param string $target
+     */
+    public function setTarget($target)
+    {
+        $this->target = $target;
+    }
+
+    /**
+     * Get url target, local URLs should always attempt to be in the same window
+     *
+     * @return string
+     */
+    public function getTarget()
+    {
+        if ($this->isLocalUrl() || $this->target != '_blank' ) {
+            return '';
+        }
+        else {
+            return 'external';
+        }
     }
 
     /**

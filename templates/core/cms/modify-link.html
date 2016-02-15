@@ -87,6 +87,11 @@
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Any further details you wish to make about the link, useful for enhancing search results">?</span>
                             <textarea name="comment" cols="40" rows="4">{COMMENT}</textarea>
                         </label>
+                        <label>Open In</label>
+                            <select name="target">
+                                <option value="">Same Window</option>
+                                <option value="_blank" {BLANK_SELECTED}>New Window</option>
+                            </select>
                         <label for="hidden">
                             Hidden
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Hide this link from anyone with read-only access">?</span>
