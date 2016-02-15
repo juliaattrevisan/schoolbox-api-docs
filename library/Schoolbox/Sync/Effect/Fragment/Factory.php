@@ -47,6 +47,7 @@ class Factory {
         'year' => 'Year Level',
 
         'role' => 'Role',
+        'userAccess' => 'Groups',
 
         'altEmail' => 'Alt Email Address',
 
@@ -98,6 +99,7 @@ class Factory {
 
         $mapper = new UserMapper();
         $allMaps = $mapper->getMap();
+        $allJoins = $mapper->getJoin();
 
         /* Get the associative array of fields
          */
@@ -140,10 +142,22 @@ class Factory {
                 /* All other types
                  */
                 default:
-                    $allFields[$key] = [
-                        'type' => self::TYPE_STRING,
-                        'label' => $label
-                    ];
+
+                    /* At this stage, joins (such as UserAccess) would have been given
+                     * self::TYPE_STRING. Check joins stack before assuming string
+                     */
+                    if (in_array($key, array_keys($allJoins))) {
+                        $allFields[$key] = [
+                            'type' => self::TYPE_COLLECTION,
+                            'label' => $label
+                        ];
+                    }
+                    else {
+                        $allFields[$key] = [
+                            'type'  => self::TYPE_STRING,
+                            'label' => $label
+                        ];
+                    }
 
                     break;
             }
