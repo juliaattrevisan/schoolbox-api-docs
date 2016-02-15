@@ -23,14 +23,17 @@
  * @param Assess_Section  $sectionHandler
  * @param array           $currentAttempt
  * @param SitePage        $page
- * @param array           $currentStudent
- * @param array           $previousAttempt
  * @param bool            $readonly
- *
- * @return void
  */
-function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent, $previousAttempt, $readonly)
-{
+function processAttempt(
+    $assessHandler,
+    $attemptHandler,
+    $responseHandler,
+    $sectionHandler,
+    $currentAttempt,
+    $page,
+    $readonly
+) {
     $firstSection = $sectionHandler->getFirst($page->arg[0]);
 
     // The total available marks for this attempt
@@ -325,8 +328,6 @@ if (is_array($allStudents) && count($allStudents)) {
      /* Process each student
       */
     foreach ($allStudents as $currentStudent) {
-        $previousAttempt = null;
-
         // need to append uid if synergetic
         if ($currentStudent['synergy_id'] && !$currentStudent['uid']) {
             $user = $userHandler->getBySynergy($currentStudent['synergy_id']);
@@ -344,15 +345,16 @@ if (is_array($allStudents) && count($allStudents)) {
                 if ($currentAttempt['user_id'] == $currentStudent['uid'] || $currentAttempt['synergy_id'] == $currentStudent['synergy_id']) {
                     if ($allAttempts[$i]['processed'] != true) {
                         processAttempt(
-                            $assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this,
-                            $currentStudent, $previousAttempt, $readonly
+                            $assessHandler,
+                            $attemptHandler,
+                            $responseHandler,
+                            $sectionHandler,
+                            $currentAttempt,
+                            $this,
+                            $readonly
                         );
-
                         $allAttempts[$i]['processed'] = true;
-
                         $numAttempts++;
-
-                        $previousAttempt = $currentAttempt;
                     }
                 }
             }
@@ -427,16 +429,17 @@ if (is_array($allStudents) && count($allStudents)) {
 /* Deal with remainder attempts
  */
 if ($allAttempts && count($allAttempts)) {
-    $previousAttempt = null;
-
     foreach ($allAttempts as $currentAttempt) {
         if ($currentAttempt['processed'] != true) {
             processAttempt(
-                $assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this,
-                $userHandler->getByID($currentAttempt['user_id']), $previousAttempt, $readonly
+                $assessHandler,
+                $attemptHandler,
+                $responseHandler,
+                $sectionHandler,
+                $currentAttempt,
+                $this,
+                $readonly
             );
-
-            $previousAttempt = $currentAttempt;
         }
     }
 }
