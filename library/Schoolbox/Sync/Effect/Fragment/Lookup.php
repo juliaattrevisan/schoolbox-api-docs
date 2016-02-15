@@ -29,7 +29,7 @@ class Lookup {
         'schoolHouse' => '\HouseMapper',
         'role' => '\Schoolbox\RoleMapper',
         'campusCollection' => '\Schoolbox\CampusMapper',
-        'userAccess' => '\Schoolbox\Permission\UserAccessMapper',
+        'userAccess' => '\Schoolbox\Resource\GroupMapper',
     ];
 
     /**
@@ -55,6 +55,9 @@ class Lookup {
                  */
                 if ($userField == 'role') {
                     $allResults = $mapper->findByColumn('group_type', $roleType);
+                }
+                else if ($userField == 'userAccess') {
+                    $allResults = $mapper->findFolders();
                 }
                 else {
                     $allResults = $mapper->findAll();
