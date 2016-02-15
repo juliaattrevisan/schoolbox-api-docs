@@ -17,7 +17,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
                 /* Ridiculous quick fix
                  */
-                filesystem = filesystem.replace('browse', 'sbfs');
+                filesystem = filesystem.replace('browse', 'sbfs').replace('store', 'storage');
 
                 return '/cms/videoThumb.php?size=poster&id=' + id + '&type=' + filesystem;
             },
@@ -54,13 +54,20 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
      */
     function render(fields, url, reset) {
 
+        /* Apply width/height dimensions upon thumbnail
+         * forcing it to have dimensions (for mejs)
+         */
+        var enforceDimensions = false;
+
         /* Special case for video url
          */
         if (fields.type.getValue() == 'video') {
             url = config.video.thumbnail(fields.id.getValue(), fields.filesystem.getValue());
+            enforceDimensions = true;
         }
         else if (fields.type.getValue() == 'audio') {
             url = config.audio.thumbnail;
+            enforceDimensions = true;
         }
 
         /* Find out width/height ratio
@@ -84,8 +91,10 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
              *
              * This occurs when setup() runs, when editing an existing image
              * Or when an image was set to Fullwidth (it won't have a width/height style attribute)
+             *
+             * Force video/audio elements to have width/height dimensions, for mejs player
              */
-            if (reset) {
+            if (reset || enforceDimensions) {
                 fields.width.setValue(width);
                 fields.height.setValue(height);
             }
