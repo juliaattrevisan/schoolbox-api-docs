@@ -15,6 +15,9 @@ $allResults = new \Schoolbox\Collection();
 
 $query = $_GET['query'];
 
+/* TODO: Maybe make findFolders() and findCampuses() synonymous,
+ * perhaps rename them both to findSimilar()
+ */
 if ($_GET['type'] == 'groups') {
     $mapper = new \Schoolbox\Resource\GroupMapper();
     $allResults = $mapper->findFolders($query);
