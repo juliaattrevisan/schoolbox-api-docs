@@ -17,7 +17,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
 
                 /* Ridiculous quick fix
                  */
-                filesystem = filesystem.replace('browse', 'sbfs');
+                filesystem = filesystem.replace('browse', 'sbfs').replace('store', 'storage');
 
                 return '/cms/videoThumb.php?size=poster&id=' + id + '&type=' + filesystem;
             },
