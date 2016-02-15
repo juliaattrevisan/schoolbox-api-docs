@@ -75,9 +75,19 @@ class ClassStatistics {
 		$this->assessMapper = new OnlineAssessmentMapper();
 		$this->attemptMapper = new AttemptMapper();
 
+		/* Visibility
+		 * Exclude hidden quizzes from the Assessments cube
+		 */
+		$quizVisibility = new \Assess\Visibility();
+		$quizVisibilities = $quizVisibility->getVisibilityArray($user);
+
 		// retrieve ALL the submission boxes for this category
 		$boxCollection = $this->submissionBoxMapper->findByColumnList(
-			array('category' => $this->getCategory()->getId(), 'task_id' => null)
+			array(
+				'category'        => $this->getCategory()->getId(),
+				'task_id'         => null,
+				'mark_visibility' => $quizVisibilities
+			)
 		);
 		foreach($boxCollection as $box) {
 			$due = $box->getDueDate();
@@ -102,16 +112,10 @@ class ClassStatistics {
 			}
 		}
 
-		/* Visibility
-		 * Exclude hidden quizzes from the Assessments cube
-		 */
-		$quizVisibility = new \Assess\Visibility();
-		$quizVisibilities = $quizVisibility->getVisibilityArray($user);
-
 		// retrieve ALL the online assessments (not surveys) for this category
 		$assessCollection = $this->assessMapper->findByColumnList(array(
-			'category_id' => $this->getCategory()->getId(),
-			'availability' => 'assess',
+			'category_id'     => $this->getCategory()->getId(),
+			'availability'    => 'assess',
 			'mark_visibility' => $quizVisibilities
 		));
 		foreach($assessCollection as $assess) {
