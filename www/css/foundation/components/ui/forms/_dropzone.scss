@@ -31,6 +31,15 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 .dropzone-wrap {
     position: relative;
     min-height: 4.5rem;
+    .dz-container {
+        img {
+            max-width: 6rem;
+            max-height: 6rem;
+        }
+        li {
+            padding: 1rem 0 1rem 1rem;
+        }
+    }
 }
 
 .dropzone {
