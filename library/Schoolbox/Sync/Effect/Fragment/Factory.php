@@ -62,7 +62,17 @@ class Factory {
         'enabled' => 'Schoolbox Account Enabled',
         'webmail' => 'Enable Webmail Tab',
         'eportfolioEnable' => 'E-Portfolio Enabled',
+    ];
 
+    /**
+     * Special ajax urls for selectize population
+     * Uses same controller with different params
+     *
+     * @var array
+     */
+    private $allAjaxUrls = [
+        'userAccess' => 'groups',
+        'campusCollection' => 'campus'
     ];
 
     /**
@@ -207,7 +217,10 @@ class Factory {
             return new Fragment('@upsEffect/subfragments/string.twig');
         }
         else if ($this->isCollection($userField)) {
-            return new Fragment('@upsEffect/subfragments/collection.twig', $this->getLookup()->findData($userField));
+            $fragment = new Fragment('@upsEffect/subfragments/collection.twig', $this->getLookup()->findData($userField));
+            $fragment->setAjaxUrl($this->allAjaxUrls[$userField]);
+
+            return $fragment;
         }
     }
 

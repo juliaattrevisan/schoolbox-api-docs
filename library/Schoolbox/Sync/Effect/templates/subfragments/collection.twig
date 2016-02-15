@@ -1,5 +1,6 @@
 {% set mapRowIdentifier = 'mappingrow-' ~ random(100000000) %}
 {% set entireDataset = allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
+{% set ajaxUrl = allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getAjaxUrl() %}
 
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
@@ -22,7 +23,7 @@
                 url: '/ajax/ups/ups.php',
                 type: 'GET',
                 data: {
-                    type: 'groups'
+                    type: '{{ ajaxUrl }}'
                 },
                 dataType: 'json'
             },
