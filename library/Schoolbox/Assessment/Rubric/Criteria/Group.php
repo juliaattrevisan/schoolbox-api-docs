@@ -199,6 +199,14 @@ class Group implements Twiggable, Calculable
         return 0;
     }
 
+    /**
+     * @return string
+     */
+    public function getHumanReadableMark()
+    {
+        return sprintf("%0.2d / %0.2d (%0.2d%%)", $this->getSum(), $this->getTotal(), round($this->getPercentage() * 100));
+    }
+
 
     /**
      * Convert yourself into a Twig context array
@@ -213,6 +221,7 @@ class Group implements Twiggable, Calculable
             'sum'        => $this->getSum(),
             'total'      => $this->getTotal(),
             'percentage' => $this->getPercentage(),
+            'humanReadableMark' => $this->getHumanReadableMark(),
             'used'       => $this->isReadOnly(),
             'criteria'   => [],
         ];

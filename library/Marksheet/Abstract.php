@@ -171,8 +171,8 @@ abstract class Marksheet_Abstract
         // handle null value and blank string, distinct from zero
         if ($value === null || $value === '') {
             return '';
-        } // handle zero
-        elseif ($value === 0) {
+        } // handle zero, accounting for either int or float
+        elseif ($value === (int)0 || $value === (float)0) {
             return $blankZero ? '' : 0;
         }
 

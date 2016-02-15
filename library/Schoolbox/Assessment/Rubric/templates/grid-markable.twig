@@ -88,7 +88,7 @@
                 data-numerator="{{ group.sum }}"
                 data-denominator="{{ group.total }}"
             >
-                {{ group.sum }} / {{ group.total }} ({{ (group.percentage * 100)|round }}%)
+                {{ group.humanReadableMark }}%)
             </th>
         </tr>
         {% endif %}
@@ -103,7 +103,7 @@
             data-numerator="{{ rubric.sum }}"
             data-denominator="{{ rubric.total }}"
         >
-            {{ rubric.sum }} / {{ rubric.total }} ({{ (rubric.percentage * 100)|round }}%)
+            {{ rubric.humanReadableMark }}%)
         </th>
     </tr>
     {% endif %}
