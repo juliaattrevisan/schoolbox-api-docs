@@ -11,20 +11,28 @@
 require_once dirname(__FILE__) . '/../../../include/Bootstrap.php';
 
 $allPairs = [];
+$allResults = new \Schoolbox\Collection();
+
 $query = $_GET['query'];
 
 if ($_GET['type'] == 'groups') {
     $mapper = new \Schoolbox\Resource\GroupMapper();
-    $allUnjoinedFolders = $mapper->findFolders($query);
+    $allResults = $mapper->findFolders($query);
+}
+else if ($_GET['type'] == 'campus') {
+    $mapper = new \Schoolbox\CampusMapper();
+    $allResults = $mapper->findCampuses($query);
+}
 
-    foreach ($allUnjoinedFolders as $current) {
+if ($allResults->count()) {
+    foreach ($allResults as $current) {
         if ($current instanceof \Schoolbox\ValueLabelInterface) {
             $pair = $current->findValueLabelPair();
 
             /* Translate for selectize
              */
             $allPairs[] = [
-                'id' => $pair['value'],
+                'id'   => $pair['value'],
                 'name' => $pair['label']
             ];
         }

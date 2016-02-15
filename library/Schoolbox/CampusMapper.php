@@ -9,6 +9,7 @@
 
 namespace Schoolbox;
 use Schoolbox;
+use \PDO;
 
 class CampusMapper extends Mapper {
 
@@ -119,4 +120,35 @@ class CampusMapper extends Mapper {
         return $c;
     }
 
+	/**
+	 * Find all campuses matching a certain name
+	 *
+	 * @param $name
+	 * @return \Schoolbox\Collection
+	 */
+	public function findCampuses($name = '') {
+		$allCampuses = $this->createCollection();
+
+		/* if $name is empty, the LIKE returns everything anyway
+         */
+		$query = "
+            SELECT
+                {$this->getColumnString('c')}
+            FROM
+                `{$this->getTable()}` c
+            WHERE c.name LIKE :name
+            ORDER BY c.name
+        ";
+
+		$statement = $this->database->prepare($query);
+		$statement->execute([
+			'name' => "%{$name}%"
+		]);
+
+		while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+			$allCampuses->add($this->hydrate($row, 'c'));
+		}
+
+		return $allCampuses;
+	}
 }
