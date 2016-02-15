@@ -249,6 +249,11 @@
         var $rb = $(this.element),
             opt = this.options;
 
+        // prevent programmatic addition of too-many-levels
+        if (opt.levelLimit > 0 && $rb.children('thead').find('input[data-level]').length >= opt.levelLimit) {
+            return false;
+        }
+
         // determine the new index
         var nextIndex = $rb.find('th[data-sequencer-group=levels]').length;
 
@@ -307,11 +312,79 @@
 
         // permit up to 11 levels
         if (opt.levelLimit > 0 && $levels.length >= opt.levelLimit) {
-            $(this).detach();
+            $levels.find('[data-spawn]').addClass('hide');
         }
 
         // refresh the sequencer
         $rb.sequencer('refresh');
+
+        return true;
+    };
+
+
+    /**
+     * Delete the nominated column, zero-indexed from the first LEVEL column
+     *
+     * @param {Number} index
+     */
+    RubricEditable.prototype.deleteLevel = function (index) {
+
+        var $rb = $(this.element),
+            opt = this.options;
+
+        var rows = $rb.find('tr');
+
+        var levelCount = rows.eq(0).children('td,th').length - 3;
+
+        // how can it be less than zer0? this is a just-in-case...
+        if (levelCount <= 0) {
+            throw "No levels exist, nothing to delete";
+        }
+
+        // disallow removal of the last level (because we lose our template)
+        if (levelCount == 1) {
+            throw "Only 1 level, cannot remove it";
+        }
+
+        // bounds-check
+        if (index < 0 || index >= levelCount) {
+            throw "Index out of bounds: " + index + " must be between 0 and " + (levelCount - 1);
+        }
+
+        // ok... NOW we can delete the level given. we count backwards from the end, to accommodate colspans and such
+        index -= (levelCount + 1);
+
+        rows.each(function () {
+            var $row = $(this);
+
+            var $cells = $row.children('td,th');
+
+            // either the column given, or the last (for colspan)
+            var $selected = $($cells.eq(index)[0] || $cells.eq(-1)[0]);
+
+            if ($selected.attr('rowspan')) {
+                // say nothing.
+
+            } else if ($selected.attr('colspan')) {
+                $selected.attr('colspan', parseInt($selected.attr('colspan')) - 1);
+
+            } else {
+                $selected.detach();
+            }
+
+        });
+
+        var $levels = $rb.children('thead').find('input[data-level]');
+
+        // permit up to 11 levels
+        if (opt.levelLimit == 0 || $levels.length < opt.levelLimit) {
+            $levels.find('[data-spawn]').removeClass('hide');
+        }
+
+        // refresh the sequencer
+        $rb.sequencer('refresh');
+
+        return true;
     };
 
 
