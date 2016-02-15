@@ -238,13 +238,13 @@
     /**
      * Adds a level to the grid, on the right-hand side
      * @param {String} [levelName]
-     * @param {Number} [descriptorValue]
+     * @param {*} [descriptorValue]
      */
     RubricEditable.prototype.addLevel = function (levelName, descriptorValue) {
 
         // allow undefined
         levelName       = levelName || '';
-        descriptorValue = descriptorValue || '';
+        descriptorValue = typeof descriptorValue === 'undefined' ? '' : descriptorValue;
 
         var $rb = $(this.element),
             opt = this.options;
