@@ -30,23 +30,74 @@
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section class="imageslider-container">
-                <div data-imageslider class="imageslider">
-                    <!-- BEGIN image_scroller -->
-                    <div data-imageslider-image class="text-center">
-                        <img src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}"/>
-                        <!-- BEGIN show_caption -->
-                        <p class="meta">{IMAGE_NAME}</p>
-                        <!-- END show_caption -->
+                <div class="dropzone-wrap no-margin">
+                    <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
+                    <div data-imageslider class="imageslider">
+                        <!-- BEGIN image_scroller -->
+                        <div data-imageslider-image class="text-center">
+                            <img src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}"/>
+                            <!-- BEGIN show_caption -->
+                            <p class="meta">{IMAGE_NAME}</p>
+                            <!-- END show_caption -->
+                        </div>
+                        <!-- END image_scroller -->
                     </div>
-                    <!-- END image_scroller -->
+                    <ul data-dz-container class="inline-list dz-container no-margin">
+                        <!-- THIS TEMPLATE WILL BE DETACHED, DON'T WORRY ABOUT THE BAD DOM -->
+                        <ul class="hide" data-dz-template>
+                            <li>
+                                <span class="th">
+                                    <img data-dz-thumbnail src="/images/resources/ajax.gif" />
+                                </span>
+                                <div class="progress dz-progress">
+                                    <span class="meter dz-upload" style="width:0;"></span>
+                                </div>
+                            </li>
+                        </ul>
+                    </ul>
                 </div>
             </section>
 
+            <!-- BEGIN submit_image -->
             <section class="content">
-                <!-- BEGIN submit_image -->
                 <a href="/cms/file/new/{IMAGESCROLLER_CATEGORY_ID}" class="button icon-upload">Post Image</a>
-                <!-- END submit_image -->
+                <script type="text/javascript">
+                    $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                        wrapClass: 'dragging',
+                        wrap: '#content',
+                        showIfEmpty: false,
+                        previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                        previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                        createImageThumbnails: true,
+                        thumbnailHeight: 400,
+                        thumbnailWidth: null,
+                        dictDefaultMessage: 'You can drag an image into this space.',
+                        acceptedFiles: 'image/*',
+                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                        refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                        addedfile: function (file) {
+                        },
+                        sending: function (file, xhr, formData) {
+                            $(file.previewElement)
+                                .addClass('category-{IMAGESCROLLER_CATEGORY_ID}')
+                                .data('node', {IMAGESCROLLER_CATEGORY_ID});
+
+                            $('#img{COMPONENT_INSTANCE_ID}').remove();
+
+                            formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                            formData.append('category', $(file.previewElement).data('node'));
+                            formData.append('comment', '');
+                            formData.append('hidden', 0);
+                        },
+                        error: function (file) {
+                            $(file.previewElement)
+                                .closest('[data-dz-container]')
+                                .find('.dz-preview').remove();
+                        }
+                    });
+                </script>
             </section>
+            <!-- END submit_image -->
         </div>
     </div>
 </div>
