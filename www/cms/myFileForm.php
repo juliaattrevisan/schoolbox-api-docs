@@ -68,6 +68,9 @@ if (isset($_POST['description'])) {
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(41);
         exit; // shut UP, storm.
+    } catch (\InvalidArgumentException $e) {
+        error(43);
+        exit;
     }
 
     // if file was synchronously uploaded

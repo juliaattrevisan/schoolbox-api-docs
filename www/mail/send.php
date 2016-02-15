@@ -105,14 +105,22 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     $mail->setBody($converter->getText(), null, 'utf-8');
     $mail->addPart($message, 'text/html', 'utf-8');
 
-    $factory = new CollectorFactory();
-    $files = $factory->build($attachments)->getAll();
+    try {
+        $factory = new CollectorFactory();
+        $files = $factory->build($attachments)->getAll();
 
-    foreach ($files as $storage) {
-        $attach = Swift_Attachment::newInstance($storage->read(), $storage->getBasename(), $storage->getMime());
-        $attach->setFilename($storage->getBasename());
-        $attach->setContentType($storage->getMime());
-        $mail->attach($attach);
+        foreach ($files as $storage) {
+            $attach = Swift_Attachment::newInstance($storage->read(), $storage->getBasename(), $storage->getMime());
+            $attach->setFilename($storage->getBasename());
+            $attach->setContentType($storage->getMime());
+            $mail->attach($attach);
+        }
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(41);
+        exit; // shut UP, storm.
+    } catch (\InvalidArgumentException $e) {
+        error(43);
+        exit;
     }
 
     try {

@@ -196,9 +196,18 @@ if (isset($_POST['curriculumCodes'])) {
 }
 
 if (isset($_POST['attachment'])) {
-    $factory = new CollectorFactory();
-    $attachments = $factory->build($_POST['attachment'])->getAll();
-    $submission->setAttachments(new Collection($attachments));
+    try {
+        $factory = new CollectorFactory();
+        $attachments = $factory->build($_POST['attachment'])->getAll();
+        $submission->setAttachments(new Collection($attachments));
+
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(41);
+        exit; // shut UP, storm.
+    } catch (\InvalidArgumentException $e) {
+        error(43);
+        exit;
+    }
 } else {
     // no attachments passed? ensure any already-attached files are detached
     $submission->setAttachments(new Collection());

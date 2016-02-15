@@ -78,7 +78,12 @@ if (is_array($_POST['attachment'])) {
         // make sure we save whatever we got so far
         $subMap->save($submissions);
         error(9, $e->getMessage());
+
+    } catch (\InvalidArgumentException $e) {
+        error(9, $e->getMessage());
+        exit;
     }
+
 }
 
 $subMap->save($submissions);

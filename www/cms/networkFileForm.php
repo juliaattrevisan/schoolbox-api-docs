@@ -33,16 +33,24 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name']) || isset(
     } else {
         // if file was ajax-uploaded
         if (isset($_POST['attachment'])) {
-            $factory = new CollectorFactory();
-            /** @var Model $result */
-            $result = $factory->build($_POST['attachment'])->getFirst();
-            $fileHandler->create(
-                $file,
-                [
-                    'name'     => $result->getBasename(),
-                    'resource' => $result->readStream(),
-                ]
-            );
+            try {
+                $factory = new CollectorFactory();
+                /** @var Model $result */
+                $result = $factory->build($_POST['attachment'])->getFirst();
+                $fileHandler->create(
+                    $file,
+                    [
+                        'name'     => $result->getBasename(),
+                        'resource' => $result->readStream(),
+                    ]
+                );
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                error(41);
+                exit; // shut UP, storm.
+            } catch (\InvalidArgumentException $e) {
+                error(43);
+                exit;
+            }
         } elseif (isset($_FILES['file']['tmp_name'])) {
             $allowedFileHandler = new AllowedFile;
             $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));

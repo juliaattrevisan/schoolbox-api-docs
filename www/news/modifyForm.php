@@ -122,6 +122,8 @@ if ($_POST['heading']) {
             $article->setImage($collector->getFirst());
         } catch (\Schoolbox\Resource\Exception $e) {
             error(41); // no any device exists
+        } catch (InvalidArgumentException $e) {
+	        error(43); // attempted to submit an exception, file not received
         }
     }
     // retained case for browsers that require fallback
