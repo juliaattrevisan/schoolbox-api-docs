@@ -310,6 +310,16 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
+     * Get a list of all the joins specified in this mapper
+     *
+     * @return array
+     */
+    public function getJoin()
+    {
+        return $this->joins;
+    }
+
+    /**
      * @param NotifInterface $notif
      */
     public function setNotifier($notif)
