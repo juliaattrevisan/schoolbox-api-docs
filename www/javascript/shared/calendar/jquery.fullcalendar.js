@@ -186,7 +186,8 @@ function Calendar(id, bubbleId, opts) {
                                 data.bookingActions.push(
                                     $('<a class="button" />')
                                         .data('seriesId', calEvent.data.meta.seriesId)
-                                        .attr('data-booking-button', this.class)
+                                        .addClass(this.class)
+                                        .attr('data-booking-button', 'booking-'+this.action)
                                         .attr('href', this.href)
                                         .text(this.label)
                                         .prepend('<span />')

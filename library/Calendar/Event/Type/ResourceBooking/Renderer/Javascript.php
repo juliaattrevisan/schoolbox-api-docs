@@ -51,9 +51,10 @@ class Javascript extends Base
         $editUrl = $this->getEditURL();
         if ($editUrl !== false) {
             $bookingButtons[] = array(
-                'label' => 'Modify',
-                'class' => 'modify booking-modify',
-                'href'  => $editUrl,
+                'label'  => 'Modify',
+                'class'  => 'icon-modify',
+                'href'   => $editUrl,
+                'action' => 'modify',
             );
         }
 
@@ -61,9 +62,10 @@ class Javascript extends Base
         $cancelUrl = $this->getCancelURL();
         if ($cancelUrl !== false) {
             $bookingButtons[] = array(
-                'label' => 'Delete',
-                'class' => 'delete booking-cancel',
-                'href'  => $cancelUrl,
+                'label'  => 'Delete',
+                'class'  => 'icon-delete',
+                'href'   => $cancelUrl,
+                'action' => 'cancel',
             );
         }
 
@@ -71,9 +73,10 @@ class Javascript extends Base
         $approveUrl = $this->getApproveURL();
         if ($approveUrl !== false) {
             $bookingButtons[] = array(
-                'label' => 'Approve',
-                'class' => 'tick booking-approve',
-                'href'  => $approveUrl,
+                'label'  => 'Approve',
+                'class'  => 'icon-tick',
+                'href'   => $approveUrl,
+                'action' => 'approve',
             );
         }
 
@@ -81,9 +84,10 @@ class Javascript extends Base
         $rejectUrl = $this->getRejectURL();
         if ($rejectUrl !== false) {
             $bookingButtons[] = array(
-                'label' => 'Reject',
-                'class' => 'reply booking-reject',
-                'href'  => $rejectUrl,
+                'label'  => 'Reject',
+                'class'  => 'icon-close',
+                'href'   => $rejectUrl,
+                'action' => 'reject',
             );
         }
 

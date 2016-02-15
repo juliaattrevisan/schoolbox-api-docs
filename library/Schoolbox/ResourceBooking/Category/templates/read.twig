@@ -31,6 +31,13 @@
                 break;
         }
 
+        // Dialog for use when clicking an item that is in a series
+        var updateSeriesDialog = $('#dialog-bulk-update');
+        updateSeriesDialog.on('click', '[data-interaction="close"]', function(e) {
+            e.preventDefault();
+            updateSeriesDialog.foundation('reveal', 'close');
+        });
+
         c = new Calendar('calendar', 'calendar-bubble', {
             filter: {
                 enabled: true,
