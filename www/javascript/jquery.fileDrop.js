@@ -11,6 +11,7 @@
             // filedrop detection options
             wrap: 'html > body',
             wrapClass: 'dragging',
+            showIfEmpty: true,
 
             // dropzone options we choose to expose
             clickable: false,
@@ -148,7 +149,7 @@
 
             dictDefaultMessage: this.options.dictDefaultMessage,
             dictFallbackMessage: this.options.dictFallbackMessage,
-            previewTemplate: this.options.previewTemplate ? $(this.options.previewTemplate).html() : this.createTemplate(this.options.tplWrap),
+            previewTemplate: this.options.previewTemplate ? $(this.options.previewTemplate).detach().html() : this.createTemplate(this.options.tplWrap),
 
             // expose dropzone methods
             init: function() {
@@ -201,7 +202,7 @@
         var containerEmpty = !$(this.options.previewsContainer).children().length,
             e = $(this.options.refreshSelector);
 
-        if (containerEmpty && this.options.dictDefaultMessage) {
+        if (containerEmpty && this.options.dictDefaultMessage && this.options.showIfEmpty) {
             e.addClass('dragging');
         } else {
             e.removeClass('dragging');
