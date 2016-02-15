@@ -48,12 +48,6 @@
             }
         });
 
-        // When I change the number of assessment levels,
-        // that means I want to use assessment specific descriptors.
-        $('[data-relation="rubric-descriptor-count"]').on('change', function(){
-            $('[data-relation="rubric-use-assessment-specific"]').prop('checked', true).trigger('change');
-        });
-
         // Set up the gradegroup thing
         $('a[data-role="showGradeScale"]').click(function(event) {
             event.preventDefault();
@@ -87,6 +81,46 @@
                         }
                     }
                 });
+
+        $('#rubric-section').on('change', 'input[name=resultset]', function (e) {
+
+            var rubricEditable = $('table[data-rubric]').data('plugin_rubricEditable');
+
+            if (rubricEditable) {
+
+                var input  = $(this),
+                    value  = input.val(),
+                    label  = input.siblings('[for=' + input.attr('id') + ']'),
+                    options;
+
+                // "custom"
+                if (value == 0) {
+                    // do nothing
+                    return true;
+                }
+
+                // get the list of options we're going to populate
+                options = label.text().split(',').map(function (v) { return v.trim(); });
+
+                // delete all but one
+                try {
+                    for (var i = 0; i < 12; ++i) {
+                        rubricEditable.deleteLevel(0);
+                    }
+                } catch (e) {
+                    // finished; noop
+                }
+
+                $.each(options, function (levelValue, levelName) {
+                    rubricEditable.addLevel(levelName, levelValue);
+                });
+
+                // and finally delete the first (now unneeded) level
+                rubricEditable.deleteLevel(0);
+
+            }
+        });
+
 
     });
 </script>
