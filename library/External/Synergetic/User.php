@@ -168,7 +168,7 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN
                 SynergyOne.dbo.Community Spouse ON Contact.SpouseID = Spouse.ID
             WHERE
-                Contact.ID = '$synID'";
+                Contact.ID = '" . $this->database->quote($synID) . "'";
         $parent = $this->getDatabase()->getRow($query);
         if ($parent['DefaultEmailCode'] == 'O') {
             $parent['Email'] = $parent['OccupEmail'];
@@ -193,9 +193,9 @@ class External_Synergetic_User implements External_UserInterface
     public function getParentSync($synID)
     {
         if (is_array($synID)) {
-            $assignation = ' IN (' . implode(',', $synID) . ')';
+            $assignation = " IN ('" . implode("','", array_map([$this->database, 'quote'], $synID)) . "')";
         } else {
-            $assignation = " = '$synID'";
+            $assignation = " =  '" . $this->database->quote($synID) . "'";
         }
         $query = "
             SELECT
@@ -314,7 +314,7 @@ class External_Synergetic_User implements External_UserInterface
                         AND vStudents.StudentYearLevel = luYearLevel.Code
                     LEFT JOIN luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
                 WHERE
-                    vStudents.StudentID = '$synID'
+                    vStudents.StudentID = '" . $this->database->quote($synID) . "'
                     AND vStudents.FileSemester='" . $this->database->quote($currentSemester) . "'
                     AND vStudents.FileYear='" . $this->database->quote($currentYear) . "'
         ";
@@ -362,7 +362,7 @@ class External_Synergetic_User implements External_UserInterface
              FROM SynergyOne.dbo.vStaff vStaff
              LEFT JOIN SynergyOne.dbo.luBuilding ON StaffBuilding = luBuilding.Code
              LEFT JOIN SynergyOne.dbo.luDepartment ON StaffDepartment = luDepartment.Code
-             WHERE vStaff.StaffID = $synID ";
+             WHERE vStaff.StaffID = '" . $this->database->quote($synID) . "'";
         $staff = $this->getDatabase()->getRow($query);
         return $staff;
     }
