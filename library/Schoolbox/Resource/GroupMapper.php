@@ -47,14 +47,18 @@ class GroupMapper extends Mapper {
     }
 
     /**
-     * Find all folders associated with userGroups
+     * Find all folders matching a certain name,
+     * associated with userGroups
      *
+     * @param $name
      * @return \Schoolbox\Collection
      */
-    public function findFolders() {
+    public function findFolders($name = '') {
         $allFolders = $this->createCollection();
         $folderMapper = new FolderMapper();
 
+        /* if $name is empty, the LIKE returns everything anyway
+         */
         $query = "
             SELECT
                 {$this->getColumnString('ug')},
@@ -64,10 +68,14 @@ class GroupMapper extends Mapper {
             LEFT JOIN
                 {$this->getJoinSql('folder', 'ug', 'f')}
             WHERE f.id IS NOT NULL
+            AND f.name LIKE :name
+            ORDER BY f.name
         ";
 
         $statement = $this->database->prepare($query);
-        $statement->execute();
+        $statement->execute([
+            'name' => "%{$name}%"
+        ]);
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $allFolders->add($folderMapper->hydrate($row, 'f'));
