@@ -546,46 +546,6 @@
                         </label>
                     </div>
 
-                    <div class="small-12 columns"
-                         data-hide-watch="#marktype"
-                         data-hide-watch-value="rubric"
-                         data-hide-watch-option-attribute="data-slug"
-                    >
-                        <fieldset>
-                            <legend>
-                                Result Set
-                                <span class="hint has-tip tip-top"
-                                      data-tooltip
-                                      title="Select at least one criterion to be assessed, and possible results.
-                                             By default descriptors are ordered lowest to highest, you may rearrange if you wish.">?</span>
-                            </legend>
-                            <!-- BEGIN resultset -->
-                            <div class="small-12 columns no-pad">
-                                <input id="rs-{RS_ID}" type="radio" name="resultset" value="{RS_ID}" {RS_CHECKED} />
-                                <label for="rs-{RS_ID}" class="radio-label">
-                                    <!-- BEGIN result -->
-                                    {RS_RESULT_LABEL}{RS_RESULT_COMMA}
-                                    <!-- END result -->
-                                </label>
-                            </div>
-                            <!-- END resultset -->
-                            <div class="small-12 medium-4 columns no-pad">
-                                <input id="rs-0" type="radio" name="resultset" value="0" {RS_0_CHECKED} data-relation="rubric-use-assessment-specific" />
-                                <label for="rs-0" class="radio-label">
-                                    Assessment specific descriptors:
-                                </label>
-                            </div>
-
-                            <div class="small-12 medium-8 columns no-pad">
-                                <select id="descriptor-count" name="descrip-count" data-relation="rubric-descriptor-count">
-                                    <!-- BEGIN des_count -->
-                                    <option value="{DES_COUNT_VALUE}" {DES_COUNT_VALUE_SELECTED}>{DES_COUNT_VALUE} levels</option>
-                                    <!-- END des_count -->
-                                </select>
-                            </div>
-                        </fieldset>
-                    </div>
-
                     <!-- BEGIN existing_marks_warning -->
                     <div class="small-12 column">
                         <div class="alert-box warning">
@@ -626,6 +586,25 @@
                         </div>
                     </div>
                     <fieldset id="rubric-section" class="small-12 content hide" data-hide-watch="#use-rubric">
+                        <legend>
+                            Result Set
+                            <span class="hint has-tip tip-top"
+                                  data-tooltip
+                                  title="Select at least one {TPL_LOCAL_RUBRICCRITERION} to be assessed, and possible results.
+                                         By default descriptors are ordered lowest to highest, you may rearrange if you wish.">?</span>
+                        </legend>
+                        <div class="small-12 columns no-pad">
+                            <!-- BEGIN resultset -->
+                            <input id="rs-{RS_ID}" type="radio" name="resultset" value="{RS_ID}" {RS_CHECKED} />
+                            <label for="rs-{RS_ID}" class="radio-label">
+                                <!-- BEGIN result -->
+                                {RS_RESULT_LABEL}{RS_RESULT_COMMA}
+                                <!-- END result -->
+                            </label>
+                            <!-- END resultset -->
+                            <input id="rs-0" type="radio" name="resultset" value="0" {RS_0_CHECKED} data-relation="rubric-use-assessment-specific" />
+                            <label for="rs-0" class="radio-label">Custom</label>
+                        </div>
                         <div style="clear:both; margin-bottom: 1rem;">
                             {CLASS_CRITERIA}
                         </div>
