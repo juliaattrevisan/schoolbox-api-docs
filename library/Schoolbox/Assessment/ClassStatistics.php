@@ -273,11 +273,10 @@ class ClassStatistics {
 	 */
 	public function getAllUsersMarks() {
 		$allData = array();
-		$i = 0;
 		foreach ($this->workMap as $dueDate => $current) {
 			$box = $current['object'];
 			$allMarks = $current['marks'];
-			$allData[$i] = array();
+			$allData[$dueDate] = array();
 			/* Stack results
              */
 			foreach ($allMarks as $userId => $currentMark) {
@@ -285,7 +284,7 @@ class ClassStatistics {
 					if ($userId !== 'avg') {
 						if (count($currentMark)) {
 							$latestAttempt = array_pop($currentMark);
-							$allData[$i][] = array(
+							$allData[$dueDate][] = array(
 								'info' => null,
 								'uid' => null,
 								'value' => (float)$latestAttempt['mark']
@@ -295,7 +294,7 @@ class ClassStatistics {
 				}
 				elseif ($box instanceof SubmissionBox) {
 					if (strlen(trim($currentMark['mark']))) {
-						$allData[$i][] = array(
+						$allData[$dueDate][] = array(
 							'info' => null,
 							'uid' => null,
 							'value' => (float)$currentMark['mark']
@@ -303,9 +302,8 @@ class ClassStatistics {
 					}
 				}
 			}
-
-			$i++;
 		}
+		ksort($allData);
 		return array_values($allData);
 	}
 
