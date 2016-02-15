@@ -24,8 +24,6 @@
 };
 
     function RubricEditable(element, options) {
-        var rubricEditable = this;
-
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
 
@@ -41,6 +39,7 @@
      * Clear and assign all relevant listeners
      */
     RubricEditable.prototype.listen = function () {
+        var rubricEditable = this;
         var $rb = $(this.element);
         var opt = this.options;
 
@@ -49,61 +48,7 @@
             e.preventDefault();
 
             if ($(this).data('spawn') == 'level') {
-
-                // determine the new index
-                var nextIndex = $rb.find('th[data-sequencer-group=levels]').length;
-
-                // iterate all rows
-                $rb.find('tr').each(function () {
-                    // locate the second-from-right-most cell, and replicate it
-
-                    var $row = $(this);
-
-                    var $cells = $row.children('td,th');
-
-                    var $last = $cells.eq(-1);
-
-                    // don't replicate, just extend the colspan
-                    if ($last.attr('colspan')) {
-                        $last.attr('colspan', parseInt($last.attr('colspan')) + 1);
-
-                    } else {
-                        var $td = $cells.eq(-2);
-
-                        var $clone = $td.clone();
-
-                        // start hidden away so we can all slide out together
-                        $clone.addClass(opt.hideHorizontalClass).find(opt.inputSelector).val('').each(function () {
-
-                            var split = this.name.split(/]\[/);
-
-                            // increment the level index in the name (second-last index)
-                            split[split.length - 2] = nextIndex;
-
-                            this.name = split.join('][');
-
-                        });
-
-                        $td.after($clone);
-
-                    }
-
-                });
-
-                // aaand meaningful-transition out
-                $rb.find('td.' + opt.hideHorizontalClass + ', th.' + opt.hideHorizontalClass).removeClass(opt.hideHorizontalClass);
-
-                // focus on the newly-created level input
-                var $levels = $rb.children('thead').find('input[data-level]');
-                $levels.eq(-1).focus();
-
-                // permit up to 11 levels
-                if (opt.levelLimit > 0 && $levels.length >= opt.levelLimit) {
-                    $(this).detach();
-                }
-
-                // refresh the sequencer
-                $rb.sequencer('refresh');
+                rubricEditable.addLevel();
             }
 
         });
@@ -287,6 +232,86 @@
             }
         });
 
+    };
+
+
+    /**
+     * Adds a level to the grid, on the right-hand side
+     * @param {String} [levelName]
+     * @param {Number} [descriptorValue]
+     */
+    RubricEditable.prototype.addLevel = function (levelName, descriptorValue) {
+
+        // allow undefined
+        levelName       = levelName || '';
+        descriptorValue = descriptorValue || '';
+
+        var $rb = $(this.element),
+            opt = this.options;
+
+        // determine the new index
+        var nextIndex = $rb.find('th[data-sequencer-group=levels]').length;
+
+        // iterate all rows
+        $rb.find('tr').each(function () {
+            // locate the second-from-right-most cell, and replicate it
+
+            var $row = $(this);
+
+            var $cells = $row.children('td,th');
+
+            var $last = $cells.eq(-1);
+
+            // don't replicate, just extend the colspan
+            if ($last.attr('colspan')) {
+                $last.attr('colspan', parseInt($last.attr('colspan')) + 1);
+
+            } else {
+                var $td = $cells.eq(-2);
+
+                var $clone = $td.clone();
+
+                // start hidden away so we can all slide out together
+                var inputs = $clone.addClass(opt.hideHorizontalClass).find(opt.inputSelector);
+
+                // assign levelname by default
+                inputs.val(levelName);
+
+                // override to the value if this is a value field
+                inputs.filter('input.rb-value').val(descriptorValue);
+
+                // rename inputs to accommodate new level "identity"
+                inputs.each(function () {
+
+                    var split = this.name.split(/]\[/);
+
+                    // increment the level index in the name (second-last index)
+                    split[split.length - 2] = nextIndex;
+
+                    this.name = split.join('][');
+
+                });
+
+                $td.after($clone);
+
+            }
+
+        });
+
+        // aaand meaningful-transition out
+        $rb.find('td.' + opt.hideHorizontalClass + ', th.' + opt.hideHorizontalClass).removeClass(opt.hideHorizontalClass);
+
+        // focus on the newly-created level input
+        var $levels = $rb.children('thead').find('input[data-level]');
+        $levels.eq(-1).focus();
+
+        // permit up to 11 levels
+        if (opt.levelLimit > 0 && $levels.length >= opt.levelLimit) {
+            $(this).detach();
+        }
+
+        // refresh the sequencer
+        $rb.sequencer('refresh');
     };
 
 
