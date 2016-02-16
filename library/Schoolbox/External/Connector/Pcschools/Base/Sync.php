@@ -60,6 +60,14 @@ class Sync implements SyncInterface
      */
     public function findAllParents()
     {
+        $childSelect = "
+            S.STUDKEY       AS student_id,
+            S.CURRENT_YEAR  AS student_year_level,
+            S.CAMPUS        AS student_campus,
+            S.SEX           AS student_gender,
+            S.GIVEN_NAME    AS student_preferred,
+            S.LEGAL_SURNAME AS student_surname
+        ";
         $query = "
             SELECT
                 ''              AS student_contact_network_login,
@@ -68,12 +76,7 @@ class Sync implements SyncInterface
                 F.DAD_FIRSTNAME AS student_contact_preferred,
                 F.DAD_SURNAME   AS student_contact_surname,
                 F.DAD_EMAIL     AS student_contact_default_email,
-                S.STUDKEY       AS student_id,
-                S.CURRENT_YEAR  AS student_year_level,
-                S.CAMPUS        AS student_campus,
-                S.SEX           AS student_gender,
-                S.GIVEN_NAME    AS student_preferred,
-                S.LEGAL_SURNAME AS student_surname
+                $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
             WHERE S.DATE_DEPART IS NULL
@@ -88,16 +91,41 @@ class Sync implements SyncInterface
                 F.MUM_FIRSTNAME AS student_contact_preferred,
                 F.MUM_SURNAME   AS student_contact_surname,
                 F.MUM_EMAIL     AS student_contact_default_email,
-                S.STUDKEY       AS student_id,
-                S.CURRENT_YEAR  AS student_year_level,
-                S.CAMPUS        AS student_campus,
-                S.SEX           AS student_gender,
-                S.GIVEN_NAME    AS student_preferred,
-                S.LEGAL_SURNAME AS student_surname
+                $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
             WHERE S.DATE_DEPART IS NULL
             AND   F.MUM_DOMICILE = 'Y'
+
+            UNION ALL
+
+            SELECT
+                ''                AS student_contact_network_login,
+                F.FAMKEY + '-C'   AS student_contact_id,
+                ''                AS student_contact_title,
+                F.CGIVE_FIRSTNAME AS student_contact_preferred,
+                F.CGIVE_SURNAME   AS student_contact_surname,
+                F.CGIVE_EMAIL     AS student_contact_default_email,
+                $childSelect
+            FROM FAMILY F
+            INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
+            WHERE S.DATE_DEPART IS NULL
+            AND   F.CGIVE_DOMICILE = 'Y'
+
+            UNION ALL
+
+            SELECT
+                ''                AS student_contact_network_login,
+                F.FAMKEY + '-G'   AS student_contact_id,
+                ''                AS student_contact_title,
+                F.GUARD_FIRSTNAME AS student_contact_preferred,
+                F.GUARD_SURNAME   AS student_contact_surname,
+                F.GUARD_EMAIL     AS student_contact_default_email,
+                $childSelect
+            FROM FAMILY F
+            INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
+            WHERE S.DATE_DEPART IS NULL
+            AND   F.GUARD_DOMICILE = 'Y'
 
             ORDER BY student_contact_id ASC
         ";
