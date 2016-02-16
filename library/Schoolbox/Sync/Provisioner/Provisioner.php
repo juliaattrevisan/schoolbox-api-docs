@@ -167,7 +167,7 @@ class Provisioner
 
                     // Get the currently stored user
                     try {
-                        $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType, UserMapper::USERACCESS_GROUP_ONLY);
+                        $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
                         $commonContext['internalUserId'] = $internalUser->getId();
                         $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
                         $action = 'update';

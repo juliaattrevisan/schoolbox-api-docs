@@ -24,13 +24,11 @@ use Schoolbox\Permission\Access\UserAccessMapper;
  */
 class UserMapper extends Mapper
 {
-    const USERACCESS_GROUP_ONLY = 1;
-
     protected function mapping()
     {
 
         $this->hasTable('user');
-        $this->hasModel('\Schoolbox\User');
+        $this->hasPrototype(new User());
 
         $this->hasMap(
             array(
@@ -340,6 +338,20 @@ class UserMapper extends Mapper
     }
 
     /**
+     * All Permissions
+     *
+     * Get a list of all Role- and Group-level userAccess instances
+     * Default behaviour, just as it always was
+     *
+     * @param User $user
+     * @return mixed
+     */
+    protected function findAccessList(User $user)
+    {
+        return $this->getJoinMapper('userAccess')->findAllForUser($user);
+    }
+
+    /**
      * Find a user by their external id and come with roles, campus, etc
      *
      * @param int    $id
@@ -350,7 +362,7 @@ class UserMapper extends Mapper
      * @return User
      * @throws Mapper\Exception
      */
-    public function findByExternalId($id, $roleType = null, $permissions = null) {
+    public function findByExternalId($id, $roleType = null, $prototype = null) {
         $user = false;
         $roleMapper = new RoleMapper;
         $campusMapper = new CampusMapper;
@@ -386,23 +398,7 @@ class UserMapper extends Mapper
                 $user->setSuperUser($row['u.superuser'] == 1);
                 $user->setRole($roleMapper->hydrate($row, 'g'));
 
-                /** @var UserAccessMapper $uaMapper */
-                $uaMapper = $this->getJoinMapper('userAccess');
-
-                $accessList = new Collection();
-
-                /* All Permissions
-                 * Get a list of all Role- and Group-level userAccess instances
-                 * Default behaviour, just as it always was
-                 */
-                if ($permissions == null) {
-                    $accessList = $uaMapper->findAllForUser($user);
-                }
-                /* Group-based permissions only
-                 */
-                else if ($permissions = self::USERACCESS_GROUP_ONLY) {
-                    $accessList = $uaMapper->findAllGroupsForUser($user);
-                }
+                $accessList = $this->findAccessList($user);
 
                 $user->setAccessList($accessList);
             }
