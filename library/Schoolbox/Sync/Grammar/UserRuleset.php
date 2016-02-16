@@ -12,6 +12,7 @@ namespace Schoolbox\Sync\Grammar;
 
 use Schoolbox\CampusMapper;
 use Schoolbox\User;
+use Schoolbox\Mapper;
 
 /**
  * Class UserRuleset
@@ -50,4 +51,25 @@ class UserRuleset extends Ruleset
         parent::applyModelPropertyValue($user, $property, $value);
     }
 
+    /**
+     * Abstractify this check so subclasses can wrangle
+     *
+     * @param $property
+     * @return bool
+     */
+    protected function isCollection($property)
+    {
+        $map = $this->mapper->getMap();
+        $mapping = $map->getOffset($property);
+
+        if (in_array($property, ['userAccessRead', 'userAccessWrite'])) {
+            return true;
+        }
+
+        if ($mapping['type'] == Mapper::TYPE_COLLECTION) {
+            return true;
+        }
+
+        return false;
+    }
 } 
