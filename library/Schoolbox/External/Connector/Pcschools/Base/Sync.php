@@ -153,7 +153,7 @@ class Sync implements SyncInterface
                 ''               AS staff_category,
                 ''               AS staff_department
             FROM TEACHER T
-            WHERE DATEDIFF(DAY, T.DATE_LEFT, '1753-01-01') = 0
+            WHERE (T.DATE_LEFT IS NULL OR DATEDIFF(DAY, T.DATE_LEFT, '1753-01-01') = 0)
             ORDER BY T.TEACHER_CODE ASC
         ";
         return new Iterator\Staff($this->database->getIterator($query));
