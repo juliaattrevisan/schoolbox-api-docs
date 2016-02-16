@@ -25,7 +25,7 @@ $this->setBlock('criteria_allowed', 'crit_group', 'crit_group_block');
 $this->setBlock('crit_group', 'criterion', 'criterion_block');
 $this->setBlock('criterion', 'crit_input', 'crit_input_block');
 
-$this->setBlock('marktype', 'resultset', 'resultset_block');
+$this->setBlock(TEMPLATE_content, 'resultset', 'resultset_block');
 $this->setBlock('resultset', 'result', 'result_block');
 $this->setBlock('marktype', 'des_count', 'des_count_block');
 $this->setBlock('marktype', 'existing_marks_warning', 'existing_marks_warning_block');
@@ -259,6 +259,11 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
     }
 
     try {
+
+        $resultCount = 2;
+        $resultSetID = 0;
+
+
         if ($submission->isRubric()) {
             // We're using rubric? Check the rubric checkbox? Check.
             $this->setVar('USE_RUBRIC_CHECKED', 'checked="checked"');
@@ -270,7 +275,11 @@ if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
             if ($rubricHandler->marksAlreadyGiven($submission->getId())) {
                 $this->parse('existing_marks_warning_block', 'existing_marks_warning');
             }
+
+            $resultSetID = $submission->getRubricResultSet();
         }
+
+        outputResultSets($this, $resultSetID, $resultCount);
 
         $map = Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper::getInstance();
 
@@ -416,3 +425,43 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => 'active',
     ]
 ]);
+
+/**
+ * @param SitePage  $page
+ * @param int       $checkedIndex
+ * @param int       $descriptorCount
+ */
+function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount = 2)
+{
+    $rubricHandler = new DueWork_Rubric_Handler();
+    $rs            = $rubricHandler->getResultSets();
+
+    $page->setVar('resultset_block', '');
+
+    if (count($rs)) {
+        foreach ($rs as $i => $set) {
+            $page->setVar('result_block', '');
+            $j = 1;
+            foreach ($set as $item) {
+                $page->setVar(
+                    array(
+                        'RS_ID'           => $i,
+                        'RS_RESULT_LABEL' => $item,
+                        'RS_RESULT_COMMA' => ($j++) < count($set) ? ', ' : '',
+                        'RS_CHECKED'      => $i == $checkedIndex ? 'checked="checked"' : ''
+                    )
+                );
+                $page->parse('result_block', 'result', true);
+            }
+            $page->parse('resultset_block', 'resultset', true);
+        }
+    }
+
+    // Output descriptor count drop down from 2-11.
+    $desCounts = array();
+    for ($i = 2; $i <= 11; ++$i) {
+        $desCounts[] = array('value' => $i);
+    }
+
+    $page->setVar('RS_0_CHECKED', $checkedIndex == 0 ? 'checked="checked"' : '');
+}
