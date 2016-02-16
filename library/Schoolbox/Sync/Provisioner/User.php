@@ -12,9 +12,17 @@ namespace Schoolbox\Sync\Provisioner;
 
 use Schoolbox\User as SchoolboxUser;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 class User extends SchoolboxUser
 {
+    /**
+     * A list of UserAccess instances to remove for this
+     * particular user instance
+     *
+     * @var array
+     */
+    protected $accessRemoveList = [];
 
     /**
      * Get user access read
@@ -56,6 +64,34 @@ class User extends SchoolboxUser
     public function setUserAccessWrite($userAccessWrite)
     {
         $this->setAccessLevel($userAccessWrite, UserAccess::ACCESS_WRITE);
+    }
+
+    /**
+     * Get user access remove
+     *
+     * TODO: This isn't actually used much, I don't think...
+     *
+     * @return mixed
+     */
+    public function getUserAccessRemove()
+    {
+        return $this->accessRemoveList;
+    }
+
+    /**
+     * Remove selected UserAccess instances
+     *
+     * @param $userAccessRemove
+     */
+    public function setUserAccessRemove($userAccessRemove)
+    {
+        $userAccessMapper = new UserAccessMapper();
+
+        foreach ($this->getAccessList() as $current) {
+            if (in_array($current->getServiceIdentifier(), $userAccessRemove)) {
+                $userAccessMapper->delete($current);
+            }
+        }
     }
 
     /**
