@@ -91,7 +91,9 @@ class Factory {
     private $lookup = null;
 
     /**
-     * Constructor
+     * Factory constructor.
+     *
+     * @param $roleType
      */
     public function __construct($roleType) {
         $this->setLookup(new Lookup());
@@ -103,6 +105,8 @@ class Factory {
     /**
      * Figure out what each desired field's type is, via the UserMapper
      * Also compile human-readable versions of the field
+     *
+     * @return array
      */
     private function generateAllFields() {
         $allFields = [];
@@ -253,23 +257,6 @@ class Factory {
     }
 
     /**
-     * Gets the key/value representation of $allFields
-     *
-     * @return array
-     */
-    public function getAllFieldsKeyValue() {
-        $allFields = $this->getAllFields();
-
-        $stack = [];
-
-        foreach ($allFields as $key => $data) {
-            $stack[$key] = $data['label'];
-        }
-
-        return $stack;
-    }
-
-    /**
      * Determine whether the current field is a Lookup
      *
      * @param $field
@@ -295,6 +282,23 @@ class Factory {
         }
 
         return false;
+    }
+
+    /**
+     * Gets the key/value representation of $allFields
+     *
+     * @return array
+     */
+    public function getAllFieldsKeyValue() {
+        $allFields = $this->getAllFields();
+
+        $stack = [];
+
+        foreach ($allFields as $key => $data) {
+            $stack[$key] = $data['label'];
+        }
+
+        return $stack;
     }
 
     /* Getters/Setters
@@ -373,6 +377,4 @@ class Factory {
     {
         return $this->roleType;
     }
-
-
 }
