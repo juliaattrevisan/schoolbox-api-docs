@@ -714,6 +714,26 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
     public function getByID($id)
     {
+        /* $id of zero is always the shadow root node, which resolves to the base URI
+           This means if the user has no access to the root of the webdav server '/'
+           it will fail with a 403 error, even if they can access all the defined shares.
+           Instead send fake data for the "/" root node.
+        */
+        if($id == "0") {
+            $temp = array(
+                'id' => $id,
+                'parent' => false,
+                'path' => $_SESSION['portfolioIdPathMap'][$id],
+                'name' => '',
+                'description' => '',
+                'type' => 'dir',
+                'file_size' => '',
+                'submitted' => '',
+                'ctime' => '',
+                'owner' => $_SESSION['id'],
+            );
+            return $temp;
+        }
         try {
             $response = $this->client->propFind($_SESSION['portfolioIdPathMap'][$id], array(
                 '{DAV:}getcontentlength',
