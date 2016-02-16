@@ -49,6 +49,7 @@ class Factory {
         'role' => 'Role',
         'userAccessRead' => 'Groups (Read)',
         'userAccessWrite' => 'Groups (Write)',
+        'userAccessRemove' => 'Groups (Remove)',
 
         'altEmail' => 'Alt Email Address',
 
@@ -74,6 +75,7 @@ class Factory {
     private $allAjaxUrls = [
         'userAccessRead' => 'groups',
         'userAccessWrite' => 'groups',
+        'userAccessRemove' => 'groups',
         'campusCollection' => 'campus',
     ];
 
@@ -186,7 +188,7 @@ class Factory {
          * userAccessRead and Write aren't found in UserMapper explicitly,
          * we've made that up; we need to assign a key/value pair accordingly
          */
-        $allSpecialCases = ['userAccessRead', 'userAccessWrite'];
+        $allSpecialCases = ['userAccessRead', 'userAccessWrite', 'userAccessRemove'];
 
         foreach ($allSpecialCases as $currentSpecialCase) {
             $allFields[$currentSpecialCase] = [

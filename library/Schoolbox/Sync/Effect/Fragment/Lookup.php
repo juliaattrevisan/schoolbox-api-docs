@@ -31,6 +31,7 @@ class Lookup {
         'campusCollection' => '\Schoolbox\CampusMapper',
         'userAccessRead' => '\Schoolbox\Resource\GroupMapper',
         'userAccessWrite' => '\Schoolbox\Resource\GroupMapper',
+        'userAccessRemove' => '\Schoolbox\Resource\GroupMapper',
     ];
 
     /**
@@ -60,7 +61,7 @@ class Lookup {
                 /* Special case for userAccess* options, which need folder selection
                  * in the ui
                  */
-                else if (in_array($userField, ['userAccessRead', 'userAccessWrite'])) {
+                else if (in_array($userField, ['userAccessRead', 'userAccessWrite', 'userAccessRemove'])) {
                     $allResults = $mapper->findFolders();
                 }
                 else {

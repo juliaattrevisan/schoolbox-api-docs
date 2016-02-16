@@ -62,7 +62,7 @@ class UserRuleset extends Ruleset
         $map = $this->mapper->getMap();
         $mapping = $map->getOffset($property);
 
-        if (in_array($property, ['userAccessRead', 'userAccessWrite'])) {
+        if (in_array($property, ['userAccessRead', 'userAccessWrite', 'userAccessRemove'])) {
             return true;
         }
 
