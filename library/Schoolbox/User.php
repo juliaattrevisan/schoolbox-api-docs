@@ -184,6 +184,19 @@ class User implements JsonSerializable
      */
     protected $config_loader;
 
+    /**
+     * A list of groups to which this user has Read access
+     *
+     * @var
+     */
+    protected $userAccessRead;
+
+    /**
+     * A list of groups to which this user has Write access
+     *
+     * @var
+     */
+    protected $userAccessWrite;
 
     /**
      * Build default empty objects so things don't explode
@@ -1111,5 +1124,62 @@ class User implements JsonSerializable
         return $this->linkedUser;
     }
 
+    /**
+     * Get user access read
+     * A list of Groups to which this user has Read access
+     *
+     * @return array
+     */
+    public function getUserAccessRead()
+    {
+        echo (gettype($this->accessList));
+        return $this->accessList->filterBy('accessLevel', UserAccess::ACCESS_READ)->getColumnValues('serviceIdentifier');
+    }
 
+    /**
+     * Set user access read
+     *
+     * @param array $userAccessRead
+     */
+    public function setUserAccessRead($userAccessRead)
+    {
+        $this->setAccessLevel($userAccessRead, UserAccess::ACCESS_READ);
+    }
+
+    /**
+     * Get user access write
+     * A list of Groups to which this user has Write access
+     *
+     * @return array
+     */
+    public function getUserAccessWrite()
+    {
+        echo (gettype($this->accessList));
+        return $this->accessList->filterBy('accessLevel', UserAccess::ACCESS_WRITE)->getColumnValues('serviceIdentifier');
+    }
+
+    /**
+     * Set user access write
+     *
+     * @param array $userAccessWrite
+     */
+    public function setUserAccessWrite($userAccessWrite)
+    {
+        $this->setAccessLevel($userAccessWrite, UserAccess::ACCESS_WRITE);
+    }
+
+    /**
+     * Set $identifiers to access level $level in $accessList collection
+     *
+     * @param $identifiers
+     * @param $level
+     */
+    private function setAccessLevel($identifiers, $level)
+    {
+        foreach ($this->getAccessList() as $current) {
+            if (in_array($current->getServiceIdentifier(), $identifiers)) {
+                $current->setAccessLevel($level);
+            }
+        }
+    }
 }
