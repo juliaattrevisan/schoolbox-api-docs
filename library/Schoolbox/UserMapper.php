@@ -24,6 +24,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
  */
 class UserMapper extends Mapper
 {
+    const USERACCESS_GROUP_ONLY = 1;
 
     protected function mapping()
     {
@@ -344,10 +345,12 @@ class UserMapper extends Mapper
      * @param int    $id
      * @param string $roleType If provided, restrict to this role type.
      *                         One of `Role::STAFF`, `Role::STUDENT`, `Role::PARENT`, `Role::GUEST`
+     * @param int    $permissions If specified, limit the kind of permissions (userAccess) instances
+     *                         spawned and hydrated (used to separate Role and Group userAccess instances)
      * @return User
      * @throws Mapper\Exception
      */
-    public function findByExternalId($id, $roleType = null) {
+    public function findByExternalId($id, $roleType = null, $permissions = null) {
         $user = false;
         $roleMapper = new RoleMapper;
         $campusMapper = new CampusMapper;
@@ -385,7 +388,23 @@ class UserMapper extends Mapper
 
                 /** @var UserAccessMapper $uaMapper */
                 $uaMapper = $this->getJoinMapper('userAccess');
-                $user->setAccessList($uaMapper->findAllForUser($user));
+
+                $accessList = new Collection();
+
+                /* All Permissions
+                 * Get a list of all Role- and Group-level userAccess instances
+                 * Default behaviour, just as it always was
+                 */
+                if ($permissions == null) {
+                    $accessList = $uaMapper->findAllForUser($user);
+                }
+                /* Group-based permissions only
+                 */
+                else if ($permissions = self::USERACCESS_GROUP_ONLY) {
+                    $accessList = $uaMapper->findAllGroupsForUser($user);
+                }
+
+                $user->setAccessList($accessList);
             }
 
             $campus = $campusMapper->hydrate($row, 'c');

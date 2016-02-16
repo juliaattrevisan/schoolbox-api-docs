@@ -22,6 +22,7 @@ use Schoolbox\Sync\Ruleset;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
+use Schoolbox\Collection;
 
 /**
  * The User Provisioning System.
@@ -166,7 +167,7 @@ class Provisioner
 
                     // Get the currently stored user
                     try {
-                        $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
+                        $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType, UserMapper::USERACCESS_GROUP_ONLY);
                         $commonContext['internalUserId'] = $internalUser->getId();
                         $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
                         $action = 'update';
@@ -175,8 +176,13 @@ class Provisioner
                         $internalUser = $this->userMapper->createModel();
                         $this->logger->debug("No existing user to retrieve: new user", $commonContext);
                         $action = 'create';
-
                     }
+
+                    /* Deliberately empty $accessList so that Role-based
+                     * permissions don't get saved in addition to the Group
+                     * permissions tha we can set
+                     */
+                    $internalUser->setAccessList(new Collection());
 
                     $commonContext['action'] = $action;
 
