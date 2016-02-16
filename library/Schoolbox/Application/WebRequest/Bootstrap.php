@@ -463,7 +463,7 @@ class Bootstrap implements BootstrapInterface {
 						\Schoolbox\Sync\Grammar\Factory::class,
 						[
 							'log'        => $di->lazyGet('ups.logger'),
-							'userMapper' => $di->lazyNew(\Schoolbox\UserMapper::class),
+							'userMapper' => $di->lazyNew(\Schoolbox\Sync\Provisioner\UserMapper::class),
 							'ruleMapper' => $di->lazyNew(\Schoolbox\Sync\Rule\Mapper::class),
 						]
 					),
@@ -471,7 +471,7 @@ class Bootstrap implements BootstrapInterface {
 						$source = new \Schoolbox\External\Connector\SyncFactory();
 						return $source->build();
 					}),
-					'userMapper'     => $di->lazyNew(\Schoolbox\UserMapper::class),
+					'userMapper'     => $di->lazyNew(\Schoolbox\Sync\Provisioner\UserMapper::class),
 					'logger'         => $di->lazyGet('ups.logger'),
 					'logMapper'      => $di->lazyNew(\Schoolbox\Sync\Log\Mapper::class),
 				]

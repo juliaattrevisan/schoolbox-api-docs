@@ -11,6 +11,7 @@
 namespace Schoolbox\Sync\Provisioner;
 
 use Schoolbox\User as SchoolboxUser;
+use Schoolbox\Permission\Access\UserAccess;
 
 class User extends SchoolboxUser
 {
