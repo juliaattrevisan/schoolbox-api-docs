@@ -23,14 +23,17 @@
  * @param Assess_Section  $sectionHandler
  * @param array           $currentAttempt
  * @param SitePage        $page
- * @param array           $currentStudent
- * @param array           $previousAttempt
  * @param bool            $readonly
- *
- * @return void
  */
-function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent, $previousAttempt, $readonly)
-{
+function processAttempt(
+    $assessHandler,
+    $attemptHandler,
+    $responseHandler,
+    $sectionHandler,
+    $currentAttempt,
+    $page,
+    $readonly
+) {
     $firstSection = $sectionHandler->getFirst($page->arg[0]);
 
     // The total available marks for this attempt
@@ -109,35 +112,19 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
         $page->parse('submitted_block', 'submitted');
     }
     else {
-        $finish = $responseHandler->getLastSave($currentAttempt['attempt_id']);
+        // If the student hasn't finished the quiz I don't see why you'd ever show a finish time.
+        $attemptStartDate = new Alaress_Date_Format($currentAttempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
+        $timeTaken        = $assessHandler->sec2hms($attemptStartDate->diffInSeconds(Alaress_Date_Format::now()));
+        $page->setVar(array(
+            'ATTEMPT_TIME_TAKEN' => $timeTaken,
+            'ATTEMPT_FINISH' => '<div>Incomplete</div>',
+            'ATTEMPT_NOT_FINISH' => '',
+            'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
+            'submitted_block' => '',
+            'has_marks_block' => '',
+        ));
 
-        if (empty($finish)) {
-            // Has the end time of the quiz passed? If so, say they finished at that time.
-
-            $page->setVar(array(
-                'ATTEMPT_FINISH' => '<div>Incomplete</div>',
-                'ATTEMPT_NOT_FINISH' => '',
-                'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
-                'submitted_block' => '',
-                'has_marks_block' => '',
-            ));
-
-            $page->parse('unsubmitted_block', 'unsubmitted');
-        }
-        else {
-            $attemptFinishDate = new Alaress_Date_Format($finish, Alaress_Date_Format::DATABASE_FORMAT);
-            $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
-
-            $page->setVar(array(
-                'ATTEMPT_TIME_TAKEN' => $timeTaken,
-                'ATTEMPT_FINISH' =>$attemptFinishDate->getShort(),
-                'ATTEMPT_NOT_FINISH' => '',
-                'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
-                'unsubmitted_block' => ''
-            ));
-
-            $page->parse('submitted_block', 'submitted');
-        }
+        $page->parse('unsubmitted_block', 'unsubmitted');
     }
 
     if ($reviewedAt) {
@@ -325,8 +312,6 @@ if (is_array($allStudents) && count($allStudents)) {
      /* Process each student
       */
     foreach ($allStudents as $currentStudent) {
-        $previousAttempt = null;
-
         // need to append uid if synergetic
         if ($currentStudent['synergy_id'] && !$currentStudent['uid']) {
             $user = $userHandler->getBySynergy($currentStudent['synergy_id']);
@@ -344,15 +329,16 @@ if (is_array($allStudents) && count($allStudents)) {
                 if ($currentAttempt['user_id'] == $currentStudent['uid'] || $currentAttempt['synergy_id'] == $currentStudent['synergy_id']) {
                     if ($allAttempts[$i]['processed'] != true) {
                         processAttempt(
-                            $assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this,
-                            $currentStudent, $previousAttempt, $readonly
+                            $assessHandler,
+                            $attemptHandler,
+                            $responseHandler,
+                            $sectionHandler,
+                            $currentAttempt,
+                            $this,
+                            $readonly
                         );
-
                         $allAttempts[$i]['processed'] = true;
-
                         $numAttempts++;
-
-                        $previousAttempt = $currentAttempt;
                     }
                 }
             }
@@ -427,16 +413,17 @@ if (is_array($allStudents) && count($allStudents)) {
 /* Deal with remainder attempts
  */
 if ($allAttempts && count($allAttempts)) {
-    $previousAttempt = null;
-
     foreach ($allAttempts as $currentAttempt) {
         if ($currentAttempt['processed'] != true) {
             processAttempt(
-                $assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this,
-                $userHandler->getByID($currentAttempt['user_id']), $previousAttempt, $readonly
+                $assessHandler,
+                $attemptHandler,
+                $responseHandler,
+                $sectionHandler,
+                $currentAttempt,
+                $this,
+                $readonly
             );
-
-            $previousAttempt = $currentAttempt;
         }
     }
 }
