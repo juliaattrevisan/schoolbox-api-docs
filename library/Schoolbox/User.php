@@ -207,6 +207,7 @@ class User implements JsonSerializable
         $this->setConfigLoader(new ConfigLoader());
         $this->setLinkedUser(new Collection(array()));
         $this->setRole(new Role());
+        $this->setAccessList(new Collection());
     }
 
     /**
@@ -1132,7 +1133,6 @@ class User implements JsonSerializable
      */
     public function getUserAccessRead()
     {
-        echo (gettype($this->accessList));
         return $this->accessList->filterBy('accessLevel', UserAccess::ACCESS_READ)->getColumnValues('serviceIdentifier');
     }
 
@@ -1154,7 +1154,6 @@ class User implements JsonSerializable
      */
     public function getUserAccessWrite()
     {
-        echo (gettype($this->accessList));
         return $this->accessList->filterBy('accessLevel', UserAccess::ACCESS_WRITE)->getColumnValues('serviceIdentifier');
     }
 
