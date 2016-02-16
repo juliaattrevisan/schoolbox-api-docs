@@ -35,19 +35,19 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT
-                s.code        AS student_id,
+                s.Code        AS student_id,
                 ''            AS network_login,
-                s.Title       AS student_title,
+                ''            AS student_title,
                 s.FirstName   AS student_preferred,
                 s.LastName    AS student_surname,
-                ''            AS student_gender,
-                ''            AS student_email,
+                s.Sex         AS student_gender,
+                s.Email       AS student_email,
                 ''            AS student_occup_email,
                 s.Year        AS student_year_level,
                 s.House       AS student_house,
                 ''            AS student_boarder,
                 s.BoarderType AS student_boarding_house,
-                ''            AS student_campus
+                s.CampusID    AS student_campus
             FROM Student s
             WHERE s.DateLeft IS NULL
             ORDER BY s.Code ASC
