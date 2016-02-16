@@ -268,6 +268,8 @@ class UserMapper extends Mapper
 
             return true;
         });
+
+        $this->registerCallback('postSave', array($this, 'postSave'));
     }
 
 
@@ -585,5 +587,19 @@ class UserMapper extends Mapper
         ";
         $statement = $this->getDatabase()->prepare($query);
         return $statement->execute(['id' => $user->getId(), 'password' => $password,]);
+    }
+
+    /**
+     * Save an updated list of UserAccess instances
+     *
+     * @param $user
+     */
+    public function postSave($user)
+    {
+        $userAccessMapper = new UserAccessMapper();
+
+        foreach ($user->getAccessList() as $current) {
+            $userAccessMapper->save($current);
+        }
     }
 }

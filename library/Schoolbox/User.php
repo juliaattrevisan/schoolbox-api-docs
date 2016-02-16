@@ -1175,9 +1175,31 @@ class User implements JsonSerializable
      */
     private function setAccessLevel($identifiers, $level)
     {
+        $found = [];
+
+        /* Update existing userAccess instance
+         */
         foreach ($this->getAccessList() as $current) {
             if (in_array($current->getServiceIdentifier(), $identifiers)) {
                 $current->setAccessLevel($level);
+
+                $found[] = $current->getServiceIdentifier();
+            }
+        }
+
+        /* If the userAccess instance didn't exist, create it
+         */
+        $diff = array_diff($identifiers, $found);
+
+        if (count($diff)) {
+            foreach ($diff as $current) {
+                $userAccess = new UserAccess();
+                $userAccess->setUser($this);
+                $userAccess->setService(HOMEPAGE_SERVICE);
+                $userAccess->setServiceIdentifier($current);
+                $userAccess->setAccessLevel($level);
+
+                $this->accessList->add($userAccess);
             }
         }
     }
