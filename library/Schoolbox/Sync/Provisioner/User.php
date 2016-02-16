@@ -13,6 +13,7 @@ namespace Schoolbox\Sync\Provisioner;
 use Schoolbox\User as SchoolboxUser;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Collection;
 
 class User extends SchoolboxUser
 {
@@ -114,8 +115,28 @@ class User extends SchoolboxUser
          * to ensure that what you remove applies to all other Groups (Read/Write)
          * effects in this rule
          */
-        foreach ($userAccessRemove as $current) {
+
+        $trimmedAccessList = new Collection();
+
+        foreach ($this->getAccessList() as $currentAccessExists) {
+            $found = false;
+
+            foreach ($userAccessRemove as $currentAccessRemove) {
+                if ($currentAccessExists->getServiceIdentifier() == $currentAccessRemove) {
+                    $found = true;
+                }
+            }
+
+            /* Keep it, if it's not supposed to be removed
+             */
+            if (!$found) {
+                $trimmedAccessList->add($currentAccessExists);
+            }
         }
+
+        /* Square it away
+         */
+        $this->setAccessList($trimmedAccessList);
     }
 
     /**
