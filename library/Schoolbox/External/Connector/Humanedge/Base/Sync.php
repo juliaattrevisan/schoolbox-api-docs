@@ -94,21 +94,25 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT
-                t.Code        AS staff_id,
-                ''            AS network_login,
-                t.Active      AS active_flag,
-                t.Title       AS staff_title,
-                t.FirstName   AS staff_preferred_name,
-                t.LastName    AS staff_surname,
-                ''            AS default_email_code,
-                ''            AS occup_email,
-                ''            AS staff_campus,
-                ''            AS staff_category_type,
-                ''            AS staff_category,
-                ''            AS staff_department
+                t.Code      AS staff_id,
+                ''          AS network_login,
+                t.Active    AS active_flag,
+                t.Title     AS staff_title,
+                t.FirstName AS staff_preferred_name,
+                t.LastName  AS staff_surname,
+                ''          AS default_email_code,
+                t.Email     AS occup_email,
+                t.CampusID  AS staff_campus,
+                CASE WHEN t.IsTeachingStaff = 'Y'
+                    THEN 'Teaching'
+                    ELSE 'Non-Teaching'
+                END         AS staff_category_type,
+                t.Position  AS staff_category,
+                ''          AS staff_department
             FROM Staff t
             WHERE t.DateLeft IS NULL
-            ORDER BY s.Code ASC
+            AND   t.Active = 'Y'
+            ORDER BY t.Code ASC
         ";
         return new Iterator\Staff($this->database->getIterator($query));
     }
