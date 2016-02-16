@@ -49,7 +49,7 @@ class Sync implements SyncInterface
                 ''              AS student_boarding_house,
                 S.CAMPUS        AS student_campus
             FROM STUDENT S
-            WHERE S.DATE_DEPART IS NULL
+            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
             ORDER BY S.STUDKEY ASC
         ";
         return new Iterator\Student($this->database->getIterator($query));
@@ -79,7 +79,7 @@ class Sync implements SyncInterface
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE S.DATE_DEPART IS NULL
+            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
             AND   F.DAD_DOMICILE = 'Y'
 
             UNION ALL
@@ -94,7 +94,7 @@ class Sync implements SyncInterface
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE S.DATE_DEPART IS NULL
+            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
             AND   F.MUM_DOMICILE = 'Y'
 
             UNION ALL
@@ -109,7 +109,7 @@ class Sync implements SyncInterface
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE S.DATE_DEPART IS NULL
+            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
             AND   F.CGIVE_DOMICILE = 'Y'
 
             UNION ALL
@@ -124,7 +124,7 @@ class Sync implements SyncInterface
                 $childSelect
             FROM FAMILY F
             INNER JOIN STUDENT S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE S.DATE_DEPART IS NULL
+            WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
             AND   F.GUARD_DOMICILE = 'Y'
 
             ORDER BY student_contact_id ASC
