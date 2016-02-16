@@ -47,7 +47,8 @@ class Factory {
         'year' => 'Year Level',
 
         'role' => 'Role',
-        'userAccess' => 'Groups',
+        'userAccessRead' => 'Groups (Read)',
+        'userAccessWrite' => 'Groups (Write)',
 
         'altEmail' => 'Alt Email Address',
 
@@ -71,8 +72,9 @@ class Factory {
      * @var array
      */
     private $allAjaxUrls = [
-        'userAccess' => 'groups',
-        'campusCollection' => 'campus'
+        'userAccessRead' => 'groups',
+        'userAccessWrite' => 'groups',
+        'campusCollection' => 'campus',
     ];
 
     /**
@@ -114,10 +116,11 @@ class Factory {
         $mapper = new UserMapper();
         $allMaps = $mapper->getMap();
         $allJoins = $mapper->getJoin();
+        $allFieldKeys = $this->getAllFieldKeys();
 
         /* Get the associative array of fields
          */
-        foreach ($this->getAllFieldKeys() as $key => $label) {
+        foreach ($allFieldKeys as $key => $label) {
             $currentMap = $allMaps->getOffset($key);
 
             /* Condense types
@@ -175,6 +178,21 @@ class Factory {
 
                     break;
             }
+        }
+
+        /* Special cases
+         * These need special treatment/representation
+         *
+         * userAccessRead and Write aren't found in UserMapper explicitly,
+         * we've made that up; we need to assign a key/value pair accordingly
+         */
+        $allSpecialCases = ['userAccessRead', 'userAccessWrite'];
+
+        foreach ($allSpecialCases as $currentSpecialCase) {
+            $allFields[$currentSpecialCase] = [
+                'type'  => self::TYPE_COLLECTION,
+                'label' => $allFieldKeys[$currentSpecialCase]
+            ];
         }
 
         return $allFields;
