@@ -57,13 +57,27 @@ class External_Maze_Class implements External_ClassInterface {
 			LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
 			LEFT JOIN ST ON STMA.SKEY = ST.STKEY
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
-			WHERE SU.SUKEY = '{$ingredients['ClassCode']}'
-			AND STMA.CLASS = '{$ingredients['ClassNumber']}'
+			WHERE ";
+
+		/* Accommodate multiple classcodes specifically
+		 */
+		$additional = [];
+
+		for ($i = 0; $i < count($ingredients['ClassCode']); $i++) {
+			$additional[] = "(SU.SUKEY = {$ingredients['ClassCode'][$i]} AND STMA.CLASS = {$ingredients['ClassNumber'][$i]})";
+		}
+
+		$query .= '(' . implode(' OR ', $additional) . ')';
+
+		/* Continue as normal
+		 */
+		$query .= "
 			AND TTPERIOD = '{$ttPeriod}'
 			AND ST.STATUS != 'LEFT'
 		";
 
 		$part1 = $this->getDb()->getAll($query);
+		$allClassCodes = implode(',', $ingredients['ClassCode']);
 
 		if (!$part1) {
 			$part1 = array();
@@ -82,7 +96,7 @@ class External_Maze_Class implements External_ClassInterface {
 			FROM ST
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
 			LEFT JOIN KGH ON ST.HOUSE = KGH.HOUSE
-			WHERE KGC.ROLL_GROUP = '{$classCode}'
+			WHERE KGC.ROLL_GROUP IN ({$allClassCodes})
 			AND ST.STATUS != 'LEFT'
 		";
 
@@ -138,12 +152,22 @@ class External_Maze_Class implements External_ClassInterface {
 				'' AS T3TEACH
 			FROM TT
 			LEFT JOIN TTTG ON TT.TTKEY = TTTG.GKEY
-			WHERE TT.TTPERIOD = '{$ttPeriod}'
-			AND TTTG.SUBJ = '{$ingredients['ClassCode']}'
-			AND CLASS = '{$ingredients['ClassNumber']}'
-		";
+			WHERE TT.TTPERIOD = '{$ttPeriod}' AND ";
 
+		/* Accommodate multiple classcodes specifically
+ 		 */
+		$additional = [];
+
+		for ($i = 0; $i < count($ingredients['ClassCode']); $i++) {
+			$additional[] = "(TTTG.SUBJ = {$ingredients['ClassCode'][$i]} AND CLASS = {$ingredients['ClassNumber'][$i]})";
+		}
+
+		$query .= '(' . implode(' OR ', $additional) . ')';
+
+		/* Continue as normal
+		 */
 		$part1 = $this->getDb()->getAll($query);
+		$allClassCodes = implode(',', $ingredients['ClassCode']);
 
 		if (!$part1) {
 			$part1 = array();
@@ -155,7 +179,7 @@ class External_Maze_Class implements External_ClassInterface {
 				'' AS T2TEACH,
 				'' AS T3TEACH
 			FROM KGC
-			WHERE KGC.ROLL_GROUP = '{$classCode}'
+			WHERE KGC.ROLL_GROUP IN ({$allClassCodes})
 			";
 
 		$part2 = $this->getDb()->getAll($query);
