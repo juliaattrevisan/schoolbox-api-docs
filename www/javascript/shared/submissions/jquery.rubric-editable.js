@@ -387,6 +387,31 @@
         return true;
     };
 
+    /**
+     * Replace the existing levels and descriptors with the array given
+     *
+     * @param {Array} options
+     */
+    RubricEditable.prototype.applyResultSet = function (options) {
+        var rubricEditable = this;
+
+        // delete all but one
+        try {
+            for (var i = 0; i < (this.options.levelLimit || 100); ++i) {
+                this.deleteLevel(0);
+            }
+        } catch (e) {
+            // finished; noop
+        }
+
+        $.each(options, function (levelValue, levelName) {
+            rubricEditable.addLevel(levelName, levelValue);
+        });
+
+        // and finally delete the first (now unneeded) level
+        this.deleteLevel(0);
+    };
+
 
     $.fn[pluginName] = function (options) {
         return this.each(function () {
