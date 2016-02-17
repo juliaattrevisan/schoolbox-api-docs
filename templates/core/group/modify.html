@@ -236,12 +236,14 @@ $(document).ready(function() {
 
                     <!-- END msg_enabled_followth -->
                     <ul class="information-list">
-                        <li class="actions">
-                            <div class="small-1 columns no-pad">
-                                <input data-toggle-all id="delete-all" name="delete-all" type="checkbox" value="1">
-                                <label for="delete-all" class="checkbox-label"></label>
-                            </div>
-                        </li>
+                        <!-- BEGIN hide_no_members -->
+                            <li class="actions">
+                                <div class="small-1 columns no-pad">
+                                    <input data-toggle-all id="delete-all" name="delete-all" type="checkbox" value="1">
+                                    <label for="delete-all" class="checkbox-label"></label>
+                                </div>
+                            </li>
+                        <!-- END hide_no_members -->
                         <!-- BEGIN groupOwner -->
                         <li class="actions" data-relation="member">
                             <div class="small-1 columns no-pad">
