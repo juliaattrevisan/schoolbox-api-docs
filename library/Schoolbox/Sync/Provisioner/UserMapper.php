@@ -12,6 +12,7 @@ namespace Schoolbox\Sync\Provisioner;
 
 use Schoolbox\UserMapper as SchoolboxMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\ConfigLoader;
 
 class UserMapper extends SchoolboxMapper
 {
@@ -45,10 +46,14 @@ class UserMapper extends SchoolboxMapper
      */
     public function postSave($user)
     {
-        $userAccessMapper = new UserAccessMapper();
+        $config = new ConfigLoader();
 
-        foreach ($user->getAccessList() as $current) {
-            $userAccessMapper->save($current);
+        if ($config->get('ups_groups_enabled')) {
+            $userAccessMapper = new UserAccessMapper();
+
+            foreach ($user->getAccessList() as $current) {
+                $userAccessMapper->save($current);
+            }
         }
     }
 }

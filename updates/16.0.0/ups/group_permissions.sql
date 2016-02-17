@@ -1,0 +1,1 @@
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('ups_groups_enabled', '0', 'UPS Group Permissions Enabled', 'If set, enables Groups Permissions to be assigned in UPS Rules.', '3', '11', 'true');

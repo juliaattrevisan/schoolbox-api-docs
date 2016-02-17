@@ -86,57 +86,61 @@ class User extends SchoolboxUser
      */
     public function setUserAccessRemove($userAccessRemove)
     {
-        $userAccessMapper = new UserAccessMapper();
-
-        /* Get a list of all the UserAccess instances for this User
+        /* Modify accessList only when ups_groups_enabled is actually enabled
+         * Otherwise leave it unchanged from whatever it was
          */
-        $allUserAccess = $userAccessMapper->findAllGroupsForUser($this);
+        if ($this->getConfigLoader()->get('ups_groups_enabled')) {
+            $userAccessMapper = new UserAccessMapper();
 
-        /* Search $allUserAccess for anything that should be deleted
-         * If found, delete it from the db if it was already there
-         * These are spawned from a previous Rule.
-         */
-        foreach ($userAccessRemove as $current) {
-            $found = $allUserAccess->getBy('serviceIdentifier', $current);
-
-            /* Do not blow away Owners, only Read/Write accessors
+            /* Get a list of all the UserAccess instances for this User
              */
-            if ($found && ($found->getAccessLevel() < UserAccess::ACCESS_FULL)) {
-                $userAccessMapper->delete($found);
-            }
-        }
+            $allUserAccess = $userAccessMapper->findAllGroupsForUser($this);
 
-        /* If you combined "Groups (Read)" and "Groups (Remove)" in the same rule
-         * you might be in a state where items in $userAccessRemove won't be in the
-         * db, but will have been added via "Groups (Read)". This means it won't
-         * have anything to delete right now.
-         *
-         * Truncate the $userAccessRemove elements from $this->accessList as well
-         * to ensure that what you remove applies to all other Groups (Read/Write)
-         * effects in this rule
-         */
+            /* Search $allUserAccess for anything that should be deleted
+             * If found, delete it from the db if it was already there
+             * These are spawned from a previous Rule.
+             */
+            foreach ($userAccessRemove as $current) {
+                $found = $allUserAccess->getBy('serviceIdentifier', $current);
 
-        $trimmedAccessList = new Collection();
-
-        foreach ($this->getAccessList() as $currentAccessExists) {
-            $found = false;
-
-            foreach ($userAccessRemove as $currentAccessRemove) {
-                if ($currentAccessExists->getServiceIdentifier() == $currentAccessRemove) {
-                    $found = true;
+                /* Do not blow away Owners, only Read/Write accessors
+                 */
+                if ($found && ($found->getAccessLevel() < UserAccess::ACCESS_FULL)) {
+                    $userAccessMapper->delete($found);
                 }
             }
 
-            /* Keep it, if it's not supposed to be removed
+            /* If you combined "Groups (Read)" and "Groups (Remove)" in the same rule
+             * you might be in a state where items in $userAccessRemove won't be in the
+             * db, but will have been added via "Groups (Read)". This means it won't
+             * have anything to delete right now.
+             *
+             * Truncate the $userAccessRemove elements from $this->accessList as well
+             * to ensure that what you remove applies to all other Groups (Read/Write)
+             * effects in this rule
              */
-            if (!$found) {
-                $trimmedAccessList->add($currentAccessExists);
-            }
-        }
+            $trimmedAccessList = new Collection();
 
-        /* Square it away
-         */
-        $this->setAccessList($trimmedAccessList);
+            foreach ($this->getAccessList() as $currentAccessExists) {
+                $found = false;
+
+                foreach ($userAccessRemove as $currentAccessRemove) {
+                    if ($currentAccessExists->getServiceIdentifier() == $currentAccessRemove) {
+                        $found = true;
+                    }
+                }
+
+                /* Keep it, if it's not supposed to be removed
+                 */
+                if (!$found) {
+                    $trimmedAccessList->add($currentAccessExists);
+                }
+            }
+
+            /* Square it away
+             */
+            $this->setAccessList($trimmedAccessList);
+        }
     }
 
     /**
@@ -147,33 +151,37 @@ class User extends SchoolboxUser
      */
     private function setAccessLevel($identifiers, $level)
     {
-        $found = [];
-
-        /* Update existing userAccess instance
+        /* Modify accessList only when ups_groups_enabled is actually enabled
+         * Otherwise leave it unchanged from whatever it was
          */
-        foreach ($this->getAccessList() as $current) {
-            if (in_array($current->getServiceIdentifier(), $identifiers)) {
-                $current->setAccessLevel($level);
+        if ($this->getConfigLoader()->get('ups_groups_enabled')) {
+            $found = [];
 
-                $found[] = $current->getServiceIdentifier();
+            /* Update existing userAccess instance
+             */
+            foreach ($this->getAccessList() as $current) {
+                if (in_array($current->getServiceIdentifier(), $identifiers)) {
+                    $current->setAccessLevel($level);
+
+                    $found[] = $current->getServiceIdentifier();
+                }
             }
-        }
 
-        /* If the userAccess instance didn't exist, create it
-         */
-        $diff = array_diff($identifiers, $found);
+            /* If the userAccess instance didn't exist, create it
+             */
+            $diff = array_diff($identifiers, $found);
 
-        if (count($diff)) {
-            foreach ($diff as $current) {
-                $userAccess = new UserAccess();
-                $userAccess->setUser($this);
-                $userAccess->setService(HOMEPAGE_SERVICE);
-                $userAccess->setServiceIdentifier($current);
-                $userAccess->setAccessLevel($level);
+            if (count($diff)) {
+                foreach ($diff as $current) {
+                    $userAccess = new UserAccess();
+                    $userAccess->setUser($this);
+                    $userAccess->setService(HOMEPAGE_SERVICE);
+                    $userAccess->setServiceIdentifier($current);
+                    $userAccess->setAccessLevel($level);
 
-                $this->accessList->add($userAccess);
+                    $this->accessList->add($userAccess);
+                }
             }
         }
     }
-
 }

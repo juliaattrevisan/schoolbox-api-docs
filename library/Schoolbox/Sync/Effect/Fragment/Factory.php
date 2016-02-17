@@ -16,6 +16,7 @@ namespace Schoolbox\Sync\Effect\Fragment;
 
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 use \Schoolbox\UserMapper;
+use \Schoolbox\ConfigLoader;
 
 class Factory {
     const TYPE_BOOLEAN = 1;
@@ -47,9 +48,6 @@ class Factory {
         'year' => 'Year Level',
 
         'role' => 'Role',
-        'userAccessRead' => 'Groups (Read)',
-        'userAccessWrite' => 'Groups (Write)',
-        'userAccessRemove' => 'Groups (Remove)',
 
         'altEmail' => 'Alt Email Address',
 
@@ -73,9 +71,6 @@ class Factory {
      * @var array
      */
     private $allAjaxUrls = [
-        'userAccessRead' => 'groups',
-        'userAccessWrite' => 'groups',
-        'userAccessRemove' => 'groups',
         'campusCollection' => 'campus',
     ];
 
@@ -100,8 +95,31 @@ class Factory {
      * @param $roleType
      */
     public function __construct($roleType) {
-        $this->setLookup(new Lookup());
 
+        /* Determine if Groups perms are enabled before making them accessible
+         */
+        $config = new ConfigLoader();
+
+        if ($config->get('ups_groups_enabled')) {
+            $this->setAllFieldKeys(array_merge($this->getAllFieldKeys(), [
+                'userAccessRead' => 'Groups (Read)',
+                'userAccessWrite' => 'Groups (Write)',
+                'userAccessRemove' => 'Groups (Remove)',
+            ]));
+
+            /* This is the &type querystring param used by the ajax controller
+             * Setting it to blank will disable any results from appearing
+             * in existing selectizes when ups_groups_enabled is 0 and these
+             * effects have already been made and configured
+             */
+            $this->setAllAjaxUrls(array_merge($this->getAllAjaxUrls(), [
+                'userAccessRead' => 'groups',
+                'userAccessWrite' => 'groups',
+                'userAccessRemove' => 'groups',
+            ]));
+        }
+
+        $this->setLookup(new Lookup());
         $this->setRoleType($roleType);
         $this->setAllFields($this->generateAllFields());
     }
@@ -396,5 +414,25 @@ class Factory {
     private function getRoleType()
     {
         return $this->roleType;
+    }
+
+    /**
+     * Get all ajax urls
+     *
+     * @return array
+     */
+    private function getAllAjaxUrls()
+    {
+        return $this->allAjaxUrls;
+    }
+
+    /**
+     * Set all ajax urls
+     *
+     * @param array $allAjaxUrls
+     */
+    private function setAllAjaxUrls($allAjaxUrls)
+    {
+        $this->allAjaxUrls = $allAjaxUrls;
     }
 }
