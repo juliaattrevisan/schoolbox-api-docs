@@ -56,7 +56,7 @@ class MssqlResultIterator implements SeekableIterator
     public function next()
     {
         $this->rowNum++;
-        $this->currentRow = mssql_fetch_assoc($this->result);
+        $this->loadNextRow();
     }
 
     /**
@@ -95,7 +95,7 @@ class MssqlResultIterator implements SeekableIterator
     {
         $this->rowNum = 0;
         $this->seek(0);
-        $this->currentRow = mssql_fetch_assoc($this->result);
+        $this->loadNextRow();
     }
 
     /**
@@ -121,5 +121,19 @@ class MssqlResultIterator implements SeekableIterator
     {
         $this->maps[] = $map;
         return $this;
+    }
+
+    /**
+     * Loads next row, and applies transformations added via `$this->addMap()`.
+     */
+    protected function loadNextRow()
+    {
+        $row = mssql_fetch_assoc($this->result);
+        if ($row !== false) {
+            foreach ($this->maps as $map) {
+                $row = $map($row);
+            }
+        }
+        $this->currentRow = $row;
     }
 }
