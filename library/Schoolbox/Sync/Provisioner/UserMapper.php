@@ -11,6 +11,7 @@
 namespace Schoolbox\Sync\Provisioner;
 
 use Schoolbox\UserMapper as SchoolboxMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 class UserMapper extends SchoolboxMapper
 {
@@ -19,6 +20,8 @@ class UserMapper extends SchoolboxMapper
         parent::mapping();
 
         $this->hasPrototype(new User());
+
+        $this->registerCallback('postSave', array($this, 'postSave'));
     }
 
     /**
@@ -33,5 +36,19 @@ class UserMapper extends SchoolboxMapper
     protected function findAccessList(User $user)
     {
         return $this->getJoinMapper('userAccess')->findAllGroupsForUser($user);
+    }
+
+    /**
+     * Save an updated list of UserAccess instances
+     *
+     * @param $user
+     */
+    public function postSave($user)
+    {
+        $userAccessMapper = new UserAccessMapper();
+
+        foreach ($user->getAccessList() as $current) {
+            $userAccessMapper->save($current);
+        }
     }
 }
