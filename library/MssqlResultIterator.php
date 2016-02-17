@@ -56,6 +56,7 @@ class MssqlResultIterator implements SeekableIterator
     public function next()
     {
         $this->rowNum++;
+        $this->currentRow = mssql_fetch_assoc($this->result);
     }
 
     /**
@@ -76,7 +77,7 @@ class MssqlResultIterator implements SeekableIterator
     public function valid()
     {
         // Is there a current result?
-        $row = mssql_fetch_assoc($this->result);
+        $row = $this->currentRow;
         if ($row === false) {
             return false;
         }
@@ -94,6 +95,7 @@ class MssqlResultIterator implements SeekableIterator
     {
         $this->rowNum = 0;
         $this->seek(0);
+        $this->currentRow = mssql_fetch_assoc($this->result);
     }
 
     /**
