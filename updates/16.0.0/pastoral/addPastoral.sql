@@ -42,10 +42,10 @@ CREATE TABLE `schoolbox`.`pastoral_attachment` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT '',
   `pastoral_id` INT NULL COMMENT '',
   `hash` VARCHAR(50) NULL COMMENT '',
-  `datetime_posted` DATETIME '0000-00-00 00:00:00' COMMENT '',
-  `datetime_modified` DATETIME '0000-00-00 00:00:00' COMMENT '',
+  `datetime_posted` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
+  `datetime_modified` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
   `datetime_deleted` DATETIME NULL DEFAULT NULL COMMENT '',
-  PRIMARY KEY (`attachment_id`)  COMMENT '');
+  PRIMARY KEY (`id`)  COMMENT '');
 
 CREATE TABLE `schoolbox`.`luPastoralType` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT '',
