@@ -980,11 +980,15 @@ class Controller extends Base
 
                 // Save the authorised users
 
-                foreach ($_POST["user_id"] as $user_id) {
-                    $access = new \Schoolbox\Pastoral\Access\Model();
-                    $access->setPastoralId($record->getId());
-                    $access->setUserId($user_id);
-                    $accessMapper->save($access);
+                if (isset($_POST["user_id"])) {
+                    if (is_array($_POST["user_id"])) {
+                        foreach ($_POST["user_id"] as $user_id) {
+                            $access = new \Schoolbox\Pastoral\Access\Model();
+                            $access->setPastoralId($record->getId());
+                            $access->setUserId($user_id);
+                            $accessMapper->save($access);
+                        }
+                    }
                 }
 
                 // Save the tags
@@ -1074,21 +1078,25 @@ class Controller extends Base
 
             // Update the authorised users
 
-            foreach ($_POST["user_id"] as $user_id) {
-                foreach ($accessRoles as $role) {
-                    if ($role->getUserId() == $user_id) {
-                        if (!in_array($user_id, $deleteIds)) {
-                            $found = true;
+            if (isset($_POST["user_id"])) {
+                if (is_array($_POST["user_id"])) {
+                    foreach ($_POST["user_id"] as $user_id) {
+                        foreach ($accessRoles as $role) {
+                            if ($role->getUserId() == $user_id) {
+                                if (!in_array($user_id, $deleteIds)) {
+                                    $found = true;
+                                }
+                                break;
+                            }
                         }
-                        break;
-                    }
-                }
 
-                if (!$found) {
-                    $access = new \Schoolbox\Pastoral\Access\Model();
-                    $access->setPastoralId($record->getId());
-                    $access->setUserId($user_id);
-                    $accessMapper->save($access);
+                        if (!$found) {
+                            $access = new \Schoolbox\Pastoral\Access\Model();
+                            $access->setPastoralId($record->getId());
+                            $access->setUserId($user_id);
+                            $accessMapper->save($access);
+                        }
+                    }
                 }
             }
 
