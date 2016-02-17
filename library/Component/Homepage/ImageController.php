@@ -39,6 +39,13 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
 
         //outputs an custom image and link to the homepage
         $this->setBlock($templateHandle, 'previewimage', 'preview_block');
+        //setup block for submission button
+        $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
+        if ($this->permission < WRITE_ACCESS) {
+            $this->setVar('submit_image_block', '');
+        } else {
+            $this->parse('submit_image_block', 'submit_image');
+        }
 
         // Get the image
         $images = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
@@ -100,16 +107,6 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
             $this->setVar("CONTENT_URL_END", "");
         }
         $this->parse("preview_block", "previewimage");
-
-
-        //setup block for submission button
-        $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
-        if ($this->permission < WRITE_ACCESS) {
-            $this->setVar('submit_image_block', '');
-        } else {
-            $this->parse('submit_image_block', 'submit_image');
-        }
-
         return true; // everything went according to plan
     }
 }
