@@ -44,7 +44,6 @@ div.jstree-default, ul.jstree-default {
     .jstree-node {
         min-height: $tree-node-height;
         line-height: $tree-node-height;
-        overflow-x: hidden;
 
         .jstree-wholerow {
             &.jstree-wholerow-hovered {
