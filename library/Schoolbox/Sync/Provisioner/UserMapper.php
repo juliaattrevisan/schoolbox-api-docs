@@ -31,10 +31,10 @@ class UserMapper extends SchoolboxMapper
      * Get a list of all Role- and Group-level userAccess instances
      * Default behaviour, just as it always was
      *
-     * @param User $user
+     * @param \Schoolbox\User $user
      * @return mixed
      */
-    protected function findAccessList(User $user)
+    protected function findAccessList(\Schoolbox\User $user)
     {
         return $this->getJoinMapper('userAccess')->findAllGroupsForUser($user);
     }
