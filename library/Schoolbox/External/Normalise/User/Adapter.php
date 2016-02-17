@@ -236,12 +236,23 @@ class Adapter  implements \External_UserInterface {
         if (is_array($allResults) && count($allResults)) {
             foreach ($allResults as $currentResult) {
 
+                /* Campus
+                 */
+                $campus = new Common\Campus();
+                $campus
+                    ->setCode($currentResult['StudentCampus'])
+                ;
+
                 /* Year (common to all Guardians)
                  */
                 $student = new Student();
                 $student
+                    ->getCampus()
+                        ->add($campus);
+
+                $student
                     ->getYear()
-                    ->setLevel($currentResult['StudentYearLevel'])
+                        ->setLevel($currentResult['StudentYearLevel'])
                 ;
 
                 /* Guardian 1
@@ -272,13 +283,6 @@ class Adapter  implements \External_UserInterface {
                         ->setLogin($currentResult['StudentContactNetworkLogin'])
                 ;
 
-                /* Campus
-                 */
-                $campus = new Common\Campus();
-                $campus
-                    ->setCode($currentResult['StudentCampus'])
-                ;
-
                 $guardian1
                     ->getCampus()
                         ->add($campus)
@@ -292,6 +296,7 @@ class Adapter  implements \External_UserInterface {
                     ->setTitle($currentResult['StudentContactSpouseTitle'])
                     ->setPreferredName($currentResult['StudentContactSpousePreferred'])
                     ->setLastname($currentResult['StudentContactSpouseSurname'])
+                    ->getStudents()->add($student)
                 ;
 
                 /* Email
@@ -322,6 +327,10 @@ class Adapter  implements \External_UserInterface {
                     ->getCampus()
                     ->add($campus)
                 ;
+
+
+                $guardian1->getStudents()->add($student);
+                $guardian2->getStudents()->add($student);
 
                 /* Stack it up
                  */
