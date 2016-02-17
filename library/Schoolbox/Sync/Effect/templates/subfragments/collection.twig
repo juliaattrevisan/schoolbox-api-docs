@@ -1,21 +1,35 @@
 {% set mapRowIdentifier = 'mappingrow-' ~ random(100000000) %}
+{% set entireDataset = allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
+{% set ajaxUrl = allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getAjaxUrl() %}
 
-{# Multiple selected values for checkbox arrays #}
-{% if preselected is iterable %}
-    <input id='{{ mapRowIdentifier }}-input' type="hidden" name="{{ dynamicInputName }}" value="{% for value in preselected %}{{ value }}{% if not loop.last %},{% endif %}{% endfor %}" />
-{% else %}
-    <input id='{{ mapRowIdentifier }}-input' type="hidden" name="{{ dynamicInputName }}" value="{{ preselected }}" />
-{% endif %}
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#{{ mapRowIdentifier }}-input').selectizeSelector({
+            value: [
+                {% if preselected is iterable %}
+                    {% for current in preselected %}
+                        {% if current in entireDataset|keys %}
+                            {% raw %}{{% endraw %}"id":{{ current }},"name":"{{ entireDataset[current] }}"{% raw %}}{% endraw %}
+                        {% endif %}
+                        {% if not loop.last %},{% endif %}
+                    {% endfor %}
+                {% elseif preselected != '' %}
+                    {% raw %}{{% endraw %}"id":{{ preselected }},"name":"{{ entireDataset[preselected] }}"{% raw %}}{% endraw %}
+                {% endif %}
+            ],
+            ajax: {
+                url: '/ajax/ups/ups.php',
+                type: 'GET',
+                data: {
+                    type: '{{ ajaxUrl }}'
+                },
+                dataType: 'json'
+            },
+            multiple: true
+        });
+    });
+</script>
 
-<div data-mapping-row="{{ mapRowIdentifier }}" class="ups-mapping-row-collection">
-    {% for campusId, campusName in allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
-        {# Each checkbox needs to be unique on the whole page
-         # due to custom checkbox design requiring ids
-         #}
-        {% set checkboxIdentifier = mapRowIdentifier ~ '-' ~ campusId %}
-
-        <input id="{{ checkboxIdentifier }}" type="checkbox" value="{{ campusId }}" />
-        <label for="{{ checkboxIdentifier }}" class="checkbox-label">{{ campusName }}</label>
-    {% endfor %}
-</div>
-
+<input id='{{ mapRowIdentifier }}-input' name="{{ dynamicInputName }}" type='text' value='' placeholder="Search" />

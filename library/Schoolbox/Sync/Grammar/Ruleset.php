@@ -106,8 +106,6 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
     {
         $object = $previous ?: $this->mapper->createModel();
 
-        $map = $this->mapper->getMap();
-
         $rules = $this->getRules();
 
         foreach ($rules as $sequence => $rule) {
@@ -135,10 +133,9 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                     // Apply tokenization to returned value. The value returned should be a primitive,
                     // which will then by hydrated into the model by the mapper
                     $value   = $this->tokenizer->parseToken($input, $value);
-                    $mapping = $map->getOffset($property);
 
                     // treat collections special-like
-                    if ($mapping['type'] == Mapper::TYPE_COLLECTION) {
+                    if ($this->isCollection($property)) {
 
                         // first, read the value out of the object
                         $array = $this->mapper->getModelProperty($object, $property);
@@ -183,6 +180,23 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
         return $object;
     }
 
+    /**
+     * Abstractify this check so subclasses can wrangle
+     *
+     * @param $property
+     * @return bool
+     */
+    protected function isCollection($property)
+    {
+        $map = $this->mapper->getMap();
+        $mapping = $map->getOffset($property);
+
+        if ($mapping['type'] == Mapper::TYPE_COLLECTION) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * @param object $object   - the object to update with the new value

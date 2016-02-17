@@ -29,6 +29,9 @@ class Lookup {
         'schoolHouse' => '\HouseMapper',
         'role' => '\Schoolbox\RoleMapper',
         'campusCollection' => '\Schoolbox\CampusMapper',
+        'userAccessRead' => '\Schoolbox\Resource\GroupMapper',
+        'userAccessWrite' => '\Schoolbox\Resource\GroupMapper',
+        'userAccessRemove' => '\Schoolbox\Resource\GroupMapper',
     ];
 
     /**
@@ -54,6 +57,12 @@ class Lookup {
                  */
                 if ($userField == 'role') {
                     $allResults = $mapper->findByColumn('group_type', $roleType);
+                }
+                /* Special case for userAccess* options, which need folder selection
+                 * in the ui
+                 */
+                else if (in_array($userField, ['userAccessRead', 'userAccessWrite', 'userAccessRemove'])) {
+                    $allResults = $mapper->findFolders();
                 }
                 else {
                     $allResults = $mapper->findAll();

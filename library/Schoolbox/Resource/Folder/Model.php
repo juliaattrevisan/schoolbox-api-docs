@@ -20,6 +20,7 @@ use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\ValueLabelInterface;
 
 /**
  * Class Model
@@ -28,7 +29,7 @@ use Schoolbox\UserMapper;
  *
  * @package Schoolbox\Resource\Folder
  */
-class Model extends AbstractFolder implements ISoftDeletable
+class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface
 {
     use Node\Traits\HasCurriculumNodes;
 
@@ -229,6 +230,19 @@ class Model extends AbstractFolder implements ISoftDeletable
     public function isDeleted()
     {
         return ($this->getDeletedAt() instanceof \Alaress_Date_Format && !$this->getDeletedAt()->isNull());
+    }
+
+    /**
+     * Return a value/label array pair
+     *
+     * @return array
+     */
+    public function findValueLabelPair()
+    {
+        return [
+            'value' => $this->getId(),
+            'label' => $this->getName()
+        ];
     }
 
     /* Getters/Setters

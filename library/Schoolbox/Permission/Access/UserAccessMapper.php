@@ -120,16 +120,7 @@ class UserAccessMapper extends Mapper
      */
     public function findAllForUser(User $user, $includeSynergy = true)
     {
-        $access = new Collection();
-
-        // start with the userAccess table (filtering away access level 0)
-        $internal = $this->findByColumnList(['uid' => $user->getId(), 'type' => [ UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL ] ])->map(function ($ua) use ($user) {
-            /** @var UserAccess $ua */
-            // don't needlessly hold stub replicas of the user in memory
-            return $ua->setUser($user);
-        });
-
-        $access->mergeUnique($internal);
+        $access = $this->findAllGroupsForUser($user);
 
         // we can bug out early if no external sources need to be considered
         if (!$includeSynergy) {
@@ -170,6 +161,30 @@ class UserAccessMapper extends Mapper
         return $access;
     }
 
+    /**
+     * Find all UserAccess instances for a User
+     *
+     * @param User $user
+     * @return Collection
+     */
+    public function findAllGroupsForUser(User $user)
+    {
+        $access = new Collection();
+
+        // start with the userAccess table (filtering away access level 0)
+        $internal = $this->findByColumnList([
+            'uid' => $user->getId(),
+            'type' => [UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL]
+        ])->map(function ($ua) use ($user) {
+            /** @var UserAccess $ua */
+            // don't needlessly hold stub replicas of the user in memory
+            return $ua->setUser($user);
+        });
+
+        $access->mergeUnique($internal);
+
+        return $access;
+    }
 
     /**
     * @param CategoryModel $category

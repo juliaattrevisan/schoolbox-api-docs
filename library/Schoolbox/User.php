@@ -184,7 +184,6 @@ class User implements JsonSerializable
      */
     protected $config_loader;
 
-
     /**
      * Build default empty objects so things don't explode
      */
@@ -194,6 +193,7 @@ class User implements JsonSerializable
         $this->setConfigLoader(new ConfigLoader());
         $this->setLinkedUser(new Collection(array()));
         $this->setRole(new Role());
+        $this->setAccessList(new Collection());
     }
 
     /**
@@ -1110,6 +1110,4 @@ class User implements JsonSerializable
     {
         return $this->linkedUser;
     }
-
-
 }

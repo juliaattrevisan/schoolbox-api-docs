@@ -16,6 +16,7 @@ namespace Schoolbox\Sync\Effect\Fragment;
 
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 use \Schoolbox\UserMapper;
+use \Schoolbox\ConfigLoader;
 
 class Factory {
     const TYPE_BOOLEAN = 1;
@@ -47,6 +48,9 @@ class Factory {
         'year' => 'Year Level',
 
         'role' => 'Role',
+        'userAccessRead' => 'Groups (Read) (Disabled)',
+        'userAccessWrite' => 'Groups (Write) (Disabled)',
+        'userAccessRemove' => 'Groups (Remove) (Disabled)',
 
         'altEmail' => 'Alt Email Address',
 
@@ -61,7 +65,19 @@ class Factory {
         'enabled' => 'Schoolbox Account Enabled',
         'webmail' => 'Enable Webmail Tab',
         'eportfolioEnable' => 'E-Portfolio Enabled',
+    ];
 
+    /**
+     * Special ajax urls for selectize population
+     * Uses same controller with different params
+     *
+     * @var array
+     */
+    private $allAjaxUrls = [
+        'userAccessRead' => 'groups',
+        'userAccessWrite' => 'groups',
+        'userAccessRemove' => 'groups',
+        'campusCollection' => 'campus',
     ];
 
     /**
@@ -80,11 +96,25 @@ class Factory {
     private $lookup = null;
 
     /**
-     * Constructor
+     * Factory constructor.
+     *
+     * @param $roleType
      */
     public function __construct($roleType) {
-        $this->setLookup(new Lookup());
 
+        /* Determine if Groups perms are enabled before making them accessible
+         */
+        $config = new ConfigLoader();
+
+        /* Rename these if enabled
+         */
+        if ($config->get('ups_groups_enabled')) {
+            $this->allFieldKeys['userAccessRead'] = 'Groups (Read)';
+            $this->allFieldKeys['userAccessWrite'] = 'Groups (Write)';
+            $this->allFieldKeys['userAccessRemove'] = 'Groups (Remove)';
+        }
+
+        $this->setLookup(new Lookup());
         $this->setRoleType($roleType);
         $this->setAllFields($this->generateAllFields());
     }
@@ -92,16 +122,20 @@ class Factory {
     /**
      * Figure out what each desired field's type is, via the UserMapper
      * Also compile human-readable versions of the field
+     *
+     * @return array
      */
     private function generateAllFields() {
         $allFields = [];
 
         $mapper = new UserMapper();
         $allMaps = $mapper->getMap();
+        $allJoins = $mapper->getJoin();
+        $allFieldKeys = $this->getAllFieldKeys();
 
         /* Get the associative array of fields
          */
-        foreach ($this->getAllFieldKeys() as $key => $label) {
+        foreach ($allFieldKeys as $key => $label) {
             $currentMap = $allMaps->getOffset($key);
 
             /* Condense types
@@ -140,13 +174,40 @@ class Factory {
                 /* All other types
                  */
                 default:
-                    $allFields[$key] = [
-                        'type' => self::TYPE_STRING,
-                        'label' => $label
-                    ];
+
+                    /* At this stage, joins (such as UserAccess) would have been given
+                     * self::TYPE_STRING. Check joins stack before assuming string
+                     */
+                    if (in_array($key, array_keys($allJoins))) {
+                        $allFields[$key] = [
+                            'type' => self::TYPE_COLLECTION,
+                            'label' => $label
+                        ];
+                    }
+                    else {
+                        $allFields[$key] = [
+                            'type'  => self::TYPE_STRING,
+                            'label' => $label
+                        ];
+                    }
 
                     break;
             }
+        }
+
+        /* Special cases
+         * These need special treatment/representation
+         *
+         * userAccessRead and Write aren't found in UserMapper explicitly,
+         * we've made that up; we need to assign a key/value pair accordingly
+         */
+        $allSpecialCases = ['userAccessRead', 'userAccessWrite', 'userAccessRemove'];
+
+        foreach ($allSpecialCases as $currentSpecialCase) {
+            $allFields[$currentSpecialCase] = [
+                'type'  => self::TYPE_COLLECTION,
+                'label' => $allFieldKeys[$currentSpecialCase]
+            ];
         }
 
         return $allFields;
@@ -193,7 +254,10 @@ class Factory {
             return new Fragment('@upsEffect/subfragments/string.twig');
         }
         else if ($this->isCollection($userField)) {
-            return new Fragment('@upsEffect/subfragments/collection.twig', $this->getLookup()->findData($userField));
+            $fragment = new Fragment('@upsEffect/subfragments/collection.twig', $this->getLookup()->findData($userField));
+            $fragment->setAjaxUrl($this->allAjaxUrls[$userField]);
+
+            return $fragment;
         }
     }
 
@@ -226,23 +290,6 @@ class Factory {
     }
 
     /**
-     * Gets the key/value representation of $allFields
-     *
-     * @return array
-     */
-    public function getAllFieldsKeyValue() {
-        $allFields = $this->getAllFields();
-
-        $stack = [];
-
-        foreach ($allFields as $key => $data) {
-            $stack[$key] = $data['label'];
-        }
-
-        return $stack;
-    }
-
-    /**
      * Determine whether the current field is a Lookup
      *
      * @param $field
@@ -268,6 +315,23 @@ class Factory {
         }
 
         return false;
+    }
+
+    /**
+     * Gets the key/value representation of $allFields
+     *
+     * @return array
+     */
+    public function getAllFieldsKeyValue() {
+        $allFields = $this->getAllFields();
+
+        $stack = [];
+
+        foreach ($allFields as $key => $data) {
+            $stack[$key] = $data['label'];
+        }
+
+        return $stack;
     }
 
     /* Getters/Setters
@@ -347,5 +411,23 @@ class Factory {
         return $this->roleType;
     }
 
+    /**
+     * Get all ajax urls
+     *
+     * @return array
+     */
+    private function getAllAjaxUrls()
+    {
+        return $this->allAjaxUrls;
+    }
 
+    /**
+     * Set all ajax urls
+     *
+     * @param array $allAjaxUrls
+     */
+    private function setAllAjaxUrls($allAjaxUrls)
+    {
+        $this->allAjaxUrls = $allAjaxUrls;
+    }
 }

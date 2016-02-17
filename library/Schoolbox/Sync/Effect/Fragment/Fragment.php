@@ -32,6 +32,18 @@ class Fragment {
     private $data = null;
 
     /**
+     * If this is of type "Collection", it might use Selectize.
+     * That uses an ajax url to retrieve data from a controller.
+     *
+     * This is the ajax url type, such as "groups" or "campus".
+     *
+     * This is an optional var, and is only used on Collections
+     *
+     * @var null
+     */
+    private $ajaxUrl = null;
+
+    /**
      * Constructor
      *
      * @param $filename
@@ -89,5 +101,25 @@ class Fragment {
     public function getFilename()
     {
         return $this->filename;
+    }
+
+    /**
+     * Get ajax url
+     *
+     * @return null
+     */
+    public function getAjaxUrl()
+    {
+        return $this->ajaxUrl;
+    }
+
+    /**
+     * Set ajax url
+     *
+     * @param null $ajaxUrl
+     */
+    public function setAjaxUrl($ajaxUrl)
+    {
+        $this->ajaxUrl = $ajaxUrl;
     }
 }

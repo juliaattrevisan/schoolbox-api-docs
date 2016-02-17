@@ -11,7 +11,6 @@ namespace Schoolbox;
 
 use PDOStatement;
 use Schoolbox;
-use Schoolbox\Permission\Access\UserAccessMapper;
 
 /**
  * Class UserMapper
@@ -24,12 +23,11 @@ use Schoolbox\Permission\Access\UserAccessMapper;
  */
 class UserMapper extends Mapper
 {
-
     protected function mapping()
     {
 
         $this->hasTable('user');
-        $this->hasModel('\Schoolbox\User');
+        $this->hasPrototype(new User());
 
         $this->hasMap(
             array(
@@ -337,6 +335,20 @@ class UserMapper extends Mapper
     }
 
     /**
+     * All Permissions
+     *
+     * Get a list of all Role- and Group-level userAccess instances
+     * Default behaviour, just as it always was
+     *
+     * @param User $user
+     * @return mixed
+     */
+    protected function findAccessList(User $user)
+    {
+        return $this->getJoinMapper('userAccess')->findAllForUser($user);
+    }
+
+    /**
      * Find a user by their external id and come with roles, campus, etc
      *
      * @param int    $id
@@ -381,9 +393,9 @@ class UserMapper extends Mapper
                 $user->setSuperUser($row['u.superuser'] == 1);
                 $user->setRole($roleMapper->hydrate($row, 'g'));
 
-                /** @var UserAccessMapper $uaMapper */
-                $uaMapper = $this->getJoinMapper('userAccess');
-                $user->setAccessList($uaMapper->findAllForUser($user));
+                $accessList = $this->findAccessList($user);
+
+                $user->setAccessList($accessList);
             }
 
             $campus = $campusMapper->hydrate($row, 'c');
