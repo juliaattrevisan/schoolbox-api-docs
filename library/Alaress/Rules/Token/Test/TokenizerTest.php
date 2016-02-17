@@ -30,12 +30,13 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->tokenizer = new MockTokenizer([
-            'foo'            => 'The foo',
-            'bar'            => 'The bar',
-            'baz.bar'        => "The baz's bar",
-            'single.multi[]' => "The single's multi",
-            'empty[]'        => "An empty multi",
-            'alpha[].id'     => "The IDs of the alpha's bravos"
+            'foo'             => 'The foo',
+            'bar'             => 'The bar',
+            'baz.bar'         => "The baz's bar",
+            'single.multi[]'  => "The single's multi",
+            'multi[].multi[]' => "The multi's multi",
+            'empty[]'         => "An empty multi",
+            'alpha[].id'      => "The IDs of the alpha's bravos"
         ]);
 
         $this->tree = [
@@ -50,6 +51,20 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
                     'second',
                     'third',
                     'fourth'
+                ]
+            ],
+            'multi' => [
+                [
+                    'multi' => [
+                        'first',
+                        'second',
+                    ]
+                ],
+                [
+                    'multi' => [
+                        'third',
+                        'fourth',
+                    ]
                 ]
             ],
             'empty' => [],
@@ -123,6 +138,8 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
                 => ['{:alpha.4.id}', 'foxtrot'],
             'nested multi-value subvalue extract out-of-range'
                 => ['{:alpha.9.id}', ''],
+            'multi-multi value'
+                => ['{:multi.multi}', ['first', 'second', 'third', 'fourth']],
         ];
     }
 
