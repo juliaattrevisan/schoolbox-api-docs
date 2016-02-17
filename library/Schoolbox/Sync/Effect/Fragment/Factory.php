@@ -48,6 +48,9 @@ class Factory {
         'year' => 'Year Level',
 
         'role' => 'Role',
+        'userAccessRead' => 'Groups (Read) (Disabled)',
+        'userAccessWrite' => 'Groups (Write) (Disabled)',
+        'userAccessRemove' => 'Groups (Remove) (Disabled)',
 
         'altEmail' => 'Alt Email Address',
 
@@ -71,6 +74,9 @@ class Factory {
      * @var array
      */
     private $allAjaxUrls = [
+        'userAccessRead' => 'groups',
+        'userAccessWrite' => 'groups',
+        'userAccessRemove' => 'groups',
         'campusCollection' => 'campus',
     ];
 
@@ -100,23 +106,12 @@ class Factory {
          */
         $config = new ConfigLoader();
 
+        /* Rename these if enabled
+         */
         if ($config->get('ups_groups_enabled')) {
-            $this->setAllFieldKeys(array_merge($this->getAllFieldKeys(), [
-                'userAccessRead' => 'Groups (Read)',
-                'userAccessWrite' => 'Groups (Write)',
-                'userAccessRemove' => 'Groups (Remove)',
-            ]));
-
-            /* This is the &type querystring param used by the ajax controller
-             * Setting it to blank will disable any results from appearing
-             * in existing selectizes when ups_groups_enabled is 0 and these
-             * effects have already been made and configured
-             */
-            $this->setAllAjaxUrls(array_merge($this->getAllAjaxUrls(), [
-                'userAccessRead' => 'groups',
-                'userAccessWrite' => 'groups',
-                'userAccessRemove' => 'groups',
-            ]));
+            $this->allFieldKeys['userAccessRead'] = 'Groups (Read)';
+            $this->allFieldKeys['userAccessWrite'] = 'Groups (Write)';
+            $this->allFieldKeys['userAccessRemove'] = 'Groups (Remove)';
         }
 
         $this->setLookup(new Lookup());
