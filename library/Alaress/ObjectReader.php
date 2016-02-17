@@ -273,7 +273,8 @@ class ObjectReader
 
                         // this array is what we'll operate on from here
                         $string .= $append;
-                        $value = $values;
+                        // $values could be an array of arrays - smoosh it into a flat list
+                        $value = $this->coerceToFlatList($values);
 
                     }
 
