@@ -49,7 +49,7 @@ class External_Humanedge_Class implements External_ClassInterface
             WHERE st.deleted = 0
             AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
 
-            UNION ALL
+            UNION
 
             SELECT DISTINCT
                 st.FirstName AS firstname,
@@ -86,7 +86,7 @@ class External_Humanedge_Class implements External_ClassInterface
             WHERE t.deleted = 0
             AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
 
-            UNION ALL
+            UNION
 
             SELECT DISTINCT
                 t.Code AS Code
