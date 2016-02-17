@@ -57,6 +57,24 @@ class ObjectReader
         return (string)$value;
     }
 
+    /**
+     * @param  mixed $value
+     * @throws DomainException if any value can't be coerced
+     * @return array|string[]
+     */
+    public function coerceToStringRecursively($value)
+    {
+        $result = [];
+        if (is_array($value) || $value instanceof Traversable) {
+            foreach ($value as $subValue) {
+                $result = array_merge($result, $this->coerceToStringRecursively($subValue));
+            }
+        } else {
+            $result[] = $this->coerceToString($value);
+        }
+        return $result;
+    }
+
 
     /**
      * Accepts any input, and returns the list of path strings that could be validly accepted by self::read()
