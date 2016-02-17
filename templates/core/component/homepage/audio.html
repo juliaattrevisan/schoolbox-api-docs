@@ -1,47 +1,5 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
     <script src="/javascript/shared/jquery.media-playlist.js"></script>
-    <script type="text/javascript">
-        $(function() {
-            $('#component{COMPONENT_INSTANCE_ID}').mediaPlaylist();
-            $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                wrapClass: 'dragging',
-                previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
-                dictDefaultMessage: 'You can drag audio files into this space.',
-                refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
-                tplWrap: '<li class="dz-preview" />',
-                addedfile: function (file) {
-                    $(file.previewElement).addClass('category-{ID}').data('node', {ID});
-                },
-                sending: function (file, xhr, formData) {
-                    formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                    formData.append('category', $(file.previewElement).data('node'));
-                    formData.append('comment', '');
-                    formData.append('hidden', 0);
-                },
-                complete: function (file) {
-                    $(file.previewElement).find('img').remove();
-                },
-                error: function (file, response) {
-                    $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
-                }
-            });
-
-            $("[audio-delete]").on('click', function (event) {
-                event.preventDefault();
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this?',
-                    confirmEvent: function (anchor) {
-                        $.get('/cms/fileForm.php?ajax=1&delete=' + anchor.attr('id')).done(function() {
-                            location.reload();
-                        });
-                    }
-                });
-            });
-        });
-    </script>
 
 	{CONFIGURATION}
 
@@ -121,6 +79,49 @@
                 <div class="content">
                     <a href="/cms/file/new/{ID}" class="button icon-upload">Post Audio File</a>
                 </div>
+
+                <script type="text/javascript">
+                    $(function() {
+                        $('#component{COMPONENT_INSTANCE_ID}').mediaPlaylist();
+                        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                            wrapClass: 'dragging',
+                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                            previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                            dictDefaultMessage: 'You can drag audio files into this space.',
+                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                            refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                            tplWrap: '<li class="dz-preview" />',
+                            addedfile: function (file) {
+                                $(file.previewElement).addClass('category-{ID}').data('node', {ID});
+                            },
+                            sending: function (file, xhr, formData) {
+                                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                formData.append('category', $(file.previewElement).data('node'));
+                                formData.append('comment', '');
+                                formData.append('hidden', 0);
+                            },
+                            complete: function (file) {
+                                $(file.previewElement).find('img').remove();
+                            },
+                            error: function (file, response) {
+                                $(file.previewElement).removeClass('dz-processing').find('[data-dz-status]').text(response.error);
+                            }
+                        });
+
+                        $("[audio-delete]").on('click', function (event) {
+                            event.preventDefault();
+
+                            $(this).confirmDialog({
+                                text: 'Are you sure you want to delete this?',
+                                confirmEvent: function (anchor) {
+                                    $.get('/cms/fileForm.php?ajax=1&delete=' + anchor.attr('id')).done(function() {
+                                        location.reload();
+                                    });
+                                }
+                            });
+                        });
+                    });
+                </script>
                 <!-- END submit_file -->
             </section>
         </div>
