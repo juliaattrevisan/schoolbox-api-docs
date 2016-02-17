@@ -37,7 +37,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * Returns the pastoral record if found in remote system
      *
-     * @param Pastoral $pastoral
+     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
      * @return array
      */
     public function getPastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
@@ -73,10 +73,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * Returns the external ID used to identify this pastoral record
      *
-     * @param Pastoral $pastoral
+     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
      * @return string
      */
-    private function getPastoralIdentifier(Pastoral $pastoral)
+    private function getPastoralIdentifier(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
     {
         return ($pastoral->getExternalId());
     }
@@ -85,10 +85,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      * Creates a new pastoral record in the external database
      *
      * @param \Schoolbox\Pastoral\Pastoral
-     * @param Pastoral $pastoral
+     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
      * @return bool
      */
-    public function createPastoral(Pastoral $pastoral)
+    public function createPastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
     {
         // Get the information necessary to create the query
 
@@ -194,10 +194,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * Updates an existing pastoral record
      *
-     * @param Pastoral $pastoral
+     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
      * @return bool
      */
-    public function updatePastoral(Pastoral $pastoral)
+    public function updatePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
     {
         // Get the information necessary to create the query
 
@@ -289,7 +289,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * @inheritDoc
      */
-    public function deletePastoral(Pastoral $pastoral)
+    public function deletePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
     {
         $result = $this->getDatabase()->query("DELETE FROM tPastoralCare WHERE PastoralCareSeq = " . $pastoral->getExternalId());
         return $result;

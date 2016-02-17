@@ -24,7 +24,7 @@ CREATE TABLE `schoolbox`.`pastoral_access` (
 CREATE TABLE `schoolbox`.`pastoral_tags` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT '',
   `pastoral_id` INT NOT NULL COMMENT '',
-  `tag` VARCHAR(255) NULL COMMENT '',
+  `name` VARCHAR(255) NULL COMMENT '',
   `datetime_deleted` DATETIME NULL DEFAULT NULL COMMENT '',
   PRIMARY KEY (`id`)  COMMENT '');
 

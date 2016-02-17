@@ -26,7 +26,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'getDashboard', $basePath, "/dashboard");
+        $this->addGetRoute($router, 'getDashboard', $basePath, "");
         $this->addGetRoute($router, 'getReport', $basePath, "/report");
         $this->addGetRoute($router, 'getIndex', $basePath, "/{id}");
         $this->addGetRoute($router, 'getInsert', $basePath, "/insert/{id}");
