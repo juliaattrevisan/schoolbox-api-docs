@@ -68,10 +68,13 @@ class FieldFactory
                 break;
             case Role::PARENT:
                 $augment = [
-                    'phoneWork.number' => 'Work Phone Number',
-                    'phoneWork.silent' => 'Work Phone Silent Status',
-                    'type'             => 'Contact Type',
-                    'role'             => 'Guardian Role',
+                    'phoneWork.number'         => 'Work Phone Number',
+                    'phoneWork.silent'         => 'Work Phone Silent Status',
+                    'type'                     => 'Contact Type',
+                    'role'                     => 'Guardian Role',
+                    'students[].campus[].code' => 'Student Campus(es) Code(s)',
+                    'students[].year'          => 'Student Year',
+                    'students[].gender'        => 'Student Gender',
                 ];
                 break;
             default:
