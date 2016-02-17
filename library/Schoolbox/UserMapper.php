@@ -354,12 +354,10 @@ class UserMapper extends Mapper
      * @param int    $id
      * @param string $roleType If provided, restrict to this role type.
      *                         One of `Role::STAFF`, `Role::STUDENT`, `Role::PARENT`, `Role::GUEST`
-     * @param int    $permissions If specified, limit the kind of permissions (userAccess) instances
-     *                         spawned and hydrated (used to separate Role and Group userAccess instances)
      * @return User
      * @throws Mapper\Exception
      */
-    public function findByExternalId($id, $roleType = null, $prototype = null) {
+    public function findByExternalId($id, $roleType = null) {
         $user = false;
         $roleMapper = new RoleMapper;
         $campusMapper = new CampusMapper;
