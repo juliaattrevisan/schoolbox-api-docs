@@ -16,12 +16,22 @@ $(document).ready(function() {
         });
     });
 
+    var deleteAllToggled = function(event) {
+        console.log('deleteAll');
+        $('input[name="delete[]"]').prop('checked', $(this)[0].checked);
+        $('[data-delete-members]').prop('disabled', $('input[name="delete[]"]:checked').length == 0);
+    };
+
+    var deleteToggled = function(event) {
+        console.log('delete');
+        $('[data-toggle-all]').prop('checked', false);
+        $('[data-delete-members]').prop('disabled', $('input[name="delete[]"]:checked').length == 0);
+    };
+
     var deleteMembers = function(event) {
         event.preventDefault();
 
-        if ($('input[name="delete[]"]:checked').length === 0) {
-            alert('You must select at least at least one member to remove');
-        } else {
+        if ($('input[name="delete[]"]:checked').length > 0) {
             $(this).confirmDialog({
                 text: 'Are you sure you want to remove the selected members from the group.',
                 confirmEvent: function () {
@@ -34,7 +44,6 @@ $(document).ready(function() {
                         categoryID: {CATEGORY_ID}
                     })
                     .always(function(data) {
-                        console.log(data);
                         location.reload();
                     });
                 }
@@ -43,6 +52,8 @@ $(document).ready(function() {
     };
 
     $('[data-delete-members]').click(deleteMembers);
+    $('[data-toggle-all]').change(deleteAllToggled);
+    $('input[name="delete[]"]').change(deleteToggled);
 
     // On accept/reject: ajax new group list in
     var waitingList = $('#waitingList');
@@ -66,6 +77,8 @@ $(document).ready(function() {
                     waitingList.empty().append($response.find('#waitingList').children());
                     memberList.empty().append($response.find('#members').children());
                     $('[data-delete-members]').off('click').click(deleteMembers);
+                    $('[data-toggle-all]').off('change').change(deleteAllToggled);
+                    $('input[name="delete[]"]').off('change').change(deleteToggled);
                 });
             })
             .fail(function() {
@@ -127,6 +140,8 @@ $(document).ready(function() {
                     waitingList.empty().append($response.find('#waitingList').children());
                     memberList.empty().append($response.find('#members').children());
                     $('[data-delete-members]').off('click').click(deleteMembers);
+                    $('[data-toggle-all]').off('change').change(deleteAllToggled);
+                    $('input[name="delete[]"]').off('change').change(deleteToggled);
                 });
             })
             .fail(function() {
@@ -221,9 +236,18 @@ $(document).ready(function() {
 
                     <!-- END msg_enabled_followth -->
                     <ul class="information-list">
+                        <li class="actions">
+                            <div class="small-1 columns no-pad">
+                                <input data-toggle-all id="delete-all" name="delete-all" type="checkbox" value="1">
+                                <label for="delete-all" class="checkbox-label"></label>
+                            </div>
+                        </li>
                         <!-- BEGIN groupOwner -->
                         <li class="actions" data-relation="member">
-                            <div class="small-12 medium-6 columns no-pad">
+                            <div class="small-1 columns no-pad">
+                                &nbsp;
+                            </div>
+                            <div class="small-11 medium-5 columns no-pad">
                                 <div class="avatar card">
                                     <!-- BEGIN msg_enabled_followadmin -->
 
@@ -252,10 +276,6 @@ $(document).ready(function() {
                                             <label for="accessLevel-{OWNER_ID}-3" class="radio-toggle">
                                                 <span class="icon-favourite" title="Make Admin"></span>
                                             </label>
-                                            <input id="delete-{OWNER_ID}" name="delete[]" type="checkbox" value="{OWNER_ID}">
-                                            <label for="delete-{OWNER_ID}" class="checkbox-toggle">
-                                                <span class="icon-tick" title="Remove From Group"></span>
-                                            </label>
                                             <input id="accessLevel-{OWNER_ID}-0" type="radio" name="accessLevel[{OWNER_ID}]" value="0" disabled />
                                             <label for="accessLevel-{OWNER_ID}-0" class="radio-toggle">
                                                 <span class="icon-close alert" title="Remove From Group"></span>
@@ -270,8 +290,13 @@ $(document).ready(function() {
 
                         <!-- BEGIN member -->
                         <li class="actions" data-relation="member">
-                            <div class="small-12 medium-6 columns no-pad">
+                            <div class="small-1 columns no-pad">
+                                <input id="delete-{USER_ID}" name="delete[]" type="checkbox" value="{USER_ID}">
+                                <label for="delete-{USER_ID}" class="checkbox-label"></label>
+                            </div>
+                            <div class="small-11 medium-5 columns no-pad">
                                 <div class="avatar card">
+
                                     <a href="/search/user/{USER_ID}">
                                         <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
                                         {USER_NAME}
@@ -283,7 +308,7 @@ $(document).ready(function() {
                                     </p>
                                 </div>
                             </div>
-                            <div class="small-12 medium-6 columns no-pad">
+                            <div class="small-11 medium-6 columns no-pad">
                                 <div class="actions-small-4">
                                     <nav>
                                         <!-- BEGIN make_owner -->
@@ -301,10 +326,6 @@ $(document).ready(function() {
                                             <input id="accessLevel-{USER_ID}-3" type="radio" name="accessLevel[{USER_ID}]" value="3" {ADMIN_ALLOWED} />
                                             <label for="accessLevel-{USER_ID}-3" class="radio-toggle">
                                                 <span class="icon-favourite" title="Make Admin"></span>
-                                            </label>
-                                            <input id="delete-{USER_ID}" name="delete[]" type="checkbox" value="{USER_ID}">
-                                            <label for="delete-{USER_ID}" class="checkbox-toggle">
-                                                <span class="icon-tick" title="Remove From Group"></span>
                                             </label>
                                             <input id="accessLevel-{USER_ID}-0" type="radio" name="accessLevel[{USER_ID}]" value="0" />
                                             <label for="accessLevel-{USER_ID}-0" class="radio-toggle">
@@ -329,7 +350,7 @@ $(document).ready(function() {
                         <!-- END member -->
                     </ul>
                     <hr>
-                    <button data-delete-members class="expand">Remove Selected Members From Group</button>
+                    <button disabled data-delete-members class="expand">Remove Selected Members From Group</button>
                 </div>
 
                 <div class="content" id="waitingList">
