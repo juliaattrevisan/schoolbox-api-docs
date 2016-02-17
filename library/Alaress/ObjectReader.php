@@ -64,13 +64,28 @@ class ObjectReader
      */
     public function coerceToStringRecursively($value)
     {
+        return array_map(
+            [$this, 'coerceToString'],
+            $this->coerceToFlatList($value)
+        );
+    }
+
+
+    /**
+     * Coerces a list (which could itself contain iterable objects) to a flat list.
+     *
+     * @param  mixed $value
+     * @return array
+     */
+    protected function coerceToFlatList($value)
+    {
         $result = [];
         if (is_array($value) || $value instanceof Traversable) {
             foreach ($value as $subValue) {
-                $result = array_merge($result, $this->coerceToStringRecursively($subValue));
+                $result = array_merge($result, $this->coerceToFlatList($subValue));
             }
         } else {
-            $result[] = $this->coerceToString($value);
+            $result[] = $value;
         }
         return $result;
     }
