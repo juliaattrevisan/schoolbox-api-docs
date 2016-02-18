@@ -316,6 +316,8 @@ class Controller extends Base
             $record->users = [];
             $record->access = false;
 
+            $record->setOwner(\Schoolbox\UserMapper::getInstance()->findById($record->getOwner()->getId()));
+
             $commentMapper = \Schoolbox\Pastoral\Comment\Mapper::getInstance();
             $record->comments = $commentMapper->findByPastoralId($record->getId());
 

@@ -1,11 +1,11 @@
-<ul class="breadcrumb">
+<ul class="breadcrumb hide-on-print">
     <li><a href="/pastoral/dashboard">Pastoral Care</a></li>
     <li class="active"><a href="#">Report</a></li>
 </ul>
 
 <div class="row">
     <div class="small-12 island">
-        <h1>Pastoral Care Report</h1>
+        <h1 class="hide-on-print">Pastoral Care Report</h1>
         <section>
             {% if results | length > 0 %}
                 <ul class="information-list">
@@ -16,28 +16,13 @@
                                     <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
                                     <h2>{{ record.student.firstname }} {{ record.student.lastname }}</h2>
                                     <h3>{{  record.getHeading() }}</h3>
-                                    <p class="spaced meta">
+                                    <p class="spaced meta hide-on-print">
                                         Posted by {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}
                                     </p>
-                                    {% if record.tags | length > 0 %}
-                                        <p class="spaced">
-                                            {% for tag in record.tags %}
-                                                <span class="neutral label">{{ tag.name }}</span>
-                                            {% endfor %}
-                                        </p>
-                                    {% endif %}
-                                    <article>
-                                        <p class="spaced">
-                                            {{ record.getBodyText() }}
-                                        </p>
-                                        {% if record.attachments.count() > 0 %}
-                                            <p class="meta">
-                                                {% for attachment in record.attachments %}
-                                                    Attached: {{  attachment.getFilename() }}<br>
-                                                {% endfor %}
-                                            </p>
-                                        {% endif %}
-                                    </article>
+                                    <p class="spaced meta show-for-print">
+                                        <br>Posted by {{ record.owner.firstName }} {{ record.owner.lastName }}<br>
+                                        {{  record.getPostDate().getShort() }}
+                                    </p>
                                     <p class="meta">
                                         Severity: {{ record.getSeverityName() }}
                                     </p>
@@ -48,6 +33,13 @@
                                     {% if record.private %}
                                         <p class="meta">
                                             Contents Private
+                                        </p>
+                                    {% endif %}
+                                    {% if record.attachments.count() > 0 %}
+                                        <p class="meta">
+                                            {% for attachment in record.attachments %}
+                                                Attached: {{  attachment.getFilename() }}<br>
+                                            {% endfor %}
                                         </p>
                                     {% endif %}
                                     <p class="spaced meta">
@@ -65,6 +57,36 @@
                                             {% endfor %}
                                         {% endif %}
                                     </p>
+
+                                    {% if record.tags | length > 0 %}
+                                        <p class="meta spaced show-for-print">
+                                            Tags:
+                                            {% for tag in record.tags %}
+                                                {{ tag.name | title }}
+                                                {% if not loop.last %} | {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                    <article class="hide-on-print">
+                                        <p class="spaced">
+                                            {{ record.getBodyText() }}
+                                        </p>
+                                    </article>
+                                    <p class="spaced show-for-print">
+                                        <br>
+                                        {{ record.getBodyText() }}
+                                        <br>
+                                        {% if record.tags | length > 0 %}
+                                            <p class="meta spaced show-for-print">
+                                                Tags:
+                                                {% for tag in record.tags %}
+                                                    {{ tag.name | title }}
+                                                    {% if not loop.last %} | {% endif %}
+                                                {% endfor %}
+                                            </p>
+                                        {% endif %}
+                                        <br>
+                                    </p>
                                 </div>
                             </div>
                         </li>
@@ -72,7 +94,8 @@
                             <li>
                                 <div class="list-item">
                                     <div class="small-12 avatar card wrap-down">
-                                        <p class="meta">Comment By <a href="/search/user/{{ comment.owner.getId() }}">{{ comment.owner.firstName }} {{ comment.owner.lastName }}</a> {{ comment.getPostDate().getShort() }}</p>
+                                        <p class="meta hide-on-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }} {{ comment.getPostDate().getShort() }}</p>
+                                        <p class="show-for-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }}<br>{{ comment.getPostDate().getShort() }}</p>
                                         <p class="spaced">
                                             {{ comment.body | raw }}
                                         </p>
