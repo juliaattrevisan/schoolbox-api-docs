@@ -29,6 +29,8 @@ class Report_Group extends Report_Abstract implements Report_IReport
         'house'              => 'House',
         'res_house'          => 'Residential House',
         'eportfolio_enabled' => 'E-Portfolio?',
+        'hide_contacts'      => 'Hide Contact Details?',
+        'hide_timetable'     => 'Hide Timetable?',
         'local_email'        => 'Email Address From Username?',
         'mail_handler'       => 'Use External Mail Client?',
         'webmail'            => 'Enable Webmail Tab?',
