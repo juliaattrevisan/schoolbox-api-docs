@@ -166,6 +166,7 @@ class Provisioner
                     ];
 
                     // Get the currently stored user
+                    /** @var User $internalUser */
                     try {
                         $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
                         $commonContext['internalUserId'] = $internalUser->getId();
