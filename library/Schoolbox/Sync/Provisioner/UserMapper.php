@@ -77,68 +77,37 @@ class UserMapper extends SchoolboxMapper
              */
             $allUserAccess = $userAccessMapper->findAllGroupsForUser($user);
 
+            /* Search $allUserAccess for anything that should be deleted
+             * If found, delete it from the db if it was already there
+             * These are spawned from a previous Rule.
+             */
+            foreach ($user->getUserAccessRemove() as $current) {
+                $found = $allUserAccess->getBy('serviceIdentifier', $current);
 
+                /* Do not blow away Owners, only Read/Write accessors
+                 */
+                if ($found && ($found->getAccessLevel() < UserAccess::ACCESS_FULL)) {
+                    $userAccessMapper->delete($found);
+                }
+            }
 
-            echo "Removes:";
-            print_r($user->getUserAccessRemove());
-
-            echo "Adds:";
+            /* Reinstate all elements in $accessList
+             */
             $accessible = [];
+
             foreach ($user->getAccessList() as $current) {
+                $userAccessMapper->save($current);
+
                 $accessible[] = $current->getServiceIdentifier();
             }
 
+            echo "Removes:\n";
+            print_r($user->getUserAccessRemove());
+
+            echo "Accessible:\n";
             print_r($accessible);
 
-
-//            /* Search $allUserAccess for anything that should be deleted
-//             * If found, delete it from the db if it was already there
-//             * These are spawned from a previous Rule.
-//             */
-//            foreach ($user->getUserAccessRemove() as $current) {
-//                $found = $allUserAccess->getBy('serviceIdentifier', $current);
-//
-//                /* Do not blow away Owners, only Read/Write accessors
-//                 */
-//                if ($found && ($found->getAccessLevel() < UserAccess::ACCESS_FULL)) {
-//                    $userAccessMapper->delete($found);
-//                }
-//            }
-//
-//            /* If you combined "Groups (Read)" and "Groups (Remove)" in the same rule
-//             * you might be in a state where items in $userAccessRemove won't be in the
-//             * db, but will have been added via "Groups (Read)". This means it won't
-//             * have anything to delete right now.
-//             *
-//             * Truncate the $userAccessRemove elements from $this->accessList as well
-//             * to ensure that what you remove applies to all other Groups (Read/Write)
-//             * effects in this rule
-//             */
-//            $trimmedAccessList = new Collection();
-//
-//            foreach ($this->getAccessList() as $currentAccessExists) {
-//                $found = false;
-//
-//                foreach ($user->getUserAccessRemove() as $currentAccessRemove) {
-//                    if ($currentAccessExists->getServiceIdentifier() == $currentAccessRemove) {
-//                        $found = true;
-//                    }
-//                }
-//
-//                /* Keep it, if it's not supposed to be removed
-//                 */
-//                if (!$found) {
-//                    $trimmedAccessList->add($currentAccessExists);
-//                }
-//            }
-//
-//            /* Square it away
-//             */
-//            $this->setAccessList($trimmedAccessList);
-//
-//            foreach ($user->getAccessList() as $current) {
-//                $userAccessMapper->save($current);
-//            }
+            echo "\n\n\n";
         }
     }
 }
