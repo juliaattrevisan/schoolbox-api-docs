@@ -93,21 +93,9 @@ class UserMapper extends SchoolboxMapper
 
             /* Reinstate all elements in $accessList
              */
-            $accessible = [];
-
             foreach ($user->getAccessList() as $current) {
                 $userAccessMapper->save($current);
-
-                $accessible[] = $current->getServiceIdentifier();
             }
-
-            echo "Removes:\n";
-            print_r($user->getUserAccessRemove());
-
-            echo "Accessible:\n";
-            print_r($accessible);
-
-            echo "\n\n\n";
         }
     }
 }
