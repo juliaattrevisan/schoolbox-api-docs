@@ -73,7 +73,7 @@ class FieldFactory
                     'type'                     => 'Contact Type',
                     'role'                     => 'Guardian Role',
                     'students[].campus[].code' => 'Student Campus(es) Code(s)',
-                    'students[].year'          => 'Student Year',
+                    'students[].year.level'    => 'Student Year',
                     'students[].gender'        => 'Student Gender',
                 ];
                 break;
