@@ -147,6 +147,8 @@ class User extends AbstractImporter
             "House"                        => '',
             "Residential House"            => '',
             "E-Portfolio?"                 => '',
+            "Hide Contact Details?"        => '',
+            "Hide Timetable?"              => '',
             "Email Address From Username?" => '',
             "Use External Mail Client?"    => '',
             "Enable Webmail Tab?"          => '',
@@ -227,6 +229,8 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\Password('Password', 'setPassword', $this->userMapper);
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Password', 'setRetrievablePassword');
         $this->userHydrators[] = new User\Hydrator\ToggleField('E-Portfolio?', 'setEportfolioEnable');
+        $this->userHydrators[] = new User\Hydrator\ToggleField('Hide Contact Details?', 'setHideContacts');
+        $this->userHydrators[] = new User\Hydrator\ToggleField('Hide Timetable?', 'setHideTimetable');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Email Address From Username?', 'setLocalEmail');
         // This one might have to be inverted
         $this->userHydrators[] = new User\Hydrator\ToggleField('Use External Mail Client?', 'setUseInternalMail');
