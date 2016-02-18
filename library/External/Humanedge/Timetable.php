@@ -289,7 +289,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                         }
                         try {
                             $endTime = new Alaress_Date_Format($timetabledClass['EndTime'], 'H:i:s+');
-                            $timetable[$x]['periodStart'] = $endTime->getUsingFormat('H:i');
+                            $timetable[$x]['periodEnd'] = $endTime->getUsingFormat('H:i');
                         } catch (Exception $e) {
                             // noop
                         }
