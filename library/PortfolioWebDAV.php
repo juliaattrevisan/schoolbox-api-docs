@@ -543,7 +543,13 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             return false;
         }
         catch (Sabre\DAV\Exception $e) {
-            error(141, $e->getMessage());
+            if($e->getMessage() == "HTTP error: 401") {
+                SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
+            } else if($e->getMessage() == "HTTP error: 404" OR $e->getMessage() == "HTTP error: 400") {
+                return false;
+            } else {
+                error(141, $e->getMessage() . " at: ".$path);
+            }
         }
 
         // remove parent
@@ -714,6 +720,26 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
     public function getByID($id)
     {
+        /* $id of zero is always the shadow root node, which resolves to the base URI
+           This means if the user has no access to the root of the webdav server '/'
+           it will fail with a 403 error, even if they can access all the defined shares.
+           Instead send fake data for the "/" root node.
+        */
+        if($id == "0") {
+            $temp = array(
+                'id' => $id,
+                'parent' => false,
+                'path' => $_SESSION['portfolioIdPathMap'][$id],
+                'name' => '',
+                'description' => '',
+                'type' => 'dir',
+                'file_size' => '',
+                'submitted' => '',
+                'ctime' => '',
+                'owner' => $_SESSION['id'],
+            );
+            return $temp;
+        }
         try {
             $response = $this->client->propFind($_SESSION['portfolioIdPathMap'][$id], array(
                 '{DAV:}getcontentlength',
@@ -743,11 +769,24 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
             return $temp;
         }
-        catch (Exception $e) {
-            //
-            // Sabre doesn't return any sort of useful exception, just send user to the network
-            // drive login page if something goes wrong
+        /* Handle Sabre_DAV_Exception specifically
+         */
+        catch (Sabre\DAV\Exception\NotAuthenticated $e) {
             SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
+        }
+        catch (Sabre\DAV\Exception\NotFound $e) {
+            /* In some cases we are told that something exists, only to be thrown a 404 error
+                Instead of reacting badly just return false and get on with life */
+            return false;
+        }
+        catch (Sabre\DAV\Exception $e) {
+            if($e->getMessage() == "HTTP error: 401") {
+                SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
+            } else if($e->getMessage() == "HTTP error: 404" OR $e->getMessage() == "HTTP error: 400") {
+                return false;
+            } else {
+                error(141, $e->getMessage(). " at: ".$_SESSION['portfolioIdPathMap'][$id]);
+            }
         }
     }
 
