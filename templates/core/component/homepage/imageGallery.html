@@ -28,40 +28,39 @@
                             </li>
                             <!-- END image_gallery -->
                         </ul>
-
-                        <!-- BEGIN submit_image -->
-                        <script type="text/javascript">
-                            $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                                wrapClass: 'dragging',
-                                previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                                previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
-                                acceptedFiles: 'image/*',
-                                createImageThumbnails: true,
-                                dictDefaultMessage: 'You can drag images into this space.',
-                                refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                                refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
-
-                                addedfile: function (file) {
-                                    $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
-                                },
-                                sending: function (file, xhr, formData) {
-                                    formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                                    formData.append('category', $(file.previewElement).data('node'));
-                                    formData.append('comment', '');
-                                    formData.append('hidden', 0);
-                                },
-                                complete: function (file) {
-                                    $(file.previewElement).find('img.dz-pending').remove();
-                                }
-                            });
-                            $('[data-image-gallery] li').magnificPopup({
-                                delegate: 'a',
-                                type: 'image'
-                            });
-                        </script>
                     </div>
                 </div>
                 <div class="content">
+                    <!-- BEGIN submit_image -->
+                    <script type="text/javascript">
+                        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                            wrapClass: 'dragging',
+                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                            previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                            acceptedFiles: 'image/*',
+                            createImageThumbnails: true,
+                            dictDefaultMessage: 'You can drag images into this space.',
+                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                            refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+
+                            addedfile: function (file) {
+                                $(file.previewElement).addClass('category-{IMAGEGALLERY_CATEGORY_ID}').data('node', {IMAGEGALLERY_CATEGORY_ID});
+                            },
+                            sending: function (file, xhr, formData) {
+                                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                formData.append('category', $(file.previewElement).data('node'));
+                                formData.append('comment', '');
+                                formData.append('hidden', 0);
+                            },
+                            complete: function (file) {
+                                $(file.previewElement).find('img.dz-pending').remove();
+                            }
+                        });
+                        $('[data-image-gallery] li').magnificPopup({
+                            delegate: 'a',
+                            type: 'image'
+                        });
+                    </script>
                     <a href="/cms/file/new/{IMAGEGALLERY_CATEGORY_ID}" class="button icon-add">Post Image</a>
                     <!-- END submit_image -->
                     <a href="/cms/imageGallery/{IMAGEGALLERY_CATEGORY_ID}/returnTo:{ID}" class="button icon-view">View Full Gallery</a>
