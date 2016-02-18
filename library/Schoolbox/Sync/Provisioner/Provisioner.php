@@ -211,7 +211,11 @@ class Provisioner
 
                     $originalName = ($action == 'create') ? "New user ({$internalUser->formatName()})" : $originalUser->formatName();
 
-                    if (count($diff)) {
+                    if (count($diff)
+                        || count($internalUser->getUserAccessRead())
+                        || count($internalUser->getUserAccessWrite())
+                        || count($internalUser->getUserAccessRemove())
+                    ) {
                         $level   = Logger::NOTICE;
                         $message = $update ? "Preparing to $action $originalName" : "$originalName would have been {$action}d";
                         $context = array_merge($commonContext, [ 'diff' => $diff ]);
