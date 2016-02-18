@@ -241,7 +241,7 @@
                  */
                 extraAllowedContent: 'img(full-width)[data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float};' +
                     'iframe(full-width)[src,allowfullscreen]{width,height,border,margin,margin-top,margin-bottom,margin-left,margin-right,display,float}; '+
-                    'div(scrollable,highlighted-note);' +
+                    'div(*);' +
                     'object[id,name,width,height];' +
                     'param[name,value];' +
                     'embed[src,type,allowscriptaccess,allowfullscreen,wmode,width,height];' +
