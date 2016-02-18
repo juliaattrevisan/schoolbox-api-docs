@@ -19,8 +19,8 @@ use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Ruleset;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
+use Schoolbox\Sync\Provisioner\User;
+use Schoolbox\Sync\Provisioner\UserMapper;
 use UnexpectedValueException;
 use Schoolbox\Collection;
 
