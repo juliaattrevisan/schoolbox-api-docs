@@ -86,14 +86,14 @@
 
             var payload = {
                 type: type,
-                rubricId: opts.rubricId,
+                rubricId: opt.rubricId,
                 groupId: groupId,
                 name: name,
                 levelCount: $rb.children('thead').find('input').length
             };
 
             if (type == 'criterion') {
-                payload.groupName = $rb.find('input[name="' + ( opts.formField + '[' + [ payload.rubricId, 'group', groupId, 'name' ].join('][') + ']' ) + '"]').val();
+                payload.groupName = $rb.find('input[name="' + ( opt.formField + '[' + [ payload.rubricId, 'group', groupId, 'name' ].join('][') + ']' ) + '"]').val();
                 payload.folderId  = $('input[name=category]').val();
             }
 
