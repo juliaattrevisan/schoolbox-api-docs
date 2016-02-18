@@ -14,6 +14,7 @@ use Schoolbox\UserMapper as SchoolboxMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\ConfigLoader;
 
+/** @method User findByExternalId($id, $roleType = null) */
 class UserMapper extends SchoolboxMapper
 {
     protected function mapping()
@@ -42,7 +43,7 @@ class UserMapper extends SchoolboxMapper
     /**
      * Save an updated list of UserAccess instances
      *
-     * @param $user
+     * @param User $user
      */
     public function postSave($user)
     {

@@ -70,8 +70,6 @@ class User extends SchoolboxUser
     /**
      * Get user access remove
      *
-     * TODO: This isn't actually used much, I don't think...
-     *
      * @return mixed
      */
     public function getUserAccessRemove()

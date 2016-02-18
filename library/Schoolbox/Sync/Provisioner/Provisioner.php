@@ -19,8 +19,8 @@ use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Ruleset;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
+use Schoolbox\Sync\Provisioner\User;
+use Schoolbox\Sync\Provisioner\UserMapper;
 use UnexpectedValueException;
 use Schoolbox\Collection;
 
@@ -166,6 +166,7 @@ class Provisioner
                     ];
 
                     // Get the currently stored user
+                    /** @var User $internalUser */
                     try {
                         $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
                         $commonContext['internalUserId'] = $internalUser->getId();
@@ -211,7 +212,11 @@ class Provisioner
 
                     $originalName = ($action == 'create') ? "New user ({$internalUser->formatName()})" : $originalUser->formatName();
 
-                    if (count($diff)) {
+                    if (count($diff)
+                        || count($internalUser->getUserAccessRead())
+                        || count($internalUser->getUserAccessWrite())
+                        || count($internalUser->getUserAccessRemove())
+                    ) {
                         $level   = Logger::NOTICE;
                         $message = $update ? "Preparing to $action $originalName" : "$originalName would have been {$action}d";
                         $context = array_merge($commonContext, [ 'diff' => $diff ]);
