@@ -31,6 +31,7 @@ use PDO;
 use Schoolbox\Application\WebRequest;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Notif\SilentNotif;
 use Scrub;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;
@@ -463,7 +464,11 @@ class Bootstrap implements BootstrapInterface {
 						\Schoolbox\Sync\Grammar\Factory::class,
 						[
 							'log'        => $di->lazyGet('ups.logger'),
-							'userMapper' => $di->lazyNew(\Schoolbox\Sync\Provisioner\UserMapper::class),
+							'userMapper' => $di->lazy(function () {
+								$map = new \Schoolbox\Sync\Provisioner\UserMapper;
+								$map->setNotifier(new SilentNotif());
+								return $map;
+							}),
 							'ruleMapper' => $di->lazyNew(\Schoolbox\Sync\Rule\Mapper::class),
 						]
 					),
