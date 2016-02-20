@@ -65,6 +65,8 @@ class Factory {
         'enabled' => 'Schoolbox Account Enabled',
         'webmail' => 'Enable Webmail Tab',
         'eportfolioEnable' => 'E-Portfolio Enabled',
+        'hideContacts' => 'Hide Contact Details',
+        'hideTimetable' => 'Hide Timetable',
     ];
 
     /**
