@@ -13,6 +13,7 @@ namespace Schoolbox\Curriculum\Component;
 
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 
 class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
@@ -60,8 +61,9 @@ class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
             $templateHandle,
             '@curriculum/component/curriculumDetails.twig',
             array(
-                'context' => $this->getContext(),
-                'node'    => $this->curriculumNode,
+                'context'  => $this->getContext(),
+                'node'     => $this->curriculumNode,
+                'readonly' => ($this->permission <= UserAccess::ACCESS_READ),
             )
         );
     }
