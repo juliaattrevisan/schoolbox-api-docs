@@ -889,14 +889,37 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getEnrolledStudents($externalUserId)
     {
-        return $this->getDatabase()->trimAll(
-            $this->getDatabase()->getAll("
-                SELECT S.STUDKEY AS RelatedID
-                FROM STUDENT S
-                INNER JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
-                WHERE S_FAMILY.FAMKEY = {$this->getDatabase()->smartQuote($externalUserId)}
-            ")
-        );
+        // parent external ID format: $famKey-{some code}
+        $suffix     = '';
+        $familyCode = $externalUserId;
+        $parts = explode('-', $externalUserId);
+        if (count($parts) > 1) {
+            $suffix     = array_pop($parts);
+            $familyCode = implode('-', $parts);
+        }
+        $query = "
+            SELECT S.STUDKEY AS RelatedID
+            FROM STUDENT S
+            INNER JOIN FAMILY AS S_FAMILY ON S.FAMILY_CODE = S_FAMILY.FAMKEY
+            WHERE S_FAMILY.FAMKEY = {$this->getDatabase()->smartQuote($familyCode)}
+        ";
+        switch ($suffix) {
+            case 'F':
+                $query .= " AND S_FAMILY.DAD_DOMICILE = 'Y'";
+                break;
+            case 'M':
+                $query .= " AND S_FAMILY.MUM_DOMICILE = 'Y'";
+                break;
+            case 'C':
+                $query .= " AND S_FAMILY.CGIVE_DOMICILE = 'Y'";
+                break;
+            case 'G':
+                $query .= " AND S_FAMILY.GUARD_DOMICILE = 'Y'";
+                break;
+            default:
+                break;
+        }
+        return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
     }
 
     /**
