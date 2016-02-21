@@ -16,6 +16,45 @@ $(document).ready(function() {
         });
     });
 
+    var deleteAllToggled = function(event) {
+        console.log('deleteAll');
+        $('input[name="delete[]"]').prop('checked', $(this)[0].checked);
+        $('[data-delete-members]').prop('disabled', $('input[name="delete[]"]:checked').length == 0);
+    };
+
+    var deleteToggled = function(event) {
+        console.log('delete');
+        $('[data-toggle-all]').prop('checked', false);
+        $('[data-delete-members]').prop('disabled', $('input[name="delete[]"]:checked').length == 0);
+    };
+
+    var deleteMembers = function(event) {
+        event.preventDefault();
+
+        if ($('input[name="delete[]"]:checked').length > 0) {
+            $(this).confirmDialog({
+                text: 'Are you sure you want to remove the selected members from the group.',
+                confirmEvent: function () {
+                    var deleteIds = $('input[name="delete[]"]:checked').map(function() {
+                        return $(this).val();
+                    }).get();
+
+                    $.post('/group/deleteMembers.php', {
+                        deleteIds: deleteIds,
+                        categoryID: {CATEGORY_ID}
+                    })
+                    .always(function(data) {
+                        location.reload();
+                    });
+                }
+            });
+        }
+    };
+
+    $('[data-delete-members]').click(deleteMembers);
+    $('[data-toggle-all]').change(deleteAllToggled);
+    $('input[name="delete[]"]').change(deleteToggled);
+
     // On accept/reject: ajax new group list in
     var waitingList = $('#waitingList');
     var memberList  = $('#members');
@@ -37,6 +76,9 @@ $(document).ready(function() {
                     var $response = $(response);
                     waitingList.empty().append($response.find('#waitingList').children());
                     memberList.empty().append($response.find('#members').children());
+                    $('[data-delete-members]').off('click').click(deleteMembers);
+                    $('[data-toggle-all]').off('change').change(deleteAllToggled);
+                    $('input[name="delete[]"]').off('change').change(deleteToggled);
                 });
             })
             .fail(function() {
@@ -97,6 +139,9 @@ $(document).ready(function() {
                     var $response = $(response);
                     waitingList.empty().append($response.find('#waitingList').children());
                     memberList.empty().append($response.find('#members').children());
+                    $('[data-delete-members]').off('click').click(deleteMembers);
+                    $('[data-toggle-all]').off('change').change(deleteAllToggled);
+                    $('input[name="delete[]"]').off('change').change(deleteToggled);
                 });
             })
             .fail(function() {
@@ -191,9 +236,20 @@ $(document).ready(function() {
 
                     <!-- END msg_enabled_followth -->
                     <ul class="information-list">
+                        <!-- BEGIN hide_no_members -->
+                            <li class="actions">
+                                <div class="small-1 columns no-pad">
+                                    <input data-toggle-all id="delete-all" name="delete-all" type="checkbox" value="1">
+                                    <label for="delete-all" class="checkbox-label"></label>
+                                </div>
+                            </li>
+                        <!-- END hide_no_members -->
                         <!-- BEGIN groupOwner -->
                         <li class="actions" data-relation="member">
-                            <div class="small-12 medium-6 columns no-pad">
+                            <div class="small-1 columns no-pad">
+                                &nbsp;
+                            </div>
+                            <div class="small-11 medium-5 columns no-pad">
                                 <div class="avatar card">
                                     <!-- BEGIN msg_enabled_followadmin -->
 
@@ -202,7 +258,7 @@ $(document).ready(function() {
                                         <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
                                         {GROUP_OWNER}
                                     </a>
-                                    <p class="meta icon-favourite">Group Admin</p>
+                                    <p class="meta icon-favourite">Group Admins</p>
                                 </div>
                             </div>
                             <div class="small-12 medium-6 columns no-pad">
@@ -236,8 +292,13 @@ $(document).ready(function() {
 
                         <!-- BEGIN member -->
                         <li class="actions" data-relation="member">
-                            <div class="small-12 medium-6 columns no-pad">
+                            <div class="small-1 columns no-pad">
+                                <input id="delete-{USER_ID}" name="delete[]" type="checkbox" value="{USER_ID}">
+                                <label for="delete-{USER_ID}" class="checkbox-label"></label>
+                            </div>
+                            <div class="small-11 medium-5 columns no-pad">
                                 <div class="avatar card">
+
                                     <a href="/search/user/{USER_ID}">
                                         <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
                                         {USER_NAME}
@@ -249,7 +310,7 @@ $(document).ready(function() {
                                     </p>
                                 </div>
                             </div>
-                            <div class="small-12 medium-6 columns no-pad">
+                            <div class="small-11 medium-6 columns no-pad">
                                 <div class="actions-small-4">
                                     <nav>
                                         <!-- BEGIN make_owner -->
@@ -290,6 +351,8 @@ $(document).ready(function() {
                         </li>
                         <!-- END member -->
                     </ul>
+                    <hr>
+                    <button disabled data-delete-members class="expand">Remove Selected Members From Group</button>
                 </div>
 
                 <div class="content" id="waitingList">
