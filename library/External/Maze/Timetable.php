@@ -97,7 +97,7 @@ class External_Maze_Timetable implements External_TimetableInterface
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
+    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
         $query = "
 			SELECT TOP 50 *
