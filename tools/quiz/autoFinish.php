@@ -27,6 +27,9 @@ use Schoolbox\Assessment\Course\Task;
 
 $log             = new Logger(STDOUT, null, Monolog\Logger::INFO, [], true);
 $attemptMapper   = new AttemptMapper();
+$attemptHandler  = new Assess_Attempt();
+$responseHandler = new Assess_Response();
+
 $taskMapper      = new Task\InstanceCompletionMapper();
 $expiredAttempts = $attemptMapper->findUnfinishedExpiredAttempts();
 $updatedAttempts = [];
@@ -65,6 +68,29 @@ foreach ($expiredAttempts as $attempt) {
         $attempt->setFinish($attemptFinishDate);
         $updatedAttempts[] = $attempt;
     }
+
+    /* Automark the attempt so its ready for review */
+    $allAttempts = $attemptHandler->getListByAssessAndAttempt($attempt->getAssessment()->getId(), $attempt->getId());
+
+    $factory = new Assess_Factory();
+
+    if ($allAttempts) {
+        foreach ($allAttempts as $currentAttempt) {
+            $allResponses = $responseHandler->getAutomarkableResponses($attempt->getId());
+
+            if (is_array($allResponses)) {
+                foreach ($allResponses as $currentResponse) {
+                    $answerHandler = $factory->createAnswerModel($currentResponse['type_id']);
+
+                    $answerHandler->mark($currentResponse);
+
+                    $markedResponseIDs[] = $currentResponse['response_id'];
+                }
+            }
+        }
+    }
+
+    $responseHandler->updatedAutomatedMarks($markedResponseIDs);
 
 }
 
