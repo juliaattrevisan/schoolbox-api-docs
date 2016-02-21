@@ -265,15 +265,17 @@ abstract class Tokenizer
         $reader = new ObjectReader();
         $values = (array)$this->getToken($token)->apply($dataset, $settings);
 
-        // No values - map to a single empty string
-        if (count($values) === 0) {
-            $values = [''];
-        }
-        foreach ($values as $i => $value) {
-            $values[$i] = $reader->coerceToString($value);
+        $newValues = [];
+        foreach ($values as $value) {
+            $newValues = array_merge($newValues, $reader->coerceToStringRecursively($value));
         }
 
-        return $values;
+        // No values - map to a single empty string
+        if (count($newValues) === 0) {
+            $newValues = [''];
+        }
+
+        return $newValues;
     }
 
 

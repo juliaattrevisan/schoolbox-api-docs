@@ -57,6 +57,39 @@ class ObjectReader
         return (string)$value;
     }
 
+    /**
+     * @param  mixed $value
+     * @throws DomainException if any value can't be coerced
+     * @return array|string[]
+     */
+    public function coerceToStringRecursively($value)
+    {
+        return array_map(
+            [$this, 'coerceToString'],
+            $this->coerceToFlatList($value)
+        );
+    }
+
+
+    /**
+     * Coerces a list (which could itself contain iterable objects) to a flat list.
+     *
+     * @param  mixed $value
+     * @return array
+     */
+    protected function coerceToFlatList($value)
+    {
+        $result = [];
+        if (is_array($value) || $value instanceof Traversable) {
+            foreach ($value as $subValue) {
+                $result = array_merge($result, $this->coerceToFlatList($subValue));
+            }
+        } else {
+            $result[] = $value;
+        }
+        return $result;
+    }
+
 
     /**
      * Accepts any input, and returns the list of path strings that could be validly accepted by self::read()
@@ -240,7 +273,8 @@ class ObjectReader
 
                         // this array is what we'll operate on from here
                         $string .= $append;
-                        $value = $values;
+                        // $values could be an array of arrays - smoosh it into a flat list
+                        $value = $this->coerceToFlatList($values);
 
                     }
 

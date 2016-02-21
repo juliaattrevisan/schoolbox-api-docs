@@ -30,12 +30,13 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->tokenizer = new MockTokenizer([
-            'foo'            => 'The foo',
-            'bar'            => 'The bar',
-            'baz.bar'        => "The baz's bar",
-            'single.multi[]' => "The single's multi",
-            'empty[]'        => "An empty multi",
-            'alpha[].id'     => "The IDs of the alpha's bravos"
+            'foo'             => 'The foo',
+            'bar'             => 'The bar',
+            'baz.bar'         => "The baz's bar",
+            'single.multi[]'  => "The single's multi",
+            'multi[].multi[]' => "The multi's multi",
+            'empty[]'         => "An empty multi",
+            'alpha[].id'      => "The IDs of the alpha's bravos"
         ]);
 
         $this->tree = [
@@ -50,6 +51,20 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
                     'second',
                     'third',
                     'fourth'
+                ]
+            ],
+            'multi' => [
+                [
+                    'multi' => [
+                        'first',
+                        'second',
+                    ]
+                ],
+                [
+                    'multi' => [
+                        'third',
+                        'fourth',
+                    ]
                 ]
             ],
             'empty' => [],
@@ -123,6 +138,31 @@ class TokenizerTest extends PHPUnit_Framework_TestCase
                 => ['{:alpha.4.id}', 'foxtrot'],
             'nested multi-value subvalue extract out-of-range'
                 => ['{:alpha.9.id}', ''],
+            'multi-multi value'
+                => ['{:multi.multi}', ['first', 'second', 'third', 'fourth']],
+            'multi-multi value filter'
+                => ['{:multi.multi|first}', ['f','s','t','f']],
+            'multi-multi x multi-multi'
+                => ['{:multi.multi|first}{:multi.multi}', [
+                        'ffirst', 'fsecond', 'fthird', 'ffourth',
+                        'sfirst', 'ssecond', 'sthird', 'sfourth',
+                        'tfirst', 'tsecond', 'tthird', 'tfourth',
+                        'ffirst', 'fsecond', 'fthird', 'ffourth',
+                    ]],
+            'multi-multi mapped'
+                => [ new Map('{:multi.multi}', [
+                        'first'  => 'ONE',
+                        'second' => 'TWO',
+                        'third'  => 'THREE',
+                        'fourth' => 'FOUR'
+                   ]), [ 'ONE', 'TWO', 'THREE', 'FOUR' ] ],
+            /*
+             * KNOWN FAIL CASE:
+             * attempting to combine an array field against a replica of itself
+             * (eg. "{:single.multi}x{:single.multi}") will result in a 'natural join' rather than 'cartesian'
+             *
+             * Buggy behaviour is observed when the token strings are identical: using a filter on one resolves the issue.
+             * */
         ];
     }
 
