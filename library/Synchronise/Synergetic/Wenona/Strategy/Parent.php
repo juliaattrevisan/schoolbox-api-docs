@@ -49,6 +49,7 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
         $newUser['firstname'] = $currentUser['Given'];
         $newUser['lastname'] = $currentUser['Surname'];
         $newUser['alt_email'] = $parent['Email']; // not mapped
+        $newUser['webmail'] = 0;
 
         // the view inverts the boolean campus flags for some reason
         $campus = array();
