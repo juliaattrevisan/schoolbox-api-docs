@@ -84,6 +84,9 @@ if (is_numeric($_GET['delete'])) {
     } catch (\Schoolbox\Resource\Exception $e) {
         error(43);
         exit;
+    } catch (InvalidArgumentException $e) {
+        error(43);
+        exit;
     }
 
     SitePage::localRedir("/homepage/".$_POST['category']);

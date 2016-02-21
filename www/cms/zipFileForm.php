@@ -28,6 +28,9 @@ if ($isSuperuser || $isAllowedTeacher) {
 		} catch (\Schoolbox\Resource\Exception $e) {
 			error(2);
 			exit;
+		} catch (\InvalidArgumentException $e) {
+			error(43);
+			exit;
 		}
 		// Ensure the file is available locally
 		$filename = tempnam(Config::get('zip_dir'), 'zip');

@@ -40,6 +40,8 @@ if ($groupHandler->isSuperuser()) {
             } catch (\Schoolbox\Resource\Exception $e) {
                 // File is empty or not found. Delete the record completely
                 $newValue = '';
+            } catch (\InvalidArgumentException $e) {
+                $newValue = '';
             }
         }
         else if ($record['field_id'] == Config::FIELD_FILEMULTI) {
@@ -55,6 +57,8 @@ if ($groupHandler->isSuperuser()) {
                 }
             } catch (\Schoolbox\Resource\Exception $e) {
                 // File is empty or not found. Delete the record completely
+                $newValue = '';
+            } catch (\InvalidArgumentException $e) {
                 $newValue = '';
             }
         }

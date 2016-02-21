@@ -58,6 +58,9 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     } catch (\Schoolbox\Resource\Exception $e) {
         error(43);
         exit;
+    } catch (\InvalidArgumentException $e) {
+        error(43);
+        exit;
     }
 
     // if file was synchronously uploaded
