@@ -154,9 +154,17 @@ class External_Tass_User implements External_UserInterface
 						WHERE stud_code = '$tassID'
 					";
 
-        $parent = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+        $parents = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
 
-        return $parent;
+        // Kludge to add spouse ID
+
+        foreach ($parents as $key => $parent) {
+            if (!empty($parent['StudentContactSpousePreferred'])) {
+                $parents[$key]['StudentContactSpouseID'] = str_replace("P", "S", $parent['StudentContactID']);
+            }
+        }
+
+        return $parents;
     }
 
     public function getCurrentSemester($externalUserId = null)
