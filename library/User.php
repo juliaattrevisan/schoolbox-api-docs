@@ -156,6 +156,24 @@ class User extends DeprecatedModel
     }
 
     /**
+     * Gets the part of a WHERE query that filters out parents from:
+     * * Guests
+     * * Staff, if config.parent_search_enable is off
+     *
+     * @param  \Schoolbox\User $user
+     * @return string
+     */
+    protected function getSearchFilter($user)
+    {
+        if ($user->getRole()->isGuest() ||
+            (!$user->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
+        ) {
+            return " `groups`.`group_type` != 'parent' ";
+        }
+        return '';
+    }
+
+    /**
      * Search the user table for particular user(s)
      *
      * @param        $keyword
@@ -189,10 +207,8 @@ class User extends DeprecatedModel
 
         //If parent search policy is disabled, only staff will see parents in search results
         //Guests never see parents
-        if ($_SESSION['user']->getRole()->isGuest() ||
-            (!$_SESSION['user']->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
-        ) {
-            $wherePart .= " AND `groups`.`group_type` != 'parent' ";
+        if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
+            $wherePart .= ' AND '.$searchFilter;
         }
 
         // retreive results
@@ -227,10 +243,9 @@ class User extends DeprecatedModel
 
         //If parent search policy is disabled, only staff will see parents in search results
         //Guests never see parents
-        if ($_SESSION['user']->getRole()->isGuest() ||
-            (!$_SESSION['user']->getRole()->isStaff() && Cfg::get('parent_search_enable') != 1)
-        ) {
-            $wherePart = " AND `groups`.`group_type` != 'parent' ";
+        $wherePart = '';
+        if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
+            $wherePart .= ' AND '.$searchFilter;
         }
 
         // retrieve results
@@ -319,6 +334,9 @@ class User extends DeprecatedModel
             $query .= "AND residential_house_id IN ("
                 . implode(',', array_map('intval', $residentialHouseIds))
                 . ')';
+        }
+        if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
+            $query .= ' AND '.$searchFilter;
         }
         $query .= "ORDER BY group_id, year, lastname, firstname";
         if (is_numeric($limit)) {

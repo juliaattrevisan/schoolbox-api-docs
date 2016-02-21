@@ -21,12 +21,7 @@ if (!empty($residentialHouseID)) {
 if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
     && (strlen($groupID) || strlen($roleTypeID))
 ) {
-
-    if ($groupHandler->isParent() || $groupHandler->isStudent()) {
-        // Parents and students can only search for staff, no matter what.
-        $groupID = $groupHandler->getStaffGroupTypeIds();
-    }
-    elseif (strlen($roleTypeID)) {
+    if (strlen($roleTypeID)) {
         // Search in a list of role types.
         $groupID = array();
         foreach (explode(';', strtolower($roleTypeID)) as $roleType) {
