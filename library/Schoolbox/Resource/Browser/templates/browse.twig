@@ -25,7 +25,6 @@
 
 <script type="text/javascript">
     $(function () {
-
         var openNode = {{ folder.id }};
 
         {# TODO put this in a new module #}
@@ -147,7 +146,7 @@
                 {# TODO cache this #}
                 .load(uri, function () {
                     $(this).removeClass('loading');
-                    $('#preview-container').foundation('tooltip', 'reflow').foundation('dropdown', 'reflow');
+                    $(document).foundation('tooltip', 'reflow').foundation('dropdown', 'reflow');
                     rs();
                 });
 
