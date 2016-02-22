@@ -789,6 +789,7 @@ class External_Synergetic_User implements External_UserInterface
         // WD:          Ward
         // GRASN/GRADR: Grandson/Granddaughter
         // FOCD:        Foster child
+        // HS:          Homestay
         $query = "
             SELECT Relationships.RelatedID
             FROM SynergyOne.dbo.Constituencies Constituencies
@@ -796,7 +797,7 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN SynergyOne.dbo.Community Community ON Relationships.RelatedID = Community.ID
             WHERE Relationships.ID = '{$synergyID}'
             AND Constituencies.ConstitCode='@SC'
-            AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD')
+            AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS')
             ORDER BY Community.BirthDate
         ";
         return $this->getDatabase()->getAll($query);
