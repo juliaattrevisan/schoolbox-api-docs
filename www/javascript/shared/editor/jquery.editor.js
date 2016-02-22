@@ -245,7 +245,7 @@
                     'object[id,name,width,height];' +
                     'param[name,value];' +
                     'embed[src,type,allowscriptaccess,allowfullscreen,wmode,width,height];' +
-                    'a[href,target];'
+                    'a[id,href,target];'
                 ,
 
                 /* Remove annoying dialog that always appears
