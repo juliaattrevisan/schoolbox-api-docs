@@ -996,6 +996,10 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             return $this->cacheNnian[$folder->getId()];
         }
 
+        // Keep a list of interim nodes we traverse so we can store these in the cache also
+
+        $interimNodes = array();
+
         // Check if the folder supplied inherits permissions
 
         if ($folder->getInherit())
@@ -1017,10 +1021,23 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                     // Found NNIAN, cache it for future calls
 
                     $this->cacheNnian[$folder->getId()] = $currentNode;
+
+                    // Cache any interim nodes we traversed as well
+
+                    foreach ($interimNodes as $id) {
+                        $this->cacheNnian[$id] = $currentNode;
+                    }
+
+                    // Return the result
+
                     return ($currentNode);
                 }
                 else
                 {
+                    // Just another interim node, store its ID so we can cache it for later calls
+
+                    $interimNodes[] = $currentNode->getId();
+
                     // Keep going back further
 
                     if ($currentNode->getParent()->getId() == 0)
@@ -1039,8 +1056,9 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
                 }
             }
-        } else {
-
+        }
+        else
+        {
             // Folder doesn't inherit, just return it
 
             $this->cacheNnian[$folder->getId()] = $folder;
