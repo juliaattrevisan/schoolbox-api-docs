@@ -10,8 +10,8 @@
 
 namespace Schoolbox\Sync\Provisioner;
 
+use Schoolbox;
 use Schoolbox\UserMapper as SchoolboxMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\ConfigLoader;
 
 /** @method User findByExternalId($id, $roleType = null) */
@@ -32,10 +32,10 @@ class UserMapper extends SchoolboxMapper
      * Get a list of all Role- and Group-level userAccess instances
      * Default behaviour, just as it always was
      *
-     * @param \Schoolbox\User $user
+     * @param Schoolbox\User $user
      * @return mixed
      */
-    protected function findAccessList(\Schoolbox\User $user)
+    protected function findAccessList(Schoolbox\User $user)
     {
         return $this->getJoinMapper('userAccess')->findAllGroupsForUser($user);
     }
@@ -50,7 +50,10 @@ class UserMapper extends SchoolboxMapper
         $config = new ConfigLoader();
 
         if ($config->get('ups_groups_enabled')) {
-            $userAccessMapper = new UserAccessMapper();
+            $userAccessMapper = $this->getJoinMapper('userAccess');
+
+            // make sure any mutes go through correctly
+            $userAccessMapper->setNotifier($this->getNotifier());
 
             foreach ($user->getAccessList() as $current) {
                 $userAccessMapper->save($current);

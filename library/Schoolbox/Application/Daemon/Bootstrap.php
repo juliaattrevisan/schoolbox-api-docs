@@ -18,6 +18,7 @@ use Autoloader;
 use Database;
 use Schoolbox\Config\ConfigMapper;
 use Config\Modules\ModuleConfigInterface;
+use Schoolbox\Notif\SilentNotif;
 
 class Bootstrap implements BootstrapInterface {
 
@@ -190,7 +191,11 @@ class Bootstrap implements BootstrapInterface {
                         $source = new \Schoolbox\External\Connector\SyncFactory();
                         return $source->build();
                     }),
-                    'userMapper'     => $di->lazyNew(\Schoolbox\Sync\Provisioner\UserMapper::class),
+                    'userMapper' => $di->lazy(function () {
+                        $map = new \Schoolbox\Sync\Provisioner\UserMapper();
+                        $map->setNotifier(new SilentNotif());
+                        return $map;
+                    }),
                     'logger'         => $di->lazyGet('ups.logger'),
                     'logMapper'      => $di->lazyNew(\Schoolbox\Sync\Log\Mapper::class),
                 ]
