@@ -19,6 +19,19 @@ use Alaress\DebugBar\DataCollector\DeprecatedDatabaseCollector;
  */
 class DeprecatedDatabase implements Serializable
 {
+    /**
+     * Non-deprecated database that this object wraps around.
+     *
+     * @var Database
+     */
+    protected $database;
+
+    /**
+     * Result from the non-deprecated database.
+     *
+     * @var PDOStatement
+     */
+    public $databaseResult;
 
     /**
      * MySQLi connection, should not be public but has a history of being
@@ -53,11 +66,11 @@ protected $collector;
  */
 function __construct($db = SQL_db, $debug = 1)
 {
-	$this->host = SQL_host;
-	$this->user = SQL_user;
-	$this->passwd = SQL_passwd;
-	$this->debug = $debug;
-	$this->db = $db;
+//	$this->host = SQL_host;
+//	$this->user = SQL_user;
+//	$this->passwd = SQL_passwd;
+//	$this->debug = $debug;
+//	$this->db = $db;
 	$this->connect();
 }
 
@@ -98,15 +111,17 @@ function reconnect()
  */
 function connect()
 {
-	if(!isset($this->dbf)) {
-		$this->dbf = mysqli_connect($this->host, $this->user, $this->passwd);
-		mysqli_set_charset($this->dbf, 'UTF8');
-	}
-	if(!$this->dbf instanceof mysqli) {
-		die("Unable to connect ".$this->user."@".$this->host." using ".$this->db);
-	}
-	if(!$this->changeDb($this->db))
-		print "Unable to access ".$this->db.", check the permissions";
+    // Assuming all DeprecatedDatabase instances use the same connection string
+    $this->database = Database::getInstance();
+//	if (!isset($this->database)) {
+//		$this->dbf = mysqli_connect($this->host, $this->user, $this->passwd);
+//		mysqli_set_charset($this->dbf, 'UTF8');
+//	}
+//	if(!$this->dbf instanceof mysqli) {
+//		die("Unable to connect ".$this->user."@".$this->host." using ".$this->db);
+//	}
+//	if(!$this->changeDb($this->db))
+//		print "Unable to access ".$this->db.", check the permissions";
 }
 
 	/**
@@ -117,7 +132,8 @@ function connect()
 	 */
 	public function setTimezone($timezone)
 	{
-		return $this->query("SET time_zone = '{$this->quote($timezone)}'");
+        return $this->database->setTimezone($timezone);
+//		return $this->query("SET time_zone = '{$this->quote($timezone)}'");
 	}
 
 /**
@@ -128,7 +144,7 @@ function connect()
  */
 function close()
 {
-	return mysqli_close($this->dbf);
+//	return mysqli_close($this->dbf);
 }
 
 /**
@@ -140,13 +156,13 @@ function close()
  */
 function changeDb($db)
 {
-	if(mysqli_select_db($this->dbf, $db))
-	{
-		$this->db = $db;
-		return true;
-	}
-	else
-		return false;
+//	if(mysqli_select_db($this->dbf, $db))
+//	{
+//		$this->db = $db;
+//		return true;
+//	}
+//	else
+//		return false;
 }
 
 /**
@@ -160,40 +176,42 @@ function changeDb($db)
  */
 function query($sql_q, $retry = true)
 {
-	if ($this->debug && $this->collector instanceof DeprecatedDatabaseCollector) {
-		$this->result = $this->collector->query($sql_q);
-	}
-	else {
-		$this->result = mysqli_query($this->dbf, $sql_q) or $mysqli_eval_error = mysqli_error($this->dbf);
-
-		if (isset($mysqli_eval_error)) {
-            if($retry) {
-                $this->reconnect();
-                return $this->query($sql_q, false);
-            }
-
-			if ($this->debug) {
-				trigger_error(sprintf('Query: "%s" triggered error: "%s"', preg_replace('`\s+`', ' ', $sql_q), $mysqli_eval_error), E_USER_WARNING);
-			}
-			else {
-				error(21, $mysqli_eval_error);
-			}
-		}
-	}
-
-	return $this->result;
+    $this->databaseResult = $this->database->query($sql_q);
+    return $this->databaseResult;
+//	if ($this->debug && $this->collector instanceof DeprecatedDatabaseCollector) {
+//		$this->result = $this->collector->query($sql_q);
+//	}
+//	else {
+//		$this->result = mysqli_query($this->dbf, $sql_q) or $mysqli_eval_error = mysqli_error($this->dbf);
+//
+//		if (isset($mysqli_eval_error)) {
+//            if($retry) {
+//                $this->reconnect();
+//                return $this->query($sql_q, false);
+//            }
+//
+//			if ($this->debug) {
+//				trigger_error(sprintf('Query: "%s" triggered error: "%s"', preg_replace('`\s+`', ' ', $sql_q), $mysqli_eval_error), E_USER_WARNING);
+//			}
+//			else {
+//				error(21, $mysqli_eval_error);
+//			}
+//		}
+//	}
+//
+//	return $this->result;
 }
 
-/**
- * Returns the current result resource
- *
- * @deprecated
- * @return mysqli_result
- */
-function getResult()
-{
-	return $this->result;
-}
+///**
+// * Returns the current result resource
+// *
+// * @deprecated
+// * @return mysqli_result
+// */
+//function getResult()
+//{
+//	return $this->result;
+//}
 
 /**
  * Gets the first result returned by the query
@@ -572,9 +590,9 @@ function dbDoQuery($sql_q) {
 	return $this->query($sql_q);
 }
 
-function dbGetResult() {
-	return $this->getResult();
-}
+//function dbGetResult() {
+//	return $this->getResult();
+//}
 
 function dbGetSingleRow($sql_q) {
 	return $this->getRow($sql_q);
