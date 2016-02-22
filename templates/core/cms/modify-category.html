@@ -8,9 +8,11 @@
         $('[data-checkbox-inherit]').change(function(event) {
             if ($(event.target).prop('checked')) {
                 $('#permissions').addClass('hide');
+                $('#synergetic-codes').addClass('hide');
                 $("input[name^='group']").removeClass('required');
             } else {
                 $('#permissions').removeClass('hide');
+                $('#synergetic-codes').removeClass('hide');
                 $("input[name^='group']").addClass('required');
             }
         });
@@ -187,32 +189,33 @@
                         </div>
                         <!-- END indiv_perms -->
                     </div>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <!-- BEGIN synergy_input -->
-                            <label>
-                                {DATABASE_TYPE} Subject Codes
-                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="If you want this category to be a subject enter its code here. You may enter multiple codes by separating them with a comma">?</span>
-                                <input type="text" name="code" size="40" value="{CODE}" />
-                            </label>
-                            <!-- END synergy_input -->
-                        </div>
-
-                        <!-- BEGIN curriculum_code_input -->
-                        <div class="small-12 large-10 columns">
-                            <label>
-                                Curriculum Codes
-                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this folder with a corresponding curriculum area, you can link multiple curriculum areas to this folder">?</span>
-                            </label>
-                            {CURRICULUM_CODE_INPUT}
-                        </div>
-                        <div class="small-12 large-2 columns">
-                            <label>Browse</label>
-                            {CURRICULUM_BROWSE_BUTTON}
-                        </div>
-                        <!-- END curriculum_code_input -->
-				    </fieldset>
                 </div>
+                <fieldset id="synergetic-codes" class="content {HIDE_PERMISSIONS}">
+                    <div class="small-12 columns">
+                        <!-- BEGIN synergy_input -->
+                        <label>
+                            {DATABASE_TYPE} Subject Codes
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="If you want this category to be a subject enter its code here. You may enter multiple codes by separating them with a comma">?</span>
+                            <input type="text" name="code" size="40" value="{CODE}" />
+                        </label>
+                        <!-- END synergy_input -->
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <!-- BEGIN curriculum_code_input -->
+                    <div class="small-12 large-10 columns">
+                        <label>
+                            Curriculum Codes
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this folder with a corresponding curriculum area, you can link multiple curriculum areas to this folder">?</span>
+                        </label>
+                        {CURRICULUM_CODE_INPUT}
+                    </div>
+                    <div class="small-12 large-2 columns">
+                        <label>Browse</label>
+                        {CURRICULUM_BROWSE_BUTTON}
+                    </div>
+                    <!-- END curriculum_code_input -->
+                </fieldset>
 			</section>
 			<div class="row">
 				<div class="small-12 column">
