@@ -83,7 +83,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         /* Template rendering
          */
         $this->setBlock($templateHandle, 'image_gallery', 'image_gallery_block');
-        $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
+        $this->setBlock($templateHandle, 'submit_image_gallery', 'submit_image_gallery_block');
 
         /* Prevent multiple galleries from other categories stacking up in the wrong place
          * and initialise empty gallery by default
@@ -109,11 +109,11 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         if ($this->permission < WRITE_ACCESS) {
             $this->setVar(
                 array(
-                    'submit_image_block' => ''
+                    'submit_image_gallery_block' => ''
                 )
             );
         } else {
-            $this->parse('submit_image_block', 'submit_image');
+            $this->parse('submit_image_gallery_block', 'submit_image_gallery');
         }
 
         // Load images for the requested homepage
