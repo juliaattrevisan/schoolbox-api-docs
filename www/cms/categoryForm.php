@@ -3,6 +3,7 @@
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\CategoryCodeMapper;
 use Schoolbox\Resource\Category as CategoryModel;
+use \Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
@@ -19,27 +20,17 @@ $groupHandler = new Group();
 $bttfCount = 1;
 
 if ($_POST['name']) {
+
     /** @var \Schoolbox\Resource\Category $model */
     $model = $categoryMapper->createModel()
         ->setName($_POST['name'])
+        ->setInherit($_POST['inherit'] == 1 ? true : false)
         ->setParent(
             $categoryMapper->createModel()
                 ->setId($_POST['parent'])
         );
 
-    // Only superusers get to change class codes
-    $codeCollection = new \Schoolbox\Collection();
-    if ($groupHandler->isSuperuser()) {
-        foreach (explode(',', $_POST['code']) as $code) {
-            $trimmedCode = trim($code);
-            if (strlen($trimmedCode)) {
-                $codeModel = new \Schoolbox\Resource\CategoryCode();
-                $codeModel->setCode($trimmedCode);
-                $codeCollection->add($codeModel);
-            }
-        }
-        $model->setCodes($codeCollection);
-    }
+    // Make sure the user has permission to perform the action
 
     if (is_numeric($_POST['categoryID'])) {
         if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
@@ -50,47 +41,90 @@ if ($_POST['name']) {
         error(6);
     }
 
-    // Delete cat codes here, allowing them to be recreated when the category
-    // gets saved.
+    // Delete category codes here, allowing them to be recreated when the category gets saved.
     // (I'm not confident that deleting cat codes in the postSave method
     //  regardless of whether there are any won't break somewhere else)
+
     if ($groupHandler->isSuperuser() && $model->getId() && count($codeCollection) === 0) {
-        CategoryCodeMapper::getInstance()->delete(
-            CategoryCodeMapper::getInstance()->findByColumn('categoryID', $model->getId())
-        );
+        CategoryCodeMapper::getInstance()->deleteByColumn('categoryID', $model->getId());
     }
 
-    // Only privileged users (teachers?) get to change curriculum codes?
-    if (isset($_POST['curriculumCodes'])) {
-        $model->setCurriculumNodes(
-            Schoolbox\Curriculum\Node\Mapper::getInstance()
-                ->findByColumn('id', $_POST['curriculumCodes'])
-        );
-    } elseif ($model->getId()) {
-        $existingModel = $categoryMapper->findById($model->getId());
-        $model->setCurriculumNodes($existingModel->getCurriculumNodes());
-    }
-    foreach (explode(',', $_POST['code']) as $code) {
-        $trimmedCode = trim($code);
-        if (strlen($trimmedCode)) {
-            $codeModel = new \Schoolbox\Resource\CategoryCode();
-            $codeModel->setCode($trimmedCode);
-            $codeCollection->add($codeModel);
+    if ($_POST['inherit'] == 1) {
+
+        // If inheriting permissions we need to remove any existing class codes...
+
+        CategoryCodeMapper::getInstance()->deleteByColumn('categoryID', $_POST['categoryID']);
+
+        // ...and user access permissions...
+
+        UserAccessMapper::getInstance()->deleteByColumn("sid", $_POST["categoryID"]);
+
+        // ...and role permissions
+
+        RoleAccessMapper::getInstance()->deleteByColumn("cid", $_POST["categoryID"]);
+
+        $affectedIds = $categoryMapper->save($model);
+
+        if ($affectedIds === false) {
+            // something went wrong
+            error(2);
         }
+
+        $model->setId($affectedIds[0]);
+
+    } else {
+
+        // Only superusers get to change class codes
+
+        $codeCollection = new \Schoolbox\Collection();
+        if ($groupHandler->isSuperuser()) {
+            foreach (explode(',', $_POST['code']) as $code) {
+                $trimmedCode = trim($code);
+                if (strlen($trimmedCode)) {
+                    $codeModel = new \Schoolbox\Resource\CategoryCode();
+                    $codeModel->setCode($trimmedCode);
+                    $codeCollection->add($codeModel);
+                }
+            }
+            $model->setCodes($codeCollection);
+        }
+
+        // Only privileged users (teachers?) get to change curriculum codes?
+
+        if (isset($_POST['curriculumCodes'])) {
+            $model->setCurriculumNodes(
+                Schoolbox\Curriculum\Node\Mapper::getInstance()
+                    ->findByColumn('id', $_POST['curriculumCodes'])
+            );
+        } elseif ($model->getId()) {
+            $existingModel = $categoryMapper->findById($model->getId());
+            $model->setCurriculumNodes($existingModel->getCurriculumNodes());
+        }
+
+        foreach (explode(',', $_POST['code']) as $code) {
+            $trimmedCode = trim($code);
+            if (strlen($trimmedCode)) {
+                $codeModel = new \Schoolbox\Resource\CategoryCode();
+                $codeModel->setCode($trimmedCode);
+                $codeCollection->add($codeModel);
+            }
+        }
+
+        $model->setCodes($codeCollection);
+
+        $affectedIds = $categoryMapper->save($model);
+
+        if ($affectedIds === false) {
+            // something went wrong
+            error(2);
+        }
+
+        $model->setId($affectedIds[0]);
+
+        // if rolepermission collection is defined, reapply permissions (possibly recursively)
+        $rolePermissions = RoleAccessMapper::getInstance()->savePermissions($model, $_POST['group'],
+            $_POST['recursive']);
     }
-    $model->setCodes($codeCollection);
-
-    $affectedIds = $categoryMapper->save($model);
-
-    if ($affectedIds === false) {
-     // something went wrong
-        error(2);
-    }
-
-    $model->setId($affectedIds[0]);
-
-    // if rolepermission collection is defined, reapply permissions (possibly recursively)
-    $rolePermissions = RoleAccessMapper::getInstance()->savePermissions($model, $_POST['group'], $_POST['recursive']);
 
     /* HomepageConfig definition
      */
