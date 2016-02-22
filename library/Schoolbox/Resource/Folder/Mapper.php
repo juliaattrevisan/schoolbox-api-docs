@@ -987,6 +987,11 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     /**
      * Finds the nearest non-inheriting ancestral node (NNIAN)
      *
+     * -_-_-_-_-_-_-_,------,
+     * _-_-_-_-_-_-_-|   /\_/\
+     * -_-_-_-_-_-_-~|__( ^ .^)
+     * // _-_-_-_-_-_-_-""  ""
+     *
      * @param \Schoolbox\Resource\Folder\Model $folder
      */
     public function findNearestNonInheritingAncestralNode(\Schoolbox\Resource\Folder\Model $folder)

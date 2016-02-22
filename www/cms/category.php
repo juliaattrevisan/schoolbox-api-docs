@@ -63,11 +63,6 @@ if (is_numeric($this->arg[0])) {
         // The node currently inherits from its parent. Pre-populate the permission details with
         // those from its nearest non-inheriting ancestral node (NNIAN)
 
-        // -_-_-_-_-_-_-_,------,
-        // _-_-_-_-_-_-_-|   /\_/\
-        // -_-_-_-_-_-_-~|__( ^ .^)
-        // _-_-_-_-_-_-_-""  ""
-
         $permissionFolder = \Schoolbox\Resource\CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
         $allRoleAccess = $roleMapper->findAllForFolder($permissionFolder);
 
