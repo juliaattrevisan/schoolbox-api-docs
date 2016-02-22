@@ -103,10 +103,8 @@ if (is_numeric($this->arg[0])) {
         'NAME' => Scrub::text($folder->getName()),
         'ACCESS_WRITE' => UserAccess::ACCESS_WRITE,
         'INHERIT_SELECTED' => $folder->getInherit() ? 'checked' : '',
-        'HIDE_PERMISSIONS' => $folder->getInherit() ? 'none' : 'block',
-        // Hide individual permissions if inherit ticked
-        'HIDE_INHERIT' => $folder->getParent()->getId() == 0 ? 'none' : 'block',
-        // Root level items cannot use inheritance
+        'HIDE_PERMISSIONS' => $folder->getInherit() ? 'none' : 'block',         // Hide individual permissions if inherit ticked
+        'HIDE_INHERIT' => $folder->getParent()->getId() == 0 ? 'hide' : '',         // Root level items cannot use inheritance
         'CODE' => $code,
         'PARENT_ID' => $folder->getParent()->getId(),
         'PARENT_NAME' => Scrub::text($folderParent->getName()),
@@ -171,7 +169,6 @@ if (is_numeric($this->arg[0])) {
             $this->setVar('indiv_modify_block', '');
         }
     }
-
 
     $this->parse('reset_content_block', 'reset_content');
 
