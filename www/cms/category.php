@@ -71,11 +71,6 @@ if (is_numeric($this->arg[0])) {
         $permissionFolder = \Schoolbox\Resource\CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
         $allRoleAccess = $roleMapper->findAllForFolder($permissionFolder);
 
-        $curriculumCodeInput = $this->getTwig()->render(
-            'sub/curriculumCodeSelector.twig',
-            ['codeList' => $permissionFolder->getCurriculumNodes(), 'renderButton' => false,]
-        );
-
         // Class code can't be the same otherwise you get a "Unable to create or modify folder as class code
         // already exists." error message, so just setting it to be blank
 
@@ -84,14 +79,13 @@ if (is_numeric($this->arg[0])) {
     } else {
 
         $allRoleAccess = $roleMapper->findAllForFolder($folder);
-
-        $curriculumCodeInput = $this->getTwig()->render(
-            'sub/curriculumCodeSelector.twig',
-            ['codeList' => $folder->getCurriculumNodes(), 'renderButton' => false,]
-        );
-
         $code = Scrub::text($folder->getCodeString());
     }
+
+    $curriculumCodeInput = $this->getTwig()->render(
+        'sub/curriculumCodeSelector.twig',
+        ['codeList' => $permissionFolder->getCurriculumNodes(), 'renderButton' => false,]
+    );
 
     $curriculumBrowseButton = $this->getTwig()->render(
         'sub/curriculumBrowseButton.twig'
