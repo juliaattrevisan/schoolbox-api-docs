@@ -272,37 +272,38 @@ function getAll($sql_q)
  * Can be optionally passed a result resource otherwise it uses current result resource
  *
  * @deprecated
- * @param int $result
+ * @param PDOStatement $result
  * @return array|bool|null
  */
 function getNextArray($result = 0)
 {
-	if($result)
-	        $return_array = mysqli_fetch_assoc($result);
-	else if($this->result)
-		$return_array = mysqli_fetch_assoc($this->result);
-	else
-		return false;
-
-	return $return_array;
+    if ($result instanceof PDOStatement) {
+        $return_array = $result->fetch(PDO::FETCH_ASSOC);
+    } elseif ($this->result instanceof PDOStatement) {
+        $return_array = $this->result->fetch(PDO::FETCH_ASSOC);
+    } else {
+        return false;
+    }
+    return $return_array;
 }
 
 /**
  * Returns the number of rows returned by the query
  *
  * @deprecated
- * @param int $result
+ * @param PDOStatement $result
  * @return bool|int
  */
 function countRows($result = 0)
 {
-	if($result)
-		$return_count = mysqli_num_rows($result);
-	else if($this->result)
-		$return_count = mysqli_num_rows($this->result);
-	else
-		return false;
-	return $return_count;
+    if ($result instanceof PDOStatement) {
+        $return_count = $result->rowCount();
+    } elseif ($this->result instanceof PDOStatement) {
+        $return_count = $this->result->rowCount();
+    } else {
+        return false;
+    }
+    return $return_count;
 }
 
 /**
