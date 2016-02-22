@@ -517,12 +517,6 @@ public function getCollector() {
  * @return string
  */
 function smartQuote($value) {
-
-// Stripslashes
-	if (get_magic_quotes_gpc()) {
-		$value = stripslashes($value);
-	}
-
 	$mysqlFuncs = array(
 		'NULL',
 		'NOW()',
@@ -533,7 +527,7 @@ function smartQuote($value) {
 	 */
 	// Quote if not integer or special
     if (!in_array($value, $mysqlFuncs) ) {
-        $value = "'" . mysqli_real_escape_string($this->dbf, $value) . "'";
+        $value = $this->database->quote($value);
     }
 
 	return $value;
@@ -548,7 +542,8 @@ function smartQuote($value) {
  * @return string
  */
 public function quote($string) {
-    return mysqli_real_escape_string($this->dbf, $string);
+    // PDO->quote() adds quote marks - I don't want those.
+    return preg_replace("/^'?(.*?)'?$/", '$1', $this->database->quote($string));
 }
 
 /**
