@@ -172,7 +172,7 @@ function changeDb($db)
  * @deprecated
  * @param $sql_q
  * @param bool $retry
- * @return bool|mysqli_result|resource
+ * @return PDOStatement
  */
 function query($sql_q, $retry = true)
 {
@@ -238,9 +238,8 @@ function getRow($sql_q)
  */
 function getOne($sql_q)
 {
-	$result = $this->query($sql_q);
-	$row = mysqli_fetch_row($result);
-	return $row[0];
+    $result = $this->query($sql_q);
+    return $result->fetchColumn();
 }
 
 /**
@@ -338,7 +337,8 @@ function insert($table, $array)
 	$values = substr($values, 0, -1);
 
 	$query = "INSERT INTO `$table` ($names) VALUES ($values)";
-	return $this->query($query);
+	$this->query($query);
+    return true;
 }
 
 /**
@@ -380,7 +380,8 @@ function insertMultiRow($table, $array, $names=false)
 	$query = "INSERT INTO `$table` ($cols) VALUES ";
 	$query .= implode(',', $rows);
 
-	return $this->query($query);
+	$this->query($query);
+    return true;
 }
 
 	/**
@@ -429,7 +430,8 @@ function update($table, $identifier, $array)
 		$query .= " AND `$ident`= ".$this->smartQuote($array[$ident]);
 	}
 
-	return $this->query($query);
+	$this->query($query);
+    return true;
 }
 
 /**
@@ -449,7 +451,8 @@ function delete($table, $identifier, $value)
 	} else {
 		$query .= "OR `$identifier` =  ".$this->smartQuote($value);
 	}
-	return $this->query($query);
+	$this->query($query);
+    return true;
 }
 
 
@@ -461,8 +464,7 @@ function delete($table, $identifier, $value)
  */
 function insertID()
 {
-	$return_id = mysqli_insert_id($this->dbf);
-	return $return_id;
+    return $this->database->lastInsertId();
 }
 
 /**
@@ -473,25 +475,19 @@ function insertID()
  */
 function affectedRows()
 {
-	$return_count = mysqli_affected_rows($this->dbf);
-	return $return_count;
+    return $this->databaseResult->rowCount();
 }
 
 /**
  * Free the result resource
  *
  * @deprecated
- * @param int $result
+ * @param PDOStatement $result
  * @return bool
  */
 function endQuery($result = 0)
 {
-	if ($result)
-		mysqli_free_result($result);
-	else if($this->result)
-		mysqli_free_result($this->result);
-	else
-		return false;
+    return true;
 }
 
 /**
@@ -500,7 +496,7 @@ function endQuery($result = 0)
  * @deprecated
  */
 public function installCollector() {
-    $this->collector = new DeprecatedDatabaseCollector($this->dbf);
+//    $this->collector = new DeprecatedDatabaseCollector($this->dbf);
 }
 
 /**
@@ -508,7 +504,7 @@ public function installCollector() {
  * @return DeprecatedDatabaseCollector
  */
 public function getCollector() {
-    return $this->collector;
+    return $this->database->getCollector();
 }
 
 /* PRIVATE FUNCTIONS */
