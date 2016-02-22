@@ -71,45 +71,6 @@ class CategoryMapper extends Schoolbox\Mapper
     }
 
     /**
-     * Finds the nearest non-inheriting ancestral node (NNIAN)
-     *
-     * @param Schoolbox\Resource\Category $category
-     */
-    public function findNearestNonInheritingAncestralNode(Schoolbox\Resource\Category $category)
-    {
-
-        if ($category->getInherit())
-        {
-            // Need to find permission of NNIAN
-
-            $parent = CategoryMapper::getInstance()->findById($category->getParent()->getId());
-
-            for (;;)
-            {
-                if (!$parent->getInherit())
-                {
-                    // Found NNIAN
-
-                    return ($parent);
-                }
-                else
-                {
-                    // Keep going back
-
-                    if ($parent->getParent()->getId() == 0) {
-                        error(2);
-                    } else {
-                        $parent = CategoryMapper::getInstance()->findById($category->getParent()->getId());
-                    }
-
-                }
-            }
-        } else {
-            return $category;
-        }
-    }
-
-    /**
      * Find all the categories belonging to an event
      *
      * @param Schoolbox\Calendar\Event $event
