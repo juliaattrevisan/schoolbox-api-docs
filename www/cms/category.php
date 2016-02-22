@@ -56,6 +56,75 @@ if (is_numeric($this->arg[0])) {
     $this->setTitle('Modify Category');
     $this->setTab('resources');
 
+    $roleMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
+
+    if ($folder->getInherit()) {
+
+        // The node currently inherits from its parent. Pre-populate the permission details with
+        // those from its nearest non-inheriting ancestral node (NNIAN)
+
+        // -_-_-_-_-_-_-_,------,
+        // _-_-_-_-_-_-_-|   /\_/\
+        // -_-_-_-_-_-_-~|__( ^ .^)
+        // _-_-_-_-_-_-_-""  ""
+
+        $found = false;
+
+        // Start at the folders immiediate parent
+
+        $parent = $folderMapper->findById($folder->getParent()->getId());
+
+        while (!$found)
+        {
+            // Check if parent of current node inherits
+
+            if (!$parent->getInherit()) {
+
+                // Found the NNIAN
+
+                $allRoleAccess = $roleMapper->findAllForFolder($parent);
+                $found = true;
+
+            } else {
+
+                // Parent also inherits, go back one more
+
+                if ($parent->getParent()->getId() == 0) {
+
+                    // Got back to the root node, somethings wrong in the database
+                    error(2);
+                }
+
+                $parent = $folderMapper->findById($parent->getParent()->getId());
+            }
+        }
+
+        $curriculumCodeInput = $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $parent->getCurriculumNodes(), 'renderButton' => false,]
+        );
+
+        // Class code can't be the same otherwise you get a "Unable to create or modify folder as class code
+        // already exists." error message, so just setting it to be blank
+
+        $code = '';
+
+    } else {
+
+        $allRoleAccess = $roleMapper->findAllForFolder($folder);
+
+        $curriculumCodeInput = $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $folder->getCurriculumNodes(), 'renderButton' => false,]
+        );
+
+        $code = Scrub::text($folder->getCodeString());
+    }
+
+    $curriculumBrowseButton = $this->getTwig()->render(
+        'sub/curriculumBrowseButton.twig'
+    );
+
     $output = array(
         'ACTION' => 'Modify',
         'CATEGORY_ID' => $folder->getId(),
@@ -63,20 +132,15 @@ if (is_numeric($this->arg[0])) {
         'ACCESS_WRITE' => UserAccess::ACCESS_WRITE,
         'INHERIT_SELECTED' => $folder->getInherit() ? 'checked' : '',
         'HIDE_PERMISSIONS' => $folder->getInherit() ? 'none' : 'block',         // Hide individual permissions if inherit ticked
-        'HIDE_INHERIT' => $folder->getParent()->getId() == 0 ? 'hide' : '',         // Root level items cannot use inheritance
-        'CODE' => Scrub::text($folder->getCodeString()),
+        'HIDE_INHERIT' => $folder->getParent()->getId() == 0 ? 'none' : 'block',         // Root level items cannot use inheritance
+        'CODE' => $code,
         'PARENT_ID' => $folder->getParent()->getId(),
         'PARENT_NAME' => Scrub::text($folderParent->getName()),
         'USER_GROUP' => $_SESSION['gid'],
         'DATABASE_TYPE' => ucfirst(Cfg::get('external_type')),
         'REQUIRED_PERMS' => $_SESSION['gid'],
-        'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
-            'sub/curriculumCodeSelector.twig',
-            ['codeList' => $folder->getCurriculumNodes(), 'renderButton' => false,]
-        ),
-        'CURRICULUM_BROWSE_BUTTON' => $this->getTwig()->render(
-            'sub/curriculumBrowseButton.twig'
-        ),
+        'CURRICULUM_CODE_INPUT' => $curriculumCodeInput,
+        'CURRICULUM_BROWSE_BUTTON' => $curriculumBrowseButton,
     );
 
     $this->setVar($output);
@@ -97,9 +161,6 @@ if (is_numeric($this->arg[0])) {
     $homepageTemplateList->prepend($keepExisting);
 
     $this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content, array('name'=>'TEMPLATE_NAME','id'=>'TEMPLATE_ID' ));
-
-    $roleMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
-    $allRoleAccess = $roleMapper->findAllForFolder($folder);
 
     if ($allRoleAccess->count()) {
         foreach ($allRoleAccess as $currentRoleAccess) {
