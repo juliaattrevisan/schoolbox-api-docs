@@ -76,16 +76,38 @@ if (is_numeric($this->arg[0])) {
 
         $code = '';
 
+        $curriculumCodeInput = $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $permissionFolder->getCurriculumNodes(), 'renderButton' => false,]
+        );
+
+        // Get the curriculum codes from the NNIAN node
+
+        $permissionFolder = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($permissionFolder->getId());
+
+        $curriculumCodeInput = $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $permissionFolder->getCurriculumNodes(), 'renderButton' => false,]
+        );
+
     } else {
 
+        // Get the roles for the current node
+
         $allRoleAccess = $roleMapper->findAllForFolder($folder);
+
+        // Get the class codes for the current node
+
         $code = Scrub::text($folder->getCodeString());
+
+        // Get the curriculum codes for the current node
+
+        $curriculumCodeInput = $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $folder->getCurriculumNodes(), 'renderButton' => false,]
+        );
     }
 
-    $curriculumCodeInput = $this->getTwig()->render(
-        'sub/curriculumCodeSelector.twig',
-        ['codeList' => $permissionFolder->getCurriculumNodes(), 'renderButton' => false,]
-    );
 
     $curriculumBrowseButton = $this->getTwig()->render(
         'sub/curriculumBrowseButton.twig'

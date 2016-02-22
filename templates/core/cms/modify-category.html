@@ -7,10 +7,10 @@
 
         $('[data-checkbox-inherit]').change(function(event) {
             if ($(event.target).prop('checked')) {
-                $('#permissions').hide();
+                $('#permissions').addClass('hide');
                 $("input[name^='group']").removeClass('required');
             } else {
-                $('#permissions').show();
+                $('#permissions').removeClass('hide');
                 $("input[name^='group']").addClass('required');
             }
         });
@@ -140,7 +140,7 @@
                     </div>
                 </fieldset>
 
-                <div id="permissions {HIDE_PERMISSIONS}">
+                <div id="permissions" class="{HIDE_PERMISSIONS}">
                     <table class="scrollable">
                         <thead>
                             <tr>

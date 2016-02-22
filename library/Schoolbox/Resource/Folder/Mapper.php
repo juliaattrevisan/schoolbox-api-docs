@@ -48,6 +48,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * @var array
      */
     protected $cacheNnian = array();
+    protected $interimNodes = array();
 
     protected function mapping()
     {
@@ -996,73 +997,46 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             return $this->cacheNnian[$folder->getId()];
         }
 
-        // Keep a list of interim nodes we traverse so we can store these in the cache also
-
-        $interimNodes = array();
-
-        // Check if the folder supplied inherits permissions
+        // Check if the node inherits permissions
 
         if ($folder->getInherit())
         {
-            // Need to find the NNIAN
+            // Just another interim node, store its ID so we can cache it for later calls
 
-            $currentNode = $this->findById($folder->getParent()->getId());
+            $this->interimNodes[] = $folder->getId();
 
-            // Keep crawling backwards until we find the NNIAN
+            // Make sure we aren't hitting the root
 
-            for (;;)
+            if ($folder->getParent()->getId() == 0)
             {
-                if (isset($this->cacheNnian[$currentNode->getId()])) {
-                    return $this->cacheNnian[$currentNode->getId()];
-                }
-
-                if (!$currentNode->getInherit())
-                {
-                    // Found NNIAN, cache it for future calls
-
-                    $this->cacheNnian[$folder->getId()] = $currentNode;
-
-                    // Cache any interim nodes we traversed as well
-
-                    foreach ($interimNodes as $id) {
-                        $this->cacheNnian[$id] = $currentNode;
-                    }
-
-                    // Return the result
-
-                    return ($currentNode);
-                }
-                else
-                {
-                    // Just another interim node, store its ID so we can cache it for later calls
-
-                    $interimNodes[] = $currentNode->getId();
-
-                    // Keep going back further
-
-                    if ($currentNode->getParent()->getId() == 0)
-                    {
-                        // Got to the top- somethings wrong with the data in the database as this
-                        // should not be possible.
-
-                        error(2);
-                    }
-                    else
-                    {
-                        // Get the parent
-
-                        $currentNode = $this->findById($currentNode->getParent()->getId());
-                    }
-
-                }
+                // Got to the top- somethings wrong with the data in the database as this should not be possible
+                error(2);
             }
+
+            // Round we go again
+
+            $parent = $this->findById($folder->getParent()->getId());
+            $result = $this->findNearestNonInheritingAncestralNode($parent);
         }
         else
         {
-            // Folder doesn't inherit, just return it
+            // The node doesn't inherit, we found what we were looking for! Cache it
 
             $this->cacheNnian[$folder->getId()] = $folder;
+
+            // Cache any interim nodes we traversed as well
+
+            foreach ($this->interimNodes as $id) {
+                $this->cacheNnian[$id] = $folder;
+            }
+
+            // Clear out the array
+
+            $this->interimNodes = array();
+
             return $folder;
         }
+
+        return $result;
     }
 }
