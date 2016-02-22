@@ -51,7 +51,7 @@ protected $collector;
  * @param string $db
  * @param int $debug
  */
-function DeprecatedDatabase($db = SQL_db, $debug = 1)
+function __construct($db = SQL_db, $debug = 1)
 {
 	$this->host = SQL_host;
 	$this->user = SQL_user;
@@ -641,6 +641,6 @@ function dbSmartQuote($value) {
 	 * @return void
 	 */
 	public function unserialize($serialized) {
-		$this->DeprecatedDatabase();
+		$this->__construct();
 	}
 }
