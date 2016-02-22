@@ -74,8 +74,7 @@ if (is_numeric($this->arg[0])) {
 
         $parent = $folderMapper->findById($folder->getParent()->getId());
 
-        while (!$found)
-        {
+        while (!$found) {
             // Check if parent of current node inherits
 
             if (!$parent->getInherit()) {
@@ -131,8 +130,10 @@ if (is_numeric($this->arg[0])) {
         'NAME' => Scrub::text($folder->getName()),
         'ACCESS_WRITE' => UserAccess::ACCESS_WRITE,
         'INHERIT_SELECTED' => $folder->getInherit() ? 'checked' : '',
-        'HIDE_PERMISSIONS' => $folder->getInherit() ? 'none' : 'block',         // Hide individual permissions if inherit ticked
-        'HIDE_INHERIT' => $folder->getParent()->getId() == 0 ? 'none' : 'block',         // Root level items cannot use inheritance
+        'HIDE_PERMISSIONS' => $folder->getInherit() ? 'none' : 'block',
+        // Hide individual permissions if inherit ticked
+        'HIDE_INHERIT' => $folder->getParent()->getId() == 0 ? 'none' : 'block',
+        // Root level items cannot use inheritance
         'CODE' => $code,
         'PARENT_ID' => $folder->getParent()->getId(),
         'PARENT_NAME' => Scrub::text($folderParent->getName()),
@@ -160,7 +161,8 @@ if (is_numeric($this->arg[0])) {
     $keepExisting->setName('Keep Existing')->setId(0);
     $homepageTemplateList->prepend($keepExisting);
 
-    $this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content, array('name'=>'TEMPLATE_NAME','id'=>'TEMPLATE_ID' ));
+    $this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content,
+        array('name' => 'TEMPLATE_NAME', 'id' => 'TEMPLATE_ID'));
 
     if ($allRoleAccess->count()) {
         foreach ($allRoleAccess as $currentRoleAccess) {
@@ -181,18 +183,22 @@ if (is_numeric($this->arg[0])) {
 
     $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
 
-    if ($_SESSION['user']->isSuperuser() || $userAccessMapper->isFolderOwner($_SESSION['user'], $folder)) {
+    if ($folder->getInherit()) {
+        $this->setVar('indiv_modify_block', '');
         $this->setVar('indiv_perms_block', '');
-        $this->parse('indiv_modify_block', 'indiv_modify');
     } else {
-        if ($userAccessMapper->hasFolderOwner($folder)) {
+        if ($_SESSION['user']->isSuperuser() || $userAccessMapper->isFolderOwner($_SESSION['user'], $folder)) {
             $this->setVar('indiv_perms_block', '');
-            $this->setVar('indiv_modify_block', '');
+            $this->parse('indiv_modify_block', 'indiv_modify');
+        } else if ($userAccessMapper->hasFolderOwner($folder)) {
+                $this->setVar('indiv_perms_block', '');
+                $this->setVar('indiv_modify_block', '');
         } else {
             $this->parse('indiv_perms_block', 'indiv_perms');
             $this->setVar('indiv_modify_block', '');
         }
     }
+
 
     $this->parse('reset_content_block', 'reset_content');
 

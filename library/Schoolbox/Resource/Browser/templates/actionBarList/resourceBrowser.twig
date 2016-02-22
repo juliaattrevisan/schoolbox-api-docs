@@ -18,7 +18,7 @@
     <li>
 
         {#<h5 class="subheader">Access Type</h5>#}
-        {% if access >= 3 or user.isSuperuser %}
+        {% if (access >= 3 or user.isSuperuser) and not folder.inherit %}
             <a class="icon-group-managers" data-action="manage" href="/group/modify/{{ folder.id }}">Manage Group</a>
         {% endif %}
 
