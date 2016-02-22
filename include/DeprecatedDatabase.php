@@ -33,22 +33,6 @@ class DeprecatedDatabase implements Serializable
      */
     public $databaseResult;
 
-    /**
-     * MySQLi connection, should not be public but has a history of being
-     * accessed outside of its class
-     *
-     * @var mysqli
-     */
-    public $dbf;
-
-    /**
-     * MySQLi result, connection, should not be public but has a history of being
-     * accessed outside of its class
-     *
-     * @var mysqli_result
-     */
-    public $result;
-
 /** @var self */
 static private $instance = false;
 
@@ -66,11 +50,6 @@ protected $collector;
  */
 function __construct($db = SQL_db, $debug = 1)
 {
-//	$this->host = SQL_host;
-//	$this->user = SQL_user;
-//	$this->passwd = SQL_passwd;
-//	$this->debug = $debug;
-//	$this->db = $db;
 	$this->connect();
 }
 
@@ -98,10 +77,9 @@ static public function reinitialise() {
  */
 function reconnect()
 {
-	$closure = mysqli_close($this->dbf);
-	unset($this->dbf);
+	unset($this->database);
 	$this->connect();
-	return $closure;
+	return true;
 }
 
 /**
@@ -113,15 +91,6 @@ function connect()
 {
     // Assuming all DeprecatedDatabase instances use the same connection string
     $this->database = Database::getInstance();
-//	if (!isset($this->database)) {
-//		$this->dbf = mysqli_connect($this->host, $this->user, $this->passwd);
-//		mysqli_set_charset($this->dbf, 'UTF8');
-//	}
-//	if(!$this->dbf instanceof mysqli) {
-//		die("Unable to connect ".$this->user."@".$this->host." using ".$this->db);
-//	}
-//	if(!$this->changeDb($this->db))
-//		print "Unable to access ".$this->db.", check the permissions";
 }
 
 	/**
@@ -144,7 +113,6 @@ function connect()
  */
 function close()
 {
-//	return mysqli_close($this->dbf);
 }
 
 /**
@@ -156,13 +124,6 @@ function close()
  */
 function changeDb($db)
 {
-//	if(mysqli_select_db($this->dbf, $db))
-//	{
-//		$this->db = $db;
-//		return true;
-//	}
-//	else
-//		return false;
 }
 
 /**
@@ -178,40 +139,7 @@ function query($sql_q, $retry = true)
 {
     $this->databaseResult = $this->database->query($sql_q);
     return $this->databaseResult;
-//	if ($this->debug && $this->collector instanceof DeprecatedDatabaseCollector) {
-//		$this->result = $this->collector->query($sql_q);
-//	}
-//	else {
-//		$this->result = mysqli_query($this->dbf, $sql_q) or $mysqli_eval_error = mysqli_error($this->dbf);
-//
-//		if (isset($mysqli_eval_error)) {
-//            if($retry) {
-//                $this->reconnect();
-//                return $this->query($sql_q, false);
-//            }
-//
-//			if ($this->debug) {
-//				trigger_error(sprintf('Query: "%s" triggered error: "%s"', preg_replace('`\s+`', ' ', $sql_q), $mysqli_eval_error), E_USER_WARNING);
-//			}
-//			else {
-//				error(21, $mysqli_eval_error);
-//			}
-//		}
-//	}
-//
-//	return $this->result;
 }
-
-///**
-// * Returns the current result resource
-// *
-// * @deprecated
-// * @return mysqli_result
-// */
-//function getResult()
-//{
-//	return $this->result;
-//}
 
 /**
  * Gets the first result returned by the query
@@ -278,8 +206,8 @@ function getNextArray($result = 0)
 {
     if ($result instanceof PDOStatement) {
         $return_array = $result->fetch(PDO::FETCH_ASSOC);
-    } elseif ($this->result instanceof PDOStatement) {
-        $return_array = $this->result->fetch(PDO::FETCH_ASSOC);
+    } elseif ($this->databaseResult instanceof PDOStatement) {
+        $return_array = $this->databaseResult->fetch(PDO::FETCH_ASSOC);
     } else {
         return false;
     }
@@ -297,8 +225,8 @@ function countRows($result = 0)
 {
     if ($result instanceof PDOStatement) {
         $return_count = $result->rowCount();
-    } elseif ($this->result instanceof PDOStatement) {
-        $return_count = $this->result->rowCount();
+    } elseif ($this->databaseResult instanceof PDOStatement) {
+        $return_count = $this->databaseResult->rowCount();
     } else {
         return false;
     }
@@ -311,7 +239,7 @@ function countRows($result = 0)
  * @deprecated use \Schoolbox\Mapper::save()
  * @param $table
  * @param $array
- * @return bool|mysqli_result|resource
+ * @return bool
  */
 function insert($table, $array)
 {
@@ -348,7 +276,7 @@ function insert($table, $array)
  * @param $table
  * @param $array
  * @param bool $names
- * @return bool|mysqli_result|resource
+ * @return bool
  */
 function insertMultiRow($table, $array, $names=false)
 {
@@ -391,7 +319,7 @@ function insertMultiRow($table, $array, $names=false)
 	 * @param $table
 	 * @param $identifier
 	 * @param $array
-	 * @return bool|mysqli_result|resource
+	 * @return bool
 	 */
 function update($table, $identifier, $array)
 {
@@ -439,7 +367,7 @@ function update($table, $identifier, $array)
  * @param $table
  * @param $identifier
  * @param $value
- * @return bool|mysqli_result|resource
+ * @return bool
  */
 function delete($table, $identifier, $value)
 {
