@@ -103,7 +103,7 @@ if (is_numeric($this->arg[0])) {
         'NAME' => Scrub::text($folder->getName()),
         'ACCESS_WRITE' => UserAccess::ACCESS_WRITE,
         'INHERIT_SELECTED' => $folder->getInherit() ? 'checked' : '',
-        'HIDE_PERMISSIONS' => $folder->getInherit() ? 'none' : 'block',         // Hide individual permissions if inherit ticked
+        'HIDE_PERMISSIONS' => $folder->getInherit() ? 'hide' : '',         // Hide individual permissions if inherit ticked
         'HIDE_INHERIT' => $folder->getParent()->getId() == 0 ? 'hide' : '',         // Root level items cannot use inheritance
         'CODE' => $code,
         'PARENT_ID' => $folder->getParent()->getId(),
@@ -240,7 +240,7 @@ else {
             'NAME' => '',
             'ACCESS_WRITE' => UserAccess::ACCESS_WRITE,
             'INHERIT_SELECTED' => $folderParent->getInherit() ? 'checked' : '',             // Default to parents inheritance status
-            'HIDE_PERMISSIONS' => $folderParent->getInherit() ? 'none' : 'block',           // Hide individual permissions if parent inherits
+            'HIDE_PERMISSIONS' => $folderParent->getInherit() ? 'hide' : '',           // Hide individual permissions if parent inherits
             'HIDE_INHERIT' => $this->arg[1] == 0 ? 'hide' : '',                        // Root level items cannot use inheritance
             'CODE' => '',
             'CURRICULUM_CODE_LIST' => json_encode([]),
