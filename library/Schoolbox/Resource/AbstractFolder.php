@@ -107,6 +107,28 @@ abstract class AbstractFolder implements IFolder
     }
 
     /**
+     * Enable inherit permissions
+     *
+     * @return $this
+     */
+    public function enableInherit()
+    {
+        $this->inherit = true;
+        return $this;
+    }
+
+    /**
+     * Disable inherit permissions
+     *
+     * @return $this
+     */
+    public function disableInherit()
+    {
+        $this->inherit = false;
+        return $this;
+    }
+
+    /**
      * Get inherit permissions flag
      *
      * @return boolean

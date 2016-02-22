@@ -20,7 +20,7 @@
             submitHandler: function(form) {
                 var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
                 var individualPerms = $('input[name=groupcheck]').is(':checked');
-                if ((hasDefaultPerms < 2) && !individualPerms && !$('[data-checkbox-inherit]').prop('checked')) {
+                if ((hasDefaultPerms < {ACCESS_WRITE}) && !individualPerms && !$('[data-checkbox-inherit]').prop('checked')) {
                     $(form).confirmDialog({
                         text: 'You do not currently have write access to this folder. Do you wish to continue?',
                         confirmEvent: function() {
@@ -127,14 +127,14 @@
 					</div>
 				</fieldset>
 
-                <fieldset class="content" style="display:{HIDE_INHERIT}">
-                    <div class="content small-12 columns">
+                <fieldset class="content {HIDE_INHERIT}">
+                    <div class="small-12 columns">
                         <label>Access Permissions
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select user roles which have access to this folder">?</span>
                         </label>
                     </div>
 
-                    <div class="content small-12 columns">
+                    <div class="small-12 columns">
                         <input data-checkbox-inherit type="checkbox" id="inherit" name="inherit" value="1" {INHERIT_SELECTED} />
                         <label for="inherit" class="checkbox-label">Inherit permissions from parent folder</label>
                     </div>

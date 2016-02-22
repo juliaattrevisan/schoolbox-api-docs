@@ -24,11 +24,16 @@ if ($_POST['name']) {
     /** @var \Schoolbox\Resource\Category $model */
     $model = $categoryMapper->createModel()
         ->setName($_POST['name'])
-        ->setInherit($_POST['inherit'] == 1 ? true : false)
         ->setParent(
             $categoryMapper->createModel()
                 ->setId($_POST['parent'])
         );
+
+    if ($_POST["inherit"] == 1) {
+        $model->enableInherit();
+    } else {
+        $model->disableInherit();
+    }
 
     // Make sure the user has permission to perform the action
 
@@ -62,15 +67,6 @@ if ($_POST['name']) {
         // ...and role permissions
 
         RoleAccessMapper::getInstance()->deleteByColumn("cid", $_POST["categoryID"]);
-
-        $affectedIds = $categoryMapper->save($model);
-
-        if ($affectedIds === false) {
-            // something went wrong
-            error(2);
-        }
-
-        $model->setId($affectedIds[0]);
 
     } else {
 
@@ -111,45 +107,52 @@ if ($_POST['name']) {
         }
 
         $model->setCodes($codeCollection);
+    }
 
-        $affectedIds = $categoryMapper->save($model);
+    $affectedIds = $categoryMapper->save($model);
 
-        if ($affectedIds === false) {
-            // something went wrong
-            error(2);
-        }
+    if ($affectedIds === false) {
+        // something went wrong
+        error(2);
+    }
 
-        $model->setId($affectedIds[0]);
+    $model->setId($affectedIds[0]);
 
-        // if rolepermission collection is defined, reapply permissions (possibly recursively)
+    if ($_POST["inherit"] == 0)
+    {
+        // If rolepermission collection is defined, reapply permissions (possibly recursively)
+
         $rolePermissions = RoleAccessMapper::getInstance()->savePermissions($model, $_POST['group'],
             $_POST['recursive']);
     }
 
-    /* HomepageConfig definition
-     */
+    // HomepageConfig definition
+
     $homepageConfig = HomepageConfigMapper::getInstance()
         ->createModel()
         ->setCategory($model);
 
     // if homepage is to be removed
-    if ($_POST['template'] == HomepageTemplate::HOMEPAGE_REMOVE) {
+    if ($_POST['template'] == HomepageTemplate::HOMEPAGE_REMOVE)
+    {
         HomepageConfigMapper::getInstance()->emptyHomepage($homepageConfig);
         HomepageConfigMapper::getInstance()->delete($homepageConfig);
     } // if template defined
-    elseif ($_POST['template'] > 0) {
+    elseif ($_POST['template'] > 0)
+    {
         $homepageConfig->setTemplate(HomepageTemplateMapper::getInstance()->findById($_POST['template']));
-     /* Save homepage config
-         */
+
+        // Save homepage config
+
         HomepageConfigMapper::getInstance()->save($homepageConfig);
         HomepageConfigMapper::getInstance()->resetToTemplate($homepageConfig);
     }
 
-    /* Ram it back into its parent object where it belongs
-     */
+    // Ram it back into its parent object where it belongs
+
     $model->setHomepage($homepageConfig);
 
-    // no changes in "KEEP_EXISTING" case
+    // No changes in "KEEP_EXISTING" case
 
     if ($_POST['groupcheck']) {
         /* Prevent students with write access from being able to
