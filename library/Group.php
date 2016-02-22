@@ -1,5 +1,7 @@
 <?php
 
+use \Schoolbox\Resource\CategoryMapper;
+
 class Group extends DeprecatedModel
 {
     public $cache = array();
@@ -407,6 +409,15 @@ class Group extends DeprecatedModel
 
     function getPermission($relationID, $userID = 0)
     {
+        // If we are getting the permission for a homepage, we need to take into account inheritance
+
+        if ($this->_service == HOMEPAGE_SERVICE) {
+
+            // Find the NNIAN for the folder
+
+            $categoryNnian = CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode(CategoryMapper::getInstance()->findById($relationID));
+            $relationID = $categoryNnian->getId();
+        }
 
         // checks permissions for specified user
         // returns NO_ACCESS, READ_ACCESS, WRITE_ACCESS or FULL_ACCESS

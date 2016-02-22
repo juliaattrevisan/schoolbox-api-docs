@@ -68,39 +68,12 @@ if (is_numeric($this->arg[0])) {
         // -_-_-_-_-_-_-~|__( ^ .^)
         // _-_-_-_-_-_-_-""  ""
 
-        $found = false;
-
-        // Start at the folders immiediate parent
-
-        $parent = $folderMapper->findById($folder->getParent()->getId());
-
-        while (!$found) {
-            // Check if parent of current node inherits
-
-            if (!$parent->getInherit()) {
-
-                // Found the NNIAN
-
-                $allRoleAccess = $roleMapper->findAllForFolder($parent);
-                $found = true;
-
-            } else {
-
-                // Parent also inherits, go back one more
-
-                if ($parent->getParent()->getId() == 0) {
-
-                    // Got back to the root node, somethings wrong in the database
-                    error(2);
-                }
-
-                $parent = $folderMapper->findById($parent->getParent()->getId());
-            }
-        }
+        $permissionFolder = \Schoolbox\Resource\CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
+        $allRoleAccess = $roleMapper->findAllForFolder($permissionFolder);
 
         $curriculumCodeInput = $this->getTwig()->render(
             'sub/curriculumCodeSelector.twig',
-            ['codeList' => $parent->getCurriculumNodes(), 'renderButton' => false,]
+            ['codeList' => $permissionFolder->getCurriculumNodes(), 'renderButton' => false,]
         );
 
         // Class code can't be the same otherwise you get a "Unable to create or modify folder as class code

@@ -17,6 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\HomepageConfig;
@@ -41,6 +42,12 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * @var External_UserInterface
      */
     protected $external_user;
+
+    /** Array of cached NNIAN nodes
+     *
+     * @var array
+     */
+    protected $cacheNnian = array();
 
     protected function mapping()
     {
@@ -974,5 +981,70 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;
+    }
+
+    /**
+     * Finds the nearest non-inheriting ancestral node (NNIAN)
+     *
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     */
+    public function findNearestNonInheritingAncestralNode(\Schoolbox\Resource\Folder\Model $folder)
+    {
+        // Check cache first
+
+        if (isset($this->cacheNnian[$folder->getId()])) {
+            return $this->cacheNnian[$folder->getId()];
+        }
+
+        // Check if the folder supplied inherits permissions
+
+        if ($folder->getInherit())
+        {
+            // Need to find the NNIAN
+
+            $currentNode = $this->findById($folder->getParent()->getId());
+
+            // Keep crawling backwards until we find the NNIAN
+
+            for (;;)
+            {
+                if (isset($this->cacheNnian[$currentNode->getId()])) {
+                    return $this->cacheNnian[$currentNode->getId()];
+                }
+
+                if (!$currentNode->getInherit())
+                {
+                    // Found NNIAN, cache it for future calls
+
+                    $this->cacheNnian[$folder->getId()] = $currentNode;
+                    return ($currentNode);
+                }
+                else
+                {
+                    // Keep going back further
+
+                    if ($currentNode->getParent()->getId() == 0)
+                    {
+                        // Got to the top- somethings wrong with the data in the database as this
+                        // should not be possible.
+
+                        error(2);
+                    }
+                    else
+                    {
+                        // Get the parent
+
+                        $currentNode = $this->findById($currentNode->getParent()->getId());
+                    }
+
+                }
+            }
+        } else {
+
+            // Folder doesn't inherit, just return it
+
+            $this->cacheNnian[$folder->getId()] = $folder;
+            return $folder;
+        }
     }
 }

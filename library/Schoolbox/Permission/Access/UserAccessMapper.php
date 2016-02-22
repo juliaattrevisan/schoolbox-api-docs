@@ -414,6 +414,16 @@ class UserAccessMapper extends Mapper
      */
     public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE)
     {
+        // If we are getting the permission for a homepage, we need to take into account inheritance
+
+        if ($service == HOMEPAGE_SERVICE) {
+
+            // Find the NNIAN for the folder
+
+            $categoryNnian = CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode(CategoryMapper::getInstance()->findById($serviceIdentifier));
+            $serviceIdentifier = $categoryNnian->getId();
+        }
+
         if (!isset($serviceIdentifier)) {
             return $this->findOneByColumnList(
                 array(
