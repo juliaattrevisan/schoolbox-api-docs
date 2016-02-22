@@ -50,7 +50,7 @@ class clean {
 		$query = "DELETE news_items, newsGroup, newsCampus FROM news_items, newsCampus, newsGroup
 					WHERE news_items.item_id = newsGroup.id AND news_items.item_id = newsCampus.id
 						AND (item_datetime_expires < NOW() || item_deleted = '1')";
-		$this->db->dbDoQuery($query);
+		$this->db->query($query);
 		print "Deleted ".$this->db->affectedRows()." news items<br>";
 	}
 
