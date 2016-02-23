@@ -63,6 +63,13 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         );
         $this->hasMap(
             array(
+                'column'   => 'inherit',
+                'property' => 'inherit',
+                'type'     => self::TYPE_BOOLEAN,
+            )
+        );
+        $this->hasMap(
+            array(
                 'column'   => 'parent',
                 'property' => 'parent',
                 'type'     => self::TYPE_MODEL,

@@ -36,6 +36,13 @@ abstract class AbstractFolder implements IFolder
     protected $name;
 
     /**
+     * Inherits permissions flag
+     *
+     * @var boolean
+     */
+    protected $inherit;
+
+    /**
      * A category instance
      *
      * @var self
@@ -85,6 +92,50 @@ abstract class AbstractFolder implements IFolder
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Set inherit permissions flag
+     *
+     * @param  boolean $inherit
+     * @return $this
+     */
+    public function setInherit($inherit)
+    {
+        $this->inherit = $inherit;
+        return $this;
+    }
+
+    /**
+     * Enable inherit permissions
+     *
+     * @return $this
+     */
+    public function enableInherit()
+    {
+        $this->inherit = true;
+        return $this;
+    }
+
+    /**
+     * Disable inherit permissions
+     *
+     * @return $this
+     */
+    public function disableInherit()
+    {
+        $this->inherit = false;
+        return $this;
+    }
+
+    /**
+     * Get inherit permissions flag
+     *
+     * @return boolean
+     */
+    public function getInherit()
+    {
+        return $this->inherit;
     }
 
     /**

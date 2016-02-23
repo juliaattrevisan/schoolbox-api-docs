@@ -1,6 +1,7 @@
 <?php
 
 use \Schoolbox\Breadcrumbs;
+use \Schoolbox\Permission\Access\UserAccess;
 
 /** @var SitePage $this */
 
@@ -8,6 +9,7 @@ $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 $groupHandler = new Group();
 
 if (is_numeric($this->arg[0])) {
+
     try {
         $folder = $folderMapper->findById($this->arg[0]);
     } catch (\Exception $e) {
@@ -58,6 +60,10 @@ if (is_numeric($this->arg[0])) {
         'ACTION' => 'Modify',
         'CATEGORY_ID' => $folder->getId(),
         'NAME' => Scrub::text($folder->getName()),
+        'ACCESS_WRITE' => UserAccess::ACCESS_WRITE,
+        'INHERIT_SELECTED' => $folder->getInherit() ? 'checked' : '',
+        'HIDE_PERMISSIONS' => $folder->getInherit() ? 'none' : 'block',         // Hide individual permissions if inherit ticked
+        'HIDE_INHERIT' => $folder->getParent()->getId() == 0 ? 'hide' : '',         // Root level items cannot use inheritance
         'CODE' => Scrub::text($folder->getCodeString()),
         'PARENT_ID' => $folder->getParent()->getId(),
         'PARENT_NAME' => Scrub::text($folderParent->getName()),
@@ -195,6 +201,10 @@ else {
             'ACTION' => 'Add',
             'CATEGORY_ID' => '',
             'NAME' => '',
+            'ACCESS_WRITE' => UserAccess::ACCESS_WRITE,
+            'INHERIT_SELECTED' => $folderParent->getInherit() ? 'checked' : '',             // Default to parents inheritance status
+            'HIDE_PERMISSIONS' => $folderParent->getInherit() ? 'none' : 'block',           // Hide individual permissions if parent inherits
+            'HIDE_INHERIT' => $this->arg[1] == 0 ? 'hide' : '',                        // Root level items cannot use inheritance
             'CODE' => '',
             'CURRICULUM_CODE_LIST' => json_encode([]),
             'PARENT_ID' => $folderParent->getId(),
