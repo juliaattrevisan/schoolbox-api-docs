@@ -1,10 +1,10 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-$page = new SitePage();
-$userMapper = \Schoolbox\UserMapper::getInstance();
-$passwordGenerator = new \Alaress\Password\Password();
-$groupHandler = new Group();
+$page            = new SitePage();
+$userMapper      = \Schoolbox\UserMapper::getInstance();
+$passwordService = new \Alaress\Password\Password();
+$groupHandler    = new Group();
 
 /* Superusers only
  */
@@ -64,7 +64,7 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
 
         // Do not change password if its the default output value
         if ($_POST['modpassword'] != 'donotchange') {
-            $user->setPassword($passwordGenerator->hash($_POST['modpassword']));
+            $user->setPassword($passwordService->hash($_POST['modpassword']));
         }
 
         $userMapper->save($user);
@@ -100,7 +100,7 @@ elseif ($_POST['modusername']) {
         }
         $user->getCampusCollection()->add($campus);
     }
-    $user->setPassword($_POST['modpassword'] == '' ? null : $passwordGenerator->hash($_POST['modpassword']));
+    $user->setPassword($_POST['modpassword'] == '' ? null : $passwordService->hash($_POST['modpassword']));
     $user->setSuperuser(isset($_POST['superuser']));
     $user->setYear($_POST['year'] == '' ? null : $_POST['year']);
     $user->setEportfolioEnable(!empty($_POST['eportfolio']));

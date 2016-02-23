@@ -27,7 +27,7 @@ class Validator
     /**
      * @var Password
      */
-    protected $passwordGenerator;
+    protected $passwordService;
 
     /**
      * @var int
@@ -38,12 +38,12 @@ class Validator
      * Constructor
      *
      * @param UserMapper $userMapper
-     * @param Password  $passwordGenerator
+     * @param Password   $passwordService
      */
-    public function __construct(UserMapper $userMapper, Password $passwordGenerator)
+    public function __construct(UserMapper $userMapper, Password $passwordService)
     {
-        $this->userMapper        = $userMapper;
-        $this->passwordGenerator = $passwordGenerator;
+        $this->userMapper      = $userMapper;
+        $this->passwordService = $passwordService;
     }
 
     /**
@@ -72,9 +72,9 @@ class Validator
         $hash    = $user->getPassword();
 
         // Matches new-style password
-        if ($this->passwordGenerator->verify($password, $hash)) {
+        if ($this->passwordService->verify($password, $hash)) {
             // Maybe requires rehash
-            if ($this->passwordGenerator->needsRehash($hash)) {
+            if ($this->passwordService->needsRehash($hash)) {
                 $this->saveUserPassword($user, $password);
             }
             return $enabled;
@@ -99,7 +99,7 @@ class Validator
      */
     protected function saveUserPassword(User $user, $password)
     {
-        $user->setPassword($this->passwordGenerator->hash($password));
+        $user->setPassword($this->passwordService->hash($password));
         $this->userMapper->save($user);
     }
 }

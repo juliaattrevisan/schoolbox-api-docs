@@ -50,7 +50,7 @@ class User extends AbstractImporter
     /**
      * @var Password
      */
-    protected $passwordGenerator;
+    protected $passwordService;
 
     /**
      * @var UserMapper
@@ -195,7 +195,7 @@ class User extends AbstractImporter
      */
     protected function setup()
     {
-        $this->passwordGenerator  = new Password();
+        $this->passwordService    = new Password();
         $this->userMapper         = new UserMapper();
         $this->userProfileMapper  = new UserProfileMapper();
         $this->userRelationMapper = new UserRelationMapper();
@@ -227,13 +227,13 @@ class User extends AbstractImporter
         // Identifiers
         $this->userIdentifiers[] = new User\Identifier\UserId($this->userMapper);
         $this->userIdentifiers[] = new User\Identifier\Username($this->userMapper);
-        $this->userIdentifiers[] = new User\Identifier\ExternalId($this->userMapper, $this->roleList);
+        $this->userIdentifiers[]  = new User\Identifier\ExternalId($this->userMapper, $this->roleList);
 
         // Hydrators
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Username', 'setUsername');
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('External ID', 'setExternalId');
         $this->userHydrators[] = new User\Hydrator\Lookup('Role', 'setRole', $this->roleList);
-        $this->userHydrators[] = new User\Hydrator\Password('Password', 'setPassword', $this->passwordGenerator);
+        $this->userHydrators[] = new User\Hydrator\Password('Password', 'setPassword', $this->passwordService);
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Password', 'setRetrievablePassword');
         $this->userHydrators[] = new User\Hydrator\ToggleField('E-Portfolio?', 'setEportfolioEnable');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Hide Contact Details?', 'setHideContacts');

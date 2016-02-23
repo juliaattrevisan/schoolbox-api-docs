@@ -7,7 +7,7 @@
 
 namespace Schoolbox\External\Importer\User\Hydrator;
 
-use Alaress\Password\Password as PasswordGenerator;
+use Alaress\Password\Password as PasswordService;
 use Schoolbox\User as UserModel;
 
 /**
@@ -18,21 +18,21 @@ use Schoolbox\User as UserModel;
 class Password extends Field
 {
     /**
-     * @var PasswordGenerator
+     * @var PasswordService
      */
-    protected $passwordGenerator;
+    protected $passwordService;
 
     /**
      * Constructor
      *
-     * @param string            $fieldname
-     * @param string            $setMethod
-     * @param PasswordGenerator $passwordGenerator
+     * @param string          $fieldname
+     * @param string          $setMethod
+     * @param PasswordService $passwordService
      */
-    public function __construct($fieldname, $setMethod, PasswordGenerator $passwordGenerator)
+    public function __construct($fieldname, $setMethod, PasswordService $passwordService)
     {
         parent::__construct($fieldname, $setMethod);
-        $this->passwordGenerator = $passwordGenerator;
+        $this->passwordService = $passwordService;
     }
 
     /**
@@ -41,7 +41,7 @@ class Password extends Field
     public function hydrate($row, UserModel $user)
     {
         if (isset($row[$this->fieldname]) && strlen($row[$this->fieldname]) > 0) {
-            $password = $this->passwordGenerator->hash($row[$this->fieldname]);
+            $password = $this->passwordService->hash($row[$this->fieldname]);
             return call_user_func([$user, $this->setMethod], $password);
         }
         return $user;
