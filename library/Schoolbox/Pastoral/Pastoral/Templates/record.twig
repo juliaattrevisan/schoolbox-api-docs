@@ -2,6 +2,9 @@
 
     <script type="text/javascript">
         $(function () {
+
+            // Delete pastoral record
+
             $('[data-delete]').click(function(event) {
                 event.preventDefault();
 
@@ -20,6 +23,8 @@
                 });
             });
 
+            // Delete comment
+
             $('[data-delete-comment]').click(function(event) {
                 event.preventDefault();
 
@@ -32,6 +37,9 @@
                             id: $(event.target).attr('data-delete-comment')
                         })
                         .done(function() {
+
+                            // Remove comment after AJAX return
+
                             $(event.target).closest('li').remove();
                         });
                     }
@@ -57,6 +65,7 @@
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="small-12 avatar card wrap-down">
+                            {# Theres no need for the all the twig access checks like the list page, if the user got to this screen they can view everything #}
                             <a href="/search/user/{{ record.owner.getId() }}">
                                 <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
                             </a>
@@ -99,7 +108,7 @@
                                         {% if record.users | length > 0 %}
                                             {% if record.roles | length > 0 %}|{% endif %}
                                             {% for user in record.users %}
-                                                {{ user.firstname }} {{ user.lastname }}{% if not loop.last %}, {% endif %}
+                                                <a href="/search/user/{{ user.getId() }}">{{ user.firstname }} {{ user.lastname }} ({{ user.getRole.name }})</a>{% if not loop.last %}, {% endif %}
                                             {% endfor %}
                                         {% endif %}
                                     {% endif %}
@@ -107,6 +116,8 @@
                             {% endif %}
                         </div>
                     </div>
+
+                    {# Only display the edit/delete links to the owner of the record or pastoral moderators #}
                     {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or session.user.getPastoralModerator %}
                     <nav>
                         <a class="icon-modify" href="/pastoral/update/{{ user.getId() }}/{{ record.getId() }}" title="Modify Comment"></a>
@@ -117,6 +128,7 @@
             </ul>
         </section>
 
+        {# Parents cannot ever add/view comments #}
         {% if role != 'parent' %}
 
             <h2>Comments</h2>
@@ -136,6 +148,8 @@
                                         </p>
                                     </div>
                                 </div>
+
+                                {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
                                 {%
                                     if  (session.user.getRole().isStaff() and record.owner.getId() == session.user.getId()) or
                                         (session.user.getRole().isStaff() and comment.owner.getId() == session.user.getId()) or
@@ -145,6 +159,7 @@
                                         <a data-delete-comment="{{ comment.getId }}" class="icon-delete" href="#" title="Delete Comment"></a>
                                     </nav>
                                 {% endif %}
+
                             </li>
                         {% endfor %}
                     </ul>
@@ -161,6 +176,7 @@
 
         {% endif %}
 
+        {# Show attached files #}
         {% if attachments.count() > 0 %}
 
             <h2>Attached Files</h2>
