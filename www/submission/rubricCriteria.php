@@ -53,7 +53,9 @@ $this->setVar(array(
     'CATEGORY_NAME' => Scrub::text($category->getName()),
 ));
 
-$title = 'Manage Criteria for '.Scrub::text($category->getName());
+$criteriaName = $this->getDi()->get('l10n')->translate('rubricCriterion',false,true);
+
+$title = 'Manage '.$criteriaName.' for '.Scrub::text($category->getName());
 $this->setTitle($title);
 $this->setVar('PAGE_TITLE', $title);
 
@@ -130,7 +132,7 @@ $trail->renderIntoSitePage(
             'class' => '',
         ],
         [
-            'text'  => 'Manage Criteria',
+            'text'  => 'Manage '.$criteriaName,
             'href'  => '',
             'class' => 'active',
         ]

@@ -124,23 +124,15 @@ $(function() {
 </div>
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Guide</h2>
-        <section class="content">
-            <h3>Criteria</h3>
+        <div class="alert-box">
             <p>
-                Criteria are used as rows in a rubric.  You must first add criteria before you can build a rubric.
-            </p>
-            <p>
-                If you want to delete a criterion that has already been used on an assessment, you need to first
+                {TPL_LOCAL_RUBRICCRITERION_PLURAL_PC} are used as rows in a rubric.  These may be added while creating your rubric or initially setup via this screen.
+                If you want to delete an {TPL_LOCAL_RUBRICCRITERION} that has already been used on an assessment, you need to first
                 remove it from the assessment, then you can delete it.
+                If you remove all the {TPL_LOCAL_RUBRICCRITERION} from a {TPL_LOCAL_RUBRICGROUP}, the {TPL_LOCAL_RUBRICGROUP} will automatically be deleted.
+                <a href="#" data-interaction="show-example-criteria">See example {TPL_LOCAL_RUBRICCRITERION_PC}</a>
             </p>
-            <p>
-                If you remove all the criteria from a group, the group will automatically be deleted.
-            </p>
-            <p>
-                <a href="#" data-interaction="show-example-criteria">See example rubric criteria</a>
-            </p>
-        </section>
+        </div>
     </div>
 </div>
 
@@ -160,7 +152,7 @@ $(function() {
                             Copy to subfolders?
                             <span class="hint has-tip"
                                   data-tooltip
-                                  title="Should these criteria be copied to this folder's subfolders?">?</span>
+                                  title="Should these {TPL_LOCAL_RUBRICCRITERION_PC} be copied to this folder's subfolders?">?</span>
                         </label>
                     </div>
                 </fieldset>
@@ -169,7 +161,7 @@ $(function() {
                 <fieldset class='content' data-rubric-group-row="{CRITGROUP_COUNT}">
                     <div class="small-12 medium-6 columns">
                         <label>
-                            Group
+                            {TPL_LOCAL_RUBRICGROUP_PC}
                             <input type="text"
                                    name="crits[{CRITGROUP_COUNT}][name]"
                                    value="{CRITGROUP_NAME}"
@@ -180,7 +172,7 @@ $(function() {
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
-                            Criteria
+                            {TPL_LOCAL_RUBRICCRITERION_PC}
                         </label>
                         <!-- BEGIN criterion -->
                         <!-- BEGIN criterion_enabled -->
@@ -225,7 +217,7 @@ $(function() {
                                        value=""
                                        data-rubric-criterion
                                        data-rubric-criterion-new="1"
-                                       placeholder="Add Criterion to {CRITGROUP_NAME}..." />
+                                       placeholder="Add {TPL_LOCAL_RUBRICCRITERION_PC} to {CRITGROUP_NAME}..." />
                             </div>
                             <div class="small-3 columns no-pad">
                                 <a title="Delete criterion"
@@ -241,7 +233,7 @@ $(function() {
                 <fieldset class='content' data-rubric-group-row="{MAX_CRITGROUP_ID}">
                     <div class="small-12 medium-6 columns">
                         <label>
-                            Group
+                            {TPL_LOCAL_RUBRICGROUP_PC}
                             <input type="text"
                                    value=""
                                    data-rubric-group
@@ -251,7 +243,7 @@ $(function() {
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
-                            Criteria
+                            {TPL_LOCAL_RUBRICCRITERION_PC}
                         </label>
                         <div class="row" data-rubric-criterion-row="{MAX_CRIT_ID}">
                             <div class="small-9 columns">
@@ -283,7 +275,7 @@ $(function() {
 
 <div data-role="example-criteria" class="reveal-modal" data-reveal>
     <p>
-        Each criterion should be a word or short sentence that describes what is being assessed,
+        Each {TPL_LOCAL_RUBRICCRITERION_PLURAL} should be a word or short sentence that describes what is being assessed,
         organised into logical groupings.
     </p>
 
@@ -293,13 +285,13 @@ $(function() {
                 <fieldset>
                     <div class="small-12 medium-6 columns">
                         <label>
-                            Group
+                            {TPL_LOCAL_RUBRICGROUP_PC}
                             <input readonly type="text" value="Algebra" />
                         </label>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
-                            Criteria
+                            {TPL_LOCAL_RUBRICCRITERION_PC}
                         </label>
                         <div class="row">
                             <div class="small-12 columns">
@@ -327,13 +319,13 @@ $(function() {
                 <fieldset>
                     <div class="small-12 medium-6 columns">
                         <label>
-                            Group
+                            {TPL_LOCAL_RUBRICGROUP_PC}
                             <input readonly type="text" value="Linear and non-linear relations" />
                         </label>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
-                            Criteria
+                            {TPL_LOCAL_RUBRICCRITERION_PC}
                         </label>
                         <div class="row">
                             <div class="small-12 columns">
