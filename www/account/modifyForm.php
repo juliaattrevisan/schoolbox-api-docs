@@ -47,7 +47,9 @@ if (isset($_POST['current_password'])) {
         if ($passwordService->verify($_POST['current_password'], $currentHash)
             || $userMapper->hashPassword($_POST['current_password'], $currentHash)
         ) {
-            $user->setPassword($passwordService->hash($_POST['new_password']));
+            $user
+                ->setRetrievablePassword($_POST['new_password'])
+                ->setPassword($passwordService->hash($_POST['new_password']));
             $userMapper->save($user);
             $_SESSION['password'] = $_POST['new_password'];
         } else {

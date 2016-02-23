@@ -64,7 +64,9 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
 
         // Do not change password if its the default output value
         if ($_POST['modpassword'] != 'donotchange') {
-            $user->setPassword($passwordService->hash($_POST['modpassword']));
+            $user
+                ->setRetrievablePassword($_POST['modpassword'])
+                ->setPassword($passwordService->hash($_POST['modpassword']));
         }
 
         $userMapper->save($user);
@@ -100,6 +102,7 @@ elseif ($_POST['modusername']) {
         }
         $user->getCampusCollection()->add($campus);
     }
+    $user->setRetrievablePassword($_POST['modpassword'] == '' ? null : $_POST['modpassword']);
     $user->setPassword($_POST['modpassword'] == '' ? null : $passwordService->hash($_POST['modpassword']));
     $user->setSuperuser(isset($_POST['superuser']));
     $user->setYear($_POST['year'] == '' ? null : $_POST['year']);
