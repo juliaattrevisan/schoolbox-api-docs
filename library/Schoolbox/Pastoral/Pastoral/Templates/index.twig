@@ -130,6 +130,11 @@
                 </div>
             </section>
             <a class="button expand spaced" href="/pastoral/insert/{{ user.getId() }}">Add Pastoral Comment</a>
+
+            {# Not sure if this is the best place, but give moderators a link to pastoral report builder #}
+            {% if session.user.getPastoralModerator %}
+                <a class="button expand spaced" href="/pastoral/report-builder">Pastoral Report Builder</a>
+            {% endif %}
             <hr>
         </div>
     </div>
