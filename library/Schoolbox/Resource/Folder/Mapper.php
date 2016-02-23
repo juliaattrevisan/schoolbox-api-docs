@@ -22,6 +22,7 @@ use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 /**
@@ -992,9 +993,11 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * -_-_-_-_-_-_-~|__( ^ .^)
      * // _-_-_-_-_-_-_-""  ""
      *
-     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @param Model $folder
+     * @param int $iteration
+     * @return Model
      */
-    public function findNearestNonInheritingAncestralNode(\Schoolbox\Resource\Folder\Model $folder, $iteration = 0)
+    public function findNearestNonInheritingAncestralNode(Folder $folder, $iteration = 0)
     {
         // Check cache first
 
