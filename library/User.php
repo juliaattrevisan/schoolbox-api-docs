@@ -369,49 +369,63 @@ class User extends DeprecatedModel
         if ($this->checkPassword($userID, $oldPassword)
             && $this->setPasswordInternal($userID, $newPassword)
         ) {
-            $groupHandler   = new Group();
-            $webServicesUrl = Cfg::get('external_web_services_url');
-            if ($groupHandler->isParent($userID)
-                && Cfg::get('external_enable')
-                && Cfg::get('external_type') === 'synergetic'
-                && !empty($webServicesUrl)
-            ) {
-                //
-                // Attempt to set with Synergetic.
-                // If that is set up and fails, then revert their password.
-                $user       = $this->getByID($userID);
-                $is_changed = false;
-                try {
-                    $api        = new External_Synergetic_Gateway(
-                        $webServicesUrl,
-                        Cfg::get('external_vendor_token_guid'),
-                        Cfg::get('external_vendor_password')
-                    );
-                    $is_changed = $api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword);
-
-                    if (!$is_changed) {
-                        //
-                        // Should throw a different error message if the remote pwd doesn't get changed.
-                        $this->setPasswordInternal($userID, $oldPassword);
-                        $this->logUserPasswordChange($username, 'change_pwd_syn_fail', 'warn', $api->getLastError());
-                        $this->sendPasswordChangeFailureEmail($userID, true);
-                        throw new Exception("The system was unable to reset your Synergetic password as it is no longer in sync with Schoolbox. Your Schoolbox password has been updated, however you will manually need to update your Synergetic password to match this new password.");
-                    }
-
-                } catch (SoapFault $ex) {
-                    $this->logUserPasswordChange($username, 'change_pwd_syn_broken', 'warn', $ex);
-                    $this->sendPasswordChangeFailureEmail($userID, true);
-                    throw new Exception("An unexpected error occurred while attempting to update your Synergetic password.");
-                }
-            }
-            $this->logUserPasswordChange($username, 'change_pwd', 'info');
-            return true;
+            return $this->updateExternalSystemPassword($user, $oldPassword, $newPassword);
         }
         $this->logUserPasswordChange($username, 'change_pwd_fail', 'warn');
         $this->sendPasswordChangeFailureEmail($userID);
         throw new Exception("Your current password did not match what is stored in the database.");
     }
 
+    /**
+     * @param $user
+     * @param $oldPassword
+     * @param $newPassword
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function updateExternalSystemPassword($user, $oldPassword, $newPassword)
+    {
+        $userID         = $user['uid'];
+        $username       = $user['username'];
+        $groupHandler   = new Group();
+        $webServicesUrl = Cfg::get('external_web_services_url');
+        if ($groupHandler->isParent($userID)
+            && Cfg::get('external_enable')
+            && Cfg::get('external_type') === 'synergetic'
+            && !empty($webServicesUrl)
+        ) {
+            //
+            // Attempt to set with Synergetic.
+            // If that is set up and fails, then revert their password.
+            $user       = $this->getByID($userID);
+            $is_changed = false;
+            try {
+                $api        = new External_Synergetic_Gateway(
+                    $webServicesUrl,
+                    Cfg::get('external_vendor_token_guid'),
+                    Cfg::get('external_vendor_password')
+                );
+                $is_changed = $api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword);
+
+                if (!$is_changed) {
+                    //
+                    // Should throw a different error message if the remote pwd doesn't get changed.
+                    $this->setPasswordInternal($userID, $oldPassword);
+                    $this->logUserPasswordChange($username, 'change_pwd_syn_fail', 'warn', $api->getLastError());
+                    $this->sendPasswordChangeFailureEmail($userID, true);
+                    throw new Exception("The system was unable to reset your Synergetic password as it is no longer in sync with Schoolbox. Your Schoolbox password has been updated, however you will manually need to update your Synergetic password to match this new password.");
+                }
+
+            } catch (SoapFault $ex) {
+                $this->logUserPasswordChange($username, 'change_pwd_syn_broken', 'warn', $ex);
+                $this->sendPasswordChangeFailureEmail($userID, true);
+                throw new Exception("An unexpected error occurred while attempting to update your Synergetic password.");
+            }
+        }
+        $this->logUserPasswordChange($username, 'change_pwd', 'info');
+        return true;
+    }
 
     /**
      * Checks the user's password in the database.

@@ -38,9 +38,37 @@ if (isset($_POST['current_password'])) {
     }
 
     try {
-        $response = $userHandler->setPassword($_SESSION['id'], $_POST['current_password'], $_POST['new_password']);
+        /** @var Schoolbox\User $user */
+        $user            = $_SESSION['user'];
+        $userMapper      = Schoolbox\UserMapper::getInstance();
+        $passwordService = new \Alaress\Password\Service();
+        // Test password against existing
+        $currentHash = $user->getPassword();
+        if ($passwordService->verify($_POST['current_password'], $currentHash)
+            || $userMapper->hashPassword($_POST['current_password'], $currentHash)
+        ) {
+            $user->setPassword($passwordService->hash($_POST['new_password']));
+            $userMapper->save($user);
+            $_SESSION['password'] = $_POST['new_password'];
+        } else {
+            $userHandler->logUserPasswordChange($user->getUsername(), 'change_pwd_fail', 'warn');
+            $userHandler->sendPasswordChangeFailureEmail($user->getId());
+            error(105, "Your current password did not match what is stored in the database.");
+            exit;
+        }
 
-        $result = $userHandler->sendChangePasswordEmail($_SESSION['id']);
+        // Try this
+        $userHandler->updateExternalSystemPassword(
+            [
+                'uid'        => $user->getId(),
+                'username'   => $user->getUsername(),
+                'synergy_id' => $user->getExternalId(),
+            ],
+            $_POST['current_password'],
+            $_POST['new_password']
+        );
+
+        $result = $userHandler->sendChangePasswordEmail($user->getId());
         $myconf = ConfigMapper::getInstance();
         $core = new CoreContext($myconf);
         $email = new TwigEmail('passwordchanged.twig');
