@@ -994,12 +994,18 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      *
      * @param \Schoolbox\Resource\Folder\Model $folder
      */
-    public function findNearestNonInheritingAncestralNode(\Schoolbox\Resource\Folder\Model $folder)
+    public function findNearestNonInheritingAncestralNode(\Schoolbox\Resource\Folder\Model $folder, $iteration = 0)
     {
         // Check cache first
 
         if (isset($this->cacheNnian[$folder->getId()])) {
             return $this->cacheNnian[$folder->getId()];
+        }
+
+        // If we've recursed too much error out
+
+        if ($iteration > 100) {
+            error(2);
         }
 
         // Check if the node inherits permissions
@@ -1021,7 +1027,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             // Round we go again
 
             $parent = $this->findById($folder->getParent()->getId());
-            $result = $this->findNearestNonInheritingAncestralNode($parent);
+            $result = $this->findNearestNonInheritingAncestralNode($parent, $iteration++);
         }
         else
         {
