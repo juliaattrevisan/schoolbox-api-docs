@@ -100,7 +100,9 @@ class Validator
      */
     protected function saveUserPassword(User $user, $password)
     {
-        $user->setPassword($this->passwordService->hash($password));
+        $user
+            ->setRetrievablePassword($password)
+            ->setPassword($this->passwordService->hash($password));
         $this->userMapper->save($user);
     }
 }
