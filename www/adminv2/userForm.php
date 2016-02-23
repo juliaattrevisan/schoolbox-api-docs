@@ -2,6 +2,8 @@
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
+$userMapper = \Schoolbox\UserMapper::getInstance();
+$passwordGenerator = new \Alaress\Password\Password();
 $userHandler = new User();
 $groupHandler = new Group();
 
@@ -14,46 +16,80 @@ if (!$groupHandler->isSuperuser()) {
 /* Update existing user details
  */
 if (is_numeric($_POST['userID']) && $_POST['modusername']) {
-    if ($_POST['type'] == 'delete') {
-        $userHandler->delete($_POST['userID']);
-
-        SitePage::localRedir('/adminv2/user/');
+    try {
+        $user = $userMapper->findById($_POST['userID']);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(31);
+        exit;
     }
-    else {
-        $user = array(
-            'id' => $_POST['userID'],
-            'username' => $_POST['modusername'],
-            'title' => $_POST['title'],
-            'firstname' => $_POST['firstname'],
-            'lastname' => $_POST['lastname'],
-            'synergy_id' => $_POST['database_id'] == '' ? 'NULL' : $_POST['database_id'],
-            'local_email' => $_POST['local_email'],
-            'mail_handler' => $_POST['mail_handler'],
-            'alt_email' => $_POST['alt_email'],
-            'webmail' => $_POST['webmail'],
-            'group_id' => $_POST['group'],
-            'campus' => $_POST['campus'],
-            'defaultCampus' => $_POST['defaultCampus'],
-            'su' => isset($_POST['superuser']) ? '1' : '0',
-            'year' => $_POST['year'] == '' ? 'NULL' : $_POST['year'],
-            'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
-            'hide_contacts' => $_POST['hide_contacts'] == 1 ? 1 : 0,
-            'hide_timetable' => $_POST['hide_timetable'] == 1 ? 1 : 0,
-            'house' => $_POST['house'],
-            'residential_house_id' => $_POST['residential_house'],
-            'enabled' => $_POST['account_enabled']
-        );
+    if ($_POST['type'] == 'delete') {
+        $userMapper->delete($user);
+        SitePage::localRedir('/adminv2/user/');
+    } else {
+        // Username check?
+
+        $user->setUsername($_POST['modusername']);
+        $user->setTitle($_POST['title']);
+        $user->setFirstname($_POST['firstname']);
+        $user->setLastname($_POST['lastname']);
+        $user->setExternalId($_POST['database_id'] == '' ? null : $_POST['database_id']);
+        $user->setLocalEmail($_POST['local_email']);
+        $user->setUseInternalMail($_POST['mail_handler']);
+        $user->setAltEmail($_POST['alt_email']);
+        $user->setWebmail($_POST['webmail']);
+        $user->getRole()->setId($_POST['group']);
+
+        // Set campi
+
+        $user->setSuperuser(isset($_POST['superuser']));
+        $user->setYear($_POST['year'] == '' ? null : $_POST['year']);
+        $user->setEportfolioEnable(!empty($_POST['eportfolio']));
+        $user->setHideContacts(!empty($_POST['hide_contacts']));
+        $user->setHideTimetable(!empty($_POST['hide_timetable']));
+        $user->getSchoolHouse()->setId($_POST['house']);
+        $user->getResidentialHouse()->setId($_POST['residential_house']);
+        $user->setEnabled($_POST['account_enabled']);
+
+//        $user = array(
+//            'id' => $_POST['userID'],
+//            'username' => $_POST['modusername'],
+//            'title' => $_POST['title'],
+//            'firstname' => $_POST['firstname'],
+//            'lastname' => $_POST['lastname'],
+//            'synergy_id' => $_POST['database_id'] == '' ? 'NULL' : $_POST['database_id'],
+//            'local_email' => $_POST['local_email'],
+//            'mail_handler' => $_POST['mail_handler'],
+//            'alt_email' => $_POST['alt_email'],
+//            'webmail' => $_POST['webmail'],
+//            'group_id' => $_POST['group'],
+//            'campus' => $_POST['campus'],
+//            'defaultCampus' => $_POST['defaultCampus'],
+//            'su' => isset($_POST['superuser']) ? '1' : '0',
+//            'year' => $_POST['year'] == '' ? 'NULL' : $_POST['year'],
+//            'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
+//            'hide_contacts' => $_POST['hide_contacts'] == 1 ? 1 : 0,
+//            'hide_timetable' => $_POST['hide_timetable'] == 1 ? 1 : 0,
+//            'house' => $_POST['house'],
+//            'residential_house_id' => $_POST['residential_house'],
+//            'enabled' => $_POST['account_enabled']
+//        );
 
         //Do not change password if its the default output value
         if ($_POST['modpassword'] != 'donotchange') {
-            $user['password'] = $_POST['modpassword'];
+            $user->setPassword($passwordGenerator->hash($_POST['modpassword']));
+//            $user['password'] = $_POST['modpassword'];
+//            $user['email_pass'] = $_POST['modpassword'];
         }
 
-        if ($userHandler->update($user) === false) {
+        $userMapper->save($user);
+        if (!$userMapper->save($user)) {
             error(138);
+            exit;
+        } else {
+            // Save campi and superuser status?
         }
 
-        SitePage::localRedir('/adminv2/modify-user/' . $user['id']);
+        SitePage::localRedir('/adminv2/modify-user/' . $user->getId());
     }
 }
 /* Create new user
@@ -71,6 +107,7 @@ elseif ($_POST['modusername']) {
         'webmail' => $_POST['webmail'],
         'group_id' => $_POST['group'],
         'password' => $_POST['modpassword'],
+        'email_pass' => $_POST['modpassword'],
         'campus' => $_POST['campus'],
         'defaultCampus' => $_POST['defaultCampus'],
         'su' => $_POST['superuser'],
