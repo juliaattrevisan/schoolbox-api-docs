@@ -15,6 +15,26 @@
     }
 }
 
+/* Destroy FullCalendar icons...
+ */
+.fc-icon-left-single-arrow:after,
+.fc-icon-right-single-arrow:after{
+    content: none !important;
+}
+/* Add SB icons instead
+ */
+.fc-button .fc-icon{
+    font-family: 'schoolbox', #{$body-font-family};
+}
+
+.fc-icon-left-single-arrow:before{
+    @extend .icon-previous;
+}
+
+.fc-icon-right-single-arrow:before{
+    @extend .icon-next;
+}
+
 /* Force FullCalendar control buttons to absorb
  * Skin Builder choices
  */
@@ -29,6 +49,7 @@
             }
         }
     }
+
     @media #{$small-only} {
         .fc-left,
         .fc-right,
