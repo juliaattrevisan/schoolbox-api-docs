@@ -3,7 +3,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page            = new SitePage();
 $userMapper      = \Schoolbox\UserMapper::getInstance();
-$passwordService = new \Alaress\Password\Password();
+$passwordService = new \Alaress\Password\Service();
 $groupHandler    = new Group();
 
 /* Superusers only

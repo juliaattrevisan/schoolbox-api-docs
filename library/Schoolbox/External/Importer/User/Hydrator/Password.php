@@ -7,7 +7,7 @@
 
 namespace Schoolbox\External\Importer\User\Hydrator;
 
-use Alaress\Password\Password as PasswordService;
+use Alaress\Password\Service as PasswordService;
 use Schoolbox\User as UserModel;
 
 /**

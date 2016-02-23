@@ -328,7 +328,7 @@ class Session
     {
         $passwordValidator = new \Schoolbox\User\Password\Validator(
             \Schoolbox\UserMapper::getInstance(),
-            new \Alaress\Password\Password()
+            new \Alaress\Password\Service()
         );
         return $passwordValidator->checkPassword($username, $password);
     }

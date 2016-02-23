@@ -8,7 +8,7 @@
 namespace Schoolbox\External\Importer;
 
 use Alaress\Csv\Reader;
-use Alaress\Password\Password;
+use Alaress\Password\Service;
 use House as HouseModel;
 use HouseMapper;
 use HouseResidential as HouseResidentialModel;
@@ -48,7 +48,7 @@ class User extends AbstractImporter
     protected $csvReader;
 
     /**
-     * @var Password
+     * @var Service
      */
     protected $passwordService;
 
@@ -195,7 +195,7 @@ class User extends AbstractImporter
      */
     protected function setup()
     {
-        $this->passwordService    = new Password();
+        $this->passwordService    = new Service();
         $this->userMapper         = new UserMapper();
         $this->userProfileMapper  = new UserProfileMapper();
         $this->userRelationMapper = new UserRelationMapper();

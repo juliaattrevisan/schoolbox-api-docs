@@ -12,7 +12,7 @@ namespace Alaress\Password;
  *
  * @package Alaress\Password
  */
-class Password
+class Service
 {
     /**
      * @var int

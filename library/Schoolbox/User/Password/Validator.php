@@ -7,7 +7,7 @@
 
 namespace Schoolbox\User\Password;
 
-use Alaress\Password\Password;
+use Alaress\Password\Service;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -25,7 +25,7 @@ class Validator
     protected $userMapper;
 
     /**
-     * @var Password
+     * @var Service
      */
     protected $passwordService;
 
@@ -36,11 +36,12 @@ class Validator
 
     /**
      * Constructor
+
      *
-     * @param UserMapper $userMapper
-     * @param Password   $passwordService
+*@param UserMapper    $userMapper
+     * @param Service $passwordService
      */
-    public function __construct(UserMapper $userMapper, Password $passwordService)
+    public function __construct(UserMapper $userMapper, Service $passwordService)
     {
         $this->userMapper      = $userMapper;
         $this->passwordService = $passwordService;
