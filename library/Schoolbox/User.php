@@ -53,10 +53,8 @@ class User implements JsonSerializable
      *
      * Intentionally not mapped - I don't want this field to be passed around.
      *
-     * @deprecated This field only exists for compatibility with pre-16
-     *             password retrieval methods.
-     *
-     * @see \Schoolbox\UserMapper::saveRetrievablePassword
+     * @deprecated This field exists for compatibility with pre-16 password
+     *             retrieval methods, and for setting the hash and key.
      *
      * @var string
      */
