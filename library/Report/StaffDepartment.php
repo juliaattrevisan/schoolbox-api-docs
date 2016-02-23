@@ -105,14 +105,16 @@ class Report_StaffDepartment extends Report_Abstract
             $previousDepartment = "";
 
             foreach ($allStaff as $key => $currentStaff) {
-                $description = trim(Scrub::text($currentStaff['StaffDepartmentDescription']));
+                $department = trim(Scrub::text($currentStaff['StaffDepartmentDescription']));
+                $role = trim(Scrub::text(implode(', ', $currentStaff['JobPositionDescription'])));
 
                 // Remove staff with unknown departments
 
-                if ($description == '' || strtolower($description) == 'not selected') {
+
+                if ($department == '' || strtolower($department) == 'not selected' || $role == '') {
                     unset($allStaff[$key]);
                 } else {
-                    $allStaff[$key]['StaffDepartmentDescription'] = $description;
+                    $allStaff[$key]['StaffDepartmentDescription'] = $department;
                 }
             }
 
