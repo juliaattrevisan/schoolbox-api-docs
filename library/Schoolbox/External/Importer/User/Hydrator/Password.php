@@ -7,9 +7,8 @@
 
 namespace Schoolbox\External\Importer\User\Hydrator;
 
-use Schoolbox\Mapper\Exception as MapperException;
+use Alaress\Password\Password as PasswordGenerator;
 use Schoolbox\User as UserModel;
-use Schoolbox\UserMapper;
 
 /**
  * Sets the user's password, if it exists in the row and it isn't empty.
@@ -19,21 +18,21 @@ use Schoolbox\UserMapper;
 class Password extends Field
 {
     /**
-     * @var UserMapper
+     * @var PasswordGenerator
      */
-    protected $userMapper;
+    protected $passwordGenerator;
 
     /**
      * Constructor
      *
-     * @param string     $fieldname
-     * @param string     $setMethod
-     * @param UserMapper $userMapper
+     * @param string            $fieldname
+     * @param string            $setMethod
+     * @param PasswordGenerator $passwordGenerator
      */
-    public function __construct($fieldname, $setMethod, UserMapper $userMapper)
+    public function __construct($fieldname, $setMethod, PasswordGenerator $passwordGenerator)
     {
         parent::__construct($fieldname, $setMethod);
-        $this->userMapper = $userMapper;
+        $this->passwordGenerator = $passwordGenerator;
     }
 
     /**
@@ -42,7 +41,7 @@ class Password extends Field
     public function hydrate($row, UserModel $user)
     {
         if (isset($row[$this->fieldname]) && strlen($row[$this->fieldname]) > 0) {
-            $password = $this->userMapper->hashPassword($row[$this->fieldname]);
+            $password = $this->passwordGenerator->hash($row[$this->fieldname]);
             return call_user_func([$user, $this->setMethod], $password);
         }
         return $user;

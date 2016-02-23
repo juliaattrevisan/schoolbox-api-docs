@@ -8,6 +8,7 @@
 namespace Schoolbox\External\Importer;
 
 use Alaress\Csv\Reader;
+use Alaress\Password\Password;
 use House as HouseModel;
 use HouseMapper;
 use HouseResidential as HouseResidentialModel;
@@ -45,6 +46,11 @@ class User extends AbstractImporter
      * @var Reader
      */
     protected $csvReader;
+
+    /**
+     * @var Password
+     */
+    protected $passwordGenerator;
 
     /**
      * @var UserMapper
@@ -189,6 +195,7 @@ class User extends AbstractImporter
      */
     protected function setup()
     {
+        $this->passwordGenerator  = new Password();
         $this->userMapper         = new UserMapper();
         $this->userProfileMapper  = new UserProfileMapper();
         $this->userRelationMapper = new UserRelationMapper();
@@ -226,7 +233,7 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Username', 'setUsername');
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('External ID', 'setExternalId');
         $this->userHydrators[] = new User\Hydrator\Lookup('Role', 'setRole', $this->roleList);
-        $this->userHydrators[] = new User\Hydrator\Password('Password', 'setPassword', $this->userMapper);
+        $this->userHydrators[] = new User\Hydrator\Password('Password', 'setPassword', $this->passwordGenerator);
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Password', 'setRetrievablePassword');
         $this->userHydrators[] = new User\Hydrator\ToggleField('E-Portfolio?', 'setEportfolioEnable');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Hide Contact Details?', 'setHideContacts');
