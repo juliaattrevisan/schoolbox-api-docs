@@ -469,7 +469,6 @@ class User extends AbstractImporter
             $this->log->info(sprintf('Creating user "%s"', $user->formatName()), ['user' => $user]);
             try {
                 if ($this->userMapper->save($user)) {
-                    $this->userMapper->saveRetrievablePassword($user);
                     $this->log->info(sprintf('User created (ID: #%d)', $user->getId()));
                 } else {
                     $this->log->error('Could not create user!');
@@ -495,7 +494,6 @@ class User extends AbstractImporter
             $this->log->info(sprintf('Updating user "%s"', $user->formatName()), ['diff' => $diff]);
             try {
                 if ($this->userMapper->save($user)) {
-                    $this->userMapper->saveRetrievablePassword($user);
                     $this->log->info(sprintf('User updated (ID: #%d)', $user->getId()));
                 } else {
                     $this->log->error('Could not update user!');
