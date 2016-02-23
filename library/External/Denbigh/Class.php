@@ -46,7 +46,12 @@ class External_Denbigh_Class implements External_ClassInterface {
 
         $classQuery = substr($classQuery, 0, -3) . ')';
 
-
+		/* Note that Classes table will have multiple records for the same
+		 * Class if there are multiple teachers in it; this will cause the
+		 * left join to include duplicate records for students too.
+		 *
+		 * Group by denbighID to uniqify the student list.
+		 */
         $statement = $this->getExternalDatabase()->query("
             SELECT p.denbighID, p.surname, p.preferred_name, s.academicYear, s.house
             FROM Classes c
@@ -54,6 +59,7 @@ class External_Denbigh_Class implements External_ClassInterface {
             LEFT JOIN Students s ON s.peopleDenbighID = e.studentID
             LEFT JOIN People p ON p.denbighID = s.peopleDenbighID
             WHERE $classQuery
+            GROUP BY denbighID
             ORDER BY p.surname ASC
         ");
 
