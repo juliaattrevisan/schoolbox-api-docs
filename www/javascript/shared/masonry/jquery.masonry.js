@@ -35,7 +35,7 @@
 
         component: {
             selector: '[data-component]',
-            handleSelector: 'h2',
+            handleSelector: '[data-component-handle]',
             immovableFilter: '.permanent',
             controlPanelSelector: '[data-component-panel]',
             editBtnSelector: 'a.edit',
