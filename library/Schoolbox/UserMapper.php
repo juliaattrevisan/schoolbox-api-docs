@@ -266,6 +266,8 @@ class UserMapper extends Mapper
 
             return true;
         });
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'setSuperuserStatus']);
     }
 
 
@@ -571,5 +573,24 @@ class UserMapper extends Mapper
         $statement = $this->getDatabase()->prepare('SELECT PASSWORD(?)');
         $statement->execute([$password]);
         return $statement->fetchColumn();
+    }
+
+    /**
+     * Post-save callback for setting a user's superuser status.
+     *
+     * @param User $user
+     */
+    public function setSuperuserStatus(User $user)
+    {
+        $superuserStatus = $user->getSuperuser();
+        if (isset($superuserStatus)) {
+            if ($superuserStatus) {
+                $query = 'INSERT IGNORE INTO superusers (id) VALUES (?)';
+            } else {
+                $query = 'DELETE FROM superusers WHERE id = ?';
+            }
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute([$user->getId()]);
+        }
     }
 }
