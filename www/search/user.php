@@ -122,6 +122,8 @@ function renderStudent(
         // Load a bunch of category and teacher info too
         try {
             $subject['folder'] = $folderMapper->findByCode($subject['code']);
+            $subject['perms'] = $groupHandler->getPermission($subject['folder']->getId());
+
         } catch (\Exception $e) {
             if (\Config::get('show_all_subjects')) {
                 $code = new Folder\Code\Model();
@@ -136,12 +138,15 @@ function renderStudent(
             'synergy_id' => $classHandler->getTeacherName($subject['code']),
             'group_id'   => $teacherRoles,
         ]);
+
         $subjects[$group][] = $subject;
     }
 
     // Load the list of groups, and their owner.
     $groups = $groupHandler->involvedInCategoryList($user['uid'], false);
     foreach ($groups as &$group) {
+        $group['perms'] = $groupHandler->getPermission($group['id']);
+
         $owner = $groupHandler->getOwner($group['id']);
         if (is_array($owner)) {
             $group['owner'] = $userMapper->findById($owner['uid']);
