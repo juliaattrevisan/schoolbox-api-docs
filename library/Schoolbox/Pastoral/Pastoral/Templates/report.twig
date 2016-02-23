@@ -1,11 +1,21 @@
+<script>
+    $(function () {
+        $('[data-print').click(function(event) {
+           window.print();
+        });
+    });
+</script>
 <ul class="breadcrumb hide-on-print">
-    <li><a href="/pastoral/dashboard">Pastoral Care</a></li>
-    <li class="active"><a href="#">Report</a></li>
+    <li><a href="/pastoral">Pastoral Care Report Builder</a></li>
+    <li class="active"><a href="#">Report Results</a></li>
 </ul>
 
 <div class="row">
     <div class="small-12 island">
-        <h1 class="hide-on-print">Pastoral Care Report</h1>
+        <h1 class="hide-on-print">
+            Pastoral Care Report
+            <a data-print class="button right icon-print"></a>
+        </h1>
         <section>
             {% if results | length > 0 %}
                 <ul class="information-list">
