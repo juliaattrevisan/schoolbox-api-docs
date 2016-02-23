@@ -457,10 +457,22 @@ class User extends DeprecatedModel
      */
     public function setPasswordInternal($userID, $newPassword)
     {
-        $newPassword = $this->db->quote($newPassword);
-        $query       = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword') WHERE `" . $this->_index . "` = $userID";
-        $this->db->query($query);
-        return $this->db->affectedRows();
+        // Babushka doll - a mapper in a handler!
+        // This is going to be slow as hell but the only place user handler
+        // should still save users is in the sync scripts, so who cares.
+        // Also, most syncs don't even save passwords.
+        $userMapper = \Schoolbox\UserMapper::getInstance();
+        try {
+            $user            = $userMapper->findById($userID);
+            $passwordService = new \Alaress\Password\Service();
+            $user
+                ->setRetrievablePassword($newPassword)
+                ->setPassword($passwordService->hash($newPassword));
+            $userMapper->save($user);
+            return 1;
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return 0;
+        }
     }
 
     /**
