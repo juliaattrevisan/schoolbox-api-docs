@@ -937,7 +937,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      */
     public function findCheaplyById($folderId) {
         $query = "
-            SELECT id, name, parent
+            SELECT id, name, parent, inherit
             FROM `{$this->getTable()}` c
             WHERE id = :folderId
         ";
@@ -1029,7 +1029,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
             // Round we go again
 
-            $parent = $this->findById($folder->getParent()->getId());
+            $parent = $this->findCheaplyById($folder->getParent()->getId());
             $result = $this->findNearestNonInheritingAncestralNode($parent, $iteration++);
         }
         else
