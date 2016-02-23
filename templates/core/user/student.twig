@@ -473,7 +473,7 @@
                                 <li>
                                     <div class="list-item">
                                         <div class="avatar card small-12">
-                                            {% if subject.folder.getId() and subject.perms > 0 %}
+                                            {% if subject.folder.getId() and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
                                             <a href="/homepage/code/{{ subject.code|e('url') }}">
                                                 <span class="icon-folder icon-32"></span>
                                                 <h3>{{ subject.name }}</h3>
