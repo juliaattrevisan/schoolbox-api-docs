@@ -376,10 +376,9 @@ class Controller extends Base
         );
     }
 
-
-    public function getDashboard()
+    public function getReportBuilder()
     {
-        // Get current users role. The list screen is restricted to parents and staff
+        // Get current users role. The screen is restricted to pastoral moderators only
 
         $role = $_SESSION["user"]->getRole()->getType();
 
@@ -387,7 +386,8 @@ class Controller extends Base
 
         if ($role != "staff") {
 
-            // The logged in user is not staff, send them back to the homepage
+            // The logged in user is not staff, send them back to the homepage. This should prevent accidental recording
+            // of parents as moderators.
 
             $this->getResponse()->redirect->afterPost("/");
             return;
@@ -430,7 +430,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             array(
-                'template' => '@pastoral/dashboard.twig',
+                'template' => '@pastoral/reportBuilder.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
                     'moderators'        => $moderators,

@@ -73,6 +73,8 @@
                             <p class="spaced meta">
                                 Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getPostDate().getShort() }}
                             </p>
+
+                            {# Show tags #}
                             {% if record.tags | length > 0 %}
                                 <p class="spaced">
                                     {% for tag in record.tags %}
@@ -80,10 +82,14 @@
                                     {% endfor %}
                                 </p>
                             {% endif %}
+
+                            {# Show article body #}
                             <article>
                                 <p class="spaced">
                                     {{ record.getBodyText() }}
                                 </p>
+
+                                {# Show any file attachments #}
                                 {% if record.attachments.count() > 0 %}
                                     <p class="spaced meta">
                                         {% for attachment in record.attachments %}
@@ -93,24 +99,31 @@
                                 {% endif %}
                             </article>
 
+                            {# Parents can never see meta #}
                             {% if role != 'parent' %}
                                 <p class="spaced meta">
-                                    {{ record.getTypeName() }}
-                                    {% if session.user.getRole().isStaff() %}
-                                        |
-                                        {% if record.private %}Contents Private | {% endif %}
-                                        {% if record.roles | length + record.users | length == 0 %}No Audience Set{% endif %}
-                                        {% if record.roles | length > 0 %}
-                                            {% for role in record.roles %}
-                                                {{ role.getName() }}{% if not loop.last %}, {% endif %}
-                                            {% endfor %}
-                                        {% endif %}
-                                        {% if record.users | length > 0 %}
-                                            {% if record.roles | length > 0 %}|{% endif %}
-                                            {% for user in record.users %}
-                                                <a href="/search/user/{{ user.getId() }}">{{ user.firstname }} {{ user.lastname }} ({{ user.getRole.name }})</a>{% if not loop.last %}, {% endif %}
-                                            {% endfor %}
-                                        {% endif %}
+                                    {# Show pastoral event type #}
+                                    {{ record.getTypeName() }} |
+
+                                    {# Show if record is marked as private #}
+                                    {% if record.private %}Contents Private | {% endif %}
+
+                                    {# Show if no audience has been set #}
+                                    {% if record.roles | length + record.users | length == 0 %}No Audience Set{% endif %}
+
+                                    {# Show audienced roles #}
+                                    {% if record.roles | length > 0 %}
+                                        {% for role in record.roles %}
+                                            {{ role.getName() }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    {# Show audienced users #}
+                                    {% if record.users | length > 0 %}
+                                        {% if record.roles | length > 0 %}|{% endif %}
+                                        {% for user in record.users %}
+                                            <a href="/search/user/{{ user.getId() }}">{{ user.firstname }} {{ user.lastname }} ({{ user.getRole.name }})</a>{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
                                     {% endif %}
                                 </p>
                             {% endif %}
@@ -135,14 +148,21 @@
             {% if comments | length > 0 %}
                 <section>
                     <ul class="action-list">
+
+                        {# Show all comments for this record #}
                         {% for comment in comments %}
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="small-12 avatar card wrap-down">
+                                        {# Comment author photo #}
                                         <a href="/search/user/{{ comment.owner.getId() }}" title="View Profile">
                                             <img src="/portrait.php?userId={{ comment.owner.getExternalId() }}&size=square64" alt="" />
                                         </a>
+
+                                        {# Show comment author #}
                                         <p class="meta">Posted By <a href="/search/user/{{ comment.owner.getId() }}">{{ comment.owner.firstName }} {{ comment.owner.lastName }}</a> {{ comment.getPostDate().getShort() }}</p>
+
+                                        {# Show comment body #}
                                         <p class="spaced">
                                             {{ comment.body | raw }}
                                         </p>
