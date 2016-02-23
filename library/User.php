@@ -345,37 +345,6 @@ class User extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-
-    /**
-     * Sets the user's password.
-     *
-     * If the Synergetic API is enabled, this also attempts to set their
-     * password in Synergetic. If that process fails, then the password will be
-     * reverted.
-     *
-     * @param $userID
-     * @param $oldPassword
-     * @param $newPassword
-     *
-     * @return bool
-     * @throws Exception
-     */
-    public function setPassword($userID, $oldPassword, $newPassword)
-    {
-        //
-        // Set password, and set it back if updating via Synergetic fails.
-        $user     = $this->getByID($userID);
-        $username = $user['username'];
-        if ($this->checkPassword($userID, $oldPassword)
-            && $this->setPasswordInternal($userID, $newPassword)
-        ) {
-            return $this->updateExternalSystemPassword($user, $oldPassword, $newPassword);
-        }
-        $this->logUserPasswordChange($username, 'change_pwd_fail', 'warn');
-        $this->sendPasswordChangeFailureEmail($userID);
-        throw new Exception("Your current password did not match what is stored in the database.");
-    }
-
     /**
      * @param $user
      * @param $oldPassword
