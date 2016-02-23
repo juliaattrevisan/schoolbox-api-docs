@@ -290,18 +290,11 @@ class ContextSelector {
 				array_push($thisHref, $catId);
 			}
 
-			$categoryHydrated = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($category->getId());
-			$codes = $categoryHydrated->getCodeString();
-
-			if (!empty($codes)) {
-				$codes = "({$codes})";
-			}
-
 			$output[] = array(
 				'SUBJECT_ID' => $catId,
 				'SUBJECT_HREF' => implode('/', $thisHref),
 				'SUBJECT_SELECTED' => $selectedId == $catId ? 'selected="selected"' : '',
-				'SUBJECT_NAME' => $category->getName() . " " . $codes
+				'SUBJECT_NAME' => $category->getNameWithCodes()
 			);
 		}
 

@@ -409,6 +409,24 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     }
 
     /**
+     * Get a hydrated category
+     *
+     * @param $id
+     * @return Collection|Model[]
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function findByColumnWithCodes($column, $value)
+    {
+        $categories = $this->findByColumn($column, $value);
+
+        foreach ($categories as $category) {
+            $category->setCodes($this->getJoinMapper('codes')->findByColumn('categoryID', $category->getId()));
+        }
+
+        return $categories;
+    }
+
+    /**
      * Helper method for creating a search query with codes, homepage config and
      * group all built in.
      *

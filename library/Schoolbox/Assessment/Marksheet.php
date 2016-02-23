@@ -455,7 +455,7 @@ class Marksheet
             }
         }
 
-        $contextSelector->setCategories($this->categoryMapper->findByColumn('id', $catIdList));
+        $contextSelector->setCategories($this->categoryMapper->findByColumnWithCodes('id', $catIdList));
 
         $contextSelector->render(
             $page, 'CONTEXT_SELECTOR', array(
