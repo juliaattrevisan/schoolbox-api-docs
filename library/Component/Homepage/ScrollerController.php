@@ -56,13 +56,17 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
             return false;
         }
 
+        /* Need name injected here
+         */
+        $this->parseConfig();
+
         if ($this->permission < READ_ACCESS) {
             return false;
         }
 
         $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
         $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
-        $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
+        $this->setBlock($templateHandle, 'submit_image_scroller', 'submit_image_scroller_block');
 
         $this->setVar(
             array(
@@ -96,9 +100,9 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
 
         // Controls such as Post Images
         if ($this->permission < WRITE_ACCESS) {
-            $this->setVar("submit_image_block", "");
+            $this->setVar("submit_image_scroller_block", "");
         } else {
-            $this->parse("submit_image_block", "submit_image");
+            $this->parse("submit_image_scroller_block", "submit_image_scroller");
         }
 
         // Iterate
@@ -119,10 +123,6 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
 
             $this->parse('image_scroller_block', 'image_scroller', true);
         }
-
-        /* Need name injected here
-         */
-        $this->parseConfig();
 
         return true; // everything went according to plan
     }
