@@ -16,7 +16,7 @@
             labelField: 'name',
             valueField: 'name',
             options: [
-                {% for tag in tags %}
+                {% for tag in tagsAll %}
                 {name: '{{ tag.name | title | escape('js') }}'},
                 {% endfor %}
             ]
@@ -128,7 +128,7 @@
 </script>
 
 <ul class="breadcrumb">
-    <li class="active"><a href="/pastoral/report-builder">Pastoral Care Report Builder</a></li>
+    <li class="active"><a href="/pastoral/dashboard">Pastoral Care</a></li>
 </ul>
 
 <div class="actions-small-1 row">
@@ -141,6 +141,28 @@
 
 <div class="row">
     <div class="small-12 island">
+        <h2>Moderators</h2>
+        <p>
+            Pastoral moderators have access to all students pastoral records and the pastoral care reporting.
+            Super users can assign individuals pastoral moderator access in the Schoolbox administration console.
+        </p>
+
+        <section>
+            <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {GRID_VIEW_CLASSES}">
+                {% for moderator in moderators %}
+                    <li>
+                        <div class="avatar card small-12">
+                            <a href="/search/user/{{ moderator.getId }}" title="View Profile">
+                                <img src="/portrait.php?userId={{ moderator.getExternalId }}&size=square64" alt="View Profile" />
+                                <p>{{ moderator.firstname }} {{ moderator.lastname }}</p>
+                            </a>
+                            <p class="meta">{{ moderator.getRole.name }}</p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+
         <h2>Pastoral Report Builder</h2>
 
         <form id="formReport" action="/pastoral/report" method="get">
@@ -208,8 +230,7 @@
             </fieldset>
         </section>
 
-        <a href="#" data-report class="submit expand">Create Report</a>
+        <button data-report class="expand">Create Report</button>
 
     </div>
-
 </div>
