@@ -1026,8 +1026,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             $this->interimNodes[] = $folder->getId();
 
             // Make sure we aren't hitting the root
-
-            if ($folder->getParent()->getId() == 0)
+            if ($folder->getParent()->isRootNode())
             {
                 // Got to the top- somethings wrong with the data in the database as this should not be possible
                 error(2);
