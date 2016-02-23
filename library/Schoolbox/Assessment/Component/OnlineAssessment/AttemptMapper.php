@@ -290,4 +290,43 @@ class AttemptMapper extends Mapper
         }
         return 0;
     }
+
+    /**
+     * Gets all attempts which are are not yet finished, but have expired.
+     *
+     * @return Attempt[]
+     */
+    public function findUnfinishedExpiredAttempts()
+    {
+        $query = "
+            SELECT
+                {$this->getColumnString('aa')},
+                {$this->getJoinColumnString('assessment', 'as')},
+                {$this->getJoinColumnString('user', 'u')}
+            FROM {$this->getTable()} aa
+            INNER JOIN {$this->getJoinSql('assessment', 'aa', 'as')}
+            LEFT  JOIN {$this->getJoinSql('user', 'aa', 'u')}
+            WHERE `as`.`availability` = 'assess'
+            AND   `as`.`duration` > 0
+            AND   TIMESTAMPADD(SECOND, `as`.`duration`, `aa`.`start`) < :expiry
+            AND   `aa`.`finish`     IS NULL
+            AND   `aa`.`deleted_at` IS NULL
+            ORDER BY TIMESTAMPADD(SECOND, `as`.`duration`, `aa`.`start`) ASC
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'expiry' => \Alaress_Date_Format::now()->getDatabase(),
+        ]);
+        return $this->hydrateList(
+            $statement,
+            'aa',
+            function ($mapper, $model, $row) {
+                /** @var Attempt $model */
+                return $model
+                    ->setAssessment($this->hydrateJoin($row, 'assessment', 'as'))
+                    ->setUser($this->hydrateJoin($row, 'user', 'u'))
+                ;
+            }
+        );
+    }
 }
