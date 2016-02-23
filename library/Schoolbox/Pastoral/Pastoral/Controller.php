@@ -909,15 +909,20 @@ class Controller extends Base
             return;
         }
 
-        $postDate = date("Y-m-d H:i:s");
+        // No blank comments thanks
 
-        $commentMapper = \Schoolbox\Pastoral\Comment\Mapper::getInstance();
-        $comment = new \Schoolbox\Pastoral\Comment\Model();
-        $comment->setPastoralId($_POST["pastoral_id"]);
-        $comment->setBody($_POST["body"]);
-        $comment->setOwner($_SESSION["user"]);
-        $comment->setPostDate($postDate);
-        $commentMapper->save($comment);
+        if (trim($_POST["body"]) != '')
+        {
+            $postDate = date("Y-m-d H:i:s");
+
+            $commentMapper = \Schoolbox\Pastoral\Comment\Mapper::getInstance();
+            $comment = new \Schoolbox\Pastoral\Comment\Model();
+            $comment->setPastoralId($_POST["pastoral_id"]);
+            $comment->setBody($_POST["body"]);
+            $comment->setOwner($_SESSION["user"]);
+            $comment->setPostDate($postDate);
+            $commentMapper->save($comment);
+        }
 
         // Go back to pastoral record
 
