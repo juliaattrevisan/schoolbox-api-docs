@@ -378,9 +378,9 @@ class User extends DeprecatedModel
                 $is_changed = $api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword);
 
                 if (!$is_changed) {
-                    //
-                    // Should throw a different error message if the remote pwd doesn't get changed.
-                    $this->setPasswordInternal($userID, $oldPassword);
+                    // Don't reset password back to old password.
+                    // The fail message says it is not set back, so why change it?
+//                    $this->setPasswordInternal($userID, $oldPassword);
                     $this->logUserPasswordChange($username, 'change_pwd_syn_fail', 'warn', $api->getLastError());
                     $this->sendPasswordChangeFailureEmail($userID, true);
                     throw new Exception("The system was unable to reset your Synergetic password as it is no longer in sync with Schoolbox. Your Schoolbox password has been updated, however you will manually need to update your Synergetic password to match this new password.");
