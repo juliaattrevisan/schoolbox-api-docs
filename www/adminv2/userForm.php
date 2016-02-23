@@ -95,37 +95,63 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
 /* Create new user
  */
 elseif ($_POST['modusername']) {
-    $user = array(
-        'username' => $_POST['modusername'],
-        'title' => $_POST['title'],
-        'firstname' => $_POST['firstname'],
-        'lastname' => $_POST['lastname'],
-        'synergy_id' => $_POST['database_id'] == '' ? 'NULL' : $_POST['database_id'],
-        'local_email' => $_POST['local_email'],
-        'mail_handler' => $_POST['mail_handler'],
-        'alt_email' => $_POST['alt_email'],
-        'webmail' => $_POST['webmail'],
-        'group_id' => $_POST['group'],
-        'password' => $_POST['modpassword'],
-        'email_pass' => $_POST['modpassword'],
-        'campus' => $_POST['campus'],
-        'defaultCampus' => $_POST['defaultCampus'],
-        'su' => $_POST['superuser'],
-        'year' => $_POST['year'] == '' ? 'NULL' : $_POST['year'],
-        'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
-        'hide_contacts' => $_POST['hide_contacts'] == 1 ? 1 : 0,
-        'house' => $_POST['house'],
-        'residential_house_id' => $_POST['residential_house'],
-        'enabled' => true,
-    );
+    $user = new \Schoolbox\User();
+    $user->setUsername($_POST['modusername']);
+    $user->setTitle($_POST['title']);
+    $user->setFirstname($_POST['firstname']);
+    $user->setLastname($_POST['lastname']);
+    $user->setExternalId($_POST['database_id'] == '' ? null : $_POST['database_id']);
+    $user->setLocalEmail($_POST['local_email']);
+    $user->setUseInternalMail($_POST['mail_handler']);
+    $user->setAltEmail($_POST['alt_email']);
+    $user->setWebmail($_POST['webmail']);
+    $user->getRole()->setId($_POST['group']);
+    $user->setPassword($_POST['modpassword'] == '' ? null : $passwordGenerator->hash($_POST['modpassword']));
+
+    // Set campi
+
+    $user->setSuperuser(isset($_POST['superuser']));
+    $user->setYear($_POST['year'] == '' ? null : $_POST['year']);
+    $user->setEportfolioEnable(!empty($_POST['eportfolio']));
+    $user->setHideContacts(!empty($_POST['hide_contacts']));
+    $user->setHideTimetable(!empty($_POST['hide_timetable']));
+    $user->getSchoolHouse()->setId($_POST['house']);
+    $user->getResidentialHouse()->setId($_POST['residential_house']);
+    $user->setEnabled($_POST['account_enabled']);
+
+//    $user = array(
+//        'username' => $_POST['modusername'],
+//        'title' => $_POST['title'],
+//        'firstname' => $_POST['firstname'],
+//        'lastname' => $_POST['lastname'],
+//        'synergy_id' => $_POST['database_id'] == '' ? 'NULL' : $_POST['database_id'],
+//        'local_email' => $_POST['local_email'],
+//        'mail_handler' => $_POST['mail_handler'],
+//        'alt_email' => $_POST['alt_email'],
+//        'webmail' => $_POST['webmail'],
+//        'group_id' => $_POST['group'],
+//        'password' => $_POST['modpassword'],
+//        'email_pass' => $_POST['modpassword'],
+//        'campus' => $_POST['campus'],
+//        'defaultCampus' => $_POST['defaultCampus'],
+//        'su' => $_POST['superuser'],
+//        'year' => $_POST['year'] == '' ? 'NULL' : $_POST['year'],
+//        'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
+//        'hide_contacts' => $_POST['hide_contacts'] == 1 ? 1 : 0,
+//        'house' => $_POST['house'],
+//        'residential_house_id' => $_POST['residential_house'],
+//        'enabled' => true,
+//    );
 
     /* Users require a campus array before they can be created successfully
 	 */
     if (is_array($_POST['campus']) && count($_POST['campus']) || $_POST['defaultCampus']) {
-        $user['campus'] = $user['campus'] ?: [$user['defaultCampus']];
-        $id = $userHandler->create($user);
+//        $user['campus'] = $user['campus'] ?: [$user['defaultCampus']];
+//        $id = $userHandler->create($user);
 
-        if (!$id) {
+        $userMapper->save($user);
+
+        if (!$user->getId()) {
             error(138);
         }
     } else {
