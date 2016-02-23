@@ -267,7 +267,7 @@ class UserMapper extends Mapper
             return true;
         });
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'setSuperuserStatus']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
     }
 
 
@@ -576,11 +576,11 @@ class UserMapper extends Mapper
     }
 
     /**
-     * Post-save callback for setting a user's superuser status.
+     * Post-save callback for updating a user's superuser status.
      *
      * @param User $user
      */
-    public function setSuperuserStatus(User $user)
+    public function updateSuperuserStatus(User $user)
     {
         $superuserStatus = $user->getSuperuser();
         if (isset($superuserStatus)) {
