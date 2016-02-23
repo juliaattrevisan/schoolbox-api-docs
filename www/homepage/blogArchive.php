@@ -3,7 +3,7 @@
 $groupHandler = new Group;
 $blogHandler = new Blog;
 $commentHandle = new Comment();
-$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 
 $this->setFile(TEMPLATE_content, "homepage/blogArchive.html");
 $this->setBlock(TEMPLATE_content, "submit_blog", "submit_blog_block");

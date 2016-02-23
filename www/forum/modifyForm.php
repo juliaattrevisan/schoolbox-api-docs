@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
-use \Schoolbox\Resource\CategoryMapper;
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Forum\PostMapper;
 use \Schoolbox\Forum\ThreadMapper;
 
@@ -14,7 +14,7 @@ if (is_numeric($_POST['categoryID'])) {
 	/* Category exists
 	 */
     try {
-        $folder = CategoryMapper::getInstance()->findById($_POST['categoryID']);
+        $folder = FolderMapper::getInstance()->findById($_POST['categoryID']);
     }
     catch (Exception $e) {
         error(2);
@@ -88,7 +88,7 @@ if (is_numeric($_POST['categoryID'])) {
 		if (!is_numeric($_POST['threadID'])) {
             /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->createModel();
-            $thread->setCategory(CategoryMapper::getInstance()->createModel()->setId($_POST['categoryID']));
+            $thread->setCategory(FolderMapper::getInstance()->createModel()->setId($_POST['categoryID']));
 		    $thread->setUser($_SESSION['user']);
 			$thread->setTitle($_POST['title']);
 

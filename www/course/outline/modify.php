@@ -13,8 +13,8 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /** @var SitePage $this */
 //list($component_id) = $this->arg;
@@ -70,7 +70,7 @@ $this->setVar(
 );
 
 // Output course and category breadcrumbs
-$homepage = CategoryMapper::getInstance()->findById($component->getIdentifier());
+$homepage = FolderMapper::getInstance()->findById($component->getIdentifier());
 
 // Output course breadcrumbs (for every course that is in this outline)
 $courseBaseHomepage = new Category();
@@ -92,7 +92,7 @@ foreach ($course_list as $unit) {
     // Find the course for this unit, and show its breadcrumb if it isn't shown
     // I am not showing anything if this category doesn't exist
     try {
-        $unitCategory = CategoryMapper::getInstance()->findById($unitCategoryId);
+        $unitCategory = FolderMapper::getInstance()->findById($unitCategoryId);
     } catch (MapperException $e) {
         continue;
     }
@@ -103,7 +103,7 @@ foreach ($course_list as $unit) {
     $courseIdList[$courseId] = $courseId;
 
     // Now, finally show the breadcrumb.
-    foreach (CategoryMapper::getInstance()->findParents($unitCategory, $courseBaseHomepage) as $parent) {
+    foreach (FolderMapper::getInstance()->findParents($unitCategory, $courseBaseHomepage) as $parent) {
         $this->setVar('COURSE_CATEGORY_ID', Scrub::text($parent->getId()));
         $this->setVar('COURSE_CATEGORY_NAME', Scrub::text($parent->getName()));
         $this->parse('course_breadcrumb_block', 'course_breadcrumb', true);
@@ -118,7 +118,7 @@ foreach ($course_list as $unit) {
     $unit_id = $unit->getId();
     try {
         $unit->setUnitCategory(
-            CategoryMapper::getInstance()->findById(
+            FolderMapper::getInstance()->findById(
                 $unit->getUnitCategory()->getId()
             )
         );
@@ -145,7 +145,7 @@ foreach ($course_list as $unit) {
 
 // Output any items that aren't in the existing block, too.
 /** @var Category[]|Collection $child_list */
-$child_list    = CategoryMapper::getInstance()->findByColumn('parent', $courseIdList);
+$child_list    = FolderMapper::getInstance()->findByColumn('parent', $courseIdList);
 $child_id_list = $child_list->getColumnValues('id');
 $task_list     = TaskMapper::getInstance()->findGroupedListForCategoryList($child_id_list);
 foreach ($child_list as $unit) {

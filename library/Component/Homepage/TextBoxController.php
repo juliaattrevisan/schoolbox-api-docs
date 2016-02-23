@@ -34,7 +34,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             $this->textbox = new \Schoolbox\Textbox\Model();
             $this->textbox
                 ->setHeading('Text Box')
-                ->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($this->getContext()->getId()));
+                ->setCategory(\Schoolbox\Resource\Folder\Mapper::getInstance()->createModel()->setId($this->getContext()->getId()));
         }
 
         if (!$this->getTextbox()->getHeading()) {

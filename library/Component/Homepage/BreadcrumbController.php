@@ -5,8 +5,8 @@
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Component_Homepage_BreadcrumbController extends Component_Homepage_ControllerAbstract
 {
@@ -14,7 +14,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
     /**
      * Category Mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var \Schoolbox\Resource\Folder\Mapper
      */
     private $categoryMapper = null;
 
@@ -30,7 +30,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
      */
     public function execute()
     {
-        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
 
         $this->source = $this->getContext();
 
@@ -92,7 +92,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
     /**
      * Set category mapper
      *
-     * @param null $categoryMapper
+     * @param FolderMapper $categoryMapper
      */
     private function setCategoryMapper($categoryMapper)
     {
@@ -102,7 +102,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
     /**
      * Get category mapper
      *
-     * @return null
+     * @return FolderMapper
      */
     private function getCategoryMapper()
     {

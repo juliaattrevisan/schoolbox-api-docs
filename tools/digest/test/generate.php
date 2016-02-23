@@ -17,7 +17,7 @@ use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Resource\Category\News;
 use Schoolbox\Resource\Category\NewsMapper;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
@@ -77,7 +77,7 @@ class HomepageNewsMap extends NewsMapper
         $model->setBody($body);
         $model->setPublishDate(Alaress_Date_Format::now());
         $model->setExpiryDate(Alaress_Date_Format::now()->addDays(1));
-        $model->setCategory(CategoryMapper::getInstance()->findById($folderId));
+        $model->setCategory(FolderMapper::getInstance()->findById($folderId));
         $model->setOwner($this->sessionData['user']);
         $model->setPostDate(Alaress_Date_Format::now());
 

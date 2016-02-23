@@ -15,7 +15,7 @@ use Alaress_Date_Format;
 use DateTime;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -60,9 +60,9 @@ class Event
     protected $owner = null;
 
     /**
-     * An instance of \Schoolbox\Resource\Category
+     * An instance of \Schoolbox\Resource\Folder\Model
      *
-     * @var Category
+     * @var Folder
      */
     protected $category = null;
 
@@ -422,7 +422,7 @@ class Event
     /**
      * Set category
      *
-     * @param Category $category
+     * @param Folder $category
      * @return self
      */
     public function setCategory($category)
@@ -434,7 +434,7 @@ class Event
     /**
      * Get category
      *
-     * @return Category
+     * @return Folder
      */
     public function getCategory()
     {

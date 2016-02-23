@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Link;
 use Schoolbox\Resource\LinkMapper;
 
@@ -55,7 +55,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
                 }
 
                 $linkDest = clone $link;
-                $linkDest->setFolder(CategoryMapper::getInstance()->createModel($cat));
+                $linkDest->setFolder(FolderMapper::getInstance()->createModel($cat));
                 $linkCollection->add($linkDest);
             }
             $link = $linkCollection;
@@ -64,7 +64,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
                 error(6);
             }
 
-            $link->setFolder(CategoryMapper::getInstance()->createModel($_POST['category']));
+            $link->setFolder(FolderMapper::getInstance()->createModel($_POST['category']));
         }
     }
 
@@ -84,7 +84,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
             } elseif ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
                 $result = "Insufficient permssions";
             } else {
-                $link->setFolder(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel($_POST['categoryID']));
+                $link->setFolder(\Schoolbox\Resource\Folder\Mapper::getInstance()->createModel($_POST['categoryID']));
                 $link->setModified(Alaress_Date_Format::now());
                 LinkMapper::getInstance()->save($link);
                 $result = "success";

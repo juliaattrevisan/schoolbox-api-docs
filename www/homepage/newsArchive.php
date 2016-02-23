@@ -4,7 +4,7 @@ $groupHandler = new Group;
 $newsHandler = new CategoryNews;
 $userHandler = new User();
 
-$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 
 $this->setFile(TEMPLATE_content, "homepage/newsArchive.html");
 $this->setBlock(TEMPLATE_content, "submit_news", "submit_news_block");

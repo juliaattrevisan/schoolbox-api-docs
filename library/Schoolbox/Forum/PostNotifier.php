@@ -16,7 +16,7 @@ use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
@@ -37,7 +37,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
     /** @var ThreadMapper */
     protected $threadMapper;
 
-    /** @var CategoryMapper */
+    /** @var FolderMapper */
     protected $categoryMapper;
 
     /**
@@ -50,7 +50,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         if (empty($dependencies['categoryMapper'])) {
-            $dependencies['categoryMapper'] = CategoryMapper::getInstance();
+            $dependencies['categoryMapper'] = FolderMapper::getInstance();
         }
         parent::loadDependencies($dependencies);
     }

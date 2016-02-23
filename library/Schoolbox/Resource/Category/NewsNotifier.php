@@ -25,7 +25,7 @@ use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -37,7 +37,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	/** @var UserMapper */
 	protected $userMapper;
 
-	/** @var CategoryMapper */
+	/** @var FolderMapper */
 	protected $categoryMapper;
 
 	/**
@@ -48,7 +48,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->userMapper = UserMapper::getInstance();
-		$this->categoryMapper = CategoryMapper::getInstance();
+		$this->categoryMapper = FolderMapper::getInstance();
 		parent::loadDependencies($dependencies);
 	}
 

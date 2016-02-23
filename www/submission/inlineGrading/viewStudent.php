@@ -31,7 +31,7 @@ $currentUid = $currentStudent->getId();
 
 /* Add category codes
  */
-$categoryCodeMapper = new \Schoolbox\Resource\CategoryCodeMapper();
+$categoryCodeMapper = new \Schoolbox\Resource\Folder\Code\Mapper();
 $categoryCode = $categoryCodeMapper->findForCategory($submissionBox->getCategory()->getId());
 $submissionBox->getCategory()->setCodes($categoryCode);
 

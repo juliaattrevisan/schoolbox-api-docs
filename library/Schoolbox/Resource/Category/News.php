@@ -10,7 +10,7 @@
 namespace Schoolbox\Resource\Category;
 
 
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class News {
@@ -36,7 +36,7 @@ class News {
 	/** @var bool */
 	protected $deleted;
 
-	/** @var Category */
+	/** @var Folder */
 	protected $category;
 
 	/** @var int */
@@ -170,7 +170,7 @@ class News {
 
 
 	/**
-	 * @param Category $category
+	 * @param Folder $category
 	 * @return self
 	 */
 	public function setCategory($category) {
@@ -180,7 +180,7 @@ class News {
 
 
 	/**
-	 * @return Category
+	 * @return Folder
 	 */
 	public function getCategory() {
 		return $this->category;

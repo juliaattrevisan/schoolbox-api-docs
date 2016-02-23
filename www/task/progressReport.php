@@ -22,8 +22,8 @@ use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -51,10 +51,10 @@ switch (count($this->arg)) {
         break;
 }
 
-/** @var Category $category */
+/** @var Folder $category */
 try {
-    $category = CategoryMapper::getInstance()->findById($class_id);
-    CategoryMapper::getInstance()->loadJoinedModel('codes', $category, array('set_method' => 'setCodes'));
+    $category = FolderMapper::getInstance()->findById($class_id);
+    FolderMapper::getInstance()->loadJoinedModel('codes', $category, array('set_method' => 'setCodes'));
 } catch (Schoolbox\Mapper\Exception $e) {
     error(6);
 }

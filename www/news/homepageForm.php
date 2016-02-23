@@ -36,7 +36,7 @@ if ($permission == WRITE_ACCESS
 }
 
 // setup various data
-$cat = new \Schoolbox\Resource\Category();
+$cat = new \Schoolbox\Resource\Folder\Model();
 $cat->setId($_POST['code']);
 $publishedDate = Alaress_Date_Format::newLocalShort($_POST['datetime_published']);
 $expiryDate = Alaress_Date_Format::newLocalShort($_POST['datetime_expires']);

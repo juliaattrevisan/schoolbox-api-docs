@@ -10,8 +10,8 @@
 /** @var SitePage $this */
 
 use Schoolbox\Collection;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
@@ -20,10 +20,10 @@ use Schoolbox\Assessment\Course\UnitInstanceMapper;
 $taskId = $this->arg[0];
 try {
     /** @var Task $task */
-    /** @var Category $category */
+    /** @var Folder $category */
     $task       = TaskMapper::getInstance()->findById($taskId);
     $categoryId = $task->getCategory()->getId();
-    $category   = CategoryMapper::getInstance()->findById($categoryId);
+    $category   = FolderMapper::getInstance()->findById($categoryId);
 }
 catch (\Schoolbox\Mapper\Exception $e) {
     error(2);
@@ -80,7 +80,7 @@ if (count($unitList) > 0) {
 
         // Load category and hierarchy for this unit
         try {
-            $unitCategory = CategoryMapper::getInstance()->findById($unit->getCategory()->getId());
+            $unitCategory = FolderMapper::getInstance()->findById($unit->getCategory()->getId());
         } catch (\Schoolbox\Mapper\Exception $e) {
             // Most likely deleted - ignore
             continue;

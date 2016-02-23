@@ -10,7 +10,7 @@
 require_once __DIR__ . '/../../../include/Bootstrap.php';
 
 use Schoolbox\Collection;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Assessment\Course\Task;
@@ -103,7 +103,7 @@ if (!$permission_denied) {
             catch (\Schoolbox\Mapper\Exception $e) {
                 if ($import) {
                     // This is an item that wasn't in the list before, add it.
-                    $unit_homepage   = CategoryMapper::getInstance()->findById($unit_id);
+                    $unit_homepage   = FolderMapper::getInstance()->findById($unit_id);
                     $course_instance = new UnitInstance();
                     $course_instance
                         ->setComponent($component)

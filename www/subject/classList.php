@@ -12,8 +12,8 @@ use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $groupHandler = new Group;
 
-$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
-$categoryLogMapper = new \Schoolbox\Resource\CategoryLogMapper();
+$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
+$categoryLogMapper = new \Schoolbox\Resource\Folder\Log\Mapper();
 $userMapper = new \Schoolbox\UserMapper();
 
 if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {

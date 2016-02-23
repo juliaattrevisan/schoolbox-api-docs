@@ -25,7 +25,7 @@ use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -36,7 +36,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	/** @var WikiMapper */
 	protected $wikiMapper;
 
-	/** @var CategoryMapper */
+	/** @var FolderMapper */
 	protected $catMapper;
 
 	/**
@@ -47,7 +47,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->wikiMapper = WikiMapper::getInstance();
-		$this->catMapper = CategoryMapper::getInstance();
+		$this->catMapper = FolderMapper::getInstance();
 		parent::loadDependencies($dependencies);
 	}
 

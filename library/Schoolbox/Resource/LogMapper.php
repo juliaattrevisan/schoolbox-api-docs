@@ -96,7 +96,7 @@ class LogMapper extends Mapper {
 		));
 
 		$this->hasJoin('cat', array(
-			'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+			'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
 			'this_key'  => 'objectId',
 			'other_key' => 'id'
 		));

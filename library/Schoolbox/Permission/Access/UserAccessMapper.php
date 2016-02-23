@@ -12,8 +12,8 @@ namespace Schoolbox\Permission\Access;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Folder\Model as CategoryModel;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -81,10 +81,10 @@ class UserAccessMapper extends Mapper
     /**
      * Determine whether $folder has a $user of type 3
      *
-     * @param CategoryModel $folder
+     * @param FolderModel $folder
      * @return bool
      */
-    public function hasFolderOwner(CategoryModel $folder)
+    public function hasFolderOwner(FolderModel $folder)
     {
         $userAccess = $this->findByColumnList(array(
             'sid' => $folder->getId(),
@@ -104,10 +104,10 @@ class UserAccessMapper extends Mapper
      * note: superusers aren't necessarily owners of all folders.
      *
      * @param User $user
-     * @param CategoryModel $folder
+     * @param FolderModel $folder
      * @return bool
      */
-    public function isFolderOwner(User $user, CategoryModel $folder)
+    public function isFolderOwner(User $user, FolderModel $folder)
     {
         $userAccess = $this->findByColumnList(array(
             'sid' => $folder->getId(),
@@ -153,7 +153,7 @@ class UserAccessMapper extends Mapper
 
         foreach ($extSubjs as $extSubj) {
             try {
-                $catId = CategoryMapper::getInstance()->findByCode($extSubj['code'])->getId();
+                $catId = FolderMapper::getInstance()->findByCode($extSubj['code'])->getId();
 
                 $ua = new UserAccess();
                 $ua->setService(UserAccess::SERVICE_HOMEPAGE)
@@ -199,7 +199,7 @@ class UserAccessMapper extends Mapper
     }
 
     /**
-    * @param CategoryModel $category
+    * @param FolderModel $category
     * @param bool $includeSynergy
     * @return Collection|User[]
     */
@@ -210,7 +210,7 @@ class UserAccessMapper extends Mapper
 
 
     /**
-    * @param CategoryModel $category
+    * @param FolderModel $category
     * @param bool $includeSynergy
     * @return Collection|User[]
     */
@@ -222,7 +222,7 @@ class UserAccessMapper extends Mapper
     /**
      * Returns a list of users who are members of a group
      *
-     * @param CategoryModel $category
+     * @param FolderModel $category
      * @return Collection|User[]
      */
     public function findAdminsInCategory($category)
@@ -233,7 +233,7 @@ class UserAccessMapper extends Mapper
 
 
     /**
-    * @param CategoryModel $category
+    * @param FolderModel $category
     * @param string $roleType
     * @param int $accessType
     * @param bool $includeSynergy

@@ -10,7 +10,7 @@
 namespace Schoolbox\Assessment\StudentReportCard;
 
 
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class Comment {
@@ -24,7 +24,7 @@ class Comment {
 	/** @var User $student */
 	protected $student;
 
-	/** @var Category $category */
+	/** @var Folder $category */
 	protected $category;
 
 	/** @var string $body */
@@ -66,14 +66,14 @@ class Comment {
 	}
 
 	/**
-	 * @param \Schoolbox\Resource\Category $category
+	 * @param \Schoolbox\Resource\Folder\Model $category
 	 */
 	public function setCategory($category) {
 		$this->category = $category;
 	}
 
 	/**
-	 * @return \Schoolbox\Resource\Category
+	 * @return \Schoolbox\Resource\Folder\Model
 	 */
 	public function getCategory() {
 		return $this->category;

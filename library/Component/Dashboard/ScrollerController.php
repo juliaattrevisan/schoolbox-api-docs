@@ -21,14 +21,14 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
     /**
      * Category Mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var \Schoolbox\Resource\Folder\Mapper
      */
     private $categoryMapper = null;
 
     /**
      * A category
      *
-     * @var \Schoolbox\Resource\Category
+     * @var \Schoolbox\Resource\Folder\Model
      */
     private $source;
 

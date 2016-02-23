@@ -16,7 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class Grades
@@ -43,9 +43,9 @@ class Grades
     * Mapper-based replacement of SubmissionReturn::getStudentMarksForCategory()
     *
     * @param Collection<User> $students
-    * @param Category $subject
-    * @param Alaress_Date_Format $from
-    * @param Alaress_Date_Format $to
+    * @param Folder $subject
+    * @param int $year
+    * @param int $semester
     * @param array $outputFormats
     * @return array
     */

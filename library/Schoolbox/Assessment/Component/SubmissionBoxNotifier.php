@@ -36,7 +36,7 @@ use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -59,7 +59,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     /** @var SubmissionMapper */
     protected $submissionMapper;
 
-    /** @var CategoryMapper */
+    /** @var FolderMapper */
     protected $categoryMapper;
 
     /** @var ReturnedWorkMapper */
@@ -77,7 +77,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             $dependencies['submissionMapper'] = SubmissionMapper::getInstance();
         }
         if(empty($dependencies['categoryMapper'])) {
-            $dependencies['categoryMapper'] = CategoryMapper::getInstance();
+            $dependencies['categoryMapper'] = FolderMapper::getInstance();
         }
         if(empty($dependencies['returnedWorkMapper'])) {
             $dependencies['returnedWorkMapper'] = ReturnedWorkMapper::getInstance();
@@ -109,7 +109,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
 
     /**
-     * @param CategoryMapper $categoryMapper
+     * @param FolderMapper $categoryMapper
      * @return self
      */
     protected function setCategoryMapper($categoryMapper)

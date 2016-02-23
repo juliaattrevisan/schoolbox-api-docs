@@ -13,7 +13,7 @@ use Alaress_Date_Format;
 use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class UnitInstance implements ISoftDeletable {
 
@@ -28,12 +28,12 @@ class UnitInstance implements ISoftDeletable {
     protected $component;
 
     /**
-     * @var Category
+     * @var Folder
      */
     protected $category;
 
     /**
-     * @var Category
+     * @var Folder
      */
     protected $unit_category;
 
@@ -198,8 +198,8 @@ class UnitInstance implements ISoftDeletable {
     }
 
     /**
-     * @param  \Schoolbox\Resource\Category $category
-     * @return self
+     * @param  \Schoolbox\Resource\Folder\Model $category
+     * @return $this
      */
     public function setCategory($category) {
         $this->category = $category;
@@ -207,15 +207,15 @@ class UnitInstance implements ISoftDeletable {
     }
 
     /**
-     * @return \Schoolbox\Resource\Category
+     * @return \Schoolbox\Resource\Folder\Model
      */
     public function getCategory() {
         return $this->category;
     }
 
     /**
-     * @param  \Schoolbox\Resource\Category $unit_category
-     * @return self
+     * @param  \Schoolbox\Resource\Folder\Model $unit_category
+     * @return $this
      */
     public function setUnitCategory($unit_category) {
         $this->unit_category = $unit_category;
@@ -223,7 +223,7 @@ class UnitInstance implements ISoftDeletable {
     }
 
     /**
-     * @return \Schoolbox\Resource\Category
+     * @return \Schoolbox\Resource\Folder\Model
      */
     public function getUnitCategory() {
         return $this->unit_category;

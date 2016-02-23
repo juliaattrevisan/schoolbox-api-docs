@@ -2,7 +2,7 @@
 
 use Schoolbox\Resource\Attachment\GenericZone;
 use \Schoolbox\Resource\File\Mapper as FileMapper;
-use \Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Breadcrumbs;
 
 $groupHandler = new Group;
@@ -86,7 +86,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	$this->setTab('resources');
 
     try{
-        $folder = CategoryMapper::getInstance()->findById($this->arg[1]);
+        $folder = FolderMapper::getInstance()->findById($this->arg[1]);
     }
     catch (Exception $e) {
 		error(13);

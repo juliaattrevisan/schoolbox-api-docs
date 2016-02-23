@@ -25,7 +25,7 @@ use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -33,7 +33,7 @@ class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface {
 
     const TRIGGER_FOLLOWED  = 'followed';
 
-    /** @var CategoryMapper */
+    /** @var FolderMapper */
     protected $categoryMapper;
 
 
@@ -43,7 +43,7 @@ class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface {
     public function loadDependencies($dependencies = null)
     {
         if (empty($dependencies['categoryMapper'])) {
-            $dependencies['categoryMapper'] = CategoryMapper::getInstance();
+            $dependencies['categoryMapper'] = FolderMapper::getInstance();
         }
         parent::loadDependencies($dependencies);
 

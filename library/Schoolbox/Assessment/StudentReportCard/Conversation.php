@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\StudentReportCard;
 
 
 use Schoolbox\Collection;
-use Schoolbox\Resource\Folder\Model as CategoryModel;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -27,7 +27,7 @@ class Conversation {
 	/** @var User $student */
 	protected $student;
 
-	/** @var CategoryModel $category */
+	/** @var FolderModel $category */
 	protected $category;
 
 	/** @var Collection[User] $participants */
@@ -43,11 +43,11 @@ class Conversation {
 	 * Generate a conversation based on student and subject
 	 *
 	 * @param User $student
-	 * @param CategoryModel $category
+	 * @param FolderModel $category
 	 * @throws \InvalidArgumentException
 	 */
 	public function __construct($student, $category) {
-		if(!($student instanceof User && $category instanceof CategoryModel)) {
+		if(!($student instanceof User && $category instanceof FolderModel)) {
 			throw new \InvalidArgumentException("Invalid conversation");
 		}
 

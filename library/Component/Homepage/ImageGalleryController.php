@@ -20,14 +20,14 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     /**
      * An instance of Category
      *
-     * @var \Schoolbox\Resource\Category
+     * @var \Schoolbox\Resource\Folder\Model
      */
     private $source;
 
     /**
      * Category Mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var \Schoolbox\Resource\Folder\Mapper
      */
     private $categoryMapper = null;
 
@@ -46,7 +46,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
 
         $this->source = $this->getContext();
 
@@ -149,7 +149,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     /**
      * Set category mapper
      *
-     * @param \Schoolbox\Resource\CategoryMapper $categoryMapper
+     * @param \Schoolbox\Resource\Folder\Mapper $categoryMapper
      */
     private function setCategoryMapper($categoryMapper)
     {
@@ -159,7 +159,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     /**
      * Get category mapper
      *
-     * @return \Schoolbox\Resource\CategoryMapper
+     * @return \Schoolbox\Resource\Folder\Mapper
      */
     private function getCategoryMapper()
     {
@@ -189,7 +189,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     /**
      * Set source
      *
-     * @param \Schoolbox\Resource\Category $source
+     * @param \Schoolbox\Resource\Folder\Model $source
      */
     protected function setSource($source)
     {
@@ -199,7 +199,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     /**
      * Get source
      *
-     * @return \Schoolbox\Resource\Category
+     * @return \Schoolbox\Resource\Folder\Model
      */
     protected function getSource()
     {

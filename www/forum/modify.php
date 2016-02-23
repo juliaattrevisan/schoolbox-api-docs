@@ -3,7 +3,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 use Schoolbox\Forum\PostMapper;
 use Schoolbox\Forum\ThreadMapper;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 
 $forumHandler = new Forum();
@@ -22,8 +22,8 @@ if (is_numeric($this->arg[0])) {
     /* Category exists
      */
     try {
-        /** @var \Schoolbox\Resource\Category $folder */
-        $folder = CategoryMapper::getInstance()->findById($this->arg[0]);
+        /** @var \Schoolbox\Resource\Folder\Model $folder */
+        $folder = FolderMapper::getInstance()->findById($this->arg[0]);
     } catch (Exception $e) {
         error(2);
     }

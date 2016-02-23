@@ -13,12 +13,12 @@ if (is_numeric($_POST['categoryID'])) {
      * Root folder is the default location to open upon first visit
      * and when a folder doesn't exist anymore
      */
-    $category = new \Schoolbox\Resource\Category();
+    $category = new \Schoolbox\Resource\Folder\Model();
     $category->setId(0);
 
     if ($_POST['categoryID']) {
         try {
-            $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+            $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
             $category = $categoryMapper->findById($_POST['categoryID']);
         } catch (\Exception $e) {
             error(13);

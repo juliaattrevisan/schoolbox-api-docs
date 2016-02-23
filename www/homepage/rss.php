@@ -31,7 +31,7 @@ if (is_numeric($catID) && !empty($token)) {
     $page = new SitePage(false);
 
     try {
-        $category = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($catID);
+        $category = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($catID);
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(13);
         exit;

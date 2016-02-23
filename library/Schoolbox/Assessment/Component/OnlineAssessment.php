@@ -16,7 +16,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
@@ -38,7 +38,7 @@ class OnlineAssessment implements ISoftDeletable
     protected $id;
 
     /**
-    * @var Category
+    * @var Folder
     */
     protected $category;
 
@@ -235,7 +235,7 @@ class OnlineAssessment implements ISoftDeletable
     }
 
     /**
-    * @param  \Schoolbox\Resource\Category $category
+    * @param  \Schoolbox\Resource\Folder\Model $category
     *
     * @return $this
     */
@@ -282,7 +282,7 @@ class OnlineAssessment implements ISoftDeletable
     }
 
     /**
-    * @return \Schoolbox\Resource\Category
+    * @return \Schoolbox\Resource\Folder\Model
     */
     public function getCategory()
     {

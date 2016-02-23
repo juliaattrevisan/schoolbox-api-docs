@@ -3,7 +3,7 @@ require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 require_once SITE_root . '/www/include/stdfuncs.php';
 
 $groupHandler = new Group();
-$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 
 $suggestions = array();
 $data = array();

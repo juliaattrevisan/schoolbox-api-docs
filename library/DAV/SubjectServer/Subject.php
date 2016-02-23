@@ -8,13 +8,13 @@
  */
 
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class DAV_SubjectServer_Subject extends Sabre\DAV\SimpleCollection
 {
     /**
-     * @var Category
+     * @var Folder
      */
     protected $category;
 
@@ -24,7 +24,7 @@ class DAV_SubjectServer_Subject extends Sabre\DAV\SimpleCollection
     protected $user;
 
     /**
-     * @param Category $category
+     * @param Folder $category
      *
      * @return $this
      */
@@ -35,7 +35,7 @@ class DAV_SubjectServer_Subject extends Sabre\DAV\SimpleCollection
     }
 
     /**
-     * @return Category
+     * @return Folder
      */
     public function getCategory()
     {

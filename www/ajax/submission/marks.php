@@ -10,7 +10,7 @@ use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Grades;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 
 if(isset($this)) {
@@ -81,7 +81,7 @@ function getMarks($userId, $catId, $sessionUserId, $year = 0, $semester = 0) {
 			throw new MapperException("Invalid number of students found for ID.");
 		}
 
-		$category = CategoryMapper::getInstance()->findById($catId);
+		$category = FolderMapper::getInstance()->findById($catId);
 
 	}
 	catch(MapperException $e) {
@@ -142,7 +142,7 @@ function setAssessmentWeight($weights) {
 	}
 
 
-	$category = CategoryMapper::getInstance()->findById($category->getId());
+	$category = FolderMapper::getInstance()->findById($category->getId());
 
 	// recalculate the grade averages for all students of the category
 	$studentList = array();

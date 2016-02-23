@@ -12,7 +12,7 @@ namespace Schoolbox\Assessment\StudentReportCard;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use SitePage;
 
 class ContextSelector
@@ -83,7 +83,7 @@ class ContextSelector
 	/**
 	 * Add a category to the selector.
 	 *
-	 * @param Category $category
+	 * @param Folder $category
 	 */
 	public function addCategory($category) {
 		$this->categories->add($category);
@@ -232,7 +232,7 @@ class ContextSelector
 		$selectedId = isset($selectedValues['category']) ? $selectedValues['category'] : 0;
 
 		foreach($this->categories as $category) {
-			/** @var Category $category */
+			/** @var Folder $category */
 
 			$catId = $category->getId();
 

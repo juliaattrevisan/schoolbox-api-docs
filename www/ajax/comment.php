@@ -10,7 +10,7 @@
 // sitepage context is not allowed
 use Schoolbox\Assessment\StudentReportCard\Comment;
 use Schoolbox\Assessment\StudentReportCard\CommentMapper;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -61,10 +61,10 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 
 	/**
 	 * @var $uMap UserMapper
-	 * @var $cMap CategoryMapper
+	 * @var $cMap FolderMapper
 	 */
 	$uMap = UserMapper::getInstance();
-	$cMap = CategoryMapper::getInstance();
+	$cMap = FolderMapper::getInstance();
 
 	// set up this comment, ready to go
 	$comment = new Comment();

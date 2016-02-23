@@ -21,7 +21,7 @@ use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -30,7 +30,7 @@ class CommentNotifier extends AbstractModuleNotifier
 
     const TRIGGER_COMMENTED = 'commented';
 
-    /** @var CategoryMapper */
+    /** @var FolderMapper */
     protected $categoryMapper;
 
     /** @var UserMapper */
@@ -42,7 +42,7 @@ class CommentNotifier extends AbstractModuleNotifier
     public function loadDependencies($dependencies = null)
     {
         if (empty($dependencies['categoryMapper'])) {
-            $dependencies['categoryMapper'] = CategoryMapper::getInstance();
+            $dependencies['categoryMapper'] = FolderMapper::getInstance();
         }
         if (empty($dependencies['userMapper'])) {
             $dependencies['userMapper'] = UserMapper::getInstance();
@@ -92,7 +92,7 @@ class CommentNotifier extends AbstractModuleNotifier
 
 
     /**
-     * @param \Schoolbox\Resource\CategoryMapper $categoryMapper
+     * @param \Schoolbox\Resource\Folder\Mapper $categoryMapper
      * @return self
      */
     public function setCategoryMapper($categoryMapper)
@@ -103,7 +103,7 @@ class CommentNotifier extends AbstractModuleNotifier
 
 
     /**
-     * @return \Schoolbox\Resource\CategoryMapper
+     * @return \Schoolbox\Resource\Folder\Mapper
      */
     public function getCategoryMapper()
     {

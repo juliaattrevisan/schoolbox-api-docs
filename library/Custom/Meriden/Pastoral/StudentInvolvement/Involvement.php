@@ -11,7 +11,7 @@ namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\User;
-use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Involvement
 {
@@ -60,14 +60,14 @@ class Involvement
     /**
      * The Schoolbox folder for this tutor group for this student
      *
-     * @var Category
+     * @var Folder
      */
     protected $folder;
 
     /**
      * The Schoolbox folders for the other classes for this subject
      *
-     * @var Category[]
+     * @var Folder[]
      */
     protected $cohortFolders;
 
@@ -180,7 +180,7 @@ class Involvement
     }
 
     /**
-     * @return Category
+     * @return Folder
      */
     public function getFolder()
     {
@@ -188,7 +188,7 @@ class Involvement
     }
 
     /**
-     * @param  Category $folder
+     * @param  Folder $folder
      *
      * @return $this
      */
@@ -273,7 +273,7 @@ class Involvement
     }
 
     /**
-     * @return \Schoolbox\Resource\Category[]
+     * @return Folder[]
      */
     public function getCohortFolders()
     {
@@ -281,7 +281,7 @@ class Involvement
     }
 
     /**
-     * @param  \Schoolbox\Resource\Category[] $cohortFolders
+     * @param  Folder[] $cohortFolders
      *
      * @return $this
      */

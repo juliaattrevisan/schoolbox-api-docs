@@ -15,7 +15,7 @@
 namespace Calendar\Event\Type\Submission;
 use Calendar\Event\Type\EventBase;
 use Calendar\Event\Type\EventInterface;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Event extends EventBase implements EventInterface {
 
@@ -36,7 +36,7 @@ class Event extends EventBase implements EventInterface {
 
     /**
      * Category which the event is related to
-     * @var Category
+     * @var Folder
      */
     protected $category = -1;
 
@@ -130,7 +130,7 @@ class Event extends EventBase implements EventInterface {
     }
 
     /**
-     * @param Category $category
+     * @param Folder $category
      */
     public function setCategory($category)
     {
@@ -138,7 +138,7 @@ class Event extends EventBase implements EventInterface {
     }
 
     /**
-     * @return Category
+     * @return Folder
      */
     public function getCategory()
     {

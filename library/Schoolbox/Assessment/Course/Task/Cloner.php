@@ -18,9 +18,10 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+
 
 // These are used for older assess export related code:
 // while this is handler-related, it works.
@@ -44,7 +45,7 @@ class Cloner
     protected $unit;
 
     /**
-     * @var Category
+     * @var Folder
      */
     protected $category;
 
@@ -68,7 +69,7 @@ class Cloner
         $component = \Component_InstanceMapper::getInstance()->findById(
             $this->unit->getComponent()->getId()
         );
-        $this->category = CategoryMapper::getInstance()->findById($component->getIdentifier());
+        $this->category = FolderMapper::getInstance()->findById($component->getIdentifier());
 
         $this->setErrorMapper(ErrorMapper::getInstance());
     }

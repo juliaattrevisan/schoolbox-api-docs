@@ -97,7 +97,7 @@ if (is_numeric($_REQUEST['cid'])) {
             die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
         }
 
-        $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+        $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
         $folder = $folderMapper->findById($_POST['cid']);
         $renderer = new Component_Renderer();
         $renderer->renderHomepageComponent($folder, $component);
@@ -170,7 +170,7 @@ if (is_numeric($_REQUEST['cid'])) {
                 $instance   = reset($componentInstanceMapper->findByInstanceId($instance->getId()));
                 $controller = new $cclass($instance, new \Schoolbox\User(), $page);
 
-                $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+                $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
                 $folder = $folderMapper->findById($_GET['cid']);
                 $renderer = new Component_Renderer();
                 $renderer->renderHomepageComponent($folder, $controller);

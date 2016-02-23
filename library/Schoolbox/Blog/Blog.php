@@ -10,7 +10,7 @@
 namespace Schoolbox\Blog;
 
 
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class Blog {
@@ -18,7 +18,7 @@ class Blog {
 	/** @var int */
 	protected $id;
 
-	/** @var Category */
+	/** @var Folder */
 	protected $category;
 
 	/** @var User */
@@ -56,7 +56,7 @@ class Blog {
 
 
 	/**
-	 * @param Category $category
+	 * @param Folder $category
 	 * @return self
 	 */
 	public function setCategory($category) {
@@ -66,7 +66,7 @@ class Blog {
 
 
 	/**
-	 * @return Category
+	 * @return Folder
 	 */
 	public function getCategory() {
 		return $this->category;

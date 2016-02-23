@@ -32,7 +32,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Category Mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var \Schoolbox\Resource\Folder\Mapper
      */
     private $categoryMapper = null;
 
@@ -46,7 +46,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
         $this->setBlogMapper(new \Schoolbox\Blog\BlogMapper());
         $this->setCommentMapper(new \Schoolbox\Blog\CommentMapper());
-        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
 
         $this->source = $this->getContext();
 

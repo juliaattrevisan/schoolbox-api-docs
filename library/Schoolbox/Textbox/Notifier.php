@@ -19,8 +19,8 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\ResourceNotifier;
 use Schoolbox\User;
@@ -40,7 +40,7 @@ class Notifier extends ResourceNotifier {
 		$envelope = new Envelope();
 
 		$resourceId = $resource->getId();
-		$category = CategoryMapper::getInstance()->findById($resource->getCategory()->getId()); // THERE HAS TO BE A WAY TO NOT NEED TO DO THIS
+		$category = FolderMapper::getInstance()->findById($resource->getCategory()->getId()); // THERE HAS TO BE A WAY TO NOT NEED TO DO THIS
 
 		$bob = new Builder();
 
@@ -124,7 +124,7 @@ class Notifier extends ResourceNotifier {
 
 	/**
 	 * @param Textbox $resource
-	 * @return Category
+	 * @return Folder
 	 */
 	protected function getResourceCategory($resource) {
 		return $resource->getCategory();

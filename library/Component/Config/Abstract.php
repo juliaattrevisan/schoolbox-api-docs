@@ -25,7 +25,7 @@ abstract class Component_Config_Abstract
     /**
      * Constructor
      *
-     * Folder should be an instance of \Schoolbox\Resource\Category
+     * Folder should be an instance of \Schoolbox\Resource\Folder\Model
      * but must be either handler array or instance, for now
      *
      * @param $folder

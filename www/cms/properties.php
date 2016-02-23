@@ -68,7 +68,7 @@ if (is_numeric($_GET['fileID'])) {
      * by default, instead of trying to be ultra-compact
      */
     try {
-        $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+        $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
         $category       = $categoryMapper->findById($link->getFolder()->getId());
     } catch (\Exception $e) {
         error(13);

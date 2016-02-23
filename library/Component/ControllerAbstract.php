@@ -111,7 +111,7 @@ abstract class Component_ControllerAbstract
         $this->user     = $user;
         $this->sitepage = $sitepage;
         $this->config   = $instance->getConfigArray();
-        $this->context  = new \Schoolbox\Resource\Category();
+        $this->context  = new \Schoolbox\Resource\Folder\Model();
     }
 
     /**

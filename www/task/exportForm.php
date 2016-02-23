@@ -10,8 +10,8 @@
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
 use Schoolbox\Collection;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
@@ -27,10 +27,10 @@ if (empty($taskId)) {
 }
 try {
     /** @var Task $task */
-    /** @var Category $category */
+    /** @var Folder $category */
     $task       = TaskMapper::getInstance()->findById($taskId);
     $categoryId = $task->getCategory()->getId();
-    $category   = CategoryMapper::getInstance()->findById($categoryId);
+    $category   = FolderMapper::getInstance()->findById($categoryId);
 }
 catch (\Schoolbox\Mapper\Exception $e) {
     error(2);
@@ -48,8 +48,8 @@ if ($groupHandler->getPermission($categoryId) < WRITE_ACCESS) {
 
 // Get list of updatable items.
 $unitList = UnitInstanceMapper::getInstance()->findByUnitCategoryId($categoryId);
-/** @var Category[] $classWithUnitList */
-$classWithUnitList = CategoryMapper::getInstance()->findByColumn(
+/** @var Folder[] $classWithUnitList */
+$classWithUnitList = FolderMapper::getInstance()->findByColumn(
     'id',
     $unitList->map(function($unit) {
         /** @var UnitInstance $unit */

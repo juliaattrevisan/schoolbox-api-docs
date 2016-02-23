@@ -24,7 +24,7 @@ AND p.pollID IS NULL";
 
 $result = $this->db->query($query);
 
-$folderMapper = new \Schoolbox\Resource\CategoryMapper();
+$folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
 while ($row = $this->db->getNextArray($result)) {
     $loaf = array();

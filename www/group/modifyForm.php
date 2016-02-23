@@ -2,7 +2,7 @@
 use Schoolbox\Collection;
 use Schoolbox\Realtime\Message\RerouteOverride;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
@@ -18,7 +18,7 @@ $uaMapper = UserAccessMapper::getInstance();
 $ua = new UserAccess();
 $ua->setService(UserAccess::SERVICE_HOMEPAGE);
 
-$catMapper = CategoryMapper::getInstance();
+$catMapper = FolderMapper::getInstance();
 $userMapper = UserMapper::getInstance();
 $groupMapper = GroupMapper::getInstance();
 

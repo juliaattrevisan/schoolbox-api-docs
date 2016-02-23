@@ -14,8 +14,8 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 // Post vars:
 // student_id
@@ -23,7 +23,7 @@ use Schoolbox\Resource\CategoryMapper;
 
 $permissionDenied = false;
 
-/** @var Category $category */
+/** @var Folder $category */
 try {
     /** @var Task\Instance $task */
     $task = Task\InstanceMapper::getInstance()->findById($_POST['task_id']);

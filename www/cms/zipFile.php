@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-$folderMapper = new \Schoolbox\Resource\CategoryMapper();
+$folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
 $isSuperuser = $_SESSION['user']->isSuperuser();
 $isAllowedTeacher = ($_SESSION['user']->getRole()->isStaff() && \Cfg::get('enable_teacher_zip_upload'));

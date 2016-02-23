@@ -17,7 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -50,14 +50,14 @@ class Generator implements GeneratorInterface
      * @param Mapper                 $userMapper
      * @param Mapper                 $roleMapper
      * @param Mapper                 $userAccessMapper
-     * @param CategoryMapper         $categoryMapper
+     * @param FolderMapper         $categoryMapper
      */
     public function __construct(
         External_UserInterface $xUserHandler = null,
         Mapper $userMapper = null,
         Mapper $roleMapper = null,
         Mapper $userAccessMapper = null,
-        CategoryMapper $categoryMapper = null
+        FolderMapper $categoryMapper = null
     ) {
         $this->setExternalUserHandler($xUserHandler)
              ->setUserMapper($userMapper)
@@ -149,12 +149,12 @@ class Generator implements GeneratorInterface
 
 
     /**
-     * @return CategoryMapper
+     * @return FolderMapper
      */
     public function getCategoryMapper()
     {
         if (!$this->categoryMapper) {
-            $this->setCategoryMapper(CategoryMapper::getInstance());
+            $this->setCategoryMapper(FolderMapper::getInstance());
         }
         return $this->categoryMapper;
     }

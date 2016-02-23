@@ -16,7 +16,7 @@ use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use \Schoolbox\Assessment\Activity;
 use Schoolbox\Resource\Attachment\Zone;
-use \Schoolbox\Resource\CategoryCodeMapper;
+use \Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Collection;
 use \Crocodoc\Renderer\Factory;
@@ -48,7 +48,7 @@ $submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 
 /* Add category codes
  */
-$categoryCodeMapper = new CategoryCodeMapper();
+$categoryCodeMapper = new FolderCodeMapper();
 $categoryCode = $categoryCodeMapper->findForCategory($submissionBox->getCategory()->getId());
 $submissionBox->getCategory()->setCodes($categoryCode);
 

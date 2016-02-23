@@ -27,7 +27,7 @@ if (!isset($thread['threadID'])) {
     error(2);
 }
 
-$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 $category = $categoryMapper->findById($thread['categoryID']);
 
 /* forum exists

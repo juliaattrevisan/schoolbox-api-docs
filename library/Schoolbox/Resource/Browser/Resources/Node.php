@@ -17,8 +17,8 @@ namespace Schoolbox\Resource\Browser\Resources;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\AbstractNode;
-use Schoolbox\Resource\Folder\Model as Category;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Exception;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 
@@ -46,7 +46,7 @@ class Node extends AbstractNode
     {
         parent::__construct($nodeId, $mimeFilter);
 
-        $this->setFolderLocator(new CategoryMapper());
+        $this->setFolderLocator(new FolderMapper());
         $this->setFileLocator(new FileMapper());
         $this->setGroupHandler(new \Group());
 
@@ -91,7 +91,7 @@ class Node extends AbstractNode
 
 
     /**
-     * @param FolderInterface|Category $folder
+     * @param FolderInterface|Folder $folder
      * @return array
      */
     protected function folderToArray(FolderInterface $folder)

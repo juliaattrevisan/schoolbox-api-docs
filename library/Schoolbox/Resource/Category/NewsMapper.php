@@ -91,7 +91,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 		));
 
 		$this->hasJoin('category', array(
-			'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+			'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
 			'this_key'  => 'code',
 			'other_key' => 'id'
 		));

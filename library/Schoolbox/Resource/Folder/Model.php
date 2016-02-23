@@ -15,7 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\AbstractFolder;
-use Schoolbox\Resource\CategoryCode;
+use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -41,9 +41,9 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     protected $homepage;
 
     /**
-     * A collection of CategoryCode() instances
+     * A collection of FolderCode() instances
      *
-     * @var Collection|CategoryCode[]
+     * @var Collection|FolderCode[]
      */
     protected $codes;
 
@@ -171,7 +171,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * Add code
      *
-     * @param  CategoryCode $code
+     * @param  FolderCode $code
      * @return $this
      */
     public function addCode($code)
@@ -285,7 +285,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @return Collection|CategoryCode[]
+     * @return Collection|FolderCode[]
      */
     public function getCodes()
     {
