@@ -38,6 +38,13 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 {
 
     /**
+     * Maximum number of recursion iterations to execute before dying
+     *
+     * @var int
+     */
+    protected $maxRecursionDepth = 100;
+
+    /**
      * Interface with external user database.
      *
      * @var External_UserInterface
@@ -1007,7 +1014,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         // If we've recursed too much error out
 
-        if ($iteration > 100) {
+        if ($iteration > $this->getMaxRecursionDepth()) {
             error(2);
         }
 
@@ -1052,5 +1059,28 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         }
 
         return $result;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Get max recursion depth
+     *
+     * @return int
+     */
+    protected function getMaxRecursionDepth()
+    {
+        return $this->maxRecursionDepth;
+    }
+
+    /**
+     * Set max recursion depth
+     *
+     * @param int $maxRecursionDepth
+     */
+    protected function setMaxRecursionDepth($maxRecursionDepth)
+    {
+        $this->maxRecursionDepth = $maxRecursionDepth;
     }
 }
