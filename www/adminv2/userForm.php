@@ -26,7 +26,13 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
         $userMapper->delete($user);
         SitePage::localRedir('/adminv2/user/');
     } else {
-        // Username check?
+        // Username check - if any other user has this username, abort
+        foreach ($userMapper->findByColumn('username', $_POST['modusername']) as $userWithUsername) {
+            if ($userWithUsername->getId() !=  $user->getId()) {
+                error(138);
+                exit;
+            }
+        }
 
         $user->setUsername($_POST['modusername']);
         $user->setTitle($_POST['title']);
@@ -82,12 +88,7 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
         }
 
         $userMapper->save($user);
-        if (!$userMapper->save($user)) {
-            error(138);
-            exit;
-        } else {
-            // Save campi and superuser status?
-        }
+        // Save campi and superuser status?
 
         SitePage::localRedir('/adminv2/modify-user/' . $user->getId());
     }
@@ -95,6 +96,12 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
 /* Create new user
  */
 elseif ($_POST['modusername']) {
+    // Username check - if any other user has this username, abort
+    if ($userMapper->countByColumn('username', $_POST['modusername']) > 0) {
+        error(138);
+        exit;
+    }
+
     $user = new \Schoolbox\User();
     $user->setUsername($_POST['modusername']);
     $user->setTitle($_POST['title']);
@@ -148,12 +155,7 @@ elseif ($_POST['modusername']) {
     if (is_array($_POST['campus']) && count($_POST['campus']) || $_POST['defaultCampus']) {
 //        $user['campus'] = $user['campus'] ?: [$user['defaultCampus']];
 //        $id = $userHandler->create($user);
-
         $userMapper->save($user);
-
-        if (!$user->getId()) {
-            error(138);
-        }
     } else {
         error(158);
     }
