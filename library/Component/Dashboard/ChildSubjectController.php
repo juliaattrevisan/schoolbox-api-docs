@@ -34,7 +34,8 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         $this->setBlock($templateHandle, "student_block", "student_subjects");
         $this->setBlock("student_block", "subject_block", "subject_item");
 		$this->setBlock('student_block', 'eportfolio', 'eportfolio_block');
-		$this->setBlock('student_block', 'due_work', 'due_work_block');
+        $this->setBlock('student_block', 'pastoral', 'pastoral_block');
+        $this->setBlock('student_block', 'due_work', 'due_work_block');
         $this->setBlock('student_block', 'grades_button', 'grades_button_block');
         $this->setBlock('student_block', 'timetable', 'timetable_block');
 
@@ -51,10 +52,23 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             if ( !( Cfg::get('site_location') == 'wenona' && $child['gid'] == 3 ) ) {
                 $i++;
+
                 $this->setVar("STUDENT_ID", $userChild->getId());
                 $this->setVar("STUDENT_EXTERNAL_ID", $userChild->getExternalId());
                 $this->setVar("STUDENT_NAME", $child['name']);
                 $this->setVar("STUDENT_YEAR", $userChild->getYear());
+
+                // Show pastoral to staff and parents
+                if ($groupHandler->isParentOfChild($userChild->getId())) {
+                    $this->parse('pastoral_block', 'pastoral');
+                } else {
+                    $this->setVar('pastoral_block', '');
+                }
+
+                if (\Config::get('pastoral_enabled') != 1) {
+                    $this->setVar('pastoral_block', '');
+                }
+
 
                 if ( is_array($child['subjects']) ) {
                     foreach ( $child['subjects'] as $subject ) {
