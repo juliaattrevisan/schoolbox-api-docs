@@ -90,7 +90,6 @@ class Session
             $_SESSION['local_email'] = $user['local_email'];
             $_SESSION['alt_email'] = $user['alt_email'];
             $_SESSION['webmail'] = $user['webmail'];
-            $_SESSION['email_pass'] = $user['email_pass'];
             $_SESSION['key'] = $user['key'];
             $_SESSION['lasttime'] = time();
             $_SESSION['username'] = $user['username'];

@@ -53,7 +53,6 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             'local_email'		 => $_GET['local_email'],
             'alt_email'			 => $_GET['alt_email'],
             'password'			 => $_GET['password'],
-            'email_pass'	     => $_GET['password'],
             'su'			 	 => $_GET['su'],
             'year'		 		 => $_GET['year'] == ''?'NULL':$_GET['year'],
             'eportfolio_enabled' => $_GET['eportfolio_enabled'] == 1?1:0,
@@ -163,7 +162,6 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
 
         if (!empty($_GET['password'])) {
             $user['password'] = $_GET['password'];
-            $user['email_pass'] = $_GET['password'];
         }
 
         /* Convert campus names into ids */
