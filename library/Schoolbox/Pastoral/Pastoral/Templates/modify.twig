@@ -8,6 +8,9 @@
 
 <script type="text/javascript">
     $(function () {
+
+        var form = $('form#pastoralForm')
+
         $.fn.alaressEditor();
 
         $('#tags').selectize({
@@ -95,6 +98,32 @@
                 dataType: 'json'
             }
         });
+
+
+
+        $('[data-submit]').click(function(event)
+        {
+            form.alaressValidate({
+                ignore: ':disabled',
+                rules: {
+                    'heading': {
+                        required:       true,
+                    },
+                    'body': {
+                        required:       true,
+                    }
+                },
+
+                messages: {
+                    'heading': {
+                        required:       'You must enter a title before you can proceed.'
+                    },
+                    'body': {
+                        required:       'You must enter a description of the pastoral event before you can proceed.'
+                    }
+                }
+            });
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -146,7 +175,7 @@
                         </label>
 
                         <label>
-                            Body
+                            Description
                             <textarea id="body" name="body">{{ record.body }}</textarea>
                         </label>
                     </div>
@@ -269,14 +298,14 @@
             <div class="row">
                 {% if id == '' %}
                     <div class="small-12 medium-6 column">
-                        <input type="submit" value="Insert Pastoral Comment"/>
+                        <input data-submit type="submit" value="Insert Pastoral Comment"/>
                     </div>
                     <div class="small-12 medium-6 column">
                         <input data-cancel type="submit" value="Cancel Changes"/>
                     </div>
                 {% else %}
                     <div class="small-12 medium-4 column">
-                        <input type="submit" value="Save Changes"/>
+                        <input data-submit type="submit" value="Save Changes"/>
                     </div>
                     <div class="small-12 medium-4 column">
                         <input data-delete type="submit" value="Delete"/>

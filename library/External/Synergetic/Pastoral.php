@@ -6,7 +6,8 @@
  */
 
 use \Schoolbox\Pastoral\Pastoral;
-use \Schoolbox\Pastoral\PastoralTypeMapper;
+use \Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
+use \Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Alaress\DebugBar\Instance as DebugBar;
 
 class External_Synergetic_Pastoral implements External_PastoralInterface
@@ -167,7 +168,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $result = $this->getDatabase()->query("SELECT SCOPE_IDENTITY() AS insert_id");
         $row = mssql_fetch_object($result);
 
-        $pastoralMapper = new \Schoolbox\Pastoral\PastoralMapper();
+        $pastoralMapper = new PastoralMapper();
         $pastoral->setExternalId($row->insert_id);
         $pastoralMapper->save($pastoral);
 

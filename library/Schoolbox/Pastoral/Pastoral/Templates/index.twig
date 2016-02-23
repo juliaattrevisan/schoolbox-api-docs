@@ -30,9 +30,11 @@
                     .done(function() {
                         $('#pastoral-' + event.target.id).remove();
                         if ($('[data-pastoral]').length == 0) {
-                            $('[data-no-records]').show();
+                            $('[data-no-records]').removeClass('hide');
+                            $('[data-type-selector]').addClass('hide');
                         } else {
-                            $('[data-no-records]').hide();
+                            $('[data-no-records]').addClass('hide');
+                            $('[data-type-selector]').removeClass('hide');
                         }
                     });
                 }
@@ -40,9 +42,11 @@
         });
 
         if ($('[data-pastoral]').length == 0) {
-            $('[data-no-records]').show();
+            $('[data-no-records]').removeClass('hide');
+            $('[data-type-selector]').addClass('hide');
         } else {
-            $('[data-no-records]').hide();
+            $('[data-no-records]').addClass('hide');
+            $('[data-type-selector]').removeClass('hide');
         }
     });
 
@@ -89,7 +93,7 @@
                                 <dd class="no-margin small-6 medium-8">{{ student.StudentYearLevelCoordinator }}</dd>
 
                                 <dt class="no-margin small-6 medium-4">House</dt>
-                                <dd class="no-margin small-6 medium-8">{{ student.StudentYearLevelCoordinator }}</dd>
+                                <dd class="no-margin small-6 medium-8">{{ student.StudentHouseDescription }}</dd>
 
                                 {% for contact in contacts if not user.hideContacts %}
                                     <dt class="no-margin small-6 medium-4">{{ contact.StudentContactRelation }}</dt>
@@ -120,7 +124,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div data-type-selector class="row{% if records.count() == 0 %} hide{% endif %}">
         <div class="small-12">
             <section>
                 <select id="filter_type_id">
@@ -135,9 +139,12 @@
 
 {% endif %}
 
-<div data-no-records class="row" {% if records.count() != 0 %} style="display:none;" {% endif %}>
+<div data-no-records class="row{% if records.count() != 0 %} hide{% endif %}">
+    <div class="small-12 column{% if role != 'parent' %} hide{% endif %}">
+        <h1>Pastoral Care</h1>
+    </div>
     <div class="small-12 column">
-        <div class="alert-box">There are currently no pastoral care records for this student.</div>
+        <div class="alert-box">No pastoral care records have been entered regarding {{ user.firstname }} {{ user.lastname }}.{% if role != 'parent' %} To add a record click on the 'Add Pastoral Comment' button above.{% endif %}</div>
     </div>
 </div>
 
