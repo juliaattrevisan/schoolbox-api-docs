@@ -4,7 +4,6 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $page = new SitePage();
 $userMapper = \Schoolbox\UserMapper::getInstance();
 $passwordGenerator = new \Alaress\Password\Password();
-$userHandler = new User();
 $groupHandler = new Group();
 
 /* Superusers only
