@@ -93,7 +93,7 @@
                                 <dt class="no-margin small-6 medium-4">Student Age</dt>
                                 <dd class="no-margin small-6 medium-8">{{ student.age }} Years Old</dd>
 
-                                <dt class="no-margin small-6 medium-4">Student Year Level</dt>
+                                <dt class="no-margin small-6 medium-4 {% if student.StudentYearLevel == '' and student.FormDescription == '' %}hide{% endif %}">Student Year Level</dt>
                                 <dd class="no-margin small-6 medium-8">{{ student.StudentYearLevel }} {{ student.FormDescription }}</dd>
 
                                 <dt class="no-margin small-6 medium-4">Homeroom/Form Teacher</dt>

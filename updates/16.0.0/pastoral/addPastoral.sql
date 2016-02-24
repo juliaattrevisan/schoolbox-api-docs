@@ -68,6 +68,7 @@ INSERT INTO `schoolbox`.`luPastoralType` (`name`) VALUES ('Academic');
 INSERT INTO `schoolbox`.`luPastoralType` (`name`) VALUES ('Attendance');
 INSERT INTO `schoolbox`.`luPastoralType` (`name`) VALUES ('Medical');
 INSERT INTO `schoolbox`.`luPastoralType` (`name`) VALUES ('Bullying');
+INSERT INTO `schoolbox`.`luPastoralType` (`name`) VALUES ('Discipline');
 
 INSERT INTO `schoolbox`.`luPastoralSeverity` (`name`, `order`) VALUES ('Low', 1);
 INSERT INTO `schoolbox`.`luPastoralSeverity` (`name`, `order`) VALUES ('Medium', 2);
