@@ -118,6 +118,14 @@ class Controller extends Base
                 // Weigh up security (give away no information about whether account exists)
                 // vs. flood prevention (don't send too many emails)
                 // vs. convenience (maybe user got password wrong)
+                // TODO refactor all of this too
+                $myconf = \Schoolbox\Config\ConfigMapper::getInstance();
+                $core   = new \Schoolbox\Mail\CoreContext($myconf);
+                $email  = new \Schoolbox\Mail\TwigEmail('resetPasswordUserNotExists.twig');
+                $email->setCoreContext($core->getContext());
+                $email->setFrom($myconf->get('password_change_email_from'), $myconf->get('mail_from_name'));
+                $email->setSubject($myconf->get('title') . ' Password Reset');
+                $email->send($emailAddress);
             }
         }
         $this->getResponse()->redirect->to($this->getRouter()->generate('user.passwordReset'));
