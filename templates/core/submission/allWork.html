@@ -53,11 +53,23 @@
                                     '</div>';
                             /* Concatenate everything
                              */
-                            tooltipContent = template;
-                            tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, infoIndex[this.x].displayMark);
-                            tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, infoIndex[this.x].gradientMark);
-                            tooltipContent = tooltipContent.replace(/{INFO}/, infoIndex[this.x].info);
-                            return tooltipContent;
+                            if(typeof infoIndex[this.x].displayMark != 'undefined')
+                            {
+                                tooltipContent = template;
+                                if(infoIndex[this.x].displayMark != null) {
+                                    tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, infoIndex[this.x].displayMark);
+                                    tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, infoIndex[this.x].gradientMark);
+                                }
+                                else {
+                                    tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, '');
+                                    tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, '');
+                                }
+                                tooltipContent = tooltipContent.replace(/{INFO}/, infoIndex[this.x].info);
+                                return tooltipContent;
+                            }
+                            else {
+                                return '<p>Pending Assessment</p>';
+                            }
                         }
                     }
                 }

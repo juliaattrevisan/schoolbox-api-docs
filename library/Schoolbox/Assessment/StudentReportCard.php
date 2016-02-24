@@ -638,12 +638,19 @@ class StudentReportCard
 
                     /* Gather JSON data for graph */
                     $allNames[] = $object->getName();
-                    $userMarks[] = (float)($marks['mark']);
-                    $infoIndex[] = array(
-                        'displayMark' => $marks['display_mark'],
-                        'gradientMark' => (int)($marks['mark'] / 10),
-                        'info' => $marks['comment']
-                    );
+
+                    if(is_numeric($marks['mark'])) {
+                        $userMarks[] = (float)$marks['mark'];
+                        $infoIndex[] = array(
+                            'displayMark' => $marks['display_mark'],
+                            'gradientMark' => (int)($marks['mark'] / 10),
+                            'info' => $marks['comment']
+                        );
+                    }
+                    else {
+                        $userMarks[] = '';
+                        $infoIndex[] = array();
+                    }
 
                     $rowData = $this->outputDueWorkRow($object, $marks);
                     $page->setVar($rowData);
@@ -696,12 +703,18 @@ class StudentReportCard
                 } elseif ($object instanceof OnlineAssessment) {
 
                     $allNames[] = $object->getTitle();
-                    $userMarks[] = (float)($marks[0]['mark']);
-                    $infoIndex[] = array(
-                        'displayMark' => $marks[0]['display_mark'],
-                        'gradientMark' => (int)($marks[0]['mark'] / 10),
-                        'info' => $marks[0]['comment']
-                    );
+                    if($marks['mark'] == '') {
+                        $userMarks[] = (float)$marks[0]['mark'];
+                        $infoIndex[] = array(
+                            'displayMark' => $marks[0]['display_mark'],
+                            'gradientMark' => (int)($marks[0]['mark'] / 10),
+                            'info' => $marks[0]['comment']
+                        );
+                    }
+                    else {
+                        $userMarks[] = '';
+                        $infoIndex[] = array();
+                    }
 
                     // Quizzes that aren't open shouldn't show here either?
                     $rowData = $this->outputOnlineAssessRow($object, $marks, $page);
