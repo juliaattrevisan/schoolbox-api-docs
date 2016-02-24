@@ -1,0 +1,55 @@
+<?php
+/**
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\User\Password\Reset;
+
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\UserMapper;
+
+/**
+ * Mapper for password resets
+ *
+ * @package Schoolbox\User\Password\Reset
+ */
+class Mapper extends BaseMapper
+{
+    /**
+     * @inheritdoc
+     */
+    protected function mapping()
+    {
+        $this->hasTable('user_password_reset_request');
+        $this->hasPrototype(new Model());
+
+        $this->uses('token', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
+        $this->uses('expiry', self::TYPE_DATETIME);
+        $this->joins('user_id', UserMapper::class);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'generateToken']);
+    }
+
+    /**
+     * Pre-save callback - generates a unique token for this request.
+     *
+     * @param  Model $model
+     * @return bool
+     * @throws BaseMapper\Exception in the extraordinary case that a unique ID
+     *                              could not be generated in 1000 attempts
+     */
+    public function generateToken(Model $model)
+    {
+        $i = 0;
+        while (empty($model->getToken()) && $i < 1000) {
+            $token = bin2hex(openssl_random_pseudo_bytes(32));
+            if ($this->countByColumn('token', $token) === 0) {
+                $model->setToken($token);
+                return true;
+            }
+            $i++;
+        }
+        throw new BaseMapper\Exception('Could not generate a unique token after 1000 attempts!');
+    }
+}
