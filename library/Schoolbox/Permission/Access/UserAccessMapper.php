@@ -424,6 +424,8 @@ class UserAccessMapper extends Mapper
             $serviceIdentifier = $categoryNnian->getId();
         }
 
+        // Not sure what this is for
+
         if (!isset($serviceIdentifier)) {
             return $this->findOneByColumnList(
                 array(
@@ -432,13 +434,85 @@ class UserAccessMapper extends Mapper
                 )
             );
         }
-        return $this->findOneByColumnList(
+
+        // Look in the userAccess table to see if the user has permission
+
+        $result_collection = $this->findByColumnList(
             array(
                 'service' => $service,
-                'sid'     => $serviceIdentifier,
-                'uid'     => $user->getId(),
+                'sid' => $serviceIdentifier,
+                'uid' => $user->getId(),
+            ),
+            array(
+                'deleted' => false,
+                'order' => array()
             )
         );
+
+        foreach ($result_collection as $model) {
+            $this->throwIfDeleted($model);
+            return $model;
+        }
+
+        // Haven't gotten access yet, start looking through Synergetic class codes for students
+
+        // Start with cached results (and setup cache array for this user if it doesn't already exist)
+
+        if (!isset($this->cachedPermissions[$user->getId()])) {
+            $this->cachedPermissions[$user->getId()] = array();
+        }
+
+        if (isset($this->cachedPermissions[$user->getId()][$serviceIdentifier])) {
+            // Found cached result, return it
+            return $this->cachedPermissions[$user->getId()][$serviceIdentifier];
+        }
+
+        // Look for students
+
+        $students = $this->findStudentsInCategory(\Schoolbox\Resource\Folder\Mapper::getInstance()->findById($serviceIdentifier), true);
+
+        foreach ($students as $student) {
+            if ($student->getId() == $user->getId()) {
+
+                // Found matching student, give them perms
+
+                $model = new \Schoolbox\Permission\Access\UserAccess();
+                $model->setService($service);
+                $model->setServiceIdentifier($serviceIdentifier);
+                $model->setUser($user);
+                $model->setAccessLevel(UserAccess::ACCESS_READ);
+
+                // Cache for future calls and return the permission object
+
+                $this->cachedPermissions[$user->getId()][$serviceIdentifier] = $model;
+                return $model;
+            }
+        }
+
+        // Try looking through staff
+
+        $staff = $this->findStaffInCategory(\Schoolbox\Resource\Folder\Mapper::getInstance()->findById($serviceIdentifier), true);
+
+        foreach ($students as $student) {
+            if ($student->getId() == $user->getId()) {
+
+                // Found matching student, give them perms
+
+                $model = new \Schoolbox\Permission\Access\UserAccess();
+                $model->setService($service);
+                $model->setServiceIdentifier($serviceIdentifier);
+                $model->setUser($user);
+                $model->setAccessLevel(UserAccess::ACCESS_WRITE);
+
+                // Cache for future calls and return the permission object
+
+                $this->cachedPermissions[$user->getId()][$serviceIdentifier] = $model;
+                return $model;
+            }
+        }
+
+        throw new \Schoolbox\Mapper\Exception('Instance of object not found');
     }
+
 
 }
