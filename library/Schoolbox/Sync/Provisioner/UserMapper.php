@@ -12,7 +12,10 @@ namespace Schoolbox\Sync\Provisioner;
 
 use Schoolbox;
 use Schoolbox\UserMapper as SchoolboxMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ConfigLoader;
+use Schoolbox\Collection;
 
 /** @method User findByExternalId($id, $roleType = null) */
 class UserMapper extends SchoolboxMapper
@@ -49,15 +52,93 @@ class UserMapper extends SchoolboxMapper
     {
         $config = new ConfigLoader();
 
+        /* Modify accessList only when ups_groups_enabled is actually enabled
+         * Otherwise leave it unchanged from whatever it was
+         */
         if ($config->get('ups_groups_enabled')) {
             $userAccessMapper = $this->getJoinMapper('userAccess');
 
             // make sure any mutes go through correctly
             $userAccessMapper->setNotifier($this->getNotifier());
 
+            /* If you combined 'Groups (Read/Write)' and 'Groups (Remove)' in the
+             * same rule, you'll always be added to the groups specified by the
+             * value of 'Groups (Read/Write)'. It will overpower the Remove.
+             * It is recommended that Remove operations be set up before Read/Write
+             *
+             * This is so you can remove people from multiple groups, then reassign
+             * people to new groups, in the same rule.
+             *
+             * There isn't a way to tell whether the 'Groups (Remove)' came before
+             * or after the 'Groups (Read/Write)' in the same rule.
+             */
+
+            /* Get a list of all the UserAccess instances for this User
+             */
+            $allUserAccess = $userAccessMapper->findAllGroupsForUser($user);
+
+
+
+            echo "Removes:";
+            print_r($user->getUserAccessRemove());
+
+            echo "Adds:";
+            $accessible = [];
             foreach ($user->getAccessList() as $current) {
-                $userAccessMapper->save($current);
+                $accessible[] = $current->getServiceIdentifier();
             }
+
+            print_r($accessible);
+
+
+//            /* Search $allUserAccess for anything that should be deleted
+//             * If found, delete it from the db if it was already there
+//             * These are spawned from a previous Rule.
+//             */
+//            foreach ($user->getUserAccessRemove() as $current) {
+//                $found = $allUserAccess->getBy('serviceIdentifier', $current);
+//
+//                /* Do not blow away Owners, only Read/Write accessors
+//                 */
+//                if ($found && ($found->getAccessLevel() < UserAccess::ACCESS_FULL)) {
+//                    $userAccessMapper->delete($found);
+//                }
+//            }
+//
+//            /* If you combined "Groups (Read)" and "Groups (Remove)" in the same rule
+//             * you might be in a state where items in $userAccessRemove won't be in the
+//             * db, but will have been added via "Groups (Read)". This means it won't
+//             * have anything to delete right now.
+//             *
+//             * Truncate the $userAccessRemove elements from $this->accessList as well
+//             * to ensure that what you remove applies to all other Groups (Read/Write)
+//             * effects in this rule
+//             */
+//            $trimmedAccessList = new Collection();
+//
+//            foreach ($this->getAccessList() as $currentAccessExists) {
+//                $found = false;
+//
+//                foreach ($user->getUserAccessRemove() as $currentAccessRemove) {
+//                    if ($currentAccessExists->getServiceIdentifier() == $currentAccessRemove) {
+//                        $found = true;
+//                    }
+//                }
+//
+//                /* Keep it, if it's not supposed to be removed
+//                 */
+//                if (!$found) {
+//                    $trimmedAccessList->add($currentAccessExists);
+//                }
+//            }
+//
+//            /* Square it away
+//             */
+//            $this->setAccessList($trimmedAccessList);
+//
+//            foreach ($user->getAccessList() as $current) {
+//                $userAccessMapper->save($current);
+//            }
         }
     }
 }
