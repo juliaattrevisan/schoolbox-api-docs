@@ -143,6 +143,7 @@ class Report_Parent extends Report_Abstract
     {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/report/parents.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'student', 'student_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'boarder', 'boarder_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_year_selector', 'has_year_selector_block');
         $this->getPage()->setBlock('has_year_selector', 'year_selector_option', 'year_selector_option_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_year_input', 'has_year_input_block');
@@ -169,6 +170,13 @@ class Report_Parent extends Report_Abstract
                 'email_all_parents_link_block' => '',
             )
         );
+
+        if (Config::get('boarder_leave_enabled')) {
+            $this->getPage()->parse('boarder_block', 'boarder');
+        } else {
+            $this->getPage()->setVar('boarder_block', '');
+        }
+
 
         if (Config::get('modules_parentdirectory_emailall')) {
             $this->getPage()->parse('email_all_parents_block', 'email_all_parents');
