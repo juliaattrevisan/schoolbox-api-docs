@@ -665,33 +665,28 @@ class Group extends DeprecatedModel
         //Fetch subject list
         $allFolders = array();
 
-        if ($userID == $_SESSION['id']) {
-            $allFolders = $_SESSION['subjects'];
-        } else {
-            $userMapper = new \Schoolbox\UserMapper();
-            $user = $userMapper->findById($userID);
+        $userMapper = new \Schoolbox\UserMapper();
+        $user = $userMapper->findById($userID);
 
-            $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+        $folderMapper = new \Schoolbox\Resource\CategoryMapper();
 
-            if ($user->getExternalId()) {
-                $externalUser = new External_User;
-                $externalSubjectList = $externalUser->getSubjectList($user->getExternalId(), $user->getId());
+        if ($user->getExternalId()) {
+            $externalUser = new External_User;
+            $externalSubjectList = $externalUser->getSubjectList($user->getExternalId(), $user->getId());
 
-                if (is_array($externalSubjectList)) {
-                    foreach ($externalSubjectList as $currentSubject) {
-                        try {
-                            $folder = $folderMapper->findByCode($currentSubject['code']);
-
-                            $allFolders[$folder->getId()] = array(
-                                'id' => $folder->getId(),
-                                'name' => $folder->getName(),
-                                'parent' => $folder->getParent()->getId(),
-                                'deleted_at' => $folder->getDeletedAt(),
-                                'code' => $folder->getCodeString(),
-                                'template' => $folder->getHomepage()->getTemplate()->getId(),
-                            );
-                        } catch (\Exception $e) {
-                        }
+            if (is_array($externalSubjectList)) {
+                foreach ($externalSubjectList as $currentSubject) {
+                    try {
+                        $folder = $folderMapper->findByCode($currentSubject['code']);
+                        $allFolders[$folder->getId()] = array(
+                            'id' => $folder->getId(),
+                            'name' => $folder->getName(),
+                            'parent' => $folder->getParent()->getId(),
+                            'deleted_at' => $folder->getDeletedAt(),
+                            'code' => $folder->getCodeString(),
+                            'template' => $folder->getHomepage()->getTemplate()->getId(),
+                        );
+                    } catch (\Exception $e) {
                     }
                 }
             }
