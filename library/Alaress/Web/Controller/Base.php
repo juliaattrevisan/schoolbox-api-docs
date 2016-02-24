@@ -15,6 +15,7 @@ use Aura\Web\Response;
 use Aura\Router\Router;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 
 abstract class Base {
@@ -151,6 +152,16 @@ abstract class Base {
      */
     public function getUser() {
         return $this->getSession()->getAuthUser();
+    }
+
+    /**
+     * Helper method for retrieving config.
+     *
+     * @return IConfigLoader
+     */
+    public function getConfigLoader()
+    {
+        return $this->getDi()->get('config');
     }
 
     /**
