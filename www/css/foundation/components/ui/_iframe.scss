@@ -1,0 +1,5 @@
+.scroll-wrapper {
+  /* Hack to allow iframes to scroll on IOS, wrap around iframes you need to be able to scroll on mobile */
+  -webkit-overflow-scrolling: touch;
+  overflow-y: scroll;
+}

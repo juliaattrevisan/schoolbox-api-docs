@@ -79,3 +79,8 @@ $alert-default-background: darken($body-bg, 10%);
         color: calc-text-color($alert-color, tint($alert-color, $alert-tint-amount), darken($alert-color, $alert-tint-amount));
     }
 }
+
+.alert-box:empty {
+    display: none;
+}
+
