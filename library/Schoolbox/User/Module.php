@@ -18,6 +18,7 @@ use Aura\Router\Router;
 use \Schoolbox\UserMapper;
 use \Schoolbox\User;
 use \Alaress\Authorizer\Failure\Unauthorized;
+use Twig_Loader_Chain;
 
 class Module extends BaseModule
 {
@@ -30,6 +31,7 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'impersonate', $basePath, '/switch/{userId}');
         $this->addGetRoute($router, 'recoverSession', $basePath, '/recoverSession');
+        $this->addGetRoute($router, 'passwordReset', $basePath, '/passwordReset');
     }
 
     /**
@@ -70,6 +72,14 @@ class Module extends BaseModule
                     }
                 )
             );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
     /**

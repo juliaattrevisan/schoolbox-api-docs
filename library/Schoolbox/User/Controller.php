@@ -43,4 +43,19 @@ class Controller extends Base
         $this->getResponse()->redirect->found('/');
     }
 
-} 
+    /**
+     * Password reset request action
+     */
+    public function passwordReset()
+    {
+        if ($this->getUser()->getId()) {
+            // You are logged in. This page is not for you
+            $this->getResponse()->redirect->found('/');
+        } else {
+            $this->getResponse()->content->set([
+                'template' => '@user/passwordReset.twig',
+                'data'     => [],
+            ]);
+        }
+    }
+}
