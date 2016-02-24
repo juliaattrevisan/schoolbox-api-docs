@@ -37,7 +37,7 @@
                     name: 'You',
                     color: 'rgb(255, 87, 87)',
                     marker: {
-                        radius: 6,
+                        radius: 6
                     },
                     data: {YOUR_GRAPH_ASSESSMENT_ITEM_VALUE},
                     tooltip: {
@@ -56,6 +56,7 @@
                             if(typeof infoIndex[this.x].displayMark != 'undefined')
                             {
                                 tooltipContent = template;
+
                                 if(infoIndex[this.x].displayMark != null) {
                                     tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, infoIndex[this.x].displayMark);
                                     tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, infoIndex[this.x].gradientMark);
@@ -65,10 +66,18 @@
                                     tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, '');
                                 }
                                 tooltipContent = tooltipContent.replace(/{INFO}/, infoIndex[this.x].info);
+
+                                /* Show tooltip
+                                 */
+                                $('.highcharts-tooltip').show();
+
                                 return tooltipContent;
                             }
                             else {
-                                return '<p>Pending Assessment</p>';
+
+                                /* Hide tooltip when no data
+                                 */
+                                $('.highcharts-tooltip').hide();
                             }
                         }
                     }
