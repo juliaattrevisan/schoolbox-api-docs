@@ -3,6 +3,12 @@
     <script type="text/javascript">
         $(function () {
 
+            // Disable post comment button if there is no comment
+
+            $('#body').on('change keyup paste', function() {
+                $('[data-post]').prop('disabled', $('#body').val().trim() === '');
+            });
+
             // Delete pastoral record
 
             $('[data-delete]').click(function(event) {
@@ -189,9 +195,9 @@
                 <input type="hidden" name="pastoral_id" value="{{ record.getId() }}">
                 <input type="hidden" name="student_id" value="{{ record.getStudentId() }}">
                 <section>
-                    <textarea rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
+                    <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
                 </section>
-                <input type="submit" class="expand" value="Post">
+                <input disabled="true" data-post type="submit" class="expand" value="Post Comment">
             </form>
 
         {% endif %}
