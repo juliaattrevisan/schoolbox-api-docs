@@ -39,7 +39,7 @@
                         <p>
                             {{- descriptor.text|raw -}}
                         </p>
-                        {% if descriptor.value is not null %}
+                        {% if descriptor.value is not null and config.rubric_show_points %}
                         <aside>
                             {{- descriptor.value -}}
                         </aside>
