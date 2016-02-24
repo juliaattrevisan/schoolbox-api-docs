@@ -8,6 +8,7 @@
 namespace Schoolbox\User;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -25,15 +26,25 @@ class Controller extends Base
     protected $resetMapper;
 
     /**
+     * @var TwigEmailFactory
+     */
+    protected $mailFactory;
+
+    /**
      * Constructor
      *
      * @param UserMapper            $userMapper
      * @param Password\Reset\Mapper $resetMapper
+     * @param TwigEmailFactory      $mailFactory
      */
-    public function __construct(UserMapper $userMapper, Password\Reset\Mapper $resetMapper)
-    {
+    public function __construct(
+        UserMapper $userMapper,
+        Password\Reset\Mapper $resetMapper,
+        TwigEmailFactory $mailFactory
+    ) {
         $this->userMapper  = $userMapper;
         $this->resetMapper = $resetMapper;
+        $this->mailFactory = $mailFactory;
     }
 
     /**
@@ -102,7 +113,8 @@ class Controller extends Base
             // Find all users with this email address. (not counting email_address_from_username)
             // If there is one, send a reset email to this address.
             /** @var User[] $users */
-            $users = $this->userMapper->findByColumn('alt_email', $emailAddress);
+            $users  = $this->userMapper->findByColumn('alt_email', $emailAddress);
+            $config = $this->getConfigLoader();
             if (count($users) > 0) {
                 foreach ($users as $user) {
                     // Make a password reset attempt (for each account, I guess)
@@ -113,29 +125,20 @@ class Controller extends Base
                         $this->resetMapper->save($reset);
                     }
 
-                    // TODO refactor all of this
-                    $myconf = \Schoolbox\Config\ConfigMapper::getInstance();
-                    $core   = new \Schoolbox\Mail\CoreContext($myconf);
-                    $email  = new \Schoolbox\Mail\TwigEmail('resetPassword.twig');
-                    $email->setCoreContext($core->getContext());
-                    $email->setFrom($myconf->get('password_change_email_from'), $myconf->get('mail_from_name'));
-                    $email->setSubject($myconf->get('title') . ' Password Reset');
-                    $email
-                        ->setContext(['user' => $user, 'reset' => $reset,])
-                        ->send(['name' => $user->formatName(), 'email' => $emailAddress,]);
+                    $email = $this->mailFactory->build('resetPassword.twig');
+                    $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
+                    $email->setSubject($config->get('title') . ' Password Reset');
+                    $email->setContext(['user' => $user, 'reset' => $reset,]);
+                    $email->send(['name' => $user->formatName(), 'email' => $emailAddress,]);
                 }
             } else {
                 // No matches - send a message anyway?
                 // Weigh up security (give away no information about whether account exists)
                 // vs. flood prevention (don't send too many emails)
                 // vs. convenience (maybe user got password wrong)
-                // TODO refactor all of this too
-                $myconf = \Schoolbox\Config\ConfigMapper::getInstance();
-                $core   = new \Schoolbox\Mail\CoreContext($myconf);
-                $email  = new \Schoolbox\Mail\TwigEmail('resetPasswordUserNotExists.twig');
-                $email->setCoreContext($core->getContext());
-                $email->setFrom($myconf->get('password_change_email_from'), $myconf->get('mail_from_name'));
-                $email->setSubject($myconf->get('title') . ' Password Reset');
+                $email = $this->mailFactory->build('resetPasswordUserNotExists.twig');
+                $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
+                $email->setSubject($config->get('title') . ' Password Reset');
                 $email->send($emailAddress);
             }
         }

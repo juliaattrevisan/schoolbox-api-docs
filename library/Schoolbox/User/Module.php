@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Mail;
 use \Schoolbox\UserMapper;
 use \Schoolbox\User;
 use \Alaress\Authorizer\Failure\Unauthorized;
@@ -93,8 +94,17 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'userMapper' => UserMapper::getInstance(),
-                    'resetMapper' => Password\Reset\Mapper::getInstance()
+                    'userMapper'  => UserMapper::getInstance(),
+                    'resetMapper' => Password\Reset\Mapper::getInstance(),
+                    'mailFactory' => $injector->lazyNew(
+                        Mail\TwigEmailFactory::class,
+                        [
+                            'context' => $injector->lazyNew(
+                                Mail\CoreContext::class,
+                                ['conf' => $injector->lazyGet('config')]
+                            )
+                        ]
+                    ),
                 ]
             )
         );
