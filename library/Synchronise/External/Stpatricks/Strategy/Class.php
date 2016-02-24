@@ -24,6 +24,17 @@ class Synchronise_External_Stpatricks_Strategy_Class extends Synchronise_Externa
      *
      */
     public function createIfExists() {
+
+        /* Use this to combine classes in the db when they are listed
+         * separately in the csv. They will do this to have multiple
+         * teachers assigned to the same class, but to do that they
+         * put the same class on multiple rows. Hence they are saved
+         * as two separate instances in the db, but the second one
+         * won't be found (it will only match the first one) since it
+         * only searches by classCode, not its identifier
+         */
+        $processed = [];
+
         $this->getVerboseFilter()->intro();
 
         if(is_array($this->entityData)) {
@@ -47,13 +58,31 @@ class Synchronise_External_Stpatricks_Strategy_Class extends Synchronise_Externa
                 $teacher = $synStmt->fetchColumn();
                 // got the teacher ID, insert class
                 if($teacher) {
-                    preg_match("#\([^)]*\) +(.*)#", $class['name'], $matches);
-                    $classStmt->execute(array(
-                        'name' => trim($matches[1]),
-                        'code' => $class['code']
-                    ));
 
-                    $classID = $db->lastInsertId();
+                    /* If it wasn't in our $processed list, insert it into
+                     * the db and remember its identifier value
+                     */
+                    if (!isset($processed[$class['code']])) {
+                        preg_match("#\([^)]*\) +(.*)#", $class['name'], $matches);
+
+                        $classStmt->execute(array(
+                            'name' => trim($matches[1]),
+                            'code' => $class['code']
+                        ));
+
+                        $classID = $db->lastInsertId();
+
+                        $processed[$class['code']] = $classID;
+                    }
+                    /* This class was previously inserted into the db, so
+                     * prevent duplicates of the same class by reusing its
+                     * identifier value so all teachers of this class get
+                     * their timetable data
+                     */
+                    else {
+                        $classID = $processed[$class['code']];
+                    }
+
                     echo "adding staff member {$teacher} to class {$classID}\n";
                     $enrolmentStmt->execute(array(
                         'classID' => $classID,
