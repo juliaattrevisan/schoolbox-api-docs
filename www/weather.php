@@ -32,7 +32,12 @@ $this->setVar("weather_unavailable_block", "");
 
 $imageLocation = '/weather/image.php?path=';
 
-$forecastDate = new Alaress_Date_Format($weather['current']['datetime'], 'U');
+try{
+    $forecastDate = new Alaress_Date_Format($weather['current']['datetime'], 'U');
+}
+catch (InvalidArgumentException $e) {
+    $forecastDate = new Alaress_Date_Format();
+}
 
 $wind = $weather['current']['wind']['speed']
     ? sprintf("%0.1fkm/h %s", $weather['current']['wind']['speed'], $weather['current']['wind']['dir'])
