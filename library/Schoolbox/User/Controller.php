@@ -97,8 +97,10 @@ class Controller extends Base
                     // And send it
                     $resetMapper = Password\Reset\Mapper::getInstance();
                     $reset       = $resetMapper->createModel();
-                    $reset->setUser($user);
-                    $resetMapper->save($reset);
+                    if ($user->getEnabled()) {
+                        $reset->setUser($user);
+                        $resetMapper->save($reset);
+                    }
 
                     // TODO refactor all of this
                     $myconf = \Schoolbox\Config\ConfigMapper::getInstance();
