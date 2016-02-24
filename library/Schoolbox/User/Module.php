@@ -92,7 +92,10 @@ class Module extends BaseModule
             'controller:'.$this->basename,
             $injector->lazyNew(
                 Controller::class,
-                ['userMapper' => UserMapper::getInstance()]
+                [
+                    'userMapper' => UserMapper::getInstance(),
+                    'resetMapper' => Password\Reset\Mapper::getInstance()
+                ]
             )
         );
     }

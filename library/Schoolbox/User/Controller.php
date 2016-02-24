@@ -19,9 +19,21 @@ class Controller extends Base
      */
     protected $userMapper;
 
-    public function __construct(UserMapper $userMapper)
+    /**
+     * @var Password\Reset\Mapper
+     */
+    protected $resetMapper;
+
+    /**
+     * Constructor
+     *
+     * @param UserMapper            $userMapper
+     * @param Password\Reset\Mapper $resetMapper
+     */
+    public function __construct(UserMapper $userMapper, Password\Reset\Mapper $resetMapper)
     {
-        $this->userMapper = $userMapper;
+        $this->userMapper  = $userMapper;
+        $this->resetMapper = $resetMapper;
     }
 
     /**
@@ -95,11 +107,10 @@ class Controller extends Base
                 foreach ($users as $user) {
                     // Make a password reset attempt (for each account, I guess)
                     // And send it
-                    $resetMapper = Password\Reset\Mapper::getInstance();
-                    $reset       = $resetMapper->createModel();
+                    $reset = $this->resetMapper->createModel();
                     if ($user->getEnabled()) {
                         $reset->setUser($user);
-                        $resetMapper->save($reset);
+                        $this->resetMapper->save($reset);
                     }
 
                     // TODO refactor all of this
