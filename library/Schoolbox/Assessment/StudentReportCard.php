@@ -639,7 +639,7 @@ class StudentReportCard
                     /* Gather JSON data for graph */
                     $allNames[] = $object->getName();
 
-                    if(is_numeric($marks['mark'])) {
+                    if($marks['display_mark'] != '') {
                         $userMarks[] = (float)$marks['mark'];
                         $infoIndex[] = array(
                             'displayMark' => $marks['display_mark'],
@@ -703,7 +703,7 @@ class StudentReportCard
                 } elseif ($object instanceof OnlineAssessment) {
 
                     $allNames[] = $object->getTitle();
-                    if($marks['mark'] == '') {
+                    if($marks[0]['mark'] !== '') {
                         $userMarks[] = (float)$marks[0]['mark'];
                         $infoIndex[] = array(
                             'displayMark' => $marks[0]['display_mark'],
