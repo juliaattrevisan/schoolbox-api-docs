@@ -372,7 +372,11 @@ abstract class AbstractController extends BaseController
 
         // urgh...
         if (method_exists($file, 'setOwner')) {
-            $file->setOwner($this->userMapper->findById($file->getOwner()->getId()));
+            try {
+                $file->setOwner($this->userMapper->findById($file->getOwner()->getId()));
+            } catch (Mapper\Exception $e) {
+                $file->setOwner($this->userMapper->createModel());
+            }
         }
 
         return $file;
