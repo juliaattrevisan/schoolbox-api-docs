@@ -58,4 +58,14 @@ class Controller extends Base
             ]);
         }
     }
+
+    /**
+     * Process password reset request action
+     */
+    public function requestPasswordReset()
+    {
+        $email = $this->getRequest()->post->get('email');
+        // Find all users with this email address.
+        // If there is one, send a reset email to this address.
+    }
 }

@@ -32,6 +32,7 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'impersonate', $basePath, '/switch/{userId}');
         $this->addGetRoute($router, 'recoverSession', $basePath, '/recoverSession');
         $this->addGetRoute($router, 'passwordReset', $basePath, '/passwordReset');
+        $this->addPostRoute($router, 'requestPasswordReset', $basePath, '/requestPasswordReset');
     }
 
     /**
