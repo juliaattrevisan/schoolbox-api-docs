@@ -8,10 +8,12 @@
 
             // Scroll to current period
             var timetable = $('#component{COMPONENT_INSTANCE_ID}').find('[data-timetable]');
-            timetable.closest('.scrollable').scrollTo(
-                timetable.find('.timetable-subject-active'),
-                {scrollX: true, scrollY: false, duration: 0, offsetLeft: 0}
-            );
+            if(timetable.find('.timetable-subject-active').length) {
+                timetable.closest('.scrollable').scrollTo(
+                        timetable.find('.timetable-subject-active'),
+                        {scrollX: true, scrollY: false, duration: 0, offsetLeft: 0}
+                );
+            }
         });
     </script>
     <!-- Probably doesn't have a configuration -->
