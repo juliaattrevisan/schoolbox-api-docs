@@ -27,6 +27,13 @@
 	compress
 }
 
+/var/log/schoolboxdev/quiz*.log {
+	monthly
+	missingok
+	rotate 2
+	compress
+}
+
 /var/log/schoolboxdev/upgrade.log {
 	monthly
 	missingok
