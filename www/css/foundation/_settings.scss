@@ -87,7 +87,7 @@ $large-range:      ($mediumwide-breakpoint + 0.0625em, $large-breakpoint)  !defa
 $xlarge-range:     ($large-breakpoint  + 0.0625em, $xlarge-breakpoint)     !default; /* 1441px, 1920px */
 $xxlarge-range:    ($xlarge-breakpoint + 0.0625em, 99999999em)             !default; /* 1921px, ...    */
 
-$screen: "only screen";
+$screen: "only print, screen";
 
 $landscape: "#{$screen} and (orientation: landscape)";
 $portrait: "#{$screen} and (orientation: portrait)";

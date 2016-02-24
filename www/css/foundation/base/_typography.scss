@@ -268,6 +268,20 @@ blockquote{
 	color: $steel;
 }
 
+@media print {
+	html,
+	body{
+		width: rem-calc(1280px);
+	}
+	a[href*="/"]:after, a[href*="/"]:visited:after {content: normal;}
+
+	@for $i from 1 through 12 {
+		.large-#{$i} {
+			width: percentage($i / 12);
+		}
+	}
+}
+
 
 
 

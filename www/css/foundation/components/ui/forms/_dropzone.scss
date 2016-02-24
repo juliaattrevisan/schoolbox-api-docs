@@ -278,6 +278,7 @@ ul.az-error-list {
 }
 
 .attachzone, .dropzone-wrap {
+    @extend .hide-for-print;
     min-width: 2.5rem;
     margin-bottom: 1rem;
     &.dz-unsupported,

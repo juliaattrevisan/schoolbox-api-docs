@@ -27,6 +27,7 @@ a[disabled], a.disabled {
  */
 .button {
     @include button-dimensions();
+	@extend .hide-for-print;
 
     color: $content-ui-foreground;
     background-color: $content-ui-background;
