@@ -855,6 +855,10 @@ nav {
 	@include information-list;
 }
 
+.inline-list>li{
+	margin-bottom: $inline-list-default-float-list-margin;
+}
+
 // Activity list
 .activity-list{
 	@include information-list;
