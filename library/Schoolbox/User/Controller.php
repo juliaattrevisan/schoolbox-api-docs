@@ -79,21 +79,44 @@ class Controller extends Base
      */
     public function requestPasswordReset()
     {
-        $email          = $this->getRequest()->post->get('email');
+        $emailAddress   = $this->getRequest()->post->get('email');
         $sessionSegment = $this->getSession()->getSegment(static::class);
-        $sessionSegment->setFlash('email', $email);
+        $sessionSegment->setFlash('email', $emailAddress);
         $sessionSegment->setFlash('isEmailSubmitted', true);
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
             $sessionSegment->setFlash('isEmailValid', false);
         } else {
             $sessionSegment->setFlash('isEmailValid', true);
             // Find all users with this email address. (not counting email_address_from_username)
             // If there is one, send a reset email to this address.
-            foreach ($this->userMapper->findByColumn('alt_email', $email) as $user) {
-                // Make a password reset attempt (for each account, I guess)
-                // And send it
+            /** @var User[] $users */
+            $users = $this->userMapper->findByColumn('alt_email', $emailAddress);
+            if (count($users) > 0) {
+                foreach ($users as $user) {
+                    // Make a password reset attempt (for each account, I guess)
+                    // And send it
+                    $resetMapper = Password\Reset\Mapper::getInstance();
+                    $reset       = $resetMapper->createModel();
+                    $reset->setUser($user);
+                    $resetMapper->save($reset);
+
+                    // TODO refactor all of this
+                    $myconf = \Schoolbox\Config\ConfigMapper::getInstance();
+                    $core   = new \Schoolbox\Mail\CoreContext($myconf);
+                    $email  = new \Schoolbox\Mail\TwigEmail('resetPassword.twig');
+                    $email->setCoreContext($core->getContext());
+                    $email->setFrom($myconf->get('password_change_email_from'), $myconf->get('mail_from_name'));
+                    $email->setSubject($myconf->get('title') . ' Password Reset');
+                    $email
+                        ->setContext(['user' => $user, 'reset' => $reset,])
+                        ->send(['name' => $user->formatName(), 'email' => $emailAddress,]);
+                }
+            } else {
+                // No matches - send a message anyway?
+                // Weigh up security (give away no information about whether account exists)
+                // vs. flood prevention (don't send too many emails)
+                // vs. convenience (maybe user got password wrong)
             }
-            // No matches - send a message anyway?
         }
         $this->getResponse()->redirect->to($this->getRouter()->generate('user.passwordReset'));
     }

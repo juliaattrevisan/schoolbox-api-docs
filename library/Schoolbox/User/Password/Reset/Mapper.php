@@ -14,6 +14,7 @@ use Schoolbox\UserMapper;
  * Mapper for password resets
  *
  * @package Schoolbox\User\Password\Reset
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {
