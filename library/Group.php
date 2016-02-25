@@ -415,7 +415,10 @@ class Group extends DeprecatedModel
 
             // Find the NNIAN for the folder
 
-            $categoryNnian = CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode(CategoryMapper::getInstance()->findCheaplyById($relationID));
+            $categoryNnian = CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode(
+                CategoryMapper::getInstance()->findCheaplyById($relationID)
+            );
+
             $relationID = $categoryNnian->getId();
         }
 
