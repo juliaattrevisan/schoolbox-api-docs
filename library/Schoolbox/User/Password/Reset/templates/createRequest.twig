@@ -2,6 +2,12 @@
     <div class="small-12 island">
         <h1>Have You Forgotten Your Password?</h1>
 
+        {% if isResetExpired %}
+            <div class="alert-box alert">
+                Your reset link has expired - please create a new request here.
+            </div>
+        {% endif %}
+
         {% if isEmailSubmitted %}
             {% if isEmailValid %}
                 <div class="alert-box success">

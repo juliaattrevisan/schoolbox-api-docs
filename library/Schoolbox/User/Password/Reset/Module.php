@@ -13,6 +13,7 @@ use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Mail;
+use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\UserMapper;
 use \Schoolbox\User;
 use Twig_Loader_Chain;
@@ -51,7 +52,12 @@ class Module extends BaseModule
             $matcher,
             '(displayResetForm|reset)',
             function ($params) {
-                return ['reset' => Mapper::getInstance()->findById($params['token']),];
+                try {
+                    $token = Mapper::getInstance()->findById($params['token']);
+                } catch (MapperException $e) {
+                    $token = Mapper::getInstance()->createModel();
+                }
+                return ['reset' => $token,];
             }
         );
     }
