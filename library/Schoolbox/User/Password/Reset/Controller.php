@@ -73,6 +73,24 @@ class Controller extends Base
     }
 
     /**
+     * Action for displaying the form for a password reset.
+     *
+     * @param Model $reset
+     */
+    public function displayResetForm(Model $reset)
+    {
+        if ($this->getUser()->getId()) {
+            // You are logged in. This page is not for you
+            $this->getResponse()->redirect->found('/');
+        } else {
+            $this->getResponse()->content->set([
+                'template' => '@userPasswordReset/reset.twig',
+                'data'     => ['reset' => $reset,],
+            ]);
+        }
+    }
+
+    /**
      * Action for creating a password reset request.
      */
     public function createRequest()

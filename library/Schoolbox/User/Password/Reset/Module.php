@@ -9,6 +9,7 @@ namespace Schoolbox\User\Password\Reset;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Mail;
@@ -35,6 +36,24 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'displayCreateRequestForm', $basePath, '');
         $this->addPostRoute($router, 'createRequest', $basePath, '/createRequest');
+        $this->addGetRoute($router, 'displayResetForm', $basePath, '/{token}')->addTokens(['token' => '[0-9a-f]+']);
+        $this->addPostRoute($router, 'reset', $basePath, '/reset');
+    }
+
+    /**
+     * Route preloads - currently, loads token into the reset form display
+     *
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $this->addRoutePreload(
+            $matcher,
+            '(displayResetForm|reset)',
+            function ($params) {
+                return ['reset' => Mapper::getInstance()->findById($params['token']),];
+            }
+        );
     }
 
     /**
