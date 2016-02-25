@@ -50,9 +50,6 @@ class Config extends DeprecatedModel {
                 $this->_index = 'name';
 
                 parent::__construct();
-
-                $this->load();
-
         }
 
         static public function getInstance() {
@@ -68,48 +65,9 @@ class Config extends DeprecatedModel {
                 return self::$instance;
         }
 
-        static private function load() {
-                $configList = DeprecatedDatabase::getInstance()->getAll("SELECT * FROM `config`");
-                self::inject($configList);
-        }
-
-
-        static public function inject($configList) {
-                if (is_array($configList)) {
-                        foreach ($configList as $config) {
-                                if(isset(self::$data[$config['name']])) {
-                                        //turn variable into an array if multiples
-                                        if(!is_array(self::$data[$config['name']])) {
-                                                $tempValue = self::$data[$config['name']];
-                                                unset(self::$data[$config['name']]);
-                                                self::$data[$config['name']][] = $tempValue;
-                                        }
-                                        self::$data[$config['name']][] = $config['value'];
-                                }
-                                else
-                                        self::$data[$config['name']] = $config['value'];
-                        }
-                }
-        }
-
-
-
-        static public function get($configName) {
-                self::getInstance();
-
-                if (!self::$data) {
-                        self::load();
-                }
-
-                if (isset(self::$data[$configName]))
-                        return self::$data[$configName];
-                elseif (isset(self::$consts[$configName]))
-                        return self::$consts[$configName];
-                elseif (defined($configName))
-                        return constant($configName);
-                else {
-                        return '';
-                }
+        static public function get($configName)
+        {
+            return \Schoolbox\Config\ConfigMapper::getInstance()->get($configName);
         }
 
         static public function set($configName, $configValue) {
