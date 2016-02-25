@@ -176,7 +176,12 @@ class Controller extends Base
             && preg_match('/\\d/i', $password)
             && preg_match('/[^a-z\\d]/i', $password)
         ) {
-            // Reset password here
+            // Reset password
+            $this->userMapper->save(
+                $reset->getUser()
+                    ->setPassword($this->passwordService->hash($password))
+                    ->setRetrievablePassword($password)
+            );
 
             // This reset has been used, save it
             $this->resetMapper->save($reset->setResetTime(\Alaress_Date_Format::now()));
