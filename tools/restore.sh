@@ -386,8 +386,15 @@ then
 	then
 		# Local Source, set the file location of the db backup
 		sourcedb="$sourcep2";
-		sourcedata=${sourcep2%/*};
+		tmpbackupdb=`echo "$sourcedb" | grep '/backups/' | wc -l`;
+		if [ "$tmpbackupdb" == "1" ];
+		then
+			sourcedata=${sourcedb%/*}'/../../../';
+		else
+			sourcedata=${sourcedb%/*};
+		fi
 		echo -e "\nPerforming Data Transfer";
+		echo -e "\nCopying data from $sourcedata to $thisdatadir";
 		rsync -rltHv $sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=*.lock;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
 		$instdir/tools/set-data-dir-perms.sh $thisdatadir $apacheuser;
@@ -417,6 +424,7 @@ then
 			error;
 		fi
 		echo -e "\nPerforming Data Transfer";
+		echo -e "\nCopying data from ssh $sourcep1 : $sourcedata to $thisdatadir";
 		rsync -rltHzv -e ssh $sourcep1:$sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip*;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
 		$instdir/tools/set-data-dir-perms.sh $thisdatadir $apacheuser;
