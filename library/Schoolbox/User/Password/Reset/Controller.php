@@ -168,6 +168,10 @@ class Controller extends Base
             && preg_match('/[^a-z\\d]/i', $password)
         ) {
             // Reset password here
+
+            // This reset has been used, save it
+            $this->resetMapper->save($reset->setResetTime(\Alaress_Date_Format::now()));
+
             $this->getResponse()->redirect->to(
                 $this->getRouter()->generate(
                     'userPasswordReset.displaySuccessMessage'
@@ -206,6 +210,9 @@ class Controller extends Base
     {
         if (!$reset->getToken()) {
             // Token wasn't found - go elsewhere
+            $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
+        } elseif (!$reset->getResetTime()->isNull()) {
+            // Token already used - go elsewhere
             $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
         } elseif ($reset->getExpiry()->lt(\Alaress_Date_Format::now())) {
             // This request has expired. Create a new one

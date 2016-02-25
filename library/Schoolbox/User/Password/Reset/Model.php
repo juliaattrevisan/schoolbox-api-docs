@@ -44,7 +44,7 @@ class Model
     /**
      * The time that the reset took place (if it ever did).
      *
-     * @var string
+     * @var Alaress_Date_Format
      */
     protected $resetTime;
 
@@ -120,7 +120,7 @@ class Model
     }
 
     /**
-     * @return string
+     * @return Alaress_Date_Format
      */
     public function getResetTime()
     {
@@ -128,7 +128,7 @@ class Model
     }
 
     /**
-     * @param  string $resetTime
+     * @param  Alaress_Date_Format $resetTime
      * @return $this
      */
     public function setResetTime($resetTime)
