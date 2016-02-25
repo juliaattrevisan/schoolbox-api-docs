@@ -28,8 +28,41 @@ class Mapper extends BaseMapper
 
         $this->uses('token', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
         $this->uses('expiry', self::TYPE_DATETIME);
-        $this->joins('user_id', UserMapper::class);
+        $this->joins('user_id', UserMapper::class, 'id', null, null, null, 'user');
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'generateToken']);
+    }
+
+    /**
+     * Adds user to all password resets retrieved.
+     *
+     * @return string
+     */
+    public function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('user', 'u')}
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('user', null, 'u')}
+        ";
+    }
+
+    /**
+     * @param \PDOStatement $statement
+     *
+     * @return \Schoolbox\Collection
+     */
+    public function hydrateSelect(\PDOStatement $statement)
+    {
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            /** @var Model $model */
+            $model = $this->hydrate($row);
+            $model->setUser($this->hydrateJoin($row, 'user', 'u'));
+            $collection->add($model);
+        }
+        return $collection;
     }
 
     /**

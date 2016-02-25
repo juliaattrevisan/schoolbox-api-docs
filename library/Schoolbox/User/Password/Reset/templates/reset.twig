@@ -76,33 +76,38 @@
             {% endif %}
         {% endif %}
 
-        <div class="alert-box">
-            <p>Your new password must be at least 6 characters in length and contain at least one letter,
-                one number and one symbol or punctuation character.<br />
-                (examples of symbol characters: $, #, _, &amp;)</p>
-        </div>
-
-        <form id="forgottenPassword" action="{{ routeLookup('userPasswordReset.createRequest') }}" method="post" class="top">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        User
-                        <label>
-                            New Password
-                            <input type="password" name="new_password" id="new_password" size="35" maxlength="50" />
-                        </label>
-                        <label>
-                            Confirm New Password
-                            <input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" />
-                        </label>
-                    </div>
-                </fieldset>
-            </section>
-            <div class="row">
-                <div class="small-12 columns">
-                    <input type="submit" name="submit" value="Update Password" />
-                </div>
+        {% if not (isPasswordSubmitted and isPasswordValid) %}
+            <div class="alert-box">
+                <p>Your new password must be at least 6 characters in length and contain at least one letter,
+                    one number and one symbol or punctuation character.<br />
+                    (examples of symbol characters: $, #, _, &amp;)</p>
             </div>
-        </form>
+
+            <form id="forgottenPassword" action="{{ routeLookup('userPasswordReset.createRequest') }}" method="post" class="top">
+                <section>
+                    <div class="small-12 avatar card">
+                        <img src="/portrait.php?userId={{ reset.getUser().getExternalId() }}&amp;size=square64" alt="{{ reset.getUser().formatName() }}">
+                        <p>{{ reset.getUser().formatName() }}</p>
+                    </div>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label>
+                                New Password
+                                <input type="password" name="new_password" id="new_password" size="35" maxlength="50" />
+                            </label>
+                            <label>
+                                Confirm New Password
+                                <input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" />
+                            </label>
+                        </div>
+                    </fieldset>
+                </section>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <input type="submit" name="submit" value="Update Password" />
+                    </div>
+                </div>
+            </form>
+        {% endif %}
     </div>
 </div>
