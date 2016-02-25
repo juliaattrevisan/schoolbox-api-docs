@@ -68,6 +68,7 @@ class Controller extends Base
         $this->validateAccess();
         $sessionSegment = $this->getSessionSegment();
         $this->getResponse()->content->set([
+            'title'    => 'Reset Password',
             'template' => '@userPasswordReset/createRequestForm.twig',
             'data'     => [
                 'email'            => $sessionSegment->getFlash('email', ''),
@@ -89,6 +90,7 @@ class Controller extends Base
         $this->validateResetRequest($reset);
         $sessionSegment = $this->getSessionSegment();
         $this->getResponse()->content->set([
+            'title'    => 'Reset Password',
             'template' => '@userPasswordReset/resetForm.twig',
             'data'     => [
                 'reset'               => $reset,
@@ -104,6 +106,7 @@ class Controller extends Base
     public function displaySuccessMessage()
     {
         $this->getResponse()->content->set([
+            'title'    => 'Password Reset Successful',
             'template' => '@userPasswordReset/successMessage.twig',
         ]);
     }
