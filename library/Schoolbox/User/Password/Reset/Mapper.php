@@ -27,6 +27,8 @@ class Mapper extends BaseMapper
         $this->hasPrototype(new Model());
 
         $this->uses('token', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
+        $this->uses('ip', self::TYPE_STRING);
+        $this->uses('reset_time', self::TYPE_DATETIME);
         $this->uses('expiry', self::TYPE_DATETIME);
         $this->joins('user_id', UserMapper::class, 'id', null, null, null, 'user');
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'generateToken']);

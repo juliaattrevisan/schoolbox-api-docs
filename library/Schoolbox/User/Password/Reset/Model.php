@@ -8,6 +8,7 @@
 namespace Schoolbox\User\Password\Reset;
 
 use Alaress_Date_Format;
+use Alaress_Date_NullDate;
 use Schoolbox\User;
 
 /**
@@ -34,6 +35,20 @@ class Model
     protected $user;
 
     /**
+     * The IP address from whence this request originated.
+     *
+     * @var string
+     */
+    protected $ip;
+
+    /**
+     * The time that the reset took place (if it ever did).
+     *
+     * @var string
+     */
+    protected $resetTime;
+
+    /**
      * When the reset attempt expires. Defaults to one day from now.
      *
      * @var Alaress_Date_Format
@@ -45,8 +60,9 @@ class Model
      */
     public function __construct()
     {
-        $this->user   = new User();
-        $this->expiry = Alaress_Date_Format::now()->addDays(1);
+        $this->user      = new User();
+        $this->expiry    = Alaress_Date_Format::now()->addDays(1);
+        $this->resetTime = new Alaress_Date_NullDate();
     }
 
     /**
@@ -82,6 +98,42 @@ class Model
     public function setToken($token)
     {
         $this->token = $token;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIp()
+    {
+        return $this->ip;
+    }
+
+    /**
+     * @param  string $ip
+     * @return $this
+     */
+    public function setIp($ip)
+    {
+        $this->ip = $ip;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResetTime()
+    {
+        return $this->resetTime;
+    }
+
+    /**
+     * @param  string $resetTime
+     * @return $this
+     */
+    public function setResetTime($resetTime)
+    {
+        $this->resetTime = $resetTime;
         return $this;
     }
 
