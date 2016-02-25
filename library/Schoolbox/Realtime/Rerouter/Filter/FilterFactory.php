@@ -88,10 +88,6 @@ class FilterFactory
             $bundle->attach(new MessagingEnabledFilter($this->conf));
         }
 
-        if ($this->uqf) {
-            $bundle->attach(new DuplicateFilter($this->uqf));
-        }
-
         $bundle->attachEach([
             new UserEnabledFilter(),
             new SelfSendFilter(),
@@ -100,6 +96,9 @@ class FilterFactory
             new RoletypeFilter(),
         ]);
 
+        if ($this->uqf) {
+            $bundle->attach(new DuplicateFilter($this->uqf));
+        }
 
         return $bundle;
     }
