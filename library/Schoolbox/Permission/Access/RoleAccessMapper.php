@@ -197,7 +197,7 @@ class RoleAccessMapper extends Mapper
 
             // Find the NNIAN for the folder
 
-            $categoryNnian = CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode(CategoryMapper::getInstance()->findById($serviceIdentifier));
+            $categoryNnian = CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode(CategoryMapper::getInstance()->findCheaplyById($serviceIdentifier));
             $serviceIdentifier = $categoryNnian->getId();
         }
 
