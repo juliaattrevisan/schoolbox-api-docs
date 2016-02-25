@@ -26,15 +26,16 @@ class Loader implements IConfigLoader, ArrayAccess {
     protected $cache = array();
 
     /**
+     * @var ConfigMapper
+     */
+    protected $configMapper;
+
+    /**
      * Set up constant paths
      */
-    public function __construct() {
-        $w = realpath(__DIR__ . "/../../..");
-        $this->consts = array(
-            'siteRoot' => $w,
-            'webRoot'  => "$w/www",
-            'webBase'  => ''
-        );
+    public function __construct()
+    {
+        $this->configMapper = ConfigMapper::getInstance();
     }
 
     /**
@@ -43,37 +44,9 @@ class Loader implements IConfigLoader, ArrayAccess {
      * @param string $var
      * @return mixed
      */
-    public function get($var) {
-        if (empty($this->cache)) {
-            $this->cache = $this->getData();
-        }
-        if (isset($this->cache[$var])) {
-            return $this->cache[$var];
-        }
-        elseif (isset($this->consts[$var])) {
-            return $this->consts[$var];
-        }
-        elseif (defined($var)) {
-            return constant($var);
-        }
-        else {
-            return '';
-        }
-    }
-
-    /**
-     * Loads data direct from database
-     *
-     * @return array
-     */
-    protected function getData() {
-        $query = \Database::getInstance()->prepare('SELECT `name`, `value` FROM `config`');
-        $query->execute();
-        $result = array();
-        foreach ($query as $row) {
-            $result[$row['name']] = $row['value'];
-        }
-        return $result;
+    public function get($var)
+    {
+        return $this->configMapper->get($var);
     }
 
     /**
@@ -85,7 +58,8 @@ class Loader implements IConfigLoader, ArrayAccess {
      * @param  mixed $offset
      * @return bool
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return true;
     }
 
@@ -95,8 +69,9 @@ class Loader implements IConfigLoader, ArrayAccess {
      * @param  mixed $offset
      * @return mixed
      */
-    public function offsetGet($offset) {
-        return $this->get($offset);
+    public function offsetGet($offset)
+    {
+        return $this->configMapper->get($offset);
     }
 
     /**
@@ -104,7 +79,8 @@ class Loader implements IConfigLoader, ArrayAccess {
      *
      * @throws OutOfRangeException
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         throw new OutOfRangeException('Schoolbox\\Config\\Loader is read-only');
     }
 
@@ -113,7 +89,8 @@ class Loader implements IConfigLoader, ArrayAccess {
      *
      * @throws OutOfRangeException
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         throw new OutOfRangeException('Schoolbox\\Config\\Loader is read-only');
     }
 
@@ -122,8 +99,8 @@ class Loader implements IConfigLoader, ArrayAccess {
      *
      * @return void
      */
-    public function dropCache() {
-        $this->cache = array();
+    public function dropCache()
+    {
+        $this->configMapper->dropCache();
     }
-
 }
