@@ -56,21 +56,17 @@ class Controller extends Base
      */
     public function displayCreateRequestForm()
     {
-        if ($this->getUser()->getId()) {
-            // You are logged in. This page is not for you
-            $this->getResponse()->redirect->found('/');
-        } else {
-            $sessionSegment = $this->getSession()->getSegment(static::class);
-            $this->getResponse()->content->set([
-                'template' => '@userPasswordReset/createRequest.twig',
-                'data'     => [
-                    'email'            => $sessionSegment->getFlash('email', ''),
-                    'isEmailValid'     => $sessionSegment->getFlash('isEmailValid', true),
-                    'isEmailSubmitted' => $sessionSegment->getFlash('isEmailSubmitted', false),
-                    'isResetExpired'   => $sessionSegment->getFlash('isResetExpired', false),
-                ],
-            ]);
-        }
+        $this->validateAccess();
+        $sessionSegment = $this->getSession()->getSegment(static::class);
+        $this->getResponse()->content->set([
+            'template' => '@userPasswordReset/createRequest.twig',
+            'data'     => [
+                'email'            => $sessionSegment->getFlash('email', ''),
+                'isEmailValid'     => $sessionSegment->getFlash('isEmailValid', true),
+                'isEmailSubmitted' => $sessionSegment->getFlash('isEmailSubmitted', false),
+                'isResetExpired'   => $sessionSegment->getFlash('isResetExpired', false),
+            ],
+        ]);
     }
 
     /**
@@ -80,25 +76,12 @@ class Controller extends Base
      */
     public function displayResetForm(Model $reset)
     {
-        if ($this->getUser()->getId()) {
-            // You are logged in. This page is not for you
-            $this->getResponse()->redirect->found('/');
-        } elseif (!$reset->getToken()) {
-            // Token wasn't found - go elsewhere
-            $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
-        } elseif ($reset->getExpiry()->lt(\Alaress_Date_Format::now())) {
-            // This request has expired. Create a new one
-            $sessionSegment = $this->getSession()->getSegment(static::class);
-            // Not setting email - stale requests should not give out this information.
-//            $sessionSegment->setFlash('email', $reset->getUser()->getAltEmail());
-            $sessionSegment->setFlash('isResetExpired', true);
-            $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
-        } else {
-            $this->getResponse()->content->set([
-                'template' => '@userPasswordReset/reset.twig',
-                'data'     => ['reset' => $reset,],
-            ]);
-        }
+        $this->validateAccess();
+        $this->validateResetRequest($reset);
+        $this->getResponse()->content->set([
+            'template' => '@userPasswordReset/reset.twig',
+            'data'     => ['reset' => $reset,],
+        ]);
     }
 
     /**
@@ -106,6 +89,7 @@ class Controller extends Base
      */
     public function createRequest()
     {
+        $this->validateAccess();
         $emailAddress   = $this->getRequest()->post->get('email');
         $sessionSegment = $this->getSession()->getSegment(static::class);
         $sessionSegment->setFlash('email', $emailAddress);
@@ -147,5 +131,38 @@ class Controller extends Base
             }
         }
         $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
+    }
+
+    /**
+     * Validates that you can access the reset module.
+     *
+     * If you're logged in, this page is not for you - redirect to dashboard.
+     */
+    protected function validateAccess()
+    {
+        if ($this->getUser()->getId()) {
+            $this->getResponse()->redirect->found('/');
+        }
+    }
+
+    /**
+     * Validates that this request hasn't expired, and actually exists.
+     * Redirect back to the create request form if it's not usable.
+     *
+     * @param Model $reset
+     */
+    protected function validateResetRequest(Model $reset)
+    {
+        if (!$reset->getToken()) {
+            // Token wasn't found - go elsewhere
+            $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
+        } elseif ($reset->getExpiry()->lt(\Alaress_Date_Format::now())) {
+            // This request has expired. Create a new one
+            $sessionSegment = $this->getSession()->getSegment(static::class);
+            // Not setting email - stale requests should not give out this information.
+//            $sessionSegment->setFlash('email', $reset->getUser()->getAltEmail());
+            $sessionSegment->setFlash('isResetExpired', true);
+            $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
+        }
     }
 }
