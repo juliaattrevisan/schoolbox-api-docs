@@ -33,8 +33,8 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'passwordReset', $basePath, '');
-        $this->addPostRoute($router, 'requestPasswordReset', $basePath, '/requestPasswordReset');
+        $this->addGetRoute($router, 'displayCreateRequestForm', $basePath, '');
+        $this->addPostRoute($router, 'createRequest', $basePath, '/createRequest');
     }
 
     /**

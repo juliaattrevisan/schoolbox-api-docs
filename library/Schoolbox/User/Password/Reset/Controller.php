@@ -52,9 +52,9 @@ class Controller extends Base
     }
 
     /**
-     * Password reset request action
+     * Action for displaying the form for creating a reset request.
      */
-    public function passwordReset()
+    public function displayCreateRequestForm()
     {
         if ($this->getUser()->getId()) {
             // You are logged in. This page is not for you
@@ -62,7 +62,7 @@ class Controller extends Base
         } else {
             $sessionSegment = $this->getSession()->getSegment(static::class);
             $this->getResponse()->content->set([
-                'template' => '@userPasswordReset/passwordReset.twig',
+                'template' => '@userPasswordReset/createRequest.twig',
                 'data'     => [
                     'email'            => $sessionSegment->getFlash('email', ''),
                     'isEmailValid'     => $sessionSegment->getFlash('isEmailValid', true),
@@ -73,9 +73,9 @@ class Controller extends Base
     }
 
     /**
-     * Process password reset request action
+     * Action for creating a password reset request.
      */
-    public function requestPasswordReset()
+    public function createRequest()
     {
         $emailAddress   = $this->getRequest()->post->get('email');
         $sessionSegment = $this->getSession()->getSegment(static::class);
@@ -117,6 +117,6 @@ class Controller extends Base
                 $email->send($emailAddress);
             }
         }
-        $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.passwordReset'));
+        $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
     }
 }
