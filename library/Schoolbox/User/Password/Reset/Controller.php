@@ -90,6 +90,16 @@ class Controller extends Base
     }
 
     /**
+     * Action for displaying a successful reset message.
+     */
+    public function displaySuccessMessage()
+    {
+        $this->getResponse()->content->set([
+            'template' => '@userPasswordReset/successMessage.twig',
+        ]);
+    }
+
+    /**
      * Action for creating a password reset request.
      */
     public function createRequest()

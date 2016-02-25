@@ -39,6 +39,7 @@ class Module extends BaseModule
         $this->addPostRoute($router, 'createRequest', $basePath, '/createRequest');
         $this->addGetRoute($router, 'displayResetForm', $basePath, '/{token}')->addTokens(['token' => '[0-9a-f]+']);
         $this->addPostRoute($router, 'reset', $basePath, '/reset/{token}')->addTokens(['token' => '[0-9a-f]+']);
+        $this->addGetRoute($router, 'displaySuccessMessage', $basePath, '/success');
     }
 
     /**
