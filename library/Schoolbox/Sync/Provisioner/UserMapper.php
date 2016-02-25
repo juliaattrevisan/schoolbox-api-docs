@@ -12,7 +12,10 @@ namespace Schoolbox\Sync\Provisioner;
 
 use Schoolbox;
 use Schoolbox\UserMapper as SchoolboxMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ConfigLoader;
+use Schoolbox\Collection;
 
 /** @method User findByExternalId($id, $roleType = null) */
 class UserMapper extends SchoolboxMapper
@@ -49,12 +52,47 @@ class UserMapper extends SchoolboxMapper
     {
         $config = new ConfigLoader();
 
+        /* Modify accessList only when ups_groups_enabled is actually enabled
+         * Otherwise leave it unchanged from whatever it was
+         */
         if ($config->get('ups_groups_enabled')) {
             $userAccessMapper = $this->getJoinMapper('userAccess');
 
             // make sure any mutes go through correctly
             $userAccessMapper->setNotifier($this->getNotifier());
 
+            /* If you combined 'Groups (Read/Write)' and 'Groups (Remove)' in the
+             * same rule, you'll always be added to the groups specified by the
+             * value of 'Groups (Read/Write)'. It will overpower the Remove.
+             * It is recommended that Remove operations be set up before Read/Write
+             *
+             * This is so you can remove people from multiple groups, then reassign
+             * people to new groups, in the same rule.
+             *
+             * There isn't a way to tell whether the 'Groups (Remove)' came before
+             * or after the 'Groups (Read/Write)' in the same rule.
+             */
+
+            /* Get a list of all the UserAccess instances for this User
+             */
+            $allUserAccess = $userAccessMapper->findAllGroupsForUser($user);
+
+            /* Search $allUserAccess for anything that should be deleted
+             * If found, delete it from the db if it was already there
+             * These are spawned from a previous Rule.
+             */
+            foreach ($user->getUserAccessRemove() as $current) {
+                $found = $allUserAccess->getBy('serviceIdentifier', $current);
+
+                /* Do not blow away Owners, only Read/Write accessors
+                 */
+                if ($found && ($found->getAccessLevel() < UserAccess::ACCESS_FULL)) {
+                    $userAccessMapper->delete($found);
+                }
+            }
+
+            /* Reinstate all elements in $accessList
+             */
             foreach ($user->getAccessList() as $current) {
                 $userAccessMapper->save($current);
             }
