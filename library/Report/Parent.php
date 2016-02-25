@@ -452,7 +452,7 @@ class Report_Parent extends Report_Abstract
                             'CONTACT_HOME_SUBURB'     => Scrub::text($currentContact['StudentContactHomeSuburb']),
                             'CONTACT_HOME_STATE'      => Scrub::text($currentContact['StudentContactHomeState']),
                             'CONTACT_HOME_POSTCODE'   => Scrub::text($currentContact['StudentContactHomePostCode']),
-                            'CONTACT_HOME_COUNTRY'    => $homeCountry,
+                            'CONTACT_HOME_COUNTRY'    => ($homeCountry == 'Not Selected' ? '' : $homeCountry,
                         )
                     );
 
