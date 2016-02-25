@@ -78,6 +78,9 @@ class Mapper extends BaseMapper
     public function generateToken(Model $model)
     {
         $i = 0;
+        if (!empty($model->getToken())) {
+            return true;
+        }
         while (empty($model->getToken()) && $i < 1000) {
             $token = bin2hex(openssl_random_pseudo_bytes(32));
             if ($this->countByColumn('token', $token) === 0) {
