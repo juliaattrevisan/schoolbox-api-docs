@@ -139,6 +139,9 @@ class ZipFileUpload extends DeprecatedModel
             if (is_dir($currentPath)) {
 
                 $category = $folderMapper->createModel();
+                if ($parent->getId() != 0) {
+                    $category->setInherit(true);
+                }
                 $category->setName($obj);
                 $category->setParent($parent);
                 $folderMapper->save($category);
