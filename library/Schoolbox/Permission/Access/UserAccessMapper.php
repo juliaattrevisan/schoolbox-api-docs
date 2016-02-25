@@ -410,6 +410,37 @@ class UserAccessMapper extends Mapper
         return $postCount > 0;
     }
 
+    /**
+     * When passed a schoolbox user ID and subject code (eg. 'CH123') returns true/false to indicate the users
+     * involvement in the class
+     *
+     * @param int       $userID
+     * @param string    $code
+     * @return bool
+     */
+    public function involvedInSubject($userID, $code)
+    {
+        try {
+            $user = UserMapper::getInstance()->findCheaplyById($userID);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        if ($user->getExternalId()) {
+            $externalUser = new \External_User;
+            $externalSubjectList = $externalUser->getSubjectList($user->getExternalId(), $user->getId());
+
+            if (is_array($externalSubjectList)) {
+                foreach ($externalSubjectList as $currentSubject) {
+                    if (strtolower($currentSubject["code"]) == strtolower($code)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 
     /**
      * @param User $user
@@ -419,6 +450,7 @@ class UserAccessMapper extends Mapper
      */
     public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE)
     {
+
         // Order of priority for permissions
         //
         // 1. Previously cached results
