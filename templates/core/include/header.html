@@ -33,7 +33,7 @@
         );
 
         var s = $('#search');
-        s.on('click', 'i', function () {
+        s.on('click', '[data-jsubmit]', function () {
             if (s.find('input').val()) {
                 s.submit();
             }
