@@ -23,6 +23,31 @@ use RuntimeException;
 class BunnyControl implements ControlInterface
 {
 
+	const QUEUES                = 'queues';
+	const QUEUE_NAME            = 'name';
+	const QUEUE_DURABLE         = 'durable';
+	const QUEUE_AUTO_DELETE     = 'auto_delete';
+	const QUEUE_MSGS            = 'messages';
+	const QUEUE_MSGS_READY      = 'messages_ready';
+	const QUEUE_MSGS_UNACK      = 'messages_unacknowledged';
+	const QUEUE_CONSUMERS       = 'consumers';
+	const QUEUE_MEMORY          = 'memory';
+	const QUEUE_STATUS          = 'status';
+
+	const EXCHANGES             = 'exchanges';
+	const EXCHANGE_NAME         = 'name';
+	const EXCHANGE_TYPE         = 'type';
+	const EXCHANGE_DURABLE      = 'durable';
+	const EXCHANGE_AUTO_DELETE  = 'auto_delete';
+	const EXCHANGE_INTERNAL     = 'internal';
+
+	const BINDINGS              = 'bindings';
+	const BINDING_SRC           = 'source';
+	const BINDING_DEST          = 'destination';
+	const BINDING_DEST_TYPE     = 'destination_type';
+	const BINDING_KEY           = 'routing_key';
+
+
     /** @var string - configuration file [default: ~/.rabbitmqadmin.conf] */
     protected $config;
 
@@ -209,6 +234,7 @@ class BunnyControl implements ControlInterface
 
 		// no fields left?
 		if(!count($fields)) {
+			throw new \OutOfRangeException("You have no valid fields");
 			return array();
 		}
 
@@ -224,14 +250,20 @@ class BunnyControl implements ControlInterface
 	 * @return array
 	 */
 	public function listQueues($fields) {
+
+		// the core list of things you might need
 		$opts = array(
-			'name', 'durable', 'auto_delete', 'arguments', 'policy', 'pid', 'owner_pid',
-			'exclusive_consumer_pid', 'exclusive_consumer_tag', 'messages_ready',
-			'messages_unacknowledged', 'messages', 'consumers', 'consumer_utilisation',
-			'memory', 'slave_pids', 'synchronised_slave_pids', 'status'
+			self::QUEUE_NAME, self::QUEUE_DURABLE, self::QUEUE_AUTO_DELETE, self::QUEUE_MSGS, self::QUEUE_MSGS_READY,
+			self::QUEUE_MSGS_UNACK, self::QUEUE_CONSUMERS, self::QUEUE_MEMORY, self::QUEUE_STATUS
 		);
 
-		return $this->retrieve('queues', $opts, $fields);
+		// these possibly don't have any data in them ever, but perhaps they do. we don't really use them currently
+		$opts = array_merge($opts, [
+			'pid', 'owner_pid','exclusive_consumer_pid', 'exclusive_consumer_tag',
+			'consumer_utilisation', 'slave_pids', 'synchronised_slave_pids'
+		]);
+
+		return $this->retrieve(self::QUEUES, $opts, $fields);
 	}
 
 
@@ -241,10 +273,10 @@ class BunnyControl implements ControlInterface
 	 */
 	public function listExchanges($fields) {
 		$opts = array(
-			'name', 'type', 'durable', 'auto_delete', 'internal', 'arguments', 'policy'
+			self::EXCHANGE_NAME, self::EXCHANGE_TYPE, self::EXCHANGE_DURABLE, self::EXCHANGE_AUTO_DELETE, self::EXCHANGE_INTERNAL
 		);
 
-		return $this->retrieve('exchanges', $opts, $fields);
+		return $this->retrieve(self::EXCHANGES, $opts, $fields);
 	}
 
 
@@ -254,11 +286,10 @@ class BunnyControl implements ControlInterface
 	 */
 	public function listBindings($fields) {
 		$opts = array(
-			'source_name', 'source_kind', 'destination_name', 'destination_kind',
-			'routing_key', 'arguments'
+			self::BINDING_SRC, self::BINDING_DEST, self::BINDING_DEST_TYPE, self::BINDING_KEY
 		);
 
-		return $this->retrieve('bindings', $opts, $fields);
+		return $this->retrieve(self::BINDINGS, $opts, $fields);
 	}
 
 
