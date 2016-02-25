@@ -29,59 +29,51 @@
     <div class="small-12 island">
         <h1>Reset Your Password</h1>
 
-        {% if isPasswordSubmitted %}
-            {% if isPasswordValid %}
-                <div class="alert-box success">
-                    Thank you. Your password has been reset, and you may now log in with your new password.
-                </div>
-            {% else %}
-                <div class="alert-box alert">
-                    The password you provided is not valid. Please follow the rules specified below.
-                </div>
-            {% endif %}
-        {% endif %}
-
-        {% if not (isPasswordSubmitted and isPasswordValid) %}
-            <div class="alert-box">
-                <p>Your new password must be at least 6 characters in length and contain at least one letter,
-                    one number and one symbol or punctuation character.<br />
-                    (examples of symbol characters: $, #, _, &amp;)</p>
+        {% if not isPasswordValid %}
+            <div class="alert-box alert">
+                The password you provided is not valid. Please follow the rules specified below.
             </div>
-
-            <form id="resetPassword" action="{{ routeLookup('userPasswordReset.reset', {token: reset.getToken()}) }}" method="post" class="top">
-                <section>
-                    <div class="small-12 avatar card">
-                        {# As you are not logged in, you don't have permission to view this user's profile image. #}
-                        <img src="/portrait.php?userId={{ reset.getUser().getExternalId() }}&amp;size=square64" alt="{{ reset.getUser().formatName() }}">
-                        <h3>{{ reset.getUser().formatName() }}</h3>
-                    </div>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>
-                                New Password
-                                <input type="password"
-                                       name="new_password"
-                                       id="new_password"
-                                       size="35"
-                                       data-rule-minlength="6"
-                                       maxlength="50"
-                                       required />
-                            </label>
-                            <label>
-                                Confirm New Password
-                                <input type="password"
-                                       name="confirm_password"
-                                       id="confirm_password"
-                                       size="35"
-                                       data-rule-minlength="6"
-                                       maxlength="50"
-                                       required />
-                            </label>
-                        </div>
-                    </fieldset>
-                </section>
-                <input type="submit" name="submit" value="Reset Password" />
-            </form>
         {% endif %}
+
+        <div class="alert-box">
+            <p>Your new password must be at least 6 characters in length and contain at least one letter,
+                one number and one symbol or punctuation character.<br />
+                (examples of symbol characters: $, #, _, &amp;)</p>
+        </div>
+
+        <form id="resetPassword" action="{{ routeLookup('userPasswordReset.reset', {token: reset.getToken()}) }}" method="post" class="top">
+            <section>
+                <div class="small-12 avatar card">
+                    {# As you are not logged in, you don't have permission to view this user's profile image. #}
+                    <img src="/portrait.php?userId={{ reset.getUser().getExternalId() }}&amp;size=square64" alt="{{ reset.getUser().formatName() }}">
+                    <h3>{{ reset.getUser().formatName() }}</h3>
+                </div>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            New Password
+                            <input type="password"
+                                   name="new_password"
+                                   id="new_password"
+                                   size="35"
+                                   data-rule-minlength="6"
+                                   maxlength="50"
+                                   required />
+                        </label>
+                        <label>
+                            Confirm New Password
+                            <input type="password"
+                                   name="confirm_password"
+                                   id="confirm_password"
+                                   size="35"
+                                   data-rule-minlength="6"
+                                   maxlength="50"
+                                   required />
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" name="submit" value="Reset Password" />
+        </form>
     </div>
 </div>

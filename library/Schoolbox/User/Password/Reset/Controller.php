@@ -157,8 +157,6 @@ class Controller extends Base
     {
         $this->validateAccess();
         $this->validateResetRequest($reset);
-        $this->getSessionSegment()->setFlash('isPasswordSubmitted', true);
-
         $password = $this->getRequest()->post->get('new_password', '');
         $confirm  = $this->getRequest()->post->get('confirm_password', '');
 
@@ -168,17 +166,21 @@ class Controller extends Base
             && preg_match('/\\d/i', $password)
             && preg_match('/[^a-z\\d]/i', $password)
         ) {
-            $this->getSessionSegment()->setFlash('isPasswordValid', true);
             // Reset password here
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate(
+                    'userPasswordReset.displaySuccessMessage'
+                )
+            );
         } else {
             $this->getSessionSegment()->setFlash('isPasswordValid', false);
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate(
+                    'userPasswordReset.displayResetForm',
+                    ['token' => $reset->getToken(),]
+                )
+            );
         }
-        $this->getResponse()->redirect->to(
-            $this->getRouter()->generate(
-                'userPasswordReset.displayResetForm',
-                ['token' => $reset->getToken(),]
-            )
-        );
     }
 
     /**
