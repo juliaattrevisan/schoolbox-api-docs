@@ -48,7 +48,7 @@
                     (examples of symbol characters: $, #, _, &amp;)</p>
             </div>
 
-            <form id="resetPassword" action="{{ routeLookup('userPasswordReset.reset') }}" method="post" class="top">
+            <form id="resetPassword" action="{{ routeLookup('userPasswordReset.reset', {token: reset.getToken()}) }}" method="post" class="top">
                 <section>
                     <div class="small-12 avatar card">
                         {# As you are not logged in, you don't have permission to view this user's profile image. #}

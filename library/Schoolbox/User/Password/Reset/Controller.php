@@ -57,7 +57,7 @@ class Controller extends Base
     public function displayCreateRequestForm()
     {
         $this->validateAccess();
-        $sessionSegment = $this->getSession()->getSegment(static::class);
+        $sessionSegment = $this->getSessionSegment();
         $this->getResponse()->content->set([
             'template' => '@userPasswordReset/createRequest.twig',
             'data'     => [
@@ -78,9 +78,14 @@ class Controller extends Base
     {
         $this->validateAccess();
         $this->validateResetRequest($reset);
+        $sessionSegment = $this->getSessionSegment();
         $this->getResponse()->content->set([
             'template' => '@userPasswordReset/reset.twig',
-            'data'     => ['reset' => $reset,],
+            'data'     => [
+                'reset'               => $reset,
+                'isPasswordSubmitted' => $sessionSegment->getFlash('isPasswordSubmitted', false),
+                'isPasswordValid'     => $sessionSegment->getFlash('isPasswordValid', true),
+            ],
         ]);
     }
 
@@ -91,7 +96,7 @@ class Controller extends Base
     {
         $this->validateAccess();
         $emailAddress   = $this->getRequest()->post->get('email');
-        $sessionSegment = $this->getSession()->getSegment(static::class);
+        $sessionSegment = $this->getSessionSegment();
         $sessionSegment->setFlash('email', $emailAddress);
         $sessionSegment->setFlash('isEmailSubmitted', true);
         if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
@@ -134,6 +139,39 @@ class Controller extends Base
     }
 
     /**
+     * Action for verifying a password reset.
+     *
+     * @param Model $reset
+     */
+    public function reset(Model $reset)
+    {
+        $this->validateAccess();
+        $this->validateResetRequest($reset);
+        $this->getSessionSegment()->setFlash('isPasswordSubmitted', true);
+
+        $password = $this->getRequest()->post->get('new_password', '');
+        $confirm  = $this->getRequest()->post->get('confirm_password', '');
+
+        // Verify that passwords match format and each other
+        if ($password === $confirm
+            && preg_match('/[a-z]/i', $password)
+            && preg_match('/\\d/i', $password)
+            && preg_match('/[^a-z\\d]/i', $password)
+        ) {
+            $this->getSessionSegment()->setFlash('isPasswordValid', true);
+            // Reset password here
+        } else {
+            $this->getSessionSegment()->setFlash('isPasswordValid', false);
+        }
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate(
+                'userPasswordReset.displayResetForm',
+                ['token' => $reset->getToken(),]
+            )
+        );
+    }
+
+    /**
      * Validates that you can access the reset module.
      *
      * If you're logged in, this page is not for you - redirect to dashboard.
@@ -158,10 +196,8 @@ class Controller extends Base
             $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
         } elseif ($reset->getExpiry()->lt(\Alaress_Date_Format::now())) {
             // This request has expired. Create a new one
-            $sessionSegment = $this->getSession()->getSegment(static::class);
             // Not setting email - stale requests should not give out this information.
-//            $sessionSegment->setFlash('email', $reset->getUser()->getAltEmail());
-            $sessionSegment->setFlash('isResetExpired', true);
+            $this->getSessionSegment()->setFlash('isResetExpired', true);
             $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
         }
     }
