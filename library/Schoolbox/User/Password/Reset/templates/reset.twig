@@ -83,7 +83,7 @@
                     (examples of symbol characters: $, #, _, &amp;)</p>
             </div>
 
-            <form id="forgottenPassword" action="{{ routeLookup('userPasswordReset.createRequest') }}" method="post" class="top">
+            <form id="forgottenPassword" action="{{ routeLookup('userPasswordReset.reset') }}" method="post" class="top">
                 <section>
                     <div class="small-12 avatar card">
                         <img src="/portrait.php?userId={{ reset.getUser().getExternalId() }}&amp;size=square64" alt="{{ reset.getUser().formatName() }}">
