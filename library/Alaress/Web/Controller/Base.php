@@ -10,6 +10,7 @@
 namespace Alaress\Web\Controller;
 
 use Aura\Di;
+use Aura\Session\SegmentInterface;
 use Aura\Web\Request;
 use Aura\Web\Response;
 use Aura\Router\Router;
@@ -162,6 +163,17 @@ abstract class Base {
     public function getConfigLoader()
     {
         return $this->getDi()->get('config');
+    }
+
+    /**
+     * Retrieves a session segment, specific to whatever class this method was
+     * called in.
+     *
+     * @return SegmentInterface
+     */
+    public function getSessionSegment()
+    {
+        return $this->getSession()->getSegment(static::class);
     }
 
     /**
