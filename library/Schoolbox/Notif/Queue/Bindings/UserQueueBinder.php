@@ -13,6 +13,7 @@ namespace Schoolbox\Notif\Queue\Bindings;
 use Alaress\Async\AMQP\AMQPExchange;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\AMQP\Bunny\ControlInterface;
+use Alaress\Async\AMQP\Bunny\BunnyControl as Rabbit;
 use Alaress\Async\Queue\AMQPQueue;
 use OutOfBoundsException;
 use RuntimeException;
@@ -154,7 +155,7 @@ class UserQueueBinder
         $this->validate();
 
         if (!$this->existingBindings) {
-            $this->cacheExistingBindings($this->amqp, $this->rabbitCtrl);
+            $this->cacheExistingBindings();
         }
 
         if (!isset($this->existingBindings[$this->userId])) {
@@ -185,7 +186,7 @@ class UserQueueBinder
         $this->existingBindings = array();
 
         try {
-            $bindings = $this->rabbitCtrl->listBindings(array('destination_name', 'routing_key'));
+            $bindings = $this->rabbitCtrl->listBindings(array(Rabbit::BINDING_DEST, Rabbit::BINDING_KEY));
         } catch (RuntimeException $e) {
             return -1;
         }
@@ -199,13 +200,13 @@ class UserQueueBinder
 
         foreach ($bindings as $binding) {
             // only parse line if this is a user exchange
-            if (substr($binding['destination_name'], 0, strlen($prefix)) != $prefix) {
+            if (substr($binding[Rabbit::BINDING_DEST], 0, strlen($prefix)) != $prefix) {
                 continue;
             }
 
-            $userId = substr($binding['destination_name'], strlen($prefix));
+            $userId = substr($binding[Rabbit::BINDING_DEST], strlen($prefix));
 
-            $this->existingBindings[$userId][] = $binding['routing_key'];
+            $this->existingBindings[$userId][] = $binding[Rabbit::BINDING_KEY];
 
             ++$count;
         }
