@@ -15,9 +15,9 @@
 
 namespace Schoolbox;
 use Schoolbox;
-use Cfg;
 use ArrayAccess;
 use OutOfRangeException;
+use Schoolbox\Config\ConfigMapper;
 
 class ConfigLoader implements IConfigLoader, ArrayAccess {
 
@@ -28,7 +28,7 @@ class ConfigLoader implements IConfigLoader, ArrayAccess {
      * @return mixed
      */
     public function get($var) {
-        return Cfg::get($var);
+        return ConfigMapper::getInstance()->get($var);
     }
 
     /**

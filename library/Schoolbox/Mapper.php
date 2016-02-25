@@ -17,7 +17,7 @@ use PDOStatement;
 use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\ConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifInterface;
@@ -209,7 +209,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         $this->database = \Database::getInstance();
         $this->map      = new MappingCollection();
-        $this->setConfigLoader(ConfigMapper::getInstance());
+        $this->setConfigLoader(new ConfigLoader());
         $this->setup();
         $this->setColumnFactory(new ColumnFactory());
         $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
