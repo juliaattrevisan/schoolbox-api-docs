@@ -1,5 +1,18 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+
+<script type="text/javascript">
+	$(function() {
+
+		$('[data-checkbox-inherit]').change(function (event) {
+			if ($(event.target).prop('checked')) {
+				$('#permissions').addClass('hide');
+			} else {
+				$('#permissions').removeClass('hide');
+			}
+		});
+	});
+</script>
 <!-- END custom_head -->
 <ul class="breadcrumb">
 	<li><a href="/homepage/{ID}/">{CATEGORY_NAME}</a></li>
@@ -24,31 +37,37 @@
 						<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Allow predefined roles of users access folders created by this extraction">?</span>
 					</legend>
 					<div class="small-12 columns">
-						<table>
-								<tr>
-									<th>Role</th>
-									<th>None</th>
-									<th>Read</th>
-									<th>Write</th>
-								</tr>
-								<!-- BEGIN perm_table -->
-								<tr>
-									<td>{GROUP_NAME}</td>
-									<td>
-										<input type="radio" class="no_permission" name="group[{GROUP_ID}]" id="groupNone{GROUP_ID}" value="0" {PERM_0_SELECTED} />
-										<label for="groupNone{GROUP_ID}" class="radio-label"></label>
-									</td>
-									<td>
-										<input type="radio" name="group[{GROUP_ID}]" id="groupRead{GROUP_ID}" value="1" {PERM_1_SELECTED} />
-										<label for="groupRead{GROUP_ID}" class="radio-label"></label>
-									</td>
-									<td>
-										<input type="radio" name="group[{GROUP_ID}]" id="groupWrite{GROUP_ID}" value="2" {PERM_2_SELECTED} />
-										<label for="groupWrite{GROUP_ID}" class="radio-label"></label>
-									</td>
-								</tr>
-								<!-- END perm_table -->
-						</table>
+						<input data-checkbox-inherit type="checkbox" id="inherit" name="inherit" value="1" {INHERIT_SELECTED} />
+						<label for="inherit" class="checkbox-label">Inherit permissions from parent folder</label>
+					</div>
+					<div id="permissions" class="{HIDE_PERMISSIONS}">
+						<div class="small-12 columns">
+							<table>
+									<tr>
+										<th>Role</th>
+										<th>None</th>
+										<th>Read</th>
+										<th>Write</th>
+									</tr>
+									<!-- BEGIN perm_table -->
+									<tr>
+										<td>{GROUP_NAME}</td>
+										<td>
+											<input type="radio" class="no_permission" name="group[{GROUP_ID}]" id="groupNone{GROUP_ID}" value="0" {PERM_0_SELECTED} />
+											<label for="groupNone{GROUP_ID}" class="radio-label"></label>
+										</td>
+										<td>
+											<input type="radio" name="group[{GROUP_ID}]" id="groupRead{GROUP_ID}" value="1" {PERM_1_SELECTED} />
+											<label for="groupRead{GROUP_ID}" class="radio-label"></label>
+										</td>
+										<td>
+											<input type="radio" name="group[{GROUP_ID}]" id="groupWrite{GROUP_ID}" value="2" {PERM_2_SELECTED} />
+											<label for="groupWrite{GROUP_ID}" class="radio-label"></label>
+										</td>
+									</tr>
+									<!-- END perm_table -->
+							</table>
+						</div>
 					</div>
 				</fieldset>
 			</section>

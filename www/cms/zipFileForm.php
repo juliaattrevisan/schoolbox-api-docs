@@ -51,7 +51,7 @@ if ($isSuperuser || $isAllowedTeacher) {
 
 	$zipFileUploadHandler = new ZipFileUpload();
 	$zipFileUploadHandler->extract($archive);
-	$zipFileUploadHandler->traverse($zipFileUploadHandler->getPath(), $_POST['category']);
+	$zipFileUploadHandler->traverse($zipFileUploadHandler->getPath(), $_POST['category'], $_POST['inherit']);
 	$zipFileUploadHandler->cleanup();
 
 	/* Error handling

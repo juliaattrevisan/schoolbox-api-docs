@@ -108,7 +108,7 @@ class ZipFileUpload extends DeprecatedModel
     * Traverse directory structure. Create Categorys and Files accordingly,
     * with the permissions specified
     */
-    public function traverse($dir, $parentID)
+    public function traverse($dir, $parentID, $inherit=0)
     {
         if (!$dh = @opendir($dir)) {
             return;
@@ -139,7 +139,7 @@ class ZipFileUpload extends DeprecatedModel
             if (is_dir($currentPath)) {
 
                 $category = $folderMapper->createModel();
-                if ($parent->getId() != 0) {
+                if ($parent->getId() != 0 && inherit == 1) {
                     $category->setInherit(true);
                 }
                 $category->setName($obj);
