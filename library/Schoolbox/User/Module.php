@@ -15,11 +15,9 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Mail;
 use \Schoolbox\UserMapper;
 use \Schoolbox\User;
 use \Alaress\Authorizer\Failure\Unauthorized;
-use Twig_Loader_Chain;
 
 class Module extends BaseModule
 {
@@ -32,8 +30,6 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'impersonate', $basePath, '/switch/{userId}');
         $this->addGetRoute($router, 'recoverSession', $basePath, '/recoverSession');
-        $this->addGetRoute($router, 'passwordReset', $basePath, '/passwordReset');
-        $this->addPostRoute($router, 'requestPasswordReset', $basePath, '/requestPasswordReset');
     }
 
     /**
@@ -77,36 +73,10 @@ class Module extends BaseModule
     }
 
     /**
-     * @inheritdoc
-     */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
-    {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set(
-            'controller:'.$this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'userMapper'  => UserMapper::getInstance(),
-                    'resetMapper' => Password\Reset\Mapper::getInstance(),
-                    'mailFactory' => $injector->lazyNew(
-                        Mail\TwigEmailFactory::class,
-                        [
-                            'context' => $injector->lazyNew(
-                                Mail\CoreContext::class,
-                                ['conf' => $injector->lazyGet('config')]
-                            )
-                        ]
-                    ),
-                ]
-            )
-        );
+        $injector->set('controller:'.$this->basename, $injector->lazyNew('Schoolbox\\User\\Controller'));
     }
 }
