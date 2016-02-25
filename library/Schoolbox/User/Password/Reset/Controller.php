@@ -122,7 +122,8 @@ class Controller extends Base
                 foreach ($users as $user) {
                     // Make a password reset attempt (for each account, I guess)
                     // And send it
-                    $reset = $this->resetMapper->createModel();
+                    $reset = $this->resetMapper->createModel()
+                        ->setIp($this->getRequest()->server->get('REMOTE_ADDR'));
                     if ($user->getEnabled()) {
                         $reset->setUser($user);
                         $this->resetMapper->save($reset);
