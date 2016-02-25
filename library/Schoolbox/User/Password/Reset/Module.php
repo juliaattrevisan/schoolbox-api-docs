@@ -9,6 +9,7 @@ namespace Schoolbox\User\Password\Reset;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
@@ -81,9 +82,10 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'userMapper'  => UserMapper::getInstance(),
-                    'resetMapper' => Mapper::getInstance(),
-                    'mailFactory' => $injector->lazyNew(
+                    'passwordService' => $injector->lazyNew(PasswordService::class),
+                    'userMapper'      => UserMapper::getInstance(),
+                    'resetMapper'     => Mapper::getInstance(),
+                    'mailFactory'     => $injector->lazyNew(
                         Mail\TwigEmailFactory::class,
                         [
                             'context' => $injector->lazyNew(

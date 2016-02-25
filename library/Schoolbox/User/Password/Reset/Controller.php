@@ -7,6 +7,7 @@
 
 namespace Schoolbox\User\Password\Reset;
 
+use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\User;
@@ -35,20 +36,28 @@ class Controller extends Base
     protected $mailFactory;
 
     /**
+     * @var PasswordService
+     */
+    protected $passwordService;
+
+    /**
      * Constructor
      *
      * @param UserMapper       $userMapper
      * @param Mapper           $resetMapper
      * @param TwigEmailFactory $mailFactory
+     * @param PasswordService  $passwordService
      */
     public function __construct(
         UserMapper $userMapper,
         Mapper $resetMapper,
-        TwigEmailFactory $mailFactory
+        TwigEmailFactory $mailFactory,
+        PasswordService $passwordService
     ) {
-        $this->userMapper  = $userMapper;
-        $this->resetMapper = $resetMapper;
-        $this->mailFactory = $mailFactory;
+        $this->userMapper      = $userMapper;
+        $this->resetMapper     = $resetMapper;
+        $this->mailFactory     = $mailFactory;
+        $this->passwordService = $passwordService;
     }
 
     /**
