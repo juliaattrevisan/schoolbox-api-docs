@@ -211,10 +211,11 @@ class Instance implements JsonSerializable
 
     /**
      * @param string $json
+     * @param string $topic
      * @throws InvalidArgumentException
      * @return self
      */
-    public static function jsonUnserialize($json)
+    public static function jsonUnserialize($json, $topic = '')
     {
         if (!($array = json_decode($json, true))) {
             throw new InvalidArgumentException("Could not JSON decode given " . gettype($json));
@@ -232,6 +233,14 @@ class Instance implements JsonSerializable
         $time          = $array['time'];
         $meta          = $array['meta'];
         $severity      = isset($array['level']) ? $array['level'] : 0;
+        $context       = isset($array['context']) ? $array['context'] : [];
+
+        // override topic if relevant to do so (happens in QueueSorter::process())
+        if ($topic) {
+            $topics = [ $topic ];
+        } else {
+            $topics = isset($array['topics']) ? $array['topics'] : [];
+        }
 
         // cast param array to objects
         $params = array();
@@ -240,10 +249,6 @@ class Instance implements JsonSerializable
                 $params[$token] = new Param($param['text'], $param['href'], $param['mode']);
             }
         }
-
-        // these vars are lost on (and not relevant to) reconstitution
-        $topics  = array();
-        $context = array();
 
         return new self($messageString, $namespace, $icon, $href, $params, $severity, $topics, $time, $meta, $context);
     }
@@ -290,6 +295,8 @@ class Instance implements JsonSerializable
             'href'      => $this->href,
             'meta'      => $this->meta,
             'level'     => $this->severity,
+            'topics'    => $this->topics,
+            'context'   => $this->context,
         );
     }
 
