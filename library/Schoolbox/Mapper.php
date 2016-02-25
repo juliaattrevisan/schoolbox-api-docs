@@ -209,7 +209,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         $this->database = \Database::getInstance();
         $this->map      = new MappingCollection();
-        $this->setConfigLoader(new ConfigMapper());
+        $this->setConfigLoader(ConfigMapper::getInstance());
         $this->setup();
         $this->setColumnFactory(new ColumnFactory());
         $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
