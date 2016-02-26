@@ -16,29 +16,6 @@ use Schoolbox\IConfigLoader;
 class Loader implements IConfigLoader, ArrayAccess {
 
     /**
-     * @var array
-     */
-    protected $consts = array();
-
-    /**
-     * @var array
-     */
-    protected $cache = array();
-
-    /**
-     * @var ConfigMapper
-     */
-    protected $configMapper;
-
-    /**
-     * Set up constant paths
-     */
-    public function __construct()
-    {
-        $this->configMapper = ConfigMapper::getInstance();
-    }
-
-    /**
      * Get a config variable
      *
      * @param string $var
@@ -46,7 +23,7 @@ class Loader implements IConfigLoader, ArrayAccess {
      */
     public function get($var)
     {
-        return $this->configMapper->get($var);
+        return ConfigMapper::getInstance()->get($var);
     }
 
     /**
