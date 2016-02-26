@@ -254,7 +254,7 @@ function interrogate(Frame $frame, LoggerInterface $log)
 		exit(2);
 	}
 
-	$instance = new $classname(new \Schoolbox\ConfigLoader());
+	$instance = new $classname(new \Schoolbox\Config\Loader());
 	if(!$instance instanceof \Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface) {
 		$log->error("Notifer class '$classname' must be instance of ModuleNotifierInterface.");
 		exit(2);

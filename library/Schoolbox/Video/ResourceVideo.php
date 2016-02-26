@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Video;
 
-use Schoolbox\ConfigLoader;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\File;

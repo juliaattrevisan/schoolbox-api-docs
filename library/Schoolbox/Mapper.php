@@ -17,7 +17,7 @@ use PDOStatement;
 use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
-use Schoolbox\ConfigLoader;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifInterface;

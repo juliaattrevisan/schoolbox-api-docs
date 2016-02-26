@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Resource;
 use Alaress_Date_Format;
-use Schoolbox\ConfigLoader;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\FileInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\File\Mimetype;

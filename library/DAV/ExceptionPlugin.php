@@ -11,7 +11,7 @@
 
 use Sabre\DAV\Server;
 use Sabre\DAV\ServerPlugin;
-use Schoolbox\ConfigLoader;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
 
 class DAV_ExceptionPlugin extends ServerPlugin {

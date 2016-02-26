@@ -10,7 +10,7 @@
 
 namespace Proxy;
 
-use Schoolbox\ConfigLoader;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
 
 /**

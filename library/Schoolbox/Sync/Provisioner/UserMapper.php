@@ -14,7 +14,7 @@ use Schoolbox;
 use Schoolbox\UserMapper as SchoolboxMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\ConfigLoader;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Collection;
 
 /** @method User findByExternalId($id, $roleType = null) */
