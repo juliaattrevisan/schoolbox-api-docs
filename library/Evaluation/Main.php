@@ -282,25 +282,6 @@ abstract class Evaluation_Main extends DeprecatedModel
     }
 
     /**
-     * Extract hours, minutes and seconds from a sec2hms value. Used to evaluate
-     * duration of assessments, converting from duration entirely in seconds.
-     *
-     * @param  $val
-     *
-     * @return array
-     */
-    public function parse_sec2hms($val)
-    {
-        preg_match('/(\d+)hrs\ (\d+)min (\d+)sec/', $val, $matches);
-
-        $formatted['hours']   = $matches[1];
-        $formatted['minutes'] = $matches[2];
-        $formatted['seconds'] = $matches[3];
-
-        return $formatted;
-    }
-
-    /**
      * Finds out if the specified user owns the assessment.
      *
      * @param        $assess_id
