@@ -170,11 +170,14 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 			}
 			$msg = new Message(":teacher has marked :student's work for :boxname in :catname", $icon, $href);
 
+			$year = $box->getDueDate()->getYear();
+			$term = $box->getDueDate()->getYearHalf();
+
 			$params = array(
 				'teacher' => array($teacherName, "/search/user/$teacherId"),
 				'student' => array($studentName, "/search/user/$studentId"),
-				'boxname' => array($boxName, "/submission/submissionHistory/$boxId"),
-				'catname' => array($catName, "/homepage/$catId")
+				'boxname' => array($boxName, "/submission/submissionHistory/$boxId/$studentId"),
+				'catname' => array($catName, "/submission/allWork/$studentId/$year/$term/$catId")
 			);
 
 			$msgr->targetToParent($studentId, $msg, "duework.$boxId.returned", Logger::NOTICE, $params);
