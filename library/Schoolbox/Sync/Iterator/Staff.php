@@ -32,6 +32,7 @@ class Staff extends IteratorIterator
             ->setId($currentResult['staff_id'])
             ->setTitle($currentResult['staff_title'])
             ->setPreferredName($currentResult['staff_preferred_name'])
+            ->setGivenName($currentResult['staff_given_name'])
             ->setLastname($currentResult['staff_surname'])
             ->getMeta()
             ->setDepartment($currentResult['staff_department'])
