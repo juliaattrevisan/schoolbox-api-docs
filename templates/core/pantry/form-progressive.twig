@@ -1,0 +1,199 @@
+<style type="text/css">
+
+    fieldset {
+        transition: opacity 360ms cubic-bezier(0.2,1,0,1);
+    }
+
+    fieldset[disabled] {
+        opacity: 0.8;
+    }
+
+    input[type="submit"][readonly] {
+        background-color: rgba(0,102,176,0.4);
+        background-image: url('/images/resources/ajax.gif');
+        background-repeat: no-repeat;
+        background-size: 1rem;
+        background-position: 0.75rem 50%;
+    }
+
+</style>
+<ul class="breadcrumb">
+    <li><a href="/">Schoolbox</a></li>
+    <li><a href="/pantry">Pantry</a></li>
+    <li><a href="/pantry/form">Forms</a></li>
+    <li class="active"><a href="/pantry/form-progressive">Progressive Form</a></li>
+</ul>
+<div class="row">
+    <div class="small-12 island">
+        <h1>Progressive Form</h1>
+        <ul class="meta">
+            <li class="icon-info">Sections in this form are dependent on the sections before them.</li>
+            <li class="icon-star">For the magically-inclined, a progressive form is <u><strong>almost</strong></u> a Wizard. So it's more like a Mage.</li>
+        </ul>
+        <h2 class="subheader">One Form, Many Fieldsets</h2>
+        <form action="/pantry/formForm.php" method="post" data-mage-preventsubmit="true">
+            <section>
+                <fieldset data-mage="part-1" class="content" {% if hashUsed %}disabled="disabled"{% endif %}>
+                    <legend>Here's Our First Fieldset</legend>
+                    <input type="hidden" name="key" value="{{ key }}" />
+                    <div class="small-12 column" data-mage-collapsefinal>
+                        <p>
+                            This first section starts us off, probably with core identity fields. Things like names.
+                            Or if you're making a Mage, maybe it just contains introduction text like this.
+                        </p>
+                        <p>
+                            Notice that you can see all the other section titles, but the content is collapsed.
+                        </p>
+                        <p>
+                            Also note the DOM structure for the button and (empty) error message below.
+                            For aesthetic consistency, it's kind of important.
+                        </p>
+                        <div class="row" data-mage-submitrow {% if hashUsed %}style="display:none;"{% endif %}>
+                            <div class="small-12 medium-8 column">
+                                <p class="alert alert-box icon-alert" data-mage-error></p>
+                            </div>
+                            <div class="small-12 medium-4 column">
+                                <input type="submit" name="part-1" value="I understand" data-mage-next="part-2" data-mage-working="Wait 2 secs..." />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset data-mage="part-2" class="content" disabled="disabled">
+                    <legend>Section Two!</legend>
+                    <input type="hidden" name="key" value="{{ key }}" />
+                    <div class="small-12 column {% if not hashUsed %}hide{% endif %}" data-mage-collapsed>
+                        <div data-mage-collapsefinal>
+                            <p>Hey, you submitted the first section! Awesome. See how the first section submit went away? Neat, right?</p>
+                            <p>Here's some things you probably should know:</p>
+                            <ul>
+                                <li>
+                                    All <code>fieldset[data-mage] input[type=submit]</code> buttons <em><strong>require</strong></em>:
+                                    <ul>
+                                        <li>a unique <code>[name]</code> attribute and</li>
+                                        <li>the <code>[data-mage-next]</code> attribute</li>
+                                    </ul>
+                                    to work progressively. There's no naming convention, they just need to be unique to the page.
+                                </li>
+                                <li>
+                                    The <code>[data-mage-working]</code> attribute is what changed the text on the submit button while the AJAX request was taking place.
+                                </li>
+                                <li>
+                                    The previous <code>fieldset</code> has now been <code>[disabled]</code>.
+                                    This is the default behaviour, but that's a config setting you can change.
+                                    There will also eventually be an IE polyfill to disable all the individual form elements too, because IE doesn't support fieldset disablement inheritance. Because IE.
+                                </li>
+                            </ul>
+                        </div>
+                        <label>Ooh, a text input!
+                            <input type="text" name="part-2-text" value="{{ part2 }}" placeholder="Leave this blank" />
+                        </label>
+                        <div class="row" data-mage-submitrow {% if hashUsed %}style="display:none;"{% endif %}>
+                            <div class="small-12 medium-8 column">
+                                <p class="alert alert-box icon-alert" data-mage-error></p>
+                            </div>
+                            <div class="small-12 medium-4 column">
+                                <input type="submit" name="part-2" value="Neeeeext!" data-mage-next="part-3" data-mage-working="Asyncing your data...." />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset data-mage="part-3" class="content" disabled="disabled">
+                    <legend>Call and Response</legend>
+                    <input type="hidden" name="key" value="{{ key }}" />
+                    <div class="small-12 column {% if not hashUsed %}hide{% endif %}" data-mage-collapsed>
+
+                        <p>Is this sort of like what you entered above?</p>
+                        <h3 class="alert-box" data-previousinput>{{ part2result }}</h3>
+                        <p data-mage-collapsefinal>
+                            The AJAX result of the previous section can be used to manipulate parts of this one (or anything else, for that matter).
+                            You could theoretically load entirely different sub-pages, based on input from above.
+                            The callback you use for this (onXhrDone) fires before the slideDown(),
+                            which lets you pipe or manipulate any part of the next section's DOM before it gets seen.
+                        </p>
+                        <div class="row" data-mage-submitrow {% if hashUsed %}style="display:none;"{% endif %}>
+                            <div class="small-12 medium-8 column">
+                                <p class="alert alert-box icon-alert" data-mage-error></p>
+                            </div>
+                            <div class="small-12 medium-4 column">
+                                <input type="submit" name="part-3" value="That's pretty neato" data-mage-next="part-4" data-mage-working="Working..." />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset data-mage="part-4" class="content" {% if not hashUsed %}disabled="disabled"{% endif %}>
+                    <legend>Presume to Resume</legend>
+                    <input type="hidden" name="key" value="{{ key }}" />
+                    <div class="small-12 column {% if not hashUsed %}hide{% endif %}" data-mage-collapsed data-mage-collapsefinal>
+                        <blockquote>"But why all this hassle??"</blockquote>
+                        <p>I hear you ask! Why bother indeed!</p>
+                        <p>
+                            There are times when you need to save a parent entity before allowing creation of sub-entities,
+                            so that ID's exist and can be linked up. You can also <em>resume</em> partial forms,
+                            since every time you press a submit button (every section), you're saving data to the DB (or in this example, your session).
+                        </p>
+                        <p>
+                            For example, your input to this form can be recovered by <a href="/pantry/form-progressive/{{ key }}">tacking '/{{ key }}' onto the URL</a>.<br/>
+                            {% if hashUsed %}<strike>{% endif %}
+                            Go on, give it a try. It will, via a synchronous page load, restore you to this point in the form.
+                            {% if hashUsed %}
+                                </strike><br/>See? Easy peasy. (You probably wouldn't display different output like this, but it was a way to force you to see the effect.)
+                            {% endif %}
+                        </p>
+                        {% if hashUsed %}
+                        <div class="row" data-mage-submitrow>
+                            <div class="small-12 medium-8 column">
+                                <p class="alert alert-box icon-alert" data-mage-error></p>
+                            </div>
+                            <div class="small-12 medium-4 column">
+                                <input type="submit" name="part-4" value="Riiight" data-mage-next="part-5" data-mage-working="Working..." />
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </fieldset>
+                <fieldset data-mage="part-5" class="content" disabled="disabled">
+                    <legend>Backward in Going Forward</legend>
+                    <input type="hidden" name="key" value="{{ key }}" />
+                    <div class="small-12 column hide" data-mage-collapsed>
+                        <p>Did you make a mistake in one of the inputs? Need to make a change?</p>
+                        <p>Right now, the only mechanism to 'revert' is via a resume-point, but future functionality could include the ability to restore a form section.</p>
+                        <p>In this final step, there's a callback that collapses all non-input content, so you get the final overview of what you're about to submit and save.</p>
+                    </div>
+                    <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
+                </fieldset>
+            </section>
+            <div class="row" data-mage="part-5">
+                <div class="small-12 column hide" data-mage-collapsed>
+                    <ul class="meta">
+                        <li class="icon-info">This final submit isn't technically part of the progressive, so it doesn't strictly need a <code>[name]</code></li>
+                    </ul>
+                    <input type="submit" value="Finish, Save, Done." />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
+<script type="text/javascript">
+    $(function () {
+        // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
+        $('input[data-mage-next]').mage();
+
+        // overload with specific callbacks (or other config values)
+        $('input[data-mage-next="part-3"]').mage({
+            onXhrDone: function (data) {
+                // $.fn.mage('next|target') will return you the target of this button, which is the "next" section
+                console.log('there');
+                $(this).mage('next').eq(0).find('[data-previousinput]').text(data);
+            }
+        });
+
+        $('input[data-mage-next="part-5"]').mage({
+            onXhrDone: function (data) {
+                $('fieldset[data-mage]').find('[data-mage-collapsefinal]').slideUp();
+                $(this).closest('form').removeAttr('data-mage-preventsubmit');
+            }
+        });
+    });
+</script>
