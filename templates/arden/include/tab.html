@@ -1,31 +1,40 @@
-<ul id="tabs">
-    <li class="{TAB_MAIN_ON}"><a href="/" title="Greeting page">Home</a></li>
-    <li class="{TAB_NEWS_ON}"><a href="/news/" title="Current school news">News</a></li>
-    <!-- BEGIN duework_tab -->
-    <li class="{TAB_SUBMISSION_ON}"><a href="/submission/dueWork" title="Access your due work">My Work</a></li>
-    <!-- END duework_tab -->
-    <!-- BEGIN webmail_tab -->
-    <li class="{TAB_WEBMAIL_ON}"><a {WEBMAIL_LOCATION} title="Access your messages here">Webmail</a></li>
-    <!-- END webmail_tab -->
-    <li class="{TAB_CALENDAR_ON}"><a href="/calendar/week/" title="School calendar events">Calendar</a></li>
-    <!-- BEGIN timetable_tab -->
-    <li class="{TAB_TIMETABLE_ON}"><a href="/timetable/" title="View your school timetable">Timetable</a></li>
-    <!-- END timetable_tab -->
-    <!-- BEGIN submission_tab -->
-    <li class="{TAB_SUBMISSION_ON}"><a href="/submission/listSubmission" title="Access your submission boxes">Submissions</a>
-    </li>
-    <!-- END submission_tab -->
-    <!-- BEGIN eportfolio_tab -->
-    <li class="{TAB_EPORTFOLIO_ON}"><a href="/eportfolio/{EPORTFOLIO_USER_ID}/profile" title="Access your eportfolio area">ePortfolio</a></li>
-    <!-- END eportfolio_tab -->
-    <!-- BEGIN myfiles_tab -->
-    <li class="{TAB_MYFILES_ON}"><a href="/my-files/" title="Access your files">My Files</a></li>
-    <!-- END myfiles_tab -->
-    <!-- BEGIN network_tab -->
-    <li class="{TAB_NETWORK_ON}"><a href="/drives/" title="Access your school network files">Drives</a></li>
-    <!-- END network_tab -->
-    <!-- BEGIN parent_tab -->
-    <!-- END parent_tab -->
-</ul>
+<li><a class="icon-home {TAB_MAIN_ON}" href="/" title="Greeting page"><span>Home</span></a></li>
+
+<li><a class="icon-news {TAB_NEWS_ON}" href="/news/" title="Current school news"><span>{TPL_LOCAL_NEWS_PLURAL_PC}</span></a></li>
+
+<!-- BEGIN duework_tab -->
+<li><a class="icon-due-work {TAB_SUBMISSION_ON}" href="/submission/dueWork" title="Access your due work"><span>My Work</span></a></li>
+<!-- END duework_tab -->
+
+<!-- BEGIN webmail_tab -->
+<li><a class="icon-email {TAB_WEBMAIL_ON}" {WEBMAIL_LOCATION} title="Access your messages here"><span>Webmail</span></a></li>
+<!-- END webmail_tab -->
+
+<li><a class="icon-calendar {TAB_CALENDAR_ON}" href="/calendar/week/" title="School calendar events"><span>{TPL_LOCAL_CALENDAR_PC}</span></a></li>
+
+<!-- BEGIN timetable_tab -->
+<li><a class="icon-timetable {TAB_TIMETABLE_ON}" href="/timetable/" title="View your school timetable"><span>Timetable</span></a></li>
+<!-- END timetable_tab -->
+
+<!-- BEGIN submission_tab -->
+<li><a class="icon-due-work {TAB_SUBMISSION_ON}" href="/submission/listSubmission" title="Access your students' submissions"><span>Submissions</span></a></li>
+<!-- END submission_tab -->
+
+<!-- BEGIN eportfolio_tab -->
+<li><a class="icon-eportfolio {TAB_EPORTFOLIO_ON}" href="/eportfolio/{EPORTFOLIO_USER_ID}/profile" title="Access your eportfolio area"><span>ePortfolio</span></a></li>
+<!-- END eportfolio_tab -->
+
+<!-- BEGIN myfiles_tab -->
+<li><a class="icon-files {TAB_MYFILES_ON}" href="/my-files/" title="Access your files"><span>My Files</span></a></li>
+<!-- END myfiles_tab -->
+
+<!-- BEGIN network_tab -->
+<li><a class="icon-network {TAB_NETWORK_ON}" href="/drives/" title="Access your school network files"><span>Drives</span></a></li>
+<!-- END network_tab -->
+
+<!-- BEGIN parent_tab -->
+
+<!-- END parent_tab -->
+
 
 
