@@ -51,6 +51,12 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
+                            Username
+                            <input type="text"
+                                   readonly
+                                   value="{{ reset.getUser().getUsername() }}" />
+                        </label>
+                        <label>
                             New Password
                             <input type="password"
                                    name="new_password"
