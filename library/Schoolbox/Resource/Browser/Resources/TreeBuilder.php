@@ -131,28 +131,31 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function getFolderPermission($folderId)
     {
+
         if ($this->user->isSuperuser()) {
             return $this->getPermissionString(UserAccess::ACCESS_FULL);
         }
 
         // check user access first, then role access if that fails
         try {
-            $access = $this->userAccessMapper
+            $access[] = $this->userAccessMapper
                 ->getAccess($this->user, $folderId)
                 ->getAccessLevel();
+        }
+        catch (Mapper\Exception $e) {
 
-        } catch (Mapper\Exception $e) {
-            try {
-                $access = $this->roleAccessMapper
+        }
+
+        try {
+                $access[] = $this->roleAccessMapper
                     ->getAccess($this->user, $folderId)
                     ->getType();
 
-            } catch (Mapper\Exception $e) {
-                $access = UserAccess::ACCESS_DENY;
-            }
+        } catch (Mapper\Exception $e) {
+            $access[] = UserAccess::ACCESS_DENY;
         }
 
-        return $this->getPermissionString($access);
+        return $this->getPermissionString(max($access));
     }
 
 
