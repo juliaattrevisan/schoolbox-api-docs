@@ -212,11 +212,11 @@ else {
 
     /* Render duration
      */
-    $duration = $assessHandler->parse_sec2hms($assessHandler->sec2hms($assessment->getDuration()));
+    $interval = new \Alaress\Date\Interval($assessment->getDuration());
 
     $this->setVar(array(
-        'DURATION_HOUR_VALUE' => $duration['hours'],
-        'DURATION_MINUTE_VALUE' => $duration['minutes'],
+        'DURATION_HOUR_VALUE' => $interval->getHourTotal(),
+        'DURATION_MINUTE_VALUE' => $interval->getMinuteRemainder(),
     ));
 
     if (!$task_id) {
