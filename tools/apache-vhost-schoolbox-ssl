@@ -46,9 +46,8 @@ NameVirtualHost *:443
         CustomLog /var/log/apache2/schoolbox_access.log combined
 
         #Setup xhprof for debugging, only works if module is installed on server
-        Alias /xhprof /usr/share/php5-xhprof/xhprof_html
-        Alias /debugbar /usr/share/schoolbox/vendor/maximebf/debugbar/src/DebugBar/Resources/
-        #Alias /xhprof /usr/share/schoolbox/vendor/facebook/xhprof/xhprof_html/
+        Alias /debugbar /usr/share/schoolbox/vendor/maximebf/debugbar/src/DebugBar/Resources
+        Alias /xhprof /usr/share/schoolbox/vendor/lox/xhprof/xhprof_html
 
         # LISS Exceptions
         <Directory /vagrant/www/liss>
@@ -139,6 +138,8 @@ NameVirtualHost *:443
         RewriteRule ^(.*)$ /homepage/rss.php?page=$1 [L]
 
         RewriteCond %{REQUEST_URI} !/dav/.*
+        RewriteCond %{REQUEST_URI} !/debugbar/.*
+        RewriteCond %{REQUEST_URI} !/xhprof/.*
         RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
         RewriteRule ^(.*)$ /index.php?page=$1 [L,QSA]
 

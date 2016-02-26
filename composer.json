@@ -103,6 +103,7 @@
         "mpratt/embera": "~1.8.6"
     },
     "require-dev": {
+        "lox/xhprof": "dev-master",
         "sebastian/phpcpd": "2.*",
         "phpmd/phpmd" : "2.*",
         "squizlabs/php_codesniffer": "2.*@dev",

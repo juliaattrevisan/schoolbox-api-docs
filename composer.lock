@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "15c30efb31cc408b70584fc101b66ef8",
-    "content-hash": "f73c2ca7587c74d631460aab57651dbd",
+    "hash": "ae4277cbc3a886814a8c1fac012055d7",
+    "content-hash": "9d7ced567225bf741fa2134c8d2c6e31",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -482,7 +482,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/caxy/php-htmldiff/zipball/36467f2c6371d819e137886e40c9dd22015ee6a6",
+                "url": "https://api.github.com/repos/caxy/php-htmldiff/zipball/5c013fa030a4eb2da64583c367166670894db010",
                 "reference": "36467f2c6371d819e137886e40c9dd22015ee6a6",
                 "shasum": ""
             },
@@ -3110,12 +3110,12 @@
             "version": "v2.5.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/videlalvaro/php-amqplib.git",
+                "url": "https://github.com/php-amqplib/php-amqplib.git",
                 "reference": "eb8f94d97c8e79900accf77343dbd7eca7f58506"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/videlalvaro/php-amqplib/zipball/eb8f94d97c8e79900accf77343dbd7eca7f58506",
+                "url": "https://api.github.com/repos/php-amqplib/php-amqplib/zipball/eb8f94d97c8e79900accf77343dbd7eca7f58506",
                 "reference": "eb8f94d97c8e79900accf77343dbd7eca7f58506",
                 "shasum": ""
             },
@@ -4076,6 +4076,45 @@
             "time": "2013-10-04 15:03:51"
         },
         {
+            "name": "lox/xhprof",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lox/xhprof.git",
+                "reference": "c64571f892bda1298bad9c5e94ede0bc3f0e4627"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lox/xhprof/zipball/c64571f892bda1298bad9c5e94ede0bc3f0e4627",
+                "reference": "c64571f892bda1298bad9c5e94ede0bc3f0e4627",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.0"
+            },
+            "bin": [
+                "bin/xhprofile"
+            ],
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "xhprof_lib/utils/xhprof_lib.php",
+                    "xhprof_lib/utils/xhprof_runs.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "XHProf: A Hierarchical Profiler for PHP",
+            "homepage": "http://pecl.php.net/package/xhprof",
+            "keywords": [
+                "performance",
+                "profiling"
+            ],
+            "time": "2015-08-31 22:07:48"
+        },
+        {
             "name": "pdepend/pdepend",
             "version": "2.2.0",
             "source": {
@@ -4968,7 +5007,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/4966b545db497e038b3ba01fd21c0899be9365a9",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/be0a7044ec8f664c07f117e86633250122af6dbf",
                 "reference": "4966b545db497e038b3ba01fd21c0899be9365a9",
                 "shasum": ""
             },
@@ -5561,6 +5600,7 @@
         "0x46616c6b/etherpad-lite-client": 20,
         "caxy/php-htmldiff": 20,
         "imagine/imagine": 20,
+        "lox/xhprof": 20,
         "squizlabs/php_codesniffer": 20,
         "fabpot/php-cs-fixer": 0
     },
