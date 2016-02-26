@@ -16,7 +16,7 @@ namespace Schoolbox\Sync\Effect\Fragment;
 
 use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 use \Schoolbox\UserMapper;
-use \Schoolbox\ConfigLoader;
+use \Schoolbox\Config\Loader as ConfigLoader;
 
 class Factory {
     const TYPE_BOOLEAN = 1;

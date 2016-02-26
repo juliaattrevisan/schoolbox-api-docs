@@ -13,6 +13,7 @@ namespace Schoolbox;
 use House;
 use HouseResidential;
 use JsonSerializable;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
 use Schoolbox\Permission\Access\UserAccess;

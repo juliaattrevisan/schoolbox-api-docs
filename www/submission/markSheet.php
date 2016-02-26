@@ -73,7 +73,7 @@ $m = new Marksheet($categoryID, $_SESSION['id'], array(
     'sb' => SubmissionBoxMapper::getInstance(),
     'oa' => OnlineAssessmentMapper::getInstance(),
     'error' => DueWork_ErrorMapper::getInstance(),
-), new \Schoolbox\ConfigLoader());
+), new \Schoolbox\Config\Loader());
 
 
 $m->generateData($year, $semester);

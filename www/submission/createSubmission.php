@@ -53,7 +53,7 @@ $cat_mapper  = new CategoryMapper();
 $type_mapper = new SubmissionBox\WorkTypeMapper();
 $mark_mapper = new SubmissionBox\MarkTypeMapper();
 $groupMapper = new SubmissionBox\GradeLevel\Group\Mapper();
-$conf_mapper = new ConfigMapper();
+$conf_mapper = ConfigMapper::getInstance();
 
 $groupHandler  = new Group;
 $rubricHandler = new DueWork_Rubric_Handler();

@@ -22,12 +22,12 @@ use \Schoolbox\IConfigLoader;
 class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract {
 
     /**
-     * @var Loader
+     * @var IConfigLoader
      */
     var $config;
 
     /**
-     * @return Loader
+     * @return IConfigLoader
      */
     public function getConfig()
     {

@@ -22,7 +22,7 @@ if (is_string($file_path)) {
         $file_contents = file_get_contents($cache_path . '/' . $file_name);
     } else {
 	    // proxy check
-	    $ps = new \Proxy\Server(new \Schoolbox\ConfigLoader());
+	    $ps = new \Proxy\Server(new \Schoolbox\Config\Loader());
 	    if ($file_contents = file_get_contents($real_url . '/' . $file_path, null, $ps->getContext())) {
             file_put_contents($cache_path . '/' . $file_name, $file_contents);
 	    }

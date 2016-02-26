@@ -9,48 +9,9 @@
 
 namespace Schoolbox\Realtime\Schedule\Persistence;
 
-
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Notif;
-use Schoolbox\Realtime\Schedule\Event;
 
 class QueueItemMapper extends Mapper {
-
-	/**
-	 * @var IConfigLoader
-	 */
-	protected $config_loader;
-
-
-	/**
-	 * @param  IConfigLoader $config_loader
-	 *
-	 * @return $this
-	 */
-	public function setConfigLoader($config_loader) {
-		$this->config_loader = $config_loader;
-		return $this;
-	}
-
-
-	/**
-	 * @return IConfigLoader
-	 */
-	public function getConfigLoader() {
-		return $this->config_loader;
-	}
-
-
-	/**
-	 * Sets up the config loader in this object.
-	 */
-	public function setup() {
-		parent::setup();
-		$this->setConfigLoader(ConfigMapper::getInstance());
-	}
-
 
 	protected function mapping () {
 		$this->hasTable('scheduleq');

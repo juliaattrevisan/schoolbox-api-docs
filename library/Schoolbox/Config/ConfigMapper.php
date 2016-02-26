@@ -86,21 +86,28 @@ class ConfigMapper extends Mapper implements IConfigLoader {
 		elseif(defined($var)) {
 			return constant($var);
 		}
-		elseif(!isset($this->cache[$var])) {
-			// Load database on request only
-			if (!($this->database instanceof \Database)) {
-				$this->database = \Database::getInstance();
-			}
-			$coll = $this->findByColumn('name', $var);
-			if($coll->count()) {
-				$this->cache[$var] = $coll->first()->getValue();
-			}
+		if (empty($this->cache)) {
+			$this->loadCache();
 		}
-
 		if(isset($this->cache[$var])) {
 			return $this->cache[$var];
 		}
 		return null;
+	}
+
+	/**
+	 * Load entire cache at once, not just one result at a time
+	 */
+	protected function loadCache()
+	{
+		// Load database on request only
+		if (!($this->database instanceof \Database)) {
+			$this->database = \Database::getInstance();
+		}
+		// Perform this common action without the overhead of hydration
+		foreach ($this->database->query("SELECT `name`, `value` FROM `{$this->getTable()}`") as $row) {
+			$this->cache[$row['name']] = $row['value'];
+		}
 	}
 
 

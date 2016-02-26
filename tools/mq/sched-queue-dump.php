@@ -120,7 +120,7 @@ function interrogate($event, $log) {
 		throw new \Schoolbox\Realtime\Schedule\ScheduleException("No notifier for model '$modelClass'.");
 	}
 
-	$instance = new $classname(new \Schoolbox\ConfigLoader());
+	$instance = new $classname(new \Schoolbox\Config\Loader());
 	if(!$instance instanceof \Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface) {
 		throw new \Schoolbox\Realtime\Schedule\ScheduleException("Notifer class '$classname' must be instance of ModuleNotifierInterface.");
 	}
