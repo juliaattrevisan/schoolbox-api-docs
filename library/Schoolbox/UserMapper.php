@@ -349,36 +349,6 @@ class UserMapper extends Mapper
     }
 
     /**
-     * Find a user by their internal id and grab their name and external ID
-     *
-     * @param int    $id
-     * @return User
-     * @throws Mapper\Exception
-     */
-    public function findCheaplyById($id)
-    {
-        $query = "
-            SELECT {$this->getColumnString('u')}
-            FROM `user` u
-            WHERE u.id = ?
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute([$id]);
-
-        foreach ($statement as $row) {
-            $user = new User();
-            $user->setId($id);
-            $user->setFirstname($row['u.firstname']);
-            $user->setLastname($row['u.lastname']);
-            $user->setExternalId($row['u.synergy_id']);
-            return $user;
-        }
-
-        throw new Schoolbox\Mapper\Exception('Instance of object not found');
-    }
-
-    /**
      * Find a user by their external id and come with roles, campus, etc
      *
      * @param int    $id

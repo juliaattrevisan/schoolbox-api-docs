@@ -191,16 +191,6 @@ class RoleAccessMapper extends Mapper
      */
     public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE)
     {
-        // If we are getting the permission for a homepage, we need to take into account inheritance
-
-        if ($service == HOMEPAGE_SERVICE) {
-
-            // Find the NNIAN for the folder
-
-            $categoryNnian = CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode(CategoryMapper::getInstance()->findCheaplyById($serviceIdentifier));
-            $serviceIdentifier = $categoryNnian->getId();
-        }
-
         // let's avoid fatal errors in the face of unexpected failure
         if (!$user->getRole() instanceof Role) {
             $ra = new RoleAccess();
@@ -208,14 +198,13 @@ class RoleAccessMapper extends Mapper
             return $ra;
         }
 
-        if ($serviceIdentifier != 0)
+        if ($serviceIdentifier != 0 &&  $service == UserAccess::SERVICE_HOMEPAGE)
         {
             $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($serviceIdentifier);
 
             if ($folder->getInherit())
             {
                 // Folder inherits, find its NNIAN
-
                 $permissionFolder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
                 $serviceIdentifier = $permissionFolder->getId();
             }

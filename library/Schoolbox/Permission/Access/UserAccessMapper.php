@@ -21,6 +21,7 @@ use Schoolbox\UserMapper;
 
 class UserAccessMapper extends Mapper
 {
+
     /**
      * Cached permissions
      * Nested array structure $cachedPermissions[id][service][sid]
@@ -414,18 +415,12 @@ class UserAccessMapper extends Mapper
      * When passed a schoolbox user ID and subject code (eg. 'CH123') returns true/false to indicate the users
      * involvement in the class
      *
-     * @param int       $userID
+     * @param User       $user
      * @param string    $code
      * @return bool
      */
-    public function involvedInSubject($userID, $code)
+    public function involvedInSubject(User $user, $code)
     {
-        try {
-            $user = UserMapper::getInstance()->findCheaplyById($userID);
-        } catch (\Exception $e) {
-            return false;
-        }
-
         if ($user->getExternalId()) {
             $externalUser = new \External_User;
             $externalSubjectList = $externalUser->getSubjectList($user->getExternalId(), $user->getId());
@@ -521,33 +516,25 @@ class UserAccessMapper extends Mapper
         }
 
         // Permission check #3 - External DB
+        $fullCategory = CategoryMapper::getInstance()->findById($serviceIdentifier);
+        $result = $this->involvedInSubject($user, $fullCategory->getCodeString());
 
-        if ($user->getRole()->getType() == 'student') {
-            $allUsers = $this->findStudentsInCategory(CategoryMapper::getInstance()->findById($serviceIdentifier), true);
-        } else {
-            $allUsers = $this->findStaffInCategory(CategoryMapper::getInstance()->findById($serviceIdentifier), true);
-        }
+        if($result) {
+            // Found matching student, give them read/write perms if student/staff respectively
 
-        foreach ($allUsers as $userCurrent)
-        {
-            if ($userCurrent->getId() == $user->getId())
-            {
-                // Found matching student, give them read/write perms if student/staff respectively
+            $model = new UserAccess();
+            $model->setService($service);
+            $model->setServiceIdentifier($serviceIdentifier);
+            $model->setUser($user);
+            $model->setAccessLevel(
+                $user->getRole()->getType() == 'student'
+                    ? UserAccess::ACCESS_READ
+                    : UserAccess::ACCESS_WRITE);
 
-                $model = new UserAccess();
-                $model->setService($service);
-                $model->setServiceIdentifier($serviceIdentifier);
-                $model->setUser($user);
-                $model->setAccessLevel(
-                    $user->getRole()->getType() == 'student'
-                        ? UserAccess::ACCESS_READ
-                        : UserAccess::ACCESS_WRITE);
+            // Cache for future calls and return the permission object
 
-                // Cache for future calls and return the permission object
-
-                $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] = $model;
-                return $model;
-            }
+            $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] = $model;
+            return $model;
         }
 
         // The users got no permission in either UserAccess or external DB, return a deny object

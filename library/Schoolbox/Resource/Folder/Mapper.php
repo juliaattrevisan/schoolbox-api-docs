@@ -944,7 +944,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     public function findCheaplyById($folderId) {
 
         // special case: 0 == root, but not in db
-        if ($id == 0) {
+        if ($folderId == 0) {
             return $this->createModel()
                 ->setId(0)
                 ->setName('Root')
