@@ -137,65 +137,67 @@ abstract class Evaluation_Main extends DeprecatedModel
 
         $allQuestions = $this->getContents($assess_id);
 
-        $currentSection = $allQuestions[0]['section_id'];
-
         /* If there are no questions, remove template variable
            */
         $page->setVar('section_block', '');
 
         // Group questions by section
         $questionsBySection = [];
-        foreach ($allQuestions as $question) {
-            $questionsBySection[$question['section_id']][] = $question;
-        }
-        foreach ($questionsBySection as $sectionId => $sectionQuestions) {
-            $questionNumber = 1;
-            $page->setVar('question_block', '');
-            foreach ($sectionQuestions as $currentQuestion) {
-                if ($currentQuestion['questionDeletedAt'] == null) {
-                    if (is_numeric($currentQuestion['question_id'])) {
-                        $page->setVar(
-                            array(
-//                                'ON_OFF'               => ++$j % 2 ? '' : 'dark',
-                                'QUESTION_SEQUENCE'    => $questionNumber,
-                                'QUESTION_QUESTION'    => Scrub::html($currentQuestion['question']),
-                                'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-                                'QUESTION_MARKS'       =>
-                                    floor($currentQuestion['marks']) < $currentQuestion['marks']
-                                        ? $currentQuestion['marks']
-                                        : floor($currentQuestion['marks']),
-                            )
-                        );
 
-                        if ($page->getVar('ASSESS_KIND_LC') == 'survey') {
-                            $page->setVar('has_mark_block', '');
-                        } else {
-                            $page->parse('has_mark_block', 'has_mark');
+        if (is_array($allQuestions) && count($allQuestions)) {
+            foreach ($allQuestions as $question) {
+                $questionsBySection[$question['section_id']][] = $question;
+            }
+
+            foreach ($questionsBySection as $sectionId => $sectionQuestions) {
+                $questionNumber = 1;
+                $page->setVar('question_block', '');
+                foreach ($sectionQuestions as $currentQuestion) {
+                    if ($currentQuestion['questionDeletedAt'] == null) {
+                        if (is_numeric($currentQuestion['question_id'])) {
+                            $page->setVar(
+                                array(
+                                    //                                'ON_OFF'               => ++$j % 2 ? '' : 'dark',
+                                    'QUESTION_SEQUENCE'    => $questionNumber,
+                                    'QUESTION_QUESTION'    => Scrub::html($currentQuestion['question']),
+                                    'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+                                    'QUESTION_MARKS'       =>
+                                        floor($currentQuestion['marks']) < $currentQuestion['marks']
+                                            ? $currentQuestion['marks']
+                                            : floor($currentQuestion['marks']),
+                                )
+                            );
+
+                            if ($page->getVar('ASSESS_KIND_LC') == 'survey') {
+                                $page->setVar('has_mark_block', '');
+                            } else {
+                                $page->parse('has_mark_block', 'has_mark');
+                            }
+
+                            $page->parse('question_block', 'question', true);
+
+                            $questionNumber++;
                         }
-
-                        $page->parse('question_block', 'question', true);
-
-                        $questionNumber++;
                     }
                 }
-            }
-            if (isset($currentQuestion)) {
-                $page->setVar(
-                    array(
-                        'SECTION_TITLE'        => Scrub::text($currentQuestion['title']),
-                        'SECTION_DESCRIPTION'  => Scrub::html($currentQuestion['description']),
-                        'SECTION_SEQUENCE'     => $currentQuestion['sectionSequence'],
-                        'SECTION_SECTION_ID'   => $currentQuestion['section_id'],
-                        'SECTION_NUMQUESTIONS' => count($sectionQuestions),
-                    )
-                );
-                if (empty(trim($currentQuestion['description']))) {
-                    $page->setVar('has_section_description_block', '');
-                } else {
-                    $page->parse('has_section_description_block', 'has_section_description');
+                if (isset($currentQuestion)) {
+                    $page->setVar(
+                        array(
+                            'SECTION_TITLE'        => Scrub::text($currentQuestion['title']),
+                            'SECTION_DESCRIPTION'  => Scrub::html($currentQuestion['description']),
+                            'SECTION_SEQUENCE'     => $currentQuestion['sectionSequence'],
+                            'SECTION_SECTION_ID'   => $currentQuestion['section_id'],
+                            'SECTION_NUMQUESTIONS' => count($sectionQuestions),
+                        )
+                    );
+                    if (empty(trim($currentQuestion['description']))) {
+                        $page->setVar('has_section_description_block', '');
+                    } else {
+                        $page->parse('has_section_description_block', 'has_section_description');
+                    }
+                    $page->parse('section_block', 'section', true);
+                    $page->setVar('question_block', '');
                 }
-                $page->parse('section_block', 'section', true);
-                $page->setVar('question_block', '');
             }
         }
     }
