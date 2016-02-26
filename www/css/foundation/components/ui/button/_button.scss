@@ -115,6 +115,13 @@ input[type="submit"]{
 		color: $submit-button-color;
 		background-color: $submit-button-bg-color;
 	}
+	&[readonly] {
+		background-color: rgba($submit-button-bg-color, $button-disabled-opacity);
+		background-image: url('/images/resources/ajax.gif');
+		background-repeat: no-repeat;
+		background-size: 1rem;
+		background-position: 0.75rem 50%;
+	}
 }
 
 /* Fake submit button
