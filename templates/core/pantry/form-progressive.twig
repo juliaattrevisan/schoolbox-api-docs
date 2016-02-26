@@ -165,7 +165,6 @@
         $('input[data-mage-next="part-3"]').mage({
             onXhrDone: function (data) {
                 // $.fn.mage('next|target') will return you the target of this button, which is the "next" section
-                console.log('there');
                 $(this).mage('next').eq(0).find('[data-previousinput]').text(data);
             }
         });
