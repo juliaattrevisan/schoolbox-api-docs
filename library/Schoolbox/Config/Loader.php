@@ -48,7 +48,7 @@ class Loader implements IConfigLoader, ArrayAccess {
      */
     public function offsetGet($offset)
     {
-        return $this->configMapper->get($offset);
+        return $this->get($offset);
     }
 
     /**
@@ -78,6 +78,6 @@ class Loader implements IConfigLoader, ArrayAccess {
      */
     public function dropCache()
     {
-        $this->configMapper->dropCache();
+        ConfigMapper::getInstance()->dropCache();
     }
 }
