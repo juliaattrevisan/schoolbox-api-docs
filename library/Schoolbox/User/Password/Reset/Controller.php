@@ -132,16 +132,22 @@ class Controller extends Base
             $config = $this->getConfigLoader();
             if (count($users) > 0) {
                 foreach ($users as $user) {
-                    // Make a password reset attempt (for each account, I guess)
-                    // And send it
-                    $reset = $this->resetMapper->createModel()
-                        ->setIp($this->getRequest()->server->get('REMOTE_ADDR'));
-                    if ($user->getEnabled()) {
-                        $reset->setUser($user);
-                        $this->resetMapper->save($reset);
+                    // Tell me more about their role
+                    $reset = null;
+                    if ($user->getRole()->getCanChangePassword()) {
+                        // Make a password reset attempt (for each account, I guess)
+                        // And send it
+                        $reset = $this->resetMapper->createModel()
+                            ->setIp($this->getRequest()->server->get('REMOTE_ADDR'));
+                        if ($user->getEnabled()) {
+                            $reset->setUser($user);
+                            $this->resetMapper->save($reset);
+                        }
+                        $email = $this->mailFactory->build('userPasswordReset/reset.twig');
+                    } else {
+                        $email = $this->mailFactory->build('userPasswordReset/userNotAllowedReset.twig');
                     }
 
-                    $email = $this->mailFactory->build('userPasswordReset/reset.twig');
                     $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
                     $email->setSubject($config->get('title') . ' Password Reset');
                     $email->setContext(['user' => $user, 'reset' => $reset,]);
