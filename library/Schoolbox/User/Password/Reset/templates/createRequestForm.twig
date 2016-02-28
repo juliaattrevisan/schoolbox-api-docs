@@ -11,8 +11,8 @@
         {% if isEmailSubmitted %}
             {% if isEmailValid %}
                 <div class="alert-box success">
-                    Thank you. We have sent an email to <strong>{{ email }}</strong>
-                    which contains a link for you to reset your password.
+                    Thank you. If <strong>{{ email }}</strong> is associated with a {{ config.title }} account,
+                    you will receive an email which contains a link for you to reset your password.
                 </div>
             {% else %}
                 <div class="alert-box alert">
