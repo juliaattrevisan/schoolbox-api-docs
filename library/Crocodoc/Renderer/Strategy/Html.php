@@ -35,13 +35,10 @@ class Html extends Base
         $this->getPage()->setFile('injectable', $this->getTemplateFile());
         $this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 
-        /* Make the image display
-         */
-        $this->getPage()->setVar(
-            array(
-                'INJECTABLE_SUBMISSION_ID' => $this->getSubmission()->getId(),
-            )
-        );
+        // not sure why this is needed, but for some reason can't read the storage object in the submission
+        $file = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($this->getSubmission()->getStorage()->getHash());
+
+        $this->getPage()->setVar('INJECTABLE_SUBMISSION_CONTENT', \Scrub::html($file->read()));
 
         /* Upload File
          */
