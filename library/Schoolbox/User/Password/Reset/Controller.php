@@ -141,7 +141,7 @@ class Controller extends Base
                         $this->resetMapper->save($reset);
                     }
 
-                    $email = $this->mailFactory->build('resetPassword.twig');
+                    $email = $this->mailFactory->build('userPasswordReset/reset.twig');
                     $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
                     $email->setSubject($config->get('title') . ' Password Reset');
                     $email->setContext(['user' => $user, 'reset' => $reset,]);
@@ -152,7 +152,7 @@ class Controller extends Base
                 // Weigh up security (give away no information about whether account exists)
                 // vs. flood prevention (don't send too many emails)
                 // vs. convenience (maybe user got password wrong)
-                $email = $this->mailFactory->build('resetPasswordUserNotExists.twig');
+                $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig');
                 $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
                 $email->setSubject($config->get('title') . ' Password Reset');
                 $email->send($emailAddress);
