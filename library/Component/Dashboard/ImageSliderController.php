@@ -135,12 +135,14 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
             $url = '#';
 
             // sanitise url
-            $description = $currentFile->getDescription();
-            if (filter_var($description, FILTER_VALIDATE_URL)) {
-                $url = $description;
-            } // it might be referencing inside schoolbox, so simulate that to the validator
-            elseif (filter_var('http://localhost/' . $description, FILTER_VALIDATE_URL)) {
-                $url = $description;
+            if($currentFile->getDescription()) {
+                $description = $currentFile->getDescription();
+                if (filter_var($description, FILTER_VALIDATE_URL)) {
+                    $url = $description;
+                } // it might be referencing inside schoolbox, so simulate that to the validator
+                elseif (filter_var('http://localhost/' . $description, FILTER_VALIDATE_URL)) {
+                    $url = $description;
+                }
             }
 
             $this->setVar(
