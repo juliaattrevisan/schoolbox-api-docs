@@ -270,6 +270,7 @@ class UnitInstanceMapper extends Mapper {
                 'order' => array(
                     'open_date' => 'asc',
                     'due_date'  => 'asc',
+                    'title'     => 'asc',
                 )
             )
         );
