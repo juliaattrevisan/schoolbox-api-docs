@@ -427,7 +427,19 @@ class Group extends DeprecatedModel
             $user = $this->cacheUser[$userID];
         }
 
-        return Access::getInstance()->getFolderAccess($user, array($relationID));
+        $permission = Access::getInstance()->getFolderAccess($user, array($relationID));
+
+        // allow staff write access to NEWS_SERVICE by default except at shore...
+        
+        if ($this->isStaff($userID)
+            && (Cfg::get('news_staff_post_enabled') == '1')
+            && ($this->_service == NEWS_SERVICE)
+            && ($permission < WRITE_ACCESS)
+        ) {
+            $permission = WRITE_ACCESS;
+        }
+
+        return $permission;
     }
 
     /**
