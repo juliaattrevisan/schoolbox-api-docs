@@ -212,7 +212,7 @@ if ($allQuestions) {
  */
 $this->setBlock(TEMPLATE_content, 'sectionPercentageComplete', 'sectionPercentageComplete_block');
 
-$allPercentageComplete = $sectionHandler->sectionPercentageComplete($this->arg[1]);
+$allPercentageComplete = $sectionHandler->sectionPercentageComplete($this->arg[1], $attempt['attempt_id']);
 
 foreach ($allPercentageComplete as $currentPercentageComplete) {
     $this->setVar(
