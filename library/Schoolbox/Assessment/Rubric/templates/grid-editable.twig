@@ -1,7 +1,7 @@
 {% set formField = formField ?: 'rb' %}
 {% set inputType = rubric.multiSelect ? 'checkbox' : 'radio' %}
 {% set rubricId  = 'rb-' ~ rubric.id %}
-{% set levelLimit = levelLimit ?: 11 %}
+{% set levelLimit = levelLimit ?: config.rubric_max_levels %}
 
     <input type="hidden" name="formField" value="{{ formField }}" />
     <h3 class="subheader show-for-medium-down">Levels</h3>
