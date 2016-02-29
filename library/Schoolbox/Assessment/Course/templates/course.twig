@@ -1,0 +1,240 @@
+{% set icons = ['task', 'due work', 'quiz'] %}
+
+{# TODO sassify this #}
+<style type="text/css">
+    .source-select {
+        border: solid 0.125rem #c1e5ff;
+        font-weight: normal;
+        background-color: #fff;
+        display: block;
+        padding: 0.375rem 0.5rem;
+        margin-bottom: 1rem;
+        color: #0066b0;
+    }
+    .source-select.icon-folder {
+        color: #000;
+    }
+    .source-select.icon-folder:before {
+        color: #0066b0;
+    }
+    .source-select:hover {
+        background-color: #d1ecff;
+        text-decoration: none !important;
+    }
+    .small-1 span {
+        display: block;
+        margin-top: 0.5rem;
+    }
+
+    fieldset {
+        transition: opacity 360ms cubic-bezier(0.2,1,0,1);
+    }
+
+    fieldset[disabled] {
+        opacity: 0.9;
+    }
+
+    input[type="submit"][readonly] {
+        background-color: rgba(0,102,176,0.4);
+        background-image: url('/images/resources/ajax.gif');
+        background-repeat: no-repeat;
+        background-size: 1rem;
+        background-position: 0.75rem 50%;
+    }
+
+    fieldset[disabled] .source-select {
+        opacity: 0.5;
+        background-color: rgba(209,236,255,0.05);
+    }
+
+</style>
+
+<ul class="breadcrumb">
+    <li><a href="/course/list">Courses</a></li>
+    <li class="active">
+        {% if folder.id %}
+            <a href="/course/modify{{ folder.id }}">Modify Course</a>
+        {% else %}
+            <a href="/course/new">New Course</a>
+        {% endif %}
+    </li>
+</ul>
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ folder.id ? 'Modify' : 'New' }} Course</h1>
+        <form>
+            <section>
+                <fieldset class="content">
+                    <legend>Course Information</legend>
+                    <div class="small-12 column">
+                        <label>Name
+                            <input type="text" name="name" value="{{ folder.name }}" placeholder="What's this course called?" />
+                        </label>
+                    </div>
+                    <div class="small-12 column">
+                        <label>Faculty / Class
+                            <input type="hidden" name="parent" value="{{ folder.parent.id }}" />
+                            <a data-source="parent" href="#" class="source-select {{ folder.parent.id ? 'icon-folder' : '' }}" title="Click to change the faculty / class this course belongs to">{{ folder.parent.id ? folder.parent.name : '(Click to select)' }}</a>
+                        </label>
+                    </div>
+                    <div class="small-12 column">
+                        <label>Curriculum Codes
+                            <input type="text" value="{{ folder.curriculumNodes.first.code }}" placeholder="{replace with curriculum selectize}" />
+                        </label>
+                    </div>
+                    <div {% if folder.id %}class="hide"{% endif %}>
+                        <div class="small-12 medium-8 column">
+                            <p data-errorreason style="display:none;" class="alert alert-box icon-alert"></p>
+                        </div>
+                        <div class="small-12 medium-4 column">
+                            <input type="submit" class="button" value="Next" data-formpartial-expose="units" />
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Units</legend>
+                    <div class="small-12 column no-pad">
+                        <ul class="information-list" {% if not folder.id %}style="display:none;"{% endif %} data-formpartial="units">
+                        {% for unit in units %}
+                            {% include '@course/unit.twig' with { i: loop.index } %}
+                        {% endfor %}
+                            <li class="actions-small-1" data-unit>
+                                <div class="list-item content">
+                                    <div class="small-1 column">
+                                        <span class="icon-add"></span>
+                                    </div>
+                                    <div class="small-11 column">
+                                        <label>
+                                            <input type="text" value="" placeholder="New Unit" id="noonit-name" />
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="small-12 medium-8 column">
+                                    <p data-errorreason style="display:none;" class="alert alert-box icon-alert"></p>
+                                </div>
+                                <div class="small-12 medium-4 column">
+                                    <ul class="flex-list buttons">
+                                        <li><a href="#" class="button" id="noonit">Create Unit</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row" data-formpartial="units" {% if not folder.id %}style="display: none;"{% endif %}>
+                <div class="small-12 column">
+                    <input type="submit" name="submit" value="Save Course" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="parent-select" data-reveal class="reveal-modal"></div>
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('[data-collapser]').collapsable();
+
+        $('[data-source]').on('click', function (e) {
+            e.preventDefault();
+
+            var $selector = $(this),
+                target = $selector.data('source'),
+                $input = $('[name="' + target + '"]');
+
+            var modal = $('#parent-select');
+
+            modal.foundation('reveal', 'open', '/course/parent').one('click', '[data-selection]', function (e) {
+                e.preventDefault();
+
+                var $selection = $(this);
+
+                // selector takes the name, input takes the ID
+                $selector.addClass('icon-folder').text($selection.text());
+                $input.val($selection.data('selection'));
+
+                modal.foundation('reveal', 'close');
+            });
+
+        });
+
+        $('[data-formpartial-expose]').on('click', function (e) {
+            e.preventDefault();
+
+            // intercept the form submit, ajax the partial, upon success expose the next section and hide self
+            var $button    = $(this),
+                target     = $button.data('formpartial-expose'),
+                $expose    = $('[data-formpartial="' + target + '"]'),
+                realForm   = $button.closest('form'),
+                $fieldset  = $button.closest('fieldset'),
+                $errMsg    = $fieldset.find('[data-errorreason]'),
+                formData   = $fieldset.clone(),
+                slideSpeed = 800,
+                ajaxForm   = $('<form/>').attr('method', realForm.attr('method')).attr('action', realForm.attr('action')).append(formData);
+
+            $fieldset.attr('disabled','disabled');
+            $errMsg.slideUp(100);
+
+
+            // cache this for if we need to restore it
+            var buttonText = $button.val();
+
+            $button.attr('readonly', 'readonly').val('Working...');
+
+            var success = function () {
+                $button.closest('div').slideUp(slideSpeed, always);
+                $expose.slideDown(slideSpeed);
+            };
+
+            var failure = function (data) {
+                $button.val(buttonText);
+
+                var nm  = formData.find('input[type=text]').eq(0).val() || 'this unnamed course';
+                var msg = 'Unable to save ' + nm + ', because ' + data + '.';
+
+                $errMsg.text(msg).slideDown(slideSpeed);
+            };
+
+            var always = function () {
+                $fieldset.removeAttr('disabled');
+                $button.removeAttr('readonly');
+            };
+
+
+            // TODO ajax, and handle success / failure
+            setTimeout(function () {
+
+                if ($errMsg.text().length) {
+                    success();
+                } else {
+                    failure('of reasons that I feel disinclined to share with you. But it\'s mostly just that I don\'t like you');
+                }
+
+                always();
+            }, 1200);
+
+        });
+
+        $('#noonit').on('click', function (e) {
+            e.preventDefault();
+
+
+            var $before = $(this).closest('li[data-unit]');
+
+            var noonitName = $('#noonit-name');
+
+            $.post('/sandbox/course/unit/new', { name: noonitName.val() }).done(function (data) {
+                $before.before(data);
+                $('[data-collapser]').collapsable();
+                noonitName.val('');
+            }).fail(function () {
+
+            }).always(function () {
+
+            });
+        });
+
+    });
+</script>
+
