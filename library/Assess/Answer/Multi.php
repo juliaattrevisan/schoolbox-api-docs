@@ -140,26 +140,20 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                     && in_array($currentAnswer->value, $existingAnswer)
                 ) {
                     // The student chose this answer.
-                    // If it's correct show a tick, if not show a cross.
                     $page->setVar('ANSWER_CHECKED', 'evaluation-selected-answer-option');
                     $page->setVar('ANSWER_GIVEN_CHECKED', 'checked');
                     if ($currentAnswer->correct) {
-                        $page->setVar('ACTUAL_CORRECT_VALUE', 'evaluation-correct-answer-option');
                         $page->setVar('ANSWER_CORRECT_CHECKED', 'checked');
                     } else {
-                        $page->setVar('ACTUAL_CORRECT_VALUE', 'evaluation-incorrect-answer-option');
                         $page->setVar('ANSWER_CORRECT_CHECKED', '');
                     }
                 } else {
                     // The student didn't choose this answer.
-                    // If it's correct show a cross (they should have chose it), if not show no icon.
                     $page->setVar('ANSWER_CHECKED', '');
                     $page->setVar('ANSWER_GIVEN_CHECKED', '');
                     if ($currentAnswer->correct) {
-                        $page->setVar('ACTUAL_CORRECT_VALUE', 'evaluation-incorrect-answer-option');
                         $page->setVar('ANSWER_CORRECT_CHECKED', 'checked');
                     } else {
-                        $page->setVar('ACTUAL_CORRECT_VALUE', '');
                         $page->setVar('ANSWER_CORRECT_CHECKED', '');
                     }
                 }
