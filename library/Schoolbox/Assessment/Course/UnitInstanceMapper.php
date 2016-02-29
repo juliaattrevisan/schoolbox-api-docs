@@ -275,6 +275,9 @@ class UnitInstanceMapper extends Mapper {
             )
         );
 
+        // Natural sort
+        $unit_list->sortBy('title', 'asc', 'strnatcasecmp');
+
         // Hydrate the list of tasks within each unit, sorting by order.
         $task_list = $this->getJoinMapper('task')->findByColumn(
             'course_unit_instance_id',
