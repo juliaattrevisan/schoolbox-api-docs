@@ -391,6 +391,16 @@ class UserAccessMapper extends Mapper
             return $v >= $minimumLevel;
         };
 
+        // Find the NNIAN for each folder
+
+        foreach ($serviceIds as $key => $serviceIdentifier) {
+            if ($serviceIdentifier != 0) {
+                $folder =  CategoryMapper::getInstance()->findCheaplyById($serviceIdentifier);
+                $categoryNnian = CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
+                $serviceIds[$key] = $categoryNnian->getId();
+            }
+        }
+
         $search = [
             'uid'     => $userId,
             'service' => $service,
@@ -445,25 +455,11 @@ class UserAccessMapper extends Mapper
      */
     public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE)
     {
-
         // Order of priority for permissions
         //
         // 1. Previously cached results
         // 2. UserAccess table
         // 3. External DB access (via Synergetic class code)
-
-        // If we are getting the permission for a homepage, we need to take into account inheritance
-
-        if ($service == HOMEPAGE_SERVICE) {
-
-            // Find the NNIAN for the folder
-
-            $categoryNnian = CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode(
-                CategoryMapper::getInstance()->findCheaplyById($serviceIdentifier)
-            );
-
-            $serviceIdentifier = $categoryNnian->getId();
-        }
 
         // Not sure what this is for (but Steve does apparently)
 
@@ -474,6 +470,18 @@ class UserAccessMapper extends Mapper
                     'uid'     => $user->getId(),
                 )
             );
+        }
+
+        // If we are getting the permission for a homepage, we need to take into account inheritance
+
+        if ($serviceIdentifier != 0 && $service == HOMEPAGE_SERVICE) {
+
+            // Find the NNIAN for the folder
+
+            $folder =  CategoryMapper::getInstance()->findCheaplyById($serviceIdentifier);
+            $categoryNnian = CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
+
+            $serviceIdentifier = $categoryNnian->getId();
         }
 
         // Setup cache array for this user/service/sid if it doesn't already exist)
@@ -489,6 +497,12 @@ class UserAccessMapper extends Mapper
         // Permission check #1 - Cached results
 
         if (isset($this->cachedPermissions[$user->getId()][$service][$serviceIdentifier])) {
+
+            if ($this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] == -1) {
+                // Found cached exception, throw it
+                throw new Mapper\Exception("Instance of object not found");
+            }
+
             // Found cached result, return it
             return $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier];
         }
@@ -519,7 +533,8 @@ class UserAccessMapper extends Mapper
         $fullCategory = CategoryMapper::getInstance()->findById($serviceIdentifier);
         $result = $this->involvedInSubject($user, $fullCategory->getCodeString());
 
-        if($result) {
+        if ($result)
+        {
             // Found matching student, give them read/write perms if student/staff respectively
 
             $model = new UserAccess();
@@ -537,17 +552,11 @@ class UserAccessMapper extends Mapper
             return $model;
         }
 
-        // The users got no permission in either UserAccess or external DB, return a deny object
+        // The users got no permission in either UserAccess or external DB
 
-        $model = new UserAccess();
-        $model->setService($service);
-        $model->setServiceIdentifier($serviceIdentifier);
-        $model->setUser($user);
-        $model->setAccessLevel(UserAccess::ACCESS_DENY);
+        // Cache and throw an exception
 
-        // Cache for future calls and return the permission object
-
-        $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] = $model;
-        return $model;
+        $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] = -1;
+        throw new Mapper\Exception("Instance of object not found");
     }
 }

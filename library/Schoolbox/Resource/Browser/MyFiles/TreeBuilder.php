@@ -33,6 +33,7 @@ class TreeBuilder extends AbstractTreeBuilder
     public function __construct(Folder\ILocator $locator, User $user)
     {
         parent::__construct($locator, 'myfile');
+
         $this->user = $user;
     }
 

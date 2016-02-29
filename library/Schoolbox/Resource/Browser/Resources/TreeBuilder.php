@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Browser\Resources;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -29,31 +30,20 @@ class TreeBuilder extends AbstractTreeBuilder
     /** @var TaskMapper */
     protected $taskMapper;
 
-    /** @var UserAccessMapper */
-    protected $userAccessMapper;
-
-    /** @var RoleAccessMapper */
-    protected $roleAccessMapper;
-
     /** @var User */
     protected $user;
-
 
     /**
      * @param Folder\ILocator  $locator
      * @param TaskMapper       $taskMapper
-     * @param UserAccessMapper $userAccessMapper
-     * @param RoleAccessMapper $roleAccessMapper
      * @param User             $user
      * @param string           $rootLabel
      */
-    public function __construct(Folder\ILocator $locator, TaskMapper $taskMapper, $userAccessMapper, $roleAccessMapper, $user, $rootLabel = 'Resources')
+    public function __construct(Folder\ILocator $locator, TaskMapper $taskMapper, $user, $rootLabel = 'Resources')
     {
         parent::__construct($locator, 'sbfsfile', $rootLabel);
 
         $this->taskMapper       = $taskMapper;
-        $this->userAccessMapper = $userAccessMapper;
-        $this->roleAccessMapper = $roleAccessMapper;
         $this->user             = $user;
     }
 
@@ -131,31 +121,7 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function getFolderPermission($folderId)
     {
-
-        if ($this->user->isSuperuser()) {
-            return $this->getPermissionString(UserAccess::ACCESS_FULL);
-        }
-
-        // check user access first, then role access if that fails
-        try {
-            $access[] = $this->userAccessMapper
-                ->getAccess($this->user, $folderId)
-                ->getAccessLevel();
-        }
-        catch (Mapper\Exception $e) {
-
-        }
-
-        try {
-                $access[] = $this->roleAccessMapper
-                    ->getAccess($this->user, $folderId)
-                    ->getType();
-
-        } catch (Mapper\Exception $e) {
-            $access[] = UserAccess::ACCESS_DENY;
-        }
-
-        return $this->getPermissionString(max($access));
+       return Access::getInstance()->getFolderAccess($this->user, [ $folderId ]);
     }
 
 

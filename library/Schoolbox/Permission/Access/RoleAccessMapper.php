@@ -11,8 +11,8 @@ namespace Schoolbox\Permission\Access;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Folder\Model as CategoryModel;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -65,22 +65,22 @@ class RoleAccessMapper extends Mapper
     /**
      * Gets all role permissions for $category.
      *
-     * @param CategoryModel $category
+     * @param FolderModel $category
      *
      * @return Collection|RoleAccess[]
      * @throws Mapper\Exception
      */
-    public function getGroupPermissions(CategoryModel $category) 
+    public function getGroupPermissions(FolderModel $category)
     {
         return $this->findAllForFolder($category);
     }
 
     /**
-     * @param CategoryModel $category
+     * @param FolderModel $category
      * @return Collection|RoleAccess[]
      * @throws Mapper\Exception
      */
-    public function findAllForFolder(CategoryModel $category)
+    public function findAllForFolder(FolderModel $category)
     {
         // Get permissions for all roles, regardless of whether there's one in
         // the database for this category.
@@ -113,7 +113,7 @@ class RoleAccessMapper extends Mapper
     /**
     * Save category permissions, optionally recursively
     *
-    * @param CategoryModel $category
+    * @param FolderModel $category
     * @param array $perms - assoc array of role IDs and permission levels
     * @param bool $recursive
     * @return bool
@@ -134,7 +134,7 @@ class RoleAccessMapper extends Mapper
     /**
     * Recursive helper function for generating a collection of permissions
     *
-    * @param CategoryModel $category
+    * @param FolderModel $category
     * @param $perms
     * @param bool $recursive
     * @return Collection|RoleAccess[]
@@ -155,7 +155,7 @@ class RoleAccessMapper extends Mapper
 
         // if recursing, locate children and generate permissions for them as well
         if ($recursive) {
-            $children = CategoryMapper::getInstance()->findByParent($category->getId());
+            $children = FolderMapper::getInstance()->findByParent($category->getId());
             if ($children->count()) {
                 foreach ($children as $subCategory) {
                     // recursive call
@@ -198,14 +198,16 @@ class RoleAccessMapper extends Mapper
             return $ra;
         }
 
-        if ($serviceIdentifier != 0 &&  $service == UserAccess::SERVICE_HOMEPAGE)
+        if ($serviceIdentifier != 0 && $service == UserAccess::SERVICE_HOMEPAGE)
         {
-            $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($serviceIdentifier);
+            $folder = FolderMapper::getInstance()->findCheaplyById($serviceIdentifier);
 
             if ($folder->getInherit())
             {
                 // Folder inherits, find its NNIAN
-                $permissionFolder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
+                $permissionFolder = FolderMapper::getInstance()->findNearestNonInheritingAncestralNode(
+                    $folder
+                );
                 $serviceIdentifier = $permissionFolder->getId();
             }
         }

@@ -940,6 +940,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      *
      * @param $folderId
      * @return \Schoolbox\Resource\Folder\Model
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function findCheaplyById($folderId) {
 
@@ -964,14 +965,18 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
-        $folder = $this->hydrate($row);
+        if ($row) {
+            $folder = $this->hydrate($row);
 
-        $parent = $this->createModel();
-        $parent->setId($folder->getParent()->getId());
+            $parent = $this->createModel();
+            $parent->setId($folder->getParent()->getId());
 
-        $folder->setParent($parent);
+            $folder->setParent($parent);
 
-        return $folder;
+            return $folder;
+        } else {
+            throw new \Schoolbox\Mapper\Exception("Instance of object not found");
+        }
     }
 
     /**
