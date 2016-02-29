@@ -97,6 +97,10 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             )
         );
 
+        /* Need title injected here
+         */
+        $this->parseConfig();
+
         //link output
         $this->setBlock($templateHandle, 'link', 'link_block');
         $this->setBlock('link', 'modify_link', 'modify_link_block');
@@ -153,10 +157,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         } else {
             $this->parse("submit_link_block", "submit_link");
         }
-
-        /* Need title injected here
-         */
-        $this->parseConfig();
 
         return true;
     }
