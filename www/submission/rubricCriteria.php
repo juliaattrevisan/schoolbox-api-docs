@@ -53,7 +53,7 @@ $this->setVar(array(
     'CATEGORY_NAME' => Scrub::text($category->getName()),
 ));
 
-$criteriaName = $this->getDi()->get('l10n')->translate('rubricCriterion',false,true);
+$criteriaName = $this->getDi()->get('l10n')->translate('rubricCriterion', true, true);
 
 $title = 'Manage '.$criteriaName.' for '.Scrub::text($category->getName());
 $this->setTitle($title);
