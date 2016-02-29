@@ -38,6 +38,7 @@ class Sync implements SyncInterface
                 s.Code        AS student_id,
                 ''            AS network_login,
                 ''            AS student_title,
+                ''            AS student_given_name,
                 s.FirstName   AS student_preferred,
                 s.LastName    AS student_surname,
                 s.Sex         AS student_gender,
@@ -65,6 +66,7 @@ class Sync implements SyncInterface
                 ''          AS student_contact_network_login,
                 c.Code      AS student_contact_id,
                 c.Title     AS student_contact_title,
+                ''          AS student_contact_given_name,
                 c.FirstName AS student_contact_preferred,
                 c.LastName  AS student_contact_surname,
                 CASE WHEN c.EmailCorrespondence = 'Y'
@@ -98,6 +100,7 @@ class Sync implements SyncInterface
                 ''          AS network_login,
                 t.Active    AS active_flag,
                 t.Title     AS staff_title,
+                ''          AS staff_given_name,
                 t.FirstName AS staff_preferred_name,
                 t.LastName  AS staff_surname,
                 ''          AS default_email_code,
