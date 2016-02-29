@@ -135,27 +135,22 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
+                if ($currentAnswer->correct) {
+                    $page->setVar('ANSWER_CORRECT_ICON', 'icon-tick');
+                } else {
+                    $page->setVar('ANSWER_CORRECT_ICON', '');
+                }
                 if ($existing['response']
                     && is_array($existingAnswer)
                     && in_array($currentAnswer->value, $existingAnswer)
                 ) {
                     // The student chose this answer.
-                    // If it's correct show a tick, if not show a cross.
                     $page->setVar('ANSWER_CHECKED', 'evaluation-selected-answer-option');
-                    if ($currentAnswer->correct) {
-                        $page->setVar('ACTUAL_CORRECT_VALUE', 'evaluation-correct-answer-option');
-                    } else {
-                        $page->setVar('ACTUAL_CORRECT_VALUE', 'evaluation-incorrect-answer-option');
-                    }
+                    $page->setVar('ANSWER_GIVEN_ICON', 'icon-tick');
                 } else {
                     // The student didn't choose this answer.
-                    // If it's correct show a cross (they should have chose it), if not show no icon.
                     $page->setVar('ANSWER_CHECKED', '');
-                    if ($currentAnswer->correct) {
-                        $page->setVar('ACTUAL_CORRECT_VALUE', 'evaluation-incorrect-answer-option');
-                    } else {
-                        $page->setVar('ACTUAL_CORRECT_VALUE', '');
-                    }
+                    $page->setVar('ANSWER_GIVEN_ICON', '');
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
