@@ -98,7 +98,7 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
         }
 
         // Show assess or quiz links? Depends on $actionable
-        $this->showAssessLink = $this->actionable;
+        $this->showAssessLink = $this->actionable || $groupHandler->isStaff();
         $this->showQuizLink   = $this->actionable;
 
         // if this is a parent viewing their child's work
