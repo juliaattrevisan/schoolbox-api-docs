@@ -137,7 +137,7 @@
                     </div>
 
                     {# Only display the edit/delete links to the owner of the record or pastoral moderators #}
-                    {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or session.user.getPastoralModerator %}
+                    {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or pastoralModerator %}
                     <nav>
                         <a class="icon-modify" href="/pastoral/update/{{ user.getId() }}/{{ record.getId() }}" title="Modify Comment"></a>
                         <a data-delete class="icon-delete" href="#" title="Delete Comment"></a>
@@ -179,7 +179,7 @@
                                 {%
                                     if  (session.user.getRole().isStaff() and record.owner.getId() == session.user.getId()) or
                                         (session.user.getRole().isStaff() and comment.owner.getId() == session.user.getId()) or
-                                        session.user.getPastoralModerator
+                                        pastoralModerator
                                 %}
                                     <nav>
                                         <a data-delete-comment="{{ comment.getId }}" class="icon-delete" href="#" title="Delete Comment"></a>

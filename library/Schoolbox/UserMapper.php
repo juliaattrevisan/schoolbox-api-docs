@@ -207,14 +207,6 @@ class UserMapper extends Mapper
 
         $this->hasMap(
             array(
-                'column' => 'pastoral_moderator',
-                'property' => 'pastoralModerator',
-                'type' => Mapper::TYPE_BOOLEAN,
-            )
-        );
-
-        $this->hasMap(
-            array(
                 'column' => 'hide_timetable',
                 'property' => 'hideTimetable',
                 'type' => Mapper::TYPE_BOOLEAN,

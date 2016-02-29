@@ -279,9 +279,6 @@
                         <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
                         <label for="eportfolio" class="checkbox-label">E-Portfolio</label>
 
-                        <input id="pastoral_moderator" type="checkbox" name="pastoral_moderator" value="1" {PASTORAL_MODERATOR_CHECKED} />
-                        <label for="pastoral_moderator" class="checkbox-label">Pastoral Moderator</label>
-
                         <input id="hide_contacts" type="checkbox" name="hide_contacts" value="1" {HIDE_CONTACTS_CHECKED} />
                         <label for="hide_contacts" class="checkbox-label">Hide Contact Details</label>
 
@@ -542,6 +539,17 @@
                 </li>
                 <!-- END user_curriculum -->
 
+                <!-- BEGIN user_pastoral -->
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 info card">Pastoral Moderator</div>
+                    </div>
+                    <nav>
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="icon-delete" title="Remove"></a>
+                    </nav>
+                </li>
+                <!-- END user_pastoral -->
+
                 <li class="actions-small-1">
                     <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService" class="list-item">
                         <div class="small-4 info card">
@@ -553,6 +561,7 @@
                                 <option value="6" data-identifier="residentialHouse">Housemaster</option>
                                 <option value="7" data-identifier="none">Resource Booking</option>
                                 <option value="8" data-identifier="none">Curriculum</option>
+                                <option value="9" data-identifier="none">Pastoral Moderator</option>
                             </select>
                         </div>
                         <div class="small-4 info card">

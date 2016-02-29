@@ -12,6 +12,7 @@
 namespace Schoolbox\Pastoral\Pastoral;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Zone;
 
 class Controller extends Base
@@ -455,6 +456,9 @@ class Controller extends Base
         $user = $userMapper->findWithSubjects($id);
         $user->loadParents();
 
+        $pastoralModerator = UserAccessMapper::getInstance()->findAllForUser($_SESSION["user"])->filterBy("service", 9);
+        $pastoralModerator = $pastoralModerator->count() > 0;
+
         // Kick them back to the kerb if they shouldn't be looking at this page
 
         if ($role != "staff" && !$_SESSION["user"]->isParentOf($user)) {
@@ -519,7 +523,7 @@ class Controller extends Base
                 }
             }
 
-            if ($_SESSION["user"]->getPastoralModerator()) {
+            if ($pastoralModerator) {
                 $record->access = true;
             }
 
@@ -539,7 +543,7 @@ class Controller extends Base
             // If the user is not in the audience for this record, and is not the owner
             // hide the record from the list
 
-            if (!$found && $_SESSION["user"]->getId() != $record->getOwner()->getId() && !$_SESSION["user"]->getPastoralModerator()) {
+            if (!$found && $_SESSION["user"]->getId() != $record->getOwner()->getId() && !$pastoralModerator) {
                 $record->hidden = true;
             } else {
                 $record->hidden = false;
@@ -599,7 +603,8 @@ class Controller extends Base
                     'student'           => $student,
                     'contacts'          => $contacts,
                     'role'              => $_SESSION["user"]->getRole()->getType(),
-                    'types'             => $types
+                    'types'             => $types,
+                    'pastoralModerator' => $pastoralModerator
                 ),
             )
         );
@@ -617,9 +622,12 @@ class Controller extends Base
         $user = $userMapper->findWithSubjects($studentId);
         $user->loadParents();
 
+        $pastoralModerator = UserAccessMapper::getInstance()->findAllForUser($_SESSION["user"])->filterBy("service", 9);
+        $pastoralModerator = $pastoralModerator->count() > 0;
+
         // Kick them back to the kerb if they shouldn't be looking at this page
 
-        if ($role != "staff" && !$_SESSION["user"]->isParentOf($user) && !$_SESSION["user"]->getPastoralModerator()) {
+        if ($role != "staff" && !$_SESSION["user"]->isParentOf($user) && !$pastoralModerator) {
 
             // The logged in user is not staff/parent, send them back to the homepage
 
@@ -663,7 +671,7 @@ class Controller extends Base
         }
 
 
-        if (!$found && !$_SESSION["user"]->getPastoralModerator()) {
+        if (!$found && !$pastoralModerator) {
             foreach ($record->roles as $role_current) {
                 if ($_SESSION["user"]->getRole()->getId() == $role_current->getId()) {
 
@@ -678,7 +686,7 @@ class Controller extends Base
         // Shouldn't be looking at this record because they're not in the audience, or the
         // comment is private and they aren't the owner. Back to the kerb...
 
-        if (!$_SESSION["user"]->getPastoralModerator()) {
+        if (!$pastoralModerator) {
             if ((!$found && $_SESSION["user"]->getId() != $record->getOwner()->getId()) || ($record->getPrivate() && $_SESSION["user"]->getId() != $record->getOwner()->getId())) {
                 $this->getResponse()->redirect->afterPost("/");
                 return;
@@ -721,7 +729,8 @@ class Controller extends Base
                     'student_id'      => $record->getStudentId(),
                     'record'          => $record,
                     'comments'        => $comments,
-                    'attachments'     => $attachments
+                    'attachments'     => $attachments,
+                    'pastoralModerator' => $pastoralModerator
                 ),
             )
         );
@@ -1292,11 +1301,14 @@ class Controller extends Base
         $pastoralMapper = \Schoolbox\Pastoral\Pastoral\Mapper::getInstance();
         $record = $pastoralMapper->findById($_POST["id"]);
 
+        $pastoralModerator = UserAccessMapper::getInstance()->findAllForUser($_SESSION["user"])->filterBy("service", 9);
+        $pastoralModerator = $pastoralModerator->count() > 0;
+
         // Work out if this person should be allowed to delete the record
 
         $role = $_SESSION["user"]->getRole()->getType();
 
-        if (!$_SESSION["user"]->getPastoralModerator()) {
+        if (!$pastoralModerator) {
             if ($role != "staff" || $_SESSION["user"]->getId() != $record->getOwner()->getId()) {
 
                 // The logged in user is not staff or is not the owner, send them back to the homepage

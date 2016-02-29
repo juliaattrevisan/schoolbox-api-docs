@@ -78,4 +78,6 @@ INSERT INTO `schoolbox`.`luPastoralSeverity` (`name`, `order`) VALUES ('Critical
 INSERT INTO schoolbox.config (name, value, title, description, field_id, options, type_id, editable, hidden, required) VALUES ('external_pastoral', '0', 'External Pastoral Syncronization', 'Enables pastoral comments to be automatically written back into the Synergetic.', 3, '', 7, 'true', 'false', 'false');
 INSERT INTO schoolbox.config (name, value, title, description, field_id, options, type_id, editable, hidden, required) VALUES ('pastoral_enabled', '0', 'Enable Pastoral Care Module', 'Is the pastoral care module enabled?', 3, '', 11, 'false', 'false', 'false');
 
-ALTER TABLE `user` ADD `pastoral_moderator` TINYINT(1) DEFAULT 0;
+-- ALTER TABLE `user` ADD `pastoral_moderator` TINYINT(1) DEFAULT 0;
+
+INSERT INTO `luServices` (`id`, `name`) VALUES (9,'Pastoral Moderator');

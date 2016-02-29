@@ -132,7 +132,7 @@
             <a class="button expand spaced" href="/pastoral/insert/{{ user.getId() }}">Add Pastoral Comment</a>
 
             {# Not sure if this is the best place, but give moderators a link to pastoral report builder #}
-            {% if session.user.getPastoralModerator %}
+            {% if pastoralModerator %}
                 <a class="button expand spaced" href="/pastoral/report-builder">Pastoral Report Builder</a>
             {% endif %}
             <hr>
@@ -177,7 +177,7 @@
                                 <div class="avatar card small-12 wrap-down">
 
                                     {# If the record is private and the person is not the owner, don't put links to view the content #}
-                                    {% if not session.user.getPastoralModerator and record.private and record.owner.getId() != session.user.getId() %}
+                                    {% if not pastoralModerator and record.private and record.owner.getId() != session.user.getId() %}
 
                                         {# Portrait image of author #}
                                         <a href="/search/user/{{ record.owner.getId() }}">
@@ -231,7 +231,7 @@
                                     {% endif %}
 
                                     <article>
-                                        {% if not session.user.getPastoralModerator and record.private and (record.owner.getId() != session.user.getId()) %}
+                                        {% if not pastoralModerator and record.private and (record.owner.getId() != session.user.getId()) %}
                                             {# The article is marked as private, only the author or pastoral moderators can see the content #}
                                             <p class="spaced">
                                                 The contents of this pastoral event have been marked as private. Please contact {{ record.owner.firstName }} {{ record.owner.lastName }} if you require more information.
@@ -287,7 +287,7 @@
                             </div>
 
                             {# Show edit links to the owner and pastoral moderators #}
-                            {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or session.user.getPastoralModerator %}
+                            {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or pastoralModerator %}
                                 <nav>
                                     <a class="icon-modify no-text" href="/pastoral/update/{{ user.getId() }}/{{ record.getId() }}" title="Modify"></a>
                                     <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>

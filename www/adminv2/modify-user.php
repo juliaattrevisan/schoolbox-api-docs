@@ -24,6 +24,7 @@ if(is_numeric($this->arg[0])) {
     $this->setBlock(TEMPLATE_content, 'user_housemaster', 'user_housemaster_block');
     $this->setBlock(TEMPLATE_content, 'user_resource_booking', 'user_resource_booking_block');
     $this->setBlock(TEMPLATE_content, 'user_curriculum', 'user_curriculum_block');
+    $this->setBlock(TEMPLATE_content, 'user_pastoral', 'user_pastoral_block');
 
     // include the admin navigation
     $nav = new AdminV2_Nav();
@@ -36,6 +37,7 @@ if(is_numeric($this->arg[0])) {
         'user_housemaster_block'=> '',
         'user_resource_booking_block'=> '',
         'user_curriculum_block'=> '',
+        'user_pastoral_block'=> '',
     ));
 
     /* Modify existing user
@@ -64,7 +66,6 @@ if(is_numeric($this->arg[0])) {
                         'DATABASE_ID'       => $user['synergy_id'],
                         'SUPERUSER_CHECKED' => $user['su']==1?'checked="checked"':'',
                         'LASTNAME'          => $user['lastname'],
-                        'PASTORAL_MODERATOR_CHECKED'=> $user['pastoral_moderator']==1?'checked="checked"':'',
                         'HIDE_CONTACTS_CHECKED'=> $user['hide_contacts']==1?'checked="checked"':'',
                         'HIDE_TIMETABLE_CHECKED'=> $user['hide_timetable']==1?'checked="checked"':'',
                         'EPORTFOLIO_CHECKED'=> $user['eportfolio_enabled']==1?'checked="checked"':'',
@@ -275,6 +276,13 @@ if(is_numeric($this->arg[0])) {
                      */
                     case CURRICULUM_SERVICE:
                         $this->parse('user_curriculum_block', 'user_curriculum', true);
+                        break;
+
+                    /* Pastoral
+                     * Use the constants for now, but they should be removed
+                     */
+                    case PASTORAL_SERVICE:
+                        $this->parse('user_pastoral_block', 'user_pastoral', true);
                         break;
                 }
 
