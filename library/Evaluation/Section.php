@@ -198,23 +198,25 @@ abstract class Evaluation_Section extends DeprecatedModel
     /**
      * Find out how much of a section was completed.
      *
-     * @param  $section_id
+     * @param  int $section_id
+     * @param  int $attemptId
      *
      * @return array
      */
-    public function sectionPercentageComplete($section_id)
+    public function sectionPercentageComplete($section_id, $attemptId)
     {
         $section = $this->getByID($section_id);
         $sectionList = $this->getList($section['assess_id']);
 
+        $completion = [];
         foreach ($sectionList as $currentSection) {
             $numQuestions = "SELECT
                                  COUNT(assess_response.question_id) AS num
                              FROM assess_response
                              LEFT JOIN assess_section on assess_section.section_id = assess_response.section_id
                              LEFT JOIN assess_question on assess_response.question_id = assess_question.question_id
-                             WHERE attempt_id = '$_SESSION[attempt_id]'
-                             AND assess_response.section_id = '$currentSection[section_id]'
+                             WHERE attempt_id = '{$this->db->quote($attemptId)}'
+                             AND assess_response.section_id = '{$this->db->quote($currentSection['section_id'])}'
                              AND assess_section.deleted_at IS NULL
                              AND assess_question.deleted_at IS NULL";
 
@@ -232,7 +234,7 @@ abstract class Evaluation_Section extends DeprecatedModel
                 $currentSection['percentageComplete'] = 0;
             }
 
-            $currentSection['sequence'] = $currentSection['sequence'];
+//            $currentSection['sequence'] = $currentSection['sequence'];
 
             $completion[] = $currentSection;
         }

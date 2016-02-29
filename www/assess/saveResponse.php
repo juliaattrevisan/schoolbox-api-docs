@@ -63,7 +63,7 @@ if($attemptHandler->checkAttemptIsValid($section['assess_id'], $_SESSION['user']
 
     /* Find out how many questions were completed in this section already
      */
-    $result['percentageComplete'] = $sectionHandler->sectionPercentageComplete($question['section_id']);
+    $result['percentageComplete'] = $sectionHandler->sectionPercentageComplete($question['section_id'], $data['attempt_id']);
 
     echo json_encode($result);
 }
