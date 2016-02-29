@@ -1,1 +1,1 @@
-ALTER TABLE `user` DROP COLUMN `email_pass`;
+UPDATE `user` SET `email_pass` = '';
