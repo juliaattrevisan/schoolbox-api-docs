@@ -83,7 +83,7 @@ class Sync implements SyncInterface
             SELECT
                 'P' + p.par_code AS student_contact_id,
                 ''               AS student_contact_title,
-                ''               AS student_contact_given_name,
+                p.f_name         AS student_contact_given_name,
                 p.f_name         AS student_contact_preferred,
                 ''               AS student_contact_surname,
                 ''               AS student_contact_default_email,
@@ -110,7 +110,7 @@ class Sync implements SyncInterface
             SELECT
                 'S' + p.par_code AS student_contact_id,
                 ''               AS student_contact_title,
-                ''               AS student_contact_given_name,
+                p.m_name         AS student_contact_given_name,
                 p.m_name         AS student_contact_preferred,
                 ''               AS student_contact_surname,
                 ''               AS student_contact_default_email,

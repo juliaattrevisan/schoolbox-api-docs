@@ -49,7 +49,7 @@ class Sync implements SyncInterface
                 denbighID      AS student_id,
                 username       AS network_login,
                 ''             AS student_title,
-                ''             AS student_given_name,
+                firstname      AS student_given_name,
                 firstname      AS student_preferred,
                 surname        AS student_surname,
                 ''             AS student_gender,
