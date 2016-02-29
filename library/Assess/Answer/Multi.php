@@ -141,20 +141,20 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                 ) {
                     // The student chose this answer.
                     $page->setVar('ANSWER_CHECKED', 'evaluation-selected-answer-option');
-                    $page->setVar('ANSWER_GIVEN_CHECKED', 'checked');
+                    $page->setVar('ANSWER_GIVEN_ICON', 'icon-tick');
                     if ($currentAnswer->correct) {
-                        $page->setVar('ANSWER_CORRECT_CHECKED', 'checked');
+                        $page->setVar('ANSWER_CORRECT_ICON', 'icon-tick');
                     } else {
-                        $page->setVar('ANSWER_CORRECT_CHECKED', '');
+                        $page->setVar('ANSWER_CORRECT_ICON', '');
                     }
                 } else {
                     // The student didn't choose this answer.
                     $page->setVar('ANSWER_CHECKED', '');
-                    $page->setVar('ANSWER_GIVEN_CHECKED', '');
+                    $page->setVar('ANSWER_GIVEN_ICON', '');
                     if ($currentAnswer->correct) {
-                        $page->setVar('ANSWER_CORRECT_CHECKED', 'checked');
+                        $page->setVar('ANSWER_CORRECT_ICON', 'icon-tick');
                     } else {
-                        $page->setVar('ANSWER_CORRECT_CHECKED', '');
+                        $page->setVar('ANSWER_CORRECT_ICON', '');
                     }
                 }
 
