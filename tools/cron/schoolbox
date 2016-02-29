@@ -34,4 +34,6 @@ MAILTO="support@schoolbox.com.au"
 0 22 * * *	root	php /usr/share/schoolbox/tools/synchronise/userProvision.php -v --perform-update >> /var/log/schoolbox/ups.log 2>&1
 
 # Complete quizzes that have expired
-*/20 * * * * root   php /usr/share/schoolbox/tools/quiz/autoFinish.php >> /var/log/schoolbox/quiz.log 2>&1
+*/20 * * * *	root	php /usr/share/schoolbox/tools/quiz/autoFinish.php >> /var/log/schoolbox/quiz.log 2>&1
+
+# End of file - do not delete
