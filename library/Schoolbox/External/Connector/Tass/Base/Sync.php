@@ -47,6 +47,7 @@ class Sync implements SyncInterface
                 s.stud_code      AS student_id,
                 s.alt_id         AS network_login,
                 ''               AS student_title,
+                s.given_name     AS student_given_name,
                 s.preferred_name AS student_preferred,
                 s.surname        AS student_surname,
                 s.sex            AS student_gender,
@@ -82,6 +83,7 @@ class Sync implements SyncInterface
             SELECT
                 'P' + p.par_code AS student_contact_id,
                 ''               AS student_contact_title,
+                ''               AS student_contact_given_name,
                 p.f_name         AS student_contact_preferred,
                 ''               AS student_contact_surname,
                 ''               AS student_contact_default_email,
@@ -108,6 +110,7 @@ class Sync implements SyncInterface
             SELECT
                 'S' + p.par_code AS student_contact_id,
                 ''               AS student_contact_title,
+                ''               AS student_contact_given_name,
                 p.m_name         AS student_contact_preferred,
                 ''               AS student_contact_surname,
                 ''               AS student_contact_default_email,
@@ -164,6 +167,7 @@ class Sync implements SyncInterface
                     ELSE 1
                 END                 AS active_flag,
                 t.salutation_flag   AS staff_title,
+                t.given_names_text  AS staff_given_name,
                 t.prefer_name_text  AS staff_preferred_name,
                 t.surname_text      AS staff_surname,
                 ''                  AS default_email_code,
