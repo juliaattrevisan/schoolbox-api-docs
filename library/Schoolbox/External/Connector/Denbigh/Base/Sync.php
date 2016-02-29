@@ -49,6 +49,7 @@ class Sync implements SyncInterface
                 denbighID      AS student_id,
                 username       AS network_login,
                 ''             AS student_title,
+                ''             AS student_given_name,
                 firstname      AS student_preferred,
                 surname        AS student_surname,
                 ''             AS student_gender,
@@ -76,19 +77,20 @@ class Sync implements SyncInterface
                 par.loginID      AS student_contact_network_login,
                 peo.denbighID    AS student_contact_id,
                 peo.title        AS student_contact_title,
-                preferred_name   AS student_contact_preferred,
+                peo.given_names  AS student_contact_given_name,
+                peo.preferred_name AS student_contact_preferred,
                 peo.surname      AS student_contact_surname,
                 peo.email        AS student_contact_default_email,
                 s.denbighID      AS student_id,
                 s.academicYear   AS student_year_level,
                 ''               AS student_campus,
                 s.gender         AS student_gender,
-                s.preferred_name AS student_preferred,
+                s.firstname      AS student_preferred,
                 s.surname        AS student_surname
             FROM Addresses adr
             LEFT JOIN Parents par ON par.familyDenbighID = adr.familyDenbighID
             LEFT JOIN People peo ON peo.denbighID = par.peopleDenbighID
-            LEFT JOIN Students s ON s.familyDenbighID = par.familyDenbighID
+            LEFT JOIN Schoolbox_Students ON s.familyDenbighID = par.familyDenbighID
             WHERE peo.id IS NOT NULL
             GROUP BY peo.denbighID
             ORDER BY familyDenbighID ASC, denbighID ASC
@@ -104,19 +106,20 @@ class Sync implements SyncInterface
     {
         $statement = $this->database->prepare("
             SELECT
-                p.denbighID    AS staff_id,
-                staffCode      AS network_login,
-                1              AS active_flag,
-                title          AS staff_title,
-                preferred_name AS staff_preferred_name,
-                surname        AS staff_surname,
-                ''             AS default_email_code,
-                ''             AS occup_email,
-                email          AS email,
-                ''             AS staff_campus,
-                ''             AS staff_category_type,
-                ''             AS staff_category,
-                ''             AS staff_department
+                p.denbighID      AS staff_id,
+                s.staffCode      AS network_login,
+                1                AS active_flag,
+                p.title          AS staff_title,
+                p.given_names    AS staff_given_name,
+                p.preferred_name AS staff_preferred_name,
+                p.surname        AS staff_surname,
+                ''               AS default_email_code,
+                ''               AS occup_email,
+                p.email          AS email,
+                ''               AS staff_campus,
+                ''               AS staff_category_type,
+                ''               AS staff_category,
+                ''               AS staff_department
             FROM Staff s
             LEFT JOIN People p ON s.peopleDenbighID = p.denbighID
         ");
