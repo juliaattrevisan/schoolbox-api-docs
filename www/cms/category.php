@@ -108,9 +108,13 @@ if (is_numeric($this->arg[0])) {
         'sub/curriculumBrowseButton.twig'
     );
 
+    $parentFolder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findCheaplyById($folder->getParent()->getId());
+
     $output = array(
         'ACTION' => 'Modify',
         'CATEGORY_ID' => $folder->getId(),
+        'PARENT_FOLDER_NAME' => $parentFolder ? $parentFolder->getName() : '',
+        'PARENT_FOLDER_ID' => $parentFolder ? $parentFolder->getId() : '',
         'NAME' => Scrub::text($folder->getName()),
         'ACCESS_WRITE' => UserAccess::ACCESS_WRITE,
         'INHERIT_SELECTED' => $folder->getInherit() ? 'checked' : '',

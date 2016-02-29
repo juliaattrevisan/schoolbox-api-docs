@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Permission\Access;
 
-
 use Schoolbox\Resource\Folder\Model as Category;
 use Schoolbox\Role;
 

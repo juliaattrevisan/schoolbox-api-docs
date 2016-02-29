@@ -138,7 +138,7 @@
 
                     <div class="small-12 columns">
                         <input data-checkbox-inherit type="checkbox" id="inherit" name="inherit" value="1" {INHERIT_SELECTED} />
-                        <label for="inherit" class="checkbox-label">Inherit permissions from parent folder</label>
+                        <label for="inherit" class="checkbox-label">Inherit permissions from '<a href="/homepage/{PARENT_FOLDER_ID}">{PARENT_FOLDER_NAME}'</a> folder</label>
                     </div>
                 </fieldset>
 
@@ -174,10 +174,6 @@
                     </table>
 
                     <div class="content small-12 columns">
-                        <!-- BEGIN recursive -->
-                        <input type="checkbox" id="recursive" name="recursive" value="1" />
-                        <label for="recursive" class="checkbox-label">Apply these permissions to all subfolders</label>
-                        <!-- END recursive -->
                         <!-- BEGIN indiv_perms -->
                         <label for="groupcheck">
                             Create Group
@@ -201,6 +197,16 @@
                         <!-- END synergy_input -->
                     </div>
                 </fieldset>
+
+                <!-- BEGIN recursive -->
+                <fieldset class="content">
+                    <div class="small-12 large-10 columns">
+                        <input type="checkbox" id="recursive" name="recursive" value="1" />
+                        <label for="recursive" class="checkbox-label">Apply these permissions to all subfolders</label>
+                    </div>
+                </fieldset>
+                <!-- END recursive -->
+
                 <fieldset class="content">
                     <!-- BEGIN curriculum_code_input -->
                     <div class="small-12 large-10 columns">
