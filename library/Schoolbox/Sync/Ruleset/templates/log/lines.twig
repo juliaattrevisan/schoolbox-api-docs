@@ -71,7 +71,7 @@
                             {% if val is iterable %}
                                 {% include '@upsRuleset/log/key-value-pair.twig' with { dataset: val } %}
                             {% elseif key not in filterBlacklist %}
-                                <a href="{{ routeLookup('upsRuleset.log', { logId: id }) }}?filter={{ key }}({{ val }})" title="Filter log on {{ key }} = {{ val }}">
+                                <a href="?filter={{ key }}({{ val }})" title="Filter log on {{ key }} = {{ val }}">
                                     <pre>
                                         {%- include '@upsRuleset/log/visible-value.twig' with { value: val } -%}
                                     </pre>
