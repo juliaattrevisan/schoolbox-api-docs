@@ -1,0 +1,26 @@
+<li class="actions-small-1 content" data-unit>
+    <div class="list-item">
+        <div class="small-1 column">
+            <span data-collapser="unit-{{ i }}" class="icon-down-arrow"></span>
+        </div>
+        <div class="small-11 column">
+            <label>
+                <input type="text" value="{{ unit.name }}" placeholder="Unit {{ i }} Name" />
+            </label>
+        </div>
+    </div>
+    <nav><a href="#" class="icon-overflow"></a></nav>
+    <div class="small-12 column hide" data-collapsable="unit-{{ i }}" data-collapse-state="collapsed">
+        <ul class="information-list sortable" data-sortable>
+            {# TODO replace this with actual data lookup #}
+            {% for j in 0..(3 + random(4)) %}
+                {% include '@course/task-item.twig' with { icon: random(icons) } %}
+            {% endfor %}
+        </ul>
+        <ul class="flex-list buttons">
+            {% for icon in icons %}
+                <li><a href="#" title="Create a new {{ icon | title }} in Unit {{ i }}" class="button icon-{{ icon | replace(' ', '-') }}">New {{ icon | title }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</li>
