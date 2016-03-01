@@ -98,7 +98,7 @@ if ($drafts->count()) {
 
 $this->setBlock(TEMPLATE_content, 'confirm_terms', 'confirm_terms_block');
 $policy = $conf->get('lms_student_policy');
-if (strlen(trim($policy) > 0)) {
+if (strlen(trim($policy)) > 0) {
     $this->setVar('STUDENT_SUBMIT_TERMS', Scrub::html($policy));
     $this->parse('confirm_terms_block', 'confirm_terms');
 } else {
