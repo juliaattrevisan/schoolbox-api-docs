@@ -270,8 +270,27 @@ class UnitInstanceMapper extends Mapper {
                 'order' => array(
                     'open_date' => 'asc',
                     'due_date'  => 'asc',
+                    'title'     => 'asc',
                 )
             )
+        );
+
+        // Natural sort
+        $unit_list->sortByCallback(
+            function($a, $b) {
+                /** @var UnitInstance $a */
+                /** @var UnitInstance $b */
+                // Open date, then due date, then title
+                $cmp = $a->getOpenDate()->compare($b->getOpenDate());
+                if ($cmp) {
+                    return $cmp;
+                }
+                $cmp = $a->getDueDate()->compare($b->getDueDate());
+                if ($cmp) {
+                    return $cmp;
+                }
+                return strnatcasecmp($a->getTitle(), $b->getTitle());
+            }
         );
 
         // Hydrate the list of tasks within each unit, sorting by order.

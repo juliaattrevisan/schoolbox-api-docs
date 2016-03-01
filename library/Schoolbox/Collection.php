@@ -298,29 +298,36 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Sorts the collection by a field and a direction. If the field values are
-    * IComparable objects, then the object's compare method is used, otherwise
-    * standard comparison is used.
-    *
-    * Special case of $this->sortByCallback().
-    *
-    * @param string $field     The name of the field to sort by.
-    * @param string $direction The order to sort by - 'asc' or 'desc'
-    *
-    * @return $this
-    */
-    public function sortBy($field, $direction)
+     * Sorts the collection by a field and a direction. If the field values are
+     * IComparable objects, then the object's compare method is used, otherwise
+     * standard comparison is used.
+     *
+     * Special case of $this->sortByCallback().
+     *
+     * @param string   $field           The name of the field to sort by.
+     * @param string   $direction       The order to sort by - 'asc' or 'desc'
+     * @param callable $compareFunction If set, use this callable as the comparison.
+     *                                  Only works if values aren't directly comparable.
+     *
+     * @return $this
+     */
+    public function sortBy($field, $direction, $compareFunction = null)
     {
         $get_method = $this->getGetMethodName($field);
         $is_asc     = (strtolower($direction) === 'asc');
-        $callback   = function($a, $b) use ($get_method, $is_asc) {
+        $isCallable = is_callable($compareFunction);
+        $callback   = function($a, $b) use ($get_method, $is_asc, $isCallable, $compareFunction) {
             $result  = 0;
             $a_value = $a->$get_method();
             $b_value = $b->$get_method();
             if ($a_value instanceof \IComparable && $b_value instanceof \IComparable) {
                 $result = $a_value->compare($b_value);
             } elseif ($a_value !== $b_value) {
-                $result = $a_value < $b_value ? -1 : 1;
+                if ($isCallable) {
+                    $result = $compareFunction($a_value, $b_value);
+                } else {
+                    $result = $a_value < $b_value ? -1 : 1;
+                }
             }
             return $is_asc ? $result : -$result;
         };
