@@ -36,6 +36,7 @@ if (is_numeric($this->arg[0])) {
         'CATEGORY_NAME'   => Scrub::text($folder->getName()),
         'CATEGORY_ID'     => $link->getFolder()->getId(),
         'HIDDEN_SELECTED' => $link->getHidden() > 0 ? 'checked="checked"' : '',
+        'BLANK_SELECTED'  => $link->getTarget() == '_blank' ? 'selected="selected"' : '',
     );
 
     $this->setVar($output);
@@ -83,6 +84,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'DESCRIPTION'     => '',
         'COMMENT'         => '',
         'HIDDEN_SELECTED' => '',
+        'BLANK_SELECTED'  => '',
         'CATEGORY_NAME'   => Scrub::text($folder->getName()),
         'CATEGORY_ID'     => $folder->getId(),
     );

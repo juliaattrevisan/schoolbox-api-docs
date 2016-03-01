@@ -32,6 +32,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         $link->setDescription($_POST['description']);
         $link->setComment($_POST['comment']);
         $link->setHidden($_POST['hidden'] ? true : false);
+        $link->setTarget($_POST['target']);
         $link->setModified(Alaress_Date_Format::now());
 
     } else {
@@ -43,7 +44,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         $link->setDescription($_POST['description']);
         $link->setComment($_POST['comment']);
         $link->setHidden($_POST['hidden'] ? true : false);
-
+        $link->setTarget($_POST['target']);
 
         // Add to multiple locations
         if (is_array($_POST['category'])) {

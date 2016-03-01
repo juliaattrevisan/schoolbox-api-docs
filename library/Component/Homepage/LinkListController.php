@@ -128,7 +128,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                     'LINK_ID'           => $currentLink->getId(),
                     'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
                     'LINK_URL'          => $currentLink->getHref(),
-                    'LINK_TARGET'       => $currentLink->getTarget(),
+                    'LINK_TARGET'       => $currentLink->getLinkTarget(),
                     'LINK_POSTED_BY'    => $currentLink->getOwner()->formatName(),
                     'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
                     'LINK_POSTED_DATE'  => $currentLink->getSubmitted()->getShort(),

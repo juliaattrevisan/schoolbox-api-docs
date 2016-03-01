@@ -86,6 +86,13 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         );
         $this->hasMap(
             array(
+                'column'   => 'target',
+                'property' => 'target',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
                 'column'            => 'submitted',
                 'property'          => 'submitted',
                 'type'              => self::TYPE_DATETIME,
