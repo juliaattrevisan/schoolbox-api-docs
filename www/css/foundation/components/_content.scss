@@ -855,7 +855,8 @@ nav {
 	@include information-list;
 }
 
-.inline-list>li{
+// Image gallery specific
+.img-gallery li{
 	margin-bottom: $inline-list-default-float-list-margin;
 }
 
