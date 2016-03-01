@@ -143,9 +143,15 @@ class Sync implements SyncInterface
                 vStaff.StaffCampus        AS staff_campus,
                 StaffCategoryType         AS staff_category_type,
                 StaffCategory             AS staff_category,
+                JobPositions.StaffJobPositionCode AS staff_position,
                 vStaff.StaffDepartment    AS staff_department
             FROM SynergyOne.dbo.vStaff vStaff
-            LEFT JOIN Community ON Community.ID = StaffID
+            LEFT JOIN SynergyOne.dbo.Community ON Community.ID = vStaff.StaffID
+            LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
+                AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
+                OR    JobPositions.StaffJobPositionStartDate IS NULL )
+                AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
+                OR    JobPositions.StaffJobPositionEndDate IS NULL )
             WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
             ORDER BY vStaff.StaffID ASC
         ";

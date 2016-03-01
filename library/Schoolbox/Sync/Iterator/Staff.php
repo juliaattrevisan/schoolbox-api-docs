@@ -34,6 +34,7 @@ class Staff extends IteratorIterator
             ->setPreferredName($currentResult['staff_preferred_name'])
             ->setLastname($currentResult['staff_surname'])
             ->getMeta()
+            ->setPosition($currentResult['staff_position'])
             ->setDepartment($currentResult['staff_department'])
         ;
 

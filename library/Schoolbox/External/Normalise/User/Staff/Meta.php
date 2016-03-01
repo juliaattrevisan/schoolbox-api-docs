@@ -115,7 +115,7 @@ class Meta {
      * @param Position $position
      * @return $this
      */
-    private function setPosition($position)
+    public function setPosition($position)
     {
         $this->position = $position;
         return $this;
