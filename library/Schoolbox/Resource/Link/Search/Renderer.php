@@ -62,7 +62,7 @@ class Renderer extends Base
             foreach ($mapperResult->getResult() as $currentLink) {
                 $this->getPage()->setVar(array(
                     'LINK_URL' => $currentLink->getHref(),
-                    'LINK_TARGET' => $currentLink->getTarget(),
+                    'LINK_TARGET' => $currentLink->getLinkTarget(),
                     'LINK_DESCRIPTION' => \Scrub::text($currentLink->getDescription()),
                     'LINK_COMMENT' => \TextFormatter::cutSentence(\Scrub::text($currentLink->getComment()), 150),
                     'LINK_OWNER' => $currentLink->getOwner()->getId(),

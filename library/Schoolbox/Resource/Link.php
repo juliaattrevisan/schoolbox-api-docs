@@ -95,45 +95,40 @@ class Link implements ISoftDeletable
         return ($this->getDeletedAt() instanceof \Alaress_Date_Format && !$this->getDeletedAt()->isNull());
     }
 
-    /* Getters/Setters
-     */
-
     /**
-     * @param  int $id
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Set category id
+     * Get link url
      *
-     * @param Category $folder
+     * @return string
      */
-    public function setFolder($folder)
+    public function getHref()
     {
-        $this->folder = $folder;
+        if ($this->isLocalUrl()) {
+            return $this->getRelativeURL();
+        } elseif ($this->isFTPURL()) {
+            return $this->getUrl();
+        }
+        /* If this has an id, then log the visit for this instance
+         */
+        else if (is_numeric($this->getId())) {
+            return "/redir.php?id={$this->getId()}";
+        } else {
+            return $this->getBase64EncodedRedirect();
+        }
     }
 
     /**
-     * Get category
+     * Get url target, local URLs should always attempt to be in the same window
      *
-     * @return Category
+     * @return string
      */
-    public function getFolder()
+    public function getLinkTarget()
     {
-        return $this->folder;
+        if ($this->isLocalUrl() || $this->getTarget() != '_blank' ) {
+            return '';
+        }
+        else {
+            return 'external';
+        }
     }
 
     /**
@@ -191,15 +186,6 @@ class Link implements ISoftDeletable
         return $this->url->isFTPURL();
     }
 
-    /**
-     * Check if hidden
-     *
-     * @return bool
-     */
-    public function isHidden()
-    {
-        return (bool)$this->getHidden();
-    }
 
     /**
      * Get relative url
@@ -231,26 +217,55 @@ class Link implements ISoftDeletable
         return $this->url->getSlug();
     }
 
+    /* Getters/Setters
+     */
 
     /**
-     * Get link url
-     *
-     * @return string
+     * @param  int $id
+     * @return $this
      */
-    public function getHref()
+    public function setId($id)
     {
-        if ($this->isLocalUrl()) {
-            return $this->getRelativeURL();
-        } elseif ($this->isFTPURL()) {
-            return $this->getUrl();
-        }
-        /* If this has an id, then log the visit for this instance
-         */
-        else if (is_numeric($this->getId())) {
-            return "/redir.php?id={$this->getId()}";
-        } else {
-            return $this->getBase64EncodedRedirect();
-        }
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set category id
+     *
+     * @param Category $folder
+     */
+    public function setFolder($folder)
+    {
+        $this->folder = $folder;
+    }
+
+    /**
+     * Get category
+     *
+     * @return Category
+     */
+    public function getFolder()
+    {
+        return $this->folder;
+    }
+
+    /**
+     * Check if hidden
+     *
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return (bool)$this->getHidden();
     }
 
     /**
@@ -331,6 +346,15 @@ class Link implements ISoftDeletable
         return $this->hidden;
     }
 
+    /**
+     * Get target
+     *
+     * @return mixed
+     */
+    public function getTarget()
+    {
+        return $this->target;
+    }
 
     /**
      * Set target
@@ -340,21 +364,6 @@ class Link implements ISoftDeletable
     public function setTarget($target)
     {
         $this->target = $target;
-    }
-
-    /**
-     * Get url target, local URLs should always attempt to be in the same window
-     *
-     * @return string
-     */
-    public function getTarget()
-    {
-        if ($this->isLocalUrl() || $this->target != '_blank' ) {
-            return '';
-        }
-        else {
-            return 'external';
-        }
     }
 
     /**
