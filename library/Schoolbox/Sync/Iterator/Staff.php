@@ -40,6 +40,7 @@ class Staff extends IteratorIterator
         $staff
             ->getMeta()
             ->getCategory()
+            ->setCode($currentResult['staff_category'])
             ->setType($currentResult['staff_category_type'])
         ;
 
