@@ -2,7 +2,7 @@
 {%- set descInput    = formField ~ '[' ~ rubric.id ~ '][descriptor][' ~ crit.id ~ ']' -%}
 {%- set checkChecked = crit.descriptors|length > 0 -%}
 {%- set cellClass    = checkChecked ? '' : 'hide-v' -%}
-{%- set levelLimit   = levelLimit ?: 11 -%}
+{%- set levelLimit   = levelLimit ?: config.rubric_max_levels -%}
 
 <th>
     <span class="sequencer" data-sequencer-v="{{ groupId }}">
