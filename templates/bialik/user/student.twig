@@ -1,5 +1,16 @@
 {% extends '@core/user/student.twig' %}
 
+{% block buttons %}
+    {{ parent() }}
+    {% if showButtons %}
+        {% block buttons_directory %}
+            <li class="no-pad">
+                <a href="/modules/report/bialik/parents?searchYear={{ externalUser.StudentYearLevel }}" class="no-margin fat button icon-fat icon-32 icon-class-list">Class Lists</a>
+            </li>
+        {% endblock buttons_directory %}
+    {% endif %}
+{% endblock buttons %}
+
 {% block medicalAlert %}
 {% endblock medicalAlert %}
 
