@@ -191,11 +191,24 @@
                 homepage.removeClass('show-empty');
             }
         });
+
+        /* Course Selector
+         */
+        $('#tab-control').find('[data-interaction="course-selector"]').on('click', function(event) {
+            event.preventDefault();
+
+            $('#course-selector-modal').foundation('reveal', 'open');
+        });
     });
 </script>
 <!-- END modify_layout -->
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <!-- END custom_head -->
+
+<div id="course-selector-modal" class="reveal-modal" data-reveal>
+    <h2>Course List</h2>
+    <a class="close-reveal-modal">&#215;</a>
+</div>
 
 <div class="row actions-small-4">
     <div class="list-item">
@@ -272,11 +285,13 @@
             <a href="/homepage/rss/{ID}/{USER_TOKEN}" class="icon-homepagefeed">RSS</a>
         </li>
         <!-- BEGIN manage_class -->
-        <li class="separator">Class Actions</li>
+        <li class="separator">Course Actions</li>
         <li><a href="/course/import/{ID}" class="icon-course" data-interaction="course-selector">Link to Course</a></li>
         <!-- BEGIN course -->
         <li><a href="/course/outline/modify/{COURSE_ID}" class="icon-course">View Course "{COURSE_NAME}"</a></li>
         <!-- END course -->
+        <li class="separator">Class Actions</li>
+
         <!-- BEGIN student_grades -->
         <li>
             <a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" title="View grades" class="icon-approve">View Grades</a>
