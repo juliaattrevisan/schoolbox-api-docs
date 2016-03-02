@@ -34,6 +34,17 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     public function renderTemplate($templateHandle)
     {
+        // All units on this page - get their component and related course
+        $componentList = [];
+        $units         = \Schoolbox\Assessment\Course\UnitInstanceMapper::getInstance()->findByColumn(
+            'category_id',
+            $this->getContext()->getId()
+        );
+        foreach ($units as $unit) {
+            // Only one unit per course
+            $componentList[$unit->getComponent()->getId()] = $unit;
+        }
+
         if (!parent::loadTemplate($templateHandle, 'manageClass')) {
             return false;
         }
@@ -47,6 +58,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, "class_list", "class_list_block");
         $this->setBlock($templateHandle, "class_mark", "class_mark_block");
         $this->setBlock($templateHandle, "student_grades", "student_grades_block");
+        $this->setBlock($templateHandle, "course", "course_block");
 
 
         // Determine the year and semester for the grades link
@@ -78,6 +90,17 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->parse('class_mark_block', 'class_mark');
         } else {
             $this->setVar('class_mark_block', '');
+        }
+
+        $this->setVar('course_block', '');
+        foreach ($componentList as $componentId => $unit) {
+            $course = \Schoolbox\Assessment\Course\UnitInstanceMapper::getInstance()
+                ->findCourseForUnit($unit);
+            $this->setVar([
+                'COURSE_NAME' => $course->getName(),
+                'COURSE_ID'   => $componentId,
+            ]);
+            $this->parse('course_block', 'course', true);
         }
 
         return true; // everything went according to plan

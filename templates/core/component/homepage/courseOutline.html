@@ -115,7 +115,7 @@
                             <li><a href="/task/progressReport/{ID}/{UNIT_ID}" class="icon-progress" data-add-button>Progress Report</a></li>
                             <!-- END unit_report_actions -->
                             <!-- BEGIN unit_modify -->
-                            <li><a href="/course/modify/{COMPONENT_INSTANCE_ID}" class="icon-modify" title="Modify this unit">Modify</a></li>
+                            <li><a href="/course/outline/modify/{COMPONENT_INSTANCE_ID}" class="icon-modify" title="Modify this unit">Modify</a></li>
                             <!-- END unit_modify -->
                             <!-- BEGIN unit_delete -->
                             <li><a href="#" data-interaction="open_delete_unit_form" class="icon-delete" title="Delete this unit">Delete</a></li>
@@ -123,7 +123,7 @@
                         </ul>
                         <!-- END unit_actions -->
 
-                        <form action="/course/modifyForm.php" method="post" data-form_type="delete_unit" class="hide">
+                        <form action="/course/outline/modifyForm.php" method="post" data-form_type="delete_unit" class="hide">
                             <input type="hidden" name="action"    value="delete" />
                             <input type="hidden" name="id"        value="{UNIT_ID}" />
                             <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
