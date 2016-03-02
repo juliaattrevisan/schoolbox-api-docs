@@ -60,6 +60,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, "class_mark", "class_mark_block");
         $this->setBlock($templateHandle, "student_grades", "student_grades_block");
         $this->setBlock($templateHandle, "course", "course_block");
+        $this->setBlock($templateHandle, "new_course", "new_course_block");
 
 
         // Determine the year and semester for the grades link
@@ -102,6 +103,11 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
                 'COURSE_ID'   => $componentId,
             ]);
             $this->parse('course_block', 'course', true);
+        }
+
+        $this->setVar('new_course_block', '');
+        if (count($this->getContext()->getCodes())) {
+            $this->parse('new_course_block', 'new_course');
         }
 
         return true; // everything went according to plan
