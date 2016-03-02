@@ -759,15 +759,28 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     }
 
     /**
+     * Find ancestry cheaply
+     *
+     * @param Model $folder
+     * @param Model $stopFolder
+     * @return Collection
+     */
+    public function findParentsCheaply(Model $folder, Model $stopFolder)
+    {
+        return $this->findParents($folder, $stopFolder, true);
+    }
+
+    /**
      * Gets a collection of parents for the given category, starting from the
      * topmost parent first.
      *
      * @param  Model $category
      * @param  Model $stop_category If supplied, the parent list is truncated
      *                                 above this category.
+     * @param bool $cheaply If true, use the findCheaplyById() for speed
      * @return Collection
      */
-    public function findParents(Model $category, Model $stop_category = null)
+    public function findParents(Model $category, Model $stop_category = null, $cheaply = false)
     {
         /** @var Model[] $stack */
         $stack = array($category);
@@ -803,7 +816,17 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 );
             }
             $ancestry[$parent_id] = true;
-            array_unshift($stack, $this->findById($parent_id));
+
+            /* Cheaply or not?
+             */
+            if ($cheaply) {
+                $node = $this->findCheaplyById($parent_id);
+            }
+            else {
+                $node = $this->findById($parent_id);
+            }
+
+            array_unshift($stack, $node);
         }
 
         // Remove the current category from the parent list first.

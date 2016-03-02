@@ -88,8 +88,7 @@ class Mapper
 
         foreach ($allCourses as $currentCourse) {
             // this is way more expensive than it needs to be -_-;
-            $lineage = $this->getFolderMapper()->findParents($currentCourse, $this->getFacultyNode());
-            $data['lineage'][$currentCourse->getId()] = $lineage;
+            $data['lineage'][$currentCourse->getId()] = $this->getFolderMapper()->findParentsCheaply($currentCourse, $this->getFacultyNode());
 
             $allUnits = $this->getFolderMapper()->findByParent($currentCourse->getId());
 
