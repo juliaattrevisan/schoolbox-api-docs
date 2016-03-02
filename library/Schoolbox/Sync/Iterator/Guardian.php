@@ -67,6 +67,7 @@ class Guardian extends IteratorIterator
         $guardian
             ->setId($currentResult['student_contact_id'])
             ->setTitle($currentResult['student_contact_title'])
+            ->setGivenName($currentResult['student_contact_given_name'])
             ->setPreferredName($currentResult['student_contact_preferred'])
             ->setLastname($currentResult['student_contact_surname'])
             ->setGender($currentResult['student_gender'])
