@@ -47,7 +47,42 @@
         background-color: rgba(209,236,255,0.05);
     }
 
+    .selectize-control.multi .selectize-input.has-items {
+        padding: 0 0 1px 0;
+    }
+
+    .selectize-control .selectize-input > div a.remove {
+        padding: 1px 5px 2px 4px !important;
+        width: 1rem !important;
+        margin: 0 4px 0 5px !important;
+    }
+
+    .selectize-control .selectize-input > div {
+        margin: 1px 0 0 1px !important;
+    }
+
+    .selectize-control .selectize-input > div a.remove:hover {
+        text-decoration: none;
+        background: #0066b0;
+        border-radius: 16px;
+        color: white;
+    }
+    .selectize-input > input[type=text] {
+        margin-left: 8px !important;
+    }
+
+    .selectize-input {
+        margin-bottom: 0;
+    }
+    .selectize-input.dropdown-active:before {
+        display: none;
+    }
+
 </style>
+
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 
 <ul class="breadcrumb">
     <li><a href="/course/list">Courses</a></li>
@@ -79,7 +114,7 @@
                     </div>
                     <div class="small-12 column">
                         <label>Curriculum Codes
-                            <input type="text" value="{{ folder.curriculumNodes.first.code }}" placeholder="{replace with curriculum selectize}" />
+                            {% include 'sub/curriculumCodeSelector.twig' with { renderButton: false, codeList: folder.curriculumNodes } %}
                         </label>
                     </div>
                     <div {% if folder.id %}class="hide"{% endif %}>
