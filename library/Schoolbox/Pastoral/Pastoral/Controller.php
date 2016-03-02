@@ -120,7 +120,7 @@ class Controller extends Base
         if (!isset($_GET["pageCurrent"]))
             $_GET["pageCurrent"] = 1;
 
-        $resultsPerPage = 3;
+        $resultsPerPage = 15;
         $totalPages = ceil($records->count() / $resultsPerPage);
 
         // Put some limit checks on page numbers
