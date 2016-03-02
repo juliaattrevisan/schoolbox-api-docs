@@ -1,9 +1,9 @@
 {# expects { branch: <data> } #}
 <li>
-    <a data-selection="{{ branch.id }}" href="/resources/{{ branch.id }}">{{ branch.name }}</a>
-    {% if branch.nodes %}
+    <a data-selection="{{ branch.id }}" href="/resources/{{ branch.id }}">{{ branch.text }}</a>
+    {% if branch.children %}
     <ul>
-        {% for node in branch.nodes %}
+        {% for node in branch.children %}
             {% include '@course/treebranch.twig' with { branch: node } %}
         {% endfor %}
     </ul>
