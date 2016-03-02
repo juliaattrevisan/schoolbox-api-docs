@@ -197,7 +197,9 @@
         $('#tab-control').find('[data-interaction="course-selector"]').on('click', function(event) {
             event.preventDefault();
 
-            $('#course-selector-modal').foundation('reveal', 'open');
+            $('#course-selector-modal').foundation('reveal', 'open', {
+                url: '/course/list/modal'
+            });
         });
     });
 </script>
