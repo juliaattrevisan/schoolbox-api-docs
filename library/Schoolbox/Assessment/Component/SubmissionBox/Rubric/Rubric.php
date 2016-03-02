@@ -348,21 +348,37 @@ class Rubric extends Core\Rubric
     /**
      * Return the Twig representation of the data structure this rubric contains
      *
+     * @param User $sessionUser
      * @return array
      */
-    public function toContext()
+    public function toContext(User $sessionUser = null)
     {
         $context = parent::toContext();
+
+        $box = $this->getSubmissionBox();
 
         // if the box doesn't mark by group, then we need to remove the group subtotals from the context
         foreach ($context['groups'] as $groupId => $group) {
 
-            if ($this->getSubmissionBox()->isMarkedPerRubricGroup()) {
-                $context['groups'][$groupId]['humanReadableMark'] = $this->calculateHumanReadable(
-                    $context['groups'][$groupId]['percentage'],
-                    $context['groups'][$groupId]['total']
-                );
+            // if no user specified, OR the specified user is allowed to view
+            if (!$sessionUser || $box->canViewRubric($sessionUser)) {
+
+                // set the human readable mark
+                if ($box->isMarkedPerRubricGroup()) {
+                    $context['groups'][$groupId]['humanReadableMark'] = $this->calculateHumanReadable(
+                        $context['groups'][$groupId]['percentage'],
+                        $context['groups'][$groupId]['total']
+                    );
+                } else {
+                    // nothing per-group? unset the mark data if any exists
+                    unset(
+                        $context['groups'][$groupId]['sum'],
+                        $context['groups'][$groupId]['total'],
+                        $context['groups'][$groupId]['percentage']
+                    );
+                }
             } else {
+                // nothing per-group? unset the mark data if any exists
                 unset(
                     $context['groups'][$groupId]['sum'],
                     $context['groups'][$groupId]['total'],
@@ -370,6 +386,15 @@ class Rubric extends Core\Rubric
                 );
             }
 
+        }
+
+        if ($sessionUser && !$box->canViewRubric($sessionUser)) {
+            unset(
+                $context['sum'],
+                $context['total'],
+                $context['percentage'],
+                $context['humanReadableMark']
+            );
         }
 
         $context['boxId'] = $this->box->getId();
