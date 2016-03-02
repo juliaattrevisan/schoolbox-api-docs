@@ -16,7 +16,7 @@
             labelField: 'name',
             valueField: 'name',
             options: [
-                {% for tag in tagsAll %}
+                {% for tag in tags %}
                 {name: '{{ tag.name | title | escape('js') }}'},
                 {% endfor %}
             ]
