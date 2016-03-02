@@ -120,17 +120,15 @@ class Controller extends BaseController
 
 
     /**
-     * Does anyone mind that this is passed by reference?
-     *
      * @param AbstractTreeBuilder $tb
      * @param array               $target
-     * @return void
+     * @return array
      */
-    protected function recursiveTreeBuild(AbstractTreeBuilder $tb, &$target)
+    protected function recursiveTreeBuild(AbstractTreeBuilder $tb, $target)
     {
         $target['children'] = $tb->buildChildNodes($target['id']);
 
-        foreach ($target['children'] as $i => &$child) {
+        foreach ($target['children'] as $i => $child) {
 
             if ($child['type'] == 'course') {
                 unset($target['children'][$i]);
@@ -138,9 +136,11 @@ class Controller extends BaseController
             }
 
             if ($child['children']) {
-                $this->recursiveTreeBuild($tb, $child);
+                $target['children'][$i] = $this->recursiveTreeBuild($tb, $child);
             }
         }
+
+        return $target;
     }
 
 
@@ -166,7 +166,7 @@ class Controller extends BaseController
         ];
 
         // recurse, passing $data by reference
-        $this->recursiveTreeBuild($tb, $data);
+        $data = $this->recursiveTreeBuild($tb, $data);
 
         $data = [
             'branch' => $data
