@@ -6,8 +6,7 @@
  * @copyright   Copyright 2016, Alaress Pty Ltd
  */
 
-use \Schoolbox\Pastoral\Pastoral;
-
+use \Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
 
 interface External_PastoralInterface
 {
@@ -15,34 +14,34 @@ interface External_PastoralInterface
     /**
      * Returns the pastoral record if found in remote system
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param PastoralModel $pastoral
      * @return array
      */
-    public function getPastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral);
+    public function getPastoral(PastoralModel $pastoral);
 
     /**
      * Creates a new pastoral record in the remote system
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param PastoralModel $pastoral
      * @return bool
      */
-    public function createPastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral);
+    public function createPastoral(PastoralModel $pastoral);
 
     /**
      * Updates an existing pastoral record
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param PastoralModel $pastoral
      * @return bool
      */
-    public function updatePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral);
+    public function updatePastoral(PastoralModel $pastoral);
 
     /**
      * Deletes an existing pastoral record
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param PastoralModel $pastoral
      * @return bool
      */
-    public function deletePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral);
+    public function deletePastoral(PastoralModel $pastoral);
 
 }
 

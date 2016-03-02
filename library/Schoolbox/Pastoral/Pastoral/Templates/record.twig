@@ -23,7 +23,7 @@
                             id: {{ record.getId() }}
                         })
                         .done(function() {
-                            window.location.href = '/pastoral/{{ record.getStudentId() }}';
+                            window.location.href = '/pastoral/{{ record.getStudent.getId() }}';
                         });
                     }
                 });
@@ -57,14 +57,14 @@
 {% endif %}
 
 <ul class="breadcrumb">
-    <li><a href="/search/user/{{ record.getStudentId }}">{{ user.formatName() }}</a></li>
-    <li><a href="/pastoral/{{ record.getStudentId }}">Pastoral Care</a></li>
+    <li><a href="/search/user/{{ record.getStudent.getId }}">{{ record.getStudent.getFirstname }} {{ record.getStudent.getLastname }}</a></li>
+    <li><a href="/pastoral/{{ record.getStudent.getId }}">Pastoral Care</a></li>
     <li class="active"><a href="#">{{ record.getHeading() }}</a></li>
 </ul>
 
 <div class="row">
     <div class="small-12 island">
-        <h1>{{ user.formatName() }}</h1>
+        <h1>{{ student.formatName() }}</h1>
         <h2>Pastoral Record Details</h2>
         <section>
             <ul class="action-list">
@@ -96,41 +96,41 @@
                                 </p>
 
                                 {# Show any file attachments #}
-                                {% if record.attachments.count() > 0 %}
+                                {% if record.getAttachmentList.count > 0 %}
                                     <p class="spaced meta">
-                                        {% for attachment in record.attachments %}
+                                        {% for attachment in record.getAttachmentList %}
                                             Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{  attachment.getFilename() }}</a><br>
                                         {% endfor %}
                                     </p>
                                 {% endif %}
                             </article>
 
-                            {# Parents can never see meta #}
+                            {# Hide meta from parents#}
                             {% if role != 'parent' %}
                                 <p class="spaced meta">
-                                    {# Show pastoral event type #}
-                                    {{ record.getTypeName() }} |
+                                    {# Pastoral event type #}
+                                    {{ record.getType.getName }} |
 
-                                    {# Show if record is marked as private #}
+                                    {# Pastoral event severity #}
+                                    {{ record.getSeverity.getName }} |
+
+                                    {# Indicate if record is private #}
                                     {% if record.private %}Contents Private | {% endif %}
 
-                                    {# Show if no audience has been set #}
-                                    {% if record.roles | length + record.users | length == 0 %}No Audience Set{% endif %}
+                                    {# Indicate if not audience has been set #}
+                                    {% if record.getAccessList.count == 0 %}No Audience Set{% endif %}
 
-                                    {# Show audienced roles #}
-                                    {% if record.roles | length > 0 %}
-                                        {% for role in record.roles %}
-                                            {{ role.getName() }}{% if not loop.last %}, {% endif %}
+                                    {# Show audienced roles  #}
+                                    {% if record.getAccessList.count > 0 %}
+                                        {% for access in record.getAccessList %}
+                                            {% if access.getRole.getId != '' %}
+                                                {{ access.getRole.getName }}{% if not loop.last %},{% endif %}
+                                            {% elseif access.getUser.getId != '' %}
+                                                <a href="/search/user/{{ access.getUser.getId }}">{{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}</a>{% if not loop.last %},{% endif %}
+                                            {% endif %}
                                         {% endfor %}
                                     {% endif %}
 
-                                    {# Show audienced users #}
-                                    {% if record.users | length > 0 %}
-                                        {% if record.roles | length > 0 %}|{% endif %}
-                                        {% for user in record.users %}
-                                            <a href="/search/user/{{ user.getId() }}">{{ user.firstname }} {{ user.lastname }} ({{ user.getRole.name }})</a>{% if not loop.last %}, {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
                                 </p>
                             {% endif %}
                         </div>
@@ -139,7 +139,7 @@
                     {# Only display the edit/delete links to the owner of the record or pastoral moderators #}
                     {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or pastoralModerator %}
                     <nav>
-                        <a class="icon-modify" href="/pastoral/update/{{ user.getId() }}/{{ record.getId() }}" title="Modify Comment"></a>
+                        <a class="icon-modify" href="/pastoral/update/{{ record.getStudent.getId() }}/{{ record.getId() }}" title="Modify Comment"></a>
                         <a data-delete class="icon-delete" href="#" title="Delete Comment"></a>
                     </nav>
                     {% endif %}
@@ -151,12 +151,12 @@
         {% if role != 'parent' %}
 
             <h2>Comments</h2>
-            {% if comments | length > 0 %}
+            {% if record.getCommentList.count > 0 %}
                 <section>
                     <ul class="action-list">
 
                         {# Show all comments for this record #}
-                        {% for comment in comments %}
+                        {% for comment in record.getCommentList %}
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="small-12 avatar card wrap-down">
@@ -166,7 +166,7 @@
                                         </a>
 
                                         {# Show comment author #}
-                                        <p class="meta">Posted By <a href="/search/user/{{ comment.owner.getId() }}">{{ comment.owner.firstName }} {{ comment.owner.lastName }}</a> {{ comment.getPostDate().getShort() }}</p>
+                                        <p class="meta">Posted By <a href="/search/user/{{ comment.getOwner.getId }}">{{ comment.getOwner.getFirstName }} {{ comment.getOwner.getLastName }}</a> {{ comment.getPostDate().getShort() }}</p>
 
                                         {# Show comment body #}
                                         <p class="spaced">
@@ -176,9 +176,10 @@
                                 </div>
 
                                 {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
+
                                 {%
-                                    if  (session.user.getRole().isStaff() and record.owner.getId() == session.user.getId()) or
-                                        (session.user.getRole().isStaff() and comment.owner.getId() == session.user.getId()) or
+                                    if  record.getOwner.getId == session.user.getId or
+                                        comment.getOwner.getId == session.user.getId or
                                         pastoralModerator
                                 %}
                                     <nav>
@@ -193,7 +194,7 @@
             {% endif %}
             <form method="post" action="/pastoral/comment">
                 <input type="hidden" name="pastoral_id" value="{{ record.getId() }}">
-                <input type="hidden" name="student_id" value="{{ record.getStudentId() }}">
+                <input type="hidden" name="student_id" value="{{ record.getStudent.getId() }}">
                 <section>
                     <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
                 </section>
@@ -212,7 +213,7 @@
                     {% for attachment in attachments %}
                         <li class="small avatar card small-12">
                             <img class="mime" src="/images/mime/60x60/{{ attachment.getIcon() }}">
-                            <a href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{  attachment.getFilename() }}</a>
+                            <a href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{ attachment.getFilename() }}</a>
                         </li>
                     {% endfor %}
                 </ul>

@@ -5,7 +5,7 @@
  * @copyright   Copyright 2016, Alaress Pty Ltd
  */
 
-use \Schoolbox\Pastoral\Pastoral;
+use \Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
 
 class External_Pastoral implements External_PastoralInterface
 {
@@ -28,10 +28,10 @@ class External_Pastoral implements External_PastoralInterface
     /**
      * Returns the pastoral record if found in remote system
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param PastoralModel $pastoral
      * @return array
      */
-    public function getPastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    public function getPastoral(PastoralModel $pastoral)
     {
         return $this->getDatabase()->getPastoral($pastoral);
     }
@@ -39,10 +39,10 @@ class External_Pastoral implements External_PastoralInterface
     /**
      * Creates a new pastoral record in the remot system
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param PastoralModel $pastoral
      * @return mixed
      */
-    public function createPastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    public function createPastoral(PastoralModel $pastoral)
     {
         return $this->getDatabase()->createPastoral($pastoral);
     }
@@ -50,10 +50,10 @@ class External_Pastoral implements External_PastoralInterface
     /**
      * Updates an existing pastoral assessment
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param PastoralModel $pastoral
      * @return mixed
      */
-    public function updatePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    public function updatePastoral(PastoralModel $pastoral)
     {
         return $this->getDatabase()->updatePastoral($pastoral);
     }
@@ -61,7 +61,7 @@ class External_Pastoral implements External_PastoralInterface
     /**
      * @inheritDoc
      */
-    public function deletePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    public function deletePastoral(PastoralModel $pastoral)
     {
         return $this->getDatabase()->deletePastoral($pastoral);
     }

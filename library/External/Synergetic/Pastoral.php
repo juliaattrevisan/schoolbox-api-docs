@@ -96,7 +96,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // External student ID
 
         $userMapper = new \Schoolbox\UserMapper();
-        $id = $userMapper->findById($pastoral->getStudentId())->getExternalId();
+        $id = $userMapper->findById($pastoral->getStudent()->getId())->getExternalId();
 
         // Set the item date to the post date
 
@@ -115,7 +115,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Pastoral event type code
 
         $typeMapper = new PastoralTypeMapper();
-        $type = $typeMapper->findById($pastoral->getTypeId());
+        $type = $typeMapper->findById($pastoral->getType()->getId());
         $type_code = "'" . $type->getExternalCode() . "'";
 
         // Created/modified dates
@@ -163,8 +163,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     -1
                 )";
 
-        $result = $this->getDatabase()->query($query);
-
+        $this->getDatabase()->query($query);
         $result = $this->getDatabase()->query("SELECT SCOPE_IDENTITY() AS insert_id");
         $row = mssql_fetch_object($result);
 
@@ -209,7 +208,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             // External student ID
 
             $userMapper = new \Schoolbox\UserMapper();
-            $id = $userMapper->findById($pastoral->getStudentId())->getExternalId();
+            $id = $userMapper->findById($pastoral->getStudent()->getId())->getExternalId();
 
             // Set the item date to the post date
 
@@ -228,7 +227,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             // Pastoral event type code
 
             $typeMapper = new PastoralTypeMapper();
-            $type = $typeMapper->findById($pastoral->getTypeId());
+            $type = $typeMapper->findById($pastoral->getType()->getId());
             $type_code = "'" . $type->getExternalCode() . "'";
 
             // Created/modified dates

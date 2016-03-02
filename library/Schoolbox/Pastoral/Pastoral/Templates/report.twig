@@ -1,7 +1,9 @@
 <script>
     $(function () {
-        $('[data-print').click(function(event) {
-           window.print();
+        $(document).foundation({
+           accordion: {
+               multi_expand: true
+           }
         });
     });
 </script>
@@ -13,116 +15,155 @@
 <div class="row">
     <div class="small-12 island">
         <h1 class="hide-on-print">
-            Pastoral Care Report
-            <a data-print class="button right icon-print"></a>
+            Pastoral Care Incidents
+            <a target="_blank" href="report-print?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}" data-print class="button right icon-print"></a>
         </h1>
-        <section>
-            {% if results | length > 0 %}
-                <ul class="information-list">
-                    {% for record in results %}
-                        <li>
-                            <div class="list-item">
-                                <div class="avatar card small-12 wrap-down">
-                                    <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
-                                    <h2>{{ record.student.firstname }} {{ record.student.lastname }}</h2>
-                                    <h3>{{  record.getHeading() }}</h3>
-                                    <p class="spaced meta hide-on-print">
-                                        Posted by {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}
-                                    </p>
-                                    <p class="spaced meta show-for-print">
-                                        <br>Posted by {{ record.owner.firstName }} {{ record.owner.lastName }}<br>
-                                        {{  record.getPostDate().getShort() }}
-                                    </p>
-                                    <p class="meta">
-                                        Severity: {{ record.getSeverityName() }}
-                                    </p>
-                                    <p class="meta">
-                                        Incident Type:
-                                        {{ record.getTypeName() }}
-                                    </p>
-                                    {% if record.private %}
-                                        <p class="meta">
-                                            Contents Private
-                                        </p>
-                                    {% endif %}
-                                    {% if record.attachments.count() > 0 %}
-                                        <p class="meta">
-                                            {% for attachment in record.attachments %}
-                                                Attached: {{  attachment.getFilename() }}<br>
-                                            {% endfor %}
-                                        </p>
-                                    {% endif %}
-                                    <p class="spaced meta">
-                                        Audience:
-                                        {% if record.roles | length + record.users | length == 0 %}No Audience Set{% endif %}
-                                        {% if record.roles | length > 0 %}
-                                            {% for role in record.roles %}
-                                                {{ role.getName() }}{% if not loop.last %}, {% endif %}
-                                            {% endfor %}
-                                        {% endif %}
-                                        {% if record.users | length > 0 %}
-                                            {% if record.roles | length > 0 %}|{% endif %}
-                                            {% for user in record.users %}
-                                                {{ user.firstname }} {{ user.lastname }}{% if not loop.last %}, {% endif %}
-                                            {% endfor %}
-                                        {% endif %}
-                                    </p>
-
-                                    {% if record.tags | length > 0 %}
-                                        <p class="meta spaced show-for-print">
-                                            Tags:
-                                            {% for tag in record.tags %}
-                                                {{ tag.name | title }}
-                                                {% if not loop.last %} | {% endif %}
-                                            {% endfor %}
-                                        </p>
-                                    {% endif %}
-                                    <article class="hide-on-print">
-                                        <p class="spaced">
-                                            {{ record.getBodyText() }}
-                                        </p>
-                                    </article>
-                                    <p class="spaced show-for-print">
-                                        <br>
-                                        {{ record.getBodyText() }}
-                                        <br>
-                                        {% if record.tags | length > 0 %}
-                                            <p class="meta spaced show-for-print">
-                                                Tags:
-                                                {% for tag in record.tags %}
-                                                    {{ tag.name | title }}
-                                                    {% if not loop.last %} | {% endif %}
-                                                {% endfor %}
-                                            </p>
-                                        {% endif %}
-                                        <br>
-                                    </p>
-                                </div>
-                            </div>
-                        </li>
-                        {% for comment in record.comments %}
-                            <li>
-                                <div class="list-item">
-                                    <div class="small-12 avatar card wrap-down">
-                                        <p class="meta hide-on-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }} {{ comment.getPostDate().getShort() }}</p>
-                                        <p class="show-for-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }}<br>{{ comment.getPostDate().getShort() }}</p>
-                                        <p class="spaced">
-                                            {{ comment.body | raw }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    {% endfor %}
-                </ul>
-            {% else %}
-
-                <div class="content">
-                    <p>No pastoral records matched your search criteria, please review your criteria and try again.</p>
-                    <p class="no-margin"><a href="/pastoral/report-builder">Click here to run another report</a></p>
-                </div>
-
-            {% endif %}
+        <section class="content">
+            <p class="no-margin left">
+                The following pastoral care incidents were found matching your report criteria, click on an incident to expand
+                and view its details.
+            </p>
+            <p class="no-margin right">
+                Viewing results {{ pageCurrent * resultsPerPage - resultsPerPage + 1 }} - {{ min(totalResults, pageCurrent * resultsPerPage) }} of {{ totalResults }}
+            </p>
+            <div class="clearfix"></div>
         </section>
     </div>
 </div>
+
+<div class="row">
+    <div class="small-9 island">
+
+    </div>
+</div>
+
+<div class="row">
+    {% if results | length > 0 %}
+        <ul class="information-list">
+            <dl class="accordion" data-accordion>
+
+            {% for record in results %}
+
+                <dd class="accordion-navigation">
+
+                    <a href="#panel-{{ record.getId }}">
+                        <div class="left">{{ record.getHeading }}</div>
+                        <div class="right">{{ record.getStudent.getFirstname }} {{ record.getStudent.getLastname }}</div>
+                        <div class="clearfix"></div>
+                    </a>
+
+                    <div id="panel-{{ record.getId }}" class="content">
+
+                        <div class="card small-12 wrap-down">
+
+                            <h3>{{ record.getType.getName }}</h3>
+
+                            <p class="meta">Posted By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}</p>
+
+                            <p class="meta">
+                                Severity: {{ record.getSeverity.getName() }}
+                            </p>
+
+                            <p class="meta">
+                                Incident Type: {{ record.getType.getName() }}
+                            </p>
+
+                            <p class="meta">
+                                Audience:
+                                {% if record.getAccessList.count > 0 %}
+                                    {% for access in record.getAccessList %}
+                                        {% if access.getRole.getId != '' %}
+                                            {{ access.getRole.getName }}{% if not loop.last %},{% endif %}
+                                        {% elseif access.getUser.getId != '' %}
+                                            {{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}{% if not loop.last %},{% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    No Audience Set
+                                {% endif %}
+                            </p>
+
+                            {% if record.getTagsList.count > 0 %}
+
+                                <p class="meta spaced">
+                                    Tags:
+                                    {% for tag in record.getTagsList %}
+                                        {{ tag.getName | title }}
+                                        {% if not loop.last %} | {% endif %}
+                                    {% endfor %}
+                                </p>
+
+                            {% endif %}
+
+                            <p class="content {% if loop.first and record.getAttachmentList.count > 0 %}spaced{% endif %}">
+                                {% if (record.getPrivate and record.getOwner.getId != session.user.getId) and not pastoralModerator %}
+
+                                    The contents of this record have been marked as private.
+
+                                {% else %}
+
+                                    {{ record.getBodyText() }}
+
+                                {% if record.getAttachmentList.count > 0 %}
+
+                                    <p class="meta">
+                                        {% for attachment in record.getAttachmentList %}
+                                            Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{  attachment.getFilename() }}</a><br>
+                                        {% endfor %}
+                                    </p>
+
+                                {% endif %}
+
+                            {% if not record.getPrivate or pastoralModerator or record.getOwner.getId == session.user.getId %}
+                                    {% for comment in record.getCommentList %}
+                                        <hr>
+                                        <p class="meta">Comment By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}</p>
+                                        <p class="spaced">
+                                            {{ comment.body | raw }}
+                                        </p>
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% endif %}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </dd>
+
+            {% endfor %}
+
+        </ul>
+
+    {% else %}
+
+        <div class="content">
+            <p>No pastoral records matched your search criteria, please review your criteria and try again.</p>
+            <p class="no-margin"><a href="/pastoral/report-builder">Click here to run another report</a></p>
+        </div>
+
+    {% endif %}
+</div>
+
+{% if results | length > 0 and totalPages > 1 %}
+
+    <br>
+    <div class="row">
+        <div class="small-12 island">
+            <ul class="pagination">
+                <li class="arrow"><a href="?pageCurrent=1&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">«</a></li>
+                <li class="arrow {% if pageCurrent == 1 %}unavailable{% endif %}"><a href="{% if pageCurrent == 1 %}#{% else %}?pageCurrent={{ pageCurrent - 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">‹</a></li>
+                {% for i in range (max(1, pageCurrent - (8 - (min(totalPages, pageCurrent + 8 - (pageCurrent - max(1, pageCurrent - 4))) - pageCurrent))), min(totalPages, pageCurrent + 8 - (pageCurrent - max(1, pageCurrent - 4))))  %}
+                    <li {% if i == pageCurrent %} class='active' {% endif %}>
+                        <a href="?pageCurrent={{ i }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+                <li class="arrow"><a href="{% if pageCurrent == totalPages %}#{% else %}?pageCurrent={{ pageCurrent + 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">›</a></li>
+                <li class="arrow"><a href="?pageCurrent={{ totalPages }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">»</a></li>
+            </ul>
+        </div>
+    </div>
+
+{% endif %}

@@ -8,12 +8,18 @@
 
 namespace Schoolbox\Pastoral\Pastoral;
 
-use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
+use Schoolbox\Pastoral\Pastoral;
+use Schoolbox\Pastoral\Tags\Mapper as TagsMapper;
+use Schoolbox\Pastoral\Comment\Mapper as CommentMapper;
+use Schoolbox\Pastoral\Attachment\Mapper as AttachmentMapper;
+use Schoolbox\Pastoral\Access\Mapper as AccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Mapper extends BaseMapper
 {
@@ -33,17 +39,37 @@ class Mapper extends BaseMapper
 
         $this->hasMap(
             array(
-                'column'     => 'type_id',
-                'property'   => 'typeId',
+                'column'     => 'parent_id',
+                'property'   => 'parentId',
                 'type'       => Mapper::TYPE_INTEGER,
             )
         );
 
         $this->hasMap(
             array(
-                'column'     => 'severity_id',
-                'property'   => 'severityId',
-                'type'       => Mapper::TYPE_INTEGER,
+                'column'   => 'type_id',
+                'property' => 'type',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'type',
+                'multiple' => true,
+                'join_def' => array(
+                    'mapper'    => '\\Schoolbox\\Pastoral\\Type\\Mapper',
+                    'other_key' => 'id',
+                ),
+            )
+        );
+
+        $this->hasMap(
+            array(
+                'column'   => 'severity_id',
+                'property' => 'severity',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'severity',
+                'multiple' => true,
+                'join_def' => array(
+                    'mapper'    => '\\Schoolbox\\Pastoral\\Severity\\Mapper',
+                    'other_key' => 'id',
+                ),
             )
         );
 
@@ -107,24 +133,67 @@ class Mapper extends BaseMapper
             array(
                 'column'   => 'owner_id',
                 'property' => 'owner',
-                'type'     => Mapper::TYPE_MODEL,
-                'join'     => 'owner'
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'owner',
+                'multiple' => true,
+                'join_def' => array(
+                    'mapper'    => '\\Schoolbox\\UserMapper',
+                    'other_key' => 'id',
+                ),
             )
         );
 
         $this->hasMap(
             array(
-                'column'     => 'student_id',
-                'property'   => 'studentId',
-                'type'       => Mapper::TYPE_INTEGER,
+                'column'   => 'student_id',
+                'property' => 'student',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'student',
+                'multiple' => true,
+                'join_def' => array(
+                    'mapper'    => '\\Schoolbox\\UserMapper',
+                    'other_key' => 'id',
+                ),
             )
         );
 
         $this->hasJoin(
-            'owner', array(
-                'mapper'    => '\\Schoolbox\\UserMapper',
-                'this_key'  => 'owner_id',
-                'other_key' => 'id',
+            'access',
+            array(
+                'mapper'    => '\\Schoolbox\\Pastoral\\Access\\Mapper',
+                'other_key' => 'pastoral_id',
+                'this_key'  => 'id',
+                'multiple'  => true,
+            )
+        );
+
+        $this->hasJoin(
+            'tags',
+            array(
+                'mapper'    => '\\Schoolbox\\Pastoral\\Tags\\Mapper',
+                'other_key' => 'pastoral_id',
+                'this_key'  => 'id',
+                'multiple'  => true,
+            )
+        );
+
+        $this->hasJoin(
+            'comments',
+            array(
+                'mapper'    => '\\Schoolbox\\Pastoral\\Comment\\Mapper',
+                'other_key' => 'pastoral_id',
+                'this_key'  => 'id',
+                'multiple'  => true,
+            )
+        );
+
+        $this->hasJoin(
+            'attachments',
+            array(
+                'mapper'    => '\\Schoolbox\\Pastoral\\Attachment\\Mapper',
+                'other_key' => 'pastoral_id',
+                'this_key'  => 'id',
+                'multiple'  => true,
             )
         );
 
@@ -132,190 +201,305 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Retrieves all records relating to a particular student
+     * Find all pastoral records by student ID number
      *
-     * @param  int $studentId
-     * @return \Schoolbox\Collection
+     * @var int $id
+     *
+     * @return Collection|Pastoral\Model[]
+     * @throws BaseMapper\Exception
      */
-    public function findByStudentId($studentId) {
-        $collection = new Collection();
-        $userMapper = new \Schoolbox\UserMapper;
 
+    public function findByStudentId($id)
+    {
         $query = "
-			SELECT
-				{$this->getColumnString('p')},
-				{$this->getJoinColumnString('owner', 'u')}
-			FROM
-				`{$this->getTable()}` `p`
-				LEFT JOIN {$this->getJoinSql('owner', 'p', 'u')}
-			WHERE
-				`p`.`datetime_deleted` IS NULL AND
-				`p`.`student_id` = :studentId
-		    ORDER BY
-		    	`p`.`datetime_posted` DESC
+            SELECT
+                {$this->getColumnString('r')},
+                {$this->getJoinColumnString('student', 's')},
+                {$this->getJoinColumnString('severity', 'sv')},
+				{$this->getJoinColumnString('owner', 'o')},
+				{$this->getJoinColumnString('type', 't')}
+            FROM {$this->getTable()} `r`
+            LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
+            LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
+            LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
+            LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
+            WHERE s.id = ?
         ";
 
-        $statement = $this->database->prepare($query);
-        $statement->bindParam(':studentId', $studentId);
-        $statement->execute();
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array($id));
 
-        foreach ($statement as $row) {
-            $record = $this->hydrate($row, 'p');
-            $owner = $userMapper->hydrate($row, 'u');
+        $records = new Collection();
 
-            $record->setOwner($owner);
-            $collection->add($record);
+        foreach ($statement as $row)
+        {
+            $record = $this->hydrate($row, 'r');
+
+            // Skip if the record has been deleted
+
+            if ($record->isDeleted())
+                continue;
+
+            // Check permissions
+
+            if ($this->hasPermission($record))
+            {
+                // Hydrate and record the record we found
+
+                $records->add($this->hydrateRecord($record, $row));
+            }
         }
 
-        return $collection;
+        return $records;
     }
 
-
     /**
-     * Retrieves record by ID with owner information
+     * Find pastoral record by ID number
      *
-     * @param  int $id
-     * @return \Schoolbox\Pastoral\Pastoral\Model
+     * @var int $id
+     *
+     * @return Pastoral\Model
+     * @throws BaseMapper\Exception
      */
-    public function findByIdWithOwner($id) {
 
-        $userMapper = new \Schoolbox\UserMapper;
-
+    public function findById($id)
+    {
         $query = "
-			SELECT
-				{$this->getColumnString('p')},
-				{$this->getJoinColumnString('owner', 'u')}
-			FROM
-				`{$this->getTable()}` `p`
-				LEFT JOIN {$this->getJoinSql('owner', 'p', 'u')}
-			WHERE
-				`p`.`datetime_deleted` IS NULL AND
-				`p`.`id` = :id
-		    ORDER BY
-		    	`p`.`datetime_posted` DESC
+            SELECT
+                {$this->getColumnString('r')},
+                {$this->getJoinColumnString('student', 's')},
+                {$this->getJoinColumnString('severity', 'sv')},
+				{$this->getJoinColumnString('owner', 'o')},
+				{$this->getJoinColumnString('type', 't')}
+            FROM {$this->getTable()} `r`
+            LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
+            LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
+            LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
+            LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
+            WHERE r.id = ?
         ";
 
-        $statement = $this->database->prepare($query);
-        $statement->bindParam(':id', $id);
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array($id));
+
+        foreach ($statement as $row)
+        {
+            /** @var Pastoral\Model $record */
+            $record = $this->hydrate($row, 'r');
+
+            // Bomb out if the record has been deleted
+
+            $this->throwIfDeleted($record);
+
+            // Check permissions
+
+            if ($this->hasPermission($record))
+            {
+                // Hydrate and record the record we found
+
+                return $this->hydrateRecord($record, $row);
+            }
+        }
+
+        throw new BaseMapper\Exception('Instance of object not found');
+    }
+
+    /**
+     * Checks if the logged in user has permission to view the specified record
+     *
+     * @var \Alaress_Date_Format $beforeDate (dd/mm/yyyy date)
+     * @var \Alaress_Date_Format $afterDate (dd/mm/yyyy date)
+     * @var int $severity (ID of severity)
+     * @var string $types (CSV list)
+     * @var string $authors (CSV list)
+     * @var string $students (CSV list)
+     *
+     * @return bool
+     */
+
+    public function findAllReport($before_date, $after_date, $severity, $types, $authors, $students)
+    {
+        // Create filter SQL
+
+        $criteria = [];
+
+        if ($before_date != '') $criteria[] = "datetime_posted <= '{$before_date}'";
+        if ($after_date != '') $criteria[] = "datetime_posted >= '{$after_date}'";
+        if ($severity != '') $criteria[] = "severity_id >= {$severity}";
+        if ($students != '') $criteria[] = "student_id IN ('{$severity}')";
+        if ($authors != '') $criteria[] = "owner_id IN ('{$severity}')";
+        if ($types != '') $criteria[] = "type_id IN ('{$types}')";
+
+        $criteria_sql = "";
+
+        foreach ($criteria as $criterion) {
+            if ($criteria_sql != "") { $criteria_sql .= " AND "; } else {
+                $criteria_sql = "WHERE ";
+            }
+            $criteria_sql .= $criterion;
+        }
+
+        // Execute SQL
+
+        $query = "
+            SELECT
+                {$this->getColumnString('r')},
+                {$this->getJoinColumnString('student', 's')},
+                {$this->getJoinColumnString('severity', 'sv')},
+				{$this->getJoinColumnString('owner', 'o')},
+				{$this->getJoinColumnString('type', 't')}
+            FROM {$this->getTable()} `r`
+            LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
+            LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
+            LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
+            LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
+            {$criteria_sql}
+            ORDER BY `r`.datetime_posted
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
         $statement->execute();
 
-        foreach ($statement as $row) {
-            $record = $this->hydrate($row, 'p');
-            $owner = $userMapper->hydrate($row, 'u');
+        // Hydrate records for return
 
-            $record->setOwner($owner);
+        $records = new Collection();
+
+        foreach ($statement as $row)
+        {
+            /** @var Pastoral\Model $record */
+            $record = $this->hydrate($row, 'r');
+
+            // Skip if the record has been deleted
+
+            if ($record->isDeleted())
+                continue;
+
+            // Check permission
+
+            if ($this->hasPermission($record))
+            {
+                // Hydrate and add to the collection
+
+                $records->add($this->hydrateRecord($record, $row));
+            }
+        }
+
+        return $records;
+    }
+
+    /**
+     * Checks if the logged in user has permission to view the specified record
+     *
+     * @var Pastoral\Model $record
+     *
+     * @return bool
+     */
+
+    public function hasPermission(Pastoral\Model $record)
+    {
+        /** @var \Schoolbox\User $user */
+        $user = $_SESSION["user"];
+
+        // Pastoral moderators can access everything
+
+        if (UserAccessMapper::getInstance()->findAllForUser($user)->filterBy("service", PASTORAL_SERVICE)->count() > 0)
+            return true;
+
+        // To access a record you at least be a staff member, or the parent of the student
+
+        /** @var \Schoolbox\Role $role */
+        $role = $user->getRole();
+
+        if ($role->getType() != "staff" && !$user->isParentOf($record->getStudent()))
+            return false;
+
+        // If we get through to here we need to check the audience of item
+
+        $record->setAccessList(AccessMapper::getInstance()->findByColumn("pastoral_id", $record->getId()));
+
+        $accessRecords = $record->getAccessList();
+
+        foreach ($accessRecords as $accessCurrent)
+        {
+            // Access records are either role based of user based.
+
+            if (is_numeric($accessCurrent->getRole()->getId()))
+            {
+                // This access record is a role one, check if the user is in this role
+
+                if ($role->getId() == $accessCurrent->getRole()->getId())
+                    return true;
+            }
+            else
+            {
+                // This access record is a user based one, check if this is the user
+
+                if ($accessCurrent->getUser()->getId() == $user->getId())
+                    return true;
+            }
+        }
+
+        // BZZZZZT! You're outta here.
+
+        return false;
+    }
+
+    // Since this hydration is common to all of the methods, shoved it down here
+
+    /**
+     * @var Pastoral\Model $record
+     * @var null $row
+     *
+     * @return Pastoral\Model
+     */
+
+    protected function hydrateRecord($record, $row)
+    {
+        // Hydrate everything on the record
+
+        $record->setStudent($this->hydrateJoin($row, 'student', 's'));
+        $record->setOwner($this->hydrateJoin($row, 'owner', 'o'));
+        $record->setSeverity($this->hydrateJoin($row, 'severity', 'sv'));
+        $record->setType($this->hydrateJoin($row, 'type', 't'));
+
+        // Don't know if this is right for the one-to-many joins, but it works
+
+        $record->setTagsList(TagsMapper::getInstance()->findByColumn("pastoral_id", $record->getId()));
+        $record->setCommentList(CommentMapper::getInstance()->findByColumn("pastoral_id", $record->getId()));
+        $record->setAttachmentList(AttachmentMapper::getInstance()->findByColumn("pastoral_id", $record->getId()));
+
+        // Grab users and roles
+
+        $record->setAccessList(AccessMapper::getInstance()->findByColumn("pastoral_id", $record->getId()));
+
+        foreach ($record->getAccessList() as $access) {
+            if ($access->getRole()->getId() != '') {
+                $access->setRole(\Schoolbox\RoleMapper::getInstance()->findById($access->getRole()->getId()));
+            } else if ($access->getUser()->getId() != '') {
+                $access->setUser(\Schoolbox\UserMapper::getInstance()->findById($access->getUser()->getId()));
+            }
+        }
+
+        // Grab comment authors
+
+        foreach ($record->getCommentList() as $comment) {
+            $comment->setOwner(\Schoolbox\UserMapper::getInstance()->findById($comment->getOwner()->getId()));
+        }
+
+        // Grab attachment details
+
+        $attachments = $record->getAttachmentList();
+
+        foreach ($attachments as $attachment) {
+
+            // Get file icon using mime type
+
+            $file = StorageMapper::getInstance()->findByHash($attachment->getHash());
+            $attachment->setIcon($file->getMimetype()->getIconFile());
+            $attachment->setFilename($file->getFilename());
         }
 
         return $record;
     }
 
-    /**
-     * Retrieves a model by id
-     *
-     * @throws Exception if no instance of model is found
-     * @throws Exception\Deleted if the model was found but has been deleted
-     *
-     * @param  int $identifierValue
-     *
-     * @return object
-     */
-    public function findById($identifierValue)
-    {
-        $t = 0;
-
-        // the main model we'll ultimately be populating
-        $mainModel = null;
-
-        /** @var Mapper[] $joinMappers */
-        $joinMappers   = array();
-        $columnStrings = array($this->getColumnString("t$t"));
-        $joinSqls      = array();
-        $propertyMap   = array();
-        $joinNames     = array();
-
-        $identifier       = $this->getIdentifier();
-        $identifierColumn = $identifier['column'];
-
-        foreach ($this->map as $map) {
-            if (empty($map['join'])) {
-                continue;
-            }
-            // increment our little `t` counter
-            ++$t;
-            $name = $map['join'];
-
-            $alias = "t$t";
-
-            $propertyMap[$alias] = $map['property'];
-            $joinNames[$alias]   = $name;
-            $joinMappers[$alias] = $this->getJoinMapper($name);
-            if (!$joinMappers[$alias] instanceof Mapper) {
-                continue;
-            }
-            $columnStrings[$alias] = $joinMappers[$alias]->getColumnString($alias);
-            $joinSqls[$alias]      = $this->getJoinSql($name, 't0', $alias);
-        }
-
-        $columns = implode(', ', $columnStrings);
-        $joins   = implode(' LEFT JOIN ', $joinSqls);
-        if (strlen($joins)) {
-            $joins = "LEFT JOIN $joins";
-        }
-
-        $stmt = $this->database->prepare(
-            "
-			SELECT $columns FROM `{$this->getTable()}` t0 {$joins} WHERE `t0`.`{$identifierColumn}` = :id_value
-		"
-        );
-
-        $stmt->execute(array('id_value' => $identifierValue));
-
-        // there will be more than one record returned by this query
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if (empty($mainModel)) {
-                /** @var Article $mainModel */
-                $mainModel = $this->hydrate($r, 't0');
-
-                // set blank collections
-            }
-
-            foreach ($joinMappers as $alias => $mapper) {
-                $subIdentifier = $mapper->getIdentifier();
-                $subColumn     = $subIdentifier['column'];
-
-                $field = "$alias.$subColumn";
-
-                if (is_null($r[$field])) {
-                    continue;
-                }
-
-                $entity = $mapper->hydrate($r, $alias);
-
-                $property = $propertyMap[$alias];
-                $joinName = $joinNames[$alias];
-
-                // singular value
-                if (empty($this->joins[$joinName]['multi'])) {
-                    $setEntity = $this->getSetMethodName($property);
-
-                    $mainModel->$setEntity($entity);
-                } // multi-value...this is a bit circuitous...
-                else {
-                    $getEntity = $this->getGetMethodName($property);
-
-                    if (!$mainModel->$getEntity() instanceof Collection) {
-                        $setEntity = $this->getSetMethodName($property);
-                        $mainModel->$setEntity(new Collection());
-                    }
-                    $mainModel->$getEntity()->add($entity);
-                }
-            }
-        }
-
-        if ($mainModel instanceof \Schoolbox\Pastoral\Pastoral\Model) {
-            return $mainModel;
-        }
-
-        throw new \Schoolbox\Mapper\Exception("Instance of object not found");
-    }
 }

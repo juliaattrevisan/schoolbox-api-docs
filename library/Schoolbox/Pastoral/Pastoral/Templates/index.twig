@@ -62,8 +62,8 @@
 </script>
 
 <ul class="breadcrumb">
-    <li><a href="/search/user/{{ user.getId }}">{{ user.formatName() }}</a></li>
-    <li class="active"><a href="/pastoral/{{ user.getId }}">Pastoral Care</a></li>
+    <li><a href="/search/user/{{ student.getId }}">{{ student.formatName() }}</a></li>
+    <li class="active"><a href="/pastoral/{{ student.getId }}">Pastoral Care</a></li>
 </ul>
 
 {# Hide contact/student information and add/filter controls from parents #}
@@ -83,29 +83,20 @@
                 <div class="content no-pad">
                     <div class="row no-margin">
                         <div class="small-12 medium-4 large-2 columns no-pad">
-                            <img src="/portrait.php?userId={{ user.getExternalId() }}" class="full-width"/>
+                            <img src="/portrait.php?userId={{ student.getExternalId() }}" class="full-width"/>
                         </div>
                         <div class="small-12 medium-8 large-10 columns">
                             <dl class="profile">
                                 <dt class="no-margin small-6 medium-4">Student Name</dt>
-                                <dd class="no-margin small-6 medium-8">{{ user.formatName() }}</dd>
+                                <dd class="no-margin small-6 medium-8">{{ student.formatName() }}</dd>
 
                                 <dt class="no-margin small-6 medium-4">Student Age</dt>
-                                <dd class="no-margin small-6 medium-8">{{ student.age }} Years Old</dd>
+                                <dd class="no-margin small-6 medium-8">{{ studentAge }} Years Old</dd>
 
                                 <dt class="no-margin small-6 medium-4 {% if student.StudentYearLevel == '' and student.FormDescription == '' %}hide{% endif %}">Student Year Level</dt>
                                 <dd class="no-margin small-6 medium-8">{{ student.StudentYearLevel }} {{ student.FormDescription }}</dd>
 
-                                <dt class="no-margin small-6 medium-4">Homeroom/Form Teacher</dt>
-                                <dd class="no-margin small-6 medium-8">{{ student.StudentFormStaffName }}</dd>
-
-                                <dt class="no-margin small-6 medium-4">Year Level Co-ordinator</dt>
-                                <dd class="no-margin small-6 medium-8">{{ student.StudentYearLevelCoordinator }}</dd>
-
-                                <dt class="no-margin small-6 medium-4">House</dt>
-                                <dd class="no-margin small-6 medium-8">{{ student.StudentHouseDescription }}</dd>
-
-                                {% for contact in contacts if not user.hideContacts %}
+                                {% for contact in studentContacts if not session.user.hideContacts %}
                                     <dt class="no-margin small-6 medium-4">{{ contact.StudentContactRelation }}</dt>
                                     <dd class="no-margin small-6 medium-8">
                                         {{ contact.main.getFullName() }}
@@ -129,12 +120,8 @@
                     </div>
                 </div>
             </section>
-            <a class="button expand spaced" href="/pastoral/insert/{{ user.getId() }}">Add Pastoral Comment</a>
-
-            {# Not sure if this is the best place, but give moderators a link to pastoral report builder #}
-            {% if pastoralModerator %}
-                <a class="button expand spaced" href="/pastoral/report-builder">Pastoral Report Builder</a>
-            {% endif %}
+            <a class="button expand spaced" href="/pastoral/insert/{{ student.getId() }}">Add Pastoral Record</a>
+            <a class="button expand spaced" href="/pastoral/report-builder">Pastoral Report Builder</a>
             <hr>
         </div>
     </div>
@@ -159,7 +146,7 @@
         <h1>Pastoral Care</h1>
     </div>
     <div class="small-12 column">
-        <div class="alert-box">No pastoral care records have been entered regarding {{ user.firstname }} {{ user.lastname }}.{% if role != 'parent' %} To add a record click on the 'Add Pastoral Comment' button above.{% endif %}</div>
+        <div class="alert-box">No pastoral care records have been entered regarding {{ student.formatName }}.{% if role != 'parent' %} To add a record click on the 'Add Pastoral Comment' button above.{% endif %}</div>
     </div>
 </div>
 
@@ -167,10 +154,10 @@
     <div class="small-12 island">
         <section>
             <ul class="information-list">
-                {% for record in records if not record.hidden %}
+                {% for record in records %}
 
                     {# Only display records the logged in user is allowed to see. Parents cannot see private records ever (even if they have been given access). #}
-                    {% if not record.hidden and not (record.private and role == 'parent') %}
+                    {% if not (record.private and role == 'parent') %}
 
                         <li record-type="{{ record.getTypeId }}" data-pastoral class="record actions-small-1" id="pastoral-{{ record.getId() }}">
                             <div class="list-item">
@@ -188,8 +175,8 @@
                                             {{  record.getHeading() }}
 
                                             {# Show how many comments have been made on the record #}
-                                            {% if record.comments | length > 0 %}
-                                                ({{ record.comments | length }} Comment{% if record.comments | length > 1 %}s{% endif %})
+                                            {% if record.getCommentList.count > 0 %}
+                                                ({{ record.getCommentList.count }} Comment{% if record.comments | length > 1 %}s{% endif %})
                                             {% endif %}
                                         </h3>
 
@@ -202,13 +189,13 @@
                                         </a>
 
                                         {# Heading of pastoral comment#}
-                                        <a href="/pastoral/{{ user.getId() }}/{{ record.getId() }}">
+                                        <a href="/pastoral/{{ student.id }}/{{ record.getId() }}">
                                             <h3>
                                                 {{  record.getHeading() }}
 
                                                 {# Show how many comments have been made on the record #}
-                                                {% if record.comments | length > 0 %}
-                                                    ({{ record.comments | length }} Comment{% if record.comments | length > 1 %}s{% endif %})
+                                                {% if record.getCommentList.count > 0 %}
+                                                    ({{ record.getCommentList.count }} Comment{% if record.getCommentList.count > 1 %}s{% endif %})
                                                 {% endif %}
                                             </h3>
 
@@ -241,10 +228,10 @@
                                             <p class="spaced">
                                                 {{ record.getBodyText() | cutSentence(375, true) }}
                                             </p>
-                                            {% if record.attachments.count() > 0 %}
+                                            {% if record.getAttachmentList.count() > 0 %}
                                                 <p class="spaced meta">
-                                                    {% for attachment in record.attachments %}
-                                                        Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{  attachment.getFilename() }}</a><br>
+                                                    {% for attachment in record.getAttachmentList %}
+                                                        Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{ attachment.getFilename() }}</a><br>
                                                     {% endfor %}
                                                 </p>
                                             {% endif %}
@@ -255,31 +242,28 @@
                                     {% if role != 'parent' %}
                                         <p class="spaced meta">
                                             {# Pastoral event type #}
-                                            {{ record.getTypeName() }} |
+                                            {{ record.getType.getName }} |
 
-                                            {# Pastoral event severity#}
-                                            {{ record.getSeverityName() }} |
+                                            {# Pastoral event severity #}
+                                            {{ record.getSeverity.getName }} |
 
                                             {# Indicate if record is private #}
                                             {% if record.private %}Contents Private | {% endif %}
 
                                             {# Indicate if not audience has been set #}
-                                            {% if record.roles | length + record.users | length == 0 %}No Audience Set{% endif %}
+                                            {% if record.getAccessList.count == 0 %}No Audience Set{% endif %}
 
                                             {# Show audienced roles  #}
-                                            {% if record.roles | length > 0 %}
-                                                {% for role in record.roles %}
-                                                    {{ role.getName() }}{% if not loop.last %}, {% endif %}
+                                            {% if record.getAccessList.count > 0 %}
+                                                {% for access in record.getAccessList %}
+                                                    {% if access.getRole.getId != '' %}
+                                                        {{ access.getRole.getName }}{% if not loop.last %},{% endif %}
+                                                    {% elseif access.getUser.getId != '' %}
+                                                        <a href="/search/user/{{ access.getUser.getId }}">{{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}</a>{% if not loop.last %},{% endif %}
+                                                    {% endif %}
                                                 {% endfor %}
                                             {% endif %}
 
-                                            {# Show audienced users #}
-                                            {% if record.users | length > 0 %}
-                                                {% if record.roles | length > 0 %}|{% endif %}
-                                                {% for user in record.users %}
-                                                    <a href="/search/user/{{ user.getId() }}">{{ user.firstname }} {{ user.lastname }} ({{ user.getRole.name }})</a>{% if not loop.last %}, {% endif %}
-                                                {% endfor %}
-                                            {% endif %}
                                         </p>
                                     {% endif %}
 
@@ -289,7 +273,7 @@
                             {# Show edit links to the owner and pastoral moderators #}
                             {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or pastoralModerator %}
                                 <nav>
-                                    <a class="icon-modify no-text" href="/pastoral/update/{{ user.getId() }}/{{ record.getId() }}" title="Modify"></a>
+                                    <a class="icon-modify no-text" href="/pastoral/update/{{ student.getId() }}/{{ record.getId() }}" title="Modify"></a>
                                     <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
                                 </nav>
                             {% endif %}

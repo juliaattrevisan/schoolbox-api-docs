@@ -26,17 +26,17 @@
             valueField: 'name',
             options: [
                 {% for tag in tagsAll %}
-                {name: '{{ tag.name | escape('js') }}'},
+                {name: '{{ tag.getName | escape('js') }}'},
                 {% endfor %}
             ]
         });
 
         $('[data-cancel]').click(function(event) {
             event.preventDefault();
-            window.location.href = '/pastoral/{{ user.id }}';
+            window.location.href = '/pastoral/{{ record.getStudent.getId }}{{ student.getId }}';
         });
 
-        {% if id != '' %}
+        {% if record.getId != '' %}
 
             var deleteIds = [];
 
@@ -52,7 +52,7 @@
                             id: {{ record.getId() }}
                         })
                         .done(function() {
-                            window.location.href = '/pastoral/{{ record.getStudentId() }}';
+                            window.location.href = '/pastoral/{{ record.getStudent.getId() }}';
                         });
                     }
                 });
@@ -131,7 +131,10 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>{{ user.formatName() }}</h1>
+            <h1>
+                {{ record.getStudent.getFirstname }} {{ record.getStudent.getLastname }}
+                {{ student.getFirstname }} {{ student.getLastname }}
+            </h1>
         </div>
     </div>
 </div>
@@ -139,10 +142,16 @@
 <div class="row">
     <div class="small-12 island">
         <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data" action="/pastoral/save">
-            <input type="hidden" name="id" value="{{ id }}">
+            <input type="hidden" name="id" value="{{ record.getId }}">
             <input type="hidden" id="deleteIds" name="deleteIds" value="">
-            <input type="hidden" name="student_id" value="{{ student_id }}">
-            <h2>Pastoral Record Details</h2>
+            <input type="hidden" name="student_id" value="{{ student.getId }}{{ record.getStudent.getId }}">
+            <h2>
+                {% if record.getId == '' %}
+                    Add Pastoral Record
+                {% else %}
+                    Modify Pastoral Record
+                {% endif %}
+            </h2>
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -155,7 +164,7 @@
                             Pastoral Event Type
                             <select class="required" name="typeId">
                                 {% for type in types %}
-                                    <option {% if type.id == record.typeId %}selected{% endif %} value="{{ type.id }}">{{ type.name }}</option>
+                                    <option {% if type.id == record.getType.getId %}selected{% endif %} value="{{ type.id }}">{{ type.name }}</option>
                                 {% endfor %}
                             </select>
                         </label>
@@ -164,18 +173,18 @@
                             Severity
                             <select class="required" name="severityId">
                                 {% for severity in severities %}
-                                    <option {% if severity.id == record.severityId %}selected{% endif %} value="{{ severity.id }}">{{ severity.name }}</option>
+                                    <option {% if severity.id == record.getSeverity.getId %}selected{% endif %} value="{{ severity.id }}">{{ severity.name }}</option>
                                 {% endfor %}
                             </select>
                         </label>
 
                         <label>
                             Tags
-                            <input id="tags" name="tags" value="{{ tags }}">
+                            <input id="tags" name="tags" value="{% for tag in tags %}{{ tag.getName }},{% endfor %}">
                         </label>
 
                         <label>
-            Description            Body
+                            Description
                             <textarea id="body" name="body">{{ record.body }}</textarea>
                         </label>
                     </div>
@@ -184,24 +193,24 @@
 
             <h2>Permissions</h2>
 
-            {% if userPermissions | length > 0 %}
+            {% if record.getAccessList.count > 0 %}
                 <section>
                     <ul class="grid information-list">
-                        {% for person in userPermissions %}
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="avatar card small-12">
-                                    <a href="/search/user/{{ person.id }}" title="View Profile">
-                                        <img src="/portrait.php?userId={{ person.externalId }}&size=square64" alt="View Profile" />
-                                        <p>{{ person.firstname }} {{ person.lastname }}</p>
-                                    </a>
-                                    <p class="meta">{{ person.getRole.name }}</p>
+                        {% for access in record.getAccessList if access.getUser.getId != '' %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="avatar card small-12">
+                                        <a href="/search/user/{{ person.id }}" title="View Profile">
+                                            <img src="/portrait.php?userId={{ access.getUser.getExternalId }}&size=square64" alt="View Profile" />
+                                            <p>{{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}</p>
+                                        </a>
+                                        <p class="meta">{{ access.getUser.getRole.getName }}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <nav>
-                                <a data-delete-permission="{{ person.id }}" class="icon-close no-text" href="#" title="Delete"></a>
-                            </nav>
-                        </li>
+                                <nav>
+                                    <a data-delete-permission="{{ access.getUser.getId }}" class="icon-close no-text" href="#" title="Remove User Permission"></a>
+                                </nav>
+                            </li>
                         {% endfor %}
                     </ul>
                 </section>
@@ -225,21 +234,26 @@
                         <label>
                             Allow All Users With Role
                             <span class="hint has-tip tip-top" data-tooltip title="Users in the selected roles will be able to see this pastoral care record. Users that are no in one of these roles will see no indication the record exists.">?</span>
-                            {% for role in roles if role.type != 'student' and role.type != 'guest' %}
+                            {% for role in roles if role.getType != 'student' and role.getType != 'guest' %}
+
                                 {# Default for new items: staff roles are selected, others are not #}
-                                <input type="hidden" name="role[{{ role.id }}]" value="0" />
-                                <input type="checkbox" name="role[{{ role.id }}]" id="role[{{ role.id }}]" value="1"
-                                    {% if id %}
-                                        {% for roleCurrent in rolesSelected %}
-                                            {% if roleCurrent.getRoleId() == role.id %}
+
+                                <input type="hidden" name="role[{{ role.getId }}]" value="0" />
+                                <input type="checkbox" name="role[{{ role.getId }}]" id="role[{{ role.getId }}]" value="1"
+                                    {% if record.getId != '' %}
+                                        {% for access in record.getAccessList if access.getRole.getId != '' %}
+                                            {% if access.getRole.getId == role.getId %}
                                                 checked
                                             {% endif %}
                                         {% endfor %}
                                     {% else %}
-                                        {% if role.type == 'staff' %}checked{% endif %}
+                                        {% if role.getType == 'staff' %}
+                                            checked
+                                        {% endif %}
                                     {% endif %}
                                 />
-                                <label for="role[{{ role.id }}]" class="checkbox-label">{{ role.name }}</label>
+                                <label for="role[{{ role.getId }}]" class="checkbox-label">{{ role.getName }}</label>
+
                             {% endfor %}
                         </label>
 
@@ -247,10 +261,10 @@
                             <legend>
                                 <label>
                                     Private Body
-                                    <span class="hint has-tip tip-top" data-width="200" title="If ticked only you will be acontentto view the body of this pastoral recowith access to the record rd. Other users will receive a message advising they will need to contact you for furt Parents will never see private records.her information.">?</span>
+                                    <span class="hint has-tip tip-top" data-width="200" title="If ticked only you will be able view the content of this pastoral record">?</span>
                                 </label>
                             </legend>
-                            <input id="visibilityPrivate" name="private" type="checkbox" {% if record.getPrivate() %}checked{% endif %} value="1"><label for="visibilityPrivate">The body of the record and attachments should only be visible by myself (When selected the title and event type will still be visible to the audiences listed above.)</label>
+                            <input id="visibilityPrivate" name="private" type="checkbox" {% if record.getPrivate %}checked{% endif %} value="1"><label for="visibilityPrivate">If ticked The body of the record and attachments should only be visible by myself (When selected the title and event type will still be visible to the audiences listed above.)</label>
                         </fieldset>
 
                     </div>
@@ -260,7 +274,7 @@
             <h2>Attach Files</h2>
 
             <section>
-            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
             </section>
 
             <h2>Notifications</h2>
@@ -273,46 +287,42 @@
                                     Send Notifications To Audience
                                 </label>
                             </legend>
-                            <input id="notify" name="notify" type="checkbox" value="1"><label for="notify">If ticked a notification will be sent to all audience members this record has been {% if id == '' %}created{% else %}updated{% endif %}.</label>
+                            <input id="notify" name="notify" type="checkbox" value="1"><label for="notify">If ticked an instant notification will be sent to all audience members this record has been {% if id == '' %}created{% else %}updated{% endif %}.</label>
                         </fieldset>
                     </div>
                 </fieldset>
             </section>
 
-            {% if id == '' %}
-
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            Create Duplicate Record On Other Students
-                            <span class="hint has-tip tip-top" data-tooltip title="Duplicate copies of this pastoral record will be added to these students.">?</span>
-                            <select id="addStudent" name="duplicate_id[]" multiple placeholder="Add Students"></select>
-                        </label>
-                    </div>
-                </fieldset>
-            </section>
-
+            {% if record.getId == '' %}
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label>
+                                Create Duplicate Record On Other Students
+                                <span class="hint has-tip tip-top" data-tooltip title="Duplicate copies of this pastoral record will be added to these students.">?</span>
+                                <select id="addStudent" name="duplicate_id[]" multiple placeholder="Add Students"></select>
+                            </label>
+                        </div>
+                    </fieldset>
+                </section>
             {% endif %}
 
             <div class="row">
-                {% if id == '' %}
-                    <div class="small-12 medium-6 column">
-                        <input data-submit type="submit" value="Insert Pastoral Comment"/>
-                    </div>
-                    <div class="small-12 medium-6 column">
-                        <input data-cancel type="submit" value="Cancel Changes"/>
-                    </div>
+                {% if record.getId == '' %}
+
+                    {# Insert Buttons #}
+
+                    <div class="small-12 medium-6 column"><input data-submit type="submit" value="Insert Pastoral Comment"/></div>
+                    <div class="small-12 medium-6 column"><input data-cancel type="submit" value="Cancel Changes"/></div>
+
                 {% else %}
-                    <div class="small-12 medium-4 column">
-                        <input data-submit type="submit" value="Save Changes"/>
-                    </div>
-                    <div class="small-12 medium-4 column">
-                        <input data-delete type="submit" value="Delete"/>
-                    </div>
-                    <div class="small-12 medium-4 column">
-                        <input data-cancel type="submit" value="Cancel Changes"/>
-                    </div>
+
+                    {# Update Buttons #}
+
+                    <div class="small-12 medium-4 column"><input data-submit type="submit" value="Save Changes"/></div>
+                    <div class="small-12 medium-4 column"><input data-delete type="submit" value="Delete"/></div>
+                    <div class="small-12 medium-4 column"><input data-cancel type="submit" value="Cancel Changes"/></div>
+
                 {% endif %}
             </div>
         </form>

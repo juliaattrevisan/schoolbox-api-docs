@@ -28,6 +28,7 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'getReportBuilder', $basePath, "/report-builder");
         $this->addGetRoute($router, 'getReport', $basePath, "/report");
+        $this->addGetRoute($router, 'getReportPrint', $basePath, "/report-print");
         $this->addGetRoute($router, 'getIndex', $basePath, "/{id}");
         $this->addGetRoute($router, 'getInsert', $basePath, "/insert/{id}");
         $this->addGetRoute($router, 'getRecord', $basePath, "/{studentId}/{id}");

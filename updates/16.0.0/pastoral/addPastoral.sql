@@ -1,5 +1,6 @@
 CREATE TABLE `schoolbox`.`pastoral` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+  `pastoral_id` INT NULL COMMENT '',
   `owner_id` INT NULL COMMENT '',
   `severity_id` INT NOT NULL COMMENT '',
   `student_id` INT NOT NULL COMMENT '',

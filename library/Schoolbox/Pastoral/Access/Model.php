@@ -20,11 +20,11 @@ class Model implements ISoftDeletable {
     /** @var int */
     protected $pastoralId;
 
-    /** @var int */
-    protected $roleId;
+    /** @var \Schoolbox\Role */
+    protected $role;
 
-    /** @var int */
-    protected $userId;
+    /** @var \Schoolbox\User */
+    protected $user;
 
     /** @var \Alaress_Date_Format */
     protected $deletedDate;
@@ -46,35 +46,35 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param string $roleId
+     * @param \Schoolbox\Role $role
      * @return self
      */
-    public function setRoleId($roleId) {
-        $this->roleId = $roleId;
-        return $roleId;
+    public function setRole($role) {
+        $this->role = $role;
+        return $role;
     }
 
     /**
-     * @return int
+     * @return \Schoolbox\Role
      */
-    public function getRoleId() {
-        return $this->roleId;
+    public function getRole() {
+        return $this->role;
     }
 
     /**
-     * @param string $roleId
+     * @param \Schoolbox\User $user
      * @return self
      */
-    public function setUserId($userId) {
-        $this->userId = $userId;
-        return $userId;
+    public function setUser($user) {
+        $this->user = $user;
+        return $user;
     }
 
     /**
-     * @return int
+     * @return \Schoolbox\User
      */
-    public function getUserId() {
-        return $this->userId;
+    public function getUser() {
+        return $this->user;
     }
 
     /**

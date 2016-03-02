@@ -1,0 +1,135 @@
+<ul class="breadcrumb hide-on-print">
+    <li><a href="/pastoral/report-builder">Pastoral Care Report Builder</a></li>
+    <li class="active"><a href="#">Report Results</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1 class="hide-on-print">
+            Pastoral Care Report
+            <a data-print class="button right icon-print" onclick="window.print()"></a>
+        </h1>
+        <section>
+            {% if results | length > 0 %}
+                <ul class="information-list">
+                    {% for record in results %}
+                        <li>
+                            <div class="list-item">
+                                <div class="avatar card small-12 wrap-down">
+                                    <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
+                                    <h2>{{ record.student.firstname }} {{ record.student.lastname }}</h2>
+                                    <h3>{{  record.getHeading() }}</h3>
+                                    <p class="spaced meta hide-on-print">
+                                        Posted by {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}
+                                    </p>
+                                    <p class="spaced meta show-for-print">
+                                        <br>Posted by {{ record.getOwner.firstName }} {{ record.getOwner.lastName }}<br>
+                                        {{  record.getPostDate().getShort() }}
+                                    </p>
+                                    <p class="meta">
+                                        Severity: {{ record.getSeverity.getName() }}
+                                    </p>
+                                    <p class="meta">
+                                        Incident Type: {{ record.getType.getName() }}
+                                    </p>
+                                    {% if record.private %}
+                                        <p class="meta">
+                                            Contents Private
+                                        </p>
+                                    {% endif %}
+                                    {% if record.getAttachmentList.count > 0 %}
+                                        <p class="meta">
+                                            {% for attachment in record.getAttachmentList %}
+                                                Attached: {{  attachment.getFilename() }}<br>
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                    <p class="spaced meta">
+                                        Audience:
+                                        {% if record.getAccessList.count > 0 %}
+                                            {% for access in record.getAccessList %}
+                                                {% if access.getRole.getId != '' %}
+                                                    {{ access.getRole.getName }}{% if not loop.last %},{% endif %}
+                                                {% elseif access.getUser.getId != '' %}
+                                                    {{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}{% if not loop.last %},{% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            No Audience Set
+                                        {% endif %}
+                                    </p>
+
+                                    {% if record.tags | length > 0 %}
+                                        <p class="meta spaced show-for-print">
+                                            Tags:
+                                            {% for tag in record.getTagList %}
+                                                {{ tag.getName | title }}
+                                                {% if not loop.last %} | {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+
+                                    <article class="hide-on-print">
+                                        <p class="spaced">
+                                            {% if (record.getPrivate and record.getOwner.getId != session.user.getId) and not pastoralModerator %}
+                                                The contents of this record have been marked as private.
+                                            {% else %}
+                                                {{ record.getBodyText() }}
+                                            {% endif %}
+                                        </p>
+                                    </article>
+
+                                    <p class="spaced show-for-print">
+                                        <br>
+                                        {{ record.getBodyText() }}
+                                        <br>
+                                        {% if record.getTagList.count > 0 %}
+                                    <p class="meta spaced show-for-print">
+                                        Tags:
+                                        {% for tag in record.getTagList %}
+                                            {{ tag.getName | title }}
+                                            {% if not loop.last %} | {% endif %}
+                                        {% endfor %}
+                                    </p>
+                                    {% endif %}
+                                    <br>
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+
+                        {% if not record.getPrivate or pastoralModerator or record.getOwner.getId == session.user.getId %}
+
+                            {% for comment in record.getCommentList %}
+
+                                <li>
+                                    <div class="list-item">
+                                        <div class="small-12 avatar card wrap-down">
+                                            <p class="meta hide-on-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }} {{ comment.getPostDate().getShort() }}</p>
+                                            <p class="show-for-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }}<br>{{ comment.getPostDate().getShort() }}</p>
+                                            <p class="spaced">
+                                                {{ comment.body | raw }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </li>
+
+                            {% endfor %}
+
+                        {% endif %}
+
+                    {% endfor %}
+                </ul>
+
+            {% else %}
+
+                <div class="content">
+                    <p>No pastoral records matched your search criteria, please review your criteria and try again.</p>
+                    <p class="no-margin"><a href="/pastoral/report-builder">Click here to run another report</a></p>
+                </div>
+
+            {% endif %}
+
+        </section>
+    </div>
+</div>

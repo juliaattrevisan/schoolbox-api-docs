@@ -42,19 +42,30 @@ class Mapper extends BaseMapper
 
         $this->hasMap(
             array(
-                'column'   => 'role_id',
-                'property' => 'roleId',
-                'type'     => Mapper::TYPE_INTEGER,
+                'column'   => 'user_id',
+                'property' => 'user',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'user',
+                'join_def' => array(
+                    'mapper'    => '\\Schoolbox\\UserMapper',
+                    'other_key' => 'id',
+                ),
             )
         );
 
         $this->hasMap(
             array(
-                'column'   => 'user_id',
-                'property' => 'userId',
-                'type'     => Mapper::TYPE_INTEGER,
+                'column'   => 'role_id',
+                'property' => 'role',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'role',
+                'join_def' => array(
+                    'mapper'    => '\\Schoolbox\\RoleMapper',
+                    'other_key' => 'id',
+                ),
             )
         );
+
 
         $this->hasSoftDeleteDateField('datetime_deleted');
     }
@@ -66,26 +77,32 @@ class Mapper extends BaseMapper
      *
      * @return \Schoolbox\Collection
      */
-    public function findByPastoralId($pastoralId) {
-        $collection = new Collection();
-        $userMapper = new \Schoolbox\UserMapper;
-
+    public function findByPastoralId($pastoralId)
+    {
         $query = "
 			SELECT
-				{$this->getColumnString('a')}
+				{$this->getColumnString('r')},
+                {$this->getJoinColumnString('role', 'rl')},
+                {$this->getJoinColumnString('user', 'u')}
 			FROM
-				`{$this->getTable()}` `a`
+				`{$this->getTable()}` `r`
+                LEFT JOIN {$this->getJoinSql('role', 'r', 'rl')}
+                LEFT JOIN {$this->getJoinSql('user', 'r', 'u')}
 			WHERE
-				`a`.`datetime_deleted` IS NULL AND
-				`a`.`pastoral_id` = :pastoralId
+				`r`.`datetime_deleted` IS NULL AND
+				`r`.`pastoral_id` = :pastoralId
 			";
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(':pastoralId', $pastoralId);
         $statement->execute();
 
+        $collection = new Collection();
+
         foreach ($statement as $row) {
             $pastoral = $this->hydrate($row, 'a');
+            $pastoral->setRole($this->hydrateJoin($row, 'role', 'r'));
+            $pastoral->setUser($this->hydrateJoin($row, 'user', 'u'));
             $collection->add($pastoral);
         }
 

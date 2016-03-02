@@ -9,32 +9,31 @@
 
 namespace Schoolbox\Pastoral\Pastoral;
 
+use Schoolbox\Pastoral;
+use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
 use Scrub;
 
-class Model implements ISoftDeletable {
-
+class Model implements ISoftDeletable
+{
     /** @var int */
     protected $id;
 
     /** @var int */
-    protected $typeId;
-
-    /** @var int */
-    protected $severityId;
-
-    /** @var int */
     protected $externalId;
 
-    /** @var string */
-    protected $typeName;
-
-    /** @var string */
-    protected $severityName;
-
     /** @var int */
-    protected $studentId;
+    protected $parentId;
+
+    /** @var Pastoral\Type\Model */
+    protected $type;
+
+    /** @var Pastoral\Severity\Model */
+    protected $severity;
+
+    /** @var \Schoolbox\User */
+    protected $student;
 
     /** @var string */
     protected $heading;
@@ -56,6 +55,54 @@ class Model implements ISoftDeletable {
 
     /** @var User */
     protected $owner;
+
+    /** @var Collection|Pastoral\Access\Model[] */
+    protected $accessList;
+
+    /** @var Collection|Pastoral\Comment\Model[] */
+    protected $commentList;
+
+    /** @var Collection|Pastoral\Attachment\Model[] */
+    protected $attachmentList;
+
+    /** @var Collection|Pastoral\Tags\Model[] */
+    protected $tagsList;
+
+    /**
+     * @param  Collection|Pastoral\Access\Model[] $accessList
+     * @return $this
+     */
+    public function setAccessList($accessList)
+    {
+        $this->accessList = $accessList;
+        return $this;
+    }
+
+    /**
+     * @return Collection|Pastoral\Access\Model[]
+     */
+    public function getAccessList()
+    {
+        return $this->accessList;
+    }
+
+    /**
+     * @param  Collection|Pastoral\Tags\Model[] $tagsList
+     * @return $this
+     */
+    public function setTagsList($tagsList)
+    {
+        $this->tagsList = $tagsList;
+        return $this;
+    }
+
+    /**
+     * @return Collection|Pastoral\Tags\Model[]
+     */
+    public function getTagsList()
+    {
+        return $this->tagsList;
+    }
 
     /**
      * @param string $body
@@ -101,7 +148,7 @@ class Model implements ISoftDeletable {
      * @return self
      */
     public function setDeletedDate($deletedDate) {
-        $this->deletedDate = deletedDate;
+        $this->deletedDate = $deletedDate;
         return $this;
     }
 
@@ -145,6 +192,54 @@ class Model implements ISoftDeletable {
     }
 
     /**
+     * @param int $parentId
+     * @return self
+     */
+    public function setParentId($parentId) {
+        $this->parentId = $parentId;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getParentId() {
+        return $this->parentId;
+    }
+
+    /**
+     * @param Collection|Pastoral\Comment\Model[] $commentList
+     * @return self
+     */
+    public function setCommentList($commentList) {
+        $this->commentList = $commentList;
+        return $this;
+    }
+
+    /**
+     * @return Collection|Pastoral\Comment\Model[]
+     */
+    public function getCommentList() {
+        return $this->commentList;
+    }
+
+    /**
+     * @return Collection|Pastoral\Attachment\Model[]
+     */
+    public function getAttachmentList() {
+        return $this->attachmentList;
+    }
+
+    /**
+     * @param Collection|Pastoral\Attachment\Model[] $attachmentList
+     * @return self
+     */
+    public function setAttachmentList($attachmentList) {
+        $this->attachmentList = $attachmentList;
+        return $this;
+    }
+
+    /**
      * @param int $externalId
      * @return self
      */
@@ -161,83 +256,51 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param int $typeId
+     * @param Pastoral\Type\Model $type
      * @return self
      */
-    public function setTypeId($typeId) {
-        $this->typeId = $typeId;
+    public function setType($type) {
+        $this->type = $type;
         return $this;
     }
 
     /**
-     * @return int
+     * @return Pastoral\Type\Model
      */
-    public function getTypeId() {
-        return $this->typeId;
+    public function getType() {
+        return $this->type;
     }
 
     /**
-     * @param int $severityId
+     * @param Pastoral\Severity\Model $severity
      * @return self
      */
-    public function setSeverityId($severityId) {
-        $this->severityId = $severityId;
+    public function setSeverity($severity) {
+        $this->severity = $severity;
         return $this;
     }
 
     /**
-     * @return int
+     * @return Pastoral\Severity\Model
      */
-    public function getSeverityId() {
-        return $this->severityId;
+    public function getSeverity() {
+        return $this->severity;
     }
 
     /**
-     * @param string $typeName
+     * @param User $student
      * @return self
      */
-    public function setTypeName($typeName) {
-        $this->typeName = $typeName;
+    public function setStudent($student) {
+        $this->student = $student;
         return $this;
     }
 
     /**
-     * @return string
+     * @return User
      */
-    public function getTypeName() {
-        return $this->typeName;
-    }
-
-    /**
-     * @param string $severityName
-     * @return self
-     */
-    public function setSeverityName($severityName) {
-        $this->severityName = $severityName;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSeverityName() {
-        return $this->severityName;
-    }
-
-    /**
-     * @param int $studentId
-     * @return self
-     */
-    public function setStudentId($studentId) {
-        $this->studentId = $studentId;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getStudentId() {
-        return $this->studentId;
+    public function getStudent() {
+        return $this->student;
     }
 
     /**
@@ -257,7 +320,7 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param \Schoolbox\User $owner
+     * @param User $owner
      * @return self
      */
     public function setOwner($owner) {
@@ -266,7 +329,7 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @return \Schoolbox\User
+     * @return User
      */
     public function getOwner() {
         return $this->owner;
@@ -294,6 +357,6 @@ class Model implements ISoftDeletable {
      * @return bool
      */
     public function isDeleted() {
-        return $this->getDeletedDate() != null;
+        return ($this->getDeletedDate() instanceof Alaress_Date_Format && !$this->getDeletedDate()->isNull());
     }
 }
