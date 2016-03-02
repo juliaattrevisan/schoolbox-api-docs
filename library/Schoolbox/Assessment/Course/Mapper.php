@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Course;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Config\Loader;
 
 class Mapper
@@ -40,6 +41,15 @@ class Mapper
     private $configLoader = null;
 
     /**
+     * A cache of ancestral Folder instances, to save
+     * on re-querying the same Folder from the db over
+     * and over again
+     *
+     * @var Ancestry
+     */
+    private $ancestry = null;
+
+    /**
      * Constructor
      *
      * Mapper constructor.
@@ -48,6 +58,7 @@ class Mapper
     {
         $this->setConfigLoader(new Loader());
         $this->setFolderMapper(FolderMapper::getInstance());
+        $this->setAncestry(new Ancestry());
 
         /* TODO: Replace /homepage/29 in config/course_homepage with just int
          * Faculty Root Node can be obtained Cheaply
@@ -88,7 +99,7 @@ class Mapper
 
         foreach ($allCourses as $currentCourse) {
             // this is way more expensive than it needs to be -_-;
-            $data['lineage'][$currentCourse->getId()] = $this->getFolderMapper()->findParentsCheaply($currentCourse, $this->getFacultyNode());
+            $data['lineage'][$currentCourse->getId()] = $this->getAncestry()->findParentsCheaply($currentCourse, $this->getFacultyNode());
 
             $allUnits = $this->getFolderMapper()->findByParent($currentCourse->getId());
 
@@ -109,6 +120,9 @@ class Mapper
                 }
             }
         }
+
+        /* TODO: Clear Ancestry results after you're done, or keep it?
+         */
 
         return $data;
     }
@@ -174,5 +188,25 @@ class Mapper
     private function setConfigLoader($configLoader)
     {
         $this->configLoader = $configLoader;
+    }
+
+    /**
+     * Get ancestry
+     *
+     * @return Ancestry
+     */
+    private function getAncestry()
+    {
+        return $this->ancestry;
+    }
+
+    /**
+     * Set ancestry
+     *
+     * @param Ancestry $ancestry
+     */
+    private function setAncestry($ancestry)
+    {
+        $this->ancestry = $ancestry;
     }
 }
