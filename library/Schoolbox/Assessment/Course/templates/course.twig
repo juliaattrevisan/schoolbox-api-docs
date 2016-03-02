@@ -145,7 +145,7 @@
 
             var modal = $('#parent-select');
 
-            modal.foundation('reveal', 'open', '/course/parent').one('click', '[data-selection]', function (e) {
+            modal.foundation('reveal', 'open', '{{ routeLookup('course.parentList') }}').one('click', '[data-selection]', function (e) {
                 e.preventDefault();
 
                 var $selection = $(this);
