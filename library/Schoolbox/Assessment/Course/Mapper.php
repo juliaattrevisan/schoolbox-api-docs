@@ -48,7 +48,14 @@ class Mapper
     {
         $this->setConfigLoader(new Loader());
         $this->setFolderMapper(FolderMapper::getInstance());
-        $this->setFacultyNode($this->getFolderMapper()->findById($this->getConfigLoader()->get('course_homepage')));
+
+        /* TODO: Replace /homepage/29 in config/course_homepage with just int
+         * Faculty Root Node can be obtained Cheaply
+         * but we have to strip out the /homepage/ part
+         */
+        $facultyNodeId = str_replace('/homepage/', '', $this->getConfigLoader()->get('course_homepage'));
+
+        $this->setFacultyNode($this->getFolderMapper()->findCheaplyById($facultyNodeId));
     }
 
     /**
