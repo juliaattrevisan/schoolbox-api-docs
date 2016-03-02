@@ -10,6 +10,10 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller\Base as BaseController;
 
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Browser\AbstractTreeBuilder;
+use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Collection;
 
@@ -115,6 +119,29 @@ class Controller extends BaseController
     }
 
 
+    /**
+     * @param AbstractTreeBuilder $tb
+     * @param array               $target
+     * @return array
+     */
+    protected function recursiveTreeBuild(AbstractTreeBuilder $tb, $target)
+    {
+        $target['children'] = $tb->buildChildNodes($target['id']);
+
+        foreach ($target['children'] as $i => $child) {
+
+            if ($child['type'] == 'course') {
+                unset($target['children'][$i]);
+                continue;
+            }
+
+            if ($child['children']) {
+                $target['children'][$i] = $this->recursiveTreeBuild($tb, $child);
+            }
+        }
+
+        return $target;
+    }
 
 
     /**
@@ -125,57 +152,24 @@ class Controller extends BaseController
      */
     public function parentList()
     {
-        // TODO un-hardcode this
         // the valid list of parents:
         //  - start at facultyTop,
         //  - recurse into every folder for which the user has WRITE access
         //  - stop at, and exclude, all Courses (folder that has > 0 children with > 0 tasks) (apparently this point is up for debate..?)
         //  - continue to exhaustion
 
+        $tb = new TreeBuilder(Folder\Mapper::getInstance(), TaskMapper::getInstance(), UserAccessMapper::getInstance(), RoleAccessMapper::getInstance(), $this->getUser());
+
         $data = [
-            'branch' => [
-                'id' => 29,
-                'name' => 'Faculties',
-                'nodes' => [
-                    [
-                        'id' => 33,
-                        'name' => 'English',
-                        'nodes' => [
-                            [
-                                'id' => 34,
-                                'name' => 'Year 10',
-                                'nodes' => [
-                                    [
-                                        'id' => 35,
-                                        'name' => 'Shakespeare in Love'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'id' => 519,
-                        'name' => 'French',
-                        'nodes' => []
-                    ],
-                    [
-                        'id' => 435,
-                        'name' => 'Science and Technology',
-                        'nodes' => [
-                            [
-                                'id' => 456,
-                                'name' => 'Subjects',
-                                'nodes' => [
-                                    [
-                                        'id' => 436,
-                                        'name' => 'Chemistry'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+            'id'   => $this->facultyTop->getId(),
+            'text' => $this->facultyTop->getName()
+        ];
+
+        // recurse, passing $data by reference
+        $data = $this->recursiveTreeBuild($tb, $data);
+
+        $data = [
+            'branch' => $data
         ];
 
         $this->tpl('parentList', $data);
