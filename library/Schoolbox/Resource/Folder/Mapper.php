@@ -335,6 +335,10 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     /**
      * Get a list of categorys which belong to a particular parent
      *
+     * TODO: This probably shouldn't get tasks and homepage configs
+     * It should only get the children of $id and probably should be
+     * established in Ancestry
+     *
      * @param $id
      * @return Collection|Model[]
      * @throws \Schoolbox\Mapper\Exception
