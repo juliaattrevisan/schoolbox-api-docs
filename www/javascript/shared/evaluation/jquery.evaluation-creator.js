@@ -415,17 +415,29 @@
                         /* Modify directly in the Question Bank
                          */
                         else {
-                            data.type_id = theForm.find('input[name=type_id]').val(),
+                            data.type_id = theForm.find('input[name=type_id]').val();
                             data.question_bank_id = theForm.find('input[name=question_bank_id]').val();
+                            data.assess_id = theForm.find('input[name=assess_id]').val();
+                            data.section_id = theForm.find('input[name=section_id]').val();
 
-                            redirect = config.questionBank.url;
+                            redirect = config.questionBank.url + '/0/' + data.assess_id + '/' + data.section_id;
                         }
+                    }
+
+                    // Whack the return URL on if we have one
+
+                    var return_url = theForm.find('input[name=return_url]').val();
+
+                    if (return_url === '' || return_url === undefined) {
+                        return_url = '';
+                    } else {
+                        return_url = "?return_url=" + return_url;
                     }
 
                     /* Submit via POST and redirect to question creation screen upon done
                      */
                     $.post(theForm.attr('action'), data, function(responseText) {
-                        window.location = redirect;
+                        window.location = redirect + return_url;
                     });
 
                     return false;

@@ -11,6 +11,7 @@
         <form id="createQuestionForm" action="/{ASSESS_KIND_LC}/question/create" method="post">
             <input name="section_id" type="hidden" value="{SECTION_ID}" />
             <input name="sequence" type="hidden" value="{SEQUENCE}" />
+            <input name="return_url" type="hidden" value="{RETURN_URL}" />
 
             <h2 class="subheader">Create Question</h2>
             <section>
@@ -82,7 +83,7 @@
         /* Change state
          */
         $('#type_id').change(function() {
-            window.location = '/{ASSESS_KIND_LC}/question/create/' + section_id + '/' + $('#type_id').val();
+            window.location = '/{ASSESS_KIND_LC}/question/create/' + section_id + '/' + $('#type_id').val() + '?return_url={RETURN_URL}';
         });
 
         /* Enforce two decimal places

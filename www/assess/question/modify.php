@@ -18,6 +18,12 @@ $groupHandler = new Group();
 /* If a question was submitted
  */
 if (!empty($_POST)) {
+
+    if ($_POST["return_url"] != "")
+        $return_url = "?return_url={$_POST["return_url"]}";
+    else
+        $return_url = "";
+
     if (!is_numeric($_POST['type_id'])) {
         error(116);
     }
@@ -66,8 +72,15 @@ if (!empty($_POST)) {
 
     /* Create new question
      */
-    SitePage::localRedir('/assess/question/create/' . $section['section_id']);
+    SitePage::localRedir('/assess/question/create/' . $section['section_id'] . $return_url);
+
 } else {
+
+    if ($_GET["return_url"] != "")
+        $return_url = "?return_url={$_GET["return_url"]}";
+    else
+        $return_url = "";
+
     if (!is_numeric($this->arg[0])) {
         error(115);
     }
@@ -169,6 +182,7 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_SECTION_TITLE' => $section['title'],
+        'RETURN_URL'           => $_GET["return_url"],
         'ASSESS_ASSESS_ID'     => $section['assess_id'],
         'ASSESS_KIND_LC'       => 'assess',
         'ASSESS_KIND'          => 'Quiz',
@@ -192,17 +206,17 @@ if (!empty($_POST)) {
         ],
         [
             'text' => $assess['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'href' => "/assess/summary/{$assess['assess_id']}{$return_url}",
             'class' => '',
         ],
         [
             'text' => $section['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'href' => "/assess/summary/{$assess['assess_id']}{$return_url}",
             'class' => '',
         ],
         [
             'text' => "Q{$question['sequence']}",
-            'href' => "/assess/question/modify/{$question['question_id']}",
+            'href' => "/assess/question/modify/{$question['question_id']}{$return_url}",
             'class' => 'active',
         ]
     ]);

@@ -59,5 +59,10 @@ $section = $sectionHandler->getByID($question['section_id']);
 
 $questionHandler->resequenceQuestionsAfterDelete($section['assess_id'], $section['section_id']);
 
-SitePage::localRedir('/assess/summary/' . $section['assess_id']);
+if ($_GET["return_url"] != "")
+	$return_url = "?return_url={$_GET["return_url"]}";
+else
+	$return_url = "";
+
+SitePage::localRedir('/assess/summary/' . $section['assess_id'] . $return_url);
 

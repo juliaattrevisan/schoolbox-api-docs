@@ -63,5 +63,10 @@ $sectionHandler->update($section);
 
 $sectionHandler->resequenceSectionsAfterDelete($section['assess_id']);
 
-SitePage::localRedir('/assess/modify/' . $section['assess_id']);
+if ($_GET["return_url"] != "")
+    $return_url = "?return_url={$_GET["return_url"]}";
+else
+    $return_url = "";
+
+SitePage::localRedir('/assess/modify/' . $section['assess_id'] . $return_url);
 

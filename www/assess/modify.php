@@ -29,7 +29,6 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 }
 
 if (!empty($_POST)) {
-
     /* Cater for unlimited duration tests. Can't use zero because of countdown
      * timer, so we use -1
      */
@@ -97,7 +96,13 @@ if (!empty($_POST)) {
         $task_instance->setTitle($_POST['title']);
         Task\InstanceMapper::getInstance()->save($task_instance);
     }
-    SitePage::localRedir('/assess/summary/' . $this->arg[0]);
+
+    if ($_POST["return_url"] != "")
+        $return_url = "?return_url={$_POST["return_url"]}";
+    else
+        $return_url = "";
+
+    SitePage::localRedir('/assess/summary/' . $this->arg[0] . $return_url);
 }
 else if(is_numeric($_GET['mark_visibility'])) {
     /* This is used for an ajax update request of just the visibility */
@@ -112,6 +117,11 @@ else if(is_numeric($_GET['mark_visibility'])) {
     exit;
 }
 else {
+
+    if ($_GET["return_url"] != "")
+        $return_url = "?return_url={$_GET["return_url"]}";
+    else
+        $return_url = "";
 
     /* Render modify page
      */
@@ -151,6 +161,8 @@ else {
 
     $this->setVar(array(
         'ACTION'                    => 'modify',
+        'RETURN_URL'                => $_GET["return_url"],
+        'RETURN_URL_DECODED'        => base64_decode($_GET["return_url"]),
         'ASSESS_HEADING'            => Scrub::text($assessment->getTitle()),
         'ASSESS_ACTION'             => 'Modify',
         'ASSESS_KIND_LC'            => 'assess',
@@ -261,7 +273,7 @@ else {
         ],
         [
             'text' => $assessment->getTitle(),
-            'href' => "/assess/summary/{$assessment->getId()}",
+            'href' => "/assess/summary/{$assessment->getId()}{$return_url}",
             'class' => 'active',
         ]
     ]);

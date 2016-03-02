@@ -31,11 +31,22 @@ if (!empty($_POST)) {
     /* Create new Section
      */
     $sectionHandler = new Assess_Section();
+
+    if ($_POST["return_url"] != "") {
+        $return_url = "?return_url={$_POST["return_url"]}";
+    } else
+        $return_url = "";
+
+    // Have to unset the return_url from the POST array, otherwise it tries to shove it in the SQL query when creating
+    // the section
+
+    unset($_POST["return_url"]);
+
     $section_id = $sectionHandler->create($_POST);
 
     /* Redirect to question creation for this section
      */
-    SitePage::localRedir('/assess/question/create/' . $section_id);
+    SitePage::localRedir('/assess/question/create/' . $section_id . $return_url);
 } else {
     if (empty($this->arg[0])) {
         error(51);
@@ -78,6 +89,7 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID'     => $this->arg[0],
+        'RETURN_URL'           => $_GET["return_url"],
         'ASSESS_KIND_LC'       => 'assess',
         'ASSESS_KIND'          => 'Quiz',
         'ASSESS_TITLE'         => Scrub::text($assess['title']),
