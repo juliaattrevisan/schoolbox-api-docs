@@ -1,0 +1,39 @@
+{% extends "schoolmail/row.twig" %}
+
+{% block image %}
+    {% set msg = row.messages | first %}
+    {% if 'icon=pin' in msg.icon %}
+        <img src="/images/slc/logo.png" width="56" height="47" />
+    {% else %}
+        <img src="{{ msg.icon }}" width="56" height="56" />
+    {% endif %}
+{% endblock %}
+
+{% block pretty %}
+    {% set msg = row.messages | first %}
+    {% if msg.meta.title %}
+        {# use the meta title if possible, it looks nicer #}
+        <a href="{{ msg.href }}" class="title">{{ msg.meta.title }}</a>
+    {% else %}
+        {{ msg.title | raw }}
+    {% endif %}
+{% endblock %}
+
+{% block meta %}
+    {% set msg = row.messages | first %}
+    {% if msg.meta %}
+        {{ parent() }}
+        <tr>
+            <td>
+                <p>
+                    <em>
+                        {{ msg.meta.byline }}
+                    </em>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>{{ msg.meta.body | cutSentence(300, true) }}</p></td>
+        </tr>
+    {% endif %}
+{% endblock %}
