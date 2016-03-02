@@ -35,12 +35,15 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     public function renderTemplate($templateHandle)
     {
         // Only classes get course lists
-        $courseList = [];
+        $componentList = [];
         if (count($this->getContext()->getCodes())) {
-            $courses = \Schoolbox\Assessment\Course\UnitInstanceMapper::getInstance()
-                ->findAllCoursesUsedInFolders([$this->getContext()->getId()])
-            ;
-            $courseList = $courses[$this->getContext()->getId()];
+            // All units on this page - get their component and related course
+            $units = \Schoolbox\Assessment\Course\UnitInstanceMapper::getInstance()
+                ->findByColumn('category_id', $this->getContext()->getId());
+            foreach ($units as $unit) {
+                // Only one unit per course
+                $componentList[$unit->getComponent()->getId()] = $unit;
+            }
         }
 
         if (!parent::loadTemplate($templateHandle, 'manageClass')) {
@@ -91,10 +94,12 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         $this->setVar('course_block', '');
-        foreach ($courseList as $course) {
+        foreach ($componentList as $componentId => $unit) {
+            $course = \Schoolbox\Assessment\Course\UnitInstanceMapper::getInstance()
+                ->findCourseForUnit($unit);
             $this->setVar([
                 'COURSE_NAME' => $course->getName(),
-                'COURSE_ID'   => $course->getId(),
+                'COURSE_ID'   => $componentId,
             ]);
             $this->parse('course_block', 'course', true);
         }
