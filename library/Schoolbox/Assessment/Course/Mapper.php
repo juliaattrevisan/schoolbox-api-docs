@@ -50,6 +50,16 @@ class Mapper extends FolderMapper
     }
 
     /**
+     * Delegation method
+     *
+     * Clear out all the objects in the Ancestry
+     */
+    public function resetAncestry()
+    {
+        $this->getAncestry()->reset();
+    }
+
+    /**
      * List the courses
      *
      * @api   /course/list
@@ -92,9 +102,6 @@ class Mapper extends FolderMapper
              */
             $data['lineage'][$currentCourse->getId()] = $this->getAncestry()->findParentsCheaply($currentCourse, $this->getFacultyNode());
         }
-
-        /* TODO: Clear Ancestry results after you're done, or keep it?
-         */
 
         return $data;
     }

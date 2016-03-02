@@ -39,6 +39,14 @@ class Ancestry
     }
 
     /**
+     * Clear out all the objects you accumulated
+     */
+    public function reset()
+    {
+        $this->cache = [];
+    }
+
+    /**
      * Find ancestry using findById() which also gives you hydrations
      * on joins and other objects
      *
