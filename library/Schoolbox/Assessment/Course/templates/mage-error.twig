@@ -1,0 +1,38 @@
+{#
+    USAGE
+        this template expects a variable called 'error' which contains:
+          * problem: a string describing what went wrong
+          * reasons: an array of one or more strings that describes how the user can rectify the situation
+
+    EXAMPLE
+        error: {
+            problem: "Could not save. You need to",
+            reasons: [
+                "supply a name",
+                "choose a type"
+            ]
+        }
+
+        would render as:
+
+        Could not save. You need to:
+          * supply a name
+          * choose a type
+#}
+
+{# display nothing if there are no errors -#}
+{% if error.problem | length > 0 -%}
+    {{- error.problem -}}
+    {%- if error.reasons | length > 0 -%}
+        {% if error.reasons | length == 1 %}
+            {{ error.reasons[0] -}}.
+        {%- else -%}
+            : <ul>
+            {%- for reason in error.reasons  -%}
+                <li>{{ reason }}</li>
+            {%- endfor -%}
+            </ul>
+        {%- endif -%}
+    {%- endif -%}
+{%- endif -%}
+
