@@ -323,10 +323,18 @@ class Mapper extends BaseMapper
 
         $criteria = [];
 
-        if ($before_date != '') $criteria[] = "datetime_posted <= '{$before_date}'";
-        if ($after_date != '') $criteria[] = "datetime_posted >= '{$after_date}'";
+        if ($before_date != '') {
+            $before_date = date("Y-m-d", strtotime($before_date));
+            $criteria[] = "datetime_posted <= '{$before_date}'";
+        }
+
+        if ($after_date != '') {
+            $after_date = date("Y-m-d", strtotime($after_date));
+            $criteria[] = "datetime_posted >= '{$after_date}'";
+        }
+
         if ($severity != '') $criteria[] = "severity_id >= {$severity}";
-        if ($students != '') $criteria[] = "student_id IN ('{$severity}')";
+        if ($students != '') $criteria[] = "student_id IN ({$students})";
         if ($authors != '') $criteria[] = "owner_id IN ('{$severity}')";
         if ($types != '') $criteria[] = "type_id IN ('{$types}')";
 

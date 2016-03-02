@@ -17,152 +17,163 @@
         <h1 class="hide-on-print">
             Pastoral Care Incidents
         </h1>
-        <section class="content">
-            <p class="no-margin left">
-                The following pastoral care incidents were found matching your report criteria, click on an incident to expand
-                and view its details.
-            </p>
-            <p class="no-margin right">
-                Viewing results {{ pageCurrent * resultsPerPage - resultsPerPage + 1 }} - {{ min(totalResults, pageCurrent * resultsPerPage) }} of {{ totalResults }}
-            </p>
-            <div class="clearfix"></div>
-        </section>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-9 island">
-
     </div>
 </div>
 
 <div class="row">
     {% if results | length > 0 %}
+
+        <div class="small-12 island">
+            <section class="content">
+                <p class="no-margin left">
+                    The following pastoral care incidents were found matching your report criteria, click on an incident to expand
+                    and view its details.
+                </p>
+                <p class="no-margin right">
+                    Viewing results {{ pageCurrent * resultsPerPage - resultsPerPage + 1 }} - {{ min(totalResults, pageCurrent * resultsPerPage) }} of {{ totalResults }}
+                </p>
+                <div class="clearfix"></div>
+            </section>
+        </div>
+        <div class="clearfix"></div>
+
         <ul class="information-list">
             <dl class="accordion" data-accordion>
 
-            {% for record in results %}
+                {% for record in results %}
 
-                <dd class="accordion-navigation">
+                    <dd class="accordion-navigation">
 
-                    <a href="#panel-{{ record.getId }}">
-                        <div class="left">{{ record.getHeading }}</div>
-                        <div class="right">{{ record.getStudent.getFirstname }} {{ record.getStudent.getLastname }}</div>
-                        <div class="clearfix"></div>
-                    </a>
+                        <a href="#panel-{{ record.getId }}">
+                            <div class="left">{{ record.getHeading }}</div>
+                            <div class="right">{{ record.getStudent.getFirstname }} {{ record.getStudent.getLastname }}</div>
+                            <div class="clearfix"></div>
+                        </a>
 
-                    <div id="panel-{{ record.getId }}" class="content">
+                        <div id="panel-{{ record.getId }}" class="content">
 
-                        <div class="card small-12 wrap-down">
+                            <div class="card small-12 wrap-down">
 
-                            <h3>{{ record.getType.getName }}</h3>
+                                <h3>{{ record.getType.getName }}</h3>
 
-                            <p class="meta">Posted By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}</p>
+                                <p class="meta">Posted By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}</p>
 
-                            <p class="meta">
-                                Severity: {{ record.getSeverity.getName() }}
-                            </p>
-
-                            <p class="meta">
-                                Incident Type: {{ record.getType.getName() }}
-                            </p>
-
-                            <p class="meta">
-                                Audience:
-                                {% if record.getAccessList.count > 0 %}
-                                    {% for access in record.getAccessList %}
-                                        {% if access.getRole.getId != '' %}
-                                            {{ access.getRole.getName }}{% if not loop.last %},{% endif %}
-                                        {% elseif access.getUser.getId != '' %}
-                                            {{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}{% if not loop.last %},{% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    No Audience Set
-                                {% endif %}
-                            </p>
-
-                            {% if record.getTagsList.count > 0 %}
-
-                                <p class="meta spaced">
-                                    Tags:
-                                    {% for tag in record.getTagsList %}
-                                        {{ tag.getName | title }}
-                                        {% if not loop.last %} | {% endif %}
-                                    {% endfor %}
+                                <p class="meta">
+                                    Severity: {{ record.getSeverity.getName() }}
                                 </p>
 
-                            {% endif %}
+                                <p class="meta">
+                                    Incident Type: {{ record.getType.getName() }}
+                                </p>
 
-                            <p class="content {% if loop.first and record.getAttachmentList.count > 0 %}spaced{% endif %}">
-                                {% if (record.getPrivate and record.getOwner.getId != session.user.getId) and not pastoralModerator %}
+                                <p class="meta">
+                                    Audience:
+                                    {% if record.getAccessList.count > 0 %}
+                                        {% for access in record.getAccessList %}
+                                            {% if access.getRole.getId != '' %}
+                                                {{ access.getRole.getName }}{% if not loop.last %},{% endif %}
+                                            {% elseif access.getUser.getId != '' %}
+                                                {{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}{% if not loop.last %},{% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        No Audience Set
+                                    {% endif %}
+                                </p>
 
-                                    The contents of this record have been marked as private.
+                                {% if record.getTagsList.count > 0 %}
 
-                                {% else %}
-
-                                    {{ record.getBodyText() }}
-
-                                {% if record.getAttachmentList.count > 0 %}
-
-                                    <p class="meta">
-                                        {% for attachment in record.getAttachmentList %}
-                                            Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{  attachment.getFilename() }}</a><br>
+                                    <p class="meta spaced">
+                                        Tags:
+                                        {% for tag in record.getTagsList %}
+                                            {{ tag.getName | title }}
+                                            {% if not loop.last %} | {% endif %}
                                         {% endfor %}
                                     </p>
 
                                 {% endif %}
 
-                            {% if not record.getPrivate or pastoralModerator or record.getOwner.getId == session.user.getId %}
-                                    {% for comment in record.getCommentList %}
-                                        <hr>
-                                        <p class="meta">Comment By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}</p>
-                                        <p class="spaced">
-                                            {{ comment.body | raw }}
-                                        </p>
-                                    {% endfor %}
-                                {% endif %}
+                                <p class="content {% if loop.first and record.getAttachmentList.count > 0 %}spaced{% endif %}">
+                                    {% if (record.getPrivate and record.getOwner.getId != session.user.getId) and not pastoralModerator %}
 
-                                {% endif %}
-                            </p>
+                                        The contents of this record have been marked as private.
+
+                                    {% else %}
+
+                                        {{ record.getBodyText() }}
+
+                                    {% if record.getAttachmentList.count > 0 %}
+
+                                        <p class="meta">
+                                            {% for attachment in record.getAttachmentList %}
+                                                Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{  attachment.getFilename() }}</a><br>
+                                            {% endfor %}
+                                        </p>
+
+                                    {% endif %}
+
+                                {% if not record.getPrivate or pastoralModerator or record.getOwner.getId == session.user.getId %}
+                                        {% for comment in record.getCommentList %}
+                                            <hr>
+                                            <p class="meta">Comment By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}</p>
+                                            <p class="spaced">
+                                                {{ comment.body | raw }}
+                                            </p>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    {% endif %}
+                                </p>
+
+                            </div>
 
                         </div>
 
-                    </div>
+                    </dd>
 
-                </dd>
+                {% endfor %}
 
-            {% endfor %}
+            </dl>
 
         </ul>
 
     {% else %}
 
-        <div class="content">
-            <p>No pastoral records matched your search criteria, please review your criteria and try again.</p>
-            <p class="no-margin"><a href="/pastoral/report-builder">Click here to run another report</a></p>
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <p class="no-margin">No pastoral records matched your search criteria, please review your criteria and try again.</p>
+                </div>
+            </section>
+            <a class="button submit" href="/pastoral/report-builder">Change Report Criteria</a>
         </div>
 
     {% endif %}
 </div>
 
-<br>
-<div class="row">
-    <div class="small-12 island">
-        <a class="button submit expand" href="./report-print?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Printable View</a>
-        {% if results | length > 0 and totalPages > 1 %}
-            <br><br>
-            <ul class="pagination">
-                <li class="arrow"><a href="?pageCurrent=1&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">«</a></li>
-                <li class="arrow {% if pageCurrent == 1 %}unavailable{% endif %}"><a href="{% if pageCurrent == 1 %}#{% else %}?pageCurrent={{ pageCurrent - 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">‹</a></li>
-                {% for i in range (max(1, pageCurrent - (8 - (min(totalPages, pageCurrent + 8 - (pageCurrent - max(1, pageCurrent - 4))) - pageCurrent))), min(totalPages, pageCurrent + 8 - (pageCurrent - max(1, pageCurrent - 4))))  %}
-                    <li {% if i == pageCurrent %} class='active' {% endif %}>
-                        <a href="?pageCurrent={{ i }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">{{ i }}</a>
-                    </li>
-                {% endfor %}
-                <li class="arrow"><a href="{% if pageCurrent == totalPages %}#{% else %}?pageCurrent={{ pageCurrent + 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">›</a></li>
-                <li class="arrow"><a href="?pageCurrent={{ totalPages }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">»</a></li>
-            </ul>
-        {% endif %}
+{% if results | length > 0 %}
+
+    <br>
+    <div class="row">
+        <div class="small-12 island">
+            <a class="button submit expand" href="./report-print?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Printable View</a>
+            <a class="button submit expand" href="/pastoral/report-builder">Change Report Criteria</a>
+
+            {% if results | length > 0 and totalPages > 1 %}
+                <br><br>
+                <ul class="pagination">
+                    <li class="arrow"><a href="?pageCurrent=1&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">«</a></li>
+                    <li class="arrow {% if pageCurrent == 1 %}unavailable{% endif %}"><a href="{% if pageCurrent == 1 %}#{% else %}?pageCurrent={{ pageCurrent - 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">‹</a></li>
+                    {% for i in range (max(1, pageCurrent - (8 - (min(totalPages, pageCurrent + 8 - (pageCurrent - max(1, pageCurrent - 4))) - pageCurrent))), min(totalPages, pageCurrent + 8 - (pageCurrent - max(1, pageCurrent - 4))))  %}
+                        <li {% if i == pageCurrent %} class='active' {% endif %}>
+                            <a href="?pageCurrent={{ i }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">{{ i }}</a>
+                        </li>
+                    {% endfor %}
+                    <li class="arrow"><a href="{% if pageCurrent == totalPages %}#{% else %}?pageCurrent={{ pageCurrent + 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">›</a></li>
+                    <li class="arrow"><a href="?pageCurrent={{ totalPages }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">»</a></li>
+                </ul>
+            {% endif %}
+        </div>
     </div>
-</div>
+
+{% endif %}

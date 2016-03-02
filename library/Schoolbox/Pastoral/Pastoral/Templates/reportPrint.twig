@@ -10,12 +10,6 @@
             Pastoral Care Incidents - Printable View
         </h1>
 
-        <div class="hide-on-print">
-            <a class="button expand spaced" href="#" onclick="window.print()">Print Results</a>
-            <a class="button submit expand spaced" href="./report?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Return To Normal View</a>
-            <br><br>
-        </div>
-
         <section>
             {% if results | length > 0 %}
                 <ul class="information-list">
@@ -138,6 +132,13 @@
             {% endif %}
 
         </section>
+
+        <div class="hide-on-print">
+            <a class="button submit expand spaced" href="#" onclick="window.print()">Print Results</a>
+            <a class="button submit expand spaced" href="./report?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Return To Normal View</a>
+            <a class="button submit expand" href="/pastoral/report-builder">Change Report Criteria</a>
+        </div>
+
 
     </div>
 </div>
