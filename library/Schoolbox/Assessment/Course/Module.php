@@ -37,6 +37,7 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
+                '/list/modal'   => 'courseListMinimal',
                 '/list'         => 'courseList',
                 '/new'          => 'newCourse',
                 '/modify/{id}'  => 'modifyCourse',

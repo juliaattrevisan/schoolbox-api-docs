@@ -1,17 +1,23 @@
+{% if hasBreadcrumb %}
 <ul class="breadcrumb">
     <li><a href="/sandbox">Sandbox</a></li>
     <li class="active"><a href="/sandbox/path/to/{{ tpl }}">{{ tpl | title }}</a></li>
 </ul>
+{% endif %}
+
 <div class="row actions-small-1">
     <div class="list-item">
         <div class="small-12 column">
             <h1>Course List</h1>
         </div>
     </div>
+    {% if hasAdd %}
     <nav>
         <a href="/course/new" class="icon-add"></a>
     </nav>
+    {% endif %}
 </div>
+
 <div class="row">
     <div class="small-12 column">
         <input type="text" value="" placeholder="Search for a course" />
@@ -23,7 +29,13 @@
             <ul class="information-list">
             {% for course in courses %}
                 {% set cparents = lineage[course.id] %}
+
+                {% if hasTot %}
                 <li class="actions-small-2">
+                {% else %}
+                <li class="actions-small-1">
+                {% endif %}
+
                     <div class="list-item">
                         <div class="compact avatar card small-12">
                             <a href="/course/modify/{{ course.id }}">
@@ -53,7 +65,10 @@
                     </div>
                     <nav>
                         <a href="#" class="icon-down-arrow" data-collapser="course-{{ course.id }}"></a>
+
+                        {% if hasTot %}
                         <a href="#" class="icon-overflow"></a>
+                        {% endif %}
                     </nav>
                 </li>
             {% endfor %}
