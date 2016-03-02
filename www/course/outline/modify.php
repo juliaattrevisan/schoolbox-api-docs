@@ -53,7 +53,7 @@ $course_list = UnitInstanceMapper::getInstance()->findByColumn(
 );
 
 // block setup (PHPLib sucks)
-$this->setFile(TEMPLATE_content, "course/modify.html");
+$this->setFile(TEMPLATE_content, "course/outline/modify.html");
 $this->setBlock(TEMPLATE_content, 'course', 'course_block');
 $this->setBlock('course', 'course_breadcrumb', 'course_breadcrumb_block');
 $this->setBlock(TEMPLATE_content, 'unit', 'unit_block');
