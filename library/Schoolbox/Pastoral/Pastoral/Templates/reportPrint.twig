@@ -1,14 +1,21 @@
 <ul class="breadcrumb hide-on-print">
     <li><a href="/pastoral/report-builder">Pastoral Care Report Builder</a></li>
-    <li class="active"><a href="#">Report Results</a></li>
+    <li class="active"><a href="./report?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Report Results</a></li>
+    <li class="active"><a href="#">Printable View</a></li>
 </ul>
 
 <div class="row">
     <div class="small-12 island">
         <h1 class="hide-on-print">
-            Pastoral Care Report
-            <a data-print class="button right icon-print" onclick="window.print()"></a>
+            Pastoral Care Incidents - Printable View
         </h1>
+
+        <div class="hide-on-print">
+            <a class="button expand spaced" href="#" onclick="window.print()">Print Results</a>
+            <a class="button submit expand spaced" href="./report?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Return To Normal View</a>
+            <br><br>
+        </div>
+
         <section>
             {% if results | length > 0 %}
                 <ul class="information-list">
@@ -131,5 +138,6 @@
             {% endif %}
 
         </section>
+
     </div>
 </div>

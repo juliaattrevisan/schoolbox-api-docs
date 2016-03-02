@@ -16,7 +16,6 @@
     <div class="small-12 island">
         <h1 class="hide-on-print">
             Pastoral Care Incidents
-            <a target="_blank" href="report-print?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}" data-print class="button right icon-print"></a>
         </h1>
         <section class="content">
             <p class="no-margin left">
@@ -147,11 +146,12 @@
     {% endif %}
 </div>
 
-{% if results | length > 0 and totalPages > 1 %}
-
-    <br>
-    <div class="row">
-        <div class="small-12 island">
+<br>
+<div class="row">
+    <div class="small-12 island">
+        <a class="button submit expand" href="./report-print?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Printable View</a>
+        {% if results | length > 0 and totalPages > 1 %}
+            <br><br>
             <ul class="pagination">
                 <li class="arrow"><a href="?pageCurrent=1&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">«</a></li>
                 <li class="arrow {% if pageCurrent == 1 %}unavailable{% endif %}"><a href="{% if pageCurrent == 1 %}#{% else %}?pageCurrent={{ pageCurrent - 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">‹</a></li>
@@ -163,7 +163,6 @@
                 <li class="arrow"><a href="{% if pageCurrent == totalPages %}#{% else %}?pageCurrent={{ pageCurrent + 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">›</a></li>
                 <li class="arrow"><a href="?pageCurrent={{ totalPages }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">»</a></li>
             </ul>
-        </div>
+        {% endif %}
     </div>
-
-{% endif %}
+</div>
