@@ -335,7 +335,7 @@ class Mapper extends BaseMapper
 
         if ($severity != '') $criteria[] = "severity_id >= {$severity}";
         if ($students != '') $criteria[] = "student_id IN ({$students})";
-        if ($authors != '') $criteria[] = "owner_id IN ('{$severity}')";
+        if ($authors != '') $criteria[] = "owner_id IN ({$authors})";
         if ($types != '') $criteria[] = "type_id IN ('{$types}')";
 
         $criteria_sql = "";
@@ -346,6 +346,7 @@ class Mapper extends BaseMapper
             }
             $criteria_sql .= $criterion;
         }
+        echo $criteria_sql;exit;
 
         // Execute SQL
 
