@@ -418,7 +418,6 @@ class Mapper extends BaseMapper
             }
             $criteria_sql .= $criterion;
         }
-        echo $criteria_sql;exit;
 
         // Execute SQL
 
