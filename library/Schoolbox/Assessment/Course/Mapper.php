@@ -11,34 +11,18 @@ namespace Schoolbox\Assessment\Course;
 
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Ancestry;
-use Schoolbox\Config\Loader;
 
-class Mapper
+class Mapper extends FolderMapper
 {
-    /**
-     * A mapper instance
-     *
-     * @var FolderMapper
-     */
-    private $folderMapper = null;
-
     /**
      * A Folder instance that represents the root node
      * for Faculties
      *
-     * @var FolderModel
+     * @var Folder
      */
     private $facultyNode = null;
-
-    /**
-     * There are only twelve config models
-     * But there are many copies
-     *
-     * @var Loader
-     */
-    private $configLoader = null;
 
     /**
      * A cache of ancestral Folder instances, to save
@@ -50,14 +34,10 @@ class Mapper
     private $ancestry = null;
 
     /**
-     * Constructor
-     *
-     * Mapper constructor.
+     * Hook method which occurs after mapping()
      */
-    public function __construct()
+    protected function postSetup()
     {
-        $this->setConfigLoader(new Loader());
-        $this->setFolderMapper(FolderMapper::getInstance());
         $this->setAncestry(new Ancestry());
 
         /* TODO: Replace /homepage/29 in config/course_homepage with just int
@@ -66,7 +46,7 @@ class Mapper
          */
         $facultyNodeId = str_replace('/homepage/', '', $this->getConfigLoader()->get('course_homepage'));
 
-        $this->setFacultyNode($this->getFolderMapper()->findCheaplyById($facultyNodeId));
+        $this->setFacultyNode($this->findCheaplyById($facultyNodeId));
     }
 
     /**
@@ -90,35 +70,27 @@ class Mapper
 
         $allFolderIds = \Database::getInstance()->query($query)->fetchAll(\PDO::FETCH_COLUMN);
 
-        /** @var Collection|FolderModel[] $courses */
-        $allCourses = $this->getFolderMapper()->findByColumn('id', $allFolderIds);
+        /** @var Collection|Folder[] $courses */
+        $allCourses = $this->findByColumn('id', $allFolderIds);
 
         $data = [
             'courses' => $allCourses
         ];
 
         foreach ($allCourses as $currentCourse) {
-            // this is way more expensive than it needs to be -_-;
-            $data['lineage'][$currentCourse->getId()] = $this->getAncestry()->findParentsCheaply($currentCourse, $this->getFacultyNode());
+            $allUnits = $this->findTaskCountForAllUnits($currentCourse);
 
-            $allUnits = $this->getFolderMapper()->findByParent($currentCourse->getId());
-
+            /* Only display units which have tasks in them
+             */
             foreach ($allUnits as $currentUnit) {
-
-                // far out, this is ridiculous: I can't even prepare this statement because of other transactions getting in the way
-                $taskCount = \Database::getInstance()->query("
-                    SELECT
-                        COUNT(t.id) AS taskCount
-                    FROM category c
-                    JOIN `task` t ON t.category_id = c.id AND t.deleted_at IS NULL
-                    WHERE c.deleted_at IS NULL AND c.id = ?
-                    GROUP BY c.id
-                ", [ $currentUnit->getId() ])->fetchColumn();
-
-                if ($taskCount > 0) {
+                if ($currentUnit->getTaskCount()) {
                     $data['units'][$currentCourse->getId()][] = $currentUnit;
                 }
             }
+
+            /* Also store the path to this Course
+             */
+            $data['lineage'][$currentCourse->getId()] = $this->getAncestry()->findParentsCheaply($currentCourse, $this->getFacultyNode());
         }
 
         /* TODO: Clear Ancestry results after you're done, or keep it?
@@ -127,33 +99,120 @@ class Mapper
         return $data;
     }
 
+    /**
+     * Get a list of Units and Tasks for a particular Course
+     *
+     * We collect homepage configs and Group access information here
+     * because sometimes we need to check whether a Course or Unit is
+     * linked to a homepage. If there is a homepage for the unit, we
+     * also need to check access perms before providing a link to users
+     *
+     * @param Folder $course
+     * @return Collection|Folder[]
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function findTaskCountForAllUnits(Folder $course)
+    {
+        $code_mapper = $this->getJoinMapper('codes');
+        $homepageConfig_mapper = $this->getJoinMapper('homepages');
+        $group_mapper = $this->getJoinMapper('groups');
+
+        // Please forgive me, I added a subquery for getting if a category
+        // contains tasks
+        $query = "
+            SELECT
+                {$this->getColumnString('c')},
+                {$code_mapper->getColumnString('cc')},
+                {$homepageConfig_mapper->getColumnString('hp')},
+                {$group_mapper->getColumnString('ug')}
+            FROM {$this->getTable()} c
+            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+            LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
+            LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
+            WHERE c.deleted_at IS NULL AND c.parent=?
+            ORDER BY c.name
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array($course->getId()));
+
+        /* Get task count as separate result set
+         *
+         * This augments a Unit instance with the number of tasks
+         * contained within it. That can be used to determine
+         * whether a Unit is reachable or not via various ui
+         */
+        $taskCountQuery = "
+            SELECT
+                unit.id,
+                COUNT(task.id) AS taskCount
+            FROM {$this->getTable()} course
+            LEFT JOIN {$this->getTable()} unit ON unit.parent = course.id AND unit.deleted_at IS NULL
+            LEFT JOIN task ON task.category_id = unit.id AND task.deleted_at IS NULL
+            WHERE course.deleted_at IS NULL AND course.id = ?
+            GROUP BY unit.id
+        ";
+
+        $taskCountStatement = $this->database->prepare($taskCountQuery);
+        $taskCountStatement->execute([$course->getId()]);
+        $taskCounts = [];
+
+        foreach ($taskCountStatement as $row) {
+            $taskCounts[$row['id']] = $row['taskCount'];
+        }
+
+        $collection = new Collection();
+        $category = null;
+
+        foreach ($statement as $row) {
+            $existingCat = $collection->filterBy('id', $row['c.id']);
+
+            if ($existingCat->count()) {
+                //Folder already exists in collection
+                $code = $code_mapper->hydrate($row, 'cc');
+
+                if ($code->getCategory()->getId()) {
+                    $existingCat->first()->addCode($code);
+                }
+            }
+            else {
+                $category = $this->hydrate($row, 'c');
+
+                if (isset($taskCounts[$row['c.id']])) {
+                    $category->setTaskCount($taskCounts[$row['c.id']]);
+                }
+
+                /* We collect homepage configs and Group access information here
+                 * because sometimes we need to check whether a Course or Unit is
+                 * linked to a homepage. If there is a homepage for the unit, we
+                 * also need to check access perms
+                 */
+                $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
+                $category->setHomepage($homepageConfig);
+
+                $group = $group_mapper->hydrate($row, 'ug');
+                $category->setGroup($group);
+
+                $code = $code_mapper->hydrate($row, 'cc');
+
+                if ($code->getCategory()->getId()) {
+                    $category->addCode($code);
+                }
+
+                $collection->add($category);
+            }
+        }
+
+        return $collection;
+    }
+
     /* Getters/Setters
      */
 
     /**
-     * Get folder mapper
-     *
-     * @return null
-     */
-    private function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-    /**
-     * Set folder mapper
-     *
-     * @param null $folderMapper
-     */
-    private function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-    }
-
-    /**
      * Get faculty node
      *
-     * @return FolderModel
+     * @return Folder
      */
     private function getFacultyNode()
     {
@@ -163,31 +222,11 @@ class Mapper
     /**
      * Set faculty node
      *
-     * @param FolderModel $facultyNode
+     * @param Folder $facultyNode
      */
     private function setFacultyNode($facultyNode)
     {
         $this->facultyNode = $facultyNode;
-    }
-
-    /**
-     * Get config loader
-     *
-     * @return Loader
-     */
-    private function getConfigLoader()
-    {
-        return $this->configLoader;
-    }
-
-    /**
-     * Set config loader
-     *
-     * @param Loader $configLoader
-     */
-    private function setConfigLoader($configLoader)
-    {
-        $this->configLoader = $configLoader;
     }
 
     /**
