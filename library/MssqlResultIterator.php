@@ -93,9 +93,11 @@ class MssqlResultIterator implements SeekableIterator
      */
     public function rewind()
     {
-        $this->rowNum = 0;
-        $this->seek(0);
-        $this->loadNextRow();
+        if (gettype($this->result) == 'resource') {
+            $this->rowNum = 0;
+            $this->seek(0);
+            $this->loadNextRow();
+        }
     }
 
     /**

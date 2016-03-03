@@ -205,7 +205,7 @@ class Factory
         $rules       = $this->findRuleset($rulesetId);
         $customRules = Hydrator\Custom\Mapper::getInstance()->findByColumnList(
             ['role_type' => $rulesetId],
-            ['order' => ['sequence' => 'asc'],]
+            ['order' => ['sequence' => 'asc']]
         );
 
         if ($log) {

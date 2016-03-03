@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Schoolpro\Base;
 
 use MSSQL;
 use Schoolbox\External\Connector\SyncInterface;
-use Schoolbox\Sync\Iterator;
 
 class Sync implements SyncInterface
 {
@@ -41,7 +40,8 @@ class Sync implements SyncInterface
                 array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
             )
         );
-        return new Iterator\Student(
+
+        return new StudentIterator(
             $this->database->getProcedureIterator($vars[0], $vars[1])
         );
     }
@@ -60,7 +60,8 @@ class Sync implements SyncInterface
                 array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
             )
         );
-        return new Iterator\Guardian(
+
+        return new GuardianIterator(
             $this->database->getProcedureIterator($vars[0], $vars[1])
         );
     }
@@ -78,7 +79,7 @@ class Sync implements SyncInterface
                 array('@pUserPass', 'alaress', SQLVARCHAR, false, false, -1),
             )
         );
-        return new Iterator\Staff(
+        return new StaffIterator(
             $this->database->getProcedureIterator($vars[0], $vars[1])
         );
     }

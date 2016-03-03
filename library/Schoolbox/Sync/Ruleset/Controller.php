@@ -83,7 +83,7 @@ class Controller extends Base {
             'data' => [
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation' => $allNavigation->getAllNodes(),
-                'logs'         => $this->findLogs(2)
+                'logs'         => $this->findLogs(3)
             ]
         ]);
     }
