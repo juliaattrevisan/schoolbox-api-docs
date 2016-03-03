@@ -303,6 +303,17 @@
 
         });
 
+        // Once level is added, scroll to it
+        $rb.closest('.scrollable').scrollTo(
+            $rb.find('[data-spawn="level"]'),
+            {
+                scrollX: true,
+                scrollY: false,
+                offsetLeft: 0,
+                duration: 0
+            }
+        );
+
         // aaand meaningful-transition out
         $rb.find('td.' + opt.hideHorizontalClass + ', th.' + opt.hideHorizontalClass).removeClass(opt.hideHorizontalClass);
 
