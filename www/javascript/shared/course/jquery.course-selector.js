@@ -43,7 +43,7 @@
                     /* Ajax update occurs $delay milliseconds after last keypress
                      * is detected in config.courseSelector.filter
                      */
-                    delay: 1000
+                    delay: 750
                 }
             };
 
