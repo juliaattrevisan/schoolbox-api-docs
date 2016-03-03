@@ -742,7 +742,14 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
 
 // do fun rubric things
 if ($box->isRubric()) {
-    $context = [ 'rubric' => RubricMapper::getInstance()->findBySubmissionBoxAndStudent($box, UserMapper::getInstance()->findById($userID))->toContext() ];
+
+    if ($box->canViewRubric($_SESSION['user'])) {
+        $grid = RubricMapper::getInstance()->findBySubmissionBoxAndStudent($box, UserMapper::getInstance()->findById($userID));
+    } else {
+        $grid = RubricMapper::getInstance()->findBySubmissionBox($box);
+    }
+
+    $context = [ 'rubric' => $grid->toContext($_SESSION['user']) ];
     $this->setVar('rubric_block', $this->getTwig()->render('@rubric/grid.twig', $context));
     $this->parse('has_rubric_block', 'has_rubric');
 }
