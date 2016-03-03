@@ -33,7 +33,9 @@
                     url: '/course/list',
 
                     /* Ajax requests spawn inside this element
+                     * These should reference the same element
                      */
+                    modalIdentifier: '#course-selector-modal',
                     modal: $('#course-selector-modal'),
 
                     /* This element is used to filter the ajax request contents
@@ -64,6 +66,9 @@
          * stopped typing before firing an ajax missle out
          */
         function courseSelector() {
+
+            /* After you finish typing, spawn search results
+             */
             $('body').on('keydown', config.courseSelector.filter, function(event) {
                 if (this.courseFilterTimeout) {
                     clearTimeout(this.courseFilterTimeout);
@@ -90,6 +95,14 @@
                 }, config.courseSelector.delay);
             });
 
+            /* Always focus on the search field upon spawn
+             */
+            $(document).on('opened.fndtn.reveal', config.courseSelector.modalIdentifier, function() {
+                config.courseSelector.modal.find(config.courseSelector.filter).focus();
+            });
+
+            /* Spawn modal
+             */
             config.element.on('click', function(event) {
                 event.preventDefault();
 
