@@ -60,10 +60,10 @@ class Mapper extends FolderMapper
     }
 
     /**
-     * List the courses
+     * List the courses. Returns a combined array of Folder instances
+     * and information about any found Units and their task counts
      *
-     * @api   /course/list
-     * @level 160
+     * @return array
      */
     public function findCourseList()
     {
