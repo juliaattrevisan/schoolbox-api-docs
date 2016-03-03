@@ -121,14 +121,16 @@ class Controller extends BaseController
             $options = [
                 'hasBreadcrumb' => false,
                 'hasAdd'        => false,
-                'hasTot'        => false
+                'hasTot'        => false,
+                'hasClose'      => true
             ];
         }
         else {
             $options = [
                 'hasBreadcrumb' => true,
                 'hasAdd'        => true,
-                'hasTot'        => true
+                'hasTot'        => true,
+                'hasClose'      => false
             ];
         }
 

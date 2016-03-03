@@ -76,6 +76,11 @@
         </section>
     </div>
 </div>
+
+{% if hasClose %}
+<a class="close-reveal-modal">&#215;</a>
+{% endif %}
+
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript">
     $(function () {
