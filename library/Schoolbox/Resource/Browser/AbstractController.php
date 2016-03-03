@@ -171,9 +171,12 @@ abstract class AbstractController extends BaseController
             $tree = [];
         }
 
+    $parent = \Schoolbox\Resource\Folder\Mapper::getInstance()->findCheaplyById($folder->getParent()->getId());
+
         return [
             'tree'      => $tree,
             'folder'    => $folder,
+            'parent'    => $parent,
             'icon'      => $this->treeBuilder->getFolderIcon($folder),
             'access'    => $access,
             'user'      => $this->getUser(),

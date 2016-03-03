@@ -17,12 +17,12 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\User;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Class Mapper
@@ -426,6 +426,39 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 $collection->add($category);
             }
         }
+
+        return $collection;
+    }
+
+
+    /**
+     * Returns a collection of all folders that are children of the specified ID (with optional recursion)
+     *
+     * @param int $id
+     * @param bool $recurse
+     * @return Collection|\Schoolbox\Resource\Folder\Model[]
+     */
+    public function findAllChildren($id, $recurse = false)
+    {
+        $collection = new Collection();
+
+        // Find all children of this node
+
+        $children = FolderMapper::findByColumn("parent", $id);
+
+        foreach ($children as $child) {
+            $collection->add($child);
+
+            // And optionally all of its children
+
+            if ($recurse) {
+                $kids = $this->findAllChildren($child->getId(), true);
+                foreach ($kids as $kid)
+                    $collection->add($kid);
+            }
+        }
+
+        // Return what we got
 
         return $collection;
     }
@@ -1028,7 +1061,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         // If we've recursed too much error out
 
         if ($iteration > $this->getMaxRecursionDepth()) {
-            error(2);
+            throw new \Schoolbox\Mapper\Exception("Recursion limit reached");
         }
 
         // Check if the node inherits permissions

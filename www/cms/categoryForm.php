@@ -10,9 +10,8 @@ use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
-
 function recurseInheritance(\Schoolbox\Resource\Folder\Model $model) {
-    $folders = FolderMapper::getInstance()->findByParent($model->getId());
+    $folders = FolderMapper::getInstance()->findAllChildren($model->getId(), true);
     foreach ($folders as $folder) {
         $folder->setInherit($model->getInherit());
         FolderMapper::getInstance()->save($folder);

@@ -252,6 +252,8 @@ else {
         $this->setVar(array(
             'ACTION' => 'Add',
             'CATEGORY_ID' => '',
+            'PARENT_FOLDER_NAME' => $folderParent->getName(),
+            'PARENT_FOLDER_ID' => $folderParent->getId(),
             'NAME' => '',
             'ACCESS_WRITE' => UserAccess::ACCESS_WRITE,
             'INHERIT_SELECTED' => $folderParent->getInherit() ? 'checked' : '',             // Default to parents inheritance status
