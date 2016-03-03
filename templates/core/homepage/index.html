@@ -203,17 +203,26 @@
          *
          * [data-course-selector-filter] doesn't always exist, so you have
          * to put this on an element which DOES always exist >.<
+         *
+         * Delay as you type on keydown, so it waits a second after you've
+         * stopped typing before firing an ajax missle out
          */
-        $('body').on('blur', courseSelectorFilter, function(event) {
-            var query = $(this).val();
+        $('body').on('keydown', courseSelectorFilter, function(event) {
+            if (this.courseFilterTimeout) {
+                clearTimeout(this.courseFilterTimeout);
+            }
 
-            $.get('/course/list', { query: query}, function(responseText) {
-                courseSelectorModal.html(responseText);
+            this.courseFilterTimeout = setTimeout(function () {
+                var query = $(courseSelectorFilter).val();
 
-                /* Repopulate the field with what you searched for
-                 */
-                courseSelectorModal.find(courseSelectorFilter).val(query).focus();
-            });
+                $.get('/course/list', { query: query}, function(responseText) {
+                    courseSelectorModal.html(responseText);
+
+                    /* Repopulate the field with what you searched for
+                     */
+                    courseSelectorModal.find(courseSelectorFilter).val(query).focus();
+                });
+            }, 1000);
         });
 
         $('#tab-control').find('[data-interaction="course-selector"]').on('click', function(event) {
