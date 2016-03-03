@@ -31,6 +31,13 @@ class Ancestry
     private $folderMapper = null;
 
     /**
+     * Maximum number of traversals before bugging out
+     *
+     * @var int
+     */
+    private $recursionLimit = 50;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -106,7 +113,12 @@ class Ancestry
 
         // Get the parent of the first item in the stack, and add it to the top
         // of the stack.
-        while ($count++ < 50) {
+
+        /* In case you somehow enter an infinite loop of nodes, place
+         * a limit on the number of traversals/iterations/recurses that
+         * can occur before arbitrarily ending
+         */
+        while ($count++ < $this->getRecursionLimit()) {
 
             /* Cycle through the parent of the current node until
              * it is no longer a node at which point we can stop
@@ -191,5 +203,25 @@ class Ancestry
     private function setFolderMapper($folderMapper)
     {
         $this->folderMapper = $folderMapper;
+    }
+
+    /**
+     * Get recursion limit
+     *
+     * @return int
+     */
+    private function getRecursionLimit()
+    {
+        return $this->recursionLimit;
+    }
+
+    /**
+     * Set recursion limit
+     *
+     * @param int $recursionLimit
+     */
+    private function setRecursionLimit($recursionLimit)
+    {
+        $this->recursionLimit = $recursionLimit;
     }
 }
