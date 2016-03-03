@@ -221,7 +221,7 @@ class Mapper extends FolderMapper
      *
      * @return Folder
      */
-    private function getFacultyNode()
+    public function getFacultyNode()
     {
         return $this->facultyNode;
     }
