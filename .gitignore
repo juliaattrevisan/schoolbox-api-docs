@@ -20,6 +20,7 @@ variables.css
 mixins.css
 dr.css
 print.css
+editor.css
 *.log
 screen.css
 vendor/
