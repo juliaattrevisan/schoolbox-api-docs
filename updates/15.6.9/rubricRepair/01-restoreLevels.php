@@ -20,7 +20,10 @@
 
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
-require_once __DIR__ . '/../../../include/Bootstrap.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
+spl_autoload_call('Schoolbox\\Application\\Daemon');
+new \Schoolbox\Application\Daemon\Kernel("15.6.9 Rubric Level Restore");
+
 
 $db     = Database::getInstance();
 $logger = new Alaress\Lumberjack\Logger();
@@ -43,11 +46,36 @@ $descriptorQuery = $db->prepare("
         rl.sequence          ASC
 ");
 
-$updateQuery = $db->prepare("
+$updateLevelQuery = $db->prepare("
     UPDATE rubric_level
     SET box_id = :boxId
     WHERE id = :levelId
 ");
+
+$obtainIncorrectLevelsQuery = $db->prepare("
+    SELECT id, sequence
+    FROM rubric_level
+    WHERE id IN (
+      SELECT DISTINCT level_id
+      FROM rubric_descriptor d
+      LEFT JOIN rubric_level l ON d.level_id = l.id
+      WHERE submission_box_id = :boxId
+    )
+");
+
+$obtainCorrectLevelsQuery = $db->prepare("
+    SELECT id, sequence
+    FROM rubric_level l
+    WHERE box_id = :boxId
+");
+
+$updateDescriptorQuery = $db->prepare("
+    UPDATE rubric_descriptor
+    SET level_id = :correctLevelId
+    WHERE submission_box_id = :boxId
+    AND level_id = :incorrectLevelId
+");
+
 
 $affectedBoxes = [];
 $descriptorQuery->execute();
@@ -61,7 +89,35 @@ foreach ($descriptorQuery as $row) {
             $row['boxId']
         )
     );
-    $updateQuery->execute(['boxId' => $row['boxId'], 'levelId' => $row['levelId']]);
+
+    $map = [];
+
+    // obtain references
+    $obtainIncorrectLevelsQuery->execute([ 'boxId' => $row['boxId'] ]);
+    while ($r = $obtainIncorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
+        $map[$r['sequence']]['bad'] = $r['id'];
+    }
+
+    $obtainCorrectLevelsQuery->execute([ 'boxId' => $row['boxId'] ]);
+    while ($r = $obtainCorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
+        $map[$r['sequence']]['good'] = $r['id'];
+    }
+
+    // update the levels
+    $updateLevelQuery->execute(['boxId' => $row['boxId'], 'levelId' => $row['levelId']]);
+
+    // now update the descriptors
+    foreach ($map as $sequence => $changes) {
+
+        if ($changes['bad'] && $changes['good']) {
+            $logger->info(sprintf("Remapping descriptor level IDs: %d -> %d", $changes['bad'], $changes['good']));
+            $updateDescriptorQuery->execute([ 'boxId' => $row['boxId'], 'correctLevelId' => $changes['good'], 'incorrectLevelId' => $changes['bad'] ]);
+        } else {
+            $logger->notice("Could not remap descriptor levels, data missing: ".json_encode($changes));
+        }
+
+    }
+
 }
 
 // Alert about affected boxes
