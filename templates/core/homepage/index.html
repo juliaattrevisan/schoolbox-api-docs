@@ -194,10 +194,32 @@
 
         /* Course Selector
          */
+        var courseSelectorModal = $('#course-selector-modal');
+        var courseSelectorFilter = '[data-course-selector-filter]';
+
+        /* As you change the Filter field, regenerate a list of matching
+         * Courses that were found. Setting Filter field to empty restores
+         * the original list of all Courses
+         *
+         * [data-course-selector-filter] doesn't always exist, so you have
+         * to put this on an element which DOES always exist >.<
+         */
+        $('body').on('blur', courseSelectorFilter, function(event) {
+            var query = $(this).val();
+
+            $.get('/course/list', { query: query}, function(responseText) {
+                courseSelectorModal.html(responseText);
+
+                /* Repopulate the field with what you searched for
+                 */
+                courseSelectorModal.find(courseSelectorFilter).val(query).focus();
+            });
+        });
+
         $('#tab-control').find('[data-interaction="course-selector"]').on('click', function(event) {
             event.preventDefault();
 
-            $('#course-selector-modal').foundation('reveal', 'open', {
+            courseSelectorModal.foundation('reveal', 'open', {
                 url: '/course/list'
             });
         });

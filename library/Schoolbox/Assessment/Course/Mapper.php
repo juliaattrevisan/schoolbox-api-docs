@@ -65,20 +65,39 @@ class Mapper extends FolderMapper
      *
      * @return array
      */
-    public function findCourseList()
+    public function findCourseList($searchParam)
     {
         $query = "
             SELECT
-                c.id,
-                COUNT(t.id) AS taskCount
-            FROM category c
-            LEFT JOIN category subc ON subc.parent = c.id AND subc.deleted_at IS NULL
-            JOIN `task` t ON t.category_id = subc.id AND t.deleted_at IS NULL
-            WHERE c.deleted_at IS NULL
-            GROUP BY c.id
+                course.id,
+                COUNT(task.id) AS taskCount
+            FROM category course
+            LEFT JOIN category unit ON unit.parent = course.id AND unit.deleted_at IS NULL
+            INNER JOIN `task` ON task.category_id = unit.id AND task.deleted_at IS NULL
+            WHERE course.deleted_at IS NULL
+            AND course.name LIKE :searchParam
+            GROUP BY course.id
         ";
 
-        $allFolderIds = \Database::getInstance()->query($query)->fetchAll(\PDO::FETCH_COLUMN);
+        /* Find all the Courses with names like $searchParam,
+         * if that was provided (otherwise returns all)
+         */
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'searchParam' => "%{$searchParam}%"
+        ]);
+
+        /* Accumulate a list of ids
+         */
+        $allFolderIds = [];
+
+        foreach ($statement as $row) {
+            $allFolderIds[] = $row['id'];
+        }
+
+        /* Manufacture a list of Courses so we can get their
+         * Unit information and Task Counts
+         */
 
         /** @var Collection|Folder[] $courses */
         $allCourses = $this->findByColumn('id', $allFolderIds);

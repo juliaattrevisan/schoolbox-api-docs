@@ -112,10 +112,10 @@ class Controller extends BaseController
 
     /**
      * Dump out a list of courses
+     * The Filter field allows you to search Course names
      */
     public function courseList() {
-        $courseMapper = new CourseMapper();
-        $data = $courseMapper->findCourseList();
+        $data = $this->getCourseMapper()->findCourseList($this->getRequest()->query->get('query'));
 
         if ($this->getRequest()->isXhr()) {
             $options = [
