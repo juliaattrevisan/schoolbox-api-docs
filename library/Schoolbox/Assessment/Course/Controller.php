@@ -138,6 +138,33 @@ class Controller extends BaseController
     }
 
     /**
+     * Dump out AJAX'd search results
+     * The Filter field allows you to search Course names
+     */
+    public function courseListAjax() {
+        $data = $this->getCourseMapper()->findCourseList($this->getRequest()->query->get('query'));
+
+        if ($this->getRequest()->isXhr()) {
+            $options = [
+                'hasBreadcrumb' => false,
+                'hasAdd'        => false,
+                'hasTot'        => false,
+                'hasClose'      => true
+            ];
+        }
+        else {
+            $options = [
+                'hasBreadcrumb' => true,
+                'hasAdd'        => true,
+                'hasTot'        => true,
+                'hasClose'      => false
+            ];
+        }
+
+        $this->tpl('courseListResults', array_merge($data, $options));
+    }
+
+    /**
      * @param AbstractTreeBuilder $tb
      * @param array               $target
      * @return array

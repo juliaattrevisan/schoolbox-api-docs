@@ -23,7 +23,8 @@
         <input type="text" value="" placeholder="Search for a course" data-course-selector-filter />
     </div>
 </div>
-<div class="row">
+<div class="row" id="results">
+    {# This is the default results when modal opens, this will get replaced by 'courseListResults.twig' after an AJAX #}
     <div class="small-12 island">
         <section>
             <ul class="information-list">
