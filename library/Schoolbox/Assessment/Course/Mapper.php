@@ -44,7 +44,7 @@ class Mapper extends FolderMapper
          * Faculty Root Node can be obtained Cheaply
          * but we have to strip out the /homepage/ part
          */
-        $facultyNodeId = str_replace('/homepage/', '', $this->getConfigLoader()->get('course_homepage'));
+        $facultyNodeId = preg_replace('/[^0-9]/', '', $this->getConfigLoader()->get('course_homepage'));
 
         $this->setFacultyNode($this->findCheaplyById($facultyNodeId));
     }
