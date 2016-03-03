@@ -106,6 +106,7 @@
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.device.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.tab-activator.js"></script>
+<script type="text/javascript" src="/javascript/shared/course/jquery.course-selector.js"></script>
 
 <script type="text/javascript">
     $(function() {
@@ -192,46 +193,9 @@
             }
         });
 
-        /* Course Selector
+        /* Attach Course Selector
          */
-        var courseSelectorModal = $('#course-selector-modal');
-        var courseSelectorFilter = '[data-course-selector-filter]';
-
-        /* As you change the Filter field, regenerate a list of matching
-         * Courses that were found. Setting Filter field to empty restores
-         * the original list of all Courses
-         *
-         * [data-course-selector-filter] doesn't always exist, so you have
-         * to put this on an element which DOES always exist >.<
-         *
-         * Delay as you type on keydown, so it waits a second after you've
-         * stopped typing before firing an ajax missle out
-         */
-        $('body').on('keydown', courseSelectorFilter, function(event) {
-            if (this.courseFilterTimeout) {
-                clearTimeout(this.courseFilterTimeout);
-            }
-
-            this.courseFilterTimeout = setTimeout(function () {
-                var query = $(courseSelectorFilter).val();
-
-                $.get('/course/list', { query: query}, function(responseText) {
-                    courseSelectorModal.html(responseText);
-
-                    /* Repopulate the field with what you searched for
-                     */
-                    courseSelectorModal.find(courseSelectorFilter).val(query).focus();
-                });
-            }, 1000);
-        });
-
-        $('#tab-control').find('[data-interaction="course-selector"]').on('click', function(event) {
-            event.preventDefault();
-
-            courseSelectorModal.foundation('reveal', 'open', {
-                url: '/course/list'
-            });
-        });
+        $('#tab-control').find('[data-interaction="course-selector"]').courseSelector();
     });
 </script>
 <!-- END modify_layout -->
