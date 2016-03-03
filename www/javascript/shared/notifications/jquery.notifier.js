@@ -573,7 +573,7 @@
                 var $item  = $a.closest('[data-' + settings.tplItem + ']');
                 var pip    = (typeof $a.data(settings.tplItemAck) != 'undefined');
                 var action = (typeof $a.data(settings.tplItemHref) != 'undefined')
-                             && (typeof $item.data(settings.itemUnread) != 'undefined');
+                             && ($item.data('status') == settings.itemUnread);
 
                 if (pip || action) {
                     var msgId = $item.attr('id').split('-')[1];
@@ -582,10 +582,8 @@
                     if(pip) {
                         e.stopPropagation();
                         e.stopImmediatePropagation();
-                        return false;
                     }
                 }
-                return true;
             });
 
 
