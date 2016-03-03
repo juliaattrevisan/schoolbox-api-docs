@@ -1053,6 +1053,22 @@ class User implements JsonSerializable
         $this->setEmailRecipients($this->findEmailRecipients($this));
     }
 
+    /**
+     * Hide notifications tray
+     */
+    public function hideNotificationsTray()
+    {
+        $this->setHideNotificationsTray(1);
+    }
+
+    /**
+     * Show notifications tray
+     */
+    public function showNotificationsTray()
+    {
+        $this->setHideNotificationsTray(0);
+    }
+
     /* Getters/Setters
      */
 
