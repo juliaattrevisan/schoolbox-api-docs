@@ -72,8 +72,16 @@
                 this.courseFilterTimeout = setTimeout(function () {
                     var query = $(config.courseSelector.filter).val();
 
+                    /* Disable search field while ajaxing data
+                     */
+                    $(config.courseSelector.filter).attr('disabled', 'disabled');
+
                     $.get('/course/list', { query: query}, function(responseText) {
                         config.courseSelector.modal.html(responseText);
+
+                        /* Re-enable search field
+                         */
+                        $(config.courseSelector.filter).removeAttr('disabled');
 
                         /* Repopulate the field with what you searched for
                          */
