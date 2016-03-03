@@ -373,6 +373,19 @@ class SitePage extends Page
         $this->renderStudents();
         $this->renderInstantMessages();
 
+        /* Hide notifications tray
+         */
+        if ($_SESSION['user']->getHideNotificationsTray()) {
+            $this->setVar([
+                'HIDE_NOTIFICATIONS_TRAY' => 'right-hidden'
+            ]);
+        }
+        else {
+            $this->setVar([
+                'HIDE_NOTIFICATIONS_TRAY' => ''
+            ]);
+        }
+
         $this->parse('MAIN_HEADER_REGION', 'headerTpl');
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
 
