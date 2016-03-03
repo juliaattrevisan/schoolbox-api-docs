@@ -75,12 +75,12 @@
                 }
 
                 this.courseFilterTimeout = setTimeout(function () {
-                    $(config.courseSelector.filter).css('background',"url('/images/core/ajax-loader.gif') no-repeat 99%");
+                    $(config.courseSelector.filter).css('background-image',"url('/images/core/ajax-loader.gif')");
                     var query = $(config.courseSelector.filter).val();
 
                     $.get('/course/list/ajax', { query: query}, function(responseText) {
                         $(config.courseSelector.modal).find('#results').html(responseText);
-                        $(config.courseSelector.filter).css('background', '');
+                        $(config.courseSelector.filter).css('background-image', '');
                     });
                 }, config.courseSelector.delay);
             });
