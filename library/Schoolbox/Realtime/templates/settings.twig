@@ -64,14 +64,25 @@
         <h1>Message Settings</h1>
 
         <h2 class="subheader">Notifications</h2>
-        <section class="content">
-            <div class="switch round">
-                <input id="toggle-tray" type="checkbox" value="{{ hideNotificationsTray }}" {% if hideNotificationsTray == 0 %}checked="checked"{% endif %} />
-                <label for="toggle-tray">
-                    <span>Show</span>
-                    <span>Hide</span>
-                </label>
-            </div>
+        <section>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <label>Toggle notifications panel</label>
+                        </td>
+                        <td>
+                            <div class="switch round">
+                                <input id="toggle-tray" type="checkbox" value="{{ hideNotificationsTray }}" {% if hideNotificationsTray == 0 %}checked="checked"{% endif %} />
+                                <label for="toggle-tray">
+                                    <span>Show</span>
+                                    <span>Hide</span>
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </section>
 
         <form method="post" action="{{ routeLookup('messages.saveConfig') }}">
