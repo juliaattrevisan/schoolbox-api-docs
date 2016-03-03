@@ -45,7 +45,7 @@
                     /* Ajax update occurs $delay milliseconds after last keypress
                      * is detected in config.courseSelector.filter
                      */
-                    delay: 750
+                    delay: 500
                 }
             };
 
@@ -75,10 +75,12 @@
                 }
 
                 this.courseFilterTimeout = setTimeout(function () {
+                    $(config.courseSelector.filter).css('background',"url('/images/core/ajax-loader.gif') no-repeat 99%");
                     var query = $(config.courseSelector.filter).val();
 
                     $.get('/course/list/ajax', { query: query}, function(responseText) {
                         $(config.courseSelector.modal).find('#results').html(responseText);
+                        $(config.courseSelector.filter).css('background', '');
                     });
                 }, config.courseSelector.delay);
             });
