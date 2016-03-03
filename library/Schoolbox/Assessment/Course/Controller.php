@@ -122,31 +122,24 @@ class Controller extends BaseController
     /**
      * Dump out a list of courses
      */
-    public function courseListMinimal() {
-        $courseMapper = new CourseMapper();
-        $data = $courseMapper->findCourseList();
-
-        $options = [
-            'hasBreadcrumb' => false,
-            'hasAdd' => false,
-            'hasTot' => false
-        ];
-
-        $this->tpl('courseList', array_merge($data, $options));
-    }
-
-    /**
-     * Dump out a list of courses
-     */
     public function courseList() {
         $courseMapper = new CourseMapper();
         $data = $courseMapper->findCourseList();
 
-        $options = [
-            'hasBreadcrumb' => true,
-            'hasAdd' => true,
-            'hasTot' => true
-        ];
+        if ($this->getRequest()->isXhr()) {
+            $options = [
+                'hasBreadcrumb' => false,
+                'hasAdd'        => false,
+                'hasTot'        => false
+            ];
+        }
+        else {
+            $options = [
+                'hasBreadcrumb' => true,
+                'hasAdd'        => true,
+                'hasTot'        => true
+            ];
+        }
 
         $this->tpl('courseList', array_merge($data, $options));
     }

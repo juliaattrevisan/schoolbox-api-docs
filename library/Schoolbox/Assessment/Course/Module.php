@@ -37,7 +37,6 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/list/modal'   => 'courseListMinimal',
                 '/list'         => 'courseList',
                 '/new'          => 'newCourse',
                 '/modify/{id}'  => 'modifyCourse',
@@ -55,9 +54,7 @@ class Module extends BaseModule
         foreach ($routes['POST'] as $path => $alias) {
             $this->addPostRoute($router, $alias, $basePath, $path);
         }
-
     }
-
 
     /**
      * {@inheritdoc}
@@ -73,7 +70,6 @@ class Module extends BaseModule
             ));
     }
 
-
     /**
      * @param Twig_Loader_Chain $templateLoader
      * @throws Twig_Error_Loader
@@ -82,7 +78,6 @@ class Module extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
-
 
     /**
      * Initializes controller classes into the dependency injector.
@@ -95,7 +90,5 @@ class Module extends BaseModule
             'controller:'.$this->basename,
             $injector->lazyNew(Controller::class)
         );
-
     }
-
 }
