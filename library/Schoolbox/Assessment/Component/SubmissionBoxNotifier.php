@@ -933,7 +933,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->setSeverity(Logger::ERROR)
             ->addTopic("duework.$boxId.closed");
 
-        $envelope->targetToUser($user->getId(), $bob->build());
+        $envelope->broadcastToCategory($submissionBox->getCategory()->getId(), UserAccess::ACCESS_WRITE, $bob->build());
 
         return $envelope;
     }

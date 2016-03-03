@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
@@ -222,8 +223,8 @@ class FileNotifier extends AbstractModuleNotifier
             ->setSeverity(Logger::NOTICE)
             ->addTopic("duework.$boxId.$type");
 
-        // send this message to the owner of the submission box
-        $envelope->targetToUser($box->getOwner(), $bob->build());
+        // send this message to any write access member
+        $envelope->broadcastToCategory($box->getCategory()->getId(), UserAccess::ACCESS_WRITE, $bob->build());
 
         return $envelope;
     }
