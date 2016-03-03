@@ -93,7 +93,11 @@ class Ancestry
             $stop_id = $stopFolder->getId();
         }
 
-        // Keep a record of ancestry
+        /* Use $ancestry to keep track of which parents have been
+         * encountered already; if we re-encounter something that
+         * has been listed here, we end up with a node being in
+         * its own ancestry, which is indicative of broken Folders
+         */
         $ancestry = array();
 
         if ($folder->getId()) {
@@ -103,11 +107,20 @@ class Ancestry
         // Get the parent of the first item in the stack, and add it to the top
         // of the stack.
         while ($count++ < 50) {
+
+            /* Cycle through the parent of the current node until
+             * it is no longer a node at which point we can stop
+             */
             $parent = $stack[0]->getParent();
+
             if (!($parent instanceof Folder)) {
                 break;
             }
+
             $parent_id = $parent->getId();
+
+            /* We can also stop if we read the $stopFolder
+             */
             if (!$parent_id || (!empty($stop_id) && $stop_id == $parent_id)) {
                 break;
             }
@@ -118,6 +131,7 @@ class Ancestry
                     'Folder "'.$folder->getId().'" is its own parent somehow'
                 );
             }
+
             $ancestry[$parent_id] = true;
 
             array_unshift($stack, $this->findCachedNode($parent_id, $cheaply));
