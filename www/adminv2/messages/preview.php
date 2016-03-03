@@ -134,8 +134,12 @@ switch ($this->arg[0]) {
             $article = \Schoolbox\News\ArticleMapper::getInstance()->findById($article->getId());
 
             try {
-                $image = '/storage/image.php?size=square64&hash=' . $article->getImage()->getHash();
-                $thumb = '/storage/image.php?size=square200&hash=' . $article->getImage()->getHash();
+                $hash = $article->getImage()->getHash();
+                if (!$hash) {
+                    throw new \Schoolbox\Mapper\Exception("No hash");
+                }
+                $image = "/storage/image.php?size=square64&hash=$hash";
+                $thumb = "/storage/image.php?size=square200&hash=$hash";
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $image = '/images/icon.php?size=64&icon=pin';
                 $thumb = '/images/emails/spacer.gif';
