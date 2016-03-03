@@ -42,27 +42,37 @@
             }, 500);
         }
 
-        $('[data-notifications-tray="show"]').on('click', function(event) {
-            $.post('/ajax/notificationsTray', {state: 'show'}, function(responseText) {
-                window.location.href = window.location.href;
-            });
-        });
-
-        $('[data-notifications-tray="hide"]').on('click', function(event) {
-            $.post('/ajax/notificationsTray', {state: 'hide'}, function(responseText) {
-                window.location.href = window.location.href;
-            });
+        /* Hide notifications tray
+         */
+        $('#toggle-tray').on('click', function(event) {
+            if ($(this).is(':checked')) {
+                $.post('/ajax/notificationsTray', {state: 'show'}, function(responseText) {
+                    window.location.href = window.location.href;
+                });
+            }
+            else {
+                $.post('/ajax/notificationsTray', {state: 'hide'}, function(responseText) {
+                    window.location.href = window.location.href;
+                });
+            }
         });
     });
 </script>
 
 <div class="row">
     <div class="small-12 island">
-
-        <a class="button" data-notifications-tray="show">Show notif tray</a>
-        <a class="button" data-notifications-tray="hide">hide notif tray</a>
-
         <h1>Message Settings</h1>
+
+        <h2 class="subheader">Notifications</h2>
+        <section class="content">
+            <div class="switch round">
+                <input id="toggle-tray" type="checkbox" value="{{ hideNotificationsTray }}" {% if hideNotificationsTray == 0 %}checked="checked"{% endif %} />
+                <label for="toggle-tray">
+                    <span>Show</span>
+                    <span>Hide</span>
+                </label>
+            </div>
+        </section>
 
         <form method="post" action="{{ routeLookup('messages.saveConfig') }}">
             {% if groups %}
