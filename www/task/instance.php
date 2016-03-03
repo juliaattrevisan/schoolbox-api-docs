@@ -16,10 +16,7 @@ $task_type    = 'task';
 $task_type_id = null;
 if ($action === 'modify') {
 
-    if (isset($_GET["return_url"]))
-        $return_url = "?return_url={$_GET["return_url"]}";
-    else
-        $return_url = "";
+    $return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
 
     $task_instance_id = $this->arg[1];
     $task_instance    = Task\InstanceMapper::getInstance()->findById($task_instance_id);

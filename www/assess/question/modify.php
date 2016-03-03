@@ -19,10 +19,7 @@ $groupHandler = new Group();
  */
 if (!empty($_POST)) {
 
-    if ($_POST["return_url"] != "")
-        $return_url = "?return_url={$_POST["return_url"]}";
-    else
-        $return_url = "";
+    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
 
     if (!is_numeric($_POST['type_id'])) {
         error(116);
@@ -76,10 +73,7 @@ if (!empty($_POST)) {
 
 } else {
 
-    if ($_GET["return_url"] != "")
-        $return_url = "?return_url={$_GET["return_url"]}";
-    else
-        $return_url = "";
+    $return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
 
     if (!is_numeric($this->arg[0])) {
         error(115);

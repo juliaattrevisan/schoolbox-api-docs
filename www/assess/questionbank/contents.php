@@ -184,9 +184,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
     $this->parse('welcome_block', 'welcome');
 }
 
-if ($_GET["return_url"] != "") {
-    $return_url = "?return_url={$_GET["return_url"]}";
-}
+$return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
 
 /* Render out breadcrumbs
  */

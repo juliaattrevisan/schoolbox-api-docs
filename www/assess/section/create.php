@@ -32,10 +32,7 @@ if (!empty($_POST)) {
      */
     $sectionHandler = new Assess_Section();
 
-    if ($_POST["return_url"] != "") {
-        $return_url = "?return_url={$_POST["return_url"]}";
-    } else
-        $return_url = "";
+    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
 
     // Have to unset the return_url from the POST array, otherwise it tries to shove it in the SQL query when creating
     // the section

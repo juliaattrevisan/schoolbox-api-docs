@@ -62,10 +62,7 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
             ));
         }
 
-        if ($_POST["return_url"] != "")
-            $return_url = "?return_url={$_POST["return_url"]}";
-        else
-            $return_url = "";
+        $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
 
         SitePage::localRedir('/assess/summary/' . $assess['assess_id'] . $return_url);
     } else {

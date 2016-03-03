@@ -125,10 +125,7 @@ if (!empty($_POST)) {
         error(112);
     }
 
-    if (isset($_POST["return_url"]))
-        $return_url = "?return_url={$_POST["return_url"]}";
-    else
-        $return_url = "";
+    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
 
     SitePage::localRedir('/assess/section/create/' . $assess_id . $return_url);
 }

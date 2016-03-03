@@ -97,10 +97,7 @@ if (!empty($_POST)) {
         Task\InstanceMapper::getInstance()->save($task_instance);
     }
 
-    if ($_POST["return_url"] != "")
-        $return_url = "?return_url={$_POST["return_url"]}";
-    else
-        $return_url = "";
+    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
 
     SitePage::localRedir('/assess/summary/' . $this->arg[0] . $return_url);
 }
@@ -118,10 +115,7 @@ else if(is_numeric($_GET['mark_visibility'])) {
 }
 else {
 
-    if ($_GET["return_url"] != "")
-        $return_url = "?return_url={$_GET["return_url"]}";
-    else
-        $return_url = "";
+    $return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
 
     /* Render modify page
      */

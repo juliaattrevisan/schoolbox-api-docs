@@ -15,10 +15,7 @@ $groupHandler = new Group();
 
 if (!empty($_POST)) {
 
-    if ($_POST["return_url"] != "")
-        $return_url = "?return_url={$_POST["return_url"]}";
-    else
-        $return_url = "";
+    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
 
     $assess = $assessHandler->getByID($_POST['assess_id']);
 
@@ -47,10 +44,7 @@ if (!empty($_POST)) {
     SitePage::localRedir('/assess/summary/' . $_POST['assess_id'] . $return_url);
 } else {
 
-    if ($_GET["return_url"] != "")
-        $return_url = "?return_url={$_GET["return_url"]}";
-    else
-        $return_url = "";
+    $return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
 
     if (!is_numeric($this->arg[0])) {
         error(112);
