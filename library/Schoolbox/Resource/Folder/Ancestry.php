@@ -61,7 +61,7 @@ class Ancestry
      * @param Model $stopFolder
      * @return Collection
      */
-    public function findParents(Folder $folder, Folder $stopFolder)
+    public function findParents(Folder $folder, Folder $stopFolder = null)
     {
         return $this->findParentAncestry($folder, $stopFolder, false);
     }
@@ -73,7 +73,7 @@ class Ancestry
      * @param Model $stopFolder
      * @return Collection
      */
-    public function findParentsCheaply(Folder $folder, Folder $stopFolder)
+    public function findParentsCheaply(Folder $folder, Folder $stopFolder = null)
     {
         return $this->findParentAncestry($folder, $stopFolder, true);
     }
@@ -89,7 +89,7 @@ class Ancestry
      * @param bool $cheaply If true, use the findCheaplyById() for speed
      * @return Collection
      */
-    private function findParentAncestry(Folder $folder, Folder $stopFolder = null, $cheaply = false)
+    private function findParentAncestry(Folder $folder, Folder $stopFolder, $cheaply)
     {
         /** @var Model[] $stack */
         $stack = array($folder);
@@ -163,7 +163,7 @@ class Ancestry
      * @param $cheaply bool Use this to switch between findCheaplyById() and findById()
      * @return mixed
      */
-    private function findCachedNode($id, $cheaply = false)
+    private function findCachedNode($id, $cheaply)
     {
         /* If it wasn't already cached, decide how complex the Folder
          * instance should be, and cache that for future reference
