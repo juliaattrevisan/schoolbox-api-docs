@@ -33,7 +33,7 @@
                         </div>
                         <nav>
                             <!-- BEGIN teacherLink -->
-                            <a class="icon-delete" href="/assess/delete/{ASSESS_ASSESS_ID}" title="Delete Quiz"></a>
+                            <a class="icon-delete" href="/assess/delete/{ASSESS_ASSESS_ID}" data-action="delete" title="Delete Quiz"></a>
                             <a class="icon-modify" href="/assess/summary/{ASSESS_ASSESS_ID}" title="Modify Quiz"></a>
                             <!-- END teacherLink -->
 
@@ -57,4 +57,13 @@
             </section>
         </div>
     </div>
+    <script type="text/javascript">
+        $('#component{COMPONENT_INSTANCE_ID}').on('click', 'a[data-action="delete"]', function(e) {
+            e.preventDefault();
+            $(this).confirmDialog({
+                text: "Are you sure you want to delete this quiz?",
+                confirmAction: $.confirmDialog.followHref
+            });
+        });
+    </script>
 </div>
