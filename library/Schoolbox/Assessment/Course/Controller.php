@@ -206,9 +206,11 @@ class Controller extends BaseController
 
         $tb = new TreeBuilder(Folder\Mapper::getInstance(), TaskMapper::getInstance(), UserAccessMapper::getInstance(), RoleAccessMapper::getInstance(), $this->getUser());
 
+        $facultyNode = $this->getCourseMapper()->getFacultyNode();
+
         $data = [
-            'id'   => $this->facultyTop->getId(),
-            'text' => $this->facultyTop->getName()
+            'id'   => $facultyNode->getId(),
+            'text' => $facultyNode->getName()
         ];
 
         // recurse, passing $data by reference
