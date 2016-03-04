@@ -1,5 +1,7 @@
+
 <div class="small-12 island">
     <section>
+        {% if courses|length %}
         <ul class="information-list">
             {% for course in courses %}
                 {% set cparents = lineage[course.id] %}
@@ -47,6 +49,9 @@
                 </li>
             {% endfor %}
         </ul>
+        {% else %}
+        <div class="alert-box">No results found.</div>
+        {% endif %}
     </section>
 </div>
 <script type="text/javascript">
@@ -54,4 +59,5 @@
         $('[data-collapser]').collapsable();
     });
 </script>
+
 
