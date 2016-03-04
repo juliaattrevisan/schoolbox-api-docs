@@ -63,10 +63,12 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
             if (fields.width.getValue()) {
                 styles.push('width:' + fields.width.getValue() + 'px');
             }
+        }
 
-            if (fields.height.getValue()) {
-                styles.push('height:' + fields.height.getValue() + 'px');
-            }
+        /* Height is always applied if set
+         */
+        if (fields.height.getValue()) {
+            styles.push('height:' + fields.height.getValue() + 'px');
         }
 
         /* Alignment
