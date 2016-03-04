@@ -48,6 +48,7 @@ class Controller extends Base
             array(
                 'template' => '@adminCourseBuilder/index.twig',
                 'data'     => array(
+                    'tab' => $_GET["tab"] != '' ? $_GET["tab"] : 'course',
                     'navigation' => AdminNavigation::getNavigation(),
                     'roles' => RoleMapper::getInstance()->findAll(),
                     'permissions' => $permissions,
@@ -97,6 +98,6 @@ class Controller extends Base
 
         // Send them back to the admin page
 
-        $this->getResponse()->redirect->afterPost('/adminv2/course-builder');
+        $this->getResponse()->redirect->afterPost('/adminv2/course-builder/?tab=' .$_POST["tab"]);
     }
 }
