@@ -88,7 +88,13 @@
         /* Enforce two decimal places
          */
         $('[data-marks]').change(function() {
-            $(this).val(parseFloat($(this).val()).toFixed(2));
+            var marks = parseFloat($(this).val()).toFixed(2);
+
+            if (isNaN(marks)) {
+                marks = '';
+            }
+
+            $(this).val(marks);
         });
     });
 </script>
