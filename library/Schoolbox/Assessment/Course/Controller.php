@@ -122,6 +122,7 @@ class Controller extends BaseController
                 'hasBreadcrumb' => false,
                 'hasAdd'        => false,
                 'hasTot'        => false,
+                'linkToUnits'   => false,
                 'hasClose'      => true
             ];
         }
@@ -130,6 +131,7 @@ class Controller extends BaseController
                 'hasBreadcrumb' => true,
                 'hasAdd'        => true,
                 'hasTot'        => true,
+                'linkToUnits'   => true,
                 'hasClose'      => false
             ];
         }

@@ -27,7 +27,7 @@
                         <ul class="unit-list">
                             {% for unit in units[course.id] %}
                                 <li>
-                                    {% if unit.hasHomepage %}
+                                    {% if unit.hasHomepage and linkToUnits %}
                                         <a title="Visit {{ unit.name }} homepage" href="/homepage/{{ unit.id }}">{{ unit.name }}</a>
                                     {% else %}
                                         {{ unit.name }}
