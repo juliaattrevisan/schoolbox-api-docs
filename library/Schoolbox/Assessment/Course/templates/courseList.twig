@@ -1,8 +1,7 @@
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 {% if hasBreadcrumb %}
 <ul class="breadcrumb">
-    <li><a href="/sandbox">Sandbox</a></li>
-    <li class="active"><a href="/sandbox/path/to/{{ tpl }}">{{ tpl | title }}</a></li>
+    <li class="active"><a href="{{ routeLookup('course.courseList') }}">Courses</a></li>
 </ul>
 {% endif %}
 
