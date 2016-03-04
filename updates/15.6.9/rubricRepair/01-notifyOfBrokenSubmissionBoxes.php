@@ -10,8 +10,7 @@
  *
  * This prevents a student's rubric from ever being saved.
  *
- * Fix:
- * # update rubric_descriptor.level_id to point to outline submission_box_id instead of builder
+ * For now, merely notify about boxes that might be broken - fix in 15.6.10.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
