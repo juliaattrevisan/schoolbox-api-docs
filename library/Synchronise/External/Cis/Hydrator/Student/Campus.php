@@ -63,7 +63,7 @@ class Synchronise_External_Cis_Hydrator_Student_Campus implements Synchronise_Ba
             }
         }
         if (empty($campusList)) {
-            throw new Exception('Students without a campus are not imported');
+            throw new Exception('Students without a campus are not imported: '.implode(',',$externalUser['StudentCampus']));
         }
         $newUser['campus'] = $campusList;
         foreach ($this->campusOrder as $campusCode) {

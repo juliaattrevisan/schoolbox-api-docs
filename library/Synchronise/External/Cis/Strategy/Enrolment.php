@@ -167,6 +167,26 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
         // Re-add enrolments in this class
         $enrolments = new \Schoolbox\Collection();
         /** @var User[] $teachers */
+        $teachers = UserMapper::getInstance()->findByColumn(
+            'synergy_id',
+            array_map(
+                function ($v) {
+                    return 'T-'.$v;
+                },
+                $newItem['ClassTeachers']
+            )
+        );
+        foreach ($teachers as $teacher) {
+            /** @var ClassInvolvement $enrolment */
+            $enrolment = $enrolmentMapper->createModel();
+            $enrolments->add(
+                $enrolment
+                    ->setClass($class)
+                    ->setUser($teacher)
+            );
+        }
+
+        /** @var User[] $students */
         $students = UserMapper::getInstance()->findByColumn(
             'synergy_id',
             array_map(
