@@ -131,9 +131,11 @@ class DescriptorMapper extends Schoolbox\Mapper {
         $query = "
             SELECT
                 {$this->getColumnString('rd')},
-                {$this->getJoinColumnString('criterion', 'rc')}
+                {$this->getJoinColumnString('criterion', 'rc')},
+                {$this->getJoinColumnString('level_id', 'rl')}
             FROM `{$this->getTable()}` `rd`
             INNER JOIN {$this->getJoinSql('criterion', 'rd', 'rc')}
+            LEFT  JOIN {$this->getJoinSql('level_id', 'rd', 'rl')}
             WHERE `rd`.`submission_box_id` = ?
         ";
         $statement = $this->getDatabase()->prepare($query);
@@ -142,8 +144,12 @@ class DescriptorMapper extends Schoolbox\Mapper {
         $fromList = $this->hydrateList($statement, 'rd', function($mapper, $model, $row) {
             /** @var Descriptor $model */
             $model->setCriterion($mapper->getJoinMapper('criterion')->hydrate($row, 'rc'));
+            $model->setLevel($mapper->getJoinMapper('level_id')->hydrate($row, 'rl'));
             return $model;
         });
+
+        /** @var Level[]|Schoolbox\Collection $toLevels */
+        $toLevels = $this->getJoinMapper('level_id')->findByColumn('box_id', $to_id);
 
         // And copy each descriptor in the from box into the to box
         /** @var SubmissionBox $toBox */
@@ -152,7 +158,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
         foreach ($fromList as $fromItem) {
             // The to box descriptor's criterion:
             // has the same name, type and grouping as the to box, but instead
-            // belongs to the to box's category.
+            // belongs to the to box's category and level.
             $params = array(
                 'parent_id'   => $toBox->getCategory()->getId(),
                 'parent_type' => Criterion::PARENT_TYPE_CATEGORY,
@@ -178,8 +184,27 @@ class DescriptorMapper extends Schoolbox\Mapper {
                 $this->getJoinMapper('criterion')->save($toCriterion);
             }
 
+            // The criterion's level:
+            // has the same sequence# as the original, but belongs to the new level.
+            $toLevel      = null;
+            $fromSequence = $fromItem->getLevel()->getSequence();
+            foreach ($toLevels as $level) {
+                if ($level->getSequence() == $fromSequence) {
+                    $toLevel = $level;
+                    break;
+                }
+            }
+            // Level doesn't exist? Build it
+            if (!$toLevel instanceof Level) {
+                $toLevel = clone $fromItem->getLevel();
+                $toLevel->setSubmissionBox($toBox);
+                $this->getJoinMapper('level_id')->create($toLevel);
+                $toLevels->add($toLevel);
+            }
+
             $toItem = clone $fromItem;
             $toItem
+                ->setLevel($toLevel)
                 ->setSubmissionBox($toBox)
                 ->setCriterion($toCriterion);
             $toList->add($toItem);
