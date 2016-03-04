@@ -79,15 +79,73 @@
                     var query = $(config.courseSelector.filter).val();
 
                     $.get('/course/list/ajax', { query: query}, function(responseText) {
-                        $(config.courseSelector.modal).find('#results').html(responseText);
+                        $('#course-selector-results').html(responseText);
+
                         $(config.courseSelector.filter).css('background-image', '');
                     });
                 }, config.courseSelector.delay);
             });
+        }
+    }
+}(jQuery));
 
-            /* Always focus on the search field upon spawn
-             */
-            $(document).on('opened.fndtn.reveal', config.courseSelector.modalIdentifier, function() {
+(function() {
+
+    /**
+     * Plugin
+     *
+     * @param options
+     */
+    $.fn.courseSelectorModal = function(options) {
+        options = options || {};
+
+        var config = init(options, $(this));
+
+        setupModal();
+
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            var defaults = {
+
+                /* The element which activates the Course Selector
+                 */
+                element: element,
+
+                courseSelector: {
+
+                    /* Where the Course List is located
+                     */
+                    url: '/course/list',
+
+                    /* Ajax requests spawn inside this element
+                     * These should reference the same element
+                     */
+                    modalIdentifier: '#course-selector-modal',
+                    modal: $('#course-selector-modal'),
+
+                    /* This element is used to filter the ajax request contents
+                     */
+                    filter: '[data-course-selector-filter]'
+                }
+            };
+
+            var derived = {
+            };
+
+            return $.extend(defaults, derived, options);
+        }
+
+        /**
+         * Set up modal behaviour
+         */
+        function setupModal() {
+            $(document).on('opened.fndtn.reveal', config.courseSelector.modalIdentifier, function () {
                 config.courseSelector.modal.find(config.courseSelector.filter).focus();
             });
 

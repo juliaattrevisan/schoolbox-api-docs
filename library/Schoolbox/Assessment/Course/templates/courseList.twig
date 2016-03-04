@@ -1,4 +1,14 @@
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/shared/course/jquery.course-selector.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        /* Attach Course Selector
+         */
+        $.fn.courseSelector();
+    });
+</script>
+
 {% if hasBreadcrumb %}
 <ul class="breadcrumb">
     <li class="active"><a href="{{ routeLookup('course.courseList') }}">Courses</a></li>
@@ -23,7 +33,7 @@
         <input type="text" value="" placeholder="Search for a course" data-course-selector-filter style="background-repeat:no-repeat;background-position: 99% 50%" />
     </div>
 </div>
-<div class="row" id="results">
+<div class="row" id="course-selector-results">
     {# This is the default results when modal opens, this will get replaced by 'courseListResults.twig' after an AJAX #}
     {% include '@course/courseListResults.twig' %}
 </div>

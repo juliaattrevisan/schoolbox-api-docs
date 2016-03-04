@@ -123,7 +123,7 @@ class Controller extends BaseController
                 'hasAdd'        => false,
                 'hasTot'        => false,
                 'linkToUnits'   => false,
-                'hasClose'      => true
+                'hasClose'      => true,
             ];
         }
         else {
@@ -132,7 +132,7 @@ class Controller extends BaseController
                 'hasAdd'        => true,
                 'hasTot'        => true,
                 'linkToUnits'   => true,
-                'hasClose'      => false
+                'hasClose'      => false,
             ];
         }
 
