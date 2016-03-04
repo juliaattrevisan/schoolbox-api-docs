@@ -1,0 +1,59 @@
+{# Shared navigation menu #}
+
+{{ navigation | raw }}
+
+{# Config page contents #}
+
+<script type="text/javascript">
+    $(function() {
+
+        /* Confirm strings
+         */
+        var str = {
+            file: 'This will permanently delete files that have been soft deleted by users. Are you sure you want to proceed?',
+            subnews: 'This will clean the database of all content no longer visible to users.',
+            fileclean: 'This will delete all files that are no longer in the database.',
+            log: 'This will delete all logs, it will impact only on the whats new feature.',
+            image: 'This will delete all image transformations that have been cached.',
+            stream: 'This will delete all cached feeds (rss, twitter, calendar etc.) and temporary zip files.'
+        };
+
+        $('[data-cleanup]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: str[element.data('cleanup')],
+                confirmEvent: function() {
+                    window.location.href = element.attr('href');
+                }
+            });
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 large-6 island">
+        <h2 class='subheader'>Remove Deleted Files</h2>
+
+        <section class="content">
+            <p>If a user has deleted a file or link this will clean up the soft deleted remnants. This should be completed yearly to keep disk usage down.</p>
+
+            <!-- <a href="/adminv2/cleanup/file" class="button icon-delete" data-cleanup="file">Remove Files</a> -->
+            <p>This function has been removed temporarily.</p>
+        </section>
+    </div>
+    <div class="small-12 large-6 island">
+        <h2 class="subheader">Clean Stream Cache</h2>
+
+        <section>
+            <div class="content">
+                <p>The stream cache is used to store items downloaded from remote systems and zip archives to be downloaded.  This can be safely deleted yearly or more frequently as all data is replaceable.  This will increase page load times while the cache items are refetched.</p>
+
+                <a href="/adminv2/cleanup/clean" class="button icon-delete" data-cleanup="stream">Clean Data Cache</a>
+            </div>
+        </section>
+    </div>
+</div>
+
