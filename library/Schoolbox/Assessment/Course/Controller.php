@@ -110,11 +110,37 @@ class Controller extends BaseController
         $this->tpl('unit', $data);
     }
 
+
     /**
      * Dump out a list of courses
      * The Filter field allows you to search Course names
+     *
+     * @api   GET /course/list
+     * @level 160
      */
     public function courseList() {
+        $this->displayCourseList('courseList');
+    }
+
+
+    /**
+     * Dump out AJAX'd search results
+     * The Filter field allows you to search Course names
+     *
+     * @api   GET /course/list/ajax
+     * @level 160
+     */
+    public function courseListAjax() {
+        $this->displayCourseList('courseListResults');
+    }
+
+
+    /**
+     * Sub-method for course list renderings
+     *
+     * @param string $template
+     */
+    protected function displayCourseList($template) {
         $data = $this->getCourseMapper()->findCourseList($this->getRequest()->query->get('query'));
 
         if ($this->getRequest()->isXhr()) {
@@ -136,35 +162,9 @@ class Controller extends BaseController
             ];
         }
 
-        $this->tpl('courseList', array_merge($data, $options));
+        $this->tpl($template, array_merge($data, $options));
     }
 
-    /**
-     * Dump out AJAX'd search results
-     * The Filter field allows you to search Course names
-     */
-    public function courseListAjax() {
-        $data = $this->getCourseMapper()->findCourseList($this->getRequest()->query->get('query'));
-
-        if ($this->getRequest()->isXhr()) {
-            $options = [
-                'hasBreadcrumb' => false,
-                'hasAdd'        => false,
-                'hasTot'        => false,
-                'hasClose'      => true
-            ];
-        }
-        else {
-            $options = [
-                'hasBreadcrumb' => true,
-                'hasAdd'        => true,
-                'hasTot'        => true,
-                'hasClose'      => false
-            ];
-        }
-
-        $this->tpl('courseListResults', array_merge($data, $options));
-    }
 
     /**
      * @param AbstractTreeBuilder $tb
