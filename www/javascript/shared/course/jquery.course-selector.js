@@ -45,7 +45,11 @@
                     /* Ajax update occurs $delay milliseconds after last keypress
                      * is detected in config.courseSelector.filter
                      */
-                    delay: 500
+                    delay: 500,
+
+                    /* CSS rule for indicating searching is happening
+                     */
+                    loadingCss: 'course-selector-search-loading'
                 }
             };
 
@@ -94,7 +98,7 @@
          * @param element
          */
         function addLoadingState(element) {
-            $(element).addClass('course-selector-search-loading');
+            $(element).addClass(config.courseSelector.loadingCss);
         }
 
         /**
@@ -103,7 +107,7 @@
          * @param element
          */
         function removeLoadingState(element) {
-            $(element).removeClass('course-selector-search-loading');
+            $(element).removeClass(config.courseSelector.loadingCss);
         }
     }
 }(jQuery));
