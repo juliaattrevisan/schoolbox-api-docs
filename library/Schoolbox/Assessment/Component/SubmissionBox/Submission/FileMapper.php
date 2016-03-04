@@ -374,6 +374,7 @@ class FileMapper extends Mapper
 
         /** @var Storage\Model $storage */
         $storage    = $storageJoin->hydrate($row, 'h');
+        $storage->setPath($this->getStorageMapper()->getManager()->calcPath($storage));
         $storage->setMimetype($mimeJoin->hydrate($row, 'afe'));
 
         $box->setCategory($category);

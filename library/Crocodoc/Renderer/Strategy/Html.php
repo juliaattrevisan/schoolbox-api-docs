@@ -35,13 +35,7 @@ class Html extends Base
         $this->getPage()->setFile('injectable', $this->getTemplateFile());
         $this->getPage()->parse('INJECTED_INTERFACE_TEMPLATE', 'injectable');
 
-        /* Make the image display
-         */
-        $this->getPage()->setVar(
-            array(
-                'INJECTABLE_SUBMISSION_ID' => $this->getSubmission()->getId(),
-            )
-        );
+        $this->getPage()->setVar('INJECTABLE_SUBMISSION_CONTENT', \Scrub::html($this->getSubmission()->getStorage()->read()));
 
         /* Upload File
          */

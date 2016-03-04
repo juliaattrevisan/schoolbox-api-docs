@@ -129,6 +129,7 @@ if (is_numeric($_GET['return'])) {
 
     // wrap HTML in niceness
     if ($studentSub->getMimetype()->matches('text/html')) {
+
         $wrapper = new Alaress\Html\Wrapper(preg_replace("#[^a-z0-9_\\-\\(\\)\\.]#i", "", $filename), $file->read());
         $wrapper->loadBaseHrefFromServerVars($_SERVER);
 
