@@ -12,11 +12,13 @@
 
 {# Config page contents #}
 
-<div class="small-12 island">
-    <dl class="tabs" data-tab="">
-        <dd class="{% if tab == 'course' %}active{% endif %}"><a data-tab id="course" href="#panel-course">Course Page</a></dd>
-        <dd class="{% if tab == 'unit' %}active{% endif %}"><a data-tab id="unit" href="#panel-unit">Unit Page</a></dd>
-    </dl>
+<div class="row">
+    <div class="small-12 columns">
+        <dl class="tabs">
+            <dd class="{% if tab == 'course' %}active{% endif %}"><a data-tab id="course" href="#panel-course">Course Page</a></dd>
+            <dd class="{% if tab == 'unit' %}active{% endif %}"><a data-tab id="unit" href="#panel-unit">Unit Page</a></dd>
+        </dl>
+    </div>
 </div>
 
 <form action="/adminv2/course-builder/save" method="post">
