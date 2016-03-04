@@ -81,42 +81,42 @@ $affectedBoxes = [];
 $descriptorQuery->execute();
 foreach ($descriptorQuery as $row) {
     $affectedBoxes[$row['boxId']] = true;
-    $logger->info(
-        sprintf(
-            'Fixing level %d (%s) for submission box #%d',
-            $row['levelSequence'],
-            $row['levelName'] ?: 'no name',
-            $row['boxId']
-        )
-    );
-
-    $map = [];
-
-    // obtain references
-    $obtainIncorrectLevelsQuery->execute([ 'boxId' => $row['boxId'] ]);
-    while ($r = $obtainIncorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
-        $map[$r['sequence']]['bad'] = $r['id'];
-    }
-
-    $obtainCorrectLevelsQuery->execute([ 'boxId' => $row['boxId'] ]);
-    while ($r = $obtainCorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
-        $map[$r['sequence']]['good'] = $r['id'];
-    }
-
-    // update the levels
-    $updateLevelQuery->execute(['boxId' => $row['boxId'], 'levelId' => $row['levelId']]);
-
-    // now update the descriptors
-    foreach ($map as $sequence => $changes) {
-
-        if ($changes['bad'] && $changes['good']) {
-            $logger->info(sprintf("Remapping descriptor level IDs: %d -> %d", $changes['bad'], $changes['good']));
-            $updateDescriptorQuery->execute([ 'boxId' => $row['boxId'], 'correctLevelId' => $changes['good'], 'incorrectLevelId' => $changes['bad'] ]);
-        } else {
-            $logger->notice("Could not remap descriptor levels, data missing: ".json_encode($changes));
-        }
-
-    }
+//    $logger->info(
+//        sprintf(
+//            'Fixing level %d (%s) for submission box #%d',
+//            $row['levelSequence'],
+//            $row['levelName'] ?: 'no name',
+//            $row['boxId']
+//        )
+//    );
+//
+//    $map = [];
+//
+//    // obtain references
+//    $obtainIncorrectLevelsQuery->execute([ 'boxId' => $row['boxId'] ]);
+//    while ($r = $obtainIncorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
+//        $map[$r['sequence']]['bad'] = $r['id'];
+//    }
+//
+//    $obtainCorrectLevelsQuery->execute([ 'boxId' => $row['boxId'] ]);
+//    while ($r = $obtainCorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
+//        $map[$r['sequence']]['good'] = $r['id'];
+//    }
+//
+//    // update the levels
+//    $updateLevelQuery->execute(['boxId' => $row['boxId'], 'levelId' => $row['levelId']]);
+//
+//    // now update the descriptors
+//    foreach ($map as $sequence => $changes) {
+//
+//        if ($changes['bad'] && $changes['good']) {
+//            $logger->info(sprintf("Remapping descriptor level IDs: %d -> %d", $changes['bad'], $changes['good']));
+//            $updateDescriptorQuery->execute([ 'boxId' => $row['boxId'], 'correctLevelId' => $changes['good'], 'incorrectLevelId' => $changes['bad'] ]);
+//        } else {
+//            $logger->notice("Could not remap descriptor levels, data missing: ".json_encode($changes));
+//        }
+//
+//    }
 
 }
 
@@ -124,7 +124,7 @@ foreach ($descriptorQuery as $row) {
 $affectedBoxes = array_keys($affectedBoxes);
 $logger->info(sprintf('%d potentially broken submission boxes were found.', count($affectedBoxes)));
 if (count($affectedBoxes)) {
-    $logger->info('The following boxes will need to be re-marked:');
+    $logger->info('The following boxes should be re-saved and re-marked:');
     foreach ($affectedBoxes as $boxId) {
         try {
             $box    = SubmissionBoxMapper::getInstance()->findById($boxId);
@@ -145,6 +145,14 @@ if (count($affectedBoxes)) {
                 $box->getName(),
                 $folder->getId(),
                 $folderName
+            )
+        );
+        $logger->info(
+            sprintf(
+                '(Direct link: http://%s.%s/submission/createSubmission/modify/%d)',
+                Config::get('site_hostname'),
+                Config::get('site_domain'),
+                $box->getId()
             )
         );
     }
