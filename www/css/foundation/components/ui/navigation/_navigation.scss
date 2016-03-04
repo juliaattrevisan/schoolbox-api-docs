@@ -106,7 +106,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
  */
 .hybrid-bar{
     .logo {
-        width: 6rem;
+        width: 5rem;
         height: 5rem;
         @media #{$mediumwide-up} {
             display: none !important;
@@ -145,7 +145,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
         }
         &:hover, &.focus {
             width: 100%;
-            padding-left: 21.22rem;
             @include placeholder-color($black, $font-weight-normal);
         }
 
@@ -254,7 +253,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
         .icon-nav{
             padding: 0;
             position: absolute;
-            left: -5rem;
+            left: 0;
             top: 80px;
             width: 100%;
             li{
@@ -526,11 +525,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 // Only show notifications sidebar on x-large-up screens
 // 1440px >
 @media #{$xlarge-up} {
-    #search{
-        &:hover, &.focus{
-            padding-left: 34.22rem;
-        }
-    }
     .right-off-canvas-menu {
         transition: $menu-slide;
         position: relative;
@@ -562,17 +556,21 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
     }
 }
 
-// Only show left nav on large-up screens
+// Large down
 @media #{$large-down} {
     .hybrid-bar #search {
         right: 5rem;
+
+        &:hover, &.focus{
+            padding-left: 5rem;
+        }
     }
 }
 
 // Medium
 // < 1024px
 @media #{$medium-down} {
-    #search{
+    .hybrid-bar #search{
         &:hover, &.focus{
             padding-left: 10rem;
         }
@@ -582,13 +580,15 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
     }
 }
 
-/* Special Small styles
- */
+// Small
 @media #{$small-only} {
-    #search{
+    .hybrid-bar #search{
         &:hover, &.focus{
             padding-left: 10rem;
         }
+    }
+    .tab-bar{
+        height: 10rem;
     }
     .tab-bar-section {
         .icon-nav {
