@@ -124,7 +124,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 	}
     .tab-bar {
-        position: initial;
+        position: inherit;
     }
     #search {
         margin: 0;
