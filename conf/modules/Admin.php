@@ -29,9 +29,10 @@ class Admin implements ModuleConfigInterface
 
         $di = $kernel->getDependencyInjector();
 
+        $home = new \Schoolbox\Admin\Home\Module($di);
+        $home->init('/adminv2/home');
+
         $courseBuilder = new \Schoolbox\Admin\CourseBuilder\Module($di);
         $courseBuilder->init('/adminv2/course-builder');
-
     }
-
 } 

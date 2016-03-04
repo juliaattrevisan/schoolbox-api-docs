@@ -48,8 +48,8 @@ class Controller extends Base
             array(
                 'template' => '@adminCourseBuilder/index.twig',
                 'data'     => array(
-                    'tab' => $_GET["tab"] != '' ? $_GET["tab"] : 'course',
                     'navigation' => AdminNavigation::getNavigation(),
+                    'tab' => $_GET["tab"] != '' ? $_GET["tab"] : 'course',
                     'roles' => RoleMapper::getInstance()->findAll(),
                     'permissions' => $permissions,
                     'courseTemplate' => ConfigMapper::getInstance()->get('default_course_page_template'),
