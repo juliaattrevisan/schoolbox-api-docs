@@ -30,7 +30,7 @@
 
                     /* Where the Course List is located
                      */
-                    url: '/course/list',
+                    url: '/course/list/ajax',
 
                     /* Ajax requests spawn inside this element
                      * These should reference the same element
@@ -83,7 +83,7 @@
 
                     addLoadingState(config.courseSelector.filter);
 
-                    $.get('/course/list/ajax', { query: query}, function(responseText) {
+                    $.get(config.courseSelector.url, { query: query}, function(responseText) {
                         $('#course-selector-results').html(responseText);
 
                         removeLoadingState(config.courseSelector.filter);
