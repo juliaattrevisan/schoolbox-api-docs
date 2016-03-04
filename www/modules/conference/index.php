@@ -8,11 +8,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-if ($this->arg[0] == 'window') {
-    $this->setFile(TEMPLATE_content, 'modules/remote/nwindow.html');
-} else {
-    $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
-}
+
 $remoteUrl = 'https://bookings.parentteacheronline.com.au';
 
 // Map file will depend on whether current user is a parent or a teacher.
@@ -80,7 +76,15 @@ $remoteUrl = $remoteUrl . $glue . http_build_query([
     'type'   => $type,
 ]);
 
-$this->setVar([
-    'REMOTE_URL'   => $remoteUrl,
-    'FRAME_HEIGHT' => $height,
-]);
+if ($this->arg[0] == 'window') {
+    header('Location: '.$remoteUrl);
+    exit;
+} else {
+    $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
+    $this->setVar([
+        'REMOTE_URL'   => $remoteUrl,
+        'FRAME_HEIGHT' => $height,
+    ]);
+
+}
+
