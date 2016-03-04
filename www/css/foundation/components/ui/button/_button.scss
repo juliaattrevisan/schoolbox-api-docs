@@ -15,9 +15,9 @@ a[disabled], a.disabled {
 }
 
 // rather than use the global (which would affect sidebar, topbar, etc.) limit anchor decoration to explicitly content
-#container a:not([class^="icon-"]):hover,
-#container a:not([class*=" icon-"]):hover {
-	text-decoration: underline;
+#container a[class^="icon-"]:hover,
+#container a[class*=" icon-"]:hover {
+	text-decoration: none;
 	&:before{
 		text-decoration: none;
 	}
