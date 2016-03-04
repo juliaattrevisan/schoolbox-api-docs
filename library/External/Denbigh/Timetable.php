@@ -195,8 +195,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             foreach ($lessonList as $lesson) {
                 $period = $lesson['period'];
                 $day = $lesson['day'];
-                $periodList[$period]['periodStart'] = date(Cfg::get('date_time'), strtotime($lesson['startTime']));
-                $periodList[$period]['periodEnd'] = date(Cfg::get('date_time'), strtotime($lesson['endTime']));
+                $periodList[$period]['periodStart'] = $lesson['startTime'] == '' ? '' : date(Cfg::get('date_time'), strtotime($lesson['startTime']));
+                $periodList[$period]['periodEnd'] = $lesson['endTime'] == '' ? '' : date(Cfg::get('date_time'), strtotime($lesson['endTime']));
 
                 if (isset($periodList[$period]['day'][$day])
                     && !isset($periodList[$period]['day'][$day][$lesson['ClassCode']])) {
@@ -273,8 +273,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         if (!empty($lessonList)) {
             foreach ($lessonList as $lesson) {
                 $period = $lesson['period'];
-                $periodList[$period]['periodStart'] = date(Cfg::get('date_time'), strtotime($lesson['startTime']));
-                $periodList[$period]['periodEnd'] = date(Cfg::get('date_time'), strtotime($lesson['endTime']));
+                $periodList[$period]['periodStart'] = $lesson['startTime'] == '' ? '' : date(Cfg::get('date_time'), strtotime($lesson['startTime']));
+                $periodList[$period]['periodEnd'] = $lesson['endTime'] == '' ? '' : date(Cfg::get('date_time'), strtotime($lesson['endTime']));
 
                 if (isset($periodList[$period])
                     && !isset($periodList[$period]['class'][$lesson['ClassCode']])
