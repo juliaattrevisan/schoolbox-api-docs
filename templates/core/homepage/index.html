@@ -195,8 +195,7 @@
 
         /* Attach Course Selector Modal listeners
          */
-        $('#tab-control').find('[data-interaction="course-selector"]').courseSelectorModal();
-        $('#content').find('[data-course-selector]').courseSelectorModal();
+        $.fn.courseSelectorModal();
     });
 </script>
 <!-- END modify_layout -->
@@ -281,7 +280,7 @@
         </li>
         <!-- BEGIN manage_class -->
         <li class="separator">Course Actions</li>
-        <li><a href="/course/import/{ID}" class="icon-course" data-interaction="course-selector">Link to Course</a></li>
+        <li><a href="/course/import/{ID}" class="icon-course" data-course-selector>Link to Course</a></li>
         <!-- BEGIN course -->
         <li><a href="/course/outline/modify/{COURSE_ID}" class="icon-course">View Course "{COURSE_NAME}"</a></li>
         <!-- END course -->

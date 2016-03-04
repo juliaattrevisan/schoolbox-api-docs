@@ -174,7 +174,7 @@
 
             /* Spawn modal
              */
-            config.element.on('click', function(event) {
+            $(document).on('click', '[data-course-selector]', function(event) {
                 event.preventDefault();
 
                 config.courseSelector.modal.foundation('reveal', 'open', {
