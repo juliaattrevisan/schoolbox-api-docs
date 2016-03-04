@@ -214,6 +214,7 @@ abstract class Mapper implements IMapper, Serializable
         $this->setColumnFactory(new ColumnFactory());
         $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
         $this->mapping();
+        $this->postSetup();
     }
 
     /**
@@ -241,6 +242,20 @@ abstract class Mapper implements IMapper, Serializable
      * Default setup for any other objects which compose the mapper.
      */
     protected function setup()
+    {
+    }
+
+    /**
+     * Secondary hook method which occurs after mapping()
+     *
+     * TODO: This might be superfluous if setup() can be moved
+     * after mapping() - I don't see it being used anywhere.
+     *
+     * This was made because a subclass of Mapper needed to make a
+     * db call, but that needs to occur after mapping() since it
+     * defines models and tables (unavailable in setup() atm)
+     */
+    protected function postSetup()
     {
     }
 

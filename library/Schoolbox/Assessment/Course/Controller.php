@@ -15,29 +15,23 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Collection;
+use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 
 class Controller extends BaseController
 {
-    /** @var Folder\Mapper */
-    protected $folderMap;
-
-    /** @var Folder\Model */
-    protected $facultyTop;
-
+    /**
+     * A CourseMapper instance
+     *
+     * @var CourseMapper
+     */
+    private $courseMapper = null;
 
     /**
      */
     public function __construct()
     {
-        $this->folderMap = Folder\Mapper::getInstance();
-
-        // don't search lineage back beyond here
-        // TODO look this up from config
-        $this->facultyTop = $this->folderMap->findById(29);
-
+        $this->setCourseMapper(CourseMapper::getInstance());
     }
-
 
     /**
      * Just a raw template render
@@ -72,16 +66,15 @@ class Controller extends BaseController
         $data = [];
 
         if ($id) {
-            $folder = $this->folderMap->findById($id);
-            $folder->setParent($this->folderMap->findById($folder->getParent()->getId()));
+            $folder = $this->getCourseMapper()->findById($id);
+            $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
 
             $data['folder'] = $folder;
-            $data['units']  = $this->folderMap->findByParent($id);
+            $data['units']  = $this->getCourseMapper()->findByParent($id);
         }
 
         $this->tpl('course', $data);
     }
-
 
     /**
      * Form to create a new course
@@ -93,7 +86,6 @@ class Controller extends BaseController
     {
         $this->modifyCourse(null);
     }
-
 
     /**
      * Post request to spawn a new unit
@@ -118,6 +110,61 @@ class Controller extends BaseController
         $this->tpl('unit', $data);
     }
 
+    /**
+     * Dump out a list of courses
+     * The Filter field allows you to search Course names
+     */
+    public function courseList() {
+        $data = $this->getCourseMapper()->findCourseList($this->getRequest()->query->get('query'));
+
+        if ($this->getRequest()->isXhr()) {
+            $options = [
+                'hasBreadcrumb' => false,
+                'hasAdd'        => false,
+                'hasTot'        => false,
+                'linkToUnits'   => false,
+                'hasClose'      => true,
+            ];
+        }
+        else {
+            $options = [
+                'hasBreadcrumb' => true,
+                'hasAdd'        => true,
+                'hasTot'        => true,
+                'linkToUnits'   => true,
+                'hasClose'      => false,
+            ];
+        }
+
+        $this->tpl('courseList', array_merge($data, $options));
+    }
+
+    /**
+     * Dump out AJAX'd search results
+     * The Filter field allows you to search Course names
+     */
+    public function courseListAjax() {
+        $data = $this->getCourseMapper()->findCourseList($this->getRequest()->query->get('query'));
+
+        if ($this->getRequest()->isXhr()) {
+            $options = [
+                'hasBreadcrumb' => false,
+                'hasAdd'        => false,
+                'hasTot'        => false,
+                'hasClose'      => true
+            ];
+        }
+        else {
+            $options = [
+                'hasBreadcrumb' => true,
+                'hasAdd'        => true,
+                'hasTot'        => true,
+                'hasClose'      => false
+            ];
+        }
+
+        $this->tpl('courseListResults', array_merge($data, $options));
+    }
 
     /**
      * @param AbstractTreeBuilder $tb
@@ -143,7 +190,6 @@ class Controller extends BaseController
         return $target;
     }
 
-
     /**
      * List the folders that are allowed to be course parents
      *
@@ -153,7 +199,7 @@ class Controller extends BaseController
     public function parentList()
     {
         // the valid list of parents:
-        //  - start at facultyTop,
+        //  - start at facultyTop $this->getCourseMapper()->getFacultyNode(),
         //  - recurse into every folder for which the user has WRITE access
         //  - stop at, and exclude, all Courses (folder that has > 0 children with > 0 tasks) (apparently this point is up for debate..?)
         //  - continue to exhaustion
@@ -175,59 +221,26 @@ class Controller extends BaseController
         $this->tpl('parentList', $data);
     }
 
+    /* Getters/Setters
+     */
 
     /**
-     * List the courses
+     * Get course mapper
      *
-     * @api   /course/list
-     * @level 160
+     * @return Mapper
      */
-    public function courseList()
+    private function getCourseMapper()
     {
-        // TODO transfer all this fetch logic into a mapper somewhere
-        $cids = \Database::getInstance()->query("
-            SELECT
-              c.id,
-              COUNT(t.id) AS taskCount
-            FROM category c
-            LEFT JOIN category subc ON subc.parent = c.id AND subc.deleted_at IS NULL
-            JOIN `task` t ON t.category_id = subc.id AND t.deleted_at IS NULL
-            WHERE c.deleted_at IS NULL
-            GROUP BY c.id
-        ")->fetchAll(\PDO::FETCH_COLUMN);
-
-        /** @var Collection|Folder\Model[] $courses */
-        $courses = $this->folderMap->findByColumn('id', $cids);
-
-        $data = [ 'courses' => $courses ];
-
-        foreach ($courses as $course) {
-            // this is way more expensive than it needs to be -_-;
-            $lineage = $this->folderMap->findParents($course, $this->facultyTop);
-            $data['lineage'][$course->getId()] = $lineage;
-
-            $units = $this->folderMap->findByParent($course->getId());
-
-            foreach ($units as $unit) {
-
-                // far out, this is ridiculous: I can't even prepare this statement because of other transactions getting in the way
-                $taskCount = \Database::getInstance()->query("
-                    SELECT
-                        COUNT(t.id) AS taskCount
-                    FROM category c
-                    JOIN `task` t ON t.category_id = c.id AND t.deleted_at IS NULL
-                    WHERE c.deleted_at IS NULL AND c.id = ?
-                    GROUP BY c.id
-                ", [ $unit->getId() ])->fetchColumn();
-
-                if ($taskCount > 0) {
-                    $data['units'][$course->getId()][] = $unit;
-                }
-            }
-
-        }
-
-        $this->tpl('courseList', $data);
+        return $this->courseMapper;
     }
 
+    /**
+     * Set course mapper
+     *
+     * @param Mapper $courseMapper
+     */
+    private function setCourseMapper($courseMapper)
+    {
+        $this->courseMapper = $courseMapper;
+    }
 }

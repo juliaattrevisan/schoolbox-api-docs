@@ -1,0 +1,26 @@
+/* Shows a list of Units for a particular Course
+ */
+ul.unit-list {
+    margin-bottom: 1rem;
+
+    li {
+        list-style: none;
+        padding: 0.25rem 0 0.25rem 0.75rem;
+
+        @media #{$medium-down} {
+            padding-left: 1rem;
+        }
+
+        @media #{$small-only} {
+            padding-left: 1.25rem;
+        }
+    }
+}
+
+/* Overpower foundation rules
+ */
+input[type="text"]:focus {
+    &.course-selector-search-loading {
+        background-image: url('/images/core/ajax-loader.gif');
+    }
+}
