@@ -242,3 +242,8 @@ ul.tileList {
     }
 }
 
+// Image gallery specific
+.img-gallery li{
+    margin-bottom: $inline-list-default-float-list-margin;
+}
+
