@@ -48,10 +48,17 @@
                     <a href="#" class="icon-down-arrow" data-collapser="course-{{ course.id }}"></a>
 
                     {% if hasTot %}
-                        <a href="#" class="icon-overflow"></a>
+                        <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ course.getId() }}" aria-expanded="false" title="Actions"></a>
                     {% endif %}
                 </nav>
-                </li>
+
+                {% if hasTot %}
+                <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ course.getId() }}">
+                    <li><a href="#" class="icon-modify">Modify</a></li>
+                    <li><a href="#" class="icon-delete">Delete</a></li>
+                </ul>
+                {% endif %}
+            </li>
             {% endfor %}
         </ul>
         {% else %}
