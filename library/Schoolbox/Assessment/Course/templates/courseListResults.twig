@@ -57,7 +57,7 @@
 
                     {# Course delete: standard folder delete #}
                     {% if currentUser.isSuperuser() %}
-                    <li><a href="/cms/categoryForm.php?delete={{ course.getId() }}" class="icon-delete" data-action="delete">Delete</a></li>
+                    <li><a href="/cms/categoryForm.php?delete={{ course.getId() }}" class="icon-delete" data-action="course-delete">Delete</a></li>
                     {% endif %}
 
                 </ul>
@@ -76,7 +76,7 @@
 
         $(document).foundation('dropdown', 'reflow');
 
-        $('a[data-action="delete"]').on('click', function(event) {
+        $('a[data-action="course-delete"]').on('click', function(event) {
             event.preventDefault();
 
             $(this).confirmDialog({
