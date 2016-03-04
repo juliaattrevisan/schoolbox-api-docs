@@ -94,7 +94,7 @@
          * @param element
          */
         function addLoadingState(element) {
-            $(element).css('background-image',"url('/images/core/ajax-loader.gif')");
+            $(element).addClass('course-selector-search-loading');
         }
 
         /**
@@ -103,7 +103,7 @@
          * @param element
          */
         function removeLoadingState(element) {
-            $(element).css('background-image', '');
+            $(element).removeClass('course-selector-search-loading');
         }
     }
 }(jQuery));

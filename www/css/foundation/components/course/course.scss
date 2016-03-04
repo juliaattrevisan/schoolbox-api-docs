@@ -16,3 +16,11 @@ ul.unit-list {
         }
     }
 }
+
+/* Overpower foundation rules
+ */
+input[type="text"]:focus {
+    &.course-selector-search-loading {
+        background-image: url('/images/core/ajax-loader.gif');
+    }
+}
