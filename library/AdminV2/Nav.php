@@ -8,8 +8,7 @@
  */
 class AdminV2_Nav
 {
-
-    private $nav = array(
+    public $nav = array(
         'home' => 'Home',
         'user' => 'Users',
         'side-menu' => 'Side Menu',
@@ -23,6 +22,7 @@ class AdminV2_Nav
         'rollover' => 'Rollover',
         'grades' => 'Grades',
         'rubric-results' => 'Rubrics',
+        'course-builder' => 'Course Builder',
         'messages' => 'Messages',
         'list' => 'Lists',
         'cleanup' => 'Cleanup',
