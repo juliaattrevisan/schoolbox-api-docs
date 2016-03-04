@@ -34,7 +34,9 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initRoutePermissions(Authorizer $authorizer) {
-        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
+
+        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
     }
 
     /**
