@@ -14,9 +14,13 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
+use Schoolbox\Resource\File\StorableTrait;
+
 
 class ReturnedWork implements ISoftDeletable
 {
+
+    use StorableTrait;
 
     /**
      * @var int
@@ -52,6 +56,7 @@ class ReturnedWork implements ISoftDeletable
      * @var float
      */
     protected $normalized_mark;
+
 
     /**
      * Is this a confirmation of an existing submission?
@@ -192,34 +197,6 @@ class ReturnedWork implements ISoftDeletable
     {
         return $this->marker;
     }
-
-
-
-    /**
-     * Gets the filename for the attached returned work
-     *
-     * @return string
-     */
-    public function getFilename()
-    {
-        return $this->getStorage()->getFilename();
-    }
-
-    /**
-     * Gets the file size for the attached returned work
-     *
-     * @return string
-     * @deprecated
-     */
-    public function getFilesize()
-    {
-        return $this->getStorage()->getSize();
-    }
-
-    public function getMimeType() {
-        return $this->getStorage()->getMimeType();
-    }
-
 
 
     /**
