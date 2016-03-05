@@ -66,6 +66,8 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
 
         $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
         $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
+        $this->setBlock('image_scroller', 'linked_image', 'linked_image_block');
+        $this->setBlock('image_scroller', 'unlinked_image', 'unlinked_image_block');
         $this->setBlock($templateHandle, 'submit_image_scroller', 'submit_image_scroller_block');
 
         $this->setVar(
@@ -108,7 +110,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         // Iterate
         foreach ($allFiles as $currentFile) {
 
-            $url = '#';
+            $url = '';
 
             // sanitise url
             if($currentFile->getDescription()) {
@@ -128,6 +130,16 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                     'IMAGE_URL'       => $url
                 )
             );
+
+            /* Link image */
+            if($url) {
+                $this->parse('linked_image_block', 'linked_image');
+                $this->setVar('unlinked_image_block','');
+            }
+            else {
+                $this->parse('unlinked_image_block', 'unlinked_image');
+                $this->setVar('linked_image_block','');
+            }
 
             // Display captions
             if ($this->getConfig('captionState') == 'Active') {
