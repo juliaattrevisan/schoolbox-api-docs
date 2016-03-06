@@ -414,6 +414,7 @@ class Group extends DeprecatedModel
         if ($userID == 0) {
             if ($_SESSION['id']) {
                 $userID = $_SESSION['id'];
+                $this->cacheUser[$userID] = $_SESSION['user'];
             } else {
                 return false;
             }
