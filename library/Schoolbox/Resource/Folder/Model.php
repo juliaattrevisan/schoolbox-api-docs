@@ -245,6 +245,16 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         ];
     }
 
+    /**
+     * Decide whether this node is a Root node
+     *
+     * @return bool
+     */
+    public function isRootNode()
+    {
+        return ($this->getId() == 0);
+    }
+
     /* Getters/Setters
      */
 

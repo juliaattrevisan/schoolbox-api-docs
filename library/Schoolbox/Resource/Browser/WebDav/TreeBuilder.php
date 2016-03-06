@@ -27,9 +27,9 @@ class TreeBuilder extends AbstractTreeBuilder
         $dav = PortfolioWebDAV::factory();
 
         parent::__construct($dav, 'webdavfile');
+
         $this->fileLocator = $dav;
     }
-
 
     /**
      * Return the given folder's href

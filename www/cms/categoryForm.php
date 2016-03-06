@@ -4,16 +4,24 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\CategoryCodeMapper;
 use Schoolbox\Resource\Category as CategoryModel;
 use \Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+function recurseInheritance(\Schoolbox\Resource\Folder\Model $model) {
+    $folders = FolderMapper::getInstance()->findAllChildren($model->getId(), true);
+    foreach ($folders as $folder) {
+        $folder->setInherit($model->getInherit());
+        FolderMapper::getInstance()->save($folder);
+        recurseInheritance($folder);
+    }
+}
 
 $page = new SitePage();
-$categoryMapper = CategoryMapper::getInstance();
-$categoryMapper->setSessionData($_SESSION);
+$folderMapper = FolderMapper::getInstance();
+$folderMapper->setSessionData($_SESSION);
 $groupHandler = new Group();
 
 // Great Scott! (go one step further BTTF if I deleted a folder)
@@ -22,10 +30,10 @@ $bttfCount = 1;
 if ($_POST['name']) {
 
     /** @var \Schoolbox\Resource\Category $model */
-    $model = $categoryMapper->createModel()
+    $model = $folderMapper->createModel()
         ->setName($_POST['name'])
         ->setParent(
-            $categoryMapper->createModel()
+            $folderMapper->createModel()
                 ->setId($_POST['parent'])
         );
 
@@ -93,7 +101,7 @@ if ($_POST['name']) {
                     ->findByColumn('id', $_POST['curriculumCodes'])
             );
         } elseif ($model->getId()) {
-            $existingModel = $categoryMapper->findById($model->getId());
+            $existingModel = $folderMapper->findById($model->getId());
             $model->setCurriculumNodes($existingModel->getCurriculumNodes());
         }
 
@@ -109,7 +117,7 @@ if ($_POST['name']) {
         $model->setCodes($codeCollection);
     }
 
-    $affectedIds = $categoryMapper->save($model);
+    $affectedIds = $folderMapper->save($model);
 
     if ($affectedIds === false) {
         // something went wrong
@@ -125,6 +133,9 @@ if ($_POST['name']) {
         $rolePermissions = RoleAccessMapper::getInstance()->savePermissions($model, $_POST['group'],
             $_POST['recursive']);
     }
+    // Recurse inheritance
+
+    recurseInheritance($model);
 
     // HomepageConfig definition
 
@@ -187,7 +198,7 @@ if ($_POST['name']) {
 } elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     /* Move link from one category to another, after checking permission on both from and to categories */
     try {
-        $category = $categoryMapper->findById($_POST['move']);
+        $category = $folderMapper->findById($_POST['move']);
     } catch (\Exception $e) {
         echo "Failed";
         exit;
@@ -205,11 +216,11 @@ if ($_POST['name']) {
         exit;
     }
 
-    $movedFolder  = $categoryMapper->findById($_POST['move']);
-    $parentFolder = $categoryMapper->findById($_POST['categoryID']);
+    $movedFolder  = $folderMapper->findById($_POST['move']);
+    $parentFolder = $folderMapper->findById($_POST['categoryID']);
 
     // Make sure $movedFolder isn't now its own ancestor
-    foreach ($categoryMapper->findParents($parentFolder) as $ancestor) {
+    foreach ($folderMapper->findParents($parentFolder) as $ancestor) {
         /** @var CategoryModel $ancestor */
         if ($ancestor->getId() == $movedFolder->getId()) {
             echo "Cannot move a folder into itself";
@@ -217,10 +228,10 @@ if ($_POST['name']) {
         }
     }
 
-    $categoryMapper->save($movedFolder->setParent($parentFolder));
+    $folderMapper->save($movedFolder->setParent($parentFolder));
 } elseif (is_numeric($_GET['delete'])) {
     try {
-        $category = $categoryMapper->findById($_GET['delete']);
+        $category = $folderMapper->findById($_GET['delete']);
     } catch (\Exception $e) {
         error(2);
     }
@@ -231,14 +242,14 @@ if ($_POST['name']) {
 
     // Are there any children of this category?
     // If so, error out if not a superuser
-    if ($categoryMapper->countByColumn('parent', $_GET['delete'])) {
+    if ($folderMapper->countByColumn('parent', $_GET['delete'])) {
         if (!$groupHandler->isSuperuser()) {
             error(12);
         }
     }
 
     // This deletes all contents of this folder and all of its children.
-    $categoryMapper->recursiveDelete($category);
+    $folderMapper->recursiveDelete($category);
 
     $_SESSION['resourcesID'] = $category->getParent()->getId();
     $bttfCount = 2;
@@ -249,8 +260,8 @@ if ($_POST['name']) {
     }
 
     try {
-        $category = $categoryMapper->findById($_GET['deleteAll']);
-        $categoryMapper->recursiveDelete($category);
+        $category = $folderMapper->findById($_GET['deleteAll']);
+        $folderMapper->recursiveDelete($category);
         $_SESSION['resourcesID'] = $category->getParent()->getId();
     } catch (Exception $e) {
         error(2);

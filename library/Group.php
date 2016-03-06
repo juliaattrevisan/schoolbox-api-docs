@@ -1,5 +1,9 @@
 <?php
 
+use \Schoolbox\UserMapper;
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Permission\Access\Access;
+
 class Group extends DeprecatedModel
 {
     public $cache = array();
@@ -407,10 +411,6 @@ class Group extends DeprecatedModel
 
     function getPermission($relationID, $userID = 0)
     {
-
-        // checks permissions for specified user
-        // returns NO_ACCESS, READ_ACCESS, WRITE_ACCESS or FULL_ACCESS
-        // default to current user
         if ($userID == 0) {
             if ($_SESSION['id']) {
                 $userID = $_SESSION['id'];
@@ -418,73 +418,19 @@ class Group extends DeprecatedModel
                 return false;
             }
         }
-        /* Cached results */
-        if (isset($this->cache[$this->_service][$relationID][$userID])) {
-            return $this->cache[$this->_service][$relationID][$userID];
-        }
 
-        /* Cache users aswell */
+        // Cache users as well
+
         if (!isset($this->cacheUser[$userID])) {
-            $userHandler = new User;
-            $this->cacheUser[$userID] = $user = $userHandler->getByID($userID);
+            $this->cacheUser[$userID] = $user = UserMapper::getInstance()->findById($userID);
         } else {
             $user = $this->cacheUser[$userID];
         }
 
-        // if superuser just return highest permission type
-        if ($user['su']) {
-            $this->cache[$this->_service][$relationID][$userID] = FULL_ACCESS;
-            return FULL_ACCESS;
-        }
-        // check individual access
-        $query = "SELECT type FROM userAccess WHERE uid = "
-            . $this->db->smartQuote($userID)
-            . " AND ( ( service = " . $this->db->smartQuote($this->_service) . " ";
-
-        if (in_array(
-            $this->_service,
-            array(HOMEPAGE_SERVICE, CALENDAR_SERVICE, HOUSEMASTER_SERVICE)
-        )) {
-            $query .= "AND sid = " . $this->db->smartQuote($relationID) . " ";
-        }
-
-        $query .= " ) ";
-
-        if ($this->_service == HOMEPAGE_SERVICE) {
-            $query .= "OR service = " . CMS_SERVICE . " ";
-        }
-
-        $query .= ") ORDER BY `type` DESC LIMIT 1 ";
-
-        $permission = $this->db->getOne($query);
-        $permission = (int)$permission;
-
-        // check group access (HOMEPAGE_SERVICE only)
-        if ($permission < WRITE_ACCESS && $this->_service == HOMEPAGE_SERVICE) {
-            $query = "SELECT type FROM perms WHERE cid="
-                . $this->db->smartQuote($relationID)
-                . " AND gid=" . $this->db->smartQuote($user['group_id']) . " ORDER BY type DESC";
-            $groupPermission = $this->db->getOne($query);
-            if ($groupPermission) {
-                $permission = $groupPermission;
-            }
-
-            /* Check subjects, allow users directly involved in a subject access regardless */
-            if ($permission < READ_ACCESS) {
-                // Allow read access to folder 0 for all users?
-                if ($relationID == 0) {
-                    $permission = READ_ACCESS;
-                } elseif ($this->involvedInSubject($relationID, $userID)) {
-                    if ($this->isStaff($userID)) {
-                        $permission = WRITE_ACCESS;
-                    } else {
-                        $permission = READ_ACCESS;
-                    }
-                }
-            }
-        }
+        $permission = Access::getInstance()->getFolderAccess($user, array($relationID));
 
         // allow staff write access to NEWS_SERVICE by default except at shore...
+        
         if ($this->isStaff($userID)
             && (Cfg::get('news_staff_post_enabled') == '1')
             && ($this->_service == NEWS_SERVICE)
@@ -493,8 +439,6 @@ class Group extends DeprecatedModel
             $permission = WRITE_ACCESS;
         }
 
-        /* Set cache */
-        $this->cache[$this->_service][$relationID][$userID] = $permission;
         return $permission;
     }
 
@@ -654,33 +598,28 @@ class Group extends DeprecatedModel
         //Fetch subject list
         $allFolders = array();
 
-        if ($userID == $_SESSION['id']) {
-            $allFolders = $_SESSION['subjects'];
-        } else {
-            $userMapper = new \Schoolbox\UserMapper();
-            $user = $userMapper->findById($userID);
+        $userMapper = new UserMapper();
+        $user = $userMapper->findById($userID);
 
-            $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+        $folderMapper = new FolderMapper();
 
-            if ($user->getExternalId()) {
-                $externalUser = new External_User;
-                $externalSubjectList = $externalUser->getSubjectList($user->getExternalId(), $user->getId());
+        if ($user->getExternalId()) {
+            $externalUser = new External_User;
+            $externalSubjectList = $externalUser->getSubjectList($user->getExternalId(), $user->getId());
 
-                if (is_array($externalSubjectList)) {
-                    foreach ($externalSubjectList as $currentSubject) {
-                        try {
-                            $folder = $folderMapper->findByCode($currentSubject['code']);
-
-                            $allFolders[$folder->getId()] = array(
-                                'id' => $folder->getId(),
-                                'name' => $folder->getName(),
-                                'parent' => $folder->getParent()->getId(),
-                                'deleted_at' => $folder->getDeletedAt(),
-                                'code' => $folder->getCodeString(),
-                                'template' => $folder->getHomepage()->getTemplate()->getId(),
-                            );
-                        } catch (\Exception $e) {
-                        }
+            if (is_array($externalSubjectList)) {
+                foreach ($externalSubjectList as $currentSubject) {
+                    try {
+                        $folder = $folderMapper->findByCode($currentSubject['code']);
+                        $allFolders[$folder->getId()] = array(
+                            'id' => $folder->getId(),
+                            'name' => $folder->getName(),
+                            'parent' => $folder->getParent()->getId(),
+                            'deleted_at' => $folder->getDeletedAt(),
+                            'code' => $folder->getCodeString(),
+                            'template' => $folder->getHomepage()->getTemplate()->getId(),
+                        );
+                    } catch (\Exception $e) {
                     }
                 }
             }
@@ -695,7 +634,7 @@ class Group extends DeprecatedModel
     /*
      * New function to make retrieving the list of user subjects easier, is deprecating involvedCategoryList
      *
-     * @see Schoolbox\Resource\CategoryMapper->getForUser() for an implementation
+     * @see Schoolbox\Resource\FolderMapper->getForUser() for an implementation
      *      that uses the mapper classes.
      */
     function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = READ_ACCESS)

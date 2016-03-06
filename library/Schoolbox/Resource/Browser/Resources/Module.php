@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
-
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
@@ -43,7 +42,6 @@ class Module extends AbstractModule
         return Controller::class;
     }
 
-
     /**
      * @param Container $ci
      * @return array
@@ -56,12 +54,9 @@ class Module extends AbstractModule
             'setFolderMapper'     => $ci->lazyNew(Resource\Folder\Mapper::class),
             'setFileMapper'       => $ci->lazyNew(Resource\File\Mapper::class),
             'setLinkMapper'       => $ci->lazyNew(Resource\LinkMapper::class),
-            'setUserAccessMapper' => $ci->lazyNew(UserAccessMapper::class),
-            'setRoleAccessMapper' => $ci->lazyNew(RoleAccessMapper::class),
             'setNodeType'         => Resource\Browser\NodeFactory::SBFS,
         ]);
     }
-
 
     /**
      * @param Container $injector
@@ -73,8 +68,6 @@ class Module extends AbstractModule
 
         $injector->params[TreeBuilder::class]['taskMapper']       = $injector->lazyNew(TaskMapper::class);
         $injector->params[TreeBuilder::class]['locator']          = $setters['setFolderMapper'];
-        $injector->params[TreeBuilder::class]['userAccessMapper'] = $setters['setUserAccessMapper'];
-        $injector->params[TreeBuilder::class]['roleAccessMapper'] = $setters['setRoleAccessMapper'];
         $injector->setters[TreeBuilder::class]['setFileLocator']  = $injector->lazy(
             function () use ($injector) {
                 return new Resource\File\CompositeLocator(new Resource\File\Mapper(), new Resource\LinkMapper());
@@ -95,5 +88,4 @@ class Module extends AbstractModule
 
         $injector->setters[$this->getControllerClass()]['setTab'] = 'resources';
     }
-
-} 
+}

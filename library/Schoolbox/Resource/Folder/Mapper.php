@@ -22,6 +22,7 @@ use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\User;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Class Mapper
@@ -36,11 +37,25 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 {
 
     /**
+     * Maximum number of recursion iterations to execute before dying
+     *
+     * @var int
+     */
+    protected $maxRecursionDepth = 100;
+
+    /**
      * Interface with external user database.
      *
      * @var External_UserInterface
      */
     protected $external_user;
+
+    /** Array of cached NNIAN nodes
+     *
+     * @var array
+     */
+    protected $cacheNnian = array();
+    protected $interimNodes = array();
 
     protected function mapping()
     {
@@ -415,6 +430,39 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 $collection->add($category);
             }
         }
+
+        return $collection;
+    }
+
+
+    /**
+     * Returns a collection of all folders that are children of the specified ID (with optional recursion)
+     *
+     * @param int $id
+     * @param bool $recurse
+     * @return Collection|\Schoolbox\Resource\Folder\Model[]
+     */
+    public function findAllChildren($id, $recurse = false)
+    {
+        $collection = new Collection();
+
+        // Find all children of this node
+
+        $children = FolderMapper::findByColumn("parent", $id);
+
+        foreach ($children as $child) {
+            $collection->add($child);
+
+            // And optionally all of its children
+
+            if ($recurse) {
+                $kids = $this->findAllChildren($child->getId(), true);
+                foreach ($kids as $kid)
+                    $collection->add($kid);
+            }
+        }
+
+        // Return what we got
 
         return $collection;
     }
@@ -952,10 +1000,20 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      *
      * @param $folderId
      * @return \Schoolbox\Resource\Folder\Model
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function findCheaplyById($folderId) {
+
+        // special case: 0 == root, but not in db
+        if ($folderId == 0) {
+            return $this->createModel()
+                ->setId(0)
+                ->setName('Root')
+                ->setParent($this->createModel()->setId('#'));
+        }
+
         $query = "
-            SELECT id, name, parent
+            SELECT id, name, parent, inherit
             FROM `{$this->getTable()}` c
             WHERE id = :folderId
         ";
@@ -967,14 +1025,18 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
-        $folder = $this->hydrate($row);
+        if ($row) {
+            $folder = $this->hydrate($row);
 
-        $parent = $this->createModel();
-        $parent->setId($folder->getParent()->getId());
+            $parent = $this->createModel();
+            $parent->setId($folder->getParent()->getId());
 
-        $folder->setParent($parent);
+            $folder->setParent($parent);
 
-        return $folder;
+            return $folder;
+        } else {
+            throw new \Schoolbox\Mapper\Exception("Instance of object not found");
+        }
     }
 
     /**
@@ -1001,5 +1063,96 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;
+    }
+
+    /**
+     * Finds the nearest non-inheriting ancestral node (NNIAN)
+     *
+     * -_-_-_-_-_-_-_,------,
+     * _-_-_-_-_-_-_-|   /\_/\
+     * -_-_-_-_-_-_-~|__( ^ .^)
+     * // _-_-_-_-_-_-_-""  ""
+     *
+     * @param Model $folder
+     * @param int $iteration
+     * @return Model
+     */
+    public function findNearestNonInheritingAncestralNode(Model $folder, $iteration = 0)
+    {
+        // Check cache first
+
+        if (isset($this->cacheNnian[$folder->getId()])) {
+            return $this->cacheNnian[$folder->getId()];
+        }
+
+        // If we've recursed too much error out
+
+        if ($iteration > $this->getMaxRecursionDepth()) {
+            throw new \Schoolbox\Mapper\Exception("Recursion limit reached");
+        }
+
+        // Check if the node inherits permissions
+
+        if ($folder->getInherit())
+        {
+            // Just another interim node, store its ID so we can cache it for later calls
+
+            $this->interimNodes[] = $folder->getId();
+
+            // Make sure we aren't hitting the root
+            if ($folder->getParent()->isRootNode())
+            {
+                // Got to the top- somethings wrong with the data in the database as this should not be possible
+                error(2);
+            }
+
+            // Round we go again
+
+            $parent = $this->findCheaplyById($folder->getParent()->getId());
+            $result = $this->findNearestNonInheritingAncestralNode($parent, $iteration++);
+        }
+        else
+        {
+            // The node doesn't inherit, we found what we were looking for! Cache it
+
+            $this->cacheNnian[$folder->getId()] = $folder;
+
+            // Cache any interim nodes we traversed as well
+
+            foreach ($this->interimNodes as $id) {
+                $this->cacheNnian[$id] = $folder;
+            }
+
+            // Clear out the array
+
+            $this->interimNodes = array();
+
+            return $folder;
+        }
+
+        return $result;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * Get max recursion depth
+     *
+     * @return int
+     */
+    protected function getMaxRecursionDepth()
+    {
+        return $this->maxRecursionDepth;
+    }
+
+    /**
+     * Set max recursion depth
+     *
+     * @param int $maxRecursionDepth
+     */
+    protected function setMaxRecursionDepth($maxRecursionDepth)
+    {
+        $this->maxRecursionDepth = $maxRecursionDepth;
     }
 }

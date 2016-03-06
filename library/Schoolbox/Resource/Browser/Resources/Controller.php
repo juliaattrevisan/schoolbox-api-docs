@@ -10,8 +10,8 @@
 namespace Schoolbox\Resource\Browser\Resources;
 
 
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractController;
@@ -20,42 +20,12 @@ use Schoolbox\User;
 
 class Controller extends AbstractController
 {
-    /** @var RoleAccessMapper */
-    protected $roleAccessMapper;
-
-    /** @var UserAccessMapper */
-    protected $userAccessMapper;
-
     /**
      * @var Resource\LinkMapper
      */
     protected $linkMapper;
 
-
     // Injectables
-
-
-    /**
-     * @param RoleAccessMapper $roleAccessMapper
-     * @return self
-     */
-    public function setRoleAccessMapper($roleAccessMapper)
-    {
-        $this->roleAccessMapper = $roleAccessMapper;
-        return $this;
-    }
-
-
-    /**
-     * @param UserAccessMapper $userAccessMapper
-     * @return self
-     */
-    public function setUserAccessMapper($userAccessMapper)
-    {
-        $this->userAccessMapper = $userAccessMapper;
-        return $this;
-    }
-
 
     /**
      * @param Resource\LinkMapper $linkMapper
@@ -90,7 +60,7 @@ class Controller extends AbstractController
             'type'      => 'link',
             'tree'      => $this->getBreadcrumbs($link->getFolder()),
             'host'      => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
-            'access'    => $this->getAccess([ $folderId ]),
+            'access'    => Access::getInstance()->getFolderAccess($this->getUser(), [ $folderId ]),
             'namespace' => $this->namespace
         ];
 
@@ -110,10 +80,10 @@ class Controller extends AbstractController
     {
         $data = parent::getFolderData($folderId);
 
-        $data['roles']  = $this->roleAccessMapper->findAllForFolder($data['folder']);
-        $data['access'] = $this->getAccess([ $folderId ]);
+        $data['roles']  = RoleAccessMapper::getInstance()->findAllForFolder($data['folder']);
+        $data['access'] = Access::getInstance()->getFolderAccess($this->getUser(), [ $folderId ]);
 
-        $admins = $this->userAccessMapper->findAdminsInCategory($data['folder']);
+        $admins = UserAccessMapper::getInstance()->findAdminsInCategory($data['folder']);
 
         if ($admins->count()) {
             $data['admin'] = $this->userMapper->findById($admins->first()->getId());
@@ -141,68 +111,6 @@ class Controller extends AbstractController
         $folder->loadTeachers();
 
         return $folder;
-    }
-
-
-    /**
-     * @param array $folderIds
-     * @return int
-     */
-    protected function getAccess(array $folderIds)
-    {
-        // Superusers always have full access
-        if ($this->getUser()->isSuperuser()) {
-            return UserAccess::ACCESS_FULL;
-        }
-
-        $accessLevels = [];
-
-        // Check CMS access level
-        try {
-            $accessLevels[] = $this->userAccessMapper
-                ->getAccess($this->getUser(), null, UserAccess::SERVICE_CMS)
-                ->getAccessLevel();
-            // Shortcircuit if access is full
-            if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
-                return UserAccess::ACCESS_FULL;
-            }
-        } catch (Mapper\Exception $e) {
-            // noop
-        }
-
-        if (count($folderIds) != 1) {
-            $accessLevels[] = $this->userAccessMapper
-                        ->userHasMinimumAccessToAll($this->getUser()->getId(), $folderIds, UserAccess::ACCESS_WRITE)
-                ? UserAccess::ACCESS_WRITE
-                : UserAccess::ACCESS_DENY;
-        } else {
-            // Check user access level
-            try {
-                $accessLevels[] = $this->userAccessMapper
-                    ->getAccess($this->getUser(), $folderIds[0])
-                    ->getAccessLevel();
-                // Shortcircuit if access is full
-                if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
-                    return UserAccess::ACCESS_FULL;
-                }
-            } catch (Mapper\Exception $e) {
-                // noop
-            }
-
-            // Check role access level
-            try {
-                $accessLevels[] = $this->roleAccessMapper
-                    ->getAccess($this->getUser(), $folderIds[0])
-                    ->getType();
-            } catch (Mapper\Exception $e) {
-                // noop
-            }
-        }
-
-        if (empty($accessLevels)) {
-            return UserAccess::ACCESS_DENY;
-        }
-        return max($accessLevels);
     }
 
 } 

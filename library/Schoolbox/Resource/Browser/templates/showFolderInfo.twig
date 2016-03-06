@@ -109,19 +109,24 @@
 
     {% if namespace == 'resourceBrowser' %}
         <h3>Permissions</h3>
-        <dl class="inline-dl">
-    {% if user.role.type == 'staff' and folder.id > 0 %}
-        {% for access in roles %}
-            <dt class="small-8">{{ access.role.name }}</dt>
-            <dd class="small-4">
-                {%- if access.type == 0 %}None{% endif -%}
-                {%- if access.type == 1 %}Read{% endif -%}
-                {%- if access.type == 2 %}Write{% endif -%}
-            </dd>
-        {% endfor %}
-    {% endif %}
-
-        </dl>
+        {% if folder.getInherit %}
+            <dl class="inline-dl">
+                <dd>This folder inherits its permission from the '<a href='/homepage/{{ parent.getId }}'>{{ parent.getName }}</a>' folder.</dd>
+            </dl>
+        {% else %}
+            <dl class="inline-dl">
+                {% if user.role.type == 'staff' and folder.id > 0 %}
+                    {% for access in roles %}
+                        <dt class="small-8">{{ access.role.name }}</dt>
+                        <dd class="small-4">
+                            {%- if access.type == 0 %}None{% endif -%}
+                            {%- if access.type == 1 %}Read{% endif -%}
+                            {%- if access.type == 2 %}Write{% endif -%}
+                        </dd>
+                    {% endfor %}
+                {% endif %}
+            </dl>
+        {% endif %}
     {% endif %}
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 

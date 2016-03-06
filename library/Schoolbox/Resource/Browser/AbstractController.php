@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Config;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
@@ -150,7 +151,7 @@ abstract class AbstractController extends BaseController
     protected function getFolderData($folderId)
     {
         // find out if we have access to the requested folder
-        $access = $this->getAccess([ $folderId ]);
+        $access = Access::getInstance()->getFolderAccess($this->getUser(), [ $folderId ]);
 
         // special case for root, just let that through to the keeper
         if ($access < UserAccess::ACCESS_READ && $folderId != 0) {
@@ -170,9 +171,12 @@ abstract class AbstractController extends BaseController
             $tree = [];
         }
 
+    $parent = \Schoolbox\Resource\Folder\Mapper::getInstance()->findCheaplyById($folder->getParent()->getId());
+
         return [
             'tree'      => $tree,
             'folder'    => $folder,
+            'parent'    => $parent,
             'icon'      => $this->treeBuilder->getFolderIcon($folder),
             'access'    => $access,
             'user'      => $this->getUser(),
@@ -322,7 +326,7 @@ abstract class AbstractController extends BaseController
             'type'   => 'file',
             'tree'   => $this->getBreadcrumbs($file->getFolder()),
             'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
-            'access' => $this->getAccess([ $folderId ]),
+            'access' => Access::getInstance()->getFolderAccess($this->getUser(), [ $folderId ]),
             'namespace' => $this->namespace
         ];
 
@@ -332,7 +336,6 @@ abstract class AbstractController extends BaseController
             'data'     => $data,
         ]);
     }
-
 
     /**
      * @api GET /resources/file/:fileIds/info
@@ -348,7 +351,7 @@ abstract class AbstractController extends BaseController
         $data = [
             'files'  => $fileIds,
             'user'   => $this->getUser(),
-            'access' => $this->getAccess($folderIds),
+            'access' => Access::getInstance()->getFolderAccess($this->getUser(), [$folderIds]),
             'namespace' => $this->namespace
         ];
 
@@ -411,12 +414,6 @@ abstract class AbstractController extends BaseController
     {
         return $this->folderMapper->findById($folderId);
     }
-
-    /**
-     * @param array $folderIds
-     * @return int
-     */
-    protected abstract function getAccess(array $folderIds);
 
     /**
      * @param  string $tab

@@ -56,27 +56,78 @@ if (is_numeric($this->arg[0])) {
     $this->setTitle('Modify Category');
     $this->setTab('resources');
 
+    $roleMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
+
+    if ($folder->getInherit()) {
+
+        // The node currently inherits from its parent. Pre-populate the permission details with
+        // those from its nearest non-inheriting ancestral node (NNIAN)
+
+        $permissionFolder = \Schoolbox\Resource\CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
+        $allRoleAccess = $roleMapper->findAllForFolder($permissionFolder);
+
+        // Class code can't be the same otherwise you get a "Unable to create or modify folder as class code
+        // already exists." error message, so just setting it to be blank
+
+        $code = '';
+
+        $curriculumCodeInput = $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $permissionFolder->getCurriculumNodes(), 'renderButton' => false,]
+        );
+
+        // Get the curriculum codes from the NNIAN node
+
+        $permissionFolder = \Schoolbox\Resource\CategoryMapper::getInstance()->findById($permissionFolder->getId());
+
+        $curriculumCodeInput = $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $permissionFolder->getCurriculumNodes(), 'renderButton' => false,]
+        );
+
+    } else {
+
+        // Get the roles for the current node
+
+        $allRoleAccess = $roleMapper->findAllForFolder($folder);
+
+        // Get the class codes for the current node
+
+        $code = Scrub::text($folder->getCodeString());
+
+        // Get the curriculum codes for the current node
+
+        $curriculumCodeInput = $this->getTwig()->render(
+            'sub/curriculumCodeSelector.twig',
+            ['codeList' => $folder->getCurriculumNodes(), 'renderButton' => false,]
+        );
+    }
+
+
+    $curriculumBrowseButton = $this->getTwig()->render(
+        'sub/curriculumBrowseButton.twig'
+    );
+
+    $parentFolder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findCheaplyById($folder->getParent()->getId());
+
     $output = array(
         'ACTION' => 'Modify',
         'CATEGORY_ID' => $folder->getId(),
+        'PARENT_FOLDER_NAME' => $parentFolder ? $parentFolder->getName() : '',
+        'PARENT_FOLDER_ID' => $parentFolder ? $parentFolder->getId() : '',
         'NAME' => Scrub::text($folder->getName()),
         'ACCESS_WRITE' => UserAccess::ACCESS_WRITE,
         'INHERIT_SELECTED' => $folder->getInherit() ? 'checked' : '',
-        'HIDE_PERMISSIONS' => $folder->getInherit() ? 'none' : 'block',         // Hide individual permissions if inherit ticked
+        'HIDE_PERMISSIONS' => $folder->getInherit() ? 'hide' : '',         // Hide individual permissions if inherit ticked
         'HIDE_INHERIT' => $folder->getParent()->getId() == 0 ? 'hide' : '',         // Root level items cannot use inheritance
-        'CODE' => Scrub::text($folder->getCodeString()),
+        'CODE' => $code,
         'PARENT_ID' => $folder->getParent()->getId(),
         'PARENT_NAME' => Scrub::text($folderParent->getName()),
         'USER_GROUP' => $_SESSION['gid'],
         'DATABASE_TYPE' => ucfirst(Cfg::get('external_type')),
         'REQUIRED_PERMS' => $_SESSION['gid'],
-        'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
-            'sub/curriculumCodeSelector.twig',
-            ['codeList' => $folder->getCurriculumNodes(), 'renderButton' => false,]
-        ),
-        'CURRICULUM_BROWSE_BUTTON' => $this->getTwig()->render(
-            'sub/curriculumBrowseButton.twig'
-        ),
+        'CURRICULUM_CODE_INPUT' => $curriculumCodeInput,
+        'CURRICULUM_BROWSE_BUTTON' => $curriculumBrowseButton,
     );
 
     $this->setVar($output);
@@ -96,10 +147,8 @@ if (is_numeric($this->arg[0])) {
     $keepExisting->setName('Keep Existing')->setId(0);
     $homepageTemplateList->prepend($keepExisting);
 
-    $this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content, array('name'=>'TEMPLATE_NAME','id'=>'TEMPLATE_ID' ));
-
-    $roleMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
-    $allRoleAccess = $roleMapper->findAllForFolder($folder);
+    $this->dropDown('template_list', $homepageTemplateList, '', TEMPLATE_content,
+        array('name' => 'TEMPLATE_NAME', 'id' => 'TEMPLATE_ID'));
 
     if ($allRoleAccess->count()) {
         foreach ($allRoleAccess as $currentRoleAccess) {
@@ -120,13 +169,16 @@ if (is_numeric($this->arg[0])) {
 
     $userAccessMapper = new \Schoolbox\Permission\Access\UserAccessMapper();
 
-    if ($_SESSION['user']->isSuperuser() || $userAccessMapper->isFolderOwner($_SESSION['user'], $folder)) {
+    if ($folder->getInherit()) {
+        $this->setVar('indiv_modify_block', '');
         $this->setVar('indiv_perms_block', '');
-        $this->parse('indiv_modify_block', 'indiv_modify');
     } else {
-        if ($userAccessMapper->hasFolderOwner($folder)) {
+        if ($_SESSION['user']->isSuperuser() || $userAccessMapper->isFolderOwner($_SESSION['user'], $folder)) {
             $this->setVar('indiv_perms_block', '');
-            $this->setVar('indiv_modify_block', '');
+            $this->parse('indiv_modify_block', 'indiv_modify');
+        } else if ($userAccessMapper->hasFolderOwner($folder)) {
+                $this->setVar('indiv_perms_block', '');
+                $this->setVar('indiv_modify_block', '');
         } else {
             $this->parse('indiv_perms_block', 'indiv_perms');
             $this->setVar('indiv_modify_block', '');
@@ -200,10 +252,12 @@ else {
         $this->setVar(array(
             'ACTION' => 'Add',
             'CATEGORY_ID' => '',
+            'PARENT_FOLDER_NAME' => $folderParent->getName(),
+            'PARENT_FOLDER_ID' => $folderParent->getId(),
             'NAME' => '',
             'ACCESS_WRITE' => UserAccess::ACCESS_WRITE,
             'INHERIT_SELECTED' => $folderParent->getInherit() ? 'checked' : '',             // Default to parents inheritance status
-            'HIDE_PERMISSIONS' => $folderParent->getInherit() ? 'none' : 'block',           // Hide individual permissions if parent inherits
+            'HIDE_PERMISSIONS' => $folderParent->getInherit() ? 'hide' : '',           // Hide individual permissions if parent inherits
             'HIDE_INHERIT' => $this->arg[1] == 0 ? 'hide' : '',                        // Root level items cannot use inheritance
             'CODE' => '',
             'CURRICULUM_CODE_LIST' => json_encode([]),

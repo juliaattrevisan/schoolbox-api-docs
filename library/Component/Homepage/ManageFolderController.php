@@ -58,7 +58,11 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         }
         if ($this->permission >= FULL_ACCESS) {
             //is owner of area
-            $this->parse("manage_page_block", "manage_page");
+            if ($this->getContext()->getInherit()) {
+                $this->setVar("manage_page_block", "");
+            } else {
+                $this->parse("manage_page_block", "manage_page");
+            }
         } else {
             $this->setVar("manage_page_block", "");
         }
