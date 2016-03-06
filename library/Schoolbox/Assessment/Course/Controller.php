@@ -141,7 +141,9 @@ class Controller extends BaseController
      * @param string $template
      */
     protected function displayCourseList($template) {
-        $data = $this->getCourseMapper()->findCourseList($this->getRequest()->query->get('query'));
+
+        $query = $this->getRequest()->query;
+        $data  = $this->getCourseMapper()->findCourseList($query->get('query'));
 
         if ($this->getRequest()->isXhr()) {
             $options = [
@@ -160,6 +162,14 @@ class Controller extends BaseController
                 'linkToUnits'   => true,
                 'hasClose'      => false,
             ];
+        }
+
+        $component = $query->get('component');
+        $folder    = $query->get('folder');
+
+        if ($folder) {
+            $options['folder']['id'] = $folder;
+            $options['component']['id'] = $component ?: "0.0"; // TODO replace: this is a hack to make the old import page work without an explicit component instance ID
         }
 
         $this->tpl($template, array_merge($data, $options));
