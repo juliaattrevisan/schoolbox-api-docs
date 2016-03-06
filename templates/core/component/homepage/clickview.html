@@ -21,6 +21,8 @@
                         }
                     });
 
+                    $('#component{COMPONENT_INSTANCE_ID}').find("input[name~='url']").val(args.embedLink);
+
                     dialog.foundation('reveal', 'close');
                     //The plugin should be reinitialised to be used again, to do this simply reload the iframe.
                     $('#plugin-frame{COMPONENT_INSTANCE_ID}').attr('src', $('#plugin-frame{COMPONENT_INSTANCE_ID}').attr('src'));
