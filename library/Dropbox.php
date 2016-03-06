@@ -89,10 +89,10 @@ class Dropbox {
             'file_size' => $filesize,
         );
 
-        $this->db->dbInsertRow('dropbox', $file);
+        $this->db->insert('dropbox', $file);
 
         //get file ID from INSERT
-        $fileId = $this->db->dbInsertId();
+        $fileId = $this->db->insertID();
 
         if ($file_loc) {
             //save file using file ID as name
@@ -125,7 +125,7 @@ class Dropbox {
         //ok all checks completed
 
         //now delete file by updating it as deleted
-        $this->db->dbDeleteRow('dropbox', 'id', $id);
+        $this->db->delete('dropbox', 'id', $id);
         @unlink(Cfg::get('dropbox_dir') . "/" . $id . '.dat');
 
         return $fileInfo['category'];
