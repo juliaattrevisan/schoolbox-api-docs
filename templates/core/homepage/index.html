@@ -195,7 +195,13 @@
 
         /* Attach Course Selector Modal listeners
          */
-        $.fn.courseSelectorModal();
+        $.fn.courseSelectorModal({
+            courseSelector: {
+                query: {
+                    folder: {ID}
+                }
+            }
+        });
     });
 </script>
 <!-- END modify_layout -->
