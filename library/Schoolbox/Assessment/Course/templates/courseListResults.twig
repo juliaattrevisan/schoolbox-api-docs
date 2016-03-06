@@ -5,6 +5,11 @@
         <ul class="information-list">
             {% for course in courses %}
                 {% set cparents = lineage[course.id] %}
+                {# TODO: replace the first clause of the ternary with a routeLookup() once a route exists #}
+                {% set linkhref =
+                    folder.id
+                        ? ['/course','import', folder.id, component.id ?: 0, course.id] | join('/')
+                        : routeLookup('course.modifyCourse', { id: course.id }) %}
 
                 {% if hasTot %}
                     <li class="actions-small-2">
@@ -14,7 +19,7 @@
 
                 <div class="list-item">
                     <div class="compact avatar card small-12">
-                        <a href="/course/modify/{{ course.id }}">
+                        <a href="{{ linkhref }}">
                             <div class="icon-course icon-16"></div>
                             <h3>{{ course.name }}</h3>
                         </a>
