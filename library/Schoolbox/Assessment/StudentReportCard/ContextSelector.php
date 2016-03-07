@@ -294,7 +294,7 @@ class ContextSelector {
 				'SUBJECT_ID' => $catId,
 				'SUBJECT_HREF' => implode('/', $thisHref),
 				'SUBJECT_SELECTED' => $selectedId == $catId ? 'selected="selected"' : '',
-				'SUBJECT_NAME' => $category->getName()
+				'SUBJECT_NAME' => $category->getNameWithCodes()
 			);
 		}
 

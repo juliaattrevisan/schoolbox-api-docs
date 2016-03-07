@@ -98,6 +98,22 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
+     * Get name of category with list of class codes (eg. 'Chemistry (CH123)')
+     *
+     * @return string
+     */
+    public function getNameWithCodes()
+    {
+        $codes = $this->getCodeString();
+
+        if (!empty($codes)) {
+            $codes = " ({$codes})";
+        }
+
+        return $this->getName() . $codes;
+    }
+
+    /**
      * Get code string
      *
      * Gets your category codes in a , seperated string
