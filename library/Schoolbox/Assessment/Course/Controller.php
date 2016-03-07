@@ -238,6 +238,36 @@ class Controller extends BaseController
     }
 
     /**
+     * Get a list of all the Folders which should
+     * receive the selected Course
+     */
+    public function importClasses()
+    {
+
+        $data = [
+            [
+                'id' => 'class1',
+                'name' => 'Class 1',
+            ],
+            [
+                'id' => 'class2',
+                'name' => 'Class 2',
+            ],
+            [
+                'id' => 'class3',
+                'name' => 'Class 3',
+            ],
+            [
+                'id' => 'class4',
+                'name' => 'Class 4',
+            ],
+        ];
+
+        echo json_encode($data);
+        exit();
+    }
+
+    /**
      * Import a Course into a set of Folders (classes)
      */
     public function import($id)
@@ -246,6 +276,12 @@ class Controller extends BaseController
 
         try {
             $course = $this->getCourseMapper()->findById($id);
+
+            $data = [
+                'course' => $course
+            ];
+
+            new \Alaress_Probe($course);
         }
         catch (\Exception $e) {
 

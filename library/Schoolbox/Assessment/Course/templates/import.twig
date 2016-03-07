@@ -1,3 +1,19 @@
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript">
+    $(function() {
+        // Add selectize for user selection and selector for related items
+        $('#import-folders').selectizeSelector({
+            ajax: {
+                url:      '/course/import/classes',
+                type:     'GET',
+                dataType: 'json'
+            },
+            multiple: true
+        })
+    });
+</script>
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Import Course Into Class</h1>
@@ -8,14 +24,16 @@
     <div class="small-12 island">
         <section class="content">
             <div class="row">
-                <div class="small-3 columns">
-                    Course
+                <div class="small-2 columns">
+                    <p>
+                        {{ course.name }}
+                    </p>
                 </div>
-                <div class="small-1 columns">
+                <div class="small-1 columns text-center">
                     &rarr;
                 </div>
-                <div class="small-8 columns">
-                    selectize
+                <div class="small-9 columns">
+                    <input id="import-folders" type="text" name="importFolders" />
                 </div>
             </div>
         </section>
