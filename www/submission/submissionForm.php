@@ -301,7 +301,7 @@ if (isset($grid)) {
 }
 
 if ($_POST["return_url"] != '') {
-    $page->localRedir(base64_decode($_POST["return_url"]));
+    $page->localRedir(base64_decode(urldecode($_POST["return_url"])));
 } else {
     $page->localRedir($is_task ? "/homepage/$categoryID" : "/submission/listSubmission/{$submission->getDueDate()->getYear()}/{$submission->getDueDate()->getYearHalf()}");
 }

@@ -277,7 +277,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         $this->setVar(
             array(
                 'UNIT_ID'                     => Scrub::text($unit->getId()),
-                'RETURN_URL'                  => base64_encode($_GET['page']),
+                'RETURN_URL'                  => urlencode(base64_encode($_GET["page"])),
                 'UNIT_HOMEPAGE_ID'            => Scrub::text($unit->getUnitCategory()->getId()),
                 'UNIT_NAME'                   => Scrub::text($unit->getTitle()),
                 'UNIT_OPEN_DATE'              => Scrub::text($unit->getOpenDate()->getDatabaseDate()),
@@ -285,7 +285,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 'UNIT_STUDENT_COUNT'          => count($this->student_list),
                 'UNIT_TASK_COMPLETE_CLASS'    => '',
                 'UNIT_EXPANDED_STATE'         => ($is_expanded ? 'expanded' : 'collapsed'),
-                'UNIT_EXPANDED_STATE_ICON'    => ($is_expanded  ? 'icon-up-arrow' : 'icon-down-arrow'),
+                'UNIT_EXPANDED_STATE_ICON'    => ($is_expanded ? 'icon-up-arrow' : 'icon-down-arrow'),
                 'UNIT_LIST_CLASS'             => ($is_expanded ? '' : 'hide'),
                 'unit_task_block'             => '',
                 'unit_task_allow_move_block'  => '',

@@ -98,7 +98,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
             array(
                 'SESSION_NAME'   => session_name(),
                 'SESSION_ID'     => session_id(),
-                'RETURN_URL'     => base64_encode($_GET["page"]),
+                'RETURN_URL'     => urlencode(base64_encode($_GET["page"])),
                 'COMPONENT_NAME' => $this->getConfig('componentname'),
                 'UNIT_LIST'      => json_encode(
                     $this->unitList->map(

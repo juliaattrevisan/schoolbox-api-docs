@@ -156,7 +156,7 @@ else {
     $this->setVar(array(
         'ACTION'                    => 'modify',
         'RETURN_URL'                => $_GET["return_url"],
-        'RETURN_URL_DECODED'        => base64_decode($_GET["return_url"]),
+        'RETURN_URL_DECODED'        => base64_decode(urldecode($_GET["return_url"])),
         'ASSESS_HEADING'            => Scrub::text($assessment->getTitle()),
         'ASSESS_ACTION'             => 'Modify',
         'ASSESS_KIND_LC'            => 'assess',

@@ -46,7 +46,7 @@ $return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : 
 
 $this->setVar(array(
     'RETURN_URL'           => $return_url,
-    'RETURN_URL_DECODED'   => base64_decode($_GET["return_url"]) == '' ? "/homepage/{$folder->getId()}" : base64_decode($_GET["return_url"]),
+    'RETURN_URL_DECODED'   => base64_decode(urldecode($_GET["return_url"])) == '' ? "/homepage/{$folder->getId()}" : base64_decode(urldecode($_GET["return_url"])),
     'ASSESS_ASSESS_ID'     => $this->arg[0],
     'ASSESS_KIND_LC'       => 'assess',
     'ASSESS_KIND'          => 'Quiz',

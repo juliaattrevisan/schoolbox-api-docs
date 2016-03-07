@@ -18,32 +18,34 @@ CREATE TABLE schoolbox.course_builder_config
 
 -- Default all permissions to none
 
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (1, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (2, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (3, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (4, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (5, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (6, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (7, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (8, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (9, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (10, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (11, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (12, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (13, 0, 'course');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (14, 0, 'course');
-
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (1, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (2, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (3, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (4, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (5, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (6, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (7, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (8, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (9, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (10, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (11, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (12, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (13, 0, 'unit');
-INSERT INTO schoolbox.course_builder_config (role_id, permission, page) VALUES (14, 0, 'unit');
+INSERT INTO schoolbox.course_builder_config
+  (role_id, permission, page)
+VALUES
+  (1, 0, 'course'),
+  (2, 0, 'course'),
+  (3, 0, 'course'),
+  (4, 0, 'course'),
+  (5, 0, 'course'),
+  (6, 0, 'course'),
+  (7, 0, 'course'),
+  (8, 0, 'course'),
+  (9, 0, 'course'),
+  (10, 0, 'course'),
+  (11, 0, 'course'),
+  (12, 0, 'course'),
+  (13, 0, 'course'),
+  (14, 0, 'course'),
+  (1, 0, 'unit'),
+  (2, 0, 'unit'),
+  (3, 0, 'unit'),
+  (4, 0, 'unit'),
+  (5, 0, 'unit'),
+  (6, 0, 'unit'),
+  (7, 0, 'unit'),
+  (8, 0, 'unit'),
+  (9, 0, 'unit'),
+  (10, 0, 'unit'),
+  (11, 0, 'unit'),
+  (12, 0, 'unit'),
+  (13, 0, 'unit'),
+  (14, 0, 'unit');

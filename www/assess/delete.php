@@ -71,7 +71,7 @@ $mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
 $mapper->delete($mapper->findById($assessId));
 
 if ($_GET["return_url"] != "")
-	SitePage::localRedir(base64_decode($_GET["return_url"]));
+	SitePage::localRedir(base64_decode(urldecode($_GET["return_url"])));
 else {
 	$this->setFile(TEMPLATE_content, 'assess/deleted.html');
 
