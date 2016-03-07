@@ -17,14 +17,14 @@
 <div class="row">
     <div class="small-12 island">
         <h1>{{ folder.id ? 'Modify' : 'New' }} Course</h1>
-        <form>
+        <form method="post">
             <section>
-                <fieldset class="content">
+                <fieldset class="content" data-mage="course-info">
                     <legend>Course Information</legend>
                     <input type="hidden" name="id" value="{{ folder.id }}">
                     <div class="small-12 column">
                         <label>Name
-                            <input type="text" name="name" value="{{ folder.name }}" placeholder="What's this course called?" />
+                            <input type="text" name="name" value="{{ folder.name }}" placeholder="What's this course called?" required />
                         </label>
                     </div>
                     <div class="small-12 column">
@@ -42,25 +42,28 @@
                             {% include 'sub/curriculumCodeSelector.twig' with { renderButton: false, codeList: folder.curriculumNodes } %}
                         </label>
                     </div>
-                    <div {% if folder.id %}class="hide"{% endif %}>
+                    {% if not folder.id %}
+                    <div data-mage-submitrow>
                         <div class="small-12 medium-8 column">
                             <!-- Don't delete the inline style, it's needed -->
-                            <p data-errorreason style="display:none;" class="alert alert-box icon-alert"></p>
+                            <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
                         </div>
                         <div class="small-12 medium-4 column">
                             <input type="submit" class="button" value="Next" data-mage-next="unit-info" data-mage-working="Working..." formaction="{{ folder.id ? routeLookup('course.updateCourse') : routeLookup('course.createCourse') }}" />
                         </div>
                     </div>
+                    {% endif %}
                 </fieldset>
-                <fieldset class="content">
+                <fieldset class="content" data-mage="unit-info" {% if not folder.id %} disabled="disabled"{% endif %}>
                     <legend>Units</legend>
                     <div class="small-12 column no-pad">
                         <!-- Don't delete the inline style, it's needed -->
-                        <ul class="information-list" {% if not folder.id %}style="display:none;"{% endif %} data-formpartial="units">
+                        <ul class="information-list" {% if not folder.id %}style="display:none;"{% endif %} data-mage-collapsed>
                         {% for unit in units %}
                             {% include '@course/unit.twig' with { i: loop.index, '_writable': true } %}
                         {% endfor %}
                             <li class="actions-small-1" data-unit>
+                                <input type="hidden" name="id" value="{{ folder.id }}" data-folder-id>
                                 <div class="list-item content">
                                     <div class="small-1 column">
                                         <span class="icon-add"></span>
@@ -95,6 +98,7 @@
     </div>
 </div>
 <div id="parent-select" data-reveal class="reveal-modal"></div>
+<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript">
     $(function () {
@@ -123,80 +127,39 @@
 
         });
 
-        $('[data-formpartial-expose]').on('click', function (e) {
-            e.preventDefault();
+        var noonitName = $('#noonit-name');
 
-            // intercept the form submit, ajax the partial, upon success expose the next section and hide self
-            var $button    = $(this),
-                target     = $button.data('formpartial-expose'),
-                $expose    = $('[data-formpartial="' + target + '"]'),
-                realForm   = $button.closest('form'),
-                $fieldset  = $button.closest('fieldset'),
-                $errMsg    = $fieldset.find('[data-errorreason]'),
-                formData   = $fieldset.clone(),
-                slideSpeed = 800,
-                ajaxForm   = $('<form/>').attr('method', realForm.attr('method')).attr('action', realForm.attr('action')).append(formData);
+        // default setup
+        $('input[data-mage-next]').mage();
 
-            $fieldset.attr('disabled','disabled');
-            $errMsg.slideUp(100);
-
-
-            // cache this for if we need to restore it
-            var buttonText = $button.val();
-
-            $button.attr('readonly', 'readonly').val('Working...');
-
-            var success = function () {
-                $button.closest('div').slideUp(slideSpeed, always);
-                $expose.slideDown(slideSpeed);
-            };
-
-            var failure = function (data) {
-                $button.val(buttonText);
-
-                var nm  = formData.find('input[type=text]').eq(0).val() || 'this unnamed course';
-                var msg = 'Unable to save ' + nm + ', because ' + data + '.';
-
-                $errMsg.text(msg).slideDown(slideSpeed);
-            };
-
-            var always = function () {
-                $fieldset.removeAttr('disabled');
-                $button.removeAttr('readonly');
-            };
-
-
-            // TODO ajax, and handle success / failure
-            setTimeout(function () {
-
-                if ($errMsg.text().length) {
-                    success();
-                } else {
-                    failure('of reasons that I feel disinclined to share with you. But it\'s mostly just that I don\'t like you');
+        // overloads
+        $('[data-mage-next="unit-info"]').mage({
+            reenablePrevious: true,
+            onXhrDone: function (data) {
+                if (data.id) {
+                    history.pushState(data, '', '/course/modify/' + data.id);
+                    $('[data-folder-id]').val(data.id);
                 }
 
-                always();
-            }, 1200);
-
+            }
         });
 
-        $('#noonit').on('click', function (e) {
-            e.preventDefault();
+        $('[data-mage-next="spawn-unit"]').mage({
+            reenablePrevious: true,
+            submittable: '[data-unit]',
 
+            setFormData: function (formData) {
+                formData.name = noonitName.val();
+            },
 
-            var $before = $(this).closest('li[data-unit]');
-
-            var noonitName = $('#noonit-name');
-
-            $.post('/sandbox/course/unit/new', { name: noonitName.val() }).done(function (data) {
-                $before.before(data);
-                $('[data-collapser]').collapsable();
+            onXhrDone: function (data) {
+                var newDOM = $(data).hide();
+                $(this).closest('[data-unit]').before(newDOM);
+                newDOM.slideDown();
+                newDOM.find('[data-collapser]').collapsable();
                 noonitName.val('');
-            }).fail(function () {
-
-            }).always(function () {
-
-            });
+                $(this).val($(this).data('mage-reset')).removeAttr('readonly');
+            }
         });
 
     });
