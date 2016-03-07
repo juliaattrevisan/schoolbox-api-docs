@@ -334,7 +334,7 @@
 
         var rows = $rb.find('tr');
 
-        var levelCount = rows.eq(0).children('td,th').length - 3;
+        var levelCount = rows.eq(0).find('[data-sequencer-group="levels"]').length;
 
         // how can it be less than zer0? this is a just-in-case...
         if (levelCount <= 0) {
