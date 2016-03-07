@@ -26,8 +26,13 @@
          * the Units and Tasks are
          */
         $(document).on('change', '#import-course', function(event) {
+
+            /* Clear current information
+             */
+            $('#importResults').html('').addClass('loader');
+
             $.get('/course/importResults/' + $(this).val(), function (responseText) {
-                $('#importResults').html(responseText);
+                $('#importResults').html(responseText).removeClass('loader');
             });
         });
     });
@@ -58,5 +63,7 @@
 </div>
 
 <div id="importResults">
-    {% include '@course/importResults.twig' %}
+    {% if folder.id %}
+        {% include '@course/importResults.twig' %}
+    {% endif %}
 </div>
