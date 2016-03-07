@@ -54,6 +54,13 @@ $obtainCorrectLevelsQuery = $db->prepare("
     WHERE box_id = :boxId
 ");
 
+$insertCorrectLevelQuery = $db->prepare("
+    INSERT INTO rubric_level
+    (box_id, name, sequence)
+    VALUES
+    (:boxId, :levelName, :levelSequence)
+");
+
 $updateDescriptorQuery = $db->prepare("
     UPDATE rubric_descriptor
     SET level_id = :correctLevelId
@@ -84,8 +91,18 @@ foreach ($descriptorQuery as $row) {
     }
 
     $obtainCorrectLevelsQuery->execute([ 'boxId' => $row['boxId'] ]);
-    while ($r = $obtainCorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
-        $map[$r['sequence']]['good'] = $r['id'];
+    if ($obtainCorrectLevelsQuery->rowCount()) {
+        while ($r = $obtainCorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
+            $map[$r['sequence']]['good'] = $r['id'];
+        }
+    } else {
+        $logger->info("Correct level does not exist - adding it");
+        $insertCorrectLevelQuery->execute([
+            'boxId'         => $row['boxId'],
+            'levelName'     => $row['levelName'],
+            'levelSequence' => $row['levelSequence'],
+        ]);
+        $map[$r['sequence']]['good'] = $db->lastInsertId();
     }
 
     // now update the descriptors
