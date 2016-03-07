@@ -457,14 +457,15 @@ class Controller extends BaseController
         }
 
         // Make sure the user has permission to perform the action
-
         if (is_numeric($postData['categoryID'])) {
-
+            // check this user has write access
             if (Access::getInstance()->getFolderAccess($this->getUser(), [ $postData['categoryID'] ]) < UserAccess::ACCESS_WRITE) {
                 throw new OutOfBoundsException("I find your lack of access disturbing.");
             }
             $model->setId($postData['categoryID']);
+
         } elseif (Access::getInstance()->getFolderAccess($this->getUser(), [ $postData['parent'] ]) < UserAccess::ACCESS_WRITE) {
+            // check this user has access to the parent folder
             throw new OutOfBoundsException("I find your lack of access disturbing.");
         }
 
@@ -493,10 +494,12 @@ class Controller extends BaseController
 
         $model->setId($affectedIds[0]);
 
-        if ($postData["inherit"] == 0)
-        {
+        if ($postData["inherit"] == 0) {
+            // only allow recursive permissions to supers
+            $recursive = $this->getUser()->isSuperuser() && $postData['recursive'];
+
             // If rolepermission collection is defined, reapply permissions (possibly recursively)
-            RoleAccessMapper::getInstance()->savePermissions($model, $postData['group'], $postData['recursive']);
+            RoleAccessMapper::getInstance()->savePermissions($model, $postData['group'], $recursive);
         }
 
         // Recurse inheritance
