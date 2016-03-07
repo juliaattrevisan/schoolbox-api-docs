@@ -29,7 +29,11 @@
             <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
             <tr>
                 <td width="640">
+                    {% if config.forgotten_password == '0' %}
+                        <p>Username: {{ user.getUsername() }}</p>
+                    {% endif %}
                     <p>
+                        Reset Link:
                         <a href="http://{{ config.fqdn|e('html_attr') }}/passwordReset/{{ reset.getToken()|e('html_attr') }}">
                             http://{{ config.fqdn }}/passwordReset/{{ reset.getToken() }}
                         </a>

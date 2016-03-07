@@ -30,6 +30,7 @@ class CoreContext {
             'site_location',
             'site_domain',
             'skin_builder',
+            'forgotten_password',
         );
 
         foreach($required as $key) {
