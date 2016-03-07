@@ -1,9 +1,9 @@
 <li class="actions-small-1 content">
-    <div class="small-12 columns">
-        {{ unit.name }}
-    </div>
+    <h3>
+        <a href="#" title="View Profile">{{ unit.name }}</a>
+    </h3>
 
-    <ul class="information-list">
+    <ul class="information-list no-pad">
         {# TODO replace this with actual data lookup #}
         {% for task in tasks[unit.id] %}
             {% include '@course/taskList.twig' %}

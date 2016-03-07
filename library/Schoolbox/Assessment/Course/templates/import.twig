@@ -25,9 +25,11 @@
         <section class="content">
             <div class="row">
                 <div class="small-2 columns">
-                    <p>
-                        {{ folder.name }}
-                    </p>
+                    <div class="info card">
+                        <a href="#" title="View Profile">
+                            <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
+                        </a>
+                    </div>
                 </div>
                 <div class="small-1 columns text-center">
                     &rarr;
