@@ -1,7 +1,7 @@
 <li class="actions-small-1 content" data-unit>
     <div class="list-item">
         <div class="small-1 column">
-            <span data-collapser="unit-{{ i }}" class="icon-down-arrow"></span>
+            <a data-collapser="unit-{{ i }}" class="icon-down-arrow"></a>
         </div>
         <div class="small-11 column">
             <label>
@@ -9,12 +9,17 @@
             </label>
         </div>
     </div>
-    <nav><a href="#" class="icon-overflow"></a></nav>
+    <nav>
+        <a class="icon-overflow" title="" data-dropdown="unit-{{ i }}-modify"></a>
+    </nav>
+    <ul id="unit-{{ i }}-modify" class="f-dropdown" data-dropdown-content>
+        <li><a href="/course/unit/{{ unit.id }}/delete" class="icon-delete" data-delete="unit">Delete Unit</a></li>
+    </ul>
     <div class="small-12 column hide" data-collapsable="unit-{{ i }}" data-collapse-state="collapsed">
         <ul class="information-list sortable" data-sortable>
             {# TODO replace this with actual data lookup #}
-            {% for j in 0..(3 + random(4)) %}
-                {% include '@course/task-item.twig' with { icon: random(icons) } %}
+            {% for task in tasks[unit.id] %}
+                {% include '@course/task-item.twig' %}
             {% endfor %}
         </ul>
         <ul class="flex-list buttons">

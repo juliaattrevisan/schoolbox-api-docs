@@ -1,21 +1,28 @@
+{# list of task actions #}
+{% set actions = ['modify', 'delete'] %}
+
 <li class="actions-small-1 actions-large-2">
     <div class="list-item">
         <div class="grip"></div>
-        <div class="small avatar card small-11 wrap-down">
-            <a href="#">
-                <div class="icon-{{ icon | replace(' ', '-') }} icon-16"></div>
-                <h3>What did you learn from today's reading?</h3>
-                <p class="meta">{{ icon | title }}</p>
-            </a>
+        <div class="compact avatar card small-11 wrap-down">
+            <div class="{{ task.iconClass }} icon-16"></div>
+            <p>{{ task.title }}</p>
+            <p class="meta">{{ task.label }}</p>
         </div>
     </div>
     <nav>
         <span class="show-for-large-up">
-            <a href="#" class="icon-modify" title="Modify"></a>
-            <a href="#" class="icon-delete" title="Delete"></a>
+            {% for action in actions %}
+                <a href="/task/{{ action }}/{{ task.id }}" class="icon-{{ action }}" title="{{ action | capitalize }}"></a>
+            {% endfor %}
         </span>
         <span class="hide-for-large-up">
-            <a href="#" class="icon-overflow"></a>
+            <a href="#" class="icon-overflow" data-dropdown="dropdown-{{ task.id }}"></a>
         </span>
     </nav>
+    <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ task.id }}">
+        {% for action in actions %}
+            <li><a href="/task/{{ action }}/{{ task.id }}" class="icon-{{ action }}">{{ action | capitalize }}</a></li>
+        {% endfor %}
+    </ul>
 </li>
