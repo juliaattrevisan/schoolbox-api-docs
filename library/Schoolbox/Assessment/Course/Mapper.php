@@ -96,6 +96,11 @@ class Mapper extends FolderMapper
             $allFolderIds[] = $row['id'];
         }
 
+        /* Manufacture a list of Courses so we can get their
+         * Unit information and Task Counts
+         */
+
+        /** @var Collection|Folder[] $courses */
         $allCourses = $this->findByColumn('id', $allFolderIds);
 
         return $allCourses;
@@ -110,40 +115,7 @@ class Mapper extends FolderMapper
      */
     public function findCourseList($searchParam)
     {
-        $query = "
-            SELECT
-                course.id,
-                COUNT(task.id) AS taskCount
-            FROM category course
-            LEFT JOIN category unit ON unit.parent = course.id AND unit.deleted_at IS NULL
-            INNER JOIN `task` ON task.category_id = unit.id AND task.deleted_at IS NULL
-            WHERE course.deleted_at IS NULL
-            AND course.name LIKE :searchParam
-            GROUP BY course.id
-        ";
-
-        /* Find all the Courses with names like $searchParam,
-         * if that was provided (otherwise returns all)
-         */
-        $statement = $this->database->prepare($query);
-        $statement->execute([
-            'searchParam' => "%{$this->database->quoteForLike($searchParam)}%"
-        ]);
-
-        /* Accumulate a list of ids
-         */
-        $allFolderIds = [];
-
-        foreach ($statement as $row) {
-            $allFolderIds[] = $row['id'];
-        }
-
-        /* Manufacture a list of Courses so we can get their
-         * Unit information and Task Counts
-         */
-
-        /** @var Collection|Folder[] $courses */
-        $allCourses = $this->findByColumn('id', $allFolderIds);
+        $allCourses = $this->findCourseListByName($searchParam);
 
         $data = [
             'courses' => $allCourses
