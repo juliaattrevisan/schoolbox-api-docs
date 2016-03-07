@@ -132,6 +132,7 @@ class Controller extends BaseController
      */
     public function createCourse()
     {
+        $parent = null;
         $errors = [];
         $post   = $this->getRequest()->post;
         $name   = trim($post->get('name'));
@@ -166,17 +167,34 @@ class Controller extends BaseController
 
         if ($id) {
             try {
-                $folder = $this->getCourseMapper()->findById($id);
+                // do checks to make sure it exists
+                $this->getCourseMapper()->findById($id);
 
             } catch (Mapper\Exception $e) {
                 $this->sendError("Could not save because ".$e->getMessage());
                 return;
             }
-        } else {
-            $folder = $this->getCourseMapper()->createModel();
         }
 
-        // TODO perform the same manipulations as /cms/categoryForm.php, then save
+        // TODO get permission and templte configs
+        $folder = $this->saveAFolderAndAllItsParts([
+            // the basics
+            'categoryID'      => $id,
+            'name'            => $name,
+            'parent'          => $parent->getId(),
+            'curriculumCodes' => $codes,
+
+            // configurable things
+            'inherit'         => false, // TODO config inheritance
+            'template'        => 0,     // TODO config template
+            'group'           => [],    // TODO config role permissions [ $roleId => $permissionLevel ]
+
+            // leave these always off
+            'recursive'       => false, // LEAVE THIS
+            'code'            => null,  // LEAVE THIS
+
+        ]);
+
 
         $this->getResponse()->content->set([
             'format' => 'json',
