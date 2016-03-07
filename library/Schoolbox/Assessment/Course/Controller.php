@@ -116,6 +116,35 @@ class Controller extends BaseController
         $this->modifyCourse(null);
     }
 
+
+    /**
+     * @param string $problem
+     * @param array  $resolutions
+     * @param int    $statusCode
+     * @return void
+     */
+    protected function sendError($problem, array $resolutions = [], $statusCode = 400)
+    {
+        if (count($resolutions)) {
+            $problem .= ". You need to";
+        }
+
+        $this->getResponse()->status->set($statusCode);
+
+        $this->getResponse()->content->set([
+            'template' => '@course/mage-error.twig',
+            'format'   => 'nochrome',
+            'data'     => [
+                'error' => [
+                    'problem' => $problem,
+                    'reasons' => $resolutions
+                ]
+            ]
+        ]);
+
+    }
+
+
     /**
      * Post request to spawn a new unit
      *
