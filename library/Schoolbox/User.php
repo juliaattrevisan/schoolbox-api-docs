@@ -1109,4 +1109,16 @@ class User implements JsonSerializable
     {
         return $this->linkedUser;
     }
+
+    /**
+     * `Schoolbox\Config\Loader` got removed in 16.0.0, but it got serialized.
+     *
+     * Put a new config loader in.
+     */
+    public function __wakeup()
+    {
+        if ($this->getConfigLoader() instanceof \__PHP_Incomplete_Class) {
+            $this->setConfigLoader(new ConfigLoader());
+        }
+    }
 }
