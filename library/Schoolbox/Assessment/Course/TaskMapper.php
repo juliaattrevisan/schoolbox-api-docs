@@ -171,7 +171,7 @@ class TaskMapper extends Mapper {
      * @param int|Folder   $category Either a Category object or a category ID
      * @param bool         $deleted  True to get deleted tasks too
      *
-     * @return Collection
+     * @return Collection|Task[]
      */
     public function findByCategory($category, $deleted = false) {
         $query = $this->getBaseQuery() . " WHERE t.category_id=?";
