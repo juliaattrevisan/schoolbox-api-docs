@@ -18,6 +18,12 @@ use Component_InstanceMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
+/**
+ * Class HomepageConfigMapper
+ *
+ * @package Schoolbox\Resource
+ * @method HomepageConfig createModel()
+ */
 class HomepageConfigMapper extends Mapper
 {
     protected function mapping()
