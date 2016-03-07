@@ -23,6 +23,7 @@
         var self = this;
 
         this.element = element;
+        this.options = undefined;
         setOptions.call(this, options);
 
         var $elem = $(this.element);
@@ -150,15 +151,33 @@
                 data: formData
             })
             .done(function (data, status, xhr) {
-                xhrDone.call(mage, mage.options.onXhrDone, targetElement, data);
+                xhrDone.call(mage, mage.options.onXhrDone, targetElement, parseJSON(data));
             })
             .fail(function (xhr, status, error) {
-                xhrFail.call(mage, mage.options.onXhrFail, targetElement, xhr.responseText);
+                xhrFail.call(mage, mage.options.onXhrFail, targetElement, parseJSON(xhr.responseText));
             })
             .always(function (xhrOrData, status, xhrOrError) {
                 xhrAlways.call(mage, mage.options.onXhrAlways, targetElement);
             });
     }
+
+
+    /**
+     * Attempt to parse input to return JSON, but do it safely
+     *
+     * @param {*} ambiguousData
+     * @return {Object|String}
+     */
+    function parseJSON(ambiguousData) {
+        try {
+            // if this is a JSON string, it will return the object...
+            return JSON.parse(ambiguousData);
+        } catch (e) {
+            // ...otherwise, just throw back whatever we were passed
+            return ambiguousData;
+        }
+    }
+
 
     /**
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
