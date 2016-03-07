@@ -480,52 +480,8 @@ class Controller extends BaseController
             RoleAccessMapper::getInstance()->deleteByColumn("cid", $postData["categoryID"]);
 
         } else {
-
-            // Only superusers get to change class codes
-            $codeCollection = Code\Mapper::getInstance()->createCollection();
-
-            if ($this->getUser()->isSuperuser()) {
-                foreach (explode(',', $postData['code']) as $code) {
-                    $trimmedCode = trim($code);
-                    if (strlen($trimmedCode)) {
-                        $codeModel = Code\Mapper::getInstance()->createModel();
-                        $codeModel->setCode($trimmedCode);
-                        $codeCollection->add($codeModel);
-                    }
-                }
-                $model->setCodes($codeCollection);
-            }
-
-            // Delete category codes here, allowing them to be recreated when the category gets saved.
-            // (I'm not confident that deleting cat codes in the postSave method
-            //  regardless of whether there are any won't break somewhere else)
-            if ($this->getUser()->isSuperuser() && $model->getId() && count($codeCollection) === 0) {
-                Code\Mapper::getInstance()->deleteByColumn('categoryID', $model->getId());
-            }
-
-            // Only privileged users (teachers?) get to change curriculum codes?
-            if (isset($postData['curriculumCodes'])) {
-                $model->setCurriculumNodes(
-                    Curriculum\Node\Mapper::getInstance()->findByColumn('id', $postData['curriculumCodes'])
-                );
-
-            } elseif ($model->getId()) {
-                $existingModel = $this->getCourseMapper()->findById($model->getId());
-                $model->setCurriculumNodes($existingModel->getCurriculumNodes());
-
-            }
-
-            foreach (explode(',', $postData['code']) as $code) {
-                $trimmedCode = trim($code);
-
-                if (strlen($trimmedCode)) {
-                    $codeModel = Code\Mapper::getInstance()->createModel();
-                    $codeModel->setCode($trimmedCode);
-                    $codeCollection->add($codeModel);
-                }
-            }
-
-            $model->setCodes($codeCollection);
+            // apply codes
+            $this->setCodesOnFolder($model, $postData['code'], $postData['curriculumCodes']);
         }
 
         $affectedIds = $this->getCourseMapper()->save($model);
@@ -550,6 +506,53 @@ class Controller extends BaseController
         $this->saveHomepageConfig($model, $postData['template']);
 
         return $model;
+    }
+
+
+    /**
+     * Put the given code lists onto the given folder
+     *
+     * @param Folder\Model $model
+     * @param string       $classCodeString
+     * @param array        $curriculumCodes
+     * @throws Mapper\Exception
+     */
+    protected function setCodesOnFolder(Folder\Model $model, $classCodeString, array $curriculumCodes)
+    {
+        $codeCollection = Code\Mapper::getInstance()->createCollection();
+
+        // Only superusers get to change class codes
+        if ($this->getUser()->isSuperuser()) {
+            foreach (explode(',', $classCodeString) as $code) {
+                $trimmedCode = trim($code);
+                if (strlen($trimmedCode)) {
+                    $codeModel = Code\Mapper::getInstance()->createModel();
+                    $codeModel->setCode($trimmedCode);
+                    $codeCollection->add($codeModel);
+                }
+            }
+            $model->setCodes($codeCollection);
+        }
+
+        // Delete category codes here, allowing them to be recreated when the category gets saved.
+        // (I'm not confident that deleting cat codes in the postSave method
+        //  regardless of whether there are any won't break somewhere else)
+        if ($this->getUser()->isSuperuser() && $model->getId() && count($codeCollection) === 0) {
+            Code\Mapper::getInstance()->deleteByColumn('categoryID', $model->getId());
+        }
+
+        // Only privileged users (teachers?) get to change curriculum codes?
+        if (isset($curriculumCodes) && count($curriculumCodes)) {
+            $model->setCurriculumNodes(
+                Curriculum\Node\Mapper::getInstance()->findByColumn('id', $curriculumCodes)
+            );
+
+        } elseif ($model->getId()) {
+            $existingModel = $this->getCourseMapper()->findById($model->getId());
+            $model->setCurriculumNodes($existingModel->getCurriculumNodes());
+
+        }
+
     }
 
 
