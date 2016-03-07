@@ -10,19 +10,26 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller\Base as BaseController;
 
+use OutOfBoundsException;
+use RangeException;
+use Schoolbox\Curriculum;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Code;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
-use Schoolbox\Resource\Group;
-use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\Resource\HomepageTemplate;
+use Schoolbox\Resource\HomepageTemplateMapper;
 
 class Controller extends BaseController
 {
@@ -423,6 +430,158 @@ class Controller extends BaseController
     private function setCourseMapper($courseMapper)
     {
         $this->courseMapper = $courseMapper;
+    }
+
+
+    /**
+     * This is public for now because /cms/categoryForm.php needs to reference it
+     *
+     * @param array $postData       the array structure we'll use to construct this folder
+     * @throws OutOfBoundsException if you lack permission to perform functions
+     * @throws RangeException       if the database fails to save your folder
+     * @return Folder\Model         representing the freshly saved folder
+     */
+    public function saveAFolderAndAllItsParts(array $postData)
+    {
+        $model = $this->getCourseMapper()->createModel()
+                              ->setName($postData['name'])
+                              ->setParent(
+                                  $this->getCourseMapper()->createModel()
+                                               ->setId($postData['parent'])
+                              );
+
+        if ($postData["inherit"] == 1) {
+            $model->enableInherit();
+        } else {
+            $model->disableInherit();
+        }
+
+        // Make sure the user has permission to perform the action
+
+        if (is_numeric($postData['categoryID'])) {
+
+            if (Access::getInstance()->getFolderAccess($this->getUser(), [ $postData['categoryID'] ]) < UserAccess::ACCESS_WRITE) {
+                throw new OutOfBoundsException("I find your lack of access disturbing.");
+            }
+            $model->setId($postData['categoryID']);
+        } elseif (Access::getInstance()->getFolderAccess($this->getUser(), [ $postData['parent'] ]) < UserAccess::ACCESS_WRITE) {
+            throw new OutOfBoundsException("I find your lack of access disturbing.");
+        }
+
+        if ($postData['inherit'] == 1) {
+
+            // If inheriting permissions we need to remove any existing class codes...
+            Code\Mapper::getInstance()->deleteByColumn('categoryID', $postData['categoryID']);
+
+            // ...and user access permissions...
+            UserAccessMapper::getInstance()->deleteByColumn("sid", $postData["categoryID"]);
+
+            // ...and role permissions
+            RoleAccessMapper::getInstance()->deleteByColumn("cid", $postData["categoryID"]);
+
+        } else {
+
+            // Only superusers get to change class codes
+            $codeCollection = Code\Mapper::getInstance()->createCollection();
+
+            if ($this->getUser()->isSuperuser()) {
+                foreach (explode(',', $postData['code']) as $code) {
+                    $trimmedCode = trim($code);
+                    if (strlen($trimmedCode)) {
+                        $codeModel = Code\Mapper::getInstance()->createModel();
+                        $codeModel->setCode($trimmedCode);
+                        $codeCollection->add($codeModel);
+                    }
+                }
+                $model->setCodes($codeCollection);
+            }
+
+            // Delete category codes here, allowing them to be recreated when the category gets saved.
+            // (I'm not confident that deleting cat codes in the postSave method
+            //  regardless of whether there are any won't break somewhere else)
+            if ($this->getUser()->isSuperuser() && $model->getId() && count($codeCollection) === 0) {
+                Code\Mapper::getInstance()->deleteByColumn('categoryID', $model->getId());
+            }
+
+            // Only privileged users (teachers?) get to change curriculum codes?
+            if (isset($postData['curriculumCodes'])) {
+                $model->setCurriculumNodes(
+                    Curriculum\Node\Mapper::getInstance()->findByColumn('id', $postData['curriculumCodes'])
+                );
+
+            } elseif ($model->getId()) {
+                $existingModel = $this->getCourseMapper()->findById($model->getId());
+                $model->setCurriculumNodes($existingModel->getCurriculumNodes());
+
+            }
+
+            foreach (explode(',', $postData['code']) as $code) {
+                $trimmedCode = trim($code);
+
+                if (strlen($trimmedCode)) {
+                    $codeModel = Code\Mapper::getInstance()->createModel();
+                    $codeModel->setCode($trimmedCode);
+                    $codeCollection->add($codeModel);
+                }
+            }
+
+            $model->setCodes($codeCollection);
+        }
+
+        $affectedIds = $this->getCourseMapper()->save($model);
+
+        if ($affectedIds === false) {
+            // something went wrong
+            throw new RangeException("Failed to save folder.");
+        }
+
+        $model->setId($affectedIds[0]);
+
+        if ($postData["inherit"] == 0)
+        {
+            // If rolepermission collection is defined, reapply permissions (possibly recursively)
+            RoleAccessMapper::getInstance()->savePermissions($model, $postData['group'], $postData['recursive']);
+        }
+
+        // Recurse inheritance
+        $this->recurseInheritance($model);
+
+        // HomepageConfig definition
+        $homepageConfig = HomepageConfigMapper::getInstance()->createModel()->setCategory($model);
+
+        // if homepage is to be removed
+        if ($postData['template'] == HomepageTemplate::HOMEPAGE_REMOVE) {
+            HomepageConfigMapper::getInstance()->emptyHomepage($homepageConfig);
+            HomepageConfigMapper::getInstance()->delete($homepageConfig);
+
+        } elseif ($postData['template'] > 0) {
+            // if template defined
+            $homepageConfig->setTemplate(HomepageTemplateMapper::getInstance()->findById($postData['template']));
+
+            // Save homepage config
+            HomepageConfigMapper::getInstance()->save($homepageConfig);
+            HomepageConfigMapper::getInstance()->resetToTemplate($homepageConfig);
+        }
+
+        // Ram it back into its parent object where it belongs
+        $model->setHomepage($homepageConfig);
+
+        return $model;
+    }
+
+
+    /**
+     * Recursively apply inheritance. Why? Not sure. Cut-Paste from /cms/categoryForm.php
+     *
+     * @param Folder\Model $model
+     */
+    protected function recurseInheritance(Folder\Model $model) {
+        $folders = $this->getCourseMapper()->findAllChildren($model->getId(), true);
+        foreach ($folders as $folder) {
+            $folder->setInherit($model->getInherit());
+            $this->getCourseMapper()->save($folder);
+            $this->recurseInheritance($folder);
+        }
     }
 
     /**
