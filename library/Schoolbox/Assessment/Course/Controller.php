@@ -237,6 +237,25 @@ class Controller extends BaseController
         $this->tpl('parentList', $data);
     }
 
+    /**
+     * Import a Course into a set of Folders (classes)
+     */
+    public function import($id)
+    {
+        $data = [];
+
+        try {
+            $course = $this->getCourseMapper()->findById($id);
+        }
+        catch (\Exception $e) {
+
+            /* TODO: No course found
+             */
+        }
+
+        $this->tpl('import', $data);
+    }
+
     /* Getters/Setters
      */
 
