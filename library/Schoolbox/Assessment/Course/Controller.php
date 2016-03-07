@@ -15,6 +15,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 
 class Controller extends BaseController
@@ -27,10 +28,18 @@ class Controller extends BaseController
     private $courseMapper = null;
 
     /**
+     * A FolderMapper instance
+     *
+     * @var FolderMapper
+     */
+    private $folderMapper = null;
+
+    /**
      */
     public function __construct()
     {
         $this->setCourseMapper(CourseMapper::getInstance());
+        $this->setFolderMapper(FolderMapper::getInstance());
     }
 
     /**
@@ -244,7 +253,7 @@ class Controller extends BaseController
     public function importClasses()
     {
         $data = [];
-        $allFolders = Folder\Mapper::getInstance()->findByName($this->getRequest()->query->get('query'));
+        $allFolders = $this->getFolderMapper()->findByName($this->getRequest()->query->get('query'));
 
         /* Swap keys for selectize compatibility -_-
          */
@@ -303,5 +312,25 @@ class Controller extends BaseController
     private function setCourseMapper($courseMapper)
     {
         $this->courseMapper = $courseMapper;
+    }
+
+    /**
+     * Get folder mapper
+     *
+     * @return FolderMapper
+     */
+    private function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+    /**
+     * Set folder mapper
+     *
+     * @param FolderMapper $folderMapper
+     */
+    private function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
     }
 }
