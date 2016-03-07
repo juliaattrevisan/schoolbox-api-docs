@@ -13,7 +13,6 @@
 
         submittable: 'fieldset',
         reenablePrevious: false,
-        modifySaved: 'legend [data-mage-unlock]',
         onXhrDone: $.noop,
         onXhrFail: $.noop,
         onXhrAlways: $.noop
