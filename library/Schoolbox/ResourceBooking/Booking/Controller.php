@@ -1330,6 +1330,11 @@ class Controller extends Base
 
         // Adjust the datetimes for the events in the series
         foreach ($series as $booking) {
+            // Update the purpose and notes for this booking
+            $booking
+                ->setName($item->getName())
+                ->setNotes($item->getNotes());
+
             $event = $booking->getEvent();
             $newStart = $event->getStartDateTime()->getDateTimeObject()->add(
                 $startDelta->getAsDateInterval()
