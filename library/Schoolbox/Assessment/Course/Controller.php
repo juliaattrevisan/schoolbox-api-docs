@@ -14,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -54,6 +55,7 @@ class Controller extends BaseController
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setTaskMapper(TaskMapper::getInstance());
     }
+
 
     /**
      * Just a raw template render
@@ -101,6 +103,7 @@ class Controller extends BaseController
 
         $this->tpl('course', $data);
     }
+
 
     /**
      * Form to create a new course
@@ -226,10 +229,11 @@ class Controller extends BaseController
         return $target;
     }
 
+
     /**
      * List the folders that are allowed to be course parents
      *
-     * @api   /course/parent
+     * @api   GET /course/parent
      * @level 160
      */
     public function parentList()
@@ -305,7 +309,7 @@ class Controller extends BaseController
     /**
      * Get course mapper
      *
-     * @return Mapper
+     * @return CourseMapper
      */
     private function getCourseMapper()
     {
@@ -315,7 +319,7 @@ class Controller extends BaseController
     /**
      * Set course mapper
      *
-     * @param Mapper $courseMapper
+     * @param CourseMapper $courseMapper
      */
     private function setCourseMapper($courseMapper)
     {
@@ -581,4 +585,5 @@ class Controller extends BaseController
             'data' => ['result' => 'success']
         ]);
     }
+
 }
