@@ -13,8 +13,8 @@
     <div class="small-12 column hide" data-collapsable="unit-{{ i }}" data-collapse-state="collapsed">
         <ul class="information-list sortable" data-sortable>
             {# TODO replace this with actual data lookup #}
-            {% for j in 0..(3 + random(4)) %}
-                {% include '@course/task-item.twig' with { icon: random(icons) } %}
+            {% for task in tasks[unit.id] %}
+                {% include '@course/task-item.twig' %}
             {% endfor %}
         </ul>
         <ul class="flex-list buttons">

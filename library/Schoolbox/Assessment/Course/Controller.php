@@ -71,6 +71,10 @@ class Controller extends BaseController
 
             $data['folder'] = $folder;
             $data['units']  = $this->getCourseMapper()->findByParent($id);
+
+            foreach ($data['units'] as $unit) {
+                $data['tasks'][$unit->getId()] = TaskMapper::getInstance()->findByCategory($unit);
+            }
         }
 
         $this->tpl('course', $data);
