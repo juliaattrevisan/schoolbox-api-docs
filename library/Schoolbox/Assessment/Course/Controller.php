@@ -547,26 +547,49 @@ class Controller extends BaseController
         $this->recurseInheritance($model);
 
         // HomepageConfig definition
-        $homepageConfig = HomepageConfigMapper::getInstance()->createModel()->setCategory($model);
+        $this->saveHomepageConfig($model, $postData['template']);
+
+        return $model;
+    }
+
+
+    /**
+     * Save the given template for the given folder
+     *
+     * @param Folder\Model $model
+     * @param int          $template
+     */
+    protected function saveHomepageConfig(Folder\Model $model, $template)
+    {
+        $confMapper = HomepageConfigMapper::getInstance();
+        $tplMapper  = HomepageTemplateMapper::getInstance();
+
+        $homepageConfig = $confMapper->createModel()->setCategory($model);
 
         // if homepage is to be removed
-        if ($postData['template'] == HomepageTemplate::HOMEPAGE_REMOVE) {
-            HomepageConfigMapper::getInstance()->emptyHomepage($homepageConfig);
-            HomepageConfigMapper::getInstance()->delete($homepageConfig);
+        try {
+            if ($template == HomepageTemplate::HOMEPAGE_REMOVE) {
+                $confMapper->emptyHomepage($homepageConfig);
+                $confMapper->delete($homepageConfig);
 
-        } elseif ($postData['template'] > 0) {
-            // if template defined
-            $homepageConfig->setTemplate(HomepageTemplateMapper::getInstance()->findById($postData['template']));
+            } elseif ($template > 0) {
+                // if template defined
+                $homepageConfig->setTemplate($tplMapper->findById($template));
 
-            // Save homepage config
-            HomepageConfigMapper::getInstance()->save($homepageConfig);
-            HomepageConfigMapper::getInstance()->resetToTemplate($homepageConfig);
+                // Save homepage config
+                $confMapper->save($homepageConfig);
+                $confMapper->resetToTemplate($homepageConfig);
+
+            } else {
+                throw new RangeException("Invalid template ID specified");
+            }
+        } catch (Mapper\Exception $e) {
+            throw new RangeException("Invalid template ID specified", 0, $e);
         }
 
         // Ram it back into its parent object where it belongs
         $model->setHomepage($homepageConfig);
 
-        return $model;
     }
 
 
