@@ -26,12 +26,6 @@ class Admin implements ModuleConfigInterface
     {
         $messagesModule = new Module($kernel->getDependencyInjector());
         $messagesModule->init('/adminv2/messages');
-
-        $di = $kernel->getDependencyInjector();
-
-        $courseBuilder = new \Schoolbox\Admin\CourseBuilder\Module($di);
-        $courseBuilder->init('/adminv2/course-builder');
-
     }
 
 } 
