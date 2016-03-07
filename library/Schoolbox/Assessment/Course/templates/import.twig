@@ -9,7 +9,8 @@
                 type:     'GET',
                 dataType: 'json'
             },
-            multiple: true
+            multiple: true,
+            value: {{ destinations|json_encode|raw }}
         })
     });
 </script>

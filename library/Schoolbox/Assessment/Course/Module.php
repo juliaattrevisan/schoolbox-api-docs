@@ -37,13 +37,13 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/list'           => 'courseList',
-                '/list/ajax'      => 'courseListAjax',
-                '/new'            => 'newCourse',
-                '/modify/{id}'    => 'modifyCourse',
-                '/parent'         => 'parentList',
-                '/import/classes' => 'importClasses',
-                '/import/{id}'    => 'import',
+                '/list'                        => 'courseList',
+                '/list/ajax'                   => 'courseListAjax',
+                '/new'                         => 'newCourse',
+                '/modify/{id}'                 => 'modifyCourse',
+                '/parent'                      => 'parentList',
+                '/import/classes'              => 'importClasses',
+                '/import/{courseId}/class/{classId}' => 'import',
             ],
             'POST' => [
                 '/unit/new' => 'newUnit',

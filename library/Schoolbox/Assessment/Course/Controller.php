@@ -270,25 +270,67 @@ class Controller extends BaseController
 
     /**
      * Import a Course into a set of Folders (classes)
+     *
+     * @param $courseId
      */
-    public function import($id)
+    public function import($courseId, $classId)
     {
-        $data = [];
+        $data = [
 
+            /* Course Folder
+             */
+            'folder' => null,
+
+            /* All Units associated with this Course
+             */
+            'units' => [],
+
+            /* All Tasks associated with Units
+             */
+            'tasks' => [],
+
+            /* Folder to which this Course shall be applied
+             */
+            'destinations' => []
+        ];
+
+        /* A course was already chosen
+         */
         try {
-            $folder = $this->getCourseMapper()->findById($id);
-            $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
+            if ($courseId) {
+                $folder = $this->getCourseMapper()->findById($courseId);
+                $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
 
-            $data['folder'] = $folder;
-            $data['units']  = $this->getCourseMapper()->findByParent($id);
+                $data['folder'] = $folder;
+                $data['units']  = $this->getCourseMapper()->findByParent($courseId);
 
-            foreach ($data['units'] as $unit) {
-                $data['tasks'][$unit->getId()] = TaskMapper::getInstance()->findByCategory($unit);
+                foreach ($data['units'] as $unit) {
+                    $data['tasks'][$unit->getId()] = TaskMapper::getInstance()->findByCategory($unit);
+                }
             }
         }
         catch (\Exception $e) {
 
             /* TODO: No course found
+             */
+        }
+
+        /* A class was already chosen
+         */
+        try {
+            if ($classId) {
+                $folder = $this->getFolderMapper()->findById($classId);
+                $pair = $folder->findValueLabelPair();
+
+                $data['destinations'] = [
+                    'id' => $pair['value'],
+                    'name' => $pair['label'],
+                ];
+            }
+        }
+        catch (\Exception $e) {
+
+            /* TODO: No destination found
              */
         }
 
