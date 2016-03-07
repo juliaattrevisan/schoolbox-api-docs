@@ -326,18 +326,11 @@ class Session
     }
     private function authenticateSQL($username, $password)
     {
-        // Function to check username exists and password is correct
-
-        $query = "SELECT user.id FROM user WHERE username = '" . $this->db->quote($username) . "'
-        AND password = PASSWORD('" . $this->db->quote($password) . "') AND `enabled` IS TRUE";
-        $this->db->query($query);
-        $result = $this->db->countRows();
-        //$user = $db->getNextArray();
-        if ($result == 1) {
-            return true;
-        } else {
-            return false;
-        }
+        $passwordValidator = new \Schoolbox\User\Password\Validator(
+            \Schoolbox\UserMapper::getInstance(),
+            new \Alaress\Password\Service()
+        );
+        return $passwordValidator->checkPassword($username, $password);
     }
 
 

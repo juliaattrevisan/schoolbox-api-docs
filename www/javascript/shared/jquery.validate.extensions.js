@@ -178,4 +178,11 @@
         }
         return false;
     }, "Please enter a URL beginning with http://, https://, ftp://, or a relative URL (beginning with /)");
+
+    /**
+     * equalsOther extension - checks that the value of this field equals that of some other field.
+     */
+    $.validator.addMethod('equalsOtherField', function(value, element, otherElement) {
+        return $(element).val() == $(otherElement).val();
+    }, 'Values do not match');
 }(jQuery));

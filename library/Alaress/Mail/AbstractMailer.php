@@ -220,6 +220,23 @@ abstract class AbstractMailer implements IMailer {
         }
 	}
 
+	/**
+	 * Sends a message nowhere.
+	 *
+	 * This is intended for use in time-sensitive requests, where it should not
+	 * be possible to infer from the request time whether an email was sent.
+	 */
+	public function sendToBlackhole()
+	{
+		// construct body and set headers
+		$this->email->setBody($this->composePlain(), null, 'utf-8');
+		$this->email->addPart($this->composeHTML(), 'text/html', 'utf-8');
+		foreach ($this->headers as $name => $value) {
+			$this->email->getHeaders()->addTextHeader($name, $value);
+		}
+		$mailer = new \Swift_NullTransport();
+		$mailer->send($this->email);
+	}
 
     /**
      * @param int  $retries

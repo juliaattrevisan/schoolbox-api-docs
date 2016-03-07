@@ -266,6 +266,9 @@ class UserMapper extends Mapper
 
             return true;
         });
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateDefaultCampus']);
     }
 
 
@@ -571,5 +574,52 @@ class UserMapper extends Mapper
         $statement = $this->getDatabase()->prepare('SELECT PASSWORD(?)');
         $statement->execute([$password]);
         return $statement->fetchColumn();
+    }
+
+    /**
+     * Post-save callback for updating a user's superuser status.
+     *
+     * @param User $user
+     */
+    public function updateSuperuserStatus(User $user)
+    {
+        $superuserStatus = $user->getSuperuser();
+        if (isset($superuserStatus)) {
+            if ($superuserStatus) {
+                $query = 'INSERT IGNORE INTO superusers (id) VALUES (?)';
+            } else {
+                $query = 'DELETE FROM superusers WHERE id = ?';
+            }
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute([$user->getId()]);
+        }
+    }
+
+    /**
+     * Post-save callback for updating a user's default campus.
+     *
+     * @param User $user
+     */
+    public function updateDefaultCampus(User $user)
+    {
+        $defaultCampus = $user->getDefaultCampus();
+        if ($defaultCampus instanceof Campus) {
+            $defaultCampusId = $defaultCampus->getId();
+            if ($defaultCampusId) {
+                $statement = $this->getDatabase()->prepare("
+                    UPDATE userCampus
+                    SET    defaultCampus = :isDefault
+                    WHERE  uid    = :userId
+                    AND    campus = :campusId
+                ");
+                foreach ($user->getCampusCollection() as $campus) {
+                    $statement->execute([
+                        'userId'    => $user->getId(),
+                        'campusId'  => $campus->getId(),
+                        'isDefault' => ($defaultCampusId == $campus->getId() ? 1 : 0),
+                    ]);
+                }
+            }
+        }
     }
 }

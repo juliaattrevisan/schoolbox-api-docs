@@ -1,0 +1,41 @@
+<div class="row">
+    <div class="small-12 island">
+        <h1>Have You Forgotten Your Password?</h1>
+
+        {% if isResetExpired %}
+            <div class="alert-box alert">
+                Your reset link has expired - please create a new request here.
+            </div>
+        {% endif %}
+
+        {% if isEmailSubmitted %}
+            {% if isEmailValid %}
+                <div class="alert-box success">
+                    Thank you. If <strong>{{ email }}</strong> is associated with a {{ config.title }} account,
+                    you will receive an email which contains a link for you to reset your password.
+                </div>
+            {% else %}
+                <div class="alert-box alert">
+                    The email address you provided is not valid - please check your email address.
+                </div>
+            {% endif %}
+
+        {% else %}
+            <div class="alert-box">
+                Please enter your email address below - we will send a link for you to reset your password. This feature works for parents only.
+            </div>
+        {% endif %}
+
+        <form id="forgottenPassword" action="{{ routeLookup('userPasswordReset.createRequest') }}" method="post" class="top">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label for="email">Email</label>
+                        <input class="input_text" type="text" name="email" id="email" value="{{ email|e('html_attr') }}" />
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" value="Send" />
+        </form>
+    </div>
+</div>

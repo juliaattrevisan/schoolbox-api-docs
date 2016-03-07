@@ -85,7 +85,9 @@
         #RewriteCond %{REQUEST_URI} ^/cms/network [OR]
         #RewriteCond %{REQUEST_URI} ^/cms/network/.* [OR]
         #RewriteCond %{REQUEST_URI} ^/account/modify [OR]
-        #RewriteCond %{REQUEST_URI} ^/account/modify/.*
+        #RewriteCond %{REQUEST_URI} ^/account/modify/.* [OR]
+        #RewriteCond %{REQUEST_URI} ^/passwordReset [OR]
+        #RewriteCond %{REQUEST_URI} ^/passwordReset/.*
         #RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R,NE,L]
 
         # Force non-secure
@@ -99,6 +101,8 @@
         #RewriteCond %{REQUEST_URI} !^/cms/network/.*
         #RewriteCond %{REQUEST_URI} !^/account/modify
         #RewriteCond %{REQUEST_URI} !^/account/modify/.*
+        #RewriteCond %{REQUEST_URI} !^/passwordReset
+        #RewriteCond %{REQUEST_URI} !^/passwordReset/.*
         #RewriteCond %{REQUEST_URI} !^/ajax/.*
         #RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
         #RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [R,NE,L]

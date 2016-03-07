@@ -345,73 +345,56 @@ class User extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-
     /**
-     * Sets the user's password.
-     *
-     * If the Synergetic API is enabled, this also attempts to set their
-     * password in Synergetic. If that process fails, then the password will be
-     * reverted.
-     *
-     * @param $userID
+     * @param $user
      * @param $oldPassword
      * @param $newPassword
      *
      * @return bool
      * @throws Exception
      */
-    public function setPassword($userID, $oldPassword, $newPassword)
+    public function updateExternalSystemPassword($user, $oldPassword, $newPassword)
     {
-        //
-        // Set password, and set it back if updating via Synergetic fails.
-        $user     = $this->getByID($userID);
-        $username = $user['username'];
-        if ($this->checkPassword($userID, $oldPassword)
-            && $this->setPasswordInternal($userID, $newPassword)
+        $userID         = $user['uid'];
+        $username       = $user['username'];
+        $groupHandler   = new Group();
+        $webServicesUrl = Cfg::get('external_web_services_url');
+        if ($groupHandler->isParent($userID)
+            && Cfg::get('external_enable')
+            && Cfg::get('external_type') === 'synergetic'
+            && !empty($webServicesUrl)
         ) {
-            $groupHandler   = new Group();
-            $webServicesUrl = Cfg::get('external_web_services_url');
-            if ($groupHandler->isParent($userID)
-                && Cfg::get('external_enable')
-                && Cfg::get('external_type') === 'synergetic'
-                && !empty($webServicesUrl)
-            ) {
-                //
-                // Attempt to set with Synergetic.
-                // If that is set up and fails, then revert their password.
-                $user       = $this->getByID($userID);
-                $is_changed = false;
-                try {
-                    $api        = new External_Synergetic_Gateway(
-                        $webServicesUrl,
-                        Cfg::get('external_vendor_token_guid'),
-                        Cfg::get('external_vendor_password')
-                    );
-                    $is_changed = $api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword);
+            //
+            // Attempt to set with Synergetic.
+            // If that is set up and fails, then revert their password.
+            $user       = $this->getByID($userID);
+            $is_changed = false;
+            try {
+                $api        = new External_Synergetic_Gateway(
+                    $webServicesUrl,
+                    Cfg::get('external_vendor_token_guid'),
+                    Cfg::get('external_vendor_password')
+                );
+                $is_changed = $api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword);
 
-                    if (!$is_changed) {
-                        //
-                        // Should throw a different error message if the remote pwd doesn't get changed.
-                        $this->setPasswordInternal($userID, $oldPassword);
-                        $this->logUserPasswordChange($username, 'change_pwd_syn_fail', 'warn', $api->getLastError());
-                        $this->sendPasswordChangeFailureEmail($userID, true);
-                        throw new Exception("The system was unable to reset your Synergetic password as it is no longer in sync with Schoolbox. Your Schoolbox password has been updated, however you will manually need to update your Synergetic password to match this new password.");
-                    }
-
-                } catch (SoapFault $ex) {
-                    $this->logUserPasswordChange($username, 'change_pwd_syn_broken', 'warn', $ex);
+                if (!$is_changed) {
+                    // Don't reset password back to old password.
+                    // The fail message says it is not set back, so why change it?
+//                    $this->setPasswordInternal($userID, $oldPassword);
+                    $this->logUserPasswordChange($username, 'change_pwd_syn_fail', 'warn', $api->getLastError());
                     $this->sendPasswordChangeFailureEmail($userID, true);
-                    throw new Exception("An unexpected error occurred while attempting to update your Synergetic password.");
+                    throw new Exception("The system was unable to reset your Synergetic password as it is no longer in sync with Schoolbox. Your Schoolbox password has been updated, however you will manually need to update your Synergetic password to match this new password.");
                 }
-            }
-            $this->logUserPasswordChange($username, 'change_pwd', 'info');
-            return true;
-        }
-        $this->logUserPasswordChange($username, 'change_pwd_fail', 'warn');
-        $this->sendPasswordChangeFailureEmail($userID);
-        throw new Exception("Your current password did not match what is stored in the database.");
-    }
 
+            } catch (SoapFault $ex) {
+                $this->logUserPasswordChange($username, 'change_pwd_syn_broken', 'warn', $ex);
+                $this->sendPasswordChangeFailureEmail($userID, true);
+                throw new Exception("An unexpected error occurred while attempting to update your Synergetic password.");
+            }
+        }
+        $this->logUserPasswordChange($username, 'change_pwd', 'info');
+        return true;
+    }
 
     /**
      * Checks the user's password in the database.
@@ -443,10 +426,22 @@ class User extends DeprecatedModel
      */
     public function setPasswordInternal($userID, $newPassword)
     {
-        $newPassword = $this->db->quote($newPassword);
-        $query       = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword') WHERE `" . $this->_index . "` = $userID";
-        $this->db->query($query);
-        return $this->db->affectedRows();
+        // Babushka doll - a mapper in a handler!
+        // This is going to be slow as hell but the only place user handler
+        // should still save users is in the sync scripts, so who cares.
+        // Also, most syncs don't even save passwords.
+        $userMapper = \Schoolbox\UserMapper::getInstance();
+        try {
+            $user            = $userMapper->findById($userID);
+            $passwordService = new \Alaress\Password\Service();
+            $user
+                ->setRetrievablePassword($newPassword)
+                ->setPassword($passwordService->hash($newPassword));
+            $userMapper->save($user);
+            return 1;
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return 0;
+        }
     }
 
     /**
