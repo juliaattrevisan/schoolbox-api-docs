@@ -9,10 +9,11 @@
 
 namespace Alaress\DebugBar\DataCollector;
 
+use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
 
-class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
+class DeprecatedDatabaseCollector extends DataCollector implements Renderable, AssetProvider {
 
     protected $widget_name = 'oldDatabase';
 
@@ -172,5 +173,16 @@ class DeprecatedDatabaseCollector extends DataCollector implements Renderable {
                 "default" => 0
             )
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAssets()
+    {
+        return [
+            'css' => 'widgets/sqlqueries/widget.css',
+            'js' => 'widgets/sqlqueries/widget.js',
+        ];
     }
 }
