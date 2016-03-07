@@ -212,7 +212,7 @@
     function xhrFail(onXhrFail, target, error) {
 
         // apply the error text and slide into view
-        target.find('[data-mage-error]').hide().text(error).slideDown();
+        target.find('[data-mage-error]').hide().html(error).slideDown();
 
         target.removeAttr('disabled');
 
