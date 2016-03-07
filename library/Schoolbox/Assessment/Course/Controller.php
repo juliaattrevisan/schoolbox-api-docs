@@ -176,30 +176,37 @@ class Controller extends BaseController
             }
         }
 
-        // TODO get permission and templte configs
-        $folder = $this->saveAFolderAndAllItsParts([
-            // the basics
-            'categoryID'      => $id,
-            'name'            => $name,
-            'parent'          => $parent->getId(),
-            'curriculumCodes' => $codes,
+        // TODO get permission and template configs
+        try {
+            $folder = $this->saveAFolderAndAllItsParts([
+                // the basics
+                'categoryID'      => $id,
+                'name'            => $name,
+                'parent'          => $parent->getId(),
+                'curriculumCodes' => $codes,
 
-            // configurable things
-            'inherit'         => false, // TODO config inheritance
-            'template'        => 0,     // TODO config template
-            'group'           => [],    // TODO config role permissions [ $roleId => $permissionLevel ]
+                // configurable things
+                'inherit'         => true,  // TODO config inheritance
+                'template'        => -1,    // TODO config template
+                'group'           => [],    // TODO config role permissions [ $roleId => $permissionLevel ]
 
-            // leave these always off
-            'recursive'       => false, // LEAVE THIS
-            'code'            => null,  // LEAVE THIS
+                // leave these always off
+                'recursive'       => false, // LEAVE THIS
+                'code'            => null,  // LEAVE THIS
 
-        ]);
+            ]);
 
+            $this->getResponse()->content->set([
+                'format' => 'json',
+                'data'   => [ 'id' => $folder->getId() ]
+            ]);
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => [ 'id' => $folder->getId() ]
-        ]);
+            return;
+
+        } catch (\Exception $e) {
+            // whatever the exception, recover from it as best you can
+            $this->sendError("Could not save because " . $e->getMessage());
+        }
 
     }
 
