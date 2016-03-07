@@ -37,12 +37,6 @@ $descriptorQuery = $db->prepare("
         rl.sequence          ASC
 ");
 
-$updateLevelQuery = $db->prepare("
-    UPDATE rubric_level
-    SET box_id = :boxId
-    WHERE id = :levelId
-");
-
 $obtainIncorrectLevelsQuery = $db->prepare("
     SELECT id, sequence
     FROM rubric_level
@@ -93,9 +87,6 @@ foreach ($descriptorQuery as $row) {
     while ($r = $obtainCorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
         $map[$r['sequence']]['good'] = $r['id'];
     }
-
-    // update the levels
-    $updateLevelQuery->execute(['boxId' => $row['boxId'], 'levelId' => $row['levelId']]);
 
     // now update the descriptors
     foreach ($map as $sequence => $changes) {
