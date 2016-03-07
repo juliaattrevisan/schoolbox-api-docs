@@ -404,12 +404,18 @@
             // finished; noop
         }
 
+        // Add each level.
+        // After adding the first level in this list - delete the first
+        // (now unneeded) level, so that there's always room for adding
+        // the maximum number of levels.
+        var isFirstDeleted = false;
         $.each(options, function (levelValue, levelName) {
             rubricEditable.addLevel(levelName, levelValue);
+            if (!isFirstDeleted) {
+                isFirstDeleted = true;
+                rubricEditable.deleteLevel(0);
+            }
         });
-
-        // and finally delete the first (now unneeded) level
-        this.deleteLevel(0);
     };
 
 
