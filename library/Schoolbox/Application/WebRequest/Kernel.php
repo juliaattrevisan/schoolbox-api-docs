@@ -158,7 +158,16 @@ class Kernel extends \Alaress\Application\Kernel
                 }
                 $uri->setQuery($query);
                 $response = $this->di->get('webFactory')->newResponse();
-                $response->redirect->to('/login/?page='.urlencode($uri));
+                if ($controller->getRequest()->isXhr()) {
+                    // Fabricate an AJAX response. Don't redirect
+                    $response->status->setCode(401);
+                    $response->content->set([
+                        'format' => 'json',
+                        'data'   => ['error' => 'Unauthenticated'],
+                    ]);
+                } else {
+                    $response->redirect->to('/login/?page='.urlencode($uri));
+                }
             }
             catch (Forbidden $e) {
                 // TODO replace the call to Sitepage::error() method
@@ -211,6 +220,7 @@ class Kernel extends \Alaress\Application\Kernel
             $pageName = 'dashboard';
         }
 
+        /** @var \SitePage $page */
         $page = $this->di->get('sitePage');
         $page->loadContent($pageName);
         $page->outputPage();
