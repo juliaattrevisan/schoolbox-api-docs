@@ -105,10 +105,18 @@ if (!empty($_POST)) {
         'POOL'                 => $section['pool'] > 0 ? $section['pool'] : ''
     ));
 
+    // Get the parent folder
+    $parent = $folderMapper->findById($folder->getParent()->getId());
+
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $parent->getName(),
+            'href' => "/homepage/{$parent->getId()}",
+            'class' => '',
+        ],
         [
             'text' => $folder->getName(),
             'href' => "/homepage/{$folder->getId()}",

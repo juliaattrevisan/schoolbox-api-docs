@@ -257,10 +257,18 @@ if (!empty($_POST)) {
 
     $this->parse('has_marks_block', 'has_marks');
 
+    // Get the parent folder
+    $parent = $folderMapper->findById($folder->getParent()->getId());
+
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+        [
+            'text' => $parent->getName(),
+            'href' => "/homepage/{$parent->getId()}",
+            'class' => '',
+        ],
         [
             'text' => $folder->getName(),
             'href' => "/homepage/{$folder->getId()}",

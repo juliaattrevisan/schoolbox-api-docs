@@ -82,10 +82,17 @@ $this->setVar(array(
     'ASSESS_DURATION' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
+$parent = $folderMapper->findById($folder->getParent()->getId());
+
 /* Render out breadcrumbs
  */
 $trail = new Breadcrumbs();
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => $parent->getName(),
+        'href' => "/homepage/{$parent->getId()}",
+        'class' => '',
+    ],
     [
         'text' => $folder->getName(),
         'href' => "/homepage/{$folder->getId()}",
