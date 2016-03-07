@@ -21,6 +21,15 @@
             multiple: true,
             value: {{ destinations|json_encode|raw }}
         });
+
+        /* Whenever you choose a Course, find out what
+         * the Units and Tasks are
+         */
+        $(document).on('change', '#import-course', function(event) {
+            $.get('/course/importResults/' + $(this).val(), function (responseText) {
+                $('#importResults').html(responseText);
+            });
+        });
     });
 </script>
 
