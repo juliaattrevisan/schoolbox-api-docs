@@ -22,7 +22,7 @@
                     >?</span>
                     <input type="hidden" value="{{ groupName }}" name="{{ groupInput }}[name]" />
                 {% else %}
-                    <input type="text" value="{{ groupName }}" name="{{ groupInput }}[name]" />
+                    <textarea name="{{ groupInput }}[name]">{{ groupName }}</textarea>
                 {% endif %}
             </label>
         {% else %}

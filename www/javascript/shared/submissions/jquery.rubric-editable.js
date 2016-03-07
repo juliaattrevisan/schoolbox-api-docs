@@ -93,7 +93,7 @@
             };
 
             if (type == 'criterion') {
-                payload.groupName = $rb.find('input[name="' + ( opt.formField + '[' + [ payload.rubricId, 'group', groupId, 'name' ].join('][') + ']' ) + '"]').val();
+                payload.groupName = $rb.find('[name="' + ( opt.formField + '[' + [ payload.rubricId, 'group', groupId, 'name' ].join('][') + ']' ) + '"]').val();
                 payload.folderId  = $('input[name=category]').val();
             }
 
@@ -179,7 +179,7 @@
             $rb.children('tbody').children('[data-group]').each(function () {
 
                 var $row = $(this);
-                var crit = $row.find('input[data-criterion-name]').data('criterion-name');
+                var crit = $row.find('[data-criterion-name]').data('criterion-name');
 
                 var $textarea = $row.children('td').eq(columnIndex).children('textarea');
 

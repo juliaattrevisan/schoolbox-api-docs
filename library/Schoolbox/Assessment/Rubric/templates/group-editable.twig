@@ -26,7 +26,7 @@
                     <span data-tooltip class="hint has-tip tip-right" data-width="200" title="This {{ locale.translate('rubricGroup') }} cannot be modified because it contains one or more {{ locale.translate('rubricCriterion', false, true) }} that are in use elsewhere">?</span>
                     <input type="hidden" value="{{ groupName }}" name="{{ groupInput }}[name]" />
                 {% else %}
-                    <input type="text" value="{{ groupName }}" name="{{ groupInput }}[name]" />
+                    <textarea name="{{ groupInput }}[name]" >{{ groupName }}</textarea>
                 {% endif %}
             </label>
         {% else %}
@@ -38,6 +38,6 @@
 
 <tr data-group="{{ groupId }}" class="rb-new-criterion">
     <th colspan="{{ rubric.levels|length + 2 }}">
-        <input data-spawn="criterion" type="text" value="" placeholder="+ Type to add new {{ locale.translate('rubricCriterion') }} {{ group.name ? ('to ' ~ group.name) : ('with no ' ~ locale.translate('rubricGroup')) }}" />
+        <textarea data-spawn="criterion" placeholder="+ Type to add new {{ locale.translate('rubricCriterion') }} {{ group.name ? ('to ' ~ group.name) : ('with no ' ~ locale.translate('rubricGroup')) }}"></textarea>
     </th>
 </tr>
