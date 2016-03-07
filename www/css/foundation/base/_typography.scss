@@ -90,8 +90,8 @@ $anchor-font-color-hover: $content-ui-foreground;
 
 // We use these to style blockquotes
 $blockquote-font-color: scale-color($header-font-color, $lightness: 35%);
-$blockquote-padding: rem-calc(9 20 0 19);
-$blockquote-border: 10px solid $iron;
+$blockquote-padding: rem-calc(9 20 9 19);
+$blockquote-border: 6px solid $base;
 $blockquote-cite-font-size: rem-calc(13);
 $blockquote-cite-font-color: scale-color($header-font-color, $lightness: 23%);
 $blockquote-cite-link-color: $blockquote-cite-font-color;
@@ -199,17 +199,24 @@ a{
 }
 
 blockquote{
-	background-color: $silver;
-	font-size: 14px;
+	background-color: $vapor;
+	font-size: rem-calc(($base-font-size - 2));
 	quotes: "\201C""\201D""\2018""\2019";
 
 	&:before {
-	    color: $blockquote-font-color;
+	    color: $base;
 	    content: open-quote;
 	    font-size: 4rem;
 	    line-height: 0.1rem;
-	    margin-right: 0.15rem;
-	    vertical-align: -1.8rem;
+	    margin-right: 0.4rem;
+		vertical-align: -2rem;
+		font-family: Georgia, serif;
+	}
+
+	p{
+		display: inline;
+		font-style: italic;
+		word-wrap: break-word;
 	}
 
 	cite:before {
