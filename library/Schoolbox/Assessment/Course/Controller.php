@@ -16,10 +16,12 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
+use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
+use Schoolbox\Resource\Group;
 use Schoolbox\Permission\Access\Access;
 
 class Controller extends BaseController
@@ -566,5 +568,63 @@ class Controller extends BaseController
                 }
             }
         }
+    }
+
+    /**
+     * Delete unit from course
+     *
+     * @param $id
+     * @throws \Exception
+     */
+    public function deleteUnit()
+    {
+        // Grab handles to the mappers as we'll reuse them
+
+        $folderMapper = CategoryMapper::getInstance();
+        $unitInstanceMapper = UnitInstanceMapper::getInstance();
+
+        try
+        {
+            // Locate the unit we want to delete
+
+            $unit = $unitInstanceMapper->findById($_POST["id"]);
+
+            // Find the corresponding folder
+
+            $folder = $folderMapper->findById($unit->getUnitCategory()->getId());
+
+            // Make sure user has write permission to the folder
+
+            if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$folder->getId()]) >= WRITE_ACCESS) {
+
+                // If the folder has children, then we will only allow superusers to delete it
+
+                if ($folderMapper->countByColumn('parent', $folder->getId()))
+                {
+                    if (!$_SESSION["user"]->isSuperuser())
+                    {
+                        throw new \Exception('Access Denied');
+                    }
+                }
+
+                // Deletes all contents of this folder and all of its children.
+
+                $folderMapper->recursiveDelete($folder);
+
+                // Delete the unit instance
+
+                $unitInstanceMapper->delete($unit);
+            }
+        }
+        catch (\Exception $e)
+        {
+            // Permission denied or something wasn't found, do nothing and just return. The folder won't have
+            // been deleted.
+        }
+
+        // What do we do at the end of an AJAX method? If I don't put an exit it renders a "template not found"
+        // error message in the AJAX result.
+
+        exit;
     }
 }

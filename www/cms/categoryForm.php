@@ -229,7 +229,7 @@ if ($_POST['name']) {
     }
 
     $folderMapper->save($movedFolder->setParent($parentFolder));
-} elseif (is_numeric($_GET['delete'])) {
+} /*elseif (is_numeric($_GET['delete'])) {
     try {
         $category = $folderMapper->findById($_GET['delete']);
     } catch (\Exception $e) {
@@ -253,7 +253,7 @@ if ($_POST['name']) {
 
     $_SESSION['resourcesID'] = $category->getParent()->getId();
     $bttfCount = 2;
-} elseif (is_numeric($_GET['deleteAll'])) {
+}*/ elseif (is_numeric($_GET['deleteAll'])) {
 // only superusers can do this no matter what
     if (!$groupHandler->isSuperuser()) {
         error(12);
