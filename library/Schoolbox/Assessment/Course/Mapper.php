@@ -60,6 +60,42 @@ class Mapper extends FolderMapper
     }
 
     /**
+     * Similar to findById() but restricts finds to Course Folders only
+     * Courses must have Units and Tasks to be matched successfully
+     *
+     * @param $id
+     * @return Folder
+     * @throws \Exception
+     */
+    public function findCourseById($id)
+    {
+        $query = "
+            SELECT
+                course.*,
+                COUNT(task.id) AS taskCount
+            FROM category course
+            LEFT JOIN category unit ON unit.parent = course.id AND unit.deleted_at IS NULL
+            INNER JOIN `task` ON task.category_id = unit.id AND task.deleted_at IS NULL
+            WHERE course.deleted_at IS NULL
+            AND course.id = :id
+            GROUP BY course.id
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'id' => $id
+        ]);
+
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        if ($row) {
+            return $this->hydrate($row);
+        }
+
+        throw new \Exception('Course not found');
+    }
+
+    /**
      * List the courses. Returns a combined array of Folder instances
      * and information about any found Units and their task counts
      *

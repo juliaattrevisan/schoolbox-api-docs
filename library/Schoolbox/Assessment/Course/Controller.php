@@ -324,7 +324,7 @@ class Controller extends BaseController
          */
         try {
             if ($courseId) {
-                $folder = $this->getCourseMapper()->findById($courseId);
+                $folder = $this->getCourseMapper()->findCourseById($courseId);
                 $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
 
                 $data['folder'] = $folder;
