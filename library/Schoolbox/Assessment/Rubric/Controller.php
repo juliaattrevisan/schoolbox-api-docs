@@ -160,7 +160,8 @@ class Controller extends BaseController
             }
 
             // attempt to build the grid
-            $grid = $this->getMapper()->buildFromCSV($file, $folderId, $taskMode)->setSubmissionBox($box);
+            $maxLevels = $this->getDi()->get('config')->get('rubric_max_levels');
+            $grid = $this->getMapper()->buildFromCSV($file, $folderId, $maxLevels, $taskMode)->setSubmissionBox($box);
 
         } catch (\Exception $e) {
 
