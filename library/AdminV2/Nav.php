@@ -8,7 +8,7 @@
  */
 class AdminV2_Nav
 {
-    public $nav = array(
+    private $nav = array(
         'home' => 'Home',
         'user' => 'Users',
         'side-menu' => 'Side Menu',
@@ -31,6 +31,10 @@ class AdminV2_Nav
         'ups' => 'User Provisioning System',
         'import' => 'Import',
     );
+
+    public function getNavigation() {
+        return $this->nav;
+    }
 
     public function parse(SitePage $page, $currentPage = 'home')
     {

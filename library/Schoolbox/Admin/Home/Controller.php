@@ -10,13 +10,11 @@
 namespace Schoolbox\Admin\Home;
 
 use Alaress\Web\Controller\Base;
-use PDepend\Util\Log;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Config\ConfigMapper;
 use Proxy\Server as ProxyServer;
-use Schoolbox\Admin\Navigation as AdminNavigation;
 
 class Controller extends Base
 {
@@ -217,13 +215,15 @@ class Controller extends Base
             }
         }
 
+        // Get the navigation
+
         // Render this thing out
 
         $this->getResponse()->content->set(
             array(
                 'template' => '@adminHome/index.twig',
                 'data'     => array(
-                    'navigation' => AdminNavigation::getNavigation(),
+                    'pageCurrent' => basename($_GET["page"]),
                     'disk_used' => \Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
                     'disk_total' => \Alaress_Byte_Format::bytesToString($disk_total),
                     'disk_percentage' => \Alaress_Byte_Format::bytesToString($disk_percentage),

@@ -16,7 +16,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\RoleMapper;
-use \Schoolbox\Admin\Navigation as AdminNavigation;
+use Schoolbox\Resource\HomepageTemplateMapper;
 
 class Controller extends Base
 {
@@ -48,10 +48,11 @@ class Controller extends Base
             array(
                 'template' => '@adminCourseBuilder/index.twig',
                 'data'     => array(
-                    'navigation' => AdminNavigation::getNavigation(),
+                    'pageCurrent' => basename($_GET["page"]),
                     'tab' => $_GET["tab"] != '' ? $_GET["tab"] : 'course',
                     'roles' => RoleMapper::getInstance()->findAll(),
                     'permissions' => $permissions,
+                    'templates' => HomepageTemplateMapper::getInstance()->findAll()->sortBy("name", "asc"),
                     'courseTemplate' => ConfigMapper::getInstance()->get('default_course_page_template'),
                     'unitTemplate' => ConfigMapper::getInstance()->get('default_unit_page_template')
                 ),

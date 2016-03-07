@@ -16,7 +16,6 @@ use Schoolbox\User;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Config\ConfigMapper;
 use Proxy\Server as ProxyServer;
-use Schoolbox\Admin\Navigation as AdminNavigation;
 
 class Controller extends Base
 {
@@ -28,7 +27,7 @@ class Controller extends Base
             array(
                 'template' => '@adminClean/index.twig',
                 'data'     => array(
-                    'navigation' => AdminNavigation::getNavigation(),
+                    'pageCurrent' => basename($_GET["page"]),
                 ),
             )
         );

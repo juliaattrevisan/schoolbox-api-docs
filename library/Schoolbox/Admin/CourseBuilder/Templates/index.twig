@@ -1,6 +1,6 @@
 {# Shared navigation menu #}
 
-{{ navigation | raw }}
+{{ renderAdminNavigation(pageCurrent) }}
 
 <script>
     $(function() {
@@ -31,17 +31,9 @@
                                 Homepage Template
                                 <select name="template_course">
                                     <option {% if courseTemplate == -1 %}selected{% endif %} value="-1">No Homepage</option>
-                                    <option {% if courseTemplate == 1 %}selected{% endif %} value="1">Class</option>
-                                    <option {% if courseTemplate == 2 %}selected{% endif %} value="2">Collab Group</option>
-                                    <option {% if courseTemplate == 4 %}selected{% endif %} value="4">Faculty</option>
-                                    <option {% if courseTemplate == 3 %}selected{% endif %} value="3">Extra-Curricular</option>
-                                    <option {% if courseTemplate == 5 %}selected{% endif %} value="5">Committee</option>
-                                    <option {% if courseTemplate == 6 %}selected{% endif %} value="6">House</option>
-                                    <option {% if courseTemplate == 7 %}selected{% endif %} value="7">Blog</option>
-                                    <option {% if courseTemplate == 9 %}selected{% endif %} value="9">Blank</option>
-                                    <option {% if courseTemplate == 10 %}selected{% endif %} value="10">Files and Folders</option>
-                                    <option {% if courseTemplate == 13 %}selected{% endif %} value="13">Course - Overview</option>
-                                    <option {% if courseTemplate == 14 %}selected{% endif %} value="14">Course - Lesson</option>
+                                    {% for template in templates %}
+                                        <option {% if courseTemplate == template.getId %}selected{% endif %} value="{{ template.getId }}">{{ template.getName }}</option>
+                                    {% endfor %}
                                 </select>
                             </label>
                         </div>
@@ -92,17 +84,9 @@
                                 Homepage Template
                                 <select name="template_unit">
                                     <option {% if unitTemplate == -1 %}selected{% endif %} value="-1">No Homepage</option>
-                                    <option {% if unitTemplate == 1 %}selected{% endif %} value="1">Class</option>
-                                    <option {% if unitTemplate == 2 %}selected{% endif %} value="2">Collab Group</option>
-                                    <option {% if unitTemplate == 4 %}selected{% endif %} value="4">Faculty</option>
-                                    <option {% if unitTemplate == 3 %}selected{% endif %} value="3">Extra-Curricular</option>
-                                    <option {% if unitTemplate == 5 %}selected{% endif %} value="5">Committee</option>
-                                    <option {% if unitTemplate == 6 %}selected{% endif %} value="6">House</option>
-                                    <option {% if unitTemplate == 7 %}selected{% endif %} value="7">Blog</option>
-                                    <option {% if unitTemplate == 9 %}selected{% endif %} value="9">Blank</option>
-                                    <option {% if unitTemplate == 10 %}selected{% endif %} value="10">Files and Folders</option>
-                                    <option {% if unitTemplate == 13 %}selected{% endif %} value="13">Course - Overview</option>
-                                    <option {% if unitTemplate == 14 %}selected{% endif %} value="14">Course - Lesson</option>
+                                    {% for template in templates %}
+                                        <option {% if unitTemplate == template.getId %}selected{% endif %} value="{{ template.getId }}">{{ template.getName }}</option>
+                                    {% endfor %}
                                 </select>
                             </label>
                         </div>

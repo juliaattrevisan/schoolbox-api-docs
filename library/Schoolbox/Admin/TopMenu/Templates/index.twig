@@ -1,0 +1,51 @@
+{# Shared navigation menu #}
+
+{{ renderAdminNavigation(pageCurrent) }}
+
+{# Config page contents #}
+
+<script>
+    $(function() {
+
+        $('[data-item]').click(function(event) {
+            $('[data-item]').each(function(e) {
+                this.removeClass('navthis')
+            });
+            $(event.target).addClass('navthis');
+        });
+
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 island collapse">
+        <div class="actions-small-1">
+            <div class="list-item">
+                <h2 class="subheader">Top Menu</h2>
+            </div>
+            <nav>
+                <a data-reveal-id="newDialog" class="icon-add" href="#" title="Create"></a>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <div class="hybrid-bar">
+            <nav class="tab-bar">
+                <section class="tab-bar-section">
+                    <ul class="icon-nav small-12 columns">
+                        {% for item in items %}
+                            <li data-item>
+                                <a id="{{ item.getId }}" class="{{ item.getIcon }}" title="{{ item.getText }}">
+                                    <span>{{ item.getText }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            </nav>
+        </div>
+    </div>
+</div>
