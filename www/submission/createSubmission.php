@@ -411,10 +411,18 @@ $output['USER_CAMPUS_LIST'] = json_encode($campusList);
 
 $this->setVar($output);
 
+// Get the parent folder
+$parent = CategoryMapper::getInstance()->findById($category->getParent()->getId());
+
 /* Render out breadcrumbs
  */
 $trail = new \Schoolbox\Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+    [
+        'text' => $parent->getName(),
+        'href' => "/homepage/{$parent->getId()}",
+        'class' => '',
+    ],
     [
         'text'  => $category->getName(),
         'href'  => "/homepage/{$category->getId()}",
