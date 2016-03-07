@@ -148,20 +148,28 @@ class Controller extends BaseController
     /**
      * Post request to spawn a new unit
      *
-     * @api   /course/unit/new
+     * @api   POST /course/unit/new
      * @level 160
      */
     public function newUnit()
     {
         $post = $this->getRequest()->post;
 
-        $name  = $post->get('name');
+        $name  = trim($post->get('name'));
         $index = $post->get('i', 1);
+
+        if (!$name) {
+            $this->sendError('Could not create unit', [ 'give the unit a name' ]);
+            return;
+        }
 
         // TODO persist new folder to DB, including course builder template
 
         $data = [
-            'unit'  => $name,
+            'unit'  => [
+                'id'   => 'unknown',
+                'name' => $name
+            ],
             'i'     => $index,
             'icons' => [ 'task', 'due work', 'quiz' ]
         ];
