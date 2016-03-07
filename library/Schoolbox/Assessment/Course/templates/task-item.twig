@@ -1,3 +1,6 @@
+{# list of task actions #}
+{% set actions = ['modify', 'delete'] %}
+
 <li class="actions-small-1 actions-large-2">
     <div class="list-item">
         <div class="grip"></div>
@@ -9,11 +12,17 @@
     </div>
     <nav>
         <span class="show-for-large-up">
-            <a href="/task/modify/{{ task.id }}" class="icon-modify" title="Modify"></a>
-            <a href="/task/delete/{{ task.id }}" class="icon-delete" title="Delete"></a>
+            {% for action in actions %}
+                <a href="/task/{{ action }}/{{ task.id }}" class="icon-{{ action }}" title="{{ action | capitalize }}"></a>
+            {% endfor %}
         </span>
         <span class="hide-for-large-up">
-            <a href="#" class="icon-overflow"></a>
+            <a href="#" class="icon-overflow" data-dropdown="dropdown-{{ task.id }}"></a>
         </span>
     </nav>
+    <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ task.id }}">
+        {% for action in actions %}
+            <li><a href="/task/{{ action }}/{{ task.id }}" class="icon-{{ action }}">{{ action | capitalize }}</a></li>
+        {% endfor %}
+    </ul>
 </li>
