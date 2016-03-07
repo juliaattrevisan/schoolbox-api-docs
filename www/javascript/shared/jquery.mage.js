@@ -15,7 +15,8 @@
         reenablePrevious: false,
         onXhrDone: $.noop,
         onXhrFail: $.noop,
-        onXhrAlways: $.noop
+        onXhrAlways: $.noop,
+        setFormData: $.noop
     };
 
     function Mage(element, options) {
@@ -139,10 +140,27 @@
      */
     function xhrSend(method, action, targetElement) {
 
-        var targetCopy = targetElement.clone().removeAttr('disabled'),
-            form       = $('<form/>').append(targetCopy.append($('<input type=text />').attr('name', this.element.name).attr('value', 1))),
-            formData   = form.serialize(),
-            mage       = this;
+        var mage = this,
+            targetCopy = targetElement.clone().removeAttr('disabled'),
+            form = $('<form/>'), formSerial, formData = {};
+
+        if (this.element.name) {
+            // submit clicked-button value
+            targetCopy.append($('<input type=text />').attr('name', this.element.name).attr('value', 1))
+        }
+
+        form.append(targetCopy);
+
+        // set up an object that can be manipulated outside
+        formSerial = form.serializeArray();
+
+        // convert this into a single object rather than an array of objects
+        for (var i = 0; i < formSerial.length; ++i) {
+            formData[formSerial[i]['name']] = formSerial[i]['value'];
+        }
+
+        // pre-flight check
+        mage.options.setFormData(formData);
 
         return $
             .ajax(action, {
