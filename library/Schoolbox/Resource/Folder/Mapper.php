@@ -1133,6 +1133,34 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         return $result;
     }
 
+    /**
+     * Find Folders whose names contain $param
+     *
+     * @param $param
+     * @return Collection
+     */
+    public function findByName($param)
+    {
+        $query = "
+            SELECT {$this->getColumnString()}
+            FROM `{$this->getTable()}`
+            WHERE name LIKE :param
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array(
+            'param' => "%{$this->database->quoteForLike($param)}%"
+        ));
+
+        $collection = new Collection();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $collection->add($this->hydrate($row));
+        }
+
+        return $collection;
+    }
+
     /* Getters/Setters
      */
 

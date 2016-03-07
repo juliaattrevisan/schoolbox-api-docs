@@ -243,25 +243,17 @@ class Controller extends BaseController
      */
     public function importClasses()
     {
+        $data = [];
+        $allFolders = Folder\Mapper::getInstance()->findByName($this->getRequest()->query->get('query'));
 
-        $data = [
-            [
-                'id' => 'class1',
-                'name' => 'Class 1',
-            ],
-            [
-                'id' => 'class2',
-                'name' => 'Class 2',
-            ],
-            [
-                'id' => 'class3',
-                'name' => 'Class 3',
-            ],
-            [
-                'id' => 'class4',
-                'name' => 'Class 4',
-            ],
-        ];
+        /* Swap keys for selectize compatibility -_-
+         */
+        foreach ($allFolders as $currentFolder) {
+            $data[] = [
+                'id' => $currentFolder->getId(),
+                'name' => $currentFolder->getName()
+            ];
+        }
 
         echo json_encode($data);
         exit();
@@ -280,8 +272,6 @@ class Controller extends BaseController
             $data = [
                 'course' => $course
             ];
-
-            new \Alaress_Probe($course);
         }
         catch (\Exception $e) {
 
