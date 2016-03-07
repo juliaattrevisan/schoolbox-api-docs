@@ -1,22 +1,4 @@
 <li class="actions-small-1 content" data-unit>
-
-    <script type="text/javascript">
-        $(function() {
-            $('#unit-{{ i }}-modify [data-delete="unit"]').click(function(event) {
-                event.preventDefault();
-
-                var element = $(this);
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this unit?',
-                    confirmEvent: function() {
-
-                    }
-                });
-            });
-        });
-    </script>
-
     <div class="list-item">
         <div class="small-1 column">
             <a data-collapser="unit-{{ i }}" class="icon-down-arrow"></a>
@@ -31,7 +13,7 @@
         <a class="icon-overflow" title="" data-dropdown="unit-{{ i }}-modify"></a>
     </nav>
     <ul id="unit-{{ i }}-modify" class="f-dropdown" data-dropdown-content>
-        <li><a href="" class="icon-delete" data-delete="unit">Delete Unit</a></li>
+        <li><a href="/course/unit/{{ unit.id }}/delete" class="icon-delete" data-delete="unit">Delete Unit</a></li>
     </ul>
     <div class="small-12 column hide" data-collapsable="unit-{{ i }}" data-collapse-state="collapsed">
         <ul class="information-list sortable" data-sortable>
