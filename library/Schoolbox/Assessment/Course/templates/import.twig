@@ -2,7 +2,16 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function() {
-        // Add selectize for user selection and selector for related items
+        $('#import-course').selectizeSelector({
+            ajax: {
+                url:      '/course/import/courses',
+                type:     'GET',
+                dataType: 'json'
+            },
+            multiple: false,
+            value: {{ sources|json_encode|raw }}
+        });
+
         $('#import-folders').selectizeSelector({
             ajax: {
                 url:      '/course/import/classes',
@@ -11,7 +20,7 @@
             },
             multiple: true,
             value: {{ destinations|json_encode|raw }}
-        })
+        });
     });
 </script>
 
@@ -25,17 +34,13 @@
     <div class="small-12 island">
         <section class="content">
             <div class="row">
-                <div class="small-2 columns">
-                    <div class="info card">
-                        <a href="#" title="View Profile">
-                            <a href="/homepage/{{ folder.id }}">{{ folder.name }}</a>
-                        </a>
-                    </div>
+                <div class="small-3 columns">
+                    <input id="import-course" type="text" name="importCourse" />
                 </div>
                 <div class="small-1 columns text-center">
                     &rarr;
                 </div>
-                <div class="small-9 columns">
+                <div class="small-8 columns">
                     <input id="import-folders" type="text" name="importFolders" />
                 </div>
             </div>

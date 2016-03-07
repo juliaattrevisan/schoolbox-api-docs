@@ -247,6 +247,28 @@ class Controller extends BaseController
     }
 
     /**
+     * Get a list of all the Courses which can be
+     * imported into a Folder
+     */
+    public function importCourses()
+    {
+        $data = [];
+        $allFolders = $this->getCourseMapper()->findCourseListByName($this->getRequest()->query->get('query'));
+
+        /* Swap keys for selectize compatibility -_-
+         */
+        foreach ($allFolders as $currentFolder) {
+            $data[] = [
+                'id' => $currentFolder->getId(),
+                'name' => $currentFolder->getName()
+            ];
+        }
+
+        echo json_encode($data);
+        exit();
+    }
+
+    /**
      * Get a list of all the Folders which should
      * receive the selected Course
      */
@@ -289,6 +311,10 @@ class Controller extends BaseController
              */
             'tasks' => [],
 
+            /* Course Folder as selectize-compatible
+             */
+            'sources' => [],
+
             /* Folder to which this Course shall be applied
              */
             'destinations' => []
@@ -302,6 +328,12 @@ class Controller extends BaseController
                 $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
 
                 $data['folder'] = $folder;
+
+                $data['sources'] = [
+                    'id' => $folder->getId(),
+                    'name' => $folder->getName()
+                ];
+
                 $data['units']  = $this->getCourseMapper()->findByParent($courseId);
 
                 foreach ($data['units'] as $unit) {
