@@ -268,6 +268,7 @@ class UserMapper extends Mapper
         });
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateDefaultCampus']);
     }
 
 
@@ -591,6 +592,34 @@ class UserMapper extends Mapper
             }
             $statement = $this->getDatabase()->prepare($query);
             $statement->execute([$user->getId()]);
+        }
+    }
+
+    /**
+     * Post-save callback for updating a user's default campus.
+     *
+     * @param User $user
+     */
+    public function updateDefaultCampus(User $user)
+    {
+        $defaultCampus = $user->getDefaultCampus();
+        if ($defaultCampus instanceof Campus) {
+            $defaultCampusId = $defaultCampus->getId();
+            if ($defaultCampusId) {
+                $statement = $this->getDatabase()->prepare("
+                    UPDATE userCampus
+                    SET    defaultCampus = :isDefault
+                    WHERE  uid    = :userId
+                    AND    campus = :campusId
+                ");
+                foreach ($user->getCampusCollection() as $campus) {
+                    $statement->execute([
+                        'userId'    => $user->getId(),
+                        'campusId'  => $campus->getId(),
+                        'isDefault' => ($defaultCampusId == $campus->getId() ? 1 : 0),
+                    ]);
+                }
+            }
         }
     }
 }
