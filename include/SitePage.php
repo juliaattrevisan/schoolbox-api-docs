@@ -1159,6 +1159,13 @@ class SitePage extends Page
      */
     function goLoginPage($error = '', $page = '')
     {
+        // AJAX request? Don't ever output a page.
+        // Output something with a 401 status code.
+        if ($this->detectAjax()) {
+            $this->outputJson(['error' => 'Unauthenticated'], false, 401);
+            exit;
+        }
+
         $this->setSite();
         $this->setFile(TEMPLATE_body, 'common/login.html');
         $this->setBlock(TEMPLATE_body, 'login_terms', 'login_terms_block');
