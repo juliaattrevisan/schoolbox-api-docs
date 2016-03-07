@@ -118,6 +118,68 @@ class Controller extends BaseController
 
 
     /**
+     * Accept the create formdata
+     *
+     * @api   POST /course/new
+     * @level 160
+     */
+    public function createCourse()
+    {
+        $errors = [];
+        $post   = $this->getRequest()->post;
+        $name   = trim($post->get('name'));
+
+        if (!$name) {
+            $errors[] = 'give the course a name';
+            $name = 'this course';
+        }
+
+        try {
+            // cause a snap if no (or invalid) parent was supplied
+            $parent = $this->getCourseMapper()->findById(trim((string)$post->get('parent', -1)));
+
+        } catch (Mapper\Exception $e) {
+
+            $errors[] = "select a faculty or class for $name to live in";
+        }
+
+        // if there were any validation problems, throw that back
+        if ($errors) {
+            $this->sendError("Could not save", $errors);
+            return;
+        }
+
+        // basic validation passed: prepare to save!
+
+        // was an ID sent through?
+        $id = trim($post->get('id'));
+
+        // extract codes
+        $codes = $post->get('curriculumCodes', []);
+
+        if ($id) {
+            try {
+                $folder = $this->getCourseMapper()->findById($id);
+
+            } catch (Mapper\Exception $e) {
+                $this->sendError("Could not save because ".$e->getMessage());
+                return;
+            }
+        } else {
+            $folder = $this->getCourseMapper()->createModel();
+        }
+
+        // TODO perform the same manipulations as /cms/categoryForm.php, then save
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => [ 'id' => $folder->getId() ]
+        ]);
+
+    }
+
+
+    /**
      * @param string $problem
      * @param array  $resolutions
      * @param int    $statusCode
