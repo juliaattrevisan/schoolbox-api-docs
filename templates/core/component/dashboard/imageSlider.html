@@ -20,9 +20,14 @@
             <section class="imageslider-container">
                 <div data-imageslider class="imageslider">
                     <!-- BEGIN image_scroller -->
+                    <!-- BEGIN linked_image -->
                     <a href="{IMAGE_URL}">
                         <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
                     </a>
+                    <!-- END linked_image -->
+                    <!-- BEGIN unlinked_image -->
+                    <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
+                    <!-- END unlinked_image -->
                     <!-- END image_scroller -->
                 </div>
             </section>

@@ -80,6 +80,8 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         }
 
         $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
+        $this->setBlock('image_scroller', 'linked_image', 'linked_image_block');
+        $this->setBlock('image_scroller', 'unlinked_image', 'unlinked_image_block');
         $this->setBlock($templateHandle, 'has_header', 'has_header_block');
 
         /* Hide header bar if desired
@@ -132,15 +134,17 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
 
         // Iterate
         foreach ($allFiles as $currentFile) {
-            $url = '#';
+            $url = '';
 
             // sanitise url
-            $description = $currentFile->getDescription();
-            if (filter_var($description, FILTER_VALIDATE_URL)) {
-                $url = $description;
-            } // it might be referencing inside schoolbox, so simulate that to the validator
-            elseif (filter_var('http://localhost/' . $description, FILTER_VALIDATE_URL)) {
-                $url = $description;
+            if($currentFile->getDescription()) {
+                $description = $currentFile->getDescription();
+                if (filter_var($description, FILTER_VALIDATE_URL)) {
+                    $url = $description;
+                } // it might be referencing inside schoolbox, so simulate that to the validator
+                elseif (filter_var('http://localhost/' . $description, FILTER_VALIDATE_URL)) {
+                    $url = $description;
+                }
             }
 
             $this->setVar(
@@ -151,6 +155,15 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
                     'IMAGE_DIMENSION' => $pixel
                 )
             );
+
+            if($url) {
+                $this->parse('linked_image_block', 'linked_image');
+                $this->setVar('unlinked_image_block','');
+            }
+            else {
+                $this->parse('unlinked_image_block', 'unlinked_image');
+                $this->setVar('linked_image_block','');
+            }
 
             $this->parse('image_scroller_block', 'image_scroller', true);
         }
