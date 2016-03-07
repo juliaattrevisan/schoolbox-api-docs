@@ -334,11 +334,9 @@ class Controller extends BaseController
                     'name' => $folder->getName()
                 ];
 
-                $data['units']  = $this->getCourseMapper()->findByParent($courseId);
-
-                foreach ($data['units'] as $unit) {
-                    $data['tasks'][$unit->getId()] = TaskMapper::getInstance()->findByCategory($unit);
-                }
+                /* Bolt on the Unit/Task data
+                 */
+                $data = array_merge($data, $this->findUnitsAndTasks($courseId));
             }
         }
         catch (\Exception $e) {
@@ -367,6 +365,53 @@ class Controller extends BaseController
         }
 
         $this->tpl('import', $data);
+    }
+
+    /**
+     * Get the Units and Tasks for a particular Course
+     *
+     * @param $courseId
+     * @return array
+     */
+    public function importResults($courseId)
+    {
+        $this->tpl('importResults', $this->findUnitsAndTasks($courseId));
+    }
+
+    /**
+     * Find Units and Tasks for a particular Course
+     *
+     * @param $courseId
+     * @return array
+     */
+    private function findUnitsAndTasks($courseId)
+    {
+        $data = [
+
+            /* All Units associated with this Course
+             */
+            'units' => [],
+
+            /* All Tasks associated with Units
+             */
+            'tasks' => [],
+        ];
+
+        /* A course was already chosen
+         */
+        try {
+            $data['units'] = $this->getCourseMapper()->findByParent($courseId);
+
+            foreach ($data['units'] as $unit) {
+                $data['tasks'][$unit->getId()] = TaskMapper::getInstance()->findByCategory($unit);
+            }
+        } catch (\Exception $e) {
+
+            /* TODO: No course found
+             */
+        }
+
+        return $data;
     }
 
     /* Getters/Setters

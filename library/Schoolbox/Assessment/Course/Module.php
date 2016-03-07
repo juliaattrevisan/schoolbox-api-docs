@@ -47,6 +47,10 @@ class Module extends BaseModule
                  */
                 '/import/{courseId}/class/{classId}' => 'import',
 
+                /* Dynamic Unit/Task list when choosing course to import
+                 */
+                '/importResults/{courseId}'          => 'importResults',
+
                 /* A list of Courses you can import via selectize
                  */
                 '/import/courses'                    => 'importCourses',

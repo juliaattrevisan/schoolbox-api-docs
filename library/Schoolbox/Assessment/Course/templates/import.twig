@@ -48,26 +48,6 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Units and Tasks</h2>
-        <section class="content">
-            <ul class="information-list">
-                {% for unit in units %}
-                {% include '@course/unitList.twig' %}
-                {% endfor %}
-            </ul>
-        </section>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Coursework?</h2>
-        <section class="content">
-            <p>
-                What is?
-            </p>
-        </section>
-    </div>
+<div id="importResults">
+    {% include '@course/importResults.twig' %}
 </div>
