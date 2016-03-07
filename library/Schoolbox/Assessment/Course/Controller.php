@@ -492,8 +492,6 @@ class Controller extends BaseController
             throw new RangeException("Failed to save folder.");
         }
 
-        $model->setId($affectedIds[0]);
-
         if ($postData["inherit"] == 0) {
             // only allow recursive permissions to supers
             $recursive = $this->getUser()->isSuperuser() && $postData['recursive'];
