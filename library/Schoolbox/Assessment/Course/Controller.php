@@ -276,11 +276,15 @@ class Controller extends BaseController
         $data = [];
 
         try {
-            $course = $this->getCourseMapper()->findById($id);
+            $folder = $this->getCourseMapper()->findById($id);
+            $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
 
-            $data = [
-                'course' => $course
-            ];
+            $data['folder'] = $folder;
+            $data['units']  = $this->getCourseMapper()->findByParent($id);
+
+            foreach ($data['units'] as $unit) {
+                $data['tasks'][$unit->getId()] = TaskMapper::getInstance()->findByCategory($unit);
+            }
         }
         catch (\Exception $e) {
 
