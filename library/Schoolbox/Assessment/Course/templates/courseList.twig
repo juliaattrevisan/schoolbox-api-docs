@@ -5,7 +5,18 @@
 
         /* Attach Course Selector
          */
-        $.fn.courseSelector();
+        $.fn.courseSelector({
+
+            courseSelector: {
+                query: {
+{% if folder.id and component.id %}
+                    component: {{ component.id }},
+                    folder: {{ folder.id }}
+{% endif %}
+                }
+            }
+
+        });
     });
 </script>
 

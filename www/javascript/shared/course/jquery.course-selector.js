@@ -32,6 +32,9 @@
                      */
                     url: '/course/list/ajax',
 
+                    // any additional params to send with the AJAX request
+                    query: {},
+
                     /* Ajax requests spawn inside this element
                      * These should reference the same element
                      */
@@ -53,9 +56,7 @@
                 }
             };
 
-            var derived = {};
-
-            return $.extend(defaults, derived, options);
+            return $.extend(true, {}, defaults, options);
         }
 
         /**
@@ -79,11 +80,16 @@
                 }
 
                 this.courseFilterTimeout = setTimeout(function () {
-                    var query = $(config.courseSelector.filter).val();
+
+                    // clone the params so we can extend them
+                    var params = $.extend(true, {}, config.courseSelector.query);
+
+                    // load the query into the params
+                    params.query = $(config.courseSelector.filter).val();
 
                     addLoadingState(config.courseSelector.filter);
 
-                    $.get(config.courseSelector.url, { query: query}, function(responseText) {
+                    $.get(config.courseSelector.url, params, function(responseText) {
                         $('#course-selector-results').html(responseText);
 
                         removeLoadingState(config.courseSelector.filter);
@@ -158,10 +164,7 @@
                 }
             };
 
-            var derived = {
-            };
-
-            return $.extend(defaults, derived, options);
+            return $.extend(true, {}, defaults, options);
         }
 
         /**
@@ -174,11 +177,19 @@
 
             /* Spawn modal
              */
-            config.element.on('click', function(event) {
+            $(document).on('click', '[data-course-selector]', function(event) {
                 event.preventDefault();
 
+                var compInstId = $(this).data('course-selector');
+                var query = $.extend(true, {}, config.courseSelector.query);
+
+                if (compInstId) {
+                    query.component = compInstId;
+                }
+
                 config.courseSelector.modal.foundation('reveal', 'open', {
-                    url: config.courseSelector.url
+                    url: config.courseSelector.url,
+                    data: query
                 });
             });
         }

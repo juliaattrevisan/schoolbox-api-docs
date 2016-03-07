@@ -19,17 +19,21 @@
 
         component.on('click.courseInstance', 'a[data-interaction=homepage_selector]', function (event) {
             event.preventDefault();
-            browser.socialstreamBrowser({
-                title: 'Select a course',
-                categoryId: settings.course_homepage,
-                isolate: true,
-                mimeFilter: false,
-                submitCallback: function(url, filename) {
-                    $(destination)
-                        .val(url.match(/[0-9]+/)[0])
-                        .trigger('change.courseInstance');
-                }
-            });
+            // Removed in favour of new course list
+            // Not sure if we need this for reference later though
+            // I'll consciously leave this here for now
+            //
+            //browser.socialstreamBrowser({
+            //    title: 'Select a course',
+            //    categoryId: settings.course_homepage,
+            //    isolate: true,
+            //    mimeFilter: false,
+            //    submitCallback: function(url, filename) {
+            //        $(destination)
+            //            .val(url.match(/[0-9]+/)[0])
+            //            .trigger('change.courseInstance');
+            //    }
+            //});
         });
 
         // Event for opening the import page - tied to change event of input

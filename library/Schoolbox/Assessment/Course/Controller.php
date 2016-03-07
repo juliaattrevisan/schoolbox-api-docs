@@ -110,12 +110,40 @@ class Controller extends BaseController
         $this->tpl('unit', $data);
     }
 
+
     /**
      * Dump out a list of courses
      * The Filter field allows you to search Course names
+     *
+     * @api   GET /course/list
+     * @level 160
      */
     public function courseList() {
-        $data = $this->getCourseMapper()->findCourseList($this->getRequest()->query->get('query'));
+        $this->displayCourseList('courseList');
+    }
+
+
+    /**
+     * Dump out AJAX'd search results
+     * The Filter field allows you to search Course names
+     *
+     * @api   GET /course/list/ajax
+     * @level 160
+     */
+    public function courseListAjax() {
+        $this->displayCourseList('courseListResults');
+    }
+
+
+    /**
+     * Sub-method for course list renderings
+     *
+     * @param string $template
+     */
+    protected function displayCourseList($template) {
+
+        $query = $this->getRequest()->query;
+        $data  = $this->getCourseMapper()->findCourseList($query->get('query'));
 
         if ($this->getRequest()->isXhr()) {
             $options = [
@@ -136,35 +164,17 @@ class Controller extends BaseController
             ];
         }
 
-        $this->tpl('courseList', array_merge($data, $options));
-    }
+        $component = $query->get('component');
+        $folder    = $query->get('folder');
 
-    /**
-     * Dump out AJAX'd search results
-     * The Filter field allows you to search Course names
-     */
-    public function courseListAjax() {
-        $data = $this->getCourseMapper()->findCourseList($this->getRequest()->query->get('query'));
-
-        if ($this->getRequest()->isXhr()) {
-            $options = [
-                'hasBreadcrumb' => false,
-                'hasAdd'        => false,
-                'hasTot'        => false,
-                'hasClose'      => true
-            ];
-        }
-        else {
-            $options = [
-                'hasBreadcrumb' => true,
-                'hasAdd'        => true,
-                'hasTot'        => true,
-                'hasClose'      => false
-            ];
+        if ($folder) {
+            $options['folder']['id'] = $folder;
+            $options['component']['id'] = $component ?: "0.0"; // TODO replace: this is a hack to make the old import page work without an explicit component instance ID
         }
 
-        $this->tpl('courseListResults', array_merge($data, $options));
+        $this->tpl($template, array_merge($data, $options));
     }
+
 
     /**
      * @param AbstractTreeBuilder $tb
@@ -206,9 +216,11 @@ class Controller extends BaseController
 
         $tb = new TreeBuilder(Folder\Mapper::getInstance(), TaskMapper::getInstance(), UserAccessMapper::getInstance(), RoleAccessMapper::getInstance(), $this->getUser());
 
+        $facultyNode = $this->getCourseMapper()->getFacultyNode();
+
         $data = [
-            'id'   => $this->facultyTop->getId(),
-            'text' => $this->facultyTop->getName()
+            'id'   => $facultyNode->getId(),
+            'text' => $facultyNode->getName()
         ];
 
         // recurse, passing $data by reference
