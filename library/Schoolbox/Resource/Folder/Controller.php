@@ -278,8 +278,10 @@ class Controller extends BaseController
 
                 $this->getResponse()->redirect->afterPost('/group/modify/'.$model->getId());
             }
-
-            error(20);
+            else
+            {
+                error(20);
+            }
         }
         else
         {
