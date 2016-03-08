@@ -256,18 +256,6 @@ class Controller extends BaseController
     }
 
     /**
-     * Get a list of all the Folders which should
-     * receive the selected Course
-     */
-    public function importClasses()
-    {
-        $importer = new CourseImport();
-
-        echo json_encode($importer->importClasses());
-        exit();
-    }
-
-    /**
      * Import a Course into a set of Folders (classes)
      *
      * @param $courseId
@@ -281,6 +269,18 @@ class Controller extends BaseController
     }
 
     /**
+     * Get a list of all the Folders which should
+     * receive the selected Course
+     */
+    public function importClasses()
+    {
+        $importer = new CourseImport();
+
+        echo json_encode($importer->importClasses());
+        exit();
+    }
+
+    /**
      * Get the Units and Tasks for a particular Course
      *
      * @param $courseId
@@ -290,7 +290,7 @@ class Controller extends BaseController
     {
         $importer = new CourseImport();
 
-        $this->tpl('importResults', $importer->findUnitsAndTasks($courseId));
+        $this->tpl('import/results', $importer->findUnitsAndTasks($courseId));
     }
 
     /* Getters/Setters
