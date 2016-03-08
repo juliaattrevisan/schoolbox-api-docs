@@ -17,6 +17,7 @@ use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
+use Schoolbox\Assessment\Course\Import\Import as CourseImport;
 
 class Controller extends BaseController
 {
@@ -35,11 +36,19 @@ class Controller extends BaseController
     private $folderMapper = null;
 
     /**
+     * A TaskMapper instance
+     *
+     * @var null
+     */
+    private $taskMapper = null;
+
+    /**
      */
     public function __construct()
     {
         $this->setCourseMapper(CourseMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
+        $this->setTaskMapper(TaskMapper::getInstance());
     }
 
     /**
@@ -252,19 +261,9 @@ class Controller extends BaseController
      */
     public function importClasses()
     {
-        $data = [];
-        $allFolders = $this->getFolderMapper()->findByName($this->getRequest()->query->get('query'));
+        $importer = new CourseImport();
 
-        /* Swap keys for selectize compatibility -_-
-         */
-        foreach ($allFolders as $currentFolder) {
-            $data[] = [
-                'id' => $currentFolder->getId(),
-                'name' => $currentFolder->getName()
-            ];
-        }
-
-        echo json_encode($data);
+        echo json_encode($importer->importClasses());
         exit();
     }
 
@@ -272,77 +271,13 @@ class Controller extends BaseController
      * Import a Course into a set of Folders (classes)
      *
      * @param $courseId
+     * @param $classId
      */
     public function import($courseId, $classId)
     {
-        $data = [
+        $importer = new CourseImport();
 
-            /* Course Folder
-             */
-            'folder' => null,
-
-            /* All Units associated with this Course
-             */
-            'units' => [],
-
-            /* All Tasks associated with Units
-             */
-            'tasks' => [],
-
-            /* Course Folder as selectize-compatible
-             */
-            'sources' => [],
-
-            /* Folder to which this Course shall be applied
-             */
-            'destinations' => []
-        ];
-
-        /* A course was already chosen
-         */
-        try {
-            if ($courseId) {
-                $folder = $this->getCourseMapper()->findCourseById($courseId);
-                $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
-
-                $data['folder'] = $folder;
-
-                $data['sources'] = [
-                    'id' => $folder->getId(),
-                    'name' => $folder->getName()
-                ];
-
-                /* Bolt on the Unit/Task data
-                 */
-                $data = array_merge($data, $this->findUnitsAndTasks($courseId));
-            }
-        }
-        catch (\Exception $e) {
-
-            /* TODO: No course found
-             */
-        }
-
-        /* A class was already chosen
-         */
-        try {
-            if ($classId) {
-                $folder = $this->getFolderMapper()->findById($classId);
-                $pair = $folder->findValueLabelPair();
-
-                $data['destinations'] = [
-                    'id' => $pair['value'],
-                    'name' => $pair['label'],
-                ];
-            }
-        }
-        catch (\Exception $e) {
-
-            /* TODO: No destination found
-             */
-        }
-
-        $this->tpl('import', $data);
+        $this->tpl('import', $importer->importSelectize($courseId, $classId));
     }
 
     /**
@@ -353,43 +288,9 @@ class Controller extends BaseController
      */
     public function importResults($courseId)
     {
-        $this->tpl('importResults', $this->findUnitsAndTasks($courseId));
-    }
+        $importer = new CourseImport();
 
-    /**
-     * Find Units and Tasks for a particular Course
-     *
-     * @param $courseId
-     * @return array
-     */
-    private function findUnitsAndTasks($courseId)
-    {
-        $data = [
-
-            /* All Units associated with this Course
-             */
-            'units' => [],
-
-            /* All Tasks associated with Units
-             */
-            'tasks' => [],
-        ];
-
-        /* A course was already chosen
-         */
-        try {
-            $data['units'] = $this->getCourseMapper()->findByParent($courseId);
-
-            foreach ($data['units'] as $unit) {
-                $data['tasks'][$unit->getId()] = TaskMapper::getInstance()->findByCategory($unit);
-            }
-        } catch (\Exception $e) {
-
-            /* TODO: No course found
-             */
-        }
-
-        return $data;
+        $this->tpl('importResults', $importer->findUnitsAndTasks($courseId));
     }
 
     /* Getters/Setters
@@ -433,5 +334,25 @@ class Controller extends BaseController
     private function setFolderMapper($folderMapper)
     {
         $this->folderMapper = $folderMapper;
+    }
+
+    /**
+     * Get task mapper
+     *
+     * @return null
+     */
+    private function getTaskMapper()
+    {
+        return $this->taskMapper;
+    }
+
+    /**
+     * Set task mapper
+     *
+     * @param null $taskMapper
+     */
+    private function setTaskMapper($taskMapper)
+    {
+        $this->taskMapper = $taskMapper;
     }
 }
