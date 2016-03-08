@@ -13,7 +13,9 @@ use Schoolbox\Resource\CategoryMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 
-$return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
+// use a return URL if passed, otherwise use the referrer (which in theory could be blank)
+$return     = $_GET["return_url"] ? $_GET["return_url"] : (string)urlencode(base64_encode(parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH)));
+$return_url = "?return_url=$return";
 
 // Wrangle arguments
 // Possible argument formats: /modify/{id}, /create/{category_id}/{type}/
