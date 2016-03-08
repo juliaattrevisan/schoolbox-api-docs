@@ -15,12 +15,12 @@
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li class="separator">{ASSESS_KIND}</li>
-        <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/modify/{ASSESS_ASSESS_ID}">Modify</a></li>
-        <li><a class="icon-poll" href="/{ASSESS_KIND_LC}/results/{ASSESS_ASSESS_ID}">View Results</a></li>
-        <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/delete/{ASSESS_ASSESS_ID}" data-delete>Delete</a></li>
+        <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/modify/{ASSESS_ASSESS_ID}{RETURN_URL}">Modify</a></li>
+        <li><a class="icon-poll" href="/{ASSESS_KIND_LC}/results/{ASSESS_ASSESS_ID}{RETURN_URL}">View Results</a></li>
+        <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/delete/{ASSESS_ASSESS_ID}{RETURN_URL}" data-delete>Delete</a></li>
         <li><a class="icon-export" href="/{ASSESS_KIND_LC}/export/xml/{ASSESS_ASSESS_ID}">Export</a></li>
         <li class="separator">Section</li>
-        <li><a class="icon-add" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}">Add Section</a></li>
+        <li><a class="icon-add" href="/{ASSESS_KIND_LC}/section/create/{ASSESS_ASSESS_ID}{RETURN_URL}">Add Section</a></li>
     </ul>
 </div>
 
@@ -38,8 +38,10 @@
         <section class="content">
             <article>{ASSESS_DESCRIPTION}</article>
         </section>
+        <a href="{RETURN_URL_DECODED}" class="button expand">Finished Editing Quiz</a>
         <!-- END has_description -->
         <!-- BEGIN allQuestions -->
         <!-- END allQuestions -->
+
     </div>
 </div>

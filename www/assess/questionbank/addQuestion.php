@@ -30,7 +30,10 @@ if (!empty($_POST)) {
     );
 
     if ($success) {
-        SitePage::localRedir('/assess/questionbank/added/' . $_POST['question_id']);
+
+        $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
+
+        SitePage::localRedir('/assess/questionbank/added/' . $_POST['question_id'] . $return_url);
     } else {
         error(8);
     }

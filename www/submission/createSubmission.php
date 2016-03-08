@@ -386,6 +386,7 @@ $output = array(
     'IS_TASK'           => $is_task ? 1 : 0,
     'UNIT_ID'           => $unit_id,
     'TASK_INSTANCE_ID'  => $task_instance_id,
+    'RETURN_URL'        => $_GET["return_url"],
     'CURRICULUM_CODE_INPUT' => $this->getTwig()->render(
         'sub/curriculumCodeSelector.twig',
         ['codeList' => $submission->getCurriculumNodes(), 'renderButton' => false,]

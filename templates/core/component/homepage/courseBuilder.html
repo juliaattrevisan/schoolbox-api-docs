@@ -86,7 +86,7 @@
                         </nav>
                         <ul data-dropdown-content class="f-dropdown" id="options-task{TASK_ID}">
                             <li><a href="/task/export/{TASK_ID}" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>
-                            <li><a href="{TASK_MODIFY_URL}" {TASK_REVEAL_ATTR} class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task">Modify</a></li>
+                            <li><a href="{TASK_MODIFY_URL}?return_url={RETURN_URL}" {TASK_REVEAL_ATTR} class="icon-modify" data-interaction="open_edit_task_form" title="Modify this task">Modify</a></li>
                             <li><a href="#" class="icon-delete" data-interaction="open_delete_task_form" title="Delete this task">Delete</a></li>
                         </ul>
                         <!-- Delete form -->
@@ -95,6 +95,7 @@
                             <input type="hidden" name="id"        value="{TASK_ID}" />
                             <input type="hidden" name="category"  value="{ID}"/>
                             <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                            <input type="hidden" name="return_url" value="{RETURN_URL}"/>
                         </form>
                         <!-- END edit_task -->
 
@@ -113,6 +114,7 @@
                                 <input type="hidden" name="id"        value="{TASK_ID}"/>
                                 <input type="hidden" name="category"  value="{ID}"/>
                                 <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                                <input type="hidden" name="return_url" value="{RETURN_URL}"/>
 
                                 <label for="title-{TASK_ID}">Title</label>
                                 <input id="title-{TASK_ID}" name="title" type="text" value="{TASK_TITLE}" />
@@ -161,8 +163,8 @@
                 </ul>
 
                 <div class="content">
-                    <a href="/submission/createSubmission/new/{ID}/task" class="button icon-due-work">Post Due Work</a>
-                    <a href="/assess/create/{ID}/task" class="button icon-quiz">Create Quiz</a>
+                    <a href="/submission/createSubmission/new/{ID}/task?return_url={RETURN_URL}" class="button icon-due-work">Post Due Work</a>
+                    <a href="/assess/create/{ID}/task?return_url={RETURN_URL}" class="button icon-quiz">Create Quiz</a>
                     <a href="/task/create/{ID}" class="button icon-task" data-reveal-id="createTask-component{COMPONENT_INSTANCE_ID}">Add Task</a>
                 </div>
 
@@ -181,6 +183,7 @@
                         <input type="hidden" name="id"        value=""/>
                         <input type="hidden" name="category"  value="{ID}"/>
                         <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                        <input type="hidden" name="return_url" value="{RETURN_URL}"/>
 
                         <label for="title-new_task-component{COMPONENT_INSTANCE_ID}">Title</label>
                         <input id="title-new_task-component{COMPONENT_INSTANCE_ID}" name="title" type="text" value="" />
@@ -229,6 +232,7 @@
                 <input type="hidden" name="action"    value="reorder"/>
                 <input type="hidden" name="category"  value="{ID}"/>
                 <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+                <input type="hidden" name="return_url" value="{RETURN_URL}"/>
             </form>
         </div>
 

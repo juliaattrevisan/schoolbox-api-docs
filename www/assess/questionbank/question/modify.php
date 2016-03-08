@@ -17,6 +17,7 @@ $groupHandler = new Group();
 /* If a question was submitted
  */
 if (!empty($_POST)) {
+
     if (!is_numeric($_POST['type_id'])) {
         error(116);
     }
@@ -75,9 +76,17 @@ if (!empty($_POST)) {
     $this->backToTheFuture(2);
 }
 else {
-    if (!is_numeric($this->arg[0])) {
-        error(115);
-    }
+	if (!is_numeric($this->arg[0])) {
+		error(115);
+	}
+
+	if (!is_numeric($this->arg[1])) {
+		error(115);
+	}
+
+	if (!is_numeric($this->arg[2])) {
+		error(115);
+	}
 
     /* Render modify page
      */
@@ -129,6 +138,9 @@ else {
 
     $this->setVar(array(
         'ASSESS_CATEGORY_ID' => 0,
+		'RETURN_URL' => $_GET["return_url"],
+		'CATEGORY_LIST_ITEM_ASSESS_ID' => $this->arg[1],
+		'SECTION_ID' => $this->arg[2],
 		'QUESTION_BANK_ID' => $question['question_bank_id'],
         'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
         'QUESTIONTYPE_DESCRIPTION' => Scrub::text($currentQuestionType['description']),

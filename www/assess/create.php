@@ -125,7 +125,9 @@ if (!empty($_POST)) {
         error(112);
     }
 
-    SitePage::localRedir('/assess/section/create/' . $assess_id);
+    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
+
+    SitePage::localRedir('/assess/section/create/' . $assess_id . $return_url);
 }
 else {
     // Params:
@@ -204,6 +206,7 @@ else {
 
     $this->setVar(array(
         'ACTION'                    => 'create',
+        'RETURN_URL'                => $_GET["return_url"],
         'ASSESS_HEADING'            => 'New Quiz',
         'ASSESS_ACTION'             => 'Create',
         'ASSESS_KIND_LC'            => 'assess',

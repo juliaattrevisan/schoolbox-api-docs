@@ -70,8 +70,12 @@ if (is_array($sectionList) && count($sectionList)) {
 $mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
 $mapper->delete($mapper->findById($assessId));
 
-$this->setFile(TEMPLATE_content, 'assess/deleted.html');
+if ($_GET["return_url"] != "")
+	SitePage::localRedir(base64_decode(urldecode($_GET["return_url"])));
+else {
+	$this->setFile(TEMPLATE_content, 'assess/deleted.html');
 
-$this->setVar(array(
-	'CATEGORY_ID' => $assess['category_id'],
-));
+	$this->setVar(array(
+		'CATEGORY_ID' => $assess['category_id'],
+	));
+}

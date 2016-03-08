@@ -246,6 +246,7 @@ switch($assess['mark_visibility']) {
 }
 
 $this->setVar(array(
+    'RETURN_URL' => $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "",
     'ASSESS_ASSESS_ID'      => $assess['assess_id'],
     'ASSESS_TITLE'          => Scrub::text($assess['title']),
     'ASSESS_DUEDATE'        => $dueDate->getLongDateOnly(),

@@ -15,6 +15,9 @@ $action       = $this->arg[0];
 $task_type    = 'task';
 $task_type_id = null;
 if ($action === 'modify') {
+
+    $return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
+
     $task_instance_id = $this->arg[1];
     $task_instance    = Task\InstanceMapper::getInstance()->findById($task_instance_id);
     $task_type        = 'task';
@@ -25,10 +28,10 @@ if ($action === 'modify') {
         $task_type = 'task';
     }
     elseif ($task_type_id === Task::TYPE_ONLINE_ASSESS) {
-        $this->localRedir('/assess/modify/'.$task_instance->getAssessment()->getId());
+        $this->localRedir('/assess/modify/'.$task_instance->getAssessment()->getId().$return_url);
     }
     elseif ($task_type_id === Task::TYPE_DUE_WORK) {
-        $this->localRedir('/submission/createSubmission/modify/'.$task_instance->getSubmissionBox()->getId());
+        $this->localRedir('/submission/createSubmission/modify/'.$task_instance->getSubmissionBox()->getId().$return_url);
     }
 }
 

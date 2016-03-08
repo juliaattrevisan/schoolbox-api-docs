@@ -43,6 +43,7 @@ $this->setBlock(TEMPLATE_content, 'has_edit_category', 'has_edit_category_block'
 $this->setVar(
     array(
         'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
+        'RETURN_URL' => $_GET["return_url"],
         'ASSESS_ID' => $quiz->getId(),
         'SECTION_ID' => $this->arg[2],
     )
@@ -183,6 +184,8 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
     $this->parse('welcome_block', 'welcome');
 }
 
+$return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
+
 /* Render out breadcrumbs
  */
 $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
@@ -194,12 +197,12 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text' => Scrub::text($quiz->getTitle()),
-        'href' => "/assess/summary/{$quiz->getId()}",
+        'href' => "/assess/summary/{$quiz->getId()}{$return_url}",
         'class' => '',
     ],
     [
         'text' => Scrub::text($section['title']),
-        'href' => "/assess/summary/{$quiz->getId()}",
+        'href' => "/assess/summary/{$quiz->getId()}{$return_url}",
         'class' => '',
     ],
     [

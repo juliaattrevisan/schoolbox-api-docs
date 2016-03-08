@@ -42,7 +42,11 @@ catch (\Exception $e) {
 $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
 $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
+$return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
+
 $this->setVar(array(
+    'RETURN_URL'           => $return_url,
+    'RETURN_URL_DECODED'   => base64_decode(urldecode($_GET["return_url"])) == '' ? "/homepage/{$folder->getId()}" : base64_decode(urldecode($_GET["return_url"])),
     'ASSESS_ASSESS_ID'     => $this->arg[0],
     'ASSESS_KIND_LC'       => 'assess',
     'ASSESS_KIND'          => 'Quiz',
@@ -89,7 +93,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text' => $assess['title'],
-        'href' => "/assess/summary/{$assess['assess_id']}",
+        'href' => "/assess/summary/{$assess['assess_id']}{$return_url}",
         'class' => 'active',
     ]
 ]);

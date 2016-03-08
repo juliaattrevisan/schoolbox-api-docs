@@ -14,6 +14,9 @@ $assessHandler = new Assess_Main();
 $groupHandler = new Group();
 
 if (!empty($_POST)) {
+
+    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
+
     $assess = $assessHandler->getByID($_POST['assess_id']);
 
     if ($assessHandler->isDeleted($_POST['assess_id'])) {
@@ -38,8 +41,11 @@ if (!empty($_POST)) {
 
     /* Redirect to summary
      */
-    SitePage::localRedir('/assess/summary/' . $_POST['assess_id']);
+    SitePage::localRedir('/assess/summary/' . $_POST['assess_id'] . $return_url);
 } else {
+
+    $return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
+
     if (!is_numeric($this->arg[0])) {
         error(112);
     }
@@ -81,6 +87,7 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID'     => $section['assess_id'],
+        'RETURN_URL'           => $_GET["return_url"],
         'ASSESS_KIND_LC'       => 'assess',
         'ASSESS_KIND'          => 'Quiz',
         'ASSESS_TITLE'         => Scrub::text($assess['title']),
@@ -109,7 +116,7 @@ if (!empty($_POST)) {
         ],
         [
             'text' => $assess['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'href' => "/assess/summary/{$assess['assess_id']}{$return_url}",
             'class' => '',
         ],
         [

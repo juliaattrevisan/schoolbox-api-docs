@@ -12,6 +12,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
+
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 
@@ -24,6 +25,9 @@ $groupHandler = new Group();
 /* If a question was submitted
  */
 if (!empty($_POST)) {
+
+    $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
+
     $section = $sectionHandler->getByID($_POST['section_id']);
     $assess = $assessHandler->getByID($section['assess_id']);
 
@@ -76,8 +80,12 @@ if (!empty($_POST)) {
 
     /* Need to keep this so non-ajaxed questions still redirect
      */
-    SitePage::localRedir('/assess/question/create/' . $section['section_id']);
+    SitePage::localRedir('/assess/question/create/' . $section['section_id'] . $return_url);
+
 } else {
+
+    $return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
+
     if (!is_numeric($this->arg[0])) {
         error(51);
     }
@@ -129,6 +137,7 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_TITLE'          => $assess['title'],
+        'RETURN_URL'            => $_GET["return_url"],
         'ASSESS_ASSESS_ID'      => $section['assess_id'],
         'ASSESS_KIND_LC'        => 'assess',
         'ASSESS_KIND'           => 'Quiz',
@@ -259,12 +268,12 @@ if (!empty($_POST)) {
         ],
         [
             'text' => $assess['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'href' => "/assess/summary/{$assess['assess_id']}{$return_url}",
             'class' => '',
         ],
         [
             'text' => $section['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'href' => "/assess/summary/{$assess['assess_id']}{$return_url}#section-{$section['section_id']}",
             'class' => '',
         ],
         [
