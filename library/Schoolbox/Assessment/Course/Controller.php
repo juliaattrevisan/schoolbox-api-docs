@@ -365,7 +365,7 @@ class Controller extends BaseController
      *
      * @param Int $homepageId
      * @param Int $courseHomepageId
-     * @param Int $componentId
+     * @param Int $componentId          -- Not sure we really need this???
      */
     public function importUnitForm($homepageId, $courseHomepageId, $componentId)
     {
@@ -375,7 +375,7 @@ class Controller extends BaseController
             'data' => [
                 'homepageId'        => $homepageId,
                 'courseHomepageId'  => $courseHomepageId,
-                'componentId'       => $componentId,    // Not sure we really need this?
+                'componentId'       => $componentId,
                 'units'             => FolderMapper::getInstance()->findByParentId($courseHomepageId)
             ]
         ]);
@@ -383,7 +383,6 @@ class Controller extends BaseController
 
     /**
      * Import a course into a component
-     *
      **/
     public function importUnit()
     {
@@ -461,7 +460,8 @@ class Controller extends BaseController
             // Something went wrong (access denied or homepage missing), just do nothing?
         }
 
-        // Redirect back to the unit homepage?
+        // Not quite sure what to do here, probably going to be an XHR request and going to be used by the mage.
+        // Currently just sending back to homepage for testing.
 
         $this->getResponse()->redirect->afterPost("/homepage/{$_POST["homepage"]}");
     }
