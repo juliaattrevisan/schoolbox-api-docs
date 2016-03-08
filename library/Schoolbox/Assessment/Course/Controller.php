@@ -361,6 +361,27 @@ class Controller extends BaseController
     }
 
     /**
+     * Import unit fragment test (eg. /course/unit/import/238/520/0)
+     *
+     * @param Int $homepageId
+     * @param Int $courseHomepageId
+     * @param Int $componentId
+     */
+    public function importUnitForm($homepageId, $courseHomepageId, $componentId)
+    {
+        $this->getResponse()->content->set([
+            'template' => "@course/unitImportForm.twig",
+            // 'format' => 'nochrome',
+            'data' => [
+                'homepageId'        => $homepageId,
+                'courseHomepageId'  => $courseHomepageId,
+                'componentId'       => $componentId,    // Not sure we really need this?
+                'units'             => FolderMapper::getInstance()->findByParentId($courseHomepageId)
+            ]
+        ]);
+    }
+
+    /**
      * Import a course into a component
      *
      **/
@@ -383,7 +404,8 @@ class Controller extends BaseController
 
             try
             {
-                // Try to find existing course outline component on the page we are importing into
+                // Try to find existing course outline component on the page we are importing into. Not sure if we need
+                // to do this, or just create a new outline every time?
 
                 $component = UnitInstanceMapper::getInstance()->findById($_POST["component"]);
             }

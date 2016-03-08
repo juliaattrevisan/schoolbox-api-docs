@@ -42,6 +42,7 @@ class Module extends BaseModule
                 '/new'                               => 'newCourse',
                 '/modify/{id}'                       => 'modifyCourse',
                 '/parent'                            => 'parentList',
+                '/unit/import/{homepageId}/{courseHomepageId}/{componentId}'  => 'importUnitForm',
 
                 /* Import screen
                  */
