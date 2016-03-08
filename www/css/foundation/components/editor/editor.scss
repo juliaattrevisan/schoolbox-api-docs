@@ -37,6 +37,17 @@
 /* Icons for our custom plugins
  */
 a.cke_button {
+
+    /* Duped up media icon
+     */
+    .cke_button__schoolboxresourcemedia_icon {
+        background: url('/javascript/ckeditor/plugins/schoolboxresource/icons/schoolboxresource.png') 0px 0px no-repeat;
+    }
+
+    .cke_button__schoolboxresourceimage_icon {
+        background: url('/javascript/ckeditor/plugins/schoolboxresource/icons/icons16.png') 0px -224px no-repeat;
+    }
+
     .cke_button__schoolboxlink_icon {
         background: url('/javascript/ckeditor/skins/flat/icons.png') 0px -888px no-repeat;
     }

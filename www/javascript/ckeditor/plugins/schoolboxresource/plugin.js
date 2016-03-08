@@ -6,10 +6,16 @@ CKEDITOR.plugins.add('schoolboxresource', {
     init: function(editorInstance) {
         editorInstance.addCommand('schoolboxresource', new CKEDITOR.dialogCommand('schoolboxresourceDialog'));
 
-        editorInstance.ui.addButton('SchoolboxResource', {
-            label: 'Embed Resource',
+        editorInstance.ui.addButton('SchoolboxResourceMedia', {
+            label: 'Embed Video/Audio',
             command: 'schoolboxresource',
             toolbar: 'schoolbox,4'
+        });
+
+        editorInstance.ui.addButton('SchoolboxResourceImage', {
+            label: 'Embed Image',
+            command: 'schoolboxresource',
+            toolbar: 'schoolbox,5'
         });
 
         CKEDITOR.dialog.add('schoolboxresourceDialog', this.path + 'dialogs/schoolboxresource.js');
