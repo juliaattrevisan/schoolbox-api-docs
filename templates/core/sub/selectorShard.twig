@@ -15,8 +15,8 @@
 {# Manufacture input id attribute
  # Modal's selection gets put into this element
  #}
-{% if not formInputId|length %}
-    {% set formInputId = 'course-selector-id' %}
+{% if not formInputName|length %}
+    {% set formInputName = 'parent' %}
 {% endif %}
 
 {# Manufacture modal activator
@@ -35,9 +35,9 @@
 
 <label>
     {{ formLabel }}
-    <input type="hidden" name="parent" value="{{ folder.parent.id }}" id="{{ formInputId }}" />
+    <input type="hidden" name="{{ formInputName }}" value="{{ folder.parent.id }}" />
     <a {{ activator }}
-       data-source="parent"
+       data-source="{{ formInputName }}"
        href="#"
        class="source-select {{ folder.parent.id ? 'icon-folder' : '' }}"
        title="{{ title }}">{{ folder.parent.id ? folder.parent.name : '(Click to select)' }}

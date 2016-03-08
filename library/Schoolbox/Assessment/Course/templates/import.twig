@@ -22,7 +22,7 @@
                 $('body').on('click', '#course-selector-results [data-course-id]', function(event) {
                     event.preventDefault();
 
-                    $('#course-selector-id').val($(this).attr('data-course-id'));
+                    $('input[name=parent]').val($(this).attr('data-course-id'));
                     $('[data-course-selector]').html($(this).attr('data-course-name'));
 
                     /* Shut it, I guess
@@ -67,7 +67,7 @@
                     <div class="small-3 columns">
                         {% include 'sub/selectorShard.twig' with {
                                 'formLabel': 'Course',
-                                'formInputId': 'course-selector-id',
+                                'formInputName': 'parent',
                                 'folder': folder,
                                 'activator': 'data-course-selector',
                                 'title': 'Select Course to import'
