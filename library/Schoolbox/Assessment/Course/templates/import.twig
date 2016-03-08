@@ -1,6 +1,7 @@
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-selector.js"></script>
-
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function() {
 
@@ -17,13 +18,7 @@
             }
             {% endif %}
         );
-    });
-</script>
 
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-<script type="text/javascript">
-    $(function() {
         $('#import-folders').selectizeSelector({
             ajax: {
                 url:      '/course/import/classes',
