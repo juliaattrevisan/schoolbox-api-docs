@@ -1,17 +1,29 @@
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/shared/course/jquery.course-selector.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+
+        /* Attach Course Selector Modal listeners
+         */
+        $.fn.courseSelectorModal(
+            {% if sources.id %}
+            {
+                courseSelector: {
+                    query: {
+                        folder: {{sources.id}}
+                    }
+                }
+            }
+            {% endif %}
+        );
+    });
+</script>
+
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('#import-course').selectizeSelector({
-            ajax: {
-                url:      '/course/import/courses',
-                type:     'GET',
-                dataType: 'json'
-            },
-            multiple: false,
-            value: {{ sources|json_encode|raw }}
-        });
-
         $('#import-folders').selectizeSelector({
             ajax: {
                 url:      '/course/import/classes',
@@ -46,7 +58,7 @@
                 <fieldset class="content">
                     <div class="small-3 columns">
                         <label>Course
-                            <input id="import-course" type="text" name="importCourse" />
+                            <input id="import-course" type="text" name="importCourse" data-course-selector />
                         </label>
                     </div>
                     <div class="small-1 columns text-center">
@@ -74,4 +86,7 @@
         </form>
     </div>
 </div>
+
+<div id="course-selector-modal" class="reveal-modal" data-reveal></div>
+
 

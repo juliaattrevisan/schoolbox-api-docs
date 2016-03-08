@@ -227,7 +227,7 @@ class Controller extends BaseController
         //  - stop at, and exclude, all Courses (folder that has > 0 children with > 0 tasks) (apparently this point is up for debate..?)
         //  - continue to exhaustion
 
-        $tb = new TreeBuilder(Folder\Mapper::getInstance(), TaskMapper::getInstance(), UserAccessMapper::getInstance(), RoleAccessMapper::getInstance(), $this->getUser());
+        $tb = new TreeBuilder(Folder\Mapper::getInstance(), TaskMapper::getInstance(), $this->getUser());
 
         $facultyNode = $this->getCourseMapper()->getFacultyNode();
 
@@ -244,28 +244,6 @@ class Controller extends BaseController
         ];
 
         $this->tpl('parentList', $data);
-    }
-
-    /**
-     * Get a list of all the Courses which can be
-     * imported into a Folder
-     */
-    public function importCourses()
-    {
-        $data = [];
-        $allFolders = $this->getCourseMapper()->findCourseListByName($this->getRequest()->query->get('query'));
-
-        /* Swap keys for selectize compatibility -_-
-         */
-        foreach ($allFolders as $currentFolder) {
-            $data[] = [
-                'id' => $currentFolder->getId(),
-                'name' => $currentFolder->getName()
-            ];
-        }
-
-        echo json_encode($data);
-        exit();
     }
 
     /**

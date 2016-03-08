@@ -51,10 +51,6 @@ class Module extends BaseModule
                  */
                 '/importResults/{courseId}'          => 'importResults',
 
-                /* A list of Courses you can import via selectize
-                 */
-                '/import/courses'                    => 'importCourses',
-
                 /* A list of Classes you can import into via selectize
                  */
                 '/import/classes'                    => 'importClasses',
