@@ -1,4 +1,3 @@
-
 <div class="small-12 island">
     <section>
         {% if courses|length %}
@@ -48,10 +47,22 @@
                     <a href="#" class="icon-down-arrow" data-collapser="course-{{ course.id }}"></a>
 
                     {% if hasTot %}
-                        <a href="#" class="icon-overflow"></a>
+                        <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ course.getId() }}" aria-expanded="false" title="Actions"></a>
                     {% endif %}
                 </nav>
-                </li>
+
+                {% if hasTot %}
+                <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ course.getId() }}">
+                    <li><a href="{{ routeLookup('course.modifyCourse', {id: course.getId()}) }}" class="icon-modify">Modify</a></li>
+
+                    {# Course delete: standard folder delete #}
+                    {% if currentUser.isSuperuser() %}
+                    <li><a href="/cms/categoryForm.php?delete={{ course.getId() }}" class="icon-delete" data-action="course-delete">Delete</a></li>
+                    {% endif %}
+
+                </ul>
+                {% endif %}
+            </li>
             {% endfor %}
         </ul>
         {% else %}
@@ -62,6 +73,17 @@
 <script type="text/javascript">
     $(function () {
         $('[data-collapser]').collapsable();
+
+        $(document).foundation('dropdown', 'reflow');
+
+        $('a[data-action="course-delete"]').on('click', function(event) {
+            event.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this course? This will delete ALL units within this course, as well as any other content that has been added!',
+                confirmEvent: $.confirmDialog.followHref
+            });
+        })
     });
 </script>
 

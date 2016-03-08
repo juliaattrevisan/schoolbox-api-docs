@@ -43,7 +43,7 @@ class Controller extends BaseController
     {
         $content = [
             'template' => "@course/$template.twig",
-            'data'     => $data,
+            'data'     => array_merge($data, ['currentUser' => $this->getUser()]),
         ];
 
         if ($this->getRequest()->isXhr()) {
