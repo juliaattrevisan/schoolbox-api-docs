@@ -587,7 +587,7 @@ class Controller extends BaseController
         {
             // Locate the unit we want to delete
 
-            $unit = $unitInstanceMapper->findById($_POST["id"]);
+            $unit = $unitInstanceMapper->findById($this->getRequest()->post["id"]);
 
             // Find the corresponding folder
 
@@ -595,13 +595,13 @@ class Controller extends BaseController
 
             // Make sure user has write permission to the folder
 
-            if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$folder->getId()]) >= WRITE_ACCESS) {
+            if (Access::getInstance()->getFolderAccess($this->getUser(), [$folder->getId()]) >= WRITE_ACCESS) {
 
                 // If the folder has children, then we will only allow superusers to delete it
 
                 if ($folderMapper->countByColumn('parent', $folder->getId()))
                 {
-                    if (!$_SESSION["user"]->isSuperuser())
+                    if (!$this->getUser()->isSuperuser())
                     {
                         throw new \Exception('Access Denied');
                     }
