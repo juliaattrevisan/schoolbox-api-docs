@@ -18,7 +18,7 @@
     <div class="small-12 column hide" data-collapsable="unit-{{ i }}" data-collapse-state="collapsed">
         <ul class="information-list sortable" data-sortable>
             {% for task in tasks[unit.id] %}
-                {% include '@course/task-item.twig' %}
+                {% include '@course/task.twig' with { '_writable': true } %}
             {% endfor %}
         </ul>
         <ul class="flex-list buttons">

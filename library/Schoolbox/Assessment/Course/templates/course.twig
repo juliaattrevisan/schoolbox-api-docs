@@ -131,7 +131,7 @@
                     <div class="small-12 column no-pad">
                         <ul class="information-list" {% if not folder.id %}style="display:none;"{% endif %} data-formpartial="units">
                         {% for unit in units %}
-                            {% include '@course/unit.twig' with { i: loop.index } %}
+                            {% include '@course/unit.twig' with { i: loop.index, '_writable': true } %}
                         {% endfor %}
                             <li class="actions-small-1" data-unit>
                                 <div class="list-item content">
