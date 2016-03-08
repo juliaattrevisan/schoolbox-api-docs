@@ -4,7 +4,7 @@
     </h3>
     <ul class="information-list no-pad">
         {% for task in tasks[unit.id] %}
-            {% include '@course/task.twig' with { '_writable': true } %}
+            {% include '@course/task.twig' with { '_writable': false } %}
         {% endfor %}
     </ul>
 </li>
