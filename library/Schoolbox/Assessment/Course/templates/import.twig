@@ -19,11 +19,15 @@
             /* Callbacks
              */
             onCourseSelect: function() {
-                console.log('fox');
-                $('body').on('click', '#course-selector-results [data-course]', function(event) {
+                $('body').on('click', '#course-selector-results [data-course-id]', function(event) {
                     event.preventDefault();
 
-                    console.log($(this).attr('data-course'));
+                    $('#course-selector-id').val($(this).attr('data-course-id'));
+                    $('[data-course-selector]').html($(this).attr('data-course-name'));
+
+                    /* Shut it, I guess
+                     */
+                    $('#course-selector-modal').foundation('reveal', 'close');
                 });
             }
         });
@@ -61,9 +65,20 @@
             <section>
                 <fieldset class="content">
                     <div class="small-3 columns">
-                        <label>Course
-                            <input id="import-course" type="text" name="importCourse" data-course-selector />
+                        <label>Faculty / Class
+                            <input type="hidden" name="parent" value="{{ folder.parent.id }}" id="course-selector-id" />
+                            <a data-course-selector
+                               data-source="parent"
+                               href="#"
+                               class="source-select {{ folder.parent.id ? 'icon-folder' : '' }}"
+                               title="Click to change the faculty / class this course belongs to">
+                                {{ folder.parent.id ? folder.parent.name : '(Click to select)' }}
+                            </a>
                         </label>
+
+                        {#<label>Course#}
+                            {#<input id="import-course" type="text" name="importCourse" data-course-selector />#}
+                        {#</label>#}
                     </div>
                     <div class="small-1 columns text-center">
                         &rarr;
