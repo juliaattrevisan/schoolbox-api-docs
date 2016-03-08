@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller\Base as BaseController;
 
+use Schoolbox\Collection;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
@@ -18,6 +19,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
+use Schoolbox\Permission\Access\Access;
 
 class Controller extends BaseController
 {
@@ -356,5 +358,89 @@ class Controller extends BaseController
     private function setTaskMapper($taskMapper)
     {
         $this->taskMapper = $taskMapper;
+    }
+
+    /**
+     * Import a course into a component
+     *
+     **/
+    public function importUnit()
+    {
+        try
+        {
+            // Test permissions. Must have write permission on the destination page and read permission
+            // on the course we are trying to import.
+
+            if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$_POST["homepage"]]) < WRITE_ACCESS ||
+                Access::getInstance()->getFolderAccess($_SESSION["user"], [$_POST["course_homepage"]]) < READ_ACCESS)
+            {
+                throw new \Exception("Access Denied");
+            }
+
+            // Get the homepage we are importing into
+
+            $homepage = FolderMapper::getInstance()->findById($_POST["homepage"]);
+
+            try
+            {
+                // Try to find existing course outline component on the page we are importing into
+
+                $component = UnitInstanceMapper::getInstance()->findById($_POST["component"]);
+            }
+            catch (\Exception $e)
+            {
+                // Couldn't find the component, create a new one course outline component at the top of the page
+
+                $componentDefinition   = \Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Homepage_CourseOutlineController');
+                $componentDefinitionId = $componentDefinition->first()->getId();
+
+                $component = new \Component_Instance();
+                $component
+                    ->setDefinitionId($componentDefinitionId)
+                    ->setModule('homepage')
+                    ->setIdentifier($homepage->getId())
+                    ->setPosition('top')
+                    ->setSequence(1);
+
+                \Component_InstanceMapper::getInstance()->save($component);
+            }
+
+            // And create a new unit instance for each one selected by the user selected
+
+            $unit_instance_list = new Collection();
+
+            foreach ($_POST["unit"] as $unit)
+            {
+                $import = !empty($unit['import']);
+
+                if ($import)
+                {
+                    // Save the unit into the course.
+
+                    $unit_homepage = FolderMapper::getInstance()->findById($unit['unit_id']);
+                    $unit_instance = new UnitInstance();
+
+                    $unit_instance
+                        ->setComponent($component)
+                        ->setTitle($unit_homepage->getName())
+                        ->setCategory($homepage)
+                        ->setUnitCategory($unit_homepage)
+                        ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
+                        ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
+
+                    $unit_instance_list->add($unit_instance);
+                }
+            }
+
+            UnitInstanceMapper::getInstance()->save($unit_instance_list);
+        }
+        catch (\Exception $e)
+        {
+            // Something went wrong (access denied or homepage missing), just do nothing?
+        }
+
+        // Redirect back to the unit homepage?
+
+        $this->getResponse()->redirect->afterPost("/homepage/{$_POST["homepage"]}");
     }
 }

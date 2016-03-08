@@ -16,8 +16,10 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Course\Task\Cloner;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class UnitInstanceMapper extends Mapper {
 
