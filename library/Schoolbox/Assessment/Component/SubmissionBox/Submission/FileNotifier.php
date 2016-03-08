@@ -117,6 +117,17 @@ class FileNotifier extends AbstractModuleNotifier
 
 
     /**
+     * @param  UserAccessMapper $userAccessMapper
+     * @return $this
+     */
+    public function setUserAccessMapper($userAccessMapper)
+    {
+        $this->userAccessMapper = $userAccessMapper;
+        return $this;
+    }
+
+
+    /**
      * This notifier does not actually use future scheduling - all events fire immediately, if at all.
      *
      * @param TriggerBundle $bundle

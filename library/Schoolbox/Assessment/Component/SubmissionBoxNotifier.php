@@ -125,6 +125,17 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     }
 
 
+    /**
+     * @param  UserAccessMapper $userAccessMapper
+     * @return $this
+     */
+    public function setUserAccessMapper($userAccessMapper)
+    {
+        $this->userAccessMapper = $userAccessMapper;
+        return $this;
+    }
+
+
 
     /**
      * @return string
