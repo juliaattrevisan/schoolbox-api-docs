@@ -19,7 +19,7 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
          * CKEDITOR.SELECTION_TEXT anyway...
          */
         if (selection.getType() == CKEDITOR.SELECTION_NONE) {
-            element.setText(fields.id.getValue());
+            element.setText(fields.display.getValue());
         }
         /* Applying link to selected text; use the selected text
          * as the link text itself. Or, if nothing was selected,
@@ -30,7 +30,7 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
                 element.setText(selection.getSelectedText());
             }
             else {
-                element.setText(fields.id.getValue());
+                element.setText(fields.display.getValue());
             }
         }
         /* Applying link to some kind of element like an img
@@ -52,8 +52,20 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
      */
     function dialogFields(dialog) {
         return {
-            id: dialog.getContentElement('schoolboxanchor-tab', 'schoolboxanchor-id')
+            id: dialog.getContentElement('schoolboxanchor-tab', 'schoolboxanchor-id'),
+            display: dialog.getContentElement('schoolboxanchor-tab', 'schoolboxanchor-display')
         };
+    }
+
+    /**
+     * Allow alphanumeric, hyphen, underscore, colons, period chars
+     * Convert all others to underscore
+     *
+     * @param val
+     * @returns {boolean}
+     */
+    function translateToId(val) {
+        return val.replace(/[^0-9a-zA-Z\-_:\.]/g, '_');
     }
 
     return {
@@ -70,25 +82,63 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
                 label: 'Link',
                 elements: [
                     {
-                        type: 'hbox',
-                        widths: ['80%', '20%'],
-                        children: [
-                            {
-                                type: 'text',
-                                id: 'schoolboxanchor-id',
-                                label: 'Id (Anchor)',
-                                validate: CKEDITOR.dialog.validate.notEmpty( "Anchor cannot be empty." ),
+                        type: 'text',
+                        id: 'schoolboxanchor-display',
+                        label: 'Text',
+                        validate: CKEDITOR.dialog.validate.notEmpty("Anchor cannot be empty."),
 
-                                /* Editing an existing element
-                                 */
-                                setup: function(element) {
-                                    var dialog = this.getDialog();
-                                    var fields = dialogFields(dialog);
+                        /* Editing an existing element
+                         */
+                        setup: function(element) {
+                            var dialog = this.getDialog();
+                            var fields = dialogFields(dialog);
 
-                                    fields.id.setValue(element.getAttribute('id'));
-                                }
-                            }
-                        ]
+                            fields.display.setValue(element.getText());
+                        },
+
+                        /* Update id value upon change
+                         * Anchor text can display different to their actual id val
+                         */
+                        onChange: function() {
+                            var dialog = this.getDialog();
+                            var fields = dialogFields(dialog);
+
+                            /* No spaces or punctuation
+                             */
+                            fields.id.setValue(translateToId(fields.display.getValue()));
+                        },
+
+                        /* Alter details about existing node
+                         */
+                        commit: function(element) {
+                            var dialog = this.getDialog();
+                            var fields = dialogFields(dialog);
+
+                            element.setText(fields.display.getValue());
+                        }
+                    },
+                    {
+                        type: 'text',
+                        id: 'schoolboxanchor-id',
+                        label: 'Id',
+
+                        /* Editing an existing element
+                         */
+                        setup: function(element) {
+                            var dialog = this.getDialog();
+                            var fields = dialogFields(dialog);
+
+                            fields.id.setValue(element.getAttribute('id'));
+                        },
+
+                        /* Alter details about existing node
+                         */
+                        commit: function(element) {
+                            var dialog = this.getDialog();
+                            var fields = dialogFields(dialog);
+
+                            element.setAttribute('id', translateToId(fields.display.getValue()));
+                        }
                     }
                 ]
             }
@@ -101,7 +151,15 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
             var dialog = this;
             var fields = dialogFields(dialog);
 
-            editorInstance.insertElement(inject(editorInstance, this.selection, fields));
+            /* Alter details about existing node
+             */
+            this.commitContent(dialog.element);
+
+            /* Or insert a new one if needed
+             */
+            if (this.insertMode) {
+                editorInstance.insertElement(inject(editorInstance, this.selection, fields));
+            }
         },
 
         /**
@@ -116,6 +174,10 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
              */
             var selection = editorInstance.getSelection();
             var element = selection.getStartElement();
+
+            if (element) {
+                element = element.getAscendant('a', true);
+            }
 
             if (!element || element.getName() != 'a') {
                 element = editorInstance.document.createElement('a');
