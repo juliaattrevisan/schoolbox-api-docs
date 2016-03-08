@@ -82,25 +82,21 @@ $this->setVar(array(
     'ASSESS_DURATION' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
-$parent = $folderMapper->findById($folder->getParent()->getId());
-
 /* Render out breadcrumbs
  */
-$trail = new Breadcrumbs();
-$trail->renderIntoSitePage($this, 'BREADCRUMB', [
-    [
-        'text' => $parent->getName(),
-        'href' => "/homepage/{$parent->getId()}",
-        'class' => '',
-    ],
-    [
-        'text' => $folder->getName(),
-        'href' => "/homepage/{$folder->getId()}",
-        'class' => '',
-    ],
+$trail = new \Schoolbox\Breadcrumbs();
+
+// get a crunchy biscuit base
+$crumbs = $trail->getFolderCrumbs($folder, $_GET['return_url']);
+
+// sprinkle some crumbs on top
+$crumbs = array_merge($crumbs, [
     [
         'text' => $assess['title'],
         'href' => "/assess/summary/{$assess['assess_id']}{$return_url}",
         'class' => 'active',
     ]
 ]);
+
+// bake in a moderate oven for 40 minutes
+$trail->renderIntoSitePage($this, 'BREADCRUMB', $crumbs);

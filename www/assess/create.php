@@ -313,31 +313,22 @@ else {
 
     /* Render out breadcrumbs
      */
-    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+    $trail = new \Schoolbox\Breadcrumbs();
 
-    // Get the parent folder
-    $parent = $folderMapper->findById($folder->getParent()->getId());
+    // get a crunchy biscuit base
+    $crumbs = $trail->getFolderCrumbs($folder, $_GET['return_url']);
 
-    /* Render out breadcrumbs
-     */
-    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
-        [
-            'text' => $parent->getName(),
-            'href' => "/homepage/{$parent->getId()}",
-            'class' => '',
-        ],
-        [
-            'text' => $folder->getName(),
-            'href' => "/homepage/{$folder->getId()}",
-            'class' => '',
-        ],
+    // sprinkle some crumbs on top
+    $crumbs = array_merge($crumbs, [
         [
             'text' => 'New Quiz',
             'href' => '',
             'class' => 'active',
         ]
     ]);
+
+    // bake in a moderate oven for 40 minutes
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', $crumbs);
 }
 
 
