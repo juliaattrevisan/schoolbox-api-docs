@@ -65,20 +65,14 @@
             <section>
                 <fieldset class="content">
                     <div class="small-3 columns">
-                        <label>Faculty / Class
-                            <input type="hidden" name="parent" value="{{ folder.parent.id }}" id="course-selector-id" />
-                            <a data-course-selector
-                               data-source="parent"
-                               href="#"
-                               class="source-select {{ folder.parent.id ? 'icon-folder' : '' }}"
-                               title="Click to change the faculty / class this course belongs to">
-                                {{ folder.parent.id ? folder.parent.name : '(Click to select)' }}
-                            </a>
-                        </label>
-
-                        {#<label>Course#}
-                            {#<input id="import-course" type="text" name="importCourse" data-course-selector />#}
-                        {#</label>#}
+                        {% include '@course/selectorShard.twig' with {
+                                'formLabel': 'Course',
+                                'formInputId': 'course-selector-id',
+                                'folder': folder,
+                                'activator': 'data-course-selector',
+                                'title': 'Select Course to import'
+                            }
+                        %}
                     </div>
                     <div class="small-1 columns text-center">
                         &rarr;
