@@ -34,7 +34,7 @@
             moveFolder: function(self, folderNode, destinationNode) {
                 return {
                     type: 'post',
-                    url:  '/resource/folder/move/categoryForm.php',
+                    url:  '/resource/folder/move',
                     data: {
                         source:      folderNode.attr('id'),
                         destination: destinationNode.attr('id')
