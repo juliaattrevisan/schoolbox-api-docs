@@ -1235,4 +1235,44 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             // been deleted.
         }
     }
+
+    /**
+     * Move folder to new parent with permission check
+     *
+     * @param Int $source
+     * @param Int $destination
+     * @throws \Exception
+     */
+    public function moveFolder($source, $destination)
+    {
+        // Check if there is nothing to do
+
+        if ($source == $destination)
+            exit;
+
+        // Check folder access
+
+        if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$source]) < WRITE_ACCESS ||
+            Access::getInstance()->getFolderAccess($_SESSION["user"], [$destination]) < WRITE_ACCESS
+        ) {
+            echo "Insufficient permissions";
+            exit;
+        }
+
+        // Grab folder object
+
+        $folderMapper = FolderMapper::getInstance();
+
+        $movedFolder  = $folderMapper->findById($source);
+        $parentFolder = $folderMapper->findById($destination);
+
+        // Make sure the moved folder is not going to be its own ancestor
+
+        foreach ($folderMapper->findParents($parentFolder) as $ancestor)
+            if ($ancestor->getId() == $movedFolder->getId())
+                exit;
+
+        $folderMapper->save($movedFolder->setParent($parentFolder));
+        exit;
+    }
 }

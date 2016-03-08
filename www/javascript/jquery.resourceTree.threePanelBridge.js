@@ -34,10 +34,10 @@
             moveFolder: function(self, folderNode, destinationNode) {
                 return {
                     type: 'post',
-                    url:  '/cms/categoryForm.php',
+                    url:  '/resource/folder/move/categoryForm.php',
                     data: {
-                        move:       folderNode.attr('id'),
-                        categoryID: destinationNode.attr('id')
+                        source:      folderNode.attr('id'),
+                        destination: destinationNode.attr('id')
                     },
                     dataType: 'json'
                 }

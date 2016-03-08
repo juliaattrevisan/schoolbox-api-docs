@@ -51,4 +51,15 @@ class Controller extends BaseController
 
         die(json_encode(['result' => 'success']));
     }
+
+    /**
+     * Move folder with an AJAX response
+     *
+     * @throws \Exception
+     */
+    public function postMoveFolder()
+    {
+        FolderMapper::getInstance()->moveFolder($this->getRequest()->post["source"], $this->getRequest()->post["destination"]);
+        die(json_encode(['result' => 'success']));
+    }
 }
