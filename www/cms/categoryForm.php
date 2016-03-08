@@ -229,31 +229,8 @@ if ($_POST['name']) {
     }
 
     $folderMapper->save($movedFolder->setParent($parentFolder));
-} /*elseif (is_numeric($_GET['delete'])) {
-    try {
-        $category = $folderMapper->findById($_GET['delete']);
-    } catch (\Exception $e) {
-        error(2);
-    }
-
-    if ($groupHandler->getPermission($category->getId()) < WRITE_ACCESS) {
-        error(8);
-    }
-
-    // Are there any children of this category?
-    // If so, error out if not a superuser
-    if ($folderMapper->countByColumn('parent', $_GET['delete'])) {
-        if (!$groupHandler->isSuperuser()) {
-            error(12);
-        }
-    }
-
-    // This deletes all contents of this folder and all of its children.
-    $folderMapper->recursiveDelete($category);
-
-    $_SESSION['resourcesID'] = $category->getParent()->getId();
-    $bttfCount = 2;
-}*/ elseif (is_numeric($_GET['deleteAll'])) {
+}
+elseif (is_numeric($_GET['deleteAll'])) {
 // only superusers can do this no matter what
     if (!$groupHandler->isSuperuser()) {
         error(12);

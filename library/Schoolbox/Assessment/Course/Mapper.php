@@ -14,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Ancestry;
+use Schoolbox\Permission\Access\Access;
 
 class Mapper extends FolderMapper
 {
@@ -326,4 +327,36 @@ class Mapper extends FolderMapper
     {
         $this->ancestry = $ancestry;
     }
+
+    /**
+     * Delete unit from course
+     *
+     * @param Int $id
+     */
+    public function deleteUnit($id)
+    {
+        // Grab handles to the mappers as we'll reuse them
+
+        $folderMapper = FolderMapper::getInstance();
+        $unitInstanceMapper = UnitInstanceMapper::getInstance();
+
+        try
+        {
+            // Locate the unit we want to delete
+
+            $unit = $unitInstanceMapper->findById($id);
+
+            if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
+            {
+                $folderMapper->deleteFolder($unit->getUnitCategory()->getId());
+                $unitInstanceMapper->delete($unit);
+            }
+        }
+        catch (\Exception $e)
+        {
+            // Permission denied or something wasn't found, do nothing and just return. The folder won't have
+            // been deleted.
+        }
+    }
+
 }

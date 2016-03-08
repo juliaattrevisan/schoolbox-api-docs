@@ -23,6 +23,7 @@ use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Permission\Access\Access;
 
 /**
  * Class Mapper
@@ -1189,5 +1190,49 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     protected function setMaxRecursionDepth($maxRecursionDepth)
     {
         $this->maxRecursionDepth = $maxRecursionDepth;
+    }
+
+    /**
+     * Delete folder and children
+     *
+     * @param Int $id
+     * @throws \Exception
+     */
+    public function deleteFolder($id)
+    {
+        // Grab handle to mapper as we'll reuse it
+
+        $folderMapper = FolderMapper::getInstance();
+
+        try
+        {
+            // Find the folder object
+
+            $folder = $folderMapper->findById($id);
+
+            // Make sure user has write permission to the folder
+
+            if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$id]) >= WRITE_ACCESS) {
+
+                // If the folder has children, then we will only allow superusers to delete it
+
+                if ($folderMapper->countByColumn('parent', $id))
+                {
+                    if (!$_SESSION["user"]->isSuperuser())
+                    {
+                        throw new \Exception('Access Denied');
+                    }
+                }
+
+                // Deletes all contents of this folder and all of its children.
+
+                $folderMapper->recursiveDelete($folder);
+            }
+        }
+        catch (\Exception $e)
+        {
+            // Permission denied or something wasn't found, do nothing and just return. The folder won't have
+            // been deleted.
+        }
     }
 }
