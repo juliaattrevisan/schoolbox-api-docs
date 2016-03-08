@@ -43,7 +43,12 @@ class Controller extends BaseController
      */
     public function getDeleteFolderAjax($id)
     {
+        $folder = FolderMapper::getInstance()->findById($id);
+
+        $_SESSION['resourcesID'] = $folder->getParent()->getId();
+
         FolderMapper::getInstance()->deleteFolder($id);
+
         die(json_encode(['result' => 'success']));
     }
 }
