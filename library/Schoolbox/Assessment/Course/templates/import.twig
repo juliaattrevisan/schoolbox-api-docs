@@ -7,17 +7,26 @@
 
         /* Attach Course Selector Modal listeners
          */
-        $.fn.courseSelectorModal(
+        $.fn.courseSelectorModal({
             {% if sources.id %}
-            {
-                courseSelector: {
-                    query: {
-                        folder: {{sources.id}}
-                    }
+            courseSelector: {
+                query: {
+                    folder: {{sources.id}}
                 }
-            }
+            },
             {% endif %}
-        );
+
+            /* Callbacks
+             */
+            onCourseSelect: function() {
+                console.log('fox');
+                $('body').on('click', '#course-selector-results [data-course]', function(event) {
+                    event.preventDefault();
+
+                    console.log($(this).attr('data-course'));
+                });
+            }
+        });
 
         $('#import-folders').selectizeSelector({
             ajax: {

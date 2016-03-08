@@ -161,6 +161,9 @@
                     /* This element is used to filter the ajax request contents
                      */
                     filter: '[data-course-selector-filter]'
+                },
+
+                onCourseSelect: function() {
                 }
             };
 
@@ -192,6 +195,10 @@
                     data: query
                 });
             });
+
+            /* Callbacks
+             */
+            config.onCourseSelect();
         }
     }
 }(jQuery));
