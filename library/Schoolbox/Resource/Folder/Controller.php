@@ -74,23 +74,6 @@ class Controller extends BaseController
     }
 
     /**
-     * Apply inherited permissions down the tree
-     *
-     * @throws \Exception
-     */
-    public function recurseInheritance(\Schoolbox\Resource\Folder\Model $model)
-    {
-        $folders = FolderMapper::getInstance()->findAllChildren($model->getId(), true);
-        foreach ($folders as $folder)
-
-        {
-            $folder->setInherit($model->getInherit());
-            FolderMapper::getInstance()->save($folder);
-            $this->recurseInheritance($folder);
-        }
-    }
-
-    /**
      * Update a folders details
      *
      * @throws \Exception
@@ -230,7 +213,7 @@ class Controller extends BaseController
 
         // Recurse inheritance
 
-        $this->recurseInheritance($model);
+        $folderMapper->recurseInheritance($model);
 
         // HomepageConfig definition
 

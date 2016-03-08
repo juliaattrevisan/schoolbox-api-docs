@@ -1276,8 +1276,21 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         exit;
     }
 
-    public function updateFolder()
+    /**
+     * Apply inherited permissions checkbox DOWN the tree
+     *
+     * @param Model $model
+     * @throws \Exception
+     */
+    public function recurseInheritance(Model $model)
     {
+        $folders = $this->findAllChildren($model->getId(), true);
+        foreach ($folders as $folder)
 
+        {
+            $folder->setInherit($model->getInherit());
+            $this->save($folder);
+            $this->recurseInheritance($folder);
+        }
     }
 }
