@@ -260,6 +260,7 @@ class StudentReportCard
                 'WORK_USER_BYLINE' => 'Year' . $this->getTargetUser()->getYear(),
                 'GRAPH_INFO_INDEX'                 => json_encode([]),
                 'GRAPH_ASSESSMENT_NAMES'           => json_encode([]),
+                'GRAPH_ASSESSMENT_ITEM_VALUE'      => json_encode([]),
                 'YOUR_GRAPH_ASSESSMENT_ITEM_VALUE' => json_encode([]),
             )
         );
