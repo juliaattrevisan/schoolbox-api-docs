@@ -39,31 +39,39 @@
 </script>
 
 <div class="row">
-    <div class="small-12 columns">
-        <h1>Import Course Into Class</h1>
-    </div>
-</div>
-
-<div class="row">
     <div class="small-12 island">
-        <section class="content">
-            <div class="row">
-                <div class="small-3 columns">
-                    <input id="import-course" type="text" name="importCourse" />
-                </div>
-                <div class="small-1 columns text-center">
-                    &rarr;
-                </div>
-                <div class="small-8 columns">
-                    <input id="import-folders" type="text" name="importFolders" />
-                </div>
-            </div>
-        </section>
+        <h1>Import Course into Class</h1>
+        <form method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-3 columns">
+                        <label>Course
+                            <input id="import-course" type="text" name="importCourse" />
+                        </label>
+                    </div>
+                    <div class="small-1 columns text-center">
+                        &rarr;
+                    </div>
+                    <div class="small-8 columns">
+                        <label>Class(es)
+                            <input id="import-folders" type="text" name="importFolders" />
+                        </label>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Units</legend>
+                    {# include content from SB-11472 here #}
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Coursework</legend>
+                    <div id="importResults">
+                        {% if folder.id %}
+                            {% include '@course/importResults.twig' %}
+                        {% endif %}
+                    </div>
+                </fieldset>
+            </section>
+        </form>
     </div>
 </div>
 
-<div id="importResults">
-    {% if folder.id %}
-        {% include '@course/importResults.twig' %}
-    {% endif %}
-</div>
