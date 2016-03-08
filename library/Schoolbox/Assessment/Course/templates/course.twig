@@ -84,10 +84,14 @@
                         </label>
                     </div>
                     <div class="small-12 column">
-                        <label>Faculty / Class
-                            <input type="hidden" name="parent" value="{{ folder.parent.id }}" />
-                            <a data-source="parent" href="#" class="source-select {{ folder.parent.id ? 'icon-folder' : '' }}" title="Click to change the faculty / class this course belongs to">{{ folder.parent.id ? folder.parent.name : '(Click to select)' }}</a>
-                        </label>
+                        {% include '@course/selectorShard.twig' with {
+                                'formLabel': 'Faculty / Class',
+                                'formInputId': 'course-selector-id',
+                                'folder': folder,
+                                'activator': 'data-course-selector',
+                                'title': 'Click to change the faculty / class this course belongs to'
+                            }
+                        %}
                     </div>
                     <div class="small-12 column">
                         <label>Curriculum Codes
