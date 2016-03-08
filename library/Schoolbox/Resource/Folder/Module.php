@@ -37,9 +37,11 @@ class Module extends BaseModule
             'GET' => [
                 '/folder/delete/history/{id}/{level}'   => 'getDeleteFolderHistory',
                 '/folder/delete/ajax/{id}'              => 'getDeleteFolderAjax',
+                '/folder/delete-all/{id}'               => 'getDeleteFolderAll',
             ],
             'POST' => [
-                '/folder/move'                          => 'postMoveFolder'
+                '/folder/move'                          => 'postMoveFolder',
+                '/folder/update'                        => 'postUpdateFolder'
             ]
         ];
 

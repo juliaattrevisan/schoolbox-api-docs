@@ -1275,4 +1275,9 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $folderMapper->save($movedFolder->setParent($parentFolder));
         exit;
     }
+
+    public function updateFolder()
+    {
+
+    }
 }
