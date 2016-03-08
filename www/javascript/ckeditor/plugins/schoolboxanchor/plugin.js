@@ -8,7 +8,7 @@ CKEDITOR.plugins.add('schoolboxanchor', {
         editorInstance.ui.addButton('schoolboxAnchor', {
             label: 'Anchor',
             command: 'schoolboxanchor',
-            toolbar: 'schoolbox,5'
+            toolbar: 'schoolbox,3'
         });
 
         CKEDITOR.dialog.add('schoolboxanchorDialog', this.path + 'dialogs/schoolboxanchor.js');

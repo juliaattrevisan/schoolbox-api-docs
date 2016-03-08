@@ -211,7 +211,7 @@
                      * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
                      * This is typically not used for anything else for now
                      */
-                    {name: 'schoolbox', groups: ['schoolboxlink', 'schoolboxresource', 'schoolboxiframe', 'schoolboxanchor']},
+                    {name: 'schoolbox', groups: ['schoolboxlink', 'schoolboxanchor', 'schoolboxresource', 'schoolboxiframe']},
                     {name: 'insert', groups: ['insert']},
                     '/',
                     {name: 'styles', groups: ['styles']},
