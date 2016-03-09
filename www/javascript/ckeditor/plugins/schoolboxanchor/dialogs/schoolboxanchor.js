@@ -12,31 +12,9 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
         var element = editorInstance.document.createElement('a');
         element.setAttribute('id', fields.id.getValue());
 
-        /* No selection.
-
-         * TODO: Hmm I'm not sure when this occurs, as an empty
-         * selection (or, placement of caret) is equivalent to
-         * CKEDITOR.SELECTION_TEXT anyway...
+        /* Only use what the user has specified in the dialog
          */
-        if (selection.getType() == CKEDITOR.SELECTION_NONE) {
-            element.setText(fields.display.getValue());
-        }
-        /* Applying link to selected text; use the selected text
-         * as the link text itself. Or, if nothing was selected,
-         * just insert a new string with the url as link text
-         */
-        else if (selection.getType() == CKEDITOR.SELECTION_TEXT) {
-
-            /* Only use what the user has specified in the dialog
-             */
-            element.setText(fields.display.getValue());
-        }
-        /* Applying link to some kind of element like an img
-         * Use the element as children of element
-         */
-        else if (selection.getType() == CKEDITOR.SELECTION_ELEMENT) {
-            element.append(selection.getSelectedElement());
-        }
+        element.setText(fields.display.getValue());
 
         return element;
     }
