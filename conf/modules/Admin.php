@@ -50,7 +50,7 @@ class Admin implements ModuleConfigInterface
 
         // Admin top menu customizer
 
-        $topMenu = new \Schoolbox\Admin\TopMenu\Module($di);
-        $topMenu->init('/adminv2/top-menu');
+        $menuTop = new \Schoolbox\Admin\MenuTop\Module($di);
+        $menuTop->init('/adminv2/menu-top');
     }
 } 

@@ -38,8 +38,8 @@
                     <ul class="icon-nav small-12 columns">
                         {% for item in items %}
                             <li data-item>
-                                <a id="{{ item.getId }}" class="{{ item.getIcon }}" title="{{ item.getText }}">
-                                    <span>{{ item.getText }}</span>
+                                <a id="{{ item.getId }}" class="{{ item.getIcon }}" title="{{ item.getTitle }}">
+                                    <span>{{ item.getTitle }}</span>
                                 </a>
                             </li>
                         {% endfor %}

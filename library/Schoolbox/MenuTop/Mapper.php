@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\TopMenu;
+namespace Schoolbox\MenuTop;
 
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
@@ -16,8 +16,8 @@ class Mapper extends BaseMapper
 {
     public function mapping()
     {
-        $this->hasTable('topMenu');
-        $this->hasModel('\\Schoolbox\\TopMenu\\Model');
+        $this->hasTable('menu_top');
+        $this->hasModel('\\Schoolbox\\MenuTop\\Model');
         $this->hasMap(
             array(
                 'column'     => 'id',
@@ -28,8 +28,8 @@ class Mapper extends BaseMapper
         );
         $this->hasMap(
             array(
-                'column'   => 'txt',
-                'property' => 'text',
+                'column'   => 'title',
+                'property' => 'title',
                 'type'     => self::TYPE_STRING,
             )
         );

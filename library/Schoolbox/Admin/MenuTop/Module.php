@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Admin\TopMenu;
+namespace Schoolbox\Admin\MenuTop;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
@@ -19,7 +19,7 @@ use Twig_Loader_Chain;
 
 class Module extends BaseModule
 {
-    protected $basename = 'adminTopMenu';
+    protected $basename = 'adminMenuTop';
 
     /**
      * {@inheritdoc}
@@ -42,7 +42,7 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initControllers(ContainerInterface $injector) {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew('Schoolbox\\Admin\\TopMenu\\Controller'));
+        $injector->set('controller:'.$this->basename, $injector->lazyNew('Schoolbox\\Admin\\MenuTop\\Controller'));
     }
 
     /**

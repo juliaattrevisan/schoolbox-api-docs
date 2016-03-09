@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\TopMenu;
+namespace Schoolbox\MenuTop;
 
 use Schoolbox\Collection;
 
@@ -21,18 +21,11 @@ class Model
     protected $id;
 
     /**
-     * This node's children (if it has any)
-     *
-     * @var Collection|Model[]
-     */
-    protected $children;
-
-    /**
      * Menu item text
      *
      * @var string
      */
-    protected $text = '';
+    protected $title = '';
 
     /**
      * Icon
@@ -101,20 +94,20 @@ class Model
     /**
      * @return string
      */
-    public function getText()
+    public function getTitle()
     {
-        return $this->text;
+        return $this->title;
     }
 
     /**
-     * @param  string $text
+     * @param  string $title
      *
      * @return $this
      */
-    public function setText($text)
+    public function setTitle($title)
     {
-        $this->text = $text;
-        return $this;
+        $this->title = $title;
+        return $title;
     }
 
     /**

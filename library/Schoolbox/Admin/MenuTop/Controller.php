@@ -7,12 +7,12 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Admin\TopMenu;
+namespace Schoolbox\Admin\MenuTop;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage;
-use Schoolbox\TopMenu\Mapper as TopMenuMapper;
+use Schoolbox\MenuTop\Mapper as MenuTopMapper;
 
 class Controller extends Base
 {
@@ -22,10 +22,10 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             array(
-                'template' => '@adminTopMenu/index.twig',
+                'template' => '@adminMenuTop/index.twig',
                 'data'     => array(
                     'pageCurrent' => basename($_GET["page"]),
-                    'items' => TopMenuMapper::getInstance()->findAll()->sortBy("order", "asc"),
+                    'items' => MenuTopMapper::getInstance()->findAll()->sortBy("order", "asc"),
                 ),
             )
         );
