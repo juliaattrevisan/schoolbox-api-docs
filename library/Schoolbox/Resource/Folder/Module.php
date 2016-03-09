@@ -37,16 +37,15 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/folder/delete/history/{id}/{level}'   => 'getDeleteFolderHistory',
-                '/folder/delete/ajax/{id}'              => 'getDeleteFolderAjax',
-                '/folder/delete-all/{id}'               => 'getDeleteFolderAll',
                 '/folder/modify/{id}'                   => 'getFolderModify',
                 '/folder/create/{parentId}'             => 'getFolderCreate',
-                '/folder/reset/{id}'                    => 'getFolderReset',
             ],
             'POST' => [
                 '/folder/move'                          => 'postMoveFolder',
-                '/folder/update'                        => 'postUpdateFolder'
+                '/folder/update'                        => 'postUpdateFolder',
+                '/folder/delete'                        => 'postDeleteFolder',
+                '/folder/delete-all'                    => 'postDeleteFolderAll',
+                '/folder/reset'                         => 'postFolderReset',
             ]
         ];
 

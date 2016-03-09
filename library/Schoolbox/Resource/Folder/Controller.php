@@ -26,6 +26,7 @@ use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Controller extends BaseController
 {
@@ -131,40 +132,20 @@ class Controller extends BaseController
     }
 
     /**
-     * Delete folder and do a history redirect
-     *
-     * @param Int $id
-     * @param Int $level
-     * @throws \Exception
+     * Delete folder AJAX
      */
-    public function getDeleteFolderHistory($id, $level)
+    public function postDeleteFolder()
     {
-        $folder = FolderMapper::getInstance()->findById($id);
+        $folder = FolderMapper::getInstance()->findById($this->getRequest()->post["id"]);
 
         $_SESSION['resourcesID'] = $folder->getParent()->getId();
 
-        FolderMapper::getInstance()->deleteFolder($id);
+        FolderMapper::getInstance()->delete($folder);
 
-        $this->getResponse()->redirect->afterPost(
-            $this->getSession()->getHistory($level)
-        );
-    }
-
-    /**
-     * Delete folder with an AJAX response
-     *
-     * @param Int $id
-     * @throws \Exception
-     */
-    public function getDeleteFolderAjax($id)
-    {
-        $folder = FolderMapper::getInstance()->findById($id);
-
-        $_SESSION['resourcesID'] = $folder->getParent()->getId();
-
-        FolderMapper::getInstance()->deleteFolder($id);
-
-        $this->getResponse()->content->set(json_encode(['result' => 'success']));
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => json_encode(['result' => 'success'])
+        ]);
     }
 
     /**
@@ -175,7 +156,11 @@ class Controller extends BaseController
     public function postMoveFolder()
     {
         FolderMapper::getInstance()->moveFolder($this->getRequest()->post["source"], $this->getRequest()->post["destination"]);
-        $this->getResponse()->content->set(json_encode(['result' => 'success']));
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => json_encode(['result' => 'success'])
+        ]);
     }
 
     /**
@@ -209,7 +194,7 @@ class Controller extends BaseController
             {
                 // No write access to the folder
 
-                throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(6));
+                throw new \Exception(ErrorMapper::getInstance()->getMessageById(6));
             }
 
             $model->setId($this->getRequest()->post['categoryID']);
@@ -218,7 +203,7 @@ class Controller extends BaseController
         {
             // No write access to parent
 
-            throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(6));
+            throw new \Exception(ErrorMapper::getInstance()->getMessageById(6));
         }
 
         // Delete category codes here, allowing them to be recreated when the category gets saved.
@@ -299,7 +284,7 @@ class Controller extends BaseController
         {
             // Something went wrong saving
 
-            throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(2));
+            throw new \Exception(ErrorMapper::getInstance()->getMessageById(2));
         }
 
         $model->setId($affectedIds[0]);
@@ -367,7 +352,7 @@ class Controller extends BaseController
             }
             else
             {
-                throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(20));
+                throw new \Exception(ErrorMapper::getInstance()->getMessageById(20));
             }
         }
         else
@@ -401,51 +386,42 @@ class Controller extends BaseController
     /**
      * Delete folder and all children (superusers only)
      *
-     * @param int $id
+     * @throws \Exception
      */
-    public function getDeleteFolderAll($id)
+    public function postDeleteFolderAll()
     {
-        if (!$this->getUser()->isSuperuser())
-            throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(12));
-
-        try
-        {
-            $folderMapper = FolderMapper::getInstance();
-
-            $folder = $folderMapper->findById($id);
-            $folderMapper->recursiveDelete($folder);
-            $_SESSION['resourcesID'] = $folder->getParent()->getId();
-        }
-        catch (\Exception $e)
-        {
-            throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(2));
+        if (!$this->getUser()->isSuperuser()) {
+            throw new \Exception(ErrorMapper::getInstance()->getMessageById(12));
         }
 
-        $this->getResponse()->redirect->afterPost(
-            $this->getSession()->getHistory(2)
-        );
+        $folderMapper = FolderMapper::getInstance();
+
+        $folder = $folderMapper->findById($this->getRequest()->post["id"]);
+        $folderMapper->recursiveDelete($folder);
+
+        $_SESSION['resourcesID'] = $folder->getParent()->getId();
     }
 
     /**
      * Reset folder content
      *
-     * @param int $id
+     * @throws \Exception
      */
-    public function getFolderReset($id)
+    public function postFolderReset()
     {
         $folderMapper = FolderMapper::getInstance();
 
         try
         {
-            $folder = $folderMapper->findById($id);
+            $folder = $folderMapper->findById($this->getRequest()->post["id"]);
 
             if (Access::getInstance()->getFolderAccess($this->getUser(), [$folder->getId()]) < WRITE_ACCESS) {
-                throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(6));
+                throw new \Exception(ErrorMapper::getInstance()->getMessageById(6));
             }
         }
         catch (\Exception $e)
         {
-            throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(13));
+            throw new \Exception(ErrorMapper::getInstance()->getMessageById(13));
         }
 
         // Remove component content
@@ -470,7 +446,5 @@ class Controller extends BaseController
         foreach ($allLinks as $currentLink) {
             $linkMapper->delete($currentLink);
         }
-
-        $this->getResponse()->redirect->afterPost("/homepage/{$folder->getId()}");
     }
 }

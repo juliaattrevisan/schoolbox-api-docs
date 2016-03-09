@@ -45,7 +45,11 @@
             event.preventDefault();
             $(this).confirmDialog({
                 text: 'Are you sure you wish to delete this folder?',
-                confirmEvent: $.confirmDialog.followHref
+                confirmEvent: function() {
+                    $.post('/resource/folder/delete', {id: {{ folder.getId }}, function () {
+                        history.go(-1);
+                    }});
+                }
             });
         });
 
@@ -56,7 +60,9 @@
             $(this).confirmDialog({
                 text: 'Are you sure you wish to delete all content from this homepage? This includes:\n - Assessments\n - Blogs\n - Calendar events\n - News\n - Chats\n - Dropbox\n - Files\n - Forums\n - Polls\n - Due Work\n - Surveys\n - TextBoxes\n - Wikis',
                 confirmEvent: function() {
-                    window.location.href = element.attr('href');
+                    $.post('/resource/folder/reset', {id: {{ folder.getId }} }).done(function() {
+                        window.location.href = '/homepage/{{ folder.getId }}';
+                    });
                 }
             });
         });
@@ -110,8 +116,8 @@
                 <li><a class="icon-group" href="/group/modify/{{ folder.getId }}" title="Manage individual user access to this folder">Modify Group</a></li>
             {% endif %}
 
-            <li><a class="icon-delete" href="/resource/folder/delete/history/{{ folder.getId }}/2" data-interaction="delete">Delete Folder</a></li>
-            <li><a class="icon-refresh" href="/resource/folder/reset/{{ folder.getId }}" data-reset-homepage-content>Reset Content</a>
+            <li><a class="icon-delete" data-interaction="delete">Delete Folder</a></li>
+            <li><a class="icon-refresh" data-reset-homepage-content>Reset Content</a>
         </ul>
 
     {% endif %}
