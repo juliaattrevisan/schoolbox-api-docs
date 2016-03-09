@@ -164,7 +164,7 @@ class Controller extends BaseController
 
         FolderMapper::getInstance()->deleteFolder($id);
 
-        die(json_encode(['result' => 'success']));
+        $this->getResponse()->content->set(json_encode(['result' => 'success']));
     }
 
     /**
@@ -175,7 +175,7 @@ class Controller extends BaseController
     public function postMoveFolder()
     {
         FolderMapper::getInstance()->moveFolder($this->getRequest()->post["source"], $this->getRequest()->post["destination"]);
-        die(json_encode(['result' => 'success']));
+        $this->getResponse()->content->set(json_encode(['result' => 'success']));
     }
 
     /**
@@ -186,7 +186,6 @@ class Controller extends BaseController
     public function postUpdateFolder()
     {
         $folderMapper = FolderMapper::getInstance();
-        $folderMapper->setSessionData($_SESSION);
 
         $model = $folderMapper->createModel()
             ->setName($this->getRequest()->post['name'])
@@ -210,7 +209,7 @@ class Controller extends BaseController
             {
                 // No write access to the folder
 
-                error(6);
+                throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(6));
             }
 
             $model->setId($this->getRequest()->post['categoryID']);
@@ -219,7 +218,7 @@ class Controller extends BaseController
         {
             // No write access to parent
 
-            error(6);
+            throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(6));
         }
 
         // Delete category codes here, allowing them to be recreated when the category gets saved.
@@ -300,7 +299,7 @@ class Controller extends BaseController
         {
             // Something went wrong saving
 
-            error(2);
+            throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(2));
         }
 
         $model->setId($affectedIds[0]);
@@ -368,7 +367,7 @@ class Controller extends BaseController
             }
             else
             {
-                error(20);
+                throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(20));
             }
         }
         else
@@ -407,7 +406,7 @@ class Controller extends BaseController
     public function getDeleteFolderAll($id)
     {
         if (!$this->getUser()->isSuperuser())
-            error(12);
+            throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(12));
 
         try
         {
@@ -419,7 +418,7 @@ class Controller extends BaseController
         }
         catch (\Exception $e)
         {
-            error(2);
+            throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(2));
         }
 
         $this->getResponse()->redirect->afterPost(
@@ -441,12 +440,12 @@ class Controller extends BaseController
             $folder = $folderMapper->findById($id);
 
             if (Access::getInstance()->getFolderAccess($this->getUser(), [$folder->getId()]) < WRITE_ACCESS) {
-                error(6);
+                throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(6));
             }
         }
         catch (\Exception $e)
         {
-            error(13);
+            throw new \Exception(\Schoolbox\Error\Mapper::getInstance()->getMessageById(13));
         }
 
         // Remove component content
