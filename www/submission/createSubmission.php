@@ -411,21 +411,25 @@ $output['USER_CAMPUS_LIST'] = json_encode($campusList);
 
 $this->setVar($output);
 
+
 /* Render out breadcrumbs
  */
-$trail = new \Schoolbox\Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-$trail->renderIntoSitePage($this, 'BREADCRUMB', [
-    [
-        'text'  => $category->getName(),
-        'href'  => "/homepage/{$category->getId()}",
-        'class' => '',
-    ],
+$trail = new \Schoolbox\Breadcrumbs();
+
+// get a crunchy biscuit base
+$crumbs = $trail->getFolderCrumbs($category, $_GET['return_url']);
+
+// sprinkle some crumbs on top
+$crumbs = array_merge($crumbs, [
     [
         'text'  => $submission->getId() ? $submission->getName() : 'Post Due Work',
         'href'  => '',
         'class' => 'active',
     ]
 ]);
+
+// bake in a moderate oven for 40 minutes
+$trail->renderIntoSitePage($this, 'BREADCRUMB', $crumbs);
 
 /**
  * @param SitePage  $page

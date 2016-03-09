@@ -41,4 +41,47 @@ class Breadcrumbs
 
     }
 
+
+    /**
+     * I don't have a better place for this to live, sorry -_-;
+     *
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @param string $returnUrl
+     * @return array
+     */
+    public function getFolderCrumbs($folder, $returnUrl = '')
+    {
+        if (!$returnUrl || strpos(urldecode(base64_decode($returnUrl)), '/course/modify/') === false) {
+            // not a course modify path, or no return URL: just give us the homepage version
+            return [
+                [
+                    'text'  => $folder->getName(),
+                    'href'  => "/homepage/{$folder->getId()}",
+                    'class' => '',
+                ]
+            ];
+        }
+
+        // course modify path: obtain parent and use that
+        $parent = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($folder->getParent()->getId());
+
+        return [
+            [
+                'text'  => 'Courses',
+                'href'  => '/course/list',
+                'class' => '',
+            ],
+            [
+                'text'  => $parent->getName(),
+                'href'  => "/course/modify/{$parent->getId()}",
+                'class' => '',
+            ],
+            [
+                'text'  => $folder->getName(),
+                'href'  => "/course/modify/{$parent->getId()}#{$folder->getId()}",
+                'class' => '',
+            ],
+        ];
+    }
+
 }

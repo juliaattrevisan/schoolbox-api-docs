@@ -101,13 +101,13 @@ if (!empty($_POST)) {
 
     /* Render out breadcrumbs
      */
-    $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
-        [
-            'text' => $folder->getName(),
-            'href' => "/homepage/{$folder->getId()}",
-            'class' => '',
-        ],
+    $trail = new \Schoolbox\Breadcrumbs();
+
+    // get a crunchy biscuit base
+    $crumbs = $trail->getFolderCrumbs($folder, $_GET['return_url']);
+
+    // sprinkle some crumbs on top
+    $crumbs = array_merge($crumbs, [
         [
             'text' => $assess['title'],
             'href' => "/assess/summary/{$assess['assess_id']}",
@@ -119,6 +119,9 @@ if (!empty($_POST)) {
             'class' => 'active',
         ]
     ]);
+
+    // bake in a moderate oven for 40 minutes
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', $crumbs);
 }
 
 
