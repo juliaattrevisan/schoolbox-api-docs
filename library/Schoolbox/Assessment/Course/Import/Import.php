@@ -47,9 +47,13 @@ class Import
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setTaskMapper(TaskMapper::getInstance());
     }
+
     /**
      * Get a list of all the Folders which should
      * receive the selected Course
+     *
+     * @param $query
+     * @return array
      */
     public function importClasses($query)
     {
