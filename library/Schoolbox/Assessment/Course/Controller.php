@@ -259,13 +259,13 @@ class Controller extends BaseController
      * Import a Course into a set of Folders (classes)
      *
      * @param $courseId
-     * @param $classId
+     * @param $classCode
      */
-    public function import($courseId, $classId)
+    public function import($courseId, $classCode)
     {
         $importer = new CourseImport();
 
-        $this->tpl('import', $importer->importSelectize($courseId, $classId));
+        $this->tpl('import', $importer->importSelectize($courseId, $classCode));
     }
 
     /**
@@ -276,7 +276,7 @@ class Controller extends BaseController
     {
         $importer = new CourseImport();
 
-        echo json_encode($importer->importClasses());
+        echo json_encode($importer->importClasses($this->getRequest()->query->get('query')));
         exit();
     }
 

@@ -51,10 +51,10 @@ class Import
      * Get a list of all the Folders which should
      * receive the selected Course
      */
-    public function importClasses()
+    public function importClasses($query)
     {
         $data = [];
-        $allFolders = $this->getFolderMapper()->findByName($this->getRequest()->query->get('query'));
+        $allFolders = $this->getFolderMapper()->findByName($query);
 
         /* Swap keys for selectize compatibility -_-
          */
@@ -72,10 +72,10 @@ class Import
      * Generate selectize data for the main import screen
      *
      * @param $courseId
-     * @param $classId
+     * @param $classCode
      * @return array
      */
-    public function importSelectize($courseId, $classId)
+    public function importSelectize($courseId, $classCode)
     {
         $data = [
 
@@ -127,8 +127,8 @@ class Import
         /* A class was already chosen
          */
         try {
-            if ($classId) {
-                $folder = $this->getFolderMapper()->findById($classId);
+            if ($classCode) {
+                $folder = $this->getFolderMapper()->findByCode($classCode);
                 $pair   = $folder->findValueLabelPair();
 
                 $data['destinations'] = [
