@@ -26,12 +26,10 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
          * just insert a new string with the url as link text
          */
         else if (selection.getType() == CKEDITOR.SELECTION_TEXT) {
-            if (selection.getSelectedText().length) {
-                element.setText(selection.getSelectedText());
-            }
-            else {
-                element.setText(fields.display.getValue());
-            }
+
+            /* Only use what the user has specified in the dialog
+             */
+            element.setText(fields.display.getValue());
         }
         /* Applying link to some kind of element like an img
          * Use the element as children of element
@@ -71,7 +69,7 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
     return {
         title: 'Anchor',
         minWidth: 400,
-        minHeight: 200,
+        minHeight: 50,
 
         /**
          * Tab Contents
@@ -89,11 +87,16 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
 
                         /* Editing an existing element
                          */
-                        setup: function(element) {
+                        setup: function(element, selection) {
                             var dialog = this.getDialog();
                             var fields = dialogFields(dialog);
 
-                            fields.display.setValue(element.getText());
+                            if (selection.getSelectedText().length) {
+                                fields.display.setValue(selection.getSelectedText());
+                            }
+                            else {
+                                fields.display.setValue(element.getText());
+                            }
                         },
 
                         /* Update id value upon change
@@ -121,10 +124,11 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
                         type: 'text',
                         id: 'schoolboxanchor-id',
                         label: 'Id',
+                        className: 'hide',
 
                         /* Editing an existing element
                          */
-                        setup: function(element) {
+                        setup: function(element, selection) {
                             var dialog = this.getDialog();
                             var fields = dialogFields(dialog);
 
@@ -153,7 +157,7 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
 
             /* Alter details about existing node
              */
-            this.commitContent(dialog.element);
+            this.commitContent(this.element);
 
             /* Or insert a new one if needed
              */
@@ -191,7 +195,7 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
             this.selection = selection;
 
             if (!this.insertMode) {
-                this.setupContent(this.element);
+                this.setupContent(this.element, this.selection);
             }
         }
     };
