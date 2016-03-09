@@ -2,7 +2,6 @@
 * http://docs.ckeditor.com/#!/guide/plugin_sdk_sample_1
 */
 CKEDITOR.plugins.add('schoolboxresource', {
-    icons: 'schoolboxresource',
     init: function(editorInstance) {
         editorInstance.addCommand('schoolboxresource', new CKEDITOR.dialogCommand('schoolboxresourceDialog'));
 

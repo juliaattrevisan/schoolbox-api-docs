@@ -2,7 +2,6 @@
 * http://docs.ckeditor.com/#!/guide/plugin_sdk_sample_1
 */
 CKEDITOR.plugins.add('schoolboxiframe', {
-    icons: 'schoolboxiframe',
     init: function(editorInstance) {
         editorInstance.addCommand('schoolboxiframe', new CKEDITOR.dialogCommand('schoolboxiframeDialog'));
 
