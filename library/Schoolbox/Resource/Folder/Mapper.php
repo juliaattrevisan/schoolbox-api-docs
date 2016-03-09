@@ -511,10 +511,6 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * @return Model
      */
     public function searchByName($keyword, $userGroupsOnly = false) {
-        $code_mapper = $this->getJoinMapper('codes');
-        $homepageConfig_mapper = $this->getJoinMapper('homepages');
-        $group_mapper = $this->getJoinMapper('groups');
-
         $query = $this->getFindQuery();
 
         $query .= "
