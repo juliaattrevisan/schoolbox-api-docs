@@ -113,7 +113,7 @@ class LogMapper extends Mapper {
 	 * Return recent log entries
 	 *
 	 * @param int $limit
-	 * @return Collection|Log[]
+	 * @return array
 	 */
 	public function findRecent($limit = 30)
 	{
