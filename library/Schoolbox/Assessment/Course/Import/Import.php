@@ -52,13 +52,15 @@ class Import
      * Get a list of all the Folders which should
      * receive the selected Course
      *
+     * Searches by both name and class code
+     *
      * @param $query
      * @return array
      */
     public function importClasses($query)
     {
         $data = [];
-        $allFolders = $this->getFolderMapper()->findByName($query);
+        $allFolders = $this->getFolderMapper()->searchByName($query);
 
         /* Swap keys for selectize compatibility -_-
          */
