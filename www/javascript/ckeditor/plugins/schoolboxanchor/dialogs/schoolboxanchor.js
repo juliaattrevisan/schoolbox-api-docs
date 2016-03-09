@@ -80,7 +80,7 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
                         /* Update id value upon change
                          * Anchor text can display different to their actual id val
                          */
-                        onChange: function() {
+                        onKeyDown: function() {
                             var dialog = this.getDialog();
                             var fields = dialogFields(dialog);
 
