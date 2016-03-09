@@ -192,9 +192,7 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
             this.element = element;
             this.selection = selection;
 
-            if (!this.insertMode) {
-                this.setupContent(this.element, this.selection);
-            }
+            this.setupContent(this.element, this.selection);
         }
     };
 });
