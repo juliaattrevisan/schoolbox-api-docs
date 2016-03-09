@@ -10,7 +10,6 @@ namespace Schoolbox\Resource\Folder;
 
 use Alaress\Web\Controller\Base as BaseController;
 
-use Schoolbox\Breadcrumbs;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -27,6 +26,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use \Schoolbox\Config\Loader as ConfigLoader;
 
 class Controller extends BaseController
 {
@@ -38,8 +38,14 @@ class Controller extends BaseController
      */
     public function getFolderModify($id)
     {
-        $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($id);
-        $parent = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($folder->getParent()->getId());
+        $folderMapper = Folder\Mapper::getInstance();
+        $homepageConfigMapper = HomepageConfigMapper::getInstance();
+        $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
+        $roleAccessMapper = RoleAccessMapper::getInstance();
+        $roleMapper = RoleMapper::getInstance();
+
+        $folder = $folderMapper->findById($id);
+        $parent = $folderMapper->findById($folder->getParent()->getId());
 
         $breadcrumbs = [
             [
@@ -53,13 +59,13 @@ class Controller extends BaseController
         ];
 
         try {
-            $homepageConfig = \Schoolbox\Resource\HomepageConfigMapper::getInstance()->findOneByColumn('cid', $folder->getId());
+            $homepageConfig = $homepageConfigMapper->findOneByColumn('cid', $folder->getId());
             $templateId = $homepageConfig->getTemplate()->getId();
         } catch (\Exception $e) {
             $templateId = HomepageTemplateMapper::TEMPLATE_NONE;
         }
 
-        $permissions = RoleAccessMapper::getInstance()->findByColumn('cid', $folder->getId());
+        $permissions = $roleAccessMapper->findByColumn('cid', $folder->getId());
 
         $rolePermissions = [];
 
@@ -67,7 +73,7 @@ class Controller extends BaseController
             $rolePermissions[$permission->getRole()->getId()] = $permission->getType();
         }
 
-        $config = new \Schoolbox\Config\Loader();
+        $config = new ConfigLoader();
 
         $this->getResponse()->content->set(
             array(
@@ -77,9 +83,9 @@ class Controller extends BaseController
                     'breadcrumbs'       => $breadcrumbs,
                     'folder'            => $folder,
                     'parent'            => $parent,
-                    'templates'         => HomepageTemplateMapper::getInstance()->findAll(),
+                    'templates'         => $homepageTemplateMapper->findAll(),
                     'templateId'        => $templateId,
-                    'roles'             => RoleMapper::getInstance()->findAll(),
+                    'roles'             => $roleMapper->findAll(),
                     'rolePermissions'   => $rolePermissions,
                     'database'          => ucfirst($config->get('external_type')),
                     'curriculumTagging' => $config->get('curriculum_tagging_enabled')
@@ -96,7 +102,11 @@ class Controller extends BaseController
      */
     public function getFolderCreate($parentId)
     {
-        $parent = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($parentId);
+        $folderMapper = FolderMapper::getInstance();
+        $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
+        $roleMapper = RoleMapper::getInstance();
+
+        $parent = $folderMapper->findById($parentId);
 
         $breadcrumbs = [
             [
@@ -109,10 +119,14 @@ class Controller extends BaseController
             ]
         ];
 
-        $config = new \Schoolbox\Config\Loader();
+        $config = new ConfigLoader();
 
         $folder = new Model();
-        $folder->enableInherit();
+
+        // Folders that are not in the root note should inherit by default to reduce the user interface
+
+        if ($parentId != FolderMapper::FOLDER_ROOT)
+            $folder->enableInherit();
 
         $this->getResponse()->content->set(
             array(
@@ -122,8 +136,8 @@ class Controller extends BaseController
                     'breadcrumbs'       => $breadcrumbs,
                     'folder'            => $folder,
                     'parent'            => $parent,
-                    'templates'         => HomepageTemplateMapper::getInstance()->findAll(),
-                    'roles'             => RoleMapper::getInstance()->findAll(),
+                    'templates'         => $homepageTemplateMapper->findAll(),
+                    'roles'             => $roleMapper->findAll(),
                     'database'          => ucfirst($config->get('external_type')),
                     'curriculumTagging' => $config->get('curriculum_tagging_enabled')
                 ),
@@ -133,14 +147,17 @@ class Controller extends BaseController
 
     /**
      * Delete folder AJAX
+     *
      */
     public function postDeleteFolder()
     {
-        $folder = FolderMapper::getInstance()->findById($this->getRequest()->post["id"]);
+        $folderMapper = FolderMapper::getInstance();
+
+        $folder = $folderMapper->findById($this->getRequest()->post["id"]);
 
         $_SESSION['resourcesID'] = $folder->getParent()->getId();
 
-        FolderMapper::getInstance()->delete($folder);
+        $folderMapper->delete($folder);
 
         $this->getResponse()->content->set([
             'format' => 'json',
@@ -155,7 +172,9 @@ class Controller extends BaseController
      */
     public function postMoveFolder()
     {
-        FolderMapper::getInstance()->moveFolder($this->getRequest()->post["source"], $this->getRequest()->post["destination"]);
+        $folderMapper = FolderMapper::getInstance();
+
+        $folderMapper->moveFolder($this->getRequest()->post["source"], $this->getRequest()->post["destination"]);
 
         $this->getResponse()->content->set([
             'format' => 'json',
@@ -170,7 +189,15 @@ class Controller extends BaseController
      */
     public function postUpdateFolder()
     {
+        $access = Access::getInstance();
         $folderMapper = FolderMapper::getInstance();
+        $folderCodeMapper = FolderCodeMapper::getInstance();
+        $userAccessMapper = UserAccessMapper::getInstance();
+        $roleAccessMapper = RoleAccessMapper::getInstance();
+        $curriculumNodeMapper = CurriculumNodeMapper::getInstance();
+        $errorMapper = ErrorMapper::getInstance();
+        $homepageConfigMapper = HomepageConfigMapper::getInstance();
+        $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
 
         $model = $folderMapper->createModel()
             ->setName($this->getRequest()->post['name'])
@@ -190,20 +217,20 @@ class Controller extends BaseController
 
         if (is_numeric($this->getRequest()->post['categoryID']))
         {
-            if (Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post['categoryID']]) < WRITE_ACCESS)
+            if ($access->getFolderAccess($this->getUser(), [$this->getRequest()->post['categoryID']]) < WRITE_ACCESS)
             {
                 // No write access to the folder
 
-                throw new \Exception(ErrorMapper::getInstance()->getMessageById(6));
+                throw new \Exception($errorMapper->getMessageById(6));
             }
 
             $model->setId($this->getRequest()->post['categoryID']);
         }
-        elseif (Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post['parent']]) < WRITE_ACCESS)
+        elseif ($access->getFolderAccess($this->getUser(), [$this->getRequest()->post['parent']]) < WRITE_ACCESS)
         {
             // No write access to parent
 
-            throw new \Exception(ErrorMapper::getInstance()->getMessageById(6));
+            throw new \Exception($errorMapper->getMessageById(6));
         }
 
         // Delete category codes here, allowing them to be recreated when the category gets saved.
@@ -212,22 +239,22 @@ class Controller extends BaseController
         // break somewhere else)
 
         if ($this->getUser()->isSuperuser() && $model->getId()) {
-            FolderCodeMapper::getInstance()->deleteByColumn('categoryID', $model->getId());
+            $folderCodeMapper->deleteByColumn('categoryID', $model->getId());
         }
 
         if ($this->getRequest()->post['inherit'] == 1)
         {
             // If inheriting permissions we need to remove any existing class codes...
 
-            FolderCodeMapper::getInstance()->deleteByColumn('categoryID', $this->getRequest()->post['categoryID']);
+            $folderCodeMapper->deleteByColumn('categoryID', $this->getRequest()->post['categoryID']);
 
             // ...and user access permissions...
 
-            UserAccessMapper::getInstance()->deleteByColumn("sid", $this->getRequest()->post["categoryID"]);
+            $userAccessMapper->deleteByColumn("sid", $this->getRequest()->post["categoryID"]);
 
             // ...and role permissions
 
-            RoleAccessMapper::getInstance()->deleteByColumn("cid", $this->getRequest()->post["categoryID"]);
+            $roleAccessMapper->deleteByColumn("cid", $this->getRequest()->post["categoryID"]);
         }
         else
         {
@@ -253,8 +280,7 @@ class Controller extends BaseController
             if (isset($this->getRequest()->post['curriculumCodes']))
             {
                 $model->setCurriculumNodes(
-                    CurriculumNodeMapper::getInstance()
-                        ->findByColumn('id', $this->getRequest()->post['curriculumCodes'])
+                    $curriculumNodeMapper->findByColumn('id', $this->getRequest()->post['curriculumCodes'])
                 );
             }
             elseif ($model->getId())
@@ -284,7 +310,7 @@ class Controller extends BaseController
         {
             // Something went wrong saving
 
-            throw new \Exception(ErrorMapper::getInstance()->getMessageById(2));
+            throw new \Exception($errorMapper->getMessageById(2));
         }
 
         $model->setId($affectedIds[0]);
@@ -293,7 +319,7 @@ class Controller extends BaseController
         {
             // If role permission collection is defined, reapply permissions (possibly recursively)
 
-            RoleAccessMapper::getInstance()->savePermissions(
+            $roleAccessMapper->savePermissions(
                 $model,
                 $this->getRequest()->post['group'],
                 $this->getRequest()->post['recursive']
@@ -306,27 +332,25 @@ class Controller extends BaseController
 
         // HomepageConfig definition
 
-        $homepageConfig = HomepageConfigMapper::getInstance()
-            ->createModel()
-            ->setCategory($model);
+        $homepageConfig = $homepageConfigMapper->createModel()->setCategory($model);
 
         if ($this->getRequest()->post['template'] == HomepageTemplate::HOMEPAGE_REMOVE)
         {
             // If homepage is to be removed
 
-            HomepageConfigMapper::getInstance()->emptyHomepage($homepageConfig);
-            HomepageConfigMapper::getInstance()->delete($homepageConfig);
+            $homepageConfigMapper->emptyHomepage($homepageConfig);
+            $homepageConfigMapper->delete($homepageConfig);
         }
         elseif ($this->getRequest()->post['template'] > 0)
         {
             // If template defined
 
-            $homepageConfig->setTemplate(HomepageTemplateMapper::getInstance()->findById($this->getRequest()->post['template']));
+            $homepageConfig->setTemplate($homepageTemplateMapper->findById($this->getRequest()->post['template']));
 
             // Save homepage config
 
-            HomepageConfigMapper::getInstance()->save($homepageConfig);
-            HomepageConfigMapper::getInstance()->resetToTemplate($homepageConfig);
+            $homepageConfigMapper->save($homepageConfig);
+            $homepageConfigMapper->resetToTemplate($homepageConfig);
         }
 
         // Ram it back into its parent object where it belongs
@@ -352,7 +376,7 @@ class Controller extends BaseController
             }
             else
             {
-                throw new \Exception(ErrorMapper::getInstance()->getMessageById(20));
+                throw new \Exception($errorMapper->getMessageById(20));
             }
         }
         else
@@ -390,11 +414,12 @@ class Controller extends BaseController
      */
     public function postDeleteFolderAll()
     {
-        if (!$this->getUser()->isSuperuser()) {
-            throw new \Exception(ErrorMapper::getInstance()->getMessageById(12));
-        }
-
+        $errorMapper = ErrorMapper::getInstance();
         $folderMapper = FolderMapper::getInstance();
+
+        if (!$this->getUser()->isSuperuser()) {
+            throw new \Exception($errorMapper->getMessageById(12));
+        }
 
         $folder = $folderMapper->findById($this->getRequest()->post["id"]);
         $folderMapper->recursiveDelete($folder);
@@ -414,19 +439,22 @@ class Controller extends BaseController
      */
     public function postFolderReset()
     {
+        $access = Access::getInstance();
+        $errorMapper = ErrorMapper::getInstance();
         $folderMapper = FolderMapper::getInstance();
+        $fileMapper = FileMapper::getInstance();
 
         try
         {
             $folder = $folderMapper->findById($this->getRequest()->post["id"]);
 
-            if (Access::getInstance()->getFolderAccess($this->getUser(), [$folder->getId()]) < WRITE_ACCESS) {
-                throw new \Exception(ErrorMapper::getInstance()->getMessageById(6));
+            if ($access->getFolderAccess($this->getUser(), [$folder->getId()]) < WRITE_ACCESS) {
+                throw new \Exception($errorMapper->getMessageById(6));
             }
         }
         catch (\Exception $e)
         {
-            throw new \Exception(ErrorMapper::getInstance()->getMessageById(13));
+            throw new \Exception($errorMapper->getMessageById(13));
         }
 
         // Remove component content
@@ -436,7 +464,6 @@ class Controller extends BaseController
 
         // Delete all files
 
-        $fileMapper = FileMapper::getInstance();
         $fileList = $fileMapper->findForFolders([ $folder->getId() ]);
 
         foreach ($fileList as $file) {

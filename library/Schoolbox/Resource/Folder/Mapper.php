@@ -38,6 +38,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 {
     const INHERIT_ON = 1;
     const INHERIT_OFF = 0;
+    const FOLDER_ROOT = 0;
 
     /**
      * Maximum number of recursion iterations to execute before dying
