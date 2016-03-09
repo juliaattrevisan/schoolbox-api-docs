@@ -143,8 +143,6 @@
 
                                 {# Display homepage templates with special case for 'No Homepage' #}
 
-                                <option value="-1" {% if templateId == -1 %}selected{% endif %}>No Homepage</option>
-
                                 {% for template in templates %}
                                     <option value="{{ template.getId }}" {% if template.getId == templateId %}selected{% endif %}>{{ template.getName }}</option>
                                 {% endfor %}

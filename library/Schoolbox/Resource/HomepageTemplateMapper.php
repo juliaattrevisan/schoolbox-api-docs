@@ -15,6 +15,7 @@ use Schoolbox\Mapper;
 
 class HomepageTemplateMapper extends Mapper
 {
+    const TEMPLATE_NONE = -1;
 
     protected function mapping()
     {
@@ -75,5 +76,24 @@ class HomepageTemplateMapper extends Mapper
         );
 
         parent::delete($object);
+    }
+
+    public function findAll($options = array())
+    {
+        $collection = new \Schoolbox\Collection;
+
+        $templateNone = new \Schoolbox\Resource\HomepageTemplate();
+        $templateNone->setId(HomepageTemplateMapper::TEMPLATE_NONE);
+        $templateNone->setName("No Homepage");
+
+        $collection->add($templateNone);
+
+        $templates = parent::findAll($options);
+
+        foreach ($templates as $template) {
+            $collection->add($template);
+        }
+
+        return $collection;
     }
 }

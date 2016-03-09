@@ -56,7 +56,7 @@ class Controller extends BaseController
             $homepageConfig = \Schoolbox\Resource\HomepageConfigMapper::getInstance()->findOneByColumn('cid', $folder->getId());
             $templateId = $homepageConfig->getTemplate()->getId();
         } catch (\Exception $e) {
-            $templateId = -1;
+            $templateId = HomepageTemplateMapper::TEMPLATE_NONE;
         }
 
         $permissions = RoleAccessMapper::getInstance()->findByColumn('cid', $folder->getId());
