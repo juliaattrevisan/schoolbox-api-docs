@@ -171,6 +171,8 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
          * of what you have currently selected
          */
         onShow: function() {
+            var dialog = this;
+            var fields = dialogFields(dialog);
 
             /* Deal with existing/inserting new elements
              */
@@ -193,6 +195,20 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
             this.selection = selection;
 
             this.setupContent(this.element, this.selection);
+
+            if (this.insertMode && selection.getSelectedText().length) {
+                fields.id.setValue(translateToId(fields.display.getValue()));
+
+                /* This is a readonly field, users should not be able to change this
+                 * value at all. If they want to alter the anchor value, they can do
+                 * it in the Source view
+                 */
+                fields.id.disable();
+
+                /* Style up help text
+                 */
+                $('#schoolboxlink-anchor-example').html(fields.id.getValue());
+            }
         }
     };
 });
