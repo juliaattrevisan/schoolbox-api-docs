@@ -46,7 +46,7 @@ input[type="submit"][readonly] {
     background-position: 0.75rem 50%;
 }
 
-.selectize-control
+.selectize-control {
     &.multi .selectize-input.has-items {
         padding: 0 0 1px 0;
     }
