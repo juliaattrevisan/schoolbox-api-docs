@@ -10,7 +10,7 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
      */
     function inject(editorInstance, selection, fields) {
         var element = editorInstance.document.createElement('a');
-        element.setAttribute('id', fields.id.getValue());
+        element.setAttribute('id', fields.id.getValue().replace('#', ''));
 
         /* Only use what the user has specified in the dialog
          */
@@ -38,10 +38,10 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
      * Convert all others to underscore
      *
      * @param val
-     * @returns {boolean}
+     * @returns string
      */
     function translateToId(val) {
-        return val.replace(/[^0-9a-zA-Z\-_:\.]/g, '_');
+        return '#' + val.replace(/[^0-9a-zA-Z\-_:\.]/g, '_');
     }
 
     return {
@@ -60,7 +60,7 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
                     {
                         type: 'text',
                         id: 'schoolboxanchor-display',
-                        label: 'Text',
+                        label: 'Acnhor Text',
                         validate: CKEDITOR.dialog.validate.notEmpty("Anchor cannot be empty."),
 
                         /* Editing an existing element
@@ -87,6 +87,10 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
                             /* No spaces or punctuation
                              */
                             fields.id.setValue(translateToId(fields.display.getValue()));
+
+                            /* Style up help text
+                             */
+                            $('#schoolboxlink-anchor-example').html(fields.id.getValue());
                         },
 
                         /* Alter details about existing node
@@ -98,11 +102,22 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
                             element.setText(fields.display.getValue());
                         }
                     },
+
                     {
                         type: 'text',
                         id: 'schoolboxanchor-id',
-                        label: 'Id',
-                        className: 'hide',
+                        label: 'Anchor Link',
+
+                        onLoad: function() {
+                            var dialog = this.getDialog();
+                            var fields = dialogFields(dialog);
+
+                            /* This is a readonly field, users should not be able to change this
+                             * value at all. If they want to alter the anchor value, they can do
+                             * it in the Source view
+                             */
+                            fields.id.disable();
+                        },
 
                         /* Editing an existing element
                          */
@@ -121,6 +136,11 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
 
                             element.setAttribute('id', translateToId(fields.display.getValue()));
                         }
+                    },
+
+                    {
+                        type: 'html',
+                        html: '<p>Add the anchor link to the end of your page URL to create the anchor link URL.<br /><br />E.g. <span class="schoolboxlink-anchor-preamble">/homepage/1234</span><span id="schoolboxlink-anchor-example" class="schoolboxlink-anchor-example"></span></p>'
                     }
                 ]
             }
