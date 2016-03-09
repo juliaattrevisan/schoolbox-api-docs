@@ -24,6 +24,8 @@ use Schoolbox\Resource\LinkMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Zend\Json\Server\Error;
 
 /**
  * Class Mapper
@@ -1246,6 +1248,8 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      */
     public function moveFolder($source, $destination)
     {
+        $errorMapper = ErrorMapper::getInstance();
+
         // Check if there is nothing to do
 
         if ($source == $destination)
@@ -1256,7 +1260,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         if (Access::getInstance()->getFolderAccess($this->sessionData["user"], [$source]) < WRITE_ACCESS ||
             Access::getInstance()->getFolderAccess($this->sessionData["user"], [$destination]) < WRITE_ACCESS
         ) {
-            error(6);
+            throw new \Exception($errorMapper->getMessageById(ErrorMapper::ERROR_PERM_CATEGORY_WRITE));
         }
 
         // Grab folder object
@@ -1268,12 +1272,13 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         // Make sure the moved folder is not going to be its own ancestor
 
-        foreach ($folderMapper->findParents($parentFolder) as $ancestor)
-            if ($ancestor->getId() == $movedFolder->getId())
-                exit;
+        foreach ($folderMapper->findParents($parentFolder) as $ancestor) {
+            if ($ancestor->getId() == $movedFolder->getId()) {
+                throw new \Exception($errorMapper->getMessageById(ErrorMapper::ERROR_DATABASE));
+            }
+        }
 
         $folderMapper->save($movedFolder->setParent($parentFolder));
-        exit;
     }
 
     /**
