@@ -400,6 +400,11 @@ class Controller extends BaseController
         $folderMapper->recursiveDelete($folder);
 
         $_SESSION['resourcesID'] = $folder->getParent()->getId();
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => json_encode(['result' => 'success'])
+        ]);
     }
 
     /**
@@ -446,5 +451,10 @@ class Controller extends BaseController
         foreach ($allLinks as $currentLink) {
             $linkMapper->delete($currentLink);
         }
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => json_encode(['result' => 'success'])
+        ]);
     }
 }
