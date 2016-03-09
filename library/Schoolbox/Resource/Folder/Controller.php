@@ -10,6 +10,7 @@ namespace Schoolbox\Resource\Folder;
 
 use Alaress\Web\Controller\Base as BaseController;
 
+use Schoolbox\Breadcrumbs;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -22,9 +23,113 @@ use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
+use Schoolbox\RoleMapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\LinkMapper;
 
 class Controller extends BaseController
 {
+    /**
+     * Display update folder screen
+     *
+     * @param Int $id
+     * @throws \Exception
+     */
+    public function getFolderModify($id)
+    {
+        $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($id);
+        $parent = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($folder->getParent()->getId());
+
+        $breadcrumbs = [
+            [
+                'text' => $parent->getName(),
+                'href' => '/homepage/' . $parent->getId(),
+            ],
+            [
+                'text' => 'Modify Folder',
+                'href' => '',
+            ]
+        ];
+
+        try {
+            $homepageConfig = \Schoolbox\Resource\HomepageConfigMapper::getInstance()->findOneByColumn('cid', $folder->getId());
+            $templateId = $homepageConfig->getTemplate()->getId();
+        } catch (\Exception $e) {
+            $templateId = -1;
+        }
+
+        $permissions = RoleAccessMapper::getInstance()->findByColumn('cid', $folder->getId());
+
+        $rolePermissions = [];
+
+        foreach ($permissions as $permission) {
+            $rolePermissions[$permission->getRole()->getId()] = $permission->getType();
+        }
+
+        $config = new \Schoolbox\Config\Loader();
+
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@folder/modify.twig',
+                'data'     => array(
+                    'user'              => $this->getUser(),
+                    'breadcrumbs'       => $breadcrumbs,
+                    'folder'            => $folder,
+                    'parent'            => $parent,
+                    'templates'         => HomepageTemplateMapper::getInstance()->findAll(),
+                    'templateId'        => $templateId,
+                    'roles'             => RoleMapper::getInstance()->findAll(),
+                    'rolePermissions'   => $rolePermissions,
+                    'database'          => ucfirst($config->get('external_type')),
+                    'curriculumTagging' => $config->get('curriculum_tagging_enabled')
+                ),
+            )
+        );
+    }
+
+    /**
+     * Display create folder screen
+     *
+     * @param Int $parentId
+     * @throws \Exception
+     */
+    public function getFolderCreate($parentId)
+    {
+        $parent = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($parentId);
+
+        $breadcrumbs = [
+            [
+                'text' => $parent->getName(),
+                'href' => '/homepage/' . $parent->getId(),
+            ],
+            [
+                'text' => 'Create Folder',
+                'href' => '',
+            ]
+        ];
+
+        $config = new \Schoolbox\Config\Loader();
+
+        $folder = new Model();
+        $folder->enableInherit();
+
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@folder/modify.twig',
+                'data'     => array(
+                    'user'              => $this->getUser(),
+                    'breadcrumbs'       => $breadcrumbs,
+                    'folder'            => $folder,
+                    'parent'            => $parent,
+                    'templates'         => HomepageTemplateMapper::getInstance()->findAll(),
+                    'roles'             => RoleMapper::getInstance()->findAll(),
+                    'database'          => ucfirst($config->get('external_type')),
+                    'curriculumTagging' => $config->get('curriculum_tagging_enabled')
+                ),
+            )
+        );
+    }
+
     /**
      * Delete folder and do a history redirect
      *
@@ -297,8 +402,9 @@ class Controller extends BaseController
     /**
      * Delete folder and all children (superusers only)
      *
+     * @param int $id
      */
-    public function getDeleteFolderAll()
+    public function getDeleteFolderAll($id)
     {
         if (!$this->getUser()->isSuperuser())
             error(12);
@@ -307,7 +413,7 @@ class Controller extends BaseController
         {
             $folderMapper = FolderMapper::getInstance();
 
-            $folder = $folderMapper->findById($_GET['deleteAll']);
+            $folder = $folderMapper->findById($id);
             $folderMapper->recursiveDelete($folder);
             $_SESSION['resourcesID'] = $folder->getParent()->getId();
         }
@@ -319,5 +425,53 @@ class Controller extends BaseController
         $this->getResponse()->redirect->afterPost(
             $this->getSession()->getHistory(2)
         );
+    }
+
+    /**
+     * Reset folder content
+     *
+     * @param int $id
+     */
+    public function getFolderReset($id)
+    {
+        $folderMapper = FolderMapper::getInstance();
+
+        try
+        {
+            $folder = $folderMapper->findById($id);
+
+            if (Access::getInstance()->getFolderAccess($this->getUser(), [$folder->getId()]) < WRITE_ACCESS) {
+                error(6);
+            }
+        }
+        catch (\Exception $e)
+        {
+            error(13);
+        }
+
+        // Remove component content
+
+        $homepage = new \Homepage($folder->getId());
+        $homepage->emptyHomepage();
+
+        // Delete all files
+
+        $fileMapper = FileMapper::getInstance();
+        $fileList = $fileMapper->findForFolders([ $folder->getId() ]);
+
+        foreach ($fileList as $file) {
+            $fileMapper->delete($file);
+        }
+
+        // Delete all links
+
+        $linkMapper = new LinkMapper();
+        $allLinks = $linkMapper->findAllInCategory($folder, array());
+
+        foreach ($allLinks as $currentLink) {
+            $linkMapper->delete($currentLink);
+        }
+
+        $this->getResponse()->redirect->afterPost("/homepage/{$folder->getId()}");
     }
 }

@@ -13,6 +13,8 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Twig_Loader_Chain;
+use Twig_Loader_Filesystem;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -38,6 +40,9 @@ class Module extends BaseModule
                 '/folder/delete/history/{id}/{level}'   => 'getDeleteFolderHistory',
                 '/folder/delete/ajax/{id}'              => 'getDeleteFolderAjax',
                 '/folder/delete-all/{id}'               => 'getDeleteFolderAll',
+                '/folder/modify/{id}'                   => 'getFolderModify',
+                '/folder/create/{parentId}'             => 'getFolderCreate',
+                '/folder/reset/{id}'                    => 'getFolderReset',
             ],
             'POST' => [
                 '/folder/move'                          => 'postMoveFolder',
@@ -66,6 +71,14 @@ class Module extends BaseModule
                     new Rule\HasRole(Role::STAFF)
                 )
             ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/Templates');
     }
 
     /**
