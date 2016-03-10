@@ -87,6 +87,25 @@ abstract class Kernel {
 	}
 
 
+    /**
+     * Convenience method to retrieve service from DI
+     *
+     * @param string $service
+     * @throws RuntimeException if the DI has not been initialised
+     * @return mixed
+     */
+    public function get($service)
+    {
+        $di = $this->getDependencyInjector();
+
+        if ($di instanceof Di\Container) {
+            return $di->get($service);
+        }
+
+        throw new RuntimeException("Dependency injector has not been set, cannot retrieve service");
+    }
+
+
 	/**
 	 * Go. Do stuff.
 	 *
