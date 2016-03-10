@@ -15,6 +15,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Mapper extends FolderMapper
 {
@@ -337,25 +338,27 @@ class Mapper extends FolderMapper
     {
         // Grab handles to the mappers as we'll reuse them
 
+        $errorMapper = ErrorMapper::getInstance();
         $folderMapper = FolderMapper::getInstance();
         $unitInstanceMapper = UnitInstanceMapper::getInstance();
 
-        try
+        // Locate the unit we want to delete
+
+        $unit = $unitInstanceMapper->findById($id);
+
+        if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
         {
-            // Locate the unit we want to delete
-
-            $unit = $unitInstanceMapper->findById($id);
-
-            if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
-            {
+            try {
                 $folderMapper->deleteFolder($unit->getUnitCategory()->getId());
-                $unitInstanceMapper->delete($unit);
+            } catch (\Exception $e) {
+                $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
+
+            $unitInstanceMapper->delete($unit);
         }
-        catch (\Exception $e)
+        else
         {
-            // Permission denied or something wasn't found, do nothing and just return. The folder won't have
-            // been deleted.
+            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
     }
 
