@@ -15,6 +15,7 @@ $this->setBlock('setting', 'setting_type_noneditable', 'setting_type_noneditable
 $this->setBlock(TEMPLATE_content, 'setting_group_localisation', 'setting_group_localisation_block');
 $this->setBlock(TEMPLATE_content, 'setting_group_skin_config', 'setting_group_skin_config_block');
 $this->setBlock('setting', 'setting_type_input', 'setting_type_input_block');
+$this->setBlock('setting', 'setting_type_password', 'setting_type_password_block');
 $this->setBlock('setting', 'setting_type_textarea', 'setting_type_textarea_block');
 $this->setBlock('setting', 'setting_type_html', 'setting_type_html_block');
 $this->setBlock('setting', 'setting_type_boolean', 'setting_type_boolean_block');
@@ -71,6 +72,7 @@ if(is_array($optionList)) {
             'SETTING_VALUE' => Scrub::text($option['value']),
             'setting_type_noneditable_block' => '',
             'setting_type_input_block'       => '',
+            'setting_type_password_block'    => '',
             'setting_type_textarea_block'    => '',
             'setting_type_html_block'        => '',
             'setting_type_boolean_block'     => '',
@@ -110,6 +112,9 @@ if(is_array($optionList)) {
             switch ($option['field']) {
                 case 'input':
                     $this->parse('setting_type_input_block', 'setting_type_input', true);
+                    break;
+                case 'password':
+                    $this->parse('setting_type_password_block', 'setting_type_password', true);
                     break;
 
                 case 'textarea' :
