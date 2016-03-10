@@ -354,13 +354,17 @@ class Bootstrap implements BootstrapInterface {
 			$di->lazy(
 				function () use ($di) {
 					$config = $di->get('config');
-					$twig   = new \Twig_Environment(
-						$di->get('templateEngine:loader'),
-						array(
-							'cache' => $config->get('stream_dir') . '/templates/',
-							'debug' => $config->get('debug_templates'),
-						)
-					);
+
+					$options = [
+						'debug' => $config->get('debug_templates'),
+					];
+
+					// do not cache when in debug mode
+					if (!$config->get('debug_mode')) {
+						$options['cache'] = $config->get('stream_dir') . '/templates/';
+					}
+
+					$twig   = new \Twig_Environment($di->get('templateEngine:loader'), $options);
 
                     if($this->debugEnabled) {
                         $twig = new TraceableTwigEnvironment($twig);
