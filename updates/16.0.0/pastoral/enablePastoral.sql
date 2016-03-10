@@ -3,10 +3,6 @@
 UPDATE `config` SET `value` = 1 WHERE `name` = 'external_pastoral';
 UPDATE `config` SET `value` = 1 WHERE `name` = 'pastoral_enabled';
 
--- Give Zane pastoral moderator access
-
-UPDATE `user` SET `pastoral_moderator` = 1 WHERE synergy_id = 165;
-
 -- Dummy data for David Rhodes
 
 INSERT INTO schoolbox.pastoral (id, owner_id, severity_id, student_id, type_id, external_id, private, heading, body, datetime_posted, datetime_modified, datetime_deleted) VALUES (13, 151, 3, 230, 5, 35, 0, 'Smoking', '<p>David was caught smoking at lunch time.&nbsp;Mumblecore heirloom godard, knausgaard everyday carry health goth messenger bag man braid church-key viral skateboard. Selfies aesthetic stumptown, helvetica iPhone PBR&amp;B viral meditation bitters chartreuse letterpress vegan fixie portland. Hammock mlkshk schlitz try-hard yuccie gastropub, normcore artisan. Meggings chillwave deep v semiotics cornhole, meh chartreuse humblebrag sartorial. Mumblecore lumbersexual truffaut, kickstarter microdosing master cleanse kogi everyday carry. Poutine fanny pack austin, kale chips ramps brooklyn kogi crucifix skateboard artisan DIY yr flexitarian shabby chic. Everyday carry venmo fap chartreuse blue bottle, chambray thundercats leggings farm-to-table synth.</p>', '2016-02-24 11:30:03', null, null);

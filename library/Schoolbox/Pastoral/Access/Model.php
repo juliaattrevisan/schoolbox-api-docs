@@ -1,5 +1,6 @@
 <?php
 /**
+ * Pastoral care access control
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
