@@ -276,8 +276,10 @@ class Controller extends BaseController
     {
         $importer = new CourseImport();
 
-        echo json_encode($importer->importClasses($this->getRequest()->query->get('query')));
-        exit();
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => $importer->importClasses($this->getRequest()->query->get('query'))
+        ]);
     }
 
     /**
