@@ -47,10 +47,5 @@ class Admin implements ModuleConfigInterface
 
         $courseBuilder = new \Schoolbox\Admin\CourseBuilder\Module($di);
         $courseBuilder->init('/adminv2/course-builder');
-
-        // Admin top menu customizer
-
-        $menuTop = new \Schoolbox\Admin\MenuTop\Module($di);
-        $menuTop->init('/adminv2/menu-top');
     }
 } 
