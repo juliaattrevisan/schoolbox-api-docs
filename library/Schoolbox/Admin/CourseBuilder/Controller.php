@@ -107,11 +107,11 @@ class Controller extends Base
         // Update default inheritance
 
         $courseTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "course_builder_default_course_page_inherit");
-        $courseTemplate->setValue($this->getRequest()->post["courseInherit"]);
+        $courseTemplate->setValue($this->getRequest()->post["courseInherit"] == 1 ? 1 : 0);
         ConfigMapper::getInstance()->save($courseTemplate);
 
         $unitTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "course_builder_default_unit_page_inherit");
-        $unitTemplate->setValue($this->getRequest()->post["unitInherit"]);
+        $unitTemplate->setValue($this->getRequest()->post["unitInherit"] == 1 ? 1 : 0);
         ConfigMapper::getInstance()->save($unitTemplate);
 
         // Send them back to the admin page
