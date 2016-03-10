@@ -4,7 +4,9 @@ INSERT INTO config
   (name, value, title, description, field_id, options, type_id, editable, hidden, required)
 VALUES
   ('default_course_page_template', '13', null, null, null, null, null, 'false', 'true', 'false'),
-  ('default_unit_page_template', '14', null, null, null, null, null, 'false', 'true', 'false');
+  ('default_unit_page_template', '14', null, null, null, null, null, 'false', 'true', 'false'),
+  ('default_course_page_inherit', '1', null, null, null, null, null, 'false', 'true', 'false'),
+  ('default_unit_page_inherit', '1', null, null, null, null, null, 'false', 'true', 'false');
 
 -- Create table to hold default permissions for course pages
 

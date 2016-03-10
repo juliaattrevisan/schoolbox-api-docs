@@ -22,20 +22,25 @@ class Controller extends Base
 {
     public function getIndex()
     {
+        $configMapper = ConfigMapper::getInstance();
+        $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
+        $roleMapper = RoleMapper::getInstance();
+        $courseConfigMapper = CourseConfigMapper::getInstance();
+
         // Get default permissions for course and unit pages
 
         $permissions = [];
         $permissions['course'] = [];
         $permissions['unit'] = [];
 
-        $coursePermissions = CourseConfigMapper::getInstance()->findByColumn("page", "course");
+        $coursePermissions = $courseConfigMapper->findByColumn("page", "course");
 
         foreach ($coursePermissions as $permission) {
             $permissions['course'][$permission->getRoleId()] = [];
             $permissions['course'][$permission->getRoleId()][$permission->getPermission()] = 'checked';
         }
 
-        $unitPermissions = CourseConfigMapper::getInstance()->findByColumn("page", "unit");
+        $unitPermissions = $courseConfigMapper->findByColumn("page", "unit");
 
         foreach ($unitPermissions as $permission) {
             $permissions['unit'][$permission->getRoleId()] = [];
@@ -50,11 +55,13 @@ class Controller extends Base
                 'data'     => array(
                     'pageCurrent' => basename($_GET["page"]),
                     'tab' => $_GET["tab"] != '' ? $_GET["tab"] : 'course',
-                    'roles' => RoleMapper::getInstance()->findAll(),
+                    'roles' => $roleMapper->findAll(),
                     'permissions' => $permissions,
-                    'templates' => HomepageTemplateMapper::getInstance()->findAll()->sortBy("name", "asc"),
-                    'courseTemplate' => ConfigMapper::getInstance()->get('default_course_page_template'),
-                    'unitTemplate' => ConfigMapper::getInstance()->get('default_unit_page_template')
+                    'templates' => $homepageTemplateMapper->findAll()->sortBy("name", "asc"),
+                    'courseTemplate' => $configMapper->get('default_course_page_template'),
+                    'unitTemplate' => $configMapper->get('default_unit_page_template'),
+                    'courseInherit' => $configMapper->get('default_course_page_inherit'),
+                    'unitInherit' => $configMapper->get('default_unit_page_inherit')
                 ),
             )
         );
@@ -90,11 +97,21 @@ class Controller extends Base
         // Update default page templates
 
         $courseTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "default_course_page_template");
-        $courseTemplate->setValue($_POST["template_course"]);
+        $courseTemplate->setValue($_POST["courseTemplate"]);
         ConfigMapper::getInstance()->save($courseTemplate);
 
         $unitTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "default_unit_page_template");
-        $unitTemplate->setValue($_POST["template_unit"]);
+        $unitTemplate->setValue($_POST["unitTemplate"]);
+        ConfigMapper::getInstance()->save($unitTemplate);
+
+        // Update default inheritance
+
+        $courseTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "default_course_page_inherit");
+        $courseTemplate->setValue($_POST["courseInherit"]);
+        ConfigMapper::getInstance()->save($courseTemplate);
+
+        $unitTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "default_unit_page_inherit");
+        $unitTemplate->setValue($_POST["unitInherit"]);
         ConfigMapper::getInstance()->save($unitTemplate);
 
         // Send them back to the admin page
