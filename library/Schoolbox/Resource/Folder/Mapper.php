@@ -1096,6 +1096,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * @param Model $folder
      * @param int $iteration
      * @return Model
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function findNearestNonInheritingAncestralNode(Model $folder, $iteration = 0)
     {
