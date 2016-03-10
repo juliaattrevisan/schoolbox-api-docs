@@ -9,8 +9,11 @@
 
 namespace Alaress\Application;
 use Alaress\Application\Boot\BootstrapInterface;
+use Alaress\Web\Controller;
+use Alaress\Module\Module;
 use Aura\Di;
 use Exception;
+use OutOfBoundsException;
 use RuntimeException;
 
 /**
@@ -106,7 +109,36 @@ abstract class Kernel {
     }
 
 
-	/**
+    /**
+     * Returns the named controller from DI, initialising and configuring as required
+     *
+     * @param string $name
+     * @throws OutOfBoundsException if the named controller is not registered
+     * @return Controller\Base
+     */
+    public function getController($name)
+    {
+        try {
+            /** @var Module $module */
+            $module = $this->get("module:$name");
+
+            // initialise the controller into the DI
+            $module->initControllerDependencies();
+            $module->initControllers($this->getDependencyInjector());
+
+            // remove this reference, we don't need it anymore
+            unset($module);
+
+            // obtain and return the controller from DI now that it's been registered
+            return $this->get("controller:$name");
+
+        } catch (\Exception $e) {
+            throw new OutOfBoundsException("Could not load controller '$name': is the module registered?", 0, $e);
+        }
+    }
+
+
+    /**
 	 * Go. Do stuff.
 	 *
 	 * @return void
