@@ -160,6 +160,18 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Throw exception
+     *
+     * @param Int $id
+     * @param \Exception $exception
+     * @throws \Exception
+     */
+
+    public function generateException($id, $exception) {
+        throw new \Exception($this->getMessageById($id), 0, $exception);
+    }
+
+    /**
      * Return error messages
      *
      * @param Int $id
