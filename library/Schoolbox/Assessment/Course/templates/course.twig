@@ -158,7 +158,7 @@
                 newDOM.slideDown();
                 newDOM.find('[data-collapser]').collapsable();
                 noonitName.val('');
-                $(this).val($(this).data('mage-reset')).removeAttr('readonly');
+                $(this).val($(this).data('mage-reset')).removeAttr('readonly').removeData('mage-submitted');
             }
         });
 

@@ -271,7 +271,9 @@ class Controller extends BaseController
                 'name' => $name
             ],
             'i'     => $index,
-            'icons' => [ 'task', 'due work', 'quiz' ]
+            'icons' => [ 'task', 'due work', 'quiz' ],
+            '_writable' => true,
+            '_expanded' => true
         ];
         $this->tpl('unit', $data);
     }
