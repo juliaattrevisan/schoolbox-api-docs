@@ -32,10 +32,6 @@ class AdminV2_Nav
         'import' => 'Import',
     );
 
-    public function getNavigation() {
-        return $this->nav;
-    }
-
     public function parse(SitePage $page, $currentPage = 'home')
     {
         $page->setFile('nav', 'adminv2/nav.html');
@@ -55,5 +51,9 @@ class AdminV2_Nav
         ));
 
         $page->parse('ADMIN_NAV', 'nav');
+    }
+
+    public function getNavigation() {
+        return $this->nav;
     }
 }
