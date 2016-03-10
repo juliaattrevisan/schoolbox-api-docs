@@ -142,9 +142,18 @@
         function init(options, element) {
             var defaults = {
 
-                /* The element which activates the Course Selector
+                /* The element acted upon by plugin
                  */
                 element: element,
+
+                /* The element which activates the Course Selector
+                 * in its data var format, and as an internally-used
+                 * version for .data() accessor
+                 */
+                activator: {
+                    selector: '[data-course-selector]',
+                    dataVar: 'course-selector'
+                },
 
                 courseSelector: {
 
@@ -161,6 +170,9 @@
                     /* This element is used to filter the ajax request contents
                      */
                     filter: '[data-course-selector-filter]'
+                },
+
+                onCourseSelect: function() {
                 }
             };
 
@@ -177,10 +189,10 @@
 
             /* Spawn modal
              */
-            $(document).on('click', '[data-course-selector]', function(event) {
+            $(document).on('click', config.activator.selector, function(event) {
                 event.preventDefault();
 
-                var compInstId = $(this).data('course-selector');
+                var compInstId = $(this).data(config.activator.dataVar);
                 var query = $.extend(true, {}, config.courseSelector.query);
 
                 if (compInstId) {
@@ -192,6 +204,10 @@
                     data: query
                 });
             });
+
+            /* Callbacks
+             */
+            config.onCourseSelect();
         }
     }
 }(jQuery));

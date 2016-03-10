@@ -1,0 +1,8 @@
+<li class="actions-small-1 content">
+    <h3>{{ unit.name }}</h3>
+    <ul class="information-list no-pad">
+        {% for task in tasks[unit.id] %}
+            {% include '@course/task.twig' with { '_writable': false } %}
+        {% endfor %}
+    </ul>
+</li>

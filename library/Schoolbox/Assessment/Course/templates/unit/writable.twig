@@ -1,0 +1,30 @@
+<li class="actions-small-1 content" data-unit>
+    <div class="list-item">
+        <div class="small-1 column">
+            <a data-collapser="unit-{{ i }}" class="icon-down-arrow"></a>
+        </div>
+        <div class="small-11 column">
+            <label>
+                <input type="text" value="{{ unit.name }}" placeholder="Unit {{ i }} Name" />
+            </label>
+        </div>
+    </div>
+    <nav>
+        <a class="icon-overflow" title="" data-dropdown="unit-{{ i }}-modify"></a>
+    </nav>
+    <ul id="unit-{{ i }}-modify" class="f-dropdown" data-dropdown-content>
+        <li><a href="/course/unit/{{ unit.id }}/delete" class="icon-delete" data-delete="unit">Delete Unit</a></li>
+    </ul>
+    <div class="small-12 column hide" data-collapsable="unit-{{ i }}" data-collapse-state="collapsed">
+        <ul class="information-list sortable" data-sortable>
+            {% for task in tasks[unit.id] %}
+                {% include '@course/task.twig' with { '_writable': true } %}
+            {% endfor %}
+        </ul>
+        <ul class="flex-list buttons">
+            {% for icon in icons %}
+                <li><a href="#" title="Create a new {{ icon | title }} in Unit {{ i }}" class="button icon-{{ icon | replace(' ', '-') }}">New {{ icon | title }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</li>

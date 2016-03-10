@@ -37,11 +37,23 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/list'         => 'courseList',
-                '/list/ajax'    => 'courseListAjax',
-                '/new'          => 'newCourse',
-                '/modify/{id}'  => 'modifyCourse',
-                '/parent'       => 'parentList',
+                '/list'                              => 'courseList',
+                '/list/ajax'                         => 'courseListAjax',
+                '/new'                               => 'newCourse',
+                '/modify/{id}'                       => 'modifyCourse',
+                '/parent'                            => 'parentList',
+
+                /* Import screen
+                 */
+                '/import/{courseId}/class/{classCode}' => 'import',
+
+                /* Dynamic Unit/Task list when choosing course to import
+                 */
+                '/importResults/{courseId}'          => 'importResults',
+
+                /* A list of Classes you can import into via selectize
+                 */
+                '/import/classes'                    => 'importClasses',
             ],
             'POST' => [
                 '/unit/new' => 'newUnit',

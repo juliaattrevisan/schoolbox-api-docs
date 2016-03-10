@@ -15,7 +15,9 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
+use Schoolbox\Assessment\Course\Import\Import as CourseImport;
 
 class Controller extends BaseController
 {
@@ -27,10 +29,26 @@ class Controller extends BaseController
     private $courseMapper = null;
 
     /**
+     * A FolderMapper instance
+     *
+     * @var FolderMapper
+     */
+    private $folderMapper = null;
+
+    /**
+     * A TaskMapper instance
+     *
+     * @var null
+     */
+    private $taskMapper = null;
+
+    /**
      */
     public function __construct()
     {
         $this->setCourseMapper(CourseMapper::getInstance());
+        $this->setFolderMapper(FolderMapper::getInstance());
+        $this->setTaskMapper(TaskMapper::getInstance());
     }
 
     /**
@@ -218,7 +236,7 @@ class Controller extends BaseController
         //  - stop at, and exclude, all Courses (folder that has > 0 children with > 0 tasks) (apparently this point is up for debate..?)
         //  - continue to exhaustion
 
-        $tb = new TreeBuilder(Folder\Mapper::getInstance(), TaskMapper::getInstance(), UserAccessMapper::getInstance(), RoleAccessMapper::getInstance(), $this->getUser());
+        $tb = new TreeBuilder(Folder\Mapper::getInstance(), TaskMapper::getInstance(), $this->getUser());
 
         $facultyNode = $this->getCourseMapper()->getFacultyNode();
 
@@ -235,6 +253,46 @@ class Controller extends BaseController
         ];
 
         $this->tpl('parentList', $data);
+    }
+
+    /**
+     * Import a Course into a set of Folders (classes)
+     *
+     * @param $courseId
+     * @param $classCode
+     */
+    public function import($courseId, $classCode)
+    {
+        $importer = new CourseImport();
+
+        $this->tpl('import', $importer->importSelectize($courseId, $classCode));
+    }
+
+    /**
+     * Get a list of all the Folders which should
+     * receive the selected Course
+     */
+    public function importClasses()
+    {
+        $importer = new CourseImport();
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => $importer->importClasses($this->getRequest()->query->get('query'))
+        ]);
+    }
+
+    /**
+     * Get the Units and Tasks for a particular Course
+     *
+     * @param $courseId
+     * @return array
+     */
+    public function importResults($courseId)
+    {
+        $importer = new CourseImport();
+
+        $this->tpl('import/results', $importer->findUnitsAndTasks($courseId));
     }
 
     /* Getters/Setters
@@ -258,5 +316,45 @@ class Controller extends BaseController
     private function setCourseMapper($courseMapper)
     {
         $this->courseMapper = $courseMapper;
+    }
+
+    /**
+     * Get folder mapper
+     *
+     * @return FolderMapper
+     */
+    private function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+    /**
+     * Set folder mapper
+     *
+     * @param FolderMapper $folderMapper
+     */
+    private function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+    }
+
+    /**
+     * Get task mapper
+     *
+     * @return null
+     */
+    private function getTaskMapper()
+    {
+        return $this->taskMapper;
+    }
+
+    /**
+     * Set task mapper
+     *
+     * @param null $taskMapper
+     */
+    private function setTaskMapper($taskMapper)
+    {
+        $this->taskMapper = $taskMapper;
     }
 }

@@ -1,0 +1,45 @@
+{# Selector Shard
+ #
+ # Originally:
+ # This lets you spawn a Course Selector modal, whose
+ # onCourseSelect() callback deals with selection
+ #}
+
+{# Manufacture form label
+ # Form label, for presentation purposes
+ #}
+{% if not formLabel|length %}
+    {% set formLabel = "Faculty / Class" %}
+{% endif %}
+
+{# Manufacture input id attribute
+ # Modal's selection gets put into this element
+ #}
+{% if not formInputName|length %}
+    {% set formInputName = 'parent' %}
+{% endif %}
+
+{# Manufacture modal activator
+ # jquery identifier (usually a data var) which spawns modal
+ #}
+{% if not activator|length %}
+    {% set activator = '[data-course-selector]' %}
+{% endif %}
+
+{# Manufacture modal activator title attribute
+ # Anchor title
+ #}
+{% if title|length %}
+    {% set title = 'Click to change the faculty / class this course belongs to' %}
+{% endif %}
+
+<label>
+    {{ formLabel }}
+    <input type="hidden" name="{{ formInputName }}" value="{{ folder.parent.id }}" />
+    <a {{ activator }}
+       data-source="{{ formInputName }}"
+       href="#"
+       class="source-select {{ folder.parent.id ? 'icon-folder' : '' }}"
+       title="{{ title }}">{{ folder.parent.id ? folder.parent.name : '(Click to select)' }}
+    </a>
+</label>

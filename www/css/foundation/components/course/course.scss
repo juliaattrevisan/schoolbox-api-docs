@@ -24,3 +24,71 @@ input[type="text"]:focus {
         background-image: url('/images/core/ajax-loader.gif');
     }
 }
+
+.small-1 span {
+    display: block;
+    margin-top: 0.5rem;
+}
+
+fieldset {
+    transition: opacity 360ms cubic-bezier(0.2,1,0,1);
+}
+
+fieldset[disabled] {
+    opacity: 0.9;
+}
+
+input[type="submit"][readonly] {
+    background-color: rgba(0,102,176,0.4);
+    background-image: url('/images/resources/ajax.gif');
+    background-repeat: no-repeat;
+    background-size: 1rem;
+    background-position: 0.75rem 50%;
+}
+
+.selectize-control {
+    &.multi .selectize-input.has-items {
+        padding: 0 0 1px 0;
+    }
+
+    .selectize-input > div a.remove {
+        padding: 1px 5px 2px 4px !important;
+        width: 1rem !important;
+        margin: 0 4px 0 5px !important;
+    }
+
+    .selectize-input > div {
+        margin: 1px 0 0 1px !important;
+    }
+
+    .selectize-input > div a.remove:hover {
+        text-decoration: none;
+        background: #0066b0;
+        border-radius: 16px;
+        color: white;
+    }
+}
+
+.selectize-input {
+    margin-bottom: 0;
+
+    &.dropdown-active:before {
+        display: none;
+    }
+}
+
+.selectize-input > input[type=text] {
+    margin-left: 8px !important;
+}
+
+/* Label elements with no text content
+ */
+.course-import {
+    &.icon-next {
+        padding-top: 1.75rem;
+
+        &:before {
+            padding-right: 0;
+        }
+    }
+}

@@ -10,10 +10,10 @@
 namespace Schoolbox\Assessment\Course;
 
 use Schoolbox\Collection;
-use Schoolbox\Mapper;
+use Schoolbox;
 use Schoolbox\Resource\Folder\Model as Folder;
 
-class TaskMapper extends Mapper {
+class TaskMapper extends Schoolbox\Mapper {
 
     protected function mapping() {
         $this->hasTable('task');
