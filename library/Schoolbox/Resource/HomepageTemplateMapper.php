@@ -80,20 +80,13 @@ class HomepageTemplateMapper extends Mapper
 
     public function findAll($options = array())
     {
-        $collection = new \Schoolbox\Collection;
-
-        $templateNone = new \Schoolbox\Resource\HomepageTemplate();
+        $templateNone = $this->createModel();
         $templateNone->setId(HomepageTemplateMapper::TEMPLATE_NONE);
         $templateNone->setName("No Homepage");
 
-        $collection->add($templateNone);
-
         $templates = parent::findAll($options);
+        $templates->prepend($templateNone);
 
-        foreach ($templates as $template) {
-            $collection->add($template);
-        }
-
-        return $collection;
+        return $templates;
     }
 }
