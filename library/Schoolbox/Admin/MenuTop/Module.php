@@ -42,13 +42,13 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initControllers(ContainerInterface $injector) {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew('Schoolbox\\Admin\\MenuTop\\Controller'));
+        $injector->set('controller:'.$this->basename, $injector->lazyNew(\Schoolbox\Admin\MenuTop\Controller::class));
     }
 
     /**
      * {@inheritdoc}
      */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader) {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/Templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 }
