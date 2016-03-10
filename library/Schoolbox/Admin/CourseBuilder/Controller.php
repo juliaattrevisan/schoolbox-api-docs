@@ -16,12 +16,10 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Controller extends Base
 {
-    const INHERIT_ON = 1;
-    const INHERIT_OFF = 0;
-
     /**
      * A CourseConfigMapper instance
      *
@@ -51,6 +49,13 @@ class Controller extends Base
     private $configMapper;
 
     /**
+     * A FolderMapper instance
+     *
+     * @var
+     */
+    private $folderMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -59,6 +64,7 @@ class Controller extends Base
         $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
         $this->setRoleMapper(RoleMapper::getInstance());
         $this->setConfigMapper(ConfigMapper::getInstance());
+        $this->setFolderMapper(FolderMapper::getInstance());
     }
 
     /**
@@ -154,32 +160,17 @@ class Controller extends Base
         // Update default inheritance
 
         $courseTemplate = $this->getConfigMapper()->findOneByColumn("name", "course_builder_default_course_page_inherit");
-        $courseTemplate->setValue($this->selectInheritance($this->getRequest()->post["courseInherit"]));
+        $courseTemplate->setValue($this->getFolderMapper()->decideInheritance($this->getRequest()->post["courseInherit"]));
         $this->getConfigMapper()->save($courseTemplate);
 
         $unitTemplate = $this->getConfigMapper()->findOneByColumn("name", "course_builder_default_unit_page_inherit");
-        $unitTemplate->setValue($this->selectInheritance($this->getRequest()->post["unitInherit"]));
+        $unitTemplate->setValue($this->getFolderMapper()->decideInheritance($this->getRequest()->post["unitInherit"]));
 
         $this->getConfigMapper()->save($unitTemplate);
 
         // Send them back to the admin page
 
         $this->getResponse()->redirect->afterPost('/adminv2/course-builder/' .$this->getRequest()->post["tab"]);
-    }
-
-    /**
-     * Decide whether inheritance we selected
-     *
-     * @param $value
-     * @return int
-     */
-    private function selectInheritance($value)
-    {
-        if ($value == 1) {
-            return self::INHERIT_ON;
-        }
-
-        return self::INHERIT_OFF;
     }
 
     /* Getters/Setters
@@ -263,5 +254,25 @@ class Controller extends Base
     private function setConfigMapper($configMapper)
     {
         $this->configMapper = $configMapper;
+    }
+
+    /**
+     * Get Folder Mapper
+     *
+     * @return mixed
+     */
+    private function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+    /**
+     * Set Folder Mapper
+     *
+     * @param mixed $folderMapper
+     */
+    private function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
     }
 }
