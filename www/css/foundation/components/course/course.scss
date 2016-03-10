@@ -39,7 +39,7 @@ fieldset[disabled] {
 }
 
 input[type="submit"][readonly] {
-    background-color: rgba($content-ui-submit-foreground, 0.4);
+    background-color: rgba($content-ui-submit-background, 0.4);
     background-image: url('/images/resources/ajax.gif');
     background-repeat: no-repeat;
     background-size: 1rem;
