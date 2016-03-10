@@ -361,22 +361,24 @@ class Controller extends BaseController
     }
 
     /**
-     * Import unit fragment test (eg. /course/unit/import/238/520/0)
+     * Retrieve selection fragment
      *
      * @param Int $homepageId
      * @param Int $courseHomepageId
-     * @param Int $componentId          -- Not sure we really need this???
+     * @param Int $componentId
      */
-    public function importUnitForm($homepageId, $courseHomepageId, $componentId)
+    public function getImportFragment($homepageId, $courseHomepageId, $componentId)
     {
+        $folderMapper = FolderMapper::getInstance();
+
         $this->getResponse()->content->set([
             'template' => "@course/unitImportForm.twig",
-            // 'format' => 'nochrome',
+            'format' => 'nochrome',
             'data' => [
                 'homepageId'        => $homepageId,
                 'courseHomepageId'  => $courseHomepageId,
                 'componentId'       => $componentId,
-                'units'             => FolderMapper::getInstance()->findByParentId($courseHomepageId)
+                'units'             => $folderMapper->findByParentId($courseHomepageId)
             ]
         ]);
     }

@@ -1,0 +1,102 @@
+<!-- BEGIN custom_head -->
+
+<script type="text/javascript" src="/javascript/shared/course/jquery.course-import.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
+<script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
+
+<!-- END custom_head -->
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <fieldset class="content">
+
+                <legend>
+                    Units
+                    <span class='hint has-tip tip-top' data-tooltip title="You will need to set a start and end date for each unit that you want to import.">?</span>
+                </legend>
+
+                {% if units.length > 0 %}
+
+                    {# There were no units in the selected course #}
+
+                    <div class="small-12 columns">
+                        <div class="alert-box">
+                            The course you have selected contains no units. Please select a course that has the "course" icon.
+                        </div>
+                    </div>
+
+                {% else %}
+
+                    {# There were units in the selected course, create import form #}
+
+                    <form method="post" action="/course/unit/import">
+
+                        <input type="hidden" name="homepage"        value="{{ homepageId }}" />
+                        <input type="hidden" name="course_homepage" value="{{ courseHomepageId }}" />
+                        <input type="hidden" name="component"       value="{{ componentId }}" />
+
+                        <div class="small-12 columns no-pad">
+                            <ul class="information-list">
+
+                                {# Iterate each unit and create checkbox and dates #}
+
+                                {% for unit in units %}
+                                    <li>
+                                        <input name="unit[{{ loop.index }}][unit_id]" type="hidden" value="{{ unit.getId }}" />
+
+                                        <div class="list-item" data-type="unit_row">
+
+                                            {# Checkbox & Unit Name #}
+
+                                            <div class="avatar card small-12 medium-6">
+                                                <input name="unit[{{ loop.index }}][import]" type="hidden" value="0" />
+                                                <input id="import-{{ loop.index }}" name="unit[{{ loop.index }}][import]" type="checkbox" value="1" data-interaction="enable" {{ unit.getChecked }} />
+                                                <label for="import-{{ loop.index }}" class="checkbox-label">{{ unit.getName }}</label>
+                                            </div>
+
+                                            {# Open Date #}
+
+                                            <div class="small-12 medium-3 columns" data-hide-watch="#import-{{ loop.index }}">
+                                                <label for="open_date-{{ loop.index }}">Open</label>
+                                                <input id="open_date-{{ loop.index }}"
+                                                       name="unit[{{ loop.index }}][open_date]"
+                                                       type="text"
+                                                       value="{{ unit.getOpenDate }}"
+                                                       data-role="open_date"
+                                                       data-datepicker
+                                                       data-datepicker-sync
+                                                       data-datepicker-sync-enddate="#due_date-{{ loop.index }}" />
+                                            </div>
+
+                                            {# Close Date #}
+
+                                            <div class="small-12 medium-3 columns" data-hide-watch="#import-{{ loop.index }}">
+                                                <label for="due_date-{{ loop.index }}">Close</label>
+                                                <input id="due_date-{{ loop.index }}"
+                                                       name="unit[{{ loop.index }}][due_date]"
+                                                       type="text"
+                                                       value="{{ unit.getDueDate }}"
+                                                       data-role="due_date"
+                                                       data-datepicker />
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                {% endfor %}
+
+                            </ul>
+                        </div>
+
+                        <input type="submit" value="Import" />
+
+                    </form>
+
+                {% endif %}
+
+            </fieldset>
+        </section>
+    </div>
+</div>
