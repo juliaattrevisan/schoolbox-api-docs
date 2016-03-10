@@ -20,32 +20,5 @@ CREATE TABLE course_builder_config
 
 -- Default all permissions to none
 
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (1, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (2, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (3, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (4, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (5, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (6, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (7, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (8, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (9, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (10, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (11, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (12, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (13, 0, 'course');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (14, 0, 'course');
-
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (1, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (2, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (3, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (4, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (5, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (6, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (7, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (8, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (9, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (10, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (11, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (12, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (13, 0, 'unit');
-INSERT INTO course_builder_config (role_id, permission, page) VALUES (14, 0, 'unit');
+INSERT INTO course_builder_config (role_id, permission, page) SELECT id, 0, 'course' FROM groups;
+INSERT INTO course_builder_config (role_id, permission, page) SELECT id, 0, 'unit' FROM groups;
