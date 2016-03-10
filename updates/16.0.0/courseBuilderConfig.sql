@@ -3,10 +3,10 @@
 INSERT INTO config
   (name, value, title, description, field_id, options, type_id, editable, hidden, required)
 VALUES
-  ('default_course_page_template', '13', null, null, null, null, null, 'false', 'true', 'false'),
-  ('default_unit_page_template', '14', null, null, null, null, null, 'false', 'true', 'false'),
-  ('default_course_page_inherit', '1', null, null, null, null, null, 'false', 'true', 'false'),
-  ('default_unit_page_inherit', '1', null, null, null, null, null, 'false', 'true', 'false');
+  ('course_builder_default_course_page_template', '13', "Default Course Page Template", 'Default homepage template when creating course overview pages', null, null, null, 'false', 'true', 'false'),
+  ('course_builder_default_unit_page_template', '14', "Default Unit Page Template", 'Default homepage template when creating course unit pages', null, null, null, 'false', 'true', 'false'),
+  ('course_builder_default_course_page_inherit', '1', "Default Course Page Inheritance", 'Indicates if new course overview  pages inherit permissions from parent', null, null, null, 'false', 'true', 'false'),
+  ('course_builder_default_unit_page_inherit', '1', "Default Unit Page Inheritance", 'Indicates if new course unit pages inherit permissions from parent', null, null, null, 'false', 'true', 'false');
 
 -- Create table to hold default permissions for course pages
 

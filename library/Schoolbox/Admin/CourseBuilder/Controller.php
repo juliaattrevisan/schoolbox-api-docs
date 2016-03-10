@@ -58,10 +58,10 @@ class Controller extends Base
                     'roles' => $roleMapper->findAll(),
                     'permissions' => $permissions,
                     'templates' => $homepageTemplateMapper->findAll()->sortBy("name", "asc"),
-                    'courseTemplate' => $configMapper->get('default_course_page_template'),
-                    'unitTemplate' => $configMapper->get('default_unit_page_template'),
-                    'courseInherit' => $configMapper->get('default_course_page_inherit'),
-                    'unitInherit' => $configMapper->get('default_unit_page_inherit')
+                    'courseTemplate' => $configMapper->get('course_builder_default_course_page_template'),
+                    'unitTemplate' => $configMapper->get('course_builder_default_unit_page_template'),
+                    'courseInherit' => $configMapper->get('course_builder_default_course_page_inherit'),
+                    'unitInherit' => $configMapper->get('course_builder_default_unit_page_inherit')
                 ),
             )
         );
@@ -96,21 +96,21 @@ class Controller extends Base
 
         // Update default page templates
 
-        $courseTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "default_course_page_template");
+        $courseTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "course_builder_default_course_page_template");
         $courseTemplate->setValue($this->getRequest()->post["courseTemplate"]);
         ConfigMapper::getInstance()->save($courseTemplate);
 
-        $unitTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "default_unit_page_template");
+        $unitTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "course_builder_default_unit_page_template");
         $unitTemplate->setValue($this->getRequest()->post["unitTemplate"]);
         ConfigMapper::getInstance()->save($unitTemplate);
 
         // Update default inheritance
 
-        $courseTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "default_course_page_inherit");
+        $courseTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "course_builder_default_course_page_inherit");
         $courseTemplate->setValue($this->getRequest()->post["courseInherit"]);
         ConfigMapper::getInstance()->save($courseTemplate);
 
-        $unitTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "default_unit_page_inherit");
+        $unitTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "course_builder_default_unit_page_inherit");
         $unitTemplate->setValue($this->getRequest()->post["unitInherit"]);
         ConfigMapper::getInstance()->save($unitTemplate);
 
