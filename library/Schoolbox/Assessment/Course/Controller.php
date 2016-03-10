@@ -609,6 +609,10 @@ class Controller extends BaseController
                 $confMapper->emptyHomepage($homepageConfig);
                 $confMapper->delete($homepageConfig);
 
+            } elseif ($template == HomepageTemplate::HOMEPAGE_KEEP_EXISTING) {
+                // we're done. get out.
+                return;
+
             } elseif ($template > 0) {
                 // if template defined
                 $homepageConfig->setTemplate($tplMapper->findById($template));
