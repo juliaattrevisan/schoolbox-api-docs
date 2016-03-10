@@ -22,7 +22,10 @@
                 $('body').on('click', '#course-selector-results [data-course-id]', function(event) {
                     event.preventDefault();
 
-                    $('input[name=parent]').val($(this).attr('data-course-id'));
+                    // Have to manually call the change event as it doesn't trigger on scripted value updates
+
+                    $('#importCourse').val($(this).attr('data-course-id')).change();
+
                     $('[data-course-selector]').html($(this).attr('data-course-name'));
 
                     /* Shut it, I guess
@@ -60,6 +63,14 @@
         {# default mage init #}
         $('input[data-mage-next]').mage();
 
+        $('input[data-mage-next="part-unit-select"]').mage({onXhrDone: function(data) {
+            /* Clear current information
+             */
+            $('#importUnits').html('').addClass('loader');
+            $('#importUnits').html(data).removeClass('loader');
+
+        }});
+
     });
 </script>
 
@@ -72,7 +83,7 @@
                     <div class="small-5 medium-5 large-3 columns">
                         {% include 'sub/selectorShard.twig' with {
                                 'formLabel': 'Course',
-                                'formInputName': 'parent',
+                                'formInputName': 'importCourse',
                                 'folder': folder,
                                 'activator': 'data-course-selector',
                                 'title': 'Select Course to import'
@@ -87,21 +98,24 @@
                             <input id="import-folders" type="text" name="importFolders" />
                         </label>
                     </div>
+
                     <div class="small-12 column">
                         <div class="row" data-mage-submitrow>
                             <div class="small-12 medium-8 column">
                                 <p class="alert alert-box icon-alert" data-mage-error></p>
                             </div>
                             <div class="small-12 medium-4 column">
-                                <input type="submit" name="part-course-select" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="/course/importResults" />
+                                <input type="submit" name="part-course-select" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="/course/importUnits" />
                             </div>
                         </div>
                     </div>
                 </fieldset>
+
                 <fieldset class="content" data-mage="part-unit-select">
                     <legend>Units</legend>
-                    {# include content from SB-11472 here #}
+                    <div id="importUnits"></div>
                 </fieldset>
+
                 <fieldset class="content" data-mage="part-tasks-select">
                     <legend>Coursework</legend>
                     <div id="importResults">

@@ -35,7 +35,7 @@
 
 <label>
     {{ formLabel }}
-    <input type="hidden" name="{{ formInputName }}" value="{{ folder.parent.id }}" />
+    <input type="hidden" name="{{ formInputName }}" id="{{ formInputName }}" value="{{ folder.parent.id }}" />
     <a {{ activator }}
        data-source="{{ formInputName }}"
        href="#"

@@ -361,14 +361,14 @@ class Controller extends BaseController
     }
 
     /**
-     * Retrieve selection fragment
+     * Retrieve fragment with units in the selected course, and checkboxes/dates for selection
      *
-     * @param Int $homepageId
-     * @param Int $courseHomepageId
-     * @param Int $componentId
      */
-    public function getImportFragment($homepageId, $courseHomepageId, $componentId)
+    public function importUnits()
     {
+        $homepageId = $this->getRequest()->post["importFolders"];
+        $courseHomepageId = $this->getRequest()->post["importCourse"];
+
         $folderMapper = FolderMapper::getInstance();
 
         $this->getResponse()->content->set([
@@ -377,7 +377,6 @@ class Controller extends BaseController
             'data' => [
                 'homepageId'        => $homepageId,
                 'courseHomepageId'  => $courseHomepageId,
-                'componentId'       => $componentId,
                 'units'             => $folderMapper->findByParentId($courseHomepageId)
             ]
         ]);
@@ -403,30 +402,20 @@ class Controller extends BaseController
 
         $homepage = FolderMapper::getInstance()->findById($this->getRequest()->post["homepage"]);
 
-        try
-        {
-            // Try to find existing course outline component on the page we are importing into. Not sure if we need
-            // to do this, or just create a new outline every time?
+        // Create the component
 
-            $component = UnitInstanceMapper::getInstance()->findById($this->getRequest()->post["component"]);
-        }
-        catch (\Exception $e)
-        {
-            // Couldn't find the component, create a new one course outline component at the top of the page
+        $componentDefinition   = \Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Homepage_CourseOutlineController');
+        $componentDefinitionId = $componentDefinition->first()->getId();
 
-            $componentDefinition   = \Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Homepage_CourseOutlineController');
-            $componentDefinitionId = $componentDefinition->first()->getId();
+        $component = new \Component_Instance();
+        $component
+            ->setDefinitionId($componentDefinitionId)
+            ->setModule('homepage')
+            ->setIdentifier($homepage->getId())
+            ->setPosition('top')
+            ->setSequence(1);
 
-            $component = new \Component_Instance();
-            $component
-                ->setDefinitionId($componentDefinitionId)
-                ->setModule('homepage')
-                ->setIdentifier($homepage->getId())
-                ->setPosition('top')
-                ->setSequence(1);
-
-            \Component_InstanceMapper::getInstance()->save($component);
-        }
+        \Component_InstanceMapper::getInstance()->save($component);
 
         // And create a new unit instance for each one selected by the user selected
 
