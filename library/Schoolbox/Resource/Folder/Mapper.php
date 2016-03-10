@@ -472,9 +472,9 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     /**
      * Get a hydrated category
      *
-     * @param $id
-     * @return Collection|Model[]
-     * @throws \Schoolbox\Mapper\Exception
+     * @param $column
+     * @param $value
+     * @return Collection
      */
     public function findByColumnWithCodes($column, $value)
     {
