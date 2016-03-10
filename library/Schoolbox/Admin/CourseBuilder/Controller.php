@@ -19,6 +19,9 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 
 class Controller extends Base
 {
+    const INHERIT_ON = 1;
+    const INHERIT_OFF = 0;
+
     /**
      * A CourseConfigMapper instance
      *
@@ -151,16 +154,32 @@ class Controller extends Base
         // Update default inheritance
 
         $courseTemplate = $this->getConfigMapper()->findOneByColumn("name", "course_builder_default_course_page_inherit");
-        $courseTemplate->setValue($this->getRequest()->post["courseInherit"] == 1 ? 1 : 0);
+        $courseTemplate->setValue($this->selectInheritance($this->getRequest()->post["courseInherit"]));
         $this->getConfigMapper()->save($courseTemplate);
 
         $unitTemplate = $this->getConfigMapper()->findOneByColumn("name", "course_builder_default_unit_page_inherit");
-        $unitTemplate->setValue($this->getRequest()->post["unitInherit"] == 1 ? 1 : 0);
+        $unitTemplate->setValue($this->selectInheritance($this->getRequest()->post["unitInherit"]));
+
         $this->getConfigMapper()->save($unitTemplate);
 
         // Send them back to the admin page
 
         $this->getResponse()->redirect->afterPost('/adminv2/course-builder/' .$this->getRequest()->post["tab"]);
+    }
+
+    /**
+     * Decide whether inheritance we selected
+     *
+     * @param $value
+     * @return int
+     */
+    private function selectInheritance($value)
+    {
+        if ($value == 1) {
+            return self::INHERIT_ON;
+        }
+
+        return self::INHERIT_OFF;
     }
 
     /* Getters/Setters
