@@ -26,7 +26,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'getIndex', $basePath, "");
+        $this->addGetRoute($router, 'getIndex', $basePath, "{/tab}");
         $this->addPostRoute($router, 'postSave', $basePath, "/save");
     }
 

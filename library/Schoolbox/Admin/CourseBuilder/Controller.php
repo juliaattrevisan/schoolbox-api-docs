@@ -20,7 +20,7 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 
 class Controller extends Base
 {
-    public function getIndex()
+    public function getIndex($tab = '')
     {
         $configMapper = ConfigMapper::getInstance();
         $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
@@ -53,8 +53,8 @@ class Controller extends Base
             array(
                 'template' => '@adminCourseBuilder/index.twig',
                 'data'     => array(
-                    'pageCurrent' => basename($_GET["page"]),
-                    'tab' => $_GET["tab"] != '' ? $_GET["tab"] : 'course',
+                    'pageCurrent' => 'course-builder',
+                    'tab' => $tab != '' ? $tab : 'course',
                     'roles' => $roleMapper->findAll(),
                     'permissions' => $permissions,
                     'templates' => $homepageTemplateMapper->findAll()->sortBy("name", "asc"),
@@ -76,7 +76,7 @@ class Controller extends Base
 
         // Add course permissions back
 
-        foreach ($_POST["course_group"] as $roleId => $permission) {
+        foreach ($this->getRequest()->post["course_group"] as $roleId => $permission) {
             $model = new CourseConfigModel();
             $model->setPage("course");
             $model->setPermission($permission);
@@ -86,7 +86,7 @@ class Controller extends Base
 
         // Add unit permissions back
 
-        foreach ($_POST["unit_group"] as $roleId => $permission) {
+        foreach ($this->getRequest()->post["unit_group"] as $roleId => $permission) {
             $model = new CourseConfigModel();
             $model->setPage("unit");
             $model->setPermission($permission);
@@ -97,25 +97,25 @@ class Controller extends Base
         // Update default page templates
 
         $courseTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "default_course_page_template");
-        $courseTemplate->setValue($_POST["courseTemplate"]);
+        $courseTemplate->setValue($this->getRequest()->post["courseTemplate"]);
         ConfigMapper::getInstance()->save($courseTemplate);
 
         $unitTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "default_unit_page_template");
-        $unitTemplate->setValue($_POST["unitTemplate"]);
+        $unitTemplate->setValue($this->getRequest()->post["unitTemplate"]);
         ConfigMapper::getInstance()->save($unitTemplate);
 
         // Update default inheritance
 
         $courseTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "default_course_page_inherit");
-        $courseTemplate->setValue($_POST["courseInherit"]);
+        $courseTemplate->setValue($this->getRequest()->post["courseInherit"]);
         ConfigMapper::getInstance()->save($courseTemplate);
 
         $unitTemplate = ConfigMapper::getInstance()->findOneByColumn("name", "default_unit_page_inherit");
-        $unitTemplate->setValue($_POST["unitInherit"]);
+        $unitTemplate->setValue($this->getRequest()->post["unitInherit"]);
         ConfigMapper::getInstance()->save($unitTemplate);
 
         // Send them back to the admin page
 
-        $this->getResponse()->redirect->afterPost('/adminv2/course-builder/?tab=' .$_POST["tab"]);
+        $this->getResponse()->redirect->afterPost('/adminv2/course-builder/' .$this->getRequest()->post["tab"]);
     }
 }
