@@ -61,7 +61,7 @@
                         </div>
                         <div class="small-12 columns">
                             <input data-checkbox-course-inherit type="checkbox" id="courseInherit" name="courseInherit" value="1" {% if courseInherit == 1 %}checked{% endif %} />
-                            <label for="courseInherit" class="checkbox-label">Inherit permissions from the courses parent folder</label>
+                            <label for="courseInherit" class="checkbox-label">Inherit permissions from the course's parent folder</label>
                         </div>
                     </fieldset>
                     <table id="course-permissions" {% if courseInherit == 1 %}class="hide"{% endif %}>
@@ -118,7 +118,7 @@
                         </div>
                         <div class="small-12 columns">
                             <input data-checkbox-unit-inherit type="checkbox" id="unitInherit" name="unitInherit" value="1" {% if unitInherit == 1 %}checked{% endif %} />
-                            <label for="unitInherit" class="checkbox-label">Inherit permissions from the courses parent folder</label>
+                            <label for="unitInherit" class="checkbox-label">Inherit permissions from the course's parent folder</label>
                         </div>
                     </fieldset>
                     <table id="unit-permissions" {% if unitInherit == 1 %}class="hide"{% endif %}>
