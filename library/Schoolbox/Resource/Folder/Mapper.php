@@ -35,6 +35,8 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
  */
 class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 {
+    const INHERIT_ON = 1;
+    const INHERIT_OFF = 0;
 
     /**
      * Maximum number of recursion iterations to execute before dying
@@ -470,9 +472,9 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     /**
      * Get a hydrated category
      *
-     * @param $id
-     * @return Collection|Model[]
-     * @throws \Schoolbox\Mapper\Exception
+     * @param $column
+     * @param $value
+     * @return Collection
      */
     public function findByColumnWithCodes($column, $value)
     {
@@ -1092,6 +1094,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * @param Model $folder
      * @param int $iteration
      * @return Model
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function findNearestNonInheritingAncestralNode(Model $folder, $iteration = 0)
     {
@@ -1147,6 +1150,22 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         }
 
         return $result;
+    }
+
+    /**
+     * Decide whether inheritance value we provided activates
+     * Folder Inheritance
+     *
+     * @param $value
+     * @return int
+     */
+    public function decideInheritance($value)
+    {
+        if ($value == 1) {
+            return self::INHERIT_ON;
+        }
+
+        return self::INHERIT_OFF;
     }
 
     /* Getters/Setters

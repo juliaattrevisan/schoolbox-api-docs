@@ -373,6 +373,7 @@ class Bootstrap implements BootstrapInterface {
 
 					$twig->addExtension(new Twig_Extension_Debug());
 					$twig->addExtension(new Twig_Extensions_Extension_Text());
+					$twig->addExtension(new \Schoolbox\Admin\Navigation\Renderer());
 
 					// HTML Purifier escape strategy
 					// Please use the filter below instead.

@@ -8,7 +8,6 @@
  */
 class AdminV2_Nav
 {
-
     private $nav = array(
         'home' => 'Home',
         'user' => 'Users',
@@ -23,6 +22,7 @@ class AdminV2_Nav
         'rollover' => 'Rollover',
         'grades' => 'Grades',
         'rubric-results' => 'Rubrics',
+        'course-builder' => 'Course Builder',
         'messages' => 'Messages',
         'list' => 'Lists',
         'cleanup' => 'Cleanup',
@@ -51,5 +51,9 @@ class AdminV2_Nav
         ));
 
         $page->parse('ADMIN_NAV', 'nav');
+    }
+
+    public function getNavigation() {
+        return $this->nav;
     }
 }
