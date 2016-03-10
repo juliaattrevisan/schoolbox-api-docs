@@ -79,7 +79,7 @@ class CampusMapper extends Mapper {
 			$statement->bindParam(':accessType', $accessType);
 			$statement->execute();
 
-			$collection = new \Schoolbox\Collection();
+			$collection = new Collection();
 
 			foreach ($statement as $row) {
 				$campus = $this->hydrate($row);
@@ -150,5 +150,41 @@ class CampusMapper extends Mapper {
 		}
 
 		return $allCampuses;
+	}
+
+	/**
+	 * Find the campuses with which this user is involved
+	 *
+	 * @param User $user
+	 * @return Collection
+	 */
+	public function findCampusInvolvement(User $user)
+	{
+		$query = "
+            SELECT
+            	userCampus.*,
+            	{$this->getColumnString('c')}
+            FROM userCampus
+            INNER JOIN luCampus c ON userCampus.campus = c.id
+            WHERE userCampus.uid = :userId
+        ";
+
+		$statement = $this->database->prepare($query);
+		$statement->execute([
+			'userId' => $user->getId()
+		]);
+
+		$collection = new Collection();
+
+		while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+			$campus = $this->hydrate($row, 'c');
+
+			$collection->setOffset($campus->getId(), [
+				'defaultCampus' => $row['defaultCampus'],
+				'campus' => $campus,
+			]);
+		}
+
+		return $collection;
 	}
 }

@@ -95,20 +95,34 @@ if(is_numeric($this->arg[0])) {
 
         /* User campuses
 		 */
-        $userCampus = $userHandler->getUserCampus($user['uid']);
+        try {
+            $currentUser = \Schoolbox\UserMapper::getInstance()->findById($user['uid']);
+        }
+        catch(\Exception $e) {
+            error(31);
+        }
+
+        $allCampuses = \Schoolbox\CampusMapper::getInstance()->findCampusInvolvement($currentUser);
 
         foreach($userHandler->getCampusList() as $campus) {
             $outcampus = array(
-                'CAMPUS_ID'         => $campus['id'],
-                'CAMPUS_NAME'           => Scrub::text($campus['name']),
-                'CAMPUS_ID_CHECKED'     => '',
-                'CAMPUS_DEFAULT_CHECKED'    => '',
+                'CAMPUS_ID'              => $campus['id'],
+                'CAMPUS_NAME'            => Scrub::text($campus['name']),
+                'CAMPUS_ID_CHECKED'      => '',
+                'CAMPUS_DEFAULT_CHECKED' => '',
             );
 
-            if (($key = array_search($campus['id'],$userCampus)) !== false) {
+            if ($allCampuses->offsetExists($campus['id'])) {
+
+                /* Mark them as "Involved"
+                 */
                 $outcampus['CAMPUS_ID_CHECKED'] = 'checked="checked"';
 
-                if ($key == 0) {
+                /* Find out if the campus is their default campus
+                 */
+                $offset = $allCampuses->offsetGet($campus['id']);
+
+                if ($offset['defaultCampus']) {
                     $outcampus['CAMPUS_DEFAULT_CHECKED'] = 'checked="checked"';
                 }
             }
