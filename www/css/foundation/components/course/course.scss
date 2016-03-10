@@ -39,7 +39,7 @@ fieldset[disabled] {
 }
 
 input[type="submit"][readonly] {
-    background-color: rgba(0,102,176,0.4);
+    background-color: rgba($content-ui-submit-foreground, 0.4);
     background-image: url('/images/resources/ajax.gif');
     background-repeat: no-repeat;
     background-size: 1rem;
@@ -63,9 +63,9 @@ input[type="submit"][readonly] {
 
     .selectize-input > div a.remove:hover {
         text-decoration: none;
-        background: #0066b0;
-        border-radius: 16px;
-        color: white;
+        background: $content-ui-submit-foreground;
+        border-radius: 1rem;
+        color: calc-text-color($content-ui-submit-foreground);
     }
 }
 
@@ -78,7 +78,7 @@ input[type="submit"][readonly] {
 }
 
 .selectize-input > input[type=text] {
-    margin-left: 8px !important;
+    margin-left: 0.5rem !important;
 }
 
 /* Label elements with no text content
