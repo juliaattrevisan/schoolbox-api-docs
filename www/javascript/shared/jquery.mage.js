@@ -116,6 +116,11 @@
     function clickIntercept (e, self, elem, form) {
         e.preventDefault();
 
+        if (typeof elem.data('mageSubmitted') != 'undefined') {
+            // do not resubmit this section
+            return;
+        }
+
         // HTML5 FTW
         var method = elem.attr('formmethod') || form.attr('method'),
             action = elem.attr('formaction') || form.attr('action'),
@@ -226,7 +231,7 @@
         target.find('[data-mage-error]').slideUp(slideDuration);
 
         // slide away the submit for this section
-        $(this.element).closest('[data-mage-submitrow]').slideUp(slideDuration);
+        $(this.element).data('mage-submitted', true).closest('[data-mage-submitrow]').slideUp(slideDuration);
 
         // call the callback (this would include any specific manipulation for the section being targeted)
         onXhrDone.call(this.element, data);
