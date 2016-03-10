@@ -64,7 +64,7 @@
         <form method="post">
             <section>
                 <fieldset class="content">
-                    <div class="small-3 columns">
+                    <div class="small-5 medium-5 large-3 columns">
                         {% include 'sub/selectorShard.twig' with {
                                 'formLabel': 'Course',
                                 'formInputName': 'parent',
@@ -74,10 +74,10 @@
                             }
                         %}
                     </div>
-                    <div class="small-1 columns text-center">
-                        &rarr;
+                    <div class="small-2 medium-2 large-1 columns text-center">
+                        <p class="course-import icon-next"></p>
                     </div>
-                    <div class="small-8 columns">
+                    <div class="small-5 medium-5 large-8 columns">
                         <label>Class(es)
                             <input id="import-folders" type="text" name="importFolders" />
                         </label>

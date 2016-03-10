@@ -80,3 +80,15 @@ input[type="submit"][readonly] {
 .selectize-input > input[type=text] {
     margin-left: 8px !important;
 }
+
+/* Label elements with no text content
+ */
+.course-import {
+    &.icon-next {
+        padding-top: 1.75rem;
+
+        &:before {
+            padding-right: 0;
+        }
+    }
+}
