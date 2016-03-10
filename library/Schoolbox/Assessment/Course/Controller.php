@@ -143,8 +143,14 @@ class Controller extends BaseController
         }
 
         try {
-            // cause a snap if no (or invalid) parent was supplied
-            $parent = $this->getCourseMapper()->findById(trim((string)$post->get('parent', -1)));
+            $parentId = $post->get('parent');
+            if ($parentId === "0" || $parentId > 0) {
+                $parent = $this->getCourseMapper()->findById($parentId);
+            } else {
+                // cause a snap if no (or invalid) parent was supplied
+                throw new Mapper\Exception("Invalid parent nominated");
+            }
+
 
         } catch (Mapper\Exception $e) {
 
