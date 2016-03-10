@@ -1260,7 +1260,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         if (Access::getInstance()->getFolderAccess($this->sessionData["user"], [$source]) < WRITE_ACCESS ||
             Access::getInstance()->getFolderAccess($this->sessionData["user"], [$destination]) < WRITE_ACCESS
         ) {
-            throw new \Exception($errorMapper->getMessageById(ErrorMapper::ERROR_PERM_CATEGORY_WRITE));
+            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
 
         // Grab folder object
@@ -1274,7 +1274,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         foreach ($folderMapper->findParents($parentFolder) as $ancestor) {
             if ($ancestor->getId() == $movedFolder->getId()) {
-                throw new \Exception($errorMapper->getMessageById(ErrorMapper::ERROR_DATABASE));
+                $errorMapper->generateException(ErrorMapper::ERROR_DATABASE, $e);
             }
         }
 
