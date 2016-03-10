@@ -141,22 +141,8 @@ class Mapper extends BaseMapper
         $this->hasTable('error');
         $this->hasPrototype(new Model());
 
-        $this->hasMap(
-            array(
-                'column' => 'id',
-                'property' => 'id',
-                'type' => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column' => 'message',
-                'property' => 'message',
-                'type' => self::TYPE_STRING,
-            )
-        );
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('message', self::TYPE_STRING);
     }
 
     /**
