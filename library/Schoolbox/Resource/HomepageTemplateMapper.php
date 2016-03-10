@@ -81,7 +81,7 @@ class HomepageTemplateMapper extends Mapper
     public function findAll($options = array())
     {
         $templateNone = $this->createModel();
-        $templateNone->setId(HomepageTemplateMapper::TEMPLATE_NONE);
+        $templateNone->setId(self::TEMPLATE_NONE);
         $templateNone->setName("No Homepage");
 
         $templates = parent::findAll($options);
