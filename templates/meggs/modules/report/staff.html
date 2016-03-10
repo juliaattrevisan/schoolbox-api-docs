@@ -32,8 +32,10 @@
                 <thead>
                 <tr>
                     <th class="hide-for-small" data-orderable="false">Image</th>
+                    <th>Title</th>
                     <th>First name</th>
                     <th>Surname</th>
+                    <th>Code</th>
                     <th class="hide-for-medium-down">Department</th>
                     <th class="hide-for-small">Role</th>
                     <th class="hide-for-medium-down">Campus</th>
@@ -47,8 +49,10 @@
                 <!-- BEGIN staff -->
                 <tr>
                     <td class="hide-for-small"><img src="/portrait.php?userId={STAFF_STAFFID}&size=square32"></td>
+                    <td>{STAFF_TITLE}</td>
                     <td>{STAFF_FIRSTNAME}</td>
                     <td>{STAFF_SURNAME}</td>
+                    <td>{STAFF_STAFFCODE}</td>
                     <td class="hide-for-medium-down">{STAFF_DEPARTMENT}</td>
                     <td class="hide-for-small">{STAFF_ROLE}</td>
                     <td class="hide-for-medium-down">{STAFF_CAMPUS}</td>
