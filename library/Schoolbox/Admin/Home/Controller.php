@@ -223,7 +223,7 @@ class Controller extends Base
             array(
                 'template' => '@adminHome/index.twig',
                 'data'     => array(
-                    'pageCurrent' => basename($_GET["page"]),
+                    'pageCurrent' => basename($this->getRequest()->query->get('page')),
                     'disk_used' => \Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
                     'disk_total' => \Alaress_Byte_Format::bytesToString($disk_total),
                     'disk_percentage' => \Alaress_Byte_Format::bytesToString($disk_percentage),

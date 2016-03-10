@@ -27,7 +27,7 @@ class Controller extends Base
             array(
                 'template' => '@adminClean/index.twig',
                 'data'     => array(
-                    'pageCurrent' => basename($_GET["page"]),
+                    'pageCurrent' => basename($this->getRequest()->query->get('page')),
                 ),
             )
         );

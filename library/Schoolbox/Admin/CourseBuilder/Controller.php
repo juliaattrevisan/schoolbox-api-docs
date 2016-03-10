@@ -53,7 +53,7 @@ class Controller extends Base
             array(
                 'template' => '@adminCourseBuilder/index.twig',
                 'data'     => array(
-                    'pageCurrent' => 'course-builder',
+                    'pageCurrent' => basename($this->getRequest()->query->get('page')),
                     'tab' => $tab != '' ? $tab : 'course',
                     'roles' => $roleMapper->findAll(),
                     'permissions' => $permissions,

@@ -24,7 +24,7 @@ class Controller extends Base
             array(
                 'template' => '@adminMenuTop/index.twig',
                 'data'     => array(
-                    'pageCurrent' => basename($_GET["page"]),
+                    'pageCurrent' => basename($this->getRequest()->query->get('page')),
                     'items' => MenuTopMapper::getInstance()->findAll()->sortBy("order", "asc"),
                 ),
             )
