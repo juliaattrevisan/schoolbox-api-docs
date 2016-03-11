@@ -390,15 +390,13 @@ class Controller extends BaseController
         else
         {
             // Everything kosher, proceed with the mage
-            $folderMapper = FolderMapper::getInstance();
-
             $this->getResponse()->content->set([
                 'template' => "@course/unitImportForm.twig",
                 'format' => 'nochrome',
                 'data' => [
                     'homepageId' => $homepageId,
                     'courseHomepageId' => $courseHomepageId,
-                    'units' => $folderMapper->findByParentId($courseHomepageId)
+                    'units' => $this->getCourseMapper()->findByParentId($courseHomepageId)
                 ]
             ]);
         }
