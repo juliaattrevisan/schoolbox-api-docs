@@ -29,7 +29,7 @@
 {# Manufacture modal activator title attribute
  # Anchor title
  #}
-{% if title|length %}
+{% if not title|length %}
     {% set title = 'Click to change the faculty / class this course belongs to' %}
 {% endif %}
 
