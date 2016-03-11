@@ -369,7 +369,13 @@ class Controller extends BaseController
         $homepageId       = trim($this->getRequest()->post["importFolders"]);
         $courseHomepageId = trim($this->getRequest()->post["importCourse"]);
 
-        if ($homepageId == "" && $courseHomepageId == "")
+        if ($this->courseMapper->findById($courseHomepageId)->getTaskCount() == 0)
+        {
+            // the nominated "course" is not actually a course...
+
+            $this->throwError('The selected source is not a course');
+        }
+        elseif ($homepageId == "" && $courseHomepageId == "")
         {
             // They didn't select anything
 
