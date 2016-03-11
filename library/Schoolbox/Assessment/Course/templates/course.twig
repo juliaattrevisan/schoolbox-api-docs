@@ -43,6 +43,7 @@
                     </div>
                     <div {% if folder.id %}class="hide"{% endif %}>
                         <div class="small-12 medium-8 column">
+                            <!-- Don't delete the inline style, it's needed -->
                             <p data-errorreason style="display:none;" class="alert alert-box icon-alert"></p>
                         </div>
                         <div class="small-12 medium-4 column">
@@ -53,6 +54,7 @@
                 <fieldset class="content">
                     <legend>Units</legend>
                     <div class="small-12 column no-pad">
+                        <!-- Don't delete the inline style, it's needed -->
                         <ul class="information-list" {% if not folder.id %}style="display:none;"{% endif %} data-formpartial="units">
                         {% for unit in units %}
                             {% include '@course/unit.twig' with { i: loop.index, '_writable': true } %}
@@ -69,6 +71,7 @@
                                     </div>
                                 </div>
                                 <div class="small-12 medium-8 column">
+                                    <!-- Don't delete the inline style, it's needed -->
                                     <p data-errorreason style="display:none;" class="alert alert-box icon-alert"></p>
                                 </div>
                                 <div class="small-12 medium-4 column">
@@ -81,6 +84,7 @@
                     </div>
                 </fieldset>
             </section>
+            <!-- Don't delete the inline style, it's needed -->
             <div class="row" data-formpartial="units" {% if not folder.id %}style="display: none;"{% endif %}>
                 <div class="small-12 column">
                     <input type="submit" name="submit" value="Save Course" />
