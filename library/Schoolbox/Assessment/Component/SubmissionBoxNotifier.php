@@ -311,7 +311,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         /** @var SubmissionBox $submissionBox */
         $submissionBox = $this->mapper->findById($boxId);
 
-        $boxType = $submissionBox->getWorkType()->getName();
+        $boxType = mb_strtolower($submissionBox->getWorkType()->getName());
         $boxName = $submissionBox->getName();
 
         $authorExtId = $user->getExternalId();
@@ -691,7 +691,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         );
 
         // renamed
-        $boxType = $submissionBox->getWorkType()->getName();
+        $boxType = mb_strtolower($submissionBox->getWorkType()->getName());
         if (!empty($diff['name'])) {
             foreach ($students as $student) {
                 $bob = $this
