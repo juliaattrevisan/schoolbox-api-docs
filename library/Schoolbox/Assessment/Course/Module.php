@@ -57,6 +57,7 @@ class Module extends BaseModule
             ],
             'POST' => [
                 '/unit/new'                             => 'newUnit',
+                '/unit/delete'                          => 'deleteUnit',
                 '/importTasks'                          => 'importTasks',
                 '/importUnits'                          => 'importUnits',
             ]
