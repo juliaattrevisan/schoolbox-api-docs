@@ -45,22 +45,8 @@
             value: {{ destinations|json_encode|raw }}
         });
 
-{#
-        /* Whenever you choose a Course, find out what
-         * the Units and Tasks are
-         */
-        $(document).on('change', '#import-course', function(event) {
-
-            /* Clear current information
-             */
-            $('#importResults').html('').addClass('loader');
-
-            $.get('/course/importResults/' + $(this).val(), function (responseText) {
-                $('#importResults').html(responseText).removeClass('loader');
-            });
-        });
-#}
         {# default mage init #}
+
         $('input[data-mage-next]').mage();
 
         $('input[data-mage-next="part-unit-select"]').mage({onXhrDone: function(data) {
@@ -69,6 +55,15 @@
             $('#importUnits').html('').addClass('loader');
             $('#importUnits').html(data).removeClass('loader');
 
+            {# After loading in the next fragment init the mage #}
+
+            $('input[data-mage-next="part-tasks-select"]').mage({onXhrDone: function(data) {
+                /* Clear current information
+                 */
+                $('#importResults').html('').addClass('loader');
+                $('#importResults').html(data).removeClass('loader');
+
+            }});
         }});
 
     });

@@ -366,19 +366,57 @@ class Controller extends BaseController
      */
     public function importUnits()
     {
-        $homepageId = $this->getRequest()->post["importFolders"];
-        $courseHomepageId = $this->getRequest()->post["importCourse"];
+        if (trim($this->getRequest()->post["importFolders"]) == "" && trim($this->getRequest()->post["importCourse"]) == "")
+        {
+            // They didn't select anything
 
-        $folderMapper = FolderMapper::getInstance();
+            $this->throwError('You must select at least one class and a course to import before you can proceed');
+        }
+        else if (trim($this->getRequest()->post["importFolders"]) == "")
+        {
+            // They didn't select a class code
+
+            $this->throwError('You must select at least one class before you can proceed');
+        }
+        else if (trim($this->getRequest()->post["importCourse"]) == "")
+        {
+            // They didn't select a course to import
+
+            $this->throwError('You must select a course to import before you can proceed');
+        }
+        else
+        {
+            // Everything kosher, proceed with the mage
+
+            $homepageId = $this->getRequest()->post["importFolders"];
+            $courseHomepageId = $this->getRequest()->post["importCourse"];
+
+            $folderMapper = FolderMapper::getInstance();
+
+            $this->getResponse()->content->set([
+                'template' => "@course/unitImportForm.twig",
+                'format' => 'nochrome',
+                'data' => [
+                    'homepageId' => $homepageId,
+                    'courseHomepageId' => $courseHomepageId,
+                    'units' => $folderMapper->findByParentId($courseHomepageId)
+                ]
+            ]);
+        }
+    }
+
+    /**
+     * Returns a HTTP 500 error with a specific text message
+     *
+     * @param $message
+     */
+    protected function throwError($message)
+    {
+        $this->getResponse()->status->set(500);
 
         $this->getResponse()->content->set([
-            'template' => "@course/unitImportForm.twig",
-            'format' => 'nochrome',
-            'data' => [
-                'homepageId'        => $homepageId,
-                'courseHomepageId'  => $courseHomepageId,
-                'units'             => $folderMapper->findByParentId($courseHomepageId)
-            ]
+            'format' => 'file',
+            'data' => $message
         ]);
     }
 
@@ -387,68 +425,103 @@ class Controller extends BaseController
      *
      * @throws \Alaress\Authorizer\Failure\Unauthorized
      **/
-    public function importUnit()
+    public function importTasks()
     {
-        // Test permissions. Must have write permission on the destination page and read permission
-        // on the course we are trying to import.
-
-        if (Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post["homepage"]]) < WRITE_ACCESS ||
-            Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS)
+        if (trim($this->getRequest()->post["homepage"]) == "")
         {
-            throw new \Alaress\Authorizer\Failure\Unauthorized;
+            // The homepage ID has gone missing
+
+            $this->throwError('No class code was specified');
         }
-
-        // Get the homepage we are importing into
-
-        $homepage = FolderMapper::getInstance()->findById($this->getRequest()->post["homepage"]);
-
-        // Create the component
-
-        $componentDefinition   = \Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Homepage_CourseOutlineController');
-        $componentDefinitionId = $componentDefinition->first()->getId();
-
-        $component = new \Component_Instance();
-        $component
-            ->setDefinitionId($componentDefinitionId)
-            ->setModule('homepage')
-            ->setIdentifier($homepage->getId())
-            ->setPosition('top')
-            ->setSequence(1);
-
-        \Component_InstanceMapper::getInstance()->save($component);
-
-        // And create a new unit instance for each one selected by the user selected
-
-        $unit_instance_list = new Collection();
-
-        foreach ($this->getRequest()->post["unit"] as $unit)
+        else if (trim($this->getRequest()->post["course_homepage"]) == "")
         {
-            $import = !empty($unit['import']);
+            // The course homepage ID has gone missing
 
-            if ($import)
+            $this->throwError('No course was specified');
+        }
+        else {
+
+            // Test permissions. Must have write permission on the destination page and read permission
+            // on the course we are trying to import.
+
+            if (Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post["homepage"]]) < WRITE_ACCESS ||
+                Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS
+            ) {
+                throw new \Alaress\Authorizer\Failure\Unauthorized;
+            }
+
+            // Get the homepage we are importing into
+
+            $homepage = FolderMapper::getInstance()->findById($this->getRequest()->post["homepage"]);
+
+            // Create the component
+
+            $componentDefinition = \Component_DefinitionMapper::getInstance()->findByColumn('class',
+                'Component_Homepage_CourseOutlineController');
+            $componentDefinitionId = $componentDefinition->first()->getId();
+
+            $component = new \Component_Instance();
+            $component
+                ->setDefinitionId($componentDefinitionId)
+                ->setModule('homepage')
+                ->setIdentifier($homepage->getId())
+                ->setPosition('top')
+                ->setSequence(1);
+
+            \Component_InstanceMapper::getInstance()->save($component);
+
+            // Check all required dates have been specified
+
+            $error = false;
+
+            foreach ($this->getRequest()->post["unit"] as $unit) {
+                $import = !empty($unit['import']);
+
+                if ($import) {
+                    if (trim($unit['open_date']) == '' || trim($unit['due_date']) == '') {
+                        $this->throwError('You must specify an open and close date for each unit you are importing');
+                        $error = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!$error)
             {
-                // Save the unit into the course.
+                // And create a new unit instance for each one selected by the user selected
 
-                $unit_homepage = FolderMapper::getInstance()->findById($unit['unit_id']);
-                $unit_instance = new UnitInstance();
+                $unit_instance_list = new Collection();
 
-                $unit_instance
-                    ->setComponent($component)
-                    ->setTitle($unit_homepage->getName())
-                    ->setCategory($homepage)
-                    ->setUnitCategory($unit_homepage)
-                    ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
-                    ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
+                foreach ($this->getRequest()->post["unit"] as $unit) {
+                    $import = !empty($unit['import']);
 
-                $unit_instance_list->add($unit_instance);
+                    if ($import) {
+                        // Save the unit into the course.
+
+                        $unit_homepage = FolderMapper::getInstance()->findById($unit['unit_id']);
+                        $unit_instance = new UnitInstance();
+
+                        $unit_instance
+                            ->setComponent($component)
+                            ->setTitle($unit_homepage->getName())
+                            ->setCategory($homepage)
+                            ->setUnitCategory($unit_homepage)
+                            ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
+                            ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
+
+                        $unit_instance_list->add($unit_instance);
+                    }
+                }
+
+                UnitInstanceMapper::getInstance()->save($unit_instance_list);
+
+                // Return the next fragment...
+
+                $this->getResponse()->content->set([
+                    'format' => 'file',
+                    'data' => 'Insert next fragment here'
+                ]);
             }
         }
-
-        UnitInstanceMapper::getInstance()->save($unit_instance_list);
-
-        // Not quite sure what to do here, probably going to be an XHR request and going to be used by the mage.
-        // Currently just sending back to homepage for testing.
-
-        $this->getResponse()->redirect->afterPost("/homepage/{$this->getRequest()->post["homepage"]}");
     }
 }

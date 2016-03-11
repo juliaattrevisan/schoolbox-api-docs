@@ -57,7 +57,7 @@ class Module extends BaseModule
             ],
             'POST' => [
                 '/unit/new'                             => 'newUnit',
-                '/unit/import'                          => 'importUnit',
+                '/importTasks'                          => 'importTasks',
                 '/importUnits'                          => 'importUnits',
             ]
         ];
