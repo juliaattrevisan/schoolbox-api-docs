@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course;
 use Alaress\Web\Controller\Base as BaseController;
 
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
@@ -369,13 +370,16 @@ class Controller extends BaseController
         $homepageId       = trim($this->getRequest()->post["importFolders"]);
         $courseHomepageId = trim($this->getRequest()->post["importCourse"]);
 
-        if ($this->courseMapper->findById($courseHomepageId)->getTaskCount() == 0)
-        {
-            // the nominated "course" is not actually a course...
+        try {
+            $this->getCourseMapper()->findCourseById($courseHomepageId);
 
+        } catch (MapperException $e) {
+            // the nominated "course" is not actually a course...
             $this->throwError('The selected source is not a course');
+            return;
         }
-        elseif ($homepageId == "" && $courseHomepageId == "")
+
+        if ($homepageId == "" && $courseHomepageId == "")
         {
             // They didn't select anything
 
