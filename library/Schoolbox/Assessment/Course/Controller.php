@@ -518,7 +518,10 @@ class Controller extends BaseController
                     \Component_InstanceMapper::getInstance()->save($componentCache[$homepageId]);
                 }
 
-                if (!$error) {
+                if ($error) {
+                    return;
+                }
+                try {
                     // Create new unit instances on each homepage
 
                     foreach ($homepages as $homepageId) {
@@ -556,6 +559,10 @@ class Controller extends BaseController
                         'format' => 'file',
                         'data' => 'Insert next fragment here'
                     ]);
+
+                } catch (\InvalidArgumentException $e) {
+                    // bad dates, most likely
+                    $this->throwError("Invalid date given");
                 }
             }
         }
