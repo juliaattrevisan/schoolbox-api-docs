@@ -9,6 +9,7 @@
  */
 namespace Schoolbox\Assessment\Course;
 
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -65,7 +66,7 @@ class Mapper extends FolderMapper
      *
      * @param $id
      * @return Folder
-     * @throws \Exception
+     * @throws MapperException
      */
     public function findCourseById($id)
     {
@@ -92,7 +93,7 @@ class Mapper extends FolderMapper
             return $this->hydrate($row);
         }
 
-        throw new \Exception('Course not found');
+        throw new MapperException('Course not found');
     }
 
     /**
