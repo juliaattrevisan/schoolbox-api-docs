@@ -366,19 +366,22 @@ class Controller extends BaseController
      */
     public function importUnits()
     {
-        if (trim($this->getRequest()->post["importFolders"]) == "" && trim($this->getRequest()->post["importCourse"]) == "")
+        $homepageId       = trim($this->getRequest()->post["importFolders"]);
+        $courseHomepageId = trim($this->getRequest()->post["importCourse"]);
+
+        if ($homepageId == "" && $courseHomepageId == "")
         {
             // They didn't select anything
 
             $this->throwError('You must select at least one class and a course to import before you can proceed');
         }
-        else if (trim($this->getRequest()->post["importFolders"]) == "")
+        else if ($homepageId == "")
         {
             // They didn't select a class code
 
             $this->throwError('You must select at least one class before you can proceed');
         }
-        else if (trim($this->getRequest()->post["importCourse"]) == "")
+        else if ($courseHomepageId == "")
         {
             // They didn't select a course to import
 
@@ -387,10 +390,6 @@ class Controller extends BaseController
         else
         {
             // Everything kosher, proceed with the mage
-
-            $homepageId = $this->getRequest()->post["importFolders"];
-            $courseHomepageId = $this->getRequest()->post["importCourse"];
-
             $folderMapper = FolderMapper::getInstance();
 
             $this->getResponse()->content->set([
