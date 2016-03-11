@@ -7,7 +7,11 @@
                 {# TODO: replace the first clause of the ternary with a routeLookup() once a route exists #}
                 {% set linkhref =
                     folder.id
-                        ? ['/course','import', folder.id, component.id ?: 0, course.id] | join('/')
+                        ? (
+                            component.id
+                                ? routeLookup('course.import', { courseId: course.id, classCode: folder.id })
+                                : ['/course','import', folder.id, component.id ?: 0, course.id] | join('/')
+                        )
                         : routeLookup('course.modifyCourse', { id: course.id }) %}
 
                 {% if hasTot %}
