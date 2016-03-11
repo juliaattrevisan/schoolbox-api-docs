@@ -691,11 +691,12 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         );
 
         // renamed
+        $boxType = $submissionBox->getWorkType()->getName();
         if (!empty($diff['name'])) {
             foreach ($students as $student) {
                 $bob = $this
                     ->setForNotifyRenamed($bob, $submissionBox, $diff, $user)
-                    ->setTitle(":child's quiz was renamed from :oldname to :newname in :catname")
+                    ->setTitle(":child's $boxType was renamed from :oldname to :newname in :catname")
                     ->unsetParam('author')
                     ->setParam('child', new UserParam($student))
                 ;
@@ -712,7 +713,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 $verb = $newDate > $oldDate ? 'extended' : 'changed';
                 $bob = $this
                     ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user)
-                    ->setTitle(":child's quiz :boxname closing date was $verb to :date in :catname")
+                    ->setTitle(":child's $boxType :boxname closing date was $verb to :date in :catname")
                     ->unsetParam('author')
                     ->setParam('child', new UserParam($student))
                 ;
@@ -745,7 +746,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             foreach ($students as $student) {
                 $bob = $this
                     ->setForNotifyUpdated($bob, $submissionBox, $user)
-                    ->setTitle(":child's quiz :quizname was updated in :catname")
+                    ->setTitle(":child's $boxType :boxname was updated in :catname")
                     ->unsetParam('author')
                     ->setParam('child', new UserParam($student))
                 ;
