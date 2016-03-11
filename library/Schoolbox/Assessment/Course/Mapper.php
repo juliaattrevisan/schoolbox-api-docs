@@ -344,7 +344,11 @@ class Mapper extends FolderMapper
 
         // Locate the unit we want to delete
 
-        $unit = $unitInstanceMapper->findById($id);
+        try {
+            $unit = $unitInstanceMapper->findById($id);
+        } catch (\Exception $e) {
+            $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+        }
 
         if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
         {

@@ -575,6 +575,10 @@ class Controller extends BaseController
     public function deleteUnit()
     {
         $this->getCourseMapper()->deleteUnit($this->getRequest()->post["id"]);
-        die(json_encode(['result' => 'success']));
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => ['result' => 'success']
+        ]);
     }
 }

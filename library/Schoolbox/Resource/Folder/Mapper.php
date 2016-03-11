@@ -1215,13 +1215,13 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
             // Make sure user has write permission to the folder
 
-            if (Access::getInstance()->getFolderAccess($this->sessionData["user"], [$id]) >= WRITE_ACCESS) {
+            if (Access::getInstance()->getFolderAccess($_SESSION["user"] == null, [$id]) >= WRITE_ACCESS) {
 
                 // If the folder has children, then we will only allow superusers to delete it
 
                 if ($folderMapper->countByColumn('parent', $id))
                 {
-                    if (!$this->sessionData["user"]->isSuperuser())
+                    if (!$_SESSION["user"]->isSuperuser())
                     {
                         throw new \Exception('Access Denied');
                     }
@@ -1257,8 +1257,8 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         // Check folder access
 
-        if (Access::getInstance()->getFolderAccess($this->sessionData["user"], [$source]) < WRITE_ACCESS ||
-            Access::getInstance()->getFolderAccess($this->sessionData["user"], [$destination]) < WRITE_ACCESS
+        if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$source]) < WRITE_ACCESS ||
+            Access::getInstance()->getFolderAccess($_SESSION["user"], [$destination]) < WRITE_ACCESS
         ) {
             $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
