@@ -483,76 +483,73 @@ class Controller extends BaseController
             if (!$foundUnit) {
                 $this->throwError('You must select at least one unit to import');
             }
-
-            // Create the component on each homepage
-
-            $unitCache = [];
-            $homepageCache = [];
-            $componentCache = [];
-
-            foreach ($homepages as $homepageId)
+            else
             {
-                // Get the homepage we are importing into and store it for later
+                // Create the component on each homepage
 
-                $homepageCache[$homepageId] = FolderMapper::getInstance()->findById($homepageId);
+                $unitCache = [];
+                $homepageCache = [];
+                $componentCache = [];
 
-                $componentDefinition = \Component_DefinitionMapper::getInstance()->findByColumn('class',
-                    'Component_Homepage_CourseOutlineController');
-                $componentDefinitionId = $componentDefinition->first()->getId();
+                foreach ($homepages as $homepageId) {
+                    // Get the homepage we are importing into and store it for later
 
-                $componentCache[$homepageId] = new \Component_Instance();
-                $componentCache[$homepageId]
-                    ->setDefinitionId($componentDefinitionId)
-                    ->setModule('homepage')
-                    ->setIdentifier($homepageId)
-                    ->setPosition('top')
-                    ->setSequence(1);
+                    $homepageCache[$homepageId] = FolderMapper::getInstance()->findById($homepageId);
 
-                \Component_InstanceMapper::getInstance()->save($componentCache[$homepageId]);
-            }
+                    $componentDefinition = \Component_DefinitionMapper::getInstance()->findByColumn('class',
+                        'Component_Homepage_CourseOutlineController');
+                    $componentDefinitionId = $componentDefinition->first()->getId();
 
-            if (!$error)
-            {
-                // Create new unit instances on each homepage
+                    $componentCache[$homepageId] = new \Component_Instance();
+                    $componentCache[$homepageId]
+                        ->setDefinitionId($componentDefinitionId)
+                        ->setModule('homepage')
+                        ->setIdentifier($homepageId)
+                        ->setPosition('top')
+                        ->setSequence(1);
 
-                foreach ($homepages as $homepageId)
-                {
-                    $unit_instance_list = new Collection();
-
-                    foreach ($this->getRequest()->post["unit"] as $unit)
-                    {
-                        $import = !empty($unit['import']);
-
-                        if ($import)
-                        {
-                            // Save the unit into the course.
-
-                            if (!isset($unitCache[$unit['unit_id']])) {
-                                $unitCache[$unit['unit_id']] = FolderMapper::getInstance()->findById($unit['unit_id']);
-                            }
-                            $unit_instance = new UnitInstance();
-
-                            $unit_instance
-                                ->setComponent($componentCache[$homepageId])
-                                ->setTitle($unitCache[$unit['unit_id']]->getName())
-                                ->setCategory($homepageCache[$homepageId])
-                                ->setUnitCategory($unitCache[$unit['unit_id']])
-                                ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
-                                ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
-
-                            $unit_instance_list->add($unit_instance);
-                        }
-                    }
-
-                    UnitInstanceMapper::getInstance()->save($unit_instance_list);
+                    \Component_InstanceMapper::getInstance()->save($componentCache[$homepageId]);
                 }
 
-                // Return the next fragment...
+                if (!$error) {
+                    // Create new unit instances on each homepage
 
-                $this->getResponse()->content->set([
-                    'format' => 'file',
-                    'data' => 'Insert next fragment here'
-                ]);
+                    foreach ($homepages as $homepageId) {
+                        $unit_instance_list = new Collection();
+
+                        foreach ($this->getRequest()->post["unit"] as $unit) {
+                            $import = !empty($unit['import']);
+
+                            if ($import) {
+                                // Save the unit into the course.
+
+                                if (!isset($unitCache[$unit['unit_id']])) {
+                                    $unitCache[$unit['unit_id']] = FolderMapper::getInstance()->findById($unit['unit_id']);
+                                }
+                                $unit_instance = new UnitInstance();
+
+                                $unit_instance
+                                    ->setComponent($componentCache[$homepageId])
+                                    ->setTitle($unitCache[$unit['unit_id']]->getName())
+                                    ->setCategory($homepageCache[$homepageId])
+                                    ->setUnitCategory($unitCache[$unit['unit_id']])
+                                    ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
+                                    ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
+
+                                $unit_instance_list->add($unit_instance);
+                            }
+                        }
+
+                        UnitInstanceMapper::getInstance()->save($unit_instance_list);
+                    }
+
+                    // Return the next fragment...
+
+                    $this->getResponse()->content->set([
+                        'format' => 'file',
+                        'data' => 'Insert next fragment here'
+                    ]);
+                }
             }
         }
     }
