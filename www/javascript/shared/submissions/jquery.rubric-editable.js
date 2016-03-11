@@ -303,6 +303,13 @@
 
         });
 
+        // aaand meaningful-transition out
+        $rb.find('td.' + opt.hideHorizontalClass + ', th.' + opt.hideHorizontalClass).removeClass(opt.hideHorizontalClass);
+
+        // focus on the newly-created level input
+        var $levels = $rb.children('thead').find('input[data-level]');
+        $levels.eq(-1).focus();
+
         // Once level is added, scroll to it
         $rb.closest('.scrollable').scrollTo(
             $rb.find('[data-spawn="level"]'),
@@ -313,13 +320,6 @@
                 duration: 0
             }
         );
-
-        // aaand meaningful-transition out
-        $rb.find('td.' + opt.hideHorizontalClass + ', th.' + opt.hideHorizontalClass).removeClass(opt.hideHorizontalClass);
-
-        // focus on the newly-created level input
-        var $levels = $rb.children('thead').find('input[data-level]');
-        $levels.eq(-1).focus();
 
         // permit up to 11 levels
         if (opt.levelLimit > 0 && $levels.length >= opt.levelLimit) {
