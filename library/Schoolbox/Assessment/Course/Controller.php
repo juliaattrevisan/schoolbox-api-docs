@@ -574,7 +574,7 @@ class Controller extends BaseController
      */
     public function deleteUnit()
     {
-        CourseMapper::getInstance()->deleteUnit($this->getRequest()->post["id"]);
+        $this->getCourseMapper()->deleteUnit($this->getRequest()->post["id"]);
         die(json_encode(['result' => 'success']));
     }
 }
