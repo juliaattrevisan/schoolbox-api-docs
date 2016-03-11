@@ -40,27 +40,12 @@ class Controller extends BaseController
      */
     private $courseMapper = null;
 
-    /**
-     * A FolderMapper instance
-     *
-     * @var FolderMapper
-     */
-    private $folderMapper = null;
-
-    /**
-     * A TaskMapper instance
-     *
-     * @var null
-     */
-    private $taskMapper = null;
 
     /**
      */
     public function __construct()
     {
         $this->setCourseMapper(CourseMapper::getInstance());
-        $this->setFolderMapper(FolderMapper::getInstance());
-        $this->setTaskMapper(TaskMapper::getInstance());
     }
 
 
@@ -648,45 +633,6 @@ class Controller extends BaseController
         }
     }
 
-    /**
-     * Get folder mapper
-     *
-     * @return FolderMapper
-     */
-    private function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-    /**
-     * Set folder mapper
-     *
-     * @param FolderMapper $folderMapper
-     */
-    private function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-    }
-
-    /**
-     * Get task mapper
-     *
-     * @return null
-     */
-    private function getTaskMapper()
-    {
-        return $this->taskMapper;
-    }
-
-    /**
-     * Set task mapper
-     *
-     * @param null $taskMapper
-     */
-    private function setTaskMapper($taskMapper)
-    {
-        $this->taskMapper = $taskMapper;
-    }
 
     /**
      * Retrieve fragment with units in the selected course, and checkboxes/dates for selection
