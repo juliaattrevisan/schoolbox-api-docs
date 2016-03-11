@@ -421,7 +421,7 @@ class Controller extends BaseController
     }
 
     /**
-     * Import a course into a component
+     * Imports a course into a list of homepages
      *
      * @throws \Alaress\Authorizer\Failure\Unauthorized
      **/
@@ -441,34 +441,24 @@ class Controller extends BaseController
         }
         else {
 
+            $homepages = explode(",", $this->getRequest()->post["homepage"]);
+
             // Test permissions. Must have write permission on the destination page and read permission
             // on the course we are trying to import.
 
-            if (Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post["homepage"]]) < WRITE_ACCESS ||
-                Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS
-            ) {
+            // Test course page read access
+
+            if (Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
                 throw new \Alaress\Authorizer\Failure\Unauthorized;
             }
 
-            // Get the homepage we are importing into
+            // Test each homepage for write access
 
-            $homepage = FolderMapper::getInstance()->findById($this->getRequest()->post["homepage"]);
-
-            // Create the component
-
-            $componentDefinition = \Component_DefinitionMapper::getInstance()->findByColumn('class',
-                'Component_Homepage_CourseOutlineController');
-            $componentDefinitionId = $componentDefinition->first()->getId();
-
-            $component = new \Component_Instance();
-            $component
-                ->setDefinitionId($componentDefinitionId)
-                ->setModule('homepage')
-                ->setIdentifier($homepage->getId())
-                ->setPosition('top')
-                ->setSequence(1);
-
-            \Component_InstanceMapper::getInstance()->save($component);
+            foreach ($homepages as $homepage) {
+                if (Access::getInstance()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
+                    throw new \Alaress\Authorizer\Failure\Unauthorized;
+                }
+            }
 
             // Check all required dates have been specified
 
@@ -486,34 +476,68 @@ class Controller extends BaseController
                 }
             }
 
+            // Create the component on each homepage
+
+            $unitCache = [];
+            $homepageCache = [];
+            $componentCache = [];
+
+            foreach ($homepages as $homepageId)
+            {
+                // Get the homepage we are importing into and store it for later
+
+                $homepageCache[$homepageId] = FolderMapper::getInstance()->findById($homepageId);
+
+                $componentDefinition = \Component_DefinitionMapper::getInstance()->findByColumn('class',
+                    'Component_Homepage_CourseOutlineController');
+                $componentDefinitionId = $componentDefinition->first()->getId();
+
+                $componentCache[$homepageId] = new \Component_Instance();
+                $componentCache[$homepageId]
+                    ->setDefinitionId($componentDefinitionId)
+                    ->setModule('homepage')
+                    ->setIdentifier($homepageId)
+                    ->setPosition('top')
+                    ->setSequence(1);
+
+                \Component_InstanceMapper::getInstance()->save($componentCache[$homepageId]);
+            }
+
             if (!$error)
             {
-                // And create a new unit instance for each one selected by the user selected
+                // Create new unit instances on each homepage
 
-                $unit_instance_list = new Collection();
+                foreach ($homepages as $homepageId)
+                {
+                    $unit_instance_list = new Collection();
 
-                foreach ($this->getRequest()->post["unit"] as $unit) {
-                    $import = !empty($unit['import']);
+                    foreach ($this->getRequest()->post["unit"] as $unit)
+                    {
+                        $import = !empty($unit['import']);
 
-                    if ($import) {
-                        // Save the unit into the course.
+                        if ($import)
+                        {
+                            // Save the unit into the course.
 
-                        $unit_homepage = FolderMapper::getInstance()->findById($unit['unit_id']);
-                        $unit_instance = new UnitInstance();
+                            if (!isset($unitCache[$unit['unit_id']])) {
+                                $unitCache[$unit['unit_id']] = FolderMapper::getInstance()->findById($unit['unit_id']);
+                            }
+                            $unit_instance = new UnitInstance();
 
-                        $unit_instance
-                            ->setComponent($component)
-                            ->setTitle($unit_homepage->getName())
-                            ->setCategory($homepage)
-                            ->setUnitCategory($unit_homepage)
-                            ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
-                            ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
+                            $unit_instance
+                                ->setComponent($componentCache[$homepageId])
+                                ->setTitle($unitCache[$unit['unit_id']]->getName())
+                                ->setCategory($homepageCache[$homepageId])
+                                ->setUnitCategory($unitCache[$unit['unit_id']])
+                                ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
+                                ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
 
-                        $unit_instance_list->add($unit_instance);
+                            $unit_instance_list->add($unit_instance);
+                        }
                     }
-                }
 
-                UnitInstanceMapper::getInstance()->save($unit_instance_list);
+                    UnitInstanceMapper::getInstance()->save($unit_instance_list);
+                }
 
                 // Return the next fragment...
 
