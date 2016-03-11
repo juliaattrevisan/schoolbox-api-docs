@@ -515,11 +515,7 @@
 
                 /* CSS for indicating which data to "make blank"
                  */
-                css: 'span.selected-word { background: #cae9b9; }',
-
-                /* Icon for the Make Blank Button
-                 */
-                icon: '/images/core/assess/fillgap.png'
+                css: 'span.selected-word { background: #cae9b9; }'
             }
 
             var merged = $.extend(defaults, derived, options);
@@ -568,11 +564,10 @@
                         }
                     });
 
-                    instance.ui.addButton('MakeBlank', { // add new button and bind our command
+                    instance.ui.addButton('schoolboxMakeBlank', { // add new button and bind our command
                         label: "Make Blank",
                         command: 'makeBlank',
-                        toolbar: 'schoolbox',
-                        icon: config.icon
+                        toolbar: 'schoolbox'
                     });
                 }
             });

@@ -539,7 +539,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                             {
                                 type: 'button',
                                 id: 'schoolboxresource-browse',
-                                label: 'Browse',
+                                label: 'Choose File',
                                 className: 'schoolboxresource-button',
                                 onClick: function() {
                                     var dialog = this.getDialog();

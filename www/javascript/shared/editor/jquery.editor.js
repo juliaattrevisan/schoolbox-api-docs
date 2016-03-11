@@ -211,7 +211,7 @@
                      * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
                      * This is typically not used for anything else for now
                      */
-                    {name: 'schoolbox', groups: ['schoolboxlink','schoolboxresource', 'schoolboxiframe']},
+                    {name: 'schoolbox', groups: ['schoolboxlink', 'schoolboxanchor', 'schoolboxresource', 'schoolboxiframe']},
                     {name: 'insert', groups: ['insert']},
                     '/',
                     {name: 'styles', groups: ['styles']},
@@ -255,7 +255,7 @@
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */
                 removePlugins: 'image,image2,uploadimage,link',
-                extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink',
+                extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink,schoolboxanchor',
 
                 /* Other settings
                  */

@@ -2,7 +2,6 @@
 * http://docs.ckeditor.com/#!/guide/plugin_sdk_sample_1
 */
 CKEDITOR.plugins.add('schoolboxlink', {
-    icons: 'link,unlink',
     init: function(editorInstance) {
         editorInstance.addCommand('schoolboxlink', new CKEDITOR.dialogCommand('schoolboxlinkDialog'));
 
