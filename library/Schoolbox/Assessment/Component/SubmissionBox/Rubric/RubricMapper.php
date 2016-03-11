@@ -389,11 +389,12 @@ class RubricMapper
     /**
      * @param IStorage $file
      * @param int      $folderId
+     * @param int      $maxLevels
      * @param bool     $taskMode
      * @throws \Schoolbox\Resource\Exception
      * @return Rubric
      */
-    public function buildFromCSV(IStorage $file, $folderId, $taskMode)
+    public function buildFromCSV(IStorage $file, $folderId, $maxLevels, $taskMode)
     {
         $square = [];
 
@@ -406,7 +407,7 @@ class RubricMapper
 
         $fp = $file->readStream();
 
-        $headerRow = $this->getcsv($fp);
+        $headerRow = $this->getcsv($fp, $maxLevels + 2);
 
         // must be an array, and must have at least 3 "cells"
         if (!is_array($headerRow) || count($headerRow) < 3) {
@@ -428,7 +429,7 @@ class RubricMapper
         $criteria = [];
 
         // build the square, extracting data as we go
-        while ($row = $this->getcsv($fp)) {
+        while ($row = $this->getcsv($fp, $maxLevels + 2)) {
 
             // list of criteria, grouped by... uh, group
             if ($row[0]) {
