@@ -45,6 +45,8 @@
             value: {{ destinations|json_encode|raw }}
         });
 
+        var $importUnits = $('#importUnits');
+
         {# default mage init #}
 
         $('input[data-mage-next]').mage();
@@ -52,16 +54,16 @@
         $('input[data-mage-next="part-unit-select"]').mage({onXhrDone: function(data) {
             /* Clear current information
              */
-            $('#importUnits').html('').addClass('loader');
-            $('#importUnits').html(data).removeClass('loader');
+            $importUnits.html('').addClass('loader');
+            $importUnits.html(data).removeClass('loader');
 
             {# After loading in the next fragment init the mage #}
 
             $('input[data-mage-next="part-tasks-select"]').mage({onXhrDone: function(data) {
                 /* Clear current information
                  */
-                $('#importResults').html('').addClass('loader');
-                $('#importResults').html(data).removeClass('loader');
+                $importUnits.html('').addClass('loader');
+                $importUnits.html(data).removeClass('loader');
 
             }});
         }});
