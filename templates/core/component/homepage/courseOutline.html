@@ -121,8 +121,7 @@
                         </ul>
                         <!-- END unit_actions -->
 
-                        <form action="/course/outline/modifyForm.php" method="post" data-form_type="delete_unit" class="hide">
-                            <input type="hidden" name="action"    value="delete" />
+                        <form action="/course/unit/delete" method="post" data-form_type="delete_unit" class="hide">
                             <input type="hidden" name="id"        value="{UNIT_ID}" />
                             <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
                         </form>

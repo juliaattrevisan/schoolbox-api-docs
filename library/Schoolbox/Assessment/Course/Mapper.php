@@ -14,6 +14,8 @@ use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Ancestry;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Mapper extends FolderMapper
 {
@@ -326,4 +328,42 @@ class Mapper extends FolderMapper
     {
         $this->ancestry = $ancestry;
     }
+
+    /**
+     * Delete unit from course
+     *
+     * @param Int $id
+     */
+    public function deleteUnit($id)
+    {
+        // Grab handles to the mappers as we'll reuse them
+
+        $errorMapper = ErrorMapper::getInstance();
+        $folderMapper = FolderMapper::getInstance();
+        $unitInstanceMapper = UnitInstanceMapper::getInstance();
+
+        // Locate the unit we want to delete
+
+        try {
+            $unit = $unitInstanceMapper->findById($id);
+        } catch (\Exception $e) {
+            $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+        }
+
+        if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
+        {
+            try {
+                $folderMapper->deleteFolder($unit->getUnitCategory()->getId());
+            } catch (\Exception $e) {
+                $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+            }
+
+            $unitInstanceMapper->delete($unit);
+        }
+        else
+        {
+            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+        }
+    }
+
 }

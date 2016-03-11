@@ -1,0 +1,174 @@
+{# Iterate through each unit being imported#}
+
+{% for unit in units %}
+
+    <h1>{{ unit.name }}</h1>
+
+    {% if unit.tasks | length > 0 %}
+
+        {# Tasks for the current unit #}
+
+        <h2>Tasks</h2>
+
+        <ul class="information-list">
+
+            {% for task in unit.tasks %}
+
+                <li>
+                    <div class="list-item" data-type="unit_row">
+
+                        {# Task name #}
+
+                        <div class="avatar card small-12">
+                            {{ task.getTitle }}
+                        </div>
+
+                    </div>
+                </li>
+
+            {% endfor %}
+
+        </ul>
+
+    {% endif %}
+
+    {% if unit.dueWork | length > 0 %}
+
+        {# Due work for the current unit #}
+
+        <h2>Due Work</h2>
+
+        <ul class="information-list">
+
+            {% for work in unit.dueWork %}
+
+                <li>
+                    <div class="list-item" data-type="unit_row">
+
+                        {# Due work name #}
+
+                        <div class="avatar card small-4">
+                            {{ work.getName }}
+                        </div>
+
+                        {# Publish Date #}
+
+                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                            {% if work.getPublishDate != '' %}
+                                <label for="publish_date-{{ work.getId }}-{{ loop.index }}">Publish Date</label>
+                                <input id=""
+                                       name=""
+                                       type="text"
+                                       value=""
+                                       data-role=""
+                                       data-datepicker />
+
+                            {% endif %}
+                        </div>
+
+                        {# Open Date #}
+
+                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                            {% if work.getOpenDate != '' %}
+                                <label for="open_date-{{ work.getId }}-{{ loop.index }}">Open Date</label>
+                                <input id=""
+                                       name=""
+                                       type="text"
+                                       value=""
+                                       data-role=""
+                                       data-datepicker />
+
+                            {% endif %}
+                        </div>
+
+                        {# Due Date #}
+
+                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                            {% if work.getDueDate != '' %}
+                                <label for="due_date-{{ work.getId }}-{{ loop.index }}">Due Date</label>
+                                <input id=""
+                                       name=""
+                                       type="text"
+                                       value=""
+                                       data-role=""
+                                       data-datepicker />
+
+                            {% endif %}
+                        </div>
+
+                        {# Late Date #}
+
+                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                            {% if work.getLateDate != '' %}
+                                <label for="late_date-{{ work.getId }}-{{ loop.index }}">Late Date</label>
+                                <input id=""
+                                       name=""
+                                       type="text"
+                                       value=""
+                                       data-role=""
+                                       data-datepicker />
+
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </li>
+
+            {% endfor %}
+
+        </ul>
+
+    {% endif %}
+
+    {% if unit.quizzes | length > 0 %}
+
+        {# Tasks for the current unit #}
+
+        <h2>Quizzes</h2>
+
+        <ul class="information-list">
+
+            {% for quiz in unit.quizzes %}
+
+                <li>
+                    <div class="list-item" data-type="unit_row">
+
+                        {# Task name #}
+
+                        <div class="avatar card small-8">
+                            {{ quiz.getTitle }}
+                        </div>
+
+                        {# Open Date #}
+
+                        <div class="medium-2 columns">
+                            <label for="">Open Date</label>
+                            <input id=""
+                                   name=""
+                                   type="text"
+                                   value=""
+                                   data-role=""
+                                   data-datepicker />
+                        </div>
+
+                        {# Close Date #}
+
+                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                            <label for="close_date-{{ work.getId }}-{{ loop.index }}">Close Date</label>
+                            <input id=""
+                                   name=""
+                                   type="text"
+                                   value=""
+                                   data-role=""
+                                   data-datepicker />
+                        </div>
+                    </div>
+                </li>
+
+            {% endfor %}
+
+        </ul>
+
+    {% endif %}
+
+{% endfor %}

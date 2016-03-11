@@ -16,10 +16,11 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
+use Schoolbox\Resource\Group;
 use Schoolbox\Permission\Access\Access;
 
 class Controller extends BaseController
@@ -566,5 +567,18 @@ class Controller extends BaseController
                 }
             }
         }
+    }
+
+    /**
+     * Delete unit from course
+     */
+    public function deleteUnit()
+    {
+        $this->getCourseMapper()->deleteUnit($this->getRequest()->post["id"]);
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => ['result' => 'success']
+        ]);
     }
 }

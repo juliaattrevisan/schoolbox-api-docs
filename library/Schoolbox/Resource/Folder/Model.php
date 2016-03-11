@@ -327,6 +327,21 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
+     * Check if the folder is a group
+     *
+     * @return boolean
+     */
+    public function isGroup()
+    {
+        if ($this->getGroup() != null) {
+
+            return $this->getGroup()->getType() != null;
+        }
+
+        return false;
+    }
+
+    /**
      * Get group
      *
      * @return \Schoolbox\Resource\Group

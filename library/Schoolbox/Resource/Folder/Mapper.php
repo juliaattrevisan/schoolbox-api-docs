@@ -23,6 +23,9 @@ use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Zend\Json\Server\Error;
 
 /**
  * Class Mapper
@@ -37,6 +40,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 {
     const INHERIT_ON = 1;
     const INHERIT_OFF = 0;
+    const FOLDER_ROOT = 0;
 
     /**
      * Maximum number of recursion iterations to execute before dying
@@ -1189,5 +1193,109 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     protected function setMaxRecursionDepth($maxRecursionDepth)
     {
         $this->maxRecursionDepth = $maxRecursionDepth;
+    }
+
+    /**
+     * Delete folder and children
+     *
+     * @param Int $id
+     * @throws \Exception
+     */
+    public function deleteFolder($id)
+    {
+        // Grab handle to mapper as we'll reuse it
+
+        $folderMapper = FolderMapper::getInstance();
+
+        try
+        {
+            // Find the folder object
+
+            $folder = $folderMapper->findById($id);
+
+            // Make sure user has write permission to the folder
+
+            if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$id]) >= WRITE_ACCESS) {
+
+                // If the folder has children, then we will only allow superusers to delete it
+
+                if ($folderMapper->countByColumn('parent', $id))
+                {
+                    if (!$_SESSION["user"]->isSuperuser())
+                    {
+                        throw new \Exception('Access Denied');
+                    }
+                }
+
+                // Deletes all contents of this folder and all of its children.
+
+                $folderMapper->recursiveDelete($folder);
+            }
+        }
+        catch (\Exception $e)
+        {
+            // Permission denied or something wasn't found, do nothing and just return. The folder won't have
+            // been deleted.
+        }
+    }
+
+    /**
+     * Move folder to new parent with permission check
+     *
+     * @param Int $source
+     * @param Int $destination
+     * @throws \Exception
+     */
+    public function moveFolder($source, $destination)
+    {
+        $errorMapper = ErrorMapper::getInstance();
+
+        // Check if there is nothing to do
+
+        if ($source == $destination)
+            exit;
+
+        // Check folder access
+
+        if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$source]) < WRITE_ACCESS ||
+            Access::getInstance()->getFolderAccess($_SESSION["user"], [$destination]) < WRITE_ACCESS
+        ) {
+            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+        }
+
+        // Grab folder object
+
+        $folderMapper = FolderMapper::getInstance();
+
+        $movedFolder  = $folderMapper->findById($source);
+        $parentFolder = $folderMapper->findById($destination);
+
+        // Make sure the moved folder is not going to be its own ancestor
+
+        foreach ($folderMapper->findParents($parentFolder) as $ancestor) {
+            if ($ancestor->getId() == $movedFolder->getId()) {
+                $errorMapper->generateException(ErrorMapper::ERROR_DATABASE, $e);
+            }
+        }
+
+        $folderMapper->save($movedFolder->setParent($parentFolder));
+    }
+
+    /**
+     * Apply inherited permissions checkbox DOWN the tree
+     *
+     * @param Model $model
+     * @throws \Exception
+     */
+    public function recurseInheritance(Model $model)
+    {
+        $folders = $this->findAllChildren($model->getId(), true);
+        foreach ($folders as $folder)
+
+        {
+            $folder->setInherit($model->getInherit());
+            $this->save($folder);
+            $this->recurseInheritance($folder);
+        }
     }
 }
