@@ -1215,7 +1215,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
             // Make sure user has write permission to the folder
 
-            if (Access::getInstance()->getFolderAccess($_SESSION["user"] == null, [$id]) >= WRITE_ACCESS) {
+            if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$id]) >= WRITE_ACCESS) {
 
                 // If the folder has children, then we will only allow superusers to delete it
 
