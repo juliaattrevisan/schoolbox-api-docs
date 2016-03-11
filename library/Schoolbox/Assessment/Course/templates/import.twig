@@ -52,10 +52,8 @@
         $('input[data-mage-next]').mage();
 
         $('input[data-mage-next="part-unit-select"]').mage({onXhrDone: function(data) {
-            /* Clear current information
-             */
-            $importUnits.html('').addClass('loader');
-            $importUnits.html(data).removeClass('loader');
+            // set content
+            $importUnits.html(data);
 
             {# After loading in the next fragment init the mage #}
 
@@ -110,12 +108,16 @@
 
                 <fieldset class="content" data-mage="part-unit-select">
                     <legend>Units</legend>
-                    <div id="importUnits"></div>
+                    <div class="small-12 column hide" data-mage-collapsed>
+                        <div id="importUnits"></div>
+                    </div>
                 </fieldset>
 
                 <fieldset class="content" data-mage="part-tasks-select">
                     <legend>Coursework</legend>
-                    <div id="importResults">
+                    <div class="small-12 column hide" data-mage-collapsed>
+                        <div id="importResults">
+                    </div>
 {#
                         {% if folder.id %}
                             {% include '@course/import/results.twig' %}
