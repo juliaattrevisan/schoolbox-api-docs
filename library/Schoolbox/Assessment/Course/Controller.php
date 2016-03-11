@@ -463,17 +463,25 @@ class Controller extends BaseController
             // Check all required dates have been specified
 
             $error = false;
+            $foundUnit = false;
 
             foreach ($this->getRequest()->post["unit"] as $unit) {
                 $import = !empty($unit['import']);
 
                 if ($import) {
+                    $foundUnit = true;
                     if (trim($unit['open_date']) == '' || trim($unit['due_date']) == '') {
                         $this->throwError('You must specify an open and close date for each unit you are importing');
                         $error = true;
                         break;
                     }
                 }
+            }
+
+            // Make sure at least one unit was specified
+
+            if (!$foundUnit) {
+                $this->throwError('You must select at least one unit to import');
             }
 
             // Create the component on each homepage
