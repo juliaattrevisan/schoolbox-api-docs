@@ -310,6 +310,17 @@
         var $levels = $rb.children('thead').find('input[data-level]');
         $levels.eq(-1).focus();
 
+        // Once level is added, scroll to it
+        $rb.closest('.scrollable').scrollTo(
+            $rb.find('[data-spawn="level"]'),
+            {
+                scrollX: true,
+                scrollY: false,
+                offsetLeft: 0,
+                duration: 0
+            }
+        );
+
         // permit up to 11 levels
         if (opt.levelLimit > 0 && $levels.length >= opt.levelLimit) {
             $levels.find('[data-spawn]').addClass('hide');
