@@ -45,24 +45,23 @@
             value: {{ destinations|json_encode|raw }}
         });
 
-        var $importUnits = $('#importUnits');
-
         {# default mage init #}
 
         $('input[data-mage-next]').mage();
 
         $('input[data-mage-next="part-unit-select"]').mage({onXhrDone: function(data) {
             // set content
-            $importUnits.html(data);
+            $('#importUnits').html(data);
 
             {# After loading in the next fragment init the mage #}
 
             $('input[data-mage-next="part-tasks-select"]').mage({onXhrDone: function(data) {
-                /* Clear current information
-                 */
-                $importUnits.html('').addClass('loader');
-                $importUnits.html(data).removeClass('loader');
 
+                // slide away the things we're not using
+                $('#importUnits').find('input[type=checkbox]').filter(':not(:checked)').closest('li').slideUp();
+
+                // set content
+                $('#importTasks').html(data);
             }});
         }});
 
@@ -116,7 +115,7 @@
                 <fieldset class="content" data-mage="part-tasks-select">
                     <legend>Coursework</legend>
                     <div class="small-12 column hide" data-mage-collapsed>
-                        <div id="importResults">
+                        <div id="importTasks">
                     </div>
 {#
                         {% if folder.id %}
