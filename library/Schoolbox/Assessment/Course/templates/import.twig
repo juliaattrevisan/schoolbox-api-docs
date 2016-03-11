@@ -22,7 +22,10 @@
                 $('body').on('click', '#course-selector-results [data-course-id]', function(event) {
                     event.preventDefault();
 
-                    $('input[name=parent]').val($(this).attr('data-course-id'));
+                    // Have to manually call the change event as it doesn't trigger on scripted value updates
+
+                    $('#importCourse').val($(this).attr('data-course-id')).change();
+
                     $('[data-course-selector]').html($(this).attr('data-course-name'));
 
                     /* Shut it, I guess
@@ -42,23 +45,25 @@
             value: {{ destinations|json_encode|raw }}
         });
 
-{#
-        /* Whenever you choose a Course, find out what
-         * the Units and Tasks are
-         */
-        $(document).on('change', '#import-course', function(event) {
-
-            /* Clear current information
-             */
-            $('#importResults').html('').addClass('loader');
-
-            $.get('/course/importResults/' + $(this).val(), function (responseText) {
-                $('#importResults').html(responseText).removeClass('loader');
-            });
-        });
-#}
         {# default mage init #}
+
         $('input[data-mage-next]').mage();
+
+        $('input[data-mage-next="part-unit-select"]').mage({onXhrDone: function(data) {
+            // set content
+            $('#importUnits').html(data);
+
+            {# After loading in the next fragment init the mage #}
+
+            $('input[data-mage-next="part-tasks-select"]').mage({onXhrDone: function(data) {
+
+                // slide away the things we're not using
+                $('#importUnits').find('input[type=checkbox]').filter(':not(:checked)').closest('li').slideUp();
+
+                // set content
+                $('#importTasks').html(data);
+            }});
+        }});
 
     });
 </script>
@@ -72,7 +77,7 @@
                     <div class="small-5 medium-5 large-3 columns">
                         {% include 'sub/selectorShard.twig' with {
                                 'formLabel': 'Course',
-                                'formInputName': 'parent',
+                                'formInputName': 'importCourse',
                                 'folder': folder,
                                 'activator': 'data-course-selector',
                                 'title': 'Select Course to import'
@@ -87,24 +92,31 @@
                             <input id="import-folders" type="text" name="importFolders" />
                         </label>
                     </div>
+
                     <div class="small-12 column">
                         <div class="row" data-mage-submitrow>
                             <div class="small-12 medium-8 column">
                                 <p class="alert alert-box icon-alert" data-mage-error></p>
                             </div>
                             <div class="small-12 medium-4 column">
-                                <input type="submit" name="part-course-select" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="/course/importResults" />
+                                <input type="submit" name="part-course-select" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="/course/importUnits" />
                             </div>
                         </div>
                     </div>
                 </fieldset>
+
                 <fieldset class="content" data-mage="part-unit-select">
                     <legend>Units</legend>
-                    {# include content from SB-11472 here #}
+                    <div class="small-12 column hide" data-mage-collapsed>
+                        <div id="importUnits"></div>
+                    </div>
                 </fieldset>
+
                 <fieldset class="content" data-mage="part-tasks-select">
                     <legend>Coursework</legend>
-                    <div id="importResults">
+                    <div class="small-12 column hide" data-mage-collapsed>
+                        <div id="importTasks">
+                    </div>
 {#
                         {% if folder.id %}
                             {% include '@course/import/results.twig' %}

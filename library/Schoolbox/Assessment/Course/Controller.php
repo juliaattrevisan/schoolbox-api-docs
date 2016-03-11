@@ -10,6 +10,8 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller\Base as BaseController;
 
+use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
@@ -18,6 +20,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
+use Schoolbox\Permission\Access\Access;
 
 class Controller extends BaseController
 {
@@ -356,5 +359,212 @@ class Controller extends BaseController
     private function setTaskMapper($taskMapper)
     {
         $this->taskMapper = $taskMapper;
+    }
+
+    /**
+     * Retrieve fragment with units in the selected course, and checkboxes/dates for selection
+     *
+     */
+    public function importUnits()
+    {
+        $homepageId       = trim($this->getRequest()->post["importFolders"]);
+        $courseHomepageId = trim($this->getRequest()->post["importCourse"]);
+
+        try {
+            $this->getCourseMapper()->findCourseById($courseHomepageId);
+
+        } catch (MapperException $e) {
+            // the nominated "course" is not actually a course...
+            $this->throwError('The selected source is not a course');
+            return;
+        }
+
+        if ($homepageId == "" && $courseHomepageId == "")
+        {
+            // They didn't select anything
+
+            $this->throwError('You must select at least one class and a course to import before you can proceed');
+        }
+        else if ($homepageId == "")
+        {
+            // They didn't select a class code
+
+            $this->throwError('You must select at least one class before you can proceed');
+        }
+        else if ($courseHomepageId == "")
+        {
+            // They didn't select a course to import
+
+            $this->throwError('You must select a course to import before you can proceed');
+        }
+        else
+        {
+            // Everything kosher, proceed with the mage
+            $this->getResponse()->content->set([
+                'template' => "@course/unitImportForm.twig",
+                'format' => 'nochrome',
+                'data' => [
+                    'homepageId' => $homepageId,
+                    'courseHomepageId' => $courseHomepageId,
+                    'units' => $this->getCourseMapper()->findByParentId($courseHomepageId)
+                ]
+            ]);
+        }
+    }
+
+    /**
+     * Returns a HTTP 500 error with a specific text message
+     *
+     * @param $message
+     */
+    protected function throwError($message)
+    {
+        $this->getResponse()->status->set(500);
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data' => $message
+        ]);
+    }
+
+    /**
+     * Imports a course into a list of homepages
+     *
+     * @throws \Alaress\Authorizer\Failure\Unauthorized
+     **/
+    public function importTasks()
+    {
+        if (trim($this->getRequest()->post["homepage"]) == "")
+        {
+            // The homepage ID has gone missing
+
+            $this->throwError('No class code was specified');
+        }
+        else if (trim($this->getRequest()->post["course_homepage"]) == "")
+        {
+            // The course homepage ID has gone missing
+
+            $this->throwError('No course was specified');
+        }
+        else {
+
+            $homepages = explode(",", $this->getRequest()->post["homepage"]);
+
+            // Test permissions. Must have write permission on the destination page and read permission
+            // on the course we are trying to import.
+
+            // Test course page read access
+
+            if (Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
+                throw new \Alaress\Authorizer\Failure\Unauthorized;
+            }
+
+            // Test each homepage for write access
+
+            foreach ($homepages as $homepage) {
+                if (Access::getInstance()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
+                    throw new \Alaress\Authorizer\Failure\Unauthorized;
+                }
+            }
+
+            // Check all required dates have been specified
+
+            $error = false;
+            $foundUnit = false;
+
+            foreach ($this->getRequest()->post["unit"] as $unit) {
+                $import = !empty($unit['import']);
+
+                if ($import) {
+                    $foundUnit = true;
+                    if (trim($unit['open_date']) == '' || trim($unit['due_date']) == '') {
+                        $this->throwError('You must specify an open and close date for each unit you are importing');
+                        $error = true;
+                        break;
+                    }
+                }
+            }
+
+            // Make sure at least one unit was specified
+
+            if (!$foundUnit) {
+                $this->throwError('You must select at least one unit to import');
+            }
+            else
+            {
+                // Create the component on each homepage
+
+                $unitCache = [];
+                $homepageCache = [];
+                $componentCache = [];
+
+                foreach ($homepages as $homepageId) {
+                    // Get the homepage we are importing into and store it for later
+
+                    $homepageCache[$homepageId] = FolderMapper::getInstance()->findById($homepageId);
+
+                    $componentDefinition = \Component_DefinitionMapper::getInstance()->findByColumn('class',
+                        'Component_Homepage_CourseOutlineController');
+                    $componentDefinitionId = $componentDefinition->first()->getId();
+
+                    $componentCache[$homepageId] = new \Component_Instance();
+                    $componentCache[$homepageId]
+                        ->setDefinitionId($componentDefinitionId)
+                        ->setModule('homepage')
+                        ->setIdentifier($homepageId)
+                        ->setPosition('top')
+                        ->setSequence(1);
+
+                    \Component_InstanceMapper::getInstance()->save($componentCache[$homepageId]);
+                }
+
+                if ($error) {
+                    return;
+                }
+                try {
+                    // Create new unit instances on each homepage
+
+                    foreach ($homepages as $homepageId) {
+                        $unit_instance_list = new Collection();
+
+                        foreach ($this->getRequest()->post["unit"] as $unit) {
+                            $import = !empty($unit['import']);
+
+                            if ($import) {
+                                // Save the unit into the course.
+
+                                if (!isset($unitCache[$unit['unit_id']])) {
+                                    $unitCache[$unit['unit_id']] = FolderMapper::getInstance()->findById($unit['unit_id']);
+                                }
+                                $unit_instance = new UnitInstance();
+
+                                $unit_instance
+                                    ->setComponent($componentCache[$homepageId])
+                                    ->setTitle($unitCache[$unit['unit_id']]->getName())
+                                    ->setCategory($homepageCache[$homepageId])
+                                    ->setUnitCategory($unitCache[$unit['unit_id']])
+                                    ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
+                                    ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
+
+                                $unit_instance_list->add($unit_instance);
+                            }
+                        }
+
+                        UnitInstanceMapper::getInstance()->save($unit_instance_list);
+                    }
+
+                    // Return the next fragment...
+
+                    $this->getResponse()->content->set([
+                        'format' => 'file',
+                        'data' => 'Insert next fragment here'
+                    ]);
+
+                } catch (\InvalidArgumentException $e) {
+                    // bad dates, most likely
+                    $this->throwError("Invalid date given");
+                }
+            }
+        }
     }
 }

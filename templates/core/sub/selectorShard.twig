@@ -29,17 +29,17 @@
 {# Manufacture modal activator title attribute
  # Anchor title
  #}
-{% if title|length %}
+{% if not title|length %}
     {% set title = 'Click to change the faculty / class this course belongs to' %}
 {% endif %}
 
 <label>
     {{ formLabel }}
-    <input type="hidden" name="{{ formInputName }}" value="{{ folder.parent.id }}" />
+    <input type="hidden" name="{{ formInputName }}" id="{{ formInputName }}" value="{{ folder.id }}" />
     <a {{ activator }}
        data-source="{{ formInputName }}"
        href="#"
-       class="source-select {{ folder.parent.id ? 'icon-folder' : '' }}"
-       title="{{ title }}">{{ folder.parent.id ? folder.parent.name : '(Click to select)' }}
+       class="source-select {{ folder.id ? 'icon-folder' : '' }}"
+       title="{{ title }}">{{ folder.id ? folder.name : '(Click to select)' }}
     </a>
 </label>

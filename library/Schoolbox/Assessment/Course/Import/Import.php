@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Assessment\Course\Import;
 
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
@@ -134,7 +135,11 @@ class Import
          */
         try {
             if ($classCode) {
-                $folder = $this->getFolderMapper()->findByCode($classCode);
+                try {
+                    $folder = $this->getFolderMapper()->findByCode($classCode);
+                } catch (MapperException $e) {
+                    $folder = $this->getFolderMapper()->findById($classCode);
+                }
                 $pair   = $folder->findValueLabelPair();
 
                 $data['destinations'] = [
