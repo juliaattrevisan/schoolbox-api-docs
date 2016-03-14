@@ -157,8 +157,9 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             INNER JOIN tblPeriod p ON a.PeriodID = p.ID
             INNER JOIN tblDay d ON a.DayID = d.ID
             LEFT  JOIN tblPeriodTimesByDay pd ON a.PeriodID = pd.PeriodID AND a.DayID = pd.DayID
-            LEFT  JOIN tblRoom r ON a.RoomID = r.ID
         ';
+        $coreRoomJoin  = "LEFT JOIN tblRoom r ON a.RoomID = r.ID";
+        $electRoomJoin = "LEFT JOIN tblRoom r ON b.RoomID = r.ID";
         $teacherSelect = "
             t.Code          AS StaffID,
             t.FamilyName    AS StaffPreferredName,
@@ -186,6 +187,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 LEFT JOIN tblTeacher t on a.TeacherID = t.ID
                 $periodJoin
+                $coreRoomJoin
                 INNER JOIN tblStudent st on a.FormID = st.FormID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 WHERE st.deleted = 0
@@ -208,6 +210,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblAllocation a ON b.BlockID = a.BlockID
                 LEFT JOIN tblTeacher t on a.TeacherID = t.ID
                 $periodJoin
+                $electRoomJoin
                 INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
                 INNER JOIN tblStudent st ON sc.StudentID = st.ID
                 WHERE st.deleted = 0
@@ -232,6 +235,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 $periodJoin
+                $coreRoomJoin
                 INNER JOIN tblTeacher t on a.TeacherID = t.ID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 WHERE t.deleted = 0
@@ -254,6 +258,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblTeacher t on b.TeacherID = t.ID
                 INNER JOIN tblAllocation a ON b.BlockID = a.BlockID
                 $periodJoin
+                $electRoomJoin
                 WHERE t.deleted = 0
                 AND t.code = $quotedId
                 AND d.SortOrder = $quotedDay
@@ -340,8 +345,9 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             INNER JOIN tblPeriod p ON a.PeriodID = p.ID
             INNER JOIN tblDay d ON a.DayID = d.ID
             LEFT  JOIN tblPeriodTimesByDay pd ON a.PeriodID = pd.PeriodID AND a.DayID = pd.DayID
-            LEFT  JOIN tblRoom r ON a.RoomID = r.ID
         ';
+        $coreRoomJoin  = "LEFT JOIN tblRoom r ON a.RoomID = r.ID";
+        $electRoomJoin = "LEFT JOIN tblRoom r ON b.RoomID = r.ID";
         $teacherSelect = "
             t.Code          AS StaffID,
             t.FamilyName    AS StaffPreferredName,
@@ -366,6 +372,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 LEFT JOIN tblTeacher t on a.TeacherID = t.ID
                 $periodJoin
+                $coreRoomJoin
                 INNER JOIN tblStudent st on a.FormID = st.FormID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 WHERE st.deleted = 0
@@ -385,6 +392,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblAllocation a ON b.BlockID = a.BlockID
                 LEFT JOIN tblTeacher t on a.TeacherID = t.ID
                 $periodJoin
+                $electRoomJoin
                 INNER JOIN tblSubjectChoice sc ON b.YearBlockItemID = sc.YearBlockItemID
                 INNER JOIN tblStudent st ON sc.StudentID = st.ID
                 WHERE st.deleted = 0
@@ -406,6 +414,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 $periodJoin
+                $coreRoomJoin
                 INNER JOIN tblTeacher t on a.TeacherID = t.ID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 WHERE t.deleted = 0
@@ -425,6 +434,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 INNER JOIN tblTeacher t on b.TeacherID = t.ID
                 INNER JOIN tblAllocation a ON b.BlockID = a.BlockID
                 $periodJoin
+                $electRoomJoin
                 WHERE t.deleted = 0
                 AND t.code = $quotedId
 
