@@ -24,7 +24,7 @@ echo "Creating artifact directory";
 mkdir -vp $initialdir/built-artifacts;
 
 echo "Creating artifact checksum";
-sha1sum composer.lock > $initialdir/built-artifacts/"$branch"-vendor-php-checksum.txt;
+sha1sum composer.lock > vendor/composer.lock.checksum;
 
 echo "Creating artifact";
 tar czvf $initialdir/built-artifacts/"$branch"-vendor-php.tar.gz vendor;
@@ -33,7 +33,7 @@ echo "Building Vendor (dev) PHP";
 tools/composer.sh
 
 echo "Creating (dev) artifact checksum";
-sha1sum composer.lock > $initialdir/built-artifacts/"$branch"-vendor-php-checksum-dev.txt;
+sha1sum composer.lock > vendor/composer.lock.checksum;
 
 echo "Creating (dev) artifact";
 tar czvf $initialdir/built-artifacts/"$branch"-vendor-php-dev.tar.gz vendor;
