@@ -853,7 +853,9 @@ class Controller extends BaseController
      */
     public function importSave()
     {
-        // Validate dates before we save
+        // Validate dates before we save (nothing to do for tasks)
+
+        // Validate due work
 
         foreach ($this->getRequest()->post["work"] as $work) {
             if (trim($work['publish_date']) == '') {
@@ -876,6 +878,9 @@ class Controller extends BaseController
                 }
             }
         }
+
+        // Validate quizzes
+
         foreach ($this->getRequest()->post["quiz"] as $quiz) {
 
             if (trim($quiz['start_date']) == '') {
