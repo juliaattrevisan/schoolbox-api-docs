@@ -65,7 +65,6 @@
         $(document).on('dnd_stop.vakata', function (event, data) {
 
             // draggedTypeGen could also be a link
-            // {{ linkController }}
             var $dragged       = $(data.element).closest(listItem),
                 draggedType    = $dragged.data('type'),
                 draggedTypeGen = '',
@@ -88,7 +87,23 @@
                     break;
             }
 
-            if (dropTargetType == 'file' || (!(dropTargetPerm == 'write' || dropTargetPerm == 'full'))) {
+            switch (dropTargetType) {
+                case 'file':
+                case 'link':
+                    // If somehow this node was dragged onto a node which can't have children,
+                    // target the folder this node is in instead.
+                    $dropTarget    = $dropTarget.parent().closest(listItem);
+                    dropTargetId   = $dropTarget.data('id');
+                    dropTargetType = $dropTarget.data('type');
+                    dropTargetPerm = $dropTarget.data('permission');
+                    break;
+
+                case 'folder':
+                default:
+                    break;
+            }
+
+            if (!(dropTargetPerm == 'write' || dropTargetPerm == 'full')) {
                 return;
             }
 

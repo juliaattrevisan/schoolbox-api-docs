@@ -122,7 +122,7 @@
                             }
 
                             // also check that you're not trying to drag onto a file
-                            if (node_parent.original.type == 'file') {
+                            if (node_parent.original.type == 'file' || node_parent.original.type == 'link'  ) {
                                 return false;
                             }
                         }
