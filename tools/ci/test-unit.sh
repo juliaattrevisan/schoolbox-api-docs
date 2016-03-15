@@ -40,4 +40,4 @@ echo "Preparing conf.php"
 cp -f www/conf/tarball.conf.php www/conf/conf.php;
 
 echo "Running php unit"
-php ../vendor/bin/phpunit --version;
+php ../vendor/bin/phpunit;
