@@ -1,4 +1,5 @@
-<table>
+<div class="scrollable">
+<table class="rb stack-for-medium-down">
     {% set hasLevels = '' %}
     {% for level in rubric.levels %}
         {% set hasLevels = hasLevels ~ level.name %}
@@ -78,4 +79,4 @@
     </tbody>
 
 </table>
-<h2></h2>
+</div>
