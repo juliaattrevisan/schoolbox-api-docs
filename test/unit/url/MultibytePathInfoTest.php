@@ -60,6 +60,7 @@ class MultibytePathInfoTest extends PHPUnit_Framework_TestCase
             if (is_null($value)) {
                 $this->assertArrayNotHasKey($field, $info, "Key '$field' is present when it should not be");
             } else {
+                $this->assertArrayHasKey($field, $info, "Key '$field' is not present when it should be");
                 $this->assertEquals($value, $info[$field], "Value for '$field' does not match");
             }
         }
