@@ -40,6 +40,16 @@ class Timetable
         $this->setAllDays(new Collection());
     }
 
+    /**
+     * Add a Day instance to the timetable
+     *
+     * @param Day $day
+     */
+    public function addDay(Day $day)
+    {
+        $this->getAllDays()->add($day);
+    }
+
     /* Getters/Setters
      */
 
