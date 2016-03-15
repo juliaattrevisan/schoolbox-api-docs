@@ -176,7 +176,9 @@ class Controller extends BaseController
 
         // Make sure they have access to delete the forlder
 
-        if ($access->getFolderAccess($this->getUser(), [$folder->getId()]) < WRITE_ACCESS) {
+        if ($access->getFolderAccess($this->getUser(), [$folder->getId()]) < WRITE_ACCESS
+            || $access->getFolderAccess($this->getUser(), [$folder->getParent()->getId()]) < WRITE_ACCESS
+        ) {
             $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
         }
 
