@@ -19,8 +19,6 @@ use Schoolbox\External\Normalise\User;
 
 class Guardian extends IteratorIterator
 {
-    use IteratorConstructorTrait;
-
     /**
      * @var int
      */
@@ -39,7 +37,7 @@ class Guardian extends IteratorIterator
     {
         $id       = null;
         $preStack = [];
-        while ($this->getInnerIterator()->valid() && $row = $this->getInnerIterator()->current()) {
+        while (parent::valid() && $row = parent::current()) {
             $thisId = $row['student_contact_id'];
             if (!isset($id)) {
                 $id = $thisId;
@@ -50,7 +48,7 @@ class Guardian extends IteratorIterator
                 break;
             }
             $preStack[] = $row;
-            $this->getInnerIterator()->next();
+            parent::next();
         }
         if (empty($preStack)) {
             $this->stack = [];
