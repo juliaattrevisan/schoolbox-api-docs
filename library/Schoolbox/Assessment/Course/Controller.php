@@ -568,7 +568,6 @@ class Controller extends BaseController
 
     /**
      * Retrieve fragment with units in the selected course, and checkboxes/dates for selection
-     *
      */
     public function importUnits()
     {
@@ -633,7 +632,8 @@ class Controller extends BaseController
     }
 
     /**
-     * Imports a course into a list of homepages
+     * Retrieve friend with a list of tasks, quizzes and due work (and relevant date entry boxes) associated with
+     * the selected course
      *
      * @throws \Alaress\Authorizer\Failure\Unauthorized
      **/
@@ -651,8 +651,8 @@ class Controller extends BaseController
 
             $this->throwError('No course was specified');
         }
-        else {
-
+        else
+        {
             $homepages = explode(",", $this->getRequest()->post["homepage"]);
 
             // Test permissions. Must have write permission on the destination page and read permission
@@ -811,7 +811,8 @@ class Controller extends BaseController
                         $units->add($unit);
                     }
 
-                    $this->getResponse()->content->set([
+                    $this->getResponse()->content->set
+                    ([
                         'template' => "@course/unitImportResults.twig",
                         'format' => 'nochrome',
                         'data' => [
@@ -823,8 +824,9 @@ class Controller extends BaseController
                             'units' => $units
                         ]
                     ]);
-
-                } catch (\InvalidArgumentException $e) {
+                }
+                catch (\InvalidArgumentException $e)
+                {
                     // bad dates, most likely
                     $this->throwError("Invalid date given");
                 }
