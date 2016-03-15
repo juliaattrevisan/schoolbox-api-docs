@@ -22,9 +22,9 @@
             {% endfor %}
         </ul>
         <ul class="flex-list buttons">
-            {% for icon in icons %}
-                <li><a href="#" title="Create a new {{ icon | title }} in Unit" class="button icon-{{ icon | replace(' ', '-') }}">New {{ icon | title }}</a></li>
-            {% endfor %}
+            <li><a href="/task/create/{{ unit.id }}"                                                     title="Create a new Task"     class="button icon-task"    >New Task</a></li>
+            <li><a href="/submission/createSubmission/new/{{ unit.id }}/task?return_url={{ returnUrl }}" title="Create a new Due Work" class="button icon-due-work">New Due Work</a></li>
+            <li><a href="/assess/create/{{ unit.id }}/task?return_url={{ returnUrl }}"                   title="Create a new Quiz"     class="button icon-quiz"    >New Quiz</a></li>
         </ul>
     </div>
 </li>

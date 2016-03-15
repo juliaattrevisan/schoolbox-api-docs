@@ -140,8 +140,9 @@ class Controller extends BaseController
             $folder = $this->getCourseMapper()->findById($id);
             $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
 
-            $data['folder'] = $folder;
-            $data['units']  = $this->getCourseMapper()->findByParent($id);
+            $data['folder']    = $folder;
+            $data['units']     = $this->getCourseMapper()->findByParent($id);
+            $data['returnUrl'] = $this->getReturnUrl($id);
 
             foreach ($data['units'] as $unit) {
                 $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
@@ -322,6 +323,18 @@ class Controller extends BaseController
 
 
     /**
+     * Give the encoded return URL for the given course ID
+     *
+     * @param int $courseId
+     * @return string
+     */
+    protected function getReturnUrl($courseId)
+    {
+        return urlencode(base64_encode($this->getRouteIfAuthorized('course.modifyCourse', [ 'id' => $courseId ])));
+    }
+
+
+    /**
      * Post request to spawn a new unit
      *
      * @api   POST /course/unit/new
@@ -364,7 +377,7 @@ class Controller extends BaseController
                     'id'   => $folder->getId(),
                     'name' => $folder->getName()
                 ],
-                'icons' => [ 'task', 'due work', 'quiz' ],
+                'returnUrl' => $this->getReturnUrl($post['id']),
                 '_writable' => true,
                 '_expanded' => true
             ];
