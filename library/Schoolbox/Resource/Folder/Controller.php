@@ -22,8 +22,6 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
-use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
@@ -37,6 +35,64 @@ use UnexpectedValueException;
 class Controller extends BaseController
 {
 
+    /** @var Mapper */
+    protected $folderMapper;
+
+    /** @var HomepageConfigMapper */
+    protected $homepageConfigMapper;
+
+    /** @var HomepageTemplateMapper */
+    protected $homepageTemplateMapper;
+
+    /** @var RoleAccessMapper */
+    protected $roleAccessMapper;
+
+    /** @var UserAccessMapper */
+    protected $userAccessMapper;
+
+    /** @var RoleMapper */
+    protected $roleMapper;
+
+    /** @var ErrorMapper */
+    protected $errorMapper;
+
+    /** @var Access */
+    protected $access;
+
+    /** @var Code\Mapper */
+    protected $codeMapper;
+
+    /** @var Curriculum\Node\Mapper */
+    protected $curriculumNodeMapper;
+
+    /** @var GroupMapper */
+    protected $groupMapper;
+
+    /** @var FileMapper */
+    protected $fileMapper;
+
+
+    /**
+     * Folder\Controller constructor.
+     * TODO DI
+     */
+    public function __construct()
+    {
+        $this->setFolderMapper(Mapper::getInstance());
+        $this->setHomepageConfigMapper(HomepageConfigMapper::getInstance());
+        $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
+        $this->setRoleAccessMapper(RoleAccessMapper::getInstance());
+        $this->setUserAccessMapper(UserAccessMapper::getInstance());
+        $this->setRoleMapper(RoleMapper::getInstance());
+        $this->setErrorMapper(ErrorMapper::getInstance());
+        $this->setAccess(Access::getInstance());
+        $this->setCodeMapper(Code\Mapper::getInstance());
+        $this->setCurriculumNodeMapper(Curriculum\Node\Mapper::getInstance());
+        $this->setGroupMapper(GroupMapper::getInstance());
+        $this->setFileMapper(FileMapper::getInstance());
+    }
+
+
     /**
      * Display update folder screen
      *
@@ -45,12 +101,12 @@ class Controller extends BaseController
      */
     public function getFolderModify($id)
     {
-        $folderMapper = Folder\Mapper::getInstance();
-        $homepageConfigMapper = HomepageConfigMapper::getInstance();
-        $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
-        $roleAccessMapper = RoleAccessMapper::getInstance();
-        $roleMapper = RoleMapper::getInstance();
-        $errorMapper = ErrorMapper::getInstance();
+        $folderMapper = $this->getFolderMapper();
+        $homepageConfigMapper = $this->getHomepageConfigMapper();
+        $homepageTemplateMapper = $this->getHomepageTemplateMapper();
+        $roleAccessMapper = $this->getRoleAccessMapper();
+        $roleMapper = $this->getRoleMapper();
+        $errorMapper = $this->getErrorMapper();
         
         try {
             $folder = $folderMapper->findById($id);
@@ -115,10 +171,10 @@ class Controller extends BaseController
      */
     public function getFolderCreate($parentId)
     {
-        $folderMapper = FolderMapper::getInstance();
-        $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
-        $roleMapper = RoleMapper::getInstance();
-        $errorMapper = ErrorMapper::getInstance();
+        $folderMapper = $this->getFolderMapper();
+        $homepageTemplateMapper = $this->getHomepageTemplateMapper();
+        $roleMapper = $this->getRoleMapper();
+        $errorMapper = $this->getErrorMapper();
 
         try {
             $parent = $folderMapper->findById($parentId);
@@ -143,7 +199,7 @@ class Controller extends BaseController
 
         // Folders that are not in the root note should inherit by default to reduce the user interface
 
-        if ($parentId != FolderMapper::FOLDER_ROOT)
+        if ($parentId != Mapper::FOLDER_ROOT)
             $folder->enableInherit();
 
         $this->getResponse()->content->set(
@@ -170,9 +226,9 @@ class Controller extends BaseController
      */
     public function postDeleteFolder()
     {
-        $folderMapper = FolderMapper::getInstance();
-        $errorMapper = ErrorMapper::getInstance();
-        $access = Access::getInstance();
+        $folderMapper = $this->getFolderMapper();
+        $errorMapper = $this->getErrorMapper();
+        $access = $this->getAccess();
 
         // Find the folder to be deleted
 
@@ -206,8 +262,8 @@ class Controller extends BaseController
      */
     public function postMoveFolder()
     {
-        $errorMapper = ErrorMapper::getInstance();
-        $folderMapper = FolderMapper::getInstance();
+        $errorMapper = $this->getErrorMapper();
+        $folderMapper = $this->getFolderMapper();
 
         if ($this->getRequest()->post["source"] != $this->getRequest()->post["destination"])
         {
@@ -252,7 +308,7 @@ class Controller extends BaseController
      */
     public function postUpdateFolder()
     {
-        $errorMapper = ErrorMapper::getInstance();
+        $errorMapper = $this->getErrorMapper();
 
         try {
             $user        = $this->getUser();
@@ -286,15 +342,15 @@ class Controller extends BaseController
      * @param  User              $user      the effecting user
      * @throws OutOfBoundsException         if you lack permission to perform functions
      * @throws RangeException               if the database fails to save your folder
-     * @return Folder\Model                 representing the freshly saved folder
+     * @return Model                        representing the freshly saved folder
      */
     public function persistFolder($postData, User $user)
     {
-        $folderMapper     = Mapper::getInstance();
-        $codeMapper       = Code\Mapper::getInstance();
-        $userAccessMapper = UserAccessMapper::getInstance();
-        $roleAccessMapper = RoleAccessMapper::getInstance();
-        $access           = Access::getInstance();
+        $folderMapper     = $this->getFolderMapper();
+        $codeMapper       = $this->getCodeMapper();
+        $userAccessMapper = $this->getUserAccessMapper();
+        $roleAccessMapper = $this->getRoleAccessMapper();
+        $access           = $this->getAccess();
 
         $model = $folderMapper->createModel()
                       ->setName($postData['name'])
@@ -367,17 +423,17 @@ class Controller extends BaseController
     /**
      * Put the given code lists onto the given folder
      *
-     * @param Folder\Model $model
+     * @param Model $model
      * @param string       $classCodeString
      * @param array        $curriculumCodes
      * @param User         $user
      * @throws MapperException
      */
-    protected function setCodesOnFolder(Folder\Model $model, $classCodeString, array $curriculumCodes, User $user)
+    protected function setCodesOnFolder(Model $model, $classCodeString, array $curriculumCodes, User $user)
     {
-        $codeMapper           = Code\Mapper::getInstance();
-        $curriculumNodeMapper = Curriculum\Node\Mapper::getInstance();
-        $folderMapper         = Mapper::getInstance();
+        $codeMapper           = $this->getCodeMapper();
+        $curriculumNodeMapper = $this->getCurriculumNodeMapper();
+        $folderMapper         = $this->getFolderMapper();
 
         $codeCollection       = $codeMapper->createCollection();
 
@@ -419,14 +475,14 @@ class Controller extends BaseController
     /**
      * Save the given template for the given folder
      *
-     * @param Folder\Model $model
+     * @param Model $model
      * @param int          $template
      * @throws RangeException if the specified template is not acceptable
      */
-    protected function saveHomepageConfig(Folder\Model $model, $template)
+    protected function saveHomepageConfig(Model $model, $template)
     {
-        $confMapper = HomepageConfigMapper::getInstance();
-        $tplMapper  = HomepageTemplateMapper::getInstance();
+        $confMapper = $this->getHomepageConfigMapper();
+        $tplMapper  = $this->getHomepageTemplateMapper();
 
         $homepageConfig = $confMapper->createModel()->setCategory($model);
 
@@ -463,11 +519,11 @@ class Controller extends BaseController
     /**
      * Recursively apply inheritance. Why? Not sure. Cut-Paste from /cms/categoryForm.php
      *
-     * @param Folder\Model $model
+     * @param Model $model
      */
-    protected function recurseInheritance(Folder\Model $model)
+    protected function recurseInheritance(Model $model)
     {
-        $folderMapper = Mapper::getInstance();
+        $folderMapper = $this->getFolderMapper();
 
         $folders = $folderMapper->findAllChildren($model->getId(), true);
         foreach ($folders as $folder) {
@@ -490,9 +546,9 @@ class Controller extends BaseController
     protected function createGroup($postData, Model $model, User $user)
     {
         // No changes in "KEEP_EXISTING" case
-        $roleAccessMapper = RoleAccessMapper::getInstance();
-        $userAccessMapper = UserAccessMapper::getInstance();
-        $groupMapper      = GroupMapper::getInstance();
+        $roleAccessMapper = $this->getRoleAccessMapper();
+        $userAccessMapper = $this->getUserAccessMapper();
+        $groupMapper      = $this->getGroupMapper();
 
         if ($postData['groupcheck']) {
 
@@ -555,8 +611,8 @@ class Controller extends BaseController
      */
     public function postDeleteFolderAll()
     {
-        $errorMapper = ErrorMapper::getInstance();
-        $folderMapper = FolderMapper::getInstance();
+        $errorMapper = $this->getErrorMapper();
+        $folderMapper = $this->getFolderMapper();
 
         if (!$this->getUser()->isSuperuser()) {
             $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_DELETE_SUBFOLDERS);
@@ -586,10 +642,10 @@ class Controller extends BaseController
      */
     public function postFolderReset()
     {
-        $access = Access::getInstance();
-        $errorMapper = ErrorMapper::getInstance();
-        $folderMapper = FolderMapper::getInstance();
-        $fileMapper = FileMapper::getInstance();
+        $access = $this->getAccess();
+        $errorMapper = $this->getErrorMapper();
+        $folderMapper = $this->getFolderMapper();
+        $fileMapper = $this->getFileMapper();
 
         try
         {
@@ -630,6 +686,246 @@ class Controller extends BaseController
             'format' => 'json',
             'data' => json_encode(['result' => 'success'])
         ]);
+    }
+
+
+    /**
+     * @return Mapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+
+    /**
+     * @param Mapper $folderMapper
+     * @return static
+     */
+    public function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return HomepageConfigMapper
+     */
+    protected function getHomepageConfigMapper()
+    {
+        return $this->homepageConfigMapper;
+    }
+
+
+    /**
+     * @param HomepageConfigMapper $homepageConfigMapper
+     * @return static
+     */
+    public function setHomepageConfigMapper($homepageConfigMapper)
+    {
+        $this->homepageConfigMapper = $homepageConfigMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return HomepageTemplateMapper
+     */
+    protected function getHomepageTemplateMapper()
+    {
+        return $this->homepageTemplateMapper;
+    }
+
+
+    /**
+     * @param HomepageTemplateMapper $homepageTemplateMapper
+     * @return static
+     */
+    public function setHomepageTemplateMapper($homepageTemplateMapper)
+    {
+        $this->homepageTemplateMapper = $homepageTemplateMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return RoleAccessMapper
+     */
+    protected function getRoleAccessMapper()
+    {
+        return $this->roleAccessMapper;
+    }
+
+
+    /**
+     * @param RoleAccessMapper $roleAccessMapper
+     * @return static
+     */
+    public function setRoleAccessMapper($roleAccessMapper)
+    {
+        $this->roleAccessMapper = $roleAccessMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return UserAccessMapper
+     */
+    public function getUserAccessMapper()
+    {
+        return $this->userAccessMapper;
+    }
+
+
+    /**
+     * @param UserAccessMapper $userAccessMapper
+     * @return static
+     */
+    public function setUserAccessMapper($userAccessMapper)
+    {
+        $this->userAccessMapper = $userAccessMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return RoleMapper
+     */
+    protected function getRoleMapper()
+    {
+        return $this->roleMapper;
+    }
+
+
+    /**
+     * @param RoleMapper $roleMapper
+     * @return static
+     */
+    public function setRoleMapper($roleMapper)
+    {
+        $this->roleMapper = $roleMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+
+    /**
+     * @param ErrorMapper $errorMapper
+     * @return static
+     */
+    public function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Access
+     */
+    protected function getAccess()
+    {
+        return $this->access;
+    }
+
+
+    /**
+     * @param Access $access
+     * @return static
+     */
+    public function setAccess($access)
+    {
+        $this->access = $access;
+        return $this;
+    }
+
+
+    /**
+     * @return Code\Mapper
+     */
+    protected function getCodeMapper()
+    {
+        return $this->codeMapper;
+    }
+
+
+    /**
+     * @param Code\Mapper $codeMapper
+     * @return static
+     */
+    public function setCodeMapper($codeMapper)
+    {
+        $this->codeMapper = $codeMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Curriculum\Node\Mapper
+     */
+    protected function getCurriculumNodeMapper()
+    {
+        return $this->curriculumNodeMapper;
+    }
+
+
+    /**
+     * @param Curriculum\Node\Mapper $curriculumNodeMapper
+     * @return static
+     */
+    public function setCurriculumNodeMapper($curriculumNodeMapper)
+    {
+        $this->curriculumNodeMapper = $curriculumNodeMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return GroupMapper
+     */
+    protected function getGroupMapper()
+    {
+        return $this->groupMapper;
+    }
+
+
+    /**
+     * @param GroupMapper $groupMapper
+     * @return static
+     */
+    public function setGroupMapper($groupMapper)
+    {
+        $this->groupMapper = $groupMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return FileMapper
+     */
+    protected function getFileMapper()
+    {
+        return $this->fileMapper;
+    }
+
+
+    /**
+     * @param FileMapper $fileMapper
+     * @return static
+     */
+    public function setFileMapper($fileMapper)
+    {
+        $this->fileMapper = $fileMapper;
+        return $this;
     }
 
 }
