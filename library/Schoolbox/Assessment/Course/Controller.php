@@ -332,26 +332,52 @@ class Controller extends BaseController
         $post = $this->getRequest()->post;
 
         $name  = trim($post->get('name'));
-        $index = $post->get('i', 1);
 
         if (!$name) {
             $this->sendError('Could not create unit', [ 'give the unit a name' ]);
             return;
         }
 
-        // TODO persist new folder to DB, including course builder template
+        // TODO get permission and template configs
+        try {
+            /** @var Folder\Controller $folderController */
+            $folderController = $this->getController('folder');
 
-        $data = [
-            'unit'  => [
-                'id'   => 'unknown',
-                'name' => $name
-            ],
-            'i'     => $index,
-            'icons' => [ 'task', 'due work', 'quiz' ],
-            '_writable' => true,
-            '_expanded' => true
-        ];
-        $this->tpl('unit', $data);
+            $folder = $folderController->persistFolder([
+                // the basics (note lack of ID and Codes)
+                'name'            => $name,
+                'parent'          => $post['id'],
+
+                // configurable things
+                'inherit'         => true,  // TODO config inheritance
+                'template'        => -1,    // TODO config template
+                'group'           => [],    // TODO config role permissions [ $roleId => $permissionLevel ]
+
+                // leave these always off
+                'recursive'       => false, // LEAVE THIS
+                'code'            => null,  // LEAVE THIS
+
+            ], $this->getUser());
+
+            $data = [
+                'unit'  => [
+                    'id'   => $folder->getId(),
+                    'name' => $folder->getName()
+                ],
+                'icons' => [ 'task', 'due work', 'quiz' ],
+                '_writable' => true,
+                '_expanded' => true
+            ];
+            $this->tpl('unit', $data);
+
+        } catch (ServiceNotFound $e) {
+            // quite simple not able to find things we need. bye bye.
+            $this->sendError("Could not save because of an internal error.", [], 500);
+
+        } catch (\Exception $e) {
+            // whatever the exception, recover from it as best you can
+            $this->sendError("Could not save because " . $e->getMessage());
+        }
     }
 
 
