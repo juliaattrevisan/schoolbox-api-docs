@@ -40,6 +40,13 @@
 {% endblock buttons_dueWork %}
 
 {% block buttons_grades %}
+    {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_grades) %}
+        <li class="no-pad">
+            <a href="https://intranet.wenona.nsw.edu.au/contentpages/studentprofile/default.aspx?studentID={{ user.getExternalId() }}"
+               class="no-margin fat button icon-fat icon-32 icon-tick"
+            >My Progress</a>
+        </li>
+    {% endif %}
 {% endblock buttons_grades %}
 
 {% block contacts_alert %}
