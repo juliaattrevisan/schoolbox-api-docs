@@ -2029,7 +2029,9 @@ abstract class Mapper implements IMapper, Serializable
         }
         $mapperClass = $this->joins[$basename]['mapper'];
         if (!($mapperClass instanceof Mapper) && class_exists($mapperClass)) {
+            /** @var Mapper $mapper */
             $mapper = call_user_func(array($mapperClass, 'getInstance'));
+            $mapper->setConfigLoader($this->getConfigLoader());
         } else {
             $mapper = $this->joins[$basename]['mapper'];
         }
