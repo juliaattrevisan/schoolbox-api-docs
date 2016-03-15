@@ -109,7 +109,21 @@ function score2pascal($score, $delim = '_') {
  * @return array
  */
 function mb_pathinfo($filepath, $options = null) {
-    preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im', $filepath, $m);
+    $regexp = <<<REGEXP
+%^
+(?P<dirname>.*?)
+[\\\\/]*
+(?P<basename>
+    (?P<filename>[^/\\\\]*?)
+    (?:\.
+        (?P<extension>[^\.\\\\/]+?)
+    |)
+)
+[\\\\/\.]*
+$%imx
+REGEXP;
+
+    preg_match($regexp, $filepath, $m);
 
     $map = [
         PATHINFO_DIRNAME   => 'dirname',
@@ -120,17 +134,17 @@ function mb_pathinfo($filepath, $options = null) {
 
     $ret = [];
 
-    if (isset($m[1]) && $m[1]) {
-        $ret[$map[PATHINFO_DIRNAME]] = $m[1];
+    if (isset($m['dirname']) && $m['dirname']) {
+        $ret[$map[PATHINFO_DIRNAME]] = $m['dirname'];
     }
-    if (isset($m[2]) && $m[2]) {
-        $ret[$map[PATHINFO_BASENAME]] = $m[2];
+    if (isset($m['basename']) && $m['basename']) {
+        $ret[$map[PATHINFO_BASENAME]] = $m['basename'];
     }
-    if (isset($m[5])) {
-        $ret[$map[PATHINFO_EXTENSION]] = $m[5];
+    if (isset($m['extension'])) {
+        $ret[$map[PATHINFO_EXTENSION]] = $m['extension'];
     }
-    if (isset($m[3]) && $m[3]) {
-        $ret[$map[PATHINFO_FILENAME]] = $m[3];
+    if (isset($m['filename']) && $m['filename']) {
+        $ret[$map[PATHINFO_FILENAME]] = $m['filename'];
     }
 
     if ($options && isset($map[$options])) {
