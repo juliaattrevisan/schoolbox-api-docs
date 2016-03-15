@@ -9,7 +9,7 @@
 namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller\Base as BaseController;
-
+use Alaress\Authorizer\Failure;
 use Component_DefinitionMapper;
 use Component_InstanceMapper;
 use RangeException;
@@ -610,14 +610,14 @@ class Controller extends BaseController
             // Test course page read access
 
             if ($this->getAccess()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
-                throw new \Alaress\Authorizer\Failure\Unauthorized;
+                throw new Failure\Unauthorized();
             }
 
             // Test each homepage for write access
 
             foreach ($homepages as $homepage) {
                 if ($this->getAccess()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
-                    throw new \Alaress\Authorizer\Failure\Unauthorized;
+                    throw new Failure\Unauthorized();
                 }
             }
 
