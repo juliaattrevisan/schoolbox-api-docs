@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Authorizer\Failure;
+use Aura\Di\Exception\ServiceNotFound;
 use Component_DefinitionMapper;
 use Component_Instance;
 use Component_InstanceMapper;
@@ -195,7 +196,7 @@ class Controller extends BaseController
         // TODO get permission and template configs
         try {
             /** @var Folder\Controller $folderController */
-            $folderController = $this->getDi()->get('controller:folder');
+            $folderController = $this->getController('folder');
 
             $folder = $folderController->persistFolder([
                 // the basics
@@ -221,6 +222,10 @@ class Controller extends BaseController
             ]);
 
             return;
+
+        } catch (ServiceNotFound $e) {
+            // quite simple not able to find things we need. bye bye.
+            $this->sendError("Could not save because of an internal error.", [], 500);
 
         } catch (\Exception $e) {
             // whatever the exception, recover from it as best you can
