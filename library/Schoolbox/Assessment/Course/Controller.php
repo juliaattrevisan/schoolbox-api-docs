@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Authorizer\Failure;
 use Component_DefinitionMapper;
+use Component_Instance;
 use Component_InstanceMapper;
 use RangeException;
 use Schoolbox\Curriculum;
@@ -20,6 +21,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
+use Schoolbox\Resource\Category;
 use Schoolbox\Resource\Folder\Code;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
@@ -648,8 +650,11 @@ class Controller extends BaseController
             {
                 // Create the component on each homepage
 
+                /** @var Category[] $unitCache */
                 $unitCache = [];
+                /** @var Category[] $homepageCache */
                 $homepageCache = [];
+                /** @var Component_Instance[] $componentCache */
                 $componentCache = [];
 
                 foreach ($homepages as $homepageId) {
