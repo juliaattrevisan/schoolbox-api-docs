@@ -114,9 +114,9 @@ function mb_pathinfo($filepath, $options = null) {
 (?P<dirname>.*?)
 [\\\\/]*
 (?P<basename>
-    (?P<filename>[^/\\\\]*?)
+    (?:[^/\\\\]*?)
     (?:\.
-        (?P<extension>[^\.\\\\/]+?)
+        (?:[^\.\\\\/]+?)
     |)
 )
 [\\\\/\.]*
@@ -139,12 +139,21 @@ REGEXP;
     }
     if (isset($m['basename']) && $m['basename']) {
         $ret[$map[PATHINFO_BASENAME]] = $m['basename'];
-    }
-    if (isset($m['extension'])) {
-        $ret[$map[PATHINFO_EXTENSION]] = $m['extension'];
-    }
-    if (isset($m['filename']) && $m['filename']) {
-        $ret[$map[PATHINFO_FILENAME]] = $m['filename'];
+        $parts = explode('.', $m['basename']);
+        if (count($parts) === 1) {
+            $extension = null;
+            $filename  = $m['basename'];
+        } else {
+            $extension = array_pop($parts);
+            $filename  = implode('.', $parts);
+        }
+        if (strlen($extension)) {
+            $ret[$map[PATHINFO_EXTENSION]] = $extension;
+        }
+        if (strlen($filename)) {
+            $ret[$map[PATHINFO_FILENAME]] = $filename;
+        }
+
     }
 
     if ($options && isset($map[$options])) {
