@@ -57,10 +57,13 @@ class Timetable
      * Set user
      *
      * @param User $user
+     * @return $this
      */
     public function setUser($user)
     {
         $this->user = $user;
+
+        return $this;
     }
 
     /**
@@ -77,9 +80,12 @@ class Timetable
      * Set all days
      *
      * @param Collection $allDays
+     * @return $this
      */
     public function setAllDays($allDays)
     {
         $this->allDays = $allDays;
+
+        return $this;
     }
 }
