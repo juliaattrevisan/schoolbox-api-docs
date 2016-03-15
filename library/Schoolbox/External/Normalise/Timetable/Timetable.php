@@ -82,38 +82,7 @@ class Timetable
                 /* Decompile Classes
                  */
                 foreach ($currentPeriod->getAllClasses() as $currentClass) {
-                    $classInfo = [
-                        'description' => $currentClass->getName(),
-                        'code' => $currentClass->getCode(),
-                        'campus' => $currentClass->getCampus()->getExtTimetableCode(),
-                        'room' => $currentClass->getRoom(),
-                    ];
-
-                    /* Only include Staff members if they exist
-                     * For classes with multiple teachers, just choose first()
-                     */
-                    if ($currentClass->getAllStaff()->count()) {
-                        $staffMember = $currentClass->getAllStaff()->first();
-
-                        $staffInfo = [
-                            'staffID'        => $staffMember->getId(),
-                            'staffFirstname' => $staffMember->getPreferredName(),
-                            'staffSurname'   => $staffMember->getLastname(),
-                            'staffTitle'     => $staffMember->getTitle()
-                        ];
-                    }
-                    else {
-                        $staffInfo = [
-                            'staffID'        => '',
-                            'staffFirstname' => '',
-                            'staffSurname'   => '',
-                            'staffTitle'     => ''
-                        ];
-                    }
-
-                    $data = array_merge($classInfo, $staffInfo);
-
-                    $timetable[$periodIndex]['day'][$dayIndex][$currentClass->getCode()] = $data;
+                    $timetable[$periodIndex]['day'][$dayIndex][$currentClass->getCode()] = $currentClass->decompile();
                 }
             }
         }

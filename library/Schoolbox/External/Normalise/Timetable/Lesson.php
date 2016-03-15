@@ -77,6 +77,45 @@ class Lesson
         $this->setAllStaff(new Collection());
     }
 
+    /**
+     * Return ancient array format
+     *
+     * @return array
+     */
+    public function decompile()
+    {
+        $classInfo = [
+            'description' => $this->getName(),
+            'code' => $this->getCode(),
+            'campus' => $this->getCampus()->getExtTimetableCode(),
+            'room' => $this->getRoom(),
+        ];
+
+        /* Only include Staff members if they exist
+         * For classes with multiple teachers, just choose first()
+         */
+        if ($this->getAllStaff()->count()) {
+            $staffMember = $this->getAllStaff()->first();
+
+            $staffInfo = [
+                'staffID'        => $staffMember->getId(),
+                'staffFirstname' => $staffMember->getPreferredName(),
+                'staffSurname'   => $staffMember->getLastname(),
+                'staffTitle'     => $staffMember->getTitle()
+            ];
+        }
+        else {
+            $staffInfo = [
+                'staffID'        => '',
+                'staffFirstname' => '',
+                'staffSurname'   => '',
+                'staffTitle'     => ''
+            ];
+        }
+
+        return array_merge($classInfo, $staffInfo);
+    }
+
     /* Getters/Setters
      */
 
