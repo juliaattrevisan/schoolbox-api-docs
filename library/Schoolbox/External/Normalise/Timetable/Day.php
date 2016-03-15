@@ -91,6 +91,8 @@ class Day
     public function setNumber($number)
     {
         $this->number = $number;
+
+        return $this;
     }
 
     /**
@@ -112,5 +114,7 @@ class Day
     public function setAllPeriods($allPeriods)
     {
         $this->allPeriods = $allPeriods;
+
+        return $this;
     }
 }

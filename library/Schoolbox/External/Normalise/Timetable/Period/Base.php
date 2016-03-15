@@ -123,6 +123,8 @@ abstract class Base
     public function setNumber($number)
     {
         $this->number = $number;
+
+        return $this;
     }
 
     /**
@@ -144,6 +146,8 @@ abstract class Base
     public function setStart($start)
     {
         $this->start = $start;
+
+        return $this;
     }
 
     /**
@@ -165,6 +169,8 @@ abstract class Base
     public function setEnd($end)
     {
         $this->end = $end;
+
+        return $this;
     }
 
     /**
@@ -186,5 +192,7 @@ abstract class Base
     public function setAllClasses($allClasses)
     {
         $this->allClasses = $allClasses;
+
+        return $this;
     }
 }
