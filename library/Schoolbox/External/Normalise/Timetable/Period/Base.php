@@ -29,7 +29,7 @@ abstract class Base
      * Period number
      * e.g. "1"
      *
-     * @var string
+     * @var int
      */
     protected $number = '';
 
