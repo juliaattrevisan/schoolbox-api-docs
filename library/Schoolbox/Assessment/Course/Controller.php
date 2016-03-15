@@ -10,6 +10,8 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller\Base as BaseController;
 
+use Component_DefinitionMapper;
+use Component_InstanceMapper;
 use RangeException;
 use Schoolbox\Curriculum;
 use Schoolbox\Collection;
@@ -20,7 +22,6 @@ use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Folder\Code;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
 use Schoolbox\Resource\HomepageConfigMapper;
@@ -31,7 +32,28 @@ class Controller extends BaseController
 {
 
     /** @var CourseMapper */
-    private $courseMapper;
+    protected $courseMapper;
+
+    /** @var Component_DefinitionMapper */
+    protected $componentDefinitionMapper;
+
+    /** @var Component_InstanceMapper */
+    protected $componentInstanceMapper;
+
+    /** @var UnitInstanceMapper */
+    protected $unitInstanceMapper;
+
+    /** @var TaskMapper */
+    protected $taskMapper;
+
+    /** @var HomepageConfigMapper */
+    protected $homepageConfigMapper;
+
+    /** @var  HomepageTemplateMapper */
+    protected $homepageTemplateMapper;
+
+    /** @var Access */
+    protected $access;
 
 
     /**
@@ -40,6 +62,13 @@ class Controller extends BaseController
     public function __construct()
     {
         $this->setCourseMapper(CourseMapper::getInstance());
+        $this->setComponentDefinitionMapper(Component_DefinitionMapper::getInstance());
+        $this->setComponentInstanceMapper(Component_InstanceMapper::getInstance());
+        $this->setUnitInstanceMapper(UnitInstanceMapper::getInstance());
+        $this->setTaskMapper(TaskMapper::getInstance());
+        $this->setHomepageConfigMapper(HomepageConfigMapper::getInstance());
+        $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
+        $this->setAccess(Access::getInstance());
     }
 
 
@@ -83,7 +112,7 @@ class Controller extends BaseController
             $data['units']  = $this->getCourseMapper()->findByParent($id);
 
             foreach ($data['units'] as $unit) {
-                $data['tasks'][$unit->getId()] = TaskMapper::getInstance()->findByCategory($unit);
+                $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
             }
         }
 
@@ -367,7 +396,7 @@ class Controller extends BaseController
         //  - stop at, and exclude, all Courses (folder that has > 0 children with > 0 tasks) (apparently this point is up for debate..?)
         //  - continue to exhaustion
 
-        $tb = new TreeBuilder(Folder\Mapper::getInstance(), TaskMapper::getInstance(), $this->getUser());
+        $tb = new TreeBuilder($this->getCourseMapper(), $this->getTaskMapper(), $this->getUser());
 
         $facultyNode = $this->getCourseMapper()->getFacultyNode();
 
@@ -426,29 +455,6 @@ class Controller extends BaseController
         $this->tpl('import/results', $importer->findUnitsAndTasks($courseId));
     }
 
-    /* Getters/Setters
-     */
-
-    /**
-     * Get course mapper
-     *
-     * @return CourseMapper
-     */
-    private function getCourseMapper()
-    {
-        return $this->courseMapper;
-    }
-
-    /**
-     * Set course mapper
-     *
-     * @param CourseMapper $courseMapper
-     */
-    private function setCourseMapper($courseMapper)
-    {
-        $this->courseMapper = $courseMapper;
-    }
-
 
     /**
      * Save the given template for the given folder
@@ -458,8 +464,8 @@ class Controller extends BaseController
      */
     protected function saveHomepageConfig(Folder\Model $model, $template)
     {
-        $confMapper = HomepageConfigMapper::getInstance();
-        $tplMapper  = HomepageTemplateMapper::getInstance();
+        $confMapper = $this->getHomepageConfigMapper();
+        $tplMapper  = $this->getHomepageTemplateMapper();
 
         $homepageConfig = $confMapper->createModel()->setCategory($model);
 
@@ -603,14 +609,14 @@ class Controller extends BaseController
 
             // Test course page read access
 
-            if (Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
+            if ($this->getAccess()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
                 throw new \Alaress\Authorizer\Failure\Unauthorized;
             }
 
             // Test each homepage for write access
 
             foreach ($homepages as $homepage) {
-                if (Access::getInstance()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
+                if ($this->getAccess()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
                     throw new \Alaress\Authorizer\Failure\Unauthorized;
                 }
             }
@@ -649,9 +655,9 @@ class Controller extends BaseController
                 foreach ($homepages as $homepageId) {
                     // Get the homepage we are importing into and store it for later
 
-                    $homepageCache[$homepageId] = FolderMapper::getInstance()->findById($homepageId);
+                    $homepageCache[$homepageId] = $this->getCourseMapper()->findById($homepageId);
 
-                    $componentDefinition = \Component_DefinitionMapper::getInstance()->findByColumn('class',
+                    $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn('class',
                         'Component_Homepage_CourseOutlineController');
                     $componentDefinitionId = $componentDefinition->first()->getId();
 
@@ -663,7 +669,7 @@ class Controller extends BaseController
                         ->setPosition('top')
                         ->setSequence(1);
 
-                    \Component_InstanceMapper::getInstance()->save($componentCache[$homepageId]);
+                    $this->getComponentInstanceMapper()->save($componentCache[$homepageId]);
                 }
 
                 if ($error) {
@@ -682,7 +688,7 @@ class Controller extends BaseController
                                 // Save the unit into the course.
 
                                 if (!isset($unitCache[$unit['unit_id']])) {
-                                    $unitCache[$unit['unit_id']] = FolderMapper::getInstance()->findById($unit['unit_id']);
+                                    $unitCache[$unit['unit_id']] = $this->getCourseMapper()->findById($unit['unit_id']);
                                 }
                                 $unit_instance = new UnitInstance();
 
@@ -698,7 +704,7 @@ class Controller extends BaseController
                             }
                         }
 
-                        UnitInstanceMapper::getInstance()->save($unit_instance_list);
+                        $this->getUnitInstanceMapper()->save($unit_instance_list);
                     }
 
                     // Return the next fragment...
@@ -727,6 +733,170 @@ class Controller extends BaseController
             'format' => 'json',
             'data' => ['result' => 'success']
         ]);
+    }
+
+
+    /* Getters/Setters
+     */
+
+
+    /**
+     * @return \Schoolbox\Assessment\Course\Mapper
+     */
+    protected function getCourseMapper()
+    {
+        return $this->courseMapper;
+    }
+
+
+    /**
+     * @param \Schoolbox\Assessment\Course\Mapper $courseMapper
+     * @return static
+     */
+    public function setCourseMapper($courseMapper)
+    {
+        $this->courseMapper = $courseMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Component_DefinitionMapper
+     */
+    protected function getComponentDefinitionMapper()
+    {
+        return $this->componentDefinitionMapper;
+    }
+
+
+    /**
+     * @param Component_DefinitionMapper $componentDefinitionMapper
+     * @return static
+     */
+    public function setComponentDefinitionMapper($componentDefinitionMapper)
+    {
+        $this->componentDefinitionMapper = $componentDefinitionMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Component_InstanceMapper
+     */
+    protected function getComponentInstanceMapper()
+    {
+        return $this->componentInstanceMapper;
+    }
+
+
+    /**
+     * @param Component_InstanceMapper $componentInstanceMapper
+     * @return static
+     */
+    public function setComponentInstanceMapper($componentInstanceMapper)
+    {
+        $this->componentInstanceMapper = $componentInstanceMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return UnitInstanceMapper
+     */
+    protected function getUnitInstanceMapper()
+    {
+        return $this->unitInstanceMapper;
+    }
+
+
+    /**
+     * @param UnitInstanceMapper $unitInstanceMapper
+     * @return static
+     */
+    public function setUnitInstanceMapper($unitInstanceMapper)
+    {
+        $this->unitInstanceMapper = $unitInstanceMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return TaskMapper
+     */
+    protected function getTaskMapper()
+    {
+        return $this->taskMapper;
+    }
+
+
+    /**
+     * @param TaskMapper $taskMapper
+     * @return static
+     */
+    public function setTaskMapper($taskMapper)
+    {
+        $this->taskMapper = $taskMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return HomepageConfigMapper
+     */
+    protected function getHomepageConfigMapper()
+    {
+        return $this->homepageConfigMapper;
+    }
+
+
+    /**
+     * @param HomepageConfigMapper $homepageConfigMapper
+     * @return static
+     */
+    public function setHomepageConfigMapper($homepageConfigMapper)
+    {
+        $this->homepageConfigMapper = $homepageConfigMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return HomepageTemplateMapper
+     */
+    protected function getHomepageTemplateMapper()
+    {
+        return $this->homepageTemplateMapper;
+    }
+
+
+    /**
+     * @param HomepageTemplateMapper $homepageTemplateMapper
+     * @return static
+     */
+    public function setHomepageTemplateMapper($homepageTemplateMapper)
+    {
+        $this->homepageTemplateMapper = $homepageTemplateMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Access
+     */
+    protected function getAccess()
+    {
+        return $this->access;
+    }
+
+
+    /**
+     * @param Access $access
+     * @return static
+     */
+    public function setAccess($access)
+    {
+        $this->access = $access;
+        return $this;
     }
 
 }
