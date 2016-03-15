@@ -326,11 +326,18 @@ class Controller extends BaseController
      * Give the encoded return URL for the given course ID
      *
      * @param int $courseId
+     * @param int $unitId
      * @return string
      */
-    protected function getReturnUrl($courseId)
+    protected function getReturnUrl($courseId, $unitId = null)
     {
-        return urlencode(base64_encode($this->getRouteIfAuthorized('course.modifyCourse', [ 'id' => $courseId ])));
+        $path = $this->getRouteIfAuthorized('course.modifyCourse', [ 'id' => $courseId ]);
+
+        if ($unitId) {
+            $path .= "#$unitId";
+        }
+
+        return urlencode(base64_encode($path));
     }
 
 
