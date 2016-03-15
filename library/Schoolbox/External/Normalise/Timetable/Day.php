@@ -63,10 +63,13 @@ class Day
      * Set name
      *
      * @param string $name
+     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -83,6 +86,7 @@ class Day
      * Set number
      *
      * @param int $number
+     * @return $this
      */
     public function setNumber($number)
     {
@@ -103,6 +107,7 @@ class Day
      * Set all periods
      *
      * @param Collection $allPeriods
+     * @return $this
      */
     public function setAllPeriods($allPeriods)
     {
