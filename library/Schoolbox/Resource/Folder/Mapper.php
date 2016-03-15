@@ -1252,15 +1252,9 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         // Check if there is nothing to do
 
-        if ($source == $destination)
+        // I AM REASONABLY SURE THIS SHOULD NOT JUST EXIT OUT
+        if ($source == $destination) {
             exit;
-
-        // Check folder access
-
-        if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$source]) < WRITE_ACCESS ||
-            Access::getInstance()->getFolderAccess($_SESSION["user"], [$destination]) < WRITE_ACCESS
-        ) {
-            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
 
         // Grab folder object
@@ -1269,6 +1263,15 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         $movedFolder  = $folderMapper->findById($source);
         $parentFolder = $folderMapper->findById($destination);
+
+        // Check folder access
+
+        if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$source]) < WRITE_ACCESS ||
+            Access::getInstance()->getFolderAccess($_SESSION["user"], [$destination]) < WRITE_ACCESS ||
+            Access::getInstance()->getFolderAccess($_SESSION["user"], [$movedFolder->getParent()]) < WRITE_ACCESS
+        ) {
+            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+        }
 
         // Make sure the moved folder is not going to be its own ancestor
 
