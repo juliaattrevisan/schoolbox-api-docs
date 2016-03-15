@@ -13,6 +13,7 @@
 namespace Schoolbox\External\Normalise\Timetable\Period;
 
 use Schoolbox\Collection;
+use Schoolbox\External\Normalise\Timetable\Lesson;
 
 abstract class Base
 {
@@ -62,6 +63,19 @@ abstract class Base
     public function __construct()
     {
         $this->setAllClasses(new Collection());
+    }
+
+    /**
+     * Add a Lesson instance
+     *
+     * @param Lesson $class
+     * @return $this
+     */
+    public function addClass(Lesson $class)
+    {
+        $this->getAllClasses()->add($class);
+
+        return $this;
     }
 
     /* Getters/Setters
