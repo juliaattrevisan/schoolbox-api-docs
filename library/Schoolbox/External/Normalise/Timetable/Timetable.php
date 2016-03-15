@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\External\Normalise;
+namespace Schoolbox\External\Normalise\Timetable;
 
 use Schoolbox\Collection;
 use Schoolbox\User;
