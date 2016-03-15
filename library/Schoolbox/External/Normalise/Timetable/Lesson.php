@@ -94,10 +94,13 @@ class Lesson
      * Set name
      *
      * @param string $name
+     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -114,10 +117,13 @@ class Lesson
      * Set code
      *
      * @param string $code
+     * @return $this
      */
     public function setCode($code)
     {
         $this->code = $code;
+
+        return $this;
     }
 
     /**
@@ -134,10 +140,13 @@ class Lesson
      * Set type
      *
      * @param string $type
+     * @return $this
      */
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
     }
 
     /**
@@ -154,10 +163,13 @@ class Lesson
      * Set room
      *
      * @param string $room
+     * @return $this
      */
     public function setRoom($room)
     {
         $this->room = $room;
+
+        return $this;
     }
 
     /**
@@ -174,10 +186,13 @@ class Lesson
      * Set campus
      *
      * @param Campus $campus
+     * @return $this
      */
     public function setCampus($campus)
     {
         $this->campus = $campus;
+
+        return $this;
     }
 
     /**
@@ -194,10 +209,13 @@ class Lesson
      * Set all students
      *
      * @param Collection $allStudents
+     * @return $this
      */
     public function setAllStudents($allStudents)
     {
         $this->allStudents = $allStudents;
+
+        return $this;
     }
 
     /**
@@ -214,9 +232,12 @@ class Lesson
      * Set all staff
      *
      * @param Collection $allStaff
+     * @return $this
      */
     public function setAllStaff($allStaff)
     {
         $this->allStaff = $allStaff;
+
+        return $this;
     }
 }

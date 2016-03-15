@@ -95,10 +95,13 @@ abstract class Base
      * Set name
      *
      * @param string $name
+     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -115,6 +118,7 @@ abstract class Base
      * Set number
      *
      * @param string $number
+     * @return $this
      */
     public function setNumber($number)
     {
@@ -135,6 +139,7 @@ abstract class Base
      * Set start
      *
      * @param string $start
+     * @return $this
      */
     public function setStart($start)
     {
@@ -155,6 +160,7 @@ abstract class Base
      * Set end
      *
      * @param string $end
+     * @return $this
      */
     public function setEnd($end)
     {
@@ -175,6 +181,7 @@ abstract class Base
      * Set all classes
      *
      * @param Collection $allClasses
+     * @return $this
      */
     public function setAllClasses($allClasses)
     {
