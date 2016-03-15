@@ -879,7 +879,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 break;
             }
             $parent_id = $parent->getId();
-            if (!$parent_id || (!empty($stop_id) && $stop_id == $parent_id)) {
+            if (!$parent_id || $parent_id == '#' || (!empty($stop_id) && $stop_id == $parent_id)) {
                 break;
             }
 
