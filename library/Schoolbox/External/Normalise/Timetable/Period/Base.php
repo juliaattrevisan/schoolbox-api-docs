@@ -79,6 +79,16 @@ abstract class Base
     }
 
     /**
+     * This is a Teaching period
+     *
+     * @return bool
+     */
+    public function isTeaching()
+    {
+        return ($this instanceof Teaching);
+    }
+
+    /**
      * Determine which type of Period instance this was
      *
      * @return mixed
