@@ -44,10 +44,13 @@ class Timetable
      * Add a Day instance to the timetable
      *
      * @param Day $day
+     * @return $this
      */
     public function addDay(Day $day)
     {
         $this->getAllDays()->add($day);
+
+        return $this;
     }
 
     /* Getters/Setters
