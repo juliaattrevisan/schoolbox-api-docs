@@ -171,6 +171,11 @@
             }
         });
 
+        if (window.location.hash) {
+            var openId = window.location.hash.slice(1);
+            $('[data-collapser=unit-' + openId + ']').trigger('click');
+        }
+
     });
 </script>
 
