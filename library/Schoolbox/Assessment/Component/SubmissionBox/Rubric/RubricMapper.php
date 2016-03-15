@@ -16,9 +16,8 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\Factory;
 use Schoolbox\IMapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Assessment\Rubric\Competency\Level;
-use Schoolbox\Assessment\Rubric\Criteria\Criterion;
-use Schoolbox\Assessment\Rubric\Criteria\Group;
+use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
+use Schoolbox\Assessment\Rubric\Criteria;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
@@ -83,7 +82,7 @@ class RubricMapper
     public function findByFolderId($folderId, $forceTaskMode = false, array $levelNames = [])
     {
 
-        /** @var Group[] $groupCache */
+        /** @var Criteria\Group[] $groupCache */
         $groupCache = [];
 
         $rubric = new Rubric();
@@ -95,7 +94,7 @@ class RubricMapper
 
         // inject the levels
         foreach ($levelNames as $i => $level) {
-            $rubric->putLevel(new Level($i, $level));
+            $rubric->putLevel(new CompetencyLevel($i, $level));
         }
 
         $args = [ 'folderId' => $folderId ];
@@ -130,10 +129,10 @@ class RubricMapper
             $groupName = $r['grouping'];
 
             if (!array_key_exists($groupName, $groupCache)) {
-                $groupCache[$groupName] = new Group($groupId++, $groupName);
+                $groupCache[$groupName] = new Criteria\Group($groupId++, $groupName);
             }
 
-            $crit = new Criterion($r['id'], $r['name']);
+            $crit = new Criteria\Criterion($r['id'], $r['name']);
 
             $crit->setReadOnly($r['usage_count'] > 0);
 
