@@ -30,6 +30,8 @@ class MultibytePathInfoTest extends PHPUnit_Framework_TestCase
             [ 'אַהֲוָא.jpeg',         null,   'אַהֲוָא.jpeg',         'jpeg',  'אַהֲוָא'        ],
             [ '/foo/אַהֲוָא.jpeg',    '/foo', 'אַהֲוָא.jpeg',         'jpeg',  'אַהֲוָא'        ],
             [ '/foo/_אַהֲוָא.jpeg',   '/foo', '_אַהֲוָא.jpeg',        'jpeg',  '_אַהֲוָא'       ],
+            [ '/foo/bar/_אַהֲוָא.jpeg', '/foo/bar', '_אַהֲוָא.jpeg',   'jpeg',  '_אַהֲוָא'       ],
+            [ '/foo/bar/',           '/foo', 'bar',             null,    'bar'       ],
         ];
     }
 
