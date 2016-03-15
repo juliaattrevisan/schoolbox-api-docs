@@ -78,6 +78,16 @@ abstract class Base
         return $this;
     }
 
+    /**
+     * Determine which type of Period instance this was
+     *
+     * @return mixed
+     */
+    public function findType()
+    {
+        return array_pop(explode('\\', get_class($this)));
+    }
+
     /* Getters/Setters
      */
 
