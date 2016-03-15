@@ -11,7 +11,7 @@
 namespace Schoolbox\External\Normalise\Timetable;
 
 use Schoolbox\Collection;
-
+use Schoolbox\External\Normalise\Timetable\Period\Base as PeriodBase;
 
 class Day
 {
@@ -44,6 +44,19 @@ class Day
     public function __construct()
     {
         $this->setAllPeriods(new Collection());
+    }
+
+    /**
+     * Add a Period instance
+     *
+     * @param PeriodBase $period
+     * @return $this
+     */
+    public function addPeriod(PeriodBase $period)
+    {
+        $this->getAllPeriods()->add($period);
+
+        return $this;
     }
 
     /* Getters/Setters
