@@ -89,6 +89,23 @@ abstract class Base
     }
 
     /**
+     * Return ancient array format
+     *
+     * @return array
+     */
+    public function decompile()
+    {
+        return [
+            'periodName'     => $this->getName(),
+            'periodStart'    => $this->getStart(),
+            'periodEnd'      => $this->getEnd(),
+            'periodNumber'   => $this->getNumber(),
+            'periodSequence' => $this->isTeaching() ? 1 : 2,
+            'day'            => []
+        ];
+    }
+
+    /**
      * Determine which type of Period instance this was
      *
      * @return mixed

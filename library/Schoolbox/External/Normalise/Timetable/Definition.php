@@ -54,6 +54,8 @@ class Definition
 
     /**
      * Return ancient array format
+     *
+     * @return array
      */
     public function decompile()
     {

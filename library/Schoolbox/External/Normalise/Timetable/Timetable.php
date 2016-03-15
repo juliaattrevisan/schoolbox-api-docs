@@ -69,14 +69,7 @@ class Timetable
                 /* Initialise Period struct if empty
                  */
                 if (!is_array($timetable[$periodIndex])) {
-                    $timetable[$periodIndex] = [
-                        'periodName'     => $currentPeriod->getName(),
-                        'periodStart'    => $currentPeriod->getStart(),
-                        'periodEnd'      => $currentPeriod->getEnd(),
-                        'periodNumber'   => $currentPeriod->getNumber(),
-                        'periodSequence' => $currentPeriod->isTeaching() ? 1 : 2,
-                        'day'            => []
-                    ];
+                    $timetable[$periodIndex] = $currentPeriod->decompile();
                 }
 
                 /* Decompile Classes
