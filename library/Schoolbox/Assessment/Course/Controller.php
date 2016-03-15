@@ -142,10 +142,10 @@ class Controller extends BaseController
 
             $data['folder']    = $folder;
             $data['units']     = $this->getCourseMapper()->findByParent($id);
-            $data['returnUrl'] = $this->getReturnUrl($id);
 
             foreach ($data['units'] as $unit) {
                 $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
+                $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
             }
         }
 
@@ -384,7 +384,9 @@ class Controller extends BaseController
                     'id'   => $folder->getId(),
                     'name' => $folder->getName()
                 ],
-                'returnUrl' => $this->getReturnUrl($post['id']),
+                'returnUrl' => [
+                    $folder->getId() => $this->getReturnUrl($post['id'], $folder->getId())
+                ],
                 '_writable' => true,
                 '_expanded' => true
             ];
