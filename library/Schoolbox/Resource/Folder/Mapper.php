@@ -1254,7 +1254,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         // I AM REASONABLY SURE THIS SHOULD NOT JUST EXIT OUT
         if ($source == $destination) {
-            exit;
+            return;
         }
 
         // Grab folder object
