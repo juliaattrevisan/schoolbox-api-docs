@@ -75,7 +75,6 @@ class GCM implements ServiceInterface
         }
 
         $client   = new Client();
-//        $response = new Response();
 
         // break into multiple requests if too many for a single pass
         foreach (array_chunk($registrationIds, self::MAX_TOKENS, false) as $chunk) {
@@ -87,7 +86,6 @@ class GCM implements ServiceInterface
             $rq = $client->post($apiUri, $headers, $payload);
 
             try {
-//                $response->append($registrationIds, $rq->send());
                 $rq->send();
 
             } catch (OutOfBoundsException $e) {
@@ -101,7 +99,6 @@ class GCM implements ServiceInterface
             // range exception not caught here
         }
 
-//        return $response;
     }
 
 }
