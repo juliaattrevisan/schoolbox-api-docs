@@ -78,12 +78,14 @@ class External_Synergetic_CommunityPortal
      */
     protected function encryptPassword($plaintext)
     {
-        return mcrypt_encrypt(
-            MCRYPT_RIJNDAEL_128,
-            $this->key,
-            $plaintext,
-            MCRYPT_MODE_CBC,
-            $this->initializationVector
+        return base64_encode(
+            mcrypt_encrypt(
+                MCRYPT_RIJNDAEL_128,
+                $this->key,
+                $plaintext,
+                MCRYPT_MODE_CBC,
+                $this->initializationVector
+            )
         );
     }
 
@@ -98,7 +100,7 @@ class External_Synergetic_CommunityPortal
         return mcrypt_decrypt(
             MCRYPT_RIJNDAEL_128,
             $this->key,
-            $encrypted,
+            base64_decode($encrypted),
             MCRYPT_MODE_CBC,
             $this->initializationVector
         );
