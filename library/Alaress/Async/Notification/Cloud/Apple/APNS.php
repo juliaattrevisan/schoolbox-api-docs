@@ -11,6 +11,7 @@ namespace Alaress\Async\Notification\Cloud\Apple;
 
 use Alaress\Async\Notification\Cloud\ServiceInterface;
 
+use InvalidArgumentException;
 use Schoolbox\MobileApp\Registry;
 use ZendService\Apple\Apns\Client\Message as Client;
 use ZendService\Apple\Apns\Message;
@@ -73,10 +74,18 @@ class APNS implements ServiceInterface
         $message = new Message();
 
         foreach ($tokens as $token) {
-            $message->setId(substr(sha1("$token.".json_encode($data)), 0, 4));
-            $message->setToken($token);
-            $message->setBadge(null);
-            $message->setSound('bingbong.aiff');
+            try {
+                $message->setId(substr(sha1("$token.".json_encode($data)), 0, 4));
+                $message->setToken($token);
+                $message->setBadge(null);
+                $message->setSound('bingbong.aiff');
+
+            } catch (InvalidArgumentException $e) {
+
+                // TODO log invalid something something
+                continue;
+            }
+
 
             try {
                 $this->ensureConnection();
