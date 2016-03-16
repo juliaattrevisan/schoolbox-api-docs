@@ -509,7 +509,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	 * Send data to all pipes associated with a specific user.
 	 *
 	 * @param int    $userId
-	 * @param string $data
+	 * @param array  $data
 	 * @param bool   $cloudPush
 	 */
 	public function sendToUser($userId, $data, $cloudPush = true) {
@@ -518,6 +518,7 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 		}
 
 		if ($cloudPush) {
+			$this->log->info("Pushing message to cloud for user $userId", $data);
 			$this->cloudManager->push($userId, $data);
 		}
 	}
