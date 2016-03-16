@@ -65,8 +65,8 @@ class GCM implements ServiceInterface
     {
         $apiUri  = self::GCM_API_URI;
         $headers = array(
-            "Authorization: key=$this->apiKey",
-            'Content-Type: application/json'
+            "Authorization" => "key={$this->apiKey}",
+            "Content-Type"  => "application/json"
         );
 
         // ensure payload does not exceed 4KB
@@ -104,4 +104,4 @@ class GCM implements ServiceInterface
 //        return $response;
     }
 
-} 
+}
