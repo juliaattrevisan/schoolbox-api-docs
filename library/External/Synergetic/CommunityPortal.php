@@ -82,7 +82,8 @@ class External_Synergetic_CommunityPortal
             mcrypt_encrypt(
                 MCRYPT_RIJNDAEL_128,
                 $this->key,
-                $plaintext,
+                // Because this is the encoding their DB uses
+                mb_convert_encoding($plaintext, 'UCS-2LE'),
                 MCRYPT_MODE_CBC,
                 $this->initializationVector
             )
