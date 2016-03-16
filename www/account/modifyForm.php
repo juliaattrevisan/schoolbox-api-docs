@@ -60,15 +60,12 @@ if (isset($_POST['current_password'])) {
         }
 
         // Try this
-        $userHandler->updateExternalSystemPassword(
-            [
-                'uid'        => $user->getId(),
-                'username'   => $user->getUsername(),
-                'synergy_id' => $user->getExternalId(),
-            ],
-            $_POST['current_password'],
-            $_POST['new_password']
-        );
+        // I shouldn't have to send all those damn password change mails anymore either
+        if ($user->getRole()->isParent()) {
+            $communityPortalFactory = new \Schoolbox\External\Connector\CommunityPortalFactory();
+            $communityPortal        = $communityPortalFactory->build();
+            $communityPortal->changePassword($user->getExternalId(), $_POST['new_password']);
+        }
 
         $result = $userHandler->sendChangePasswordEmail($user->getId());
         $myconf = ConfigMapper::getInstance();
