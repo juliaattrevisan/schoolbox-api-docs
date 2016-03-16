@@ -5,6 +5,8 @@
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
+ *
+ * @specialThanksTo Damian Sloane <damian.sloane@alaress.com.au>
  */
 
 use Alaress\DebugBar\Instance as DebugBar;
@@ -15,6 +17,20 @@ class External_Synergetic_CommunityPortal
      * @var MSSQL
      */
     private $database;
+
+    /**
+     * The password encryption key. This must be secret and not stored in code.
+     *
+     * @var string
+     */
+    private $key;
+
+    /**
+     * The hard-coded IV for the password. This does not need to be secret.
+     *
+     * @var string
+     */
+    private $initializationVector;
 
     /**
      * Constructor
@@ -57,7 +73,13 @@ class External_Synergetic_CommunityPortal
      */
     protected function encryptPassword($plaintext)
     {
-        return $plaintext;
+        return mcrypt_encrypt(
+            MCRYPT_RIJNDAEL_128,
+            $this->key,
+            $plaintext,
+            MCRYPT_MODE_CBC,
+            $this->initializationVector
+        );
     }
 
     /**
@@ -68,6 +90,12 @@ class External_Synergetic_CommunityPortal
      */
     protected function decryptPassword($encrypted)
     {
-        return $encrypted;
+        return mcrypt_decrypt(
+            MCRYPT_RIJNDAEL_128,
+            $this->key,
+            $encrypted,
+            MCRYPT_MODE_CBC,
+            $this->initializationVector
+        );
     }
 }
