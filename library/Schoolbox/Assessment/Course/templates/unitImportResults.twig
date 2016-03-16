@@ -86,13 +86,13 @@
 
                         {# Due work name #}
 
-                        <div class="avatar card small-4">
+                        <div class="avatar card small-12 medium-4">
                             {{ work.getName }}
                         </div>
 
                         {# Publish Date #}
 
-                        <div class="small-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                        <div class="small-12 medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
                             {% if work.getPublishDate != '' %}
                                 <label for="work_publish_date-{{ work.getId }}">Publish Date</label>
                                 <input id="work_publish_date-{{ work.getId }}"
@@ -108,7 +108,7 @@
 
                         {# Due Date #}
 
-                        <div class="small-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                        <div class="small-12 medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
                             {% if work.getDueDate != '' %}
                                 <label for="work_due_date-{{ work.getId }}">Due Date</label>
                                 <input id="work_due_date-{{ work.getId }}"
@@ -128,7 +128,7 @@
 
                             {# Open Date #}
 
-                            <div class="small-2 columns" data-hide-watch="#import-work-{{ work.getId }}">
+                            <div class="small-12 medium-2 columns" data-hide-watch="#import-work-{{ work.getId }}">
                                 <label for="work_open_date-{{ work.getId }}">Open Date</label>
                                 <input id="work_open_date-{{ work.getId }}"
                                        name="work[{{ work.getId }}][open_date]"
@@ -142,7 +142,7 @@
 
                             {# Late Date #}
 
-                            <div class="small-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                            <div class="small-12 medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
                                 <label for="work_late_date-{{ work.getId }}">Late Date</label>
                                 <input id="work_late_date-{{ work.getId }}"
                                        name="work[{{ work.getId }}][late_date]"
@@ -192,13 +192,13 @@
 
                         {# Task name #}
 
-                        <div class="avatar card small-4">
+                        <div class="avatar card small-12 medium-4">
                             {{ quiz.getTitle }}
                         </div>
 
                         {# Open Date #}
 
-                        <div class="small-2 columns">
+                        <div class="small-12 medium-2 columns">
                             <label for="quiz_start_date-{{ quiz.getId }}">Start Date</label>
                             <input id="quiz_start_date-{{ quiz.getId }}"
                                    name="quiz[{{ quiz.getId }}][start_date]"
@@ -212,7 +212,7 @@
 
                         {# Close Date #}
 
-                        <div class="small-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                        <div class="small-12 medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
                             <label for="quiz_finish_date-{{ quiz.getId }}">Finish Date</label>
                             <input id="quiz_finish_date-{{ quiz.getId }}"
                                    name="quiz[{{ quiz.getId }}][finish_date]"
@@ -224,7 +224,7 @@
                                    data-datepicker-sync-enddate="#quiz_finish_date-{{ quiz.getId }}" />
                         </div>
 
-                        <div class="small-4 columns"></div>
+                        <div class="small-12 medium-4 columns"></div>
                     </div>
                 </li>
 

@@ -67,11 +67,13 @@
 
                 $('#importTasks').html(data);
 
-                {# Init stage 3 mages #}
+                {# Init stage 3 mage #}
 
                 $('input[data-mage-next="part-results-select"]').mage({onXhrDone: function(data)
                 {
-                    alert('Import Completed. YAY!');
+                    {# Game over, not sure where to go here #}
+
+                    alert('THANK YOU MARIO!\n\n▒▒▒▒▒▒▒▒▒▄▄▄▄▒▒▒▒▒▒▒\n▒▒▒▒▒▒▄▀▀▓▓▓▀█▒▒▒▒▒▒\n▒▒▒▒▄▀▓▓▄██████▄▒▒▒▒\n▒▒▒▄█▄█▀░░▄░▄░█▀▒▒▒▒\n▒▒▄▀░██▄░░▀░▀░▀▄▒▒▒▒\n▒▒▀▄░░▀░▄█▄▄░░▄█▄▒▒▒\n▒▒▒▒▀█▄▄░░▀▀▀█▀▒▒▒▒▒\n▒▒▒▄▀▓▓▓▀██▀▀█▄▀▀▄▒▒\n▒▒█▓▓▄▀▀▀▄█▄▓▓▀█░█▒▒\n▒▒▀▄█░░░░░█▀▀▄▄▀█▒▒▒\n▒▒▒▄▀▀▄▄▄██▄▄█▀▓▓█▒▒\n▒▒█▀▓█████████▓▓▓█▒▒\n▒▒█▓▓██▀▀▀▒▒▒▀▄▄█▀▒▒\n▒▒▒▀▀▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒\n\nBUT OUR PRINCESS IS IN ANOTHER CASTLE.');
                 }});
             }});
         }});
