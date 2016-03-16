@@ -360,25 +360,6 @@ class User extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    /**
-     * Checks the user's password in the database.
-     *
-     * @param int    $user_id
-     * @param string $password
-     *
-     * @return bool Does the user ID have this password?
-     */
-    protected function checkPassword($user_id, $password)
-    {
-        $esc_user_id  = $this->db->quote($user_id);
-        $esc_password = $this->db->quote($password);
-        $query        =
-            "SELECT `" . $this->_index . "` FROM `" . $this->_table . '` ' .
-            "WHERE `" . $this->_index . "` = $esc_user_id AND password = PASSWORD('$esc_password') AND deleted_at IS NULL";
-        $this->db->query($query);
-        return ($this->db->countRows() > 0);
-    }
-
 
     /**
      * Sets the user's password in the database.
@@ -464,30 +445,6 @@ class User extends DeprecatedModel
             $mailHandler->setVar('DATE', date('j F Y', $_SERVER['REQUEST_TIME']));
             $mailHandler->setVar('TIME', date('g:i a', $_SERVER['REQUEST_TIME']));
             return $mailHandler->send();
-        }
-        return false;
-    }
-
-
-    public function sendPassword($email)
-    {
-        if (empty($email)) {
-            return false;
-        }
-        $groupHandler = new Group();
-        $user_list    = $this->getAllByField('alt_email', $email);
-        $result = array();
-        if (!empty($user_list)) {
-            foreach ($user_list as $user) {
-                if ($user['enabled'] && $user['email_pass'] != '') {
-                    $result['NAME'] = $user['firstname'];
-                    $result['USERNAME'] = $user['username'];
-                    $result['EMAIL'] = $user['alt_email'];
-                    $result['FULLNAME'] = $user['firstname']." ".$user['lastname'];
-                    $result['FIRSTNAME'] = $user['firstname'];
-                    return $result;
-                }
-            }
         }
         return false;
     }
