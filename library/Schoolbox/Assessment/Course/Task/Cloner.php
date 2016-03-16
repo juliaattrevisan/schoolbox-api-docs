@@ -76,6 +76,7 @@ class Cloner
     {
         $assess_id = $this->task_instance->getTask()->getAssessment()->getId();
         if ($assess_id) {
+
             $mapper   = OnlineAssessmentMapper::getInstance();
             $handler  = new Assess_Main();
             $section  = new Assess_Section();
@@ -113,12 +114,29 @@ class Cloner
             // And update the mapper version
             /** @var OnlineAssessment $newAssess */
             $newAssess = $mapper->findById($newAssessId);
+
+            // Get start/finish dates from cloned task
+
+            $start = $this->getOpenTimeFromTask();
+            $finish = $this->getAssessmentCloseTimeFromTask();
+
+            // Check if we need to override the dates
+
+            $quizDates = $this->task_instance->getUnitInstance()->getQuizDates();
+
+            if (is_array($quizDates)) {
+                if (isset($quizDates[$assess_id])) {
+                    $start = \Alaress_Date_Format::newLocalShort($quizDates[$assess_id]['start_date']);
+                    $finish = \Alaress_Date_Format::newLocalShort($quizDates[$assess_id]['finish_date']);
+                }
+            }
+
             $newAssess
                 ->setTask(null)
                 ->setTaskInstance($this->task_instance)
                 ->setUser($_SESSION['id'])
-                ->setStart($this->getOpenTimeFromTask())
-                ->setFinish($this->getAssessmentCloseTimeFromTask())
+                ->setStart($start)
+                ->setFinish($finish)
                 ->setCurriculumNodes($oldAssess->getCurriculumNodes())
             ;
             $mapper->save($newAssess);
@@ -144,15 +162,34 @@ class Cloner
             } catch (MapperException $e) {
                 throw new ClonerException('No submission box is attached to this task');
             }
+
+            $publish = $this->getOpenTimeFromTask();
+            $open = $this->getOpenTimeFromTask();
+            $due = $this->getSubmissionBoxCloseTimeFromTask();
+            $late = $this->getSubmissionBoxCloseTimeFromTask();
+
+            // Check if we need to override the dates
+
+            $workDates = $this->task_instance->getUnitInstance()->getWorkDates();
+
+            if (is_array($workDates)) {
+                if (isset($workDates[$box_id])) {
+                    $publish = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['publish_date']);
+                    $open = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['open_date']);
+                    $due = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['due_date']);
+                    $late = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['late_date']);
+                }
+            }
+
             $box
                 ->setTask(null)
                 ->setTaskInstance($this->task_instance)
                 ->setOwner($_SESSION['id'])
                 ->setCategory($this->category)
-                ->setPublishDate($this->getOpenTimeFromTask())
-                ->setOpenDate($this->getOpenTimeFromTask())
-                ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
-                ->setLateDate($this->getSubmissionBoxCloseTimeFromTask())
+                ->setPublishDate($publish)
+                ->setOpenDate($open)
+                ->setDueDate($due)
+                ->setLateDate($late)
             ;
             SubmissionBoxMapper::getInstance()->create($box);
 

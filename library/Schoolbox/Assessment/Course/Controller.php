@@ -892,9 +892,6 @@ class Controller extends BaseController
             }
         }
 
-        $this->throwError('Yep');
-        return;
-
         // Parse homepages out of CSV format into an array
 
         $homepages = explode(",", $this->getRequest()->post["homepage"]);
@@ -970,6 +967,8 @@ class Controller extends BaseController
                     $unit_instance = new UnitInstance();
 
                     $unit_instance
+                        ->setWorkDates($this->getRequest()->post["work"])           // Override due work dates in cloner
+                        ->setQuizDates($this->getRequest()->post["quiz"])           // Override quiz dates in cloner
                         ->setComponent($componentCache[$homepageId])
                         ->setTitle($unitCache[$unit['unit_id']]->getName())
                         ->setCategory($homepageCache[$homepageId])
@@ -983,6 +982,7 @@ class Controller extends BaseController
 
             UnitInstanceMapper::getInstance()->save($unit_instance_list);
         }
+
     }
 
     /* Getters/Setters

@@ -24,13 +24,24 @@
 
 {% for unit in units %}
 
-    <h1>{{ unit.name }}</h1>
-
     {% if unit.tasks | length > 0 %}
 
         {# Tasks for the current unit #}
 
-        <h2>Tasks</h2>
+        <ul class="component-titlebar" style="background-color:#ddd">
+            <li>
+                <div class="list-item">
+                    <div class="small-12 card">
+                        <h2>
+                            <div class="left">{{ unit.name }}</div>
+                            <div class="right">Tasks</div>
+                            <div class="clearfix" />
+                        </h2>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
         <ul class="information-list no-pad">
             {% for task in unit.tasks %}
                 <li>
@@ -38,7 +49,7 @@
 
                         {# Due work name #}
 
-                        <div class="avatar card small-4">
+                        <div class="avatar card compact small-12">
                             {{ task.getTitle }}
                         </div>
                     </div>
@@ -52,7 +63,19 @@
 
         {# Due work for the current unit #}
 
-        <h2>Due Work</h2>
+        <ul class="component-titlebar" style="background-color:#ddd">
+            <li>
+                <div class="list-item">
+                    <div class="small-12 card">
+                        <h2>
+                            <div class="left">{{ unit.name }}</div>
+                            <div class="right">Due Work</div>
+                            <div class="clearfix" />
+                        </h2>
+                    </div>
+                </div>
+            </li>
+        </ul>
 
         <ul class="information-list no-pad">
 
@@ -144,9 +167,21 @@
 
     {% if unit.quizzes | length > 0 %}
 
-        {# Tasks for the current unit #}
+        {# Quizzes for the current unit #}
 
-        <h2>Quizzes</h2>
+        <ul class="component-titlebar" style="background-color:#ddd">
+            <li>
+                <div class="list-item">
+                    <div class="small-12 card">
+                        <h2>
+                            <div class="left">{{ unit.name }}</div>
+                            <div class="right">Quizzes</div>
+                            <div class="clearfix" />
+                        </h2>
+                    </div>
+                </div>
+            </li>
+        </ul>
 
         <ul class="information-list no-pad">
 
