@@ -64,7 +64,7 @@ class External_Synergetic_CommunityPortal
         $encryptedPassword = $this->encryptPassword($newPassword);
         $query = "
             UPDATE CommunityLogins
-            SET    PasswordHashed = {$this->database->smartQuote($encryptedPassword)}
+            SET    Password = {$this->database->smartQuote($encryptedPassword)}
             WHERE  ID = {$this->database->smartQuote($communityId)}
         ";
         $this->database->query($query);
