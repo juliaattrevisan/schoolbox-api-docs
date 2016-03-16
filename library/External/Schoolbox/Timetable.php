@@ -177,7 +177,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         $periodStatement = $this->getPeriodStatement(false);
         $periodStatement->execute(array(':campusId' => $campus->getId(),));
-        $current_time = date('H:i:s', $now ?: time());
+        $current_time = date('g:ia', $now ?: time());
         foreach ($periodStatement as $item) {
             if ($item['start'] <= $current_time && $item['finish'] >= $current_time) {
                 return array(
