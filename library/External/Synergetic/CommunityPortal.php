@@ -104,12 +104,15 @@ class External_Synergetic_CommunityPortal
      */
     protected function decryptPassword($encrypted)
     {
-        return mcrypt_decrypt(
-            MCRYPT_RIJNDAEL_128,
-            $this->key,
-            base64_decode($encrypted),
-            MCRYPT_MODE_CBC,
-            $this->initializationVector
+        return mb_convert_encoding(
+            mcrypt_decrypt(
+                MCRYPT_RIJNDAEL_128,
+                $this->key,
+                base64_decode($encrypted),
+                MCRYPT_MODE_CBC,
+                $this->initializationVector
+            ),
+            'UTF-8'
         );
     }
 }
