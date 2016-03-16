@@ -14,30 +14,27 @@
 <input type="hidden" name="course_homepage" value="{{ courseHomepage }}" />
 
 {% for unit in unitDates %}
-    <input type="hidden" name="unit[{{ loop.index }}][unit_id]" value="{{ unit.unit_id }}">
-    <input type="hidden" name="unit[{{ loop.index }}][import]" value="{{ unit.import }}">
-    <input type="hidden" name="unit[{{ loop.index }}][open_date]" value="{{ unit.open_date }}">
-    <input type="hidden" name="unit[{{ loop.index }}][due_date]" value="{{ unit.due_date }}">
+<input type="hidden" name="unit[{{ loop.index }}][unit_id]" value="{{ unit.unit_id }}">
+<input type="hidden" name="unit[{{ loop.index }}][import]" value="{{ unit.import }}">
+<input type="hidden" name="unit[{{ loop.index }}][open_date]" value="{{ unit.open_date }}">
+<input type="hidden" name="unit[{{ loop.index }}][due_date]" value="{{ unit.due_date }}">
 {% endfor %}
 
 {# Iterate through each unit being imported #}
 
 {% for unit in units %}
-
-<div class="small-12 island">
-    <div class="row">
-        <h1 class='subheader'>{{ unit.name }}</h1>
-        <div class="small-12 island">
+<div class="row">
+    <div class="small-12 columns">
+        <section>
+            <h3>{{ unit.name }}</h3>
 
             {% if unit.dueWork | length > 0 %}
-
-                <h2 class="subheader">Due Work</h2>
+                <h4>Due Work</h4>
                 <ul class="information-list no-pad">
 
                 {# Due work for the current unit #}
 
                 {% for work in unit.dueWork %}
-
                     <li>
                         <div class="list-item" data-type="unit_row">
                             <input type="hidden" name="submissions" value="{% if work.getAcceptOnline %}1{% else %}0{% endif %}">
@@ -116,79 +113,70 @@
                             </div>
                         </div>
                     </li>
-
                 {% endfor %}
-
                 </ul>
-
             {% endif %}
 
             {% if unit.quizzes | length > 0 %}
-
-                <h2 class="subheader">Quizzes</h2>
+                <h4>Quizzes</h4>
                 <ul class="information-list no-pad">
 
                 {# Quizzes for the current unit #}
 
                 {% for quiz in unit.quizzes %}
+                <li>
+                    <div class="list-item" data-type="unit_row">
 
-                    <li>
-                        <div class="list-item" data-type="unit_row">
+                        {# Task name #}
 
-                            {# Task name #}
-
-                            <div class="avatar card small-12 medium-4">
-                                {{ quiz.getTitle }}
-                            </div>
-
-                            {# Publish Date #}
-                            {# This will exist for Quiz at some point #}
-                            <div class="small-12 medium-2 columns">
-                                &nbsp;
-                            </div>
-
-                            {# Open Date #}
-                            <div class="small-12 medium-2 columns">
-                                <label for="quiz_start_date-{{ quiz.getId }}">Start Date</label>
-                                <input id="quiz_start_date-{{ quiz.getId }}"
-                                       name="quiz[{{ quiz.getId }}][start_date]"
-                                       type="text"
-                                       value="{{ unit.open_date }}"
-                                       data-role="start_date"
-                                       data-datepicker
-                                       data-datepicker-sync
-                                       data-datepicker-sync-enddate="#quiz_start_date-{{ quiz.getId }}" />
-                            </div>
-
-                            {# Close Date #}
-                            <div class="small-12 medium-2 columns">
-                                <label for="quiz_finish_date-{{ quiz.getId }}">Finish Date</label>
-                                <input id="quiz_finish_date-{{ quiz.getId }}"
-                                       name="quiz[{{ quiz.getId }}][finish_date]"
-                                       type="text"
-                                       value="{{ unit.due_date }}"
-                                       data-role="finish_date"
-                                       data-datepicker
-                                       data-datepicker-sync
-                                       data-datepicker-sync-enddate="#quiz_finish_date-{{ quiz.getId }}" />
-                            </div>
-
-                            {# Late Date #}
-                            <div class="small-12 medium-2 columns">
-                                &nbsp;
-                            </div>
+                        <div class="avatar card small-12 medium-4">
+                            {{ quiz.getTitle }}
                         </div>
-                    </li>
 
+                        {# Publish Date #}
+                        {# This will exist for Quiz at some point #}
+                        <div class="small-12 medium-2 columns">
+                            &nbsp;
+                        </div>
+
+                        {# Open Date #}
+                        <div class="small-12 medium-2 columns">
+                            <label for="quiz_start_date-{{ quiz.getId }}">Start Date</label>
+                            <input id="quiz_start_date-{{ quiz.getId }}"
+                                   name="quiz[{{ quiz.getId }}][start_date]"
+                                   type="text"
+                                   value="{{ unit.open_date }}"
+                                   data-role="start_date"
+                                   data-datepicker
+                                   data-datepicker-sync
+                                   data-datepicker-sync-enddate="#quiz_start_date-{{ quiz.getId }}" />
+                        </div>
+
+                        {# Close Date #}
+                        <div class="small-12 medium-2 columns">
+                            <label for="quiz_finish_date-{{ quiz.getId }}">Finish Date</label>
+                            <input id="quiz_finish_date-{{ quiz.getId }}"
+                                   name="quiz[{{ quiz.getId }}][finish_date]"
+                                   type="text"
+                                   value="{{ unit.due_date }}"
+                                   data-role="finish_date"
+                                   data-datepicker
+                                   data-datepicker-sync
+                                   data-datepicker-sync-enddate="#quiz_finish_date-{{ quiz.getId }}" />
+                        </div>
+
+                        {# Late Date #}
+                        <div class="small-12 medium-2 columns">
+                            &nbsp;
+                        </div>
+                    </div>
+                </li>
                 {% endfor %}
-
                 </ul>
-
             {% endif %}
 
             {% if unit.tasks | length > 0 %}
-
-                <h2 class="subheader">Tasks</h2>
+                <h4>Tasks</h4>
                 <ul class="information-list no-pad">
 
                 {# Tasks for the current unit #}
@@ -205,15 +193,11 @@
                         </div>
                     </li>
                 {% endfor %}
-
                 </ul>
-
             {% endif %}
-
-        </div>
+        </section>
     </div>
 </div>
-
 {% endfor %}
 
 <div class="small-12 column">
