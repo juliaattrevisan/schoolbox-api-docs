@@ -13,6 +13,7 @@ use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\External\Connector\CommunityPortalFactory;
 use Schoolbox\Mail;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\UserMapper;
@@ -82,10 +83,11 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'passwordService' => $injector->lazyNew(PasswordService::class),
-                    'userMapper'      => UserMapper::getInstance(),
-                    'resetMapper'     => Mapper::getInstance(),
-                    'mailFactory'     => $injector->lazyNew(
+                    'passwordService'        => $injector->lazyNew(PasswordService::class),
+                    'userMapper'             => UserMapper::getInstance(),
+                    'resetMapper'            => Mapper::getInstance(),
+                    'communityPortalFactory' => $injector->lazyNew(CommunityPortalFactory::class),
+                    'mailFactory'            => $injector->lazyNew(
                         Mail\TwigEmailFactory::class,
                         [
                             'context' => $injector->lazyNew(

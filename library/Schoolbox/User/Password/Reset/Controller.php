@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\External\Connector\CommunityPortalFactory;
 
 /**
  * Controller for password resets
@@ -41,23 +42,31 @@ class Controller extends Base
     protected $passwordService;
 
     /**
+     * @var CommunityPortalFactory
+     */
+    protected $communityPortalFactory;
+
+    /**
      * Constructor
      *
-     * @param UserMapper       $userMapper
-     * @param Mapper           $resetMapper
-     * @param TwigEmailFactory $mailFactory
-     * @param PasswordService  $passwordService
+     * @param UserMapper             $userMapper
+     * @param Mapper                 $resetMapper
+     * @param TwigEmailFactory       $mailFactory
+     * @param PasswordService        $passwordService
+     * @param CommunityPortalFactory $communityPortalFactory
      */
     public function __construct(
         UserMapper $userMapper,
         Mapper $resetMapper,
         TwigEmailFactory $mailFactory,
-        PasswordService $passwordService
+        PasswordService $passwordService,
+        CommunityPortalFactory $communityPortalFactory
     ) {
-        $this->userMapper      = $userMapper;
-        $this->resetMapper     = $resetMapper;
-        $this->mailFactory     = $mailFactory;
-        $this->passwordService = $passwordService;
+        $this->userMapper             = $userMapper;
+        $this->resetMapper            = $resetMapper;
+        $this->mailFactory            = $mailFactory;
+        $this->passwordService        = $passwordService;
+        $this->communityPortalFactory = $communityPortalFactory;
     }
 
     /**
