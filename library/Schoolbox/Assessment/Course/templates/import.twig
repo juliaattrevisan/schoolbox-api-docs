@@ -117,28 +117,26 @@
                         </div>
                     </div>
                 </fieldset>
-            </section>
 
-            <h2 class="subheader">Units</h2>
-            <section>
-                <fieldset data-mage="part-unit-select">
+                <fieldset class='content' data-mage="part-unit-select">
+                    <legend>Units</legend>
+
                     <div class="small-12 column hide" data-mage-collapsed>
                         <div id="importUnits"></div>
                     </div>
                 </fieldset>
-            </section>
 
-            <h2 class="subheader">Coursework</h2>
-            <section>
-                <fieldset data-mage="part-tasks-select">
+                <fieldset class='content' data-mage="part-tasks-select">
+                    <legend>Coursework</legend>
+
                     <div class="small-12 column hide" data-mage-collapsed>
                         <div id="importTasks">
                     </div>
-{#
+    {#
                         {% if folder.id %}
                             {% include '@course/import/results.twig' %}
                         {% endif %}
-#}
+    #}
                     </div>
                     <div id="importResults" class="hide" data-mage-collapsed></div>
                 </fieldset>
