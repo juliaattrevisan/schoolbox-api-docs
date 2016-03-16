@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 // These are used for older assess export related code:
 // while this is handler-related, it works.
@@ -48,6 +49,11 @@ class Cloner
     protected $category;
 
     /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
      * Creates the cloner, setting up the unit and category objects that are
      * required.
      *
@@ -63,6 +69,17 @@ class Cloner
             $this->unit->getComponent()->getId()
         );
         $this->category = CategoryMapper::getInstance()->findById($component->getIdentifier());
+
+        $this->setErrorMapper(ErrorMapper::getInstance());
+    }
+
+    public function setErrorMapper($errorMapper) {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+    public function getErrorMapper() {
+        return $this->errorMapper;
     }
 
     /**
@@ -109,11 +126,17 @@ class Cloner
 
             // Get curriculum codes out of old assess
             // (yes, I currently need both the mapper and the handler version!)
-            /** @var OnlineAssessment $oldAssess */
-            $oldAssess = $mapper->findById($assess_id);
-            // And update the mapper version
-            /** @var OnlineAssessment $newAssess */
-            $newAssess = $mapper->findById($newAssessId);
+
+            try {
+                /** @var OnlineAssessment $oldAssess */
+                $oldAssess = $mapper->findById($assess_id);
+                // And update the mapper version
+                /** @var OnlineAssessment $newAssess */
+                $newAssess = $mapper->findById($newAssessId);
+            }
+            catch (\Exception $e) {
+                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            }
 
             // Get start/finish dates from cloned task
 
