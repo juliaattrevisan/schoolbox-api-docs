@@ -2,6 +2,8 @@
 /**
  * Synergetic SOAP API Gateway
  *
+ * @deprecated use External_Synergetic_CommunityPortal instead
+ *
  * @author      Ryan Hughes <ryan.hughes@alaress.com.au>
  * @copyright   Copyright 2011 Alaress. All Rights Reserved.
  * @link        http://www.alaress.com.au/
