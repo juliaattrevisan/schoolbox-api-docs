@@ -96,7 +96,7 @@ $kernel->run(
                }
            }
 
-           $cloudManager = new MobileApp\ServiceManager($services);
+           $cloudManager = new MobileApp\ServiceManager($services, $log);
 
            $stompFactory = new Factory($loop);
 

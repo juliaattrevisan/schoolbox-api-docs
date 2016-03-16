@@ -13,6 +13,7 @@ use Alaress\Async\Notification\Cloud\ServiceInterface;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use OverflowException;
+use Psr\Log\LoggerInterface;
 use RangeException;
 
 class ServiceManager
@@ -24,14 +25,19 @@ class ServiceManager
     /** @var RegistryMapper */
     protected $registryMapper;
 
+    /** @var LoggerInterface */
+    protected $log;
+
 
     /**
      * @param ServiceInterface[] $services
      * @param RegistryMapper     $registryMapper
+     * @param LoggerInterface    $log
      */
-    public function __construct(array $services = array(), RegistryMapper $registryMapper = null)
+    public function __construct(array $services, LoggerInterface $log, RegistryMapper $registryMapper = null)
     {
         $this->registryMapper = $registryMapper ?: RegistryMapper::getInstance();
+        $this->log = $log;
 
         foreach ($services as $service) {
             // ensure typesafety
@@ -55,6 +61,7 @@ class ServiceManager
 
         // index by provider name
         $this->services[$provider] = $service;
+        $this->log->debug("Added cloud notification provider '$provider'");
         return $this;
     }
 
@@ -67,6 +74,7 @@ class ServiceManager
     protected function dropService($provider) {
         if (array_key_exists($provider, $this->services)) {
             $this->services[$provider] = null;
+            $this->log->debug("Dropped cloud notification provider '$provider'");
         }
     }
 
@@ -87,7 +95,7 @@ class ServiceManager
 
             } catch (InvalidArgumentException $e) {
                 // service not available
-                echo $e; // TODO use logger
+                $this->log->notice("Failed push to '$provider': {$e->getMessage()}", [ $e ]);
             }
         }
     }
@@ -103,17 +111,18 @@ class ServiceManager
         $provider = $service->getProviderName();
 
         try {
+            $this->log->info("Sending data to " . count($tokens) . " $provider devices");
             $service->send($tokens, $data);
 
         } catch (OutOfBoundsException $e) {
             // bad API key, which will require a daemon restart, so remove this service from use
             $this->dropService($provider);
-            echo $e; // TODO use logger
+            $this->log->warning("Dropping unusable service '$provider': {$e->getMessage()}", [ $e ]);
 
         } catch (RangeException $e) {
             // TODO implement backoff-and-retry.
             // TODO $e->getCode() will contain a Retry-After TTL (in seconds), or 0 if exponential backoff is to be implemented
-            echo $e;
+            $this->log->info($e->getMessage(), [ $e ]);
         }
     }
 
