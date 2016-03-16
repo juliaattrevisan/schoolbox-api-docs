@@ -209,6 +209,13 @@ class Controller extends Base
                     'userPasswordReset.displaySuccessMessage'
                 )
             );
+
+            // Reset their password in SCP too
+            if ($reset->getUser()->getRole()->isParent()) {
+                $communityPortalFactory = new \Schoolbox\External\Connector\CommunityPortalFactory();
+                $communityPortal        = $communityPortalFactory->build();
+                $communityPortal->changePassword($reset->getUser()->getExternalId(), $password);
+            }
         } else {
             $this->getSessionSegment()->setFlash('isPasswordValid', false);
             $this->getResponse()->redirect->to(
