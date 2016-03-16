@@ -78,12 +78,18 @@ class External_Synergetic_CommunityPortal
      */
     protected function encryptPassword($plaintext)
     {
+        // Pad converted text to a block with chr(bytes to pad)
+        // @see https://php.net/manual/en/function.mcrypt-encrypt.php#47973
+        $blockSize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+        // Because this is the encoding their DB uses
+        $convText  = mb_convert_encoding($plaintext, 'UCS-2LE');
+        $padding   = $blockSize - (strlen($convText) % $blockSize);
+        $convText  .= str_repeat(chr($padding), $padding);
         return base64_encode(
             mcrypt_encrypt(
                 MCRYPT_RIJNDAEL_128,
                 $this->key,
-                // Because this is the encoding their DB uses
-                mb_convert_encoding($plaintext, 'UCS-2LE'),
+                $convText,
                 MCRYPT_MODE_CBC,
                 $this->initializationVector
             )
