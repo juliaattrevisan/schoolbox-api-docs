@@ -30,8 +30,8 @@ class APNS implements ServiceInterface
     /** @var Client */
     protected $client;
 
-    /** @var string */
-    protected $uri;
+    /** @var int */
+    protected $environment;
 
     /** @var string */
     protected $certPath;
@@ -41,16 +41,16 @@ class APNS implements ServiceInterface
 
 
     /**
-     * @param string $uri
+     * @param int    $environment
      * @param string $certificatePath
      * @param string $passPhrase
      */
-    public function __construct($uri, $certificatePath, $passPhrase = null)
+    public function __construct($environment, $certificatePath, $passPhrase = null)
     {
-        $this->client     = new Client();
-        $this->uri        = $uri;
-        $this->certPath   = $certificatePath;
-        $this->passPhrase = $passPhrase;
+        $this->client      = new Client();
+        $this->environment = $environment;
+        $this->certPath    = $certificatePath;
+        $this->passPhrase  = $passPhrase;
     }
 
 
@@ -102,7 +102,7 @@ class APNS implements ServiceInterface
     protected function ensureConnection()
     {
         if (!$this->client->isConnected()) {
-            $this->client->open($this->uri, $this->certPath, $this->passPhrase);
+            $this->client->open($this->environment, $this->certPath, $this->passPhrase);
         }
     }
 
