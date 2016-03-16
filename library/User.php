@@ -379,33 +379,12 @@ class User extends DeprecatedModel
             && Cfg::get('external_type') === 'synergetic'
             && !empty($webServicesUrl)
         ) {
-            //
-            // Attempt to set with Synergetic.
-            // If that is set up and fails, then revert their password.
-            $user       = $this->getByID($userID);
-            $is_changed = false;
-            try {
-                $api        = new External_Synergetic_Gateway(
-                    $webServicesUrl,
-                    Cfg::get('external_vendor_token_guid'),
-                    Cfg::get('external_vendor_password')
-                );
-                $is_changed = $api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword);
-
-                if (!$is_changed) {
-                    // Don't reset password back to old password.
-                    // The fail message says it is not set back, so why change it?
-//                    $this->setPasswordInternal($userID, $oldPassword);
-                    $this->logUserPasswordChange($username, 'change_pwd_syn_fail', 'warn', $api->getLastError());
-                    $this->sendPasswordChangeFailureEmail($userID, true);
-                    throw new Exception("The system was unable to reset your Synergetic password as it is no longer in sync with Schoolbox. Your Schoolbox password has been updated, however you will manually need to update your Synergetic password to match this new password.");
-                }
-
-            } catch (SoapFault $ex) {
-                $this->logUserPasswordChange($username, 'change_pwd_syn_broken', 'warn', $ex);
-                $this->sendPasswordChangeFailureEmail($userID, true);
-                throw new Exception("An unexpected error occurred while attempting to update your Synergetic password.");
-            }
+            // TODO: store real keys somewhere (NOT CODE) and use them here
+            $key    = 'NOT A REAL KEY';
+            $iv     = 'NOT A REAL IV EITHER';
+            $user   = $this->getByID($userID);
+            $portal = new External_Synergetic_CommunityPortal($key, $iv);
+            $portal->changePassword($user['synergy_id'], $newPassword);
         }
         $this->logUserPasswordChange($username, 'change_pwd', 'info');
         return true;
