@@ -195,11 +195,13 @@ class Controller extends Base
             && preg_match('/[^a-z\\d]/i', $password)
         ) {
             // Reset password
-            $this->userMapper->save(
-                $reset->getUser()
-                    ->setPassword($this->passwordService->hash($password))
-                    ->setRetrievablePassword($password)
-            );
+            // Refetch user too cause other things may break
+            $user = $this->userMapper->findById($reset->getUser()->getId());
+            $user
+                ->setPassword($this->passwordService->hash($password))
+                ->setRetrievablePassword($password)
+            ;
+            $this->userMapper->save($user);
 
             // This reset has been used, save it
             $this->resetMapper->save($reset->setResetTime(\Alaress_Date_Format::now()));
@@ -211,7 +213,7 @@ class Controller extends Base
             );
 
             // Reset their password in SCP too
-            if ($reset->getUser()->getRole()->isParent()) {
+            if ($user->getRole()->isParent()) {
                 $communityPortal = $this->communityPortalFactory->build();
                 $communityPortal->changePassword($reset->getUser()->getExternalId(), $password);
             }
