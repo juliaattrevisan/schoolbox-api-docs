@@ -764,7 +764,7 @@ class Controller extends BaseController
 
                     // Find all tasks, due work, and quizzes associated with the selected units.
 
-                    $units = new \Schoolbox\Collection;
+                    $units = new Collection();
 
                     foreach ($unitCache as $key => $unitCurrent)
                     {
@@ -772,6 +772,7 @@ class Controller extends BaseController
 
                         $unit['id'] = $unitCurrent->getId();
                         $unit['name'] = $unitCache[$unitCurrent->getId()]->getName();
+                        $unit['items'] = new Collection();
 
                         foreach ($this->getRequest()->post["unit"] as $unitDate) {
                             if ($unitDate["unit_id"] == $unitCurrent->getId()) {
@@ -791,8 +792,7 @@ class Controller extends BaseController
                                 ->sortBy('title', 'asc') ;
                         }
 
-                        if (isset($taskCache[$unitCurrent->getId()]))
-                            $unit['tasks'] = $taskCache[$unitCurrent->getId()];
+                        $unit['items']->merge($taskCache[$unitCurrent->getId()]);
 
                         // Due work
 
@@ -801,7 +801,7 @@ class Controller extends BaseController
                                 ->findByColumn('category', $unitCurrent->getId());
                         }
 
-                        $unit['dueWork'] = $submissionCache[$unitCurrent->getId()];
+                        $unit['items']->merge($submissionCache[$unitCurrent->getId()]);
 
                         // Quizzes
 
@@ -810,7 +810,15 @@ class Controller extends BaseController
                                 ->findByColumn('category_id', $unitCurrent->getId());
                         }
 
-                        $unit['quizzes'] = $quizCache[$unitCurrent->getId()];
+                        $unit['items']->merge($quizCache[$unitCurrent->getId()]);
+
+                        /* Unify all three of Tasks, Due Work and Quizzes
+                         * into one mega list
+                         *
+                         * Sort by Created At for now, until manual sequencing
+                         * is added to the ui so teachers can sort it themselves
+                         */
+                        $unit['items']->sortBy('created', 'asc');
 
                         $units->add($unit);
                     }
