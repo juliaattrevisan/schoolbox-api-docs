@@ -213,7 +213,7 @@ then
 fi
 
 echo "$vag Installing all required packages";
-apt-get -y install imagemagick php5-imagick;
+apt-get -y install imagemagick php5-imagick php5-mcrypt;
 
 if [ "`apache2 -v | grep Apache | cut -d'/' -f2 | cut -d'.' -f1-2`" == "2.4" ];
 then
