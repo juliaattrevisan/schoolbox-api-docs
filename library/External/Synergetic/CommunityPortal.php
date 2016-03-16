@@ -34,10 +34,15 @@ class External_Synergetic_CommunityPortal
 
     /**
      * Constructor
+     *
+     * @param string $key
+     * @param string $initializationVector
      */
-    public function __construct()
+    public function __construct($key, $initializationVector)
     {
-        $this->database = MSSQL::getInstance();
+        $this->key                  = $key;
+        $this->initializationVector = $initializationVector;
+        $this->database             = MSSQL::getInstance();
         if (DebugBar::isEnabled()) {
             $this->database->installCollector();
             /** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
