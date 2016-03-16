@@ -773,6 +773,13 @@ class Controller extends BaseController
                         $unit['id'] = $unitCurrent->getId();
                         $unit['name'] = $unitCache[$unitCurrent->getId()]->getName();
 
+                        foreach ($this->getRequest()->post["unit"] as $unitDate) {
+                            if ($unitDate["unit_id"] == $unitCurrent->getId()) {
+                                $unit['open_date'] = $unitDate['open_date'];
+                                $unit['due_date'] = $unitDate['due_date'];
+                            }
+                        }
+
                         // Tasks
 
                         if (!isset($taskCache[$unitCurrent->getId()])) {

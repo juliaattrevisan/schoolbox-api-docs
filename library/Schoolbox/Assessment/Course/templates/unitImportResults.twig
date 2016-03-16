@@ -55,7 +55,7 @@
                                     <input id="work_publish_date-{{ work.getId }}"
                                            name="work[{{ work.getId }}][publish_date]"
                                            type="text"
-                                           value="{{ work.getPublishDate.getLocalShort }}"
+                                           value="{{ unit.open_date }}"
                                            data-role="publish_date"
                                            data-datepicker
                                            data-datepicker-sync
@@ -71,7 +71,7 @@
                                     <input id="work_due_date-{{ work.getId }}"
                                            name="work[{{ work.getId }}][due_date]"
                                            type="text"
-                                           value="{{ work.getDueDate.getLocalShort }}"
+                                           value="{{ unit.due_date }}"
                                            data-role="due_date"
                                            data-datepicker
                                            data-datepicker-sync
@@ -90,7 +90,7 @@
                                     <input id="work_open_date-{{ work.getId }}"
                                            name="work[{{ work.getId }}][open_date]"
                                            type="text"
-                                           value="{{ work.getOpenDate.getLocalShort }}"
+                                           value="{{ unit.open_date }}"
                                            data-role="open_date"
                                            data-datepicker
                                            data-datepicker-sync
@@ -104,7 +104,7 @@
                                     <input id="work_late_date-{{ work.getId }}"
                                            name="work[{{ work.getId }}][late_date]"
                                            type="text"
-                                           value="{{ work.getLateDate.getLocalShort }}"
+                                           value="{{ unit.due_date }}"
                                            data-role="late_date"
                                            data-datepicker
                                            data-datepicker-sync
@@ -147,7 +147,7 @@
                                 <input id="quiz_start_date-{{ quiz.getId }}"
                                        name="quiz[{{ quiz.getId }}][start_date]"
                                        type="text"
-                                       value="{{ quiz.getStart.getLocalShort }}"
+                                       value="{{ unit.open_date }}"
                                        data-role="start_date"
                                        data-datepicker
                                        data-datepicker-sync
@@ -161,7 +161,7 @@
                                 <input id="quiz_finish_date-{{ quiz.getId }}"
                                        name="quiz[{{ quiz.getId }}][finish_date]"
                                        type="text"
-                                       value="{{ quiz.getFinish.getLocalShort }}"
+                                       value="{{ unit.due_date }}"
                                        data-role="finish_date"
                                        data-datepicker
                                        data-datepicker-sync
