@@ -18,5 +18,7 @@ class CommunityPortal implements CommunityPortalInterface
      */
     public function changePassword($communityId, $newPassword)
     {
+        // If there's nothing here, nothing went wrong, so...
+        return true;
     }
 }

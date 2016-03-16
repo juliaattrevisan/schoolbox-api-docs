@@ -16,8 +16,9 @@ interface CommunityPortalInterface
     /**
      * Updates the community portal password for this user.
      *
-     * @param string $communityId
-     * @param string $newPassword
+     * @param  string $communityId
+     * @param  string $newPassword
+     * @return bool
      */
     public function changePassword($communityId, $newPassword);
 }

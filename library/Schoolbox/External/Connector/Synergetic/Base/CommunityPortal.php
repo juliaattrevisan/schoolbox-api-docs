@@ -60,8 +60,9 @@ class CommunityPortal implements CommunityPortalInterface
     /**
      * Updates the community portal password for this user.
      *
-     * @param string $communityId
-     * @param string $newPassword
+     * @param  string $communityId
+     * @param  string $newPassword
+     * @return bool
      */
     public function changePassword($communityId, $newPassword)
     {
@@ -72,6 +73,7 @@ class CommunityPortal implements CommunityPortalInterface
             WHERE  ID = {$this->database->smartQuote($communityId)}
         ";
         $this->database->query($query);
+        return intval($this->database->getOne('SELECT @@ROWCOUNT')) > 0;
     }
 
     /**
