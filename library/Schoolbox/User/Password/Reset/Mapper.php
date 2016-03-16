@@ -44,9 +44,11 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('user', 'u')},
+                {$this->getJoinColumnString('user.role', 'r')}
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('user', null, 'u')}
+            LEFT JOIN {$this->getJoinSql('user.role', 'u', 'r')}
         ";
     }
 
@@ -62,6 +64,7 @@ class Mapper extends BaseMapper
             /** @var Model $model */
             $model = $this->hydrate($row);
             $model->setUser($this->hydrateJoin($row, 'user', 'u'));
+            $model->getUser()->setRole($this->hydrateJoin($row, 'user.role', 'r'));
             $collection->add($model);
         }
         return $collection;
