@@ -27,9 +27,10 @@ class CommunityPortalFactory
         if ($connector != 'Synergetic' || empty($webServicesUrl)) {
             return new Offline\Base\CommunityPortal();
         } else {
-            return new Synergetic\Base\CommunityPortal(
-
-            );
+            // TODO: store real keys somewhere (NOT CODE) and use them here
+            $key = 'NOT A REAL KEY';
+            $iv  = 'NOT A REAL IV EITHER';
+            return new Synergetic\Base\CommunityPortal($key, $iv);
         }
     }
 }
