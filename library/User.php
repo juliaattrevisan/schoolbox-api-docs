@@ -361,36 +361,6 @@ class User extends DeprecatedModel
     }
 
     /**
-     * @param $user
-     * @param $oldPassword
-     * @param $newPassword
-     *
-     * @return bool
-     * @throws Exception
-     */
-    public function updateExternalSystemPassword($user, $oldPassword, $newPassword)
-    {
-        $userID         = $user['uid'];
-        $username       = $user['username'];
-        $groupHandler   = new Group();
-        $webServicesUrl = Cfg::get('external_web_services_url');
-        if ($groupHandler->isParent($userID)
-            && Cfg::get('external_enable')
-            && Cfg::get('external_type') === 'synergetic'
-            && !empty($webServicesUrl)
-        ) {
-            // TODO: store real keys somewhere (NOT CODE) and use them here
-            $key    = 'NOT A REAL KEY';
-            $iv     = 'NOT A REAL IV EITHER';
-            $user   = $this->getByID($userID);
-            $portal = new External_Synergetic_CommunityPortal($key, $iv);
-            $portal->changePassword($user['synergy_id'], $newPassword);
-        }
-        $this->logUserPasswordChange($username, 'change_pwd', 'info');
-        return true;
-    }
-
-    /**
      * Checks the user's password in the database.
      *
      * @param int    $user_id
