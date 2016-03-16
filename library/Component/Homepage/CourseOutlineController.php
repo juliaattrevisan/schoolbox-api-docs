@@ -488,7 +488,9 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                     $this->parse('unit_task_quiz_attempts_block', 'unit_task_quiz_attempts');
                 }
             } elseif ($task->getType() == Task::TYPE_DUE_WORK) {
-                if ($task->getSubmissionBox()->getPublishDate()->isFuture()) {
+                if (!$task->getSubmissionBox()->getPublishDate()->isNull()
+                    && $task->getSubmissionBox()->getPublishDate()->isFuture()
+                ) {
                     // this box is to be published in the future: do not render it.
                     return;
                 }

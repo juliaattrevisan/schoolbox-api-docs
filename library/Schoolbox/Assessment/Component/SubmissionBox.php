@@ -171,6 +171,10 @@ class SubmissionBox implements ISoftDeletable
         $this->setMarkType(new MarkType());
         $this->setGradeGroup(new GradeLevel\Group\Model());
         $this->setCurriculumNodes(new Collection());
+        $this->setPublishDate(new \Alaress_Date_NullDate());
+        $this->setOpenDate(new \Alaress_Date_NullDate());
+        $this->setDueDate(new \Alaress_Date_NullDate());
+        $this->setLateDate(new \Alaress_Date_NullDate());
     }
 
     /**
