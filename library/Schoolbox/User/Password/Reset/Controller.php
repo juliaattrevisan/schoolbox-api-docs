@@ -212,8 +212,7 @@ class Controller extends Base
 
             // Reset their password in SCP too
             if ($reset->getUser()->getRole()->isParent()) {
-                $communityPortalFactory = new \Schoolbox\External\Connector\CommunityPortalFactory();
-                $communityPortal        = $communityPortalFactory->build();
+                $communityPortal = $this->communityPortalFactory->build();
                 $communityPortal->changePassword($reset->getUser()->getExternalId(), $password);
             }
         } else {
