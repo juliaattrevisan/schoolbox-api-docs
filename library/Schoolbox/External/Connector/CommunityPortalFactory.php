@@ -14,7 +14,7 @@ class CommunityPortalFactory
     /**
      * Choose which variant to spawn
      *
-     * @return SyncInterface
+     * @return CommunityPortalInterface
      * @throws \UnexpectedValueException if nothing can be built
      */
     public function build()
