@@ -11,6 +11,7 @@ namespace Alaress\Async\Notification\Cloud\Apple;
 
 use Alaress\Async\Notification\Cloud\ServiceInterface;
 
+use Schoolbox\MobileApp\Registry;
 use ZendService\Apple\Apns\Client\Message as Client;
 use ZendService\Apple\Apns\Message;
 use ZendService\Apple\Exception\RuntimeException;
@@ -58,7 +59,7 @@ class APNS implements ServiceInterface
      */
     public function getProviderName()
     {
-        return 'apns';
+        return Registry::PROVIDER_APPLE;
     }
 
 

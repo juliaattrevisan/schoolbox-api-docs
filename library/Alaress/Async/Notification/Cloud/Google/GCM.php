@@ -14,6 +14,7 @@ use Guzzle\Http\Client;
 use OutOfBoundsException;
 use OverflowException;
 use RangeException;
+use Schoolbox\MobileApp\Registry;
 
 
 /**
@@ -48,7 +49,7 @@ class GCM implements ServiceInterface
      */
     public function getProviderName()
     {
-        return 'gcm';
+        return Registry::PROVIDER_GOOGLE;
     }
 
 
