@@ -61,7 +61,7 @@ class PushHandler extends AbstractProcessingHandler
         preg_match('`instant.user.([0-9]+)`', $record['channel'], $matches);
         $user = UserMapper::getInstance()->findById($matches[1]);
 
-        $this->cloudManager->push($user->getId(), $record['message']);
+        $this->cloudManager->push($user->getId(), [ $record['message'] ]);
     }
 
 } 
