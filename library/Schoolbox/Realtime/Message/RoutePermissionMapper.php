@@ -218,4 +218,53 @@ class RoutePermissionMapper extends Mapper {
 	}
 
 
+	/**
+	 * @param array $mask
+	 * @return bool
+	 */
+	public function isMuted($mask)
+	{
+		return in_array(RoutePermission::MUTE, $mask);
+	}
+
+
+	/**
+	 * @param array $mask
+	 * @return bool
+	 */
+	public function isDigest($mask)
+	{
+		return in_array(RoutePermission::DIGEST, $mask);
+	}
+
+
+	/**
+	 * @param array $mask
+	 * @return bool
+	 */
+	public function isInstant($mask)
+	{
+		return in_array(RoutePermission::INSTANT, $mask);
+	}
+
+
+	/**
+	 * @param array $mask
+	 * @return bool
+	 */
+	public function isPush($mask)
+	{
+		return in_array(RoutePermission::PUSH, $mask);
+	}
+
+
+	/**
+	 * @param array $mask
+	 * @return bool
+	 */
+	public function isEmail($mask)
+	{
+		return in_array(RoutePermission::EMAIL, $mask);
+	}
+
 }
