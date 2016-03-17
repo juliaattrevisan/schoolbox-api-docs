@@ -21,7 +21,7 @@ use Schoolbox\User;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
-class UnitInstanceMapper extends Mapper {
+class UnitInstanceMapper extends BaseMapper {
 
     protected function mapping() {
         $this->hasTable('course_unit_instance');
