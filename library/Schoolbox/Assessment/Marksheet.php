@@ -564,7 +564,9 @@ class Marksheet
                     $page->setVar(
                         array(
                             'WORK_CLASSAVG_GRADIENT' => $gradient,
-                            'WORK_CLASSAVG_CLEAN'    => $value
+                            'WORK_CLASSAVG_CLEAN'    => $value,
+                            'WORK_PATH'              => $item['isOA'] ? '/assess/results' : '/submission/viewSubmission',
+                            'WORK_ID'                => $item['id'],
                         )
                     );
                     $page->parse('class_average_block', 'class_average', true);
@@ -713,6 +715,7 @@ class Marksheet
                 }
                 $page->setVar(
                     array(
+                        'WORK_PATH'              => $item['isOA'] ? '/assess/results' : '/submission/viewSubmission',
                         'WORK_TYPE'              => $item['isOA'] ? 'assess' : 'submission',
                         'WORK_ID'                => $item['id'],
                         'STUDENT_WORK_NORM_MARK' => $mark['norm_mark'],
