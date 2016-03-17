@@ -13,6 +13,8 @@
 namespace Schoolbox\Resource;
 
 
+use Schoolbox\Resource\Folder\Model as Category;
+
 class HomepageConfig {
 	/**
 	 * @var Category
@@ -125,7 +127,7 @@ class HomepageConfig {
 	protected $top_bg_primary;
 
     /**
-     * @param \Schoolbox\Resource\Category $category
+     * @param Category $category
      * @return $this
      */
     public function setCategory($category)
@@ -135,7 +137,7 @@ class HomepageConfig {
     }
 
     /**
-     * @return \Schoolbox\Resource\Category
+     * @return Category
      */
     public function getCategory()
     {

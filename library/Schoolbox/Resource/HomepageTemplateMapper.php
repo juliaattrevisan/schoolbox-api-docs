@@ -13,6 +13,12 @@ namespace Schoolbox\Resource;
 
 use Schoolbox\Mapper;
 
+/**
+ * Class HomepageTemplateMapper
+ *
+ * @package Schoolbox\Resource
+ * @method HomepageTemplate findById($id)
+ */
 class HomepageTemplateMapper extends Mapper
 {
     const TEMPLATE_NONE = -1;

@@ -10,6 +10,7 @@
 namespace Alaress\Web\Controller;
 
 use Aura\Di;
+use Aura\Di\Exception\ServiceNotFound;
 use Aura\Session\SegmentInterface;
 use Aura\Web\Request;
 use Aura\Web\Response;
@@ -195,4 +196,39 @@ abstract class Base {
         }
         return false;
     }
+
+
+
+
+    /**
+     * @param  string $name
+     * @return self
+     * @throws ServiceNotFound
+     */
+    protected function getController($name)
+    {
+        try {
+            return $this->getDi()->get("controller:$name");
+
+        } catch (ServiceNotFound $e) {
+            // the controller isn't registered... hawkward. Let's remedy that
+
+            /** @var \Alaress\Module\Module $module */
+            $module = $this->getDi()->get("module:$name");
+
+            // initialise the controller into the DI
+            $module->initControllerDependencies();
+            $module->initControllers($this->getDi());
+
+            // remove this reference, we don't need it anymore
+            unset($module);
+
+            // obtain and return the controller from DI now that it's been registered
+            return $this->getDi()->get("controller:$name");
+
+
+        }
+    }
+
+
 }

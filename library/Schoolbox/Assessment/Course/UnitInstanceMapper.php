@@ -15,13 +15,13 @@ use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Course\Task\Cloner;
 use Schoolbox\Collection;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
-class UnitInstanceMapper extends Mapper {
+class UnitInstanceMapper extends BaseMapper {
 
     protected function mapping() {
         $this->hasTable('course_unit_instance');
@@ -121,7 +121,7 @@ class UnitInstanceMapper extends Mapper {
      *
      * @param UnitInstance $unitInstance
      * @return object
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws BaseMapper\Exception
      */
     public function findCourseForUnit(UnitInstance $unitInstance) {
         $folderMapper = $this->getJoinMapper('course_folder');
@@ -149,7 +149,7 @@ class UnitInstanceMapper extends Mapper {
             return $folder;
         }
 
-        throw new \Schoolbox\Mapper\Exception('Instance of object not found');
+        throw new BaseMapper\Exception('Instance of object not found');
     }
 
     /**
@@ -329,7 +329,7 @@ class UnitInstanceMapper extends Mapper {
                             $this->getJoinMapper('task.assessment')->findById($quizId)
                         );
                     }
-                } catch (Mapper\Exception $e) {
+                } catch (BaseMapper\Exception $e) {
                     // Object was deleted or something: noop
                 }
                 $unit->getTasks()->add($task);
@@ -421,8 +421,8 @@ class UnitInstanceMapper extends Mapper {
      * Implemented as a function because it's common to be provided with a unit
      * instance ID, and a category ID for checking it against.
      *
-     * @throws Mapper\Exception if no instance of model is found
-     * @throws Mapper\Exception\Deleted if the model was found but has been deleted
+     * @throws BaseMapper\Exception if no instance of model is found
+     * @throws BaseMapper\Exception\Deleted if the model was found but has been deleted
      * @param  int $id
      * @param  int $category_id
      * @return UnitInstance
@@ -456,7 +456,7 @@ class UnitInstanceMapper extends Mapper {
             $this->throwIfDeleted($model);
             return $model;
         }
-        throw new Mapper\Exception('Instance of object not found');
+        throw new BaseMapper\Exception('Instance of object not found');
     }
 
     /**
@@ -514,7 +514,7 @@ class UnitInstanceMapper extends Mapper {
      * @param  UnitInstance $previous
      * @return void
      */
-    protected function postSave(UnitInstance $object, $previous = null) {
+    public function postSave(UnitInstance $object, $previous = null) {
         // Create tasks for this item (if this item was only just saved)
         if (!$previous) {
             $criterionMapper = SubmissionBox\Rubric\CriterionMapper::getInstance();
@@ -550,7 +550,7 @@ class UnitInstanceMapper extends Mapper {
      *
      * @param UnitInstance $object
      */
-    protected function postDelete(UnitInstance $object) {
+    public function postDelete(UnitInstance $object) {
         // Delete any related task instances
         $task_instance_mapper = Task\InstanceMapper::getInstance();
         $task_instance_mapper->delete(
@@ -567,7 +567,7 @@ class UnitInstanceMapper extends Mapper {
      *
      * @param UnitInstance $object
      */
-    protected function postRestore(UnitInstance $object) {
+    public function postRestore(UnitInstance $object) {
         $task_instance_mapper = Task\InstanceMapper::getInstance();
         $task_instance_mapper->restoreSoftDeleted(
             $task_instance_mapper->findByColumn(

@@ -13,16 +13,17 @@
 
         submittable: 'fieldset',
         reenablePrevious: false,
-        modifySaved: 'legend [data-mage-unlock]',
         onXhrDone: $.noop,
         onXhrFail: $.noop,
-        onXhrAlways: $.noop
+        onXhrAlways: $.noop,
+        setFormData: $.noop
     };
 
     function Mage(element, options) {
         var self = this;
 
         this.element = element;
+        this.options = undefined;
         setOptions.call(this, options);
 
         var $elem = $(this.element);
@@ -115,6 +116,11 @@
     function clickIntercept (e, self, elem, form) {
         e.preventDefault();
 
+        if (typeof elem.data('mageSubmitted') != 'undefined') {
+            // do not resubmit this section
+            return;
+        }
+
         // HTML5 FTW
         var method = elem.attr('formmethod') || form.attr('method'),
             action = elem.attr('formaction') || form.attr('action'),
@@ -139,10 +145,27 @@
      */
     function xhrSend(method, action, targetElement) {
 
-        var targetCopy = targetElement.clone().removeAttr('disabled'),
-            form       = $('<form/>').append(targetCopy.append($('<input type=text />').attr('name', this.element.name).attr('value', 1))),
-            formData   = form.serialize(),
-            mage       = this;
+        var mage = this,
+            targetCopy = targetElement.clone().removeAttr('disabled'),
+            form = $('<form/>'), formSerial, formData = {};
+
+        if (this.element.name) {
+            // submit clicked-button value
+            targetCopy.append($('<input type=text />').attr('name', this.element.name).attr('value', 1))
+        }
+
+        form.append(targetCopy);
+
+        // set up an object that can be manipulated outside
+        formSerial = form.serializeArray();
+
+        // convert this into a single object rather than an array of objects
+        for (var i = 0; i < formSerial.length; ++i) {
+            formData[formSerial[i]['name']] = formSerial[i]['value'];
+        }
+
+        // pre-flight check
+        mage.options.setFormData(formData);
 
         return $
             .ajax(action, {
@@ -150,15 +173,33 @@
                 data: formData
             })
             .done(function (data, status, xhr) {
-                xhrDone.call(mage, mage.options.onXhrDone, targetElement, data);
+                xhrDone.call(mage, mage.options.onXhrDone, targetElement, parseJSON(data));
             })
             .fail(function (xhr, status, error) {
-                xhrFail.call(mage, mage.options.onXhrFail, targetElement, xhr.responseText);
+                xhrFail.call(mage, mage.options.onXhrFail, targetElement, parseJSON(xhr.responseText));
             })
             .always(function (xhrOrData, status, xhrOrError) {
                 xhrAlways.call(mage, mage.options.onXhrAlways, targetElement);
             });
     }
+
+
+    /**
+     * Attempt to parse input to return JSON, but do it safely
+     *
+     * @param {*} ambiguousData
+     * @return {Object|String}
+     */
+    function parseJSON(ambiguousData) {
+        try {
+            // if this is a JSON string, it will return the object...
+            return JSON.parse(ambiguousData);
+        } catch (e) {
+            // ...otherwise, just throw back whatever we were passed
+            return ambiguousData;
+        }
+    }
+
 
     /**
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
@@ -190,7 +231,7 @@
         target.find('[data-mage-error]').slideUp(slideDuration);
 
         // slide away the submit for this section
-        $(this.element).closest('[data-mage-submitrow]').slideUp(slideDuration);
+        $(this.element).data('mage-submitted', true).closest('[data-mage-submitrow]').slideUp(slideDuration);
 
         // call the callback (this would include any specific manipulation for the section being targeted)
         onXhrDone.call(this.element, data);
@@ -212,7 +253,7 @@
     function xhrFail(onXhrFail, target, error) {
 
         // apply the error text and slide into view
-        target.find('[data-mage-error]').hide().text(error).slideDown();
+        target.find('[data-mage-error]').hide().html(error).slideDown();
 
         target.removeAttr('disabled');
 

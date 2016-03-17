@@ -9,8 +9,8 @@
 
 namespace Schoolbox\Assessment\Course;
 
-use Schoolbox\Collection;
 use Schoolbox;
+use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class TaskMapper extends Schoolbox\Mapper {

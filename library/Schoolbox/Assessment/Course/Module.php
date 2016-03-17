@@ -60,6 +60,9 @@ class Module extends BaseModule
                 '/unit/delete'                          => 'deleteUnit',
                 '/importTasks'                          => 'importTasks',
                 '/importUnits'                          => 'importUnits',
+                '/new'                                  => 'createCourse',
+                '/modify/{id}'                          => 'updateCourse',
+                '/finalise'                             => 'persistCourse'
             ]
         ];
 

@@ -218,4 +218,24 @@ class RoleAccessMapper extends Mapper
             )
         );
     }
+
+
+    /**
+     * Determine whether or not the give role is allowed to own folders
+     *
+     * @param Role $role
+     * @return bool
+     */
+    public function roleMayOwnFolders(Role $role)
+    {
+        $roleType = $role->getType();
+
+        if (!$roleType) {
+            // do not allow false positives in the event of poorly-hydrated object
+            return false;
+        }
+
+        return $this->getConfigLoader()->get('group_staff_only') ? ($roleType == Role::STAFF) : true;
+
+    }
 }

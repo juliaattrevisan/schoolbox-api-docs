@@ -19,6 +19,12 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Class UserAccessMapper
+ *
+ * @package Schoolbox\Permission\Access
+ * @method UserAccess createModel()
+ */
 class UserAccessMapper extends Mapper
 {
 

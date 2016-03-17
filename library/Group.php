@@ -286,6 +286,12 @@ class Group extends DeprecatedModel
         return $this->db->getRow($query); //only one owner at the moment
     }
 
+
+    /**
+     * @deprecated replaced by Schoolbox\Permission\Access\RoleAccessMapper::roleMayOwnFolders()
+     * @param $userID
+     * @return bool
+     */
     function allowOwner($userID)
     {
         //checks if the user can become the owner of group

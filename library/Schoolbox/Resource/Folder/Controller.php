@@ -9,28 +9,90 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress\Web\Controller\Base as BaseController;
-
-use Schoolbox\Collection;
+use ArrayAccess;
+use Homepage;
+use OutOfBoundsException;
+use RangeException;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Curriculum;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
-use Schoolbox\Resource\Folder;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\Group;
+use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
-use Schoolbox\Resource\Folder\Code\Model as FolderCode;
-use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
-use Schoolbox\RoleMapper;
-use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\LinkMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Config\Loader as ConfigLoader;
-use Zend\Json\Server\Error;
+use Schoolbox\RoleMapper;
+use Schoolbox\User;
+use UnexpectedValueException;
 
 class Controller extends BaseController
 {
+
+    /** @var Mapper */
+    protected $folderMapper;
+
+    /** @var HomepageConfigMapper */
+    protected $homepageConfigMapper;
+
+    /** @var HomepageTemplateMapper */
+    protected $homepageTemplateMapper;
+
+    /** @var RoleAccessMapper */
+    protected $roleAccessMapper;
+
+    /** @var UserAccessMapper */
+    protected $userAccessMapper;
+
+    /** @var RoleMapper */
+    protected $roleMapper;
+
+    /** @var ErrorMapper */
+    protected $errorMapper;
+
+    /** @var Access */
+    protected $access;
+
+    /** @var Code\Mapper */
+    protected $codeMapper;
+
+    /** @var Curriculum\Node\Mapper */
+    protected $curriculumNodeMapper;
+
+    /** @var GroupMapper */
+    protected $groupMapper;
+
+    /** @var FileMapper */
+    protected $fileMapper;
+
+
+    /**
+     * Folder\Controller constructor.
+     * TODO DI
+     */
+    public function __construct()
+    {
+        $this->setFolderMapper(Mapper::getInstance());
+        $this->setHomepageConfigMapper(HomepageConfigMapper::getInstance());
+        $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
+        $this->setRoleAccessMapper(RoleAccessMapper::getInstance());
+        $this->setUserAccessMapper(UserAccessMapper::getInstance());
+        $this->setRoleMapper(RoleMapper::getInstance());
+        $this->setErrorMapper(ErrorMapper::getInstance());
+        $this->setAccess(Access::getInstance());
+        $this->setCodeMapper(Code\Mapper::getInstance());
+        $this->setCurriculumNodeMapper(Curriculum\Node\Mapper::getInstance());
+        $this->setGroupMapper(GroupMapper::getInstance());
+        $this->setFileMapper(FileMapper::getInstance());
+    }
+
+
     /**
      * Display update folder screen
      *
@@ -39,12 +101,12 @@ class Controller extends BaseController
      */
     public function getFolderModify($id)
     {
-        $folderMapper = Folder\Mapper::getInstance();
-        $homepageConfigMapper = HomepageConfigMapper::getInstance();
-        $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
-        $roleAccessMapper = RoleAccessMapper::getInstance();
-        $roleMapper = RoleMapper::getInstance();
-        $errorMapper = ErrorMapper::getInstance();
+        $folderMapper = $this->getFolderMapper();
+        $homepageConfigMapper = $this->getHomepageConfigMapper();
+        $homepageTemplateMapper = $this->getHomepageTemplateMapper();
+        $roleAccessMapper = $this->getRoleAccessMapper();
+        $roleMapper = $this->getRoleMapper();
+        $errorMapper = $this->getErrorMapper();
         
         try {
             $folder = $folderMapper->findById($id);
@@ -100,6 +162,7 @@ class Controller extends BaseController
         );
     }
 
+
     /**
      * Display create folder screen
      *
@@ -108,10 +171,10 @@ class Controller extends BaseController
      */
     public function getFolderCreate($parentId)
     {
-        $folderMapper = FolderMapper::getInstance();
-        $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
-        $roleMapper = RoleMapper::getInstance();
-        $errorMapper = ErrorMapper::getInstance();
+        $folderMapper = $this->getFolderMapper();
+        $homepageTemplateMapper = $this->getHomepageTemplateMapper();
+        $roleMapper = $this->getRoleMapper();
+        $errorMapper = $this->getErrorMapper();
 
         try {
             $parent = $folderMapper->findById($parentId);
@@ -136,7 +199,7 @@ class Controller extends BaseController
 
         // Folders that are not in the root note should inherit by default to reduce the user interface
 
-        if ($parentId != FolderMapper::FOLDER_ROOT)
+        if ($parentId != Mapper::FOLDER_ROOT)
             $folder->enableInherit();
 
         $this->getResponse()->content->set(
@@ -156,15 +219,16 @@ class Controller extends BaseController
         );
     }
 
+
     /**
      * Delete folder AJAX
      *
      */
     public function postDeleteFolder()
     {
-        $folderMapper = FolderMapper::getInstance();
-        $errorMapper = ErrorMapper::getInstance();
-        $access = Access::getInstance();
+        $folderMapper = $this->getFolderMapper();
+        $errorMapper = $this->getErrorMapper();
+        $access = $this->getAccess();
 
         // Find the folder to be deleted
 
@@ -190,6 +254,7 @@ class Controller extends BaseController
         ]);
     }
 
+
     /**
      * Move folder with an AJAX response
      *
@@ -197,8 +262,8 @@ class Controller extends BaseController
      */
     public function postMoveFolder()
     {
-        $errorMapper = ErrorMapper::getInstance();
-        $folderMapper = FolderMapper::getInstance();
+        $errorMapper = $this->getErrorMapper();
+        $folderMapper = $this->getFolderMapper();
 
         if ($this->getRequest()->post["source"] != $this->getRequest()->post["destination"])
         {
@@ -235,6 +300,7 @@ class Controller extends BaseController
         }
     }
 
+
     /**
      * Update a folders details
      *
@@ -242,228 +308,301 @@ class Controller extends BaseController
      */
     public function postUpdateFolder()
     {
-        $access = Access::getInstance();
-        $folderMapper = FolderMapper::getInstance();
-        $folderCodeMapper = FolderCodeMapper::getInstance();
-        $userAccessMapper = UserAccessMapper::getInstance();
-        $roleAccessMapper = RoleAccessMapper::getInstance();
-        $curriculumNodeMapper = CurriculumNodeMapper::getInstance();
-        $errorMapper = ErrorMapper::getInstance();
-        $homepageConfigMapper = HomepageConfigMapper::getInstance();
-        $homepageTemplateMapper = HomepageTemplateMapper::getInstance();
+        $errorMapper = $this->getErrorMapper();
+
+        try {
+            $user        = $this->getUser();
+            $model       = $this->persistFolder($this->getRequest()->post, $user);
+            $newLocation = $this->createGroup($this->getRequest()->post, $model, $user);
+
+            $this->getResponse()->redirect->afterPost($newLocation);
+
+        } catch (RangeException $e) {
+            // not enough info submitted to the form
+            $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING, $e);
+
+        } catch (OutOfBoundsException $e) {
+            // you lack permission to do the things
+            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE, $e);
+
+        } catch (UnexpectedValueException $e) {
+            // you lack permission to do the other things
+            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_CREATE, $e);
+        }
+    }
+
+
+
+
+
+    /**
+     * This is public for now because /cms/categoryForm.php needs to reference it
+     *
+     * @param  ArrayAccess|array $postData  the array structure we'll use to construct this folder
+     * @param  User              $user      the effecting user
+     * @throws OutOfBoundsException         if you lack permission to perform functions
+     * @throws RangeException               if the database fails to save your folder
+     * @return Model                        representing the freshly saved folder
+     */
+    public function persistFolder($postData, User $user)
+    {
+        $folderMapper     = $this->getFolderMapper();
+        $codeMapper       = $this->getCodeMapper();
+        $userAccessMapper = $this->getUserAccessMapper();
+        $roleAccessMapper = $this->getRoleAccessMapper();
+        $access           = $this->getAccess();
 
         $model = $folderMapper->createModel()
-            ->setName($this->getRequest()->post['name'])
-            ->setParent
-            (
-                $folderMapper->createModel()
-                    ->setId($this->getRequest()->post['parent'])
-            );
+                      ->setName($postData['name'])
+                      ->setParent(
+                          $folderMapper->createModel()
+                               ->setId($postData['parent'])
+                      );
 
-        if ($this->getRequest()->post["inherit"] == 1) {
+        if ($postData["inherit"] == 1) {
             $model->enableInherit();
         } else {
             $model->disableInherit();
         }
 
         // Make sure the user has permission to perform the action
+        if (is_numeric($postData['categoryID'])) {
+            // check this user has write access
+            if ($access->getFolderAccess($user, [ $postData['categoryID'] ]) < UserAccess::ACCESS_WRITE) {
+                throw new OutOfBoundsException("I find your lack of access disturbing.");
 
-        if (is_numeric($this->getRequest()->post['categoryID']))
-        {
-            if ($access->getFolderAccess($this->getUser(), [$this->getRequest()->post['categoryID']]) < WRITE_ACCESS)
-            {
-                // No write access to the folder
-
-                $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
             }
+            $model->setId($postData['categoryID']);
 
-            $model->setId($this->getRequest()->post['categoryID']);
-        }
-        elseif ($access->getFolderAccess($this->getUser(), [$this->getRequest()->post['parent']]) < WRITE_ACCESS)
-        {
-            // No write access to parent
-
-            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+        } elseif ($access->getFolderAccess($user, [ $postData['parent'] ]) < UserAccess::ACCESS_WRITE) {
+            // check this user has access to the parent folder
+            throw new OutOfBoundsException("I find your lack of access disturbing.");
         }
 
-        // Delete category codes here, allowing them to be recreated when the category gets saved.
+        if ($postData['inherit'] == 1) {
 
-        // (I'm not confident that deleting cat codes in the postSave method regardless of whether there are any won't
-        // break somewhere else)
-
-        if ($this->getUser()->isSuperuser() && $model->getId()) {
-            $folderCodeMapper->deleteByColumn('categoryID', $model->getId());
-        }
-
-        if ($this->getRequest()->post['inherit'] == 1)
-        {
             // If inheriting permissions we need to remove any existing class codes...
-
-            $folderCodeMapper->deleteByColumn('categoryID', $this->getRequest()->post['categoryID']);
+            $codeMapper->deleteByColumn('categoryID', $postData['categoryID']);
 
             // ...and user access permissions...
-
-            $userAccessMapper->deleteByColumn("sid", $this->getRequest()->post["categoryID"]);
+            $userAccessMapper->deleteByColumn("sid", $postData["categoryID"]);
 
             // ...and role permissions
+            $roleAccessMapper->deleteByColumn("cid", $postData["categoryID"]);
 
-            $roleAccessMapper->deleteByColumn("cid", $this->getRequest()->post["categoryID"]);
-        }
-        else
-        {
-            // Only superusers get to change class codes
-
-            $codeCollection = new Collection();
-
-            if ($this->getUser()->isSuperuser()) {
-                foreach (explode(',', $this->getRequest()->post['code']) as $code) {
-                    $trimmedCode = trim($code);
-                    if (strlen($trimmedCode)) {
-                        $codeModel = new FolderCode();
-                        $codeModel->setCode($trimmedCode);
-                        $codeCollection->add($codeModel);
-                    }
-                }
-
-                $model->setCodes($codeCollection);
-            }
-
-            // Only privileged users (teachers?) get to change curriculum codes?
-
-            if (isset($this->getRequest()->post['curriculumCodes']))
-            {
-                $model->setCurriculumNodes(
-                    $curriculumNodeMapper->findByColumn('id', $this->getRequest()->post['curriculumCodes'])
-                );
-            }
-            elseif ($model->getId())
-            {
-                try {
-                    $existingModel = $folderMapper->findById($model->getId());
-                } catch (\Exception $e) {
-                    $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
-                }
-
-                $model->setCurriculumNodes($existingModel->getCurriculumNodes());
-            }
-
-            foreach (explode(',', $this->getRequest()->post['code']) as $code)
-            {
-                $trimmedCode = trim($code);
-
-                if (strlen($trimmedCode))
-                {
-                    $codeModel = new FolderCode();
-                    $codeModel->setCode($trimmedCode);
-                    $codeCollection->add($codeModel);
-                }
-            }
-
-            $model->setCodes($codeCollection);
+        } else {
+            // apply codes
+            $this->setCodesOnFolder($model, $postData['code'], $postData['curriculumCodes'], $user);
         }
 
         $affectedIds = $folderMapper->save($model);
 
-        if ($affectedIds === false)
-        {
-            // Something went wrong saving
-
-            $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        if ($affectedIds === false) {
+            // something went wrong
+            throw new RangeException("Failed to save folder.");
         }
 
-        $model->setId($affectedIds[0]);
+        if ($postData["inherit"] == 0) {
+            // only allow recursive permissions to supers
+            $recursive = $user->isSuperuser() && $postData['recursive'];
 
-        if ($this->getRequest()->post["inherit"] == 0)
-        {
-            // If role permission collection is defined, reapply permissions (possibly recursively)
-
-            $roleAccessMapper->savePermissions(
-                $model,
-                $this->getRequest()->post['group'],
-                $this->getRequest()->post['recursive']
-            );
+            // If rolepermission collection is defined, reapply permissions (possibly recursively)
+            $roleAccessMapper->savePermissions($model, $postData['group'], $recursive);
         }
 
         // Recurse inheritance
-
-        $folderMapper->recurseInheritance($model);
+        $this->recurseInheritance($model);
 
         // HomepageConfig definition
+        $this->saveHomepageConfig($model, $postData['template']);
 
-        $homepageConfig = $homepageConfigMapper->createModel()->setCategory($model);
+        return $model;
+    }
 
-        if ($this->getRequest()->post['template'] == HomepageTemplate::HOMEPAGE_REMOVE)
-        {
-            // If homepage is to be removed
 
-            $homepageConfigMapper->emptyHomepage($homepageConfig);
-            $homepageConfigMapper->delete($homepageConfig);
+    /**
+     * Put the given code lists onto the given folder
+     *
+     * @param Model $model
+     * @param string       $classCodeString
+     * @param array        $curriculumCodes
+     * @param User         $user
+     * @throws MapperException
+     */
+    protected function setCodesOnFolder(Model $model, $classCodeString, array $curriculumCodes, User $user)
+    {
+        $codeMapper           = $this->getCodeMapper();
+        $curriculumNodeMapper = $this->getCurriculumNodeMapper();
+        $folderMapper         = $this->getFolderMapper();
+
+        $codeCollection       = $codeMapper->createCollection();
+
+        // Only superusers get to change class codes
+        if ($user->isSuperuser()) {
+            foreach (explode(',', $classCodeString) as $code) {
+                $trimmedCode = trim($code);
+                if (strlen($trimmedCode)) {
+                    $codeModel = $codeMapper->createModel();
+                    $codeModel->setCode($trimmedCode);
+                    $codeCollection->add($codeModel);
+                }
+            }
+            $model->setCodes($codeCollection);
         }
-        elseif ($this->getRequest()->post['template'] > 0)
-        {
-            // If template defined
 
-            $homepageConfig->setTemplate($homepageTemplateMapper->findById($this->getRequest()->post['template']));
+        // Delete category codes here, allowing them to be recreated when the category gets saved.
+        // (I'm not confident that deleting cat codes in the postSave method
+        //  regardless of whether there are any won't break somewhere else)
+        if ($user->isSuperuser() && $model->getId() && count($codeCollection) === 0) {
+            $codeMapper->deleteByColumn('categoryID', $model->getId());
+        }
 
-            // Save homepage config
+        // Only privileged users (teachers?) get to change curriculum codes?
+        if (isset($curriculumCodes) && count($curriculumCodes)) {
+            $model->setCurriculumNodes(
+                $curriculumNodeMapper->findByColumn('id', $curriculumCodes)
+            );
 
-            $homepageConfigMapper->save($homepageConfig);
-            $homepageConfigMapper->resetToTemplate($homepageConfig);
+        } elseif ($model->getId()) {
+            $existingModel = $folderMapper->findById($model->getId());
+            $model->setCurriculumNodes($existingModel->getCurriculumNodes());
+
+        }
+
+    }
+
+
+    /**
+     * Save the given template for the given folder
+     *
+     * @param Model $model
+     * @param int          $template
+     * @throws RangeException if the specified template is not acceptable
+     */
+    protected function saveHomepageConfig(Model $model, $template)
+    {
+        $confMapper = $this->getHomepageConfigMapper();
+        $tplMapper  = $this->getHomepageTemplateMapper();
+
+        $homepageConfig = $confMapper->createModel()->setCategory($model);
+
+        // if homepage is to be removed
+        try {
+            if ($template == HomepageTemplate::HOMEPAGE_REMOVE) {
+                $confMapper->emptyHomepage($homepageConfig);
+                $confMapper->delete($homepageConfig);
+
+            } elseif ($template == HomepageTemplate::HOMEPAGE_KEEP_EXISTING) {
+                // we're done. get out.
+                return;
+
+            } elseif ($template > 0) {
+                // if template defined
+                $homepageConfig->setTemplate($tplMapper->findById($template));
+
+                // Save homepage config
+                $confMapper->save($homepageConfig);
+                $confMapper->resetToTemplate($homepageConfig);
+
+            } else {
+                throw new RangeException("Invalid template ID specified");
+            }
+        } catch (MapperException $e) {
+            throw new RangeException("Invalid template ID specified", 0, $e);
         }
 
         // Ram it back into its parent object where it belongs
-
         $model->setHomepage($homepageConfig);
+    }
 
-        // No changes in "KEEP_EXISTING" case
 
-        $groupHandler = new \Group();
+    /**
+     * Recursively apply inheritance. Why? Not sure. Cut-Paste from /cms/categoryForm.php
+     *
+     * @param Model $model
+     */
+    protected function recurseInheritance(Model $model)
+    {
+        $folderMapper = $this->getFolderMapper();
 
-        if ($this->getRequest()->post['groupcheck'])
-        {
-            // Prevent students with write access from being able to create folders
-
-            if ($groupHandler->allowOwner($_SESSION['id']))
-            {
-                // Setup group and forward to group management page
-
-                $groupHandler->createGroup($model->getId());
-                $groupHandler->addUser($model->getId(), $_SESSION['id'], 3);
-
-                $this->getResponse()->redirect->afterPost('/group/modify/'.$model->getId());
-            }
-            else
-            {
-                $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_CREATE);
-            }
-        }
-        else
-        {
-            // Redirect to / if the homepage was removed from a category, otherwise go back to the category
-
-            if ($this->getRequest()->post['template'] == \Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID)
-            {
-                $this->getResponse()->redirect->afterPost('/resources/' . $model->getId());
-            }
-            else
-            {
-                // If a category code exists, just go back to where you came from
-
-                if (strlen(trim($this->getRequest()->post['code'])))
-                {
-                    $this->getResponse()->redirect->afterPost(
-                        $this->getSession()->getHistory(2)
-                    );
-                }
-                else
-                {
-                    // Otherwise if you deleted the category code, redirect to categoryId link instead
-
-                    $this->getResponse()->redirect->afterPost('/homepage/' . $model->getId());
-                }
-            }
+        $folders = $folderMapper->findAllChildren($model->getId(), true);
+        foreach ($folders as $folder) {
+            $folder->setInherit($model->getInherit());
+            $folderMapper->save($folder);
+            $this->recurseInheritance($folder);
         }
     }
+
+
+    /**
+     * Helper function to persist a group for a folder
+     *
+     * @param ArrayAccess $postData the array structure we'll use to construct this group
+     * @param Model       $model    the Folder model we're working with
+     * @param User        $user     the effecting user
+     * @throws \Exception
+     * @return string
+     */
+    protected function createGroup($postData, Model $model, User $user)
+    {
+        // No changes in "KEEP_EXISTING" case
+        $roleAccessMapper = $this->getRoleAccessMapper();
+        $userAccessMapper = $this->getUserAccessMapper();
+        $groupMapper      = $this->getGroupMapper();
+
+        if ($postData['groupcheck']) {
+
+            // Prevent students with write access from being able to create folders
+            if ($roleAccessMapper->roleMayOwnFolders($user->getRole())) {
+                // Setup group and forward to group management page
+
+                try {
+                    // confirm the group exists
+                    $groupMapper->findOneByColumn('cid', $model->getId());
+
+                } catch (MapperException $e) {
+                    // doesn't exist
+                    $group = $groupMapper->createModel()
+                        ->setCategory($model)
+                        ->setType(Group::PRIVATE_GROUP)
+                        ->setForceFollow(false);
+
+                    // create the group
+                    $groupMapper->save($group);
+                }
+
+                // assign group ownership to the effecting user
+                $uA = $userAccessMapper->createModel()
+                    ->setService(UserAccess::SERVICE_HOMEPAGE)
+                    ->setAccessLevel(UserAccess::ACCESS_FULL)
+                    ->setServiceIdentifier($model->getId())
+                    ->setUser($user);
+
+                $userAccessMapper->save($uA);
+
+                // TODO replace with routeLookup once it exists
+                return '/group/modify/'.$model->getId();
+
+            } else {
+                throw new UnexpectedValueException("I find your lack of access disturbing.");
+            }
+
+        } elseif ($postData['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
+            // Redirect to / if the homepage was removed from a category, otherwise go back to the category
+            // TODO replace with routeLookup once it exists
+            return '/resources/' . $model->getId();
+
+        } elseif (strlen(trim($postData['code']))) {
+            // If a category code exists, just go back to where you came from
+            return $this->getSession()->getHistory(2);
+
+        }
+
+        // Otherwise if you deleted the category code, redirect to categoryId link instead
+        // TODO replace with routeLookup once it exists
+        return '/homepage/' . $model->getId();
+    }
+
 
     /**
      * Delete folder and all children (superusers only)
@@ -472,8 +611,8 @@ class Controller extends BaseController
      */
     public function postDeleteFolderAll()
     {
-        $errorMapper = ErrorMapper::getInstance();
-        $folderMapper = FolderMapper::getInstance();
+        $errorMapper = $this->getErrorMapper();
+        $folderMapper = $this->getFolderMapper();
 
         if (!$this->getUser()->isSuperuser()) {
             $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_DELETE_SUBFOLDERS);
@@ -495,6 +634,7 @@ class Controller extends BaseController
         ]);
     }
 
+
     /**
      * Reset folder content
      *
@@ -502,10 +642,10 @@ class Controller extends BaseController
      */
     public function postFolderReset()
     {
-        $access = Access::getInstance();
-        $errorMapper = ErrorMapper::getInstance();
-        $folderMapper = FolderMapper::getInstance();
-        $fileMapper = FileMapper::getInstance();
+        $access = $this->getAccess();
+        $errorMapper = $this->getErrorMapper();
+        $folderMapper = $this->getFolderMapper();
+        $fileMapper = $this->getFileMapper();
 
         try
         {
@@ -522,7 +662,7 @@ class Controller extends BaseController
 
         // Remove component content
 
-        $homepage = new \Homepage($folder->getId());
+        $homepage = new Homepage($folder->getId());
         $homepage->emptyHomepage();
 
         // Delete all files
@@ -547,4 +687,245 @@ class Controller extends BaseController
             'data' => json_encode(['result' => 'success'])
         ]);
     }
+
+
+    /**
+     * @return Mapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+
+    /**
+     * @param Mapper $folderMapper
+     * @return static
+     */
+    public function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return HomepageConfigMapper
+     */
+    protected function getHomepageConfigMapper()
+    {
+        return $this->homepageConfigMapper;
+    }
+
+
+    /**
+     * @param HomepageConfigMapper $homepageConfigMapper
+     * @return static
+     */
+    public function setHomepageConfigMapper($homepageConfigMapper)
+    {
+        $this->homepageConfigMapper = $homepageConfigMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return HomepageTemplateMapper
+     */
+    protected function getHomepageTemplateMapper()
+    {
+        return $this->homepageTemplateMapper;
+    }
+
+
+    /**
+     * @param HomepageTemplateMapper $homepageTemplateMapper
+     * @return static
+     */
+    public function setHomepageTemplateMapper($homepageTemplateMapper)
+    {
+        $this->homepageTemplateMapper = $homepageTemplateMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return RoleAccessMapper
+     */
+    protected function getRoleAccessMapper()
+    {
+        return $this->roleAccessMapper;
+    }
+
+
+    /**
+     * @param RoleAccessMapper $roleAccessMapper
+     * @return static
+     */
+    public function setRoleAccessMapper($roleAccessMapper)
+    {
+        $this->roleAccessMapper = $roleAccessMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return UserAccessMapper
+     */
+    public function getUserAccessMapper()
+    {
+        return $this->userAccessMapper;
+    }
+
+
+    /**
+     * @param UserAccessMapper $userAccessMapper
+     * @return static
+     */
+    public function setUserAccessMapper($userAccessMapper)
+    {
+        $this->userAccessMapper = $userAccessMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return RoleMapper
+     */
+    protected function getRoleMapper()
+    {
+        return $this->roleMapper;
+    }
+
+
+    /**
+     * @param RoleMapper $roleMapper
+     * @return static
+     */
+    public function setRoleMapper($roleMapper)
+    {
+        $this->roleMapper = $roleMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+
+    /**
+     * @param ErrorMapper $errorMapper
+     * @return static
+     */
+    public function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Access
+     */
+    protected function getAccess()
+    {
+        return $this->access;
+    }
+
+
+    /**
+     * @param Access $access
+     * @return static
+     */
+    public function setAccess($access)
+    {
+        $this->access = $access;
+        return $this;
+    }
+
+
+    /**
+     * @return Code\Mapper
+     */
+    protected function getCodeMapper()
+    {
+        return $this->codeMapper;
+    }
+
+
+    /**
+     * @param Code\Mapper $codeMapper
+     * @return static
+     */
+    public function setCodeMapper($codeMapper)
+    {
+        $this->codeMapper = $codeMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return Curriculum\Node\Mapper
+     */
+    protected function getCurriculumNodeMapper()
+    {
+        return $this->curriculumNodeMapper;
+    }
+
+
+    /**
+     * @param Curriculum\Node\Mapper $curriculumNodeMapper
+     * @return static
+     */
+    public function setCurriculumNodeMapper($curriculumNodeMapper)
+    {
+        $this->curriculumNodeMapper = $curriculumNodeMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return GroupMapper
+     */
+    protected function getGroupMapper()
+    {
+        return $this->groupMapper;
+    }
+
+
+    /**
+     * @param GroupMapper $groupMapper
+     * @return static
+     */
+    public function setGroupMapper($groupMapper)
+    {
+        $this->groupMapper = $groupMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return FileMapper
+     */
+    protected function getFileMapper()
+    {
+        return $this->fileMapper;
+    }
+
+
+    /**
+     * @param FileMapper $fileMapper
+     * @return static
+     */
+    public function setFileMapper($fileMapper)
+    {
+        $this->fileMapper = $fileMapper;
+        return $this;
+    }
+
 }

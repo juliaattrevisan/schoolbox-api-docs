@@ -15,6 +15,12 @@ use \PDO;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\User;
 
+/**
+ * Class GroupMapper
+ *
+ * @package Schoolbox\Resource
+ * @method Group createModel()
+ */
 class GroupMapper extends Mapper {
 
     protected function mapping() {
