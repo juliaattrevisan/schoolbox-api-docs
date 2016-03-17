@@ -199,7 +199,6 @@ class Controller extends BaseController
             }
         }
 
-        // TODO get permission and template configs
         try {
             /** @var Folder\Controller $folderController */
             $folderController = $this->getController('folder');
@@ -222,8 +221,8 @@ class Controller extends BaseController
                 'curriculumCodes' => $codes,
 
                 // configurable things
-                'inherit'         => true,  // TODO config inheritance
-                'template'        => -1,    // TODO config template
+                'inherit'         => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
+                'template'        => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
                 'group'           => $rolePermissions,
 
                 // leave these always off
