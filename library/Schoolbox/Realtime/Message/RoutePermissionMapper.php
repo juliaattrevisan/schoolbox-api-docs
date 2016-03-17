@@ -23,7 +23,7 @@ class RoutePermissionMapper extends Mapper {
 
 	/** @var array */
 	protected $severityMap = [
-		RoutePermission::MUTE    => Logger::INFO,
+		RoutePermission::DIGEST  => Logger::INFO,
 		RoutePermission::INSTANT => Logger::NOTICE,
 		RoutePermission::PUSH    => Logger::WARNING,
 		RoutePermission::EMAIL   => Logger::ERROR
