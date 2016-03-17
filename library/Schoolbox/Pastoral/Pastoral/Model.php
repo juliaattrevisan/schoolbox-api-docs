@@ -357,6 +357,6 @@ class Model implements ISoftDeletable
      * @return bool
      */
     public function isDeleted() {
-        return ($this->getDeletedDate() instanceof Alaress_Date_Format && !$this->getDeletedDate()->isNull());
+        return !($this->getDeletedDate() instanceof \Alaress_Date_NullDate);
     }
 }
