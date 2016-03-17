@@ -21,6 +21,7 @@ use Psr\Log\LoggerInterface;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Notif\IQueueFactory;
 use Schoolbox\Notif\NotifInterface;
+use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Rerouter\Filter\FilterException;
 use Schoolbox\Realtime\Rerouter\Filter\FilterInterface;
@@ -47,10 +48,10 @@ class QueueSorter implements FilterInterface {
 
     /** @var array */
     protected $map = [
-        'DI' => Logger::INFO,
-        'IN' => Logger::NOTICE,
-        'MO' => Logger::WARNING,
-        'EM' => Logger::ERROR
+        RoutePermission::MUTE    => Logger::INFO,
+        RoutePermission::INSTANT => Logger::NOTICE,
+        RoutePermission::PUSH    => Logger::WARNING,
+        RoutePermission::EMAIL   => Logger::ERROR
     ];
 
     /**
@@ -103,13 +104,13 @@ class QueueSorter implements FilterInterface {
 			$this->validate($instance, $formatted, $user);
 			$outputLevels = $this->getReroutedLevel($user, $formatted['channel']);
 
-            if (in_array('MU', $outputLevels)) {
+            if ($this->permMapper->isMuted($outputLevels)) {
                 throw new FilterException("Reroute level is zero");
 
-            } elseif (in_array('DI', $outputLevels)) {
+            } elseif ($this->permMapper->isDigest($outputLevels)) {
                 $method = UserQueue::Q_DIGEST;
 
-            } elseif (in_array('IN', $outputLevels)) {
+            } elseif ($this->permMapper->isInstant($outputLevels)) {
                 $method = UserQueue::Q_LISTED;
 
             } else {
@@ -186,13 +187,13 @@ class QueueSorter implements FilterInterface {
 		if (count($intent) == 0) {
 			// if we got nothing back, this user isn't meant to see this message
             $this->log->debug("Got no levels back, msg source is disabled for this user's role");
-            return [ 'MU' ];
+            return [ RoutePermission::MUTE ];
 		}
 
 		// if the user in question has no digest schedule and digest level is selected, escalate to instant
-		if ((string)$user->getRole()->getDigestSchedule() == (string)Role::DIGEST_NEVER && in_array('DI', $intent)) {
+		if ((string)$user->getRole()->getDigestSchedule() == (string)Role::DIGEST_NEVER && $this->permMapper->isDigest($intent)) {
 			$this->log->info("User doesn't have digest schedule: upgrading to instant");
-			$intent = [ 'IN' ];
+			$intent = [ RoutePermission::INSTANT ];
 		}
 
 		return $intent;
