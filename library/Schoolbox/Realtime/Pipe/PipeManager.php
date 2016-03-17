@@ -26,7 +26,6 @@ use React\EventLoop\Timer\Timer;
 use React\EventLoop\Timer\TimerInterface;
 use React\Socket\ConnectionException;
 use React\Stomp\Client;
-use Schoolbox\MobileApp\ServiceManager;
 use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\ProcessException;
@@ -64,9 +63,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	/** @var SubscriptionManager */
 	protected $subscriptionManager;
 
-    /** @var ServiceManager */
-    protected $cloudManager;
-
 	/** @var LoopInterface */
 	protected $reactLoop;
 
@@ -90,7 +86,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
      * @param SessionValidator          $sessionValidator
      * @param Client                    $stompClient
      * @param QueueFactory              $qf
-     * @param ServiceManager            $cloudManager
      * @param LoggerInterface           $log
      * @param DispatchStrategyInterface $strat
      */
@@ -99,7 +94,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
         SessionValidator $sessionValidator,
         Client $stompClient,
         QueueFactory $qf,
-        ServiceManager $cloudManager,
         LoggerInterface $log,
         DispatchStrategyInterface $strat = null
     ) {
@@ -107,7 +101,6 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
         $this->reactLoop           = $reactLoop;
         $this->taskDispatcher      = new Dispatcher($reactLoop, $this, $log, $strat);
         $this->log                 = $log;
-        $this->cloudManager        = $cloudManager;
         $this->subscriptionManager = new SubscriptionManager($stompClient, $this, $log, $qf);
 
         $this->log->debug('Instantiated PipeManager');
@@ -510,16 +503,10 @@ class PipeManager implements WampServerInterface, MessageComponentInterface, Tas
 	 *
 	 * @param int    $userId
 	 * @param array  $data
-	 * @param bool   $cloudPush
 	 */
-	public function sendToUser($userId, $data, $cloudPush = true) {
+	public function sendToUser($userId, $data) {
 		foreach($this->pipes->getPipesByUserId($userId) as $pipe) {
 			$this->sendToPipe($pipe, $data);
-		}
-
-		if ($cloudPush) {
-			$this->log->info("Pushing message to cloud for user $userId", $data);
-			$this->cloudManager->push($userId, $data);
 		}
 	}
 
