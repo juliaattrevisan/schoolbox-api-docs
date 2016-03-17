@@ -14,6 +14,12 @@ use Schoolbox\Role;
 
 class RoutePermission {
 
+	const MUTE    = 'MU';
+	const DIGEST  = 'DI';
+	const INSTANT = 'IN';
+	const PUSH    = 'MO';
+	const EMAIL   = 'EM';
+
 	/** @var Source */
 	protected $msgSource;
 	/** @var int */
