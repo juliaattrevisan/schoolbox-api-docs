@@ -159,7 +159,7 @@
                     </div>
                 </fieldset>
 
-                <fieldset class="content {HIDE_INHERIT}">
+                <fieldset class="content {{ folder.getInherit() ? 'hide' : '' }}">
 
                     <div class="small-12 columns">
                         <label>Access Permissions
@@ -236,7 +236,7 @@
 
                 {% endif %}
 
-                <fieldset id="synergetic-codes" class="content {HIDE_PERMISSIONS}">
+                <fieldset id="synergetic-codes" class="content {{ folder.getInherit() ? 'hide' : '' }}">
                     <div class="small-12 columns">
 
                         {# Only superusers can change subject codes#}
