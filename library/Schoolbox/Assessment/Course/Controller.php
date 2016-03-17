@@ -25,6 +25,7 @@ use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\Folder\Code;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
 use Schoolbox\Resource\HomepageConfigMapper;
@@ -55,6 +56,9 @@ class Controller extends BaseController
     /** @var  HomepageTemplateMapper */
     protected $homepageTemplateMapper;
 
+    /** @var CourseConfigMapper */
+    protected $courseConfigMapper;
+
     /** @var Access */
     protected $access;
 
@@ -72,6 +76,7 @@ class Controller extends BaseController
         $this->setHomepageConfigMapper(HomepageConfigMapper::getInstance());
         $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
         $this->setAccess(Access::getInstance());
+        $this->setCourseConfigMapper(CourseConfigMapper::getInstance());
     }
 
 
@@ -889,6 +894,23 @@ class Controller extends BaseController
         return $this;
     }
 
+    /**
+     * @return CourseConfigMapper
+     */
+    public function getCourseConfigMapper()
+    {
+        return $this->courseConfigMapper;
+    }
+
+    /**
+     * @param  CourseConfigMapper $courseConfigMapper
+     * @return $this
+     */
+    public function setCourseConfigMapper($courseConfigMapper)
+    {
+        $this->courseConfigMapper = $courseConfigMapper;
+        return $this;
+    }
 
     /**
      * @return Access
