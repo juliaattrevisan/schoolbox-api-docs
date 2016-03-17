@@ -71,7 +71,7 @@
         <div class="alert-box">No results found.</div>
         <form method="post" action="/course/new">
             <input type="hidden" name="query" value="{{ query }}" />
-            <input type="submit" value="Create a Course called {{ query }}" />
+            <input type="submit" class='expand' value="Create a Course called {{ query }}" />
         </form>
     {% endif %}
 </div>
