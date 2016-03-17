@@ -66,6 +66,7 @@
     <div class="small-12 island">
         <h1>{{ student.formatName() }}</h1>
         <h2>Pastoral Record Details</h2>
+
         <section>
             <ul class="action-list">
                 <li class="actions-small-1">
@@ -88,22 +89,6 @@
                                     {% endfor %}
                                 </p>
                             {% endif %}
-
-                            {# Show article body #}
-                            <article>
-                                <p class="spaced">
-                                    {{ record.getBodyText() }}
-                                </p>
-
-                                {# Show any file attachments #}
-                                {% if record.getAttachmentList.count > 0 %}
-                                    <p class="spaced meta">
-                                        {% for attachment in record.getAttachmentList %}
-                                            Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{  attachment.getFilename() }}</a><br>
-                                        {% endfor %}
-                                    </p>
-                                {% endif %}
-                            </article>
 
                             {# Hide meta from parents#}
                             {% if role != 'parent' %}
@@ -145,6 +130,22 @@
                     {% endif %}
                 </li>
             </ul>
+        </section>
+
+        <section>
+            {# Show article body #}
+            <div class="content">
+                {{ record.getBody() | raw }}
+
+                {# Show any file attachments #}
+                {% if record.getAttachmentList.count > 0 %}
+                    <p class="spaced meta">
+                        {% for attachment in record.getAttachmentList %}
+                            Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{  attachment.getFilename() }}</a><br>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+            </div>
         </section>
 
         {# Parents cannot ever add/view comments #}

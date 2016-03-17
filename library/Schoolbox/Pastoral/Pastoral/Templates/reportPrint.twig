@@ -70,32 +70,36 @@
                                         </p>
                                     {% endif %}
 
-                                    <article class="hide-on-print">
-                                        <p class="spaced">
-                                            {% if (record.getPrivate and record.getOwner.getId != session.user.getId) and not pastoralModerator %}
-                                                The contents of this record have been marked as private.
-                                            {% else %}
-                                                {{ record.getBodyText() }}
-                                            {% endif %}
-                                        </p>
-                                    </article>
-
-                                    <p class="spaced show-for-print">
-                                        <br>
-                                        {{ record.getBodyText() }}
-                                        <br>
-                                        {% if record.getTagList.count > 0 %}
-                                    <p class="meta spaced show-for-print">
-                                        Tags:
-                                        {% for tag in record.getTagList %}
-                                            {{ tag.getName | title }}
-                                            {% if not loop.last %} | {% endif %}
-                                        {% endfor %}
-                                    </p>
-                                    {% endif %}
-                                    <br>
-                                    </p>
                                 </div>
+                                <section>
+                                    <div class="content">
+                                        <article class="hide-on-print">
+                                            {% if (record.getPrivate and record.getOwner.getId != session.user.getId) and not pastoralModerator %}
+                                                <p>The contents of this record have been marked as private.</p>
+                                            {% else %}
+                                                {{ record.getBody() | raw }}
+                                            {% endif %}
+                                        </article>
+                                        <article class="show-for-print">
+                                            <p class="spaced">
+                                                <br>
+                                                {{ record.getBody() | raw }}
+                                                <br>
+                                                {% if record.getTagList.count > 0 %}
+                                            </p>
+                                        </article>
+
+                                        <p class="meta spaced show-for-print">
+                                            Tags:
+                                            {% for tag in record.getTagList %}
+                                                {{ tag.getName | title }}
+                                                {% if not loop.last %} | {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                        {% endif %}
+                                        </p>
+                                    </div>
+                                </section>
                             </div>
                         </li>
 

@@ -52,21 +52,13 @@
 
                         <div id="panel-{{ record.getId }}" class="content">
 
-                            <div class="card small-12 wrap-down">
-
                                 <h3>{{ record.getType.getName }}</h3>
 
-                                <p class="meta">Posted By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}</p>
+                                <p class="meta spaced">
 
-                                <p class="meta">
-                                    Severity: {{ record.getSeverity.getName() }}
-                                </p>
-
-                                <p class="meta">
-                                    Incident Type: {{ record.getType.getName() }}
-                                </p>
-
-                                <p class="meta">
+                                    Posted By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}<br>
+                                    Severity: {{ record.getSeverity.getName() }}<br>
+                                    Incident Type: {{ record.getType.getName() }}<br>
                                     Audience:
                                     {% if record.getAccessList.count > 0 %}
                                         {% for access in record.getAccessList %}
@@ -76,43 +68,37 @@
                                                 {{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}{% if not loop.last %},{% endif %}
                                             {% endif %}
                                         {% endfor %}
+                                        <br>
                                     {% else %}
                                         No Audience Set
+                                        <br>
                                     {% endif %}
-                                </p>
-
-                                {% if record.getTagsList.count > 0 %}
-
-                                    <p class="meta spaced">
+                                    {% if record.getTagsList.count > 0 %}
                                         Tags:
                                         {% for tag in record.getTagsList %}
                                             {{ tag.getName | title }}
                                             {% if not loop.last %} | {% endif %}
                                         {% endfor %}
-                                    </p>
+                                    {% endif %}
+                                </p>
 
-                                {% endif %}
+                                {% if (record.getPrivate and record.getOwner.getId != session.user.getId) and not pastoralModerator %}
 
-                                <p class="content {% if loop.first and record.getAttachmentList.count > 0 %}spaced{% endif %}">
-                                    {% if (record.getPrivate and record.getOwner.getId != session.user.getId) and not pastoralModerator %}
+                                    The contents of this record have been marked as private.
 
-                                        The contents of this record have been marked as private.
+                                {% else %}
 
-                                    {% else %}
-
-                                        {{ record.getBodyText() }}
+                                    {{ record.getBody() | raw }}
 
                                     {% if record.getAttachmentList.count > 0 %}
-
                                         <p class="meta">
                                             {% for attachment in record.getAttachmentList %}
                                                 Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{  attachment.getFilename() }}</a><br>
                                             {% endfor %}
                                         </p>
-
                                     {% endif %}
 
-                                {% if not record.getPrivate or pastoralModerator or record.getOwner.getId == session.user.getId %}
+                                    {% if not record.getPrivate or pastoralModerator or record.getOwner.getId == session.user.getId %}
                                         {% for comment in record.getCommentList %}
                                             <hr>
                                             <p class="meta">Comment By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}</p>
@@ -122,10 +108,7 @@
                                         {% endfor %}
                                     {% endif %}
 
-                                    {% endif %}
-                                </p>
-
-                            </div>
+                                {% endif %}
 
                         </div>
 
