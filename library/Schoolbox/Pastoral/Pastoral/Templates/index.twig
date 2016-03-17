@@ -209,9 +209,9 @@
                                     </p>
 
                                     {# Display tags #}
-                                    {% if record.tags | length > 0 %}
+                                    {% if record.tagsList | length > 0 %}
                                         <p class="spaced">
-                                            {% for tag in record.tags %}
+                                            {% for tag in record.tagsList %}
                                                 <span class="neutral label">{{ tag.name }}</span>
                                             {% endfor %}
                                         </p>

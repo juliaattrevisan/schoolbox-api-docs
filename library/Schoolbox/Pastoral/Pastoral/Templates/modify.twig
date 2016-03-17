@@ -180,7 +180,7 @@
 
                         <label>
                             Tags
-                            <input id="tags" name="tags" value="{% for tag in tags %}{{ tag.getName }},{% endfor %}">
+                            <input id="tags" name="tags" value="{% for tag in record.tagsList %}{{ tag.getName }},{% endfor %}">
                         </label>
 
                         <label>
