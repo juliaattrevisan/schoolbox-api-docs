@@ -15,9 +15,19 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Mapper extends BaseMapper
 {
+    /**
+     * Mapper constructor.
+     */
+    public function __construct()
+    {
+        $this->setErrorMapper(ErrorMapper::getInstance());
+        Parent::__construct();
+    }
+
     protected function mapping()
     {
         $this->hasTable('pastoral_tags');
@@ -104,11 +114,9 @@ class Mapper extends BaseMapper
             $joins = "LEFT JOIN $joins";
         }
 
-        $stmt = $this->database->prepare(
-            "
+        $stmt = $this->database->prepare("
 			SELECT $columns FROM `{$this->getTable()}` t0 {$joins} WHERE `t0`.`{$identifierColumn}` = :id_value
-		"
-        );
+		");
 
         $stmt->execute(array('id_value' => $identifierValue));
 
@@ -153,10 +161,31 @@ class Mapper extends BaseMapper
             }
         }
 
-        if ($mainModel instanceof \Schoolbox\Pastoral\Type\Model) {
+        if ($mainModel instanceof Model) {
             return $mainModel;
         }
 
-        throw new \Schoolbox\Mapper\Exception("Instance of object not found");
+        $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+    }
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * @param ErrorMapper $errorMapper
+     * @return $this
+     */
+    public function setErrorMapper($errorMapper) {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    public function getErrorMapper() {
+        return $this->errorMapper;
     }
 }

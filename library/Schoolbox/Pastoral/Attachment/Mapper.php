@@ -15,55 +15,26 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Mapper extends BaseMapper
 {
+    public function __construct()
+    {
+        $this->setErrorMapper(ErrorMapper::getInstance());
+        Parent::__construct();
+    }
+
     protected function mapping()
     {
         $this->hasTable('pastoral_attachment');
-        $this->hasModel('\\Schoolbox\\Pastoral\\Attachment\\Model');
-
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => Mapper::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'pastoral_id',
-                'property' => 'pastoralId',
-                'type'     => Mapper::TYPE_INTEGER,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'hash',
-                'property' => 'hash',
-                'type'     => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'datetime_posted',
-                'property' => 'postDate',
-                'type'     => Mapper::TYPE_DATETIME,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'datetime_modified',
-                'property' => 'modifiedDate',
-                'type'     => Mapper::TYPE_DATETIME,
-            )
-        );
-
+        $this->hasPrototype(new PastoralAttachmentModel);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('pastoral_id', self::TYPE_INTEGER);
+        $this->uses('hash', self::TYPE_STRING);
+        $this->uses('datetime_posted', self::TYPE_DATETIME, null, 'postDate');
+        $this->uses('datetime_modified', self::TYPE_DATETIME, null, 'modifiedDate');
         $this->hasSoftDeleteDateField('datetime_deleted');
     }
 
@@ -76,7 +47,6 @@ class Mapper extends BaseMapper
      */
     public function findByPastoralId($pastoralId) {
         $collection = new Collection();
-        $userMapper = new \Schoolbox\UserMapper;
 
         $query = "
 			SELECT
@@ -153,18 +123,16 @@ class Mapper extends BaseMapper
             $joins = "LEFT JOIN $joins";
         }
 
-        $stmt = $this->database->prepare(
-            "
+        $stmt = $this->database->prepare("
 			SELECT $columns FROM `{$this->getTable()}` t0 {$joins} WHERE `t0`.`{$identifierColumn}` = :id_value
-		"
-        );
+		");
 
         $stmt->execute(array('id_value' => $identifierValue));
 
         // there will be more than one record returned by this query
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if (empty($mainModel)) {
-                /** @var Article $mainModel */
+                /** @var Model $mainModel */
                 $mainModel = $this->hydrate($r, 't0');
                 // set blank collections
             }
@@ -202,10 +170,31 @@ class Mapper extends BaseMapper
             }
         }
 
-        if ($mainModel instanceof \Schoolbox\Pastoral\Attachment\Model) {
+        if ($mainModel instanceof Model) {
             return $mainModel;
         }
 
-        throw new \Schoolbox\Mapper\Exception("Instance of object not found");
+        $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+    }
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * @param ErrorMapper $errorMapper
+     * @return $this
+     */
+    public function setErrorMapper($errorMapper) {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    public function getErrorMapper() {
+        return $this->errorMapper;
     }
 }

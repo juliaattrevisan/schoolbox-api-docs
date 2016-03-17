@@ -15,13 +15,21 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Schoolbox\Pastoral\Severity\Model as SeverityModel;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Mapper extends BaseMapper
 {
+    public function __construct()
+    {
+        $this->setErrorMapper(ErrorMapper::getInstance());
+        Parent::__construct();
+    }
+
     protected function mapping()
     {
         $this->hasTable('luPastoralSeverity');
-        $this->hasModel('\\Schoolbox\\Pastoral\\Severity\\Model');
+        $this->hasPrototype(new SeverityModel);
 
         $this->hasMap(
             array(
@@ -59,7 +67,7 @@ class Mapper extends BaseMapper
      *
      * @param  int $identifierValue
      *
-     * @return object
+     * @return Model
      */
     public function findById($identifierValue)
     {
@@ -104,18 +112,16 @@ class Mapper extends BaseMapper
             $joins = "LEFT JOIN $joins";
         }
 
-        $stmt = $this->database->prepare(
-            "
+        $stmt = $this->database->prepare("
 			SELECT $columns FROM `{$this->getTable()}` t0 {$joins} WHERE `t0`.`{$identifierColumn}` = :id_value
-		"
-        );
+		");
 
         $stmt->execute(array('id_value' => $identifierValue));
 
         // there will be more than one record returned by this query
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if (empty($mainModel)) {
-                /** @var Article $mainModel */
+                /** @var SeverityModel $mainModel */
                 $mainModel = $this->hydrate($r, 't0');
                 // set blank collections
             }
@@ -153,10 +159,31 @@ class Mapper extends BaseMapper
             }
         }
 
-        if ($mainModel instanceof \Schoolbox\Pastoral\Severity\Model) {
+        if ($mainModel instanceof SeverityModel) {
             return $mainModel;
         }
 
-        throw new \Schoolbox\Mapper\Exception("Instance of object not found");
+        $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+    }
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * @param ErrorMapper $errorMapper
+     * @return $this
+     */
+    public function setErrorMapper($errorMapper) {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    public function getErrorMapper() {
+        return $this->errorMapper;
     }
 }

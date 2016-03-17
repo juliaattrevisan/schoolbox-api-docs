@@ -273,7 +273,7 @@
                             {# Show edit links to the owner and pastoral moderators #}
                             {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or pastoralModerator %}
                                 <nav>
-                                    <a class="icon-modify no-text" href="/pastoral/update/{{ student.getId() }}/{{ record.getId() }}" title="Modify"></a>
+                                    <a class="icon-modify no-text" href="/pastoral/update/{{ record.getId() }}" title="Modify"></a>
                                     <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
                                 </nav>
                             {% endif %}

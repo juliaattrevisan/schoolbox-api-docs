@@ -24,12 +24,10 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('pastoral_access');
         $this->hasPrototype(new Model());
-
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('pastoral_id', self::TYPE_INTEGER);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user');
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role');
-
         $this->hasSoftDeleteDateField('datetime_deleted');
     }
 
@@ -37,7 +35,6 @@ class Mapper extends BaseMapper
      * Retrieves all access relating to a particular pastoral id
      *
      * @param  int $pastoralId
-     *
      * @return \Schoolbox\Collection
      */
     public function findByPastoralId($pastoralId)

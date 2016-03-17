@@ -27,7 +27,7 @@ class Model implements ISoftDeletable {
     protected $deletedDate;
 
     /**
-     * @param string $hash
+     * @param string $name
      * @return self
      */
     public function setName($name) {
@@ -75,7 +75,7 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param \Alaress_Date_Format $modifiedDate
+     * @param \Alaress_Date_Format $deletedDate
      * @return self
      */
     public function setDeletedDate($deletedDate) {

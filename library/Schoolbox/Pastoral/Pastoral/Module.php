@@ -26,18 +26,18 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'getReportBuilder', $basePath, "/report-builder");
-        $this->addGetRoute($router, 'getReport', $basePath, "/report");
-        $this->addGetRoute($router, 'getReportPrint', $basePath, "/report-print");
-        $this->addGetRoute($router, 'getIndex', $basePath, "/{id}");
-        $this->addGetRoute($router, 'getInsert', $basePath, "/insert/{id}");
-        $this->addGetRoute($router, 'getRecord', $basePath, "/{studentId}/{id}");
-        $this->addGetRoute($router, 'getUpdate', $basePath, "/update/{studentId}/{id}");
+        $this->addGetRoute($router, 'getReportBuilder',     $basePath, "/report-builder");
+        $this->addGetRoute($router, 'getReport',            $basePath, "/report");
+        $this->addGetRoute($router, 'getReportPrint',       $basePath, "/report-print");
+        $this->addGetRoute($router, 'getInsert',            $basePath, "/insert/{id}");
+        $this->addGetRoute($router, 'getUpdate',            $basePath, "/update/{id}");
+        $this->addGetRoute($router, 'getRecord',            $basePath, "/{studentId}/{id}");
+        $this->addGetRoute($router, 'getIndex',             $basePath, "/{id}");
 
-        $this->addPostRoute($router, 'postSave', $basePath, "/save");
-        $this->addPostRoute($router, 'postComment', $basePath, "/comment");
-        $this->addPostRoute($router, 'postCommentDelete', $basePath, "/commentDelete");
-        $this->addPostRoute($router, 'postDelete', $basePath, "/delete");
+        $this->addPostRoute($router, 'postSave',            $basePath, "/save");
+        $this->addPostRoute($router, 'postComment',         $basePath, "/comment");
+        $this->addPostRoute($router, 'postCommentDelete',   $basePath, "/commentDelete");
+        $this->addPostRoute($router, 'postDelete',          $basePath, "/delete");
     }
 
     /**

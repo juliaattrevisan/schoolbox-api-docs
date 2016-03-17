@@ -59,7 +59,7 @@ class Mapper extends BaseMapper
      *
      * @param  int $identifierValue
      *
-     * @return object
+     * @return Model
      */
     public function findById($identifierValue)
     {

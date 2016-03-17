@@ -14,11 +14,15 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
+use Schoolbox\RoleMapper;
+use Schoolbox\UserMapper;
 use Schoolbox\Pastoral\Pastoral;
-use Schoolbox\Pastoral\Tags\Mapper as TagsMapper;
-use Schoolbox\Pastoral\Comment\Mapper as CommentMapper;
-use Schoolbox\Pastoral\Attachment\Mapper as AttachmentMapper;
-use Schoolbox\Pastoral\Access\Mapper as AccessMapper;
+use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
+use Schoolbox\Pastoral\Tags\Mapper as PastoralTagsMapper;
+use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
+use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Permission\Access\Access as AccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
@@ -29,16 +33,72 @@ class Mapper extends BaseMapper
      */
     protected $errorMapper;
 
+    /**
+     * @var RoleMapper
+     */
+    protected $roleMapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * @var UserAccessMapper
+     */
+    protected $userAccessMapper;
+
+    /**
+     * @var AccessMapper
+     */
+    protected $accessMapper;
+
+    /**
+     * @var StorageMapper
+     */
+    protected $storageMapper;
+
+    /**
+     * @var PastoralTagsMapper
+     */
+    protected $pastoralTagsMapper;
+
+    /**
+     * @var PastoralCommentMapper
+     */
+    protected $pastoralCommentMapper;
+
+    /**
+     * @var PastoralAccessMapper
+     */
+    protected $pastoralAccessMapper;
+
+    /**
+     * @var PastoralAttachmentMapper
+     */
+    protected $pastoralAttachmentMapper;
+
     public function __construct()
     {
         $this->setErrorMapper(ErrorMapper::getInstance());
+        $this->setUserAccessMapper(UserAccessMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
+        $this->setAccessMapper(AccessMapper::getInstance());
+        $this->setRoleMapper(RoleMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
+        $this->setStorageMapper(StorageMapper::getInstance());
+        $this->setPastoralTagsMapper(PastoralTagsMapper::getInstance());
+        $this->setPastoralCommentMapper(PastoralCommentMapper::getInstance());
+        $this->setPastoralAttachmentMapper(PastoralAttachmentMapper::getInstance());
+        $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
+
         parent::__construct();
     }
 
     protected function mapping()
     {
         $this->hasTable('pastoral');
-        $this->hasModel('\\Schoolbox\\Pastoral\\Pastoral\\Model');
+        $this->hasPrototype(new PastoralModel);
 
         $this->hasMap(
             array(
@@ -326,7 +386,7 @@ class Mapper extends BaseMapper
      * @var string $authors (CSV list)
      * @var string $students (CSV list)
      *
-     * @return bool
+     * @return Collection|Pastoral\Model
      */
 
     public function findAllReport($before_date, $after_date, $severity, $types, $authors, $students)
@@ -422,7 +482,7 @@ class Mapper extends BaseMapper
 
         // Pastoral moderators can access everything
 
-        if (UserAccessMapper::getInstance()->findAllForUser($user)->filterBy("service", PASTORAL_SERVICE)->count() > 0)
+        if ($this->getUserAccessMapper()->findAllForUser($user)->filterBy("service", PASTORAL_SERVICE)->count() > 0)
             return true;
 
         // To access a record you at least be a staff member, or the parent of the student
@@ -433,7 +493,7 @@ class Mapper extends BaseMapper
         if ($role->getType() != "staff")
         {
             try {
-                $record->setStudent(\Schoolbox\UserMapper::getInstance()->findById($record->getStudent()->getId()));
+                $record->setStudent($this->getUserMapper()->findById($record->getStudent()->getId()));
             }
             catch (\Exception $e) {
                 $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
@@ -449,7 +509,7 @@ class Mapper extends BaseMapper
 
         // If we get through to here we need to check the audience of item
 
-        $record->setAccessList(AccessMapper::getInstance()->findByColumn("pastoral_id", $record->getId()));
+        $record->setAccessList($this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId()));
 
         $accessRecords = $record->getAccessList();
 
@@ -498,24 +558,24 @@ class Mapper extends BaseMapper
 
         // Don't know if this is right for the one-to-many joins, but it works
 
-        $record->setTagsList(TagsMapper::getInstance()->findByColumn("pastoral_id", $record->getId()));
-        $record->setCommentList(CommentMapper::getInstance()->findByColumn("pastoral_id", $record->getId()));
-        $record->setAttachmentList(AttachmentMapper::getInstance()->findByColumn("pastoral_id", $record->getId()));
+        $record->setTagsList($this->getPastoralTagsMapper()->findByColumn("pastoral_id", $record->getId()));
+        $record->setCommentList($this->getPastoralCommentMapper()->findByColumn("pastoral_id", $record->getId()));
+        $record->setAttachmentList($this->getPastoralAttachmentMapper()->findByColumn("pastoral_id", $record->getId()));
 
         // Grab users and roles
 
-        $record->setAccessList(AccessMapper::getInstance()->findByColumn("pastoral_id", $record->getId()));
+        $record->setAccessList($this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId()));
 
         foreach ($record->getAccessList() as $access) {
             if ($access->getRole()->getId() != '') {
                 try {
-                    $access->setRole(\Schoolbox\RoleMapper::getInstance()->findById($access->getRole()->getId()));
+                    $access->setRole($this->getRoleMapper()->findById($access->getRole()->getId()));
                 } catch (\Exception $e) {
                     $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
                 }
             } else if ($access->getUser()->getId() != '') {
                 try {
-                    $access->setUser(\Schoolbox\UserMapper::getInstance()->findById($access->getUser()->getId()));
+                    $access->setUser($this->getUserMapper()->findById($access->getUser()->getId()));
                 } catch (\Exception $e) {
                     $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
                 }
@@ -526,7 +586,7 @@ class Mapper extends BaseMapper
 
         foreach ($record->getCommentList() as $comment) {
             try {
-                $comment->setOwner(\Schoolbox\UserMapper::getInstance()->findById($comment->getOwner()->getId()));
+                $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
             } catch (\Exception $e) {
                 $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
             }
@@ -540,7 +600,7 @@ class Mapper extends BaseMapper
 
             // Get file icon using mime type
 
-            $file = StorageMapper::getInstance()->findByHash($attachment->getHash());
+            $file = $this->getStorageMapper()->findByHash($attachment->getHash());
             $attachment->setIcon($file->getMimetype()->getIconFile());
             $attachment->setFilename($file->getFilename());
         }
@@ -562,5 +622,130 @@ class Mapper extends BaseMapper
      */
     public function getErrorMapper() {
         return $this->errorMapper;
+    }
+
+    /**
+     * @param $userAccessMapper
+     */
+    public function setUserAccessMapper($userAccessMapper) {
+        $this->userAccessMapper = $userAccessMapper;
+    }
+
+    /**
+     * @return UserAccessMapper
+     */
+    public function getUserAccessMapper() {
+        return $this->userAccessMapper;
+    }
+
+    /**
+     * @param $accessMapper
+     */
+    public function setAccessMapper($accessMapper) {
+        $this->accessMapper = $accessMapper;
+    }
+
+    /**
+     * @return AccessMapper
+     */
+    public function getAccessMapper() {
+        return $this->accessMapper;
+    }
+    /**
+     * @param $roleMapper
+     */
+    public function setRoleMapper($roleMapper) {
+        $this->roleMapper = $roleMapper;
+    }
+
+    /**
+     * @return RoleMapper
+     */
+    public function getRoleMapper() {
+        return $this->roleMapper;
+    }
+
+    /**
+     * @param $userMapper
+     */
+    public function setUserMapper($userMapper) {
+        $this->userMapper = $userMapper;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper() {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param $storageMapper
+     */
+    public function setStorageMapper($storageMapper) {
+        $this->storageMapper = $storageMapper;
+    }
+
+    /**
+     * @return StorageMapper
+     */
+    public function getStorageMapper() {
+        return $this->storageMapper;
+    }
+
+    /**
+     * @param $pastoralCommentMapper
+     */
+    public function setPastoralCommentMapper($pastoralCommentMapper) {
+        $this->pastoralCommentMapper = $pastoralCommentMapper;
+    }
+
+    /**
+     * @return PastoralCommentMapper
+     */
+    public function getPastoralCommentMapper() {
+        return $this->pastoralCommentMapper;
+    }
+
+    /**
+     * @param $pastoralTagsMapper
+     */
+    public function setPastoralTagsMapper($pastoralTagsMapper) {
+        $this->pastoralTagsMapper = $pastoralTagsMapper;
+    }
+
+    /**
+     * @return PastoralTagsMapper
+     */
+    public function getPastoralTagsMapper() {
+        return $this->pastoralTagsMapper;
+    }
+
+    /**
+     * @param $pastoralAttachmentMapper
+     */
+    public function setPastoralAttachmentMapper($pastoralAttachmentMapper) {
+        $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
+    }
+
+    /**
+     * @return PastoralAttachmentMapper
+     */
+    public function getPastoralAttachmentMapper() {
+        return $this->pastoralAttachmentMapper;
+    }
+
+    /**
+     * @param $pastoralAccessMapper
+     */
+    public function setPastoralAccessMapper($pastoralAccessMapper) {
+        $this->pastoralAccessMapper = $pastoralAccessMapper;
+    }
+
+    /**
+     * @return PastoralAccessMapper
+     */
+    public function getPastoralAccessMapper() {
+        return $this->pastoralAccessMapper;
     }
 }

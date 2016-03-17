@@ -29,11 +29,91 @@ use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Controller extends Base
 {
+    /**
+     * @var PastoralMapper
+     */
+    protected $pastoralMapper;
+
+    /**
+     * @var UserAccessMapper
+     */
+    protected $userAccessMapper;
+
+    /**
+     * @var PastoralTypeMapper
+     */
+    protected $pastoralTypeMapper;
+
+    /**
+     * @var PastoralSeverityMapper
+     */
+    protected $pastoralSeverityMapper;
+
+    /**
+     * @var PastoralTagsMapper
+     */
+    protected $pastoralTagsMapper;
+
+    /**
+     * @var RoleMapper
+     */
+    protected $roleMapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * @var PastoralCommentMapper
+     */
+    protected $pastoralCommentMapper;
+
+    /**
+     * @var PastoralAccessMapper
+     */
+    protected $pastoralAccessMapper;
+
+    /**
+     * @var PastoralAttachmentMapper
+     */
+    protected $pastoralAttachmentMapper;
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * Controller constructor.
+     */
+    public function __construct()
+    {
+        // Grab instances of all the mappers
+
+        $this->setPastoralMapper(PastoralMapper::getInstance());
+        $this->setUserAccessMapper(UserAccessMapper::getInstance());
+        $this->setPastoralTypeMapper(PastoralTypeMapper::getInstance());
+        $this->setPastoralSeverityMapper(PastoralSeverityMapper::getInstance());
+        $this->setPastoralTagsMapper(PastoralTagsMapper::getInstance());
+        $this->setPastoralCommentMapper(PastoralCommentMapper::getInstance());
+        $this->setPastoralAttachmentMapper(PastoralAttachmentMapper::getInstance());
+        $this->setRoleMapper(RoleMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
+        $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
+        $this->setErrorMapper(ErrorMapper::getInstance());
+    }
+
     // Insert an attach zone into the template
 
+    /**
+     * @param Collection|PastoralAttachmentModel $attachments
+     * @return array
+     */
     private function getAttachZone($attachments = null)
     {
         $zone = new Zone('attachment');
@@ -57,6 +137,11 @@ class Controller extends Base
 
     // Calculate age of student
 
+    /**
+     * @param int $timestamp
+     * @param int $now
+     * @return int
+     */
     private function calculateAge($timestamp = 0, $now = 0) {
 
         if ($now == 0)
@@ -82,7 +167,7 @@ class Controller extends Base
     {
         // Get current users role
 
-        $role = $_SESSION["user"]->getRole()->getType();
+        $role = $this->getUser()->getRole()->getType();
 
         // Kick them back to the kerb if they aren't allowed to view this page
 
@@ -97,51 +182,74 @@ class Controller extends Base
         // Make sure all the criteria exist before we starting trying to use them, and if they don't get passed
         // across, just set blank defaults
 
-        if (!isset($_GET["students"]))  $_GET["students"] = '';
-        if (!isset($_GET["authors"]))   $_GET["authors"] = '';
-        if (!isset($_GET["types"]))     $_GET["types"] = '';
-        if (!isset($_GET["severity"]))  $_GET["severity"] = '';
-        if (!isset($_GET["before"]))    $_GET["before"] = '';
-        if (!isset($_GET["after"]))     $_GET["after"] = '';
+        if (!isset($this->getRequest()->query["students"]))
+            $students = '';
+        else
+            $students = $this->getRequest()->query["students"];
 
-        $students = $_GET["students"];
-        $authors = $_GET["authors"];
-        $types = $_GET["types"];
-        $before_date = $_GET["before"];
-        $after_date = $_GET["after"];
-        $severity = $_GET["severity"];
+        if (!isset($this->getRequest()->query["tags"]))
+            $tags = '';
+        else
+            $tags = $this->getRequest()->query["tags"];
+
+        if (!isset($this->getRequest()->query["authors"]))
+            $authors = '';
+        else
+            $authors = $this->getRequest()->query["authors"];
+
+        if (!isset($this->getRequest()->query["types"]))
+            $types = '';
+        else
+            $types = $this->getRequest()->query["types"];
+
+        if (!isset($this->getRequest()->query["severity"]))
+            $severity = '';
+        else
+            $severity = $this->getRequest()->query["severity"];
+
+        if (!isset($this->getRequest()->query["before"]))
+            $before_date = '';
+        else
+            $before_date = $this->getRequest()->query["before"];
+
+        if (!isset($this->getRequest()->query["after"]))
+            $after_date = '';
+        else
+            $after_date = $this->getRequest()->query["after"];
 
         // Get matching records
 
-        $records = PastoralMapper::getInstance()->findAllReport($before_date, $after_date, $severity, $types, $authors, $students);
+        $records = $this->getPastoralMapper()->findAllReport($before_date, $after_date, $severity, $types, $authors, $students);
 
         // Restrict results based on pagination
 
-        if (!isset($_GET["pageCurrent"]))
-            $_GET["pageCurrent"] = 1;
+        if (!isset($this->getRequest()->query["pageCurrent"]))
+            $pageCurrent = 1;
+        else
+            $pageCurrent = $this->getRequest()->query["pageCurrent"];
 
         $resultsPerPage = 15;
         $totalPages = ceil($records->count() / $resultsPerPage);
 
         // Put some limit checks on page numbers
 
-        if ($_GET["pageCurrent"] < 1)
-            $_GET["pageCurrent"] = 1;
-        else if ($_GET["pageCurrent"] > $totalPages)
-            $_GET["pageCurrent"] = $totalPages;
+        if ($pageCurrent < 1)
+            $pageCurrent = 1;
+        else if ($pageCurrent > $totalPages)
+            $pageCurrent = $totalPages;
 
         // Grab the records we're going to render
 
         $paginatedRecords = new Collection;
 
-        for ($i = ($_GET["pageCurrent"] - 1) * $resultsPerPage; $i < ($_GET["pageCurrent"] - 1) * $resultsPerPage + $resultsPerPage; $i++) {
+        for ($i = ($pageCurrent - 1) * $resultsPerPage; $i < ($pageCurrent - 1) * $resultsPerPage + $resultsPerPage; $i++) {
             if ($records[$i] != null)
                 $paginatedRecords[] = $records[$i];
         }
 
         // And spit this thing out
 
-        $pastoralModerator = UserAccessMapper::getInstance()->findAllForUser($_SESSION["user"])->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         $this->getResponse()->content->set(
             array(
@@ -153,14 +261,14 @@ class Controller extends Base
                     'totalPages'        => $totalPages,
                     'totalResults'      => $records->count(),
                     'pastoralModerator' => $pastoralModerator,
-                    'pageCurrent'       => $_GET["pageCurrent"],
-                    'students'          => $_GET["students"],
-                    'authors'           => $_GET["authors"],
-                    'severity'          => $_GET["severity"],
-                    'types'             => $_GET["types"],
-                    'tags'              => $_GET["tags"],
-                    'before'            => $_GET["before"],
-                    'after'             => $_GET["after"],
+                    'pageCurrent'       => $pageCurrent,
+                    'students'          => $students,
+                    'authors'           => $authors,
+                    'severity'          => $severity,
+                    'types'             => $types,
+                    'tags'              => $tags,
+                    'before'            => $before_date,
+                    'after'             => $after_date,
                 ),
             )
         );
@@ -170,7 +278,7 @@ class Controller extends Base
     {
         // Get current users role
 
-        $role = $_SESSION["user"]->getRole()->getType();
+        $role = $this->getUser()->getRole()->getType();
 
         // Kick them back to the kerb if they aren't allowed to view this page
 
@@ -185,27 +293,44 @@ class Controller extends Base
         // Make sure all the criteria exist before we starting trying to use them, and if they don't get passed
         // across, just set blank defaults
 
-        if (!isset($_GET["students"]))  $_GET["students"] = '';
-        if (!isset($_GET["authors"]))   $_GET["authors"] = '';
-        if (!isset($_GET["types"]))     $_GET["types"] = '';
-        if (!isset($_GET["severity"]))  $_GET["severity"] = '';
-        if (!isset($_GET["before"]))    $_GET["before"] = '';
-        if (!isset($_GET["after"]))     $_GET["after"] = '';
+        if (!isset($this->getRequest()->query["students"]))
+            $students = '';
+        else
+            $students = $this->getRequest()->query["students"];
 
-        $students = $_GET["students"];
-        $authors = $_GET["authors"];
-        $types = $_GET["types"];
-        $before_date = $_GET["before"];
-        $after_date = $_GET["after"];
-        $severity = $_GET["severity"];
+        if (!isset($this->getRequest()->query["authors"]))
+            $authors = '';
+        else
+            $authors = $this->getRequest()->query["authors"];
+
+        if (!isset($this->getRequest()->query["types"]))
+            $types = '';
+        else
+            $types = $this->getRequest()->query["types"];
+
+        if (!isset($this->getRequest()->query["severity"]))
+            $severity = '';
+        else
+            $severity = $this->getRequest()->query["severity"];
+
+        if (!isset($this->getRequest()->query["before"]))
+            $before_date = '';
+        else
+            $before_date = $this->getRequest()->query["before"];
+
+        if (!isset($this->getRequest()->query["after"]))
+            $after_date = '';
+        else
+            $after_date = $this->getRequest()->query["after"];
+
 
         // Get matching records
 
-        $records = PastoralMapper::getInstance()->findAllReport($before_date, $after_date, $severity, $types, $authors, $students);
+        $records = $this->getPastoralMapper()->findAllReport($before_date, $after_date, $severity, $types, $authors, $students);
 
         // And render this thing out
 
-        $pastoralModerator = UserAccessMapper::getInstance()->findAllForUser($_SESSION["user"])->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         $this->getResponse()->content->set(
             array(
@@ -223,7 +348,7 @@ class Controller extends Base
     {
         // Get current users role. The screen is restricted to pastoral moderators only
 
-        $role = $_SESSION["user"]->getRole()->getType();
+        $role = $this->getUser()->getRole()->getType();
 
         // Kick them back to the kerb if they shouldn't be looking at this page
 
@@ -243,36 +368,39 @@ class Controller extends Base
                 'template' => '@pastoral/reportBuilder.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
-                    'moderators'        => $moderators,
-                    'types'             => PastoralTypeMapper::getInstance()->findAll(),
-                    'severities'        => PastoralSeverityMapper::getInstance()->findAll()->sortBy('order', 'asc'),
-                    'tags'              => PastoralTagsMapper::getInstance()->findAll()
+                    'types'             => $this->getPastoralTypeMapper()->findAll(),
+                    'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
+                    'tags'              => $this->getPastoralTagsMapper()->findAll()
                 ),
             )
         );
     }
 
+    /**
+     * @param $id
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function getIndex($id)
     {
         // Get current users role. The list screen is restricted to parents and staff
 
-        $role = $_SESSION["user"]->getRole()->getType();
+        $role = $this->getUser()->getRole()->getType();
 
         // Get the students parents
 
         $externalUserMapper = new \External_User();
-        $student = UserMapper::getInstance()->findWithSubjects($id);
+        $student = $this->getUserMapper()->findWithSubjects($id);
         $student->loadParents();
 
         // Get pastoral moderator status
 
-        $pastoralModerator = UserAccessMapper::getInstance()->findAllForUser($_SESSION["user"])->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         if (!$pastoralModerator)
         {
             // Kick them back to the kerb if they shouldn't be looking at this page
 
-            if ($role != "staff" && !$_SESSION["user"]->isParentOf($student)) {
+            if ($role != "staff" && !$this->getUser()->isParentOf($student)) {
 
                 // The logged in user is not staff/parent, send them back to the homepage
 
@@ -293,15 +421,15 @@ class Controller extends Base
             {
                 $main = null;
                 try {
-                    $main = UserMapper::getInstance()->findByExternalId($contact['StudentContactID']);
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    // noop
+                    $main = $this->getUserMapper()->findByExternalId($contact['StudentContactID']);
+                } catch (\Exception $e) {
+                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
                 $spouse = null;
                 try {
-                    $spouse = UserMapper::getInstance()->findByExternalId($contact['StudentContactSpouseID']);
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    // noop
+                    $spouse = $this->getUserMapper()->findByExternalId($contact['StudentContactSpouseID']);
+                } catch (\Exception $e) {
+                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
 
                 $contact['main'] = $main;
@@ -312,7 +440,7 @@ class Controller extends Base
 
         // And render this mess out
 
-        $records = PastoralMapper::getInstance()->findByStudentId($id);
+        $records = $this->getPastoralMapper()->findByStudentId($id);
 
         $this->getResponse()->content->set(
             array(
@@ -323,8 +451,8 @@ class Controller extends Base
                     'student'           => $student,
                     'studentAge'        => $this->calculateAge($studentExternal['StudentBirthDate']),
                     'studentContacts'   => $studentContacts,
-                    'role'              => $_SESSION["user"]->getRole()->getType(),
-                    'types'             => PastoralTypeMapper::getInstance()->findAll(),
+                    'role'              => $this->getUser()->getRole()->getType(),
+                    'types'             => $this->getPastoralTypeMapper()->findAll(),
                     'pastoralModerator' => $pastoralModerator
                 ),
             )
@@ -335,24 +463,24 @@ class Controller extends Base
     {
         /** @var \Schoolbox\User $user */
 
-        $user = $_SESSION["user"];
+        $user = $this->getUser();
 
         // Get the current users role
 
-        $role = $_SESSION["user"]->getRole()->getType();
+        $role = $this->getUser()->getRole()->getType();
 
         // Get the students parents
 
-        $student = UserMapper::getInstance()->findWithSubjects($studentId);
+        $student = $this->getUserMapper()->findWithSubjects($studentId);
         $student->loadParents();
 
-        $pastoralModerator = UserAccessMapper::getInstance()->findAllForUser($user)->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($user)->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         if (!$pastoralModerator)
         {
             // Kick them back to the kerb if they shouldn't be looking at this page
 
-            if ($role != "staff" && !$_SESSION["user"]->isParentOf($student) && !$pastoralModerator) {
+            if ($role != "staff" && !$this->getUser()->isParentOf($student) && !$pastoralModerator) {
 
                 // The logged in user is not staff/parent, send them back to the homepage
 
@@ -363,7 +491,7 @@ class Controller extends Base
 
         // Get the pastoral care record
 
-        if ($pastoral = PastoralMapper::getInstance()->findById($id)) {
+        if ($pastoral = $this->getPastoralMapper()->findById($id)) {
 
             // Lets render this thing
 
@@ -392,7 +520,7 @@ class Controller extends Base
     {
         // Only staff should be inserting comments
 
-        $role = $_SESSION["user"]->getRole()->getType();
+        $role = $this->getUser()->getRole()->getType();
 
         if ($role != "staff")
         {
@@ -409,33 +537,33 @@ class Controller extends Base
                 'template' => '@pastoral/modify.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
-                    'student'           => UserMapper::getInstance()->findById($id),
+                    'student'           => $this->getUserMapper()->findById($id),
                     'id'                => '',
                     'record'            => null,
-                    'types'             => PastoralTypeMapper::getInstance()->findAll(),
-                    'severities'        => PastoralSeverityMapper::getInstance()->findAll()->sortBy('order', 'asc'),
-                    'roles'             => RoleMapper::getInstance()->findAll(),
+                    'types'             => $this->getPastoralTypeMapper()->findAll(),
+                    'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
+                    'roles'             => $this->getRoleMapper()->findAll(),
                     'attachzone'        => $this->getAttachZone(),
                 ),
             )
         );
     }
 
-    public function getUpdate($studentId, $id)
+    public function getUpdate($id)
     {
         // Get the record we are updating
 
-        $record = PastoralMapper::getInstance()->findById($id);
+        $record = $this->getPastoralMapper()->findById($id);
 
         // Only the staff member that owns the record should be updating it
 
-        $role = $_SESSION["user"]->getRole()->getType();
+        $role = $this->getUser()->getRole()->getType();
 
-        $pastoralModerator = UserAccessMapper::getInstance()->findAllForUser($_SESSION["user"])->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         if (!$pastoralModerator)
         {
-            if ($role != "staff" || $_SESSION["user"]->getId() != $record->getOwner()->getId()) {
+            if ($role != "staff" || $this->getUser()->getId() != $record->getOwner()->getId()) {
 
                 // The logged in user is not staff or is not the owner, send them back to the homepage
 
@@ -452,28 +580,27 @@ class Controller extends Base
                 'data'     => array(
                     'session'         => $_SESSION,
                     'record'          => $record,
-                    'types'           => PastoralTypeMapper::getInstance()->findAll(),
-                    'severities'      => PastoralSeverityMapper::getInstance()->findAll()->sortBy('order', 'asc'),
-                    'roles'           => RoleMapper::getInstance()->findAll(),
-                    'tags'            => PastoralTagsMapper::getInstance()->findAll()->sortBy('name', 'asc'),
-                    'attachzone'      => $this->getAttachZone(PastoralAttachmentMapper::getInstance()->findByPastoralId($id)),
+                    'types'           => $this->getPastoralTypeMapper()->findAll(),
+                    'severities'      => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
+                    'roles'           => $this->getRoleMapper()->findAll(),
+                    'tags'            => $this->getPastoralTagsMapper()->findAll()->sortBy('name', 'asc'),
+                    'attachzone'      => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($id)),
                 ),
             )
         );
     }
 
-    public function postCommentDelete($id)
+    public function postCommentDelete()
     {
-        // Get the record we are updating
+        // Get the comment we are deleting
 
-        $pastoral = PastoralMapper::getInstance();
-        $record = $pastoral->findByIdWithOwner($id);
+        $comment = $this->getPastoralCommentMapper()->findById($this->getRequest()->post['id']);
 
         // Only the staff member that owns the record should be updating it
 
-        $role = $_SESSION["user"]->getRole()->getType();
+        $role = $this->getUser()->getRole()->getType();
 
-        if ($role != "staff" || $_SESSION["user"]->getId() != $record->getOwner()->getId()) {
+        if ($role != "staff" || $this->getUser()->getId() != $comment->getOwner()->getId()) {
 
             // The logged in user is not staff or is not the owner, send them back to the homepage
 
@@ -481,15 +608,14 @@ class Controller extends Base
             return;
         }
 
-        $commentMapper = PastoralCommentMapper::getInstance();
-        $commentMapper->deleteByColumn("id", $_POST["id"]);
+        $this->getPastoralCommentMapper()->delete($comment);
     }
 
     public function postComment()
     {
         // Post a comment on a pastoral record
 
-        $role = $_SESSION["user"]->getRole()->getType();
+        $role = $this->getUser()->getRole()->getType();
 
         // Only staff should be doing this
 
@@ -503,29 +629,26 @@ class Controller extends Base
 
         // No blank comments thanks
 
-        if (trim($_POST["body"]) != '')
+        if (trim($this->getRequest()->post["body"]) != '')
         {
-            $postDate = date("Y-m-d H:i:s");
-
-            $commentMapper = PastoralCommentMapper::getInstance();
             $comment = new PastoralCommentModel();
-            $comment->setPastoralId($_POST["pastoral_id"]);
-            $comment->setBody($_POST["body"]);
-            $comment->setOwner($_SESSION["user"]);
-            $comment->setPostDate($postDate);
-            $commentMapper->save($comment);
+            $comment->setPastoralId($this->getRequest()->post["pastoral_id"]);
+            $comment->setBody($this->getRequest()->post["body"]);
+            $comment->setOwner($this->getUser());
+            $comment->setPostDate(\Alaress_Date_Format::now());
+            $this->getPastoralCommentMapper()->save($comment);
         }
 
         // Go back to pastoral record
 
-        $this->getResponse()->redirect->afterPost("/pastoral/{$_POST["student_id"]}/{$_POST["pastoral_id"]}");
+        $this->getResponse()->redirect->afterPost("/pastoral/{$this->getRequest()->post["student_id"]}/{$this->getRequest()->post["pastoral_id"]}");
     }
 
     public function postSave()
     {
         // Update/Insert a pastoral record
 
-        $role = $_SESSION["user"]->getRole()->getType();
+        $role = $this->getUser()->getRole()->getType();
 
         // Only staff should be doing this
 
@@ -545,7 +668,7 @@ class Controller extends Base
 
         $recordIds = [];
 
-        if (empty($_POST["id"])) {
+        if (empty($this->getRequest()->post["id"])) {
 
             // Creating new pastoral record
 
@@ -555,12 +678,12 @@ class Controller extends Base
 
             // The student the user was currently viewing
 
-            $students[$_POST["student_id"]] = 1;
+            $students[$this->getRequest()->post["student_id"]] = 1;
 
             // And any other students specified on the pastoral record
 
-            if (is_array($_POST["duplicate_id"])) {
-                foreach ($_POST["duplicate_id"] as $studentId) {
+            if (is_array($this->getRequest()->post["duplicate_id"])) {
+                foreach ($this->getRequest()->post["duplicate_id"] as $studentId) {
                     if (trim($studentId) != '') {
                         $students[$studentId] = 1;
                     }
@@ -569,7 +692,7 @@ class Controller extends Base
 
             // Create a post date, so they are all the same
 
-            $postDate = date("Y-m-d H:i:s");
+            $postDate = \Alaress_Date_Format::now();
 
             // Go through every kid
 
@@ -582,15 +705,15 @@ class Controller extends Base
                 if (isset($parentId))
                     $record->setParentId($parentId);
 
-                $record->setStudent(UserMapper::getInstance()->findById($student_id));
-                $record->setHeading($_POST["heading"]);
-                $record->setType(PastoralTypeMapper::getInstance()->findById($_POST["typeId"]));
-                $record->setSeverity(PastoralSeverityMapper::getInstance()->findById($_POST["severityId"]));
-                $record->setBody($_POST["body"]);
-                $record->setPrivate($_POST["private"]);
-                $record->setOwner($_SESSION["user"]);
+                $record->setStudent($this->getUserMapper()->findById($student_id));
+                $record->setHeading($this->getRequest()->post["heading"]);
+                $record->setType($this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]));
+                $record->setSeverity($this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]));
+                $record->setBody($this->getRequest()->post["body"]);
+                $record->setPrivate($this->getRequest()->post["private"]);
+                $record->setOwner($this->getUser());
                 $record->setPostDate($postDate);
-                PastoralMapper::getInstance()->save($record);
+                $this->getPastoralMapper()->save($record);
 
                 $recordIds[] = $record->getId();
 
@@ -603,38 +726,38 @@ class Controller extends Base
 
                 // Save the authorised users
 
-                if (isset($_POST["user_id"])) {
-                    if (is_array($_POST["user_id"])) {
-                        foreach ($_POST["user_id"] as $user_id) {
+                if (isset($this->getRequest()->post["user_id"])) {
+                    if (is_array($this->getRequest()->post["user_id"])) {
+                        foreach ($this->getRequest()->post["user_id"] as $user_id) {
                             $access = new PastoralAccessModel();
                             $access->setPastoralId($record->getId());
-                            $access->setUser(UserMapper::getInstance()->findbyId($user_id));
-                            PastoralAccessMapper::getInstance()->save($access);
+                            $access->setUser($this->getUserMapper()->findbyId($user_id));
+                            $this->getPastoralAccessMapper()->save($access);
                         }
                     }
                 }
 
                 // Save the tags
 
-                $tags = explode("," , $_POST["tags"]);
+                $tags = explode("," , $this->getRequest()->post["tags"]);
 
                 foreach ($tags as $tagCurrent) {
                     if (trim($tagCurrent) != '') {
                         $tag = new PastoralTagsModel();
                         $tag->setName($tagCurrent);
                         $tag->setPastoralId($record->getId());
-                        PastoralTagsMapper::getInstance()->save($tag);
+                        $this->getPastoralTagsMapper()->save($tag);
                     }
                 }
 
                 // Save the audiences
 
-                foreach ($_POST["role"] as $role_id => $checked) {
+                foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
                     if ($checked) {
                         $access = new PastoralAccessModel();
                         $access->setPastoralId($record->getId());
-                        $access->setRole(RoleMapper::getInstance()->findById($role_id));
-                        PastoralAccessMapper::getInstance()->save($access);
+                        $access->setRole($this->getRoleMapper()->findById($role_id));
+                        $this->getPastoralAccessMapper()->save($access);
                     }
                 }
             }
@@ -643,17 +766,17 @@ class Controller extends Base
         {
             // Modifying existing record
 
-            $record = PastoralMapper::getInstance()->findById($_POST["id"]);
+            $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
 
-            $recordIds[] = $_POST["id"];
+            $recordIds[] = $this->getRequest()->post["id"];
 
             // Only the owner or a moderator should be updating a record
 
-            $pastoralModerator = UserAccessMapper::getInstance()->findAllForUser($_SESSION["user"])->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+            $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
             if (!$pastoralModerator)
             {
-                if ($_SESSION["user"]->getId() != $record->getOwner()->getId()) {
+                if ($this->getUser()->getId() != $record->getOwner()->getId()) {
 
                     // The logged in user is not the owner, get them outta here
 
@@ -662,14 +785,14 @@ class Controller extends Base
                 }
             }
 
-            $record->setHeading($_POST["heading"]);
-            $record->setType(PastoralTypeMapper::getInstance()->findById($_POST["typeId"]));
-            $record->setSeverity(PastoralSeverityMapper::getInstance()->findById($_POST["severityId"]));
-            $record->setBody($_POST["body"]);
-            $record->setPrivate($_POST["private"]);
-            $record->setOwner($_SESSION["user"]);
-            $record->setModifiedDate(date("Y-m-d H:i:s"));
-            PastoralMapper::getInstance()->save($record);
+            $record->setHeading($this->getRequest()->post["heading"]);
+            $record->setType($this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]));
+            $record->setSeverity($this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]));
+            $record->setBody($this->getRequest()->post["body"]);
+            $record->setPrivate($this->getRequest()->post["private"]);
+            $record->setOwner($this->getUser());
+            $record->setModifiedDate(\Alaress_Date_Format::now());
+            $this->getPastoralMapper()->save($record);
 
             // Update external record
 
@@ -677,18 +800,18 @@ class Controller extends Base
 
             // Delete old tags
 
-            PastoralTagsMapper::getInstance()->deleteByColumn("pastoral_id", $record->getId());
+            $this->getPastoralTagsMapper()->deleteByColumn("pastoral_id", $record->getId());
 
             // Save the tags
 
-            $tags = explode(",", $_POST["tags"]);
+            $tags = explode(",", $this->getRequest()->post["tags"]);
 
             foreach ($tags as $tagCurrent) {
                 if (trim($tagCurrent) != '') {
                     $tag = new PastoralTagsModel();
                     $tag->setName($tagCurrent);
                     $tag->setPastoralId($record->getId());
-                    PastoralTagsMapper::getInstance()->save($tag);
+                    $this->getPastoralTagsMapper()->save($tag);
                 }
             }
 
@@ -696,13 +819,13 @@ class Controller extends Base
 
             $accessRoles = $record->getAccessList();
 
-            if (trim($_POST["deleteIds"]) != "") {
-                $deleteIds = explode(",", $_POST["deleteIds"]);
+            if (trim($this->getRequest()->post["deleteIds"]) != "") {
+                $deleteIds = explode(",", $this->getRequest()->post["deleteIds"]);
 
                 foreach ($deleteIds as $user_id) {
                     foreach ($accessRoles as $role) {
                         if ($role->getUser()->getId() == $user_id) {
-                            PastoralAccessMapper::getInstance()->delete($role);
+                            $this->getPastoralAccessMapper()->delete($role);
                             break;
                         }
                     }
@@ -711,9 +834,9 @@ class Controller extends Base
 
             // Update the authorised users
 
-            if (isset($_POST["user_id"])) {
-                if (is_array($_POST["user_id"])) {
-                    foreach ($_POST["user_id"] as $user_id) {
+            if (isset($this->getRequest()->post["user_id"])) {
+                if (is_array($this->getRequest()->post["user_id"])) {
+                    foreach ($this->getRequest()->post["user_id"] as $user_id) {
 
                         $found = false;
 
@@ -729,8 +852,8 @@ class Controller extends Base
                         if (!$found) {
                             $access = new PastoralAccessModel();
                             $access->setPastoralId($record->getId());
-                            $access->setUser(UserMapper::getInstance()->findById($user_id));
-                            PastoralAccessMapper::getInstance()->save($access);
+                            $access->setUser($this->getUserMapper()->findById($user_id));
+                            $this->getPastoralAccessMapper()->save($access);
                         }
                     }
                 }
@@ -739,7 +862,7 @@ class Controller extends Base
             // Update the role based audience
 
 
-            foreach ($_POST["role"] as $role_id => $checked) {
+            foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
 
                 echo $role_id . " " . $checked . "<BR>";
 
@@ -759,8 +882,8 @@ class Controller extends Base
                     if (!$found) {
                         $access = new PastoralAccessModel();
                         $access->setPastoralId($record->getId());
-                        $access->setRole(RoleMapper::getInstance()->findById($role_id));
-                        PastoralAccessMapper::getInstance()->save($access);
+                        $access->setRole($this->getRoleMapper()->findById($role_id));
+                        $this->getPastoralAccessMapper()->save($access);
                     }
 
                 } else {
@@ -769,7 +892,7 @@ class Controller extends Base
 
                     foreach ($accessRoles as $role) {
                         if ($role->getId() == $role_id) {
-                            PastoralAccessMapper::getInstance()->delete($role);
+                            $this->getPastoralAccessMapper()->delete($role);
                             break;
                         }
                     }
@@ -785,14 +908,14 @@ class Controller extends Base
 
         // Get all attachments associated with this record
 
-        $attachments = PastoralAttachmentMapper::getInstance()->findByPastoralId($record->getId());
+        $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($record->getId());
 
         foreach ($attachments as $attachment) {
 
             $foundAttachment = false;
 
-            if (is_array($_POST["attachment"])) {
-                foreach ($_POST["attachment"] as $hash) {
+            if (is_array($this->getRequest()->post["attachment"])) {
+                foreach ($this->getRequest()->post["attachment"] as $hash) {
 
                     $hash_array = explode(":", $hash);
 
@@ -807,8 +930,8 @@ class Controller extends Base
 
                 // The attachment was found in the database, remove it
 
-                $attachment->setModifiedDate(date("Y-m-d H:i:s"));
-                PastoralAttachmentMapper::getInstance()->delete($attachment);
+                $attachment->setModifiedDate(\Alaress_Date_Format::now());
+                $this->getPastoralAttachmentMapper()->delete($attachment);
 
             } else {
 
@@ -820,8 +943,8 @@ class Controller extends Base
 
         // Save any new attachments
 
-        if (is_array($_POST["attachment"])) {
-            foreach ($_POST["attachment"] as $hash) {
+        if (is_array($this->getRequest()->post["attachment"])) {
+            foreach ($this->getRequest()->post["attachment"] as $hash) {
 
                 $hash_array = explode(":", $hash);
 
@@ -834,8 +957,8 @@ class Controller extends Base
                         $attachment = new PastoralAttachmentModel();
                         $attachment->setPastoralId($recordId);
                         $attachment->setHash($hash_array[1]);
-                        $attachment->setModifiedDate(date("Y-m-d H:i:s"));
-                        PastoralAttachmentMapper::getInstance()->save($attachment);
+                        $attachment->setModifiedDate(\Alaress_Date_Format::now());
+                        $this->getPastoralAttachmentMapper()->save($attachment);
                     }
                 }
             }
@@ -843,17 +966,17 @@ class Controller extends Base
 
         // Send instant notifications - Must talk to doctor and change this to digestable notification
 
-        if ($_POST["notify"] == 1) {
+        if ($this->getRequest()->post["notify"] == 1) {
 
-            $user = UserMapper::getInstance()->findById($_POST["student_id"]);
+            $user = $this->getUserMapper()->findById($this->getRequest()->post["student_id"]);
 
-            if (!$_POST["private"]) {
-                $link = "/pastoral/{$_POST["student_id"]}/" . $record->getId();
+            if (!$this->getRequest()->post["private"]) {
+                $link = "/pastoral/{$this->getRequest()->post["student_id"]}/" . $record->getId();
             } else {
-                $link = "/pastoral/{$_POST["student_id"]}";
+                $link = "/pastoral/{$this->getRequest()->post["student_id"]}";
             }
 
-            if (empty($_POST["id"])) {
+            if (empty($this->getRequest()->post["id"])) {
                 $body = "A new pastoral alert has been entered for " . $user->getFullName() . ". Click here to view this alert.";
             } else {
                 $body = "An existing pastoral alert has been updated for " . $user->getFullName() . ". Click here to view this alert.";
@@ -865,15 +988,15 @@ class Controller extends Base
                 ->setNamespace('ALERT')
                 ->setHref($link)
                 ->setIcon('/images/icon.php?icon=bolt&size=64')
-                ->addTopic("notify.user." . $_POST["student_id"])
+                ->addTopic("notify.user." . $this->getRequest()->post["student_id"])
                 ->putMeta('ttl', 60)
                 ->putMeta('title', 'Pastoral Care Alert');
 
             $ids = array();
 
-            $users = UserMapper::getInstance()->findAll();
+            $users = $this->getUserMapper()->findAll();
 
-            foreach ($_POST["role"] as $role_id => $checked) {
+            foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
 
                 // Find all users with this role
 
@@ -889,7 +1012,7 @@ class Controller extends Base
 
             // Don't send it to the user making the change
 
-            $ids[$_SESSION["user"]->getId()] = 0;
+            $ids[$this->getUser()->getId()] = 0;
 
             // Trigger the notifications
 
@@ -902,7 +1025,7 @@ class Controller extends Base
 
             // Send notifications to all individually added users
 
-            foreach ($_POST["user_id"] as $user_id) {
+            foreach ($this->getRequest()->post["user_id"] as $user_id) {
                 $n = new \Schoolbox\Notif\Notif("instant.user.$user_id.alert");
                 $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
             }
@@ -910,25 +1033,24 @@ class Controller extends Base
 
         // Go back to students pastoral record
 
-        $this->getResponse()->redirect->afterPost("/pastoral/{$_POST["student_id"]}");
+        $this->getResponse()->redirect->afterPost("/pastoral/{$this->getRequest()->post["student_id"]}");
     }
 
     public function postDelete()
     {
         // Get the record we are deleting
 
-        $pastoralMapper = PastoralMapper::getInstance();
-        $record = $pastoralMapper->findById($_POST["id"]);
+        $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
 
         // Work out if this person should be allowed to delete the record
 
-        $pastoralModerator = UserAccessMapper::getInstance()->findAllForUser($_SESSION["user"])->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         if (!$pastoralModerator)
         {
-            $role = $_SESSION["user"]->getRole()->getType();
+            $role = $this->getUser()->getRole()->getType();
 
-            if ($role != "staff" || $_SESSION["user"]->getId() != $record->getOwner()->getId()) {
+            if ($role != "staff" || $this->getUser()->getId() != $record->getOwner()->getId()) {
 
                 // The logged in user is not staff or is not the owner, send them back to the homepage
 
@@ -937,7 +1059,7 @@ class Controller extends Base
             }
         }
 
-        PastoralCommentMapper::getInstance()->deleteByColumn("pastoral_id", $_POST["id"]);
+        $this->getPastoralCommentMapper()->deleteByColumn("pastoral_id", $this->getRequest()->post["id"]);
 
         // Get ready for some external ninja'ing
 
@@ -949,9 +1071,162 @@ class Controller extends Base
 
         // Delete locally
 
-        $pastoralMapper->delete($record);
+        $this->getPastoralMapper()->delete($record);
     }
 
+    /**
+     * @param $pastoralMapper
+     */
+    public function setPastoralMapper($pastoralMapper) {
+        $this->pastoralMapper = $pastoralMapper;
+    }
+
+    /**
+     * @return PastoralMapper
+     */
+    public function getPastoralMapper() {
+        return $this->pastoralMapper;
+    }
+
+    /**
+     * @param $userAccessMapper
+     */
+    public function setUserAccessMapper($userAccessMapper) {
+        $this->userAccessMapper = $userAccessMapper;
+    }
+
+    /**
+     * @return UserAccessMapper
+     */
+    public function getUserAccessMapper() {
+        return $this->userAccessMapper;
+    }
+
+    /**
+     * @param $pastoralTypeMapper
+     */
+    public function setPastoralTypeMapper($pastoralTypeMapper) {
+        $this->pastoralTypeMapper = $pastoralTypeMapper;
+    }
+
+    /**
+     * @return PastoralTypeMapper
+     */
+    public function getPastoralTypeMapper() {
+        return $this->pastoralTypeMapper;
+    }
+
+    /**
+     * @param $pastoralSeverityMapper
+     */
+    public function setPastoralSeverityMapper($pastoralSeverityMapper) {
+        $this->pastoralSeverityMapper = $pastoralSeverityMapper;
+    }
+
+    /**
+     * @return PastoralSeverityMapper
+     */
+    public function getPastoralSeverityMapper() {
+        return $this->pastoralSeverityMapper;
+    }
+
+    /**
+     * @param $pastoralTagsMapper
+     */
+    public function setPastoralTagsMapper($pastoralTagsMapper) {
+        $this->pastoralTagsMapper = $pastoralTagsMapper;
+    }
+
+    /**
+     * @return PastoralTagsMapper
+     */
+    public function getPastoralTagsMapper() {
+        return $this->pastoralTagsMapper;
+    }
+
+    /**
+     * @param $roleMapper
+     */
+    public function setRoleMapper($roleMapper) {
+        $this->roleMapper = $roleMapper;
+    }
+
+    /**
+     * @return RoleMapper
+     */
+    public function getRoleMapper() {
+        return $this->roleMapper;
+    }
+
+    /**
+     * @param $userMapper
+     */
+    public function setUserMapper($userMapper) {
+        $this->userMapper = $userMapper;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper() {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param $pastoralCommentMapper
+     */
+    public function setPastoralCommentMapper($pastoralCommentMapper) {
+        $this->pastoralCommentMapper = $pastoralCommentMapper;
+    }
+
+    /**
+     * @return PastoralCommentMapper
+     */
+    public function getPastoralCommentMapper() {
+        return $this->pastoralCommentMapper;
+    }
+
+    /**
+     * @param $pastoralAccessMapper
+     */
+    public function setPastoralAccessMapper($pastoralAccessMapper) {
+        $this->pastoralAccessMapper = $pastoralAccessMapper;
+    }
+
+    /**
+     * @return PastoralAccessMapper
+     */
+    public function getPastoralAccessMapper() {
+        return $this->pastoralAccessMapper;
+    }
+
+    /**
+     * @param $pastoralAttachmentMapper
+     */
+    public function setPastoralAttachmentMapper($pastoralAttachmentMapper) {
+        $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
+    }
+
+    /**
+     * @return PastoralAttachmentMapper
+     */
+    public function getPastoralAttachmentMapper() {
+        return $this->pastoralAttachmentMapper;
+    }
+
+    /**
+     * @param $errorMapper
+     */
+    public function setErrorMapper($errorMapper) {
+        $this->errorMapper = $errorMapper;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    public function getErrorMapper() {
+        return $this->errorMapper;
+    }
 }
 
 /*

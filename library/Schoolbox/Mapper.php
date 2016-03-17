@@ -1266,7 +1266,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param  mixed $identifierValue
      *
-     * @return object
+     * @return Role
      */
     public function findById($identifierValue)
     {
