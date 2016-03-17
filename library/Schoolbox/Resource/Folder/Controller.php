@@ -156,7 +156,8 @@ class Controller extends BaseController
                     'roles'             => $roleMapper->findAll(),
                     'rolePermissions'   => $rolePermissions,
                     'database'          => ucfirst($config->get('external_type')),
-                    'curriculumTagging' => $config->get('curriculum_tagging_enabled')
+                    'curriculumTagging' => $config->get('curriculum_tagging_enabled'),
+                    'writePermission'   => UserAccess::ACCESS_WRITE,
                 ),
             )
         );
@@ -213,7 +214,8 @@ class Controller extends BaseController
                     'templates'         => $homepageTemplateMapper->findAll(),
                     'roles'             => $roleMapper->findAll(),
                     'database'          => ucfirst($config->get('external_type')),
-                    'curriculumTagging' => $config->get('curriculum_tagging_enabled')
+                    'curriculumTagging' => $config->get('curriculum_tagging_enabled'),
+                    'writePermission'   => UserAccess::ACCESS_WRITE,
                 ),
             )
         );

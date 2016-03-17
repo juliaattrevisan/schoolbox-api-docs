@@ -11,6 +11,8 @@
 <script type="text/javascript">
     $(function() {
 
+        var writePermission = {{ writePermission }};
+
         $('[data-checkbox-inherit]').change(function(event) {
             if ($(event.target).prop('checked')) {
                 $('#permissions').addClass('hide');
@@ -24,9 +26,9 @@
         var form = $('#folderForm');
         form.alaressValidate({
             submitHandler: function(form) {
-                var hasDefaultPerms = $("input[name='group[{REQUIRED_PERMS}]']:checked").val();
+                var hasDefaultPerms = $("input[name='group[{{ user.getRole().getId() }}]']:checked").val();
                 var individualPerms = $('input[name=groupcheck]').is(':checked');
-                if ((hasDefaultPerms < {ACCESS_WRITE}) && !individualPerms && !$('[data-checkbox-inherit]').prop('checked')) {
+                if ((hasDefaultPerms < writePermission) && !individualPerms && !$('[data-checkbox-inherit]').prop('checked')) {
                     $(form).confirmDialog({
                         text: 'You do not currently have write access to this folder. Do you wish to continue?',
                         confirmEvent: function() {
