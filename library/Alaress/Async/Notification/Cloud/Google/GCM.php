@@ -63,6 +63,9 @@ class GCM implements ServiceInterface
      */
     public function send(array $registrationIds, array $data)
     {
+        // convert the data to the format the apps expect
+        $data = $this->formatData($data);
+
         $apiUri  = self::GCM_API_URI;
         $headers = array(
             "Authorization" => "key={$this->apiKey}",
@@ -98,6 +101,27 @@ class GCM implements ServiceInterface
             }
             // range exception not caught here
         }
+
+    }
+
+
+    /**
+     * Coerce the data into a format the app at the other end expects
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function formatData(array $data)
+    {
+        return $data;
+
+//        TODO hook this up
+//        return [
+//            'id'      => '',
+//            'title'   => '',
+//            'message' => '',
+//            'vibrate' => true,
+//        ];
 
     }
 
