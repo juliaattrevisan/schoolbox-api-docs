@@ -26,6 +26,7 @@ use Schoolbox\Resource\Category;
 use Schoolbox\Resource\Folder\Code;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
+use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
 use Schoolbox\Resource\HomepageConfigMapper;
@@ -203,6 +204,16 @@ class Controller extends BaseController
             /** @var Folder\Controller $folderController */
             $folderController = $this->getController('folder');
 
+            // Need:
+            // base config
+            // course config
+            $rolePermissions = [];
+            foreach ($this->getCourseConfigMapper()->findByColumn('page', 'course') as $courseConfig) {
+                /** @var CourseConfigModel $courseConfig */
+                $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
+            }
+
+
             $folder = $folderController->persistFolder([
                 // the basics
                 'categoryID'      => $id,
@@ -213,7 +224,7 @@ class Controller extends BaseController
                 // configurable things
                 'inherit'         => true,  // TODO config inheritance
                 'template'        => -1,    // TODO config template
-                'group'           => [],    // TODO config role permissions [ $roleId => $permissionLevel ]
+                'group'           => $rolePermissions,
 
                 // leave these always off
                 'recursive'       => false, // LEAVE THIS
