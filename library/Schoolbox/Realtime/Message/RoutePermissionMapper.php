@@ -10,6 +10,8 @@
 namespace Schoolbox\Realtime\Message;
 
 
+use Monolog\Logger;
+use OutOfBoundsException;
 use PDO;
 use PDOStatement;
 use Schoolbox\Mapper;
@@ -18,6 +20,15 @@ class RoutePermissionMapper extends Mapper {
 
 	/** @var PDOStatement[] */
 	protected $prepared = array();
+
+	/** @var array */
+	protected $severityMap = [
+		RoutePermission::MUTE    => Logger::INFO,
+		RoutePermission::INSTANT => Logger::NOTICE,
+		RoutePermission::PUSH    => Logger::WARNING,
+		RoutePermission::EMAIL   => Logger::ERROR
+	];
+
 
 	protected function mapping() {
 		$this->hasTable('msg_route_perm');
@@ -217,6 +228,21 @@ class RoutePermissionMapper extends Mapper {
 		return $this->prepared[$hash];
 	}
 
+
+	/**
+	 * Casts a route level (MUTE, DIGEST, INSTANT, PUSH, EMAIL) to a Logger severity
+	 *
+	 * @param string $level
+	 * @throws OutOfBoundsException if the given level does not exist
+	 * @return int
+	 */
+	public function getSeverity($level)
+	{
+		if (isset($this->severityMap[$level])) {
+			return $this->severityMap[$level];
+		}
+		throw new OutOfBoundsException("Cannot cast permission '$level' to severity level");
+	}
 
 	/**
 	 * @param array $mask

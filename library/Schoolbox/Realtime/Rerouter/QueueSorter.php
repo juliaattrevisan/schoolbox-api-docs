@@ -15,7 +15,7 @@ use Alaress\Async\Queue\RedisQueue;
 use Alaress\Async\UserQueue\UserQueue;
 use Exception;
 use InvalidArgumentException;
-use Monolog\Logger;
+use OutOfBoundsException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use React\Stomp\Protocol\Frame;
@@ -46,13 +46,6 @@ class QueueSorter implements FilterInterface {
     /** @var IQueueFactory */
     protected $qFactory;
 
-    /** @var array */
-    protected $map = [
-        RoutePermission::MUTE    => Logger::INFO,
-        RoutePermission::INSTANT => Logger::NOTICE,
-        RoutePermission::PUSH    => Logger::WARNING,
-        RoutePermission::EMAIL   => Logger::ERROR
-    ];
 
     /**
      * @param FilterInterface[]     $filters
@@ -131,9 +124,10 @@ class QueueSorter implements FilterInterface {
 
             // log for each expected output level
             foreach ($outputLevels as $level) {
-                if (isset($this->map[$level])) {
-                    $this->notif->logTo($newTopic, $this->map[$level], $formatted['message'], $formatted['context']);
-                } else {
+               try {
+                    $this->notif->logTo($newTopic, $this->permMapper->getSeverity($level), $formatted['message'], $formatted['context']);
+
+               } catch (OutOfBoundsException $e) {
                     $this->log->warning("Unable to SEND: could not map priority '$level'");
                 }
             }
