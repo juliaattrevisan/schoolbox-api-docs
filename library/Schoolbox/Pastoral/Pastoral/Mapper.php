@@ -20,9 +20,21 @@ use Schoolbox\Pastoral\Comment\Mapper as CommentMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as AttachmentMapper;
 use Schoolbox\Pastoral\Access\Mapper as AccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Mapper extends BaseMapper
 {
+    /**
+     * @var ErrorMapper $errorMapper
+     */
+    protected $errorMapper;
+
+    public function __construct()
+    {
+        $this->setErrorMapper(ErrorMapper::getInstance());
+        parent::__construct();
+    }
+
     protected function mapping()
     {
         $this->hasTable('pastoral');
@@ -418,8 +430,22 @@ class Mapper extends BaseMapper
         /** @var \Schoolbox\Role $role */
         $role = $user->getRole();
 
-        if ($role->getType() != "staff" && !$user->isParentOf($record->getStudent()))
-            return false;
+        if ($role->getType() != "staff")
+        {
+            try {
+                $record->setStudent(\Schoolbox\UserMapper::getInstance()->findById($record->getStudent()->getId()));
+            }
+            catch (\Exception $e) {
+                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+            }
+            
+            $record->getStudent()->loadParents();
+
+            if (!$user->isParentOf($record->getStudent())) {
+                return false;
+            }
+        }
+
 
         // If we get through to here we need to check the audience of item
 
@@ -482,16 +508,28 @@ class Mapper extends BaseMapper
 
         foreach ($record->getAccessList() as $access) {
             if ($access->getRole()->getId() != '') {
-                $access->setRole(\Schoolbox\RoleMapper::getInstance()->findById($access->getRole()->getId()));
+                try {
+                    $access->setRole(\Schoolbox\RoleMapper::getInstance()->findById($access->getRole()->getId()));
+                } catch (\Exception $e) {
+                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+                }
             } else if ($access->getUser()->getId() != '') {
-                $access->setUser(\Schoolbox\UserMapper::getInstance()->findById($access->getUser()->getId()));
+                try {
+                    $access->setUser(\Schoolbox\UserMapper::getInstance()->findById($access->getUser()->getId()));
+                } catch (\Exception $e) {
+                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+                }
             }
         }
 
         // Grab comment authors
 
         foreach ($record->getCommentList() as $comment) {
-            $comment->setOwner(\Schoolbox\UserMapper::getInstance()->findById($comment->getOwner()->getId()));
+            try {
+                $comment->setOwner(\Schoolbox\UserMapper::getInstance()->findById($comment->getOwner()->getId()));
+            } catch (\Exception $e) {
+                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+            }
         }
 
         // Grab attachment details
@@ -510,4 +548,19 @@ class Mapper extends BaseMapper
         return $record;
     }
 
+    /**
+     * @param $errorMapper
+     * @return $this
+     */
+    public function setErrorMapper($errorMapper) {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    public function getErrorMapper() {
+        return $this->errorMapper;
+    }
 }
