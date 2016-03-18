@@ -37,138 +37,14 @@
                     <div class="list-item" data-type="unit_row">
                         <input type="hidden" name="submissions" value="{% if work.item.getAcceptOnline %}1{% else %}0{% endif %}">
 
-                        {# Name #}
-                        <div class="compact avatar card small-12 medium-4">
                         {% if work.class == 'SubmissionBox' %}
-                            <div class="icon-due-work"></div>
-                            {{ work.item.getName }}
-
+                            {% include '@course/import/submissionBox.twig' %}
                         {% elseif work.class == 'Task' %}
-                            <div class="icon-task"></div>
-                            {{ work.item.getTitle }}
-
+                            {% include '@course/import/task.twig' %}
                         {% elseif work.class == 'OnlineAssessment' %}
-                            <div class="icon-quiz"></div>
-                            {{ work.item.getTitle }}
-                        {% endif %}
-                        </div>
-
-                        {# Publish Date - when people can see this work exists #}
-
-                        {% if work.class == 'SubmissionBox' %}
-                        <div class="small-12 medium-2 columns">
-                            {# Due Work: Publish Date #}
-                            <label for="work_publish_date-{{ work.item.getId }}">Publish Date</label>
-                            <input id="work_publish_date-{{ work.item.getId }}"
-                                   name="work[{{ work.item.getId }}][publish_date]"
-                                   type="text"
-                                   value="{{ unit.open_date }}"
-                                   data-role="publish_date"
-                                   data-datepicker
-                                   data-datepicker-sync
-                                   data-datepicker-sync-enddate="#work_publish_date-{{ work.item.getId }}" />
-                        </div>
-                        {% elseif work.class == 'Task' %}
-                        <div class="small-12 medium-2 columns hide-for-small">
-                            &nbsp;
-                        </div>
-                        {% elseif work.class == 'OnlineAssessment' %}
-                        <div class="small-12 medium-2 columns hide-for-small">
-                            &nbsp;
-                        </div>
+                            {% include '@course/import/quiz.twig' %}
                         {% endif %}
 
-                        {# Open Date - when people can start the work #}
-
-                        {% if work.class == 'SubmissionBox' %}
-                        <div class="small-12 medium-2 columns">
-                            {# Due Work: Open Date #}
-                            <label for="work_open_date-{{ work.item.getId }}">Open Date</label>
-                            <input id="work_open_date-{{ work.item.getId }}"
-                                   name="work[{{ work.item.getId }}][open_date]"
-                                   type="text"
-                                   value="{{ unit.open_date }}"
-                                   data-role="open_date"
-                                   data-datepicker
-                                   data-datepicker-sync
-                                   data-datepicker-sync-enddate="#work_open_date-{{ work.item.getId }}" />
-                        </div>
-                        {% elseif work.class == 'Task' %}
-                        <div class="small-12 medium-2 columns hide-for-small">
-                            &nbsp;
-                        </div>
-                        {% elseif work.class == 'OnlineAssessment' %}
-                        <div class="small-12 medium-2 columns">
-                            {# Quiz: Start Date #}
-                            <label for="quiz_start_date-{{ work.item.getId }}">Start Date</label>
-                            <input id="quiz_start_date-{{ work.item.getId }}"
-                                   name="quiz[{{ work.item.getId }}][start_date]"
-                                   type="text"
-                                   value="{{ unit.open_date }}"
-                                   data-role="start_date"
-                                   data-datepicker
-                                   data-datepicker-sync
-                                   data-datepicker-sync-enddate="#quiz_start_date-{{ work.item.getId }}" />
-                        </div>
-                        {% endif %}
-
-                        {# Due Date - when this work needs to be finished #}
-
-                        {% if work.class == 'SubmissionBox' %}
-                        <div class="small-12 medium-2 columns">
-                            {# Due Work: Due Date #}
-                            <label for="work_due_date-{{ work.item.getId }}">Due Date</label>
-                            <input id="work_due_date-{{ work.item.getId }}"
-                                   name="work[{{ work.item.getId }}][due_date]"
-                                   type="text"
-                                   value="{{ unit.due_date }}"
-                                   data-role="due_date"
-                                   data-datepicker
-                                   data-datepicker-sync
-                                   data-datepicker-sync-enddate="#work_due_date-{{ work.item.getId }}" />
-                        </div>
-                        {% elseif work.class == 'Task' %}
-                        <div class="small-12 medium-2 columns hide-for-small">
-                            &nbsp;
-                        </div>
-                        {% elseif work.class == 'OnlineAssessment' %}
-                        <div class="small-12 medium-2 columns">
-                            {# Quiz: Finish Date #}
-                            <label for="quiz_finish_date-{{ work.item.getId }}">Finish Date</label>
-                            <input id="quiz_finish_date-{{ work.item.getId }}"
-                                   name="quiz[{{ work.item.getId }}][finish_date]"
-                                   type="text"
-                                   value="{{ unit.due_date }}"
-                                   data-role="finish_date"
-                                   data-datepicker
-                                   data-datepicker-sync
-                                   data-datepicker-sync-enddate="#quiz_finish_date-{{ quiz.getId }}" />
-                        </div>
-                        {% endif %}
-
-                        {# Late Date - when submissions are considered overdue (late) #}
-
-                        {% if work.class == 'SubmissionBox' %}
-                        <div class="small-12 medium-2 columns">
-                            <label for="work_late_date-{{ work.getId }}">Late Date</label>
-                            <input id="work_late_date-{{ work.getId }}"
-                                   name="work[{{ work.getId }}][late_date]"
-                                   type="text"
-                                   value="{{ unit.due_date }}"
-                                   data-role="late_date"
-                                   data-datepicker
-                                   data-datepicker-sync
-                                   data-datepicker-sync-enddate="#work_late_date-{{ work.getId }}" />
-                        </div>
-                        {% elseif work.class == 'Task' %}
-                        <div class="small-12 medium-2 columns hide-for-small">
-                            &nbsp;
-                        </div>
-                        {% elseif work.class == 'OnlineAssessment' %}
-                        <div class="small-12 medium-2 columns hide-for-small">
-                            &nbsp;
-                        </div>
-                        {% endif %}
                     </div>
                 </li>
             {% endfor %}
