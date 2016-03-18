@@ -128,7 +128,7 @@ class Controller extends BaseController
 
         try {
             $homepageConfig = $homepageConfigMapper->findOneByColumn('cid', $folder->getId());
-            $templateId = $homepageConfig->getTemplate()->getId();
+            $templateId = HomepageTemplateMapper::TEMPLATE_KEEP_EXISTING;
         } catch (\Exception $e) {
             $templateId = HomepageTemplateMapper::TEMPLATE_NONE;
         }
