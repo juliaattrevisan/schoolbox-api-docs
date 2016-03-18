@@ -23,8 +23,8 @@ class Model implements ISoftDeletable
     /** @var int */
     protected $externalId;
 
-    /** @var int */
-    protected $parentId;
+    /** @var Model */
+    protected $parent;
 
     /** @var Pastoral\Type\Model */
     protected $type;
@@ -38,17 +38,8 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $heading;
 
-    /** @var \Alaress_Date_Format */
-    protected $postDate;
-
-    /** @var \Alaress_Date_Format */
-    protected $modifiedDate;
-
     /** @var string */
     protected $body;
-
-    /** @var \Alaress_Date_Format */
-    protected $deletedDate;
 
     /** @var bool */
     protected $private;
@@ -67,6 +58,15 @@ class Model implements ISoftDeletable
 
     /** @var Collection|Pastoral\Tags\Model[] */
     protected $tagsList;
+
+    /** @var \Alaress_Date_Format */
+    protected $datetimePosted;
+
+    /** @var \Alaress_Date_Format */
+    protected $datetimeModified;
+
+    /** @var \Alaress_Date_Format */
+    protected $datetimeDeleted;
 
     /**
      * @param  Collection|Pastoral\Access\Model[] $accessList
@@ -105,22 +105,6 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $body
-     * @return self
-     */
-    public function setBody($body) {
-        $this->body = $body;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBody() {
-        return $this->body;
-    }
-
-    /**
      * @param boolean $private
      * @return self
      */
@@ -137,26 +121,26 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string
-     */
-    public function getBodyText() {
-        return Scrub::html2text($this->body);
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedDate
+     * @param string $body
      * @return self
      */
-    public function setDeletedDate($deletedDate) {
-        $this->deletedDate = $deletedDate;
+    public function setBody($body) {
+        $this->body = $body;
         return $this;
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return string
      */
-    public function getDeletedDate() {
-        return $this->deletedDate;
+    public function getBody() {
+        return $this->body;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBodyText() {
+        return Scrub::html2text($this->body);
     }
 
     /**
@@ -189,22 +173,6 @@ class Model implements ISoftDeletable
      */
     public function getId() {
         return $this->id;
-    }
-
-    /**
-     * @param int $parentId
-     * @return self
-     */
-    public function setParentId($parentId) {
-        $this->parentId = $parentId;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getParentId() {
-        return $this->parentId;
     }
 
     /**
@@ -272,6 +240,22 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * @param Model $parent
+     * @return self
+     */
+    public function setParent($parent) {
+        $this->parent = $parent;
+        return $this;
+    }
+
+    /**
+     * @return Model
+     */
+    public function getParent() {
+        return $this->parent;
+    }
+
+    /**
      * @param Pastoral\Severity\Model $severity
      * @return self
      */
@@ -304,22 +288,6 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param \Alaress_Date_Format $modifiedDate
-     * @return self
-     */
-    public function setModifiedDate($modifiedDate) {
-        $this->modifiedDate = $modifiedDate;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getModifiedDate() {
-        return $this->modifiedDate;
-    }
-
-    /**
      * @param User $owner
      * @return self
      */
@@ -336,27 +304,59 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param \Alaress_Date_Format $postDate
+     * @param \Alaress_Date_Format $datetimeModified
      * @return self
      */
-    public function setPostDate($postDate) {
-        $this->postDate = $postDate;
+    public function setDatetimeModified($datetimeModified) {
+        $this->datetimeModified = $datetimeModified;
         return $this;
     }
 
     /**
      * @return \Alaress_Date_Format
      */
-    public function getPostDate() {
-        return $this->postDate;
+    public function getDatetimeModified() {
+        return $this->datetimeModified;
     }
 
+    /**
+     * @param \Alaress_Date_Format $datetimePosted
+     * @return self
+     */
+    public function setDatetimePosted($datetimePosted) {
+        $this->datetimePosted = $datetimePosted;
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getDatetimePosted() {
+        return $this->datetimePosted;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $datetimeDeleted
+     * @return self
+     */
+    public function setDatetimeDeleted($datetimeDeleted) {
+        $this->datetimeDeleted = $datetimeDeleted;
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getDatetimeDeleted() {
+        return $this->datetimeDeleted;
+    }    
+    
     /**
      * Is this object deleted?
      *
      * @return bool
      */
     public function isDeleted() {
-        return !($this->getDeletedDate() instanceof \Alaress_Date_NullDate);
+        return !$this->getDatetimeDeleted() instanceof \Alaress_Date_NullDate;
     }
 }

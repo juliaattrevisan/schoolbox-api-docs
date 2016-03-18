@@ -21,6 +21,14 @@ use Schoolbox\Pastoral\Comment\Model as PastoralCommentModel;
 
 class Mapper extends BaseMapper
 {
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * Mapper constructor.
+     */
     public function __construct()
     {
         $this->setErrorMapper(ErrorMapper::getInstance());
@@ -31,73 +39,13 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('pastoral_comment');
         $this->hasPrototype(new PastoralCommentModel);
-
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => Mapper::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'pastoral_id',
-                'property' => 'pastoralId',
-                'type'     => Mapper::TYPE_INTEGER,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'owner_id',
-                'property' => 'owner',
-                'type'     => Mapper::TYPE_MODEL,
-                'join'     => 'owner'
-            )
-        );
-
-        $this->hasJoin(
-            'owner', array(
-                'mapper'    => '\\Schoolbox\\UserMapper',
-                'this_key'  => 'owner_id',
-                'other_key' => 'id',
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'body',
-                'property' => 'body',
-                'type'     => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'datetime_posted',
-                'property' => 'postDate',
-                'type'     => Mapper::TYPE_DATETIME,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'datetime_modified',
-                'property' => 'modifiedDate',
-                'type'     => Mapper::TYPE_DATETIME,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'datetime_deleted',
-                'property' => 'deletedDate',
-                'type'     => Mapper::TYPE_DATETIME,
-            )
-        );
-
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('pastoral_id', self::TYPE_INTEGER);
+        $this->uses('body', self::TYPE_STRING);
+        $this->uses('datetime_posted', self::TYPE_DATETIME);
+        $this->uses('datetime_modified', self::TYPE_DATETIME);
+        $this->uses('datetime_deleted', self::TYPE_DATETIME);
+        $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner');
         $this->hasSoftDeleteDateField('datetime_deleted');
     }
 
@@ -148,7 +96,7 @@ class Mapper extends BaseMapper
      *
      * @param  int $identifierValue
      *
-     * @return object
+     * @return null|Model|void
      */
     public function findById($identifierValue)
     {
@@ -194,7 +142,9 @@ class Mapper extends BaseMapper
         }
 
         $stmt = $this->database->prepare("
-			SELECT $columns FROM `{$this->getTable()}` t0 {$joins} WHERE `t0`.`{$identifierColumn}` = :id_value
+			SELECT $columns
+			FROM `{$this->getTable()}` t0 {$joins}
+			WHERE `t0`.`{$identifierColumn}` = :id_value
 		");
 
         $stmt->execute(array('id_value' => $identifierValue));
@@ -245,12 +195,8 @@ class Mapper extends BaseMapper
         }
 
         $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+        return null;
     }
-
-    /**
-     * @var ErrorMapper
-     */
-    protected $errorMapper;
 
     /**
      * @param ErrorMapper $errorMapper

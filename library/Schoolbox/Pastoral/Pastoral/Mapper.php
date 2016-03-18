@@ -19,6 +19,10 @@ use Schoolbox\UserMapper;
 use Schoolbox\Pastoral\Pastoral;
 use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Tags\Mapper as PastoralTagsMapper;
+use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
+use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
+use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -78,6 +82,9 @@ class Mapper extends BaseMapper
      */
     protected $pastoralAttachmentMapper;
 
+    /**
+     * Mapper constructor.
+     */
     public function __construct()
     {
         $this->setErrorMapper(ErrorMapper::getInstance());
@@ -99,135 +106,22 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('pastoral');
         $this->hasPrototype(new PastoralModel);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('external_id', self::TYPE_INTEGER);
+        $this->uses('body', self::TYPE_STRING);
+        $this->uses('heading', self::TYPE_STRING);
+        $this->uses('private', self::TYPE_BOOLEAN);
+        $this->uses('datetime_posted', self::TYPE_DATETIME);
+        $this->uses('datetime_modified', self::TYPE_DATETIME);
+        $this->uses('datetime_deleted', self::TYPE_DATETIME);
+        $this->joins('parent_id', self::class, 'id', null, null, 'parent', 'parent');
+        $this->joins('type_id', PastoralTypeMapper::class, 'id', null, null, 'type', 'type');
+        $this->joins('severity_id', PastoralSeverityMapper::class, 'id', null, null, 'severity', 'severity');
+        $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner', 'owner');
+        $this->joins('student_id', UserMapper::class, 'id', null, null, 'student', 'student');
+        $this->hasSoftDeleteDateField('datetime_deleted');
 
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => Mapper::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'     => 'parent_id',
-                'property'   => 'parentId',
-                'type'       => Mapper::TYPE_INTEGER,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'type_id',
-                'property' => 'type',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'type',
-                'multiple' => true,
-                'join_def' => array(
-                    'mapper'    => '\\Schoolbox\\Pastoral\\Type\\Mapper',
-                    'other_key' => 'id',
-                ),
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'severity_id',
-                'property' => 'severity',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'severity',
-                'multiple' => true,
-                'join_def' => array(
-                    'mapper'    => '\\Schoolbox\\Pastoral\\Severity\\Mapper',
-                    'other_key' => 'id',
-                ),
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'     => 'external_id',
-                'property'   => 'externalId',
-                'type'       => Mapper::TYPE_INTEGER,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'heading',
-                'property' => 'heading',
-                'type'     => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'private',
-                'property' => 'private',
-                'type'     => Mapper::TYPE_BOOLEAN,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'datetime_posted',
-                'property' => 'postDate',
-                'type'     => Mapper::TYPE_DATETIME,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'datetime_modified',
-                'property' => 'modifiedDate',
-                'type'     => Mapper::TYPE_DATETIME,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'datetime_deleted',
-                'property' => 'deletedDate',
-                'type'     => Mapper::TYPE_DATETIME,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'body',
-                'property' => 'body',
-                'type'     => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'owner_id',
-                'property' => 'owner',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'owner',
-                'multiple' => true,
-                'join_def' => array(
-                    'mapper'    => '\\Schoolbox\\UserMapper',
-                    'other_key' => 'id',
-                ),
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'student_id',
-                'property' => 'student',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'student',
-                'multiple' => true,
-                'join_def' => array(
-                    'mapper'    => '\\Schoolbox\\UserMapper',
-                    'other_key' => 'id',
-                ),
-            )
-        );
+        // Anyone got a shorthand version of these?
 
         $this->hasJoin(
             'access',
@@ -268,8 +162,6 @@ class Mapper extends BaseMapper
                 'multiple'  => true,
             )
         );
-
-        $this->hasSoftDeleteDateField('datetime_deleted');
     }
 
     /**
@@ -296,6 +188,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
             WHERE s.id = ?
+            AND r.datetime_deleted IS NULL
         ";
 
         $statement = $this->getDatabase()->prepare($query);
@@ -305,21 +198,13 @@ class Mapper extends BaseMapper
 
         foreach ($statement as $row)
         {
+            /** @var Pastoral\Model $record */
             $record = $this->hydrate($row, 'r');
-
-            // Skip if the record has been deleted
-
-            if ($record->isDeleted())
-                continue;
 
             // Check permissions
 
             if ($this->hasPermission($record))
-            {
-                // Hydrate and record the record we found
-
                 $records->add($this->hydrateRecord($record, $row));
-            }
         }
 
         return $records;
@@ -349,6 +234,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
             WHERE r.id = ?
+            AND r.datetime_deleted IS NULL
         ";
 
         $statement = $this->getDatabase()->prepare($query);
@@ -359,37 +245,29 @@ class Mapper extends BaseMapper
             /** @var Pastoral\Model $record */
             $record = $this->hydrate($row, 'r');
 
-            // Bomb out if the record has been deleted
-
-            $this->throwIfDeleted($record);
-
             // Check permissions
 
             if ($this->hasPermission($record))
-            {
-                // Hydrate and record the record we found
-
                 return $this->hydrateRecord($record, $row);
-            }
         }
 
         throw new BaseMapper\Exception('Instance of object not found');
     }
 
     /**
-     * Checks if the logged in user has permission to view the specified record
+     * Gets DB records matching report criteria
      *
-     * @var \Alaress_Date_Format $beforeDate (dd/mm/yyyy date)
-     * @var \Alaress_Date_Format $afterDate (dd/mm/yyyy date)
-     * @var int $severity (ID of severity)
-     * @var string $types (CSV list)
-     * @var string $authors (CSV list)
-     * @var string $students (CSV list)
-     *
-     * @return Collection|Pastoral\Model
+     * @param $before_date
+     * @param $after_date
+     * @param $severity
+     * @param $types
+     * @param $authors
+     * @param $students
+     * @param $tags
+     * @return Collection
+     * @throws Exception
      */
-
-    public function findAllReport($before_date, $after_date, $severity, $types, $authors, $students)
+    public function findAllReport($before_date, $after_date, $severity, $types, $authors, $students, $tags)
     {
         // Create filter SQL
 
@@ -454,14 +332,37 @@ class Mapper extends BaseMapper
             if ($record->isDeleted())
                 continue;
 
+            // Check tags
+
+            if (trim($tags) != '') {
+
+                $tagsArray = explode(",", strtolower(trim($tags)));
+                $tagsList = $this->getPastoralTagsMapper()->findByColumn('pastoral_id', $record->getId());
+
+                $found = false;
+
+                foreach ($tagsArray as $tagCurrent) {
+                    foreach ($tagsList as $tag) {
+                        if (strtolower($tag->getName()) == $tagCurrent) {
+                            $found = true;
+                            break;
+                        }
+                    }
+
+                    if ($found) {
+                        break;
+                    }
+                }
+
+                if (!$found) {
+                    continue;
+                }
+            }
+
             // Check permission
 
             if ($this->hasPermission($record))
-            {
-                // Hydrate and add to the collection
-
                 $records->add($this->hydrateRecord($record, $row));
-            }
         }
 
         return $records;
@@ -498,14 +399,13 @@ class Mapper extends BaseMapper
             catch (\Exception $e) {
                 $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
             }
-            
+
             $record->getStudent()->loadParents();
 
             if (!$user->isParentOf($record->getStudent())) {
                 return false;
             }
         }
-
 
         // If we get through to here we need to check the audience of item
 
@@ -551,10 +451,19 @@ class Mapper extends BaseMapper
     {
         // Hydrate everything on the record
 
-        $record->setStudent($this->hydrateJoin($row, 'student', 's'));
-        $record->setOwner($this->hydrateJoin($row, 'owner', 'o'));
-        $record->setSeverity($this->hydrateJoin($row, 'severity', 'sv'));
-        $record->setType($this->hydrateJoin($row, 'type', 't'));
+        /** @var User $student */
+        $student = $this->hydrateJoin($row, 'student', 's');
+        /** @var User $owner */
+        $owner = $this->hydrateJoin($row, 'owner', 'o');
+        /** @var PastoralSeverityModel $severity */
+        $severity = $this->hydrateJoin($row, 'severity', 'sv');
+        /** @var PastoralTypeModel $type */
+        $type = $this->hydrateJoin($row, 'type', 't');
+
+        $record->setStudent($student);
+        $record->setOwner($owner);
+        $record->setSeverity($severity);
+        $record->setType($type);
 
         // Don't know if this is right for the one-to-many joins, but it works
 
@@ -569,7 +478,9 @@ class Mapper extends BaseMapper
         foreach ($record->getAccessList() as $access) {
             if ($access->getRole()->getId() != '') {
                 try {
-                    $access->setRole($this->getRoleMapper()->findById($access->getRole()->getId()));
+                    /** @var \Schoolbox\Role $role */
+                    $role = $this->getRoleMapper()->findById($access->getRole()->getId());
+                    $access->setRole($role);
                 } catch (\Exception $e) {
                     $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
                 }
@@ -607,6 +518,10 @@ class Mapper extends BaseMapper
 
         return $record;
     }
+
+    /**
+     * Here be the getters/setters
+     */
 
     /**
      * @param $errorMapper

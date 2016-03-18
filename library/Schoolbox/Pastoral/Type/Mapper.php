@@ -15,39 +15,28 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
 
 class Mapper extends BaseMapper
 {
+    /**
+     * Mapper constructor.
+     */
+    public function __construct()
+    {
+        $this->setErrorMapper(ErrorMapper::getInstance());
+        Parent::__construct();
+    }
+
     protected function mapping()
     {
         $this->hasTable('luPastoralType');
-        $this->hasModel('\\Schoolbox\\Pastoral\\Type\\Model');
-
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => Mapper::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'     => 'external_code',
-                'property'   => 'externalCode',
-                'type'       => Mapper::TYPE_STRING,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'name',
-                'property' => 'name',
-                'type'     => Mapper::TYPE_STRING,
-            )
-        );
-
+        $this->hasPrototype(new PastoralTypeModel);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('external_code', self::TYPE_STRING);
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('datetime_deleted', self::TYPE_DATETIME);
         $this->hasSoftDeleteDateField('datetime_deleted');
     }
 
@@ -59,7 +48,7 @@ class Mapper extends BaseMapper
      *
      * @param  int $identifierValue
      *
-     * @return Model
+     * @return null|Model
      */
     public function findById($identifierValue)
     {
@@ -106,7 +95,9 @@ class Mapper extends BaseMapper
 
         $stmt = $this->database->prepare(
             "
-			SELECT $columns FROM `{$this->getTable()}` t0 {$joins} WHERE `t0`.`{$identifierColumn}` = :id_value
+			SELECT  $columns
+			FROM    `{$this->getTable()}` t0 {$joins}
+			WHERE   `t0`.`{$identifierColumn}` = :id_value
 		"
         );
 
@@ -115,7 +106,7 @@ class Mapper extends BaseMapper
         // there will be more than one record returned by this query
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if (empty($mainModel)) {
-                /** @var Article $mainModel */
+                /** @var Model $mainModel */
                 $mainModel = $this->hydrate($r, 't0');
                 // set blank collections
             }
@@ -153,10 +144,32 @@ class Mapper extends BaseMapper
             }
         }
 
-        if ($mainModel instanceof \Schoolbox\Pastoral\Type\Model) {
+        if ($mainModel instanceof Model) {
             return $mainModel;
         }
 
-        throw new \Schoolbox\Mapper\Exception("Instance of object not found");
+        $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+        return null;
+    }
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * @param ErrorMapper $errorMapper
+     * @return $this
+     */
+    public function setErrorMapper($errorMapper) {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    public function getErrorMapper() {
+        return $this->errorMapper;
     }
 }

@@ -30,44 +30,18 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('luPastoralSeverity');
         $this->hasPrototype(new SeverityModel);
-
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => Mapper::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'     => 'order',
-                'property'   => 'order',
-                'type'       => Mapper::TYPE_INTEGER,
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'name',
-                'property' => 'name',
-                'type'     => Mapper::TYPE_STRING,
-            )
-        );
-
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('order', self::TYPE_INTEGER);
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('datetime_deleted', self::TYPE_DATETIME);
         $this->hasSoftDeleteDateField('datetime_deleted');
     }
 
     /**
      * Retrieves a model by id
      *
-     * @throws Exception if no instance of model is found
-     * @throws Exception\Deleted if the model was found but has been deleted
-     *
-     * @param  int $identifierValue
-     *
-     * @return Model
+     * @param mixed $identifierValue
+     * @return null|Model
      */
     public function findById($identifierValue)
     {
@@ -113,7 +87,9 @@ class Mapper extends BaseMapper
         }
 
         $stmt = $this->database->prepare("
-			SELECT $columns FROM `{$this->getTable()}` t0 {$joins} WHERE `t0`.`{$identifierColumn}` = :id_value
+			SELECT  $columns
+			FROM    `{$this->getTable()}` t0 {$joins}
+			WHERE   `t0`.`{$identifierColumn}` = :id_value
 		");
 
         $stmt->execute(array('id_value' => $identifierValue));
@@ -164,6 +140,7 @@ class Mapper extends BaseMapper
         }
 
         $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+        return null;
     }
 
     /**

@@ -16,6 +16,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Pastoral\Tags\Model as PastoralTagsModel;
 
 class Mapper extends BaseMapper
 {
@@ -31,33 +32,11 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('pastoral_tags');
-        $this->hasModel('\\Schoolbox\\Pastoral\\Tags\\Model');
-
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => Mapper::TYPE_INTEGER,
-                'identifier' => true
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'     => 'pastoral_id',
-                'property'   => 'pastoralId',
-                'type'       => Mapper::TYPE_INTEGER
-            )
-        );
-
-        $this->hasMap(
-            array(
-                'column'   => 'name',
-                'property' => 'name',
-                'type'     => Mapper::TYPE_STRING,
-            )
-        );
-
+        $this->hasPrototype(new PastoralTagsModel);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('pastoral_id', self::TYPE_INTEGER);
+        $this->uses('name', self::TYPE_STRING);
+        $this->uses('datetime_deleted', self::TYPE_DATETIME);
         $this->hasSoftDeleteDateField('datetime_deleted');
     }
 
@@ -69,7 +48,7 @@ class Mapper extends BaseMapper
      *
      * @param  int $identifierValue
      *
-     * @return object
+     * @return null|object
      */
     public function findById($identifierValue)
     {
@@ -115,7 +94,9 @@ class Mapper extends BaseMapper
         }
 
         $stmt = $this->database->prepare("
-			SELECT $columns FROM `{$this->getTable()}` t0 {$joins} WHERE `t0`.`{$identifierColumn}` = :id_value
+			SELECT  $columns
+			FROM    `{$this->getTable()}` t0 {$joins}
+			WHERE   `t0`.`{$identifierColumn}` = :id_value
 		");
 
         $stmt->execute(array('id_value' => $identifierValue));
@@ -123,7 +104,7 @@ class Mapper extends BaseMapper
         // there will be more than one record returned by this query
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if (empty($mainModel)) {
-                /** @var Article $mainModel */
+                /** @var Model $mainModel */
                 $mainModel = $this->hydrate($r, 't0');
                 // set blank collections
             }
@@ -166,6 +147,7 @@ class Mapper extends BaseMapper
         }
 
         $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+        return null;
     }
 
     /**

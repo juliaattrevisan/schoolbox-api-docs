@@ -4,12 +4,14 @@
 
         // Filter pastoral records on type
 
-        $('#filter_type_id').change(function(event) {
+        var filter_type_id = $('#filter_type_id');
+
+        filter_type_id.change(function() {
             $('.record').each(function(index, record) {
-                if ($('#filter_type_id').val() === '') {
+                if (filter_type_id.val() === '') {
                     $(record).show();
                 } else {
-                    if ($(record).attr('record-type') != $('#filter_type_id').val()) {
+                    if ($(record).attr('data-record-type') != $('#filter_type_id').val()) {
                         $(record).hide();
                     } else {
                         $(record).show();
@@ -32,8 +34,6 @@
 
         $('[data-delete]').click(function(event) {
             event.preventDefault();
-
-            var element = $(this);
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this record?',
@@ -129,6 +129,7 @@
     <div data-type-selector class="row{% if records.count() == 0 %} hide{% endif %}">
         <div class="small-12">
             <section>
+                <label for="filter_type_id">Filter Pastoral Records By Type</label>
                 <select id="filter_type_id">
                     <option value="">Show All Record Types</option>
                     {% for type in types %}
@@ -159,7 +160,7 @@
                     {# Only display records the logged in user is allowed to see. Parents cannot see private records ever (even if they have been given access). #}
                     {% if not (record.private and role == 'parent') %}
 
-                        <li record-type="{{ record.getTypeId }}" data-pastoral class="record actions-small-1" id="pastoral-{{ record.getId() }}">
+                        <li data-record-type="{{ record.getTypeId }}" data-pastoral class="record actions-small-1" id="pastoral-{{ record.getId() }}">
                             <div class="list-item">
                                 <div class="avatar card small-12 wrap-down">
 
@@ -205,7 +206,7 @@
 
                                     {# Display name of poster #}
                                     <p class="spaced meta">
-                                        Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getPostDate().getShort() }}
+                                        Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getDatetimePosted().getShort() }}
                                     </p>
 
                                     {# Display tags #}

@@ -108,9 +108,9 @@ class Controller extends Base
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
-    // Insert an attach zone into the template
-
     /**
+     * Insert an attach zone into the template
+     *
      * @param Collection|PastoralAttachmentModel $attachments
      * @return array
      */
@@ -126,18 +126,16 @@ class Controller extends Base
             ->setReadOnly(false)
             ->setMulti(true);
 
-        if ($attachments != null) {
-            foreach ($attachments as $attachment) {
+        if ($attachments != null)
+            foreach ($attachments as $attachment)
                 $zone->attachFiles(array($attachment->getHash()));
-            }
-        }
 
         return $zone->getTwigContext();
     }
 
-    // Calculate age of student
-
     /**
+     * Calculate age of student
+     *
      * @param int $timestamp
      * @param int $now
      * @return int
@@ -161,65 +159,12 @@ class Controller extends Base
         return $result;
     }
 
-    // Generate a pastoral report with the relevant filtering applied
-
+    /**
+     * Generate a pastoral report with the relevant filtering applied, this version has the accordion and pagination
+     */
     public function getReport()
     {
-        // Get current users role
-
-        $role = $this->getUser()->getRole()->getType();
-
-        // Kick them back to the kerb if they aren't allowed to view this page
-
-        if ($role != "staff") {
-
-            // User is not staff, kick them to the kerb
-
-            $this->getResponse()->redirect->afterPost("/");
-            return;
-        }
-
-        // Make sure all the criteria exist before we starting trying to use them, and if they don't get passed
-        // across, just set blank defaults
-
-        if (!isset($this->getRequest()->query["students"]))
-            $students = '';
-        else
-            $students = $this->getRequest()->query["students"];
-
-        if (!isset($this->getRequest()->query["tags"]))
-            $tags = '';
-        else
-            $tags = $this->getRequest()->query["tags"];
-
-        if (!isset($this->getRequest()->query["authors"]))
-            $authors = '';
-        else
-            $authors = $this->getRequest()->query["authors"];
-
-        if (!isset($this->getRequest()->query["types"]))
-            $types = '';
-        else
-            $types = $this->getRequest()->query["types"];
-
-        if (!isset($this->getRequest()->query["severity"]))
-            $severity = '';
-        else
-            $severity = $this->getRequest()->query["severity"];
-
-        if (!isset($this->getRequest()->query["before"]))
-            $before_date = '';
-        else
-            $before_date = $this->getRequest()->query["before"];
-
-        if (!isset($this->getRequest()->query["after"]))
-            $after_date = '';
-        else
-            $after_date = $this->getRequest()->query["after"];
-
-        // Get matching records
-
-        $records = $this->getPastoralMapper()->findAllReport($before_date, $after_date, $severity, $types, $authors, $students);
+        $records = $this->getReportData();
 
         // Restrict results based on pagination
 
@@ -242,14 +187,11 @@ class Controller extends Base
 
         $paginatedRecords = new Collection;
 
-        for ($i = ($pageCurrent - 1) * $resultsPerPage; $i < ($pageCurrent - 1) * $resultsPerPage + $resultsPerPage; $i++) {
+        for ($i = ($pageCurrent - 1) * $resultsPerPage; $i < ($pageCurrent - 1) * $resultsPerPage + $resultsPerPage; $i++)
             if ($records[$i] != null)
                 $paginatedRecords[] = $records[$i];
-        }
 
         // And spit this thing out
-
-        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         $this->getResponse()->content->set(
             array(
@@ -260,20 +202,23 @@ class Controller extends Base
                     'resultsPerPage'    => $resultsPerPage,
                     'totalPages'        => $totalPages,
                     'totalResults'      => $records->count(),
-                    'pastoralModerator' => $pastoralModerator,
+                    'pastoralModerator' => $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0,
                     'pageCurrent'       => $pageCurrent,
-                    'students'          => $students,
-                    'authors'           => $authors,
-                    'severity'          => $severity,
-                    'types'             => $types,
-                    'tags'              => $tags,
-                    'before'            => $before_date,
-                    'after'             => $after_date,
+                    'students'          => $this->getRequest()->query["students"],
+                    'authors'           => $this->getRequest()->query["authors"],
+                    'severity'          => $this->getRequest()->query["severity"],
+                    'types'             => $this->getRequest()->query["types"],
+                    'tags'              => $this->getRequest()->query["tags"],
+                    'before'            => $this->getRequest()->query["before"],
+                    'after'             => $this->getRequest()->query["after"],
                 ),
             )
         );
     }
 
+    /**
+     * Generate a printable report layout without the accordion or pagination for printing purposes
+     */
     public function getReportPrint()
     {
         // Get current users role
@@ -282,14 +227,28 @@ class Controller extends Base
 
         // Kick them back to the kerb if they aren't allowed to view this page
 
-        if ($role != "staff") {
+        if ($role != "staff")
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
-            // User is not staff, kick them to the kerb
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@pastoral/reportPrint.twig',
+                'data'     => array(
+                    'session'           => $_SESSION,
+                    'results'           => $this->getReportData(),
+                    'pastoralModerator' => $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0
+                ),
+            )
+        );
+    }
 
-            $this->getResponse()->redirect->afterPost("/");
-            return;
-        }
-
+    /**
+     * Get pastoral report records
+     *
+     * @return Collection|Model
+     */
+    private function getReportData()
+    {
         // Make sure all the criteria exist before we starting trying to use them, and if they don't get passed
         // across, just set blank defaults
 
@@ -323,27 +282,19 @@ class Controller extends Base
         else
             $after_date = $this->getRequest()->query["after"];
 
+        if (!isset($this->getRequest()->query["tags"]))
+            $tags = '';
+        else
+            $tags = $this->getRequest()->query["tags"];
 
         // Get matching records
 
-        $records = $this->getPastoralMapper()->findAllReport($before_date, $after_date, $severity, $types, $authors, $students);
-
-        // And render this thing out
-
-        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
-
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@pastoral/reportPrint.twig',
-                'data'     => array(
-                    'session'           => $_SESSION,
-                    'results'           => $records,
-                    'pastoralModerator' => $pastoralModerator
-                ),
-            )
-        );
+        return $this->getPastoralMapper()->findAllReport($before_date, $after_date, $severity, $types, $authors, $students, $tags);
     }
 
+    /**
+     * Display report builder page
+     */
     public function getReportBuilder()
     {
         // Get current users role. The screen is restricted to pastoral moderators only
@@ -352,14 +303,8 @@ class Controller extends Base
 
         // Kick them back to the kerb if they shouldn't be looking at this page
 
-        if ($role != "staff") {
-
-            // The logged in user is not staff, send them back to the homepage. This should prevent accidental recording
-            // of parents as moderators.
-
-            $this->getResponse()->redirect->afterPost("/");
-            return;
-        }
+        if ($role != "staff")
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // And render this thing out
 
@@ -377,6 +322,8 @@ class Controller extends Base
     }
 
     /**
+     * Display list of all pastoral records for selected student
+     *
      * @param $id
      * @throws \Schoolbox\Mapper\Exception
      */
@@ -397,17 +344,8 @@ class Controller extends Base
         $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         if (!$pastoralModerator)
-        {
-            // Kick them back to the kerb if they shouldn't be looking at this page
-
-            if ($role != "staff" && !$this->getUser()->isParentOf($student)) {
-
-                // The logged in user is not staff/parent, send them back to the homepage
-
-                $this->getResponse()->redirect->afterPost("/");
-                return;
-            }
-        }
+            if ($role != "staff" && !$this->getUser()->isParentOf($student))
+                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // Get the students contact details for display
 
@@ -440,7 +378,12 @@ class Controller extends Base
 
         // And render this mess out
 
-        $records = $this->getPastoralMapper()->findByStudentId($id);
+        try {
+            $records = $this->getPastoralMapper()->findByStudentId($id);
+        } catch (\Exception $e) {
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+            return;
+        }
 
         $this->getResponse()->content->set(
             array(
@@ -459,10 +402,16 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Get an individual pastoral care record
+     * 
+     * @param $studentId
+     * @param $id
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function getRecord($studentId, $id)
     {
         /** @var \Schoolbox\User $user */
-
         $user = $this->getUser();
 
         // Get the current users role
@@ -477,45 +426,37 @@ class Controller extends Base
         $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($user)->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         if (!$pastoralModerator)
-        {
-            // Kick them back to the kerb if they shouldn't be looking at this page
-
-            if ($role != "staff" && !$this->getUser()->isParentOf($student) && !$pastoralModerator) {
-
-                // The logged in user is not staff/parent, send them back to the homepage
-
-                $this->getResponse()->redirect->afterPost("/");
-                return;
-            }
-        }
+            if ($role != "staff" && !$this->getUser()->isParentOf($student) && !$pastoralModerator)
+                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // Get the pastoral care record
 
-        if ($pastoral = $this->getPastoralMapper()->findById($id)) {
-
-            // Lets render this thing
-
-            $this->getResponse()->content->set(
-                array(
-                    'template' => '@pastoral/record.twig',
-                    'data'     => array(
-                        'session'           => $_SESSION,
-                        'record'            => $pastoral,
-                        'pastoralModerator' => $pastoralModerator
-                    ),
-                )
-            );
-
-        }
-        else
-        {
-            // Record not found, probably don't have access
-
-            $this->getResponse()->redirect->afterPost("/");
+        try {
+            $pastoral = $this->getPastoralMapper()->findById($id);
+        } catch (\Exception $e) {
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             return;
         }
+
+        // Lets render this thing
+
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@pastoral/record.twig',
+                'data'     => array(
+                    'session'           => $_SESSION,
+                    'record'            => $pastoral,
+                    'pastoralModerator' => $pastoralModerator
+                ),
+            )
+        );
     }
 
+    /**
+     * Insert pastoral care record page
+     * 
+     * @param $id
+     */
     public function getInsert($id)
     {
         // Only staff should be inserting comments
@@ -523,10 +464,12 @@ class Controller extends Base
         $role = $this->getUser()->getRole()->getType();
 
         if ($role != "staff")
-        {
-            // The logged in user is not staff, send them back to the homepage
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
-            $this->getResponse()->redirect->afterPost("/");
+        try {
+            $student = $this->getUserMapper()->findById($id);
+        } catch (\Exception $e) {
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             return;
         }
 
@@ -537,7 +480,7 @@ class Controller extends Base
                 'template' => '@pastoral/modify.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
-                    'student'           => $this->getUserMapper()->findById($id),
+                    'student'           => $student,
                     'id'                => '',
                     'record'            => null,
                     'types'             => $this->getPastoralTypeMapper()->findAll(),
@@ -549,11 +492,22 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Update pastoral care record page
+     * 
+     * @param $id
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function getUpdate($id)
     {
         // Get the record we are updating
 
-        $record = $this->getPastoralMapper()->findById($id);
+        try {
+            $record = $this->getPastoralMapper()->findById($id);
+        } catch (\Exception $e) {
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+            return;
+        }
 
         // Only the staff member that owns the record should be updating it
 
@@ -562,15 +516,8 @@ class Controller extends Base
         $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         if (!$pastoralModerator)
-        {
-            if ($role != "staff" || $this->getUser()->getId() != $record->getOwner()->getId()) {
-
-                // The logged in user is not staff or is not the owner, send them back to the homepage
-
-                $this->getResponse()->redirect->afterPost("/");
-                return;
-            }
-        }
+            if ($role != "staff" || $this->getUser()->getId() != $record->getOwner()->getId())
+                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // Lets get the party started...
 
@@ -594,19 +541,19 @@ class Controller extends Base
     {
         // Get the comment we are deleting
 
-        $comment = $this->getPastoralCommentMapper()->findById($this->getRequest()->post['id']);
+        try {
+            $comment = $this->getPastoralCommentMapper()->findById($this->getRequest()->post['id']);
+        } catch (\Exception $e) {
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+            return;
+        }
 
         // Only the staff member that owns the record should be updating it
 
         $role = $this->getUser()->getRole()->getType();
 
-        if ($role != "staff" || $this->getUser()->getId() != $comment->getOwner()->getId()) {
-
-            // The logged in user is not staff or is not the owner, send them back to the homepage
-
-            $this->getResponse()->redirect->afterPost("/");
-            return;
-        }
+        if ($role != "staff" || $this->getUser()->getId() != $comment->getOwner()->getId())
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         $this->getPastoralCommentMapper()->delete($comment);
     }
@@ -619,13 +566,8 @@ class Controller extends Base
 
         // Only staff should be doing this
 
-        if ($role != "staff") {
-
-            // The logged in user is not staff, send them back to the homepage
-
-            $this->getResponse()->redirect->afterPost("/");
-            return;
-        }
+        if ($role != "staff")
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // No blank comments thanks
 
@@ -635,7 +577,7 @@ class Controller extends Base
             $comment->setPastoralId($this->getRequest()->post["pastoral_id"]);
             $comment->setBody($this->getRequest()->post["body"]);
             $comment->setOwner($this->getUser());
-            $comment->setPostDate(\Alaress_Date_Format::now());
+            $comment->setDatetimePosted(\Alaress_Date_Format::now());
             $this->getPastoralCommentMapper()->save($comment);
         }
 
@@ -644,20 +586,18 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost("/pastoral/{$this->getRequest()->post["student_id"]}/{$this->getRequest()->post["pastoral_id"]}");
     }
 
+    /**
+     * Insert/update a pastoral care record
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function postSave()
     {
-        // Update/Insert a pastoral record
-
         $role = $this->getUser()->getRole()->getType();
 
         // Only staff should be doing this
 
         if ($role != "staff") {
-
-            // The logged in user is not staff, send them back to the homepage
-
-            $this->getResponse()->redirect->afterPost("/");
-            return;
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         // External interface
@@ -666,7 +606,8 @@ class Controller extends Base
 
         // Keep track of IDs created
 
-        $recordIds = [];
+        /** @var Collection|Model $records */
+        $records = new Collection();
 
         if (empty($this->getRequest()->post["id"])) {
 
@@ -692,7 +633,7 @@ class Controller extends Base
 
             // Create a post date, so they are all the same
 
-            $postDate = \Alaress_Date_Format::now();
+            $datetimePosted = \Alaress_Date_Format::now();
 
             // Go through every kid
 
@@ -702,25 +643,36 @@ class Controller extends Base
 
                 // If this is not the first record, set the parent ID
 
-                if (isset($parentId))
-                    $record->setParentId($parentId);
+                if (isset($parent)) {
+                    $record->setParent($parent);
+                }
 
-                $record->setStudent($this->getUserMapper()->findById($student_id));
+                try {
+                    $student = $this->getUserMapper()->findById($student_id);
+                    $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
+                    $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
+                } catch (\Exception $e) {
+                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                    return;
+                }
+
+                $record->setStudent($student);
                 $record->setHeading($this->getRequest()->post["heading"]);
-                $record->setType($this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]));
-                $record->setSeverity($this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]));
+                $record->setType($type);
+                $record->setSeverity($severity);
                 $record->setBody($this->getRequest()->post["body"]);
                 $record->setPrivate($this->getRequest()->post["private"]);
                 $record->setOwner($this->getUser());
-                $record->setPostDate($postDate);
+                $record->setDatetimePosted($datetimePosted);
                 $this->getPastoralMapper()->save($record);
 
-                $recordIds[] = $record->getId();
+                $records->add($record);
 
                 // Store the first records ID for use as parent for subsequent copies
 
-                if (!isset($parentId))
-                    $parentId = $record->getId();
+                if (!isset($parent)) {
+                    $parent = $record;
+                }
 
                 // $pastoralExternal->createPastoral($record);
 
@@ -729,9 +681,17 @@ class Controller extends Base
                 if (isset($this->getRequest()->post["user_id"])) {
                     if (is_array($this->getRequest()->post["user_id"])) {
                         foreach ($this->getRequest()->post["user_id"] as $user_id) {
+
+                            try {
+                                $user = $this->getUserMapper()->findbyId($user_id);
+                            } catch (\Exception $e) {
+                                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                                return;
+                            }
+
                             $access = new PastoralAccessModel();
                             $access->setPastoralId($record->getId());
-                            $access->setUser($this->getUserMapper()->findbyId($user_id));
+                            $access->setUser($user);
                             $this->getPastoralAccessMapper()->save($access);
                         }
                     }
@@ -739,7 +699,7 @@ class Controller extends Base
 
                 // Save the tags
 
-                $tags = explode("," , $this->getRequest()->post["tags"]);
+                $tags = explode(",", $this->getRequest()->post["tags"]);
 
                 foreach ($tags as $tagCurrent) {
                     if (trim($tagCurrent) != '') {
@@ -754,9 +714,17 @@ class Controller extends Base
 
                 foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
                     if ($checked) {
+                        try {
+                            /** @var \Schoolbox\Role $role */
+                            $role = $this->getRoleMapper()->findById($role_id);
+                        } catch (\Exception $e) {
+                            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                            return;
+                        }
+
                         $access = new PastoralAccessModel();
                         $access->setPastoralId($record->getId());
-                        $access->setRole($this->getRoleMapper()->findById($role_id));
+                        $access->setRole($role);
                         $this->getPastoralAccessMapper()->save($access);
                     }
                 }
@@ -766,32 +734,41 @@ class Controller extends Base
         {
             // Modifying existing record
 
-            $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
+            try {
+                $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
+            } catch (\Exception $e) {
+                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                return;
+            }
 
-            $recordIds[] = $this->getRequest()->post["id"];
+            $records->add($record);
 
             // Only the owner or a moderator should be updating a record
 
-            $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+            $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service",
+                    PASTORAL_SERVICE)->count() > 0;
 
-            if (!$pastoralModerator)
-            {
+            if (!$pastoralModerator) {
                 if ($this->getUser()->getId() != $record->getOwner()->getId()) {
-
-                    // The logged in user is not the owner, get them outta here
-
-                    $this->getResponse()->redirect->afterPost("/");
-                    return;
+                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
                 }
             }
 
+            try {
+                $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
+                $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
+            } catch (\Exception $e) {
+                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                return;
+            }
+
             $record->setHeading($this->getRequest()->post["heading"]);
-            $record->setType($this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]));
-            $record->setSeverity($this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]));
+            $record->setType($type);
+            $record->setSeverity($severity);
             $record->setBody($this->getRequest()->post["body"]);
             $record->setPrivate($this->getRequest()->post["private"]);
             $record->setOwner($this->getUser());
-            $record->setModifiedDate(\Alaress_Date_Format::now());
+            $record->setDatetimeModified(\Alaress_Date_Format::now());
             $this->getPastoralMapper()->save($record);
 
             // Update external record
@@ -818,6 +795,8 @@ class Controller extends Base
             // Delete user permissions
 
             $accessRoles = $record->getAccessList();
+
+            $deleteIds = [];
 
             if (trim($this->getRequest()->post["deleteIds"]) != "") {
                 $deleteIds = explode(",", $this->getRequest()->post["deleteIds"]);
@@ -850,9 +829,17 @@ class Controller extends Base
                         }
 
                         if (!$found) {
+
+                            try {
+                                $user = $this->getUserMapper()->findById($user_id);
+                            } catch (\Exception $e) {
+                                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                                return;
+                            }
+
                             $access = new PastoralAccessModel();
                             $access->setPastoralId($record->getId());
-                            $access->setUser($this->getUserMapper()->findById($user_id));
+                            $access->setUser($user);
                             $this->getPastoralAccessMapper()->save($access);
                         }
                     }
@@ -860,7 +847,6 @@ class Controller extends Base
             }
 
             // Update the role based audience
-
 
             foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
 
@@ -879,10 +865,18 @@ class Controller extends Base
                         }
                     }
 
+                    try {
+                        /** @var \Schoolbox\Role $role */
+                        $role = $this->getRoleMapper()->findById($role_id);
+                    } catch (\Exception $e) {
+                        $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                        return;
+                    }
+
                     if (!$found) {
                         $access = new PastoralAccessModel();
                         $access->setPastoralId($record->getId());
-                        $access->setRole($this->getRoleMapper()->findById($role_id));
+                        $access->setRole($role);
                         $this->getPastoralAccessMapper()->save($access);
                     }
 
@@ -900,134 +894,143 @@ class Controller extends Base
             }
         }
 
-        // Delete attachments if required
+        foreach ($records as $record)
+        {
+            // Delete attachments if required
 
-        // Keep track of attachments that aren't deleted so we don't add them again
+            // Keep track of attachments that aren't deleted so we don't add them again
 
-        $retainedAttachments = array();
+            $retainedAttachments = array();
 
-        // Get all attachments associated with this record
+            // Get all attachments associated with this record
 
-        $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($record->getId());
+            try {
+                $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($record->getId());
+            } catch (\Exception $e) {
+                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                return;
+            }
 
-        foreach ($attachments as $attachment) {
+            foreach ($attachments as $attachment) {
 
-            $foundAttachment = false;
+                $foundAttachment = false;
+
+                if (is_array($this->getRequest()->post["attachment"])) {
+                    foreach ($this->getRequest()->post["attachment"] as $hash) {
+
+                        $hash_array = explode(":", $hash);
+
+                        if ($attachment->getHash() == $hash_array[1]) {
+                            $foundAttachment = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$foundAttachment) {
+
+                    // The attachment was found in the database, remove it
+
+                    $attachment->setModifiedDate(\Alaress_Date_Format::now());
+                    $this->getPastoralAttachmentMapper()->delete($attachment);
+
+                } else {
+
+                    // We are keeping this attachment
+
+                    $retainedAttachments[] = $attachment->getHash();
+                }
+            }
+
+            // Save any new attachments
 
             if (is_array($this->getRequest()->post["attachment"])) {
                 foreach ($this->getRequest()->post["attachment"] as $hash) {
 
                     $hash_array = explode(":", $hash);
 
-                    if ($attachment->getHash() == $hash_array[1]) {
-                        $foundAttachment = true;
-                        break;
-                    }
-                }
-            }
+                    // Only add attachments which don't already exist
 
-            if (!$foundAttachment) {
-
-                // The attachment was found in the database, remove it
-
-                $attachment->setModifiedDate(\Alaress_Date_Format::now());
-                $this->getPastoralAttachmentMapper()->delete($attachment);
-
-            } else {
-
-                // We are keeping this attachment
-
-                $retainedAttachments[] = $attachment->getHash();
-            }
-        }
-
-        // Save any new attachments
-
-        if (is_array($this->getRequest()->post["attachment"])) {
-            foreach ($this->getRequest()->post["attachment"] as $hash) {
-
-                $hash_array = explode(":", $hash);
-
-                // Only add attachments which don't already exist
-
-                foreach ($recordIds as $recordId)
-                {
-                    if (!in_array($hash_array[1], $retainedAttachments))
-                    {
+                    if (!in_array($hash_array[1], $retainedAttachments)) {
                         $attachment = new PastoralAttachmentModel();
-                        $attachment->setPastoralId($recordId);
+                        $attachment->setPastoralId($record->getId());
                         $attachment->setHash($hash_array[1]);
-                        $attachment->setModifiedDate(\Alaress_Date_Format::now());
+                        $attachment->setDatetimeModified(\Alaress_Date_Format::now());
                         $this->getPastoralAttachmentMapper()->save($attachment);
                     }
                 }
             }
-        }
 
-        // Send instant notifications - Must talk to doctor and change this to digestable notification
+            // Send instant notifications - Must talk to doctor and change this to digestable notification
 
-        if ($this->getRequest()->post["notify"] == 1) {
+            if ($this->getRequest()->post["notify"] == 1) {
 
-            $user = $this->getUserMapper()->findById($this->getRequest()->post["student_id"]);
+                try {
+                    $user = $this->getUserMapper()->findById($this->getRequest()->post["student_id"]);
+                } catch (\Exception $e) {
+                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                    return;
+                }
 
-            if (!$this->getRequest()->post["private"]) {
-                $link = "/pastoral/{$this->getRequest()->post["student_id"]}/" . $record->getId();
-            } else {
-                $link = "/pastoral/{$this->getRequest()->post["student_id"]}";
-            }
+                if (!$this->getRequest()->post["private"]) {
+                    $link = "/pastoral/{$record->getStudent()->getId()}/" . $record->getId();
+                } else {
+                    $link = "/pastoral/{$record->getStudent()->getId()}";
+                }
 
-            if (empty($this->getRequest()->post["id"])) {
-                $body = "A new pastoral alert has been entered for " . $user->getFullName() . ". Click here to view this alert.";
-            } else {
-                $body = "An existing pastoral alert has been updated for " . $user->getFullName() . ". Click here to view this alert.";
-            }
+                if (empty($this->getRequest()->post["id"])) {
+                    $body = "A new pastoral alert has been entered for " . $user->getFullName() . ". Click here to view this alert.";
+                } else {
+                    $body = "An existing pastoral alert has been updated for " . $user->getFullName() . ". Click here to view this alert.";
+                }
 
-            $bob = new \Alaress\Async\Notification\Instance\Builder();
-            $bob->setTitle($body)
-                ->setSeverity(\Monolog\Logger::INFO)
-                ->setNamespace('ALERT')
-                ->setHref($link)
-                ->setIcon('/images/icon.php?icon=bolt&size=64')
-                ->addTopic("notify.user." . $this->getRequest()->post["student_id"])
-                ->putMeta('ttl', 60)
-                ->putMeta('title', 'Pastoral Care Alert');
+                $bob = new \Alaress\Async\Notification\Instance\Builder();
+                $bob->setTitle($body)
+                    ->setSeverity(\Monolog\Logger::INFO)
+                    ->setNamespace('ALERT')
+                    ->setHref($link)
+                    ->setIcon('/images/icon.php?icon=bolt&size=64')
+                    ->addTopic("notify.user." . $this->getRequest()->post["student_id"])
+                    ->putMeta('ttl', 60)
+                    ->putMeta('title', 'Pastoral Care Alert');
 
-            $ids = array();
+                $ids = array();
 
-            $users = $this->getUserMapper()->findAll();
+                $users = $this->getUserMapper()->findAll();
 
-            foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
+                foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
 
-                // Find all users with this role
+                    // Find all users with this role
 
-                foreach ($users as $user) {
-                    if ($user->getRole()->getId() == $role_id) {
+                    foreach ($users as $user) {
+                        if ($user->getRole()->getId() == $role_id) {
 
-                        // Add them to the notification list
+                            // Add them to the notification list
 
-                        $ids[$user->getId()] = 1;
+                            $ids[$user->getId()] = 1;
+                        }
                     }
                 }
-            }
 
-            // Don't send it to the user making the change
+                // Don't send it to the user making the change
 
-            $ids[$this->getUser()->getId()] = 0;
+                $ids[$this->getUser()->getId()] = 0;
 
-            // Trigger the notifications
+                // Trigger the notifications
 
-            foreach ($ids as $id => $value) {
-                if ($value == 1) {
-                    $n = new \Schoolbox\Notif\Notif("instant.user.{$id}.alert");
+                foreach ($ids as $id => $value) {
+                    if ($value == 1) {
+                        $n = new \Schoolbox\Notif\Notif("instant.user.{$id}.alert");
+                        $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
+                    }
+                }
+
+                // Send notifications to all individually added users
+
+                foreach ($this->getRequest()->post["user_id"] as $user_id) {
+                    $n = new \Schoolbox\Notif\Notif("instant.user.$user_id.alert");
                     $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
                 }
-            }
-
-            // Send notifications to all individually added users
-
-            foreach ($this->getRequest()->post["user_id"] as $user_id) {
-                $n = new \Schoolbox\Notif\Notif("instant.user.$user_id.alert");
-                $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
             }
         }
 
@@ -1040,7 +1043,12 @@ class Controller extends Base
     {
         // Get the record we are deleting
 
-        $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
+        try {
+            $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
+        } catch (\Exception $e) {
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+            return;
+        }
 
         // Work out if this person should be allowed to delete the record
 
@@ -1050,29 +1058,25 @@ class Controller extends Base
         {
             $role = $this->getUser()->getRole()->getType();
 
-            if ($role != "staff" || $this->getUser()->getId() != $record->getOwner()->getId()) {
-
-                // The logged in user is not staff or is not the owner, send them back to the homepage
-
-                $this->getResponse()->redirect->afterPost("/");
-                return;
-            }
+            if ($role != "staff" || $this->getUser()->getId() != $record->getOwner()->getId())
+                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         $this->getPastoralCommentMapper()->deleteByColumn("pastoral_id", $this->getRequest()->post["id"]);
 
-        // Get ready for some external ninja'ing
-
-        $pastoralExternal = new \External_Pastoral();
-
         // Delete on external database
 
+        $pastoralExternal = new \External_Pastoral();
         $pastoralExternal->deletePastoral($record);
 
         // Delete locally
 
         $this->getPastoralMapper()->delete($record);
     }
+
+    /**
+     * Here be the getters/setters, nothing else interesting to see
+     */
 
     /**
      * @param $pastoralMapper

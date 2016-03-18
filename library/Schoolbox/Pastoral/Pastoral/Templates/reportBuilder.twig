@@ -22,7 +22,7 @@
             ]
         });
 
-        var selectorStudents = $('#filterStudents').selectizeSelector({
+        $('#filterStudents').selectizeSelector({
             multiple: true,
             ajax: {
                 url:      '/ajax/user.php',
@@ -31,7 +31,8 @@
                 dataType: 'json'
             }
         });
-        var selectorAuthors = $('#filterAuthors').selectizeSelector({
+
+        $('#filterAuthors').selectizeSelector({
             multiple: true,
             ajax: {
                 url:      '/ajax/user.php',
@@ -40,6 +41,7 @@
                 dataType: 'json'
             }
         });
+
         $('#datetime_before, #datetime_after').datepicker();
 
         $('[data-report]').click(function(event) {

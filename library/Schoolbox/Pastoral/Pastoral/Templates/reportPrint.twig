@@ -21,11 +21,11 @@
                                     <h2>{{ record.student.firstname }} {{ record.student.lastname }}</h2>
                                     <h3>{{  record.getHeading() }}</h3>
                                     <p class="spaced meta hide-on-print">
-                                        Posted by {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getPostDate().getShort() }}
+                                        Posted by {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getDatetimePosted().getShort() }}
                                     </p>
                                     <p class="spaced meta show-for-print">
                                         <br>Posted by {{ record.getOwner.firstName }} {{ record.getOwner.lastName }}<br>
-                                        {{  record.getPostDate().getShort() }}
+                                        {{  record.getDatetimePosted().getShort() }}
                                     </p>
                                     <p class="meta">
                                         Severity: {{ record.getSeverity.getName() }}
@@ -33,6 +33,15 @@
                                     <p class="meta">
                                         Incident Type: {{ record.getType.getName() }}
                                     </p>
+                                    {% if record.getTagsList.count > 0 %}
+                                        <p class="meta">
+                                            Tags:
+                                            {% for tag in record.getTagsList %}
+                                                {{ tag.getName | title }}
+                                                {% if not loop.last %} | {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
                                     {% if record.private %}
                                         <p class="meta">
                                             Contents Private
@@ -97,7 +106,6 @@
                                             {% endfor %}
                                         </p>
                                         {% endif %}
-                                        </p>
                                     </div>
                                 </section>
                             </div>
@@ -110,8 +118,8 @@
                                 <li>
                                     <div class="list-item">
                                         <div class="small-12 avatar card wrap-down">
-                                            <p class="meta hide-on-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }} {{ comment.getPostDate().getShort() }}</p>
-                                            <p class="show-for-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }}<br>{{ comment.getPostDate().getShort() }}</p>
+                                            <p class="meta hide-on-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }} {{ comment.getDatetimePosted().getShort() }}</p>
+                                            <p class="show-for-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }}<br>{{ comment.getDatetimePosted().getShort() }}</p>
                                             <p class="spaced">
                                                 {{ comment.body | raw }}
                                             </p>

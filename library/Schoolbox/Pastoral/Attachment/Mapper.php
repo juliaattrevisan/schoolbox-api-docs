@@ -20,6 +20,11 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Mapper extends BaseMapper
 {
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
     public function __construct()
     {
         $this->setErrorMapper(ErrorMapper::getInstance());
@@ -33,8 +38,9 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('pastoral_id', self::TYPE_INTEGER);
         $this->uses('hash', self::TYPE_STRING);
-        $this->uses('datetime_posted', self::TYPE_DATETIME, null, 'postDate');
-        $this->uses('datetime_modified', self::TYPE_DATETIME, null, 'modifiedDate');
+        $this->uses('datetime_posted', self::TYPE_DATETIME);
+        $this->uses('datetime_modified', self::TYPE_DATETIME);
+        $this->uses('datetime_deleted', self::TYPE_DATETIME);
         $this->hasSoftDeleteDateField('datetime_deleted');
     }
 
@@ -49,13 +55,10 @@ class Mapper extends BaseMapper
         $collection = new Collection();
 
         $query = "
-			SELECT
-				{$this->getColumnString('p')}
-			FROM
-				`{$this->getTable()}` `p`
-			WHERE
-				`p`.`datetime_deleted` IS NULL AND
-				`p`.`pastoral_id` = :pastoralId
+			SELECT  {$this->getColumnString('p')}
+			FROM    `{$this->getTable()}` `p`
+			WHERE   `p`.`datetime_deleted` IS NULL AND
+				    `p`.`pastoral_id` = :pastoralId
 			";
 
         $statement = $this->database->prepare($query);
@@ -78,7 +81,7 @@ class Mapper extends BaseMapper
      *
      * @param  int $identifierValue
      *
-     * @return object
+     * @return null|object
      */
     public function findById($identifierValue)
     {
@@ -124,7 +127,9 @@ class Mapper extends BaseMapper
         }
 
         $stmt = $this->database->prepare("
-			SELECT $columns FROM `{$this->getTable()}` t0 {$joins} WHERE `t0`.`{$identifierColumn}` = :id_value
+			SELECT  $columns
+			FROM    `{$this->getTable()}` t0 {$joins}
+			WHERE   `t0`.`{$identifierColumn}` = :id_value
 		");
 
         $stmt->execute(array('id_value' => $identifierValue));
@@ -143,9 +148,8 @@ class Mapper extends BaseMapper
 
                 $field = "$alias.$subColumn";
 
-                if (is_null($r[$field])) {
+                if (is_null($r[$field]))
                     continue;
-                }
 
                 $entity = $mapper->hydrate($r, $alias);
 
@@ -175,12 +179,8 @@ class Mapper extends BaseMapper
         }
 
         $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+        return null;
     }
-
-    /**
-     * @var ErrorMapper
-     */
-    protected $errorMapper;
 
     /**
      * @param ErrorMapper $errorMapper
