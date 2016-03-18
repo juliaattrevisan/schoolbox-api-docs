@@ -949,11 +949,12 @@ class SitePage extends Page
 
         if (Cfg::get('messaging_enabled')) {
             $this->parse('INSTANTMESSAGE_BLOCK', 'instantTpl');
+            $this->setVar('NOTIFICATION_CLASS', '');
         } else {
             $this->setVar('INSTANTMESSAGE_BLOCK', '');
+            $this->setVar('NOTIFICATION_CLASS', 'disableNotifications');
         }
     }
-
 
     function renderScriptIncludes()
     {

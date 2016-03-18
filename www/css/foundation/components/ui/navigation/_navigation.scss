@@ -565,6 +565,14 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
             padding-left: 5rem;
         }
     }
+    // When notifications are disabled
+    .hybrid-bar .disableNotifications #search {
+        right: 0;
+
+        &:hover, &.focus{
+            padding-left: 0;
+        }
+    }
 }
 
 // Medium
@@ -573,6 +581,11 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
     .hybrid-bar #search{
         &:hover, &.focus{
             padding-left: 10rem;
+        }
+    }
+    .hybrid-bar .disableNotifications #search {
+        &:hover, &.focus{
+            padding-left: 5rem;
         }
     }
     .tab-bar-section.middle {
