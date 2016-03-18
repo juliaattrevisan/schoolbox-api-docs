@@ -542,78 +542,7 @@ class Controller extends BaseController
         }
     }
 
-    /**
-     * Save the given template for the given folder
-     *
-     * @param Folder\Model $model
-     * @param int          $template
-     */
-    protected function saveHomepageConfig(Folder\Model $model, $template)
-    {
-        $confMapper = $this->getHomepageConfigMapper();
-        $tplMapper  = $this->getHomepageTemplateMapper();
 
-        $homepageConfig = $confMapper->createModel()->setCategory($model);
-
-        // if homepage is to be removed
-        try {
-            if ($template == HomepageTemplate::HOMEPAGE_REMOVE) {
-                $confMapper->emptyHomepage($homepageConfig);
-                $confMapper->delete($homepageConfig);
-
-            } elseif ($template == HomepageTemplate::HOMEPAGE_KEEP_EXISTING) {
-                // we're done. get out.
-                return;
-
-            } elseif ($template > 0) {
-                // if template defined
-                $homepageConfig->setTemplate($tplMapper->findById($template));
-
-                // Save homepage config
-                $confMapper->save($homepageConfig);
-                $confMapper->resetToTemplate($homepageConfig);
-
-            } else {
-                throw new RangeException("Invalid template ID specified");
-            }
-        } catch (Mapper\Exception $e) {
-            throw new RangeException("Invalid template ID specified", 0, $e);
-        }
-
-        // Ram it back into its parent object where it belongs
-        $model->setHomepage($homepageConfig);
-
-    }
-
-
-    /**
-     * Recursively apply inheritance. Why? Not sure. Cut-Paste from /cms/categoryForm.php
-     *
-     * @param Folder\Model $model
-     */
-    protected function recurseInheritance(Folder\Model $model) {
-        $folders = $this->getCourseMapper()->findAllChildren($model->getId(), true);
-        foreach ($folders as $folder) {
-            $folder->setInherit($model->getInherit());
-            $this->getCourseMapper()->save($folder);
-            $this->recurseInheritance($folder);
-        }
-    }
-
-    /**
-     * Returns a HTTP 500 error with a specific text message
-     *
-     * @param $message
-     */
-    protected function throwError($message)
-    {
-        $this->getResponse()->status->set(500);
-
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data' => $message
-        ]);
-    }
 
     /**
      * Retrieve friend with a list of tasks, quizzes and due work (and relevant date entry boxes) associated with
@@ -828,20 +757,6 @@ class Controller extends BaseController
     }
 
     /**
-     * Delete unit from course
-     */
-    public function deleteUnit()
-    {
-        $this->getCourseMapper()->deleteUnit($this->getRequest()->post["id"]);
-
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => ['result' => 'success']
-        ]);
-    }
-
-
-    /*
      * Do the actual import and create all relevant database entries
      */
     public function importSave()
@@ -983,6 +898,93 @@ class Controller extends BaseController
 
             $this->getUnitInstanceMapper()->save($unit_instance_list);
         }
+    }
+
+
+    /**
+     * Save the given template for the given folder
+     *
+     * @param Folder\Model $model
+     * @param int          $template
+     */
+    protected function saveHomepageConfig(Folder\Model $model, $template)
+    {
+        $confMapper = $this->getHomepageConfigMapper();
+        $tplMapper  = $this->getHomepageTemplateMapper();
+
+        $homepageConfig = $confMapper->createModel()->setCategory($model);
+
+        // if homepage is to be removed
+        try {
+            if ($template == HomepageTemplate::HOMEPAGE_REMOVE) {
+                $confMapper->emptyHomepage($homepageConfig);
+                $confMapper->delete($homepageConfig);
+
+            } elseif ($template == HomepageTemplate::HOMEPAGE_KEEP_EXISTING) {
+                // we're done. get out.
+                return;
+
+            } elseif ($template > 0) {
+                // if template defined
+                $homepageConfig->setTemplate($tplMapper->findById($template));
+
+                // Save homepage config
+                $confMapper->save($homepageConfig);
+                $confMapper->resetToTemplate($homepageConfig);
+
+            } else {
+                throw new RangeException("Invalid template ID specified");
+            }
+        } catch (Mapper\Exception $e) {
+            throw new RangeException("Invalid template ID specified", 0, $e);
+        }
+
+        // Ram it back into its parent object where it belongs
+        $model->setHomepage($homepageConfig);
+
+    }
+
+
+    /**
+     * Recursively apply inheritance. Why? Not sure. Cut-Paste from /cms/categoryForm.php
+     *
+     * @param Folder\Model $model
+     */
+    protected function recurseInheritance(Folder\Model $model) {
+        $folders = $this->getCourseMapper()->findAllChildren($model->getId(), true);
+        foreach ($folders as $folder) {
+            $folder->setInherit($model->getInherit());
+            $this->getCourseMapper()->save($folder);
+            $this->recurseInheritance($folder);
+        }
+    }
+
+    /**
+     * Returns a HTTP 500 error with a specific text message
+     *
+     * @param $message
+     */
+    protected function throwError($message)
+    {
+        $this->getResponse()->status->set(500);
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data' => $message
+        ]);
+    }
+
+    /**
+     * Delete unit from course
+     */
+    public function deleteUnit()
+    {
+        $this->getCourseMapper()->deleteUnit($this->getRequest()->post["id"]);
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => ['result' => 'success']
+        ]);
     }
 
     /* Getters/Setters
