@@ -925,11 +925,11 @@ class Controller extends BaseController
         {
             // Get the homepage we are importing into and store it for later
 
-            $homepageCache[$homepageId] = FolderMapper::getInstance()->findById($homepageId);
+            $homepageCache[$homepageId] = $this->getFolderMapper()->findById($homepageId);
 
             // Create course outline component on the current page
 
-            $componentDefinition = \Component_DefinitionMapper::getInstance()->findByColumn(
+            $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn(
                 'class',
                 'Component_Homepage_CourseOutlineController'
             );
@@ -944,7 +944,7 @@ class Controller extends BaseController
                 ->setPosition('top')
                 ->setSequence(1);
 
-            \Component_InstanceMapper::getInstance()->save($componentCache[$homepageId]);
+            $this->getComponentInstanceMapper()->save($componentCache[$homepageId]);
         }
 
         // Create new unit instances in each of these pages/components
@@ -962,7 +962,7 @@ class Controller extends BaseController
                     // Save the unit into the course.
 
                     if (!isset($unitCache[$unit['unit_id']]))
-                        $unitCache[$unit['unit_id']] = FolderMapper::getInstance()->findById($unit['unit_id']);
+                        $unitCache[$unit['unit_id']] = $this->getFolderMapper()->findById($unit['unit_id']);
 
                     $unit_instance = new UnitInstance();
 
@@ -980,114 +980,153 @@ class Controller extends BaseController
                 }
             }
 
-            UnitInstanceMapper::getInstance()->save($unit_instance_list);
+            $this->getUnitInstanceMapper()->save($unit_instance_list);
         }
-
     }
 
     /* Getters/Setters
      */
 
     /**
-     * @return \Schoolbox\Assessment\Course\Mapper
+     * Get course mapper
+     *
+     * @return Mapper
      */
-    protected function getCourseMapper()
+    private function getCourseMapper()
     {
         return $this->courseMapper;
     }
 
-
     /**
-     * @param \Schoolbox\Assessment\Course\Mapper $courseMapper
-     * @return static
+     * Set course mapper
+     *
+     * @param Mapper $courseMapper
      */
-    public function setCourseMapper($courseMapper)
+    private function setCourseMapper($courseMapper)
     {
         $this->courseMapper = $courseMapper;
-        return $this;
     }
 
-
     /**
-     * @return Component_DefinitionMapper
+     * Get folder mapper
+     *
+     * @return FolderMapper
      */
-    protected function getComponentDefinitionMapper()
+    private function getFolderMapper()
     {
-        return $this->componentDefinitionMapper;
+        return $this->folderMapper;
     }
 
-
     /**
-     * @param Component_DefinitionMapper $componentDefinitionMapper
-     * @return static
+     * Set folder mapper
+     *
+     * @param FolderMapper $folderMapper
      */
-    public function setComponentDefinitionMapper($componentDefinitionMapper)
+    private function setFolderMapper($folderMapper)
     {
-        $this->componentDefinitionMapper = $componentDefinitionMapper;
-        return $this;
+        $this->folderMapper = $folderMapper;
     }
 
-
     /**
-     * @return Component_InstanceMapper
+     * Get task mapper
+     *
+     * @return null
      */
-    protected function getComponentInstanceMapper()
-    {
-        return $this->componentInstanceMapper;
-    }
-
-
-    /**
-     * @param Component_InstanceMapper $componentInstanceMapper
-     * @return static
-     */
-    public function setComponentInstanceMapper($componentInstanceMapper)
-    {
-        $this->componentInstanceMapper = $componentInstanceMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return UnitInstanceMapper
-     */
-    protected function getUnitInstanceMapper()
-    {
-        return $this->unitInstanceMapper;
-    }
-
-
-    /**
-     * @param UnitInstanceMapper $unitInstanceMapper
-     * @return static
-     */
-    public function setUnitInstanceMapper($unitInstanceMapper)
-    {
-        $this->unitInstanceMapper = $unitInstanceMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return TaskMapper
-     */
-    protected function getTaskMapper()
+    private function getTaskMapper()
     {
         return $this->taskMapper;
     }
 
-
     /**
-     * @param TaskMapper $taskMapper
-     * @return static
+     * Set task mapper
+     *
+     * @param null $taskMapper
      */
-    public function setTaskMapper($taskMapper)
+    private function setTaskMapper($taskMapper)
     {
         $this->taskMapper = $taskMapper;
-        return $this;
     }
 
 
+    /**
+     * Get component instance mapper
+     *
+     * @return null
+     */
+    private function getComponentInstanceMapper()
+    {
+        return $this->componentInstanceMapper;
+    }
+
+    /**
+     * Set component instance mapper
+     *
+     * @param null $componentInstanceMapper
+     */
+    private function setComponentInstanceMapper($componentInstanceMapper)
+    {
+        $this->componentInstanceMapper = $componentInstanceMapper;
+    }
+
+    /**
+     * Get component definition mapper
+     *
+     * @return null
+     */
+    private function getComponentDefinitionMapper()
+    {
+        return $this->componentDefinitionMapper;
+    }
+
+    /**
+     * Set component definition mapper
+     *
+     * @param null $componentDefinitionMapper
+     */
+    private function setComponentDefinitionMapper($componentDefinitionMapper)
+    {
+        $this->componentDefinitionMapper = $componentDefinitionMapper;
+    }
+
+    /**
+     * Get unit instance mapper
+     *
+     * @return null
+     */
+    private function getUnitInstanceMapper()
+    {
+        return $this->unitInstanceMapper;
+    }
+
+    /**
+     * Set unit instance mapper
+     *
+     * @param null $unitInstanceMapper
+     */
+    private function setUnitInstanceMapper($unitInstanceMapper)
+    {
+        $this->unitInstanceMapper = $unitInstanceMapper;
+    }
+
+    /**
+     * Set task mapper
+     *
+     * @param null $submissionBoxMapper
+     */
+    private function setSubmissionBoxMapper($submissionBoxMapper)
+    {
+        $this->submissionBoxMapper = $submissionBoxMapper;
+    }
+
+    /**
+     * Set online assessment mapper
+     *
+     * @param null $onlineAssessmentMapper
+     */
+    private function setOnlineAssessmentMapper($onlineAssessmentMapper)
+    {
+        $this->onlineAssessmentMapper = $onlineAssessmentMapper;
+    }
     /**
      * @return HomepageConfigMapper
      */
@@ -1162,25 +1201,5 @@ class Controller extends BaseController
     {
         $this->access = $access;
         return $this;
-    }
-
-    /**
-     * Set task mapper
-     *
-     * @param null $submissionBoxMapper
-     */
-    protected function setSubmissionBoxMapper($submissionBoxMapper)
-    {
-        $this->submissionBoxMapper = $submissionBoxMapper;
-    }
-
-    /**
-     * Set online assessment mapper
-     *
-     * @param null $onlineAssessmentMapper
-     */
-    protected function setOnlineAssessmentMapper($onlineAssessmentMapper)
-    {
-        $this->onlineAssessmentMapper = $onlineAssessmentMapper;
     }
 }
