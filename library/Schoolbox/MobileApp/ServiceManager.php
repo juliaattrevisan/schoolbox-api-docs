@@ -59,6 +59,9 @@ class ServiceManager
             throw new OverflowException("Cannot redeclare service '$provider'.");
         }
 
+        // apply our logger to this server
+        $service->setLog($this->log);
+
         // index by provider name
         $this->services[$provider] = $service;
         $this->log->debug("Added cloud notification provider '$provider'");
