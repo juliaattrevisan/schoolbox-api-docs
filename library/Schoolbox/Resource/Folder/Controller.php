@@ -198,6 +198,13 @@ class Controller extends BaseController
 
         $folder = new Model();
 
+        // Default to parent's permissions
+        $permissions = $this->getRoleAccessMapper()->findByColumn('cid', $parent->getId());
+        $rolePermissions = [];
+        foreach ($permissions as $permission) {
+            $rolePermissions[$permission->getRole()->getId()] = $permission->getType();
+        }
+
         // Folders that are not in the root note should inherit by default to reduce the user interface
 
         if ($parentId != Mapper::FOLDER_ROOT)
@@ -213,6 +220,7 @@ class Controller extends BaseController
                     'parent'            => $parent,
                     'templates'         => $homepageTemplateMapper->findAll(),
                     'roles'             => $roleMapper->findAll(),
+                    'rolePermissions'   => $rolePermissions,
                     'database'          => ucfirst($config->get('external_type')),
                     'curriculumTagging' => $config->get('curriculum_tagging_enabled'),
                     'writePermission'   => UserAccess::ACCESS_WRITE,
