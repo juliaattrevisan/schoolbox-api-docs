@@ -141,6 +141,9 @@ class Controller extends BaseController
             $rolePermissions[$permission->getRole()->getId()] = $permission->getType();
         }
 
+        $homepageTemplates = $homepageTemplateMapper->findAll();
+        $homepageTemplates->prepend($homepageTemplateMapper->getKeepExistingHomepageTemplate());
+
         $config = new ConfigLoader();
 
         $this->getResponse()->content->set(
@@ -151,7 +154,7 @@ class Controller extends BaseController
                     'breadcrumbs'       => $breadcrumbs,
                     'folder'            => $folder,
                     'parent'            => $parent,
-                    'templates'         => $homepageTemplateMapper->findAll(),
+                    'templates'         => $homepageTemplates,
                     'templateId'        => $templateId,
                     'roles'             => $roleMapper->findAll(),
                     'rolePermissions'   => $rolePermissions,
