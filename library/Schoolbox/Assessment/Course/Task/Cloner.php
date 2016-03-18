@@ -150,7 +150,7 @@ class Cloner
             if (is_array($quizDates)) {
                 if (isset($quizDates[$assess_id])) {
                     $start = \Alaress_Date_Format::newLocalShort($quizDates[$assess_id]['start_date']);
-                    $finish = \Alaress_Date_Format::newLocalShort($quizDates[$assess_id]['finish_date']);
+                    $finish = \Alaress_Date_Format::newLocalShort($quizDates[$assess_id]['finish_date'])->endOfDay();
                 }
             }
 
@@ -199,8 +199,8 @@ class Cloner
                 if (isset($workDates[$box_id])) {
                     $publish = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['publish_date']);
                     $open = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['open_date']);
-                    $due = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['due_date']);
-                    $late = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['late_date']);
+                    $due = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['due_date'])->endOfDay();
+                    $late = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['late_date'])->endOfDay();
                 }
             }
 
