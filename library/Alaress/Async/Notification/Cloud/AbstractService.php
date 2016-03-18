@@ -11,6 +11,7 @@ namespace Alaress\Async\Notification\Cloud;
 
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Realtime\Notification\Decorator;
 
 abstract class AbstractService implements ServiceInterface
 {
@@ -21,6 +22,18 @@ abstract class AbstractService implements ServiceInterface
      * @var LoggerInterface
      */
     private $log;
+
+    /** @var Decorator */
+    protected $decorator;
+
+
+    /**
+     * AbstractService constructor.
+     */
+    public function __construct()
+    {
+        $this->decorator = new Decorator();
+    }
 
 
     /**

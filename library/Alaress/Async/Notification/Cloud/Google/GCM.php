@@ -40,6 +40,7 @@ class GCM extends AbstractService
      */
     public function __construct($apiKey)
     {
+        parent::__construct();
         $this->apiKey = $apiKey;
     }
 

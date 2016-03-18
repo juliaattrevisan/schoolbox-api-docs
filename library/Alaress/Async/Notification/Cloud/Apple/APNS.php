@@ -48,6 +48,7 @@ class APNS extends AbstractService
      */
     public function __construct($environment, $certificatePath, $passPhrase = null)
     {
+        parent::__construct();
         $this->client      = new Client();
         $this->environment = $environment;
         $this->certPath    = $certificatePath;
