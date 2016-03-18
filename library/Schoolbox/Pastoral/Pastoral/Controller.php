@@ -236,7 +236,14 @@ class Controller extends Base
                 'data'     => array(
                     'session'           => $_SESSION,
                     'results'           => $this->getReportData(),
-                    'pastoralModerator' => $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0
+                    'pastoralModerator' => $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0,
+                    'students'          => $this->getRequest()->query["students"],
+                    'authors'           => $this->getRequest()->query["authors"],
+                    'severity'          => $this->getRequest()->query["severity"],
+                    'types'             => $this->getRequest()->query["types"],
+                    'tags'              => $this->getRequest()->query["tags"],
+                    'before'            => $this->getRequest()->query["before"],
+                    'after'             => $this->getRequest()->query["after"],
                 ),
             )
         );
