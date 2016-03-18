@@ -17,6 +17,9 @@ use Component_InstanceMapper;
 use RangeException;
 use Schoolbox\Curriculum;
 use Schoolbox\Collection;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
@@ -36,6 +39,34 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 class Controller extends BaseController
 {
 
+    /**
+     * A FolderMapper instance
+     *
+     * @var FolderMapper
+     */
+    protected $folderMapper = null;
+
+    /**
+     * A SubmissionBoxMapper instance
+     *
+     * @var SubmissionBoxMapper
+     */
+    protected $submissionBoxMapper = null;
+
+    /**
+     * An OnlineAssessmentMapper instance
+     *
+     * @var null
+     */
+    protected $onlineAssessmentMapper = null;
+
+    /**
+     * A TaskMapper instance
+     *
+     * @var null
+     */
+    protected $taskMapper = null;
+
     /** @var CourseMapper */
     protected $courseMapper;
 
@@ -47,9 +78,6 @@ class Controller extends BaseController
 
     /** @var UnitInstanceMapper */
     protected $unitInstanceMapper;
-
-    /** @var TaskMapper */
-    protected $taskMapper;
 
     /** @var HomepageConfigMapper */
     protected $homepageConfigMapper;
@@ -70,6 +98,9 @@ class Controller extends BaseController
     public function __construct()
     {
         $this->setCourseMapper(CourseMapper::getInstance());
+        $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
+        $this->setFolderMapper(FolderMapper::getInstance());
+        $this->setOnlineAssessmentMapper(OnlineAssessmentMapper::getInstance());
         $this->setComponentDefinitionMapper(Component_DefinitionMapper::getInstance());
         $this->setComponentInstanceMapper(Component_InstanceMapper::getInstance());
         $this->setUnitInstanceMapper(UnitInstanceMapper::getInstance());
@@ -734,9 +765,56 @@ class Controller extends BaseController
 
                     // Return the next fragment...
 
+                    // Find all tasks, due work, and quizzes associated with the selected units.
+
+                    $units = new \Schoolbox\Collection;
+
+                    foreach ($unitCache as $key => $unitCurrent)
+                    {
+
+                        $unit = [];
+
+                        $unit['id'] = $unitCurrent->getId();
+                        $unit['name'] = $unitCache[$unitCurrent->getId()]->getName();
+
+                        // Tasks
+
+                        if (!isset($taskCache[$unitCurrent->getId()])) {
+                            $taskCache[$unitCurrent->getId()] = $this->taskMapper
+                                ->findByCategory($unitCache[$unitCurrent->getId()]);
+                        }
+
+                        $unit['tasks'] = $taskCache[$unitCurrent->getId()];
+
+                        // Due work
+
+                        if (!isset($submissionCache[$unitCurrent->getId()])) {
+                            $submissionCache[$unitCurrent->getId()] = $this->submissionBoxMapper
+                                ->findByColumn('category', $unitCurrent->getId());
+                        }
+
+                        $unit['dueWork'] = $submissionCache[$unitCurrent->getId()];
+
+                        // Quizzes
+
+                        if (!isset($quizCache[$unitCurrent->getId()])) {
+                            $quizCache[$unitCurrent->getId()] = $this->onlineAssessmentMapper
+                                ->findByColumn('category_id', $unitCurrent->getId());
+                        }
+
+                        $unit['quizzes'] = $quizCache[$unitCurrent->getId()];
+
+                        $units->add($unit);
+                    }
+
                     $this->getResponse()->content->set([
-                        'format' => 'file',
-                        'data' => 'Insert next fragment here'
+                        'template' => "@course/unitImportResults.twig",
+                        'format' => 'nochrome',
+                        'data' => [
+                            'homepage' => $this->getRequest()->post["homepage"],
+                            'course' => $this->getRequest()->post["course_homepage"],
+                            'units' => $units
+                        ]
                     ]);
 
                 } catch (\InvalidArgumentException $e) {
@@ -941,4 +1019,23 @@ class Controller extends BaseController
         return $this;
     }
 
+    /**
+     * Set task mapper
+     *
+     * @param null $submissionBoxMapper
+     */
+    protected function setSubmissionBoxMapper($submissionBoxMapper)
+    {
+        $this->submissionBoxMapper = $submissionBoxMapper;
+    }
+
+    /**
+     * Set online assessment mapper
+     *
+     * @param null $onlineAssessmentMapper
+     */
+    protected function setOnlineAssessmentMapper($onlineAssessmentMapper)
+    {
+        $this->onlineAssessmentMapper = $onlineAssessmentMapper;
+    }
 }
