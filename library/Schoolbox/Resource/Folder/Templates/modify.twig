@@ -24,6 +24,10 @@
         });
 
         var form = $('#folderForm');
+        var postParams = {
+            id: form.find('input[name="categoryID"]').val()
+        };
+
         form.alaressValidate({
             submitHandler: function(form) {
                 var hasDefaultPerms = $("input[name='group[{{ user.getRole().getId() }}]']:checked").val();
@@ -48,9 +52,9 @@
                 $(this).confirmDialog({
                     text: 'Are you sure you wish to delete this folder?',
                     confirmEvent: function() {
-                        $.post('/resource/folder/delete', {id: {{ folder.getId }}, function () {
+                        $.post('/resource/folder/delete', postParams).done(function () {
                             history.go(-1);
-                        }});
+                        });
                     }
                 });
             });
@@ -62,7 +66,7 @@
                 $(this).confirmDialog({
                     text: 'Are you sure you wish to delete all content from this homepage? This includes:\n - Assessments\n - Blogs\n - Calendar events\n - News\n - Chats\n - Dropbox\n - Files\n - Forums\n - Polls\n - Due Work\n - Surveys\n - TextBoxes\n - Wikis',
                     confirmEvent: function() {
-                        $.post('/resource/folder/reset', {id: {{ folder.getId }} }).done(function() {
+                        $.post('/resource/folder/reset', postParams).done(function() {
                             window.location.href = '/homepage/{{ folder.getId }}';
                         });
                     }
