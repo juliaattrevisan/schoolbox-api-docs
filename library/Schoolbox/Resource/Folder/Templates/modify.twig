@@ -17,9 +17,11 @@
             if ($(event.target).prop('checked')) {
                 $('#permissions').addClass('hide');
                 $('#synergetic-codes').addClass('hide');
+                $("input[name^='groupNone'], input[name^='groupRead'], input[name^='groupWrite']").removeClass('required');
             } else {
                 $('#permissions').removeClass('hide');
                 $('#synergetic-codes').removeClass('hide');
+                $("input[name^='groupNone'], input[name^='groupRead'], input[name^='groupWrite']").addClass('required');
             }
         });
 
