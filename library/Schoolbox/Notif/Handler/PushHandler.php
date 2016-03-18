@@ -42,7 +42,7 @@ class PushHandler extends AbstractProcessingHandler
                 $services[] = new Cloud\Google\GCM($conf->get('push_gcm_api_key'));
             }
             if ($conf->get('push_apns_cert_path')) {
-                $services[] = new Cloud\Apple\APNS(Apns\Client\Message::SANDBOX_URI, $conf->get('push_apns_cert_path'), $conf->get('push_apns_cert_key') ?: null);
+                $services[] = new Cloud\Apple\APNS(Apns\Client\Message::PRODUCTION_URI, $conf->get('push_apns_cert_path'), $conf->get('push_apns_cert_key') ?: null);
             }
         }
 
