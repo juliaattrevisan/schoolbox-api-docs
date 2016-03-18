@@ -9,7 +9,7 @@
 
 namespace Alaress\Async\Notification\Cloud\Apple;
 
-use Alaress\Async\Notification\Cloud\ServiceInterface;
+use Alaress\Async\Notification\Cloud\AbstractService;
 
 use InvalidArgumentException;
 use Schoolbox\MobileApp\Registry;
@@ -25,7 +25,7 @@ use ZendService\Apple\Exception\RuntimeException;
  *
  * @package Alaress\Async\Notification\Cloud\Apple
  */
-class APNS implements ServiceInterface
+class APNS extends AbstractService
 {
 
     /** @var Client */

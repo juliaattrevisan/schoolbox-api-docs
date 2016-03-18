@@ -9,7 +9,7 @@
 
 namespace Alaress\Async\Notification\Cloud\Google;
 
-use Alaress\Async\Notification\Cloud\ServiceInterface;
+use Alaress\Async\Notification\Cloud\AbstractService;
 use Guzzle\Http\Client;
 use OutOfBoundsException;
 use OverflowException;
@@ -24,7 +24,7 @@ use Schoolbox\MobileApp\Registry;
  *
  * @package Alaress\Async\Notification\Cloud\Google
  */
-class GCM implements ServiceInterface
+class GCM extends AbstractService
 {
 
     const GCM_API_URI = 'https://android.googleapis.com/gcm/send';
