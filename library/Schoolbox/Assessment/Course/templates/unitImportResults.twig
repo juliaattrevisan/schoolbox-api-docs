@@ -10,8 +10,8 @@
 
 {# Persist data from previous stages #}
 
-<input type="hidden" name="homepage"        value="{{ homepageId }}" />
-<input type="hidden" name="course_homepage" value="{{ courseHomepageId }}" />
+<input type="hidden" name="homepage"        value="{{ homepage }}" />
+<input type="hidden" name="course_homepage" value="{{ courseHomepage }}" />
 
 {% for unit in unitDates %}
     <input type="hidden" name="unit[{{ loop.index }}][unit_id]" value="{{ unit.unit_id }}">

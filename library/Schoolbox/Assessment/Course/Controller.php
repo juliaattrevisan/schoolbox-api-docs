@@ -514,11 +514,11 @@ class Controller extends BaseController
      */
     public function importUnits()
     {
-        $homepageId       = trim($this->getRequest()->post["importFolders"]);
-        $courseHomepageId = trim($this->getRequest()->post["importCourse"]);
+        $homepage       = trim($this->getRequest()->post["importFolders"]);
+        $courseHomepage = trim($this->getRequest()->post["importCourse"]);
 
         try {
-            $this->getCourseMapper()->findCourseById($courseHomepageId);
+            $this->getCourseMapper()->findCourseById($courseHomepage);
 
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...
@@ -526,19 +526,19 @@ class Controller extends BaseController
             return;
         }
 
-        if ($homepageId == "" && $courseHomepageId == "")
+        if ($homepage == "" && $courseHomepage == "")
         {
             // They didn't select anything
 
             $this->throwError('You must select at least one class and a course to import before you can proceed');
         }
-        else if ($homepageId == "")
+        else if ($homepage == "")
         {
             // They didn't select a class code
 
             $this->throwError('You must select at least one class before you can proceed');
         }
-        else if ($courseHomepageId == "")
+        else if ($courseHomepage == "")
         {
             // They didn't select a course to import
 
@@ -551,9 +551,9 @@ class Controller extends BaseController
                 'template' => "@course/unitImportForm.twig",
                 'format' => 'nochrome',
                 'data' => [
-                    'homepageId' => $homepageId,
-                    'courseHomepageId' => $courseHomepageId,
-                    'units' => $this->getCourseMapper()->findByParentId($courseHomepageId)
+                    'homepage' => $homepage,
+                    'courseHomepage' => $courseHomepage,
+                    'units' => $this->getCourseMapper()->findByParentId($courseHomepage)
                 ]
             ]);
         }
@@ -768,7 +768,6 @@ class Controller extends BaseController
 
                     foreach ($unitCache as $key => $unitCurrent)
                     {
-
                         $unit = [];
 
                         $unit['id'] = $unitCurrent->getId();
@@ -778,10 +777,15 @@ class Controller extends BaseController
 
                         if (!isset($taskCache[$unitCurrent->getId()])) {
                             $taskCache[$unitCurrent->getId()] = $this->taskMapper
-                                ->findByCategory($unitCache[$unitCurrent->getId()]);
+                                ->findByColumnList([
+                                    'category_id' => $unitCache[$unitCurrent->getId()]->getId(),
+                                    'assess_id' => null
+                                ])
+                                ->sortBy('title', 'asc') ;
                         }
 
-                        $unit['tasks'] = $taskCache[$unitCurrent->getId()];
+                        if (isset($taskCache[$unitCurrent->getId()]))
+                            $unit['tasks'] = $taskCache[$unitCurrent->getId()];
 
                         // Due work
 
@@ -809,10 +813,8 @@ class Controller extends BaseController
                         'template' => "@course/unitImportResults.twig",
                         'format' => 'nochrome',
                         'data' => [
-                            'homepageId' => $this->getRequest()->post["homepage"],
-                            'courseHomepageId' => $this->getRequest()->post["course_homepage"],
                             'homepage' => $this->getRequest()->post["homepage"],
-                            'course' => $this->getRequest()->post["course_homepage"],
+                            'courseHomepage' => $this->getRequest()->post["course_homepage"],
                             'unitDates' => $this->getRequest()->post["unit"],
                             'units' => $units
                         ]
@@ -914,11 +916,11 @@ class Controller extends BaseController
 
         // Create course outline component on each homepage
 
-        foreach ($homepages as $homepageId)
+        foreach ($homepages as $homepage)
         {
             // Get the homepage we are importing into and store it for later
 
-            $homepageCache[$homepageId] = $this->getFolderMapper()->findById($homepageId);
+            $homepageCache[$homepage] = $this->getFolderMapper()->findById($homepage);
 
             // Create course outline component on the current page
 
@@ -929,20 +931,20 @@ class Controller extends BaseController
 
             $componentDefinitionId = $componentDefinition->first()->getId();
 
-            $componentCache[$homepageId] = new \Component_Instance();
-            $componentCache[$homepageId]
+            $componentCache[$homepage] = new \Component_Instance();
+            $componentCache[$homepage]
                 ->setDefinitionId($componentDefinitionId)
                 ->setModule('homepage')
-                ->setIdentifier($homepageId)
+                ->setIdentifier($homepage)
                 ->setPosition('top')
                 ->setSequence(1);
 
-            $this->getComponentInstanceMapper()->save($componentCache[$homepageId]);
+            $this->getComponentInstanceMapper()->save($componentCache[$homepage]);
         }
 
         // Create new unit instances in each of these pages/components
 
-        foreach ($homepages as $homepageId)
+        foreach ($homepages as $homepage)
         {
             $unit_instance_list = new Collection();
 
@@ -962,9 +964,9 @@ class Controller extends BaseController
                     $unit_instance
                         ->setWorkDates($this->getRequest()->post["work"])           // Override due work dates in cloner
                         ->setQuizDates($this->getRequest()->post["quiz"])           // Override quiz dates in cloner
-                        ->setComponent($componentCache[$homepageId])
+                        ->setComponent($componentCache[$homepage])
                         ->setTitle($unitCache[$unit['unit_id']]->getName())
-                        ->setCategory($homepageCache[$homepageId])
+                        ->setCategory($homepageCache[$homepage])
                         ->setUnitCategory($unitCache[$unit['unit_id']])
                         ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
                         ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
