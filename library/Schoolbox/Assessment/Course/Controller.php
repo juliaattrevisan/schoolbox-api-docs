@@ -39,32 +39,16 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 class Controller extends BaseController
 {
 
-    /**
-     * A FolderMapper instance
-     *
-     * @var FolderMapper
-     */
+    /** @var FolderMapper */
     protected $folderMapper = null;
 
-    /**
-     * A SubmissionBoxMapper instance
-     *
-     * @var SubmissionBoxMapper
-     */
+    /** @var SubmissionBoxMapper */
     protected $submissionBoxMapper = null;
 
-    /**
-     * An OnlineAssessmentMapper instance
-     *
-     * @var null
-     */
+    /** @var OnlineAssessmentMapper */
     protected $onlineAssessmentMapper = null;
 
-    /**
-     * A TaskMapper instance
-     *
-     * @var null
-     */
+    /** @var TaskMapper */
     protected $taskMapper = null;
 
     /** @var CourseMapper */
@@ -90,7 +74,6 @@ class Controller extends BaseController
 
     /** @var Access */
     protected $access;
-
 
     /**
      * Set dependencies
