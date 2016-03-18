@@ -39,13 +39,13 @@
            data-datepicker-sync-enddate="#work_due_date-{{ work.item.getId }}" />
 </div>
 <div class="small-12 medium-2 columns">
-    <label for="work_late_date-{{ work.getId }}">Late Date</label>
-    <input id="work_late_date-{{ work.getId }}"
-           name="work[{{ work.getId }}][late_date]"
+    <label for="work_late_date-{{ work.item.getId }}">Late Date</label>
+    <input id="work_late_date-{{ work.item.getId }}"
+           name="work[{{ work.item.getId }}][late_date]"
            type="text"
            value="{{ unit.due_date }}"
            data-role="late_date"
            data-datepicker
            data-datepicker-sync
-           data-datepicker-sync-enddate="#work_late_date-{{ work.getId }}" />
+           data-datepicker-sync-enddate="#work_late_date-{{ work.item.getId }}" />
 </div>
