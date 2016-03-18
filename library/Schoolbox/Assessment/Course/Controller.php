@@ -847,9 +847,9 @@ class Controller extends BaseController
 
 
     /*
-     * Do the actual import and create database entries
+     * Do the actual import and create all relevant database entries
      */
-    public function postImportResults()
+    public function importSave()
     {
         // Validate dates before we save
 

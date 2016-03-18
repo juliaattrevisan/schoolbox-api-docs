@@ -59,11 +59,11 @@ class Module extends BaseModule
                 '/unit/new'                             => 'newUnit',
                 '/unit/delete'                          => 'deleteUnit',
                 '/importTasks'                          => 'importTasks',
-                '/importResults'                        => 'postImportResults',
                 '/importUnits'                          => 'importUnits',
+                '/importSave'                           => 'importSave',
                 '/new'                                  => 'createCourse',
                 '/modify/{id}'                          => 'updateCourse',
-                '/finalise'                             => 'persistCourse'
+                '/finalise'                             => 'persistCourse',
             ]
         ];
 
