@@ -67,6 +67,16 @@ class UnitInstance implements ISoftDeletable {
      */
     protected $deleted;
 
+    /**
+     * @var array
+     */
+    protected $workDates;
+
+    /**
+     * @var array
+     */
+    protected $quizDates;
+
     public function __construct() {
         $this->tasks = new Collection();
     }
@@ -293,4 +303,43 @@ class UnitInstance implements ISoftDeletable {
         $date->modify('23:59:59');
         return new Alaress_Date_Format($date);
     }
+
+    /**
+     * Get array of dates for work. Used to override default dates when saving
+     *
+     * @return array
+     */
+    public function getWorkDates() {
+        return $this->workDates;
+    }
+
+    /**
+     * Get array of dates for quizzes. Used to override default dates when saving
+     *
+     * @return array
+     */
+    public function getQuizDates() {
+        return $this->quizDates;
+    }
+
+    /**
+     * Set array of dates for work. Used to override default dates when saving
+     *
+     * @return array
+     */
+    public function setWorkDates($workDates) {
+        $this->workDates = $workDates;
+        return $this;
+    }
+
+    /**
+     * Set array of dates for quizzes. Used to override default dates when saving
+     *
+     * @return array
+     */
+    public function setQuizDates($quizDates) {
+        $this->quizDates = $quizDates;
+        return $this;
+    }
+
 }

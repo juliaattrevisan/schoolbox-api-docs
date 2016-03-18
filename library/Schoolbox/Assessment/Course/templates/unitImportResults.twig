@@ -1,174 +1,66 @@
-{# Iterate through each unit being imported#}
+<!-- BEGIN custom_head -->
+
+<script type="text/javascript" src="/javascript/shared/course/jquery.course-import.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
+<script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
+
+<!-- END custom_head -->
+
+{# Persist data from previous stages #}
+
+<input type="hidden" name="homepage"        value="{{ homepage }}" />
+<input type="hidden" name="course_homepage" value="{{ courseHomepage }}" />
+
+{% for unit in unitDates %}
+<input type="hidden" name="unit[{{ loop.index }}][unit_id]" value="{{ unit.unit_id }}">
+<input type="hidden" name="unit[{{ loop.index }}][import]" value="{{ unit.import }}">
+<input type="hidden" name="unit[{{ loop.index }}][open_date]" value="{{ unit.open_date }}">
+<input type="hidden" name="unit[{{ loop.index }}][due_date]" value="{{ unit.due_date }}">
+{% endfor %}
+
+{# Iterate through each unit being imported #}
 
 {% for unit in units %}
+<div class="row">
+    <div class="small-12 columns">
+        <section>
+            <h3>{{ unit.name }}</h3>
 
-    <h1>{{ unit.name }}</h1>
+            <ul class="information-list no-pad">
 
-    {% if unit.tasks | length > 0 %}
+            {# All work items in the current unit #}
 
-        {# Tasks for the current unit #}
-
-        <h2>Tasks</h2>
-
-        <ul class="information-list">
-
-            {% for task in unit.tasks %}
-
+            {% for work in unit.items %}
                 <li>
                     <div class="list-item" data-type="unit_row">
+                        <input type="hidden" name="submissions" value="{% if work.item.getAcceptOnline %}1{% else %}0{% endif %}">
 
-                        {# Task name #}
-
-                        <div class="avatar card small-12">
-                            {{ task.getTitle }}
-                        </div>
+                        {% if work.class == 'SubmissionBox' %}
+                            {% include '@course/import/submissionBox.twig' %}
+                        {% elseif work.class == 'Task' %}
+                            {% include '@course/import/task.twig' %}
+                        {% elseif work.class == 'OnlineAssessment' %}
+                            {% include '@course/import/quiz.twig' %}
+                        {% endif %}
 
                     </div>
                 </li>
-
             {% endfor %}
-
-        </ul>
-
-    {% endif %}
-
-    {% if unit.dueWork | length > 0 %}
-
-        {# Due work for the current unit #}
-
-        <h2>Due Work</h2>
-
-        <ul class="information-list">
-
-            {% for work in unit.dueWork %}
-
-                <li>
-                    <div class="list-item" data-type="unit_row">
-
-                        {# Due work name #}
-
-                        <div class="avatar card small-4">
-                            {{ work.getName }}
-                        </div>
-
-                        {# Publish Date #}
-
-                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
-                            {% if work.getPublishDate != '' %}
-                                <label for="publish_date-{{ work.getId }}-{{ loop.index }}">Publish Date</label>
-                                <input id=""
-                                       name=""
-                                       type="text"
-                                       value=""
-                                       data-role=""
-                                       data-datepicker />
-
-                            {% endif %}
-                        </div>
-
-                        {# Open Date #}
-
-                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
-                            {% if work.getOpenDate != '' %}
-                                <label for="open_date-{{ work.getId }}-{{ loop.index }}">Open Date</label>
-                                <input id=""
-                                       name=""
-                                       type="text"
-                                       value=""
-                                       data-role=""
-                                       data-datepicker />
-
-                            {% endif %}
-                        </div>
-
-                        {# Due Date #}
-
-                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
-                            {% if work.getDueDate != '' %}
-                                <label for="due_date-{{ work.getId }}-{{ loop.index }}">Due Date</label>
-                                <input id=""
-                                       name=""
-                                       type="text"
-                                       value=""
-                                       data-role=""
-                                       data-datepicker />
-
-                            {% endif %}
-                        </div>
-
-                        {# Late Date #}
-
-                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
-                            {% if work.getLateDate != '' %}
-                                <label for="late_date-{{ work.getId }}-{{ loop.index }}">Late Date</label>
-                                <input id=""
-                                       name=""
-                                       type="text"
-                                       value=""
-                                       data-role=""
-                                       data-datepicker />
-
-                            {% endif %}
-                        </div>
-
-                    </div>
-                </li>
-
-            {% endfor %}
-
-        </ul>
-
-    {% endif %}
-
-    {% if unit.quizzes | length > 0 %}
-
-        {# Tasks for the current unit #}
-
-        <h2>Quizzes</h2>
-
-        <ul class="information-list">
-
-            {% for quiz in unit.quizzes %}
-
-                <li>
-                    <div class="list-item" data-type="unit_row">
-
-                        {# Task name #}
-
-                        <div class="avatar card small-8">
-                            {{ quiz.getTitle }}
-                        </div>
-
-                        {# Open Date #}
-
-                        <div class="medium-2 columns">
-                            <label for="">Open Date</label>
-                            <input id=""
-                                   name=""
-                                   type="text"
-                                   value=""
-                                   data-role=""
-                                   data-datepicker />
-                        </div>
-
-                        {# Close Date #}
-
-                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
-                            <label for="close_date-{{ work.getId }}-{{ loop.index }}">Close Date</label>
-                            <input id=""
-                                   name=""
-                                   type="text"
-                                   value=""
-                                   data-role=""
-                                   data-datepicker />
-                        </div>
-                    </div>
-                </li>
-
-            {% endfor %}
-
-        </ul>
-
-    {% endif %}
-
+            </ul>
+        </section>
+    </div>
+</div>
 {% endfor %}
+
+<div class="small-12 column">
+    <div class="row" data-mage-submitrow>
+        <div class="small-12 medium-8 column">
+            <p class="alert alert-box icon-alert" data-mage-error></p>
+        </div>
+        <div class="small-12 medium-4 column">
+            <input type="submit" name="part-results-select" value="Import" data-mage-next="part-results-select" data-mage-working="Working..." formaction="/course/importSave" />
+        </div>
+    </div>
+</div>

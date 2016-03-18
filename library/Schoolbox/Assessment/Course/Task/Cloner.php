@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 // These are used for older assess export related code:
 // while this is handler-related, it works.
@@ -48,6 +49,11 @@ class Cloner
     protected $category;
 
     /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
      * Creates the cloner, setting up the unit and category objects that are
      * required.
      *
@@ -63,6 +69,17 @@ class Cloner
             $this->unit->getComponent()->getId()
         );
         $this->category = CategoryMapper::getInstance()->findById($component->getIdentifier());
+
+        $this->setErrorMapper(ErrorMapper::getInstance());
+    }
+
+    public function setErrorMapper($errorMapper) {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+    public function getErrorMapper() {
+        return $this->errorMapper;
     }
 
     /**
@@ -76,6 +93,7 @@ class Cloner
     {
         $assess_id = $this->task_instance->getTask()->getAssessment()->getId();
         if ($assess_id) {
+
             $mapper   = OnlineAssessmentMapper::getInstance();
             $handler  = new Assess_Main();
             $section  = new Assess_Section();
@@ -108,17 +126,40 @@ class Cloner
 
             // Get curriculum codes out of old assess
             // (yes, I currently need both the mapper and the handler version!)
-            /** @var OnlineAssessment $oldAssess */
-            $oldAssess = $mapper->findById($assess_id);
-            // And update the mapper version
-            /** @var OnlineAssessment $newAssess */
-            $newAssess = $mapper->findById($newAssessId);
+
+            try {
+                /** @var OnlineAssessment $oldAssess */
+                $oldAssess = $mapper->findById($assess_id);
+                // And update the mapper version
+                /** @var OnlineAssessment $newAssess */
+                $newAssess = $mapper->findById($newAssessId);
+            }
+            catch (\Exception $e) {
+                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            }
+
+            // Get start/finish dates from cloned task
+
+            $start = $this->getOpenTimeFromTask();
+            $finish = $this->getAssessmentCloseTimeFromTask();
+
+            // Check if we need to override the dates
+
+            $quizDates = $this->task_instance->getUnitInstance()->getQuizDates();
+
+            if (is_array($quizDates)) {
+                if (isset($quizDates[$assess_id])) {
+                    $start = \Alaress_Date_Format::newLocalShort($quizDates[$assess_id]['start_date']);
+                    $finish = \Alaress_Date_Format::newLocalShort($quizDates[$assess_id]['finish_date'])->endOfDay();
+                }
+            }
+
             $newAssess
                 ->setTask(null)
                 ->setTaskInstance($this->task_instance)
                 ->setUser($_SESSION['id'])
-                ->setStart($this->getOpenTimeFromTask())
-                ->setFinish($this->getAssessmentCloseTimeFromTask())
+                ->setStart($start)
+                ->setFinish($finish)
                 ->setCurriculumNodes($oldAssess->getCurriculumNodes())
             ;
             $mapper->save($newAssess);
@@ -144,15 +185,34 @@ class Cloner
             } catch (MapperException $e) {
                 throw new ClonerException('No submission box is attached to this task');
             }
+
+            $publish = $this->getOpenTimeFromTask();
+            $open = $this->getOpenTimeFromTask();
+            $due = $this->getSubmissionBoxCloseTimeFromTask();
+            $late = $this->getSubmissionBoxCloseTimeFromTask();
+
+            // Check if we need to override the dates
+
+            $workDates = $this->task_instance->getUnitInstance()->getWorkDates();
+
+            if (is_array($workDates)) {
+                if (isset($workDates[$box_id])) {
+                    $publish = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['publish_date']);
+                    $open = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['open_date']);
+                    $due = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['due_date'])->endOfDay();
+                    $late = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['late_date'])->endOfDay();
+                }
+            }
+
             $box
                 ->setTask(null)
                 ->setTaskInstance($this->task_instance)
                 ->setOwner($_SESSION['id'])
                 ->setCategory($this->category)
-                ->setPublishDate($this->getOpenTimeFromTask())
-                ->setOpenDate($this->getOpenTimeFromTask())
-                ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
-                ->setLateDate($this->getSubmissionBoxCloseTimeFromTask())
+                ->setPublishDate($publish)
+                ->setOpenDate($open)
+                ->setDueDate($due)
+                ->setLateDate($late)
             ;
             SubmissionBoxMapper::getInstance()->create($box);
 
