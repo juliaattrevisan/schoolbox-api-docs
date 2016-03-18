@@ -9,6 +9,8 @@
 namespace Alaress\Async\Notification\Cloud;
 
 
+use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Notification;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\Notification\Decorator;
@@ -58,5 +60,41 @@ abstract class AbstractService implements ServiceInterface
         }
         return $this->log;
     }
+
+
+    /**
+     * @param array $tokens
+     * @param array $data
+     * @throws \Exception
+     * @return bool
+     */
+    public function send(array $tokens, array $data)
+    {
+        // it's like reconstituting orange juice... it's just not right *sigh*
+        $n = new Notification([ Instance::jsonUnserialize($data[0]) ]);
+
+        $id = $n->getId();
+
+        $body  = $n->getMeta('body');
+
+        if ($body) {
+            $title = $this->decorator->renderTitleAsPlaintext($n);
+        } else {
+            $title = 'Your Schoolname';
+            $body  = $this->decorator->renderTitleAsPlaintext($n);
+        }
+
+        return $this->propagate($tokens, $id, $title, $body);
+    }
+
+
+    /**
+     * @param array $tokens
+     * @param string $title
+     * @param string $body
+     * @return bool
+     */
+    protected abstract function propagate(array $tokens, $id, $title, $body);
+
 
 }

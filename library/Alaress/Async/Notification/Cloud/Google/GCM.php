@@ -13,7 +13,6 @@ use Alaress\Async\Notification\Cloud\AbstractService;
 use Guzzle\Http\Client;
 use OutOfBoundsException;
 use OverflowException;
-use RangeException;
 use Schoolbox\MobileApp\Registry;
 
 
@@ -55,17 +54,20 @@ class GCM extends AbstractService
 
 
     /**
-     * @param array $registrationIds
-     * @param array $data
-     * @throws OverflowException     if the intended payload would be too large
-     * @throws OutOfBoundsException  if the GCM API key is invalid
-     * @throws RangeException        if GCM needs us to back off
-     * @return void
+     * @param array  $registrationIds
+     * @param int    $id
+     * @param string $title
+     * @param string $body
+     * @return bool
      */
-    public function send(array $registrationIds, array $data)
+    public function propagate(array $registrationIds, $id, $title, $body)
     {
-        // convert the data to the format the apps expect
-        $data = $this->formatData($data);
+        $data = [
+            'id'      => $id,
+            'title'   => $title,
+            'body'    => $body,
+            'vibrate' => true
+        ];
 
         $apiUri  = self::GCM_API_URI;
         $headers = array(
@@ -97,32 +99,10 @@ class GCM extends AbstractService
                     // your API key is bad: don't try to do anything else
                     throw $e;
                 }
-                // TODO log $e as a non-fatal error
-                echo $e;
+                $this->getLog()->warning($e->getMessage(), [ $e ]);
             }
             // range exception not caught here
         }
-
-    }
-
-
-    /**
-     * Coerce the data into a format the app at the other end expects
-     *
-     * @param array $data
-     * @return array
-     */
-    protected function formatData(array $data)
-    {
-        return $data;
-
-//        TODO hook this up
-//        return [
-//            'id'      => '',
-//            'title'   => '',
-//            'message' => '',
-//            'vibrate' => true,
-//        ];
 
     }
 
