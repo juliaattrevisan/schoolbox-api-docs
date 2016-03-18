@@ -33,37 +33,6 @@
     <div class="off-canvas-wrap docs-wrap" data-offcanvas>
         <div class="inner-wrap">
 
-            <!-- The Schoolbox Hybrid Bar -->
-            <div class="hybrid-bar hide-for-print" id="hybrid-bar">
-                <nav class="tab-bar">
-                    <section class="left-small">
-                        <a class="left-off-canvas-toggle menu-icon hide-for-large-up" href="#"><span></span></a>
-                    </section>
-
-                    <section class="row middle tab-bar-section">
-                        <a href="/" class="logo small-2 columns no-pad">
-                            <img src="/images/logo.php?logo=skin_logo_square&size=normal" srcset="/images/logo.php?logo=skin_logo_square&size=normal 1x,/images/logo.php?logo=skin_logo_square&size=hidpi 2x" alt="{SITE_NAME}"/>
-                        </a>
-
-                        <ul class="icon-nav small-10 columns">
-                            {MAIN_TAB_REGION}
-                        </ul>
-
-                        <form id="search" action="/search" method="get">
-                            <input id="search-field" type="text" name="keyword" placeholder="Search"/>
-                            <label data-jsubmit for="search-field" class="icon-search no-text"></label>
-                        </form>
-                    </section>
-                    <!-- BEGIN instantmessage_toggle -->
-                    <section class="right-small">
-                        <a id="notifier" class="right-off-canvas-toggle icon-notifications" data-unread="{WEBSOCKET_UNREAD_COUNT}">
-                            <span id="unread-count">{WEBSOCKET_UNREAD_LABEL}</span>
-                        </a>
-                    </section>
-                    <!-- END instantmessage_toggle -->
-                </nav>
-            </div>
-
             {INSTANTMESSAGE_BLOCK}
 
             <aside class="left-off-canvas-menu hide-for-print" data-side-nav>
@@ -133,6 +102,37 @@
             <section class="main-section">
                 <div id="header">
                     {MAIN_BANNER_REGION}
+                </div>
+
+                <!-- The Schoolbox Hybrid Bar -->
+                <div class="hybrid-bar hide-for-print" id="hybrid-bar">
+                    <nav class="tab-bar">
+                        <section class="left-small">
+                            <a class="left-off-canvas-toggle menu-icon hide-for-large-up" href="#"><span></span></a>
+                        </section>
+
+                        <section class="row middle tab-bar-section {NOTIFICATION_CLASS}">
+                            <a href="/" class="logo small-2 columns no-pad">
+                                <img src="/images/logo.php?logo=skin_logo_square&size=normal" srcset="/images/logo.php?logo=skin_logo_square&size=normal 1x,/images/logo.php?logo=skin_logo_square&size=hidpi 2x" alt="{SITE_NAME}"/>
+                            </a>
+
+                            <ul class="icon-nav small-10 columns">
+                                {MAIN_TAB_REGION}
+                            </ul>
+
+                            <form id="search" action="/search" method="get">
+                                <input id="search-field" type="text" name="keyword" placeholder="Search"/>
+                                <label data-jsubmit for="search-field" class="icon-search no-text"></label>
+                            </form>
+                        </section>
+                        <!-- BEGIN instantmessage_toggle -->
+                        <section class="right-small">
+                            <a id="notifier" class="right-off-canvas-toggle icon-notifications" data-unread="{WEBSOCKET_UNREAD_COUNT}">
+                                <span id="unread-count">{WEBSOCKET_UNREAD_LABEL}</span>
+                            </a>
+                        </section>
+                        <!-- END instantmessage_toggle -->
+                    </nav>
                 </div>
 
                 <div id="container">
