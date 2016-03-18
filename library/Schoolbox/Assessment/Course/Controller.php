@@ -897,7 +897,7 @@ class Controller extends BaseController
         // Test course page read access
 
         if (Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
-            throw new Authorizer\Failure\Unauthorized;
+            throw new \Alaress\Authorizer\Failure\Unauthorized;
         }
 
         // Test each homepage for write access
@@ -956,22 +956,30 @@ class Controller extends BaseController
                 {
                     // Save the unit into the course.
 
-                    if (!isset($unitCache[$unit['unit_id']]))
-                        $unitCache[$unit['unit_id']] = $this->getFolderMapper()->findById($unit['unit_id']);
+                    try {
+                        if (!isset($unitCache[$unit['unit_id']])) {
+                            $unitCache[$unit['unit_id']] = $this->getFolderMapper()->findById($unit['unit_id']);
+                        }
+                    } catch (\Exception $e) {
+                        $this->throwError('An unexpected error occurred');
+                        return;
+                    }
 
-                    $unit_instance = new UnitInstance();
+                    if (isset($unitCache[$unit['unit_id']])) {
+                        $unit_instance = new UnitInstance();
 
-                    $unit_instance
-                        ->setWorkDates($this->getRequest()->post["work"])           // Override due work dates in cloner
-                        ->setQuizDates($this->getRequest()->post["quiz"])           // Override quiz dates in cloner
-                        ->setComponent($componentCache[$homepage])
-                        ->setTitle($unitCache[$unit['unit_id']]->getName())
-                        ->setCategory($homepageCache[$homepage])
-                        ->setUnitCategory($unitCache[$unit['unit_id']])
-                        ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
-                        ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
+                        $unit_instance
+                            ->setWorkDates($this->getRequest()->post["work"])// Override due work dates in cloner
+                            ->setQuizDates($this->getRequest()->post["quiz"])// Override quiz dates in cloner
+                            ->setComponent($componentCache[$homepage])
+                            ->setTitle($unitCache[$unit['unit_id']]->getName())
+                            ->setCategory($homepageCache[$homepage])
+                            ->setUnitCategory($unitCache[$unit['unit_id']])
+                            ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
+                            ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
 
-                    $unit_instance_list->add($unit_instance);
+                        $unit_instance_list->add($unit_instance);
+                    }
                 }
             }
 

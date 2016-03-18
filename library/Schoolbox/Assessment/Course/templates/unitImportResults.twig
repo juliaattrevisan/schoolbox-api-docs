@@ -28,167 +28,180 @@
     <div class="row">
         <h1 class='subheader'>{{ unit.name }}</h1>
         <div class="small-12 island">
-            <ul class="information-list no-pad">
 
-                {% if unit.dueWork | length > 0 %}
+            {% if unit.dueWork | length > 0 %}
 
-                    {# Due work for the current unit #}
+                <h2 class="subheader">Due Work</h2>
+                <ul class="information-list no-pad">
 
-                    {% for work in unit.dueWork %}
+                {# Due work for the current unit #}
 
-                        <li>
-                            <div class="list-item" data-type="unit_row">
+                {% for work in unit.dueWork %}
 
-                                {# Due work name #}
+                    <li>
+                        <div class="list-item" data-type="unit_row">
 
-                                <div class="avatar card small-12 medium-4">
-                                    {{ work.getName }}
-                                </div>
+                            {# Due work name #}
 
-                                {# Publish Date #}
-
-                                <div class="small-12 medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
-                                    {% if work.getPublishDate != '' %}
-                                        <label for="work_publish_date-{{ work.getId }}">Publish Date</label>
-                                        <input id="work_publish_date-{{ work.getId }}"
-                                               name="work[{{ work.getId }}][publish_date]"
-                                               type="text"
-                                               value="{{ work.getPublishDate.getLocalShort }}"
-                                               data-role="publish_date"
-                                               data-datepicker
-                                               data-datepicker-sync
-                                               data-datepicker-sync-enddate="#work_publish_date-{{ work.getId }}" />
-                                    {% endif %}
-                                </div>
-
-                                {# Due Date #}
-
-                                <div class="small-12 medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
-                                    {% if work.getDueDate != '' %}
-                                        <label for="work_due_date-{{ work.getId }}">Due Date</label>
-                                        <input id="work_due_date-{{ work.getId }}"
-                                               name="work[{{ work.getId }}][due_date]"
-                                               type="text"
-                                               value="{{ work.getDueDate.getLocalShort }}"
-                                               data-role="due_date"
-                                               data-datepicker
-                                               data-datepicker-sync
-                                               data-datepicker-sync-enddate="#work_due_date-{{ work.getId }}" />
-                                    {% endif %}
-                                </div>
-
-                                <input type="hidden" name="submissions" value="{% if work.getAcceptOnline %}1{% else %}0{% endif %}">
-
-                                {% if work.getAcceptOnline %}
-
-                                    {# Open Date #}
-
-                                    <div class="small-12 medium-2 columns" data-hide-watch="#import-work-{{ work.getId }}">
-                                        <label for="work_open_date-{{ work.getId }}">Open Date</label>
-                                        <input id="work_open_date-{{ work.getId }}"
-                                               name="work[{{ work.getId }}][open_date]"
-                                               type="text"
-                                               value="{{ work.getOpenDate.getLocalShort }}"
-                                               data-role="open_date"
-                                               data-datepicker
-                                               data-datepicker-sync
-                                               data-datepicker-sync-enddate="#work_open_date-{{ work.getId }}" />
-                                    </div>
-
-                                    {# Late Date #}
-
-                                    <div class="small-12 medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
-                                        <label for="work_late_date-{{ work.getId }}">Late Date</label>
-                                        <input id="work_late_date-{{ work.getId }}"
-                                               name="work[{{ work.getId }}][late_date]"
-                                               type="text"
-                                               value="{{ work.getLateDate.getLocalShort }}"
-                                               data-role="late_date"
-                                               data-datepicker
-                                               data-datepicker-sync
-                                               data-datepicker-sync-enddate="#work_late_date-{{ work.getId }}" />
-                                    </div>
-
-                                {% endif %}
-
+                            <div class="avatar card small-12 medium-4">
+                                {{ work.getName }}
                             </div>
-                        </li>
 
-                    {% endfor %}
+                            {# Publish Date #}
 
-                {% endif %}
+                            <div class="small-12 medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                                {% if work.getPublishDate != '' %}
+                                    <label for="work_publish_date-{{ work.getId }}">Publish Date</label>
+                                    <input id="work_publish_date-{{ work.getId }}"
+                                           name="work[{{ work.getId }}][publish_date]"
+                                           type="text"
+                                           value="{{ work.getPublishDate.getLocalShort }}"
+                                           data-role="publish_date"
+                                           data-datepicker
+                                           data-datepicker-sync
+                                           data-datepicker-sync-enddate="#work_publish_date-{{ work.getId }}" />
+                                {% endif %}
+                            </div>
 
-                {% if unit.quizzes | length > 0 %}
+                            {# Due Date #}
 
-                    {# Quizzes for the current unit #}
+                            <div class="small-12 medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                                {% if work.getDueDate != '' %}
+                                    <label for="work_due_date-{{ work.getId }}">Due Date</label>
+                                    <input id="work_due_date-{{ work.getId }}"
+                                           name="work[{{ work.getId }}][due_date]"
+                                           type="text"
+                                           value="{{ work.getDueDate.getLocalShort }}"
+                                           data-role="due_date"
+                                           data-datepicker
+                                           data-datepicker-sync
+                                           data-datepicker-sync-enddate="#work_due_date-{{ work.getId }}" />
+                                {% endif %}
+                            </div>
 
-                    {% for quiz in unit.quizzes %}
+                            <input type="hidden" name="submissions" value="{% if work.getAcceptOnline %}1{% else %}0{% endif %}">
 
-                        <li>
-                            <div class="list-item" data-type="unit_row">
-
-                                {# Task name #}
-
-                                <div class="avatar card small-12 medium-4">
-                                    {{ quiz.getTitle }}
-                                </div>
+                            {% if work.getAcceptOnline %}
 
                                 {# Open Date #}
 
-                                <div class="small-12 medium-2 columns">
-                                    <label for="quiz_start_date-{{ quiz.getId }}">Start Date</label>
-                                    <input id="quiz_start_date-{{ quiz.getId }}"
-                                           name="quiz[{{ quiz.getId }}][start_date]"
+                                <div class="small-12 medium-2 columns" data-hide-watch="#import-work-{{ work.getId }}">
+                                    <label for="work_open_date-{{ work.getId }}">Open Date</label>
+                                    <input id="work_open_date-{{ work.getId }}"
+                                           name="work[{{ work.getId }}][open_date]"
                                            type="text"
-                                           value="{{ quiz.getStart.getLocalShort }}"
-                                           data-role="start_date"
+                                           value="{{ work.getOpenDate.getLocalShort }}"
+                                           data-role="open_date"
                                            data-datepicker
                                            data-datepicker-sync
-                                           data-datepicker-sync-enddate="#quiz_start_date-{{ quiz.getId }}" />
+                                           data-datepicker-sync-enddate="#work_open_date-{{ work.getId }}" />
                                 </div>
 
-                                {# Close Date #}
+                                {# Late Date #}
 
                                 <div class="small-12 medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
-                                    <label for="quiz_finish_date-{{ quiz.getId }}">Finish Date</label>
-                                    <input id="quiz_finish_date-{{ quiz.getId }}"
-                                           name="quiz[{{ quiz.getId }}][finish_date]"
+                                    <label for="work_late_date-{{ work.getId }}">Late Date</label>
+                                    <input id="work_late_date-{{ work.getId }}"
+                                           name="work[{{ work.getId }}][late_date]"
                                            type="text"
-                                           value="{{ quiz.getFinish.getLocalShort }}"
-                                           data-role="finish_date"
+                                           value="{{ work.getLateDate.getLocalShort }}"
+                                           data-role="late_date"
                                            data-datepicker
                                            data-datepicker-sync
-                                           data-datepicker-sync-enddate="#quiz_finish_date-{{ quiz.getId }}" />
+                                           data-datepicker-sync-enddate="#work_late_date-{{ work.getId }}" />
                                 </div>
 
-                                <div class="small-12 medium-4 columns"></div>
+                            {% endif %}
+
+                        </div>
+                    </li>
+
+                {% endfor %}
+
+                </ul>
+
+            {% endif %}
+
+            {% if unit.quizzes | length > 0 %}
+
+                <h2 class="subheader">Quizzes</h2>
+                <ul class="information-list no-pad">
+
+                {# Quizzes for the current unit #}
+
+                {% for quiz in unit.quizzes %}
+
+                    <li>
+                        <div class="list-item" data-type="unit_row">
+
+                            {# Task name #}
+
+                            <div class="avatar card small-12 medium-4">
+                                {{ quiz.getTitle }}
                             </div>
-                        </li>
 
-                    {% endfor %}
+                            {# Open Date #}
 
-                {% endif %}
-
-                {% if unit.tasks | length > 0 %}
-
-                    {# Tasks for the current unit #}
-
-                    {% for task in unit.tasks %}
-                        <li>
-                            <div class="list-item" data-type="unit_row">
-
-                                {# Due work name #}
-
-                                <div class="avatar card compact small-12 medium-4">
-                                    {{ task.getTitle }}
-                                </div>
+                            <div class="small-12 medium-2 columns">
+                                <label for="quiz_start_date-{{ quiz.getId }}">Start Date</label>
+                                <input id="quiz_start_date-{{ quiz.getId }}"
+                                       name="quiz[{{ quiz.getId }}][start_date]"
+                                       type="text"
+                                       value="{{ quiz.getStart.getLocalShort }}"
+                                       data-role="start_date"
+                                       data-datepicker
+                                       data-datepicker-sync
+                                       data-datepicker-sync-enddate="#quiz_start_date-{{ quiz.getId }}" />
                             </div>
-                        </li>
-                    {% endfor %}
 
-                {% endif %}
+                            {# Close Date #}
 
-            </ul>
+                            <div class="small-12 medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                                <label for="quiz_finish_date-{{ quiz.getId }}">Finish Date</label>
+                                <input id="quiz_finish_date-{{ quiz.getId }}"
+                                       name="quiz[{{ quiz.getId }}][finish_date]"
+                                       type="text"
+                                       value="{{ quiz.getFinish.getLocalShort }}"
+                                       data-role="finish_date"
+                                       data-datepicker
+                                       data-datepicker-sync
+                                       data-datepicker-sync-enddate="#quiz_finish_date-{{ quiz.getId }}" />
+                            </div>
+
+                            <div class="small-12 medium-4 columns"></div>
+                        </div>
+                    </li>
+
+                {% endfor %}
+
+                </ul>
+
+            {% endif %}
+
+            {% if unit.tasks | length > 0 %}
+
+                <h2 class="subheader">Tasks</h2>
+                <ul class="information-list no-pad">
+
+                {# Tasks for the current unit #}
+
+                {% for task in unit.tasks %}
+                    <li>
+                        <div class="list-item" data-type="unit_row">
+
+                            {# Due work name #}
+
+                            <div class="avatar card compact small-12 medium-4">
+                                {{ task.getTitle }}
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+
+                </ul>
+
+            {% endif %}
+
         </div>
     </div>
 </div>
