@@ -26,18 +26,29 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'getReportBuilder',     $basePath, "/report-builder");
-        $this->addGetRoute($router, 'getReport',            $basePath, "/report");
-        $this->addGetRoute($router, 'getReportPrint',       $basePath, "/report-print");
-        $this->addGetRoute($router, 'getInsert',            $basePath, "/insert/{id}");
-        $this->addGetRoute($router, 'getUpdate',            $basePath, "/update/{id}");
-        $this->addGetRoute($router, 'getRecord',            $basePath, "/{studentId}/{id}");
-        $this->addGetRoute($router, 'getIndex',             $basePath, "/{id}");
+        $routes = [
+            'GET' => [
+                '/report-builder'   => 'getReportBuilder',
+                '/report'           => 'getReport',
+                '/report-print'     => 'getReportPrint',
+                '/insert/{id}'      => 'getInsert',
+                '/update/{id}'      => 'getUpdate',
+                '/{studentId}/{id}' => 'getRecord',
+                '/{id}'             => 'getIndex',
+            ],
+            'POST' => [
+                '/save'             => 'postSave',
+                '/comment'          => 'postComment',
+                '/comment-delete'   => 'postCommentDelete',
+                '/delete'           => 'postDelete',
+            ]
+        ];
 
-        $this->addPostRoute($router, 'postSave',            $basePath, "/save");
-        $this->addPostRoute($router, 'postComment',         $basePath, "/comment");
-        $this->addPostRoute($router, 'postCommentDelete',   $basePath, "/commentDelete");
-        $this->addPostRoute($router, 'postDelete',          $basePath, "/delete");
+        foreach ($routes['GET'] as $path => $alias)
+            $this->addGetRoute($router, $alias, $basePath, $path);
+
+        foreach ($routes['POST'] as $path => $alias)
+            $this->addPostRoute($router, $alias, $basePath, $path);
     }
 
     /**

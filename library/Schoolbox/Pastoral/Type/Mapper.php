@@ -9,8 +9,6 @@
 
 namespace Schoolbox\Pastoral\Type;
 
-use PDO;
-use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;

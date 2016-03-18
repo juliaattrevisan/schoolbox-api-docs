@@ -22,10 +22,13 @@ use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Comment\Model as PastoralCommentModel;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
+use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Schoolbox\Pastoral\Tags\Mapper as PastoralTagsMapper;
 use Schoolbox\Pastoral\Tags\Model as PastoralTagsModel;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Zone;
@@ -655,8 +658,11 @@ class Controller extends Base
                 }
 
                 try {
+                    /** @var User $student */
                     $student = $this->getUserMapper()->findById($student_id);
+                    /** @var PastoralTypeModel $type */
                     $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
+                    /** @var PastoralSeverityModel $severity */
                     $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
                 } catch (\Exception $e) {
                     $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
@@ -762,7 +768,9 @@ class Controller extends Base
             }
 
             try {
+                /** @var PastoralTypeModel $type */
                 $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
+                /** @var PastoralSeverityModel $severity */
                 $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
             } catch (\Exception $e) {
                 $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
@@ -970,6 +978,7 @@ class Controller extends Base
 
             // Send instant notifications - Must talk to doctor and change this to digestable notification
 
+            /*
             if ($this->getRequest()->post["notify"] == 1) {
 
                 try {
@@ -1039,6 +1048,7 @@ class Controller extends Base
                     $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
                 }
             }
+            */
         }
 
         // Go back to students pastoral record
