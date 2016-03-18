@@ -49,22 +49,32 @@
 
         $('input[data-mage-next]').mage();
 
-        $('input[data-mage-next="part-unit-select"]').mage({onXhrDone: function(data) {
-            // set content
+        {# Init stage 1 mage #}
+
+        $('input[data-mage-next="part-unit-select"]').mage({onXhrDone: function(data)
+        {
             $('#importUnits').html(data);
 
-            {# After loading in the next fragment init the mage #}
+            {# Init stage 2 mage #}
 
-            $('input[data-mage-next="part-tasks-select"]').mage({onXhrDone: function(data) {
-
+            $('input[data-mage-next="part-tasks-select"]').mage({onXhrDone: function(data)
+            {
                 // slide away the things we're not using
+
                 $('#importUnits').find('input[type=checkbox]').filter(':not(:checked)').closest('li').slideUp();
 
                 // set content
+
                 $('#importTasks').html(data);
+
+                {# Init stage 3 mages #}
+
+                $('input[data-mage-next="part-results-select"]').mage({onXhrDone: function(data)
+                {
+                    alert('Import Completed. YAY!');
+                }});
             }});
         }});
-
     });
 </script>
 

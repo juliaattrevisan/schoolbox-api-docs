@@ -508,7 +508,6 @@ class Controller extends BaseController
         $this->tpl('import/results', $importer->findUnitsAndTasks($courseId));
     }
 
-
     /**
      * Save the given template for the given folder
      *
@@ -566,7 +565,6 @@ class Controller extends BaseController
             $this->recurseInheritance($folder);
         }
     }
-
 
     /**
      * Retrieve fragment with units in the selected course, and checkboxes/dates for selection
@@ -676,7 +674,7 @@ class Controller extends BaseController
 
             // Check all required dates have been specified
 
-            $error = false;
+            $errorDate = false;
             $foundUnit = false;
 
             foreach ($this->getRequest()->post["unit"] as $unit) {
@@ -686,7 +684,7 @@ class Controller extends BaseController
                     $foundUnit = true;
                     if (trim($unit['open_date']) == '' || trim($unit['due_date']) == '') {
                         $this->throwError('You must specify an open and close date for each unit you are importing');
-                        $error = true;
+                        $errorDate = true;
                         break;
                     }
                 }
@@ -700,6 +698,11 @@ class Controller extends BaseController
             else
             {
                 // Create the component on each homepage
+                // Make sure dates were valid
+
+                if ($errorDate) {
+                    return;
+                }
 
                 /** @var Category[] $unitCache */
                 $unitCache = [];
@@ -728,7 +731,7 @@ class Controller extends BaseController
                     $this->getComponentInstanceMapper()->save($componentCache[$homepageId]);
                 }
 
-                if ($error) {
+                if ($errorDate) {
                     return;
                 }
                 try {
@@ -746,6 +749,7 @@ class Controller extends BaseController
                                 if (!isset($unitCache[$unit['unit_id']])) {
                                     $unitCache[$unit['unit_id']] = $this->getCourseMapper()->findById($unit['unit_id']);
                                 }
+
                                 $unit_instance = new UnitInstance();
 
                                 $unit_instance
@@ -811,8 +815,11 @@ class Controller extends BaseController
                         'template' => "@course/unitImportResults.twig",
                         'format' => 'nochrome',
                         'data' => [
+                            'homepageId' => $this->getRequest()->post["homepage"],
+                            'courseHomepageId' => $this->getRequest()->post["course_homepage"],
                             'homepage' => $this->getRequest()->post["homepage"],
                             'course' => $this->getRequest()->post["course_homepage"],
+                            'unitDates' => $this->getRequest()->post["unit"],
                             'units' => $units
                         ]
                     ]);
@@ -839,9 +846,140 @@ class Controller extends BaseController
     }
 
 
+    /*
+     * Do the actual import and create database entries
+     */
+    public function postImportResults()
+    {
+        // Validate dates before we save
+
+        foreach ($this->getRequest()->post["work"] as $work) {
+            if (trim($work['publish_date']) == '') {
+                $this->throwError('You must enter a publish date for each due work item before you can proceed.');
+                return;
+            } else if (trim($work['due_date']) == '') {
+                $this->throwError('You must enter a due date for each due work item before you can proceed.');
+                return;
+            }
+
+            // Accepting submissions, must have the other two dates
+
+            if ($work['submissions'] == '1') {
+                if (trim($work['open_date']) == '') {
+                    $this->throwError('You must enter an open date for each due work item that accepts submissions before you can proceed.');
+                    return;
+                } else if (trim($work['late_date']) == '') {
+                    $this->throwError('You must enter a late date for each due work item that accepts submissions before you can proceed.');
+                    return;
+                }
+            }
+        }
+        foreach ($this->getRequest()->post["quiz"] as $quiz) {
+
+            if (trim($quiz['start_date']) == '') {
+                $this->throwError('You must enter a start date for each quiz before you can proceed.');
+                return;
+            } else if (trim($quiz['finish_date']) == '') {
+                $this->throwError('You must enter a finish date for each quiz before you can proceed.');
+                return;
+            }
+        }
+
+        $this->throwError('Yep');
+        return;
+
+        // Parse homepages out of CSV format into an array
+
+        $homepages = explode(",", $this->getRequest()->post["homepage"]);
+
+        // Test permissions for each homepage. Must have write permission on the destination page and read permission
+        // on the course we are trying to import.
+
+        // Test course page read access
+
+        if (Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
+            throw new Authorizer\Failure\Unauthorized;
+        }
+
+        // Test each homepage for write access
+
+        foreach ($homepages as $homepage) {
+            if (Access::getInstance()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
+                throw new \Alaress\Authorizer\Failure\Unauthorized;
+            }
+        }
+
+        // Keep a cache of queried data
+
+        $unitCache = [];
+        $homepageCache = [];
+        $componentCache = [];
+
+        // Create course outline component on each homepage
+
+        foreach ($homepages as $homepageId)
+        {
+            // Get the homepage we are importing into and store it for later
+
+            $homepageCache[$homepageId] = FolderMapper::getInstance()->findById($homepageId);
+
+            // Create course outline component on the current page
+
+            $componentDefinition = \Component_DefinitionMapper::getInstance()->findByColumn(
+                'class',
+                'Component_Homepage_CourseOutlineController'
+            );
+
+            $componentDefinitionId = $componentDefinition->first()->getId();
+
+            $componentCache[$homepageId] = new \Component_Instance();
+            $componentCache[$homepageId]
+                ->setDefinitionId($componentDefinitionId)
+                ->setModule('homepage')
+                ->setIdentifier($homepageId)
+                ->setPosition('top')
+                ->setSequence(1);
+
+            \Component_InstanceMapper::getInstance()->save($componentCache[$homepageId]);
+        }
+
+        // Create new unit instances in each of these pages/components
+
+        foreach ($homepages as $homepageId)
+        {
+            $unit_instance_list = new Collection();
+
+            foreach ($this->getRequest()->post["unit"] as $unit)
+            {
+                $import = !empty($unit['import']);
+
+                if ($import)
+                {
+                    // Save the unit into the course.
+
+                    if (!isset($unitCache[$unit['unit_id']]))
+                        $unitCache[$unit['unit_id']] = FolderMapper::getInstance()->findById($unit['unit_id']);
+
+                    $unit_instance = new UnitInstance();
+
+                    $unit_instance
+                        ->setComponent($componentCache[$homepageId])
+                        ->setTitle($unitCache[$unit['unit_id']]->getName())
+                        ->setCategory($homepageCache[$homepageId])
+                        ->setUnitCategory($unitCache[$unit['unit_id']])
+                        ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
+                        ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
+
+                    $unit_instance_list->add($unit_instance);
+                }
+            }
+
+            UnitInstanceMapper::getInstance()->save($unit_instance_list);
+        }
+    }
+
     /* Getters/Setters
      */
-
 
     /**
      * @return \Schoolbox\Assessment\Course\Mapper

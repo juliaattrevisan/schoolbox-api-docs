@@ -8,7 +8,19 @@
 
 <!-- END custom_head -->
 
-{# Iterate through each unit being imported#}
+{# Persist data from previous stages #}
+
+<input type="hidden" name="homepage"        value="{{ homepageId }}" />
+<input type="hidden" name="course_homepage" value="{{ courseHomepageId }}" />
+
+{% for unit in unitDates %}
+    <input type="hidden" name="unit[{{ loop.index }}][unit_id]" value="{{ unit.unit_id }}">
+    <input type="hidden" name="unit[{{ loop.index }}][import]" value="{{ unit.import }}">
+    <input type="hidden" name="unit[{{ loop.index }}][open_date]" value="{{ unit.open_date }}">
+    <input type="hidden" name="unit[{{ loop.index }}][due_date]" value="{{ unit.due_date }}">
+{% endfor %}
+
+{# Iterate through each unit being imported #}
 
 {% for unit in units %}
 
@@ -19,9 +31,18 @@
         {# Tasks for the current unit #}
 
         <h2>Tasks</h2>
-        <ul class="information-list">
+        <ul class="information-list no-pad">
             {% for task in unit.tasks %}
-                <li>{{ task.getTitle }}</li>
+                <li>
+                    <div class="list-item" data-type="unit_row">
+
+                        {# Due work name #}
+
+                        <div class="avatar card small-4">
+                            {{ task.getTitle }}
+                        </div>
+                    </div>
+                </li>
             {% endfor %}
         </ul>
 
@@ -48,13 +69,13 @@
 
                         {# Publish Date #}
 
-                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                        <div class="small-2 columns" data-hide-watch="#import-{{ loop.index }}">
                             {% if work.getPublishDate != '' %}
                                 <label for="work_publish_date-{{ work.getId }}">Publish Date</label>
                                 <input id="work_publish_date-{{ work.getId }}"
-                                       name="unit[{{ work.getId }}][publish_date]"
+                                       name="work[{{ work.getId }}][publish_date]"
                                        type="text"
-                                       value="{{ work.getPublishDate }}"
+                                       value="{{ work.getPublishDate.getLocalShort }}"
                                        data-role="publish_date"
                                        data-datepicker
                                        data-datepicker-sync
@@ -62,32 +83,15 @@
                             {% endif %}
                         </div>
 
-                        {# Open Date #}
-
-                        <div class="medium-2 columns" data-hide-watch="#import-work-{{ work.getId }}">
-                            {% if work.getOpenDate != '' %}
-                                <label for="work_open_date-{{ work.getId }}">Open Date</label>
-                                <input id="work_open_date-{{ work.getId }}"
-                                       name="unit[{{ work.getId }}][open_date]"
-                                       type="text"
-                                       value="{{ work.getOpenDate }}"
-                                       data-role="open_date"
-                                       data-datepicker
-                                       data-datepicker-sync
-                                       data-datepicker-sync-enddate="#work_open_date-{{ work.getId }}" />
-                            {% endif %}
-
-                        </div>
-
                         {# Due Date #}
 
-                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                        <div class="small-2 columns" data-hide-watch="#import-{{ loop.index }}">
                             {% if work.getDueDate != '' %}
                                 <label for="work_due_date-{{ work.getId }}">Due Date</label>
                                 <input id="work_due_date-{{ work.getId }}"
-                                       name="unit[{{ work.getId }}][due_date]"
+                                       name="work[{{ work.getId }}][due_date]"
                                        type="text"
-                                       value="{{ work.getDueDate }}"
+                                       value="{{ work.getDueDate.getLocalShort }}"
                                        data-role="due_date"
                                        data-datepicker
                                        data-datepicker-sync
@@ -95,21 +99,39 @@
                             {% endif %}
                         </div>
 
-                        {# Late Date #}
+                        <input type="hidden" name="submissions" value="{% if work.getAcceptOnline %}1{% else %}0{% endif %}">
 
-                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
-                            {% if work.getLateDate != '' %}
+                        {% if work.getAcceptOnline %}
+
+                            {# Open Date #}
+
+                            <div class="small-2 columns" data-hide-watch="#import-work-{{ work.getId }}">
+                                <label for="work_open_date-{{ work.getId }}">Open Date</label>
+                                <input id="work_open_date-{{ work.getId }}"
+                                       name="work[{{ work.getId }}][open_date]"
+                                       type="text"
+                                       value="{{ work.getOpenDate.getLocalShort }}"
+                                       data-role="open_date"
+                                       data-datepicker
+                                       data-datepicker-sync
+                                       data-datepicker-sync-enddate="#work_open_date-{{ work.getId }}" />
+                            </div>
+
+                            {# Late Date #}
+
+                            <div class="small-2 columns" data-hide-watch="#import-{{ loop.index }}">
                                 <label for="work_late_date-{{ work.getId }}">Late Date</label>
                                 <input id="work_late_date-{{ work.getId }}"
-                                       name="unit[{{ work.getId }}][late_date]"
+                                       name="work[{{ work.getId }}][late_date]"
                                        type="text"
-                                       value="{{ work.getLateDate }}"
+                                       value="{{ work.getLateDate.getLocalShort }}"
                                        data-role="late_date"
                                        data-datepicker
                                        data-datepicker-sync
                                        data-datepicker-sync-enddate="#work_late_date-{{ work.getId }}" />
-                            {% endif %}
-                        </div>
+                            </div>
+
+                        {% endif %}
 
                     </div>
                 </li>
@@ -135,37 +157,39 @@
 
                         {# Task name #}
 
-                        <div class="avatar card small-8">
+                        <div class="avatar card small-4">
                             {{ quiz.getTitle }}
                         </div>
 
                         {# Open Date #}
 
-                        <div class="medium-2 columns">
-                            <label for="quiz_open_date-{{ quiz.getId }}">Open Date</label>
-                            <input id="quiz_open_date-{{ quiz.getId }}"
-                                   name="unit[{{ quiz.getId }}][open_date]"
+                        <div class="small-2 columns">
+                            <label for="quiz_start_date-{{ quiz.getId }}">Start Date</label>
+                            <input id="quiz_start_date-{{ quiz.getId }}"
+                                   name="quiz[{{ quiz.getId }}][start_date]"
                                    type="text"
-                                   value="{{ quiz.getOpenDate }}"
-                                   data-role="open_date"
+                                   value="{{ quiz.getStart.getLocalShort }}"
+                                   data-role="start_date"
                                    data-datepicker
                                    data-datepicker-sync
-                                   data-datepicker-sync-enddate="#quiz_open_date-{{ quiz.getId }}" />
+                                   data-datepicker-sync-enddate="#quiz_start_date-{{ quiz.getId }}" />
                         </div>
 
                         {# Close Date #}
 
-                        <div class="medium-2 columns" data-hide-watch="#import-{{ loop.index }}">
-                            <label for="quiz_close_date-{{ quiz.getId }}">Close Date</label>
-                            <input id="quiz_close_date-{{ quiz.getId }}"
-                                   name="unit[{{ quiz.getId }}][close_date]"
+                        <div class="small-2 columns" data-hide-watch="#import-{{ loop.index }}">
+                            <label for="quiz_finish_date-{{ quiz.getId }}">Finish Date</label>
+                            <input id="quiz_finish_date-{{ quiz.getId }}"
+                                   name="quiz[{{ quiz.getId }}][finish_date]"
                                    type="text"
-                                   value="{{ quiz.getCloseDate }}"
-                                   data-role="close_date"
+                                   value="{{ quiz.getFinish.getLocalShort }}"
+                                   data-role="finish_date"
                                    data-datepicker
                                    data-datepicker-sync
-                                   data-datepicker-sync-enddate="#quiz_close_date-{{ quiz.getId }}" />
+                                   data-datepicker-sync-enddate="#quiz_finish_date-{{ quiz.getId }}" />
                         </div>
+
+                        <div class="small-4 columns"></div>
                     </div>
                 </li>
 
@@ -176,3 +200,14 @@
     {% endif %}
 
 {% endfor %}
+
+<div class="small-12 column">
+    <div class="row" data-mage-submitrow>
+        <div class="small-12 medium-8 column">
+            <p class="alert alert-box icon-alert" data-mage-error></p>
+        </div>
+        <div class="small-12 medium-4 column">
+            <input type="submit" name="part-results-select" value="Import" data-mage-next="part-results-select" data-mage-working="Working..." formaction="/course/importResults" />
+        </div>
+    </div>
+</div>
