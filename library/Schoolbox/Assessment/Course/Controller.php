@@ -508,6 +508,57 @@ class Controller extends BaseController
         $this->tpl('import/results', $importer->findUnitsAndTasks($courseId));
     }
 
+
+    /**
+     * Retrieve fragment with units in the selected course, and checkboxes/dates for selection
+     */
+    public function importUnits()
+    {
+        $homepageId       = trim($this->getRequest()->post["importFolders"]);
+        $courseHomepageId = trim($this->getRequest()->post["importCourse"]);
+
+        try {
+            $this->getCourseMapper()->findCourseById($courseHomepageId);
+
+        } catch (MapperException $e) {
+            // the nominated "course" is not actually a course...
+            $this->throwError('The selected source is not a course');
+            return;
+        }
+
+        if ($homepageId == "" && $courseHomepageId == "")
+        {
+            // They didn't select anything
+
+            $this->throwError('You must select at least one class and a course to import before you can proceed');
+        }
+        else if ($homepageId == "")
+        {
+            // They didn't select a class code
+
+            $this->throwError('You must select at least one class before you can proceed');
+        }
+        else if ($courseHomepageId == "")
+        {
+            // They didn't select a course to import
+
+            $this->throwError('You must select a course to import before you can proceed');
+        }
+        else
+        {
+            // Everything kosher, proceed with the mage
+            $this->getResponse()->content->set([
+                'template' => "@course/unitImportForm.twig",
+                'format' => 'nochrome',
+                'data' => [
+                    'homepageId' => $homepageId,
+                    'courseHomepageId' => $courseHomepageId,
+                    'units' => $this->getCourseMapper()->findByParentId($courseHomepageId)
+                ]
+            ]);
+        }
+    }
+
     /**
      * Save the given template for the given folder
      *
@@ -563,56 +614,6 @@ class Controller extends BaseController
             $folder->setInherit($model->getInherit());
             $this->getCourseMapper()->save($folder);
             $this->recurseInheritance($folder);
-        }
-    }
-
-    /**
-     * Retrieve fragment with units in the selected course, and checkboxes/dates for selection
-     */
-    public function importUnits()
-    {
-        $homepageId       = trim($this->getRequest()->post["importFolders"]);
-        $courseHomepageId = trim($this->getRequest()->post["importCourse"]);
-
-        try {
-            $this->getCourseMapper()->findCourseById($courseHomepageId);
-
-        } catch (MapperException $e) {
-            // the nominated "course" is not actually a course...
-            $this->throwError('The selected source is not a course');
-            return;
-        }
-
-        if ($homepageId == "" && $courseHomepageId == "")
-        {
-            // They didn't select anything
-
-            $this->throwError('You must select at least one class and a course to import before you can proceed');
-        }
-        else if ($homepageId == "")
-        {
-            // They didn't select a class code
-
-            $this->throwError('You must select at least one class before you can proceed');
-        }
-        else if ($courseHomepageId == "")
-        {
-            // They didn't select a course to import
-
-            $this->throwError('You must select a course to import before you can proceed');
-        }
-        else
-        {
-            // Everything kosher, proceed with the mage
-            $this->getResponse()->content->set([
-                'template' => "@course/unitImportForm.twig",
-                'format' => 'nochrome',
-                'data' => [
-                    'homepageId' => $homepageId,
-                    'courseHomepageId' => $courseHomepageId,
-                    'units' => $this->getCourseMapper()->findByParentId($courseHomepageId)
-                ]
-            ]);
         }
     }
 
@@ -678,12 +679,9 @@ class Controller extends BaseController
             $foundUnit = false;
 
             foreach ($this->getRequest()->post["unit"] as $unit) {
-                $import = !empty($unit['import']);
-
-                if ($import) {
+                if (!empty($unit['import'])) {
                     $foundUnit = true;
                     if (trim($unit['open_date']) == '' || trim($unit['due_date']) == '') {
-                        $this->throwError('You must specify an open and close date for each unit you are importing');
                         $errorDate = true;
                         break;
                     }
@@ -695,14 +693,12 @@ class Controller extends BaseController
             if (!$foundUnit) {
                 $this->throwError('You must select at least one unit to import');
             }
-            else
-            {
-                // Create the component on each homepage
-                // Make sure dates were valid
-
-                if ($errorDate) {
-                    return;
-                }
+            else if ($errorDate) {
+                // Make sure dates were specified
+                $this->throwError('You must specify an open and close date for each unit you are importing');
+                return;
+            }
+            else {
 
                 /** @var Category[] $unitCache */
                 $unitCache = [];
@@ -731,9 +727,6 @@ class Controller extends BaseController
                     $this->getComponentInstanceMapper()->save($componentCache[$homepageId]);
                 }
 
-                if ($errorDate) {
-                    return;
-                }
                 try {
                     // Create new unit instances on each homepage
 
