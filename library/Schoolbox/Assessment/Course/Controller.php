@@ -686,6 +686,8 @@ class Controller extends BaseController
                         $unit['name'] = $unitCache[$unitCurrent->getId()]->getName();
                         $unit['items'] = new Collection();
 
+                        $temp = new Collection();
+
                         foreach ($this->getRequest()->post["unit"] as $unitDate) {
                             if ($unitDate["unit_id"] == $unitCurrent->getId()) {
                                 $unit['open_date'] = $unitDate['open_date'];
@@ -704,7 +706,7 @@ class Controller extends BaseController
                                 ->sortBy('title', 'asc') ;
                         }
 
-                        $unit['items']->merge($taskCache[$unitCurrent->getId()]);
+                        $temp->merge($taskCache[$unitCurrent->getId()]);
 
                         // Due work
 
@@ -713,7 +715,7 @@ class Controller extends BaseController
                                 ->findByColumn('category', $unitCurrent->getId());
                         }
 
-                        $unit['items']->merge($submissionCache[$unitCurrent->getId()]);
+                        $temp->merge($submissionCache[$unitCurrent->getId()]);
 
                         // Quizzes
 
@@ -722,7 +724,7 @@ class Controller extends BaseController
                                 ->findByColumn('category_id', $unitCurrent->getId());
                         }
 
-                        $unit['items']->merge($quizCache[$unitCurrent->getId()]);
+                        $temp->merge($quizCache[$unitCurrent->getId()]);
 
                         /* Unify all three of Tasks, Due Work and Quizzes
                          * into one mega list
@@ -730,7 +732,17 @@ class Controller extends BaseController
                          * Sort by Created At for now, until manual sequencing
                          * is added to the ui so teachers can sort it themselves
                          */
-                        $unit['items']->sortBy('created', 'asc');
+                        $temp->sortBy('created', 'asc');
+
+                        foreach($temp as $current) {
+                            $reflection = new \ReflectionClass($current);
+                            $class = $reflection->getShortName();
+
+                            $unit['items']->add([
+                                'class' => $class,
+                                'item' => $current
+                            ]);
+                        }
 
                         $units->add($unit);
                     }
