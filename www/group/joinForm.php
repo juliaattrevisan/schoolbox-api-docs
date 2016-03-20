@@ -24,6 +24,8 @@ if (!empty($_POST['group'])) {
 	$groupsSelected[$_GET['leave']] = false;
 }
 
+/** @var Schoolbox\User $user */
+$user = $_SESSION['user'];
 foreach ($groupsSelected as $groupId => $isJoining) {
 	if ($isJoining) {
 		$group = $groupHandler->getByID($groupId);
@@ -32,7 +34,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 		$ua
 			->setService(UserAccess::SERVICE_HOMEPAGE)
 			->setServiceIdentifier($groupId)
-			->setUser($_SESSION['user'])
+			->setUser($user)
 			->setAccessLevel(UserAccess::ACCESS_DENY);
 
 		if ($group['type'] == GROUP_TYPE_FREE) {
@@ -51,7 +53,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 		// delete the record that matches the given params
 		$count = $uaMapper->deleteByColumnList(array(
 			'service' => UserAccess::SERVICE_HOMEPAGE,
-			'uid'     => $_SESSION['user']->getId(),
+			'uid'     => $user->getId(),
 			'sid'     => $groupId
 		));
 
@@ -61,12 +63,12 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 			// we need to manually raise a DELETE notification
 			// since the Mapper can't automagically do it for this Model
 			$model = new UserAccess();
-			$model->setUser($_SESSION['user'])
+			$model->setUser($user)
 				->setAccessLevel(0)
 				->setService(UserAccess::SERVICE_HOMEPAGE)
 				->setServiceIdentifier($groupId);
 
-			$event = new Event($_SESSION['user'], Mapper::METHOD_DELETE, $model, $uaMapper);
+			$event = new Event($user, Mapper::METHOD_DELETE, $model, $uaMapper);
 			$notif = new Notif(Notif::TOPIC_APPLICATION);
 			$notif->notice(serialize($event));
 		}
