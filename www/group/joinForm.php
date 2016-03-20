@@ -72,7 +72,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 			// since the Mapper can't automagically do it for this Model
 			$model = new UserAccess();
 			$model->setUser($user)
-				->setAccessLevel(0)
+				->setAccessLevel(UserAccess::ACCESS_DENY)
 				->setService(UserAccess::SERVICE_HOMEPAGE)
 				->setServiceIdentifier($groupId);
 
