@@ -30,12 +30,19 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 	if ($isJoining) {
 		$group = $groupHandler->getByID($groupId);
 
-		$ua = new UserAccess();
-		$ua
-			->setService(UserAccess::SERVICE_HOMEPAGE)
-			->setServiceIdentifier($groupId)
-			->setUser($user)
-			->setAccessLevel(UserAccess::ACCESS_DENY);
+		try {
+			$ua = $uaMapper->findOneByColumnList([
+				'uid' => $user->getId(),
+				'service' => UserAccess::SERVICE_HOMEPAGE,
+				'sid'     => $groupId,
+			]);
+		} catch (Mapper\Exception $e) {
+			$ua = new UserAccess();
+			$ua->setUser($user)
+				->setAccessLevel(UserAccess::ACCESS_DENY)
+				->setService(UserAccess::SERVICE_HOMEPAGE)
+				->setServiceIdentifier($groupId);
+		}
 
 		if ($group['type'] == GROUP_TYPE_FREE) {
 			// allow read access immediately for a free group
@@ -45,6 +52,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 		}
 		else if ($group['type'] == GROUP_TYPE_MODERATED) {
 			// insert the user into the perms table, but deny them access (pending state)
+			// If they already have access, keep it as is.
 			$uaMapper->save($ua);
 			$response = 'pending';
 		}
