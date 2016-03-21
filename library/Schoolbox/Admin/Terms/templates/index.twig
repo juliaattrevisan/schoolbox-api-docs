@@ -1,6 +1,8 @@
 {# Shared navigation menu #}
 {{ renderAdminNavigation(pageCurrent) }}
 
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
+
 {# show each term #}
 <div class="row">
     <div class="small-12 island">
@@ -20,28 +22,40 @@
                     </li>
                     <li class="row">
                         <form method="POST" action="">
-                            <div class="small-12 columns">
+                            <div class="small-12 medium-8 columns">
                                 <label>
                                     Title
-                                    <input type="text" name="terms[{{ term.getId() }}][title]" value="{{ term.getTitle() }}" />
+                                    <input type="text"
+                                           name="terms[{{ term.getId() }}][title]"
+                                           value="{{ term.getTitle() }}"
+                                           maxlength="100" />
                                 </label>
                             </div>
-                            <div class="small-12 columns">
+                            <div class="small-12 medium-4 columns">
                                 <label>
                                     Code
-                                    <input type="text" name="terms[{{ term.getId() }}][code]" value="{{ term.getCode() }}" />
+                                    <input type="text"
+                                           name="terms[{{ term.getId() }}][code]"
+                                           value="{{ term.getCode() }}"
+                                           maxlength="16" />
                                 </label>
                             </div>
-                            <div class="small-12 columns">
+                            <div class="small-12 medium-6 columns">
                                 <label>
                                     Start
-                                    <input type="text" name="terms[{{ term.getId() }}][start]" value="{{ term.getStart().getLocalShort() }}" />
+                                    <input type="text"
+                                           name="terms[{{ term.getId() }}][start]"
+                                           value="{{ term.getStart().getLocalShort() }}"
+                                           data-datepicker />
                                 </label>
                             </div>
-                            <div class="small-12 columns">
+                            <div class="small-12 medium-6 columns">
                                 <label>
                                     Finish
-                                    <input type="text" name="terms[{{ term.getId() }}][finish]" value="{{ term.getFinish().getLocalShort() }}" />
+                                    <input type="text"
+                                           name="terms[{{ term.getId() }}][finish]"
+                                           value="{{ term.getFinish().getLocalShort() }}"
+                                           data-datepicker />
                                 </label>
                             </div>
                             <input type="submit" value="Save Changes" />
