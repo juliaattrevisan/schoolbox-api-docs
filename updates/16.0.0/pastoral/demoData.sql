@@ -1,4 +1,4 @@
-INSERT INTO schoolbox.pastoral
+INSERT INTO pastoral
   (owner_id, severity_id, student_id, type_id, external_id, private, heading, body, datetime_posted, datetime_modified, datetime_deleted, parent_id)
 VALUES
   (19, 1, 230, 1, null, 0, 'Amazing Stuff Happened', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pellentesque, metus vel elementum porta, felis erat interdum ipsum, nec gravida quam sapien vitae leo. Vestibulum massa felis, maximus vitae egestas et, facilisis vitae arcu. Nunc malesuada, ligula imperdiet porta iaculis, neque est condimentum ante, nec dapibus tortor ante ac sem. Vivamus at magna eu enim porta dapibus. Praesent bibendum ante et risus ultrices tristique. Morbi pretium, sem at aliquam dignissim, dui mi imperdiet nulla, vel pellentesque dolor erat ut lacus. Ut ac finibus arcu, non blandit ipsum. In id turpis tincidunt diam imperdiet consectetur. Sed sagittis justo at leo hendrerit suscipit. Suspendisse aliquet interdum dolor, nec euismod purus efficitur id. Vestibulum vitae pharetra ex. Nunc quis mattis augue. Sed dapibus ultricies sem, eget molestie purus aliquam eget. Pellentesque et neque pretium, pharetra nunc a, maximus enim. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.', '2016-03-01 13:38:50', '2016-03-01 15:01:37', null, null),
@@ -32,7 +32,7 @@ VALUES
   (19, 1, 230, 2, null, 0, 'Lets Do Coffee Sometime', 'In aliquam quam faucibus risus semper vulputate. Maecenas mollis gravida est eu pretium. Sed venenatis mi nec mauris hendrerit, sed fringilla orci finibus. Sed a purus neque. Curabitur hendrerit nibh tellus, in facilisis leo laoreet non. Suspendisse potenti. Suspendisse sed est molestie, vestibulum metus vel, semper nibh. Vestibulum pharetra pharetra lorem quis laoreet. Nulla maximus mauris neque, eu ornare nunc iaculis ut.', '2016-03-01 13:38:50', '2016-03-01 15:01:37', null, null);
 
 
-INSERT INTO schoolbox.pastoral_comment
+INSERT INTO pastoral_comment
   (pastoral_id, owner_id, body, datetime_posted, datetime_modified, datetime_deleted)
 VALUES
   (6, 19, 'Nunc malesuada, ligula imperdiet porta iaculis, neque est condimentum ante, nec dapibus tortor ante ac sem. Vivamus at magna eu enim porta dapibus. Praesent bibendum ante et risus ultrices tristique. Morbi pretium, sem at aliquam dignissim, dui mi imperdiet nulla, vel pellentesque dolor erat ut lacus. Ut ac finibus arcu, non blandit ipsum. In id turpis tincidunt diam imperdiet consectetur. Sed sagittis justo at leo hendrerit suscipit. Suspendisse aliquet interdum dolor, nec euismod purus efficitur id. Vestibulum vitae pharetra ex. Nunc quis mattis augue. Sed dapibus ultricies sem, eget molestie purus aliquam eget. Pellentesque et neque pretium, pharetra nunc a, maximus enim. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.', '2016-03-01 15:01:13', null, null),
