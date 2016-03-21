@@ -1,13 +1,11 @@
 {% if term.getId() %}
     {% set saveRoute = routeLookup('adminTerms.postUpdateTerm', {id: term.getId()}) %}
     {% set saveValue = 'Update Term' %}
-    {% set formId    = 'term-' ~ term.getId() ~ '-updateForm' %}
 {% else %}
     {% set saveRoute = routeLookup('adminTerms.postCreateTerm') %}
     {% set saveValue = 'Create Term' %}
-    {% set formId    = 'term-createForm' %}
 {% endif %}
-<form method="POST" action="{{ saveRoute }}" class="row" id="{{ formId }}">
+<form method="POST" action="{{ saveRoute }}" class="row" data-role="termForm">
     <div class="small-6 columns">
         <label>
             Title
@@ -50,8 +48,3 @@
     </div>
     <input type="submit" class="full-width" value="{{ saveValue }}" />
 </form>
-<script type="text/javascript">
-    $(function(){
-        $('#{{ formId }}').alaressValidate();
-    });
-</script>

@@ -29,5 +29,8 @@
 <script type="text/javascript">
     $(function(){
         $('[data-collapser]').collapsable();
+        $('form[data-role="termForm"]').each(function() {
+            $(this).alaressValidate();
+        });
     });
 </script>
