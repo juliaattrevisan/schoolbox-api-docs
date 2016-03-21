@@ -1,0 +1,43 @@
+<form method="POST" action="{{ saveRoute }}" class="row">
+    <div class="small-6 columns">
+        <label>
+            Title
+            <input type="text"
+                   name="title"
+                   value="{{ term.getTitle() }}"
+                   required
+                   maxlength="100" />
+        </label>
+    </div>
+    <div class="small-6 columns">
+        <label>
+            Code
+            <input type="text"
+                   name="code"
+                   value="{{ term.getCode() }}"
+                   required
+                   maxlength="16" />
+        </label>
+    </div>
+    <div class="small-6 columns">
+        <label>
+            Start
+            <input type="text"
+                   name="start"
+                   value="{{ term.getStart().getLocalShort() }}"
+                   required
+                   data-datepicker />
+        </label>
+    </div>
+    <div class="small-6 columns">
+        <label>
+            Finish
+            <input type="text"
+                   name="finish"
+                   value="{{ term.getFinish().getLocalShort() }}"
+                   required
+                   data-datepicker />
+        </label>
+    </div>
+    <input type="submit" value="Save Changes" />
+</form>

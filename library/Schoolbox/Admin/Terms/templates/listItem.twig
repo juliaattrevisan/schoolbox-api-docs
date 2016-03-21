@@ -1,0 +1,14 @@
+<div class="list-item">
+    <div class="small-12 info card">
+        <h3>{{ term.getTitle() }} ({{ term.getCode() }})</h3>
+        <p class="meta">
+            {{ term.getStart().getDateOnly() }}—{{ term.getFinish().getDateOnly() }}
+        </p>
+    </div>
+</div>
+<div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="term-{{ term.getId() }}">
+    {% include '@adminTerms/form.twig' with {term: term} %}
+</div>
+<nav>
+    <a href="#" class="icon-down-arrow" data-collapser="term-{{ term.getId() }}"></a>
+</nav>
