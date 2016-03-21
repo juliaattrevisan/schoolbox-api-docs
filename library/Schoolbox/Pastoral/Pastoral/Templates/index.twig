@@ -167,7 +167,7 @@
                     {# Only display records the logged in user is allowed to see. Parents cannot see private records ever (even if they have been given access). #}
                     {% if not (record.private and role == 'parent') %}
 
-                        <li data-record-type="{{ record.getTypeId }}" data-pastoral class="record actions-small-1" id="pastoral-{{ record.getId() }}">
+                        <li data-record-type="{{ record.getType().getId() }}" data-pastoral class="record actions-small-1" id="pastoral-{{ record.getId() }}">
                             <div class="list-item">
                                 <div class="avatar card small-12 wrap-down">
 
