@@ -16,8 +16,8 @@ $db     = Database::getInstance();
 $logger = new Alaress\Lumberjack\Logger();
 
 $insertTermQuery = $db->prepare("
-    INSERT INTO `term` (`title`, `start`, `finish`, `archived`)
-    VALUES (:title, :start, :finish, FALSE)
+    INSERT INTO `term` (`title`, `code`, `start`, `finish`, `archived`)
+    VALUES (:title, :code, :start, :finish, FALSE)
 ");
 
 $firstDateQuery = $db->query("
@@ -36,11 +36,13 @@ $firstYear = intval(date('Y', strtotime($firstDateQuery->fetchColumn())));
 foreach (range($firstYear, $lastYear) as $year) {
     $insertTermQuery->execute([
         'title'  => "Semester 1, $year",
+        'code'   => "$year-1",
         'start'  => "$year-01-01",
         'finish' => "$year-06-30",
     ]);
     $insertTermQuery->execute([
         'title'  => "Semester 2, $year",
+        'code'   => "$year-2",
         'start'  => "$year-07-01",
         'finish' => "$year-12-31",
     ]);
