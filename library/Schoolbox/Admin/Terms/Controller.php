@@ -95,11 +95,11 @@ class Controller extends Base
     }
 
     /**
-     * POST action for un-archiving an existing term
+     * POST action for restoring an existing archived term
      *
      * @param Term\Model $term
      */
-    public function postUnarchiveTerm(Term\Model $term)
+    public function postRestoreTerm(Term\Model $term)
     {
         $term->setArchived(false);
         $this->termMapper->save($term);

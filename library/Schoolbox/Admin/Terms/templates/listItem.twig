@@ -24,7 +24,7 @@
     <ul class="f-dropdown" data-dropdown-content id="term-{{ term.getId() }}-dropdown">
         <li>
             {% if term.getArchived() %}
-                <a href="#" data-post-action="{{ routeLookup('adminTerms.postUnarchiveTerm', {id: term.getId()}) }}" class="icon-undo">Restore</a>
+                <a href="#" data-post-action="{{ routeLookup('adminTerms.postRestoreTerm', {id: term.getId()}) }}" class="icon-undo">Restore</a>
             {% else %}
                 <a href="#" data-post-action="{{ routeLookup('adminTerms.postArchiveTerm', {id: term.getId()}) }}" class="icon-archive">Archive</a>
             {% endif %}

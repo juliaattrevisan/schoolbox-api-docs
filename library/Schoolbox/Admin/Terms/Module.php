@@ -52,7 +52,7 @@ class Module extends BaseModule
         $this->addPostRoute($router, 'postUpdateTerm', $basePath, "/{id}/update");
         $this->addPostRoute($router, 'postDeleteTerm', $basePath, "/{id}/delete");
         $this->addPostRoute($router, 'postArchiveTerm', $basePath, "/{id}/archive");
-        $this->addPostRoute($router, 'postUnarchiveTerm', $basePath, "/{id}/unarchive");
+        $this->addPostRoute($router, 'postRestoreTerm', $basePath, "/{id}/restore");
     }
 
     /**
