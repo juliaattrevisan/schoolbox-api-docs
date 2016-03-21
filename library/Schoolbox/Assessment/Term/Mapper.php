@@ -13,6 +13,8 @@ use Schoolbox\Mapper as BaseMapper;
  * Mapper for terms.
  *
  * @package Schoolbox\Assessment\Term
+ * @method Model createModel()
+ * @method Model findById($identifierValue)
  */
 class Mapper extends BaseMapper
 {
