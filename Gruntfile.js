@@ -79,13 +79,13 @@ module.exports = function(grunt) {
                     'www/javascript/components/foundation/js/foundation/foundation.js',
                     'www/javascript/components/foundation/js/foundation/foundation.accordion.js',
                     'www/javascript/components/foundation/js/foundation/foundation.alert.js',
-                    'www/javascript/components/foundation/js/foundation/foundation.dropdown.js',
                     'www/javascript/components/foundation/js/foundation/foundation.equalizer.js',
                     'www/javascript/components/foundation/js/foundation/foundation.offcanvas.js',
                     'www/javascript/components/foundation/js/foundation/foundation.reveal.js',
                     'www/javascript/components/foundation/js/foundation/foundation.slider.js',
                     'www/javascript/components/foundation/js/foundation/foundation.tab.js',
                     'www/javascript/components/foundation/js/foundation/foundation.tooltip.js',
+                    'www/javascript/shared/foundation.dropdown.js',
 
                     // Side Navigation
                     // This includes the Flyout menu, on user profile drop down
