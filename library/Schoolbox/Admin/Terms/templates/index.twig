@@ -32,5 +32,15 @@
         $('form[data-role="termForm"]').each(function() {
             $(this).alaressValidate();
         });
+        $('#content').on('click', 'a[data-post-action]', function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                confirmEvent: function(el) {
+                    // Build a POST form, and submit it.
+                    // Not currently AJAXing.
+                    $('<form method="post" />').attr('action', el.data('postAction')).submit();
+                }
+            })
+        });
     });
 </script>

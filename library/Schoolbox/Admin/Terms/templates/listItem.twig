@@ -15,7 +15,15 @@
         <a href="#" class="icon-overflow" data-dropdown="term-{{ term.getId() }}-dropdown" aria-expanded="false" title="Actions"></a>
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="term-{{ term.getId() }}-dropdown">
-        <li><a href="#" class="icon-archive">Archive</a></li>
-        <li><a href="#" class="icon-delete">Delete</a></li>
+        <li>
+            {% if term.getArchived() %}
+                <a href="#" data-post-action="{{ routeLookup('adminTerms.postUnarchiveTerm', {id: term.getId()}) }}" class="icon-undo">Restore</a>
+            {% else %}
+                <a href="#" data-post-action="{{ routeLookup('adminTerms.postArchiveTerm', {id: term.getId()}) }}" class="icon-archive">Archive</a>
+            {% endif %}
+        </li>
+        <li>
+            <a href="#" data-post-action="{{ routeLookup('adminTerms.postDeleteTerm', {id: term.getId()}) }}" class="icon-delete">Delete</a>
+        </li>
     </ul>
 </li>
