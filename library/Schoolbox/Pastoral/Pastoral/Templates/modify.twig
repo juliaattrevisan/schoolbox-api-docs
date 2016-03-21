@@ -233,7 +233,10 @@
 
                             <div class="switch">
                                 <input id="private" name="private" {% if record.getPrivate %}checked{% endif %} value="1" type="checkbox">
-                                <label for="private"></label>
+                                <label for="private">
+                                    <span>On</span>
+                                    <span>Off</span>
+                                </label>
                             </div>
 
                         </fieldset>
@@ -303,7 +306,10 @@
 
                         <div class="switch">
                             <input id="notify" name="notify" value="1" type="checkbox">
-                            <label for="notify"></label>
+                            <label for="notify">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
                         </div>
                     </div>
                 </fieldset>
