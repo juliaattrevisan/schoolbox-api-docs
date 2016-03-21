@@ -27,6 +27,7 @@ class Controller extends Base
                 'data'     => [
                     'pageCurrent' => basename($this->getRequest()->query->get('page')),
                 ],
+                'title' => 'Admin - Terms'
             )
         );
     }
