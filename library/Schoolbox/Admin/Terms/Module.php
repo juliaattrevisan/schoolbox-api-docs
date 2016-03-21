@@ -10,8 +10,10 @@ namespace Schoolbox\Admin\Terms;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Assessment\Term;
 use Twig_Loader_Chain;
 
 /**
@@ -29,6 +31,8 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'getIndex', $basePath, "");
+        $this->addPostRoute($router, 'postCreateTerm', $basePath, "");
+        $this->addPostRoute($router, 'postUpdateTerm', $basePath, "/{id}/update");
     }
 
     /**
@@ -40,6 +44,18 @@ class Module extends BaseModule
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser())
+        ;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $this
+            ->addRoutePreload($matcher, 'postUpdateTerm', function($params) {
+                return ['term' => Term\Mapper::getInstance()->findById($params['id']),];
+            })
         ;
     }
 

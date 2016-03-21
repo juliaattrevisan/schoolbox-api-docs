@@ -7,7 +7,7 @@
     </div>
 </div>
 <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="term-{{ term.getId() }}">
-    <form method="POST" action="" class="row">
+    <form method="POST" action="{{ routeLookup('adminTerms.postUpdateTerm', {id: term.getId()}) }}" class="row">
         <div class="small-6 columns">
             <label>
                 Title

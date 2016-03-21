@@ -18,7 +18,7 @@ use Schoolbox\Assessment\Term;
 class Controller extends Base
 {
     /**
-     * Renders index
+     * GET action for viewing list of terms
      */
     public function getIndex()
     {
@@ -33,5 +33,19 @@ class Controller extends Base
                 'title' => 'Admin - Terms'
             )
         );
+    }
+
+    /**
+     * POST action for creating a new term
+     */
+    public function postCreateTerm()
+    {
+    }
+
+    /**
+     * POST action for updating an existing term
+     */
+    public function postUpdateTerm(Term\Model $term)
+    {
     }
 }
