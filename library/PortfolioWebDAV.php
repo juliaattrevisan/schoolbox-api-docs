@@ -352,6 +352,24 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $settings['baseUri'].'/webdav/shared/'
                 );
             }
+        } elseif ($site_location == 'btac') {
+            $settings = array(
+                'userName' =>  $_SESSION['username'],
+                'password' => $_SESSION['password'],
+                'baseUri' => 'https://btac12.btac.nsw.edu.au',
+            );
+
+            if ($groupHandler->isStaff()) {
+                $paths = array(
+                    $settings['baseUri'].'/home/' . $_SESSION['username'] . '/',
+                    $settings['baseUri'].'/vol/shared/',
+                    $settings['baseUri'].'/vol/common/'
+                );
+            } elseif ($groupHandler->isStudent()) {
+                $paths = array(
+                    $settings['baseUri'].'/vol/common/'
+                );
+            }
 
         } elseif ($site_location=='fintona') {
             $settings = array(
