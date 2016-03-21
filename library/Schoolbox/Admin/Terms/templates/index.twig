@@ -1,5 +1,29 @@
 {# Shared navigation menu #}
 {{ renderAdminNavigation(pageCurrent) }}
 
-{# Page contents #}
-<h1>Terms</h1>
+{# show each term #}
+<div class="row">
+    <div class="small-12 island">
+        <form method="POST" action="">
+
+            <section>
+                <ul class="action-list">
+                    {% for term in terms %}
+                        <li>
+                            <div class="list-item">
+                                <div class="small-12 info card">
+                                    <h3>{{ term.getTitle() }} ({{ term.getCode() }})</h3>
+                                    <p class="meta">
+                                        {{ term.getStart().getLocalShort() }}—{{ term.getFinish().getLocalShort() }}
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <input type="submit" value="Save Changes" />
+        </form>
+    </div>
+</div>

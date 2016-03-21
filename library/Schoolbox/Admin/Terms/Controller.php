@@ -8,6 +8,7 @@
 namespace Schoolbox\Admin\Terms;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Term;
 
 /**
  * Controller for managing school terms through the admin section.
@@ -21,11 +22,13 @@ class Controller extends Base
      */
     public function getIndex()
     {
+        // TODO make this use the new way of creating responses
         $this->getResponse()->content->set(
             array(
                 'template' => '@adminTerms/index.twig',
                 'data'     => [
                     'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                    'terms'       => Term\Mapper::getInstance()->findAll(['order' => ['start' => 'desc']]),
                 ],
                 'title' => 'Admin - Terms'
             )
