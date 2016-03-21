@@ -95,15 +95,17 @@ class Mapper extends BaseMapper
     {
         $query = $this->selectScalarByColumnList($this->getIdentifier()['column'], [$field => $value]);
         $query->execute();
-        $dupeId = $query->fetchColumn();
-        if (!$dupeId) {
-            // No duplicate
-            return true;
-        } elseif ($currentId == $dupeId) {
-            // This row already has this value - that's okay
-            return true;
+        while (($dupeId = $query->fetchColumn()) !== false) {
+            if ($currentId == $dupeId) {
+                // I'm trying to save this row. I don't mind if it dupes itself
+                continue;
+            } else {
+                // This is a legitimate dupe
+                return false;
+            }
         }
-        return false;
+        // No duplicates
+        return true;
     }
 
     /**
