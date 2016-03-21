@@ -25,7 +25,7 @@ class AdminV2_Nav
         'terms' => 'Terms',
         'course-builder' => 'Course Builder',
         'messages' => 'Messages',
-        'list' => 'Lists',
+        'lists' => 'Lists',
         'cleanup' => 'Cleanup',
         'usage' => 'Usage',
         'engagement' => 'Engagement',

@@ -39,6 +39,11 @@ class Admin implements ModuleConfigInterface
         $home = new \Schoolbox\Admin\Home\Module($di);
         $home->init('/adminv2/home');
 
+        // Admin lists
+
+        $lists = new \Schoolbox\Admin\Lists\Module($di);
+        $lists->init('/adminv2/lists');
+
         // Admin cleanup page
 
         $clean = new \Schoolbox\Admin\Clean\Module($di);

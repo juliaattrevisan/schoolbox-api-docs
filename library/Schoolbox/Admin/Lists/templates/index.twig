@@ -1,0 +1,178 @@
+{# Shared navigation menu #}
+
+{{ renderAdminNavigation(pageCurrent) }}
+
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+    $(function() {
+        $('[data-button=add-row]').click(function(event) {
+            event.preventDefault();
+
+            var newRow = $('[data-clone]').find('tr').clone();
+
+            /* Randomise ids for every cloned checkbox
+             */
+            var uniqueNull = 'checkbox-clone-' + Math.random(0, 100000);
+            newRow.find('[data-null]').find('input[type=checkbox]').attr('id', uniqueNull);
+            newRow.find('[data-null]').find('.checkbox-label').attr('for', uniqueNull);
+
+            var uniqueDefault = 'checkbox-clone-' + Math.random(0, 100000);
+            newRow.find('[data-default]').find('input[type=checkbox]').attr('id', uniqueDefault);
+            newRow.find('[data-default]').find('.checkbox-label').attr('for', uniqueDefault);
+
+            $('[data-list]')
+                    .find('tbody')
+                    .append(newRow)
+                    .find('input[name="name[{ROW_NUMBER}]"]')
+                    .last()
+                    .focus();
+
+            return false;
+        });
+
+        $('[data-sortable]').sortable({ handle: '.grip', axis: 'y' });
+    });
+</script>
+<!-- END custom_head -->
+
+<div class="row">
+    <li class="small-12 island">
+        <dl class="sub-nav">
+            {% for tableKey, tableCurrent in tables %}
+                <dd {% if tableKey == table %}class="active"{% endif %}><a href="/adminv2/lists/{{ tableKey }}">{{ tableCurrent.title }}</a></dd>
+            {% endfor %}
+        </dl>
+
+        <form method="post" action="/adminv2/listForm.php">
+            <input name="table" type="hidden" value="{{ table }}" />
+
+            <section>
+
+                <ul class="information-list sortable ui-sortable" data-sortable>
+
+                    {# Heading row #}
+
+                    <li class="row">
+
+                        {# If the data is sortable need to add a blank column for drag handle #}
+
+                        {% if tables[table].sortable %}
+                            <div class="small-1 column">&nbsp;</div>
+                        {% endif %}
+
+                        {% for field_key, field in tables[table].fields %}
+                            {% if field.hidden is empty %}
+                                <div class="small-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} column">
+                                    {{ field.caption }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                    </li>
+
+                    {# Render each row of data#}
+
+                    {% for record in records %}
+
+                        <li class="row">
+
+                            {% set recordIndex = loop.index %}
+
+                                {% if tables[table].sortable %}
+                                    <div class="small-1 column grip">&nbsp;</div>
+                                {% endif %}
+
+                                {% for field_key, field in tables[table].fields %}
+                                    {% if field.hidden is empty %}
+
+                                        <div class="small-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} column">
+
+                                            {% if field.readonly is not empty %}
+
+                                                {# Read only field, just display label #}
+
+                                                {{ record[field_key] }}
+
+                                            {% elseif field.radio is not empty %}
+
+                                                {# Radio field, shared between all rows#}
+
+                                                <div class="radiolist">
+                                                    <input type="radio" name="{{ field_key }}" value="{{ tables[table].radio }}" id="{{ field_key }}-{{ recordIndex }}" checked="{{ record[field_key] == 1 }}">
+                                                    <label for="{{ field_key }}-{{ recordIndex }}"></label>
+                                                </div>
+
+                                            {% elseif field.lookup is not empty %}
+
+                                                {# Lookup select box #}
+
+                                                <select name="{{ field_key }}">
+                                                    {% for option in field.lookup %}
+                                                        <option {% if record[field_key] == option.key %}selected {% endif %}value="{{ option.key }}">{{ option.value }}</option>
+                                                    {% endfor %}
+                                                </select>
+
+                                            {% else %}
+
+                                                {# All other fields are just text boxes#}
+
+                                                <input name="{{field_key}}" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" />
+
+                                                {# Nullable text boxes get a tickbox as well#}
+
+                                                {% if field.nullable is not empty %}
+                                                    <div class="checklist">
+                                                        <input id="{{ field_key }}-{{ recordIndex }}" type="checkbox" {% if record[field_key] == null %}checked{% endif %}>
+                                                        <label for="{{ field_key }}-{{ recordIndex }}">Set To Null</label>
+                                                    </div>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                            {% endfor %}
+                        </li>
+                    {% endfor %}
+                </ul>
+
+            </section>
+            <div class="content">
+                <a href="#" data-button="add-row" class="button icon-add">New Row</a>
+            </div>
+            <input type="submit" value="Save"/>
+        </form>
+    </div>
+</div>
+
+<table data-clone class="hide">
+    <tbody>
+    <tr>
+        <!-- BEGIN newInput -->
+        <td>
+            <input class="{NULLABLE_CLASS}" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="{TYPE}" {READONLY} value="{VALUE}" />
+            <!-- BEGIN newInput_null -->
+        </td>
+        <td data-null>
+            <input id="{TABLE_COLUMN}-new-null" type="checkbox" name="{TABLE_COLUMN}[{ROW_NUMBER}]" value="NULL" />
+            <label for="{TABLE_COLUMN}-new-null" class="checkbox-label">Null?</label>
+            <!-- END newInput_null -->
+        </td>
+        <!-- END newInput -->
+        <!-- BEGIN newSelect -->
+        <td>
+            <select name="{TABLE_COLUMN}[{ROW_NUMBER}]">
+                <!-- BEGIN newSelect_option -->
+                <option value="{OPTION_VALUE}">{OPTION_LABEL}</option>
+                <!-- END newSelect_option -->
+            </select>
+        </td>
+        <!-- END newSelect -->
+        <!-- BEGIN newCheckbox -->
+        <td data-default>
+            <input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="hidden" value="0" />
+            <input id="checkbox-{TABLE_COLUMN}[{ROW_NUMBER}]" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="checkbox" {READONLY} value="1" />
+            <label for="checkbox-{TABLE_COLUMN}[{ROW_NUMBER}]" class="checkbox-label"></label>
+        </td>
+        <!-- END newCheckbox -->
+    </tr>
+    </tbody>
+</table>
