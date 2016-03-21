@@ -9,58 +9,7 @@
             <ul class="action-list">
                 {% for term in terms %}
                     <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="small-12 info card">
-                                <h3>{{ term.getTitle() }} ({{ term.getCode() }})</h3>
-                                <p class="meta">
-                                    {{ term.getStart().getDateOnly() }}—{{ term.getFinish().getDateOnly() }}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="term-{{ term.getId() }}">
-                            <form method="POST" action="" class="row">
-                                <div class="small-6 columns">
-                                    <label>
-                                        Title
-                                        <input type="text"
-                                               name="terms[{{ term.getId() }}][title]"
-                                               value="{{ term.getTitle() }}"
-                                               maxlength="100" />
-                                    </label>
-                                </div>
-                                <div class="small-6 columns">
-                                    <label>
-                                        Code
-                                        <input type="text"
-                                               name="terms[{{ term.getId() }}][code]"
-                                               value="{{ term.getCode() }}"
-                                               maxlength="16" />
-                                    </label>
-                                </div>
-                                <div class="small-6 columns">
-                                    <label>
-                                        Start
-                                        <input type="text"
-                                               name="terms[{{ term.getId() }}][start]"
-                                               value="{{ term.getStart().getLocalShort() }}"
-                                               data-datepicker />
-                                    </label>
-                                </div>
-                                <div class="small-6 columns">
-                                    <label>
-                                        Finish
-                                        <input type="text"
-                                               name="terms[{{ term.getId() }}][finish]"
-                                               value="{{ term.getFinish().getLocalShort() }}"
-                                               data-datepicker />
-                                    </label>
-                                </div>
-                                <input type="submit" value="Save Changes" />
-                            </form>
-                        </div>
-                        <nav>
-                            <a href="#" class="icon-down-arrow" data-collapser="term-{{ term.getId() }}"></a>
-                        </nav>
+                        {% include '@adminTerms/term.twig' with {term: term} %}
                     </li>
                 {% endfor %}
             </ul>
