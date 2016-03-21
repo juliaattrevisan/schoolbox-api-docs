@@ -61,6 +61,8 @@ class Controller extends Base
             ->setStart(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('start')))
             ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
         ;
+        $this->termMapper->save($term);
+        $this->redirectToList();
     }
 
     /**
@@ -76,6 +78,8 @@ class Controller extends Base
             ->setStart(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('start')))
             ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
         ;
+        $this->termMapper->save($term);
+        $this->redirectToList();
     }
 
     /**
@@ -86,6 +90,8 @@ class Controller extends Base
     public function postArchiveTerm(Term\Model $term)
     {
         $term->setArchived(true);
+        $this->termMapper->save($term);
+        $this->redirectToList();
     }
 
     /**
@@ -96,6 +102,8 @@ class Controller extends Base
     public function postUnarchiveTerm(Term\Model $term)
     {
         $term->setArchived(false);
+        $this->termMapper->save($term);
+        $this->redirectToList();
     }
 
     /**
@@ -105,5 +113,19 @@ class Controller extends Base
      */
     public function postDeleteTerm(Term\Model $term)
     {
+        $this->termMapper->delete($term);
+        $this->redirectToList();
+    }
+
+    /**
+     * Temporary redirect function after every save.
+     */
+    protected function redirectToList()
+    {
+        if ($this->getRequest()->isXhr()) {
+            // Dump out some AJAX response
+        } else {
+            $this->getResponse()->redirect->to($this->getRouter()->generate('adminTerms.getIndex'));
+        }
     }
 }
