@@ -72,9 +72,21 @@
     <div class="actions-small-1 row">
         <div class="list-item">
             <div class="small-12 column">
-                <h2>Student Details</h2>
+                <h1>Pastoral Care</h1>
             </div>
         </div>
+    </div>
+
+    <div class="row actions-small-3">
+        <div class="list-item">
+            <div class="small-12 island">
+                <h2 class="subheader">{{ student.formatName() }}</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="/pastoral/insert/{{ student.getId() }}" class="icon-add" title="Add Pastoral Record"></a>
+            <a href="/pastoral/report-builder" class="icon-report" title="Pastoral Report Generator"></a>
+        </nav>
     </div>
 
     <div class="row">
@@ -87,9 +99,6 @@
                         </div>
                         <div class="small-12 medium-8 large-10 columns">
                             <dl class="profile">
-                                <dt class="no-margin small-6 medium-4">Student Name</dt>
-                                <dd class="no-margin small-6 medium-8">{{ student.formatName() }}</dd>
-
                                 <dt class="no-margin small-6 medium-4">Student Age</dt>
                                 <dd class="no-margin small-6 medium-8">{{ studentAge }} Years Old</dd>
 
@@ -120,9 +129,6 @@
                     </div>
                 </div>
             </section>
-            <a class="button expand spaced" href="/pastoral/insert/{{ student.getId() }}">Add Pastoral Record</a>
-            <a class="button expand spaced" href="/pastoral/report-builder">Pastoral Report Builder</a>
-            <hr>
         </div>
     </div>
 
@@ -131,7 +137,7 @@
             <section>
                 <label for="filter_type_id">Filter Pastoral Records By Type</label>
                 <select id="filter_type_id">
-                    <option value="">Show All Record Types</option>
+                    <option value="">All</option>
                     {% for type in types %}
                         <option value="{{ type.id }}">{{ type.name }}</option>
                     {% endfor %}
@@ -147,12 +153,13 @@
         <h1>Pastoral Care</h1>
     </div>
     <div class="small-12 column">
-        <div class="alert-box">No pastoral care records have been entered regarding {{ student.formatName }}.{% if role != 'parent' %} To add a record click on the 'Add Pastoral Comment' button above.{% endif %}</div>
+        <div class="alert-box">No pastoral care records are visible regarding {{ student.formatName }}.{% if role != 'parent' %} To add a record click 'Add Pastoral Comment'.{% endif %}</div>
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 island">
+        <h2 class="subheader">Records</h2>
         <section>
             <ul class="information-list">
                 {% for record in records %}

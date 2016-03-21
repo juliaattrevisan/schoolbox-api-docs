@@ -13,22 +13,22 @@
 
         $.fn.alaressEditor();
 
-        $('#tags').selectize({
-            delimiter: ',',
-            persist: false,
-            create: function(input) {
-                return {
-                    name: input
-                }
+        $('#tags').selectizeSelector({
+            ajax: {
+                url:      '/ajax/tags.php',
+                type:     'GET',
+                dataType: 'json'
             },
-            searchField: 'name',
-            labelField: 'name',
-            valueField: 'name',
-            options: [
-                {% for tag in tagsAll %}
-                {name: '{{ tag.getName | escape('js') }}'},
-                {% endfor %}
-            ]
+            multiple: true,
+            selectize: {
+                create: function (input) {
+                    return {
+                        id: input,
+                        name: input
+                    }
+                },
+            },
+            value: [{% for tag in record.tagsList %}'{{ tag.getName | escape('js') }}',{% endfor %}]
         });
 
         $('[data-cancel]').click(function(event) {
@@ -64,11 +64,11 @@
                     confirmEvent: function() {
 
                         var selector = $("#deleteIds")
-                        var deleteIds = .val();
+                        var deleteIds = selector.val();
                         if (deleteIds != '') {
                             deleteIds += ',';
                         }
-                        $("#deleteIds").val(deleteIds + $(event.target).attr('data-delete-permission'))
+                        selector.val(deleteIds + $(event.target).attr('data-delete-permission'))
                         $(event.target).closest('li').remove();
                     }
                 });
@@ -103,27 +103,30 @@
             form.alaressValidate({
                 ignore: ':disabled',
                 rules: {
-                    'heading': {
-                        required:       true
-                    },
-                    'body': {
-                        required:       true
-                    }
+                    'heading': { required: true},
+                    'body': { required: true}
                 },
 
                 messages: {
-                    'heading': {
-                        required:       'You must enter a title enter a heading before you can proceed.'
-     ,                     'body': {
-                        required:       'You must enter a description of the pastoral event before you can proceed.'
-                    }
-              }
+                    'heading': { required: 'You must enter a title enter a heading before you can proceed.' },
+                    'body': { required: 'You must enter a description of the pastoral event before you can proceed.' }
                 }
             });
         });
     });
 </script>
 <!-- END custom_head -->
+
+<ul class="breadcrumb">
+    <li>
+        <a href="/search/user/{{ student.getId }}">
+            {{ record.getStudent.getFirstname }} {{ record.getStudent.getLastname }}
+            {{ student.getFirstname }} {{ student.getLastname }}
+        </a>
+    </li>
+    <li><a href="/pastoral/{{ student.getId }}{{ record.getStudent.getId }}">Pastoral Care</a></li>
+    <li class="active"><a href="#">{% if record.getId == '' %}Add Record{% else %}Modify Record{% endif %}</a></li>
+</ul>
 
 <div class="actions-small-1 row">
     <div class="list-item">
@@ -142,11 +145,11 @@
             <input type="hidden" name="id" value="{{ record.getId }}">
             <input type="hidden" id="deleteIds" name="deleteIds" value="">
             <input type="hidden" name="student_id" value="{{ student.getId }}{{ record.getStudent.getId }}">
-            <h2>
+            <h2 class="subheader">
                 {% if record.getId == '' %}
-                    Add Pastoral Record
+                    Add Record
                 {% else %}
-                    Modify Pastoral Record
+                    Modify Record
                 {% endif %}
             </h2>
             <section>
@@ -177,6 +180,7 @@
 
                         <label>
                             Tags
+                            {% for tag in record.tagsList %}{{ tag.getName }},{% endfor %}
                             <input id="tags" name="tags" value="{% for tag in record.tagsList %}{{ tag.getName }},{% endfor %}">
                         </label>
 
@@ -188,7 +192,55 @@
                 </fieldset>
             </section>
 
-            <h2>Permissions</h2>
+            <h2 class="subheader">Access Permissions</h2>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Roles
+                            <span class="hint has-tip tip-top" data-tooltip title="Select the roles you would like to access this record and its contents. Roles not selected will not be able to see the record.">?</span>
+                            {% for role in roles if role.getType != 'student' and role.getType != 'guest' %}
+
+                                {# Default for new items: staff roles are selected, others are not #}
+
+                                <input type="hidden" name="role[{{ role.getId }}]" value="0" />
+                                <input type="checkbox" name="role[{{ role.getId }}]" id="role[{{ role.getId }}]" value="1"
+                                        {% if record.getId != '' %}
+                                            {% for access in record.getAccessList if access.getRole.getId != '' %}
+                                                {% if access.getRole.getId == role.getId %}
+                                                    checked
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            {% if role.getType == 'staff' %}
+                                                checked
+                                            {% endif %}
+                                        {% endif %}
+                                />
+                                <label for="role[{{ role.getId }}]" class="checkbox-label">{{ role.getName }} {% if role.getType == 'parent' %}of student{% endif %}</label>
+
+                            {% endfor %}
+                        </label>
+
+                        <fieldset >
+                            <legend>
+                                <label>
+                                    Hide Content From These Roles
+                                    <span class="hint has-tip tip-top" data-tooltip title="If selected, the body of this report will only be visible to you, and no other users. Other users will only see the title and the event type.">?</span>
+                                </label>
+                            </legend>
+
+                            <div class="switch">
+                                <input id="private" name="private" {% if record.getPrivate %}checked{% endif %} value="1" type="checkbox">
+                                <label for="private"></label>
+                            </div>
+
+                        </fieldset>
+
+                    </div>
+                </fieldset>
+            </section>
 
             {% if record.getAccessList.count > 0 %}
                 <section>
@@ -217,86 +269,54 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
-                            Add Authorised User
-                            <span class="hint has-tip tip-top" data-tooltip title="These selected users will have access to view this record and its contents.">?</span>
-                            <select id="addUser" name="user_id[]" multiple placeholder="Add Authorised User"></select>
+                            Individual Users
+                            <span class="hint has-tip tip-top" data-tooltip title="Add individual users who you would like to access this record and its contents.">?</span>
+                            <select id="addUser" name="user_id[]" multiple placeholder="Individual Users"></select>
                         </label>
                     </div>
                 </fieldset>
             </section>
 
+            <h2 class="subheader">Attach Files</h2>
+
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
-                            Allow All Users With Role
-                            <span class="hint has-tip tip-top" data-tooltip title="Users in the selected roles will be able to see this pastoral care record. Users that are no in one of these roles will see no indication the record exists.">?</span>
-                            {% for role in roles if role.getType != 'student' and role.getType != 'guest' %}
-
-                                {# Default for new items: staff roles are selected, others are not #}
-
-                                <input type="hidden" name="role[{{ role.getId }}]" value="0" />
-                                <input type="checkbox" name="role[{{ role.getId }}]" id="role[{{ role.getId }}]" value="1"
-                                    {% if record.getId != '' %}
-                                        {% for access in record.getAccessList if access.getRole.getId != '' %}
-                                            {% if access.getRole.getId == role.getId %}
-                                                checked
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% else %}
-                                        {% if role.getType == 'staff' %}
-                                            checked
-                                        {% endif %}
-                                    {% endif %}
-                                />
-                                <label for="role[{{ role.getId }}]" class="checkbox-label">{{ role.getName }}</label>
-
-                            {% endfor %}
-                        </label>
-
-                        <fieldset class="checklist">
-                            <legend>
-                                <label>
-                                    Private Body
-                                    <span class="hint has-tip tip-top" data-width="200" title="If ticked only you will be able view the content of this pastoral record">?</span>
-                                </label>
-                            </legend>
-                            <input id="visibilityPrivate" name="private" type="checkbox" {% if record.getPrivate %}checked{% endif %} value="1"><label for="visibilityPrivate">If ticked The body of the record and attachments should only be visible by myself (When selected the title and event type will still be visible to the audiences listed above.)</label>
-                        </fieldset>
-
+                        <section>
+                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                        </section>
                     </div>
                 </fieldset>
             </section>
 
-            <h2>Attach Files</h2>
+            <h2 class="subheader">Notifications</h2>
 
-            <section>
-                {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-            </section>
-
-            <h2>Notifications</h2>
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <fieldset class="checklist">
-                            <legend>
-                                <label>
-                                    Send Notifications To Audience
-                                </label>
-                            </legend>
-                            <input id="notify" name="notify" type="checkbox" value="1"><label for="notify">If ticked an instant notification will be sent to all audience members this record has been {% if id == '' %}created{% else %}updated{% endif %}.</label>
-                        </fieldset>
+                        <legend>
+                            <label>
+                                Notifications
+                                <span class="hint has-tip tip-top" data-tooltip title="If ticked, notifications about creation, modifications, and comments will be sent to all roles and users who have permissions to access this record.">?</span>
+                            </label>
+                        </legend>
+
+                        <div class="switch">
+                            <input id="notify" name="notify" value="1" type="checkbox">
+                            <label for="notify"></label>
+                        </div>
                     </div>
                 </fieldset>
             </section>
+
 
             {% if record.getId == '' %}
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label>
-                                Create Duplicate Record On Other Students
-                                <span class="hint has-tip tip-top" data-tooltip title="Duplicate copies of this pastoral record will be added to these students.">?</span>
+                                Other Students Involved
+                                <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate report and add it to the pastoral care area for these students.">?</span>
                                 <select id="addStudent" name="duplicate_id[]" multiple placeholder="Add Students"></select>
                             </label>
                         </div>
@@ -305,22 +325,29 @@
             {% endif %}
 
             <div class="row">
-                {% if record.getId == '' %}
+                <div class="small-12 column">
+                    {% if record.getId == '' %}
 
-                    {# Insert Buttons #}
+                        {# Insert Buttons #}
 
-                    <div class="small-12 medium-6 column"><input data-submit type="submit" value="Insert Pastoral Comment"/></div>
-                    <div class="small-12 medium-6 column"><input data-cancel type="submit" value="Cancel Changes"/></div>
+                        <ul class="flex-list buttons">
+                            <li><input type="submit" data-submit class="icon-add submit" value="Save"></li>
+                            <li><a href="#" data-cancel class="button icon-cancel">Cancel Changes</a></li>
+                        </ul>
 
-                {% else %}
 
-                    {# Update Buttons #}
+                    {% else %}
 
-                    <div class="small-12 medium-4 column"><input data-submit type="submit" value="Save Changes"/></div>
-                    <div class="small-12 medium-4 column"><input data-delete type="submit" value="Delete"/></div>
-                    <div class="small-12 medium-4 column"><input data-cancel type="submit" value="Cancel Changes"/></div>
+                        {# Update Buttons #}
 
-                {% endif %}
+                        <ul class="flex-list buttons">
+                            <li><input type="submit" data-submit class="icon-modify submit" value="Save"></li>
+                            <li><a href="#" data-delete class="button icon-delete">Delete Pastoral Record</a></li>
+                            <li><a href="#" data-cancel class="button icon-cancel">Cancel Changes</a></li>
+                        </ul>
+
+                    {% endif %}
+                </div>
             </div>
         </form>
     </div>

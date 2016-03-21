@@ -540,7 +540,6 @@ class Controller extends Base
                     'types'           => $this->getPastoralTypeMapper()->findAll(),
                     'severities'      => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
                     'roles'           => $this->getRoleMapper()->findAll(),
-                    'tags'            => $this->getPastoralTagsMapper()->findAll()->sortBy('name', 'asc'),
                     'attachzone'      => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($id)),
                 ),
             )
@@ -995,9 +994,9 @@ class Controller extends Base
                 }
 
                 if (empty($this->getRequest()->post["id"])) {
-                    $body = "A new pastoral alert has been entered for " . $user->getFullName() . ". Click here to view this alert.";
+                    $body = "Pastoral care message received (confidential)";
                 } else {
-                    $body = "An existing pastoral alert has been updated for " . $user->getFullName() . ". Click here to view this alert.";
+                    $body = "Pastoral care message updated (confidential)";
                 }
 
                 $bob = new \Alaress\Async\Notification\Instance\Builder();
@@ -1248,6 +1247,7 @@ class Controller extends Base
     public function getErrorMapper() {
         return $this->errorMapper;
     }
+
 }
 
 /*

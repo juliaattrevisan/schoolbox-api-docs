@@ -312,7 +312,10 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
             {$criteria_sql}
-            ORDER BY `r`.datetime_posted
+            ORDER BY
+              `s`.lastname,
+
+            `r`.datetime_posted
         ";
 
         $statement = $this->getDatabase()->prepare($query);

@@ -60,8 +60,8 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h1>{{ student.formatName() }}</h1>
-        <h2>Pastoral Record Details</h2>
+        <h1>{{ record.getStudent.formatName() }}</h1>
+        <h2 class="subheader">Pastoral Record Details</h2>
 
         <section>
             <ul class="action-list">
@@ -147,7 +147,7 @@
         {# Parents cannot ever add/view comments #}
         {% if role != 'parent' %}
 
-            <h2>Comments</h2>
+            <h2 class="subheader">Comments</h2>
             {% if record.getCommentList.count > 0 %}
                 <section>
                     <ul class="action-list">

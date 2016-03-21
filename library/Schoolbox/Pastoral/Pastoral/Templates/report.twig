@@ -8,7 +8,7 @@
     });
 </script>
 <ul class="breadcrumb hide-on-print">
-    <li><a href="/pastoral/report-builder">Pastoral Care Report Builder</a></li>
+    <li><a href="/pastoral/report-builder">Pastoral Care Report Generator</a></li>
     <li class="active"><a href="#">Report Results</a></li>
 </ul>
 
@@ -26,8 +26,8 @@
         <div class="small-12 island">
             <section class="content">
                 <p class="no-margin left">
-                    The following pastoral care incidents were found matching your report criteria, click on an incident to expand
-                    and view its details.
+                    The following pastoral care incidents were found matching your report criteria, click to expand an
+                    incident and view the full report.
                 </p>
                 <p class="no-margin right">
                     Viewing results {{ pageCurrent * resultsPerPage - resultsPerPage + 1 }} - {{ min(totalResults, pageCurrent * resultsPerPage) }} of {{ totalResults }}
@@ -45,9 +45,7 @@
                     <dd class="accordion-navigation">
 
                         <a href="#panel-{{ record.getId }}">
-                            <div class="left">{{ record.getHeading }}</div>
-                            <div class="right">{{ record.getStudent.getFirstname }} {{ record.getStudent.getLastname }}</div>
-                            <div class="clearfix"></div>
+                            {{ record.getStudent.getLastname }}, {{ record.getStudent.getFirstname }} - {{ record.getHeading }}
                         </a>
 
                         <div id="panel-{{ record.getId }}" class="content">
