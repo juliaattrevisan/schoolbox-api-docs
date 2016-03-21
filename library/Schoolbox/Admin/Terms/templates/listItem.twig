@@ -1,14 +1,21 @@
-<div class="list-item">
-    <div class="small-12 info card">
-        <h3>{{ term.getTitle() }} ({{ term.getCode() }})</h3>
-        <p class="meta">
-            {{ term.getStart().getDateOnly() }}—{{ term.getFinish().getDateOnly() }}
-        </p>
+<li class="actions-small-2">
+    <div class="list-item">
+        <div class="small-12 info card">
+            <h3>{{ term.getTitle() }} ({{ term.getCode() }})</h3>
+            <p class="meta">
+                {{ term.getStart().getDateOnly() }}—{{ term.getFinish().getDateOnly() }}
+            </p>
+        </div>
     </div>
-</div>
-<div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="term-{{ term.getId() }}">
-    {% include '@adminTerms/form.twig' with {term: term} %}
-</div>
-<nav>
-    <a href="#" class="icon-down-arrow" data-collapser="term-{{ term.getId() }}"></a>
-</nav>
+    <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="term-{{ term.getId() }}">
+        {% include '@adminTerms/form.twig' with {term: term} %}
+    </div>
+    <nav>
+        <a href="#" class="icon-down-arrow" data-collapser="term-{{ term.getId() }}"></a>
+        <a href="#" class="icon-overflow" data-dropdown="term-{{ term.getId() }}-dropdown" aria-expanded="false" title="Actions"></a>
+    </nav>
+    <ul class="f-dropdown" data-dropdown-content id="term-{{ term.getId() }}-dropdown">
+        <li><a href="#" class="icon-archive">Archive</a></li>
+        <li><a href="#" class="icon-delete">Delete</a></li>
+    </ul>
+</li>

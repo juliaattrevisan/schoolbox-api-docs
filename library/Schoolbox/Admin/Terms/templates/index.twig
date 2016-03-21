@@ -8,9 +8,7 @@
         <section>
             <ul class="action-list">
                 {% for term in terms %}
-                    <li class="actions-small-1">
-                        {% include '@adminTerms/listItem.twig' with {term: term} %}
-                    </li>
+                    {% include '@adminTerms/listItem.twig' with {term: term} %}
                 {% endfor %}
             </ul>
         </section>
