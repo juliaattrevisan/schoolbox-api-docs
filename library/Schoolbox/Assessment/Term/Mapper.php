@@ -7,7 +7,10 @@
 
 namespace Schoolbox\Assessment\Term;
 
+use Alaress_Date_Format;
+use RangeException;
 use Schoolbox\Mapper as BaseMapper;
+use UnexpectedValueException;
 
 /**
  * Mapper for terms.
@@ -39,6 +42,7 @@ class Mapper extends BaseMapper
      *
      * @param  Model $model
      * @return bool Always true, as long as it doesn't throw
+     * @throws RangeException if it overlaps
      */
     public function verifyNoOverlap(Model $model)
     {
@@ -66,7 +70,7 @@ class Mapper extends BaseMapper
         $statement->execute($params);
         $row = $statement->fetch();
         if ($row !== false) {
-            throw new \RangeException(
+            throw new RangeException(
                 sprintf(
                     'This term overlaps term "%s" (%s).',
                     $row['title'],
