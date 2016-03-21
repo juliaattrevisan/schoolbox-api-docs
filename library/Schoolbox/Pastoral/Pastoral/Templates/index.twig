@@ -153,7 +153,7 @@
         <h1>Pastoral Care</h1>
     </div>
     <div class="small-12 column">
-        <div class="alert-box">No pastoral care records are visible regarding {{ student.formatName }}.{% if role != 'parent' %} To add a record click 'Add Pastoral Comment'.{% endif %}</div>
+        <div class="alert-box">No pastoral care records are visible regarding {{ student.formatName }}.{% if role != 'parent' %} <a href="/pastoral/insert/{{ student.getId }}">Add a Pastoral Record</a>{% endif %}</div>
     </div>
 </div>
 
