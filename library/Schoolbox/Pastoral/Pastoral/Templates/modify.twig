@@ -145,13 +145,29 @@
             <input type="hidden" name="id" value="{{ record.getId }}">
             <input type="hidden" id="deleteIds" name="deleteIds" value="">
             <input type="hidden" name="student_id" value="{{ student.getId }}{{ record.getStudent.getId }}">
-            <h2 class="subheader">
-                {% if record.getId == '' %}
-                    Add Record
-                {% else %}
-                    Modify Record
+
+            <div class="actions-small-1 row">
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <h2 class="subheader">
+                            {% if record.getId == '' %}
+                                Add Record
+                            {% else %}
+                                Modify Record
+                            {% endif %}
+                        </h2>
+                    </div>
+                </div>
+                {% if record.getId != '' %}
+                    <nav>
+                        <a class="icon-more" title="" data-dropdown="header-options"></a>
+                    </nav>
+                    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                        <li><a href="#" data-delete class="icon-delete">Delete Pastoral Record</a></li>
+                    </ul>
                 {% endif %}
-            </h2>
+            </div>
+
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -337,7 +353,7 @@
                         {# Insert Buttons #}
 
                         <ul class="flex-list buttons">
-                            <li><input type="submit" data-submit class="icon-add submit" value="Save"></li>
+                            <li><input type="submit" data-submit class="submit" value="Save"></li>
                             <li><a href="#" data-cancel class="button icon-cancel">Cancel Changes</a></li>
                         </ul>
 
@@ -347,8 +363,7 @@
                         {# Update Buttons #}
 
                         <ul class="flex-list buttons">
-                            <li><input type="submit" data-submit class="icon-modify submit" value="Save"></li>
-                            <li><a href="#" data-delete class="button icon-delete">Delete Pastoral Record</a></li>
+                            <li><input type="submit" data-submit class="submit" value="Save"></li>
                             <li><a href="#" data-cancel class="button icon-cancel">Cancel Changes</a></li>
                         </ul>
 
