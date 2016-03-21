@@ -31,5 +31,49 @@ class Mapper extends BaseMapper
         $this->uses('start', self::TYPE_DATE);
         $this->uses('finish', self::TYPE_DATE);
         $this->uses('archived', self::TYPE_BOOLEAN);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyNoOverlap']);
+    }
+
+    /**
+     * Verifies this term doesn't overlap any other terms.
+     *
+     * @param  Model $model
+     * @return bool Always true, as long as it doesn't throw
+     */
+    public function verifyNoOverlap(Model $model)
+    {
+        // if any term that isn't this one:
+        // * finish <= this start
+        // * start >= this finish
+        // error out
+        $query = "
+            SELECT * FROM {$this->getTable()}
+            WHERE (
+                (`start`  BETWEEN CAST(:thisStart AS DATE) AND CAST(:thisFinish AS DATE))
+                OR
+                (`finish` BETWEEN CAST(:thisStart AS DATE) AND CAST(:thisFinish AS DATE))
+            )
+        ";
+        $params = [
+            'thisStart'  => $model->getStart()->getDatabaseDate(),
+            'thisFinish' => $model->getFinish()->getDatabaseDate(),
+        ];
+        if ($model->getId()) {
+            $query .= ' AND id != :id';
+            $params['id'] = $model->getId();
+        }
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
+        $row = $statement->fetch();
+        if ($row !== false) {
+            throw new \RangeException(
+                sprintf(
+                    'This term overlaps term "%s" (%s).',
+                    $row['title'],
+                    $row['code']
+                )
+            );
+        }
+        return true;
     }
 }
