@@ -37,11 +37,15 @@
                             }
                         %}
                     </div>
+
+                    {% if curriculumEnabled %}
                     <div class="small-12 column">
                         <label>Curriculum Codes
                             {% include 'sub/curriculumCodeSelector.twig' with { renderButton: false, codeList: folder.curriculumNodes } %}
                         </label>
                     </div>
+                    {% endif %}
+
                     {% if not folder.id %}
                     <div data-mage-submitrow>
                         <div class="small-12 medium-8 column">
