@@ -22,6 +22,7 @@ class AdminV2_Nav
         'rollover' => 'Rollover',
         'grades' => 'Grades',
         'rubric-results' => 'Rubrics',
+        'terms' => 'Terms',
         'course-builder' => 'Course Builder',
         'messages' => 'Messages',
         'list' => 'Lists',
