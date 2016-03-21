@@ -356,7 +356,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             $settings = array(
                 'userName' =>  $_SESSION['username'],
                 'password' => $_SESSION['password'],
-                'baseUri' => 'https://btac12.btac.nsw.edu.au',
+                'baseUri' => 'https://wd1.btac.nsw.edu.au',
             );
 
             if ($groupHandler->isStaff()) {
