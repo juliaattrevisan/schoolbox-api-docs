@@ -1,3 +1,10 @@
+{% if term.getId() %}
+    {% set saveRoute = routeLookup('adminTerms.postUpdateTerm', {id: term.getId()}) %}
+    {% set saveValue = 'Update Term' %}
+{% else %}
+    {% set saveRoute = routeLookup('adminTerms.postCreateTerm') %}
+    {% set saveValue = 'Create Term' %}
+{% endif %}
 <form method="POST" action="{{ saveRoute }}" class="row">
     <div class="small-6 columns">
         <label>
@@ -39,5 +46,5 @@
                    data-datepicker />
         </label>
     </div>
-    <input type="submit" value="Save Changes" />
+    <input type="submit" class="full-width" value="{{ saveValue }}" />
 </form>

@@ -15,7 +15,15 @@
             </ul>
         </section>
 
+        <a href="#" class="button submit full-width" data-reveal-id="addTermModal">Add Term</a>
+
     </div>
+</div>
+
+<div id="addTermModal" class="reveal-modal" data-reveal aria-labelledby="addTermModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="addTermModalTitle">Add Term</h2>
+    {% include '@adminTerms/form.twig' %}
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
