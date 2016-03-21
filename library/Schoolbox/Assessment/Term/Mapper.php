@@ -49,7 +49,7 @@ class Mapper extends BaseMapper
      */
     public function verifyTitle(Model $model)
     {
-        if (!$this->isUnique('title', $model->getTitle(), $model->getId())) {
+        if (!$this->isUnique(['title' => $model->getTitle()], $model->getId())) {
             throw new UnexpectedValueException(
                 sprintf(
                     'A term with title "%s" already exists.',
@@ -69,7 +69,7 @@ class Mapper extends BaseMapper
      */
     public function verifyCode(Model $model)
     {
-        if (!$this->isUnique('code', $model->getCode(), $model->getId())) {
+        if (!$this->isUnique(['code' => $model->getCode()], $model->getId())) {
             throw new UnexpectedValueException(
                 sprintf(
                     'A term with code "%s" already exists.',
@@ -77,34 +77,6 @@ class Mapper extends BaseMapper
                 )
             );
         }
-        return true;
-    }
-
-    /**
-     * Verifies that a field's value is unique.
-     *
-     * @param  string $field     The column to compare
-     * @param  mixed  $value     The value to compare
-     * @param  mixed  $currentId The ID of the row I'm trying to save.
-     *                           It's okay if the row I'm trying to save has
-     *                           this value already.
-     *
-     * @return bool
-     */
-    protected function isUnique($field, $value, $currentId)
-    {
-        $query = $this->selectScalarByColumnList($this->getIdentifier()['column'], [$field => $value]);
-        $query->execute();
-        while (($dupeId = $query->fetchColumn()) !== false) {
-            if ($currentId == $dupeId) {
-                // I'm trying to save this row. I don't mind if it dupes itself
-                continue;
-            } else {
-                // This is a legitimate dupe
-                return false;
-            }
-        }
-        // No duplicates
         return true;
     }
 
