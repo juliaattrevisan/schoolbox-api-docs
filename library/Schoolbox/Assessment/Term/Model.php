@@ -55,7 +55,7 @@ class Model
     /**
      * If a term is archived, it should be de-emphasized in term selectors.
      *
-     * @var string
+     * @var bool
      */
     protected $archived;
 
@@ -159,7 +159,7 @@ class Model
     }
 
     /**
-     * @return string
+     * @return bool
      */
     public function getArchived()
     {
@@ -167,7 +167,7 @@ class Model
     }
 
     /**
-     * @param  string $archived
+     * @param  bool $archived
      * @return $this
      */
     public function setArchived($archived)
