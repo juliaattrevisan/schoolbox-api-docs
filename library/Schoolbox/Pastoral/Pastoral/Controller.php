@@ -224,13 +224,10 @@ class Controller extends Base
      */
     public function getReportPrint()
     {
-        // Get current users role
-
-        $role = $this->getUser()->getRole()->getType();
 
         // Kick them back to the kerb if they aren't allowed to view this page
 
-        if ($role != "staff")
+        if (!$this->getUser()->getRole()->isStaff())
             $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         $this->getResponse()->content->set(
@@ -308,12 +305,9 @@ class Controller extends Base
     public function getReportBuilder()
     {
         // Get current users role. The screen is restricted to pastoral moderators only
-
-        $role = $this->getUser()->getRole()->getType();
-
         // Kick them back to the kerb if they shouldn't be looking at this page
 
-        if ($role != "staff")
+        if (!$this->getUser()->getRole()->isStaff())
             $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // And render this thing out
@@ -339,10 +333,6 @@ class Controller extends Base
      */
     public function getIndex($id)
     {
-        // Get current users role. The list screen is restricted to parents and staff
-
-        $role = $this->getUser()->getRole()->getType();
-
         // Get the students parents
 
         $externalUserMapper = new \External_User();
@@ -353,8 +343,10 @@ class Controller extends Base
 
         $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
+        // The list screen is restricted to parents and staff
+
         if (!$pastoralModerator)
-            if ($role != "staff" && !$this->getUser()->isParentOf($student))
+            if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student))
                 $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // Get the students contact details for display
@@ -424,10 +416,6 @@ class Controller extends Base
         /** @var \Schoolbox\User $user */
         $user = $this->getUser();
 
-        // Get the current users role
-
-        $role = $this->getUser()->getRole()->getType();
-
         // Get the students parents
 
         $student = $this->getUserMapper()->findWithSubjects($studentId);
@@ -436,7 +424,7 @@ class Controller extends Base
         $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($user)->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         if (!$pastoralModerator)
-            if ($role != "staff" && !$this->getUser()->isParentOf($student) && !$pastoralModerator)
+            if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student) && !$pastoralModerator)
                 $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // Get the pastoral care record
@@ -471,9 +459,7 @@ class Controller extends Base
     {
         // Only staff should be inserting comments
 
-        $role = $this->getUser()->getRole()->getType();
-
-        if ($role != "staff")
+        if (!$this->getUser()->getRole()->isStaff())
             $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         try {
@@ -521,12 +507,10 @@ class Controller extends Base
 
         // Only the staff member that owns the record should be updating it
 
-        $role = $this->getUser()->getRole()->getType();
-
         $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         if (!$pastoralModerator)
-            if ($role != "staff" || $this->getUser()->getId() != $record->getOwner()->getId())
+            if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $record->getOwner()->getId())
                 $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // Lets get the party started...
@@ -559,9 +543,7 @@ class Controller extends Base
 
         // Only the staff member that owns the record should be updating it
 
-        $role = $this->getUser()->getRole()->getType();
-
-        if ($role != "staff" || $this->getUser()->getId() != $comment->getOwner()->getId())
+        if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $comment->getOwner()->getId())
             $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         $this->getPastoralCommentMapper()->delete($comment);
@@ -570,12 +552,9 @@ class Controller extends Base
     public function postComment()
     {
         // Post a comment on a pastoral record
-
-        $role = $this->getUser()->getRole()->getType();
-
         // Only staff should be doing this
 
-        if ($role != "staff")
+        if (!$this->getUser()->getRole()->isStaff())
             $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // No blank comments thanks
@@ -601,11 +580,9 @@ class Controller extends Base
      */
     public function postSave()
     {
-        $role = $this->getUser()->getRole()->getType();
-
         // Only staff should be doing this
 
-        if ($role != "staff") {
+        if (!$this->getUser()->getRole()->isStaff()) {
             $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
@@ -1072,9 +1049,7 @@ class Controller extends Base
 
         if (!$pastoralModerator)
         {
-            $role = $this->getUser()->getRole()->getType();
-
-            if ($role != "staff" || $this->getUser()->getId() != $record->getOwner()->getId())
+            if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $record->getOwner()->getId())
                 $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
