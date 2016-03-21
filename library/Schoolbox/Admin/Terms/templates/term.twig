@@ -12,7 +12,7 @@
             <label>
                 Title
                 <input type="text"
-                       name="terms[{{ term.getId() }}][title]"
+                       name="title"
                        value="{{ term.getTitle() }}"
                        required
                        maxlength="100" />
@@ -22,7 +22,7 @@
             <label>
                 Code
                 <input type="text"
-                       name="terms[{{ term.getId() }}][code]"
+                       name="code"
                        value="{{ term.getCode() }}"
                        required
                        maxlength="16" />
@@ -32,7 +32,7 @@
             <label>
                 Start
                 <input type="text"
-                       name="terms[{{ term.getId() }}][start]"
+                       name="start"
                        value="{{ term.getStart().getLocalShort() }}"
                        required
                        data-datepicker />
@@ -42,7 +42,7 @@
             <label>
                 Finish
                 <input type="text"
-                       name="terms[{{ term.getId() }}][finish]"
+                       name="finish"
                        value="{{ term.getFinish().getLocalShort() }}"
                        required
                        data-datepicker />

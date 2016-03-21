@@ -54,12 +54,27 @@ class Controller extends Base
      */
     public function postCreateTerm()
     {
+        $term = $this->termMapper->createModel();
+        $term
+            ->setTitle($this->getRequest()->post->get('title'))
+            ->setCode($this->getRequest()->post->get('code'))
+            ->setStart(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('start')))
+            ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
+        ;
     }
 
     /**
      * POST action for updating an existing term
+     *
+     * @param Term\Model $term
      */
     public function postUpdateTerm(Term\Model $term)
     {
+        $term
+            ->setTitle($this->getRequest()->post->get('title'))
+            ->setCode($this->getRequest()->post->get('code'))
+            ->setStart(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('start')))
+            ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
+        ;
     }
 }
