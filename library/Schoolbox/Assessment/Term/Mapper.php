@@ -34,7 +34,97 @@ class Mapper extends BaseMapper
         $this->uses('start', self::TYPE_DATE);
         $this->uses('finish', self::TYPE_DATE);
         $this->uses('archived', self::TYPE_BOOLEAN);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyTitle']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyCode']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyDates']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyNoOverlap']);
+    }
+
+    /**
+     * Verifies this term's title is unique.
+     *
+     * @param  Model $model
+     * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if it isn't unique
+     */
+    public function verifyTitle(Model $model)
+    {
+        if (!$this->isUnique('title', $model->getTitle(), $model->getId())) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'A term with title "%s" already exists.',
+                    $model->getTitle()
+                )
+            );
+        }
+        return true;
+    }
+
+    /**
+     * Verifies this term's code is unique.
+     *
+     * @param  Model $model
+     * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if it isn't unique
+     */
+    public function verifyCode(Model $model)
+    {
+        if (!$this->isUnique('code', $model->getCode(), $model->getId())) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'A term with code "%s" already exists.',
+                    $model->getCode()
+                )
+            );
+        }
+        return true;
+    }
+
+    /**
+     * Verifies that a field's value is unique.
+     *
+     * @param  string $field     The column to compare
+     * @param  mixed  $value     The value to compare
+     * @param  mixed  $currentId The ID of the row I'm trying to save.
+     *                           It's okay if the row I'm trying to save has
+     *                           this value already.
+     *
+     * @return bool
+     */
+    protected function isUnique($field, $value, $currentId)
+    {
+        $query = $this->selectScalarByColumnList($this->getIdentifier()['column'], [$field => $value]);
+        $query->execute();
+        $dupeId = $query->fetchColumn();
+        if (!$dupeId) {
+            // No duplicate
+            return true;
+        } elseif ($currentId == $dupeId) {
+            // This row already has this value - that's okay
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Verifies this term has proper dates.
+     *
+     * @param  Model $model
+     * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if dates are invalid
+     */
+    public function verifyDates(Model $model)
+    {
+        if (!($model->getStart() instanceof Alaress_Date_Format && !$model->getStart()->isNull())) {
+            throw new UnexpectedValueException('Term start must be a valid date.');
+        }
+        if (!($model->getFinish() instanceof Alaress_Date_Format && !$model->getFinish()->isNull())) {
+            throw new UnexpectedValueException('Term finish must be a valid date.');
+        }
+        if ($model->getStart()->gte($model->getFinish())) {
+            throw new UnexpectedValueException('Term start must be before term finish.');
+        }
+        return true;
     }
 
     /**
