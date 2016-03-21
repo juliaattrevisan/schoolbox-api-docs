@@ -8,6 +8,7 @@
 namespace Schoolbox\Admin\Terms;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Term;
 
 /**
@@ -18,21 +19,34 @@ use Schoolbox\Assessment\Term;
 class Controller extends Base
 {
     /**
+     * @var Term\Mapper
+     */
+    protected $termMapper;
+
+    /**
+     * Constructor
+     *
+     * @param Term\Mapper $termMapper
+     */
+    public function __construct(Term\Mapper $termMapper)
+    {
+        $this->termMapper = $termMapper;
+    }
+
+    /**
      * GET action for viewing list of terms
      */
     public function getIndex()
     {
         // TODO make this use the new way of creating responses
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@adminTerms/index.twig',
-                'data'     => [
-                    'pageCurrent' => basename($this->getRequest()->query->get('page')),
-                    'terms'       => Term\Mapper::getInstance()->findAll(['order' => ['start' => 'desc']]),
-                ],
-                'title' => 'Admin - Terms'
-            )
-        );
+        $this->getResponse()->content->set([
+            'template' => '@adminTerms/index.twig',
+            'data'     => [
+                'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                'terms'       => $this->termMapper->findAll(['order' => ['start' => 'desc']]),
+            ],
+            'title' => 'Admin - Terms'
+        ]);
     }
 
     /**

@@ -26,6 +26,23 @@ class Module extends BaseModule
     protected $basename = 'adminTerms';
 
     /**
+     * @var Term\Mapper;
+     */
+    protected $termMapper;
+
+    /**
+     * Constructor
+     *
+     * @param ContainerInterface $injector
+     * @param Term\Mapper        $mapper
+     */
+    public function __construct(ContainerInterface $injector, Term\Mapper $mapper)
+    {
+        parent::__construct($injector);
+        $this->termMapper = $mapper;
+    }
+
+    /**
      * @inheritdoc
      */
     public function initRoutes(Router $router, $basePath)
@@ -54,7 +71,7 @@ class Module extends BaseModule
     {
         $this
             ->addRoutePreload($matcher, 'postUpdateTerm', function($params) {
-                return ['term' => Term\Mapper::getInstance()->findById($params['id']),];
+                return ['term' => $this->termMapper->findById($params['id']),];
             })
         ;
     }
@@ -66,7 +83,10 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            $injector->lazyNew(
+                Controller::class,
+                ['termMapper' => $this->termMapper,]
+            )
         );
     }
 

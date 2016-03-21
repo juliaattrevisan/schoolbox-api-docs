@@ -10,6 +10,7 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Realtime\Admin\Module;
 
 class Admin implements ModuleConfigInterface
@@ -49,7 +50,7 @@ class Admin implements ModuleConfigInterface
         $courseBuilder->init('/adminv2/course-builder');
 
         // Admin terms manager page
-        $terms = new \Schoolbox\Admin\Terms\Module($di);
+        $terms = new \Schoolbox\Admin\Terms\Module($di, Term\Mapper::getInstance());
         $terms->init('/adminv2/terms');
     }
 } 
