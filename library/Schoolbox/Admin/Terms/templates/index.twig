@@ -1,8 +1,6 @@
 {# Shared navigation menu #}
 {{ renderAdminNavigation(pageCurrent) }}
 
-<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
-
 {# show each term #}
 <div class="row">
     <div class="small-12 island">
@@ -10,7 +8,7 @@
         <section>
             <ul class="action-list">
                 {% for term in terms %}
-                    <li>
+                    <li class="actions-small-1">
                         <div class="list-item">
                             <div class="small-12 info card">
                                 <h3>{{ term.getTitle() }} ({{ term.getCode() }})</h3>
@@ -19,47 +17,50 @@
                                 </p>
                             </div>
                         </div>
-                    </li>
-                    <li class="row">
-                        <form method="POST" action="">
-                            <div class="small-6 columns">
-                                <label>
-                                    Title
-                                    <input type="text"
-                                           name="terms[{{ term.getId() }}][title]"
-                                           value="{{ term.getTitle() }}"
-                                           maxlength="100" />
-                                </label>
-                            </div>
-                            <div class="small-6 columns">
-                                <label>
-                                    Code
-                                    <input type="text"
-                                           name="terms[{{ term.getId() }}][code]"
-                                           value="{{ term.getCode() }}"
-                                           maxlength="16" />
-                                </label>
-                            </div>
-                            <div class="small-6 columns">
-                                <label>
-                                    Start
-                                    <input type="text"
-                                           name="terms[{{ term.getId() }}][start]"
-                                           value="{{ term.getStart().getLocalShort() }}"
-                                           data-datepicker />
-                                </label>
-                            </div>
-                            <div class="small-6 columns">
-                                <label>
-                                    Finish
-                                    <input type="text"
-                                           name="terms[{{ term.getId() }}][finish]"
-                                           value="{{ term.getFinish().getLocalShort() }}"
-                                           data-datepicker />
-                                </label>
-                            </div>
-                            <input type="submit" value="Save Changes" />
-                        </form>
+                        <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="term-{{ term.getId() }}">
+                            <form method="POST" action="" class="row">
+                                <div class="small-6 columns">
+                                    <label>
+                                        Title
+                                        <input type="text"
+                                               name="terms[{{ term.getId() }}][title]"
+                                               value="{{ term.getTitle() }}"
+                                               maxlength="100" />
+                                    </label>
+                                </div>
+                                <div class="small-6 columns">
+                                    <label>
+                                        Code
+                                        <input type="text"
+                                               name="terms[{{ term.getId() }}][code]"
+                                               value="{{ term.getCode() }}"
+                                               maxlength="16" />
+                                    </label>
+                                </div>
+                                <div class="small-6 columns">
+                                    <label>
+                                        Start
+                                        <input type="text"
+                                               name="terms[{{ term.getId() }}][start]"
+                                               value="{{ term.getStart().getLocalShort() }}"
+                                               data-datepicker />
+                                    </label>
+                                </div>
+                                <div class="small-6 columns">
+                                    <label>
+                                        Finish
+                                        <input type="text"
+                                               name="terms[{{ term.getId() }}][finish]"
+                                               value="{{ term.getFinish().getLocalShort() }}"
+                                               data-datepicker />
+                                    </label>
+                                </div>
+                                <input type="submit" value="Save Changes" />
+                            </form>
+                        </div>
+                        <nav>
+                            <a href="#" class="icon-down-arrow" data-collapser="term-{{ term.getId() }}"></a>
+                        </nav>
                     </li>
                 {% endfor %}
             </ul>
@@ -67,3 +68,11 @@
 
     </div>
 </div>
+
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $('[data-collapser]').collapsable();
+    });
+</script>
