@@ -4,26 +4,52 @@
 {# show each term #}
 <div class="row">
     <div class="small-12 island">
-        <form method="POST" action="">
 
-            <section>
-                <ul class="action-list">
-                    {% for term in terms %}
-                        <li>
-                            <div class="list-item">
-                                <div class="small-12 info card">
-                                    <h3>{{ term.getTitle() }} ({{ term.getCode() }})</h3>
-                                    <p class="meta">
-                                        {{ term.getStart().getLocalShort() }}—{{ term.getFinish().getLocalShort() }}
-                                    </p>
-                                </div>
+        <section>
+            <ul class="action-list">
+                {% for term in terms %}
+                    <li>
+                        <div class="list-item">
+                            <div class="small-12 info card">
+                                <h3>{{ term.getTitle() }} ({{ term.getCode() }})</h3>
+                                <p class="meta">
+                                    {{ term.getStart().getDateOnly() }}—{{ term.getFinish().getDateOnly() }}
+                                </p>
                             </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
+                        </div>
+                    </li>
+                    <li class="row">
+                        <form method="POST" action="">
+                            <div class="small-12 columns">
+                                <label>
+                                    Title
+                                    <input type="text" name="terms[{{ term.getId() }}][title]" value="{{ term.getTitle() }}" />
+                                </label>
+                            </div>
+                            <div class="small-12 columns">
+                                <label>
+                                    Code
+                                    <input type="text" name="terms[{{ term.getId() }}][code]" value="{{ term.getCode() }}" />
+                                </label>
+                            </div>
+                            <div class="small-12 columns">
+                                <label>
+                                    Start
+                                    <input type="text" name="terms[{{ term.getId() }}][start]" value="{{ term.getStart().getLocalShort() }}" />
+                                </label>
+                            </div>
+                            <div class="small-12 columns">
+                                <label>
+                                    Finish
+                                    <input type="text" name="terms[{{ term.getId() }}][finish]" value="{{ term.getFinish().getLocalShort() }}" />
+                                </label>
+                            </div>
+                            <input type="submit" value="Save Changes" />
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
 
-            <input type="submit" value="Save Changes" />
-        </form>
     </div>
 </div>
