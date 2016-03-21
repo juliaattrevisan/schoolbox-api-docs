@@ -77,4 +77,33 @@ class Controller extends Base
             ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
         ;
     }
+
+    /**
+     * POST action for archiving an existing term
+     *
+     * @param Term\Model $term
+     */
+    public function postArchiveTerm(Term\Model $term)
+    {
+        $term->setArchived(true);
+    }
+
+    /**
+     * POST action for un-archiving an existing term
+     *
+     * @param Term\Model $term
+     */
+    public function postUnarchiveTerm(Term\Model $term)
+    {
+        $term->setArchived(false);
+    }
+
+    /**
+     * POST action for un-archiving an existing term
+     *
+     * @param Term\Model $term
+     */
+    public function postDeleteTerm(Term\Model $term)
+    {
+    }
 }

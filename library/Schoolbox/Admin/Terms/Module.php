@@ -50,6 +50,9 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'getIndex', $basePath, "");
         $this->addPostRoute($router, 'postCreateTerm', $basePath, "");
         $this->addPostRoute($router, 'postUpdateTerm', $basePath, "/{id}/update");
+        $this->addPostRoute($router, 'postDeleteTerm', $basePath, "/{id}/delete");
+        $this->addPostRoute($router, 'postArchiveTerm', $basePath, "/{id}/archive");
+        $this->addPostRoute($router, 'postUnarchiveTerm', $basePath, "/{id}/unarchive");
     }
 
     /**
@@ -70,8 +73,11 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         $this
-            ->addRoutePreload($matcher, 'postUpdateTerm', function($params) {
-                return ['term' => $this->termMapper->findById($params['id']),];
+            ->addRoutePreload($matcher, '.*', function($params) {
+                if (array_key_exists('id', $params)) {
+                    return ['term' => $this->termMapper->findById($params['id']),];
+                }
+                return [];
             })
         ;
     }
