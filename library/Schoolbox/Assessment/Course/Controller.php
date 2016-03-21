@@ -139,6 +139,10 @@ class Controller extends BaseController
             }
         }
 
+        /* Optionally display Curriculum Tagging
+         */
+        $data['curriculumEnabled'] = $this->getConfigLoader()->get('curriculum_tagging_enabled');
+
         $this->tpl('course', $data);
     }
 
