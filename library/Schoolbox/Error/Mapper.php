@@ -145,16 +145,20 @@ class Mapper extends BaseMapper
         $this->uses('message', self::TYPE_STRING);
     }
 
+
     /**
      * Throw exception
      *
-     * @param Int $id
+     * @param Int        $id
      * @param \Exception $parent
+     * @param string     $additionalInfo
      * @throws \Exception
      */
 
-    public function generateException($id, $parent = null) {
-        throw new \Exception($this->getMessageById($id), 0, $parent);
+    public function generateException($id, $parent = null, $additionalInfo = '')
+    {
+        $msg = str_replace("%MESSAGE%", $additionalInfo, $this->getMessageById($id));
+        throw new \Exception($msg, 0, $parent);
     }
 
     /**
