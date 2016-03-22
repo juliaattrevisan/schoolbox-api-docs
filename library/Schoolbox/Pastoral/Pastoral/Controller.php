@@ -810,12 +810,14 @@ class Controller extends Base
 
                         $found = false;
 
+                        // Don't re-add deleted users
+
                         foreach ($accessRoles as $role) {
                             if ($role->getUser()->getId() == $user_id) {
-                                if (!in_array($user_id, $deleteIds)) {
+                                if (in_array($user_id, $deleteIds)) {
                                     $found = true;
+                                    break;
                                 }
-                                break;
                             }
                         }
 
