@@ -7,6 +7,8 @@ if (isset($_GET['year']) || isset($_GET['semester'])) {
     $this->localRedir("/submission/listSubmission/{$_GET['year']}/{$_GET['semester']}");
 }
 
+$termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
+
 $currentYear = date('Y');
 $currentSemester = date('m') > 6 ? 2 : 1;
 
@@ -58,29 +60,30 @@ $submissionHandler = new Submission();
 $groupHandler = new Group();
 
 $contextSelector = new ContextSelector('submission/listSubmission');
+$contextSelector->setTerms($termMapper->findAll(['order' => ['start' => 'desc']]));
 
 if(!$_SESSION['user']->getRole()->isStaff() ) {
     error(19);
 }
 
-// generate a "past 6 years" array
-for($i = 5; $i >= 0; $i--) {
-    $years[] = $currentYear - $i;
-}
-
-/* Find the submission that occurs furthest into the future
- * so you can find your way back there
- */
-$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
-$allYears = $submissionMapper->findYears();
-
-if ($allYears->count() && ($allYears->first() > $currentYear)) {
-    for ($j = $currentYear+1; $j <= $allYears->first(); $j++) {
-        $years[] = $j;
-    }
-}
-
-$contextSelector->setYears($years);
+//// generate a "past 6 years" array
+//for($i = 5; $i >= 0; $i--) {
+//    $years[] = $currentYear - $i;
+//}
+//
+///* Find the submission that occurs furthest into the future
+// * so you can find your way back there
+// */
+//$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+//$allYears = $submissionMapper->findYears();
+//
+//if ($allYears->count() && ($allYears->first() > $currentYear)) {
+//    for ($j = $currentYear+1; $j <= $allYears->first(); $j++) {
+//        $years[] = $j;
+//    }
+//}
+//
+//$contextSelector->setYears($years);
 
 $subjectList = array();
 /* Use provided ID, or check for the subjects the user is involved with */
