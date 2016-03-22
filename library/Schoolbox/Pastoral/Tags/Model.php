@@ -24,7 +24,7 @@ class Model implements ISoftDeletable {
     protected $name;
 
     /** @var \Alaress_Date_Format */
-    protected $datetimeDeleted;
+    protected $deletedAt;
 
     /**
      * @param string $name
@@ -75,19 +75,19 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param \Alaress_Date_Format $datetimeDeleted
+     * @param \Alaress_Date_Format $deletedAt
      * @return self
      */
-    public function setDatetimeDeleted($datetimeDeleted) {
-        $this->datetimeDeleted = $datetimeDeleted;
+    public function setDeletedAt($deletedAt) {
+        $this->deletedAt = $deletedAt;
         return $this;
     }
 
     /**
-     * @return \Alaress_Date_Format $datetimeDeleted
+     * @return \Alaress_Date_Format $deletedAt
      */
-    public function getDatetimeDeleted() {
-        return $this->datetimeDeleted;
+    public function getDeletedAt() {
+        return $this->deletedAt;
     }
 
     /**
@@ -96,6 +96,6 @@ class Model implements ISoftDeletable {
      * @return bool
      */
     public function isDeleted() {
-        return !$this->getDatetimeDeleted() instanceof \Alaress_Date_NullDate;
+        return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
     }
 }

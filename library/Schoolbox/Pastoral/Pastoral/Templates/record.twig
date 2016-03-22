@@ -74,7 +74,7 @@
                             </a>
                             <h3>{{ record.getHeading() }}</h3>
                             <p class="spaced meta">
-                                Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getDatetimePosted().getShort() }}
+                                Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getCreatedAt().getShort() }}
                             </p>
 
                             {# Show tags #}
@@ -163,7 +163,7 @@
                                         </a>
 
                                         {# Show comment author #}
-                                        <p class="meta">Posted By <a href="/search/user/{{ comment.getOwner.getId }}">{{ comment.getOwner.getFirstName }} {{ comment.getOwner.getLastName }}</a> {{ comment.getDatetimePosted().getShort() }}</p>
+                                        <p class="meta">Posted By <a href="/search/user/{{ comment.getOwner.getId }}">{{ comment.getOwner.getFirstName }} {{ comment.getOwner.getLastName }}</a> {{ comment.getCreatedAt().getShort() }}</p>
 
                                         {# Show comment body #}
                                         <p class="spaced">

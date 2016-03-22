@@ -565,7 +565,7 @@ class Controller extends Base
             $comment->setPastoralId($this->getRequest()->post["pastoral_id"]);
             $comment->setBody($this->getRequest()->post["body"]);
             $comment->setOwner($this->getUser());
-            $comment->setDatetimePosted(\Alaress_Date_Format::now());
+            $comment->setCreatedAt(\Alaress_Date_Format::now());
             $this->getPastoralCommentMapper()->save($comment);
         }
 
@@ -619,7 +619,7 @@ class Controller extends Base
 
             // Create a post date, so they are all the same
 
-            $datetimePosted = \Alaress_Date_Format::now();
+            $createdAt = \Alaress_Date_Format::now();
 
             // Go through every kid
 
@@ -652,7 +652,7 @@ class Controller extends Base
                 $record->setBody($this->getRequest()->post["body"]);
                 $record->setPrivate($this->getRequest()->post["private"]);
                 $record->setOwner($this->getUser());
-                $record->setDatetimePosted($datetimePosted);
+                $record->setCreatedAt($createdAt);
                 $this->getPastoralMapper()->save($record);
 
                 $records->add($record);
@@ -759,7 +759,7 @@ class Controller extends Base
             $record->setBody($this->getRequest()->post["body"]);
             $record->setPrivate($this->getRequest()->post["private"]);
             $record->setOwner($this->getUser());
-            $record->setDatetimeModified(\Alaress_Date_Format::now());
+            $record->setUpdatedAt(\Alaress_Date_Format::now());
             $this->getPastoralMapper()->save($record);
 
             // Update external record
@@ -946,7 +946,7 @@ class Controller extends Base
                         $attachment = new PastoralAttachmentModel();
                         $attachment->setPastoralId($record->getId());
                         $attachment->setHash($hash_array[1]);
-                        $attachment->setDatetimeModified(\Alaress_Date_Format::now());
+                        $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                         $this->getPastoralAttachmentMapper()->save($attachment);
                     }
                 }

@@ -34,8 +34,8 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('external_code', self::TYPE_STRING);
         $this->uses('name', self::TYPE_STRING);
-        $this->uses('datetime_deleted', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('datetime_deleted');
+        $this->uses('deleted_at', self::TYPE_DATETIME);
+        $this->hasSoftDeleteDateField('deleted_at');
     }
 
     /**

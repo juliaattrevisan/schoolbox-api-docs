@@ -37,10 +37,10 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('pastoral_id', self::TYPE_INTEGER);
         $this->uses('hash', self::TYPE_STRING);
-        $this->uses('datetime_posted', self::TYPE_DATETIME);
-        $this->uses('datetime_modified', self::TYPE_DATETIME);
-        $this->uses('datetime_deleted', self::TYPE_DATETIME);
-        $this->hasSoftDeleteDateField('datetime_deleted');
+        $this->uses('created_at', self::TYPE_DATETIME);
+        $this->uses('updated_at', self::TYPE_DATETIME);
+        $this->uses('deleted_at', self::TYPE_DATETIME);
+        $this->hasSoftDeleteDateField('deleted_at');
     }
 
     /**
@@ -56,7 +56,7 @@ class Mapper extends BaseMapper
         $query = "
 			SELECT  {$this->getColumnString('p')}
 			FROM    `{$this->getTable()}` `p`
-			WHERE   `p`.`datetime_deleted` IS NULL AND
+			WHERE   `p`.`deleted_at` IS NULL AND
 				    `p`.`pastoral_id` = :pastoralId
 			";
 

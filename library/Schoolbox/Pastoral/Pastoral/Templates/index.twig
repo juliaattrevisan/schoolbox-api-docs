@@ -213,7 +213,7 @@
 
                                     {# Display name of poster #}
                                     <p class="spaced meta">
-                                        Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getDatetimePosted().getShort() }}
+                                        Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getCreatedAt().getShort() }}
                                     </p>
 
                                     {# Display tags #}

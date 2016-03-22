@@ -41,11 +41,11 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('pastoral_id', self::TYPE_INTEGER);
         $this->uses('body', self::TYPE_STRING);
-        $this->uses('datetime_posted', self::TYPE_DATETIME);
-        $this->uses('datetime_modified', self::TYPE_DATETIME);
-        $this->uses('datetime_deleted', self::TYPE_DATETIME);
+        $this->uses('created_at', self::TYPE_DATETIME);
+        $this->uses('updated_at', self::TYPE_DATETIME);
+        $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner');
-        $this->hasSoftDeleteDateField('datetime_deleted');
+        $this->hasSoftDeleteDateField('deleted_at');
     }
 
     /**
@@ -67,7 +67,7 @@ class Mapper extends BaseMapper
 				`{$this->getTable()}` `a`
 				LEFT JOIN {$this->getJoinSql('owner', 'a', 'u')}
 			WHERE
-				`a`.`datetime_deleted` IS NULL AND
+				`a`.`deleted_at` IS NULL AND
 				`a`.`pastoral_id` = :pastoralId
 			";
 

@@ -28,7 +28,7 @@ class Mapper extends BaseMapper
         $this->uses('pastoral_id', self::TYPE_INTEGER);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user');
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role');
-        $this->hasSoftDeleteDateField('datetime_deleted');
+        $this->hasSoftDeleteDateField('deleted_at');
     }
 
     /**
@@ -49,7 +49,7 @@ class Mapper extends BaseMapper
                 LEFT JOIN {$this->getJoinSql('role', 'r', 'rl')}
                 LEFT JOIN {$this->getJoinSql('user', 'r', 'u')}
 			WHERE
-				`r`.`datetime_deleted` IS NULL AND
+				`r`.`deleted_at` IS NULL AND
 				`r`.`pastoral_id` = :pastoralId
 			";
 

@@ -21,11 +21,11 @@
                                     <h2>{{ record.student.firstname }} {{ record.student.lastname }}</h2>
                                     <h3>{{  record.getHeading() }}</h3>
                                     <p class="spaced meta hide-on-print">
-                                        Posted by {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getDatetimePosted().getShort() }}
+                                        Posted by {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getCreatedAt().getShort() }}
                                     </p>
                                     <p class="spaced meta show-for-print">
                                         <br>Posted by {{ record.getOwner.firstName }} {{ record.getOwner.lastName }}<br>
-                                        {{  record.getDatetimePosted().getShort() }}
+                                        {{  record.getCreatedAt().getShort() }}
                                     </p>
                                     <p class="meta">
                                         Severity: {{ record.getSeverity.getName() }}
@@ -115,8 +115,8 @@
                                 <li>
                                     <div class="list-item">
                                         <div class="small-12 avatar card wrap-down">
-                                            <p class="meta hide-on-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }} {{ comment.getDatetimePosted().getShort() }}</p>
-                                            <p class="show-for-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }}<br>{{ comment.getDatetimePosted().getShort() }}</p>
+                                            <p class="meta hide-on-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }} {{ comment.getCreatedAt().getShort() }}</p>
+                                            <p class="show-for-print">Comment By {{ comment.owner.firstName }} {{ comment.owner.lastName }}<br>{{ comment.getCreatedAt().getShort() }}</p>
                                             <p class="spaced">
                                                 {{ comment.body | raw }}
                                             </p>

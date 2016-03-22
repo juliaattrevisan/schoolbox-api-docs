@@ -10,9 +10,9 @@ CREATE TABLE `pastoral` (
   `private` TINYINT NULL DEFAULT 0 COMMENT '',
   `heading` VARCHAR(255) NULL COMMENT '',
   `body` TEXT NULL COMMENT '',
-  `datetime_posted` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
-  `datetime_modified` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
-  `datetime_deleted` DATETIME NULL DEFAULT NULL COMMENT '',
+  `created_at` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
+  `updated_at` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
+  `deleted_at` DATETIME NULL DEFAULT NULL COMMENT '',
   PRIMARY KEY (`id`)  COMMENT '');
 
 CREATE TABLE `pastoral_access` (
@@ -20,14 +20,14 @@ CREATE TABLE `pastoral_access` (
   `pastoral_id` INT NOT NULL COMMENT '',
   `role_id` INT NULL COMMENT '',
   `user_id` INT NULL COMMENT '',
-  `datetime_deleted` DATETIME NULL DEFAULT NULL COMMENT '',
+  `deleted_at` DATETIME NULL DEFAULT NULL COMMENT '',
   PRIMARY KEY (`id`)  COMMENT '');
 
 CREATE TABLE `pastoral_tags` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT '',
   `pastoral_id` INT NOT NULL COMMENT '',
   `name` VARCHAR(255) NULL COMMENT '',
-  `datetime_deleted` DATETIME NULL DEFAULT NULL COMMENT '',
+  `deleted_at` DATETIME NULL DEFAULT NULL COMMENT '',
   PRIMARY KEY (`id`)  COMMENT '');
 
 CREATE TABLE `pastoral_comment` (
@@ -35,18 +35,18 @@ CREATE TABLE `pastoral_comment` (
   `pastoral_id` INT NOT NULL COMMENT '',
   `owner_id` INT NULL COMMENT '',
   `body` TEXT NULL COMMENT '',
-  `datetime_posted` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
-  `datetime_modified` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
-  `datetime_deleted` DATETIME NULL DEFAULT NULL COMMENT '',
+  `created_at` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
+  `updated_at` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
+  `deleted_at` DATETIME NULL DEFAULT NULL COMMENT '',
   PRIMARY KEY (`id`)  COMMENT '');
 
 CREATE TABLE `pastoral_attachment` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT '',
   `pastoral_id` INT NULL COMMENT '',
   `hash` VARCHAR(50) NULL COMMENT '',
-  `datetime_posted` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
-  `datetime_modified` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
-  `datetime_deleted` DATETIME NULL DEFAULT NULL COMMENT '',
+  `created_at` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
+  `updated_at` DATETIME NULL DEFAULT '0000-00-00 00:00:00' COMMENT '',
+  `deleted_at` DATETIME NULL DEFAULT NULL COMMENT '',
   PRIMARY KEY (`id`)  COMMENT '');
 
 CREATE TABLE `luPastoralType` (
@@ -54,7 +54,7 @@ CREATE TABLE `luPastoralType` (
   `name` VARCHAR(100) NULL COMMENT '',
   `external_code` VARCHAR(50) NULL COMMENT '',
   `external_id` INT NULL DEFAULT NULL COMMENT '',
-  `datetime_deleted` DATETIME NULL DEFAULT NULL COMMENT '',
+  `deleted_at` DATETIME NULL DEFAULT NULL COMMENT '',
   PRIMARY KEY (`id`) COMMENT ''
 );
 
@@ -62,7 +62,7 @@ CREATE TABLE `luPastoralSeverity` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT '',
   `name` VARCHAR(100) NULL COMMENT '',
   `order` INT NULL COMMENT '',
-  `datetime_deleted` DATETIME NULL DEFAULT NULL COMMENT '',
+  `deleted_at` DATETIME NULL DEFAULT NULL COMMENT '',
   PRIMARY KEY (`id`) COMMENT ''
 );
 

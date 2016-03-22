@@ -54,7 +54,7 @@
 
                                 <p class="meta spaced">
 
-                                    Posted By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getDatetimePosted().getShort() }}<br>
+                                    Posted By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getCreatedAt().getShort() }}<br>
                                     Severity: {{ record.getSeverity.getName() }}<br>
                                     Incident Type: {{ record.getType.getName() }}<br>
                                     Audience:
@@ -99,7 +99,7 @@
                                     {% if not record.getPrivate or pastoralModerator or record.getOwner.getId == session.user.getId %}
                                         {% for comment in record.getCommentList %}
                                             <hr>
-                                            <p class="meta">Comment By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getDatetimePosted().getShort() }}</p>
+                                            <p class="meta">Comment By: {{ record.owner.firstName }} {{ record.owner.lastName }} {{  record.getCreatedAt().getShort() }}</p>
                                             <p class="spaced">
                                                 {{ comment.body | raw }}
                                             </p>

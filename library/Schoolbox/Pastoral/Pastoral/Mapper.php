@@ -111,15 +111,15 @@ class Mapper extends BaseMapper
         $this->uses('body', self::TYPE_STRING);
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('private', self::TYPE_BOOLEAN);
-        $this->uses('datetime_posted', self::TYPE_DATETIME);
-        $this->uses('datetime_modified', self::TYPE_DATETIME);
-        $this->uses('datetime_deleted', self::TYPE_DATETIME);
+        $this->uses('created_at', self::TYPE_DATETIME);
+        $this->uses('updated_at', self::TYPE_DATETIME);
+        $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->joins('parent_id', self::class, 'id', null, null, 'parent', 'parent');
         $this->joins('type_id', PastoralTypeMapper::class, 'id', null, null, 'type', 'type');
         $this->joins('severity_id', PastoralSeverityMapper::class, 'id', null, null, 'severity', 'severity');
         $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner', 'owner');
         $this->joins('student_id', UserMapper::class, 'id', null, null, 'student', 'student');
-        $this->hasSoftDeleteDateField('datetime_deleted');
+        $this->hasSoftDeleteDateField('deleted_at');
 
         // Anyone got a shorthand version of these?
 
@@ -188,7 +188,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
             WHERE s.id = ?
-            AND r.datetime_deleted IS NULL
+            AND r.deleted_at IS NULL
         ";
 
         $statement = $this->getDatabase()->prepare($query);
@@ -234,7 +234,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
             WHERE r.id = ?
-            AND r.datetime_deleted IS NULL
+            AND r.deleted_at IS NULL
         ";
 
         $statement = $this->getDatabase()->prepare($query);
@@ -275,12 +275,12 @@ class Mapper extends BaseMapper
 
         if ($before_date != '') {
             $before_date = date("Y-m-d", strtotime($before_date));
-            $criteria[] = "datetime_posted <= '{$before_date}'";
+            $criteria[] = "created_at <= '{$before_date}'";
         }
 
         if ($after_date != '') {
             $after_date = date("Y-m-d", strtotime($after_date));
-            $criteria[] = "datetime_posted >= '{$after_date}'";
+            $criteria[] = "created_at >= '{$after_date}'";
         }
 
         if ($severity != '') $criteria[] = "severity_id >= {$severity}";
@@ -315,7 +315,7 @@ class Mapper extends BaseMapper
             ORDER BY
               `s`.lastname,
 
-            `r`.datetime_posted
+            `r`.created_at
         ";
 
         $statement = $this->getDatabase()->prepare($query);
