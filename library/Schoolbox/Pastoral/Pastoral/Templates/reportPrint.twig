@@ -93,6 +93,7 @@
                                             <p class="spaced">
                                                 <br>
                                                 {{ record.getBody() | raw }}
+                                                <br>
                                             </p>
                                         </article>
 
@@ -103,7 +104,6 @@
                                                 {% if not loop.last %} | {% endif %}
                                             {% endfor %}
                                         </p>
-                                        {% endif %}
                                     </div>
                                 </section>
                             </div>
