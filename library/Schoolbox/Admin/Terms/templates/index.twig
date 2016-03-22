@@ -24,6 +24,12 @@
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
+<div id="errorModal" class="reveal-modal" data-reveal aria-labelledby="errorModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="errorModalTitle">Error</h2>
+    <p class="alert alert-box icon-alert">Something went wrong - maybe try reloading your page and trying again?</p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
@@ -53,47 +59,42 @@
             initForm($(this));
         });
 
-        // Archive/restore action
-        $('#content').on('click', 'a[data-term-action="archive"], a[data-term-action="restore"]', function(event) {
+        // Jellytot actions
+        $('#content').on('click', 'a[data-term-action]', function(event) {
             event.preventDefault();
-            var button = $(this);
+            var button = $(this),
+                action = button.data('termAction'),
+                term   = button.closest('[data-term]');
             button.confirmDialog({
                 confirmEvent: function(el) {
                     // AJAX, then update DOM
+                    // Archive/restore: refresh
+                    // Delete: remove completely
                     $.post(el.data('postAction'))
                         .done(function(data) {
-                            var newDom  = $(data),
-                                oldDom  = button.closest('[data-term]');
-                            // Replace infocard and jellytot
-                            oldDom.find('[data-term-infocard]').replaceWith(newDom.find('[data-term-infocard]'));
-                            oldDom.find('[data-term-dropdown]').replaceWith(newDom.find('[data-term-dropdown]'));
+                            switch (action) {
+                                case 'delete':
+                                    term.fadeOut({ done: term.remove });
+                                    break;
+                                case 'archive':
+                                case 'restore':
+                                default:
+                                    var newDom  = $(data);
+                                    // Replace infocard and jellytot
+                                    term.find('[data-term-infocard]').replaceWith(newDom.find('[data-term-infocard]'));
+                                    term.find('[data-term-dropdown]').replaceWith(newDom.find('[data-term-dropdown]'));
+                                    break;
+                            }
                         })
                         .fail(function() {
                             // ¯\_(ツ)_/¯
+                            $('#errorModal').foundation('reveal', 'open');
                         });
                 }
             })
         });
 
-        // Delete action
-        $('#content').on('click', 'a[data-term-action="delete"]', function(event) {
-            event.preventDefault();
-            var button = $(this);
-            button.confirmDialog({
-                confirmEvent: function(el) {
-                    // AJAX, then remove from DOM
-                    $.post(el.data('postAction'))
-                        .done(function() {
-                            var term = button.closest('[data-term]');
-                            term.fadeOut({
-                                done: term.remove
-                            });
-                        })
-                        .fail(function() {
-                            // ¯\_(ツ)_/¯
-                        });
-                }
-            })
-        });
+        // On adding a new item:
+        // ensure it gets AJAXd in, and refresh
     });
 </script>
