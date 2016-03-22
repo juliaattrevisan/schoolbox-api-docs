@@ -3,30 +3,43 @@ use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+// How does this even $_GET set?
 if (isset($_GET['year']) || isset($_GET['semester'])) {
     $this->localRedir("/submission/listSubmission/{$_GET['year']}/{$_GET['semester']}");
 }
 
 $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
 
-$currentYear = date('Y');
-$currentSemester = date('m') > 6 ? 2 : 1;
+$termSlug = $this->arg[0];
 
-if (isset($this->arg[0])) {
-    if(!(is_numeric($this->arg[0]) && is_numeric($this->arg[1]))) {
+// Do I convert old year/semester to new format?
+//$currentYear = date('Y');
+//$currentSemester = date('m') > 6 ? 2 : 1;
+
+if (isset($termSlug)) {
+    try {
+        $currentTerm = $termMapper->findOneByColumn('code', $termSlug);
+    } catch (\Schoolbox\Mapper\Exception $e) {
         $this->localRedir('/submission/listSubmission');
+        exit;
     }
 
-    if ($this->arg[1] < 1 || $this->arg[1] > 2) {
-        error(2); // TODO find a more appropriate error
-    }
+//    if(!(is_numeric($this->arg[0]) && is_numeric($this->arg[1]))) {
+//        $this->localRedir('/submission/listSubmission');
+//    }
+//
+//    if ($this->arg[1] < 1 || $this->arg[1] > 2) {
+//        error(2); // TODO find a more appropriate error
+//    }
 
-    $year = (int)$this->arg[0];
-    $semester = (int)$this->arg[1];
-    $semesterSlug = "/$year/$semester";
+//    $year = (int)$this->arg[0];
+//    $semester = (int)$this->arg[1];
+//    $semesterSlug = "/$year/$semester";
+    $semesterSlug = "/$termSlug";
 } else {
-    $year = $currentYear;
-    $semester = $currentSemester;
+//    $year = $currentYear;
+//    $semester = $currentSemester;
+    $currentTerm  = $termMapper->findMostRecent();
     $semesterSlug = '';
 }
 
@@ -87,19 +100,32 @@ if(!$_SESSION['user']->getRole()->isStaff() ) {
 
 $subjectList = array();
 /* Use provided ID, or check for the subjects the user is involved with */
-if(isset($this->arg[2]) && is_numeric($this->arg[2])){
-    $subjectList[] = $this->arg[2];
+if (isset($this->arg[1]) && is_numeric($this->arg[1])){
+    $subjectList[] = $this->arg[1];
 
     //Selector rendored to maintain single category link
-    $contextSelector->render($this, 'CONTEXT_SELECTOR', array(
-            'year' => $year, 'semester' => $semester, 'list'=>$this->arg[2]
-        ));
+    $contextSelector->render(
+        $this,
+        'CONTEXT_SELECTOR',
+        array(
+//            'year'     => $year,
+//            'semester' => $semester,
+            'term'     => $currentTerm,
+            'list'     => $this->arg[1],
+        )
+    );
 }
 else {
     //Selector rendered without category
-    $contextSelector->render($this, 'CONTEXT_SELECTOR', array(
-            'year' => $year, 'semester' => $semester
-        ));
+    $contextSelector->render(
+        $this,
+        'CONTEXT_SELECTOR',
+        array(
+//            'year'     => $year,
+//            'semester' => $semester,
+            'term'     => $currentTerm,
+        )
+    );
 
     $involvedIn = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
     if(is_array($involvedIn)) {
