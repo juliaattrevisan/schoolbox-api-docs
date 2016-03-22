@@ -363,15 +363,24 @@ class Controller extends BaseController
             /** @var Folder\Controller $folderController */
             $folderController = $this->getController('folder');
 
+            // Need:
+            // base config
+            // course config
+            $rolePermissions = [];
+            foreach ($this->getCourseConfigMapper()->findByColumn('page', 'unit') as $courseConfig) {
+                /** @var CourseConfigModel $courseConfig */
+                $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
+            }
+
             $folder = $folderController->persistFolder([
                 // the basics (note lack of ID and Codes)
                 'name'            => $name,
                 'parent'          => $post['id'],
 
                 // configurable things
-                'inherit'         => true,  // TODO config inheritance
-                'template'        => -1,    // TODO config template
-                'group'           => [],    // TODO config role permissions [ $roleId => $permissionLevel ]
+                'inherit'         => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
+                'template'        => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
+                'group'           => $rolePermissions,
 
                 // leave these always off
                 'recursive'       => false, // LEAVE THIS
