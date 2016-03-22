@@ -9,6 +9,26 @@
 
     $(function () {
 
+        {# Toggle all checkboxes when the 'Select All' box is changed #}
+
+        $('[data-check-all]').change(function(e) {
+            $('[data-check-type]').prop('checked', $(e.target)[0].checked);
+        });
+
+        {# Whenever a type checkbox is changed disable the 'Select All' box #}
+
+        $('[data-check-type]').change(function(e) {
+            $('[data-check-all]').prop('checked', false);
+        });
+
+        {# If we are changing report criteria this will tick the 'Select All' box if every type was selected #}
+
+        if ($('[data-check-type]:checked').length == $('[data-check-type]').length) {
+            $('[data-check-all]').prop('checked', true);
+        }
+
+        {# Setup selectize boxes #}
+
         $('#tags_filter').selectizeSelector({
             ajax: {
                 url:      '/ajax/tags.php',
@@ -58,13 +78,19 @@
                 {% endfor %}]
         });
 
+        {# Setup datepicker#}
+
         $('#datetime_before, #datetime_after').datepicker();
+
+        {# Generate the report after a little sanity checking#}
 
         $('[data-report]').click(function(event) {
 
             event.preventDefault();
 
             var error = false;
+
+            // Dates can't be backwards
 
             $('#datetime_after_error').hide();
 
@@ -77,6 +103,15 @@
                     $('#datetime_after_error').show();
                     error = true;
                 }
+            }
+
+            // At least one record type has to be selected
+
+            $('#type_error').hide();
+
+            if ($('[data-check-type]:checked').length == 0) {
+                $('#type_error').show();
+                error = true;
             }
 
             if (!error)
@@ -125,6 +160,7 @@
     <div class="list-item">
         <div class="small-12 column">
             <h1>Pastoral Report Generator</h1>
+            <h2 class="subheader">Select Report Criteria</h2>
         </div>
     </div>
 </div>
@@ -187,10 +223,12 @@
                 <div class="small-12 columns">
                     <fieldset class="checklist" data-equalizer-watch="">
                         <label>
-                            Include Record Types (Leave Blank To Show All)
+                            Select Record Types To View
                         </label>
+                        <input id="type-all" data-check-all type="checkbox">
+                        <label for="type-all">Select All</label>
                         {% for type in types %}
-                            <input id="type-{{ type.id }}" name="types[]" value="{{ type.id }}" type="checkbox"
+                            <input data-check-type id="type-{{ type.id }}" name="types[]" value="{{ type.id }}" type="checkbox"
                                 {% for typeSelected in typesSelected %}
                                     {% if typeSelected == type.id %}
                                         checked
@@ -203,6 +241,9 @@
                         {% endfor %}
                     </fieldset>
                 </div>
+                <div class="small-12 columns">
+                    <label id="type_error" for="datetime_after" class="error" style="display:none;">You must select at least one record type</label></div>
+
             </fieldset>
         </section>
 
