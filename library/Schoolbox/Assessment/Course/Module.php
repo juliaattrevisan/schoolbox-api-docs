@@ -40,6 +40,7 @@ class Module extends BaseModule
                 '/list'                                 => 'courseList',
                 '/list/ajax'                            => 'courseListAjax',
                 '/new'                                  => 'newCourse',
+                '/new/{name}'                           => 'newCourse',
                 '/modify/{id}'                          => 'modifyCourse',
                 '/parent'                               => 'parentList',
 
@@ -56,7 +57,6 @@ class Module extends BaseModule
                 '/import/classes'                       => 'importClasses',
             ],
             'POST' => [
-                '/new'                                  => 'newCourse',
                 '/unit/new'                             => 'newUnit',
                 '/unit/delete'                          => 'deleteUnit',
                 '/importTasks'                          => 'importTasks',

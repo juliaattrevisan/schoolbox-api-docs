@@ -122,8 +122,9 @@ class Controller extends BaseController
      * @api   GET /course/modify/{id}
      * @level 160
      * @param int $id
+     * @param string $name
      */
-    public function modifyCourse($id = null)
+    public function modifyCourse($id = null, $name = null)
     {
         $data = [];
 
@@ -144,8 +145,9 @@ class Controller extends BaseController
         $data['curriculumEnabled'] = $this->getConfigLoader()->get('curriculum_tagging_enabled');
 
         /* Search query
+         * Optional name passed in url
          */
-        $data['query'] = $this->getRequest()->post->get('query');
+        $data['query'] = $name;
 
         $this->tpl('course', $data);
     }
@@ -156,10 +158,11 @@ class Controller extends BaseController
      *
      * @api   GET /course/new
      * @level 160
+     * @param null $name
      */
-    public function newCourse()
+    public function newCourse($name = null)
     {
-        $this->modifyCourse(null);
+        $this->modifyCourse(null, $name);
     }
 
 

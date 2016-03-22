@@ -69,10 +69,8 @@
         </section>
     {% else %}
         <div class="alert-box">No results found.</div>
-        <form method="post" action="/course/new">
-            <input type="hidden" name="query" value="{{ query }}" />
-            <input type="submit" class='expand' value="Create a Course called {{ query }}" />
-        </form>
+
+        <a class='button submit expand' href="/course/new/{{ query }}">Create a Course called {{ query }}</a>
     {% endif %}
 </div>
 <script type="text/javascript">
