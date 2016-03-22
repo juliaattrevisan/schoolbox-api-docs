@@ -504,7 +504,8 @@ class Controller extends Base
                 'data'     => array(
                     'session'           => $_SESSION,
                     'record'            => $pastoral,
-                    'pastoralModerator' => $pastoralModerator
+                    'pastoralModerator' => $pastoralModerator,
+                    'role'              => $this->getUser()->getRole()->getType(),
                 ),
             )
         );
