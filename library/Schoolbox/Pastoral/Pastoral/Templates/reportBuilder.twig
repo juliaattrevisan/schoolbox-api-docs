@@ -9,17 +9,25 @@
 
     $(function () {
 
-        $('#tags_filter').selectize({
-            delimiter: ',',
-            persist: false,
-            searchField: 'name',
-            labelField: 'name',
-            valueField: 'name',
-            options: [
-                {% for tag in tags %}
-                {name: '{{ tag.name | title | escape('js') }}'},
-                {% endfor %}
-            ]
+        $('#tags_filter').selectizeSelector({
+            ajax: {
+                url:      '/ajax/tags.php',
+                type:     'GET',
+                dataType: 'json'
+            },
+            multiple: true,
+            selectize: {
+                create: function (input) {
+                    return {
+                        id: input,
+                        name: input
+                    }
+                },
+            },
+            value: [
+                {% for tag in tagsSelected %}
+                    {'id':'{{ tag | escape('js') }}', 'name': '{{ tag | escape('js') }}'},
+                {% endfor %}]
         });
 
         $('#filterStudents').selectizeSelector({
@@ -29,7 +37,11 @@
                 type:     'GET',
                 data:     {roleTypeID: 'student'},
                 dataType: 'json'
-            }
+            },
+            value: [
+                {% for student in studentsSelected %}
+                {'id':'{{ student.id }}', 'name': '{{ student.name | escape('js') }}'},
+                {% endfor %}]
         });
 
         $('#filterAuthors').selectizeSelector({
@@ -39,7 +51,11 @@
                 type:     'GET',
                 data:     {roleTypeID: 'staff'},
                 dataType: 'json'
-            }
+            },
+            value: [
+                {% for author in authorsSelected %}
+                {'id':'{{ author.id }}', 'name': '{{ author.name | escape('js') }}'},
+                {% endfor %}]
         });
 
         $('#datetime_before, #datetime_after').datepicker();
@@ -143,7 +159,7 @@
                         <select id="filterSeverity" name="severity_id">
                             <option value="">Show All Severity Levels</option>
                             {% for severity in severities %}
-                                <option value="{{ severity.id }}">{{ severity.name }}</option>
+                                <option {% if severity.id == severitySelected %}selected{% endif %} value="{{ severity.id }}">{{ severity.name }}</option>
                             {% endfor %}
                         </select>
                     </label>
@@ -154,19 +170,19 @@
                 <div class="small-12 large-6 columns">
                     <label for="datetime_after">
                         Published On Or After
-                        <input type="text" class="required" name="after" id="datetime_after" maxlength="50"/>
+                        <input type="text" class="required" name="after" id="datetime_after" maxlength="50" value="{{ afterSelected }}"/>
                     </label>
                 </div>
                 <div class="small-12 large-6 columns">
                     <label for="item_datetime_published">
                         Published On Or Before
-                        <input type="text" class="required" name="before" id="datetime_before" maxlength="50"/>
+                        <input type="text" class="required" name="before" id="datetime_before" maxlength="50" value="{{ beforeSelected }}"/>
                     </label>
                 </div>
                 <div class="small-12 columns">
                     <label for="item_datetime_published">
                         Filtered By Tags
-                        <input type="text" class="required" name="tags_filter" id="tags_filter" maxlength="50"/>
+                        <input type="text" class="required" name="tags_filter" id="tags_filter" maxlength="50" value="{{ tagsSelected }}"/>
                     </label>
                 </div>
                 <div class="small-12 columns">
@@ -175,7 +191,16 @@
                             Include Record Types (Leave Blank To Show All)
                         </label>
                         {% for type in types %}
-                            <input id="type-{{ type.id }}" name="types[]" value="{{ type.id }}" type="checkbox"><label for="type-{{ type.id }}">{{ type.name }}</label>
+                            <input id="type-{{ type.id }}" name="types[]" value="{{ type.id }}" type="checkbox"
+                                {% for typeSelected in typesSelected %}
+                                    {% if typeSelected == type.id %}
+                                        checked
+                                    {% endif %}
+                                {% endfor %}
+                            >
+                            <label for="type-{{ type.id }}">
+                                {{ type.name }}
+                            </label>
                         {% endfor %}
                     </fieldset>
                 </div>

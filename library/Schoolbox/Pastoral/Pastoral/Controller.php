@@ -310,6 +310,38 @@ class Controller extends Base
         if (!$this->getUser()->getRole()->isStaff())
             $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
+        // Create some arrays used to repopulate the selectizes
+
+        // Students
+
+        $studentsSelected = array();
+        $studentsArray = array_filter(explode(",", $this->getRequest()->query["students"]));
+
+        foreach ($studentsArray as $student) {
+            $student = $this->getUserMapper()->findById($student);
+            $studentsSelected[] = [
+                'id' => $student->getId(),
+                'name' => $student->getFirstname() . " " . $student->getLastname() .
+                    " - Year " . $student->getYear() . " " .$student->getRole()->getName() .
+                    " (" . $student->getExternalId() . ")"
+            ];
+        }
+
+        // Authors
+
+        $authorsSelected = array();
+        $authorsArray = array_filter(explode(",", $this->getRequest()->query["authors"]));
+
+        foreach ($authorsArray as $author) {
+            $author = $this->getUserMapper()->findById($author);
+            $authorsSelected[] = [
+                'id' => $author->getId(),
+                'name' => $author->getFirstname() . " " . $author->getLastname() .
+                    " - " . $author->getRole()->getName() .
+                    " (" . $author->getExternalId() . ")"
+            ];
+        }
+
         // And render this thing out
 
         $this->getResponse()->content->set(
@@ -319,7 +351,14 @@ class Controller extends Base
                     'session'           => $_SESSION,
                     'types'             => $this->getPastoralTypeMapper()->findAll(),
                     'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
-                    'tags'              => $this->getPastoralTagsMapper()->findAll()
+                    'tags'              => $this->getPastoralTagsMapper()->findAll(),
+                    'studentsSelected'  => $studentsSelected,
+                    'authorsSelected'   => $authorsSelected,
+                    'severitySelected'  => $this->getRequest()->query["severity"],
+                    'typesSelected'     => array_filter(explode(",", $this->getRequest()->query["types"])),
+                    'tagsSelected'      => array_filter(explode(",", $this->getRequest()->query["tags"])),
+                    'beforeSelected'    => $this->getRequest()->query["before"],
+                    'afterSelected'     => $this->getRequest()->query["after"],
                 ),
             )
         );

@@ -125,7 +125,7 @@
                     <p class="no-margin">No pastoral records matched your search criteria, please review your criteria and try again.</p>
                 </div>
             </section>
-            <a class="button submit" href="/pastoral/report-builder">Change Report Criteria</a>
+            <a class="button submit expand" href="/pastoral/report-builder?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Change Report Criteria</a>
         </div>
 
     {% endif %}
@@ -137,7 +137,7 @@
     <div class="row">
         <div class="small-12 island">
             <a class="button submit expand" href="./report-print?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Printable View</a>
-            <a class="button submit expand" href="/pastoral/report-builder">Change Report Criteria</a>
+            <a class="button submit expand" href="/pastoral/report-builder?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Change Report Criteria</a>
 
             {% if results | length > 0 and totalPages > 1 %}
                 <br><br>
