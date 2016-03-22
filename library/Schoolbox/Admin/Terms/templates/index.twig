@@ -28,24 +28,32 @@
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
 <script type="text/javascript">
+
+    var initForm = function(form) {
+        form.find(':submit').mage({
+            submittable: '[data-mage-wrapper]',
+            reenablePrevious: true,
+            onXhrDone: function(data) {
+                var newDom  = $(data),
+                    oldDom  = $(this).closest('[data-term]'),
+                    butonye = oldDom.find('[data-term-form] :submit');
+                // Replace infocard
+                oldDom.find('[data-term-infocard]').replaceWith(newDom.find('[data-term-infocard]'));
+                // Restore butonye
+                butonye.val(butonye.data('mage-reset')).removeAttr('readonly');
+                $.fn.executeCollapsable(oldDom.find('[data-collapsable]'), oldDom.find('[data-collapser]'));
+            },
+            onXhrFail: function(data) {
+                // Show error messages
+            }
+        });
+        form.alaressValidate();
+    };
+
     $(function(){
         $('[data-collapser]').collapsable();
         $('form[data-term-form]').each(function() {
-            $(this).find(':submit').mage({
-                submittable: '[data-mage-wrapper]',
-                onXhrDone: function(data) {
-                    var newDom = $(data);
-                    var oldDom = $(this).closest('[data-term]');
-                    // Replace infocard and maged submit only
-                    oldDom.find('[data-term-infocard]').replaceWith(newDom.find('[data-term-infocard]'));
-                    oldDom.find('[data-term-form] :submit').replaceWith(newDom.find('[data-term-form] :submit'));
-                    $.fn.executeCollapsable(oldDom.find('[data-collapsable]'), oldDom.find('[data-collapser]'));
-                },
-                onXhrFail: function(data) {
-                    // Show error messages
-                }
-            });
-            $(this).alaressValidate();
+            initForm($(this));
         });
         $('#content').on('click', 'a[data-post-action]', function(event) {
             event.preventDefault();
