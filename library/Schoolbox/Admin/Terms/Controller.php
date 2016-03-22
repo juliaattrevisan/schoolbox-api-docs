@@ -61,8 +61,12 @@ class Controller extends Base
             ->setStart(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('start')))
             ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
         ;
-        $this->termMapper->save($term);
-        $this->redirectToList();
+        try {
+            $this->termMapper->save($term);
+            $this->outputPostSuccess($term);
+        } catch (\Exception $e) {
+            $this->outputPostError($term, $e);
+        }
     }
 
     /**
@@ -78,8 +82,12 @@ class Controller extends Base
             ->setStart(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('start')))
             ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
         ;
-        $this->termMapper->save($term);
-        $this->redirectToList();
+        try {
+            $this->termMapper->save($term);
+            $this->outputPostSuccess($term);
+        } catch (\Exception $e) {
+            $this->outputPostError($term, $e);
+        }
     }
 
     /**
@@ -90,8 +98,12 @@ class Controller extends Base
     public function postArchiveTerm(Term\Model $term)
     {
         $term->setArchived(true);
-        $this->termMapper->save($term);
-        $this->redirectToList();
+        try {
+            $this->termMapper->save($term);
+            $this->outputPostSuccess($term);
+        } catch (\Exception $e) {
+            $this->outputPostError($term, $e);
+        }
     }
 
     /**
@@ -102,8 +114,12 @@ class Controller extends Base
     public function postRestoreTerm(Term\Model $term)
     {
         $term->setArchived(false);
-        $this->termMapper->save($term);
-        $this->redirectToList();
+        try {
+            $this->termMapper->save($term);
+            $this->outputPostSuccess($term);
+        } catch (\Exception $e) {
+            $this->outputPostError($term, $e);
+        }
     }
 
     /**
@@ -113,19 +129,52 @@ class Controller extends Base
      */
     public function postDeleteTerm(Term\Model $term)
     {
-        $this->termMapper->delete($term);
-        $this->redirectToList();
+        try {
+            $this->termMapper->delete($term);
+            $this->outputPostSuccess($term);
+        } catch (\Exception $e) {
+            $this->outputPostError($term, $e);
+        }
     }
 
     /**
-     * Temporary redirect function after every save.
+     * POST action success method.
+     *
+     * @param Term\Model $term
      */
-    protected function redirectToList()
+    protected function outputPostSuccess(Term\Model $term)
     {
         if ($this->getRequest()->isXhr()) {
-            // Dump out some AJAX response
+            $this->getResponse()->content->set([
+                'template' => "@adminTerms/listItem.twig",
+                'format'   => 'nochrome',
+                'data'     => ['term' => $term,]
+            ]);
         } else {
             $this->getResponse()->redirect->to($this->getRouter()->generate('adminTerms.getIndex'));
+        }
+    }
+
+    /**
+     * Outputs a POST error, perhaps via AJAX
+     *
+     * @param Term\Model $term
+     * @param \Exception $e    The exception which caused the error.
+     *
+     * @throws \Exception If not an AJAX request, pass $e down the chain.
+     */
+    protected function outputPostError(Term\Model $term, \Exception $e)
+    {
+        if ($this->getRequest()->isXhr()) {
+            // Dump out an AJAX error
+            $this->getResponse()->status->setCode(500);
+            $this->getResponse()->content->set([
+                'type' => 'json',
+                'data' => ['error' => $e->getMessage(),],
+            ]);
+        } else {
+            // ¯\_(ツ)_/¯
+            throw $e;
         }
     }
 }
