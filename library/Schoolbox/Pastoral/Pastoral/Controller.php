@@ -176,6 +176,12 @@ class Controller extends Base
         else
             $pageCurrent = $this->getRequest()->query["pageCurrent"];
 
+        // This is the number of pages the user is allowed to select from at any one time (Must be even)
+
+        $pagesToDisplay = 8;
+
+        // This is the number of records before we force them to browse to another page
+
         $resultsPerPage = 15;
         $totalPages = ceil($records->count() / $resultsPerPage);
 
@@ -200,20 +206,21 @@ class Controller extends Base
             array(
                 'template' => '@pastoral/report.twig',
                 'data'     => array(
-                    'session'           => $_SESSION,
-                    'results'           => $paginatedRecords,
-                    'resultsPerPage'    => $resultsPerPage,
-                    'totalPages'        => $totalPages,
-                    'totalResults'      => $records->count(),
-                    'pastoralModerator' => $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0,
-                    'pageCurrent'       => $pageCurrent,
-                    'students'          => $this->getRequest()->query["students"],
-                    'authors'           => $this->getRequest()->query["authors"],
-                    'severity'          => $this->getRequest()->query["severity"],
-                    'types'             => $this->getRequest()->query["types"],
-                    'tags'              => $this->getRequest()->query["tags"],
-                    'before'            => $this->getRequest()->query["before"],
-                    'after'             => $this->getRequest()->query["after"],
+                    'session'               => $_SESSION,
+                    'results'               => $paginatedRecords,
+                    'resultsPerPage'        => $resultsPerPage,
+                    'pagesToDisplay'  => $pagesToDisplay % 2 == 0 ? $pagesToDisplay : $pagesToDisplay + 1,
+                    'totalPages'            => $totalPages,
+                    'totalResults'          => $records->count(),
+                    'pastoralModerator'     => $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0,
+                    'pageCurrent'           => $pageCurrent,
+                    'students'              => $this->getRequest()->query["students"],
+                    'authors'               => $this->getRequest()->query["authors"],
+                    'severity'              => $this->getRequest()->query["severity"],
+                    'types'                 => $this->getRequest()->query["types"],
+                    'tags'                  => $this->getRequest()->query["tags"],
+                    'before'                => $this->getRequest()->query["before"],
+                    'after'                 => $this->getRequest()->query["after"],
                 ),
             )
         );

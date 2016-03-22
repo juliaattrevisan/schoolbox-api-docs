@@ -144,7 +144,7 @@
                 <ul class="pagination">
                     <li class="arrow"><a href="?pageCurrent=1&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">«</a></li>
                     <li class="arrow {% if pageCurrent == 1 %}unavailable{% endif %}"><a href="{% if pageCurrent == 1 %}#{% else %}?pageCurrent={{ pageCurrent - 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">‹</a></li>
-                    {% for i in range (max(1, pageCurrent - (8 - (min(totalPages, pageCurrent + 8 - (pageCurrent - max(1, pageCurrent - 4))) - pageCurrent))), min(totalPages, pageCurrent + 8 - (pageCurrent - max(1, pageCurrent - 4))))  %}
+                    {% for i in range (max(1, pageCurrent - ( pagesToDisplay - (min(totalPages, pageCurrent +  pagesToDisplay - (pageCurrent - max(1, pageCurrent - (pagesToDisplay / 2) ))) - pageCurrent))), min(totalPages, pageCurrent + pagesToDisplay - (pageCurrent - max(1, pageCurrent - (pagesToDisplay / 2)))))  %}
                         <li {% if i == pageCurrent %} class='active' {% endif %}>
                             <a href="?pageCurrent={{ i }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">{{ i }}</a>
                         </li>
