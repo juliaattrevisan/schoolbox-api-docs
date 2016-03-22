@@ -40,14 +40,20 @@
             submittable: '[data-mage-wrapper]',
             reenablePrevious: true,
             onXhrDone: function(data) {
-                var newDom  = $(data),
-                    oldDom  = $(this).closest('[data-term]'),
-                    butonye = oldDom.find('[data-term-form] :submit');
-                // Replace infocard
-                oldDom.find('[data-term-infocard]').replaceWith(newDom.find('[data-term-infocard]'));
-                // Restore butonye
-                butonye.val(butonye.data('mage-reset')).removeAttr('readonly');
-                $.fn.executeCollapsable(oldDom.find('[data-collapsable]'), oldDom.find('[data-collapser]'));
+                if (form.data('termForm') == 'create') {
+                    // New term? reload whole page for now, as I don't know where to put it.
+                    // I also want to clear the form's contents.
+                    window.location.reload();
+                } else {
+                    var newDom  = $(data),
+                        oldDom  = $(this).closest('[data-term]'),
+                        butonye = oldDom.find('[data-term-form] :submit');
+                    // Replace infocard
+                    oldDom.find('[data-term-infocard]').replaceWith(newDom.find('[data-term-infocard]'));
+                    // Restore butonye
+                    butonye.val(butonye.data('mage-reset')).removeAttr('readonly');
+                    $.fn.executeCollapsable(oldDom.find('[data-collapsable]'), oldDom.find('[data-collapser]'));
+                }
             }
         });
         form.alaressValidate();
@@ -93,8 +99,5 @@
                 }
             })
         });
-
-        // On adding a new item:
-        // ensure it gets AJAXd in, and refresh
     });
 </script>

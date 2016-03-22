@@ -1,11 +1,13 @@
 {% if term.getId() %}
     {% set saveRoute = routeLookup('adminTerms.postUpdateTerm', {id: term.getId()}) %}
     {% set saveValue = 'Update Term' %}
+    {% set saveType  = 'update' %}
 {% else %}
     {% set saveRoute = routeLookup('adminTerms.postCreateTerm') %}
     {% set saveValue = 'Create Term' %}
+    {% set saveType  = 'create' %}
 {% endif %}
-<form method="post" action="{{ saveRoute }}" class="row" data-term-form>
+<form method="post" action="{{ saveRoute }}" class="row" data-term-form="{{ saveType }}">
     {# This wrapper exists solely to get around a bug in Mage where the form can't be used as the submittable. #}
     <div data-mage-wrapper>
         <div class="small-6 columns">
