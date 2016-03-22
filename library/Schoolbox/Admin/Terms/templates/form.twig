@@ -5,7 +5,7 @@
     {% set saveRoute = routeLookup('adminTerms.postCreateTerm') %}
     {% set saveValue = 'Create Term' %}
 {% endif %}
-<form method="post" action="{{ saveRoute }}" class="row" data-role="termForm">
+<form method="post" action="{{ saveRoute }}" class="row" data-term-form>
     {# This wrapper exists solely to get around a bug in Mage where the form can't be used as the submittable. #}
     <div data-mage-wrapper>
         <div class="small-6 columns">
@@ -49,5 +49,8 @@
             </label>
         </div>
         <input type="submit" class="full-width" value="{{ saveValue }}" data-mage-working="Saving..." />
+        <!-- Don't delete the inline style, it's needed -->
+        <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
+        <p data-mage-custom-error class="hide alert alert-box icon-alert"></p>
     </div>
 </form>
