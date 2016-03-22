@@ -394,7 +394,14 @@ class Mapper extends BaseMapper
         /** @var \Schoolbox\Role $role */
         $role = $user->getRole();
 
-        if ($role->getType() != "staff")
+        // Students and guests, get outta here
+
+        if ($role->isStudent() || $role->isGuest())
+            return false;
+
+        // Parents must be a parent of the child the record relates to
+
+        if ($role->isParent())
         {
             try {
                 $record->setStudent($this->getUserMapper()->findById($record->getStudent()->getId()));
