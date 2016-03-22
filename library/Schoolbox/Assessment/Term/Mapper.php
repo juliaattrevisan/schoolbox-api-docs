@@ -54,7 +54,7 @@ class Mapper extends BaseMapper
             $date = Alaress_Date_Format::now();
         }
         $query = "
-            SELECT   {$this->getSelectString()}
+            SELECT   {$this->getColumnString()}
             FROM     {$this->getTable()}
             WHERE    `start` <= :date
             ORDER BY `start` DESC
