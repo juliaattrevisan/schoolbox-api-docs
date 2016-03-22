@@ -981,15 +981,15 @@ class Controller extends BaseController
 
         // Test course page read access
 
-        if (Access::getInstance()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
-            throw new Unauthorized;
+        if ($this->getAccess()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
+            throw new Unauthorized();
         }
 
         // Test each homepage for write access
 
         foreach ($homepages as $homepage) {
-            if (Access::getInstance()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
-                throw new Unauthorized;
+            if ($this->getAccess()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
+                throw new Unauthorized();
             }
         }
 
