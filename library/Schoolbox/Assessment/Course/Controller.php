@@ -982,14 +982,14 @@ class Controller extends BaseController
         // Test course page read access
 
         if ($this->getAccess()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
-            throw new Unauthorized();
+            throw new Failure\Unauthorized();
         }
 
         // Test each homepage for write access
 
         foreach ($homepages as $homepage) {
             if ($this->getAccess()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
-                throw new Unauthorized();
+                throw new Failure\Unauthorized();
             }
         }
 
