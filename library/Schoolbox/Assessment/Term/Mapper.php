@@ -41,7 +41,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Verifies this term's title is unique.
+     * Verifies this term's title is unique and not empty.
      *
      * @param  Model $model
      * @return bool Always true, as long as it doesn't throw
@@ -49,6 +49,9 @@ class Mapper extends BaseMapper
      */
     public function verifyTitle(Model $model)
     {
+        if (strlen($model->getTitle()) === 0) {
+            throw new UnexpectedValueException('A term must have a title.');
+        }
         if (!$this->isUnique(['title' => $model->getTitle()], $model->getId())) {
             throw new UnexpectedValueException(
                 sprintf(
@@ -61,7 +64,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Verifies this term's code is unique.
+     * Verifies this term's code is unique and not empty.
      *
      * @param  Model $model
      * @return bool Always true, as long as it doesn't throw
@@ -69,6 +72,9 @@ class Mapper extends BaseMapper
      */
     public function verifyCode(Model $model)
     {
+        if (strlen($model->getCode()) === 0) {
+            throw new UnexpectedValueException('A term must have a code.');
+        }
         if (!$this->isUnique(['code' => $model->getCode()], $model->getId())) {
             throw new UnexpectedValueException(
                 sprintf(
