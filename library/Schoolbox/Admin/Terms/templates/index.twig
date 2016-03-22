@@ -26,10 +26,20 @@
 
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
 <script type="text/javascript">
     $(function(){
         $('[data-collapser]').collapsable();
         $('form[data-role="termForm"]').each(function() {
+            $(this).find(':submit').mage({
+                submittable: '[data-mage-wrapper]',
+                onXhrDone: function(data) {
+                    // reload this item and slide up
+                },
+                onXhrFail: function(data) {
+                    // Show error messages
+                }
+            });
             $(this).alaressValidate();
         });
         $('#content').on('click', 'a[data-post-action]', function(event) {
