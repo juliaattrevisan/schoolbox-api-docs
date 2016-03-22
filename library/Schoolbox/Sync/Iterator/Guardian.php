@@ -73,9 +73,26 @@ class Guardian extends IteratorIterator
 
         /* Email
          */
-        $email = new User\Common\Email();
-        $email->setAddress($currentResult['student_contact_default_email']);
-        $guardian->addEmail($email);
+        $email = array();
+        if(substr_count($currentResult['student_contact_default_email'],';') > 0){
+            $emailList = explode(';',$currentResult['student_contact_default_email']);
+            foreach ($emailList as $anEmail) {
+                $email[] = $anEmail;
+            }
+        }
+        else {
+            $email[] = $currentResult['student_contact_default_email'];
+        }
+
+        foreach ($email as $key => $anEmail) {
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
+
+            /** @var User\Common\Email $currentEmail */
+            if (strlen($currentEmail->getAddress())) {
+                $guardian->addEmail($currentEmail);
+            }
+        }
 
         /* Account
          */
