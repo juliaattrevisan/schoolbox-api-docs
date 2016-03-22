@@ -158,13 +158,21 @@ class Controller extends BaseController
      *
      * @api   GET /course/new
      * @level 160
-     * @param null $name
      */
-    public function newCourse($name = null)
+    public function newCourse()
+    {
+        $this->modifyCourse(null, null);
+    }
+
+    /**
+     * Form to create a new course, but also include search param
+     *
+     * @param $name
+     */
+    public function newCourseFromSearch($name)
     {
         $this->modifyCourse(null, $name);
     }
-
 
     /**
      * Accept the create formdata
