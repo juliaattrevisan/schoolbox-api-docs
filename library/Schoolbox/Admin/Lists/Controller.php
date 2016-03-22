@@ -185,6 +185,7 @@ class Controller extends Base
                     ],
                     'canChangePassword' => [
                         'caption'   => 'Allow Password Change',
+                        //'tooltip'   => 'Test',                                // If defined a tooltip will appear next to the header
                         'lookup'    => [
                             ['key' => 1, 'value' => 'Yes'],
                             ['key' => 0, 'value' => 'No'],

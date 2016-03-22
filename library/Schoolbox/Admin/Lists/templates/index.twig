@@ -75,7 +75,12 @@
                                 {% for field_key, field in tables[table].fields %}
                                     {% if field.hidden is empty %}
                                         <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} columns">
-                                            <h3>{{ field.caption }}</h3>
+                                            <h3>
+                                                {{ field.caption }}
+                                                {% if field.tooltip %}
+                                                    <span class="hint has-tip tip-top" data-tooltip title="{{ field.tooltip }}">?</span>
+                                                {% endif %}
+                                            </h3>
                                         </div>
                                     {% endif %}
                                 {% endfor %}
