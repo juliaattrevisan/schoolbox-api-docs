@@ -82,4 +82,4 @@ INSERT INTO config (name, value, title, description, field_id, options, type_id,
 
 -- ALTER TABLE `user` ADD `pastoral_moderator` TINYINT(1) DEFAULT 0;
 
-INSERT INTO `luServices` (`id`, `name`) VALUES (9,'Pastoral Moderator');
+INSERT INTO `luServices` (`id`, `name`) VALUES (9, 'Pastoral Moderator');
