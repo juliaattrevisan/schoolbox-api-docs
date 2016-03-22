@@ -27,9 +27,9 @@ class ContextSelector {
 	/**
 	 * The term objects that may be selected.
 	 *
-	 * @var Term\Model[]
+	 * @var Term\Model[]|Collection
 	 */
-	protected $terms = [];
+	protected $terms;
 
 	/**
 	 * The years that are shown in this selector
@@ -69,6 +69,7 @@ class ContextSelector {
 		$this->basePath = $basePath;
 		$this->categories = new Collection();
 		$this->units = new Collection();
+		$this->terms = new Collection();
 	}
 
 
@@ -187,7 +188,7 @@ class ContextSelector {
         $page->setVar('SEMESTER_CONTEXT_CATEGORY_ID', isset($selectedValues['list']) ? '/'.($selectedValues['list']) : '');
 
 		// parse the semesters, if there are any
-		if(count($this->years)) {
+		if(count($this->terms)) {
 			$this->renderSemesterSelector($page, $selectedValues);
 		}
 		else {
@@ -222,71 +223,89 @@ class ContextSelector {
 	 */
 	protected function createSemesterSelectorValues($selectedValues, $direction = 'DESC') {
 
-		// create a little list
-		switch($this->granularity) {
-			case self::GRANULARITY_YEAR:
-				$iterate = array('');
-				$labelFormat = '%s%s'; // sprintf compatibility
-				if(isset($selectedValues['year'])) {
-					$selection = array($selectedValues['year']);
-				}
-				break;
-			case self::GRANULARITY_TERM:
-				$iterate = array(1,2,3,4);
-				$labelFormat = 'Term %s, %s';
-				if(isset($selectedValues['year']) && isset($selectedValues['semester'])) {
-					$selection = array($selectedValues['year'], $selectedValues['semester']);
-				}
-				break;
-			// should almost always be default (self::GRANULARITY_SEMESTER)
-			default:
-				$iterate = array(1,2);
-				$labelFormat = 'Semester %s, %s';
-				if(isset($selectedValues['year']) && isset($selectedValues['semester'])) {
-					$selection = array($selectedValues['year'], $selectedValues['semester']);
-				}
-				break;
-		}
+//		// create a little list
+//		switch($this->granularity) {
+//			case self::GRANULARITY_YEAR:
+//				$iterate = array('');
+//				$labelFormat = '%s%s'; // sprintf compatibility
+//				if(isset($selectedValues['year'])) {
+//					$selection = array($selectedValues['year']);
+//				}
+//				break;
+//			case self::GRANULARITY_TERM:
+//				$iterate = array(1,2,3,4);
+//				$labelFormat = 'Term %s, %s';
+//				if(isset($selectedValues['year']) && isset($selectedValues['semester'])) {
+//					$selection = array($selectedValues['year'], $selectedValues['semester']);
+//				}
+//				break;
+//			// should almost always be default (self::GRANULARITY_SEMESTER)
+//			default:
+//				$iterate = array(1,2);
+//				$labelFormat = 'Semester %s, %s';
+//				if(isset($selectedValues['year']) && isset($selectedValues['semester'])) {
+//					$selection = array($selectedValues['year'], $selectedValues['semester']);
+//				}
+//				break;
+//		}
+
+		$selection = $selectedValues['term'];
 
 		// reverse chronological order is the default behaviour
-		if($direction == 'DESC') {
-			$years = array_reverse($this->years, false);
-			$semesters = array_reverse($iterate, false);
+		if ($direction == 'DESC') {
+			$this->terms->sortBy('start', 'DESC');
+//			$years = array_reverse($this->years, false);
+//			$semesters = array_reverse($iterate, false);
 		}
 		else {
-			$years = $this->years;
-			$semesters = $iterate;
+			$this->terms->sortBy('start', 'ASC');
+//			$years = $this->years;
+//			$semesters = $iterate;
 		}
 
 		$output = array();
 
 		// if there is no selection, standard behaviour is default to the first element
 		if(!isset($selection)) {
-			$selection = array(reset($years), reset($semesters));
+//			$selection = array(reset($years), reset($semesters));
+			$selection = $this->terms->first();
+		}
+
+		foreach ($this->terms as $term) {
+			$option = array(
+				'SEMESTER_SLUG'     => $term->getCode(),
+				'SEMESTER_VALUE'    => $term->getTitle(),
+				'SEMESTER_SELECTED' => ''
+			);
+			if ($term->getId() == $selection->getId()) {
+				$option['SEMESTER_SELECTED'] = 'selected="selected"';
+//				$output['nav'] = $this->calculateSemesterNavigation(count($iterate), $selection, $years);
+			}
+			$output['options'][] = $option;
 		}
 
 		// iterate by year, then by semester
-		foreach($years as $year) {
-			foreach($semesters as $semester) {
-				$option = array(
-					'SEMESTER_SLUG'     => strlen($semester) ? "$year/$semester" : "$year",
-					'SEMESTER_VALUE'    => sprintf($labelFormat, $semester, $year),
-					'SEMESTER_SELECTED' => ''
-				);
-
-				if(array($year, $semester) == $selection) {
-					$option['SEMESTER_SELECTED'] = 'selected="selected"';
-					$output['nav'] = $this->calculateSemesterNavigation(count($iterate), $selection, $years);
-				}
-
-				$output['options'][] = $option;
-			}
-		}
-
-        // Nothing was selected? Calculate navigation
-		if(!isset($output['nav'])) {
-			$output['nav'] = $this->calculateSemesterNavigation(count($iterate), array(reset($years), reset($semesters)), $years);
-		}
+//		foreach ($years as $year) {
+//			foreach($semesters as $semester) {
+//				$option = array(
+//					'SEMESTER_SLUG'     => strlen($semester) ? "$year/$semester" : "$year",
+//					'SEMESTER_VALUE'    => sprintf($labelFormat, $semester, $year),
+//					'SEMESTER_SELECTED' => ''
+//				);
+//
+//				if(array($year, $semester) == $selection) {
+//					$option['SEMESTER_SELECTED'] = 'selected="selected"';
+//					$output['nav'] = $this->calculateSemesterNavigation(count($iterate), $selection, $years);
+//				}
+//
+//				$output['options'][] = $option;
+//			}
+//		}
+//
+//        // Nothing was selected? Calculate navigation
+//		if(!isset($output['nav'])) {
+//			$output['nav'] = $this->calculateSemesterNavigation(count($iterate), array(reset($years), reset($semesters)), $years);
+//		}
 
 		return $output;
 	}
