@@ -51,13 +51,15 @@ $notification-header-background: $navigation-background !default;
             label {
                 background: $notification-header-background;
                 color: contrast-bg(0.4, $notification-header-background);
-                &:after{
-                    content: "\00AB";
-                    @extend %h2;
-                    padding-left: 0.5rem;
-                }
-                &.raquo:after{
-                    content: "\00BB";
+                @media #{$large-up} {
+                    &:after {
+                        content: "\00AB";
+                        @include scale-font-size($h2-font-scale);
+                        padding-left: 0.5rem;
+                    }
+                    &.raquo:after {
+                        content: "\00BB";
+                    }
                 }
             }
 
