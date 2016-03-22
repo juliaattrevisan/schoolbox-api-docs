@@ -12,16 +12,13 @@ namespace Schoolbox\Admin\Lists;
 use Alaress\Web\Controller\Base;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
-use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\News\Topic;
 use Schoolbox\News\TopicMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
+use Schoolbox\Pastoral\Severity\Mapper as SeverityMapper;
+use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 
 class Controller extends Base
 {
@@ -33,46 +30,171 @@ class Controller extends Base
     }
 
     /**
+     * Converts "strings_like_this" to "StringsLikeThis"
+     *
+     * @param $string
+     * @param bool $capitalizeFirstCharacter
+     * @return mixed
+     */
+    private function underscoreToCamelCase($string, $capitalizeFirstCharacter = true)
+    {
+
+        $str = str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
+
+        if (!$capitalizeFirstCharacter) {
+            $str[0] = strtolower($str[0]);
+        } else {
+            $str[0] = strtoupper($str[0]);
+        }
+
+        return $str;
+    }
+
+    public function postSave()
+    {
+        $mapper_name = $this->getRequest()->post["mapper"];
+        $sortable_column = $this->getRequest()->post["sortable_column"];
+
+        /** @var \Schoolbox\Mapper $mapper */
+        $mapper = new $mapper_name;
+        $model_name = $mapper->getModel();
+
+        $ids = [];
+        $values = [];
+        $fixed = [];
+        $nulls = [];
+        $radios = [];
+
+        // Get the data into some sort of usable format
+
+        foreach ($this->getRequest()->post as $field => $value) {
+
+            if (substr($field, 0, 6) == "value-")
+                $values[substr($field, 6)] = $value;
+            else if (substr($field, 0, 6) == "fixed-")
+                $fixed[substr($field, 6)] = $value;
+            else if (substr($field, 0, 5) == "null-")
+                $nulls[substr($field, 5)] = $value;
+            else if (substr($field, 0, 6) == "radio-")
+                $radios[substr($field, 6)] = $value;
+            else if ($field == "id")
+                $ids = $value;
+        }
+
+        foreach ($ids as $currentIndex => $id)
+        {
+            // Negative ID numbers indicate new records
+
+            if ($id > 0)
+                // Lookup existing record
+                $model = $mapper->findById($id);
+            else {
+                // Create new record
+                $model = new $model_name;
+                foreach ($fixed as $field => $value) {
+                    $setter = "set" . $this->underscoreToCamelCase($field);
+                    $model->$setter($value);
+                }
+            }
+
+            foreach ($values as $field => $value)
+            {
+                // Update values
+
+                $setter = "set" . $this->underscoreToCamelCase($field);
+                $model->$setter($value[$currentIndex]);
+
+                // Override nullable fields where appropriate
+
+                if (isset($nulls[$field])) {
+                    foreach ($nulls[$field] as $nullableField => $index) {
+                        if ($currentIndex == $index) {
+                            $model->$setter(null);
+                        }
+                    }
+                }
+            }
+
+            // Process any radio buttons for this list
+
+            foreach ($radios as $field => $index)
+            {
+                $setter = "set" . $this->underscoreToCamelCase($field);
+
+                // Radio buttons can only be on for one row, so set that row to true and all others to false
+
+                if ($id == $ids[$index]) {
+                    $model->$setter(1);
+                } else {
+                    $model->$setter(0);
+                }
+            }
+
+            if (trim($sortable_column) != "") {
+                $setter = "set" . $this->underscoreToCamelCase($sortable_column);
+                $model->$setter($currentIndex);
+            }
+
+            // Save the changes
+
+            $mapper->save($model);
+        }
+
+        $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->getRequest()->post["table"]);
+    }
+
+    /**
      * Show options
      *
      * @param string $tab
      * @param string $table
      */
-    public function getIndex($tab = '', $table = 'groups')
+    public function getIndex($table)
     {
+        if (!isset($table)) {
+            $table = "roles";
+        }
+
+        // This array defines the tables that can be updated
+
         $tables = [
             'roles' => [
-                'title'             => 'Roles',
-                'prototype'         => Role::class,
-                'mapper'            => RoleMapper::class,
-                'fields'            => [
+                'title'             => 'Roles',                                 // Title of the tab
+                'mapper'            => RoleMapper::class,                       // Mapper for the list item
+                //'findAllMethod'     => 'findAllIncludeHidden',                // By default it uses the findAll() method of the mapper- however you can override this. Necessary for 'components' page where findAll is overridden to not return items with 'visible = false'
+                'fixed'             => [                                        // This is a list of fixed values added to new items, useful if there are hidden items that need default values
+                    'digestSchedule' => '0'                                     // (e.g. Digest schedule cannot be null, so is hardcoded to 0 for new records)
+                ],
+                'fields'            => [                                        // This is a list of all of the updateable fields
                     'name'          => [
-                        'caption'   => 'Name',
-                        'width'     => 9,
+                        'caption'   => 'Name',                                  // Friendly caption that is displayed
+                        'width'     => 6,                                       // Width of the column on anything bigger than 'small'
                     ],
                     'type' => [
-                        'caption' => 'Role Type',
-                        'lookup' => [
+                        //'radio'     => '1'                                    // If defined the column will be a radio button shared by every item
+                        //'nullable'  => '1'                                    // If defined the column will have a checkbox that can be ticked to select NULL as a value
+                        //'getter'    => 'getTimetableColourId',                // Can be used to override getter if it has some weird name
+                        'caption'   => 'Role Type',
+                        'lookup'    => [                                        // If defined the column will appear as a select box
                             ['key' => 'guest', 'value' => 'Guest'],
                             ['key' => 'staff', 'value' => 'Staff'],
                             ['key' => 'student', 'value' => 'Student'],
                             ['key' => 'parent', 'value' => 'Parent'],
                         ],
-                        'width'     => 1,
+                        'width'     => 3,
                     ],
                     'canChangePassword' => [
-                        'caption' => 'Allow Password Change',
-                        'lookup' => [
+                        'caption'   => 'Allow Password Change',
+                        'lookup'    => [
                             ['key' => 1, 'value' => 'Yes'],
                             ['key' => 0, 'value' => 'No'],
                         ],
-                        'width'     => 2,
+                        'width'     => 3,
                     ]
                 ]
             ],
             'house' => [
                 'title'             => 'Houses',
-                'prototype'         => \House::class,
                 'mapper'            => \HouseMapper::class,
                 'fields'            => [
                     'house'         => [
@@ -83,7 +205,6 @@ class Controller extends Base
             ],
             'luResidentialHouse'    => [
                 'title'             => 'Residential Houses',
-                'prototype'         => \HouseResidential::class,
                 'mapper'            => \HouseResidentialMapper::class,
                 'fields'            => [
                     'house'         => [
@@ -94,56 +215,49 @@ class Controller extends Base
             ],
             'luCampus'    => [
                 'title'             => 'Campus',
-                'prototype'         => Campus::class,
                 'mapper'            => CampusMapper::class,
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 8,
+                        'width'     => 6,
                     ],
                     'extTimetableCode' => [
                         'caption'   => 'External Timetable Code',
-                        'width'     => 2,
+                        'width'     => 3,
                     ],
-                    'timetableDay' => [
+                    'timetableDay'  => [
                         'caption'   => 'Timetable Days',
-                        'width'     => 2,
+                        'width'     => 3,
                     ]
                 ]
             ],
-            'luEventType'    => [
+            'luEventType'           => [
                 'title'             => 'Event Types',
-                'prototype'         => EventType::class,
                 'mapper'            => EventTypeMapper::class,
                 'fields'            => [
-                    'type' => [
+                    'type'          => [
                         'caption'   => 'Event Type',
-                        'width'     => 10,
+                        'width'     => 8,
                     ],
-                    'color' => [
+                    'color'         => [
                         'caption'   => 'Event Colour',
-                        'width'     => 2,
+                        'width'     => 4,
                     ]
                 ]
             ],
-            'newsTopic'    => [
+            'newsTopic'             => [
                 'title'             => 'News Topics',
-                'prototype'         => Topic::class,
                 'mapper'            => TopicMapper::class,
+                'sortable'          => 'sequence',
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
                         'width'     => 11,
                     ],
-                    'sequence' => [
-                        'caption'   => 'Sequence',
-                        'width'     => 1,
-                    ],
                 ]
             ],
             'lu_submission_type'    => [
                 'title'             => 'Submission Types',
-                'prototype'         => WorkType::class,
                 'mapper'            => WorkTypeMapper::class,
                 'fields'            => [
                     'name'          => [
@@ -154,16 +268,15 @@ class Controller extends Base
             ],
             'submission_errors'     => [
                 'title'             => 'Submission States',
-                'prototype'         => \DueWork_Error::class,
                 'mapper'            => \DueWork_ErrorMapper::class,
                 'fields'            => [
                     'code'          => [
                         'caption'   => 'Code',
-                        'width'     => 1,
+                        'width'     => 2,
                     ],
                     'displayAs'     => [
                         'caption'   => 'Display Name',
-                        'width'     => 7,
+                        'width'     => 6,
                     ],
                     'normaliseAs'   => [
                         'caption'   => 'Normalised Mark',
@@ -171,7 +284,6 @@ class Controller extends Base
                         'width'     => 2,
                     ],
                     'isDefaultForNewSubmissions' => [
-                        'getter'    => 'isIsDefaultForNewSubmissions',
                         'caption'   => 'Default for new submissions?',
                         'radio'     => '1',
                         'width'     => 2,
@@ -180,13 +292,13 @@ class Controller extends Base
             ],
             'component_definition'  => [
                 'title'             => 'Components',
-                'prototype'         => \Component_Definition::class,
                 'mapper'            => \Component_DefinitionMapper::class,
+                'findAllMethod'     => 'findAllIncludeHidden',
                 'fields'            => [
                     'module'        => [
                         'caption'   => 'Module',
                         'readonly'  => true,
-                        'width'     => 1,
+                        'width'     => 2,
                     ],
                     'name'          => [
                         'caption'   => 'Name',
@@ -196,41 +308,59 @@ class Controller extends Base
                     'description'   => [
                         'caption'   => 'Description',
                         'readonly'  => true,
-                        'width'     => 8,
+                        'width'     => 6,
                     ],
-                    'visible' => [
+                    'visible'       => [
                         'caption'   => 'visible',
-                        'lookup' => [
+                        'lookup'    => [
                             ['key' => 'true', 'value' => 'Yes'],
                             ['key' => 'false', 'value' => 'No'],
                         ],
-                        'width'     => 1,
+                        'width'     => 2,
                     ]
                 ]
             ],
             'lu_timetable_colour'   => [
                 'title'             => 'Timetable Colours',
-                'prototype'         => \Timetable_Colour::class,
                 'mapper'            => \Timetable_ColourMapper::class,
-                'sortable'          => 'order',
                 'fields'            => [
                     'id'            => [
                         'getter'    => 'getTimetableColourId',
                         'hidden'    => true,
                     ],
                     'hex_colour'    => [
-                        'getter'    => 'getHexColour',
                         'caption'   => 'Colour',
+                        'width'     => 12
                     ],
                 ]
-            ]
-
-
+            ],
+            'luPastoralType'        => [
+                'title'             => 'Pastoral Event Types',
+                'mapper'            => TypeMapper::class,
+                'fields'            => [
+                    'name'          => [
+                        'caption'   => 'Name',
+                        'width'     => 12,
+                    ],
+                ]
+            ],
+            'luPastoralSeverity'    => [
+                'title'             => 'Pastoral Event Severity',
+                'mapper'            => SeverityMapper::class,
+                'sortable'          => 'order',
+                'fields'            => [
+                    'name'          => [
+                        'caption'   => 'Name',
+                        'width'     => 11,
+                    ],
+                ]
+            ],
         ];
 
         /** @var \Schoolbox\Mapper $mapper */
         $mapper = new $tables[$table]['mapper'];
-        $prototype = new $tables[$table]['prototype'];
+        $model_name = $mapper->getModel();
+        $prototype = new $model_name;
 
         $reflect = new \ReflectionClass($prototype);
         $properties   = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PRIVATE);
@@ -239,7 +369,18 @@ class Controller extends Base
 
         // Go through every row in the current lookup table
 
-        $rows = $mapper->findAll();
+        if (isset($tables[$table]['findAllMethod'])) {
+            $finder = $tables[$table]['findAllMethod'];
+            $rows = $mapper->$finder();
+        } else {
+            $rows = $mapper->findAll();
+        }
+
+        if (isset($tables[$table]['sortable'])) {
+            if ($reflect->hasMethod('get' . $tables[$table]['sortable'])) {
+                $rows = $rows->sortBy($tables[$table]['sortable'], 'asc');
+            }
+        }
 
         foreach ($rows as $row) {
 
@@ -260,7 +401,7 @@ class Controller extends Base
                         if (isset($tables[$table]['fields'][$prop->getName()]['getter']))
                             $getter = $tables[$table]['fields'][$prop->getName()]['getter'];
                         else
-                            $getter = "get" . ucfirst($prop->getName());
+                            $getter = "get" . $this->underscoreToCamelCase($prop->getName());
 
                         if ($reflect->hasMethod($getter)) {
 
@@ -282,102 +423,6 @@ class Controller extends Base
             }
         }
 
-
-        /*$tables = [
-            'groups' => [
-                'title' => 'Roles',
-                'index' => 'id',
-                'fields' => array(
-                    'id'         => array('readonly' => '1'),
-                    'name'       => array('caption' => 'Name'),
-                    'group_type' => array('caption' => 'Role Type'),
-                    'can_change_password' => array('caption' => 'Allow Password Change'),
-                ),
-            ],
-            'luResidentialHouse' => array(
-                'title' => 'Residential Houses',
-                'index' => 'id'
-            ),
-            'luCampus' => array(
-                'title' => 'Campus',
-                'index' => 'id',
-                'fields' => array(
-                    'id' => array('readonly' => '1'),
-                    'name' => array('caption' => 'Name'),
-                    'ext_timetable_code' => array('caption'=>'External Timetable Code'),
-                    'timetable_day' => array('caption'=>'Timetable Days'),
-                )
-            ),
-            'luEventType' => array(
-                'title' => 'Event Types',
-                'index' => 'eventTypeID'
-            ),
-            'file_type' => array(
-                'title' => 'Assessment Types',
-                'index' => 'id'
-            ),
-            'newsTopic' => array(
-                'title' => 'News Topics',
-                'index' => 'newsTopicID'
-            ),
-            'lu_submission_type' => array(
-                'title' => 'Submission Types',
-                'index' => 'id'
-            ),
-            'submission_errors' => array(
-                'title'  => 'Submission States',
-                'index'  => 'id',
-                'fields' => array(
-                    'id' => array(
-                        'readonly' => '1'
-                    ),
-                    'code' => array(
-                        'caption' => 'Code',
-                    ),
-                    'display_as' => array(
-                        'caption' => 'Display Name',
-                    ),
-                    'normalise_as' => array(
-                        'caption' => 'Normalised Mark',
-                        'nullable' => true,
-                    ),
-                    'is_default_for_new_submissions' => array(
-                        'caption' => 'Default for new submissions?',
-                    )
-                ),
-            ),
-            'component_definition' => array(
-                'title' => 'Components',
-                'index' => 'id',
-                'create' => false,
-                'fields' => array(
-                    'id' => array(
-                        'readonly' => '1'
-                    ),
-                    'module' => array(
-                        'caption' => 'Module',
-                        'readonly' => '1'
-                    ),
-                    'name' => array(
-                        'caption' => 'Component Name',
-                        'readonly' => '1'
-                    ),
-                    'description' => array(
-                        'caption' => 'Description',
-                        'readonly' => '1'
-                    ),
-                    'visible' => array(
-                        'caption' => 'Visible',
-                        'readonly' => '0'
-                    ),
-                ),
-            ),
-            'lu_timetable_colour' => array(
-                'title' => 'Timetable Colours',
-                'index' => 'timetable_colour_id'
-            )
-        ];*/
-
         // Stick a name column in those with no fields defined
 
         foreach ($tables as $tableCurrent) {
@@ -395,11 +440,11 @@ class Controller extends Base
             array(
                 'template' => '@adminLists/index.twig',
                 'data'     => array(
-                    'pageCurrent' => basename($this->getRequest()->query->get('page')),
-                    'tab' => $tab != '' ? $tab : 'course',
+                    'pageCurrent' => 'lists',
                     'tables' => $tables,
                     'table' => $table,
                     'records' => $records,
+                    'mapper' => get_class($mapper)
                 ),
             )
         );

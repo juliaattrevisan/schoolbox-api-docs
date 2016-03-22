@@ -64,10 +64,32 @@ class Component_DefinitionMapper extends Schoolbox\Mapper {
 
 	}
 
+	/**
+	 * @param array $options
+	 * @return \Schoolbox\Collection
+	 */
 	public function findAll($options = array()) {
 		$statement = $this->database->prepare("
 			SELECT {$this->getColumnString()}
 			FROM `{$this->table}` WHERE visible = 'true'
+		");
+
+		$statement->execute();
+
+		$rowset = $statement->fetchAll();
+
+		return $this->hydrateList($rowset);
+	}
+
+	/**
+	 * Find all component definitions including the hidden ones (uses in admin 'Components' list editor)
+	 *
+	 * @return \Schoolbox\Collection
+	 */
+	public function findAllIncludeHidden() {
+		$statement = $this->database->prepare("
+			SELECT {$this->getColumnString()}
+			FROM `{$this->table}`
 		");
 
 		$statement->execute();

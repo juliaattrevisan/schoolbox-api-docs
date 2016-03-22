@@ -1,80 +1,95 @@
+<script type="text/javascript">
+
+    $(function() {
+
+        {# Function to add new rows to the end of the list #}
+
+        {# New rows will be given sequential negative numbers #}
+
+        var newId = -1;
+
+        $('[data-button=add-row]').click(function(event) {
+            event.preventDefault();
+
+            var newRow = $('[data-clone]').find('li').clone()
+
+            {# Ninja ID numbers into the new HTML #}
+
+            newRow[0].innerHTML = newRow[0].innerHTML.replace(/#ID#/g, newId--);
+
+            $('[data-list]')
+                .append(newRow)
+                .find('[data-focus]')
+                .last()
+                .focus();
+        });
+
+        {# Wire up sortable lists #}
+
+        $('[data-sortable]').sortable({ handle: '.grip', axis: 'y' });
+    });
+
+</script>
+
 {# Shared navigation menu #}
 
 {{ renderAdminNavigation(pageCurrent) }}
 
-<!-- BEGIN custom_head -->
-<script type="text/javascript">
-    $(function() {
-        $('[data-button=add-row]').click(function(event) {
-            event.preventDefault();
-
-            var newRow = $('[data-clone]').find('tr').clone();
-
-            /* Randomise ids for every cloned checkbox
-             */
-            var uniqueNull = 'checkbox-clone-' + Math.random(0, 100000);
-            newRow.find('[data-null]').find('input[type=checkbox]').attr('id', uniqueNull);
-            newRow.find('[data-null]').find('.checkbox-label').attr('for', uniqueNull);
-
-            var uniqueDefault = 'checkbox-clone-' + Math.random(0, 100000);
-            newRow.find('[data-default]').find('input[type=checkbox]').attr('id', uniqueDefault);
-            newRow.find('[data-default]').find('.checkbox-label').attr('for', uniqueDefault);
-
-            $('[data-list]')
-                    .find('tbody')
-                    .append(newRow)
-                    .find('input[name="name[{ROW_NUMBER}]"]')
-                    .last()
-                    .focus();
-
-            return false;
-        });
-
-        $('[data-sortable]').sortable({ handle: '.grip', axis: 'y' });
-    });
-</script>
-<!-- END custom_head -->
-
 <div class="row">
-    <li class="small-12 island">
+    <div class="small-12 island">
         <dl class="sub-nav">
             {% for tableKey, tableCurrent in tables %}
                 <dd {% if tableKey == table %}class="active"{% endif %}><a href="/adminv2/lists/{{ tableKey }}">{{ tableCurrent.title }}</a></dd>
             {% endfor %}
         </dl>
 
-        <form method="post" action="/adminv2/listForm.php">
+        <form method="post" action="/adminv2/lists/save">
             <input name="table" type="hidden" value="{{ table }}" />
+            <input name="mapper" type="hidden" value="{{ mapper }}" />
+            <input name="sortable_column" type="hidden" value="{{ tables[table].sortable }}">
+
+            {# This is used when hidden fields cannot be NULL. Existing records should already be set in DB #}
+
+            {% for field_key, value in tables[table].fixed %}
+                <input type="hidden" name="fixed-{{field_key}}" value="{{ value }}">
+            {% endfor %}
 
             <section>
 
-                <ul class="information-list sortable ui-sortable" data-sortable>
+                <ul class="information-list sortable ui-sortable" data-sortable data-list>
 
                     {# Heading row #}
 
-                    <li class="row">
+                    <li class="show-for-medium-up no-border">
+                        <div class="list-item">
+                            <section>
 
-                        {# If the data is sortable need to add a blank column for drag handle #}
+                                {# If the data is sortable need to add a blank column for drag handle #}
 
-                        {% if tables[table].sortable %}
-                            <div class="small-1 column">&nbsp;</div>
-                        {% endif %}
+                                {% if tables[table].sortable %}
+                                    <div class="small-1 columns">
+                                        <h3>Order</h3>
+                                    </div>
+                                {% endif %}
 
-                        {% for field_key, field in tables[table].fields %}
-                            {% if field.hidden is empty %}
-                                <div class="small-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} column">
-                                    {{ field.caption }}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
+                                {% for field_key, field in tables[table].fields %}
+                                    {% if field.hidden is empty %}
+                                        <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} columns">
+                                            <h3>{{ field.caption }}</h3>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
 
+                            </section>
+                        </div>
                     </li>
 
                     {# Render each row of data#}
 
-                    {% for record in records %}
+                    {% for key,record in records %}
 
-                        <li class="row">
+                        <li class="no-border">
+                            <input type="hidden" name="id[]" value="{{ key }}">
 
                             {% set recordIndex = loop.index %}
 
@@ -83,9 +98,16 @@
                                 {% endif %}
 
                                 {% for field_key, field in tables[table].fields %}
+
+                                    <div class="small-12 column hide-for-medium-up">
+                                        <label>
+                                            {{ field.caption }}
+                                        </label>
+                                    </div>
+
                                     {% if field.hidden is empty %}
 
-                                        <div class="small-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} column">
+                                        <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} column">
 
                                             {% if field.readonly is not empty %}
 
@@ -95,35 +117,35 @@
 
                                             {% elseif field.radio is not empty %}
 
-                                                {# Radio field, shared between all rows#}
+                                                {# Radio field, shared between all rows #}
 
                                                 <div class="radiolist">
-                                                    <input type="radio" name="{{ field_key }}" value="{{ tables[table].radio }}" id="{{ field_key }}-{{ recordIndex }}" checked="{{ record[field_key] == 1 }}">
+                                                    <input type="radio" name="radio-{{ field_key }}" value="{{ recordIndex - 1 }}" id="{{ field_key }}-{{ recordIndex }}" checked="{{ record[field_key] == 1 }}">
                                                     <label for="{{ field_key }}-{{ recordIndex }}"></label>
                                                 </div>
 
                                             {% elseif field.lookup is not empty %}
 
                                                 {# Lookup select box #}
-
-                                                <select name="{{ field_key }}">
+                                                <select name="value-{{ field_key }}[]">
                                                     {% for option in field.lookup %}
+
                                                         <option {% if record[field_key] == option.key %}selected {% endif %}value="{{ option.key }}">{{ option.value }}</option>
                                                     {% endfor %}
                                                 </select>
 
                                             {% else %}
 
-                                                {# All other fields are just text boxes#}
+                                                {# All other fields are just text boxes #}
 
-                                                <input name="{{field_key}}" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" />
+                                                <input name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" />
 
-                                                {# Nullable text boxes get a tickbox as well#}
+                                                {# Nullable text boxes get a tickbox as well #}
 
                                                 {% if field.nullable is not empty %}
                                                     <div class="checklist">
-                                                        <input id="{{ field_key }}-{{ recordIndex }}" type="checkbox" {% if record[field_key] == null %}checked{% endif %}>
-                                                        <label for="{{ field_key }}-{{ recordIndex }}">Set To Null</label>
+                                                        <input name="null-{{ field_key }}[]" value="{{ recordIndex - 1 }}" id="{{ field_key }}-{{ recordIndex }}" type="checkbox" {% if record[field_key] == null %}checked{% endif %}>
+                                                        <label for="{{ field_key }}-{{ recordIndex }}">Null</label>
                                                     </div>
                                                 {% endif %}
                                             {% endif %}
@@ -135,44 +157,73 @@
                 </ul>
 
             </section>
-            <div class="content">
-                <a href="#" data-button="add-row" class="button icon-add">New Row</a>
-            </div>
+            <a href="#" data-button="add-row" class="button expand icon-add">New Row</a>
             <input type="submit" value="Save"/>
         </form>
     </div>
 </div>
 
-<table data-clone class="hide">
-    <tbody>
-    <tr>
-        <!-- BEGIN newInput -->
-        <td>
-            <input class="{NULLABLE_CLASS}" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="{TYPE}" {READONLY} value="{VALUE}" />
-            <!-- BEGIN newInput_null -->
-        </td>
-        <td data-null>
-            <input id="{TABLE_COLUMN}-new-null" type="checkbox" name="{TABLE_COLUMN}[{ROW_NUMBER}]" value="NULL" />
-            <label for="{TABLE_COLUMN}-new-null" class="checkbox-label">Null?</label>
-            <!-- END newInput_null -->
-        </td>
-        <!-- END newInput -->
-        <!-- BEGIN newSelect -->
-        <td>
-            <select name="{TABLE_COLUMN}[{ROW_NUMBER}]">
-                <!-- BEGIN newSelect_option -->
-                <option value="{OPTION_VALUE}">{OPTION_LABEL}</option>
-                <!-- END newSelect_option -->
-            </select>
-        </td>
-        <!-- END newSelect -->
-        <!-- BEGIN newCheckbox -->
-        <td data-default>
-            <input name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="hidden" value="0" />
-            <input id="checkbox-{TABLE_COLUMN}[{ROW_NUMBER}]" name="{TABLE_COLUMN}[{ROW_NUMBER}]" type="checkbox" {READONLY} value="1" />
-            <label for="checkbox-{TABLE_COLUMN}[{ROW_NUMBER}]" class="checkbox-label"></label>
-        </td>
-        <!-- END newCheckbox -->
-    </tr>
-    </tbody>
-</table>
+{# Draw cloneable row for use when adding new rows#}
+
+<div data-clone class="hide">
+    <li class="row">
+        <input type="hidden" name="id[]" value="#ID#">
+
+        {# The first non-hidden input field needs to have the data-focus attribute set, this variable keeps track of that #}
+
+        {% set focusSet = false %}
+
+        {% if tables[table].sortable %}
+            <div class="small-1 column grip">&nbsp;</div>
+        {% endif %}
+
+        {% for field_key, field in tables[table].fields %}
+            {% if field.hidden is empty %}
+
+                <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} column">
+
+                    {% if field.readonly is not empty %}
+
+                        {# Read only field, just display label #}
+
+                        {{ record[field_key] }}
+
+                    {% elseif field.radio is not empty %}
+
+                        {# Radio field, shared between all rows #}
+
+                        <div class="radiolist">
+                            <input {% if not focusSet %}data-focus{% set focusSet = true %}{% endif %} type="radio" name="radio-{{ field_key }}" value="#ID#" id="{{ field_key }}-{{ recordIndex }}">
+                            <label for="{{ field_key }}-{{ recordIndex }}"></label>
+                        </div>
+
+                    {% elseif field.lookup is not empty %}
+
+                        {# Lookup select box #}
+
+                        <select {% if not focusSet %}data-focus{% set focusSet = true %}{% endif %} name="value-{{ field_key }}[]">
+                            {% for option in field.lookup %}
+                                <option value="{{ option.key }}">{{ option.value }}</option>
+                            {% endfor %}
+                        </select>
+
+                    {% else %}
+
+                        {# All other fields are just text boxes #}
+
+                        <input {% if not focusSet %}data-focus{% set focusSet = true %}{% endif %} name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}"/>
+
+                        {# Nullable text boxes get a tickbox as well #}
+
+                        {% if field.nullable is not empty %}
+                            <div class="checklist">
+                                <input name="null-{{ field_key }}[]" id="{{ field_key }}-{{ recordIndex }}" value="#ID#" type="checkbox">
+                                <label for="{{ field_key }}-{{ recordIndex }}">Null</label>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </li>
+</div>
