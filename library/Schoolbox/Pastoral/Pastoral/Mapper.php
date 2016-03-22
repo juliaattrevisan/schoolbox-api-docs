@@ -189,6 +189,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
             WHERE s.id = ?
             AND r.deleted_at IS NULL
+            ORDER BY r.created_at DESC
         ";
 
         $statement = $this->getDatabase()->prepare($query);
