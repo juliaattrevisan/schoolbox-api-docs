@@ -417,6 +417,8 @@ class Mapper extends BaseMapper
             }
         }
 
+        // Give owners permission to their own records regardless of other permissions
+
         if ($record->getOwner()->getId() == $user->getId()) {
             return true;
         }
