@@ -66,16 +66,16 @@
     <li class="active"><a href="/pastoral/{{ student.getId }}">Pastoral Care</a></li>
 </ul>
 
-{# Hide contact/student information and add/filter controls from parents #}
-{% if role != 'parent' %}
-
-    <div class="actions-small-1 row">
-        <div class="list-item">
-            <div class="small-12 column">
-                <h1>Pastoral Care</h1>
-            </div>
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Pastoral Care</h1>
         </div>
     </div>
+</div>
+
+{# Hide contact/student information and add/filter controls from parents #}
+{% if role != 'parent' %}
 
     <div class="row actions-small-3">
         <div class="list-item">

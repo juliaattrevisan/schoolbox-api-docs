@@ -167,6 +167,9 @@ class Controller extends Base
      */
     public function getReport()
     {
+        if ($this->getUser()->getRole()->isStudent())
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+
         $records = $this->getReportData();
 
         // Restrict results based on pagination
@@ -231,6 +234,8 @@ class Controller extends Base
      */
     public function getReportPrint()
     {
+        if ($this->getUser()->getRole()->isStudent())
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
         // Kick them back to the kerb if they aren't allowed to view this page
 
@@ -311,6 +316,9 @@ class Controller extends Base
      */
     public function getReportBuilder()
     {
+        if ($this->getUser()->getRole()->isStudent())
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+
         // Get current users role. The screen is restricted to pastoral moderators only
         // Kick them back to the kerb if they shouldn't be looking at this page
 
@@ -379,6 +387,9 @@ class Controller extends Base
      */
     public function getIndex($id)
     {
+        if ($this->getUser()->getRole()->isStudent())
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+
         // Get the students parents
 
         $externalUserMapper = new \External_User();
@@ -459,6 +470,9 @@ class Controller extends Base
      */
     public function getRecord($studentId, $id)
     {
+        if ($this->getUser()->getRole()->isStudent())
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+
         /** @var \Schoolbox\User $user */
         $user = $this->getUser();
 
@@ -503,6 +517,9 @@ class Controller extends Base
      */
     public function getInsert($id)
     {
+        if ($this->getUser()->getRole()->isStudent())
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+
         // Only staff should be inserting comments
 
         if (!$this->getUser()->getRole()->isStaff())
@@ -542,6 +559,9 @@ class Controller extends Base
      */
     public function getUpdate($id)
     {
+        if ($this->getUser()->getRole()->isStudent())
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+
         // Get the record we are updating
 
         try {
@@ -578,6 +598,9 @@ class Controller extends Base
 
     public function postCommentDelete()
     {
+        if ($this->getUser()->getRole()->isStudent())
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+
         // Get the comment we are deleting
 
         try {
@@ -597,6 +620,9 @@ class Controller extends Base
 
     public function postComment()
     {
+        if ($this->getUser()->getRole()->isStudent())
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+
         // Post a comment on a pastoral record
         // Only staff should be doing this
 
@@ -626,6 +652,9 @@ class Controller extends Base
      */
     public function postSave()
     {
+        if ($this->getUser()->getRole()->isStudent())
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+
         // Only staff should be doing this
 
         if (!$this->getUser()->getRole()->isStaff()) {
@@ -953,7 +982,7 @@ class Controller extends Base
                 $foundAttachment = false;
 
                 if (is_array($this->getRequest()->post["attachment"])) {
-                    foreach ($this->getRequest()->post["attachment"] as $hash) {
+                    foreach ($this->getRequest()->post["attachment"] as $nh) {
 
                         $hash_array = explode(":", $hash);
 
@@ -1080,6 +1109,9 @@ class Controller extends Base
 
     public function postDelete()
     {
+        if ($this->getUser()->getRole()->isStudent())
+            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+
         // Get the record we are deleting
 
         try {
