@@ -9,6 +9,7 @@ namespace Schoolbox\Admin\Terms;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Aura\Web\Request;
 use Schoolbox\Assessment\Term;
 
 /**
@@ -56,12 +57,7 @@ class Controller extends Base
     {
         $term = $this->termMapper->createModel();
         try {
-            $term
-                ->setTitle($this->getRequest()->post->get('title'))
-                ->setCode($this->getRequest()->post->get('code'))
-                ->setStart(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('start')))
-                ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
-            ;
+            $term = $this->populateModelFromPostData($term, $this->getRequest()->post);
             $this->termMapper->save($term);
             $this->outputPostSuccess($term);
         } catch (\Exception $e) {
@@ -77,17 +73,37 @@ class Controller extends Base
     public function postUpdateTerm(Term\Model $term)
     {
         try {
-            $term
-                ->setTitle($this->getRequest()->post->get('title'))
-                ->setCode($this->getRequest()->post->get('code'))
-                ->setStart(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('start')))
-                ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
-            ;
+            $term = $this->populateModelFromPostData($term, $this->getRequest()->post);
             $this->termMapper->save($term);
             $this->outputPostSuccess($term);
         } catch (\Exception $e) {
             $this->outputPostError($term, $e);
         }
+    }
+
+    /**
+     * Sets a model's fields from post data.
+     *
+     * @param  Term\Model     $term
+     * @param  Request\Values $postdata
+     * @return Term\Model
+     * @throws \Exception if dates aren't valid
+     */
+    protected function populateModelFromPostData(Term\Model $term, Request\Values $postdata)
+    {
+        $term->setTitle($postdata->get('title'));
+        $term->setCode($postdata->get('code'));
+        try {
+            $term->setStart(Alaress_Date_Format::newLocalShort($postdata->get('start')));
+        } catch (\Exception $e) {
+            throw new \Exception('Start date is not a valid date.');
+        }
+        try {
+            $term->setFinish(Alaress_Date_Format::newLocalShort($postdata->get('finish')));
+        } catch (\Exception $e) {
+            throw new \Exception('Finish date is not a valid date.');
+        }
+        return $term;
     }
 
     /**
