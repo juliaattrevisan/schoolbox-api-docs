@@ -348,26 +348,10 @@
 
             <div class="row">
                 <div class="small-12 column">
-                    {% if record.getId == '' %}
-
-                        {# Insert Buttons #}
-
-                        <ul class="flex-list buttons">
-                            <li><input type="submit" data-submit class="submit" value="Save"></li>
-                            <li><a href="#" data-cancel class="button icon-cancel">Cancel Changes</a></li>
-                        </ul>
-
-
-                    {% else %}
-
-                        {# Update Buttons #}
-
-                        <ul class="flex-list buttons">
-                            <li><input type="submit" data-submit class="submit" value="Save"></li>
-                            <li><a href="#" data-cancel class="button icon-cancel">Cancel Changes</a></li>
-                        </ul>
-
-                    {% endif %}
+                    <ul class="flex-list buttons">
+                        <li><input type="submit" data-submit class="submit" value="Save"></li>
+                        <li><a href="#" data-cancel class="button icon-cancel">Cancel Changes</a></li>
+                    </ul>
                 </div>
             </div>
         </form>
