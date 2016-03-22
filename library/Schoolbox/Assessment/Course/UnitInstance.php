@@ -77,13 +77,17 @@ class UnitInstance implements ISoftDeletable {
      */
     protected $quizDates;
 
+
+    /**
+     * UnitInstance constructor.
+     */
     public function __construct() {
         $this->tasks = new Collection();
     }
 
     /**
      * @param  \Component_Instance $component
-     * @return $this
+     * @return self
      */
     public function setComponent($component) {
         $this->component = $component;
@@ -99,7 +103,7 @@ class UnitInstance implements ISoftDeletable {
 
     /**
      * @param  \Alaress_Date_Format $created
-     * @return $this
+     * @return self
      */
     public function setCreated($created) {
         $this->created = $created;
@@ -115,7 +119,7 @@ class UnitInstance implements ISoftDeletable {
 
     /**
      * @param  \Alaress_Date_Format $deleted
-     * @return $this
+     * @return self
      */
     public function setDeleted($deleted) {
         $this->deleted = $deleted;
@@ -131,7 +135,7 @@ class UnitInstance implements ISoftDeletable {
 
     /**
      * @param  \Alaress_Date_Format $due_date
-     * @return $this
+     * @return self
      */
     public function setDueDate($due_date) {
         $this->due_date = $due_date;
@@ -147,7 +151,7 @@ class UnitInstance implements ISoftDeletable {
 
     /**
      * @param  int   $id
-     * @return $this
+     * @return self
      */
     public function setId($id) {
         $this->id = $id;
@@ -163,7 +167,7 @@ class UnitInstance implements ISoftDeletable {
 
     /**
      * @param  \Alaress_Date_Format $open_date
-     * @return $this
+     * @return self
      */
     public function setOpenDate($open_date) {
         $this->open_date = $open_date;
@@ -179,7 +183,7 @@ class UnitInstance implements ISoftDeletable {
 
     /**
      * @param  string $title
-     * @return $this
+     * @return self
      */
     public function setTitle($title) {
         $this->title = $title;
@@ -195,7 +199,7 @@ class UnitInstance implements ISoftDeletable {
 
     /**
      * @param  \Schoolbox\Resource\Category $category
-     * @return $this
+     * @return self
      */
     public function setCategory($category) {
         $this->category = $category;
@@ -211,7 +215,7 @@ class UnitInstance implements ISoftDeletable {
 
     /**
      * @param  \Schoolbox\Resource\Category $unit_category
-     * @return $this
+     * @return self
      */
     public function setUnitCategory($unit_category) {
         $this->unit_category = $unit_category;
@@ -227,7 +231,7 @@ class UnitInstance implements ISoftDeletable {
 
     /**
      * @param  Collection $tasks
-     * @return $this
+     * @return self
      */
     public function setTasks($tasks) {
         $this->tasks = $tasks;
@@ -325,7 +329,8 @@ class UnitInstance implements ISoftDeletable {
     /**
      * Set array of dates for work. Used to override default dates when saving
      *
-     * @return UnitInstance
+     * @param array $workDates
+     * @return self
      */
     public function setWorkDates($workDates) {
         $this->workDates = $workDates;
@@ -335,7 +340,8 @@ class UnitInstance implements ISoftDeletable {
     /**
      * Set array of dates for quizzes. Used to override default dates when saving
      *
-     * @return UnitInstance
+     * @param array $quizDates
+     * @return self
      */
     public function setQuizDates($quizDates) {
         $this->quizDates = $quizDates;

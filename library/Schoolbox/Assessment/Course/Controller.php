@@ -22,7 +22,7 @@ use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
@@ -44,16 +44,16 @@ class Controller extends BaseController
 {
 
     /** @var FolderMapper */
-    protected $folderMapper = null;
+    protected $folderMapper;
 
     /** @var SubmissionBoxMapper */
-    protected $submissionBoxMapper = null;
+    protected $submissionBoxMapper;
 
     /** @var OnlineAssessmentMapper */
-    protected $onlineAssessmentMapper = null;
+    protected $onlineAssessmentMapper;
 
     /** @var TaskMapper */
-    protected $taskMapper = null;
+    protected $taskMapper;
 
     /** @var TaskInstanceMapper */
     protected $taskInstanceMapper = null;
@@ -207,11 +207,11 @@ class Controller extends BaseController
                 $parent = $this->getCourseMapper()->findById($parentId);
             } else {
                 // cause a snap if no (or invalid) parent was supplied
-                throw new Mapper\Exception("Invalid parent nominated");
+                throw new BaseMapper\Exception("Invalid parent nominated");
             }
 
 
-        } catch (Mapper\Exception $e) {
+        } catch (BaseMapper\Exception $e) {
 
             $errors[] = "select a faculty or class for $name to live in";
         }
@@ -235,7 +235,7 @@ class Controller extends BaseController
                 // do checks to make sure it exists
                 $this->getCourseMapper()->findById($id);
 
-            } catch (Mapper\Exception $e) {
+            } catch (BaseMapper\Exception $e) {
                 $this->sendError("Could not save because ".$e->getMessage());
                 return;
             }
@@ -997,10 +997,8 @@ class Controller extends BaseController
 
         /** @var Category[] $unitCache */
         $unitCache = [];
-
         /** @var Category[] $homepageCache */
         $homepageCache = [];
-
         /** @var Component_Instance[] $componentCache */
         $componentCache = [];
 
@@ -1300,7 +1298,7 @@ class Controller extends BaseController
             } else {
                 throw new RangeException("Invalid template ID specified");
             }
-        } catch (Mapper\Exception $e) {
+        } catch (BaseMapper\Exception $e) {
             throw new RangeException("Invalid template ID specified", 0, $e);
         }
 
