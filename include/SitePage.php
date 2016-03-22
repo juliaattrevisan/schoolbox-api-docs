@@ -373,19 +373,6 @@ class SitePage extends Page
         $this->renderStudents();
         $this->renderInstantMessages();
 
-        /* Hide notifications tray
-         */
-        if ($_SESSION['user']->getHideNotificationsTray()) {
-            $this->setVar([
-                'HIDE_NOTIFICATIONS_TRAY' => 'right-hidden'
-            ]);
-        }
-        else {
-            $this->setVar([
-                'HIDE_NOTIFICATIONS_TRAY' => ''
-            ]);
-        }
-
         $this->parse('MAIN_HEADER_REGION', 'headerTpl');
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
 
@@ -436,11 +423,11 @@ class SitePage extends Page
                 }
 
                 $this->setVar(array(
-                                    'MENU_SWITCH_USERID'        => $linkedUser->getId(),
-                                    'MENU_SWITCH_EXTERNAL_ID'   => $linkedUser->getExternalId(),
-                                    'MENU_SWITCH_USER_FULLNAME' => $linkedUser->getFullName(),
-                                    'MENU_SWITCH_USER_ROLE'     => $linkedUser->getRole()->getName(),
-                                    )
+                        'MENU_SWITCH_USERID'        => $linkedUser->getId(),
+                        'MENU_SWITCH_EXTERNAL_ID'   => $linkedUser->getExternalId(),
+                        'MENU_SWITCH_USER_FULLNAME' => $linkedUser->getFullName(),
+                        'MENU_SWITCH_USER_ROLE'     => $linkedUser->getRole()->getName(),
+                    )
                 );
                 $this->parse('switch_user_block', 'switch_user', true);
                 $canSwitch = true;
@@ -454,11 +441,11 @@ class SitePage extends Page
 
             if($previousUser instanceof \Schoolbox\User) {
                 $this->setVar(array(
-                                    'MENU_SWITCH_USERID'        => $previousUser->getId(),
-                                    'MENU_SWITCH_EXTERNAL_ID'   => $previousUser->getExternalId(),
-                                    'MENU_SWITCH_USER_FULLNAME' => $previousUser->getFullName(),
-                                    'MENU_SWITCH_USER_ROLE'     => $previousUser->getRole()->getName(),
-                                    )
+                        'MENU_SWITCH_USERID'        => $previousUser->getId(),
+                        'MENU_SWITCH_EXTERNAL_ID'   => $previousUser->getExternalId(),
+                        'MENU_SWITCH_USER_FULLNAME' => $previousUser->getFullName(),
+                        'MENU_SWITCH_USER_ROLE'     => $previousUser->getRole()->getName(),
+                    )
                 );
                 $this->parse('recover_user_block', 'recover_user', true);
                 $canSwitch = true;

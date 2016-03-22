@@ -92,176 +92,189 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
  * mysteriously based on viewport size (there's no side nav)
  */
 .standard-bar {
-    padding: 0;
-    background-color: $tabbar-bg;
-    height: $tabbar-height;
-    img {
-        display: block;
-        max-height: 5rem;
-        max-width: none;
-    }
+	padding: 0;
+	background-color: $tabbar-bg;
+	height: $tabbar-height;
+	img {
+		display: block;
+		max-height: 5rem;
+		max-width: none;
+	}
 }
 
 /* Main navigation tab bar at top
  */
 .hybrid-bar{
-    .logo {
-        width: 5rem;
-        height: 5rem;
-        @media #{$mediumwide-up} {
-            display: none !important;
-        }
-        img{
-            display: block;
-            height: 100%;
-            max-width: none;
-        }
-    }
+	.logo {
+		width: 5rem;
+		height: 5rem;
+		@media #{$mediumwide-up} {
+			display: none !important;
+		}
+		img{
+			display: block;
+			height: 100%;
+			max-width: none;
+		}
+	}
 	.left-small{
 		z-index: 100;
 		.menu-icon{
 			height: $tabbar-height;
 		}
 	}
-    .tab-bar {
-        position: inherit;
-    }
-    #search {
-        margin: 0;
-        position: absolute;
-        right: 0;
-        height: $tabbar-height;
-        @include placeholder-color(transparent, $font-weight-normal);
-        input[type="text"]{
-            border: 0;
-            background-color: transparent;
-            color: $body-bg;
-            height: $tabbar-height;
-            width: $tabbar-height;
-            padding: $base-font-size;
-            margin: 0;
-            opacity: 0;
-            line-height: $tabbar-height / 2;
-        }
-        &:hover, &.focus {
-            width: 100%;
-            @include placeholder-color($black, $font-weight-normal);
-        }
+	.right-small{
+		z-index: 1002;
+	}
+	.tab-bar {
+		position: inherit;
+	}
+	#search {
+		margin: 0;
+		position: absolute;
+		right: $tabbar-height;
+		height: 0;
+		padding-left: $tabbar-height;
+		@include placeholder-color(transparent, $font-weight-normal);
+		input[type="text"]{
+			border: 0;
+			background-color: transparent;
+			color: $body-bg;
+			height: $tabbar-height;
+			width: $tabbar-height;
+			padding: $base-font-size;
+			margin: 0;
+			opacity: 0;
+			line-height: $tabbar-height / 2;
+		}
+		&:hover, &.focus {
+			width: 100%;
+			@include placeholder-color($black, $font-weight-normal);
+		}
 
-        /* Search icon in its idle state
-         */
-        .icon-search {
-            @include absolute (0, auto, auto, 32px);
-            @include transition(all, 0.3s, ease-in);
-            margin: 0;
-            z-index: 1;
-            &:before {
-                color: $navigation-foreground;
-            }
-            line-height: inherit;
-        }
+		/* Search icon in its idle state
+		 */
+		.icon-search {
+			@include absolute (0, auto, auto, 32px);
+			@include transition(all, 0.3s, ease-in);
+			margin: 0;
+			z-index: 1;
+			&:before {
+				color: $navigation-foreground;
+			}
+			line-height: inherit;
+		}
 
-        /* Input field when Search feature is activated
-         */
-        [type="text"]:focus,
-        [type="text"]:active,
-        &:hover [type="text"],
-        &:hover [type="text"]:focus{
-            background-color: $white;
-            border: 2px solid $navigation-hover;
-            color: $black;
-            width: 100%;
-            opacity: 1;
-        }
+		/* Input field when Search feature is activated
+		 */
+		[type="text"]:focus,
+		[type="text"]:active,
+		&:hover [type="text"],
+		&:hover [type="text"]:focus{
+			background-color: $white;
+			border: 2px solid $navigation-hover;
+			color: $black;
+			width: 100%;
+			opacity: 1;
+		}
 
-        [type="text"]:focus + .icon-search,
-        [type="text"]:active + .icon-search,
-        &:hover .icon-search {
-            @include absolute (0, auto, auto, 16px);
+		[type="text"]:focus + .icon-search,
+		[type="text"]:active + .icon-search,
+		&:hover .icon-search {
+			@include absolute (0, auto, auto, 16px);
 
-            /* Search icon when Search feature is activated
-             */
-            &:before {
-                color: $navigation-background;
-            }
-        }
-    }
+			/* Search icon when Search feature is activated
+			 */
+			&:before {
+				color: $navigation-background;
+			}
+		}
+	}
+	// When notifications are disabled
+	.disableNotifications #search {
+		right: 0;
+		&:hover, &.focus{
+			padding-left: 0;
+		}
+	}
 
-    .tab-bar-section {
-        position: relative;
-        left: 0;
-        right: 0;
-    }
+	.tab-bar-section {
+		position: relative;
+		left: 0;
+		right: 0;
+	}
 
-    .icon-nav{
-        @include inline-list;
-        margin: 0;
-        height: inherit;
-        padding: 0 0 0 rem-calc(($base-font-size - 2));
+	.icon-nav{
+		@include inline-list;
+		margin: 0;
+		height: inherit;
+		padding: 0 0 0 rem-calc(($base-font-size - 2));
 
-        li:nth-child(n+5){
-            @extend .show-for-large-up;
-        }
-        li:nth-child(n+7){
-            @extend .show-for-xlarge-up;
-        }
+		li:nth-child(n+5){
+			@extend .show-for-large-up;
+		}
+		li:nth-child(n+7){
+			@extend .show-for-xlarge-up;
+		}
 
-        li {
-            margin: 0;
-            width: 5rem;
-            a {
-                height: 5rem;
-                padding: rem-calc(($base-font-size - 2)) 0;
-                text-align: center;
-                @extend .icon-32;
-                @extend .no-text;
+		li {
+			margin: 0;
+			width: 5rem;
+			a {
+				height: 5rem;
+				padding: rem-calc(($base-font-size - 2)) 0;
+				text-align: center;
+				@extend .icon-32;
+				@extend .no-text;
 
-                &.navthis {
-                    background-color: calc-text-color(
-                                    $tabbar-bg,
-                                    tint($tabbar-bg, 4%),
-                                    darken($tabbar-bg, 4%)
-                    );
-                    &:before, span {
-                        color: $icon-nav-highlight-color;
-                    }
-                }
+				&.navthis {
+					background-color: calc-text-color(
+									$tabbar-bg,
+									tint($tabbar-bg, 4%),
+									darken($tabbar-bg, 4%)
+					);
+					&:before, span {
+						color: $icon-nav-highlight-color;
+					}
+				}
 
-                &:hover {
-                    background-color: $navigation-hover;
-                }
+				&:hover {
+					background-color: $navigation-hover;
+				}
 
-                &:before {
-                    @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
-                    text-align: center;
-                    float: none;
-                    color: $navigation-foreground;
-                }
-            }
+				&:before {
+					@include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+					text-align: center;
+					float: none;
+					color: $navigation-foreground;
+				}
+			}
 
-            span {
-                @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
-                color: $navigation-foreground;
-                font-weight: $font-weight-normal;
-                line-height: rem-calc($base-font-size);
-                display: block;
-            }
-        }
-    }
-    @media #{$small-only} {
-        height: $tabbar-height * 2;
-        .icon-nav{
-            padding: 0;
-            position: absolute;
-            left: 0;
-            top: 80px;
-            width: 100%;
-            li{
-                width: 25%;
-            }
-        }
-    }
+			span {
+				@include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+				color: $navigation-foreground;
+				font-weight: $font-weight-normal;
+				line-height: rem-calc($base-font-size);
+				display: block;
+			}
+		}
+	}
+	@media #{$small-only} {
+		height: $tabbar-height * 2;
+		.icon-nav{
+			padding: 0;
+			position: absolute;
+			left: 0;
+			top: 80px;
+			width: 100%;
+			li{
+				width: 25%;
+			}
+		}
+	}
 }
+
+
 
 .left-off-canvas-toggle,
 .right-off-canvas-toggle {
@@ -273,9 +286,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
 .right-off-canvas-toggle{
 	&:before{
-        text-align: center;
-        display: block;
-        padding: 0;
+		text-align: center;
+		display: block;
+		padding: 0;
 	}
 }
 
@@ -283,25 +296,25 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
  * This can be summoned using the hamburger if it's not already visible
  */
 .left-off-canvas-menu {
-    /* A background colour specifically for the logo/crest
-     * so a school logo won't be mashed by the off-canvas colour
-     * set selections they are allowed to make
-     */
-    .logo-wrapper {
-        background-color: $logo-background;
+	/* A background colour specifically for the logo/crest
+	 * so a school logo won't be mashed by the off-canvas colour
+	 * set selections they are allowed to make
+	 */
+	.logo-wrapper {
+		background-color: $logo-background;
 
-        .logo {
-            @media #{$medium-down} {
-                display: none !important;
-            }
-            display: block;
-            padding: 2rem 0;
-            img {
-                display: block;
-                margin: 0 auto;
-            }
-        }
-    }
+		.logo {
+			@media #{$medium-down} {
+				display: none !important;
+			}
+			display: block;
+			padding: 2rem 0;
+			img {
+				display: block;
+				margin: 0 auto;
+			}
+		}
+	}
 
 	/* Second Nav
 	 * This appears when you're on medium displays and you have to
@@ -317,9 +330,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		li:nth-child(-n+6){
 			@extend .hide-for-large-only;
 		}
-        li:nth-child(-n+4){
-            @extend .hide-for-medium-down;
-        }
+		li:nth-child(-n+4){
+			@extend .hide-for-medium-down;
+		}
 	}
 
 	/* Profile Accordion Menu
@@ -327,150 +340,150 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	 * Appears when you click a guy's username in the left menu
 	 */
 	.account-menu {
-        color: $off-canvas-foreground;
-        background-color: transparent;
+		color: $off-canvas-foreground;
+		background-color: transparent;
 		padding: 0;
 		font-weight: $font-weight-bold;
 		width: 100%;
 		text-align: left;
-        @include single-transition(all, 0.15s, linear);
+		@include single-transition(all, 0.15s, linear);
 
-        &:hover {
-            background-color: $off-canvas-hover;
-        }
+		&:hover {
+			background-color: $off-canvas-hover;
+		}
 
-        .accordion-navigation {
-            .profile-drop{
-                background: transparent;
-                color: $off-canvas-foreground;
-                display: table;
-                padding: 0;
-                font-size: 0.875rem;
-                width: $off-canvas-width;
-                img{
-                    display: table-cell;
-                    vertical-align: middle;
-                }
-                span {
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    display: table-cell;
-                    padding-left: 0.5rem;
-                    vertical-align: middle;
+		.accordion-navigation {
+			.profile-drop{
+				background: transparent;
+				color: $off-canvas-foreground;
+				display: table;
+				padding: 0;
+				font-size: 0.875rem;
+				width: $off-canvas-width;
+				img{
+					display: table-cell;
+					vertical-align: middle;
+				}
+				span {
+					overflow: hidden;
+					text-overflow: ellipsis;
+					display: table-cell;
+					padding-left: 0.5rem;
+					vertical-align: middle;
 
-                    /* Different viewports have different dimensions
-                     * Also, the presence of a scrollbar further restricts you
-                     */
-                    @media #{$medium-only} {
-                        max-width: 104px;
-                    }
-                    @media #{$large-up} {
-                        max-width: 135px;
-                    }
-                }
-            }
-            .profile-drop:after {
-                content: "\e901";
-                color: $off-canvas-foreground;
-                display: table-cell;
-                padding: 27px 10px;
-                vertical-align: middle;
-            }
-            &.active > a:after {
-                content: "\e900";
-            }
-            .content{
-                display: block;
-                max-height: 0;
-                visibility: hidden;
-                overflow: hidden;
-                @include transition(ease-out, 0.2s, max-height);
+					/* Different viewports have different dimensions
+					 * Also, the presence of a scrollbar further restricts you
+					 */
+					@media #{$medium-only} {
+						max-width: 104px;
+					}
+					@media #{$large-up} {
+						max-width: 135px;
+					}
+				}
+			}
+			.profile-drop:after {
+				content: "\e901";
+				color: $off-canvas-foreground;
+				display: table-cell;
+				padding: 27px 10px;
+				vertical-align: middle;
+			}
+			&.active > a:after {
+				content: "\e900";
+			}
+			.content{
+				display: block;
+				max-height: 0;
+				visibility: hidden;
+				overflow: hidden;
+				@include transition(ease-out, 0.2s, max-height);
 
-                &.active {
-                    display: block;
-                    max-height: 1000px;
-                    visibility: visible;
-                    @include transition(ease-in, 0.2s, max-height);
-                }
-            }
-        }
+				&.active {
+					display: block;
+					max-height: 1000px;
+					visibility: visible;
+					@include transition(ease-in, 0.2s, max-height);
+				}
+			}
+		}
 
-        .content{
-            padding: 0;
-            a {
-                color: $off-canvas-foreground;
-                background-color: $off-canvas;
-                display: block;
-                padding: 0.625rem 0.8125rem;
-                font-size: 1rem;
-                font-weight: 300;
-                &:hover {
-                    background-color: $off-canvas-hover;
-                }
-            }
-            ul{
-                font-size: 0.875rem;
-                margin: 0;
-                list-style: none;
-            }
-            .separator {
-                color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
-                background: $off-canvas;
-                padding: 0.625rem 0.8125rem;
-                font-weight: 300;
-                text-transform: uppercase;
-                cursor: default;
-                font-size: 0.8125rem;
+		.content{
+			padding: 0;
+			a {
+				color: $off-canvas-foreground;
+				background-color: $off-canvas;
+				display: block;
+				padding: 0.625rem 0.8125rem;
+				font-size: 1rem;
+				font-weight: 300;
+				&:hover {
+					background-color: $off-canvas-hover;
+				}
+			}
+			ul{
+				font-size: 0.875rem;
+				margin: 0;
+				list-style: none;
+			}
+			.separator {
+				color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
+				background: $off-canvas;
+				padding: 0.625rem 0.8125rem;
+				font-weight: 300;
+				text-transform: uppercase;
+				cursor: default;
+				font-size: 0.8125rem;
 
-                &:hover {
-                    background: $off-canvas;
-                }
-            }
-            .switch-user {
-                background: $off-canvas;
+				&:hover {
+					background: $off-canvas;
+				}
+			}
+			.switch-user {
+				background: $off-canvas;
 
-                &:hover {
-                    background: $off-canvas-hover;
-                }
+				&:hover {
+					background: $off-canvas-hover;
+				}
 
-                .avatar {
-                    &.card {
-                        padding: 0.5rem 0rem 0rem 1rem;
-                        .meta {
-                            color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
-                        }
-                        a {
-                            background-color: transparent;
-                            &:hover {
-                                background-color: transparent;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+				.avatar {
+					&.card {
+						padding: 0.5rem 0rem 0rem 1rem;
+						.meta {
+							color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
+						}
+						a {
+							background-color: transparent;
+							&:hover {
+								background-color: transparent;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
-    /* These are used to style implicit separators within My Groups etc.
-     * as opposed to explicit .separator elements
-     *
-     * Not sure why there's a distinction between the two. That requires
-     * some additional investigation
-     */
-    h3, h4 {
-        font-weight: $off-canvas-label-font-weight;
-        padding: $off-canvas-label-padding;
-        margin: $off-canvas-label-margin;
-        font-size: $off-canvas-label-font-size;
+	/* These are used to style implicit separators within My Groups etc.
+	 * as opposed to explicit .separator elements
+	 *
+	 * Not sure why there's a distinction between the two. That requires
+	 * some additional investigation
+	 */
+	h3, h4 {
+		font-weight: $off-canvas-label-font-weight;
+		padding: $off-canvas-label-padding;
+		margin: $off-canvas-label-margin;
+		font-size: $off-canvas-label-font-size;
 
-        /* Use adaptive for separators
-         */
-        color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
-    }
+		/* Use adaptive for separators
+		 */
+		color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
+	}
 
-    h3 {
-        text-transform: $off-canvas-label-text-transform;
-    }
+	h3 {
+		text-transform: $off-canvas-label-text-transform;
+	}
 
 	h4 {
 		@extend %p;
@@ -478,13 +491,13 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
 	// Left nav arrow override
 	ul.off-canvas-list {
-	    a {
-	        color: $off-canvas-foreground;
-            &:hover {
-                color: $off-canvas-foreground;
-                background-color: $off-canvas-hover;
-            }
-        }
+		a {
+			color: $off-canvas-foreground;
+			&:hover {
+				color: $off-canvas-foreground;
+				background-color: $off-canvas-hover;
+			}
+		}
 
 		li.has-submenu > a:after{
 			content: "\e64b";
@@ -493,121 +506,125 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		}
 	}
 
-    // 5.5.3 shrinks the submenu for some reason
-    .left-submenu {
-        min-height: 100%;
-        background-color: $off-canvas-background;
-        a {
-            color: $off-canvas-foreground;
-            &:hover {
-                background-color: $off-canvas-hover;
-            }
-        }
-    }
+	// 5.5.3 shrinks the submenu for some reason
+	.left-submenu {
+		min-height: 100%;
+		background-color: $off-canvas-background;
+		a {
+			color: $off-canvas-foreground;
+			&:hover {
+				background-color: $off-canvas-hover;
+			}
+		}
+	}
 
-    /* The Back button in the Off-Canvas Menu
-     */
+	/* The Back button in the Off-Canvas Menu
+	 */
 	.left-submenu .back > a {
-        height: 5rem;
-        padding-top: 1.625rem;
-	    color: $off-canvas-foreground;
-	    background-color: $off-canvas-background;
-	    &:hover {
-	        background-color: $off-canvas-hover;
-        }
-    }
+		height: 5rem;
+		padding-top: 1.625rem;
+		color: $off-canvas-foreground;
+		background-color: $off-canvas-background;
+		&:hover {
+			background-color: $off-canvas-hover;
+		}
+	}
 	.left-submenu .back > a:before{
 		content: "\e655";
 		font-family: 'schoolbox';
 	}
 }
 
-// Only show notifications sidebar on x-large-up screens
-// 1440px >
-@media #{$xlarge-up} {
-    .right-off-canvas-menu {
-        transition: $menu-slide;
-        position: relative;
-        transform: none;
-        float: right;
-    }
-    .move-right > .inner-wrap {
-        transform: none;
-    }
-    .main-section {
-        overflow: hidden;
-    }
+@media #{$large-up} {
+	.inner-wrap.docking{
+		.right-off-canvas-menu{
+			transition: $menu-slide;
+			position: relative;
+			transform: none;
+			float: right;
+		}
+		#search{
+			right: 0;
+			&:hover, &.focus{
+				padding-left: 0;
+			}
+		}
+	}
+	.right-off-canvas-menu.docking + #search{
+		right: 0;
+		padding-left: 0;
+	}
+	.right-off-canvas-menu.overlap {
+		@include transform(none);
+		transition: $menu-slide;
+		background-color: $off-canvas-background;
+	}
+	.main-section {
+		overflow: hidden;
+	}
 }
 
 // Only show left nav on large-up screens
 // 1024px >
 @media #{$mediumwide-up} {
-    .left-off-canvas-menu {
-        position: relative;
-        transition: $menu-slide;
-        @include transform(none);
-        float: left;
-    }
-    .move-right > .inner-wrap {
-        transform: none;
-    }
-    .main-section {
-        overflow: hidden;
-    }
+	.move-right > .inner-wrap {
+		transform: none;
+	}
+	.left-off-canvas-menu {
+		position: relative;
+		transition: $menu-slide;
+		@include transform(none);
+		float: left;
+	}
+	.main-section {
+		overflow: hidden;
+	}
 }
 
 // Large down
 @media #{$large-down} {
-    .hybrid-bar #search {
-        right: 5rem;
+	.hybrid-bar #search {
+		right: 5rem;
 
-        &:hover, &.focus{
-            padding-left: 5rem;
-        }
-    }
-    // When notifications are disabled
-    .hybrid-bar .disableNotifications #search {
-        right: 0;
-
-        &:hover, &.focus{
-            padding-left: 0;
-        }
-    }
+		&:hover, &.focus{
+			padding-left: 5rem;
+		}
+	}
 }
 
 // Medium
 // < 1024px
 @media #{$medium-down} {
-    .hybrid-bar #search{
-        &:hover, &.focus{
-            padding-left: 10rem;
-        }
-    }
-    .hybrid-bar .disableNotifications #search {
-        &:hover, &.focus{
-            padding-left: 5rem;
-        }
-    }
-    .tab-bar-section.middle {
-        padding-left: 5rem;
-    }
+	.hybrid-bar #search{
+		&:hover, &.focus{
+			padding-left: 10rem;
+		}
+	}
+	.hybrid-bar .disableNotifications #search {
+		&:hover, &.focus{
+			padding-left: 5rem;
+		}
+	}
+	.tab-bar-section.middle {
+		padding-left: 5rem;
+	}
 }
 
 // Small
 @media #{$small-only} {
-    .hybrid-bar #search{
-        &:hover, &.focus{
-            padding-left: 10rem;
-        }
-    }
-    .tab-bar{
-        height: 10rem;
-    }
-    .tab-bar-section {
-        .icon-nav {
-            li {
-                width: 25%;
-            }
-        }
-    }
+	.hybrid-bar #search{
+		&:hover, &.focus{
+			padding-left: 10rem;
+		}
+	}
+	.tab-bar{
+		height: 10rem;
+	}
+	.tab-bar-section {
+		.icon-nav {
+			li {
+				width: 25%;
+			}
+		}
+	}
 }
