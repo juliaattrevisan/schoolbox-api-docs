@@ -55,13 +55,13 @@ class Controller extends Base
     public function postCreateTerm()
     {
         $term = $this->termMapper->createModel();
-        $term
-            ->setTitle($this->getRequest()->post->get('title'))
-            ->setCode($this->getRequest()->post->get('code'))
-            ->setStart(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('start')))
-            ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
-        ;
         try {
+            $term
+                ->setTitle($this->getRequest()->post->get('title'))
+                ->setCode($this->getRequest()->post->get('code'))
+                ->setStart(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('start')))
+                ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
+            ;
             $this->termMapper->save($term);
             $this->outputPostSuccess($term);
         } catch (\Exception $e) {
@@ -76,13 +76,13 @@ class Controller extends Base
      */
     public function postUpdateTerm(Term\Model $term)
     {
-        $term
-            ->setTitle($this->getRequest()->post->get('title'))
-            ->setCode($this->getRequest()->post->get('code'))
-            ->setStart(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('start')))
-            ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
-        ;
         try {
+            $term
+                ->setTitle($this->getRequest()->post->get('title'))
+                ->setCode($this->getRequest()->post->get('code'))
+                ->setStart(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('start')))
+                ->setFinish(Alaress_Date_Format::newLocalShort($this->getRequest()->post->get('finish')))
+            ;
             $this->termMapper->save($term);
             $this->outputPostSuccess($term);
         } catch (\Exception $e) {
