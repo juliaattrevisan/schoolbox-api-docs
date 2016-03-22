@@ -52,6 +52,7 @@
 
         $('.right-small a, .right-off-canvas-menu label').click(function() {
             $('.inner-wrap').toggleClass('docking');
+            $(this).toggleClass('raquo');
 
             if ($('.inner-wrap').hasClass('docking')){
                 $.post('/ajax/notificationsTray', {state: 'show'}, function(responseText) {

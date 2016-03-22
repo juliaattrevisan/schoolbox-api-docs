@@ -51,6 +51,14 @@ $notification-header-background: $navigation-background !default;
             label {
                 background: $notification-header-background;
                 color: contrast-bg(0.4, $notification-header-background);
+                &:after{
+                    content: "\00AB";
+                    @extend %h2;
+                    padding-left: 0.5rem;
+                }
+                &.raquo:after{
+                    content: "\00BB";
+                }
             }
 
             /* Hide gap from ".island section" definition
