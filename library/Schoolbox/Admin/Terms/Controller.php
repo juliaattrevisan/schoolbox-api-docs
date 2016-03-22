@@ -169,8 +169,8 @@ class Controller extends Base
             // Dump out an AJAX error
             $this->getResponse()->status->setCode(500);
             $this->getResponse()->content->set([
-                'type' => 'json',
-                'data' => ['error' => $e->getMessage(),],
+                'format' => 'json',
+                'data'   => ['error' => $e->getMessage(),],
             ]);
         } else {
             // ¯\_(ツ)_/¯
