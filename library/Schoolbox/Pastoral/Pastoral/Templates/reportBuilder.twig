@@ -72,46 +72,18 @@
                 $('#before').val($('#datetime_before').val());
                 $('#severity').val($('#filterSeverity').val());
 
-                // Selected students
-
-                var students = '';
-
-                if ($('#filterStudents').val() != null) {
-                    var students_array = $('#filterStudents').val();
-
-                    for (i = 0; i < students_array.length; i++) {
-                        if (students != '') {
-                            students += ",";
-                        }
-                        students += students_array[i];
-                    }
-                }
-
-                $('#students').val(students);
-
-                // Selected authors
-
-                var authors = '';
-
-                if ($('#filterAuthors').val() != null) {
-                    var authors_array = $('#filterAuthors').val();
-
-                    for (i=0; i<authors_array.length; i++) {
-                        if (authors != '') {
-                            authors += ",";
-                        }
-                        authors += authors_array[i];
-                    }
-                }
-
-                $('#authors').val(authors);
-
-                // Selected types
-
                 var types = '';
                 var types_array = $('[name="types[]"]');
+                var students = $('#filterStudents');
+                var authors = $('#filterAuthors');
 
-                for (i=0; i<types_array.length; i++) {
+                if (students.val() != null)
+                    $('#students').val(students.val().join());
+
+                if (authors.val() != null)
+                    $('#authors').val(authors.val().join());
+
+                for (var i=0; i<types_array.length; i++) {
                     if (types_array[i].checked) {
                         if (types != '') {
                             types += ",";
