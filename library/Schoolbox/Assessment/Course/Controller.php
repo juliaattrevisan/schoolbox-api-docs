@@ -9,7 +9,7 @@
 namespace Schoolbox\Assessment\Course;
 
 use Alaress\Authorizer\Failure\Unauthorized;
-use Alaress\Web\Controller\Base as BaseController;
+use Alaress\Web\Controller as Base;
 use Alaress\Authorizer\Failure;
 use Aura\Di\Exception\ServiceNotFound;
 use Component_DefinitionMapper;
@@ -20,6 +20,7 @@ use Schoolbox\Curriculum;
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Error;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper as BaseMapper;
@@ -40,7 +41,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
 
-class Controller extends BaseController
+class Controller extends Base\Base
 {
 
     /** @var FolderMapper */
@@ -79,6 +80,9 @@ class Controller extends BaseController
     /** @var CourseConfigMapper */
     protected $courseConfigMapper;
 
+    /** @var Error\Mapper */
+    protected $errorMapper;
+
     /** @var Access */
     protected $access;
 
@@ -100,6 +104,7 @@ class Controller extends BaseController
         $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
         $this->setAccess(Access::getInstance());
         $this->setCourseConfigMapper(CourseConfigMapper::getInstance());
+        $this->setErrorMapper(Error\Mapper::getInstance());
     }
 
 
@@ -1666,6 +1671,27 @@ class Controller extends BaseController
         $this->courseConfigMapper = $courseConfigMapper;
         return $this;
     }
+
+
+    /**
+     * @return Error\Mapper
+     */
+    public function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+
+    /**
+     * @param Error\Mapper $errorMapper
+     * @return static
+     */
+    public function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
 
     /**
      * @return Access
