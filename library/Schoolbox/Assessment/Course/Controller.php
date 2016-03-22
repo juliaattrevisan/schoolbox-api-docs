@@ -12,6 +12,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Web\Controller as Base;
 use Alaress\Authorizer\Failure;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Web\Request\Values;
 use Component_DefinitionMapper;
 use Component_Instance;
 use Component_InstanceMapper;
@@ -196,9 +197,77 @@ class Controller extends Base\Base
      */
     public function createCourse()
     {
+        $rq = $this->getRequest();
+
+        $this->saveCourse($rq->post, $rq->isXhr(), 'course.modify');
+    }
+
+
+    /**
+     * @api   POST /course/modify/{id}
+     * @level 160
+     *
+     * @param int $id
+     */
+    public function updateCourse($id)
+    {
+        $rq = $this->getRequest();
+
+        $post = $rq->post;
+
+        // if something got passed, don't care: overriding it
+        $post['id'] = $id;
+
+        $this->saveCourse($post, $rq->isXhr(), 'course.list');
+    }
+
+
+    /**
+     * Common logic to create and modify a course
+     *
+     * @param Values $post
+     * @param bool   $xhr
+     * @param string $redir
+     */
+    protected function saveCourse(Values $post, $xhr, $redir)
+    {
+        $rs = $this->getResponse();
+
+        try {
+            // attempt to persist this course based on the given POST data
+            $folder = $this->persistCourse($post);
+
+            if ($xhr) {
+                // respond to XHR with JSON
+                $rs->content->set([
+                    'format' => 'json',
+                    'data'   => [ 'id' => $folder->getId() ]
+                ]);
+
+            } else {
+                // respond to synchronous POST with redirect
+                $rs->redirect->afterPost($this->getRouteIfAuthorized($redir, [ $folder->getId() ]));
+            }
+
+        } catch (Base\Exception $e) {
+            // sometimes bad things happen, and there's nothing you can do about it
+            $this->sendError($e);
+        }
+    }
+
+
+    /**
+     * Save the course based on the given POST data
+     *
+     * @param Values $post
+     * @throws Base\Exception
+     * @return Folder\Model
+     */
+    protected function persistCourse($post)
+    {
+        $mode   = BaseMapper::METHOD_CREATE;
         $parent = null;
         $errors = [];
-        $post   = $this->getRequest()->post;
         $name   = trim($post->get('name'));
 
         if (!$name) {
@@ -223,8 +292,7 @@ class Controller extends Base\Base
 
         // if there were any validation problems, throw that back
         if ($errors) {
-            $this->sendError("Could not save", $errors);
-            return;
+            throw new Base\Exception("Could not save", $errors);
         }
 
         // basic validation passed: prepare to save!
@@ -239,10 +307,10 @@ class Controller extends Base\Base
             try {
                 // do checks to make sure it exists
                 $this->getCourseMapper()->findById($id);
+                $mode = BaseMapper::METHOD_UPDATE;
 
             } catch (BaseMapper\Exception $e) {
-                $this->sendError("Could not save because ".$e->getMessage());
-                return;
+                throw new Base\Exception("Could not save because " . $e->getMessage());
             }
         }
 
@@ -250,48 +318,47 @@ class Controller extends Base\Base
             /** @var Folder\Controller $folderController */
             $folderController = $this->getController('folder');
 
-            // Need:
-            // base config
-            // course config
-            $rolePermissions = [];
-            foreach ($this->getCourseConfigMapper()->findByColumn('page', 'course') as $courseConfig) {
-                /** @var CourseConfigModel $courseConfig */
-                $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
-            }
-
-
-            $folder = $folderController->persistFolder([
+            $datums = [
                 // the basics
                 'categoryID'      => $id,
                 'name'            => $name,
                 'parent'          => $parent->getId(),
                 'curriculumCodes' => $codes,
 
-                // configurable things
-                'inherit'         => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
-                'template'        => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
-                'group'           => $rolePermissions,
+            ];
 
-                // leave these always off
-                'recursive'       => false, // LEAVE THIS
-                'code'            => null,  // LEAVE THIS
+            if ($mode == BaseMapper::METHOD_CREATE) {
+                $rolePermissions = [];
 
-            ], $this->getUser());
+                foreach ($this->getCourseConfigMapper()->findByColumn('page', 'course') as $courseConfig) {
+                    /** @var CourseConfigModel $courseConfig */
+                    $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
+                }
+                $datums = array_merge($datums, [
 
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data'   => [ 'id' => $folder->getId() ]
-            ]);
+                    // configurable things
+                    'inherit'   => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
+                    'template'  => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
+                    'group'     => $rolePermissions,
 
-            return;
+                    // leave these always off
+                    'recursive' => false, // LEAVE THIS
+                    'code'      => null,  // LEAVE THIS
+
+                ]);
+            }
+
+            $folder = $folderController->persistFolder($datums, $this->getUser());
+
+            return $folder;
 
         } catch (ServiceNotFound $e) {
             // quite simple not able to find things we need. bye bye.
-            $this->sendError("Could not save because of an internal error.", [], 500);
+            throw new Base\Exception("Could not save because of an internal error.", [], 500);
 
         } catch (\Exception $e) {
             // whatever the exception, recover from it as best you can
-            $this->sendError("Could not save because " . $e->getMessage());
+            throw new Base\Exception("Could not save because " . $e->getMessage());
         }
 
     }
@@ -300,18 +367,29 @@ class Controller extends Base\Base
     /**
      * Send a neat and tidy error back to the client
      *
-     * @param string $problem
+     * @param string|Base\Exception $problem
      * @param array  $resolutions
      * @param int    $statusCode
      * @return void
      */
     protected function sendError($problem, array $resolutions = [], $statusCode = 400)
     {
+        // cast exception to primitives
+        if ($problem instanceof Base\Exception) {
+            $resolutions = $problem->getReasons();
+            $problem     = $problem->getMessage();
+        }
+
         if (count($resolutions)) {
             $problem .= ". You need to";
         }
 
         $this->getResponse()->status->set($statusCode);
+
+        if (!$this->getRequest()->isXhr()) {
+            $this->getErrorMapper()->generateException(105, null, $problem . implode(', ', $resolutions));
+            return;
+        }
 
         $this->getResponse()->content->set([
             'template' => '@course/mage-error.twig',
@@ -363,7 +441,6 @@ class Controller extends Base\Base
             return;
         }
 
-        // TODO get permission and template configs
         try {
             /** @var Folder\Controller $folderController */
             $folderController = $this->getController('folder');
@@ -1664,7 +1741,7 @@ class Controller extends Base\Base
 
     /**
      * @param  CourseConfigMapper $courseConfigMapper
-     * @return $this
+     * @return static
      */
     public function setCourseConfigMapper($courseConfigMapper)
     {
