@@ -41,6 +41,36 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Find whichever term is the most recent one.
+     *
+     * @param Alaress_Date_Format $date Get the term for this date,
+     *                                  or today if not provided.
+     *
+     * @return Model
+     */
+    public function findMostRecent(Alaress_Date_Format $date = null)
+    {
+        if (!isset($date)) {
+            $date = Alaress_Date_Format::now();
+        }
+        $query = "
+            SELECT   {$this->getSelectString()}
+            FROM     {$this->getTable()}
+            WHERE    `start` <= :date
+            ORDER BY `start` DESC
+            LIMIT 1
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(['date' => $date->getDatabaseDate(),]);
+        $result = $statement->fetch();
+        if ($result) {
+            return $this->hydrate($result);
+        }
+        // Nothing? Either throw exception or return an empty item
+        return $this->createModel();
+    }
+
+    /**
      * Verifies this term's title is unique and not empty.
      *
      * @param  Model $model
