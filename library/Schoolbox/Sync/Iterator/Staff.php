@@ -54,17 +54,31 @@ class Staff extends IteratorIterator
 
         /* Email
          */
-        $email1 = new User\Common\Email();
-        $email1
-            ->setAddress($currentResult['email'])
-        ;
+        $email = array();
+        if(substr_count($currentResult['email'],';') > 0){
+            $emailList = explode(';',$currentResult['email']);
+            foreach ($emailList as $anEmail) {
+                $email[] = $anEmail;
+            }
+        }
+        else {
+            $email[] = $currentResult['email'];
+        }
 
-        $email2 = new User\Common\Email();
-        $email2
-            ->setAddress($currentResult['occup_email'])
-        ;
+        if(substr_count($currentResult['occup_email'],';') > 0){
+            $emailList = explode(';',$currentResult['occup_email']);
+            foreach ($emailList as $anEmail) {
+                $email[] = $anEmail;
+            }
+        }
+        else {
+            $email[] = $currentResult['occup_email'];
+        }
 
-        foreach (array($email1, $email2) as $currentEmail) {
+        foreach ($email as $key => $anEmail) {
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
+
             /** @var User\Common\Email $currentEmail */
             if (strlen($currentEmail->getAddress())) {
                 $staff->addEmail($currentEmail);
