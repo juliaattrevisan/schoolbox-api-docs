@@ -255,7 +255,15 @@
         }
 
         // determine the new index
-        var nextIndex = $rb.find('th[data-sequencer-group=levels]').length;
+        // Need the maximum index + 1, not just the count
+        var nextIndex = 0;
+        $rb.find('th[data-sequencer-group=levels] input[data-level]').each(function(i, v) {
+            var thisIndex = v.name.match(/^rb\[\d+]\[level]\[(\d+)]\[name]$/);
+            if (thisIndex) {
+                nextIndex = Math.max(nextIndex, thisIndex[1]);
+            }
+        });
+        nextIndex += 1;
 
         // iterate all rows
         $rb.find('tr').each(function () {
@@ -332,6 +340,17 @@
         return true;
     };
 
+    /**
+     * How many levels are there in this rubric?
+     *
+     * @returns int
+     */
+    RubricEditable.prototype.getLevelCount = function () {
+        return $(this.element)
+            .find('tr')
+            .eq(0)
+            .find('[data-sequencer-group="levels"]').length;
+    };
 
     /**
      * Delete the nominated column, zero-indexed from the first LEVEL column
@@ -345,7 +364,7 @@
 
         var rows = $rb.find('tr');
 
-        var levelCount = rows.eq(0).find('[data-sequencer-group="levels"]').length;
+        var levelCount = this.getLevelCount();
 
         // how can it be less than zer0? this is a just-in-case...
         if (levelCount <= 0) {
@@ -406,13 +425,14 @@
     RubricEditable.prototype.applyResultSet = function (options) {
         var rubricEditable = this;
 
-        // delete all but one
-        try {
-            for (var i = 0; i < (this.options.levelLimit || 100); ++i) {
-                this.deleteLevel(0);
+        // delete all but the first level
+        var i = 0;
+        while (i++ < 100) {
+            var levelCount = this.getLevelCount();
+            if (levelCount <= 1) {
+                break;
             }
-        } catch (e) {
-            // finished; noop
+            this.deleteLevel(levelCount - 1);
         }
 
         // Add each level.
