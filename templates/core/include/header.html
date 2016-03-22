@@ -42,6 +42,27 @@
         /* Replace all editor video/audio placeholders
          */
         $.fn.schoolboxResource_ProxyReplacment();
+
+        $('.right-small, .right-off-canvas-menu').hover(function(){
+            $('.right-off-canvas-menu').addClass('overlap');
+        },
+        function(){
+            $('.right-off-canvas-menu').removeClass('overlap');
+        });
+
+        $('.right-small a, .right-off-canvas-menu label').click(function() {
+            $('.inner-wrap').toggleClass('docking');
+
+            if ($('.inner-wrap').hasClass('docking')){
+                $.post('/ajax/notificationsTray', {state: 'show'}, function(responseText) {
+                });
+            }
+            else {
+                $.post('/ajax/notificationsTray', {state: 'hide'}, function(responseText) {
+                });
+            }
+        });
+
     });
 
     // Date formats (global variable)

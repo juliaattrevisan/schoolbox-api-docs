@@ -937,6 +937,21 @@ class SitePage extends Page
 
     function renderInstantMessages()
     {
+
+        /* Docking the tray
+         */
+        if ($_SESSION['user']->getHideNotificationsTray()) {
+
+            $this->setVar([
+                'HIDE_NOTIFICATIONS_TRAY' => 'docking'
+            ]);
+        }
+        else {
+            $this->setVar([
+                'HIDE_NOTIFICATIONS_TRAY' => ''
+            ]);
+        }
+
         if ($this->responsive) {
             $this->setBlock(TEMPLATE_body, 'instantmessage_toggle', 'instantmessage_toggle_block');
 

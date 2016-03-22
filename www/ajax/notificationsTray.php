@@ -14,17 +14,22 @@ use Schoolbox\UserMapper;
 
 if (in_array($_POST['state'], ['show', 'hide'])) {
     try {
+        $userMapper = new UserMapper();
+        $user = $userMapper->findById($_SESSION['user']->getId());
+
+
         if ($_POST['state'] == 'show') {
+            $user->showNotificationsTray();
             $_SESSION['user']->showNotificationsTray();
         }
         else {
+            $user->hideNotificationsTray();
             $_SESSION['user']->hideNotificationsTray();
         }
 
         /* Save setting
          */
-        $userMapper = new UserMapper();
-        $userMapper->save($_SESSION['user']);
+        $userMapper->save($user);
     }
     catch (\Exception $e) {
     }

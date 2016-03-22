@@ -3,7 +3,7 @@ $notification-unread-color: calc-text-color($notification-unread-background);
 $notification-header-background: $navigation-background !default;
 
 // where data-unread != 0
-a.right-off-canvas-toggle {
+.right-small a {
     width: 5rem;
     height: 5rem;
     display: block;
@@ -71,13 +71,11 @@ a.right-off-canvas-toggle {
     }
     ul.off-canvas-list {
         label {
-            @media #{$xlarge-up} {
-                margin-right: 5rem;
-            }
             height: 5rem;
             line-height: 3rem;
             background: $notification-unread-background;
             color: $notification-unread-color;
+            z-index: 1003;
         }
     }
 
