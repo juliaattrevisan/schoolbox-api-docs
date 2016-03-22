@@ -29,7 +29,10 @@
             {% endfor %}
             <td class="actions-small-1">
                 <nav>
-                    <a href="{{ routeLookup('upsRuleset.log', { logId: id }) }}" class="icon-next" title="View log"></a>
+                    <a href="{{ routeLookup('upsRuleset.logFormat', { logId: id, format: 'html' }) }}"
+                       target="_blank"
+                       class="icon-next"
+                       title="View log"></a>
                 </nav>
             </td>
         </tr>
