@@ -170,7 +170,7 @@ class Controller extends Base
             $this->getResponse()->status->setCode(500);
             $this->getResponse()->content->set([
                 'format' => 'json',
-                'data'   => ['error' => $e->getMessage(),],
+                'data'   => $e->getMessage(),
             ]);
         } else {
             // ¯\_(ツ)_/¯
