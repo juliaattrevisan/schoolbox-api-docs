@@ -841,8 +841,6 @@ class Controller extends Base
 
             foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
 
-                echo $role_id . " " . $checked . "<BR>";
-
                 if ($checked) {
 
                     // Add this access if it doesn't already exist
