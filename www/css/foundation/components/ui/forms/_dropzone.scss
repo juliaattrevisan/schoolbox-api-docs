@@ -191,7 +191,7 @@ ul.az-error-list {
         }
         @media #{$small-only} {
             background-size: 1.5rem;
-            height: 3rem;
+            height: 2.7rem;
             padding-left: 3.5rem;
             background-position: 0.75rem;
         }
@@ -221,7 +221,9 @@ ul.az-error-list {
     }
 }
 
-/* 32 px version */
+/* Smaller version.
+   For when this sits next to buttons, it is equal height.
+ */
 .s32 {
     .filename {
         line-height: 1.25rem;
@@ -231,31 +233,16 @@ ul.az-error-list {
     }
     .dzone {
         @extend .icon-attach;
+        background-size: 1rem;
+        min-height: 2.7rem;
+        background-position: 0.875rem;
+        padding-left: 2.75rem;
         &:before {
             position: absolute;
             font-weight: $font-weight-normal;
-            @media #{$small-only} {
-                left: 0.625rem;
-                top: 0.2rem;
-                font-size: 1rem;
-            }
-            @media #{$medium-up} {
-                left: 1rem;
-                top: 0.1rem;
-                font-size: 1rem;
-            }
-        }
-        @media #{$small-only} {
-            background-size: 0.75rem;
-            min-height: 1.5rem;
-            padding-left: 2.75rem;
-            background-position: 0.75rem;
-        }
-        @media #{$medium-up} {
-            background-size: 1rem;
-            min-height: 2rem;
-            background-position: 0.875rem;
-            padding-left: 2.75rem;
+            left: 1rem;
+            top: 0.5rem;
+            font-size: 1rem;
         }
     }
     .dz-upload {

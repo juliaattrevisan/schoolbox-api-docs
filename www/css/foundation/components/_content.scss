@@ -802,15 +802,18 @@ nav {
 		}
 	}
 	.reply{
+		background-color: rgba(0,0,0,0.02);
 		border-top: 1px solid $body-bg;
 		clear: both;
+		.reply{
+			background-color: transparent;
+			@media #{$medium-up} {
+				margin-left: rem-calc((4.3 * $base-font-size));
+			}
 
-		@media #{$medium-up} {
-			margin-left: rem-calc((4.3 * $base-font-size));
-		}
-
-		@media #{$small-up} {
-			margin-left: rem-calc((2 * $base-font-size));
+			@media #{$small-up} {
+				margin-left: rem-calc((2 * $base-font-size));
+			}
 		}
 
 		li,
@@ -1481,7 +1484,6 @@ p{
 			margin: $paragraph-margin-bottom 0;
 		}
 	}
-
 	@media #{$small-only} {
 		.body{
 			margin: rem-calc(($base-font-size - 8)) 0;
