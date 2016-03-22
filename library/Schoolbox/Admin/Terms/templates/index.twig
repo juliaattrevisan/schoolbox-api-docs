@@ -42,9 +42,6 @@
                 // Restore butonye
                 butonye.val(butonye.data('mage-reset')).removeAttr('readonly');
                 $.fn.executeCollapsable(oldDom.find('[data-collapsable]'), oldDom.find('[data-collapser]'));
-            },
-            onXhrFail: function(data) {
-                // Show error messages
             }
         });
         form.alaressValidate();
@@ -55,13 +52,46 @@
         $('form[data-term-form]').each(function() {
             initForm($(this));
         });
-        $('#content').on('click', 'a[data-post-action]', function(event) {
+
+        // Archive/restore action
+        $('#content').on('click', 'a[data-term-action="archive"], a[data-term-action="restore"]', function(event) {
             event.preventDefault();
-            $(this).confirmDialog({
+            var button = $(this);
+            button.confirmDialog({
                 confirmEvent: function(el) {
-                    // Build a POST form, and submit it.
-                    // Not currently AJAXing.
-                    $('<form method="post" />').attr('action', el.data('postAction')).submit();
+                    // AJAX, then update DOM
+                    $.post(el.data('postAction'))
+                        .done(function(data) {
+                            var newDom  = $(data),
+                                oldDom  = button.closest('[data-term]');
+                            // Replace infocard and jellytot
+                            oldDom.find('[data-term-infocard]').replaceWith(newDom.find('[data-term-infocard]'));
+                            oldDom.find('[data-term-dropdown]').replaceWith(newDom.find('[data-term-dropdown]'));
+                        })
+                        .fail(function() {
+                            // ¯\_(ツ)_/¯
+                        });
+                }
+            })
+        });
+
+        // Delete action
+        $('#content').on('click', 'a[data-term-action="delete"]', function(event) {
+            event.preventDefault();
+            var button = $(this);
+            button.confirmDialog({
+                confirmEvent: function(el) {
+                    // AJAX, then remove from DOM
+                    $.post(el.data('postAction'))
+                        .done(function() {
+                            var term = button.closest('[data-term]');
+                            term.fadeOut({
+                                done: term.remove
+                            });
+                        })
+                        .fail(function() {
+                            // ¯\_(ツ)_/¯
+                        });
                 }
             })
         });
