@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\StudentReportCard;
 
 use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Category;
 use SitePage;
@@ -22,16 +23,39 @@ class ContextSelector {
 
 	/** @var string */
 	protected $basePath;
-	/** @var array */
+
+	/**
+	 * The term objects that may be selected.
+	 *
+	 * @var Term\Model[]
+	 */
+	protected $terms = [];
+
+	/**
+	 * The years that are shown in this selector
+	 *
+	 * @deprecated Use terms instead.
+	 *
+	 * @var array
+	 */
 	protected $years = array();
+
 	/** @var Collection */
 	protected $categories;
 	/** @var Collection */
 	protected $units;
 	/** @var string */
 	protected $_template = 'submission/_contextSelector.html';
-	/** @var string */
+
+	/**
+	 * Granularity (year, semester (1/2 year), term (1/4 year))
+	 *
+	 * @deprecated Use terms instead.
+	 *
+	 * @var string
+	 */
 	protected $granularity = self::GRANULARITY_SEMESTER;
+
 	/** @var bool */
 	protected $categoryFirst = false;
 
@@ -52,12 +76,23 @@ class ContextSelector {
 	 * Set the years that the semester selector will display.
 	 * If this array is empty, then the semester selector will be hidden.
 	 *
+	 * @deprecated use `setTerms()` instead
+	 *
 	 * @param array $years
 	 */
 	public function setYears($years) {
 		$this->years = $years;
 	}
 
+	/**
+	 * @param  Term\Model[] $terms
+	 * @return $this
+	 */
+	public function setTerms($terms)
+	{
+		$this->terms = $terms;
+		return $this;
+	}
 
 	/**
 	 * Set the categories to display in the selector.
@@ -92,6 +127,8 @@ class ContextSelector {
 	/**
 	 * Set the granularity for the semester selector (year, semester or term)
 	 * (...don't use term)
+	 *
+	 * @deprecated use `setTerms()` instead
 	 *
 	 * @param string $granularity
 	 */
