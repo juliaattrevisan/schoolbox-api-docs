@@ -417,6 +417,10 @@ class Mapper extends BaseMapper
             }
         }
 
+        if ($record->getOwner()->getId() == $user->getId()) {
+            return true;
+        }
+
         // If we get through to here we need to check the audience of item
 
         $record->setAccessList($this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId()));

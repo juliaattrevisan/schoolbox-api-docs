@@ -932,6 +932,7 @@ class Controller extends Base
                         }
                     }
 
+
                     try {
                         /** @var \Schoolbox\Role $role */
                         $role = $this->getRoleMapper()->findById($role_id);
@@ -951,14 +952,16 @@ class Controller extends Base
 
                     // Delete this access if it exists because its no longer ticked
 
-                    foreach ($accessRoles as $role) {
-                        if ($role->getId() == $role_id) {
-                            $this->getPastoralAccessMapper()->delete($role);
-                            break;
-                        }
-                    }
+                    $access = $this->getPastoralAccessMapper()->findByColumnList([
+                            'pastoral_id' => $record->getId(),
+                            'role_id' => $role_id
+                        ]
+                    );
+
+                    $this->getPastoralAccessMapper()->delete($access);
                 }
             }
+
         }
 
         foreach ($records as $record)
