@@ -2,7 +2,7 @@
 
 {% block image %}
     {% set msg = row.messages | first %}
-    {% if 'icon=pin' in msg.icon %}
+    {% if 'icon=news' in msg.icon %}
         <img src="/images/slc/logo.png" width="56" height="47" />
     {% else %}
         <img src="{{ msg.icon }}" width="56" height="56" />
