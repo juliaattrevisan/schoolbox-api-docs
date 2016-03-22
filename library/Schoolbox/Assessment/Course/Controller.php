@@ -143,6 +143,10 @@ class Controller extends BaseController
          */
         $data['curriculumEnabled'] = $this->getConfigLoader()->get('curriculum_tagging_enabled');
 
+        /* Search query
+         */
+        $data['query'] = $this->getRequest()->post->get('query');
+
         $this->tpl('course', $data);
     }
 
@@ -365,6 +369,10 @@ class Controller extends BaseController
 
         $query = $this->getRequest()->query;
         $data  = $this->getCourseMapper()->findCourseList($query->get('query'));
+
+        /* Remember what the user searched for
+         */
+        $data['query'] = $query->get('query');
 
         if ($this->getRequest()->isXhr()) {
             $options = [

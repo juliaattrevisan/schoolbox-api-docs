@@ -56,6 +56,7 @@ class Module extends BaseModule
                 '/import/classes'                       => 'importClasses',
             ],
             'POST' => [
+                '/new'                                  => 'newCourse',
                 '/unit/new'                             => 'newUnit',
                 '/unit/delete'                          => 'deleteUnit',
                 '/importTasks'                          => 'importTasks',

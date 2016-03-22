@@ -24,7 +24,12 @@
                     <input type="hidden" name="id" value="{{ folder.id }}">
                     <div class="small-12 column">
                         <label>Name
-                            <input type="text" name="name" value="{{ folder.name }}" placeholder="What's this course called?" required />
+                            {% if query|length %}
+                                {% set val = query %}
+                            {% else %}
+                                {% set val = folder.name %}
+                            {% endif %}
+                            <input type="text" name="name" value="{{ val }}" placeholder="What's this course called?" required />
                         </label>
                     </div>
                     <div class="small-12 column">
