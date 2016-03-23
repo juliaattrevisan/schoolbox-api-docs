@@ -968,8 +968,20 @@ class Controller extends BaseController
          */
         $folder = $this->getFolderMapper()->findById($homepageId);
 
+        /* Find all the Courses assocated with this Folder,
+         * via imported Units
+         */
+        $allCourses = new Collection();
+
+        $allFolders = $this->getUnitInstanceMapper()->findAllCoursesUsedInFolders(array($homepageId));
+
+        if ($allFolders->count()) {
+            $allCourses = $allFolders->getOffset($homepageId);
+        }
+
         $this->tpl('management', [
             'folder' => $folder,
+            'allCourses' => $allCourses,
         ]);
     }
 

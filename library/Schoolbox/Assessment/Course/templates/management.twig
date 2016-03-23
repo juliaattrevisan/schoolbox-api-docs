@@ -9,15 +9,17 @@
 
 <div class="row">
     <div class="small-12 island">
+
+        {% if allCourses|length %}
         <section>
             <ul class="action-list">
+                {% for currentCourse in allCourses %}
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="small-12 info card">
                             <a href="#" title="">
-                                <p>Course name</p>
+                                <h3>{{ currentCourse.name }}</h3>
                             </a>
-                            <p class="meta">Course Info</p>
                         </div>
                     </div>
                     <nav>
@@ -26,7 +28,19 @@
                         <a href="" class="icon-delete" title="Delete Course"></a>
                     </nav>
                 </li>
+                {% endfor %}
             </ul>
         </section>
+
+        {% else %}
+
+        <section>
+            <div class="content">
+                <p>There are no Courses associated with this homepage.</p>
+            </div>
+        </section>
+
+        <a href="/course/import/0/class/{{ folder.id }}" class="button submit expand">Import a Course</a>
+        {% endif %}
     </div>
 </div>
