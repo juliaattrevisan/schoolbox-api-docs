@@ -982,10 +982,15 @@ class Controller extends BaseController
          */
         $allRestorableCourses = $this->getUnitInstanceMapper()->findRestorableCourses($folderId);
 
+        /* Find all the Units in this Folder
+         */
+        $allCourseComponentIds = $this->getUnitInstanceMapper()->findComponentsForCourses($folderId);
+
         $this->tpl('management', [
             'folder' => $folder,
             'allCourses' => $allCourses,
             'allRestorableCourses' => $allRestorableCourses,
+            'allCourseComponentIds' => $allCourseComponentIds,
         ]);
     }
 
