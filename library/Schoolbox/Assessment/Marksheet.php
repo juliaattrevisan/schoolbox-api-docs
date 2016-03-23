@@ -480,13 +480,14 @@ class Marksheet
         }
 
         $contextSelector->setCategories($this->categoryMapper->findByColumnWithCodes('id', $catIdList));
-
+        $contextSelector->setTerms($this->termMapper->findAll());
         $contextSelector->render(
-            $page, 'CONTEXT_SELECTOR', array(
-            'year'     => $this->year,
-            'semester' => $this->semester,
-            'category' => $this->category->getId()
-        )
+            $page,
+            'CONTEXT_SELECTOR',
+            array(
+                'term'     => $this->term,
+                'category' => $this->category->getId()
+            )
         );
 
         $page->setFile(TEMPLATE_content, 'submission/markSheet.html');
@@ -516,7 +517,7 @@ class Marksheet
             ],
             [
                 'text' => \Scrub::text($this->category->getName().' '.( strlen($codeString) > 0 ? ('('.$codeString.')') : '' )) ,
-                'href' => "/submission/listSubmission/{$this->year}/{$this->semester}/".$this->category->getId(),
+                'href' => "/submission/listSubmission/{$this->term->getCode()}/".$this->category->getId(),
                 'class' => '',
             ],
             [
