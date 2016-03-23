@@ -514,7 +514,6 @@ class Controller extends BaseController
         $this->tpl('import/results', $importer->findUnitsAndTasks($courseId));
     }
 
-
     /**
      * Retrieve fragment with units in the selected course, and checkboxes/dates for selection
      */
@@ -564,8 +563,6 @@ class Controller extends BaseController
             ]);
         }
     }
-
-
 
     /**
      * Retrieve friend with a list of tasks, quizzes and due work (and relevant date entry boxes) associated with
@@ -886,6 +883,70 @@ class Controller extends BaseController
     }
 
     /**
+     * Modify the Unit information for a previously imported Course
+     *
+     * @param $folderId
+     * @param $componentId
+     */
+    public function importModify($folderId, $componentId)
+    {
+
+        $compendium = [];
+
+        /** @var Component_Instance $compInst */
+        $compInst = $this->componentInstanceMapper->findById($componentId);
+
+        /** @var Collection|UnitInstance[] $selectedUnitInstances */
+        $selectedUnitInstances = $this->unitInstanceMapper->findForComponent($compInst);
+
+        foreach ($selectedUnitInstances as $selectedUnitInstance) {
+            $compendium[$selectedUnitInstance->getUnitCategory()->getId()]['selected'] = $selectedUnitInstance;
+        }
+
+        /** @var Folder\Model $course */
+        $course   = $this->unitInstanceMapper->findCourseForUnit($selectedUnitInstances->first());
+
+        /** @var Collection|Folder\Model[] $allUnits */
+        $allUnits = $this->courseMapper->findAllChildren($course->getId());
+
+        foreach ($allUnits as $unit) {
+            $compendium[$unit->getId()]['folder'] = $unit;
+        }
+
+        $unitOutput = [];
+
+        foreach ($compendium as $id => $values) {
+
+            $unitOutput[$id] = [
+                'id' => $id,
+                'name' => $values['folder']->getName(),
+            ];
+
+            if (isset($values['selected'])) {
+                $unitOutput[$id]['checked'] = true;
+                $unitOutput[$id]['openDate'] = $values['selected']->getOpenDate();
+                $unitOutput[$id]['dueDate']  = $values['selected']->getDueDate();
+
+
+            }
+
+        }
+
+
+        $destination = $this->folderMapper->findCheaplyById($folderId);
+
+        $this->tpl('import', [
+            '_part2'  => true,
+            'units'   => $unitOutput,
+            'folder'  => $course,
+            'sources' => $course,
+            'destinations' => array_combine(['id','name'], $destination->findValueLabelPair()),
+            'homepage' => $destination->getId(),
+            'courseHomepage' => $course->getId()
+        ]);
+    }
+
+    /**
      * Save the given template for the given folder
      *
      * @param Folder\Model $model
@@ -927,7 +988,6 @@ class Controller extends BaseController
         $model->setHomepage($homepageConfig);
 
     }
-
 
     /**
      * Recursively apply inheritance. Why? Not sure. Cut-Paste from /cms/categoryForm.php

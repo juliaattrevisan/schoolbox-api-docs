@@ -454,7 +454,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         // Find all children of this node
 
-        $children = FolderMapper::findByColumn("parent", $id);
+        $children = $this->findByColumn("parent", $id);
 
         foreach ($children as $child) {
             $collection->add($child);
@@ -971,7 +971,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      *
      * @see findByParent()
      * @param int $nodeId
-     * @return IFolder[]
+     * @return Collection|IFolder[]
      */
     public function findByParentId($nodeId)
     {

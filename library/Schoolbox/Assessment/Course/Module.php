@@ -66,7 +66,7 @@ class Module extends BaseModule
 
                 /* Modify the imported Course's Unit details
                  */
-                '/import/modify/{componentId}'             => 'importModify',
+                '/import/modify/{folderId}/{componentId}'  => 'importModify',
             ],
             'POST' => [
                 '/unit/new'    => 'newUnit',
