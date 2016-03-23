@@ -1,0 +1,1 @@
+ALTER TABLE `user` ADD COLUMN `hide_notifications_tray` TINYINT(1) DEFAULT 0 NULL COMMENT 'Is the notifications tray hidden?' AFTER `hide_timetable`;

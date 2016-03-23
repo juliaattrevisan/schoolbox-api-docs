@@ -4,20 +4,20 @@
         var iiCache = {};
 
         $('#msg-settings')
-            .msgconfig({
-                sourceSelector: '[data-source]',
-                tableSelector:  '[data-digest-settings]',
-    //            roleSelector:   '',
+                .msgconfig({
+                            sourceSelector: '[data-source]',
+                            tableSelector:  '[data-digest-settings]',
+                            //            roleSelector:   '',
 
-                customSelector: null,
-                muteSelector:   null,
-                toggleSelector: null,
+                            customSelector: null,
+                            muteSelector:   null,
+                            toggleSelector: null,
 
-                persist: function () {
-                    sendAjax(this, 'source');
-                }
-            }
-        );
+                            persist: function () {
+                                sendAjax(this, 'source');
+                            }
+                        }
+                );
 
         $('#follow-settings').on('change', 'input[type=checkbox]', function (e) {
             sendAjax($('#follow-settings'), 'follow');
@@ -30,8 +30,8 @@
          */
         function sendAjax($input, dataField) {
             var action   = $input.closest('form[method=post]').attr('action'),
-                formdata = $('<form/>').append($input.clone()).serialize(),
-                sourceId = $input.data(dataField) || dataField;
+                    formdata = $('<form/>').append($input.clone()).serialize(),
+                    sourceId = $input.data(dataField) || dataField;
 
             if (iiCache[sourceId]) {
                 clearTimeout(iiCache[sourceId]);
@@ -40,56 +40,55 @@
             iiCache[sourceId] = setTimeout(function () {
                 $.post(action, formdata);
             }, 500);
-
         }
+
     });
 </script>
 
 <div class="row">
     <div class="small-12 island">
         <h1>Message Settings</h1>
-
         <form method="post" action="{{ routeLookup('messages.saveConfig') }}">
             {% if groups %}
-            <h2 class="subheader">Homepages</h2>
+                <h2 class="subheader">Homepages</h2>
 
-            <section>
-                <p class="content">
-                    If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
-                </p>
-                <table id="follow-settings">
-                    <thead>
+                <section>
+                    <p class="content">
+                        If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
+                    </p>
+                    <table id="follow-settings">
+                        <thead>
                         <tr>
                             <th>Homepage</th>
                             <th>&nbsp;</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         {% for groupId, group in groups %}
-                        <tr>
-                            <td>
-                                <label for="follow-{{ groupId }}">{{ group.name }}</label>
-                            </td>
-                            <td>
-                                <div class="long switch">
-                                    <input type="hidden" name="follow[{{ groupId }}]" value="{{ group.force ? 1 : 0 }}">
-                                    <input id="follow-{{ groupId }}"
-                                           type="checkbox"
-                                           name="follow[{{ groupId }}]"
-                                           value="1"
-                                           {% if group.follow %}checked="checked"{% endif %}
-                                           {% if group.force %}disabled="disabled"{% endif %} />
-                                    <label for="follow-{{ groupId }}">
-                                        <span>Following</span>
-                                        <span>Muted</span>
-                                    </label>
-                                </div>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>
+                                    <label for="follow-{{ groupId }}">{{ group.name }}</label>
+                                </td>
+                                <td>
+                                    <div class="long switch">
+                                        <input type="hidden" name="follow[{{ groupId }}]" value="{{ group.force ? 1 : 0 }}">
+                                        <input id="follow-{{ groupId }}"
+                                               type="checkbox"
+                                               name="follow[{{ groupId }}]"
+                                               value="1"
+                                               {% if group.follow %}checked="checked"{% endif %}
+                                                {% if group.force %}disabled="disabled"{% endif %} />
+                                        <label for="follow-{{ groupId }}">
+                                            <span>Following</span>
+                                            <span>Muted</span>
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </section>
+                        </tbody>
+                    </table>
+                </section>
             {% endif %}
 
             <div class="actions-small-1 row">
@@ -104,27 +103,27 @@
             </div>
             <div class="alert-box">
                 <p>
-                   Customise when and how you receive messages.
-                   <em>Options that are unavailable have been disabled by your system administrator.</em>
+                    Customise when and how you receive messages.
+                    <em>Options that are unavailable have been disabled by your system administrator.</em>
                 </p>
             </div>
 
             {% for namespace in config %}
-            <h3 class="subheader">Receive {{ namespace.label }} messages when&hellip;</h3>
-            <section>
+                <h3 class="subheader">Receive {{ namespace.label }} messages when&hellip;</h3>
+                <section>
                     <ul class='permission-list' id="msg-settings" data-roles data-digest-settings>
                         {% for source in namespace.sources %}
-                        <li>
-                            <label class="content">&hellip;{{ source.description }}.</label>
-                            <div class="actions-small-6" data-source="{{ source.id }}">
-                                <nav>
-                                    {% include '@messages/options.twig' with { mode: 'p', role: source } %}
-                                </nav>
-                            </div>
-                        </li>
+                            <li>
+                                <label class="content">&hellip;{{ source.description }}.</label>
+                                <div class="actions-small-6" data-source="{{ source.id }}">
+                                    <nav>
+                                        {% include '@messages/options.twig' with { mode: 'p', role: source } %}
+                                    </nav>
+                                </div>
+                            </li>
                         {% endfor %}
                     </ul>
-            </section>
+                </section>
             {% endfor %}
 
             <input type="submit" value="Submit" />

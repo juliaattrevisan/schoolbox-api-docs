@@ -423,11 +423,11 @@ class SitePage extends Page
                 }
 
                 $this->setVar(array(
-                                    'MENU_SWITCH_USERID'        => $linkedUser->getId(),
-                                    'MENU_SWITCH_EXTERNAL_ID'   => $linkedUser->getExternalId(),
-                                    'MENU_SWITCH_USER_FULLNAME' => $linkedUser->getFullName(),
-                                    'MENU_SWITCH_USER_ROLE'     => $linkedUser->getRole()->getName(),
-                                    )
+                        'MENU_SWITCH_USERID'        => $linkedUser->getId(),
+                        'MENU_SWITCH_EXTERNAL_ID'   => $linkedUser->getExternalId(),
+                        'MENU_SWITCH_USER_FULLNAME' => $linkedUser->getFullName(),
+                        'MENU_SWITCH_USER_ROLE'     => $linkedUser->getRole()->getName(),
+                    )
                 );
                 $this->parse('switch_user_block', 'switch_user', true);
                 $canSwitch = true;
@@ -441,11 +441,11 @@ class SitePage extends Page
 
             if($previousUser instanceof \Schoolbox\User) {
                 $this->setVar(array(
-                                    'MENU_SWITCH_USERID'        => $previousUser->getId(),
-                                    'MENU_SWITCH_EXTERNAL_ID'   => $previousUser->getExternalId(),
-                                    'MENU_SWITCH_USER_FULLNAME' => $previousUser->getFullName(),
-                                    'MENU_SWITCH_USER_ROLE'     => $previousUser->getRole()->getName(),
-                                    )
+                        'MENU_SWITCH_USERID'        => $previousUser->getId(),
+                        'MENU_SWITCH_EXTERNAL_ID'   => $previousUser->getExternalId(),
+                        'MENU_SWITCH_USER_FULLNAME' => $previousUser->getFullName(),
+                        'MENU_SWITCH_USER_ROLE'     => $previousUser->getRole()->getName(),
+                    )
                 );
                 $this->parse('recover_user_block', 'recover_user', true);
                 $canSwitch = true;
@@ -937,6 +937,21 @@ class SitePage extends Page
 
     function renderInstantMessages()
     {
+
+        /* Docking the tray
+         */
+        if ($_SESSION['user']->getHideNotificationsTray()) {
+
+            $this->setVar([
+                'HIDE_NOTIFICATIONS_TRAY' => ''
+            ]);
+        }
+        else {
+            $this->setVar([
+                'HIDE_NOTIFICATIONS_TRAY' => 'docking'
+            ]);
+        }
+
         if ($this->responsive) {
             $this->setBlock(TEMPLATE_body, 'instantmessage_toggle', 'instantmessage_toggle_block');
 

@@ -7,7 +7,7 @@
 
             // selectors
 
-            counter:    '#unread-count',
+            counter:    '[data-unread-count]',
             content:    '#msg-content',
             list:       '#message-list',
             readall:    '#msg-mar',

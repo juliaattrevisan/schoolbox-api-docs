@@ -213,6 +213,14 @@ class UserMapper extends Mapper
             )
         );
 
+        $this->hasMap(
+            array(
+                'column' => 'hide_notifications_tray',
+                'property' => 'hideNotificationsTray',
+                'type' => Mapper::TYPE_BOOLEAN,
+            )
+        );
+
         //
         // Boarder leave field is only there if the boarder leave module is
         // enabled.

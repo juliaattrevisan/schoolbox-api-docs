@@ -124,6 +124,13 @@ class User implements JsonSerializable
     private $hideTimetable;
 
     /**
+     * Hide notifications tray
+     *
+     * @var bool
+     */
+    private $hideNotificationsTray;
+
+    /**
      * @var SubjectCollection|Subject[]
      */
     protected $subject_collection;
@@ -1053,6 +1060,22 @@ class User implements JsonSerializable
         $this->setEmailRecipients($this->findEmailRecipients($this));
     }
 
+    /**
+     * Hide notifications tray
+     */
+    public function hideNotificationsTray()
+    {
+        $this->setHideNotificationsTray(true);
+    }
+
+    /**
+     * Show notifications tray
+     */
+    public function showNotificationsTray()
+    {
+        $this->setHideNotificationsTray(false);
+    }
+
     /* Getters/Setters
      */
 
@@ -1111,14 +1134,22 @@ class User implements JsonSerializable
     }
 
     /**
-     * `Schoolbox\Config\Loader` got removed in 16.0.0, but it got serialized.
+     * Get hide notifications tray
      *
-     * Put a new config loader in.
+     * @return boolean
      */
-    public function __wakeup()
+    public function getHideNotificationsTray()
     {
-        if ($this->getConfigLoader() instanceof \__PHP_Incomplete_Class) {
-            $this->setConfigLoader(new ConfigLoader());
-        }
+        return $this->hideNotificationsTray;
+    }
+
+    /**
+     * Set hide notifications tray
+     *
+     * @param boolean $hideNotificationsTray
+     */
+    public function setHideNotificationsTray($hideNotificationsTray)
+    {
+        $this->hideNotificationsTray = $hideNotificationsTray;
     }
 }

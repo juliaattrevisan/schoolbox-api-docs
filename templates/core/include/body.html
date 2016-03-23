@@ -30,123 +30,126 @@
 
 </head>
 <body>
-    <div class="off-canvas-wrap docs-wrap" data-offcanvas>
-        <div class="inner-wrap">
+<div class="off-canvas-wrap docs-wrap" data-offcanvas>
+    <div class="inner-wrap {HIDE_NOTIFICATIONS_TRAY}">
 
-            {INSTANTMESSAGE_BLOCK}
+        {INSTANTMESSAGE_BLOCK}
 
-            <aside class="left-off-canvas-menu hide-for-print" data-side-nav>
-                <div class="logo-wrapper">
-                    <a href="/" class="logo">
-                        <img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{SITE_NAME}"/>
-                    </a>
-                </div>
+        <aside class="left-off-canvas-menu hide-for-print" data-side-nav>
+            <div class="logo-wrapper">
+                <a href="/" class="logo">
+                    <img src="/images/logo.php?logo=skin_logo_large&size=normal" srcset="/images/logo.php?logo=skin_logo_large&size=normal 1x,/images/logo.php?logo=skin_logo_large&size=hidpi 2x" alt="{SITE_NAME}"/>
+                </a>
+            </div>
 
-                <!-- BEGIN banner_logged_in -->
-                <div class="row">
-                    <ul class="account-menu accordion" data-accordion>
-                        <li class="accordion-navigation">
-                            <a href="#accountContent" class="profile-drop">
-                                <img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square80"/>
-                                <span>{SITE_LOGINNAME}</span>
-                            </a>
-                            <div id="accountContent" class="content">
-                                <ul id="avatar2">
-                                    <li><a class="icon-staff-students" href="/search/user/{USER_ID}">Profile</a></li>
-                                    <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
-                                    <!-- BEGIN admin_only_menu -->
-                                    <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
-                                    <!-- END admin_only_menu -->
-                                    <li><a class="icon-logout" href="/logout.php">Logout</a></li>
-                                    <!-- BEGIN can_switch -->
-                                    <li class="separator">Switch User</li>
-                                    <!-- END can_switch -->
-                                    <!-- BEGIN switch_user -->
-                                    <li class="switch-user">
-                                        <div class="avatar card">
-                                            <a class="no-pad" href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to {MENU_SWITCH_USER_FULLNAME}">
-                                                <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
-                                                <p>{MENU_SWITCH_USER_FULLNAME}</p>
-                                                <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
-                                            </a>
-                                        </div>
-                                    </li>
-                                    <!-- END switch_user -->
-                                    <!-- BEGIN recover_user -->
-                                    <li class="switch-user">
-                                        <div class="avatar card">
-                                            <a class="no-pad" href="/user/recoverSession" title="Return to {MENU_SWITCH_USER_FULLNAME}">
-                                                <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
-                                                <p>{MENU_SWITCH_USER_FULLNAME}</p>
-                                                <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
-                                            </a>
-                                        </div>
-                                    </li>
-                                    <!-- END recover_user -->
-                                </ul>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <!-- END banner_logged_in -->
-
-                <div class="row">
-                    <ul class="off-canvas-list second-nav">
-                        {MAIN_TAB_REGION}
-                    </ul>
-                </div>
-                {MAIN_NAV_REGION}
-            </aside>
-
-            <!-- START CONTAINER -->
-            <section class="main-section">
-                <div id="header">
-                    {MAIN_BANNER_REGION}
-                </div>
-
-                <!-- The Schoolbox Hybrid Bar -->
-                <div class="hybrid-bar hide-for-print" id="hybrid-bar">
-                    <nav class="tab-bar">
-                        <section class="left-small">
-                            <a class="left-off-canvas-toggle menu-icon hide-for-large-up" href="#"><span></span></a>
-                        </section>
-
-                        <section class="row middle tab-bar-section {NOTIFICATION_CLASS}">
-                            <a href="/" class="logo small-2 columns no-pad">
-                                <img src="/images/logo.php?logo=skin_logo_square&size=normal" srcset="/images/logo.php?logo=skin_logo_square&size=normal 1x,/images/logo.php?logo=skin_logo_square&size=hidpi 2x" alt="{SITE_NAME}"/>
-                            </a>
-
-                            <ul class="icon-nav small-10 columns">
-                                {MAIN_TAB_REGION}
+            <!-- BEGIN banner_logged_in -->
+            <div class="row">
+                <ul class="account-menu accordion" data-accordion>
+                    <li class="accordion-navigation">
+                        <a href="#accountContent" class="profile-drop">
+                            <img height="80" width="80" alt="View Profile" src="/portrait.php?userId={EXTERNAL_ID}&size=square80"/>
+                            <span>{SITE_LOGINNAME}</span>
+                        </a>
+                        <div id="accountContent" class="content">
+                            <ul id="avatar2">
+                                <li><a class="icon-staff-students" href="/search/user/{USER_ID}">Profile</a></li>
+                                <li><a class="icon-settings" href="/settings/messages">Settings</a></li>
+                                <!-- BEGIN admin_only_menu -->
+                                <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
+                                <!-- END admin_only_menu -->
+                                <li><a class="icon-logout" href="/logout.php">Logout</a></li>
+                                <!-- BEGIN can_switch -->
+                                <li class="separator">Switch User</li>
+                                <!-- END can_switch -->
+                                <!-- BEGIN switch_user -->
+                                <li class="switch-user">
+                                    <div class="avatar card">
+                                        <a class="no-pad" href="/user/switch/{MENU_SWITCH_USERID}" title="Switch to {MENU_SWITCH_USER_FULLNAME}">
+                                            <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
+                                            <p>{MENU_SWITCH_USER_FULLNAME}</p>
+                                            <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
+                                        </a>
+                                    </div>
+                                </li>
+                                <!-- END switch_user -->
+                                <!-- BEGIN recover_user -->
+                                <li class="switch-user">
+                                    <div class="avatar card">
+                                        <a class="no-pad" href="/user/recoverSession" title="Return to {MENU_SWITCH_USER_FULLNAME}">
+                                            <img src="/portrait.php?userId={MENU_SWITCH_EXTERNAL_ID}&amp;size=square64" />
+                                            <p>{MENU_SWITCH_USER_FULLNAME}</p>
+                                            <p class="meta">{MENU_SWITCH_USER_ROLE}</p>
+                                        </a>
+                                    </div>
+                                </li>
+                                <!-- END recover_user -->
                             </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- END banner_logged_in -->
 
-                            <form id="search" action="/search" method="get">
-                                <input id="search-field" type="text" name="keyword" placeholder="Search"/>
-                                <label data-jsubmit for="search-field" class="icon-search no-text"></label>
-                            </form>
-                        </section>
-                        <!-- BEGIN instantmessage_toggle -->
-                        <section class="right-small">
-                            <a id="notifier" class="right-off-canvas-toggle icon-notifications" data-unread="{WEBSOCKET_UNREAD_COUNT}">
-                                <span id="unread-count">{WEBSOCKET_UNREAD_LABEL}</span>
-                            </a>
-                        </section>
-                        <!-- END instantmessage_toggle -->
-                    </nav>
-                </div>
+            <div class="row">
+                <ul class="off-canvas-list second-nav">
+                    {MAIN_TAB_REGION}
+                </ul>
+            </div>
+            {MAIN_NAV_REGION}
+        </aside>
 
-                <div id="container">
-                    <div id="content">
-                        {MAIN_CONTENT_REGION}
-                    </div>
+        <!-- START CONTAINER -->
+        <section class="main-section">
+            <div id="header">
+                {MAIN_BANNER_REGION}
+            </div>
+
+            <!-- The Schoolbox Hybrid Bar -->
+            <div class="hybrid-bar hide-for-print" id="hybrid-bar">
+                <nav class="tab-bar">
+                    <section class="left-small">
+                        <a class="left-off-canvas-toggle menu-icon hide-for-large-up" href="#"><span></span></a>
+                    </section>
+
+                    <section class="row middle tab-bar-section {NOTIFICATION_CLASS}">
+                        <a href="/" class="logo small-2 columns no-pad">
+                            <img src="/images/logo.php?logo=skin_logo_square&size=normal" srcset="/images/logo.php?logo=skin_logo_square&size=normal 1x,/images/logo.php?logo=skin_logo_square&size=hidpi 2x" alt="{SITE_NAME}"/>
+                        </a>
+
+                        <ul class="icon-nav small-10 columns">
+                            {MAIN_TAB_REGION}
+                        </ul>
+
+                        <form id="search" action="/search" method="get">
+                            <input id="search-field" type="text" name="keyword" placeholder="Search"/>
+                            <label data-jsubmit for="search-field" class="icon-search no-text"></label>
+                        </form>
+                    </section>
+                    <!-- BEGIN instantmessage_toggle -->
+                    <section class="right-small">
+                        <a class="right-off-canvas-toggle icon-notifications hidden-for-large-up" data-unread="{WEBSOCKET_UNREAD_COUNT}">
+                            <span data-unread-count>{WEBSOCKET_UNREAD_LABEL}</span>
+                        </a>
+                        <a class="icon-notifications show-for-large-up" data-unread="{WEBSOCKET_UNREAD_COUNT}">
+                            <span data-unread-count>{WEBSOCKET_UNREAD_LABEL}</span>
+                        </a>
+                    </section>
+                    <!-- END instantmessage_toggle -->
+                </nav>
+            </div>
+
+            <div id="container">
+                <div id="content">
+                    {MAIN_CONTENT_REGION}
                 </div>
-                {MAIN_FOOTER_REGION}
-                {DEBUGBAR_HEAD}
-                {DEBUGBAR}
-            </section>
-            <!-- END CONTAINER -->
-            <a href="#" class="exit-off-canvas"></a>
-          </div>
-        </div>
-    </body>
+            </div>
+            {MAIN_FOOTER_REGION}
+            {DEBUGBAR_HEAD}
+            {DEBUGBAR}
+        </section>
+        <!-- END CONTAINER -->
+        <a href="#" class="exit-off-canvas"></a>
+    </div>
+</div>
+</body>
 </html>
