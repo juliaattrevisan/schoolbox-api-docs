@@ -986,6 +986,18 @@ class Controller extends BaseController
     }
 
     /**
+     * Delete a course by blowing away all its units
+     */
+    public function deleteCourse()
+    {
+        $courseId = $this->getRequest()->post->get('courseId');
+
+        new \Alaress_Probe($courseId);
+
+        die();
+    }
+
+    /**
      * Returns a HTTP 500 error with a specific text message
      *
      * @param $message

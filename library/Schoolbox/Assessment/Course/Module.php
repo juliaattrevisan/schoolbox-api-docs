@@ -69,6 +69,7 @@ class Module extends BaseModule
                 '/new'         => 'createCourse',
                 '/modify/{id}' => 'updateCourse',
                 '/finalise'    => 'persistCourse',
+                '/delete'      => 'deleteCourse',
             ]
         ];
 
