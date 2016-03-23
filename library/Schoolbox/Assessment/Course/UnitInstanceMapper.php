@@ -296,15 +296,39 @@ class UnitInstanceMapper extends BaseMapper {
     public function findRestorableCourses($folderId)
     {
         $allCourses = [];
-        $allRestorableUnits = $this->findRestorableUnits($folderId);
+        $allUnits = $this->findRestorableUnits($folderId);
 
-        foreach ($allRestorableUnits as $currentRestorableUnit) {
-            $course = $this->findCourseForUnit($currentRestorableUnit);
+        foreach ($allUnits as $currentUnit) {
+            $course = $this->findCourseForUnit($currentUnit);
 
             /* component_id is the closest concept to a course_id
              * and we can derive it from the associated unit
              */
-            $allCourses[$course->getId()] = $currentRestorableUnit->getComponent();
+            $allCourses[$course->getId()] = $currentUnit->getComponent();
+        }
+
+        return $allCourses;
+    }
+
+    /**
+     * Find the componentId used for a particular Course
+     * (a set of Units...)
+     *
+     * @param $folderId
+     * @return array
+     */
+    public function findComponentsForCourses($folderId)
+    {
+        $allCourses = [];
+        $allUnits = $this->findByColumn('category_id', $folderId);
+
+        foreach ($allUnits as $currentUnit) {
+            $course = $this->findCourseForUnit($currentUnit);
+
+            /* component_id is the closest concept to a course_id
+             * and we can derive it from the associated unit
+             */
+            $allCourses[$course->getId()] = $currentUnit->getComponent();
         }
 
         return $allCourses;
