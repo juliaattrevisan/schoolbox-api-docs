@@ -61,7 +61,6 @@ if (isset($termSlug)) {
 } else {
     $currentTerm  = $termMapper->findMostRecent();
 }
-$nextTerm = $termMapper->findNext($currentTerm);
 
 $m = new Marksheet($categoryID, $_SESSION['id'], array(
     // inject handler dependencies
@@ -83,6 +82,7 @@ $m = new Marksheet($categoryID, $_SESSION['id'], array(
 ), array(
     // inject mapper dependencies
     'user' => \Schoolbox\UserMapper::getInstance(),
+    'term' => $termMapper,
     'category' => \Schoolbox\Resource\CategoryMapper::getInstance(),
     'sb' => SubmissionBoxMapper::getInstance(),
     'oa' => OnlineAssessmentMapper::getInstance(),
@@ -90,7 +90,7 @@ $m = new Marksheet($categoryID, $_SESSION['id'], array(
 ), new \Schoolbox\Config\Loader());
 
 
-$m->generateData($year, $semester);
+$m->generateData($currentTerm);
 if ($performExport) {
     $m->renderCsv();
     exit;

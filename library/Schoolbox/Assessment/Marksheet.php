@@ -76,6 +76,8 @@ class Marksheet
     protected $sbMapper;
     /** @var \DueWork_ErrorMapper */
     protected $errorMapper;
+    /** @var Term\Mapper */
+    protected $termMapper;
 
     /** @var IConfigLoader */
     protected $conf;
@@ -91,10 +93,24 @@ class Marksheet
     /** @var Collection */
     protected $errorList;
 
-    /** @var int */
+    /**
+     * @deprecated Use terms instead
+     *
+     * @var int
+     */
     protected $year;
-    /** @var int */
+
+    /**
+     * @deprecated Use terms instead
+     *
+     * @var int
+     */
     protected $semester;
+
+    /**
+     * @var Term\Model
+     */
+    protected $term;
 
 
     /**
@@ -139,13 +155,16 @@ class Marksheet
 
     /**
      * Generate the data from the given category and session user
+     *
+     * @param Term\Model $term
      */
-    public function generateData($year, $semester)
+    public function generateData(Term\Model $term)
     {
 
         $catId          = $this->category->getId();
-        $this->year     = $year;
-        $this->semester = $semester;
+//        $this->year     = $year;
+//        $this->semester = $semester;
+        $this->term = $term;
 
         /** @var Collection|User[] $studentCollection */
         $studentCollection = new Collection();
@@ -171,7 +190,12 @@ class Marksheet
         // Get list of extra users for each work item
         // Online assessments: get all users who have attempted assessment
         // Due work: all users who have submitted or returned work
-        $workList = $this->submissionHandler->getAllForUserCategory($catId, null, $year, $semester);
+        $workList = $this->submissionHandler->getAllForUserCategory(
+            $catId,
+            null,
+            $term->getStart(),
+            $this->termMapper->findNext($term)->getStart()->addDays(-1)
+        );
         if (is_array($workList)) {
             foreach ($workList as $work) {
                 if ($work['type_id'] == \Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
