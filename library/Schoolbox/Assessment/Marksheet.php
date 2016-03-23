@@ -94,20 +94,6 @@ class Marksheet
     protected $errorList;
 
     /**
-     * @deprecated Use terms instead
-     *
-     * @var int
-     */
-    protected $year;
-
-    /**
-     * @deprecated Use terms instead
-     *
-     * @var int
-     */
-    protected $semester;
-
-    /**
      * @var Term\Model
      */
     protected $term;

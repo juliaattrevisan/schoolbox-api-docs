@@ -30,25 +30,6 @@ if (isset($_GET['year']) || isset($_GET['semester'])) {
     $this->localRedir("/submission/markSheet/{$categoryID}/{$_GET['year']}/{$_GET['semester']}");
 }
 
-//$currentYear = date('Y');
-//$currentSemester = date('m') > 6 ? 2 : 1;
-//
-//if (isset($this->arg[1])) {
-//    if (!(is_numeric($this->arg[1]) && is_numeric($this->arg[2]))) {
-//        error(2); // TODO find a more appropriate error
-//    }
-//
-//    if ($this->arg[2] < 1 || $this->arg[2] > 2) {
-//        error(2); // TODO find a more appropriate error
-//    }
-//
-//    $year = (int)$this->arg[1];
-//    $semester = (int)$this->arg[2];
-//} else {
-//    $year = $currentYear;
-//    $semester = $currentSemester;
-//}
-
 $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
 $termSlug   = $this->arg[1];
 if (isset($termSlug)) {
