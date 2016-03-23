@@ -42,6 +42,9 @@ if (isset($termSlug)) {
     $currentTerm  = $termMapper->findMostRecent();
     $semesterSlug = '';
 }
+// Get the next ending term too
+$nextTerm = $termMapper->findNext($currentTerm);
+$endDate  = $nextTerm->getStart()->addDays(-1);
 
 
 $this->setFile(TEMPLATE_content, 'submission/listSubmission.html');
@@ -139,7 +142,7 @@ else {
     $allUserBoxes = $submissionHandler->getAllForUser(
         $_SESSION['id'],
         $currentTerm->getStart(),
-        $currentTerm->getFinish()
+        $endDate
     );
     if(is_array($allUserBoxes)) {
         foreach($allUserBoxes as $box) {
@@ -158,7 +161,7 @@ foreach($subjectList as $subject) {
         $subject,
         0,
         $currentTerm->getStart(),
-        $currentTerm->getFinish()
+        $endDate
     );
     if(is_array($assessments)) {
         $subList = array_merge($subList, $assessments);

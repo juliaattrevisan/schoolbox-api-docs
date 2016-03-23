@@ -71,6 +71,33 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Retrieves whichever term is the next term opening after this one.
+     *
+     * @param Model $term
+     * @return Model
+     */
+    public function findNext(Model $term)
+    {
+        $endDate = $term->getFinish();
+        if ($endDate instanceof Alaress_Date_Format && !$endDate->isNull()) {
+            $query = "
+                SELECT   {$this->getColumnString()}
+                FROM     {$this->getTable()}
+                WHERE    `start` > :date
+                ORDER BY `start` ASC
+                LIMIT 1
+            ";
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute(['date' => $endDate->getDatabaseDate(),]);
+            $result = $statement->fetch();
+            if ($result) {
+                return $this->hydrate($result);
+            }
+        }
+        return $this->createModel();
+    }
+
+    /**
      * Verifies this term's title is unique and not empty.
      *
      * @param  Model $model
