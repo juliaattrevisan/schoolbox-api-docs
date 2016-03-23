@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Assessment;
 
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
@@ -43,20 +44,28 @@ class Grades
     *
     * @param Collection<User> $students
     * @param Category $subject
-    * @param int $year
-    * @param int $semester
+    * @param Alaress_Date_Format $from
+    * @param Alaress_Date_Format $to
     * @param array $outputFormats
     * @return array
     */
-    public function getStudentGradesForSubject($students, $subject, $year = 0, $semester = 0, $outputFormats = array('float'))
-    {
+    public function getStudentGradesForSubject(
+        $students,
+        $subject,
+        Alaress_Date_Format $from = null,
+        Alaress_Date_Format $to = null,
+        $outputFormats = array('float')
+    ) {
 
-        $params = array();
+        $params = array(
+            'from' => $from,
+            'to'   => $to,
+        );
 
-        if ($year && $semester) {
-            $params['year'] = $year;
-            $params['semester'] = $semester;
-        }
+//        if ($year && $semester) {
+//            $params['year'] = $year;
+//            $params['semester'] = $semester;
+//        }
 
         $assessmentsSeen = array(
             'sb' => array(),

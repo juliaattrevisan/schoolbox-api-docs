@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Assessment\Component\OnlineAssessment;
 
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper;
 
@@ -116,6 +117,8 @@ class AttemptMapper extends Mapper
      *                            * year
      *                            * semester
      *                            * owner - the creator of the submission box
+     *                            * from (Alaress_Date_Format)
+     *                            * to (Alaress_Date_Format)
      *
      * @return array
      */
@@ -154,6 +157,17 @@ class AttemptMapper extends Mapper
         if (!empty($extra_params['visibility'])) {
             $params    = array_merge($params, $this->getArrayParameters($extra_params['visibility'], 'vis'));
             $filters[] = 'a.mark_visibility IN ' . $this->getArrayPlaceholders($extra_params['visibility'], 'vis');
+        }
+
+        // From/to dates
+        // TODO consider allowing assess that spans from and to, not just finish
+        if ($extra_params['from'] instanceof Alaress_Date_Format && !$extra_params['from']->isNull()) {
+            $params['from'] = $extra_params['from']->getDatabaseDate();
+            $filters[]      = 'DATE(a.finish) >= :from';
+        }
+        if ($extra_params['to'] instanceof Alaress_Date_Format && !$extra_params['to']->isNull()) {
+            $params['to'] = $extra_params['to']->getDatabaseDate();
+            $filters[]    = 'DATE(a.finish) <= :to';
         }
 
         $filters = implode(' AND ', $filters);

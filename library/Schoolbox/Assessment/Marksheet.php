@@ -337,8 +337,8 @@ class Marksheet
             $studentGrades = Grades::getInstance()->getStudentGradesForSubject(
                 $studentCollection,
                 $this->category,
-                $this->year,
-                $this->semester
+                $this->term->getStart(),
+                $this->termMapper->findNext($this->term)->getStart()->addDays(-1)
             );
 
             foreach ($studentCollection as $student) {
@@ -504,7 +504,8 @@ class Marksheet
                     ? ('('.\Scrub::text($codeString).')')
                     : '',
                 'WORK_YEAR'     => $this->year,
-                'WORK_SEMESTER' => $this->semester
+                'WORK_SEMESTER' => $this->semester,
+                'WORK_TERM'     => $this->term->getCode(),
             )
         );
 
