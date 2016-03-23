@@ -503,8 +503,6 @@ class Marksheet
                 'CATEGORY_CODE' => strlen($codeString) > 0
                     ? ('('.\Scrub::text($codeString).')')
                     : '',
-                'WORK_YEAR'     => $this->year,
-                'WORK_SEMESTER' => $this->semester,
                 'WORK_TERM'     => $this->term->getCode(),
             )
         );

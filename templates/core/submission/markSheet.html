@@ -26,7 +26,7 @@
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
         <li><a href='/submission/createSubmission/new/{CID}/' class='icon-progress'>Post Due Work</a>
         <li><a href='/assess/create/{CID}/' class='icon-quiz'>Create Quiz</a>
-        <li><a href='/submission/markSheet/{CID}/{WORK_YEAR}/{WORK_SEMESTER}/export' class='icon-download'>Download Spreadsheet</a>
+        <li><a href='/submission/markSheet/{CID}/{WORK_TERM}/export' class='icon-download'>Download Spreadsheet</a>
     </ul>
 </div>
 
@@ -114,7 +114,7 @@
                         </td>
                         <!-- END student_work -->
                         <td class="gradient-{STUDENT_AVG_GRADIENT}-bg">
-                            <a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{CID}">{STUDENT_AVG_CLEAN}</a>
+                            <a class="gradient-{STUDENT_AVG_GRADIENT}" href="/submission/allWork/{STUDENT_ID}/{WORK_TERM}/{CID}">{STUDENT_AVG_CLEAN}</a>
                         </td>
                     </tr>
                     <!-- END student_row -->
