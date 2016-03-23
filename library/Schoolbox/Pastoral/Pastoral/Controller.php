@@ -729,6 +729,7 @@ class Controller extends Base
                 $record->setPrivate($this->getRequest()->post["private"]);
                 $record->setOwner($this->getUser());
                 $record->setCreatedAt($createdAt);
+                $this->getPastoralMapper()->setSessionData($_SESSION);
                 $this->getPastoralMapper()->save($record);
 
                 $records->add($record);
@@ -836,6 +837,7 @@ class Controller extends Base
             $record->setPrivate($this->getRequest()->post["private"]);
             $record->setOwner($this->getUser());
             $record->setUpdatedAt(\Alaress_Date_Format::now());
+            $this->getPastoralMapper()->setSessionData($_SESSION);
             $this->getPastoralMapper()->save($record);
 
             // Update external record

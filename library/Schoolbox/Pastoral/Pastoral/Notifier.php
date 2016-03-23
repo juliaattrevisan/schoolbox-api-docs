@@ -4,8 +4,10 @@ namespace Schoolbox\Pastoral\Pastoral;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
-use Schoolbox\Mapper;
+use Schoolbox\Collection;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral\Access\Mapper as AccessMapper;
+use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -18,30 +20,44 @@ class Notifier extends AbstractModuleNotifier
     const TRIGGER_UPDATED = 'updated';
 
     /**
-     * @param int $id
+     * @param Model $model
      * @param string $method
      * @return Envelope
      */
-    protected function buildMessage($id, $method)
+    protected function buildMessage($model, $method)
     {
         $envelope = new Envelope();
+
         $builder = new Builder();
-
-        $access = $this->accessMapper->findByColumn("pastoral_id", $id);
-
-        $builder->setTitle("yay")
-            ->setIcon("")
-            ->setHref("http://www.wombles.com")
+        $builder->setTitle("A pastoral care record has been {$method}")
+            ->setIcon("/portrait.php?size=32&userId=" . $model->getStudent()->getExternalId())
+            ->setHref("/pastoral/" . $model->getStudent()->getId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::ERROR)
-            ->addTopic("pastoral.{$id}.{$method}");
+            ->addTopic("pastoral." . $model->getId() . ".{$method}");
 
         $message = $builder->build();
-        $envelope->broadcastToRole(1, $message);
-        /*
-        $envelope->targetToParent($studentid, $message);
-        $envelope->targetToUser($user, $message);
-        */
+
+        // Work out who to send the message to
+
+        /** @var Collection|PastoralAccessModel $accessModels */
+        $accessModels = $this->accessMapper->findByColumn("pastoral_id", $model->getId());
+
+        $sendToParents = false;
+
+        /** @var PastoralAccessModel $accessModel */
+        foreach ($accessModels as $accessModel) {
+
+            if ($accessModel->getRole()->isStaff()) {
+                $envelope->broadcastToRole($accessModel->getRole()->getId(), $message);
+            } else if ($accessModel->getRole()->isParent()) {
+                $sendToParents = true;
+            }
+        }
+
+        $envelope->targetToParent($model->getStudent()->getId(), $message);
+        $envelope->targetToUser(19, $message);
+
         return $envelope;
     }
 
@@ -70,10 +86,10 @@ class Notifier extends AbstractModuleNotifier
     public function bundleTriggers($bundle)
     {
         switch ($bundle->getMethod()) {
-            case Mapper::METHOD_CREATE:
+            case BaseMapper::METHOD_CREATE:
                 $bundle->attach(self::TRIGGER_CREATED, self::IMMEDIATELY);
                 break;
-            case Mapper::METHOD_UPDATE:
+            case BaseMapper::METHOD_UPDATE:
                 $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
                 break;
         }
@@ -87,7 +103,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyCreated($model, $userEffected, $diff=[])
     {
-        return $this->buildMessage($model->getId(), self::TRIGGER_CREATED);
+        return $this->buildMessage($model, self::TRIGGER_CREATED);
     }
 
     /**
@@ -98,7 +114,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyUpdated($model, $userEffected, $diff=[])
     {
-        return $this->buildMessage($model->getId(), self::TRIGGER_UPDATED);
+        return $this->buildMessage($model, self::TRIGGER_UPDATED);
     }
 
     /**
@@ -107,7 +123,9 @@ class Notifier extends AbstractModuleNotifier
      */
     public function retrieveCallbacks($label)
     {
-        return [$this, "notify{$label}"];
+        return [
+            [ $this, "notify" . ucfirst($label) ]
+        ];
     }
 
     // Here be the getters/setter
