@@ -12,6 +12,7 @@ use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 
@@ -32,7 +33,7 @@ class Notifier extends AbstractModuleNotifier
         $builder = new Builder();
         $builder->setTitle("A pastoral care record has been {$method}")
             ->setIcon("/portrait.php?size=32&userId=" . $model->getStudent()->getExternalId())
-            ->setHref("/pastoral/" . $model->getStudent()->getId())
+            ->setHref("/pastoral/" . $model->getStudent()->getId() . "/" . $model->getId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::ERROR)
             ->addTopic("pastoral." . $model->getId() . ".{$method}");
@@ -51,9 +52,12 @@ class Notifier extends AbstractModuleNotifier
             $roleId = $accessModel->getRole()->getId();
 
             if (!empty($roleId)) {
-                $accessModel->setRole(
-                    $this->getRoleMapper()->findById($roleId)
-                );
+
+                /** @var Role $role */
+                $role = $this->getRoleMapper()->findById($roleId);
+
+                $accessModel->setRole($role);
+
                 if ($accessModel->getRole()->isStaff()) {
                     $envelope->broadcastToRole($accessModel->getRole()->getId(), $message);
                 } else {
@@ -104,7 +108,7 @@ class Notifier extends AbstractModuleNotifier
                 break;
             case BaseMapper::METHOD_UPDATE:
                 $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
-                break;o
+                break;
         }
     }
 

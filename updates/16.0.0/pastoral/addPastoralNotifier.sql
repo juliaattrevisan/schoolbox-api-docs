@@ -32,8 +32,11 @@ DELIMITER ;
 -- Delete any previous created pastoral notification stuff
 
 DELETE FROM msg_route_perm WHERE msg_source_id in (SELECT `id` FROM msg_source WHERE namespace in (SELECT `id` FROM msg_namespace WHERE slug = 'pastoral'));
+DELETE FROM msg_route_perm WHERE msg_source_id in (SELECT `id` FROM msg_source WHERE namespace in (SELECT `id` FROM msg_namespace WHERE slug = 'pastoral_comment'));
 DELETE FROM msg_source WHERE namespace in (SELECT `id` FROM msg_namespace WHERE slug = 'pastoral');
+DELETE FROM msg_source WHERE namespace in (SELECT `id` FROM msg_namespace WHERE slug = 'pastoral_comment');
 DELETE FROM msg_namespace WHERE slug = 'pastoral';
+DELETE FROM msg_namespace WHERE slug = 'pastoral_comment';
 
 -- Create notification namespace and get its ID
 
@@ -61,6 +64,37 @@ CALL create_route_perms(@source, 'staff');
 -- Parent update message source
 
 INSERT INTO schoolbox.msg_source (`namespace`, `key`, `role_type`, `description`) VALUES (@namespace, 'updated', 'staff', 'an existing pastoral record has been updated.');
+SET @source = LAST_INSERT_ID();
+CALL create_route_perms(@source, 'staff');
+
+-- Do the same for comments
+
+-- Create notification namespace and get its ID
+
+INSERT INTO msg_namespace (slug, label) VALUES ('pastoral_comment', 'Pastoral Care Comment');
+SET @namespace = LAST_INSERT_ID();
+
+-- Parent create message source
+
+INSERT INTO schoolbox.msg_source (`namespace`, `key`, `role_type`, `description`) VALUES (@namespace, 'created', 'parent', 'a new pastoral care comment has been created.');
+SET @source = LAST_INSERT_ID();
+CALL create_route_perms(@source, 'parent');
+
+-- Parent update message source
+
+INSERT INTO schoolbox.msg_source (`namespace`, `key`, `role_type`, `description`) VALUES (@namespace, 'updated', 'parent', 'an existing pastoral comment has been updated.');
+SET @source = LAST_INSERT_ID();
+CALL create_route_perms(@source, 'parent');
+
+-- Parent create message source
+
+INSERT INTO schoolbox.msg_source (`namespace`, `key`, `role_type`, `description`) VALUES (@namespace, 'created', 'staff', 'a new pastoral care comment has been created.');
+SET @source = LAST_INSERT_ID();
+CALL create_route_perms(@source, 'staff');
+
+-- Parent update message source
+
+INSERT INTO schoolbox.msg_source (`namespace`, `key`, `role_type`, `description`) VALUES (@namespace, 'updated', 'staff', 'an existing pastoral care comment has been updated.');
 SET @source = LAST_INSERT_ID();
 CALL create_route_perms(@source, 'staff');
 
