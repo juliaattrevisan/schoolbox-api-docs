@@ -1031,23 +1031,34 @@ class Controller extends Base
                 }
             }
 
-            // Send instant notifications - Must talk to doctor and change this to digestable notification
+            // Send notifications
 
-            /*
-            if ($this->getRequest()->post["notify"] == 1) {
+            if ($this->getRequest()->post["notify"] == 1 && !$this->getRequest()->post["private"]) {
 
-                try {
-                    $user = $this->getUserMapper()->findById($this->getRequest()->post["student_id"]);
-                } catch (\Exception $e) {
-                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-                    return;
+                // Work out who to send the notification to and store their IDs in an array
+
+                $ids = [];
+                $users = $this->getUserMapper()->findAll();
+
+                // Find all users with access via role
+
+                foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
+                    foreach ($users as $user) {
+                        if ($user->getRole()->getId() == $role_id) {
+                            $ids[$user->getId()] = 1;
+                        }
+                    }
                 }
 
-                if (!$this->getRequest()->post["private"]) {
-                    $link = "/pastoral/{$record->getStudent()->getId()}/" . $record->getId();
-                } else {
-                    $link = "/pastoral/{$record->getStudent()->getId()}";
+                foreach ($this->getRequest()->post["user_id"] as $user_id) {
+                    $ids[$user_id] = 1;
                 }
+
+                // Don't send it to the user making the change
+
+                unset($ids[$this->getUser()->getId()]);
+
+                // Create the notification
 
                 if (empty($this->getRequest()->post["id"])) {
                     $body = "Pastoral care message received (confidential)";
@@ -1059,51 +1070,19 @@ class Controller extends Base
                 $bob->setTitle($body)
                     ->setSeverity(\Monolog\Logger::INFO)
                     ->setNamespace('ALERT')
-                    ->setHref($link)
+                    ->setHref("/pastoral/{$record->getStudent()->getId()}/" . $record->getId())
                     ->setIcon('/images/icon.php?icon=bolt&size=64')
                     ->addTopic("notify.user." . $this->getRequest()->post["student_id"])
                     ->putMeta('ttl', 60)
                     ->putMeta('title', 'Pastoral Care Alert');
 
-                $ids = array();
-
-                $users = $this->getUserMapper()->findAll();
-
-                foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
-
-                    // Find all users with this role
-
-                    foreach ($users as $user) {
-                        if ($user->getRole()->getId() == $role_id) {
-
-                            // Add them to the notification list
-
-                            $ids[$user->getId()] = 1;
-                        }
-                    }
-                }
-
-                // Don't send it to the user making the change
-
-                $ids[$this->getUser()->getId()] = 0;
-
-                // Trigger the notifications
+                // Send them out to all the peoples round the world
 
                 foreach ($ids as $id => $value) {
-                    if ($value == 1) {
-                        $n = new \Schoolbox\Notif\Notif("instant.user.{$id}.alert");
-                        $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
-                    }
-                }
-
-                // Send notifications to all individually added users
-
-                foreach ($this->getRequest()->post["user_id"] as $user_id) {
-                    $n = new \Schoolbox\Notif\Notif("instant.user.$user_id.alert");
+                    $n = new \Schoolbox\Notif\Notif("instant.user.{$id}.alert");
                     $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
                 }
             }
-            */
         }
 
         // Go back to students pastoral record
