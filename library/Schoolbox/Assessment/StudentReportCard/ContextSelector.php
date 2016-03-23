@@ -501,7 +501,7 @@ class ContextSelector {
 	}
 
 	/**
-	 * Render the selector for units
+	 * Render the selector for units. Units will be grouped by term if terms have been set.
 	 *
 	 * Used on the progress report
 	 *
@@ -512,51 +512,33 @@ class ContextSelector {
 		$page->setBlock('unit_context', 'unit_select', 'unit_select_block');
 		$page->setBlock('unit_select', 'unit_option', 'unit_option_block');
 
-		// Group units by year/semester
+		// Group units by term (assuming there are terms!)
 		$unit_year_list = [];
-		$years          = [];
-		foreach ($this->units as $unit) {
-			/** @var UnitInstance $unit */
-			$open = $unit->getOpenDate();
-			$year = $open->getYear();
-			$years[$year] = $year;
-			switch ($this->granularity) {
-				case self::GRANULARITY_YEAR:
-					$key = $year;
-					break;
-				case self::GRANULARITY_TERM:
-					// Don't use this, I guarantee nothing about it working
-					$key = $year.'/'.ceil($open->getMonth() / 3);
-					break;
-				case self::GRANULARITY_SEMESTER:
-				default:
-					// should almost always be default (self::GRANULARITY_SEMESTER)
-					$key = $year.'/'.$open->getYearHalf();
-					break;
-			}
-			$unit_year_list[$key][] = $unit;
-		}
+		if (count($this->terms) === 0) {
+			$unit_year_list[''] = $this->units;
+		} else {
+			$this->terms->sortBy('start', 'asc');
+			/** @var Term\Model[] $terms */
+			$terms = array_values($this->terms->getAll());
 
-		// Add empty lists for each semester that doesn't have a unit,
-		// so at least SOMETHING can show.
-		$semesters = [];
-		switch ($this->granularity) {
-			case self::GRANULARITY_YEAR:
-				break;
-			case self::GRANULARITY_TERM:
-				$semesters = [1,2,3,4];
-				break;
-			case self::GRANULARITY_SEMESTER:
-			default:
-				$semesters = [1, 2];
-				break;
-		}
-		if (!empty($semesters)) {
-			foreach ($years as $year) {
-				foreach ($semesters as $semester) {
-					$key = $year.'/'.$semester;
-					if (empty($unit_year_list[$key])) {
-						$unit_year_list[$key] = [];
+			// Add a selector for all terms without units
+			foreach ($terms as $term) {
+				$unit_year_list[$term->getCode()] = [];
+			}
+
+			// Add unit to term
+			foreach ($this->units as $unit) {
+				/** @var UnitInstance $unit */
+				foreach ($terms as $i => $term) {
+					$nextTerm = $terms[$i+1];
+					if (
+						!isset($nextTerm)
+						|| $unit->getOpenDate()->between($term->getStart(), $nextTerm->getStart())
+					) {
+						// Last term - put this unit in this term
+						// Unit starts between this and next term's start
+						$unit_year_list[$term->getCode()][] = $unit;
+						break;
 					}
 				}
 			}
