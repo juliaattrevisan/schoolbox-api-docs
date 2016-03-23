@@ -136,7 +136,11 @@ else {
 
     /* Merge in all the rest that are not related to the user by folder but by owner
        note i am using an older function for a simple task that is why it does more than it should */
-    $allUserBoxes = $submissionHandler->getAllForUser($_SESSION['id'], $year, $semester);
+    $allUserBoxes = $submissionHandler->getAllForUser(
+        $_SESSION['id'],
+        $currentTerm->getStart(),
+        $currentTerm->getFinish()
+    );
     if(is_array($allUserBoxes)) {
         foreach($allUserBoxes as $box) {
             $subjectList[] = $box['catid'];
@@ -150,7 +154,12 @@ else {
 
 $subList = array();
 foreach($subjectList as $subject) {
-    $assessments = $submissionHandler->getAllForUserCategory($subject, 0, $year, $semester);
+    $assessments = $submissionHandler->getAllForUserCategory(
+        $subject,
+        0,
+        $currentTerm->getStart(),
+        $currentTerm->getFinish()
+    );
     if(is_array($assessments)) {
         $subList = array_merge($subList, $assessments);
     }

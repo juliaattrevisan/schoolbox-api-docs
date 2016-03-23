@@ -490,21 +490,40 @@ class Submission extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    function getAllForUserCategory($categoryID, $userID = 0, $year = 0, $semester = 0)
+    /**
+     * @param int                 $categoryID
+     * @param int                 $userID
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
+     *
+     * @return bool|mixed
+     */
+    function getAllForUserCategory($categoryID, $userID = 0, Alaress_Date_Format $from = null, Alaress_Date_Format $to = null)
     {
         $dateCondA  = '';
         $dateCondB  = '';
         $ownerCondA = '';
         $ownerCondB = '';
 
-        if ($year) {
-            $dateCondA .= " AND DATE_FORMAT(sb.date, '%Y') = $year";
-            $dateCondB .= " AND DATE_FORMAT(assess.finish, '%Y') = $year";
+        if (isset($from) && !$from->isNull()) {
+            $date       = $this->db->smartQuote($from->getDatabaseDate());
+            $dateCondA .= ' AND DATE(sb.date)       >= '.$date;
+            $dateCondB .= ' AND DATE(assess.finish) >= '.$date;
         }
-        if ($semester) {
-            $dateCondA .= " AND DATE_FORMAT(sb.date, '%m') " . DueWork_All::getSemesterLogic($semester);
-            $dateCondB .= " AND DATE_FORMAT(assess.finish, '%m') " . DueWork_All::getSemesterLogic($semester);
+        if (isset($to) && !$to->isNull()) {
+            $date       = $this->db->smartQuote($to->getDatabaseDate());
+            $dateCondA .= ' AND DATE(sb.date)       <= '.$date;
+            $dateCondB .= ' AND DATE(assess.finish) <= '.$date;
         }
+
+//        if ($year) {
+//            $dateCondA .= " AND DATE_FORMAT(sb.date, '%Y') = $year";
+//            $dateCondB .= " AND DATE_FORMAT(assess.finish, '%Y') = $year";
+//        }
+//        if ($semester) {
+//            $dateCondA .= " AND DATE_FORMAT(sb.date, '%m') " . DueWork_All::getSemesterLogic($semester);
+//            $dateCondB .= " AND DATE_FORMAT(assess.finish, '%m') " . DueWork_All::getSemesterLogic($semester);
+//        }
         if ($userID) {
             $ownerCondA = "AND sb.owner = '$userID'";
             $ownerCondB = "AND assess.user_id = '$userID'";
@@ -603,25 +622,38 @@ class Submission extends DeprecatedModel
     /**
      * Simplified this query so we can use it just to find out what categories a user has submission boxes in
      *
-     * @param  $userID
+     * @param int                 $userID
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      *
      * @return array|bool
      */
-    public function getAllForUser($userID, $year = 0, $semester = 0)
+    public function getAllForUser($userID, Alaress_Date_Format $from = null, Alaress_Date_Format $to = null)
     {
         $dateConditionA = '';
         $dateConditionB = '';
 
-        if ($year) {
-            $dateConditionA .= " AND DATE_FORMAT(submission_box.date, '%Y') = $year";
-            $dateConditionB .= " AND DATE_FORMAT(assess.start, '%Y') = $year";
+        if (isset($from) && !$from->isNull()) {
+            $date            = $this->db->smartQuote($from->getDatabaseDate());
+            $dateConditionA .= ' AND DATE(submission_box.date) >= '.$date;
+            $dateConditionB .= ' AND DATE(assess.start)        >= '.$date;
         }
-        if ($semester) {
-            $dateConditionA .= " AND DATE_FORMAT(submission_box.date, '%m') " . DueWork_All::getSemesterLogic(
-                    $semester
-                );
-            $dateConditionB .= " AND DATE_FORMAT(assess.start, '%m') " . DueWork_All::getSemesterLogic($semester);
+        if (isset($to) && !$to->isNull()) {
+            $date            = $this->db->smartQuote($to->getDatabaseDate());
+            $dateConditionA .= ' AND DATE(submission_box.date) <= '.$date;
+            $dateConditionB .= ' AND DATE(assess.start)        <= '.$date;
         }
+
+//        if ($year) {
+//            $dateConditionA .= " AND DATE_FORMAT(submission_box.date, '%Y') = $year";
+//            $dateConditionB .= " AND DATE_FORMAT(assess.start, '%Y') = $year";
+//        }
+//        if ($semester) {
+//            $dateConditionA .= " AND DATE_FORMAT(submission_box.date, '%m') " . DueWork_All::getSemesterLogic(
+//                    $semester
+//                );
+//            $dateConditionB .= " AND DATE_FORMAT(assess.start, '%m') " . DueWork_All::getSemesterLogic($semester);
+//        }
 
         $query = "
             (
