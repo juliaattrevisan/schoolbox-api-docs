@@ -258,6 +258,31 @@ class UnitInstanceMapper extends BaseMapper {
     }
 
     /**
+     * Find a list of Units whose Course Outlines no longer exist
+     *
+     * @param $folderId
+     * @return Collection
+     */
+    public function findRestorableUnits($folderId)
+    {
+        $query = "
+            SELECT {$this->getColumnString('cui')}
+            FROM {$this->getTable()} cui
+            LEFT JOIN component_instance ON cui.`component_id` = component_instance.`id`
+            WHERE component_instance.id IS NULL
+            AND category_id = :folderId
+        ";
+
+        $statement = $this->database->prepare($query);
+
+        $statement->execute([
+            'folderId' => $folderId
+        ]);
+
+        return $this->hydrateList($statement, 'cui');
+    }
+
+    /**
      * Retrieves unit instances for the given component.
      *
      * @param  Component_Instance        $component

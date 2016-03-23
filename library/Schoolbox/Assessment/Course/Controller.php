@@ -959,25 +959,28 @@ class Controller extends BaseController
     /**
      * View a list of courses associated with a homepage
      *
-     * @api   GET /course/management/{homepageId}
-     * @param $homepageId
+     * @api   GET /course/management/{folderId}
+     * @param $folderId
      */
-    public function management($homepageId)
+    public function management($folderId)
     {
         /* TODO: Exception falls directly on to carpet
          */
-        $folder = $this->getFolderMapper()->findById($homepageId);
+        $folder = $this->getFolderMapper()->findById($folderId);
 
-        /* Find all the Courses assocated with this Folder,
-         * via imported Units
+        /* Find all the Courses assocated with this Folder, via imported Units
          */
         $allCourses = new Collection();
 
-        $allFolders = $this->getUnitInstanceMapper()->findAllCoursesUsedInFolders(array($homepageId));
+        $allFolders = $this->getUnitInstanceMapper()->findAllCoursesUsedInFolders([$folderId]);
 
         if ($allFolders->count()) {
-            $allCourses = $allFolders->getOffset($homepageId);
+            $allCourses = $allFolders->getOffset($folderId);
         }
+
+        /* A list of Units which have had their Course Outlines removed
+         */
+        $allRestorableUnits = $this->getUnitInstanceMapper()->findRestorableUnits($folderId);
 
         $this->tpl('management', [
             'folder' => $folder,

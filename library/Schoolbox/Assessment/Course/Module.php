@@ -46,7 +46,7 @@ class Module extends BaseModule
 
                 /* Course Management for a particular Homepage
                  */
-                '/management/{homepageId}'             => 'management',
+                '/management/{folderId}'               => 'management',
 
                 /* Import screen
                  */
