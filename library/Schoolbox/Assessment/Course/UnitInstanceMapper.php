@@ -283,36 +283,16 @@ class UnitInstanceMapper extends BaseMapper {
     }
 
     /**
-     * Find a list of originating Course Folders whose Units
+     * Find the componentId used for a particular Course
+     * (a set of Units...)
+     *
+     * Also determine whether Courses are restorable. These
+     * are in a list of originating Course Folders whose Units
      * had their Course Outlines deleted from $folderId
      *
      * Returns you an associative array between a folderId and
-     * the componentId which used it
-     *
-     * @param $folderId
-     * @return array An array of folderId => componentId pairs
-     * @throws BaseMapper\Exception
-     */
-    public function findRestorableCourses($folderId)
-    {
-        $allCourses = [];
-        $allUnits = $this->findRestorableUnits($folderId);
-
-        foreach ($allUnits as $currentUnit) {
-            $course = $this->findCourseForUnit($currentUnit);
-
-            /* component_id is the closest concept to a course_id
-             * and we can derive it from the associated unit
-             */
-            $allCourses[$course->getId()] = $currentUnit->getComponent();
-        }
-
-        return $allCourses;
-    }
-
-    /**
-     * Find the componentId used for a particular Course
-     * (a set of Units...)
+     * the componentId which used it along with the restorable
+     * state of the Course
      *
      * @param $folderId
      * @return array
@@ -320,15 +300,29 @@ class UnitInstanceMapper extends BaseMapper {
     public function findComponentsForCourses($folderId)
     {
         $allCourses = [];
-        $allUnits = $this->findByColumn('category_id', $folderId);
+        $allRestorableUnitIds = [];
 
+        $allUnits = $this->findByColumn('category_id', $folderId);
+        $allRestorableUnits = $this->findRestorableUnits($folderId);
+
+        /* Just get the ids, for some easy checking
+         */
+        foreach ($allRestorableUnits as $currentRestorableUnit) {
+            $allRestorableUnitIds[] = $currentRestorableUnit->getId();
+        }
+
+        /* Check every unit -_-
+         */
         foreach ($allUnits as $currentUnit) {
             $course = $this->findCourseForUnit($currentUnit);
 
             /* component_id is the closest concept to a course_id
              * and we can derive it from the associated unit
              */
-            $allCourses[$course->getId()] = $currentUnit->getComponent();
+            $allCourses[$course->getId()] = [
+                'componentId' => $currentUnit->getComponent()->getId(),
+                'restorable' => in_array($currentUnit->getId(), $allRestorableUnitIds) ? true : false,
+            ];
         }
 
         return $allCourses;
