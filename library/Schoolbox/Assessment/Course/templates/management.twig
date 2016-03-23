@@ -66,7 +66,11 @@
                     </div>
                     <nav>
                         <a href="" class="icon-modify" title="Modify Course"></a>
+
+                        {% if currentCourse.getId() in allRestorableCourses %}
                         <a href="" class="icon-upload" title="Restore Course"></a>
+                        {% endif %}
+
                         <a href="" class="icon-delete" title="Delete Course" data-delete="{{ currentCourse.getId() }}"></a>
                     </nav>
                 </li>
