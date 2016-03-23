@@ -14,7 +14,7 @@ $groupHandler = new Group();
 $performExport = false;
 if (is_numeric($this->arg[0])) {
     $categoryID = $this->arg[0];
-    if ($this->arg[3] == 'export') {
+    if ($this->arg[2] == 'export') {
         $performExport = true;
     }
     if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS) {
@@ -30,24 +30,38 @@ if (isset($_GET['year']) || isset($_GET['semester'])) {
     $this->localRedir("/submission/markSheet/{$categoryID}/{$_GET['year']}/{$_GET['semester']}");
 }
 
-$currentYear = date('Y');
-$currentSemester = date('m') > 6 ? 2 : 1;
+//$currentYear = date('Y');
+//$currentSemester = date('m') > 6 ? 2 : 1;
+//
+//if (isset($this->arg[1])) {
+//    if (!(is_numeric($this->arg[1]) && is_numeric($this->arg[2]))) {
+//        error(2); // TODO find a more appropriate error
+//    }
+//
+//    if ($this->arg[2] < 1 || $this->arg[2] > 2) {
+//        error(2); // TODO find a more appropriate error
+//    }
+//
+//    $year = (int)$this->arg[1];
+//    $semester = (int)$this->arg[2];
+//} else {
+//    $year = $currentYear;
+//    $semester = $currentSemester;
+//}
 
-if (isset($this->arg[1])) {
-    if (!(is_numeric($this->arg[1]) && is_numeric($this->arg[2]))) {
+$termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
+$termSlug   = $this->arg[1];
+if (isset($termSlug)) {
+    try {
+        $currentTerm = $termMapper->findOneByColumn('code', $termSlug);
+    } catch (\Schoolbox\Mapper\Exception $e) {
         error(2); // TODO find a more appropriate error
+        exit;
     }
-
-    if ($this->arg[2] < 1 || $this->arg[2] > 2) {
-        error(2); // TODO find a more appropriate error
-    }
-
-    $year = (int)$this->arg[1];
-    $semester = (int)$this->arg[2];
 } else {
-    $year = $currentYear;
-    $semester = $currentSemester;
+    $currentTerm  = $termMapper->findMostRecent();
 }
+$nextTerm = $termMapper->findNext($currentTerm);
 
 $m = new Marksheet($categoryID, $_SESSION['id'], array(
     // inject handler dependencies
