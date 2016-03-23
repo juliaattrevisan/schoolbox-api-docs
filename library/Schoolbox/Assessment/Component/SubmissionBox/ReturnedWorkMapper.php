@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
+use Alaress_Date_Format;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
@@ -219,6 +220,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      *                            * owner - the creator of the submission box
      *                            * visibility - a list containing the allowed
      *                              submission box mark visibility values.
+     *                            * from (Alaress_Date_Format)
+     *                            * to (Alaress_Date_Format)
      *
      * @return array
      */
@@ -257,6 +260,15 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         if (!empty($extra_params['visibility'])) {
             $params = array_merge($params, $this->getArrayParameters($extra_params['visibility'], 'vis'));
             $filters[] = 'sb.mark_visibility IN ' . $this->getArrayPlaceholders($extra_params['visibility'], 'vis');
+        }
+        // From/to dates
+        if ($extra_params['from'] instanceof Alaress_Date_Format && !$extra_params['from']->isNull()) {
+            $params['from'] = $extra_params['from']->getDatabaseDate();
+            $filters[]      = 'DATE(sb.date) >= :from';
+        }
+        if ($extra_params['to'] instanceof Alaress_Date_Format && !$extra_params['to']->isNull()) {
+            $params['to'] = $extra_params['to']->getDatabaseDate();
+            $filters[]    = 'DATE(sb.date) <= :to';
         }
         $filters = implode(' AND ', $filters);
 
