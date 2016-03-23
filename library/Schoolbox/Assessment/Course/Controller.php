@@ -978,18 +978,14 @@ class Controller extends BaseController
             $allCourses = $allFolders->getOffset($folderId);
         }
 
-        /* A list of Units which have had their Course Outlines removed
-         */
-        $allRestorableCourses = $this->getUnitInstanceMapper()->findRestorableCourses($folderId);
-
-        /* Find all the Units in this Folder
+        /* Find all the Units in this Folder; also includes
+         * Units which have had their Course Outlines removed
          */
         $allCourseComponentIds = $this->getUnitInstanceMapper()->findComponentsForCourses($folderId);
 
         $this->tpl('management', [
             'folder' => $folder,
             'allCourses' => $allCourses,
-            'allRestorableCourses' => $allRestorableCourses,
             'allCourseComponentIds' => $allCourseComponentIds,
         ]);
     }

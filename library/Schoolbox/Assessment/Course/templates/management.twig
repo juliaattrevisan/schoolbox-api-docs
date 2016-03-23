@@ -55,7 +55,8 @@
         <section>
             <ul class="action-list" id="courseList">
                 {% for currentCourse in allCourses %}
-                {% set courseComponentId = allCourseComponentIds[currentCourse.getId()].getId() %}
+                {% set courseComponentId = allCourseComponentIds[currentCourse.getId()].componentId %}
+
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="small-12 info card">
@@ -66,10 +67,9 @@
                         </div>
                     </div>
                     <nav>
-                        {# TODO #}
                         <a href="/course/import/modify/{{ folder.getId() }}/{{ courseComponentId }}" class="icon-modify" title="Modify Course"></a>
 
-                        {% if currentCourse.getId() in allRestorableCourses|keys %}
+                        {% if allCourseComponentIds[currentCourse.getId()].restorable %}
                         <a href="/course/import/restore/{{ folder.getId() }}/{{ courseComponentId }}" class="icon-upload" title="Restore Course"></a>
                         {% endif %}
 
