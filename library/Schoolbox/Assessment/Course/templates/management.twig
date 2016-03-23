@@ -67,7 +67,7 @@
                     <nav>
                         <a href="" class="icon-modify" title="Modify Course"></a>
 
-                        {% if currentCourse.getId() in allRestorableCourses %}
+                        {% if currentCourse.getId() in allRestorableCourses|keys %}
                         <a href="" class="icon-upload" title="Restore Course"></a>
                         {% endif %}
 

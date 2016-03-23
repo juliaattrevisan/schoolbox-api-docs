@@ -985,8 +985,17 @@ class Controller extends BaseController
         $this->tpl('management', [
             'folder' => $folder,
             'allCourses' => $allCourses,
-            'allRestorableCourses' => array_keys($allRestorableCourses),
+            'allRestorableCourses' => $allRestorableCourses,
         ]);
+    }
+
+    public function restoreCourse($folderId, $courseId)
+    {
+//        $allUnits = $this->getUnitInstanceMapper()->findForCourse($courseId);
+//
+//        foreach ($allUnits as $currentUnit) {
+//            new \Alaress_Probe($currentUnit);
+//        }
     }
 
     /**

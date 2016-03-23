@@ -286,8 +286,11 @@ class UnitInstanceMapper extends BaseMapper {
      * Find a list of originating Course Folders whose Units
      * had their Course Outlines deleted from $folderId
      *
+     * Returns you an associative array between a folderId and
+     * the componentId which used it
+     *
      * @param $folderId
-     * @return mixed
+     * @return array An array of folderId => componentId pairs
      * @throws BaseMapper\Exception
      */
     public function findRestorableCourses($folderId)
@@ -298,11 +301,33 @@ class UnitInstanceMapper extends BaseMapper {
         foreach ($allRestorableUnits as $currentRestorableUnit) {
             $course = $this->findCourseForUnit($currentRestorableUnit);
 
-            $allCourses[$course->getId()] = $course;
+            /* component_id is the closest concept to a course_id
+             */
+            $allCourses[$course->getId()] = $currentRestorableUnit->getComponent();
         }
 
         return $allCourses;
     }
+
+//    public function findForCourse($folderId)
+//    {
+//        $query = "
+//            SELECT {$this->getColumnString('u')}
+//            FROM category f
+//            LEFT JOIN {$this->getTable()} u ON f.id = u.unit_category_id
+//            WHERE f.deleted_at IS NULL
+//            AND f.parent = :folderId
+//            AND u.category_id =
+//        ";
+//
+//        $statement = $this->database->prepare($query);
+//
+//        $statement->execute([
+//            'folderId' => $folderId
+//        ]);
+//
+//        return $this->hydrateList($statement, 'u');
+//    }
 
     /**
      * Retrieves unit instances for the given component.
