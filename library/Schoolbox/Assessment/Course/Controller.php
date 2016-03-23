@@ -631,162 +631,103 @@ class Controller extends BaseController
             else if ($errorDate) {
                 // Make sure dates were specified
                 $this->throwError('You must specify an open and close date for each unit you are importing');
-                return;
             }
             else {
 
                 /** @var Category[] $unitCache */
                 $unitCache = [];
-                /** @var Category[] $homepageCache */
-                $homepageCache = [];
-                /** @var Component_Instance[] $componentCache */
-                $componentCache = [];
 
-                foreach ($homepages as $homepageId) {
-                    // Get the homepage we are importing into and store it for later
-
-                    $homepageCache[$homepageId] = $this->getCourseMapper()->findById($homepageId);
-
-                    $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn('class',
-                        'Component_Homepage_CourseOutlineController');
-                    $componentDefinitionId = $componentDefinition->first()->getId();
-
-                    $componentCache[$homepageId] = new \Component_Instance();
-                    $componentCache[$homepageId]
-                        ->setDefinitionId($componentDefinitionId)
-                        ->setModule('homepage')
-                        ->setIdentifier($homepageId)
-                        ->setPosition('top')
-                        ->setSequence(1);
-
-                    $this->getComponentInstanceMapper()->save($componentCache[$homepageId]);
+                /* Make a local cache for unit information
+                 */
+                foreach ($this->getRequest()->post["unit"] as $unit) {
+                    if (!empty($unit['import']) && !isset($unitCache[$unit['unit_id']])) {
+                        $unitCache[$unit['unit_id']] = $this->getCourseMapper()->findById($unit['unit_id']);
+                    }
                 }
 
-                try {
-                    // Create new unit instances on each homepage
+                // Find all tasks, due work, and quizzes associated with the selected units.
 
-                    foreach ($homepages as $homepageId) {
-                        $unit_instance_list = new Collection();
+                $units = new Collection();
 
-                        foreach ($this->getRequest()->post["unit"] as $unit) {
-                            $import = !empty($unit['import']);
-
-                            if ($import) {
-                                // Save the unit into the course.
-
-                                if (!isset($unitCache[$unit['unit_id']])) {
-                                    $unitCache[$unit['unit_id']] = $this->getCourseMapper()->findById($unit['unit_id']);
-                                }
-
-                                $unit_instance = new UnitInstance();
-
-                                $unit_instance
-                                    ->setComponent($componentCache[$homepageId])
-                                    ->setTitle($unitCache[$unit['unit_id']]->getName())
-                                    ->setCategory($homepageCache[$homepageId])
-                                    ->setUnitCategory($unitCache[$unit['unit_id']])
-                                    ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
-                                    ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
-
-                                $unit_instance_list->add($unit_instance);
-                            }
-                        }
-
-                        $this->getUnitInstanceMapper()->save($unit_instance_list);
-                    }
-
-                    // Return the next fragment...
-
-                    // Find all tasks, due work, and quizzes associated with the selected units.
-
-                    $units = new Collection();
-
-                    foreach ($unitCache as $key => $unitCurrent)
-                    {
-                        $unit = [];
-
-                        $unit['id'] = $unitCurrent->getId();
-                        $unit['name'] = $unitCache[$unitCurrent->getId()]->getName();
-                        $unit['items'] = new Collection();
-
-                        $temp = new Collection();
-
-                        foreach ($this->getRequest()->post["unit"] as $unitDate) {
-                            if ($unitDate["unit_id"] == $unitCurrent->getId()) {
-                                $unit['open_date'] = $unitDate['open_date'];
-                                $unit['due_date'] = $unitDate['due_date'];
-                            }
-                        }
-
-                        // Tasks
-
-                        if (!isset($taskCache[$unitCurrent->getId()])) {
-                            $taskCache[$unitCurrent->getId()] = $this->taskMapper
-                                ->findByColumnList([
-                                    'category_id' => $unitCache[$unitCurrent->getId()]->getId(),
-                                    'assess_id' => null
-                                ])
-                                ->sortBy('title', 'asc') ;
-                        }
-
-                        $temp->merge($taskCache[$unitCurrent->getId()]);
-
-                        // Due work
-
-                        if (!isset($submissionCache[$unitCurrent->getId()])) {
-                            $submissionCache[$unitCurrent->getId()] = $this->submissionBoxMapper
-                                ->findByColumn('category', $unitCurrent->getId());
-                        }
-
-                        $temp->merge($submissionCache[$unitCurrent->getId()]);
-
-                        // Quizzes
-
-                        if (!isset($quizCache[$unitCurrent->getId()])) {
-                            $quizCache[$unitCurrent->getId()] = $this->onlineAssessmentMapper
-                                ->findByColumn('category_id', $unitCurrent->getId());
-                        }
-
-                        $temp->merge($quizCache[$unitCurrent->getId()]);
-
-                        /* Unify all three of Tasks, Due Work and Quizzes
-                         * into one mega list
-                         *
-                         * Sort by Created At for now, until manual sequencing
-                         * is added to the ui so teachers can sort it themselves
-                         */
-                        $temp->sortBy('created', 'asc');
-
-                        foreach($temp as $current) {
-                            $reflection = new \ReflectionClass($current);
-                            $class = $reflection->getShortName();
-
-                            $unit['items']->add([
-                                'class' => $class,
-                                'item' => $current
-                            ]);
-                        }
-
-                        $units->add($unit);
-                    }
-
-                    $this->getResponse()->content->set
-                    ([
-                        'template' => "@course/unitImportResults.twig",
-                        'format' => 'nochrome',
-                        'data' => [
-                            'homepage' => $this->getRequest()->post["homepage"],
-                            'courseHomepage' => $this->getRequest()->post["course_homepage"],
-                            'unitDates' => $this->getRequest()->post["unit"],
-                            'units' => $units
-                        ]
-                    ]);
-                }
-                catch (\InvalidArgumentException $e)
+                foreach ($unitCache as $key => $unitCurrent)
                 {
-                    // bad dates, most likely
-                    $this->throwError("Invalid date given");
+                    $unit = [];
+                    $unit['id'] = $unitCurrent->getId();
+                    $unit['name'] = $unitCache[$unitCurrent->getId()]->getName();
+                    $unit['items'] = new Collection();
+
+                    $temp = new Collection();
+
+                    foreach ($this->getRequest()->post["unit"] as $unitDate) {
+                        if ($unitDate["unit_id"] == $unitCurrent->getId()) {
+                            $unit['open_date'] = $unitDate['open_date'];
+                            $unit['due_date'] = $unitDate['due_date'];
+                        }
+                    }
+
+                    // Tasks
+
+                    if (!isset($taskCache[$unitCurrent->getId()])) {
+                        $taskCache[$unitCurrent->getId()] = $this->taskMapper
+                            ->findByColumnList([
+                                'category_id' => $unitCache[$unitCurrent->getId()]->getId(),
+                                'assess_id' => null
+                            ])
+                            ->sortBy('title', 'asc') ;
+                    }
+
+                    $temp->merge($taskCache[$unitCurrent->getId()]);
+
+                    // Due work
+
+                    if (!isset($submissionCache[$unitCurrent->getId()])) {
+                        $submissionCache[$unitCurrent->getId()] = $this->submissionBoxMapper
+                            ->findByColumn('category', $unitCurrent->getId());
+                    }
+
+                    $temp->merge($submissionCache[$unitCurrent->getId()]);
+
+                    // Quizzes
+
+                    if (!isset($quizCache[$unitCurrent->getId()])) {
+                        $quizCache[$unitCurrent->getId()] = $this->onlineAssessmentMapper
+                            ->findByColumn('category_id', $unitCurrent->getId());
+                    }
+
+                    $temp->merge($quizCache[$unitCurrent->getId()]);
+
+                    /* Unify all three of Tasks, Due Work and Quizzes
+                     * into one mega list
+                     *
+                     * Sort by Created At for now, until manual sequencing
+                     * is added to the ui so teachers can sort it themselves
+                     */
+                    $temp->sortBy('created', 'asc');
+
+                    foreach($temp as $current) {
+                        $reflection = new \ReflectionClass($current);
+                        $class = $reflection->getShortName();
+
+                        $unit['items']->add([
+                            'class' => $class,
+                            'item' => $current
+                        ]);
+                    }
+
+                    $units->add($unit);
                 }
+
+                $this->getResponse()->content->set
+                ([
+                    'template' => "@course/unitImportResults.twig",
+                    'format' => 'nochrome',
+                    'data' => [
+                        'homepage' => $this->getRequest()->post["homepage"],
+                        'courseHomepage' => $this->getRequest()->post["course_homepage"],
+                        'unitDates' => $this->getRequest()->post["unit"],
+                        'units' => $units
+                    ]
+                ]);
             }
         }
     }
@@ -858,83 +799,163 @@ class Controller extends BaseController
 
         // Keep a cache of queried data
 
+        /** @var Category[] $unitCache */
         $unitCache = [];
+
+        /** @var Category[] $homepageCache */
         $homepageCache = [];
+
+        /** @var Component_Instance[] $componentCache */
         $componentCache = [];
 
         // Create course outline component on each homepage
 
-        foreach ($homepages as $homepage)
-        {
-            // Get the homepage we are importing into and store it for later
+        try {
 
-            $homepageCache[$homepage] = $this->getFolderMapper()->findById($homepage);
+            foreach ($homepages as $homepage) {
+                // Get the homepage we are importing into and store it for later
 
-            // Create course outline component on the current page
+                $homepageCache[$homepage] = $this->getFolderMapper()->findById($homepage);
 
-            $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn(
-                'class',
-                'Component_Homepage_CourseOutlineController'
-            );
+                // Create course outline component on the current page
 
-            $componentDefinitionId = $componentDefinition->first()->getId();
+                $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn(
+                    'class',
+                    'Component_Homepage_CourseOutlineController'
+                );
 
-            $componentCache[$homepage] = new \Component_Instance();
-            $componentCache[$homepage]
-                ->setDefinitionId($componentDefinitionId)
-                ->setModule('homepage')
-                ->setIdentifier($homepage)
-                ->setPosition('top')
-                ->setSequence(1);
+                $componentDefinitionId = $componentDefinition->first()->getId();
 
-            $this->getComponentInstanceMapper()->save($componentCache[$homepage]);
-        }
+                $componentCache[$homepage] = new \Component_Instance();
+                $componentCache[$homepage]
+                    ->setDefinitionId($componentDefinitionId)
+                    ->setModule('homepage')
+                    ->setIdentifier($homepage)
+                    ->setPosition('top')
+                    ->setSequence(1);
 
-        // Create new unit instances in each of these pages/components
-
-        foreach ($homepages as $homepage)
-        {
-            $unit_instance_list = new Collection();
-
-            foreach ($this->getRequest()->post["unit"] as $unit)
-            {
-                $import = !empty($unit['import']);
-
-                if ($import)
-                {
-                    // Save the unit into the course.
-
-                    try {
-                        if (!isset($unitCache[$unit['unit_id']])) {
-                            $unitCache[$unit['unit_id']] = $this->getFolderMapper()->findById($unit['unit_id']);
-                        }
-                    } catch (\Exception $e) {
-                        $this->throwError('An unexpected error occurred');
-                        return;
-                    }
-
-                    if (isset($unitCache[$unit['unit_id']])) {
-                        $unit_instance = new UnitInstance();
-
-                        $unit_instance
-                            ->setWorkDates($this->getRequest()->post["work"])// Override due work dates in cloner
-                            ->setQuizDates($this->getRequest()->post["quiz"])// Override quiz dates in cloner
-                            ->setComponent($componentCache[$homepage])
-                            ->setTitle($unitCache[$unit['unit_id']]->getName())
-                            ->setCategory($homepageCache[$homepage])
-                            ->setUnitCategory($unitCache[$unit['unit_id']])
-                            ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
-                            ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
-
-                        $unit_instance_list->add($unit_instance);
-                    }
-                }
+                $this->getComponentInstanceMapper()->save($componentCache[$homepage]);
             }
 
-            $this->getUnitInstanceMapper()->save($unit_instance_list);
+            // Create new unit instances in each of these pages/components
+
+            foreach ($homepages as $homepage) {
+                $unit_instance_list = new Collection();
+
+                foreach ($this->getRequest()->post["unit"] as $unit) {
+                    $import = !empty($unit['import']);
+
+                    if ($import) {
+                        // Save the unit into the course.
+
+                        try {
+                            if (!isset($unitCache[$unit['unit_id']])) {
+                                $unitCache[$unit['unit_id']] = $this->getFolderMapper()->findById($unit['unit_id']);
+                            }
+                        } catch (\Exception $e) {
+                            $this->throwError('An unexpected error occurred');
+                            return;
+                        }
+
+                        if (isset($unitCache[$unit['unit_id']])) {
+                            $unit_instance = new UnitInstance();
+
+                            $unit_instance
+                                ->setWorkDates($this->getRequest()->post["work"])// Override due work dates in cloner
+                                ->setQuizDates($this->getRequest()->post["quiz"])// Override quiz dates in cloner
+                                ->setComponent($componentCache[$homepage])
+                                ->setTitle($unitCache[$unit['unit_id']]->getName())
+                                ->setCategory($homepageCache[$homepage])
+                                ->setUnitCategory($unitCache[$unit['unit_id']])
+                                ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
+                                ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
+
+                            $unit_instance_list->add($unit_instance);
+                        }
+                    }
+                }
+
+                $this->getUnitInstanceMapper()->save($unit_instance_list);
+            }
+
+            // Find all tasks, due work, and quizzes associated with the selected units.
+
+            $units = new Collection();
+
+            foreach ($unitCache as $key => $unitCurrent)
+            {
+                $unit = [];
+
+                $unit['id'] = $unitCurrent->getId();
+                $unit['name'] = $unitCache[$unitCurrent->getId()]->getName();
+                $unit['items'] = new Collection();
+
+                $temp = new Collection();
+
+                foreach ($this->getRequest()->post["unit"] as $unitDate) {
+                    if ($unitDate["unit_id"] == $unitCurrent->getId()) {
+                        $unit['open_date'] = $unitDate['open_date'];
+                        $unit['due_date'] = $unitDate['due_date'];
+                    }
+                }
+
+                // Tasks
+
+                if (!isset($taskCache[$unitCurrent->getId()])) {
+                    $taskCache[$unitCurrent->getId()] = $this->taskMapper
+                        ->findByColumnList([
+                            'category_id' => $unitCache[$unitCurrent->getId()]->getId(),
+                            'assess_id' => null
+                        ])
+                        ->sortBy('title', 'asc') ;
+                }
+
+                $temp->merge($taskCache[$unitCurrent->getId()]);
+
+                // Due work
+
+                if (!isset($submissionCache[$unitCurrent->getId()])) {
+                    $submissionCache[$unitCurrent->getId()] = $this->getSubmissionBoxMapper()->findByColumn('category', $unitCurrent->getId());
+                }
+
+                $temp->merge($submissionCache[$unitCurrent->getId()]);
+
+                // Quizzes
+
+                if (!isset($quizCache[$unitCurrent->getId()])) {
+                    $quizCache[$unitCurrent->getId()] = $this->getOnlineAssessmentMapper()->findByColumn('category_id', $unitCurrent->getId());
+                }
+
+                $temp->merge($quizCache[$unitCurrent->getId()]);
+
+                /* Unify all three of Tasks, Due Work and Quizzes
+                 * into one mega list
+                 *
+                 * Sort by Created At for now, until manual sequencing
+                 * is added to the ui so teachers can sort it themselves
+                 */
+                $temp->sortBy('created', 'asc');
+
+                foreach($temp as $current) {
+                    $reflection = new \ReflectionClass($current);
+                    $class = $reflection->getShortName();
+
+                    $unit['items']->add([
+                        'class' => $class,
+                        'item' => $current
+                    ]);
+                }
+
+                $units->add($unit);
+            }
+
+        }
+        catch (\InvalidArgumentException $e)
+        {
+            // bad dates, most likely
+            $this->throwError("Invalid date given");
         }
     }
-
 
     /**
      * Save the given template for the given folder
@@ -1157,6 +1178,26 @@ class Controller extends BaseController
     }
 
     /**
+     * Get submission box mapper
+     *
+     * @return SubmissionBoxMapper
+     */
+    private function getSubmissionBoxMapper()
+    {
+        return $this->submissionBoxMapper;
+    }
+
+    /**
+     * Get online assessment mapper
+     *
+     * @return OnlineAssessmentMapper
+     */
+    private function getOnlineAssessmentMapper()
+    {
+        return $this->onlineAssessmentMapper;
+    }
+
+    /**
      * Set online assessment mapper
      *
      * @param null $onlineAssessmentMapper
@@ -1165,6 +1206,7 @@ class Controller extends BaseController
     {
         $this->onlineAssessmentMapper = $onlineAssessmentMapper;
     }
+
     /**
      * @return HomepageConfigMapper
      */
