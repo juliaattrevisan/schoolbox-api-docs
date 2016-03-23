@@ -210,16 +210,9 @@ $this->setVar(
     )
 );
 
-// Unit dropdown, with semester optgroups
-$current_year     = $current_unit->getOpenDate()->getYear();
-$current_semester = $current_unit->getOpenDate()->getYearHalf();
-$years            = [];
-foreach ($unit_list as $unit) {
-    $year = $unit->getOpenDate()->getYear();
-    $years[$year] = $year;
-}
-
-$trail = new \Schoolbox\Breadcrumbs();
+// Unit dropdown, with term optgroups
+$currentTerm = $termMapper->findMostRecent($current_unit->getOpenDate());
+$trail       = new \Schoolbox\Breadcrumbs();
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text' => 'Submissions',
@@ -228,7 +221,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text' => Scrub::text($category->getName().' '.( strlen($code) > 0 ? ('('.$code.')') : '' )) ,
-        'href' => "/submission/listSubmission/$current_year/$current_semester/".$category->getId(),
+        'href' => "/submission/listSubmission/{$currentTerm->getCode()}/".$category->getId(),
         'class' => '',
     ],
     [
@@ -240,16 +233,15 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
 
 // The doctor's context selector
 $contextSelector = new \Schoolbox\Assessment\StudentReportCard\ContextSelector('task/progressReport/'.$class_id);
-$contextSelector->setYears($years);
 $contextSelector->setUnits($unit_list);
+$contextSelector->setTerms($termMapper->findAll());
 $contextSelector->render(
     $this,
     'CONTEXT_SELECTOR',
     array(
-        'year'     => $current_year,
-        'semester' => $current_semester,
         'subject'  => $class_id,
         'unit'     => $unit_id,
+        'term'     => $currentTerm,
     )
 );
 
