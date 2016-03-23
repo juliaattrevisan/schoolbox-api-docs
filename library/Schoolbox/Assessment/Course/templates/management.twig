@@ -65,10 +65,11 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="" class="icon-modify" title="Modify Course"></a>
+                        {# TODO #}
+                        <a href="/course/import/modify/{{ folder.getId() }}/componentId" class="icon-modify" title="Modify Course"></a>
 
                         {% if currentCourse.getId() in allRestorableCourses|keys %}
-                        <a href="/course/restore/{{ allRestorableCourses[currentCourse.getId()].getCategory().getId() }}/{{ allRestorableCourses[currentCourse.getId()].getComponent().getId() }}" class="icon-upload" title="Restore Course"></a>
+                        <a href="/course/restore/{{ folder.getId() }}/{{ allRestorableCourses[currentCourse.getId()].getId() }}" class="icon-upload" title="Restore Course"></a>
                         {% endif %}
 
                         <a href="" class="icon-delete" title="Delete Course" data-delete="{{ currentCourse.getId() }}"></a>
