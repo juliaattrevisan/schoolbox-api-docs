@@ -943,12 +943,12 @@ class SitePage extends Page
         if ($_SESSION['user']->getHideNotificationsTray()) {
 
             $this->setVar([
-                'HIDE_NOTIFICATIONS_TRAY' => 'docking'
+                'HIDE_NOTIFICATIONS_TRAY' => ''
             ]);
         }
         else {
             $this->setVar([
-                'HIDE_NOTIFICATIONS_TRAY' => ''
+                'HIDE_NOTIFICATIONS_TRAY' => 'docking'
             ]);
         }
 

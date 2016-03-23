@@ -51,16 +51,6 @@ $notification-header-background: $navigation-background !default;
             label {
                 background: $notification-header-background;
                 color: contrast-bg(0.4, $notification-header-background);
-                @media #{$large-up} {
-                    &:after {
-                        content: "\00AB";
-                        @include scale-font-size($h2-font-scale);
-                        padding-left: 0.5rem;
-                    }
-                    &.raquo:after {
-                        content: "\00BB";
-                    }
-                }
             }
 
             /* Hide gap from ".island section" definition
@@ -86,6 +76,16 @@ $notification-header-background: $navigation-background !default;
             background: $notification-unread-background;
             color: $notification-unread-color;
             z-index: 1003;
+            @media #{$large-up} {
+                &:after {
+                    content: "\00AB";
+                    @include scale-font-size($h2-font-scale);
+                    padding-left: 0.5rem;
+                }
+                &.raquo:after {
+                    content: "\00BB";
+                }
+            }
         }
     }
 

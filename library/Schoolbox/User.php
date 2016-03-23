@@ -1065,7 +1065,7 @@ class User implements JsonSerializable
      */
     public function hideNotificationsTray()
     {
-        $this->setHideNotificationsTray(false);
+        $this->setHideNotificationsTray(true);
     }
 
     /**
@@ -1073,7 +1073,7 @@ class User implements JsonSerializable
      */
     public function showNotificationsTray()
     {
-        $this->setHideNotificationsTray(true);
+        $this->setHideNotificationsTray(false);
     }
 
     /* Getters/Setters
