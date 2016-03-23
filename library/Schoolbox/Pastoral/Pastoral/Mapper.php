@@ -256,6 +256,52 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Find pastoral record by parent ID number
+     *
+     * @var int $parentId
+     *
+     * @return Collection|Model
+     * @throws BaseMapper\Exception
+     */
+
+    public function findByParentId($parentId)
+    {
+        $query = "
+            SELECT
+                {$this->getColumnString('r')},
+                {$this->getJoinColumnString('student', 's')},
+                {$this->getJoinColumnString('severity', 'sv')},
+				{$this->getJoinColumnString('owner', 'o')},
+				{$this->getJoinColumnString('type', 't')}
+            FROM {$this->getTable()} `r`
+            LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
+            LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
+            LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
+            LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
+            WHERE r.parent_id = ?
+            AND r.deleted_at IS NULL
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array($parentId));
+
+        $collection = new Collection;
+
+        foreach ($statement as $row)
+        {
+            /** @var Pastoral\Model $record */
+            $record = $this->hydrate($row, 'r');
+
+            // Check permissions
+
+            if ($this->hasPermission($record))
+                $collection->add($this->hydrateRecord($record, $row));
+        }
+
+        return $collection;
+    }
+
+    /**
      * Gets DB records matching report criteria
      *
      * @param $before_date

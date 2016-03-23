@@ -489,12 +489,21 @@ class Controller extends Base
 
         // Get the pastoral care record
 
-        try {
-            $pastoral = $this->getPastoralMapper()->findById($id);
-        } catch (\Exception $e) {
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-            return;
+        $pastoral = $this->getPastoralMapper()->findById($id);
+
+        // Load in related records
+
+        $collection = new Collection();
+
+        if (!empty($pastoral->getParent()->getId())) {
+            $collection->merge($this->getPastoralMapper()->findByParentId($pastoral->getParent()->getId()));
+            $collection->add($this->getPastoralMapper()->findById($pastoral->getParent()->getId()));
+        } else {
+            $collection->merge($this->getPastoralMapper()->findByParentId($pastoral->getId()));
+            $collection->add($pastoral);
         }
+
+        $pastoral->setRelatedRecords($collection);
 
         // Lets render this thing
 

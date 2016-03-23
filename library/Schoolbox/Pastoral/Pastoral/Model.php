@@ -59,6 +59,9 @@ class Model implements ISoftDeletable
     /** @var Collection|Pastoral\Tags\Model[] */
     protected $tagsList;
 
+    /** @var Collection|Model[] */
+    protected $relatedRecords;
+
     /** @var \Alaress_Date_Format */
     protected $createdAt;
 
@@ -358,5 +361,19 @@ class Model implements ISoftDeletable
      */
     public function isDeleted() {
         return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
+    }
+
+    /**
+     * @param Collection|Model
+     */
+    public function setRelatedRecords($relatedRecords) {
+        $this->relatedRecords = $relatedRecords;
+    }
+
+    /**
+     * @return Collection|Model
+     */
+    public function getRelatedRecords() {
+        return $this->relatedRecords;
     }
 }

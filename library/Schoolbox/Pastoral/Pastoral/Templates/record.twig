@@ -144,8 +144,44 @@
             </div>
         </section>
 
-        {# Parents cannot ever add/view comments #}
+        {# Parents cannot ever add/view comments or related records #}
         {% if role != 'parent' %}
+
+            {# Show related records #}
+            {% if record.getRelatedRecords | length > 0 %}
+
+                <h2 class="subheader">Related Records</h2>
+                <section>
+                    <ul class="action-list">
+
+                        {% for related in record.getRelatedRecords %}
+
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 avatar card wrap-down">
+                                        {# Show student photo #}
+                                        <a href="/pastoral/{{ related.getStudent.getId }}/{{ related.getId }}" title="View Record">
+                                            <img src="/portrait.php?userId={{ related.student.getExternalId() }}&size=square64" alt="" />
+                                        </a>
+                                        {# Show styudent author #}
+                                        <p class="meta">
+                                            <a title="View Record" href="/pastoral/{{ related.getStudent.getId }}/{{ related.getId }}">
+                                                {{ related.getStudent.getFirstName }} {{ related.getStudent.getLastName }}
+                                            </a>
+                                        </p>
+                                        <p class="spaced">
+                                            {{ related.getHeading }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+
+                        {% endfor %}
+
+                    </ul>
+                </section>
+
+            {% endif %}
 
             <h2 class="subheader">Comments</h2>
             {% if record.getCommentList.count > 0 %}
@@ -197,24 +233,6 @@
                 </section>
                 <input disabled data-post type="submit" class="expand" value="Post Comment">
             </form>
-
-        {% endif %}
-
-        {# Show attached files #}
-        {% if attachments.count() > 0 %}
-
-            <h2>Attached Files</h2>
-
-            <section>
-                <ul class="action-list">
-                    {% for attachment in attachments %}
-                        <li class="small avatar card small-12">
-                            <img class="mime" src="/images/mime/60x60/{{ attachment.getIcon() }}">
-                            <a href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{ attachment.getFilename() }}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
 
         {% endif %}
     </div>
