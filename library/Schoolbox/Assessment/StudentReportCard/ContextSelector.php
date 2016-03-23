@@ -279,10 +279,10 @@ class ContextSelector {
 			);
 			if ($term->getId() == $selection->getId()) {
 				$option['SEMESTER_SELECTED'] = 'selected="selected"';
-//				$output['nav'] = $this->calculateSemesterNavigation(count($iterate), $selection, $years);
 			}
 			$output['options'][] = $option;
 		}
+		$output['nav'] = $this->calculateSemesterNavigation($selection);
 
 		// iterate by year, then by semester
 //		foreach ($years as $year) {
@@ -361,64 +361,89 @@ class ContextSelector {
 	/**
 	 * Figure out the BACK and FORWARD nav elements for the given parameters
 	 *
-	 * @param int   $size      The number of semesters
-	 * @param array $selection The selected year and semester
-	 * @param array $years     The available years - used to calculate if a
-	 *                         back or forward nav should be disabled.
+	 * @param  Term\Model $selection The selected term
 	 * @return array
 	 */
-	protected function calculateSemesterNavigation($size, $selection, $years) {
-		list($year, $semester) = $selection;
+	protected function calculateSemesterNavigation(Term\Model $selection) {
+		$result = [
+			'SEMESTER_BACK'          => '',
+			'SEMESTER_FWD'           => '',
+			'SEMESTER_BACK_DISABLED' => 'disabled',
+			'SEMESTER_FWD_DISABLED'  => 'disabled',
+		];
 
-		$nextYear = $year + 1;
-		$lastYear = $year - 1;
-		$backDisabled = false;
-		$fwdDisabled  = false;
-		if(is_numeric($semester)) {
-			$nextSemester = $semester + 1;
-			$lastSemester = $semester - 1;
+		// I'd like an iterator which returns current, previous and next as a triple
+		/** @var Term\Model[] $terms */
+		$terms = array_values($this->terms->getAll());
 
-			// wrapping backwards
-			if ($lastSemester <= 0) {
-				$back = "$lastYear/" . $size;
-				if ($lastYear < min($years)) {
-					$backDisabled = true;
+		foreach ($terms as $i => $term) {
+			$prevTerm = $terms[$i-1];
+			$nextTerm = $terms[$i+1];
+			if ($term->getId() == $selection->getId()) {
+				if (isset($prevTerm)) {
+					$result['SEMESTER_FWD']          = $prevTerm->getCode();
+					$result['SEMESTER_FWD_DISABLED'] = '';
 				}
-			}
-			else {
-				$back = "$year/$lastSemester";
-			}
-
-			// wrapping forwards
-			if($nextSemester > $size){
-				$fwd = "$nextYear/1";
-				if ($nextYear > max($years)) {
-					$fwdDisabled = true;
+				if (isset($nextTerm)) {
+					$result['SEMESTER_BACK']          = $nextTerm->getCode();
+					$result['SEMESTER_BACK_DISABLED'] = '';
 				}
-			}
-			else {
-				$fwd = "$year/$nextSemester";
-			}
-
-		}
-		// if there's no semester, just in/de-crement the year
-		else {
-			$back = $lastYear;
-			$fwd = $nextYear;
-			if ($year < min($years)) {
-				$backDisabled = true;
-			}
-			if ($year > max($years)) {
-				$fwdDisabled = true;
+				return $result;
 			}
 		}
+		return [];
 
-		return array(
-			'SEMESTER_BACK' => $back,
-			'SEMESTER_FWD'  => $fwd,
-			'SEMESTER_BACK_DISABLED' => ($backDisabled ? 'disabled' : ''),
-			'SEMESTER_FWD_DISABLED'  => ($fwdDisabled  ? 'disabled' : ''),
-		);
+//		list($year, $semester) = $selection;
+//
+//		$nextYear = $year + 1;
+//		$lastYear = $year - 1;
+//		$backDisabled = false;
+//		$fwdDisabled  = false;
+//		if(is_numeric($semester)) {
+//			$nextSemester = $semester + 1;
+//			$lastSemester = $semester - 1;
+//
+//			// wrapping backwards
+//			if ($lastSemester <= 0) {
+//				$back = "$lastYear/" . $size;
+//				if ($lastYear < min($years)) {
+//					$backDisabled = true;
+//				}
+//			}
+//			else {
+//				$back = "$year/$lastSemester";
+//			}
+//
+//			// wrapping forwards
+//			if($nextSemester > $size){
+//				$fwd = "$nextYear/1";
+//				if ($nextYear > max($years)) {
+//					$fwdDisabled = true;
+//				}
+//			}
+//			else {
+//				$fwd = "$year/$nextSemester";
+//			}
+//
+//		}
+//		// if there's no semester, just in/de-crement the year
+//		else {
+//			$back = $lastYear;
+//			$fwd = $nextYear;
+//			if ($year < min($years)) {
+//				$backDisabled = true;
+//			}
+//			if ($year > max($years)) {
+//				$fwdDisabled = true;
+//			}
+//		}
+//
+//		return array(
+//			'SEMESTER_BACK' => $back,
+//			'SEMESTER_FWD'  => $fwd,
+//			'SEMESTER_BACK_DISABLED' => ($backDisabled ? 'disabled' : ''),
+//			'SEMESTER_FWD_DISABLED'  => ($fwdDisabled  ? 'disabled' : ''),
+//		);
 
 	}
 
