@@ -272,9 +272,18 @@ class ContextSelector {
 		}
 
 		foreach ($this->terms as $term) {
+			$termValue = sprintf(
+				'%s (%s—%s)',
+				$term->getTitle(),
+				$term->getStart()->getDateOnly(),
+				$term->getFinish()->getDateOnly()
+			);
+			if ($term->getArchived()) {
+				$termValue = '(archived) '.$termValue;
+			}
 			$option = array(
 				'SEMESTER_SLUG'     => $term->getCode(),
-				'SEMESTER_VALUE'    => $term->getTitle(),
+				'SEMESTER_VALUE'    => $termValue,
 				'SEMESTER_SELECTED' => ''
 			);
 			if ($term->getId() == $selection->getId()) {
