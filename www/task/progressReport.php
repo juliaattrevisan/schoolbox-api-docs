@@ -17,6 +17,8 @@ if (isset($_GET['category_id']) && isset($_GET['unit_id'])) {
     SitePage::localRedir(sprintf('/task/progressReport/%d/%d', $_GET['category_id'], $_GET['unit_id']));
 }
 
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
@@ -26,20 +28,26 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 // URL: task/progressReport/$classId/($unitId)
-// Alternate: task/progressReport/$classId/($year/$semester)
-// If no year and semester are supplied, then the current year/semester are used.
+// Alternate: task/progressReport/$classId/term/($termSlug)
+// If no term is supplied, the current one is used.
+// (Term is used only for redirection)
+$termMapper = TermMapper::getInstance();
+/** @var TermModel $currentTerm */
+$currentTerm = null;
 switch (count($this->arg)) {
     case 2:
         list($class_id, $unit_id) = $this->arg;
         break;
     case 3:
-        list($class_id, $year, $semester) = $this->arg;
+        list($class_id, $type, $termSlug) = $this->arg;
+        if ($type == 'term') {
+            // Load the term
+            $currentTerm = $termMapper->findByColumn('code', $termSlug);
+        }
         break;
     case 1:
     default:
         list($class_id) = $this->arg;
-        $year     = date('Y');
-        $semester = date('m') <= 6 ? 1 : 2;
         break;
 }
 
@@ -65,16 +73,22 @@ if (count($unit_list) === 0) {
 }
 if (!isset($unit_id)) {
     // Redirect to first task in the list
-    // (that is in the requested year/semester) if any.
+    // (that is in the requested term) if any.
     // If not, then just redir to the first one.
+    if (!$currentTerm instanceof TermModel) {
+        $currentTerm = $termMapper->findCurrent();
+    }
+    $nextTerm = $termMapper->findNext($currentTerm);
     $firstId = null;
     foreach ($unit_list as $unit) {
         if (!isset($firstId)) {
             $firstId = $unit->getId();
         }
-        $unitYear     = $unit->getOpenDate()->getYear();
-        $unitSemester = $unit->getOpenDate()->getYearHalf();
-        if ($year == $unitYear && $semester == $unitSemester) {
+        // Course must open in this term
+        if ($unit->getOpenDate()->between(
+            $currentTerm->getStart()->startOfDay(),
+            $nextTerm->getStart()->endOfDay()
+        )) {
             $unit_id = $unit->getId();
             break;
         }
