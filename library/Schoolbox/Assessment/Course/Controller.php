@@ -1026,6 +1026,8 @@ class Controller extends BaseController
 
             $this->getUnitInstanceMapper()->save($currentUnit);
         }
+
+        $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('course.management', ['folderId' => $folderId]));
     }
 
     /**
