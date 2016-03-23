@@ -1,3 +1,6 @@
+<link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
+<script type="text/javascript" src="/javascript/components/spectrum/spectrum.js"></script>
+
 <script type="text/javascript">
 
     $(function() {
@@ -13,15 +16,49 @@
 
             var newRow = $('[data-clone]').find('li').clone()
 
-            {# Ninja ID numbers into the new HTML #}
+            {#
+                Ninja ID numbers into the cloned HTML. We also have to rename the data-colour-picker class so that
+                when we wire it up the template row doesn't get wired up- otherwise this screws up any subsequent
+                adds. Bit hacky, but works.
+            #}
 
-            newRow[0].innerHTML = newRow[0].innerHTML.replace(/#ID#/g, newId--);
+            newRow[0].innerHTML = newRow[0].innerHTML
+                    .replace(/#ID#/g, newId--)
+                    .replace(/data-colour-picker-clone/g, 'data-colour-picker-new');
 
             $('[data-list]')
                 .append(newRow)
                 .find('[data-focus]')
                 .last()
                 .focus();
+
+            {# Wire up any colour pickers that were just added #}
+
+            $("[data-colour-picker-new]").spectrum({
+                allowEmpty: false,
+                showAlpha: true,
+                showInput: true,
+                preferredFormat: 'rgb',
+                clickoutFiresChange: true,
+                showInitial: true,
+                change: function(color) {
+                    $(this).val(color.toHexString());
+                }
+            });
+        });
+
+        {# Wire up colour pickers #}
+
+        $("[data-colour-picker]").spectrum({
+            allowEmpty: false,
+            showAlpha: true,
+            showInput: true,
+            preferredFormat: 'rgb',
+            clickoutFiresChange: true,
+            showInitial: true,
+            change: function(color) {
+                $(this).val(color.toHexString());
+            }
         });
 
         {# Wire up sortable lists #}
@@ -132,12 +169,19 @@
                                             {% elseif field.lookup is not empty %}
 
                                                 {# Lookup select box #}
+
                                                 <select name="value-{{ field_key }}[]">
                                                     {% for option in field.lookup %}
 
                                                         <option {% if record[field_key] == option.key %}selected {% endif %}value="{{ option.key }}">{{ option.value }}</option>
                                                     {% endfor %}
                                                 </select>
+
+                                            {% elseif field.colour is not empty %}
+
+                                                {# Color picker #}
+
+                                                <input name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" data-colour-picker />
 
                                             {% else %}
 
@@ -211,6 +255,12 @@
                                 <option value="{{ option.key }}">{{ option.value }}</option>
                             {% endfor %}
                         </select>
+
+                    {% elseif field.colour is not empty %}
+
+                        {# Color picker #}
+
+                        <input {% if not focusSet %}data-focus{% set focusSet = true %}{% endif %} name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" data-colour-picker-clone />
 
                     {% else %}
 

@@ -238,11 +238,12 @@ class Controller extends Base
                 'fields'            => [
                     'type'          => [
                         'caption'   => 'Event Type',
-                        'width'     => 8,
+                        'width'     => 10,
                     ],
                     'color'         => [
                         'caption'   => 'Event Colour',
-                        'width'     => 4,
+                        'colour'    => true,
+                        'width'     => 2,
                     ]
                 ]
             ],
@@ -330,7 +331,8 @@ class Controller extends Base
                         'hidden'    => true,
                     ],
                     'hex_colour'    => [
-                        'caption'   => 'Colour',
+                        'caption'   => 'Event Colours',
+                        'colour'    => true,
                         'width'     => 12
                     ],
                 ]
