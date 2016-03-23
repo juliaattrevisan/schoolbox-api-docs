@@ -959,10 +959,13 @@ class Controller extends BaseController
     /**
      * View a list of courses associated with a homepage
      *
+     * @api   GET /course/management/{homepageId}
      * @param $homepageId
      */
     public function management($homepageId)
     {
+        /* TODO: Exception falls directly on to carpet
+         */
         $folder = $this->getFolderMapper()->findById($homepageId);
 
         $this->tpl('management', [
