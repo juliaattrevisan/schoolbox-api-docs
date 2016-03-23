@@ -50,7 +50,18 @@ class StudentReportCard
      */
     protected $targetUser;
 
+    /**
+     * @deprecated Use term instead
+     *
+     * @var int
+     */
     protected $targetYear;
+
+    /**
+     * @deprecated Use term instead
+     *
+     * @var int
+     */
     protected $targetSemester;
 
 
@@ -71,14 +82,29 @@ class StudentReportCard
     protected $permissionSet = array();
     protected $minimumVisibility = 3;
 
-    // helpful vars
+    /**
+     * @deprecated Use term instead
+     *
+     * @var int
+     */
     protected $currentYear;
+
+    /**
+     * @deprecated Use term instead
+     *
+     * @var int
+     */
     protected $currentSemester;
+
+    /**
+     * @var Term\Model
+     */
+    protected $currentTerm;
 
     // populated data
     /**
      * A collection of Folder models
-     * 
+     *
      * @var \Schoolbox\Collection
      */
     protected $categoriesInSemester = array();
@@ -120,8 +146,9 @@ class StudentReportCard
         // build permissions set
         $this->establishPermissions();
         // setup helper vars
-        $this->currentYear     = date('Y');
-        $this->currentSemester = date('m') > 6 ? 2 : 1;
+//        $this->currentYear     = date('Y');
+//        $this->currentSemester = date('m') > 6 ? 2 : 1;
+        $this->currentTerm = new Term\Model();
     }
 
     /**
@@ -181,10 +208,22 @@ class StudentReportCard
     }
 
     /**
+     * @param  Term\Model $term
+     * @return $this
+     */
+    public function setTerm(Term\Model $term)
+    {
+        $this->currentTerm = $term;
+        return $this;
+    }
+
+    /**
      * Defining the semester will self-populate with the subjects available to this semester
      *
      * @param $year
      * @param $semester
+     *
+     * @deprecated Use setTerm() instead
      *
      * @throws \InvalidArgumentException
      */
