@@ -1026,17 +1026,17 @@ class Submission extends DeprecatedModel
     /**
      * This function is supposed to determine a list of categories the user WAS involved in based on due work submission
      *
-     * @param     $userID
-     * @param     $year
-     * @param     $semester
-     * @param     $includeSubjectList
-     * @param int $accessType
+     * @param int                 $userID
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      */
-    function submittedToCategoryList($userID, $year, $semester)
+    function submittedToCategoryList($userID, Alaress_Date_Format $from, Alaress_Date_Format $to)
     {
-        $semesterTest = DueWork_All::getSemesterLogic($semester);
+//        $semesterTest = DueWork_All::getSemesterLogic($semester);
 
-        $sql = "SELECT category.name, category.id, GROUP_CONCAT(cc.code) AS `code`
+        $fromDate = $this->db->smartQuote($from->getDatabaseDate());
+        $toDate   = $this->db->smartQuote($to->getDatabaseDate());
+        $sql      = "SELECT category.name, category.id, GROUP_CONCAT(cc.code) AS `code`
                 FROM category
                 LEFT JOIN categoryCode cc ON category.id = categoryID AND cc.deleted_at IS NULL
                 WHERE category.id IN (
@@ -1045,11 +1045,11 @@ class Submission extends DeprecatedModel
                     LEFT JOIN student_submission ss ON ss.`box_id` = sb.`id`
                     LEFT JOIN submission_return sr ON sb.id = sr.`box_id`
                     WHERE (ss.`owner` = $userID OR sr.`owner` = $userID)
-                    AND ((
-                        DATE_FORMAT(ss.submitted, '%Y') = $year AND DATE_FORMAT(ss.submitted, '%m') $semesterTest
-                    ) OR (
-                        DATE_FORMAT(sr.returned, '%Y') = $year AND DATE_FORMAT(sr.returned, '%m') $semesterTest
-                    ))
+                    AND (
+                        DATE(ss.submitted) BETWEEN $fromDate AND $toDate
+                        OR
+                        DATE(sr.returned) BETWEEN $fromDate AND $toDate
+                    )
                 )
                 GROUP BY category.id
                 ORDER BY category.name";
