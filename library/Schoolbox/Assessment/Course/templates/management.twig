@@ -1,3 +1,19 @@
+<script type="text/javascript" src="/javascript/shared/course/jquery.course-selector.js"></script>
+<script type="text/javascript">
+    $(function() {
+
+        /* Attach Course Selector Modal listeners
+         */
+        $.fn.courseSelectorModal({
+            courseSelector: {
+                query: {
+                    folder: {{ folder.id }}
+                }
+            }
+        });
+    });
+</script>
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Course Management</h1>
@@ -9,6 +25,16 @@
 
 <div class="row">
     <div class="small-12 island">
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Courses for {{ folder.name }}</h2>
+                </div>
+            </div>
+            <nav>
+                <a href="/course/import/{{ folder.id }}" class="icon-add" title="Link to Course" data-course-selector></a>
+            </nav>
+        </div>
 
         {% if allCourses|length %}
         <section>
@@ -44,3 +70,5 @@
         {% endif %}
     </div>
 </div>
+
+<div id="course-selector-modal" class="reveal-modal" data-reveal></div>
