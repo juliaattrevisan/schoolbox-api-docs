@@ -1,12 +1,6 @@
-// We use these to set the color of the pip in dropdowns
-$dropdown-button-pip-color: transparent;
-$dropdown-button-pip-color-alt: transparent;
-$f-dropdown-triangle-color: transparent;
-
-@import "../../../../../javascript/components/foundation/scss/foundation/components/dropdown-buttons";
-
 /* Jelly Tot Menu dropdowns
  */
+$f-dropdown-triangle-color: transparent;
 $f-dropdown-max-width: 242px;
 $f-dropdown-margin-top: 0px;
 $f-dropdown-bg: $content-ui-background;
