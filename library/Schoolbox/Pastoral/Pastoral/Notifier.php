@@ -104,7 +104,7 @@ class Notifier extends AbstractModuleNotifier
                 break;
             case BaseMapper::METHOD_UPDATE:
                 $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
-                break;
+                break;o
         }
     }
 

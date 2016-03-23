@@ -1032,59 +1032,6 @@ class Controller extends Base
                     }
                 }
             }
-
-            // Send notifications
-
-            if ($this->getRequest()->post["notify"] == 1 && !$this->getRequest()->post["private"]) {
-
-                // Work out who to send the notification to and store their IDs in an array
-
-                $ids = [];
-                $users = $this->getUserMapper()->findAll();
-
-                // Find all users with access via role
-
-                foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
-                    foreach ($users as $user) {
-                        if ($user->getRole()->getId() == $role_id) {
-                            $ids[$user->getId()] = 1;
-                        }
-                    }
-                }
-
-                foreach ($this->getRequest()->post["user_id"] as $user_id) {
-                    $ids[$user_id] = 1;
-                }
-
-                // Don't send it to the user making the change
-
-                unset($ids[$this->getUser()->getId()]);
-
-                // Create the notification
-
-                if (empty($this->getRequest()->post["id"])) {
-                    $body = "Pastoral care message received (confidential)";
-                } else {
-                    $body = "Pastoral care message updated (confidential)";
-                }
-
-                $bob = new \Alaress\Async\Notification\Instance\Builder();
-                $bob->setTitle($body)
-                    ->setSeverity(\Monolog\Logger::INFO)
-                    ->setNamespace('ALERT')
-                    ->setHref("/pastoral/{$record->getStudent()->getId()}/" . $record->getId())
-                    ->setIcon('/images/icon.php?icon=bolt&size=64')
-                    ->addTopic("notify.user." . $this->getRequest()->post["student_id"])
-                    ->putMeta('ttl', 60)
-                    ->putMeta('title', 'Pastoral Care Alert');
-
-                // Send them out to all the peoples round the world
-
-                foreach ($ids as $id => $value) {
-                    $n = new \Schoolbox\Notif\Notif("instant.user.{$id}.alert");
-                    $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
-                }
-            }
         }
 
         // Go back to students pastoral record
