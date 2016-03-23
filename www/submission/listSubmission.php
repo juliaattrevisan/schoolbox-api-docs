@@ -35,13 +35,12 @@ if (isset($termSlug)) {
 //    $year = (int)$this->arg[0];
 //    $semester = (int)$this->arg[1];
 //    $semesterSlug = "/$year/$semester";
-    $semesterSlug = "/$termSlug";
 } else {
 //    $year = $currentYear;
 //    $semester = $currentSemester;
-    $currentTerm  = $termMapper->findMostRecent();
-    $semesterSlug = '';
+    $currentTerm = $termMapper->findMostRecent();
 }
+$semesterSlug = $currentTerm->getCode();
 // Get the next ending term too
 $nextTerm = $termMapper->findNext($currentTerm);
 $endDate  = $nextTerm->getStart()->addDays(-1);
