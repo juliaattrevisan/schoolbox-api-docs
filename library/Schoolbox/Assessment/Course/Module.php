@@ -47,7 +47,7 @@ class Module extends BaseModule
                 /* Course Management for a particular Homepage
                  */
                 '/management/{folderId}'               => 'management',
-                '/restore/{folderId}/{courseId}'       => 'restoreCourse',
+                '/restore/{folderId}/{componentId}'    => 'restoreCourse',
 
                 /* Import screen
                  */

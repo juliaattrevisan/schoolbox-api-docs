@@ -302,32 +302,13 @@ class UnitInstanceMapper extends BaseMapper {
             $course = $this->findCourseForUnit($currentRestorableUnit);
 
             /* component_id is the closest concept to a course_id
+             * and we can derive it from the associated unit
              */
-            $allCourses[$course->getId()] = $currentRestorableUnit->getComponent();
+            $allCourses[$course->getId()] = $currentRestorableUnit;
         }
 
         return $allCourses;
     }
-
-//    public function findForCourse($folderId)
-//    {
-//        $query = "
-//            SELECT {$this->getColumnString('u')}
-//            FROM category f
-//            LEFT JOIN {$this->getTable()} u ON f.id = u.unit_category_id
-//            WHERE f.deleted_at IS NULL
-//            AND f.parent = :folderId
-//            AND u.category_id =
-//        ";
-//
-//        $statement = $this->database->prepare($query);
-//
-//        $statement->execute([
-//            'folderId' => $folderId
-//        ]);
-//
-//        return $this->hydrateList($statement, 'u');
-//    }
 
     /**
      * Retrieves unit instances for the given component.

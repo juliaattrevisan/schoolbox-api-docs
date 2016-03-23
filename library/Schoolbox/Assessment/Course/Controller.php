@@ -989,13 +989,43 @@ class Controller extends BaseController
         ]);
     }
 
-    public function restoreCourse($folderId, $courseId)
+    /**
+     * Restore a Course instance via rebuilding its component
+     *
+     * @param $folderId
+     * @param $componentId
+     */
+    public function restoreCourse($folderId, $componentId)
     {
-//        $allUnits = $this->getUnitInstanceMapper()->findForCourse($courseId);
-//
-//        foreach ($allUnits as $currentUnit) {
-//            new \Alaress_Probe($currentUnit);
-//        }
+        $allUnits = $this->getUnitInstanceMapper()->findByColumn('component_id', $componentId);
+
+        /* Spawn a new Course Builder instance
+         */
+        $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn(
+            'class',
+            'Component_Homepage_CourseOutlineController'
+        );
+
+        $componentDefinitionId = $componentDefinition->first()->getId();
+
+        $component = new \Component_Instance();
+        $component
+            ->setDefinitionId($componentDefinitionId)
+            ->setModule('homepage')
+            ->setIdentifier($folderId)
+            ->setPosition('top')
+            ->setSequence(1);
+
+        $this->getComponentInstanceMapper()->save($component);
+
+        /* Reassign the new Course Builder instance id to each
+         * unit that previously used $componentId
+         */
+        foreach ($allUnits as $currentUnit) {
+            $currentUnit->setComponent($component->getId());
+
+            $this->getUnitInstanceMapper()->save($currentUnit);
+        }
     }
 
     /**
