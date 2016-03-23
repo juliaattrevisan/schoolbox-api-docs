@@ -968,7 +968,7 @@ class Controller extends BaseController
          */
         $folder = $this->getFolderMapper()->findById($folderId);
 
-        /* Find all the Courses assocated with this Folder, via imported Units
+        /* Find all the Courses associated with this Folder, via imported Units
          */
         $allCourses = new Collection();
 

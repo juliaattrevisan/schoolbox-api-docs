@@ -60,6 +60,10 @@ class Module extends BaseModule
                 /* A list of Classes you can import into via selectize
                  */
                 '/import/classes'                      => 'importClasses',
+
+                /* Modify the imported Course's Unit details
+                 */
+                '/import/modify/{componentId}'         => 'importModify',
             ],
             'POST' => [
                 '/unit/new'    => 'newUnit',

@@ -304,7 +304,7 @@ class UnitInstanceMapper extends BaseMapper {
             /* component_id is the closest concept to a course_id
              * and we can derive it from the associated unit
              */
-            $allCourses[$course->getId()] = $currentRestorableUnit;
+            $allCourses[$course->getId()] = $currentRestorableUnit->getComponent();
         }
 
         return $allCourses;
