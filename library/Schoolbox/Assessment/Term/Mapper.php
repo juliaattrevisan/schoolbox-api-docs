@@ -41,6 +41,16 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Finds whichever term is the current one.
+     *
+     * @return Model
+     */
+    public function findCurrent()
+    {
+        return $this->findMostRecent();
+    }
+
+    /**
      * Find whichever term is the most recent one.
      *
      * @param Alaress_Date_Format $date Get the term for this date,
