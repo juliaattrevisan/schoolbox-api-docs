@@ -125,7 +125,7 @@ $removedStudentIdList = array();
 if ($code && Config::get('external_enable')) {
     $class_handler = new External_Class();
     $class_list    = $class_handler->getStudents($code);
-    if (is_array($student_list)) {
+    if (is_array($class_list)) {
         $externalIdList = array_map(
             function($student) { return $student['synergy_id'];
             },
