@@ -283,6 +283,28 @@ class UnitInstanceMapper extends BaseMapper {
     }
 
     /**
+     * Find a list of originating Course Folders whose Units
+     * had their Course Outlines deleted from $folderId
+     *
+     * @param $folderId
+     * @return mixed
+     * @throws BaseMapper\Exception
+     */
+    public function findRestorableCourses($folderId)
+    {
+        $allCourses = [];
+        $allRestorableUnits = $this->findRestorableUnits($folderId);
+
+        foreach ($allRestorableUnits as $currentRestorableUnit) {
+            $course = $this->findCourseForUnit($currentRestorableUnit);
+
+            $allCourses[$course->getId()] = $course;
+        }
+
+        return $allCourses;
+    }
+
+    /**
      * Retrieves unit instances for the given component.
      *
      * @param  Component_Instance        $component

@@ -980,11 +980,12 @@ class Controller extends BaseController
 
         /* A list of Units which have had their Course Outlines removed
          */
-        $allRestorableUnits = $this->getUnitInstanceMapper()->findRestorableUnits($folderId);
+        $allRestorableCourses = $this->getUnitInstanceMapper()->findRestorableCourses($folderId);
 
         $this->tpl('management', [
             'folder' => $folder,
             'allCourses' => $allCourses,
+            'allRestorableCourses' => array_keys($allRestorableCourses),
         ]);
     }
 
