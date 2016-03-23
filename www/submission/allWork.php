@@ -13,6 +13,7 @@ define('PERMISSION_GRANTED', true);
 define('PERMISSION_DENIED', false);
 
 use Schoolbox\Assessment\StudentReportCard;
+use Schoolbox\Assessment\Term;
 
 // require sitepage context
 if(!isset($this)) {
@@ -33,23 +34,25 @@ if(isset($this->arg[0])) {
 }
 
 // redirect if GET params are specified; make the URL look pretty
+// TODO figure out what actually passes $_GET params
 if(isset($_GET['year']) || isset($_GET['semester'])) {
 	$this->localRedir("/submission/allWork/$userId/{$_GET['year']}/{$_GET['semester']}");
 }
 
-$year = (int)(isset($this->arg[1]) ? $this->arg[1] : date('Y'));
-
-if(isset($this->arg[2])) {
-	$semester = $this->arg[2];
-	if($semester > 2) {
-		error(105, 'Semester can only be 1 or 2.');
+// Is a term set? Use it if so, otherwise use most recent
+$termMapper = Term\Mapper::getInstance();
+if (isset($this->arg[1])) {
+	try {
+		$term = $termMapper->findByColumn('code', $this->arg[1]);
+	} catch (\Schoolbox\Mapper\Exception $e) {
+		$this->localRedir('/submission/allWork/'.$userId);
+		exit;
 	}
-}
-else {
-	$semester = date('m') > 6 ? 2 : 1;
+} else {
+	$term = $termMapper->findCurrent();
 }
 
-$subject = isset($this->arg[3]) ? $this->arg[3] : false;
+$subject = isset($this->arg[2]) ? $this->arg[2] : false;
 
 /* DEFINE HANDLERS - TODO DELETE THIS SECTION */
 $groupHandler = new Group();
@@ -73,7 +76,11 @@ if($subject) {
 	}
 	// if the student is not enrolled, check if they have submitted to the subject
 	else {
-		$catArray = $boxHandler->submittedToCategoryList($userId, $year, $semester);
+		$catArray = $boxHandler->submittedToCategoryList(
+			$userId,
+			$term->getStart(),
+			$termMapper->findNext($term)->getStart()
+		);
 		$catIdArray = array();
 		foreach($catArray as $c) {
 			$catIdArray[] = $c['id'];
