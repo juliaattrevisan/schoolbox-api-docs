@@ -50,10 +50,11 @@
         $('input[data-mage-next]').mage();
 
         {# Init stage 1 mage #}
-
+{% if not _part2 %}
         $('input[data-mage-next="part-unit-select"]').mage({onXhrDone: function(data)
         {
             $('#importUnits').html(data);
+{% endif %}
 
             {# Init stage 2 mage #}
 
@@ -76,17 +77,18 @@
                     alert('THANK YOU MARIO!\n\n▒▒▒▒▒▒▒▒▒▄▄▄▄▒▒▒▒▒▒▒\n▒▒▒▒▒▒▄▀▀▓▓▓▀█▒▒▒▒▒▒\n▒▒▒▒▄▀▓▓▄██████▄▒▒▒▒\n▒▒▒▄█▄█▀░░▄░▄░█▀▒▒▒▒\n▒▒▄▀░██▄░░▀░▀░▀▄▒▒▒▒\n▒▒▀▄░░▀░▄█▄▄░░▄█▄▒▒▒\n▒▒▒▒▀█▄▄░░▀▀▀█▀▒▒▒▒▒\n▒▒▒▄▀▓▓▓▀██▀▀█▄▀▀▄▒▒\n▒▒█▓▓▄▀▀▀▄█▄▓▓▀█░█▒▒\n▒▒▀▄█░░░░░█▀▀▄▄▀█▒▒▒\n▒▒▒▄▀▀▄▄▄██▄▄█▀▓▓█▒▒\n▒▒█▀▓█████████▓▓▓█▒▒\n▒▒█▓▓██▀▀▀▒▒▒▀▄▄█▀▒▒\n▒▒▒▀▀▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒\n\nBUT OUR PRINCESS IS IN ANOTHER CASTLE.');
                 }});
             }});
+{% if not _part2 %}
         }});
+{% endif %}
     });
 </script>
-
 <div class="row">
     <div class="small-12 island">
         <h1>Import Course into Class</h1>
 
         <form method="post">
             <section>
-                <fieldset class="content" data-mage="part-course-select">
+                <fieldset class="content" data-mage="part-course-select" {% if _part2 %}disabled{% endif %}>
                     <div class="small-5 medium-5 large-3 columns">
                         {% include 'sub/selectorShard.twig' with {
                                 'formLabel': 'Course',
@@ -105,7 +107,7 @@
                             <input id="import-folders" type="text" name="importFolders" />
                         </label>
                     </div>
-
+{% if not _part2 %}
                     <div class="small-12 column">
                         <div class="row" data-mage-submitrow>
                             <div class="small-12 medium-8 column">
@@ -116,13 +118,17 @@
                             </div>
                         </div>
                     </div>
+{% endif %}
                 </fieldset>
-
                 <fieldset class='content' data-mage="part-unit-select">
                     <legend>Units</legend>
 
-                    <div class="small-12 column hide" data-mage-collapsed>
-                        <div id="importUnits"></div>
+                    <div class="small-12 column{% if not _part2 %} hide" data-mage-collapsed{% else %}"{% endif %}>
+                        <div id="importUnits">
+                            {% if _part2 %}
+                                {% include '@course/unitImportForm.twig' %}
+                            {% endif %}
+                        </div>
                     </div>
                 </fieldset>
 

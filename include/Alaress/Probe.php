@@ -17,7 +17,7 @@ class Alaress_Probe {
 	/**
 	 * Constructor
 	 */
-	public function __construct() {
+	public function __construct($_ = null) {
         $numArgs = func_num_args();
 
 		if (DebugBar::isEnabled()) {
