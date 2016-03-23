@@ -6,12 +6,13 @@ use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Pastoral\Access\Mapper as AccessMapper;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 
 class Notifier extends AbstractModuleNotifier
@@ -41,22 +42,32 @@ class Notifier extends AbstractModuleNotifier
         // Work out who to send the message to
 
         /** @var Collection|PastoralAccessModel $accessModels */
-        $accessModels = $this->accessMapper->findByColumn("pastoral_id", $model->getId());
+        $accessModels = $this->getPastoralAccessMapper()->findByColumn("pastoral_id", $model->getId());
 
         $sendToParents = false;
 
         /** @var PastoralAccessModel $accessModel */
         foreach ($accessModels as $accessModel) {
+            $roleId = $accessModel->getRole()->getId();
 
-            if ($accessModel->getRole()->isStaff()) {
-                $envelope->broadcastToRole($accessModel->getRole()->getId(), $message);
-            } else if ($accessModel->getRole()->isParent()) {
-                $sendToParents = true;
+            if (!empty($roleId)) {
+                $accessModel->setRole(
+                    $this->getRoleMapper()->findById($roleId)
+                );
+                if ($accessModel->getRole()->isStaff()) {
+                    $envelope->broadcastToRole($accessModel->getRole()->getId(), $message);
+                } else {
+                    if ($accessModel->getRole()->isParent()) {
+                        $sendToParents = true;
+                    }
+                }
+            } else {
+                $envelope->targetToUser($accessModel->getUser()->getId(), $message);
             }
         }
 
-        $envelope->targetToParent($model->getStudent()->getId(), $message);
-        $envelope->targetToUser(19, $message);
+        if ($sendToParents)
+            $envelope->targetToParent($model->getStudent()->getId(), $message);
 
         return $envelope;
     }
@@ -66,8 +77,10 @@ class Notifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
-        if (empty($dependencies["accessMapper"]))
-            $dependencies["accessMapper"] = AccessMapper::getInstance();
+        if (empty($dependencies["pastoralAccessMapper"]))
+            $dependencies["pastoralAccessMapper"] = PastoralAccessMapper::getInstance();
+        if (empty($dependencies["roleMapper"]))
+            $dependencies["roleMapper"] = RoleMapper::getInstance();
 
         parent::loadDependencies($dependencies);
     }
@@ -130,23 +143,45 @@ class Notifier extends AbstractModuleNotifier
 
     // Here be the getters/setter
 
-    /** @var AccessMapper $accessMapper */
-    protected $accessMapper;
+    /**
+     * @var RoleMapper $roleMapper;
+     */
+    protected $roleMapper;
+
+    /** @var PastoralAccessMapper $pastoralAccessMapper */
+    protected $pastoralAccessMapper;
 
     /**
-     * @return AccessMapper
+     * @return PastoralAccessMapper
      */
-    public function getAccessMapper() {
-        return $this->accessMapper;
+    public function getPastoralAccessMapper() {
+        return $this->pastoralAccessMapper;
     }
 
     /**
-     * @param $accessMapper
+     * @param $pastoralAccessMapper
      * @return $this
      */
-    public function setAccessMapper($accessMapper)
+    public function setPastoralAccessMapper($pastoralAccessMapper)
     {
-        $this->accessMapper = $accessMapper;
+        $this->pastoralAccessMapper = $pastoralAccessMapper;
+        return $this;
+    }
+
+    /**
+     * @return RoleMapper
+     */
+    public function getRoleMapper() {
+        return $this->roleMapper;
+    }
+
+    /**
+     * @param $roleMapper
+     * @return $this
+     */
+    public function setRoleMapper($roleMapper)
+    {
+        $this->roleMapper = $roleMapper;
         return $this;
     }
 }
