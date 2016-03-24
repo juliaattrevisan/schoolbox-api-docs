@@ -11,7 +11,10 @@
 
 use Psr\Log\LoggerInterface;
 use React\Stomp\Protocol\Frame;
+use Schoolbox\Notif\Formatter\CompressedFormatter;
+use Schoolbox\Notif\Formatter\CompressionException;
 use Schoolbox\Realtime\Schedule\Event;
+use Schoolbox\Realtime\Schedule\ScheduleException;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
@@ -96,12 +99,12 @@ foreach ($sqlq as $qi) {
         $d->error("RuntimeException: ".$e->getMessage());
         $d->notice("Message unparseable", array('char' => '-'));
 
-    } catch (\Schoolbox\Realtime\Schedule\ScheduleException $e) {
+    } catch (ScheduleException $e) {
         // we're happy to ignore this, it just means no scheduling strategy exists for this Model
         $d->warning('Schedule Exception: ' . $e->getMessage());
         $d->notice("Message ignorable", array('char' => '-'));
 
-    } catch (\Schoolbox\Notif\Formatter\CompressionException $e) {
+    } catch (CompressionException $e) {
         // this message is unparseable, so we'll eventually ACK it to make it go away
         $d->error('Compression Exception: ' . $e->getMessage());
         $d->notice("Message unparseable", array('char' => '-'));
@@ -184,13 +187,41 @@ $stomp->connect()->then(function($stomp) use ($d, $loop, $perform) {
 $loop->run();
 
 
+/**
+ * @param object $object
+ * @return Event
+ * @throws CompressionException
+ * @throws RuntimeException
+ */
+function extractEvent($object)
+{
+	// already what we want
+	if ($object instanceof Event) {
+		return $object;
+	}
+
+	// extract event from frame
+	if ($object instanceof Frame) {
+		$formatted = CompressedFormatter::uncompress($object->body);
+		$event     = unserialize($formatted['message']);
+
+		if ($event instanceof Event) {
+			return $event;
+		}
+
+		throw new RuntimeException("Could not unserialize message data");
+	}
+
+	throw new RuntimeException("Cannot extract event data from given object");
+}
+
 
 /**
- * @param LoggerInterface $log
- * @param Frame           $frame
- * @return bool whether or not to acknowledge the message
+ * @param LoggerInterface $log      the logger to output to
+ * @param object          $input    either an Event or a Frame containing one
+ * @return bool                     whether or not to acknowledge the message
  */
-function interrogate(Frame $frame, LoggerInterface $log)
+function interrogate($input, LoggerInterface $log)
 {
 	// BEWARE! CUTLERY!
 	$pid = pcntl_fork();
@@ -225,11 +256,11 @@ function interrogate(Frame $frame, LoggerInterface $log)
 		}
 	}, $log);
 
-	$formatted = \Schoolbox\Notif\Formatter\CompressedFormatter::uncompress($frame->body);
-	$event = unserialize($formatted['message']);
+	try {
+		$event = extractEvent($input);
 
-	if (!$event instanceof Event) {
-		$log->critical("Could not unserialize message data");
+	} catch (Exception $e) {
+		$log->critical($e->getMessage());
 		exit(2);
 	}
 
