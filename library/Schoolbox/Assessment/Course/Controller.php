@@ -653,8 +653,6 @@ class Controller extends BaseController
                     $unit['name'] = $unitCache[$unitCurrent->getId()]->getName();
                     $unit['items'] = new Collection();
 
-                    $temp = new Collection();
-
                     foreach ($this->getRequest()->post["unit"] as $unitDate) {
                         if ($unitDate["unit_id"] == $unitCurrent->getId()) {
                             $unit['open_date'] = $unitDate['open_date'];
@@ -662,54 +660,86 @@ class Controller extends BaseController
                         }
                     }
 
-                    // Tasks
-
-                    if (!isset($taskCache[$unitCurrent->getId()])) {
-                        $taskCache[$unitCurrent->getId()] = $this->taskMapper
-                            ->findByColumnList([
-                                'category_id' => $unitCache[$unitCurrent->getId()]->getId(),
-                                'assess_id' => null
-                            ])
-                            ->sortBy('title', 'asc') ;
-                    }
-
-                    $temp->merge($taskCache[$unitCurrent->getId()]);
-
-                    // Due work
-
-                    if (!isset($submissionCache[$unitCurrent->getId()])) {
-                        $submissionCache[$unitCurrent->getId()] = $this->submissionBoxMapper
-                            ->findByColumn('category', $unitCurrent->getId());
-                    }
-
-                    $temp->merge($submissionCache[$unitCurrent->getId()]);
-
-                    // Quizzes
-
-                    if (!isset($quizCache[$unitCurrent->getId()])) {
-                        $quizCache[$unitCurrent->getId()] = $this->onlineAssessmentMapper
-                            ->findByColumn('category_id', $unitCurrent->getId());
-                    }
-
-                    $temp->merge($quizCache[$unitCurrent->getId()]);
-
-                    /* Unify all three of Tasks, Due Work and Quizzes
-                     * into one mega list
-                     *
-                     * Sort by Created At for now, until manual sequencing
-                     * is added to the ui so teachers can sort it themselves
+                    /* Get a list of all the abstract coursework that were part of
+                     * the original unit specification
                      */
-                    $temp->sortBy('created', 'asc');
+                    $taskInstanceMapper = new \Schoolbox\Assessment\Course\Task\InstanceMapper();
+                    $abstractCoursework = $taskInstanceMapper->findAbstractTasksForUnit($key);
 
-                    foreach($temp as $current) {
-                        $reflection = new \ReflectionClass($current);
-                        $class = $reflection->getShortName();
-
-                        $unit['items']->add([
-                            'class' => $class,
-                            'item' => $current
+                    /* Get a list of all the coursework instances that were created
+                     * as instances of the origin abstracts
+                     */
+                    if ($this->getRequest()->post->get('componentId')) {
+                        $instancesCoursework = $this->getUnitInstanceMapper()->findByColumnList([
+                            'component_id' => $this->getRequest()->post->get('componentId'),
+                            'unit_category_id' => $key
                         ]);
                     }
+                    else {
+                        $instancesCoursework = new Collection();
+                    }
+
+                    new \Alaress_Probe($abstractCoursework, $instancesCoursework);
+
+                    /* If the coursework instances exist, use them; otherwise spawn
+                     * a temporary instance of the abstract coursework
+                     */
+                    foreach ($abstractCoursework as $current) {
+                    }
+
+
+
+
+//                    $temp = new Collection();
+//
+                    // Tasks
+//
+//                    if (!isset($taskCache[$unitCurrent->getId()])) {
+//                        $taskCache[$unitCurrent->getId()] = $this->taskMapper
+//                            ->findByColumnList([
+//                                'category_id' => $unitCache[$unitCurrent->getId()]->getId(),
+//                                'assess_id' => null
+//                            ])
+//                            ->sortBy('title', 'asc') ;
+//                    }
+//
+//                    $temp->merge($taskCache[$unitCurrent->getId()]);
+//
+//                    // Due work
+//
+//                    if (!isset($submissionCache[$unitCurrent->getId()])) {
+//                        $submissionCache[$unitCurrent->getId()] = $this->submissionBoxMapper
+//                            ->findByColumn('category', $unitCurrent->getId());
+//                    }
+//
+//                    $temp->merge($submissionCache[$unitCurrent->getId()]);
+//
+//                    // Quizzes
+//
+//                    if (!isset($quizCache[$unitCurrent->getId()])) {
+//                        $quizCache[$unitCurrent->getId()] = $this->onlineAssessmentMapper
+//                            ->findByColumn('category_id', $unitCurrent->getId());
+//                    }
+//
+//                    $temp->merge($quizCache[$unitCurrent->getId()]);
+//
+//                    /* Unify all three of Tasks, Due Work and Quizzes
+//                     * into one mega list
+//                     *
+//                     * Sort by Created At for now, until manual sequencing
+//                     * is added to the ui so teachers can sort it themselves
+//                     */
+//                    $temp->sortBy('created', 'asc');
+//
+//                    foreach($temp as $current) {
+//                        $reflection = new \ReflectionClass($current);
+//                        $class = $reflection->getShortName();
+//
+//                        $unit['items']->add([
+//                            'class' => $class,
+//                            'item' => $current
+//                        ]);
+//                    }
 
                     $units->add($unit);
                 }
@@ -890,7 +920,6 @@ class Controller extends BaseController
      */
     public function importModify($folderId, $componentId)
     {
-
         $compendium = [];
 
         /** @var Component_Instance $compInst */
@@ -916,7 +945,6 @@ class Controller extends BaseController
         $unitOutput = [];
 
         foreach ($compendium as $id => $values) {
-
             $unitOutput[$id] = [
                 'id' => $id,
                 'name' => $values['folder']->getName(),
@@ -926,12 +954,8 @@ class Controller extends BaseController
                 $unitOutput[$id]['checked'] = true;
                 $unitOutput[$id]['openDate'] = $values['selected']->getOpenDate();
                 $unitOutput[$id]['dueDate']  = $values['selected']->getDueDate();
-
-
             }
-
         }
-
 
         $destination = $this->folderMapper->findCheaplyById($folderId);
 
@@ -942,7 +966,8 @@ class Controller extends BaseController
             'sources' => $course,
             'destinations' => array_combine(['id','name'], $destination->findValueLabelPair()),
             'homepage' => $destination->getId(),
-            'courseHomepage' => $course->getId()
+            'courseHomepage' => $course->getId(),
+            'componentId' => $componentId,
         ]);
     }
 
