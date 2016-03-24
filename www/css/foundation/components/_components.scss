@@ -232,6 +232,9 @@ ul.tileList {
     .labels{
         @extend %p;
         text-transform: uppercase;
+        @media #{$small-only} {
+            font-size: 0.625rem;
+        }
     }
 }
 
