@@ -14,10 +14,11 @@ use Alaress\DebugBar\Instance as DebugBar;
 
 class Alaress_Probe {
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
+    /**
+     * Alaress_Probe constructor.
+     * @param null $_
+     */
+	public function __construct($_ = null) {
         $numArgs = func_num_args();
 
 		if (DebugBar::isEnabled()) {
