@@ -42,6 +42,10 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
     }
 }
 
+section > .dropzone-wrap {
+    margin: 0px;
+}
+
 .dropzone {
     &.overlay {
         position: absolute;

@@ -5,8 +5,8 @@
         <div class="island small-12">
             <section>
                 <div class="dropzone-wrap">
-                    <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
                     <div class="content">
+                    <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
                         <ul class="hide" data-dz-template>
                             <li>
                                 <span class="th">
@@ -28,9 +28,6 @@
                             </li>
                             <!-- END image_gallery -->
                         </ul>
-                    </div>
-                </div>
-                <div class="content">
                     <!-- BEGIN submit_image_gallery -->
                     <script type="text/javascript">
                         $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
@@ -64,6 +61,7 @@
                     <a href="/cms/file/new/{IMAGEGALLERY_CATEGORY_ID}" class="button icon-add">Post Image</a>
                     <!-- END submit_image_gallery -->
                     <a href="/cms/imageGallery/{IMAGEGALLERY_CATEGORY_ID}/returnTo:{ID}" class="button icon-view">View Full Gallery</a>
+                </div>
                 </div>
             </section>
         </div>
