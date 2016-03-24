@@ -491,6 +491,12 @@ class Controller extends Base
 
         $pastoral = $this->getPastoralMapper()->findById($id);
 
+        if ($pastoral->getPrivate()) {
+            if (!$this->getPastoralMapper()->hasPrivatePermission($pastoral)) {
+                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            }
+        }
+
         // Load in related records
 
         $collection = new Collection();

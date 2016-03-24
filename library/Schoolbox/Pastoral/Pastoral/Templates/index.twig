@@ -171,7 +171,7 @@
                                 <div class="avatar card small-12 wrap-down">
 
                                     {# If the record is private and the person is not the owner, don't put links to view the content #}
-                                    {% if not pastoralModerator and record.private and record.owner.getId() != session.user.getId() %}
+                                    {% if record.private and not record.showPrivate %}
 
                                         {# Portrait image of author #}
                                         <a href="/search/user/{{ record.owner.getId() }}">
@@ -225,23 +225,16 @@
                                     {% endif %}
 
                                     <article>
-                                        {% if not pastoralModerator and record.private and (record.owner.getId() != session.user.getId()) %}
-                                            {# The article is marked as private, only the author or pastoral moderators can see the content #}
-                                            <p class="spaced">
-                                                The contents of this pastoral event have been marked as private. Please contact {{ record.owner.firstName }} {{ record.owner.lastName }} if you require more information.
+                                        {# Content of article #}
+                                        <p class="spaced">
+                                            {{ record.getBodyText() | cutSentence(375, true) | raw }}
+                                        </p>
+                                        {% if record.getAttachmentList.count() > 0 %}
+                                            <p class="spaced meta">
+                                                {% for attachment in record.getAttachmentList %}
+                                                    Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{ attachment.getFilename() }}</a><br>
+                                                {% endfor %}
                                             </p>
-                                        {% else %}
-                                            {# Content of article #}
-                                            <p class="spaced">
-                                                {{ record.getBodyText() | cutSentence(375, true) | raw }}
-                                            </p>
-                                            {% if record.getAttachmentList.count() > 0 %}
-                                                <p class="spaced meta">
-                                                    {% for attachment in record.getAttachmentList %}
-                                                        Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{ attachment.getFilename() }}</a><br>
-                                                    {% endfor %}
-                                                </p>
-                                            {% endif %}
                                         {% endif %}
                                     </article>
 

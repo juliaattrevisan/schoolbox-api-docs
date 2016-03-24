@@ -204,8 +204,21 @@ class Mapper extends BaseMapper
 
             // Check permissions
 
-            if ($this->hasPermission($record))
+            if ($this->hasPermission($record)) {
+
+                if ($record->getPrivate() && !$this->hasPrivatePermission($record)) {
+
+                    // The record is private and the user does not have access, remove attachments and
+                    // override the body
+
+                    $record->setAttachmentList(null);
+                    $record->setShowPrivate(false);
+                    $record->setBody("The contents of this record have been marked as private.");
+                } else {
+                    $record->setShowPrivate(true);
+                }
                 $records->add($this->hydrateRecord($record, $row));
+            }
         }
 
         return $records;
@@ -496,6 +509,74 @@ class Mapper extends BaseMapper
                         return true;
                     }
                 } else {
+                    // This access record is a user based one, check if this is the user
+
+                    if ($accessCurrent->getUser()->getId() == $user->getId()) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // BZZZZZT! You're outta here.
+
+        return false;
+    }
+
+    /**
+     * Checks if the logged in user has permission to view private records
+     *
+     * @var Pastoral\Model $record
+     *
+     * @return bool
+     */
+
+    public function hasPrivatePermission(Pastoral\Model $record)
+    {
+        // Hack for notifier
+
+        if (!isset($_SESSION)) {
+            return true;
+        }
+
+        /** @var \Schoolbox\User $user */
+        $user = $_SESSION["user"];
+
+        if ($user instanceof \Schoolbox\User) {
+
+            // Pastoral moderators can access everything
+
+            if ($this->getUserAccessMapper()->findAllForUser($user)->filterBy("service",
+                    PASTORAL_SERVICE)->count() > 0
+            ) {
+                return true;
+            }
+
+            // To access a private record you at least be a staff member
+
+            /** @var \Schoolbox\Role $role */
+            $role = $user->getRole();
+
+            if ($role->isStudent() || $role->isParent() || $role->isGuest()) {
+                return false;
+            }
+
+            // Give owners permission to their own records regardless of other permissions
+
+            if ($record->getOwner()->getId() == $user->getId()) {
+                return true;
+            }
+
+            // If we get through to here we need to check the audience of item
+
+            $record->setAccessList($this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId()));
+
+            $accessRecords = $record->getAccessList();
+
+            foreach ($accessRecords as $accessCurrent) {
+                // Access records are either role based of user based.
+
+                if (is_numeric($accessCurrent->getUser()->getId())) {
                     // This access record is a user based one, check if this is the user
 
                     if ($accessCurrent->getUser()->getId() == $user->getId()) {

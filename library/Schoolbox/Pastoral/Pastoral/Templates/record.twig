@@ -148,7 +148,7 @@
         {% if role != 'parent' %}
 
             {# Show related records #}
-            {% if record.getRelatedRecords | length > 0 %}
+            {% if record.getRelatedRecords | length > 1 %}
 
                 <h2 class="subheader">Related Records</h2>
                 <section>

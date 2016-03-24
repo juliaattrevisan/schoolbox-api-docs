@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Pastoral\Pastoral;
 
+use Sabre\VObject\Property\Boolean;
 use Schoolbox\Pastoral;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
@@ -70,6 +71,9 @@ class Model implements ISoftDeletable
 
     /** @var \Alaress_Date_Format */
     protected $deletedAt;
+
+    /** @var Boolean */
+    protected $showPrivate;
 
     /**
      * @param  Collection|Pastoral\Access\Model[] $accessList
@@ -375,5 +379,19 @@ class Model implements ISoftDeletable
      */
     public function getRelatedRecords() {
         return $this->relatedRecords;
+    }
+
+    /**
+     * @param Boolean
+     */
+    public function setShowPrivate($showPrivate) {
+        $this->showPrivate = $showPrivate;
+    }
+
+    /**
+     * @return Boolean
+     */
+    public function getShowPrivate() {
+        return $this->showPrivate;
     }
 }
