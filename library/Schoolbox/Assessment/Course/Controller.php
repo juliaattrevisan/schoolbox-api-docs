@@ -35,6 +35,7 @@ use Schoolbox\Assessment\Course\Import\Import as CourseImport;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
 
 class Controller extends BaseController
 {
@@ -50,6 +51,9 @@ class Controller extends BaseController
 
     /** @var TaskMapper */
     protected $taskMapper = null;
+
+    /** @var TaskInstanceMapper */
+    protected $taskInstanceMapper = null;
 
     /** @var CourseMapper */
     protected $courseMapper;
@@ -666,17 +670,18 @@ class Controller extends BaseController
                     $abstractCoursework = $this->getTaskMapper()->findAbstractTasksForUnit($key);
 
                     /* Get a list of all the coursework instances that were created
-                     * as instances of the origin abstracts
+                     * as instances of the original abstracts
                      */
                     if ($this->getRequest()->post->get('componentId')) {
+
+                        /* TODO: Check when no unitInstances exist
+                         */
                         $unitInstance = $this->getUnitInstanceMapper()->findByColumnList([
                             'component_id' => $this->getRequest()->post->get('componentId'),
                             'unit_category_id' => $key
                         ])->first();
 
-                        $taskInstanceMapper = new \Schoolbox\Assessment\Course\Task\InstanceMapper();
-                        $instancesCoursework = $taskInstanceMapper->findByColumn('course_unit_instance_id', $unitInstance->getId());
-
+                        $instancesCoursework = $this->getTaskInstanceMapper()->findByColumn('course_unit_instance_id', $unitInstance->getId());
                     }
                     else {
                         $instancesCoursework = new Collection();
@@ -1407,5 +1412,21 @@ class Controller extends BaseController
     {
         $this->access = $access;
         return $this;
+    }
+
+    /**
+     * @return TaskInstanceMapper
+     */
+    public function getTaskInstanceMapper()
+    {
+        return $this->taskInstanceMapper;
+    }
+
+    /**
+     * @param TaskInstanceMapper $taskInstanceMapper
+     */
+    public function setTaskInstanceMapper($taskInstanceMapper)
+    {
+        $this->taskInstanceMapper = $taskInstanceMapper;
     }
 }
