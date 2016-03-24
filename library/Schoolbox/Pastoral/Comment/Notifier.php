@@ -52,7 +52,6 @@ class Notifier extends AbstractModuleNotifier
         /** @var Collection|PastoralAccessModel $accessModels */
         $accessModels = $this->getPastoralAccessMapper()->findByColumn("pastoral_id", $pastoral->getId());
 
-        $sendToParents = false;
         /** @var PastoralAccessModel $accessModel */
         foreach ($accessModels as $accessModel) {
             $roleId = $accessModel->getRole()->getId();
@@ -63,18 +62,11 @@ class Notifier extends AbstractModuleNotifier
                 $accessModel->setRole($role);
                 if ($accessModel->getRole()->isStaff()) {
                     $envelope->broadcastToRole($accessModel->getRole()->getId(), $message);
-                } else {
-                    if ($accessModel->getRole()->isParent()) {
-                        $sendToParents = true;
-                    }
                 }
             } else {
                 $envelope->targetToUser($accessModel->getUser()->getId(), $message);
             }
         }
-
-        if ($sendToParents)
-            $envelope->targetToParent($pastoral->getStudent()->getId(), $message);
 
         return $envelope;
     }
