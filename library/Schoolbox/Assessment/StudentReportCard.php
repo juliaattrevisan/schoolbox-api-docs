@@ -64,6 +64,11 @@ class StudentReportCard
      */
     protected $targetSemester;
 
+    /**
+     *
+     * @var Term\Model
+     */
+    protected $targetTerm;
 
     protected $targetCategoryId;
 
@@ -97,6 +102,8 @@ class StudentReportCard
     protected $currentSemester;
 
     /**
+     * The current term.
+     *
      * @var Term\Model
      */
     protected $currentTerm;
@@ -154,7 +161,8 @@ class StudentReportCard
         // setup helper vars
 //        $this->currentYear     = date('Y');
 //        $this->currentSemester = date('m') > 6 ? 2 : 1;
-        $this->currentTerm = new Term\Model();
+        $this->targetTerm  = new Term\Model();
+        $this->currentTerm = $this->termMapper->findCurrent();
     }
 
     /**
@@ -219,7 +227,7 @@ class StudentReportCard
      */
     public function setTerm(Term\Model $term)
     {
-        $this->currentTerm = $term;
+        $this->targetTerm = $term;
         $this->findSubjectsForTerm();
         return $this;
     }
