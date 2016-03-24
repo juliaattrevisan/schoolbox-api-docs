@@ -930,28 +930,27 @@ class Controller extends BaseController
     /**
      * Modify the Unit information for a previously imported Course
      *
-     * @param $folderId
      * @param $componentId
      */
-    public function importModify($folderId, $componentId)
+    public function importModify($componentId)
     {
         $compendium = [];
 
         /** @var Component_Instance $compInst */
-        $compInst = $this->componentInstanceMapper->findById($componentId);
+        $compInst = $this->getComponentInstanceMapper()->findById($componentId);
 
         /** @var Collection|UnitInstance[] $selectedUnitInstances */
-        $selectedUnitInstances = $this->unitInstanceMapper->findForComponent($compInst);
+        $selectedUnitInstances = $this->getUnitInstanceMapper()->findForComponent($compInst);
 
         foreach ($selectedUnitInstances as $selectedUnitInstance) {
             $compendium[$selectedUnitInstance->getUnitCategory()->getId()]['selected'] = $selectedUnitInstance;
         }
 
         /** @var Folder\Model $course */
-        $course   = $this->unitInstanceMapper->findCourseForUnit($selectedUnitInstances->first());
+        $course   = $this->getUnitInstanceMapper()->findCourseForUnit($selectedUnitInstances->first());
 
         /** @var Collection|Folder\Model[] $allUnits */
-        $allUnits = $this->courseMapper->findAllChildren($course->getId());
+        $allUnits = $this->getCourseMapper()->findAllChildren($course->getId());
 
         foreach ($allUnits as $unit) {
             $compendium[$unit->getId()]['folder'] = $unit;
@@ -972,12 +971,23 @@ class Controller extends BaseController
             }
         }
 
-        $destination = $this->folderMapper->findCheaplyById($folderId);
+        /* Find the destination for selectize
+         */
+        $allComponents = $this->getUnitInstanceMapper()->findByColumn('component_id', $componentId);
+
+        if ($allComponents->count()) {
+            $folderId = $allComponents->first()->getCategory()->getId();
+            $destination = $this->getFolderMapper()->findCheaplyById($folderId);
+        }
+        else {
+            /* TODO: Error; component never existed
+             */
+        }
 
         $this->tpl('import', [
             '_part2'  => true,
             'units'   => $unitOutput,
-            'folder'  => $course,
+            'folder'  => $destination,
             'sources' => $course,
             'destinations' => array_combine(['id','name'], $destination->findValueLabelPair()),
             'homepage' => $destination->getId(),
