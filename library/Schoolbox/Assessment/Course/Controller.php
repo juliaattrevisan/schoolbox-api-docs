@@ -682,8 +682,8 @@ class Controller extends BaseController
                         $instancesCoursework = new Collection();
                     }
 
-                    new \Alaress_Probe($key, $unitInstance->getId());
-                    new \Alaress_Probe($abstractCoursework, $instancesCoursework);
+//                    new \Alaress_Probe($key, $unitInstance->getId());
+//                    new \Alaress_Probe($abstractCoursework, $instancesCoursework);
 
                     /* If the coursework instances exist, use them; otherwise spawn
                      * a temporary instance of the abstract coursework
@@ -692,9 +692,13 @@ class Controller extends BaseController
                     }
 
 
+                    /* Compile them into a list
+                     */
+                    $temp = new Collection();
 
-
-//                    $temp = new Collection();
+                    foreach ($abstractCoursework as $currentAbstractCoursework) {
+                        $temp->add($currentAbstractCoursework);
+                    }
 //
                     // Tasks
 //
@@ -727,23 +731,30 @@ class Controller extends BaseController
 //
 //                    $temp->merge($quizCache[$unitCurrent->getId()]);
 //
-//                    /* Unify all three of Tasks, Due Work and Quizzes
-//                     * into one mega list
-//                     *
-//                     * Sort by Created At for now, until manual sequencing
-//                     * is added to the ui so teachers can sort it themselves
-//                     */
-//                    $temp->sortBy('created', 'asc');
-//
-//                    foreach($temp as $current) {
-//                        $reflection = new \ReflectionClass($current);
-//                        $class = $reflection->getShortName();
-//
-//                        $unit['items']->add([
-//                            'class' => $class,
-//                            'item' => $current
-//                        ]);
-//                    }
+                    /* Unify all three of Tasks, Due Work and Quizzes
+                     * into one mega list
+                     *
+                     * Sort by Created At for now, until manual sequencing
+                     * is added to the ui so teachers can sort it themselves
+                     */
+                    $temp->sortBy('created', 'asc');
+
+                    foreach($temp as $current) {
+                        if ($current->getAssessment()->getId()) {
+                            $class = 'OnlineAssessment';
+                        }
+                        else if ($current->getSubmissionBox()->getId()) {
+                            $class = 'SubmissionBox';
+                        }
+                        else {
+                            $class = 'Task';
+                        }
+
+                        $unit['items']->add([
+                            'class' => $class,
+                            'item' => $current
+                        ]);
+                    }
 
                     $units->add($unit);
                 }
