@@ -1218,8 +1218,8 @@ class StudentReportCard
         /* Subjects involved with currently
          */
         if (\Alaress_Date_Format::now()->between(
-            $this->currentTerm->getStart(),
-            $this->termMapper->findNext($this->currentTerm)->getStart()->addDays(-1)
+            $this->targetTerm->getStart(),
+            $this->termMapper->findNext($this->targetTerm)->getStart()->addDays(-1)
         )) {
             $categoryList = $this->groupHandler->involvedInCategoryList($this->targetUserId, true, READ_ACCESS);
             // filter this list, so that it only contains categories in which contain results
@@ -1243,8 +1243,8 @@ class StudentReportCard
          */
         $submittedList = $this->submissionMapper->submittedToCategoryList(
             $this->targetUserId,
-            $this->currentTerm->getStart(),
-            $this->termMapper->findNext($this->currentTerm)->getStart()->addDays(-1)
+            $this->targetTerm->getStart(),
+            $this->termMapper->findNext($this->targetTerm)->getStart()->addDays(-1)
         );
         /* Combine lists alphabetically
             */
