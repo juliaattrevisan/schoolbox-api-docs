@@ -261,8 +261,19 @@ class Mapper extends BaseMapper
 
             // Check permissions
 
-            if ($this->hasPermission($record))
-                return $this->hydrateRecord($record, $row);
+            if ($this->hasPermission($record)) {
+
+                $record = $this->hydrateRecord($record, $row);
+
+                if ($record->getPrivate() && !$this->hasPrivatePermission($record)) {
+                    $record->setBody("The contents of this record have been marked as private.");
+                    $record->setShowPrivate(false);
+                } else {
+                    $record->setShowPrivate(true);
+                }
+
+                return $record;
+            }
         }
 
         throw new BaseMapper\Exception('Instance of object not found');
@@ -577,15 +588,16 @@ class Mapper extends BaseMapper
 
             // If we get through to here we need to check the audience of item
 
-            $record->setAccessList($this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId()));
+            $accessRecords = $this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId());
 
-            $accessRecords = $record->getAccessList();
+            $record->setAccessList($accessRecords);
 
             foreach ($accessRecords as $accessCurrent) {
                 // Access records are either role based of user based.
 
                 if (is_numeric($accessCurrent->getUser()->getId())) {
                     // This access record is a user based one, check if this is the user
+
 
                     if ($accessCurrent->getUser()->getId() == $user->getId()) {
                         return true;

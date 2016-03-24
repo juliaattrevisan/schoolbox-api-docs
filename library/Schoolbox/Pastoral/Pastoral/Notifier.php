@@ -75,7 +75,9 @@ class Notifier extends AbstractModuleNotifier
             }
         }
 
-        if ($sendToParents)
+        // Just make sure parents don't ever get private notifications
+
+        if ($sendToParents && !$pastoral->getPrivate())
             $envelope->targetToParent($model->getStudent()->getId(), $message);
 
         return $envelope;
