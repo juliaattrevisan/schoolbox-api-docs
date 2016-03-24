@@ -496,7 +496,7 @@ class Controller extends Base
 
                 // Didn't have access to private record, but did have access by role
 
-                $this->getResponse()->redirect->afterPost("/pastoral/{$this->getRequest()->post["student_id"]}/{$this->getRequest()->post["pastoral_id"]}");
+                $this->getResponse()->redirect->afterPost("/pastoral/{$student->getId()}");
                 return;
             }
         }
