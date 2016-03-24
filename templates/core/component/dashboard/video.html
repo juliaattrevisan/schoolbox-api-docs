@@ -58,20 +58,22 @@
     </div>
 
     <script type="text/javascript">
-        var component    = $('#component{COMPONENT_INSTANCE_ID}');
-        var videoElement = component.find('[data-role="media-player"]').mediaelementplayer();
-        var video        = videoElement.data('mediaelementplayer');
-        component.find('[data-media-id]').click(function(event) {
-            event.preventDefault();
-            var videoId = $(this).data('media-id');
-            var $target = "/cms/sendVideo.php?type=sbfs&id="+videoId;
-            var $poster = "/cms/videoThumb.php?type=sbfs&id="+videoId+"&size=poster";
-            // setting video plugin's poster doesn't work as expected,
-            // so set the video's poster directly
-            videoElement.attr('poster', $poster);
-            video.pause();
-            video.setSrc($target);
-            video.setPoster($poster);
+        $(function() {
+            var component    = $('#component{COMPONENT_INSTANCE_ID}');
+            var videoElement = component.find('[data-role="media-player"]').mediaelementplayer();
+            var video        = videoElement.data('mediaelementplayer');
+            component.find('[data-media-id]').click(function(event) {
+                event.preventDefault();
+                var videoId = $(this).data('media-id');
+                var $target = "/cms/sendVideo.php?type=sbfs&id="+videoId;
+                var $poster = "/cms/videoThumb.php?type=sbfs&id="+videoId+"&size=poster";
+                // setting video plugin's poster doesn't work as expected,
+                // so set the video's poster directly
+                videoElement.attr('poster', $poster);
+                video.pause();
+                video.setSrc($target);
+                video.setPoster($poster);
+            });
         });
     </script>
 </div>
