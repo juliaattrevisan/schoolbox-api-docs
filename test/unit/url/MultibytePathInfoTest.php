@@ -30,6 +30,8 @@ class MultibytePathInfoTest extends PHPUnit_Framework_TestCase
             [ 'אַהֲוָא.jpeg',         null,   'אַהֲוָא.jpeg',         'jpeg',  'אַהֲוָא'        ],
             [ '/foo/אַהֲוָא.jpeg',    '/foo', 'אַהֲוָא.jpeg',         'jpeg',  'אַהֲוָא'        ],
             [ '/foo/_אַהֲוָא.jpeg',   '/foo', '_אַהֲוָא.jpeg',        'jpeg',  '_אַהֲוָא'       ],
+            [ '/foo/bar/_אַהֲוָא.jpeg', '/foo/bar', '_אַהֲוָא.jpeg',   'jpeg',  '_אַהֲוָא'       ],
+            [ '/foo/bar/',           '/foo', 'bar',             null,    'bar'       ],
         ];
     }
 
@@ -58,6 +60,7 @@ class MultibytePathInfoTest extends PHPUnit_Framework_TestCase
             if (is_null($value)) {
                 $this->assertArrayNotHasKey($field, $info, "Key '$field' is present when it should not be");
             } else {
+                $this->assertArrayHasKey($field, $info, "Key '$field' is not present when it should be");
                 $this->assertEquals($value, $info[$field], "Value for '$field' does not match");
             }
         }

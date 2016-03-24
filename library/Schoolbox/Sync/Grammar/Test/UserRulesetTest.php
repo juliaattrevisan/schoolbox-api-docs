@@ -50,38 +50,39 @@ class UserRulesetTest extends \PHPUnit_Framework_TestCase
      */
     public function dataLogging()
     {
-        $euh = new External_User();
-
-        // students
-        $studentUserAccountInfo = (array)$euh->getStudentUserAccountInfo();
-
-        /** @var ExternalStudent[] $studentData */
-        $studentData = [];
-
-        // collate the student data, because there be lotsa dupes
-        $adapter = new Adapter($euh);
-        $roleIds = RoleMapper::getInstance()->findIdsByColumn('group_type', 'student');
-        $size    = 1;
-
-        for ($i = 0; $i < $size; ++$i) {
-
-            $extId = $studentUserAccountInfo[$i]['StudentID'];
-
-            $existing = UserMapper::getInstance()->findByColumnList([ 'synergy_id' => $extId, 'group_id' => $roleIds ])->first();
-
-            if (!$existing)
-            {
-                // not an internal user - for the sake of testing, skip and get the next one if possible
-                if ($size < count($studentUserAccountInfo)) {
-                    ++$size;
-                }
-                continue;
-            }
-
-            $studentData["user $extId"] = [ $adapter->getStudent($extId), $existing ];
-        }
-
-        return $studentData;
+        return [];
+//        $euh = new External_User();
+//
+//        // students
+//        $studentUserAccountInfo = (array)$euh->getStudentUserAccountInfo();
+//
+//        /** @var ExternalStudent[] $studentData */
+//        $studentData = [];
+//
+//        // collate the student data, because there be lotsa dupes
+//        $adapter = new Adapter($euh);
+//        $roleIds = RoleMapper::getInstance()->findIdsByColumn('group_type', 'student');
+//        $size    = 1;
+//
+//        for ($i = 0; $i < $size; ++$i) {
+//
+//            $extId = $studentUserAccountInfo[$i]['StudentID'];
+//
+//            $existing = UserMapper::getInstance()->findByColumnList([ 'synergy_id' => $extId, 'group_id' => $roleIds ])->first();
+//
+//            if (!$existing)
+//            {
+//                // not an internal user - for the sake of testing, skip and get the next one if possible
+//                if ($size < count($studentUserAccountInfo)) {
+//                    ++$size;
+//                }
+//                continue;
+//            }
+//
+//            $studentData["user $extId"] = [ $adapter->getStudent($extId), $existing ];
+//        }
+//
+//        return $studentData;
     }
 
 

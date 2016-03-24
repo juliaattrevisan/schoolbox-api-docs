@@ -15,8 +15,6 @@ use Schoolbox\External\Normalise\User;
 
 class Student extends IteratorIterator
 {
-    use IteratorConstructorTrait;
-
     /**
      * Return the current element
      *
@@ -26,7 +24,7 @@ class Student extends IteratorIterator
     {
         // Build a normalized object out of the current item
         // (copypasted from Adapter->getStudentUserAccountInfo)
-        $currentResult = $this->getInnerIterator()->current();
+        $currentResult = parent::current();
         $student       = new User\Student();
         $student
             ->setId($currentResult['student_id'])

@@ -15,8 +15,6 @@ use Schoolbox\External\Normalise\User;
 
 class Staff extends IteratorIterator
 {
-    use IteratorConstructorTrait;
-
     /**
      * Return the current element
      *
@@ -26,7 +24,7 @@ class Staff extends IteratorIterator
     {
         // Build a normalized object out of the current item
         // (copypasted from Adapter->getStaffUserAccountInfo)
-        $currentResult = $this->getInnerIterator()->current();
+        $currentResult = parent::current();
         $staff         = new User\Staff();
         $staff
             ->setId($currentResult['staff_id'])
