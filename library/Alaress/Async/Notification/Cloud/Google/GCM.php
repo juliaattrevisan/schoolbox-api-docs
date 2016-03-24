@@ -9,11 +9,11 @@
 
 namespace Alaress\Async\Notification\Cloud\Google;
 
-use Alaress\Async\Notification\Cloud\ServiceInterface;
+use Alaress\Async\Notification\Cloud\AbstractService;
 use Guzzle\Http\Client;
 use OutOfBoundsException;
 use OverflowException;
-use RangeException;
+use Schoolbox\MobileApp\Registry;
 
 
 /**
@@ -23,7 +23,7 @@ use RangeException;
  *
  * @package Alaress\Async\Notification\Cloud\Google
  */
-class GCM implements ServiceInterface
+class GCM extends AbstractService
 {
 
     const GCM_API_URI = 'https://android.googleapis.com/gcm/send';
@@ -39,6 +39,7 @@ class GCM implements ServiceInterface
      */
     public function __construct($apiKey)
     {
+        parent::__construct();
         $this->apiKey = $apiKey;
     }
 
@@ -48,24 +49,30 @@ class GCM implements ServiceInterface
      */
     public function getProviderName()
     {
-        return 'gcm';
+        return Registry::PROVIDER_GOOGLE;
     }
 
 
     /**
-     * @param array $registrationIds
-     * @param array $data
-     * @throws OverflowException     if the intended payload would be too large
-     * @throws OutOfBoundsException  if the GCM API key is invalid
-     * @throws RangeException        if GCM needs us to back off
-     * @return void
+     * @param array  $registrationIds
+     * @param int    $id
+     * @param string $title
+     * @param string $body
+     * @return bool
      */
-    public function send(array $registrationIds, array $data)
+    public function propagate(array $registrationIds, $id, $title, $body)
     {
+        $data = [
+            'id'      => $id,
+            'title'   => $title,
+            'body'    => $body,
+            'vibrate' => true
+        ];
+
         $apiUri  = self::GCM_API_URI;
         $headers = array(
-            "Authorization: key=$this->apiKey",
-            'Content-Type: application/json'
+            "Authorization" => "key={$this->apiKey}",
+            "Content-Type"  => "application/json"
         );
 
         // ensure payload does not exceed 4KB
@@ -74,7 +81,6 @@ class GCM implements ServiceInterface
         }
 
         $client   = new Client();
-//        $response = new Response();
 
         // break into multiple requests if too many for a single pass
         foreach (array_chunk($registrationIds, self::MAX_TOKENS, false) as $chunk) {
@@ -86,7 +92,6 @@ class GCM implements ServiceInterface
             $rq = $client->post($apiUri, $headers, $payload);
 
             try {
-//                $response->append($registrationIds, $rq->send());
                 $rq->send();
 
             } catch (OutOfBoundsException $e) {
@@ -94,13 +99,11 @@ class GCM implements ServiceInterface
                     // your API key is bad: don't try to do anything else
                     throw $e;
                 }
-                // TODO log $e as a non-fatal error
-                echo $e;
+                $this->getLog()->warning($e->getMessage(), [ $e ]);
             }
             // range exception not caught here
         }
 
-//        return $response;
     }
 
-} 
+}

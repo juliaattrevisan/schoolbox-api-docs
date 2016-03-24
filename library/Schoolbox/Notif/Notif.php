@@ -273,8 +273,9 @@ class Notif implements NotifInterface {
 			array_push($stack, $this->handlers['instant']);
 
             if(!isset($this->handlers['push'])) {
-                $this->handlers['push'] = new PushHandler(Logger::WARNING, true);
+                $this->handlers['push'] = new PushHandler($this->log, Logger::WARNING, true);
             }
+			array_push($stack, $this->handlers['push']);
 
 			// [3f] instant user email (warning)
 			if(!isset($this->handlers['mail'])) {
