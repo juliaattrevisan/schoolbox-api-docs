@@ -69,6 +69,24 @@ class Model
     }
 
     /**
+     * Is this date considered as falling within this term?
+     *
+     * Terms actually cover all dates from their start date to the start
+     * of the next term (not inclusive).
+     *
+     * @param  Alaress_Date_Format $date
+     * @return bool
+     */
+    public function contains(Alaress_Date_Format $date)
+    {
+        // TODO make this calculation take next term's start
+        return $date->between(
+            $this->getStart(),
+            $this->getFinish()
+        );
+    }
+
+    /**
      * @return int
      */
     public function getId()
