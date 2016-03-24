@@ -128,6 +128,8 @@ if (!isset($targetDate)) {
     $targetDate = new Alaress_Date_Format(time(), 'U');
 }
 
+$targetTerm = Schoolbox\Assessment\Term\Mapper::getInstance()->findMostRecent($targetDate);
+
 $user = $userHandler->getByID($userID);
 
 // check this is a valid user
@@ -388,8 +390,7 @@ foreach ($categoryList as $category) {
         $card  = new Schoolbox\Assessment\SubjectReportCard(
             $category['id'],
             $userID,
-            $selectedYear,
-            DueWork_All::getSemester($targetDate->getUnixTimestamp()),
+            $targetTerm,
             $visibilities
         );
         $grade = $card->getGradeAverage();
