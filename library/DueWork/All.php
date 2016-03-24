@@ -4,6 +4,7 @@ use \Schoolbox\Assessment\Component\SubmissionBox;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 /**
+ * @deprecated As far as I can tell this is used nowhere.
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
