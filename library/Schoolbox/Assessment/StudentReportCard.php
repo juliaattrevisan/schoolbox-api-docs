@@ -460,7 +460,12 @@ class StudentReportCard
         $submissionBoxMapper = $this->submissionMapper;
         $rubricHandler = new \DueWork_Rubric_Handler();
 
-        $allDueWork = $submissionBoxMapper->getAllDueWork($this->targetUserId, array($this->targetCategoryId), $this->targetYear, $this->targetSemester);
+        $allDueWork = $submissionBoxMapper->getAllDueWork(
+            $this->targetUserId,
+            array($this->targetCategoryId),
+            $this->targetYear,
+            $this->targetSemester
+        );
 
         /* Oh. My. GOD.
          *
