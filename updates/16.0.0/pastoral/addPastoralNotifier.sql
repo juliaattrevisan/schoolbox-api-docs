@@ -1,7 +1,9 @@
 -- Create a stored procedure to create the message route permissions
 
+DELIMITER ;
 DROP PROCEDURE IF EXISTS create_route_perms;
 
+DELIMITER //
 CREATE PROCEDURE create_route_perms(IN source INT, IN grouptype VARCHAR(255))
 BEGIN
 
@@ -26,7 +28,9 @@ BEGIN
 
   END LOOP;
 
-END;
+END
+//
+
 DELIMITER ;
 
 -- Delete any previous created pastoral notification stuff

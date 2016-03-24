@@ -648,6 +648,7 @@ class Controller extends Base
             $comment->setBody($this->getRequest()->post["body"]);
             $comment->setOwner($this->getUser());
             $comment->setCreatedAt(\Alaress_Date_Format::now());
+            $this->getPastoralCommentMapper()->setSessionData($_SESSION);
             $this->getPastoralCommentMapper()->save($comment);
         }
 
@@ -673,7 +674,7 @@ class Controller extends Base
 
         // External interface
 
-        $pastoralExternal = new \External_Pastoral();
+        //$pastoralExternal = new \External_Pastoral();
 
         // Keep track of IDs created
 
@@ -851,7 +852,7 @@ class Controller extends Base
 
             // Update external record
 
-            $pastoralExternal->updatePastoral($record);
+            //$pastoralExternal->updatePastoral($record);
 
             // Delete old tags
 
@@ -1076,8 +1077,8 @@ class Controller extends Base
 
         // Delete on external database
 
-        $pastoralExternal = new \External_Pastoral();
-        $pastoralExternal->deletePastoral($record);
+        //$pastoralExternal = new \External_Pastoral();
+        //$pastoralExternal->deletePastoral($record);
 
         // Delete locally
 
