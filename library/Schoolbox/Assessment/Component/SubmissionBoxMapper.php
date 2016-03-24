@@ -390,13 +390,13 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     * This could get a list of categories which have submissions, and pass to
     * CategoryMapper->getByIds()?
     *
-    * @param int $user_id  The user ID to retrieve for.
-    * @param int $year     The year to fetch for.
-    * @param int $semester The semester to fetch for.
+    * @param int                  $user_id  The user ID to retrieve for.
+    * @param \Alaress_Date_Format $from
+    * @param \Alaress_Date_Format $to
     *
     * @return array
     */
-    public function submittedToCategoryList($user_id, $year, $semester)
+    public function submittedToCategoryList($user_id, \Alaress_Date_Format $from, \Alaress_Date_Format $to)
     {
         $query = "
 			SELECT category.id, category.name, GROUP_CONCAT(cc.code) AS code
@@ -410,19 +410,17 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 				WHERE (ss.owner = :user_id OR sr.owner = :user_id)
 				AND sb.deleted IS FALSE
 				AND sb.task_id IS NULL
-				AND (YEAR(sb.`date`) = :year AND MONTH(sb.`date`) BETWEEN :month_start AND :month_end)
+				AND DATE(sb.`date`) BETWEEN :from AND :to
 			)
 			GROUP BY category.id
 			ORDER BY category.name";
 
-        $months    = $this->getSemesterMonths($semester);
         $statement = $this->database->prepare($query);
 
         $statement->execute(array(
             'user_id'     => $user_id,
-            'year'        => $year,
-            'month_start' => $months['start'],
-            'month_end'   => $months['end'],
+            'from'        => $from->getDatabaseDate(),
+            'to'          => $to->getDatabaseDate(),
         ));
         return $statement->fetchAll();
     }
