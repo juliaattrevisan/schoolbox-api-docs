@@ -8,7 +8,7 @@
     <input id="work_publish_date-{{ work.item.getId }}"
            name="work[{{ work.item.getId }}][publish_date]"
            type="text"
-           value="{{ unit.open_date }}"
+           value="{{ unitDates[work.item.category.id].open_date }}"
            data-role="publish_date"
            data-datepicker
            data-datepicker-sync
@@ -20,7 +20,7 @@
     <input id="work_open_date-{{ work.item.getId }}"
            name="work[{{ work.item.getId }}][open_date]"
            type="text"
-           value="{{ unit.open_date }}"
+           value="{{ unitDates[work.item.category.id].open_date }}"
            data-role="open_date"
            data-datepicker
            data-datepicker-sync
@@ -32,7 +32,7 @@
     <input id="work_due_date-{{ work.item.getId }}"
            name="work[{{ work.item.getId }}][due_date]"
            type="text"
-           value="{{ unit.due_date }}"
+           value="{{ unitDates[work.item.category.id].due_date }}"
            data-role="due_date"
            data-datepicker
            data-datepicker-sync
@@ -43,7 +43,7 @@
     <input id="work_late_date-{{ work.item.getId }}"
            name="work[{{ work.item.getId }}][late_date]"
            type="text"
-           value="{{ unit.due_date }}"
+           value="{{ unitDates[work.item.category.id].due_date }}"
            data-role="late_date"
            data-datepicker
            data-datepicker-sync
