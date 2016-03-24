@@ -120,6 +120,11 @@ class StudentReportCard
     protected $assessMapper;
 
     /**
+     * @var Term\Mapper
+     */
+    protected $termMapper;
+
+    /**
      * @var Folder\Mapper
      */
     protected $folderMapper;
@@ -143,6 +148,7 @@ class StudentReportCard
         $this->assessMapper     = new OnlineAssessmentMapper();
         $this->groupHandler     = new \Group();
         $this->folderMapper     = new Folder\Mapper();
+        $this->termMapper       = Term\Mapper::getInstance();
         // build permissions set
         $this->establishPermissions();
         // setup helper vars
@@ -214,32 +220,8 @@ class StudentReportCard
     public function setTerm(Term\Model $term)
     {
         $this->currentTerm = $term;
+        $this->findSubjectsForTerm();
         return $this;
-    }
-
-    /**
-     * Defining the semester will self-populate with the subjects available to this semester
-     *
-     * @param $year
-     * @param $semester
-     *
-     * @deprecated Use setTerm() instead
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setSemester($year, $semester)
-    {
-        if ($year < 2000 || $year > 9999) {
-            throw new \InvalidArgumentException("Invalid year '$year'");
-        }
-        if ($semester < 1 || $semester > 2) {
-            throw new \InvalidArgumentException("Invalid semester '$semester'");
-        }
-        // set class vars
-        $this->targetYear     = $year;
-        $this->targetSemester = $semester;
-        // populate subjects in this semester
-        $this->findSubjectsForSemester();
     }
 
     /**
@@ -1227,15 +1209,17 @@ class StudentReportCard
     }
 
     /**
-     * Find all the subjects a student is involved with for a given
-     * year and semester
+     * Find all the subjects a student is involved with for this report card's term.
      */
-    protected function findSubjectsForSemester()
+    protected function findSubjectsForTerm()
     {
         $categoryList = array();
         /* Subjects involved with currently
-            */
-        if ($this->targetYear == $this->currentYear && $this->targetSemester == $this->currentSemester) {
+         */
+        if (\Alaress_Date_Format::now()->between(
+            $this->currentTerm->getStart(),
+            $this->termMapper->findNext($this->currentTerm)->getStart()->addDays(-1)
+        )) {
             $categoryList = $this->groupHandler->involvedInCategoryList($this->targetUserId, true, READ_ACCESS);
             // filter this list, so that it only contains categories in which contain results
             foreach ($categoryList as $k => $cat) {
@@ -1253,13 +1237,13 @@ class StudentReportCard
             }
         }
         /* Always merge with a list of subjects that the student has submitted to
-            * to allow them access to work completed in classes in which they may no
-            * longer be participating
-            */
+         * to allow them access to work completed in classes in which they may no
+         * longer be participating
+         */
         $submittedList = $this->submissionMapper->submittedToCategoryList(
             $this->targetUserId,
-            $this->targetYear,
-            $this->targetSemester
+            $this->currentTerm->getStart(),
+            $this->termMapper->findNext($this->currentTerm)->getStart()->addDays(-1)
         );
         /* Combine lists alphabetically
             */
