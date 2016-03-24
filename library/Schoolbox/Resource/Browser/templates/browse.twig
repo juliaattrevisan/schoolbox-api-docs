@@ -69,6 +69,8 @@
                 draggedType    = $dragged.data('type'),
                 draggedTypeGen = '',
                 draggedId      = $dragged.data('id'),
+                draggedPerm    = $dragged.data('permission'),
+                dragParentPerm = $dragged.closest(listItem).data('permission'),
                 $dropTarget    = $(data.event.target).closest(listItem),
                 dropTargetId   = $dropTarget.data('id'),
                 dropTargetType = $dropTarget.data('type'),
@@ -85,6 +87,13 @@
                 default:
                     draggedTypeGen = '{{ folderController }}';
                     break;
+            }
+
+            // Can I actually drag this item or its parent?
+            if (!(draggedPerm == 'write' || draggedPerm == 'full')
+                || !(dragParentPerm == 'write' || dragParentPerm == 'full')
+            ) {
+                return;
             }
 
             switch (dropTargetType) {

@@ -140,10 +140,15 @@
                     touch: false, // no dragging on touch screen thanks
                     copy: false,
                     is_draggable: function(nodes) {
-                        var isDraggable = true;
+                        var isDraggable = true,
+                            jstree      = this;
                         $.each(nodes, function(i, node) {
-                            var permission = node.li_attr['data-permission'];
-                            if (!(permission == 'write' || permission == 'full')) {
+                            // Check both the file and its parent
+                            var permission       = node.li_attr['data-permission'];
+                            var parentPermission = jstree.get_node(node.parent).li_attr['data-permission'];
+                            if (!(permission == 'write' || permission == 'full')
+                                || !(parentPermission == 'write' || parentPermission == 'full')
+                            ) {
                                 isDraggable = false;
                                 return false;
                             }
