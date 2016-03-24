@@ -311,26 +311,20 @@ class StudentReportCard
     protected function renderSemesterSelectors(\SitePage $page)
     {
         $contextSelector = new ContextSelector("submission/allWork/{$this->targetUserId}");
-
-        // Years is tricksy, because we first need to find out all the years in which the student in question has submitted work
-        // also, merging in this current year is a tad unfortunate
-        $submitYears  = $this->submissionMapper->getAllYearsByUser($this->targetUserId);
-        $earliestYear = empty($submitYears) ? $this->currentYear : min($submitYears);
-        $years = range($this->currentYear, $earliestYear);
-
-        $contextSelector->setYears($years);
+        $contextSelector->setTerms($this->termMapper->findAll());
         $contextSelector->setCategoryFirst(false);
 
         try {
             $contextSelector->setCategories($this->categoriesInSemester);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
+            // noop?
         }
 
         $contextSelector->render(
-            $page, 'CONTEXT_SELECTOR', array(
-                'year'     => $this->targetYear,
-                'semester' => $this->targetSemester,
+            $page,
+            'CONTEXT_SELECTOR',
+            array(
+                'term'     => $this->targetTerm,
                 'category' => ''
             )
         );
@@ -338,8 +332,7 @@ class StudentReportCard
         /* Additional phplibs not in contextSelector instance
          */
         $page->setVar(array(
-            'WORK_YEAR'     => $this->targetYear,
-            'WORK_SEMESTER' => $this->targetSemester,
+            'WORK_TERM' => $this->targetTerm->getCode(),
         ));
     }
 
