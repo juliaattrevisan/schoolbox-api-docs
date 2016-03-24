@@ -459,7 +459,18 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 );
             }
 
-        } elseif ($site_location == 'rlc') {
+        }
+        elseif ($site_location=='diocesan') {
+            $settings = array(
+                'baseUri'  => 'http://rdrive.diocesan.school.nz/',
+                'userName' => 'diont/' . $_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+            if ($groupHandler->isStaff()) {
+                $paths = array($settings['baseUri'] . 'rdrive/',);
+            }
+        }
+        elseif ($site_location == 'rlc') {
             $settings = array(
                 'baseUri' => 'http://WebDavShareDrive.rlc.qld.edu.au',
                 'userName' => 'redeemer/'.$_SESSION['username'],
