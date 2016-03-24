@@ -697,49 +697,16 @@ class Controller extends BaseController
                     }
 
 
-                    /* Compile them into a list
+                    /* Unify all three of Tasks, Due Work and Quizzes
+                     * into one mega list
                      */
                     $temp = new Collection();
 
                     foreach ($abstractCoursework as $currentAbstractCoursework) {
                         $temp->add($currentAbstractCoursework);
                     }
-//
-                    // Tasks
-//
-//                    if (!isset($taskCache[$unitCurrent->getId()])) {
-//                        $taskCache[$unitCurrent->getId()] = $this->taskMapper
-//                            ->findByColumnList([
-//                                'category_id' => $unitCache[$unitCurrent->getId()]->getId(),
-//                                'assess_id' => null
-//                            ])
-//                            ->sortBy('title', 'asc') ;
-//                    }
-//
-//                    $temp->merge($taskCache[$unitCurrent->getId()]);
-//
-//                    // Due work
-//
-//                    if (!isset($submissionCache[$unitCurrent->getId()])) {
-//                        $submissionCache[$unitCurrent->getId()] = $this->submissionBoxMapper
-//                            ->findByColumn('category', $unitCurrent->getId());
-//                    }
-//
-//                    $temp->merge($submissionCache[$unitCurrent->getId()]);
-//
-//                    // Quizzes
-//
-//                    if (!isset($quizCache[$unitCurrent->getId()])) {
-//                        $quizCache[$unitCurrent->getId()] = $this->onlineAssessmentMapper
-//                            ->findByColumn('category_id', $unitCurrent->getId());
-//                    }
-//
-//                    $temp->merge($quizCache[$unitCurrent->getId()]);
-//
-                    /* Unify all three of Tasks, Due Work and Quizzes
-                     * into one mega list
-                     *
-                     * Sort by Created At for now, until manual sequencing
+
+                    /* Sort by Created At for now, until manual sequencing
                      * is added to the ui so teachers can sort it themselves
                      */
                     $temp->sortBy('created', 'asc');
