@@ -1,33 +1,33 @@
 <div class="compact avatar card small-12 medium-4">
     <div class="icon-quiz"></div>
-    {{ work.item.getTitle }}
+    {{ work.item.title }}
 </div>
 <div class="small-12 medium-2 columns hide-for-small">
     &nbsp;
 </div>
 <div class="small-12 medium-2 columns">
     {# Quiz: Start Date #}
-    <label for="quiz_start_date-{{ work.item.getId }}">Start Date</label>
-    <input id="quiz_start_date-{{ work.item.getId }}"
-           name="quiz[{{ work.item.getId }}][start_date]"
+    <label for="quiz_start_date-{{ work.item.id }}">Start Date</label>
+    <input id="quiz_start_date-{{ work.item.id }}"
+           name="quiz[{{ work.item.id }}][start_date]"
            type="text"
            value="{{ unitDates[work.item.category.id].open_date }}"
            data-role="start_date"
            data-datepicker
            data-datepicker-sync
-           data-datepicker-sync-enddate="#quiz_start_date-{{ work.item.getId }}" />
+           data-datepicker-sync-enddate="#quiz_start_date-{{ work.item.id }}" />
 </div>
 <div class="small-12 medium-2 columns">
     {# Quiz: Finish Date #}
-    <label for="quiz_finish_date-{{ work.item.getId }}">Finish Date</label>
-    <input id="quiz_finish_date-{{ work.item.getId }}"
-           name="quiz[{{ work.item.getId }}][finish_date]"
+    <label for="quiz_finish_date-{{ work.item.id }}">Finish Date</label>
+    <input id="quiz_finish_date-{{ work.item.id }}"
+           name="quiz[{{ work.item.id }}][finish_date]"
            type="text"
            value="{{ unitDates[work.item.category.id].due_date }}"
            data-role="finish_date"
            data-datepicker
            data-datepicker-sync
-           data-datepicker-sync-enddate="#quiz_finish_date-{{ quiz.getId }}" />
+           data-datepicker-sync-enddate="#quiz_finish_date-{{ quiz.id }}" />
 </div>
 <div class="small-12 medium-2 columns hide-for-small">
     &nbsp;
