@@ -17,8 +17,13 @@
 
 namespace Schoolbox\External\Normalise\Timetable\Period;
 
-
 class NonTeaching extends Base
 {
-
+    /**
+     * Determine whether this instance is a Teaching
+     * Period (or a Non-Teaching Period)
+     *
+     * @var bool
+     */
+    protected $isTeaching = false;
 }

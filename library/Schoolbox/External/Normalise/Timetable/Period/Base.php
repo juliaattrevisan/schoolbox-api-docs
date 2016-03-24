@@ -58,6 +58,14 @@ abstract class Base
     protected $allClasses = null;
 
     /**
+     * Determine whether this instance is a Teaching
+     * Period (or a Non-Teaching Period)
+     *
+     * @var bool
+     */
+    protected $isTeaching = true;
+
+    /**
      * Base constructor.
      */
     public function __construct()
@@ -85,7 +93,7 @@ abstract class Base
      */
     public function isTeaching()
     {
-        return ($this instanceof Teaching);
+        return $this->isTeaching;
     }
 
     /**
@@ -103,16 +111,6 @@ abstract class Base
             'periodSequence' => $this->isTeaching() ? 1 : 2,
             'day'            => []
         ];
-    }
-
-    /**
-     * Determine which type of Period instance this was
-     *
-     * @return mixed
-     */
-    public function findType()
-    {
-        return array_pop(explode('\\', get_class($this)));
     }
 
     /* Getters/Setters
