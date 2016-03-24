@@ -88,20 +88,6 @@ class StudentReportCard
     protected $minimumVisibility = 3;
 
     /**
-     * @deprecated Use term instead
-     *
-     * @var int
-     */
-    protected $currentYear;
-
-    /**
-     * @deprecated Use term instead
-     *
-     * @var int
-     */
-    protected $currentSemester;
-
-    /**
      * The current term.
      *
      * @var Term\Model
@@ -351,7 +337,7 @@ class StudentReportCard
                 'RC_TITLE'      => $this->subjectData->getCategory()->getName(),
                 'SUBJ_ID'       => $this->subjectData->getCategory()->getId(),
                 'SUBJ_NAME'     => $this->subjectData->getCategory()->getName(),
-                'SUBJ_SEMESTER' => "Semester {$this->targetSemester}, {$this->targetYear}",
+                'SUBJ_SEMESTER' => $this->targetTerm->getTitle(),
             )
         );
         // iterate the components and output them if we know how
@@ -1032,7 +1018,7 @@ class StudentReportCard
      */
     protected function renderOverview(\SitePage $page)
     {
-        $page->setVar('RC_TITLE', "Semester {$this->targetSemester}, {$this->targetYear}");
+        $page->setVar('RC_TITLE', $this->targetTerm->getTitle());
         // we need to inject content into subject_container_block rather than use its template
         $page->setFile('subjectListTpl', 'submission/allWorkOverview.html');
         $page->setFile('subjectTpl', 'activity/subjectlist.html');
@@ -1144,7 +1130,7 @@ class StudentReportCard
                 'SUBJ_SUBJECT_NAME' => \Scrub::Text($category->getName()),
                 'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
                 'SUBJ_SUBJECT_CODE' => $categoryCode,
-                'SUBJ_SUBJECT_URL'  => "/submission/allWork/{$this->targetUserId}/{$this->targetYear}/{$this->targetSemester}/$categoryID",
+                'SUBJ_SUBJECT_URL'  => "/submission/allWork/{$this->targetUserId}/{$this->targetTerm->getCode()}/$categoryID",
 //                'SUBJ_TOTAL' => $summary[$category['id']]['total'],
                 'SUBJ_TREND_DIR'    => $trendDir,
                 'SUBJ_TREND_AMT'    => $trendAmt,
@@ -1327,17 +1313,5 @@ class StudentReportCard
     public function setViewingUser($viewingUser)
     {
         $this->viewingUser = $viewingUser;
-    }
-
-
-
-    public function getTargetYear()
-    {
-        return $this->targetYear;
-    }
-
-    public function getTargetSemester()
-    {
-        return $this->targetSemester;
     }
 }
