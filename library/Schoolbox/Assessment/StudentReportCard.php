@@ -258,8 +258,7 @@ class StudentReportCard
         $this->subjectData = new SubjectReportCard(
             $subjectId,
             $this->targetUserId,
-            $this->targetYear,
-            $this->targetSemester,
+            $this->targetTerm,
             $duework_visibilities
         );
     }
@@ -1122,8 +1121,7 @@ class StudentReportCard
                 $card  = new SubjectReportCard(
                     $categoryID,
                     $this->targetUserId,
-                    $this->targetYear,
-                    $this->targetSemester,
+                    $this->targetTerm,
                     $visibilities
                 );
                 $grade = $card->getGradeAverage();
