@@ -332,7 +332,9 @@ class StudentReportCard
         /* Additional phplibs not in contextSelector instance
          */
         $page->setVar(array(
-            'WORK_TERM' => $this->targetTerm->getCode(),
+            'WORK_YEAR'     => $this->targetTerm->getStart()->getYear(),
+            'WORK_SEMESTER' => $this->targetTerm->getStart()->getYearHalf(),
+            'WORK_TERM'     => $this->targetTerm->getCode(),
         ));
     }
 
