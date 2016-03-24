@@ -760,8 +760,20 @@ class Controller extends BaseController
                             $class = 'Task';
                         }
 
+                        /* Determine whether this was an abstract task, or a task instance
+                         * that actually exists (the former will have to inherit unit dates
+                         * and the latter will have to retain unit dates
+                         */
+                        if ($current instanceof \Schoolbox\Assessment\Course\Task) {
+                            $isAbstract = true;
+                        }
+                        else {
+                            $isAbstract = false;
+                        }
+
                         $unit['items']->add([
                             'class' => $class,
+                            'isAbstract' => $isAbstract,
                             'item' => $current
                         ]);
                     }
