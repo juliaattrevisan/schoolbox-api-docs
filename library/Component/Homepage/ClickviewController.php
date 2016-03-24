@@ -62,7 +62,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
 
 
             /* Latest version now provides iframe embedding but uses a masking URL, so annoying
-            * http://clickv.ie/w/-eFa
+             * http://clickv.ie/w/-eFa
              * Also can be embed code with the following URL
              * <iframe frameborder="0"
              *  allowfullscreen webkitallowfullscreen mozallowfullscreen
@@ -104,6 +104,8 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                     $this->setVar('VIDEO_ID', $parts['sharecode']);
                     $this->parse('iframe_clickview_block', 'iframe_clickview');
                 }
+                // Is there a start and end?
+
             }
         }
 

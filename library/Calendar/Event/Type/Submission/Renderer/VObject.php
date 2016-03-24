@@ -42,10 +42,14 @@ class VObject extends VObjectBase
             $start_time = $this->getEvent()->getStartTime()->getDateTimeObject();
             if (!($start_time instanceof DateTime)) {
                 $start_time = new DateTime($this->getEvent()->getStartTime()->getDatabase());
+            } else {
+                $start_time = clone $start_time;
             }
             $end_time = $this->getEvent()->getEndTime()->getDateTimeObject();
             if (!($end_time instanceof DateTime)) {
                 $end_time = new DateTime($this->getEvent()->getEndTime()->getDatabase());
+            } else {
+                $end_time = clone $end_time;
             }
             if (!$this->getEvent()->getAllday()) {
                 $start_time->setTimezone($utcTimezone);
