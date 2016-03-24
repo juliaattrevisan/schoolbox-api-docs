@@ -24,16 +24,25 @@ if (!empty($_POST['group'])) {
 	$groupsSelected[$_GET['leave']] = false;
 }
 
+/** @var Schoolbox\User $user */
+$user = $_SESSION['user'];
 foreach ($groupsSelected as $groupId => $isJoining) {
 	if ($isJoining) {
 		$group = $groupHandler->getByID($groupId);
 
-		$ua = new UserAccess();
-		$ua
-			->setService(UserAccess::SERVICE_HOMEPAGE)
-			->setServiceIdentifier($groupId)
-			->setUser($_SESSION['user'])
-			->setAccessLevel(UserAccess::ACCESS_DENY);
+		try {
+			$ua = $uaMapper->findOneByColumnList([
+				'uid' => $user->getId(),
+				'service' => UserAccess::SERVICE_HOMEPAGE,
+				'sid'     => $groupId,
+			]);
+		} catch (Mapper\Exception $e) {
+			$ua = new UserAccess();
+			$ua->setUser($user)
+				->setAccessLevel(UserAccess::ACCESS_DENY)
+				->setService(UserAccess::SERVICE_HOMEPAGE)
+				->setServiceIdentifier($groupId);
+		}
 
 		if ($group['type'] == GROUP_TYPE_FREE) {
 			// allow read access immediately for a free group
@@ -43,6 +52,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 		}
 		else if ($group['type'] == GROUP_TYPE_MODERATED) {
 			// insert the user into the perms table, but deny them access (pending state)
+			// If they already have access, keep it as is.
 			$uaMapper->save($ua);
 			$response = 'pending';
 		}
@@ -51,7 +61,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 		// delete the record that matches the given params
 		$count = $uaMapper->deleteByColumnList(array(
 			'service' => UserAccess::SERVICE_HOMEPAGE,
-			'uid'     => $_SESSION['user']->getId(),
+			'uid'     => $user->getId(),
 			'sid'     => $groupId
 		));
 
@@ -61,12 +71,12 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 			// we need to manually raise a DELETE notification
 			// since the Mapper can't automagically do it for this Model
 			$model = new UserAccess();
-			$model->setUser($_SESSION['user'])
-				->setAccessLevel(0)
+			$model->setUser($user)
+				->setAccessLevel(UserAccess::ACCESS_DENY)
 				->setService(UserAccess::SERVICE_HOMEPAGE)
 				->setServiceIdentifier($groupId);
 
-			$event = new Event($_SESSION['user'], Mapper::METHOD_DELETE, $model, $uaMapper);
+			$event = new Event($user, Mapper::METHOD_DELETE, $model, $uaMapper);
 			$notif = new Notif(Notif::TOPIC_APPLICATION);
 			$notif->notice(serialize($event));
 		}
