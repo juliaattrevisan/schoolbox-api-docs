@@ -1,6 +1,12 @@
 <div class="compact avatar card small-12 medium-4">
     <div class="icon-quiz"></div>
     {{ work.item.title }}
+
+    <p>
+        Item: {{ work.item.id }}<br />
+        Category: {{ work.item.category.id }}<br />
+        Is Abstract: {{ work.isAbstract }}
+    </p>
 </div>
 <div class="small-12 medium-2 columns hide-for-small">
     &nbsp;
@@ -11,7 +17,7 @@
     <input id="quiz_start_date-{{ work.item.id }}"
            name="quiz[{{ work.item.id }}][start_date]"
            type="text"
-           value="{{ unitDates[work.item.category.id].open_date }}"
+           value="{% if work.isAbstract %}{{ unitDates[work.item.category.id].open_date }}{% else %}{{ unit.open_date }}{% endif %}"
            data-role="start_date"
            data-datepicker
            data-datepicker-sync
@@ -23,7 +29,7 @@
     <input id="quiz_finish_date-{{ work.item.id }}"
            name="quiz[{{ work.item.id }}][finish_date]"
            type="text"
-           value="{{ unitDates[work.item.category.id].due_date }}"
+           value="{% if work.isAbstract %}{{ unitDates[work.item.category.id].due_date }}{% else %}{{ unit.open_date }}{% endif %}"
            data-role="finish_date"
            data-datepicker
            data-datepicker-sync

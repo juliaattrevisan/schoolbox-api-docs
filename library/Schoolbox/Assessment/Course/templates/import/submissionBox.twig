@@ -1,6 +1,12 @@
 <div class="compact avatar card small-12 medium-4">
     <div class="icon-due-work"></div>
-    {{ work.item.title }} {{ work.item.id }}
+    {{ work.item.title }}
+
+    <p>
+        Item: {{ work.item.id }}<br />
+        Category: {{ work.item.category.id }}<br />
+        Is Abstract: {{ work.isAbstract }}
+    </p>
 </div>
 <div class="small-12 medium-2 columns">
     {# Due Work: Publish Date #}
@@ -8,7 +14,7 @@
     <input id="work_publish_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][publish_date]"
            type="text"
-           value="{{ unitDates[work.item.category.id].open_date }}"
+           value="{% if work.isAbstract %}{{ unitDates[work.item.category.id].open_date }}{% else %}{{ unit.open_date }}{% endif %}"
            data-role="publish_date"
            data-datepicker
            data-datepicker-sync
@@ -20,7 +26,7 @@
     <input id="work_open_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][open_date]"
            type="text"
-           value="{{ unitDates[work.item.category.id].open_date }}"
+           value="{% if work.isAbstract %}{{ unitDates[work.item.category.id].open_date }}{% else %}{{ unit.open_date }}{% endif %}"
            data-role="open_date"
            data-datepicker
            data-datepicker-sync
@@ -32,7 +38,7 @@
     <input id="work_due_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][due_date]"
            type="text"
-           value="{{ unitDates[work.item.category.id].due_date }}"
+           value="{% if work.isAbstract %}{{ unitDates[work.item.category.id].due_date }}{% else %}{{ unit.due_date }}{% endif %}"
            data-role="due_date"
            data-datepicker
            data-datepicker-sync
@@ -43,7 +49,7 @@
     <input id="work_late_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][late_date]"
            type="text"
-           value="{{ unitDates[work.item.category.id].due_date }}"
+           value="{% if work.isAbstract %}{{ unitDates[work.item.category.id].due_date }}{% else %}{{ unit.due_date }}{% endif %}"
            data-role="late_date"
            data-datepicker
            data-datepicker-sync
