@@ -256,30 +256,6 @@ class InstanceMapper extends Mapper {
     }
 
     /**
-     * Find the originally-specified list of tasks for a given
-     * Unit Category ID (the originating unit for a unit instance)
-     *
-     * @param $unitCategoryId
-     * @return \Schoolbox\Collection
-     */
-    public function findAbstractTasksForUnit($unitCategoryId)
-    {
-        $query = "
-            SELECT {$this->getColumnString('ti')}
-            FROM {$this->getTable()} ti
-            LEFT JOIN course_unit_instance cui ON ti.course_unit_instance_id = cui.id
-            WHERE cui.unit_category_id = :unitCategoryId;
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute([
-            'unitCategoryId' => $unitCategoryId
-        ]);
-
-        return $this->hydrateList($statement, 'ti');
-    }
-
-    /**
      * @param object $object
      * @param string $verb
      * @param null   $previous
