@@ -424,8 +424,16 @@ class Mapper extends BaseMapper
 
             // Check permission
 
-            if ($this->hasPermission($record))
+            if ($this->hasPermission($record)) {
+
+                if ($record->getPrivate() && !$this->hasPrivatePermission($record)) {
+                    $record->setBody("The contents of this record have been marked as private.");
+                    $record->setShowPrivate(false);
+                } else {
+                    $record->setShowPrivate(true);
+                }
                 $records->add($this->hydrateRecord($record, $row));
+            }
         }
 
         return $records;

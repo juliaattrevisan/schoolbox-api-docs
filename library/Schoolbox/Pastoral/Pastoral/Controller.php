@@ -493,7 +493,11 @@ class Controller extends Base
 
         if ($pastoral->getPrivate()) {
             if (!$this->getPastoralMapper()->hasPrivatePermission($pastoral)) {
-                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+
+                // Didn't have access to private record, but did have access by role
+
+                $this->getResponse()->redirect->afterPost("/pastoral/{$this->getRequest()->post["student_id"]}/{$this->getRequest()->post["pastoral_id"]}");
+                return;
             }
         }
 
