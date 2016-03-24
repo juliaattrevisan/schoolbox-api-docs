@@ -92,6 +92,7 @@ class Controller extends BaseController
         $this->setComponentInstanceMapper(Component_InstanceMapper::getInstance());
         $this->setUnitInstanceMapper(UnitInstanceMapper::getInstance());
         $this->setTaskMapper(TaskMapper::getInstance());
+        $this->setTaskInstanceMapper(TaskInstanceMapper::getInstance());
         $this->setHomepageConfigMapper(HomepageConfigMapper::getInstance());
         $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
         $this->setAccess(Access::getInstance());
