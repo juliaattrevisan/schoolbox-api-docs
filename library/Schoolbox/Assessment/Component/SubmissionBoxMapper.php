@@ -438,16 +438,14 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     *
     * @return array
     */
-    public function getAllDueWork($user_id, $categories, $year = 0, $semester = 0)
+    public function getAllDueWork($user_id, $categories, \Alaress_Date_Format $from, \Alaress_Date_Format $to)
     {
         //
         // Submission box: hydrate with category, student submissions and returns.
-        $months = $this->getSemesterMonths($semester);
         $params = $this->getArrayParameters($categories, 'category');
-        $params['year']        = $year ?: date('Y');
-        $params['user_id']     = $user_id;
-        $params['month_start'] = $months['start'];
-        $params['month_end']   = $months['end'];
+        $params['user_id'] = $user_id;
+        $params['from']    = $from->getDatabaseDate();
+        $params['to']      = $to->getDatabaseDate();
 
         $query = "
 			SELECT
@@ -472,8 +470,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			LEFT JOIN lu_submission_type f ON b.type = f.id
 			WHERE b.deleted = 0
 			AND b.category IN {$this->getArrayPlaceholders($categories, 'category')}
-			AND YEAR(b.date) = :year
-			AND MONTH(b.date) BETWEEN :month_start AND :month_end
+			AND DATE(b.date) BETWEEN :from AND :to
 			AND b.task_id IS NULL
 			GROUP BY b.id
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
