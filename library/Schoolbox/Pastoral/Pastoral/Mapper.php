@@ -428,71 +428,80 @@ class Mapper extends BaseMapper
 
     public function hasPermission(Pastoral\Model $record)
     {
+        // Hack for notifier
+
+        if (!isset($_SESSION)) {
+            return true;
+        }
+
         /** @var \Schoolbox\User $user */
         $user = $_SESSION["user"];
 
-        // Pastoral moderators can access everything
+        if ($user instanceof \Schoolbox\User) {
 
-        if ($this->getUserAccessMapper()->findAllForUser($user)->filterBy("service", PASTORAL_SERVICE)->count() > 0)
-            return true;
+            // Pastoral moderators can access everything
 
-        // To access a record you at least be a staff member, or the parent of the student
-
-        /** @var \Schoolbox\Role $role */
-        $role = $user->getRole();
-
-        // Students and guests, get outta here
-
-        if ($role->isStudent() || $role->isGuest())
-            return false;
-
-        // Parents must be a parent of the child the record relates to
-
-        if ($role->isParent())
-        {
-            try {
-                $record->setStudent($this->getUserMapper()->findById($record->getStudent()->getId()));
-            }
-            catch (\Exception $e) {
-                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+            if ($this->getUserAccessMapper()->findAllForUser($user)->filterBy("service",
+                    PASTORAL_SERVICE)->count() > 0
+            ) {
+                return true;
             }
 
-            $record->getStudent()->loadParents();
+            // To access a record you at least be a staff member, or the parent of the student
 
-            if (!$user->isParentOf($record->getStudent())) {
+            /** @var \Schoolbox\Role $role */
+            $role = $user->getRole();
+
+            // Students and guests, get outta here
+
+            if ($role->isStudent() || $role->isGuest()) {
                 return false;
             }
-        }
 
-        // Give owners permission to their own records regardless of other permissions
+            // Parents must be a parent of the child the record relates to
 
-        if ($record->getOwner()->getId() == $user->getId()) {
-            return true;
-        }
+            if ($role->isParent()) {
+                try {
+                    $record->setStudent($this->getUserMapper()->findById($record->getStudent()->getId()));
+                } catch (\Exception $e) {
+                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+                }
 
-        // If we get through to here we need to check the audience of item
+                $record->getStudent()->loadParents();
 
-        $record->setAccessList($this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId()));
-
-        $accessRecords = $record->getAccessList();
-
-        foreach ($accessRecords as $accessCurrent)
-        {
-            // Access records are either role based of user based.
-
-            if (is_numeric($accessCurrent->getRole()->getId()))
-            {
-                // This access record is a role one, check if the user is in this role
-
-                if ($role->getId() == $accessCurrent->getRole()->getId())
-                    return true;
+                if (!$user->isParentOf($record->getStudent())) {
+                    return false;
+                }
             }
-            else
-            {
-                // This access record is a user based one, check if this is the user
 
-                if ($accessCurrent->getUser()->getId() == $user->getId())
-                    return true;
+            // Give owners permission to their own records regardless of other permissions
+
+            if ($record->getOwner()->getId() == $user->getId()) {
+                return true;
+            }
+
+            // If we get through to here we need to check the audience of item
+
+            $record->setAccessList($this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId()));
+
+            $accessRecords = $record->getAccessList();
+
+            foreach ($accessRecords as $accessCurrent) {
+                // Access records are either role based of user based.
+
+                if (is_numeric($accessCurrent->getRole()->getId())) {
+                    // This access record is a role one, check if the user is in this role
+
+                    if ($role->getId() == $accessCurrent->getRole()->getId()) {
+                        return true;
+                    }
+                } else {
+                    // This access record is a user based one, check if this is the user
+
+                    if ($accessCurrent->getUser()->getId() == $user->getId()) {
+                        return true;
+                    }
+                }
             }
         }
 

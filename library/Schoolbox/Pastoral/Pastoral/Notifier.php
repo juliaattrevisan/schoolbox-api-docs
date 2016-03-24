@@ -6,6 +6,7 @@ use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -30,9 +31,13 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
+        // Get hydrated pastoral record
+
+        $pastoral = $this->getPastoralMapper()->findById($model->getId());
+
         $builder = new Builder();
         $builder->setTitle("A pastoral care record has been {$method}")
-            ->setIcon("/portrait.php?size=32&userId=" . $model->getStudent()->getExternalId())
+            ->setIcon("/portrait.php?size=32&userId=" . $pastoral->getOwner()->getExternalId())
             ->setHref("/pastoral/" . $model->getStudent()->getId() . "/" . $model->getId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::ERROR)
@@ -81,6 +86,8 @@ class Notifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
+        if (empty($dependencies["pastoralMapper"]))
+            $dependencies["pastoralMapper"] = PastoralMapper::getInstance();
         if (empty($dependencies["pastoralAccessMapper"]))
             $dependencies["pastoralAccessMapper"] = PastoralAccessMapper::getInstance();
         if (empty($dependencies["roleMapper"]))
@@ -152,6 +159,9 @@ class Notifier extends AbstractModuleNotifier
      */
     protected $roleMapper;
 
+    /** @var PastoralMapper $pastoralMapper */
+    protected $pastoralMapper;
+
     /** @var PastoralAccessMapper $pastoralAccessMapper */
     protected $pastoralAccessMapper;
 
@@ -188,4 +198,22 @@ class Notifier extends AbstractModuleNotifier
         $this->roleMapper = $roleMapper;
         return $this;
     }
+
+    /**
+     * @return PastoralMapper
+     */
+    public function getPastoralMapper() {
+        return $this->pastoralMapper;
+    }
+
+    /**
+     * @param PastoralMapper
+     * @return $this
+     */
+    public function setPastoralMapper($pastoralMapper)
+    {
+        $this->pastoralMapper = $pastoralMapper;
+        return $this;
+    }
+
 }
