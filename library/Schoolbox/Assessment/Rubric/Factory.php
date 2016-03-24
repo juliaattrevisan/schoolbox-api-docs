@@ -242,7 +242,7 @@ class Factory
                 $descriptorText  = $descriptor['text'];
                 $descriptorValue = $descriptor['points'];
 
-                if ($descriptorText || $descriptorValue) {
+                if (strlen($descriptorText) || strlen($descriptorValue)) {
                     $d = new Descriptor($descriptorText, $descriptorValue, $descriptorId);
                     try {
                         $rubric->putDescriptor($g, $c, $l, $d);

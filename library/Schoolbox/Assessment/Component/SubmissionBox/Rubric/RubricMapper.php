@@ -510,7 +510,7 @@ class RubricMapper
                 $dText = trim($square[$i][$j]);
                 $dVal  = trim($square[$i + 1][$j]);
 
-                if ($dText || $dVal) {
+                if (strlen($dText) || strlen($dVal)) {
 
                     // turn this criterion on
                     $postdata['criterion'][$critId]['on'] = true;
