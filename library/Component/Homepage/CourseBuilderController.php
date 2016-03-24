@@ -8,6 +8,7 @@
  */
 
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\TaskBuilder;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Resource\Folder\Model as CategoryModel;
 use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
@@ -94,11 +95,13 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
         $this->setBlock('task', 'task_no_link', 'task_no_link_block');
         $this->setBlock('task', 'edit_task_form', 'edit_task_form_block');
 
+        $returnUrl = urlencode(base64_encode($_GET["page"])) == '' ? $_POST["return_url"] : urlencode(base64_encode($_GET["page"]));
+
         $this->setVar(
             array(
                 'SESSION_NAME'   => session_name(),
                 'SESSION_ID'     => session_id(),
-                'RETURN_URL'     => urlencode(base64_encode($_GET["page"])) == '' ? $_POST["return_url"] : urlencode(base64_encode($_GET["page"])),
+                'RETURN_URL'     => $returnUrl,
                 'COMPONENT_NAME' => $this->getConfig('componentname'),
                 'UNIT_LIST'      => json_encode(
                     $this->unitList->map(
@@ -123,7 +126,6 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
         }
         $this->setVar('task_block', '');
 
-        $i = 0;
         foreach ($this->task_list as $task) {
             $this->setVar(
                 array(
@@ -144,52 +146,38 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
             );
 
             $task_type = $task->getType();
+
             if ($task_type === Task::TYPE_TASK) {
-                $this->setVar(
-                    'TASK_REVEAL_ATTR',
-                    'data-reveal-id="editTask-' . Scrub::text($task->getId()) . '"'
-                );
-                $zone = $this->newZone('az-task-' . $task->getId());
 
-                if (strpos($task->getLink(), '/storage/fetch.php') === 0) {
-                    $zone->attachFiles(array(substr($task->getLink(), -40)));
-                    $this->setVar(
-                        array(
-                            'TASK_ATTACH_DISPLAY' => 'display: block;',
-                            'TASK_URL_DISPLAY'    => 'display: none;'
-                        )
-                    );
+                $this->setVar('edit_task_form_block', $this->sitepage->getTwig()->render('@course/task/reveal-modal.twig', [
+                    'reveal' => new TaskBuilder($this->getInstance(), $task, $returnUrl)
+                ]));
 
-                } else {
-                    $this->setVar(
-                        array(
-                            'TASK_ATTACH_DISPLAY' => 'display: none;',
-                            'TASK_URL_DISPLAY'    => 'display: block;'
-                        )
-                    );
-                }
-
-                $zone->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
-
-                $this->parse('edit_task_form_block', 'edit_task_form');
                 $this->setVar('TASK_TYPE', 'task');
+
                 if (strlen($task->getLink()) > 0) {
                     $this->parse('task_link_block', 'task_link');
+
                 } else {
                     $this->parse('task_no_link_block', 'task_no_link');
                 }
+
             } elseif ($task_type === Task::TYPE_DUE_WORK) {
                 $this->setVar('TASK_TYPE', 'due_work');
                 $this->parse('task_no_link_block', 'task_no_link');
+
             } elseif ($task_type === Task::TYPE_ONLINE_ASSESS) {
                 $this->setVar('TASK_TYPE', 'assessment');
                 $this->parse('task_no_link_block', 'task_no_link');
             }
+
             $this->parse('edit_task_block', 'edit_task');
             $this->parse('task_block', 'task', true);
         }
 
-        $this->newZone('az-new-task', 'ATTACH_ZONE');
+        $this->setVar('CREATE_MODAL', $this->sitepage->getTwig()->render('@course/task/reveal-modal.twig', [
+            'reveal' => new TaskBuilder($this->getInstance(), null, $returnUrl)
+        ]));
 
         return true;
     }
