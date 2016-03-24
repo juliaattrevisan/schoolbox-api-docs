@@ -223,12 +223,15 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         foreach ($periodList as $period) {
             $periodSequence = $period['sequence'];
 
+            $startTime = new Alaress_Date_Format($period['start'], Alaress_Date_Format::DATABASE_TIME_FORMAT);
+            $endTime = new Alaress_Date_Format($period['finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT);
+
             if (!isset($periodListAdaption[$periodSequence])) {
                 $periodListAdaption[$periodSequence] = array(
                     'periodNumber'   => $period['sequence'],
                     'periodName'     => $period['title'],
-                    'periodStart'    => $period['start'],
-                    'periodEnd'      => $period['finish'],
+                    'periodStart'    => $startTime->getTimeOnly(),
+                    'periodEnd'      => $endTime->getTimeOnly(),
                     'periodSequence' => 1,
                     'day'            => array_fill(1, $dayCount, array()),
                 );
@@ -284,11 +287,15 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $periodListAdaption = array();
 
         foreach ($periodList as $period) {
+
+            $startTime = new Alaress_Date_Format($period['start'], Alaress_Date_Format::DATABASE_TIME_FORMAT);
+            $endTime = new Alaress_Date_Format($period['finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT);
+
             $periodAdaption = array(
                 'periodNumber'   => $period['sequence'],
                 'periodName'     => $period['title'],
-                'periodStart'    => $period['start'],
-                'periodEnd'      => $period['finish'],
+                'periodStart'    => $startTime->getTimeOnly(),
+                'periodEnd'      => $endTime->getTimeOnly(),
                 'periodSequence' => 1,
                 'class'          => [],
             );
