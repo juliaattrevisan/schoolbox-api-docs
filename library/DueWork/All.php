@@ -32,6 +32,16 @@ class DueWork_All {
     private $year = 0;
     private $semester = 0;
 
+    /**
+     * @var Alaress_Date_Format
+     */
+    private $fromDate;
+
+    /**
+     * @var Alaress_Date_Format
+     */
+    private $toDate;
+
     private $categories = array();
 
 	protected $submission_mapper;
@@ -91,6 +101,22 @@ class DueWork_All {
 
         $this->year = $year;
         $this->semester = $semester;
+
+        // Half-heartedly make this compatible with terms
+        $from = Alaress_Date_Format::now()->setYear($this->year ?: $this->currentYear)->startOfYear();
+        $to   = Alaress_Date_Format::now()->setYear($this->year ?: $this->currentYear)->endOfYear();
+        switch ($this->semester) {
+            case 1:
+                $to = $to->setMonth(6)->setDay(30);
+                break;
+            case 2:
+                $from = $from->setMonth(7)->setDay(1);
+                break;
+            default:
+                break;
+        }
+        $this->fromDate = $from;
+        $this->toDate   = $to;
 
         $this->setupTemplates();
         $this->parseArchiveSelector();
@@ -189,8 +215,8 @@ class DueWork_All {
         else {
             $categoryList = $this->submission_mapper->submittedToCategoryList(
                 $this->user['uid'],
-                $this->year,
-                $this->semester
+                $this->fromDate,
+                $this->toDate
             );
         }
 
@@ -211,8 +237,8 @@ class DueWork_All {
         $allWork = $this->submission_mapper->getAllDueWork(
             $this->user['uid'],
             $this->getCategoryIDList(),
-            $this->year,
-            $this->semester
+            $this->fromDate,
+            $this->toDate
         );
 
         if (!is_array($allWork) || !count($allWork)) {
