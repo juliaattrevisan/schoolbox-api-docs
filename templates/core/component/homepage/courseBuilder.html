@@ -15,35 +15,6 @@
                     previewSelector: '[data-plugin=preview]'
                 });
 
-                // Url attachment options
-                $(document).on('click', 'form[data-component="component{COMPONENT_INSTANCE_ID}"] .post-attachment a[data-value]', function() {
-                    var self = $(this),
-                            form = self.closest('form'),
-                            type = self.attr('data-value');
-
-                    form.find('input[name=type]').val(type);
-
-                    // show only the one we want
-                    var attachers = form.find('div.post-attachment');
-                    attachers.hide().filter('.'+type).show();
-
-                    form.find('input[name=url]').val('').prop('readonly', type == 'attach');
-
-                    if (type == 'url') {
-                        // tell the attacher to clear any attachments by simulating clicking of all the (one...) delete buttons
-                        // not jQuery.detach() - it can't trigger dropzone's event listener
-                        form.find('.post-attachment.attach').find('p.actions a.delete').each(function() {
-                            var event = new CustomEvent('click');
-                            this.dispatchEvent(event);
-                        });
-                    }
-
-                });
-
-                // Did I remove an attachment? Remove the URL too
-                component.on('click', 'a[data-dz-remove]', function() {
-                    $(this).closest('form').find('input[name=url]').val('').prop('readonly', false);
-                });
             });
         })(jQuery);
     </script>
