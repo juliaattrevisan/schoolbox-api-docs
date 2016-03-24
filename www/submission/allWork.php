@@ -43,7 +43,7 @@ if(isset($_GET['year']) || isset($_GET['semester'])) {
 $termMapper = Term\Mapper::getInstance();
 if (isset($this->arg[1])) {
 	try {
-		$term = $termMapper->findByColumn('code', $this->arg[1]);
+		$term = $termMapper->findOneByColumn('code', $this->arg[1]);
 	} catch (\Schoolbox\Mapper\Exception $e) {
 		$this->localRedir('/submission/allWork/'.$userId);
 		exit;
@@ -123,7 +123,7 @@ if($permission == PERMISSION_DENIED) {
 
 // ok. from here we're actually going to show the page, and not redirect
 $report = new StudentReportCard($userId);
-$report->setSemester($year, $semester);
+$report->setTerm($term);
 
 if($subject) {
 	$report->setSubjectWithinSemester($subject);
