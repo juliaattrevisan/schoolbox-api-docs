@@ -11,7 +11,7 @@
     <input id="quiz_start_date-{{ work.item.getId }}"
            name="quiz[{{ work.item.getId }}][start_date]"
            type="text"
-           value="{{ unit.open_date }}"
+           value="{{ unitDates[work.item.category.id].open_date }}"
            data-role="start_date"
            data-datepicker
            data-datepicker-sync
@@ -23,7 +23,7 @@
     <input id="quiz_finish_date-{{ work.item.getId }}"
            name="quiz[{{ work.item.getId }}][finish_date]"
            type="text"
-           value="{{ unit.due_date }}"
+           value="{{ unitDates[work.item.category.id].due_date }}"
            data-role="finish_date"
            data-datepicker
            data-datepicker-sync

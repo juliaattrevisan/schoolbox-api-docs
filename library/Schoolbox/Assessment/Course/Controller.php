@@ -639,6 +639,16 @@ class Controller extends BaseController
                 /** @var Category[] $unitCache */
                 $unitCache = [];
 
+                $unitDates = $this->getRequest()->post["unit"];
+
+                /* Format this into a convenient structure for now
+                 */
+                $preprocessedUnitDates = [];
+
+                foreach ($unitDates as $currentUnitDate) {
+                    $preprocessedUnitDates[$currentUnitDate['unit_id']] = $currentUnitDate;
+                }
+
                 /* Make a local cache for unit information
                  */
                 foreach ($this->getRequest()->post["unit"] as $unit) {
@@ -691,20 +701,47 @@ class Controller extends BaseController
 //                    new \Alaress_Probe($key, $unitInstance->getId());
 //                    new \Alaress_Probe($abstractCoursework, $instancesCoursework);
 
-                    /* If the coursework instances exist, use them; otherwise spawn
-                     * a temporary instance of the abstract coursework
-                     */
-                    foreach ($abstractCoursework as $current) {
-                    }
-
 
                     /* Unify all three of Tasks, Due Work and Quizzes
                      * into one mega list
                      */
                     $temp = new Collection();
 
+                    /* If the coursework instances exist, use them; otherwise spawn
+                     * a temporary instance of the abstract coursework
+                     */
+                    $found = [];
+
                     foreach ($abstractCoursework as $currentAbstractCoursework) {
-                        $temp->add($currentAbstractCoursework);
+                        foreach ($instancesCoursework as $currentInstanceCoursework) {
+
+                            /* An instance already exists; use that and stop searching
+                             */
+                            if ($currentInstanceCoursework->getTask()->getId() == $currentAbstractCoursework->getId()) {
+                                $found[] = $currentAbstractCoursework->getId();
+
+                                $temp->add($currentInstanceCoursework);
+
+                                /* Retain the dates for this coursework as specified by
+                                 * the original import;
+                                 */
+                                $unitInstance = $this->getUnitInstanceMapper()->findById($currentInstanceCoursework->getUnitInstance()->getId());
+
+                                $key = $unitInstance->getUnitCategory()->getId();
+
+                                $preprocessedUnitDates[$key]['open_date'] = $unitInstance->getOpenDate()->getLocalShort();
+                                $preprocessedUnitDates[$key]['due_date'] = $unitInstance->getDueDate()->getLocalShort();
+
+                                break;
+                            }
+                        }
+
+                        /* If an instance of the abstract coursework wasn't found,
+                         * use the abstract instead; otherwise ignore and continue
+                         */
+                        if (in_array($currentAbstractCoursework->getId(), $found)) {
+                            $temp->add($currentAbstractCoursework);
+                        }
                     }
 
                     /* Sort by Created At for now, until manual sequencing
@@ -739,7 +776,7 @@ class Controller extends BaseController
                     'data' => [
                         'homepage' => $this->getRequest()->post["homepage"],
                         'courseHomepage' => $this->getRequest()->post["course_homepage"],
-                        'unitDates' => $this->getRequest()->post["unit"],
+                        'unitDates' => $preprocessedUnitDates,
                         'units' => $units
                     ]
                 ]);
