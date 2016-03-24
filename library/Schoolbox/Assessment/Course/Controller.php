@@ -663,22 +663,26 @@ class Controller extends BaseController
                     /* Get a list of all the abstract coursework that were part of
                      * the original unit specification
                      */
-                    $taskInstanceMapper = new \Schoolbox\Assessment\Course\Task\InstanceMapper();
-                    $abstractCoursework = $taskInstanceMapper->findAbstractTasksForUnit($key);
+                    $abstractCoursework = $this->getTaskMapper()->findAbstractTasksForUnit($key);
 
                     /* Get a list of all the coursework instances that were created
                      * as instances of the origin abstracts
                      */
                     if ($this->getRequest()->post->get('componentId')) {
-                        $instancesCoursework = $this->getUnitInstanceMapper()->findByColumnList([
+                        $unitInstance = $this->getUnitInstanceMapper()->findByColumnList([
                             'component_id' => $this->getRequest()->post->get('componentId'),
                             'unit_category_id' => $key
-                        ]);
+                        ])->first();
+
+                        $taskInstanceMapper = new \Schoolbox\Assessment\Course\Task\InstanceMapper();
+                        $instancesCoursework = $taskInstanceMapper->findByColumn('course_unit_instance_id', $unitInstance->getId());
+
                     }
                     else {
                         $instancesCoursework = new Collection();
                     }
 
+                    new \Alaress_Probe($key, $unitInstance->getId());
                     new \Alaress_Probe($abstractCoursework, $instancesCoursework);
 
                     /* If the coursework instances exist, use them; otherwise spawn
