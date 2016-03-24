@@ -182,27 +182,4 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
         return true;
     }
 
-
-    /**
-     * @param string $id
-     * @param string $target
-     * @return \Schoolbox\Resource\Attachment\Zone
-     */
-    protected function newZone($id, $target = '')
-    {
-        $zone = new \Schoolbox\Resource\Attachment\Zone($id);
-        $zone->setMulti(false)
-            ->setReadOnly(false)
-            ->setMimeFilter(null)
-            ->setAttachmentsLabel('')
-            ->setAttachPrompt('Attach file or folder')
-            ->setModalTitle('Select File or Folder')
-            ->setThumbnailSize(32);
-
-        if ($target) {
-            $zone->renderIntoSitePage($this->sitepage, $target);
-        }
-
-        return $zone;
-    }
 }
