@@ -312,7 +312,7 @@ class External_Humanedge_User implements External_UserInterface
                 WHERE st.deleted = 0
                 AND st.code = $quotedId
 
-                UNION ALL
+                UNION
 
                 SELECT DISTINCT
                     s.Code + ISNULL(b.Suffix, '') AS code,
@@ -344,7 +344,7 @@ class External_Humanedge_User implements External_UserInterface
                 WHERE t.deleted = 0
                 AND t.code = $quotedId
 
-                UNION ALL
+                UNION
 
                 SELECT DISTINCT
                     s.Code + ISNULL(b.Suffix, '') as code,

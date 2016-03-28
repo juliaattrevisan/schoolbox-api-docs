@@ -194,7 +194,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 AND st.code = $quotedId
                 AND d.SortOrder = $quotedDay
 
-                UNION ALL
+                UNION
 
                 SELECT
                     s.Code + ISNULL(b.Suffix, '') AS ClassCode,
@@ -242,7 +242,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 AND t.code = $quotedId
                 AND d.SortOrder = $quotedDay
 
-                UNION ALL
+                UNION
 
                 SELECT
                     s.Code + ISNULL(b.Suffix, '') AS ClassCode,
@@ -378,7 +378,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 WHERE st.deleted = 0
                 AND st.code = $quotedId
 
-                UNION ALL
+                UNION
 
                 SELECT
                     s.Code + ISNULL(b.Suffix, '') AS ClassCode,
@@ -420,7 +420,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                 WHERE t.deleted = 0
                 AND t.code = $quotedId
 
-                UNION ALL
+                UNION
 
                 SELECT
                     s.Code + ISNULL(b.Suffix, '') AS ClassCode,
