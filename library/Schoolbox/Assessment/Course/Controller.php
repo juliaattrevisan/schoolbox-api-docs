@@ -920,7 +920,6 @@ class Controller extends BaseController
         // Create course outline component on each homepage
 
         try {
-
             foreach ($homepages as $homepage) {
                 // Get the homepage we are importing into and store it for later
 
@@ -949,39 +948,42 @@ class Controller extends BaseController
             // Create new unit instances in each of these pages/components
 
             foreach ($homepages as $homepage) {
+
+                /* Use same derivation as previous step
+                 */
+                $allTaskDates = $this->determineTaskDates($this->getRequest()->post["unit"], $componentCache[$homepage]->getId());
+
                 $unit_instance_list = new Collection();
 
-                foreach ($this->getRequest()->post["unit"] as $unit) {
-                    $import = !empty($unit['import']);
+                foreach ($allTaskDates['units'] as $currentUnit) {
 
-                    if ($import) {
-                        // Save the unit into the course.
-
+                    /* TODO: Not sure if caching is much use here
+                     * I thought Units couldn't be duped anyway
+                     */
+                    if (!isset($unitCache[$currentUnit['unit_id']])) {
                         try {
-                            if (!isset($unitCache[$unit['unit_id']])) {
-                                $unitCache[$unit['unit_id']] = $this->getFolderMapper()->findById($unit['unit_id']);
-                            }
+                            $unitCache[$currentUnit['unit_id']] = $this->getFolderMapper()->findById($currentUnit['unit_id']);
                         } catch (\Exception $e) {
                             $this->throwError('An unexpected error occurred');
                             return;
                         }
-
-                        if (isset($unitCache[$unit['unit_id']])) {
-                            $unit_instance = new UnitInstance();
-
-                            $unit_instance
-                                ->setWorkDates($this->getRequest()->post["work"])// Override due work dates in cloner
-                                ->setQuizDates($this->getRequest()->post["quiz"])// Override quiz dates in cloner
-                                ->setComponent($componentCache[$homepage])
-                                ->setTitle($unitCache[$unit['unit_id']]->getName())
-                                ->setCategory($homepageCache[$homepage])
-                                ->setUnitCategory($unitCache[$unit['unit_id']])
-                                ->setOpenDate(\Alaress_Date_Format::newLocalShort($unit['open_date']))
-                                ->setDueDate(\Alaress_Date_Format::newLocalShort($unit['due_date']));
-
-                            $unit_instance_list->add($unit_instance);
-                        }
                     }
+
+                    // Save the unit into the course.
+
+                    $unit_instance = new UnitInstance();
+
+                    $unit_instance
+                        ->setWorkDates($this->getRequest()->post["work"])// Override due work dates in cloner
+                        ->setQuizDates($this->getRequest()->post["quiz"])// Override quiz dates in cloner
+                        ->setComponent($componentCache[$homepage])
+                        ->setTitle($unitCache[$currentUnit['unit_id']]->getName())
+                        ->setCategory($homepageCache[$homepage])
+                        ->setUnitCategory($unitCache[$currentUnit['unit_id']])
+                        ->setOpenDate(\Alaress_Date_Format::newLocalShort($currentUnit['open_date']))
+                        ->setDueDate(\Alaress_Date_Format::newLocalShort($currentUnit['due_date']));
+
+                    $unit_instance_list->add($unit_instance);
                 }
 
                 $this->getUnitInstanceMapper()->save($unit_instance_list);
