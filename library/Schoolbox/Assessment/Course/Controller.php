@@ -960,9 +960,9 @@ class Controller extends BaseController
                     /* TODO: Not sure if caching is much use here
                      * I thought Units couldn't be duped anyway
                      */
-                    if (!isset($unitCache[$currentUnit['unit_id']])) {
+                    if (!isset($unitCache[$currentUnit['id']])) {
                         try {
-                            $unitCache[$currentUnit['unit_id']] = $this->getFolderMapper()->findById($currentUnit['unit_id']);
+                            $unitCache[$currentUnit['id']] = $this->getFolderMapper()->findById($currentUnit['id']);
                         } catch (\Exception $e) {
                             $this->throwError('An unexpected error occurred');
                             return;
@@ -977,9 +977,9 @@ class Controller extends BaseController
                         ->setWorkDates($this->getRequest()->post["work"])// Override due work dates in cloner
                         ->setQuizDates($this->getRequest()->post["quiz"])// Override quiz dates in cloner
                         ->setComponent($componentCache[$homepage])
-                        ->setTitle($unitCache[$currentUnit['unit_id']]->getName())
+                        ->setTitle($unitCache[$currentUnit['id']]->getName())
                         ->setCategory($homepageCache[$homepage])
-                        ->setUnitCategory($unitCache[$currentUnit['unit_id']])
+                        ->setUnitCategory($unitCache[$currentUnit['id']])
                         ->setOpenDate(\Alaress_Date_Format::newLocalShort($currentUnit['open_date']))
                         ->setDueDate(\Alaress_Date_Format::newLocalShort($currentUnit['due_date']));
 
