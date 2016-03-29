@@ -7,6 +7,13 @@
         Category: {{ work.item.category.id }}<br />
         Is Abstract: {{ work.isAbstract }}
     </p>
+
+    <p>
+        {% if not work.isAbstract %}
+            {{ dump(work.item.unitinstance.unitcategory.id) }}
+            {{ dump(unitDates) }}
+        {% endif %}
+    </p>
 </div>
 <div class="small-12 medium-2 columns">
     {# Due Work: Publish Date #}
@@ -14,7 +21,7 @@
     <input id="work_publish_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][publish_date]"
            type="text"
-           value="{% if work.isAbstract %}{{ unitDates[work.item.category.id].open_date }}{% else %}{{ unit.open_date }}{% endif %}"
+           value="{% if work.isAbstract %}{{ unit.open_date }}{% else %}{{ unitDates[work.item.unitinstance.unitcategory.id].open_date }}{% endif %}"
            data-role="publish_date"
            data-datepicker
            data-datepicker-sync
@@ -26,7 +33,7 @@
     <input id="work_open_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][open_date]"
            type="text"
-           value="{% if work.isAbstract %}{{ unitDates[work.item.category.id].open_date }}{% else %}{{ unit.open_date }}{% endif %}"
+           value="{% if work.isAbstract %}{{ unit.open_date }}{% else %}{{ unitDates[work.item.unitinstance.unitcategory.id].open_date }}{% endif %}"
            data-role="open_date"
            data-datepicker
            data-datepicker-sync
@@ -38,7 +45,7 @@
     <input id="work_due_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][due_date]"
            type="text"
-           value="{% if work.isAbstract %}{{ unitDates[work.item.category.id].due_date }}{% else %}{{ unit.due_date }}{% endif %}"
+           value="{% if work.isAbstract %}{{ unit.due_date }}{% else %}{{ unitDates[work.item.unitinstance.unitcategory.id].due_date }}{% endif %}"
            data-role="due_date"
            data-datepicker
            data-datepicker-sync
@@ -49,7 +56,7 @@
     <input id="work_late_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][late_date]"
            type="text"
-           value="{% if work.isAbstract %}{{ unitDates[work.item.category.id].due_date }}{% else %}{{ unit.due_date }}{% endif %}"
+           value="{% if work.isAbstract %}{{ unit.due_date }}{% else %}{{ unitDates[work.item.unitinstance.unitcategory.id].due_date }}{% endif %}"
            data-role="late_date"
            data-datepicker
            data-datepicker-sync
