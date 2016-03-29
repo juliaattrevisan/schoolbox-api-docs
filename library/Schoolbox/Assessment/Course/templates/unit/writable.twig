@@ -5,7 +5,7 @@
         </div>
         <div class="small-11 column">
             <label>
-                <input type="text" value="{{ unit.name }}" placeholder="Unit Name" />
+                <input type="text" value="{{ unit.name }}" placeholder="Unit Name" name="unitname[{{ unit.id }}]" />
             </label>
         </div>
     </div>
@@ -13,7 +13,7 @@
         <a class="icon-overflow" title="" data-dropdown="unit-{{ unit.id }}-modify"></a>
     </nav>
     <ul id="unit-{{ unit.id }}-modify" class="f-dropdown" data-dropdown-content>
-        <li><a href="/course/unit/{{ unit.id }}/delete" class="icon-delete" data-delete="unit">Delete Unit</a></li>
+        <li><a href="/course/unit/{{ unit.id }}/delete" class="icon-delete" data-delete="{{ unit.id }}">Delete Unit</a></li>
     </ul>
     <div class="small-12 column {% if not _expanded %}hide{% endif %}" data-collapsable="unit-{{ unit.id }}" {% if not _expanded %}data-collapse-state="collapsed"{% endif %}>
         <ul class="information-list sortable" data-sortable data-task_list>
