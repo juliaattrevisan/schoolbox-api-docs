@@ -986,6 +986,9 @@ class Controller extends BaseController
                     $unit_instance_list->add($unit_instance);
                 }
 
+                /* TODO: Coursework Date superposition
+                 * Apply separate dates for existing and new tasks
+                 */
                 $this->getUnitInstanceMapper()->save($unit_instance_list);
             }
         }
