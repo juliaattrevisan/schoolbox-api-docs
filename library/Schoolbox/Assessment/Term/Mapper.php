@@ -50,18 +50,18 @@ class Mapper extends BaseMapper
      */
     public function findCurrent()
     {
-        return $this->findMostRecent();
+        return $this->findForDate();
     }
 
     /**
-     * Find whichever term is the most recent one.
+     * Find whichever term is current for this date.
      *
      * @param Alaress_Date_Format $date Get the term for this date,
      *                                  or today if not provided.
      *
      * @return Model
      */
-    public function findMostRecent(Alaress_Date_Format $date = null)
+    public function findForDate(Alaress_Date_Format $date = null)
     {
         if (!isset($date)) {
             $date = Alaress_Date_Format::now();

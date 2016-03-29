@@ -40,7 +40,7 @@ if (isset($termSlug)) {
         exit;
     }
 } else {
-    $currentTerm  = $termMapper->findMostRecent();
+    $currentTerm  = $termMapper->findForDate();
 }
 
 $m = new Marksheet($categoryID, $_SESSION['id'], array(

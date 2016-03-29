@@ -128,7 +128,7 @@ if (!isset($targetDate)) {
     $targetDate = new Alaress_Date_Format(time(), 'U');
 }
 
-$targetTerm = Schoolbox\Assessment\Term\Mapper::getInstance()->findMostRecent($targetDate);
+$targetTerm = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($targetDate);
 
 $user = $userHandler->getByID($userID);
 

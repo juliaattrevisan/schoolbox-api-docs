@@ -211,7 +211,7 @@ $this->setVar(
 );
 
 // Unit dropdown, with term optgroups
-$currentTerm = $termMapper->findMostRecent($current_unit->getOpenDate());
+$currentTerm = $termMapper->findForDate($current_unit->getOpenDate());
 $trail       = new \Schoolbox\Breadcrumbs();
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
