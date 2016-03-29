@@ -228,7 +228,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
         /* Show correct answer
          */
         $page->setVar(array(
-            'CORRECT_ANSWER' => $currentAnswer['answer']
+            'CORRECT_ANSWER' => Scrub::html($currentAnswer['answer'])
         ));
 
         $page->parse('answerOption_block', 'answerOption', true);
