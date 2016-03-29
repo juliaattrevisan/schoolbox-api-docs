@@ -636,6 +636,10 @@ class Controller extends BaseController
             }
             else {
                 $unitDates = $this->getRequest()->post["unit"];
+                $courseComponentId = $this->getRequest()->post->get('componentId');
+
+
+
 
                 /** @var Category[] $unitCache */
                 $unitCache = [];
@@ -650,7 +654,7 @@ class Controller extends BaseController
 
                 /* Make a local cache for unit information
                  */
-                foreach ($this->getRequest()->post["unit"] as $unit) {
+                foreach ($unitDates as $unit) {
                     if (!empty($unit['import']) && !isset($unitCache[$unit['unit_id']])) {
                         $unitCache[$unit['unit_id']] = $this->getCourseMapper()->findById($unit['unit_id']);
                     }
@@ -667,7 +671,7 @@ class Controller extends BaseController
                     $unit['name'] = $unitCache[$unitCurrent->getId()]->getName();
                     $unit['items'] = new Collection();
 
-                    foreach ($this->getRequest()->post["unit"] as $unitDate) {
+                    foreach ($unitDates as $unitDate) {
                         if ($unitDate["unit_id"] == $unitCurrent->getId()) {
                             $unit['open_date'] = $unitDate['open_date'];
                             $unit['due_date'] = $unitDate['due_date'];
@@ -682,10 +686,10 @@ class Controller extends BaseController
                     /* Get a list of all the coursework instances that were created
                      * as instances of the original abstracts
                      */
-                    if ($this->getRequest()->post->get('componentId')) {
+                    if ($courseComponentId) {
                         $unitInstance = $this->getUnitInstanceMapper()->findByColumnList(
                             [
-                                'component_id' => $this->getRequest()->post->get('componentId'),
+                                'component_id' => $courseComponentId,
                                 'unit_category_id' => $key
                             ]
                         )->first();
