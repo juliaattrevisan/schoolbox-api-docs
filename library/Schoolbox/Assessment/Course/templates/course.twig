@@ -67,7 +67,7 @@
                     </div>
                     {% endif %}
                 </fieldset>
-                <fieldset class="content" data-mage="unit-info" {% if not folder.id %} disabled="disabled"{% endif %}>
+                <fieldset id="unit-info" class="content" data-mage="unit-info" {% if not folder.id %} disabled="disabled"{% endif %}>
                     <legend>Units</legend>
                     <div class="small-12 column no-pad">
                         <!-- Don't delete the inline style, it's needed -->
@@ -116,6 +116,27 @@
 <script type="text/javascript">
     $(function () {
         $('[data-collapser]').collapsable();
+
+        $('#unit-info').on('click', '[data-delete]', function (e) {
+            e.preventDefault();
+
+            var $input = $(this);
+            var unitId = $input.data('delete');
+
+            $(this).confirmDialog({
+                text: 'Are you sure you wish to delete this unit? This will also delete all coursework and content it contains.',
+                confirmEvent: function () {
+                    $.post('/resource/folder/delete', {id: unitId })
+                        .done(function () {
+                            var $listItem = $input.closest('[data-unit]');
+                            $listItem.slideUp(400, function () {
+                                $listItem.detach();
+                            });
+                        });
+                }
+            });
+
+        });
 
         $('[data-source]').on('click', function (e) {
             e.preventDefault();
