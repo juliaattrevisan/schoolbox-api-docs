@@ -943,9 +943,26 @@ class Submission extends DeprecatedModel
      */
     function submittedToCategoryList($userID, Alaress_Date_Format $from, Alaress_Date_Format $to)
     {
-        $fromDate = $this->db->smartQuote($from->getDatabaseDate());
-        $toDate   = $this->db->smartQuote($to->getDatabaseDate());
-        $sql      = "SELECT category.name, category.id, GROUP_CONCAT(cc.code) AS `code`
+        $quotedId = $this->db->smartQuote($userID);
+        $parts    = ["(ss.`owner` = $quotedId OR sr.`owner` = $quotedId)"];
+        if ($from->isNull() && $to->isNull()) {
+            // noop: allow all dates
+        } elseif (!$from->isNull() && $to->isNull()) {
+            // only from is set
+            $fromDate = $this->db->smartQuote($from->getDatabaseDate());
+            $parts[]  = "(DATE(ss.submitted) >= $fromDate OR DATE(sr.returned) >= $fromDate)";
+        } elseif ($from->isNull() && !$to->isNull()) {
+            // only to is set
+            $toDate  = $this->db->smartQuote($to->getDatabaseDate());
+            $parts[] = "(DATE(ss.submitted) <= $toDate OR DATE(sr.returned) <= $toDate)";
+        } else {
+            // neither are null
+            $fromDate = $this->db->smartQuote($from->getDatabaseDate());
+            $toDate   = $this->db->smartQuote($to->getDatabaseDate());
+            $parts[]  = "(DATE(ss.submitted) BETWEEN $fromDate AND $toDate OR DATE(sr.returned) BETWEEN $fromDate AND $toDate)";
+        }
+        $wherePart = implode(' AND ', $parts);
+        $sql       = "SELECT category.name, category.id, GROUP_CONCAT(cc.code) AS `code`
                 FROM category
                 LEFT JOIN categoryCode cc ON category.id = categoryID AND cc.deleted_at IS NULL
                 WHERE category.id IN (
@@ -953,12 +970,7 @@ class Submission extends DeprecatedModel
                     FROM submission_box sb
                     LEFT JOIN student_submission ss ON ss.`box_id` = sb.`id`
                     LEFT JOIN submission_return sr ON sb.id = sr.`box_id`
-                    WHERE (ss.`owner` = $userID OR sr.`owner` = $userID)
-                    AND (
-                        DATE(ss.submitted) BETWEEN $fromDate AND $toDate
-                        OR
-                        DATE(sr.returned) BETWEEN $fromDate AND $toDate
-                    )
+                    WHERE $wherePart
                 )
                 GROUP BY category.id
                 ORDER BY category.name";
