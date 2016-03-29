@@ -24,15 +24,17 @@ class Admin implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
-        $messagesModule = new Module($kernel->getDependencyInjector());
-        $messagesModule->init('/adminv2/messages');
-
         $di = $kernel->getDependencyInjector();
 
         // Share navigation element
 
         $navigation = new \Schoolbox\Admin\Navigation\Module($di);
         $navigation->init('/adminv2/navigation');
+
+        // Messages
+
+        $messagesModule = new Module($kernel->getDependencyInjector());
+        $messagesModule->init('/adminv2/messages');
 
         // Admin home
 
@@ -57,5 +59,13 @@ class Admin implements ModuleConfigInterface
         // Admin terms manager page
         $terms = new \Schoolbox\Admin\Terms\Module($di, Term\Mapper::getInstance());
         $terms->init('/adminv2/terms');
+
+        // Pastoral care import page
+
+        if ($di->get('config')->get('pastoral_enabled')) {
+            $courseBuilder = new \Schoolbox\Admin\Import\Pastoral\Module($di);
+            $courseBuilder->init('/adminv2/import-pastoral');
+        }
+
     }
 } 

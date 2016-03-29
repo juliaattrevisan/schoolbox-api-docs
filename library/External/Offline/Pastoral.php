@@ -50,6 +50,14 @@ class External_Offline_Pastoral implements External_PastoralInterface
     }
 
     /**
+     * Import pastoral care records from external SIS
+     */
+    public function importPastoral()
+    {
+        // NOOP
+    }
+
+    /**
      * @inheritDoc
      */
     public function deletePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)

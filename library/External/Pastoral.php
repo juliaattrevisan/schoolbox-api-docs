@@ -37,6 +37,14 @@ class External_Pastoral implements External_PastoralInterface
     }
 
     /**
+     * Import pastoral care records from external SIS
+     */
+    public function importPastoral()
+    {
+        return $this->getDatabase()->importPastoral();
+    }
+
+    /**
      * Creates a new pastoral record in the remot system
      *
      * @param PastoralModel $pastoral
