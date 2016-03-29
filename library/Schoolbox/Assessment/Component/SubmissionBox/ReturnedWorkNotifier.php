@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 
 use Monolog\Logger;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper;
@@ -38,6 +39,8 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	/** @var SubmissionBoxMapper */
 	protected $boxMapper;
 
+	/** @var Term\Mapper */
+	protected $termMapper;
 
 	/**
 	 * @return string
@@ -57,6 +60,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 		$this->userMapper = UserMapper::getInstance();
 		$this->catMapper = CategoryMapper::getInstance();
 		$this->boxMapper = SubmissionBoxMapper::getInstance();
+		$this->termMapper = Term\Mapper::getInstance();
 		parent::loadDependencies($dependencies);
 	}
 
@@ -170,14 +174,13 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 			}
 			$msg = new Message(":teacher has marked :student's work for :boxname in :catname", $icon, $href);
 
-			$year = $box->getDueDate()->getYear();
-			$term = $box->getDueDate()->getYearHalf();
+			$term = $this->termMapper->findForDate($box->getDueDate());
 
 			$params = array(
 				'teacher' => array($teacherName, "/search/user/$teacherId"),
 				'student' => array($studentName, "/search/user/$studentId"),
 				'boxname' => array($boxName, "/submission/submissionHistory/$boxId/$studentId"),
-				'catname' => array($catName, "/submission/allWork/$studentId/$year/$term/$catId")
+				'catname' => array($catName, "/submission/allWork/$studentId/{$term->getCode()}/$catId")
 			);
 
 			$msgr->targetToParent($studentId, $msg, "duework.$boxId.returned", Logger::NOTICE, $params);
