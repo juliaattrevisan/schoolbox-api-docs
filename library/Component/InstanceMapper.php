@@ -9,6 +9,12 @@
  *
  */
 
+/**
+ * Class Component_InstanceMapper
+ * @method Component_Instance createModel()
+ * @method Component_Instance findById($id)
+ * @method Component_Instance hydrate(array $row, $alias = '', $callback = null)
+ */
 class Component_InstanceMapper extends Schoolbox\Mapper
 {
     protected function mapping()
