@@ -800,7 +800,14 @@ class Controller extends BaseController
             foreach ($this->getRequest()->post["unit"] as $unit) {
                 if (!empty($unit['import'])) {
                     $foundUnit = true;
-                    if (trim($unit['open_date']) == '' || trim($unit['due_date']) == '') {
+
+                    /* Add date validation
+                     */
+                    try {
+                        \Alaress_Date_Format::newLocalShort($unit['open_date']);
+                        \Alaress_Date_Format::newLocalShort($unit['due_date']);
+                    }
+                    catch (\Exception $e) {
                         $errorDate = true;
                         break;
                     }
@@ -814,7 +821,7 @@ class Controller extends BaseController
             }
             else if ($errorDate) {
                 // Make sure dates were specified
-                $this->throwError('You must specify an open and close date for each unit you are importing');
+                $this->throwError('You must specify a valid open and close date for each unit you are importing');
             }
             else {
 
@@ -851,10 +858,18 @@ class Controller extends BaseController
         // Validate due work
 
         foreach ($this->getRequest()->post["work"] as $work) {
-            if (trim($work['publish_date']) == '') {
+            try {
+                \Alaress_Date_Format::newLocalShort($work['publish_date']);
+            }
+            catch (\Exception $e) {
                 $this->throwError('You must enter a publish date for each due work item before you can proceed.');
                 return;
-            } else if (trim($work['due_date']) == '') {
+            }
+
+            try {
+                \Alaress_Date_Format::newLocalShort($work['due_date']);
+            }
+            catch (\Exception $e) {
                 $this->throwError('You must enter a due date for each due work item before you can proceed.');
                 return;
             }
@@ -862,10 +877,18 @@ class Controller extends BaseController
             // Accepting submissions, must have the other two dates
 
             if ($work['submissions'] == '1') {
-                if (trim($work['open_date']) == '') {
+                try {
+                    \Alaress_Date_Format::newLocalShort($work['open_date']);
+                }
+                catch (\Exception $e) {
                     $this->throwError('You must enter an open date for each due work item that accepts submissions before you can proceed.');
                     return;
-                } else if (trim($work['late_date']) == '') {
+                }
+
+                try {
+                    \Alaress_Date_Format::newLocalShort($work['late_date']);
+                }
+                catch (\Exception $e) {
                     $this->throwError('You must enter a late date for each due work item that accepts submissions before you can proceed.');
                     return;
                 }
@@ -875,11 +898,18 @@ class Controller extends BaseController
         // Validate quizzes
 
         foreach ($this->getRequest()->post["quiz"] as $quiz) {
-
-            if (trim($quiz['start_date']) == '') {
+            try {
+                \Alaress_Date_Format::newLocalShort($quiz['start_date']);
+            }
+            catch (\Exception $e) {
                 $this->throwError('You must enter a start date for each quiz before you can proceed.');
                 return;
-            } else if (trim($quiz['finish_date']) == '') {
+            }
+
+            try {
+                \Alaress_Date_Format::newLocalShort($quiz['finish_date']);
+            }
+            catch (\Exception $e) {
                 $this->throwError('You must enter a finish date for each quiz before you can proceed.');
                 return;
             }
