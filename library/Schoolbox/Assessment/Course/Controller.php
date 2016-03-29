@@ -122,8 +122,9 @@ class Controller extends BaseController
      * @api   GET /course/modify/{id}
      * @level 160
      * @param int $id
+     * @param string $name
      */
-    public function modifyCourse($id = null)
+    public function modifyCourse($id = null, $name = null)
     {
         $data = [];
 
@@ -143,6 +144,11 @@ class Controller extends BaseController
          */
         $data['curriculumEnabled'] = $this->getConfigLoader()->get('curriculum_tagging_enabled');
 
+        /* Search query
+         * Optional name passed in url
+         */
+        $data['query'] = $name;
+
         $this->tpl('course', $data);
     }
 
@@ -155,9 +161,18 @@ class Controller extends BaseController
      */
     public function newCourse()
     {
-        $this->modifyCourse(null);
+        $this->modifyCourse(null, null);
     }
 
+    /**
+     * Form to create a new course, but also include search param
+     *
+     * @param $name
+     */
+    public function newCourseFromSearch($name)
+    {
+        $this->modifyCourse(null, $name);
+    }
 
     /**
      * Accept the create formdata
@@ -365,6 +380,10 @@ class Controller extends BaseController
 
         $query = $this->getRequest()->query;
         $data  = $this->getCourseMapper()->findCourseList($query->get('query'));
+
+        /* Remember what the user searched for
+         */
+        $data['query'] = $query->get('query');
 
         if ($this->getRequest()->isXhr()) {
             $options = [

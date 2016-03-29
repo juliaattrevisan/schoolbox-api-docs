@@ -40,6 +40,7 @@ class Module extends BaseModule
                 '/list'                                 => 'courseList',
                 '/list/ajax'                            => 'courseListAjax',
                 '/new'                                  => 'newCourse',
+                '/new/{name}'                           => 'newCourseFromSearch',
                 '/modify/{id}'                          => 'modifyCourse',
                 '/parent'                               => 'parentList',
 
