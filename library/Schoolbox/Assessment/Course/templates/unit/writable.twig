@@ -16,7 +16,7 @@
         <li><a href="/course/unit/{{ unit.id }}/delete" class="icon-delete" data-delete="unit">Delete Unit</a></li>
     </ul>
     <div class="small-12 column {% if not _expanded %}hide{% endif %}" data-collapsable="unit-{{ unit.id }}" {% if not _expanded %}data-collapse-state="collapsed"{% endif %}>
-        <ul class="information-list sortable" data-sortable>
+        <ul class="information-list sortable" data-sortable data-task_list>
             {% for task in tasks[unit.id] %}
                 {% include '@course/task.twig' with { '_writable': true } %}
             {% endfor %}
@@ -27,5 +27,16 @@
             <li><a href="/assess/create/{{ unit.id }}/task?return_url={{ returnUrl[unit.id] }}"                   title="Create a new Quiz"     class="button icon-quiz"    >New Quiz</a></li>
         </ul>
     </div>
+    <form action="/task/saveForm.php" method="post" data-interaction="reorder-tasks">
+        <input type="hidden" name="action"    value="reorder"/>
+        <input type="hidden" name="category"   value="{{ unit.id }}"/>
+        <input type="hidden" name="component"  value="{{ reveals[unit.id].component.id }}"/>
+        <input type="hidden" name="return_url" value="{{ returnUrl[unit.id] }}"/>
+    </form>
     {% include '@course/task/reveal-modal.twig' with { reveal: reveals[unit.id] } %}
+    <script type="text/javascript">
+        $(function () {
+            $('#{{ reveals[unit.id].id }}').setupCourseBuilder();
+        });
+    </script>
 </li>
