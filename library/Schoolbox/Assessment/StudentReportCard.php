@@ -51,20 +51,6 @@ class StudentReportCard
     protected $targetUser;
 
     /**
-     * @deprecated Use term instead
-     *
-     * @var int
-     */
-    protected $targetYear;
-
-    /**
-     * @deprecated Use term instead
-     *
-     * @var int
-     */
-    protected $targetSemester;
-
-    /**
      *
      * @var Term\Model
      */
@@ -145,8 +131,6 @@ class StudentReportCard
         // build permissions set
         $this->establishPermissions();
         // setup helper vars
-//        $this->currentYear     = date('Y');
-//        $this->currentSemester = date('m') > 6 ? 2 : 1;
         $this->targetTerm  = new Term\Model();
         $this->currentTerm = $this->termMapper->findForToday();
     }
