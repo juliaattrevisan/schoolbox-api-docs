@@ -276,7 +276,7 @@ class ContextSelector {
 				'%s (%s—%s)',
 				$term->getTitle(),
 				$term->getStart()->getDateOnly(),
-				$term->getFinish()->getDateOnly()
+				$term->getDisplayFinish()->getDateOnly()
 			);
 			if ($term->getArchived()) {
 				$termValue = '(archived) '.$termValue;

@@ -99,7 +99,7 @@ class Controller extends Base
             throw new \Exception('Start date is not a valid date.');
         }
         try {
-            $term->setFinish(Alaress_Date_Format::newLocalShort($postdata->get('finish')));
+            $term->setDisplayFinish(Alaress_Date_Format::newLocalShort($postdata->get('finish')));
         } catch (\Exception $e) {
             throw new \Exception('Finish date is not a valid date.');
         }

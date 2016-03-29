@@ -32,7 +32,8 @@ class Mapper extends BaseMapper
         $this->uses('title', self::TYPE_STRING);
         $this->uses('code', self::TYPE_STRING);
         $this->uses('start', self::TYPE_DATE);
-        $this->uses('finish', self::TYPE_DATE);
+        $this->uses('display_finish', self::TYPE_DATE);
+        $this->uses('actual_finish', self::TYPE_DATE);
         $this->uses('archived', self::TYPE_BOOLEAN);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyTitle']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyCode']);
@@ -88,7 +89,7 @@ class Mapper extends BaseMapper
      */
     public function findNext(Model $term)
     {
-        $endDate = $term->getFinish();
+        $endDate = $term->getDisplayFinish();
         if ($endDate instanceof Alaress_Date_Format && !$endDate->isNull()) {
             $query = "
                 SELECT   {$this->getColumnString()}
@@ -165,10 +166,10 @@ class Mapper extends BaseMapper
         if (!($model->getStart() instanceof Alaress_Date_Format && !$model->getStart()->isNull())) {
             throw new UnexpectedValueException('Term start must be a valid date.');
         }
-        if (!($model->getFinish() instanceof Alaress_Date_Format && !$model->getFinish()->isNull())) {
+        if (!($model->getDisplayFinish() instanceof Alaress_Date_Format && !$model->getDisplayFinish()->isNull())) {
             throw new UnexpectedValueException('Term finish must be a valid date.');
         }
-        if ($model->getStart()->gte($model->getFinish())) {
+        if ($model->getStart()->gte($model->getDisplayFinish())) {
             throw new UnexpectedValueException('Term start must be before term finish.');
         }
         return true;
@@ -197,7 +198,7 @@ class Mapper extends BaseMapper
         ";
         $params = [
             'thisStart'  => $model->getStart()->getDatabaseDate(),
-            'thisFinish' => $model->getFinish()->getDatabaseDate(),
+            'thisFinish' => $model->getDisplayFinish()->getDatabaseDate(),
         ];
         if ($model->getId()) {
             $query .= ' AND id != :id';

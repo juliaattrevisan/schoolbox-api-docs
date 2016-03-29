@@ -45,12 +45,19 @@ class Model
     protected $start;
 
     /**
-     * The date on which this term finishes. The term's date span should not
-     * overlap any other term.
+     * The display date on which this term is said to finish.
      *
      * @var Alaress_Date_Format
      */
-    protected $finish;
+    protected $displayFinish;
+
+    /**
+     * The date on which this term actually finishes.
+     * (This date will always be one day before the next term starts)
+     *
+     * @var Alaress_Date_Format
+     */
+    protected $actualFinish;
 
     /**
      * If a term is archived, it should be de-emphasized in term selectors.
@@ -64,8 +71,9 @@ class Model
      */
     public function __construct()
     {
-        $this->start  = new Alaress_Date_Format();
-        $this->finish = new Alaress_Date_Format();
+        $this->start         = new Alaress_Date_Format();
+        $this->displayFinish = new Alaress_Date_Format();
+        $this->actualFinish  = new Alaress_Date_Format();
     }
 
     /**
@@ -82,7 +90,7 @@ class Model
         // TODO make this calculation take next term's start
         return $date->between(
             $this->getStart(),
-            $this->getFinish()
+            $this->getDisplayFinish()
         );
     }
 
@@ -161,18 +169,18 @@ class Model
     /**
      * @return Alaress_Date_Format
      */
-    public function getFinish()
+    public function getDisplayFinish()
     {
-        return $this->finish;
+        return $this->displayFinish;
     }
 
     /**
-     * @param  Alaress_Date_Format $finish
+     * @param  Alaress_Date_Format $displayFinish
      * @return $this
      */
-    public function setFinish($finish)
+    public function setDisplayFinish($displayFinish)
     {
-        $this->finish = $finish;
+        $this->displayFinish = $displayFinish;
         return $this;
     }
 
