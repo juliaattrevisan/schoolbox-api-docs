@@ -70,7 +70,7 @@
                         <a href="/course/import/modify/{{ folder.getId() }}/{{ courseComponentId }}" class="icon-modify" title="Modify Course"></a>
 
                         {% if currentCourse.getId() in allRestorableCourses|keys %}
-                        <a href="/course/restore/{{ folder.getId() }}/{{ courseComponentId }}" class="icon-upload" title="Restore Course"></a>
+                        <a href="/course/import/restore/{{ folder.getId() }}/{{ courseComponentId }}" class="icon-upload" title="Restore Course"></a>
                         {% endif %}
 
                         <a href="" class="icon-delete" title="Delete Course" data-delete="{{ currentCourse.getId() }}"></a>

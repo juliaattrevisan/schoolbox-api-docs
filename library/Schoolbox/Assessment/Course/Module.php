@@ -46,24 +46,27 @@ class Module extends BaseModule
 
                 /* Course Management for a particular Homepage
                  */
-                '/management/{folderId}'               => 'management',
-                '/restore/{folderId}/{componentId}'    => 'restoreCourse',
+                '/management/{folderId}'                => 'management',
 
                 /* Import screen
                  */
-                '/import/{courseId}/class/{classCode}' => 'import',
+                '/import/{courseId}/class/{classCode}'     => 'import',
 
                 /* Dynamic Unit/Task list when choosing course to import
                  */
-                '/importResults/{courseId}'            => 'importResults',
+                '/importResults/{courseId}'                => 'importResults',
 
                 /* A list of Classes you can import into via selectize
                  */
-                '/import/classes'                      => 'importClasses',
+                '/import/classes'                          => 'importClasses',
+
+                /* Restore an unlinked Course Outline that was previously imported
+                 */
+                '/import/restore/{folderId}/{componentId}' => 'restoreCourse',
 
                 /* Modify the imported Course's Unit details
                  */
-                '/import/modify/{componentId}'         => 'importModify',
+                '/import/modify/{componentId}'             => 'importModify',
             ],
             'POST' => [
                 '/unit/new'    => 'newUnit',
