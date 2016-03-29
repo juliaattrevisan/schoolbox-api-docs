@@ -227,6 +227,7 @@ $this->setVar(array(
 $this->setTitle('Results for: ' . $assess['title']);
 
 $dueDate = new Alaress_Date_Format($assess['finish'],Alaress_Date_Format::DATABASE_DATE_FORMAT);
+$term    = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
 
 $visibility = '';
 
@@ -255,8 +256,7 @@ $this->setVar(array(
     'VISIBILITY_CLASS'      => $visibilityClass,
     'CID'                   => $folder->getId(),
     'CATEGORY_NAME'         => Scrub::text($folder->getName()),
-    'DUEWORK_YEAR'          => $dueDate->getYear(),
-    'DUEWORK_SEMESTER'      => $dueDate->getYearHalf(),
+    'DUEWORK_TERM'          => $term->getCode(),
 ));
 
 /**
@@ -452,7 +452,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text' => $folder->getName(),
-        'href' => "/submission/listSubmission/{$dueDate->getYear()}/{$dueDate->getYearHalf()}/{$folder->getId()}",
+        'href' => "/submission/listSubmission/{$term->getCode()}/{$folder->getId()}",
         'class' => '',
     ],
     [
