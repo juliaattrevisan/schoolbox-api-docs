@@ -30,6 +30,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /** @var PastoralTypeMapper $pastoralTypeMapper */
     protected $pastoralTypeMapper;
 
+    /** @var PastoralSeverityMapper $pastoralSeverityMapper */
+    protected $pastoralSeverityMapper;
+
     /**
      * @return UserMapper
      */
@@ -187,7 +190,10 @@ FROM            dbo.tPastoralCare INNER JOIN
 
         $records = $this->getDatabase()->getAll($query);
 
+        $owner = null;
+        $student = null;
         try
+
         {
             // Default all imported items to the lowest priority as there is no concept of this in Synergetic
 
@@ -239,8 +245,6 @@ FROM            dbo.tPastoralCare INNER JOIN
                 else
                     $record["heading"] = substr($record["Details"], 0, 50);
 
-                $owner = null;
-                $student = null;
                 $owner = $this->getUserMapper()->findByExternalId($record["CreatedByID"]);
                 $student = $this->getUserMapper()->findByExternalId($record["ID"]);
 
