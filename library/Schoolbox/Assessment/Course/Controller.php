@@ -991,6 +991,16 @@ class Controller extends BaseController
                  */
                 $this->getUnitInstanceMapper()->save($unit_instance_list);
             }
+
+            /* Redirect back to wherever you came from...
+             * ...hopefully
+             */
+            $this->getResponse()->content->set([
+                'format' => 'json',
+                'data' => [
+                    'redirect' => $this->getSession()->getHistory(2)
+                ]
+            ]);
         }
         catch (\InvalidArgumentException $e)
         {

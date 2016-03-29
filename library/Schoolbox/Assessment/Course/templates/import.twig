@@ -70,12 +70,14 @@
 
                 {# Init stage 3 mage #}
 
-                $('input[data-mage-next="part-results-select"]').mage({onXhrDone: function(data)
-                {
-                    {# Game over, not sure where to go here #}
+                $('input[data-mage-next="part-results-select"]').mage({
+                    onXhrDone: function(data) {
 
-                    alert('THANK YOU MARIO!\n\n▒▒▒▒▒▒▒▒▒▄▄▄▄▒▒▒▒▒▒▒\n▒▒▒▒▒▒▄▀▀▓▓▓▀█▒▒▒▒▒▒\n▒▒▒▒▄▀▓▓▄██████▄▒▒▒▒\n▒▒▒▄█▄█▀░░▄░▄░█▀▒▒▒▒\n▒▒▄▀░██▄░░▀░▀░▀▄▒▒▒▒\n▒▒▀▄░░▀░▄█▄▄░░▄█▄▒▒▒\n▒▒▒▒▀█▄▄░░▀▀▀█▀▒▒▒▒▒\n▒▒▒▄▀▓▓▓▀██▀▀█▄▀▀▄▒▒\n▒▒█▓▓▄▀▀▀▄█▄▓▓▀█░█▒▒\n▒▒▀▄█░░░░░█▀▀▄▄▀█▒▒▒\n▒▒▒▄▀▀▄▄▄██▄▄█▀▓▓█▒▒\n▒▒█▀▓█████████▓▓▓█▒▒\n▒▒█▓▓██▀▀▀▒▒▒▀▄▄█▀▒▒\n▒▒▒▀▀▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒\n\nBUT OUR PRINCESS IS IN ANOTHER CASTLE.');
-                }});
+                        /* Go back to wherever you came from (hopefully)
+                         */
+                        window.location.href = data.redirect;
+                    }
+                });
             }});
 {% if not _part2 %}
         }});
@@ -137,8 +139,7 @@
                     <legend>3. Coursework</legend>
 
                     <div class="small-12 column hide" data-mage-collapsed>
-                        <div id="importTasks">
-                    </div>
+                        <div id="importTasks"></div>
     {#
                         {% if folder.id %}
                             {% include '@course/import/results.twig' %}
