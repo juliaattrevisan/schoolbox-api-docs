@@ -459,8 +459,8 @@ class StudentReportCard
         $allDueWork = $submissionBoxMapper->getAllDueWork(
             $this->targetUserId,
             array($this->targetCategoryId),
-            $this->targetYear,
-            $this->targetSemester
+            $this->targetTerm->getStart(),
+            $this->targetTerm->getActualFinish()
         );
 
         /* Oh. My. GOD.
