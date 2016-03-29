@@ -70,7 +70,7 @@
     {% else %}
         <p>No results found.</p>
 
-        <a class='button submit expand' href="/course/new/{{ query }}">Create a Course called {{ query }}</a>
+        <a class='button submit expand' href="/course/new/{{ query | url_encode }}">Create a Course called {{ query }}</a>
     {% endif %}
 </div>
 <script type="text/javascript">
