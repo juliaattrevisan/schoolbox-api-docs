@@ -515,15 +515,6 @@ class Submission extends DeprecatedModel
             $dateCondA .= ' AND DATE(sb.date)       <= '.$date;
             $dateCondB .= ' AND DATE(assess.finish) <= '.$date;
         }
-
-//        if ($year) {
-//            $dateCondA .= " AND DATE_FORMAT(sb.date, '%Y') = $year";
-//            $dateCondB .= " AND DATE_FORMAT(assess.finish, '%Y') = $year";
-//        }
-//        if ($semester) {
-//            $dateCondA .= " AND DATE_FORMAT(sb.date, '%m') " . DueWork_All::getSemesterLogic($semester);
-//            $dateCondB .= " AND DATE_FORMAT(assess.finish, '%m') " . DueWork_All::getSemesterLogic($semester);
-//        }
         if ($userID) {
             $ownerCondA = "AND sb.owner = '$userID'";
             $ownerCondB = "AND assess.user_id = '$userID'";
@@ -643,17 +634,6 @@ class Submission extends DeprecatedModel
             $dateConditionA .= ' AND DATE(submission_box.date) <= '.$date;
             $dateConditionB .= ' AND DATE(assess.start)        <= '.$date;
         }
-
-//        if ($year) {
-//            $dateConditionA .= " AND DATE_FORMAT(submission_box.date, '%Y') = $year";
-//            $dateConditionB .= " AND DATE_FORMAT(assess.start, '%Y') = $year";
-//        }
-//        if ($semester) {
-//            $dateConditionA .= " AND DATE_FORMAT(submission_box.date, '%m') " . DueWork_All::getSemesterLogic(
-//                    $semester
-//                );
-//            $dateConditionB .= " AND DATE_FORMAT(assess.start, '%m') " . DueWork_All::getSemesterLogic($semester);
-//        }
 
         $query = "
             (
@@ -1029,11 +1009,11 @@ class Submission extends DeprecatedModel
      * @param int                 $userID
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
+     *
+     * @return array
      */
     function submittedToCategoryList($userID, Alaress_Date_Format $from, Alaress_Date_Format $to)
     {
-//        $semesterTest = DueWork_All::getSemesterLogic($semester);
-
         $fromDate = $this->db->smartQuote($from->getDatabaseDate());
         $toDate   = $this->db->smartQuote($to->getDatabaseDate());
         $sql      = "SELECT category.name, category.id, GROUP_CONCAT(cc.code) AS `code`

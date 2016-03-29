@@ -62,11 +62,6 @@ class Grades
             'to'   => $to,
         );
 
-//        if ($year && $semester) {
-//            $params['year'] = $year;
-//            $params['semester'] = $semester;
-//        }
-
         $assessmentsSeen = array(
             'sb' => array(),
             'oa' => array()
