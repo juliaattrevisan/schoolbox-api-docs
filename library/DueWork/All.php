@@ -5,6 +5,8 @@ use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 /**
  * @deprecated As far as I can tell this is used nowhere.
+ *             Exception: static methods `getSemester()` and `getSemesterLogic()`.
+ *             (Those should be removed anyway, as they use old semester logic.)
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
