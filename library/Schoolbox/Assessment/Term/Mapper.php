@@ -39,6 +39,8 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyCode']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyDates']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyNoOverlap']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateActualFinishDates']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'updateActualFinishDates']);
     }
 
     /**
@@ -217,5 +219,27 @@ class Mapper extends BaseMapper
             );
         }
         return true;
+    }
+
+    /**
+     * Sets the actual finish date for all terms as appropriate.
+     */
+    public function updateActualFinishDates()
+    {
+        $updateTermQuery = $this->getDatabase()->prepare(
+            "UPDATE `term` SET `actual_finish` = :actual_finish WHERE `id` = :id"
+        );
+        $selectActualFinishQuery = $this->getDatabase()->query("
+            SELECT `current`.`id`, (MIN(`next`.`start`) - INTERVAL 1 DAY) AS `actual_finish`
+            FROM `term` `current`
+            LEFT JOIN `term` `next` ON `current`.`display_finish` < `next`.`start`
+            GROUP BY `current`.`id`;
+        ");
+        foreach ($selectActualFinishQuery->fetchAll() as $row) {
+            $updateTermQuery->execute([
+                'id'            => $row['id'],
+                'actual_finish' => $row['actual_finish'],
+            ]);
+        }
     }
 }
