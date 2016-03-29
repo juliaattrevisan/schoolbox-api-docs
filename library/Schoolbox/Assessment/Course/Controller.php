@@ -17,24 +17,24 @@ use Component_DefinitionMapper;
 use Component_Instance;
 use Component_InstanceMapper;
 use RangeException;
-use Schoolbox\Curriculum;
-use Schoolbox\Collection;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
+use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
+use Schoolbox\Assessment\Course\Import\Import as CourseImport;
+use Schoolbox\Assessment\Course\Mapper as CourseMapper;
+use Schoolbox\Collection;
+use Schoolbox\Curriculum;
 use Schoolbox\Error;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Category;
-use Schoolbox\Resource\Folder\Code;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
-use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
-use Schoolbox\Assessment\Course\Mapper as CourseMapper;
-use Schoolbox\Assessment\Course\Import\Import as CourseImport;
+use Schoolbox\Resource\Folder\Code;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -146,12 +146,69 @@ class Controller extends Base\Base
             $folder = $this->getCourseMapper()->findById($id);
             $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
 
-            $data['folder']    = $folder;
-            $data['units']     = $this->getCourseMapper()->findByParent($id);
+            $instances        = [];
+            $instanceMapper   = $this->getComponentInstanceMapper();
+            $definitionMapper = $this->getComponentDefinitionMapper();
+
+            $data['folder'] = $folder;
+            $data['units']  = $this->getCourseMapper()->findByParent($id)->filter(function ($folder) use ($instanceMapper, &$instances) {
+                /**
+                 * This folder is considered a unit:
+                 *      IF it has a course builder component (this is new logic)
+                 *      OR it has tasks (since the component may have been deleted)
+                 *
+                 * @var Folder\Model $folder
+                 */
+
+                if ($folder->getTaskCount()) {
+                    // easy win
+                    return true;
+                }
+
+                $id = $folder->getId();
+
+                // check for instance (and cache it while you're at it)
+                $instances[$id] = array_values($instanceMapper->findByContextAndClass('homepage', $id, \Component_Homepage_CourseBuilderController::class));
+
+                // if there's an instance, you know she's a keeper
+                return count($instances[$id]) > 0;
+            });
 
             foreach ($data['units'] as $unit) {
                 $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
+
+                // obtain the Course Builder Component Instance from the homepage.
+                if (count($instances[$unit->getId()]) == 0) {
+                    // Doesn't exist. We need that to exist. Make it exist.
+                    $definition = $definitionMapper->findOneByColumn('class', \Component_Homepage_CourseBuilderController::class);
+
+                    // invent a new component
+                    $newInstance = $this->getComponentInstanceMapper()
+                                        ->createModel()
+                                        ->setModule('homepage')
+                                        ->setIdentifier($unit->getId())
+                                        ->setDefinitionId($definition->getId())
+                                        ->setSequence(0)
+                                        ->setPosition('top');
+
+                    // save it
+                    $instanceMapper->save($newInstance);
+
+                    // reapply the sequencing so the homepage doesn't break
+                    $instanceMapper->cascadeSequence($unit->getId(), 'top');
+
+                    // shove that new instance into where we expect it to be
+                    $instances[$unit->getId()] = [ $newInstance ];
+                }
+
+                foreach ($data['tasks'][$unit->getId()] as $task) {
+                    /** @var Task $task */
+                    $data['taskReveals'][$task->getId()] = new TaskBuilder($instances[$unit->getId()][0], $task);
+                }
+
+                // set reference to this reveal instance
+                $data['reveals'][$unit->getId()] = new TaskBuilder($instances[$unit->getId()][0]);
             }
         }
 
