@@ -66,7 +66,7 @@ class Loader
 
         /* Handle postfields different from student viewers and teacher/superuser viewers
          */
-        if($this->getUser()->getRole()->isStudent()) {
+        if ($this->getUser()->getRole()->isStudent() || $this->getUser()->getRole()->isParent()) {
             $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=false";
         }
         else if ($this->getUser()->getRole()->isStaff() || $this->getUser()->isSuperuser()) {
