@@ -342,6 +342,7 @@ else {
 /* Render out breadcrumbs
  */
 $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$term  = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submissionBox->getDueDate());
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text' => 'Submissions',
@@ -350,7 +351,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text' => $submissionBox->getCategory()->getName(),
-        'href' => "/submission/listSubmission/{$submissionBox->getDueDate()->getYear()}/{$submissionBox->getDueDate()->getYearHalf()}/{$submissionBox->getCategory()->getId()}",
+        'href' => "/submission/listSubmission/{$term->getCode()}/{$submissionBox->getCategory()->getId()}",
         'class' => '',
     ],
     [
