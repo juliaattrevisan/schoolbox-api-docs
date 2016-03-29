@@ -193,9 +193,9 @@ class Mapper extends BaseMapper
         $query = "
             SELECT * FROM {$this->getTable()}
             WHERE (
-                (`start`  BETWEEN CAST(:thisStart AS DATE) AND CAST(:thisFinish AS DATE))
+                (`start`          BETWEEN CAST(:thisStart AS DATE) AND CAST(:thisFinish AS DATE))
                 OR
-                (`finish` BETWEEN CAST(:thisStart AS DATE) AND CAST(:thisFinish AS DATE))
+                (`display_finish` BETWEEN CAST(:thisStart AS DATE) AND CAST(:thisFinish AS DATE))
             )
         ";
         $params = [
