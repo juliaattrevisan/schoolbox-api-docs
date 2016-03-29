@@ -52,7 +52,7 @@ class Assess_Main extends Evaluation_Main {
 	 * @param bool $limit
 	 * @return array|bool
 	 */
-    public function getList($category_id, $limit = false, $year = 0, $semester = 0) {
+    public function getList($category_id, $limit = false) {
 
         if (is_array($category_id)) {
             $categoryIDList = implode(',', $category_id);
@@ -65,14 +65,6 @@ class Assess_Main extends Evaluation_Main {
             $query = "SELECT *
                       FROM {$this->_table}
                       WHERE category_id = '$category_id'";
-        }
-
-        if($year) {
-            $query .= " AND DATE_FORMAT(start, '%Y') = $year";
-        }
-
-        if($semester) {
-            $query .= " AND DATE_FORMAT(start, '%m') " . DueWork_All::getSemesterLogic($semester);
         }
 
         $query .= " AND availability = 'assess'
