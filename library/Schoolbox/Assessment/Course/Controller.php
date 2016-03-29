@@ -570,6 +570,188 @@ class Controller extends BaseController
     }
 
     /**
+     * Decide publish, open, due, late, start, finish dates for tasks
+     *
+     * Figger out when each task should open, due, late, etc
+     * A superposition of Task Instances over Task Abstracts
+     *
+     * (a Task Abstract is one specified in the original Unit
+     * but has not yet been imported)
+     *
+     * @param $unitDates array User-selected dates for a Unit, (via POST, typically)
+     * @param $courseComponentId int A componentId related to this course >.<
+     * @return array
+     */
+    private function determineTaskDates($unitDates, $courseComponentId)
+    {
+        /** @var Category[] $unitCache */
+        $unitCache = [];
+
+        /* Format this into a convenient structure for now
+         */
+        $preprocessedUnitDates = [];
+
+        foreach ($unitDates as $currentUnitDate) {
+            $preprocessedUnitDates[$currentUnitDate['unit_id']] = $currentUnitDate;
+        }
+
+        /* Make a local cache for unit information
+         */
+        foreach ($unitDates as $unit) {
+            if (!empty($unit['import']) && !isset($unitCache[$unit['unit_id']])) {
+                $unitCache[$unit['unit_id']] = $this->getCourseMapper()->findById($unit['unit_id']);
+            }
+        }
+
+        // Find all tasks, due work, and quizzes associated with the selected units.
+
+        $units = new Collection();
+
+        foreach ($unitCache as $key => $unitCurrent) {
+            $unit          = [];
+            $unit['id']    = $unitCurrent->getId();
+            $unit['name']  = $unitCache[$unitCurrent->getId()]->getName();
+            $unit['items'] = new Collection();
+
+            foreach ($unitDates as $unitDate) {
+                if ($unitDate["unit_id"] == $unitCurrent->getId()) {
+                    $unit['open_date'] = $unitDate['open_date'];
+                    $unit['due_date']  = $unitDate['due_date'];
+                }
+            }
+
+            /* Get a list of all the abstract coursework that were part of
+             * the original unit specification
+             */
+            $abstractCoursework = $this->getTaskMapper()->findAbstractTasksForUnit($key);
+
+            /* Get a list of all the coursework instances that were created
+             * as instances of the original abstracts
+             */
+            if ($courseComponentId) {
+                $unitInstance = $this->getUnitInstanceMapper()->findByColumnList(
+                    [
+                        'component_id'     => $courseComponentId,
+                        'unit_category_id' => $key
+                    ]
+                )->first();
+
+                if ($unitInstance instanceof \Schoolbox\Assessment\Course\UnitInstance) {
+                    $instancesCoursework = $this->getTaskInstanceMapper()->findByColumn(
+                        'course_unit_instance_id',
+                        $unitInstance->getId()
+                    );
+                } else {
+
+                    /* No instances to list
+                     */
+                    $instancesCoursework = new Collection();
+                }
+            } else {
+
+                /* No instances to list
+                 */
+                $instancesCoursework = new Collection();
+            }
+
+            /* Unify all three of Tasks, Due Work and Quizzes
+             * into one mega list
+             */
+            $temp = new Collection();
+
+            /* If the coursework instances exist, use them; otherwise use
+             * an instance of the abstract coursework
+             */
+            $found = [];
+
+            foreach ($abstractCoursework as $currentAbstractCoursework) {
+                foreach ($instancesCoursework as $currentInstanceCoursework) {
+
+                    /* An instance already exists; use that and stop searching
+                     */
+                    if ($currentInstanceCoursework->getTask()->getId() == $currentAbstractCoursework->getId()) {
+
+                        /* This abstract already has an instance; ignore it
+                         * after inserting the instance
+                         */
+                        $found[] = $currentAbstractCoursework->getId();
+
+                        /* Retain the dates for this coursework as specified by
+                         * the original import; ram in the recently-found Unit Instance
+                         */
+                        $unitInstance = $this->getUnitInstanceMapper()->findById(
+                            $currentInstanceCoursework->getUnitInstance()->getId()
+                        );
+                        $currentInstanceCoursework->setUnitInstance($unitInstance);
+
+                        /* Stack it up
+                         */
+                        $temp->add($currentInstanceCoursework);
+
+                        /* Retain an associative array of dates that we can summon
+                         */
+                        $key = $unitInstance->getUnitCategory()->getId();
+
+                        $preprocessedUnitDates[$key]['open_date'] = $unitInstance->getOpenDate()->getLocalShort();
+                        $preprocessedUnitDates[$key]['due_date']  = $unitInstance->getDueDate()->getLocalShort();
+
+                        break;
+                    }
+                }
+
+                /* If an instance of the abstract coursework wasn't found,
+                 * use the abstract instead; otherwise ignore and continue
+                 */
+                if (in_array($currentAbstractCoursework->getId(), $found)) {
+                    $temp->add($currentAbstractCoursework);
+                }
+            }
+
+            /* Sort by Created At for now, until manual sequencing
+             * is added to the ui so teachers can sort it themselves
+             */
+            $temp->sortBy('created', 'asc');
+
+            foreach ($temp as $current) {
+                if ($current->getAssessment()->getId()) {
+                    $class = 'OnlineAssessment';
+                } else {
+                    if ($current->getSubmissionBox()->getId()) {
+                        $class = 'SubmissionBox';
+                    } else {
+                        $class = 'Task';
+                    }
+                }
+
+                /* Determine whether this was an abstract task, or a task instance
+                 * that actually exists (the former will have to inherit unit dates
+                 * and the latter will have to retain unit dates
+                 */
+                if ($current instanceof \Schoolbox\Assessment\Course\Task) {
+                    $isAbstract = true;
+                } else {
+                    $isAbstract = false;
+                }
+
+                $unit['items']->add(
+                    [
+                        'class'      => $class,
+                        'isAbstract' => $isAbstract,
+                        'item'       => $current
+                    ]
+                );
+            }
+
+            $units->add($unit);
+        }
+
+        return [
+            'units' => $units,
+            'preprocessedUnitDates' => $preprocessedUnitDates
+        ];
+    }
+
+    /**
      * Retrieve friend with a list of tasks, quizzes and due work (and relevant date entry boxes) associated with
      * the selected course
      *
@@ -635,169 +817,14 @@ class Controller extends BaseController
                 $this->throwError('You must specify an open and close date for each unit you are importing');
             }
             else {
-                $unitDates = $this->getRequest()->post["unit"];
-                $courseComponentId = $this->getRequest()->post->get('componentId');
 
-
-
-
-                /** @var Category[] $unitCache */
-                $unitCache = [];
-
-                /* Format this into a convenient structure for now
+                /* Figger out when each task should open, due, late, etc
+                 * A superposition of Task Instances over Task Abstracts
+                 *
+                 * (a Task Abstract is one specified in the original Unit
+                 * but has not yet been imported)
                  */
-                $preprocessedUnitDates = [];
-
-                foreach ($unitDates as $currentUnitDate) {
-                    $preprocessedUnitDates[$currentUnitDate['unit_id']] = $currentUnitDate;
-                }
-
-                /* Make a local cache for unit information
-                 */
-                foreach ($unitDates as $unit) {
-                    if (!empty($unit['import']) && !isset($unitCache[$unit['unit_id']])) {
-                        $unitCache[$unit['unit_id']] = $this->getCourseMapper()->findById($unit['unit_id']);
-                    }
-                }
-
-                // Find all tasks, due work, and quizzes associated with the selected units.
-
-                $units = new Collection();
-
-                foreach ($unitCache as $key => $unitCurrent)
-                {
-                    $unit = [];
-                    $unit['id'] = $unitCurrent->getId();
-                    $unit['name'] = $unitCache[$unitCurrent->getId()]->getName();
-                    $unit['items'] = new Collection();
-
-                    foreach ($unitDates as $unitDate) {
-                        if ($unitDate["unit_id"] == $unitCurrent->getId()) {
-                            $unit['open_date'] = $unitDate['open_date'];
-                            $unit['due_date'] = $unitDate['due_date'];
-                        }
-                    }
-
-                    /* Get a list of all the abstract coursework that were part of
-                     * the original unit specification
-                     */
-                    $abstractCoursework = $this->getTaskMapper()->findAbstractTasksForUnit($key);
-
-                    /* Get a list of all the coursework instances that were created
-                     * as instances of the original abstracts
-                     */
-                    if ($courseComponentId) {
-                        $unitInstance = $this->getUnitInstanceMapper()->findByColumnList(
-                            [
-                                'component_id' => $courseComponentId,
-                                'unit_category_id' => $key
-                            ]
-                        )->first();
-
-                        if ($unitInstance instanceof \Schoolbox\Assessment\Course\UnitInstance) {
-                            $instancesCoursework = $this->getTaskInstanceMapper()->findByColumn(
-                                'course_unit_instance_id',
-                                $unitInstance->getId()
-                            );
-                        }
-                        else {
-
-                            /* No instances to list
-                             */
-                            $instancesCoursework = new Collection();
-                        }
-                    }
-                    else {
-                        $instancesCoursework = new Collection();
-                    }
-
-                    /* Unify all three of Tasks, Due Work and Quizzes
-                     * into one mega list
-                     */
-                    $temp = new Collection();
-
-                    /* If the coursework instances exist, use them; otherwise use
-                     * an instance of the abstract coursework
-                     */
-                    $found = [];
-
-                    foreach ($abstractCoursework as $currentAbstractCoursework) {
-                        foreach ($instancesCoursework as $currentInstanceCoursework) {
-
-                            /* An instance already exists; use that and stop searching
-                             */
-                            if ($currentInstanceCoursework->getTask()->getId() == $currentAbstractCoursework->getId()) {
-
-                                /* This abstract already has an instance; ignore it
-                                 * after inserting the instance
-                                 */
-                                $found[] = $currentAbstractCoursework->getId();
-
-                                /* Retain the dates for this coursework as specified by
-                                 * the original import; ram in the recently-found Unit Instance
-                                 */
-                                $unitInstance = $this->getUnitInstanceMapper()->findById($currentInstanceCoursework->getUnitInstance()->getId());
-                                $currentInstanceCoursework->setUnitInstance($unitInstance);
-
-                                /* Stack it up
-                                 */
-                                $temp->add($currentInstanceCoursework);
-
-                                /* Retain an associative array of dates that we can summon
-                                 */
-                                $key = $unitInstance->getUnitCategory()->getId();
-
-                                $preprocessedUnitDates[$key]['open_date'] = $unitInstance->getOpenDate()->getLocalShort();
-                                $preprocessedUnitDates[$key]['due_date'] = $unitInstance->getDueDate()->getLocalShort();
-
-                                break;
-                            }
-                        }
-
-                        /* If an instance of the abstract coursework wasn't found,
-                         * use the abstract instead; otherwise ignore and continue
-                         */
-                        if (in_array($currentAbstractCoursework->getId(), $found)) {
-                            $temp->add($currentAbstractCoursework);
-                        }
-                    }
-
-                    /* Sort by Created At for now, until manual sequencing
-                     * is added to the ui so teachers can sort it themselves
-                     */
-                    $temp->sortBy('created', 'asc');
-
-                    foreach($temp as $current) {
-                        if ($current->getAssessment()->getId()) {
-                            $class = 'OnlineAssessment';
-                        }
-                        else if ($current->getSubmissionBox()->getId()) {
-                            $class = 'SubmissionBox';
-                        }
-                        else {
-                            $class = 'Task';
-                        }
-
-                        /* Determine whether this was an abstract task, or a task instance
-                         * that actually exists (the former will have to inherit unit dates
-                         * and the latter will have to retain unit dates
-                         */
-                        if ($current instanceof \Schoolbox\Assessment\Course\Task) {
-                            $isAbstract = true;
-                        }
-                        else {
-                            $isAbstract = false;
-                        }
-
-                        $unit['items']->add([
-                            'class' => $class,
-                            'isAbstract' => $isAbstract,
-                            'item' => $current
-                        ]);
-                    }
-
-                    $units->add($unit);
-                }
+                $allTaskDates = $this->determineTaskDates($this->getRequest()->post["unit"], $this->getRequest()->post->get('componentId'));
 
                 $this->getResponse()->content->set
                 ([
@@ -806,8 +833,8 @@ class Controller extends BaseController
                     'data' => [
                         'homepage' => $this->getRequest()->post["homepage"],
                         'courseHomepage' => $this->getRequest()->post["course_homepage"],
-                        'unitDates' => $preprocessedUnitDates,
-                        'units' => $units
+                        'unitDates' => $allTaskDates['preprocessedUnitDates'],
+                        'units' => $allTaskDates['units']
                     ]
                 ]);
             }
