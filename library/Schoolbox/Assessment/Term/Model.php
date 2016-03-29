@@ -185,6 +185,24 @@ class Model
     }
 
     /**
+     * @return Alaress_Date_Format
+     */
+    public function getActualFinish()
+    {
+        return $this->actualFinish;
+    }
+
+    /**
+     * @param  Alaress_Date_Format $actualFinish
+     * @return $this
+     */
+    public function setActualFinish($actualFinish)
+    {
+        $this->actualFinish = $actualFinish;
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function getArchived()
