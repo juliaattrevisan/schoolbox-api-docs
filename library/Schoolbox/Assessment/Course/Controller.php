@@ -739,13 +739,18 @@ class Controller extends BaseController
                                  */
                                 $found[] = $currentAbstractCoursework->getId();
 
-                                $temp->add($currentInstanceCoursework);
-
                                 /* Retain the dates for this coursework as specified by
-                                 * the original import;
+                                 * the original import; ram in the recently-found Unit Instance
                                  */
                                 $unitInstance = $this->getUnitInstanceMapper()->findById($currentInstanceCoursework->getUnitInstance()->getId());
+                                $currentInstanceCoursework->setUnitInstance($unitInstance);
 
+                                /* Stack it up
+                                 */
+                                $temp->add($currentInstanceCoursework);
+
+                                /* Retain an associative array of dates that we can summon
+                                 */
                                 $key = $unitInstance->getUnitCategory()->getId();
 
                                 $preprocessedUnitDates[$key]['open_date'] = $unitInstance->getOpenDate()->getLocalShort();
