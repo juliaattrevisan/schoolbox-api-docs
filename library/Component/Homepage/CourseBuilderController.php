@@ -90,10 +90,6 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
 
         $this->setBlock($templateHandle, 'task', 'task_block');
         $this->setBlock($templateHandle, 'category_breadcrumb', 'category_breadcrumb_block');
-        $this->setBlock('task', 'edit_task', 'edit_task_block');
-        $this->setBlock('task', 'task_link', 'task_link_block');
-        $this->setBlock('task', 'task_no_link', 'task_no_link_block');
-        $this->setBlock('task', 'edit_task_form', 'edit_task_form_block');
 
         $returnUrl = urlencode(base64_encode($_GET["page"])) == '' ? $_POST["return_url"] : urlencode(base64_encode($_GET["page"]));
 
@@ -124,54 +120,23 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
                 $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
             }
         }
+
+        // the 'unit' is just the page we're on
+        $unitId = $this->getContext()->getId();
+
         $this->setVar('task_block', '');
 
         foreach ($this->task_list as $task) {
-            $this->setVar(
-                array(
-                    'TASK_ID'              => Scrub::text($task->getId()),
-                    'TASK_TITLE'           => Scrub::text($task->getTitle()),
-                    'TASK_TYPE'            => '',
-                    'TASK_TYPE_LABEL'      => Scrub::text($task->getLabel()),
-                    'TASK_CLASS'           => Scrub::text($task->getIconClass()),
-                    'TASK_PREVIEW'         => $task->getType() == Task::TYPE_TASK ? 'data-plugin="preview"' : '',
-                    'TASK_LINK'            => Scrub::text($task->getLink()),
-                    'TASK_SELF_ASSESS'     => ($task->getRequiresConfirmation() ? '' : 'checked'),
-                    'TASK_MODIFY_URL'      => $task->getType() == Task::TYPE_TASK ? '#' : '/task/modify/'.$task->getId(),
-                    'TASK_REVEAL_ATTR'     => '',
-                    'task_link_block'      => '',
-                    'task_no_link_block'   => '',
-                    'edit_task_form_block' => '',
-                )
-            );
 
-            $task_type = $task->getType();
+            // mash sitepage vars into a twig... what could possibly go wrong...
+            $this->setVar('TASK_ITEM', $this->sitepage->getTwig()->render('@course/task/writable.twig', [
+                'unit'        => [ 'id' => $unitId ],
+                'returnUrl'   => [ $unitId => $returnUrl ],
+                'task'        => $task,
+                'taskReveals' => [ $task->getId() => new TaskBuilder($this->getInstance(), $task, $returnUrl) ],
+                'reveals'     => [ $unitId => new TaskBuilder($this->getInstance()) ]
+            ]));
 
-            if ($task_type === Task::TYPE_TASK) {
-
-                $this->setVar('edit_task_form_block', $this->sitepage->getTwig()->render('@course/task/reveal-modal.twig', [
-                    'reveal' => new TaskBuilder($this->getInstance(), $task, $returnUrl)
-                ]));
-
-                $this->setVar('TASK_TYPE', 'task');
-
-                if (strlen($task->getLink()) > 0) {
-                    $this->parse('task_link_block', 'task_link');
-
-                } else {
-                    $this->parse('task_no_link_block', 'task_no_link');
-                }
-
-            } elseif ($task_type === Task::TYPE_DUE_WORK) {
-                $this->setVar('TASK_TYPE', 'due_work');
-                $this->parse('task_no_link_block', 'task_no_link');
-
-            } elseif ($task_type === Task::TYPE_ONLINE_ASSESS) {
-                $this->setVar('TASK_TYPE', 'assessment');
-                $this->parse('task_no_link_block', 'task_no_link');
-            }
-
-            $this->parse('edit_task_block', 'edit_task');
             $this->parse('task_block', 'task', true);
         }
 
