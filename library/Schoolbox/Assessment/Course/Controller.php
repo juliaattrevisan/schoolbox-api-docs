@@ -944,6 +944,33 @@ class Controller extends BaseController
     }
 
     /**
+     * Delete unit from course
+     */
+    public function deleteUnit()
+    {
+        $this->getCourseMapper()->deleteUnit($this->getRequest()->post["id"]);
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => ['result' => 'success']
+        ]);
+    }
+
+    /**
+     * View a list of courses associated with a homepage
+     *
+     * @param $homepageId
+     */
+    public function management($homepageId)
+    {
+        $folder = $this->getFolderMapper()->findById($homepageId);
+
+        $this->tpl('management', [
+            'folder' => $folder,
+        ]);
+    }
+
+    /**
      * Returns a HTTP 500 error with a specific text message
      *
      * @param $message
@@ -958,18 +985,6 @@ class Controller extends BaseController
         ]);
     }
 
-    /**
-     * Delete unit from course
-     */
-    public function deleteUnit()
-    {
-        $this->getCourseMapper()->deleteUnit($this->getRequest()->post["id"]);
-
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data' => ['result' => 'success']
-        ]);
-    }
 
     /* Getters/Setters
      */
