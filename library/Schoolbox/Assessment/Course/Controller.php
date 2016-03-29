@@ -598,7 +598,7 @@ class Controller extends BaseController
         /* Make a local cache for unit information
          */
         foreach ($unitDates as $unit) {
-            if (!empty($unit['import']) && !isset($unitCache[$unit['unit_id']])) {
+            if ($unit['import'] && !isset($unitCache[$unit['unit_id']])) {
                 $unitCache[$unit['unit_id']] = $this->getCourseMapper()->findById($unit['unit_id']);
             }
         }
