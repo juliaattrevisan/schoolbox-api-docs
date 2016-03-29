@@ -531,10 +531,7 @@ class ContextSelector {
 				/** @var UnitInstance $unit */
 				foreach ($terms as $i => $term) {
 					$nextTerm = $terms[$i+1];
-					if (
-						!isset($nextTerm)
-						|| $unit->getOpenDate()->between($term->getStart(), $nextTerm->getStart())
-					) {
+					if (!isset($nextTerm) || $term->contains($unit->getOpenDate())) {
 						// Last term - put this unit in this term
 						// Unit starts between this and next term's start
 						$unit_year_list[$term->getCode()][] = $unit;
