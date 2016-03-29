@@ -44,27 +44,31 @@ class Module extends BaseModule
                 '/modify/{id}'                          => 'modifyCourse',
                 '/parent'                               => 'parentList',
 
+                /* Course Management for a particular Homepage
+                 */
+                '/management/{homepageId}'             => 'management',
+
                 /* Import screen
                  */
-                '/import/{courseId}/class/{classCode}'  => 'import',
+                '/import/{courseId}/class/{classCode}' => 'import',
 
                 /* Dynamic Unit/Task list when choosing course to import
                  */
-                '/importResults/{courseId}'             => 'importResults',
+                '/importResults/{courseId}'            => 'importResults',
 
                 /* A list of Classes you can import into via selectize
                  */
-                '/import/classes'                       => 'importClasses',
+                '/import/classes'                      => 'importClasses',
             ],
             'POST' => [
-                '/unit/new'                             => 'newUnit',
-                '/unit/delete'                          => 'deleteUnit',
-                '/importTasks'                          => 'importTasks',
-                '/importUnits'                          => 'importUnits',
-                '/importSave'                           => 'importSave',
-                '/new'                                  => 'createCourse',
-                '/modify/{id}'                          => 'updateCourse',
-                '/finalise'                             => 'persistCourse',
+                '/unit/new'    => 'newUnit',
+                '/unit/delete' => 'deleteUnit',
+                '/importTasks' => 'importTasks',
+                '/importUnits' => 'importUnits',
+                '/importSave'  => 'importSave',
+                '/new'         => 'createCourse',
+                '/modify/{id}' => 'updateCourse',
+                '/finalise'    => 'persistCourse',
             ]
         ];
 
