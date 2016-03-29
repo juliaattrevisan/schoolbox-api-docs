@@ -261,6 +261,7 @@ FROM            dbo.tPastoralCare INNER JOIN
                 $pastoralRecord->setStudent($student);
                 $pastoralRecord->setOwner($owner);
                 $pastoralRecord->setSeverity($severity);
+                $pastoralRecord->setPrivate($record["ConfidentialFlag"]);
                 $pastoralRecord->setCreatedAt(\Alaress_Date_Format::newLocal($record["CreatedDate"]));
                 $pastoralRecord->setUpdatedAt(\Alaress_Date_Format::newLocal($record["ModifiedDate"]));
                 $this->getPastoralMapper()->save($pastoralRecord);
