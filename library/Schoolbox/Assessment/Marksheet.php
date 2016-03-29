@@ -180,7 +180,7 @@ class Marksheet
             $catId,
             null,
             $term->getStart(),
-            $this->termMapper->findNext($term)->getStart()->addDays(-1)
+            $term->getActualFinish()
         );
         if (is_array($workList)) {
             foreach ($workList as $work) {
@@ -324,7 +324,7 @@ class Marksheet
                 $studentCollection,
                 $this->category,
                 $this->term->getStart(),
-                $this->termMapper->findNext($this->term)->getStart()->addDays(-1)
+                $this->term->getActualFinish()
             );
 
             foreach ($studentCollection as $student) {

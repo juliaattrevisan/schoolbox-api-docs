@@ -1210,7 +1210,7 @@ class StudentReportCard
          */
         if (\Alaress_Date_Format::now()->between(
             $this->targetTerm->getStart(),
-            $this->termMapper->findNext($this->targetTerm)->getStart()->addDays(-1)
+            $this->targetTerm->getActualFinish()
         )) {
             $categoryList = $this->groupHandler->involvedInCategoryList($this->targetUserId, true, READ_ACCESS);
             // filter this list, so that it only contains categories in which contain results
@@ -1235,7 +1235,7 @@ class StudentReportCard
         $submittedList = $this->submissionMapper->submittedToCategoryList(
             $this->targetUserId,
             $this->targetTerm->getStart(),
-            $this->termMapper->findNext($this->targetTerm)->getStart()->addDays(-1)
+            $this->targetTerm->getActualFinish()
         );
         /* Combine lists alphabetically
             */

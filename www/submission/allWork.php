@@ -79,7 +79,7 @@ if($subject) {
 		$catArray = $boxHandler->submittedToCategoryList(
 			$userId,
 			$term->getStart(),
-			$termMapper->findNext($term)->getStart()
+			$term->getActualFinish()
 		);
 		$catIdArray = array();
 		foreach($catArray as $c) {

@@ -141,7 +141,6 @@ class SubjectReportCard {
 			// populate cache
 			$returnMapper = new ReturnedWorkMapper();
 			$assessMapper = new AttemptMapper();
-			$termMapper   = Term\Mapper::getInstance();
 
 			/* Visibilities
 			 */
@@ -154,12 +153,12 @@ class SubjectReportCard {
 				$returnMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array(
 					'visibility' => $this->visibilities,
 					'from'       => $this->targetTerm->getStart(),
-					'to'         => $termMapper->findNext($this->targetTerm)->getStart()->addDays(-1),
+					'to'         => $this->targetTerm->getActualFinish(),
 				)),
 				$assessMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array(
 					'visibility' => $quizVisibilities,
 					'from'       => $this->targetTerm->getStart(),
-					'to'         => $termMapper->findNext($this->targetTerm)->getStart()->addDays(-1),
+					'to'         => $this->targetTerm->getActualFinish(),
 				))
 			);
 			$studentGrades = array_filter(
