@@ -722,8 +722,8 @@ class Controller extends BaseController
                      */
                     $temp = new Collection();
 
-                    /* If the coursework instances exist, use them; otherwise spawn
-                     * a temporary instance of the abstract coursework
+                    /* If the coursework instances exist, use them; otherwise use
+                     * an instance of the abstract coursework
                      */
                     $found = [];
 
@@ -733,6 +733,10 @@ class Controller extends BaseController
                             /* An instance already exists; use that and stop searching
                              */
                             if ($currentInstanceCoursework->getTask()->getId() == $currentAbstractCoursework->getId()) {
+
+                                /* This abstract already has an instance; ignore it
+                                 * after inserting the instance
+                                 */
                                 $found[] = $currentAbstractCoursework->getId();
 
                                 $temp->add($currentInstanceCoursework);
