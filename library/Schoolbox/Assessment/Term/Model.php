@@ -87,11 +87,10 @@ class Model
      */
     public function contains(Alaress_Date_Format $date)
     {
-        // TODO make this calculation take next term's start
-        return $date->between(
-            $this->getStart(),
-            $this->getDisplayFinish()
-        );
+        // TODO make ADF immutable already
+        $start  = clone $this->getStart();
+        $finish = clone $this->getActualFinish();
+        return $date->between($start->startOfDay(), $finish->endOfDay());
     }
 
     /**
