@@ -639,6 +639,8 @@ class Controller extends BaseController
                 /** @var Category[] $unitCache */
                 $unitCache = [];
 
+                /* TODO: I think abstracts are getting this value when maybe they shouldn't?
+                 */
                 $unitDates = $this->getRequest()->post["unit"];
 
                 /* Format this into a convenient structure for now
@@ -687,12 +689,25 @@ class Controller extends BaseController
 
                         /* TODO: Check when no unitInstances exist
                          */
-                        $unitInstance = $this->getUnitInstanceMapper()->findByColumnList([
-                            'component_id' => $this->getRequest()->post->get('componentId'),
-                            'unit_category_id' => $key
-                        ])->first();
+                        $unitInstance = $this->getUnitInstanceMapper()->findByColumnList(
+                            [
+                                'component_id' => $this->getRequest()->post->get('componentId'),
+                                'unit_category_id' => $key
+                            ]
+                        )->first();
 
-                        $instancesCoursework = $this->getTaskInstanceMapper()->findByColumn('course_unit_instance_id', $unitInstance->getId());
+                        if ($unitInstance instanceof \Schoolbox\Assessment\Course\UnitInstance) {
+                            $instancesCoursework = $this->getTaskInstanceMapper()->findByColumn(
+                                'course_unit_instance_id',
+                                $unitInstance->getId()
+                            );
+                        }
+                        else {
+
+                            /* No instances to list
+                             */
+                            $instancesCoursework = new Collection();
+                        }
                     }
                     else {
                         $instancesCoursework = new Collection();
