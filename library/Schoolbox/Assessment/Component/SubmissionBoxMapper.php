@@ -431,23 +431,34 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     *
     * @todo Implement this as an activity list instead of an array return
     *
-    * @param int   $user_id    The user ID to retrieve for.
-    * @param array $categories The categories to search for.
-    * @param int   $year       The year to fetch for.
-    * @param int   $semester   The semester to fetch for.
+    * @param int                  $user_id    The user ID to retrieve for.
+    * @param array                $categories The categories to search for.
+    * @param \Alaress_Date_Format $from
+    * @param \Alaress_Date_Format $to
     *
     * @return array
     */
     public function getAllDueWork($user_id, $categories, \Alaress_Date_Format $from, \Alaress_Date_Format $to)
     {
-        //
         // Submission box: hydrate with category, student submissions and returns.
+        $parts = [
+            'b.deleted = 0',
+            "b.category IN {$this->getArrayPlaceholders($categories, 'category')}",
+            'b.task_id IS NULL',
+        ];
         $params = $this->getArrayParameters($categories, 'category');
         $params['user_id'] = $user_id;
-        $params['from']    = $from->getDatabaseDate();
-        $params['to']      = $to->getDatabaseDate();
+        if (!$from->isNull()) {
+            $params['from'] = $from->getDatabaseDate();
+            $parts[]        = 'DATE(b.date) >= :from';
+        }
+        if (!$to->isNull()) {
+            $params['to'] = $to->getDatabaseDate();
+            $parts[]      = 'DATE(b.date) <= :to';
+        }
 
-        $query = "
+        $wherePart = implode(' AND ', $parts);
+        $query     = "
 			SELECT
 			b.id AS bid,
 			s.id AS sid,
@@ -468,10 +479,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = :user_id OR s.owner IS NULL)
 			LEFT JOIN submission_return  r ON r.box_id = b.id AND (r.owner = :user_id OR r.owner IS NULL)
 			LEFT JOIN lu_submission_type f ON b.type = f.id
-			WHERE b.deleted = 0
-			AND b.category IN {$this->getArrayPlaceholders($categories, 'category')}
-			AND DATE(b.date) BETWEEN :from AND :to
-			AND b.task_id IS NULL
+			WHERE $wherePart
 			GROUP BY b.id
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
 		";
