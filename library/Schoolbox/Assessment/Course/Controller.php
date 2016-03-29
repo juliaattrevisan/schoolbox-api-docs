@@ -702,7 +702,7 @@ class Controller extends BaseController
                 /* If an instance of the abstract coursework wasn't found,
                  * use the abstract instead; otherwise ignore and continue
                  */
-                if (in_array($currentAbstractCoursework->getId(), $found)) {
+                if (!in_array($currentAbstractCoursework->getId(), $found)) {
                     $temp->add($currentAbstractCoursework);
                 }
             }
