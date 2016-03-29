@@ -35,8 +35,6 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
             'BOX_ID'                => $submissionBox->getId(),
             'BOX_GRADIENT'          => $submissionBox->getGradientIndex(),
             'CAT_ID'                => $submissionBox->getCategory()->getId(),
-            'DUEWORK_YEAR'          => date('Y', strtotime($submissionBox->getDueDate())),
-            'DUEWORK_SEMESTER'      => DueWork_All::getSemester(strtotime($submissionBox->getDueDate())),
             'DUEWORK_TYPE'          => $submissionBox->getWorkType()->getName(),
             'DUEWORK_DUEDATE'       => $submissionBox->getDueDate()->getLongDateOnly(),
             'GRADE_VISIBILITY'      => $submissionBox->getMarkVisibilityDescription(),
