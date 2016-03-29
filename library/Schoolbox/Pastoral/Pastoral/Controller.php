@@ -364,7 +364,7 @@ class Controller extends Base
                 'template' => '@pastoral/reportBuilder.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
-                    'types'             => $this->getPastoralTypeMapper()->findAll(),
+                    'types'           => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
                     'tags'              => $this->getPastoralTagsMapper()->findAll(),
                     'studentsSelected'  => $studentsSelected,
@@ -454,7 +454,7 @@ class Controller extends Base
                     'studentAge'        => $this->calculateAge($studentExternal['StudentBirthDate']),
                     'studentContacts'   => $studentContacts,
                     'role'              => $this->getUser()->getRole()->getType(),
-                    'types'             => $this->getPastoralTypeMapper()->findAll(),
+                    'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'pastoralModerator' => $pastoralModerator
                 ),
             )
@@ -562,7 +562,7 @@ class Controller extends Base
                     'student'           => $student,
                     'id'                => '',
                     'record'            => null,
-                    'types'             => $this->getPastoralTypeMapper()->findAll(),
+                    'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
                     'roles'             => $this->getRoleMapper()->findAll(),
                     'attachzone'        => $this->getAttachZone(),
@@ -607,7 +607,7 @@ class Controller extends Base
                 'data'     => array(
                     'session'         => $_SESSION,
                     'record'          => $record,
-                    'types'           => $this->getPastoralTypeMapper()->findAll(),
+                    'types'           => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'severities'      => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
                     'roles'           => $this->getRoleMapper()->findAll(),
                     'attachzone'      => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($id)),
