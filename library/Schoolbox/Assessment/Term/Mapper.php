@@ -141,6 +141,11 @@ class Mapper extends BaseMapper
         if (strlen($model->getCode()) === 0) {
             throw new UnexpectedValueException('A term must have a code.');
         }
+        if (!preg_match('/^[a-z0-9\\-_]+$/i', $model->getCode())) {
+            throw new UnexpectedValueException(
+                'A code may only contain alphanumeric, hyphen and underscore characters.'
+            );
+        }
         if (!$this->isUnique(['code' => $model->getCode()], $model->getId())) {
             throw new UnexpectedValueException(
                 sprintf(
