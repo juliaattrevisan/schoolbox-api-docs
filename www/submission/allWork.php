@@ -49,7 +49,7 @@ if (isset($this->arg[1])) {
 		exit;
 	}
 } else {
-	$term = $termMapper->findCurrent();
+	$term = $termMapper->findForToday();
 }
 
 $subject = isset($this->arg[2]) ? $this->arg[2] : false;

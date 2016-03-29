@@ -148,7 +148,7 @@ class StudentReportCard
 //        $this->currentYear     = date('Y');
 //        $this->currentSemester = date('m') > 6 ? 2 : 1;
         $this->targetTerm  = new Term\Model();
-        $this->currentTerm = $this->termMapper->findCurrent();
+        $this->currentTerm = $this->termMapper->findForToday();
     }
 
     /**

@@ -48,24 +48,20 @@ class Mapper extends BaseMapper
      *
      * @return Model
      */
-    public function findCurrent()
+    public function findForToday()
     {
-        return $this->findForDate();
+        return $this->findForDate(Alaress_Date_Format::now());
     }
 
     /**
      * Find whichever term is current for this date.
      *
-     * @param Alaress_Date_Format $date Get the term for this date,
-     *                                  or today if not provided.
+     * @param Alaress_Date_Format $date Get the term for this date.
      *
      * @return Model
      */
-    public function findForDate(Alaress_Date_Format $date = null)
+    public function findForDate(Alaress_Date_Format $date)
     {
-        if (!isset($date)) {
-            $date = Alaress_Date_Format::now();
-        }
         $query = "
             SELECT   {$this->getColumnString()}
             FROM     {$this->getTable()}

@@ -38,7 +38,7 @@ if (isset($termSlug)) {
 } else {
 //    $year = $currentYear;
 //    $semester = $currentSemester;
-    $currentTerm = $termMapper->findForDate();
+    $currentTerm = $termMapper->findForToday();
 }
 $semesterSlug = $currentTerm->getCode();
 // Get the next ending term too

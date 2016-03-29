@@ -76,7 +76,7 @@ if (!isset($unit_id)) {
     // (that is in the requested term) if any.
     // If not, then just redir to the first one.
     if (!$currentTerm instanceof TermModel) {
-        $currentTerm = $termMapper->findCurrent();
+        $currentTerm = $termMapper->findForToday();
     }
     $nextTerm = $termMapper->findNext($currentTerm);
     $firstId = null;

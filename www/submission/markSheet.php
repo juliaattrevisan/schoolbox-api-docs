@@ -40,7 +40,7 @@ if (isset($termSlug)) {
         exit;
     }
 } else {
-    $currentTerm  = $termMapper->findForDate();
+    $currentTerm  = $termMapper->findForToday();
 }
 
 $m = new Marksheet($categoryID, $_SESSION['id'], array(
