@@ -398,7 +398,22 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     */
     public function submittedToCategoryList($user_id, \Alaress_Date_Format $from, \Alaress_Date_Format $to)
     {
-        $query = "
+        $parts = [
+            '(ss.owner = :user_id OR sr.owner = :user_id)',
+            'sb.deleted IS FALSE',
+            'sb.task_id IS NULL',
+        ];
+        $params['user_id'] = $user_id;
+        if (!$from->isNull()) {
+            $params['from'] = $from->getDatabaseDate();
+            $parts[]        = 'DATE(sb.date) >= :from';
+        }
+        if (!$to->isNull()) {
+            $params['to'] = $to->getDatabaseDate();
+            $parts[]      = 'DATE(sb.date) <= :to';
+        }
+        $wherePart = implode(' AND ', $parts);
+        $query     = "
 			SELECT category.id, category.name, GROUP_CONCAT(cc.code) AS code
 			FROM category
 			LEFT JOIN categoryCode cc ON category.id = cc.categoryID AND cc.deleted_at IS NULL
@@ -407,21 +422,13 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 				FROM submission_box sb
 				LEFT JOIN student_submission ss ON ss.box_id = sb.id
 				LEFT JOIN submission_return  sr ON sr.box_id = sb.id
-				WHERE (ss.owner = :user_id OR sr.owner = :user_id)
-				AND sb.deleted IS FALSE
-				AND sb.task_id IS NULL
-				AND DATE(sb.`date`) BETWEEN :from AND :to
+				WHERE $wherePart
 			)
 			GROUP BY category.id
 			ORDER BY category.name";
 
         $statement = $this->database->prepare($query);
-
-        $statement->execute(array(
-            'user_id'     => $user_id,
-            'from'        => $from->getDatabaseDate(),
-            'to'          => $to->getDatabaseDate(),
-        ));
+        $statement->execute($params);
         return $statement->fetchAll();
     }
 
