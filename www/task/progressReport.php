@@ -78,17 +78,13 @@ if (!isset($unit_id)) {
     if (!$currentTerm instanceof TermModel) {
         $currentTerm = $termMapper->findForToday();
     }
-    $nextTerm = $termMapper->findNext($currentTerm);
     $firstId = null;
     foreach ($unit_list as $unit) {
         if (!isset($firstId)) {
             $firstId = $unit->getId();
         }
         // Course must open in this term
-        if ($unit->getOpenDate()->between(
-            $currentTerm->getStart()->startOfDay(),
-            $nextTerm->getStart()->endOfDay()
-        )) {
+        if ($currentTerm->contains($unit->getOpenDate())) {
             $unit_id = $unit->getId();
             break;
         }
