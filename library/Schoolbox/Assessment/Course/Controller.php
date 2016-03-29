@@ -635,13 +635,10 @@ class Controller extends BaseController
                 $this->throwError('You must specify an open and close date for each unit you are importing');
             }
             else {
+                $unitDates = $this->getRequest()->post["unit"];
 
                 /** @var Category[] $unitCache */
                 $unitCache = [];
-
-                /* TODO: I think abstracts are getting this value when maybe they shouldn't?
-                 */
-                $unitDates = $this->getRequest()->post["unit"];
 
                 /* Format this into a convenient structure for now
                  */
@@ -686,9 +683,6 @@ class Controller extends BaseController
                      * as instances of the original abstracts
                      */
                     if ($this->getRequest()->post->get('componentId')) {
-
-                        /* TODO: Check when no unitInstances exist
-                         */
                         $unitInstance = $this->getUnitInstanceMapper()->findByColumnList(
                             [
                                 'component_id' => $this->getRequest()->post->get('componentId'),
@@ -712,10 +706,6 @@ class Controller extends BaseController
                     else {
                         $instancesCoursework = new Collection();
                     }
-
-//                    new \Alaress_Probe($key, $unitInstance->getId());
-//                    new \Alaress_Probe($abstractCoursework, $instancesCoursework);
-
 
                     /* Unify all three of Tasks, Due Work and Quizzes
                      * into one mega list
