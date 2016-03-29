@@ -249,6 +249,9 @@ FROM            dbo.tPastoralCare INNER JOIN
                 else
                     $record["heading"] = substr($record["Details"], 0, 50);
 
+                $owner = null;
+                $student = null;
+
                 $owner = $this->getUserMapper()->findByExternalId($record["CreatedByID"]);
                 $student = $this->getUserMapper()->findByExternalId($record["ID"]);
 
