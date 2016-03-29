@@ -35,7 +35,9 @@ use Schoolbox\Assessment\Course\Import\Import as CourseImport;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
+use Schoolbox\Assessment\Course\UnitInstance;
 
 class Controller extends BaseController
 {
@@ -636,7 +638,7 @@ class Controller extends BaseController
                     ]
                 )->first();
 
-                if ($unitInstance instanceof \Schoolbox\Assessment\Course\UnitInstance) {
+                if ($unitInstance instanceof UnitInstance) {
                     $instancesCoursework = $this->getTaskInstanceMapper()->findByColumn(
                         'course_unit_instance_id',
                         $unitInstance->getId()
@@ -727,7 +729,7 @@ class Controller extends BaseController
                  * that actually exists (the former will have to inherit unit dates
                  * and the latter will have to retain unit dates
                  */
-                if ($current instanceof \Schoolbox\Assessment\Course\Task) {
+                if ($current instanceof Task) {
                     $isAbstract = true;
                 } else {
                     $isAbstract = false;
