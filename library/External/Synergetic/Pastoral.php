@@ -192,8 +192,12 @@ FROM            dbo.tPastoralCare INNER JOIN
 
         $owner = null;
         $student = null;
-        try
 
+        // Give the import 5 minutes to complete
+
+        set_time_limit(60 * 5);
+
+        try
         {
             // Default all imported items to the lowest priority as there is no concept of this in Synergetic
 
