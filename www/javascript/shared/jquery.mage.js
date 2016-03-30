@@ -30,12 +30,11 @@
         // non-negotiable selector
         var $form = $elem.closest('form');
 
-        if ($form.length == 0) {
-            throw "Cannot target an element not in a form";
-        }
+        if ($form.length) {
 
-        // don't duplicate this listener
-        $elem.closest('form').off('submit', submitIntercept).on('submit', submitIntercept);
+            // don't duplicate this listener
+            $form.off('submit', submitIntercept).on('submit', submitIntercept);
+        }
 
         // wrap the interceptor so we can clear and reset it for overloading
         var onclick = function (e) { clickIntercept(e, self, $elem, $form); };
@@ -111,7 +110,7 @@
      * @param {Event} e
      * @param {Mage} self
      * @param {jQuery} elem
-     * @param {jQuery} form
+     * @param {jQuery} [form] optional
      */
     function clickIntercept (e, self, elem, form) {
         e.preventDefault();
@@ -140,8 +139,8 @@
         }
 
         // HTML5 FTW
-        var method = elem.attr('formmethod') || form.attr('method'),
-            action = elem.attr('formaction') || form.attr('action'),
+        var method = elem.attr('formmethod') || (form.length ? form.attr('method') : 'post'),
+            action = elem.attr('formaction') || (form.length ? form.attr('action') : window.location),
             target = elem.closest(self.options.submittable);
 
         // do the prep-work
