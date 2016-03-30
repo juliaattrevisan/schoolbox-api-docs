@@ -16,7 +16,7 @@ $db     = Database::getInstance();
 $logger = new Alaress\Lumberjack\Logger();
 
 $insertTermQuery = $db->prepare("
-    INSERT INTO `term` (`title`, `code`, `start`, `finish`, `archived`)
+    INSERT INTO `term` (`title`, `code`, `start`, `display_finish`, `archived`)
     VALUES (:title, :code, :start, :finish, FALSE)
 ");
 
