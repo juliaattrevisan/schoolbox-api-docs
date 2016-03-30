@@ -12,6 +12,7 @@
 
 <input type="hidden" name="homepage"        value="{{ homepage }}" />
 <input type="hidden" name="course_homepage" value="{{ courseHomepage }}" />
+<input type="hidden" name="component_id"    value="{{ componentId }}" />
 
 {% for unit in unitDates %}
 <input type="hidden" name="unit[{{ loop.index }}][unit_id]" value="{{ unit.unit_id }}">
@@ -60,7 +61,7 @@
             <p class="alert alert-box icon-alert" data-mage-error></p>
         </div>
         <div class="small-12 medium-4 column">
-            <input type="submit" name="part-results-select" value="Import" data-mage-next="part-results-select" data-mage-working="Working..." formaction="/course/importSave" />
+            <input type="submit" name="part-results-select" value="{% if componentId %}Modify{% else %}Import{% endif %}" data-mage-next="part-results-select" data-mage-working="Working..." formaction="/course/importSave" />
         </div>
     </div>
 </div>

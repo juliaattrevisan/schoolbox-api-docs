@@ -8,7 +8,7 @@
     <input id="work_publish_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][publish_date]"
            type="text"
-           value="{% if work.isAbstract %}{{ unit.open_date }}{% else %}{{ unitDates[work.item.unitinstance.unitcategory.id].open_date }}{% endif %}"
+           value="{% if work.isAbstract %}{{ unit.open_date }}{% else %}{{ work.detail.getPublishDate.localShort }}{% endif %}"
            data-role="publish_date"
            data-datepicker
            data-datepicker-sync
@@ -20,7 +20,7 @@
     <input id="work_open_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][open_date]"
            type="text"
-           value="{% if work.isAbstract %}{{ unit.open_date }}{% else %}{{ unitDates[work.item.unitinstance.unitcategory.id].open_date }}{% endif %}"
+           value="{% if work.isAbstract %}{{ unit.open_date }}{% else %}{{ work.detail.getOpenDate.localShort }}{% endif %}"
            data-role="open_date"
            data-datepicker
            data-datepicker-sync
@@ -32,7 +32,7 @@
     <input id="work_due_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][due_date]"
            type="text"
-           value="{% if work.isAbstract %}{{ unit.due_date }}{% else %}{{ unitDates[work.item.unitinstance.unitcategory.id].due_date }}{% endif %}"
+           value="{% if work.isAbstract %}{{ unit.due_date }}{% else %}{{ work.detail.getDueDate.localShort }}{% endif %}"
            data-role="due_date"
            data-datepicker
            data-datepicker-sync
@@ -43,7 +43,7 @@
     <input id="work_late_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][late_date]"
            type="text"
-           value="{% if work.isAbstract %}{{ unit.due_date }}{% else %}{{ unitDates[work.item.unitinstance.unitcategory.id].due_date }}{% endif %}"
+           value="{% if work.isAbstract %}{{ unit.due_date }}{% else %}{{ work.detail.getLateDate.localShort }}{% endif %}"
            data-role="late_date"
            data-datepicker
            data-datepicker-sync
