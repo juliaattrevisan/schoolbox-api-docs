@@ -1056,8 +1056,8 @@ class Controller extends BaseController
                         // Update the units open/due date
 
                         $unit_instance
-                            ->setOpenDate(\Alaress_Date_Format::newLocalShort($currentUnit['open_date']))
-                            ->setDueDate(\Alaress_Date_Format::newLocalShort($currentUnit['due_date']));
+                            ->setOpenDate(\Alaress_Date_Format::newLocalShort($currentUnit['open_date'])->startOfDay())
+                            ->setDueDate(\Alaress_Date_Format::newLocalShort($currentUnit['due_date'])->endOfDay());
 
                         // Update everything associated with the unit instance
 
@@ -1079,10 +1079,10 @@ class Controller extends BaseController
                                     $open_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["work"][$taskInstance->getId()]['open_date']);
                                     $publish_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["work"][$taskInstance->getId()]['publish_date']);
 
-                                    $submissionBox->setDueDate($due_date);
-                                    $submissionBox->setLateDate($late_date);
-                                    $submissionBox->setOpenDate($open_date);
-                                    $submissionBox->setPublishDate($publish_date);
+                                    $submissionBox->setDueDate($due_date->endOfDay());
+                                    $submissionBox->setLateDate($late_date->endOfDay());
+                                    $submissionBox->setOpenDate($open_date->startOfDay());
+                                    $submissionBox->setPublishDate($publish_date->startOfDay());
                                     $this->getSubmissionBoxMapper()->save($submissionBox);
 
                                     break;
@@ -1096,8 +1096,8 @@ class Controller extends BaseController
                                     $start_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["quiz"][$taskInstance->getId()]['start_date']);
                                     $finish_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["quiz"][$taskInstance->getId()]['finish_date']);
 
-                                    $assessment->setStart($start_date);
-                                    $assessment->setFinish($finish_date);
+                                    $assessment->setStart($start_date->startOfDay());
+                                    $assessment->setFinish($finish_date->endOfDay());
                                     $this->getOnlineAssessmentMapper()->save($assessment);
 
                                     break;
@@ -1121,8 +1121,8 @@ class Controller extends BaseController
                             ->setTitle($unitCache[$currentUnit['id']]->getName())
                             ->setCategory($homepageCache[$homepage])
                             ->setUnitCategory($unitCache[$currentUnit['id']])
-                            ->setOpenDate(\Alaress_Date_Format::newLocalShort($currentUnit['open_date']))
-                            ->setDueDate(\Alaress_Date_Format::newLocalShort($currentUnit['due_date']));
+                            ->setOpenDate(\Alaress_Date_Format::newLocalShort($currentUnit['open_date'])->startOfDay())
+                            ->setDueDate(\Alaress_Date_Format::newLocalShort($currentUnit['due_date'])->endOfDay());
 
                         $unit_instance_list->add($unit_instance);
                     }
