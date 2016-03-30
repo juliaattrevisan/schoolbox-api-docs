@@ -114,8 +114,6 @@ class AttemptMapper extends Mapper
      * @param int   $category_id
      * @param int   $student_id
      * @param array $extra_params Any extra filters:
-     *                            * year
-     *                            * semester
      *                            * owner - the creator of the submission box
      *                            * from (Alaress_Date_Format)
      *                            * to (Alaress_Date_Format)

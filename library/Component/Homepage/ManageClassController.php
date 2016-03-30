@@ -61,7 +61,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, "course", "course_block");
 
 
-        // Determine the year and semester for the grades link
+        // Determine the term for the grades link
         $this->setVar('WORK_TERM', Schoolbox\Assessment\Term\Mapper::getInstance()->findForToday()->getCode());
 
         /* Output student grades link to students of this class */

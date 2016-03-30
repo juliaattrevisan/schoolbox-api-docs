@@ -146,10 +146,7 @@ class Marksheet
      */
     public function generateData(Term\Model $term)
     {
-
-        $catId          = $this->category->getId();
-//        $this->year     = $year;
-//        $this->semester = $semester;
+        $catId      = $this->category->getId();
         $this->term = $term;
 
         /** @var Collection|User[] $studentCollection */
