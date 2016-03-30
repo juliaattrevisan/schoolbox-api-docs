@@ -150,7 +150,7 @@ class CommentNotifier extends AbstractModuleNotifier
         $category->loadTeachers();
 
         $term = $this->termMapper->findForToday();
-        $href = sprintf("/submission/allWork/%s/%s/%s/%s", $student->getId(), $term->getCode(), $category->getId());
+        $href = sprintf("/submission/allWork/%s/%s/%s", $student->getId(), $term->getCode(), $category->getId());
 
         // create base essentials first
         $bob->setNamespace(NSMapper::NS_REPORT_CARD)
