@@ -33,12 +33,6 @@ if(isset($this->arg[0])) {
 	}
 }
 
-// redirect if GET params are specified; make the URL look pretty
-// TODO figure out what actually passes $_GET params
-if(isset($_GET['year']) || isset($_GET['semester'])) {
-	$this->localRedir("/submission/allWork/$userId/{$_GET['year']}/{$_GET['semester']}");
-}
-
 // Is a term set? Use it if so, otherwise use most recent
 $termMapper = Term\Mapper::getInstance();
 if (isset($this->arg[1])) {

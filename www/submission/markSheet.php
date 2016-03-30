@@ -25,11 +25,6 @@ if (is_numeric($this->arg[0])) {
     exit;
 }
 
-
-if (isset($_GET['year']) || isset($_GET['semester'])) {
-    $this->localRedir("/submission/markSheet/{$categoryID}/{$_GET['year']}/{$_GET['semester']}");
-}
-
 $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
 $termSlug   = $this->arg[1];
 if (isset($termSlug)) {

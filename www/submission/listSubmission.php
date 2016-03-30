@@ -3,18 +3,9 @@ use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-// How does this even $_GET set?
-if (isset($_GET['year']) || isset($_GET['semester'])) {
-    $this->localRedir("/submission/listSubmission/{$_GET['year']}/{$_GET['semester']}");
-}
-
 $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
 
 $termSlug = $this->arg[0];
-
-// Do I convert old year/semester to new format?
-//$currentYear = date('Y');
-//$currentSemester = date('m') > 6 ? 2 : 1;
 
 if (isset($termSlug)) {
     try {
@@ -23,21 +14,7 @@ if (isset($termSlug)) {
         $this->localRedir('/submission/listSubmission');
         exit;
     }
-
-//    if(!(is_numeric($this->arg[0]) && is_numeric($this->arg[1]))) {
-//        $this->localRedir('/submission/listSubmission');
-//    }
-//
-//    if ($this->arg[1] < 1 || $this->arg[1] > 2) {
-//        error(2); // TODO find a more appropriate error
-//    }
-
-//    $year = (int)$this->arg[0];
-//    $semester = (int)$this->arg[1];
-//    $semesterSlug = "/$year/$semester";
 } else {
-//    $year = $currentYear;
-//    $semester = $currentSemester;
     $currentTerm = $termMapper->findForToday();
 }
 $semesterSlug = $currentTerm->getCode();
@@ -105,12 +82,7 @@ if (isset($this->arg[1]) && is_numeric($this->arg[1])){
     $contextSelector->render(
         $this,
         'CONTEXT_SELECTOR',
-        array(
-//            'year'     => $year,
-//            'semester' => $semester,
-            'term'     => $currentTerm,
-            'list'     => $this->arg[1],
-        )
+        array('term' => $currentTerm, 'list' => $this->arg[1],)
     );
 }
 else {
@@ -118,11 +90,7 @@ else {
     $contextSelector->render(
         $this,
         'CONTEXT_SELECTOR',
-        array(
-//            'year'     => $year,
-//            'semester' => $semester,
-            'term'     => $currentTerm,
-        )
+        array('term' => $currentTerm,)
     );
 
     $involvedIn = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
