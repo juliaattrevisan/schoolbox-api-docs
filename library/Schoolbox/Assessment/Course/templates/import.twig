@@ -123,7 +123,7 @@
                     }
                 }).bind('validate', function() {
 
-                    {# Stage 2 validation #}
+                    {# Stage 3 validation #}
 
                     if ($('#importUnits').find('input[type=checkbox]').filter(':checked').length > 0) {
 
@@ -141,6 +141,11 @@
                                 {# Date field was blank #}
 
                                 blankFound = true;
+                                $('label[for="'+$(field).attr('id')+'"].error').removeClass('hide');
+                                $(field).addClass('error');
+                            } else {
+                                $(field).removeClass('error');
+                                $('label[for="'+$(field).attr('id')+'"].error').addClass('hide');
                             }
                         });
 
@@ -158,7 +163,7 @@
                 });
             }}).bind('validate', function() {
 
-                {# Stage 3 validation #}
+                {# Stage 2 validation #}
 
                 if ($('#importUnits').find('input[type=checkbox]').filter(':checked').length > 0)
                 {
@@ -178,6 +183,11 @@
                             {# Date field was blank #}
 
                             blankFound = true;
+                            $('label[for="'+$(field).attr('id')+'"].error').removeClass('hide');
+                            $(field).addClass('error');
+                        } else {
+                            $(field).removeClass('error');
+                            $('label[for="'+$(field).attr('id')+'"].error').addClass('hide');
                         }
                     });
 

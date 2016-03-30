@@ -56,6 +56,8 @@
                                    data-datepicker
                                    data-datepicker-sync
                                    data-datepicker-sync-enddate="#due_date-{{ loop.index }}" />
+                            <label for="open_date-{{ loop.index }}" class="hide error">This field is required.</label>
+
                         </div>
 
                         {# Close Date #}
@@ -68,6 +70,7 @@
                                    value="{{ unit.dueDate.localShort }}"
                                    data-role="due_date"
                                    data-datepicker />
+                            <label for="due_date-{{ loop.index }}" class="hide error">This field is required.</label>
                         </div>
                     </div>
                 </li>
