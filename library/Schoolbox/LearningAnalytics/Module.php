@@ -154,8 +154,6 @@ class Module extends BaseModule
             $toTerm   = clone $fromTerm;
         }
 
-        /* TODO: Repair arg usage inside method
-         */
         $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $fromTerm, $toTerm);
 
         /* Acrobatics
@@ -254,8 +252,6 @@ class Module extends BaseModule
             $toTerm   = clone $fromTerm;
         }
 
-        /* TODO: Repair arg usage inside method
-         */
         $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $fromTerm, $toTerm);
 
         /* No acrobatics required
