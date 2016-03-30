@@ -17,7 +17,7 @@ if (isset($termSlug)) {
 } else {
     $currentTerm = $termMapper->findForToday();
 }
-$semesterSlug = $currentTerm->getCode();
+$termSlug = $currentTerm->getCode();
 
 $this->setFile(TEMPLATE_content, 'submission/listSubmission.html');
 $this->setTitle('Submissions');
@@ -42,7 +42,7 @@ $this->setBlock('normalSubmission', 'writable_close', 'writable_close_block');
 $this->setBlock('category_listing', 'learning_analytics', 'learning_analytics_block');
 $this->setBlock(TEMPLATE_content, 'no_category_listing', 'no_category_listing_block');
 
-$this->setVar('SEM_SLUG', $semesterSlug);
+$this->setVar('SEM_SLUG', $termSlug);
 
 $submissionHandler = new Submission();
 $groupHandler = new Group();
