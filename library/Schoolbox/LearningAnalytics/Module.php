@@ -37,26 +37,38 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        // All of these URLs relate to the resource ID, not a booking ID.
-        // Therefore, they should probably be moved to the item module.
+        $get = [
 
-        /* folderId is associated with a course, a set of units. This finds all
-         * the units associated with all the folders that use the course.
-         */
-        $this->addGetRoute($router, 'course', $basePath, "/course/{courseId}");
+            /**
+             * For a Course - aggregating all Folders which use this Course
+             */
 
-        /* With optional task filter
-         */
-        $this->addGetRoute($router, 'courseWithTask', $basePath, "/course/{courseId}/task/{taskId}");
+            /* folderId is associated with a course, a set of units. This finds all
+             * the units associated with all the folders that use the course.
+             */
+            'course'         => "/course/{courseId}",
 
-        /* folderId is associated with a course, a set of units. This finds all
-         * the units associated with a particular folder that uses the course.
-         */
-        $this->addGetRoute($router, 'folder', $basePath, "/course/{courseId}/folder/{folderId}");
+            /* With optional task filter
+             */
+            'courseWithTask' => "/course/{courseId}/task/{taskId}",
 
-        /* With optional task filter
-         */
-        $this->addGetRoute($router, 'folderWithTask', $basePath, "/course/{courseId}/folder/{folderId}/task/{taskId}");
+            /**
+             * Per Folder that uses a particular Course
+             */
+
+            /* folderId is associated with a course, a set of units. This finds all
+             * the units associated with a particular folder that uses the course.
+             */
+            'folder'         => "/course/{courseId}/folder/{folderId}",
+
+            /* With optional task filter
+             */
+            'folderWithTask' => "/course/{courseId}/folder/{folderId}/task/{taskId}"
+        ];
+
+        foreach ($get as $method => $route) {
+            $this->addGetRoute($router, $method, $basePath, $route);
+        }
     }
 
     /**
