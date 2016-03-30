@@ -223,12 +223,12 @@ class Mapper extends BaseMapper
     public function updateActualFinishDates()
     {
         $updateTermQuery = $this->getDatabase()->prepare(
-            "UPDATE `term` SET `actual_finish` = :actual_finish WHERE `id` = :id"
+            "UPDATE {$this->getTable()} SET `actual_finish` = :actual_finish WHERE `id` = :id"
         );
         $selectActualFinishQuery = $this->getDatabase()->query("
             SELECT `current`.`id`, (MIN(`next`.`start`) - INTERVAL 1 DAY) AS `actual_finish`
-            FROM `term` `current`
-            LEFT JOIN `term` `next` ON `current`.`display_finish` < `next`.`start`
+            FROM {$this->getTable()} `current`
+            LEFT JOIN {$this->getTable()} `next` ON `current`.`display_finish` < `next`.`start`
             GROUP BY `current`.`id`;
         ");
         foreach ($selectActualFinishQuery->fetchAll() as $row) {
