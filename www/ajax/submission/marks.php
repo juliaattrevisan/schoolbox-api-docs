@@ -150,7 +150,7 @@ function setAssessmentWeight($weights) {
 	$studentCollection = UserMapper::getInstance()->findByColumn('synergy_id', $extIds);
 
 	$studentGrades = Grades::getInstance()->getStudentGradesForSubject(
-		$studentCollection, $category, 0, 0, array('int', 'letter')
+		$studentCollection, $category, null, null, array('int', 'letter')
 	);
 
 	// return a json string
