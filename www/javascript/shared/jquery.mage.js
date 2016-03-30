@@ -121,6 +121,22 @@
             return;
         }
 
+        // Perform validation if required
+
+        events = $(e.target).data('events');
+
+        if (events != null && typeof(events.validate) !== undefined) {
+            var validator = $(e.target).triggerHandler('validate');
+
+            if (!validator['result']) {
+
+                // Validation failed, show message and bomb out
+
+                form.find('[data-mage-error]').hide().html(validator['message']).slideDown();
+                return;
+            }
+        }
+
         // HTML5 FTW
         var method = elem.attr('formmethod') || form.attr('method'),
             action = elem.attr('formaction') || form.attr('action'),
