@@ -45,12 +45,14 @@ class Module extends BaseModule
 
             /* folderId is associated with a course, a set of units. This finds all
              * the units associated with all the folders that use the course.
+             *
+             * Extra args can focus the results on all Tasks within a Course; and
+             * also further focus on a particular time range via Term args
              */
-            'course'         => "/course/{courseId}",
-
-            /* With optional task filter
-             */
-            'courseWithTask' => "/course/{courseId}/task/{taskId}",
+            'course'                 => "/course/{courseId}",
+            'courseWithTerms'        => "/course/{courseId}/from/{from}/to/{to}",
+            'courseWithTask'         => "/course/{courseId}/task/{taskId}",
+            'courseWithTaskAndTerms' => "/course/{courseId}/task/{taskId}/from/{from}/to/{to}",
 
             /**
              * Per Folder that uses a particular Course
@@ -58,17 +60,47 @@ class Module extends BaseModule
 
             /* folderId is associated with a course, a set of units. This finds all
              * the units associated with a particular folder that uses the course.
+             *
+             * Extra args can focus the results on all Tasks within a Folder; and
+             * also further focus on a particular time range via Term args
              */
-            'folder'         => "/course/{courseId}/folder/{folderId}",
-
-            /* With optional task filter
-             */
-            'folderWithTask' => "/course/{courseId}/folder/{folderId}/task/{taskId}"
+            'folder'                 => "/course/{courseId}/folder/{folderId}",
+            'folderWithTerms'        => "/course/{courseId}/folder/{folderId}/from/{from}/to/{to}",
+            'folderWithTask'         => "/course/{courseId}/folder/{folderId}/task/{taskId}",
+            'folderWithTaskAndTerms' => "/course/{courseId}/folder/{folderId}/task/{taskId}/from/{from}/to/{to}",
         ];
 
         foreach ($get as $method => $route) {
             $this->addGetRoute($router, $method, $basePath, $route);
         }
+    }
+
+    /**
+     * Inject params into controller
+     *
+     * {@inheritdoc}
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        /* Inject ingredients into course controller method
+         */
+        $this->addRoutePreload(
+            $matcher,
+            '(?:course|courseWithTerms|courseWithTask|courseWithTaskAndTerms)',
+            function($params) {
+                return $this->courseDependencies($params);
+            }
+        );
+
+        /* Inject ingredients into folder controller method
+         */
+        $this->addRoutePreload(
+            $matcher,
+            '(?:folder|folderWithTerms|folderWithTask|folderWithTaskAndTerms)',
+            function($params) {
+                return $this->folderDependencies($params);
+            }
+        );
     }
 
     /**
@@ -205,33 +237,7 @@ class Module extends BaseModule
         );
     }
 
-    /**
-     * Inject params into controller
-     *
-     * {@inheritdoc}
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        /* Inject ingredients into course controller method
-         */
-        $this->addRoutePreload(
-            $matcher,
-            '(?:course|courseWithTask)',
-            function($params) {
-                return $this->courseDependencies($params);
-            }
-        );
 
-        /* Inject ingredients into folder controller method
-         */
-        $this->addRoutePreload(
-            $matcher,
-            '(?:folder|folderWithTask)',
-            function($params) {
-                return $this->folderDependencies($params);
-            }
-        );
-    }
 
     /**
      * Template locations for this module
