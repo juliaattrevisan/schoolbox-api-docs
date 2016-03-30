@@ -447,12 +447,6 @@ class Marksheet
 //		var_dump($this->displayOrder);
 
         $contextSelector = new ContextSelector('submission/markSheet');
-
-        // generate a "past 6 years" array
-        for ($i = 5; $i >= 0; $i--) {
-            $years[] = date('Y') - $i;
-        }
-        $contextSelector->setYears($years);
         $contextSelector->setCategoryFirst(true);
 
         $catIdList = array();

@@ -27,15 +27,6 @@ class ContextSelector
 	 */
 	protected $terms;
 
-	/**
-	 * The years that are shown in this selector
-	 *
-	 * @deprecated Use terms instead.
-	 *
-	 * @var array
-	 */
-	protected $years = array();
-
 	/** @var Collection */
 	protected $categories;
 	/** @var Collection */
@@ -57,19 +48,6 @@ class ContextSelector
 		$this->categories = new Collection();
 		$this->units = new Collection();
 		$this->terms = new Collection();
-	}
-
-
-	/**
-	 * Set the years that the semester selector will display.
-	 * If this array is empty, then the semester selector will be hidden.
-	 *
-	 * @deprecated use `setTerms()` instead
-	 *
-	 * @param array $years
-	 */
-	public function setYears($years) {
-		$this->years = $years;
 	}
 
 	/**
