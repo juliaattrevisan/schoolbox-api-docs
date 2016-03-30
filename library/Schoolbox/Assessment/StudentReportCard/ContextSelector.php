@@ -225,14 +225,6 @@ class ContextSelector
 		$href = array();
 		$output = array();
 
-		if(isset($selectedValues['year'])) {
-			$href[] = $selectedValues['year'];
-
-			if(isset($selectedValues['semester'])) {
-				$href[] = $selectedValues['semester'];
-			}
-		}
-
 		$selectedId = isset($selectedValues['category']) ? $selectedValues['category'] : 0;
 
 		foreach($this->categories as $category) {
