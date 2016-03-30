@@ -10,21 +10,19 @@
 
 namespace Schoolbox\LearningAnalytics;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
-use Schoolbox\Permission\Access\UserAccess;
 
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Group;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Module extends BaseModule
 {
@@ -108,6 +106,7 @@ class Module extends BaseModule
      *
      * @param $params
      * @return array
+     * @throws Exception
      */
     private function courseDependencies($params) {
 
@@ -135,8 +134,29 @@ class Module extends BaseModule
         }
 
         /* Try to find all the folders which used $courseFolder as a source
+         *
+         * If a date range was specified, use that. Otherwise default to the
+         * current Term
          */
-        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, date('Y'));
+        $termMapper = new TermMapper();
+
+        if (isset($params['from']) && isset($params['to'])) {
+            try {
+                $fromTerm = $termMapper->findOneByColumn('code', $params['from']);
+                $toTerm = $termMapper->findOneByColumn('code', $params['to']);
+            }
+            catch (\Exception $e) {
+                throw new Exception('Invalid date range.');
+            }
+        }
+        else {
+            $fromTerm = $termMapper->findForToday();
+            $toTerm   = clone $fromTerm;
+        }
+
+        /* TODO: Repair arg usage inside method
+         */
+        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $fromTerm, $toTerm);
 
         /* Acrobatics
          */
@@ -186,6 +206,7 @@ class Module extends BaseModule
      *
      * @param $params
      * @return array
+     * @throws Exception
      */
     private function folderDependencies($params) {
 
@@ -213,8 +234,29 @@ class Module extends BaseModule
         }
 
         /* Try to find all the folders which used $courseFolder as a source
+         *
+         * If a date range was specified, use that. Otherwise default to the
+         * current Term
          */
-        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, date('Y'));
+        $termMapper = new TermMapper();
+
+        if (isset($params['from']) && isset($params['to'])) {
+            try {
+                $fromTerm = $termMapper->findOneByColumn('code', $params['from']);
+                $toTerm = $termMapper->findOneByColumn('code', $params['to']);
+            }
+            catch (\Exception $e) {
+                throw new Exception('Invalid date range.');
+            }
+        }
+        else {
+            $fromTerm = $termMapper->findForToday();
+            $toTerm   = clone $fromTerm;
+        }
+
+        /* TODO: Repair arg usage inside method
+         */
+        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $fromTerm, $toTerm);
 
         /* No acrobatics required
          */
