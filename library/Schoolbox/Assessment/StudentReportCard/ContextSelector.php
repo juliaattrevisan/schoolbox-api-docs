@@ -131,7 +131,7 @@ class ContextSelector
 		$tpl = 'selectorTpl';
 
 		$page->setFile($tpl, $this->_template);
-		$page->setBlock($tpl, 'semester_context', 'semester_context_block');
+		$page->setBlock($tpl, 'term_context', 'term_context_block');
 		$page->setBlock($tpl, 'subject_context', 'subject_context_block');
 		$page->setBlock($tpl, 'unit_context', 'unit_context_block');
 		$page->setVar('USE_PLUGIN',   $this->usePlugin);
@@ -144,7 +144,7 @@ class ContextSelector
 			$this->renderSemesterSelector($page, $selectedValues);
 		}
 		else {
-			$page->setVar('semester_context_block', '');
+			$page->setVar('term_context_block', '');
 		}
 
 		// parse the subjects, if there are any
@@ -307,19 +307,19 @@ class ContextSelector
 	 * @param $selectedValues
 	 */
 	protected function renderSemesterSelector($page, $selectedValues) {
-		$page->setBlock('semester_context', 'semester_option', 'semester_option_block');
+		$page->setBlock('term_context', 'term_option', 'term_option_block');
 
 		$semesters = $this->createSemesterSelectorValues($selectedValues);
 
 		foreach($semesters['options'] as $option) {
 			$page->setVar($option);
-			$page->parse('semester_option_block', 'semester_option', true);
+			$page->parse('term_option_block', 'term_option', true);
 		}
 
 		$page->setVar($semesters['nav']);
 
 		// punch it
-		$page->parse('semester_context_block', 'semester_context', false);
+		$page->parse('term_context_block', 'term_context', false);
 	}
 
 

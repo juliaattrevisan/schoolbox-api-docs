@@ -202,7 +202,6 @@ $this->setVar(
             ? ('('.\Scrub::text($code).')')
             : '',
         'student_block' => '',
-        'unit_selector_semester_block' => '',
     )
 );
 

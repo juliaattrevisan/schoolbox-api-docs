@@ -508,7 +508,7 @@ class Marksheet
 
 
         // define blocks
-        $page->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
+        $page->setBlock(TEMPLATE_content, 'term_option', 'term_option_block');
         $page->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
 
         $page->setBlock(TEMPLATE_content, 'work_header', 'work_header_block');
