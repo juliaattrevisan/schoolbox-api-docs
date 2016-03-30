@@ -262,7 +262,7 @@ class StudentReportCard
                 'YOUR_GRAPH_ASSESSMENT_ITEM_VALUE' => json_encode([]),
             )
         );
-        $this->renderSemesterSelectors($page);
+        $this->renderTermSelectors($page);
 
         // only attempt to render a subject's details if a subject has actually been selected
         if ($this->hasSubjectSelected()) {
@@ -277,7 +277,7 @@ class StudentReportCard
      *
      * @param \SitePage $page
      */
-    protected function renderSemesterSelectors(\SitePage $page)
+    protected function renderTermSelectors(\SitePage $page)
     {
         $contextSelector = new ContextSelector("submission/allWork/{$this->targetUserId}");
         $contextSelector->setTerms($this->termMapper->findAll());

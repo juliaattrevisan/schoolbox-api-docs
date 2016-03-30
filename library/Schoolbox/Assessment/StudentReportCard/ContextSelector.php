@@ -141,7 +141,7 @@ class ContextSelector
 
 		// parse the semesters, if there are any
 		if(count($this->terms)) {
-			$this->renderSemesterSelector($page, $selectedValues);
+			$this->renderTermSelector($page, $selectedValues);
 		}
 		else {
 			$page->setVar('term_context_block', '');
@@ -306,7 +306,7 @@ class ContextSelector
 	 * @param SitePage $page
 	 * @param $selectedValues
 	 */
-	protected function renderSemesterSelector($page, $selectedValues) {
+	protected function renderTermSelector($page, $selectedValues) {
 		$page->setBlock('term_context', 'term_option', 'term_option_block');
 
 		$semesters = $this->createSemesterSelectorValues($selectedValues);
