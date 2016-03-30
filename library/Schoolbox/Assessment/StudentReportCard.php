@@ -314,10 +314,9 @@ class StudentReportCard
         // subject globals
         $page->setVar(
             array(
-                'RC_TITLE'      => $this->subjectData->getCategory()->getName(),
-                'SUBJ_ID'       => $this->subjectData->getCategory()->getId(),
-                'SUBJ_NAME'     => $this->subjectData->getCategory()->getName(),
-                'SUBJ_SEMESTER' => $this->targetTerm->getTitle(),
+                'RC_TITLE'  => $this->subjectData->getCategory()->getName(),
+                'SUBJ_ID'   => $this->subjectData->getCategory()->getId(),
+                'SUBJ_NAME' => $this->subjectData->getCategory()->getName(),
             )
         );
         // iterate the components and output them if we know how
