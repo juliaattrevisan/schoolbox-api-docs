@@ -86,7 +86,12 @@
 </script>
 <div class="row">
     <div class="small-12 island">
-        <h1>Import Course into Class</h1>
+
+        {% if _part2 %}
+            <h1>Modify Course</h1>
+        {% else %}
+            <h1>Import Course into Class</h1>
+        {% endif %}
 
         <form method="post">
             <section>

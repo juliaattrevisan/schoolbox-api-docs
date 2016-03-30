@@ -11,7 +11,7 @@
     <input id="quiz_start_date-{{ work.item.id }}"
            name="quiz[{{ work.item.id }}][start_date]"
            type="text"
-           value="{% if work.isAbstract %}{{ unit.open_date }}{% else %}{{ unitDates[work.item.unitinstance.unitcategory.id].open_date }}{% endif %}"
+           value="{% if work.isAbstract %}{{ unit.open_date }}{% else %}{{ work.detail.getStart.localShort }}{% endif %}"
            data-role="start_date"
            data-datepicker
            data-datepicker-sync
@@ -23,7 +23,7 @@
     <input id="quiz_finish_date-{{ work.item.id }}"
            name="quiz[{{ work.item.id }}][finish_date]"
            type="text"
-           value="{% if work.isAbstract %}{{ unit.open_date }}{% else %}{{ unitDates[work.item.unitinstance.unitcategory.id].due_date }}{% endif %}"
+           value="{% if work.isAbstract %}{{ unit.due_date }}{% else %}{{ work.detail.getFinish.localShort }}{% endif %}"
            data-role="finish_date"
            data-datepicker
            data-datepicker-sync
