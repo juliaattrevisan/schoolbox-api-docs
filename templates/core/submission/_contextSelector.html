@@ -16,17 +16,17 @@
         <div class="context-switch clearfix">
             <!-- BEGIN semester_context -->
             <nav>
-                <a data-interaction="previous" {SEMESTER_BACK_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_BACK}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
+                <a data-interaction="previous" {TERM_BACK_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{TERM_BACK}{TERM_CONTEXT_CATEGORY_ID}"></a>
             </nav>
             <div class="semester">
                 <select id="context-selector-semester">
                     <!-- BEGIN semester_option -->
-                    <option value="{SUBJECT_PART}{SEMESTER_SLUG}" {SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
+                    <option value="{SUBJECT_PART}{TERM_SLUG}" {TERM_SELECTED}>{TERM_VALUE}</option>
                     <!-- END semester_option -->
                 </select>
             </div>
             <nav>
-                <a data-interaction="next" {SEMESTER_FWD_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{SEMESTER_FWD}{SEMESTER_CONTEXT_CATEGORY_ID}"></a>
+                <a data-interaction="next" {TERM_FWD_DISABLED} href="/{PAGE_HREF}/{SUBJECT_PART}{TERM_FWD}{TERM_CONTEXT_CATEGORY_ID}"></a>
             </nav>
             <!-- END semester_context -->
             <!-- BEGIN subject_context -->

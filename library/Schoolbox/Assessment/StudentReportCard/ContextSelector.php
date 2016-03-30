@@ -137,7 +137,7 @@ class ContextSelector
 		$page->setVar('USE_PLUGIN',   $this->usePlugin);
 		$page->setVar('PAGE_HREF',    $this->basePath);
 		$page->setVar('SUBJECT_PART', is_numeric($selectedValues['category']) ? ($selectedValues['category'].'/') : '');
-        $page->setVar('SEMESTER_CONTEXT_CATEGORY_ID', isset($selectedValues['list']) ? '/'.($selectedValues['list']) : '');
+        $page->setVar('TERM_CONTEXT_CATEGORY_ID', isset($selectedValues['list']) ? '/'.($selectedValues['list']) : '');
 
 		// parse the semesters, if there are any
 		if(count($this->terms)) {
@@ -202,12 +202,12 @@ class ContextSelector
 				$termValue = '(archived) '.$termValue;
 			}
 			$option = array(
-				'SEMESTER_SLUG'     => $term->getCode(),
-				'SEMESTER_VALUE'    => $termValue,
-				'SEMESTER_SELECTED' => ''
+				'TERM_SLUG'     => $term->getCode(),
+				'TERM_VALUE'    => $termValue,
+				'TERM_SELECTED' => ''
 			);
 			if ($term->getId() == $selection->getId()) {
-				$option['SEMESTER_SELECTED'] = 'selected="selected"';
+				$option['TERM_SELECTED'] = 'selected="selected"';
 			}
 			$output['options'][] = $option;
 		}
@@ -271,10 +271,10 @@ class ContextSelector
 	 */
 	protected function calculateSemesterNavigation(Term\Model $selection) {
 		$result = [
-			'SEMESTER_BACK'          => '',
-			'SEMESTER_FWD'           => '',
-			'SEMESTER_BACK_DISABLED' => 'disabled',
-			'SEMESTER_FWD_DISABLED'  => 'disabled',
+			'TERM_BACK'          => '',
+			'TERM_FWD'           => '',
+			'TERM_BACK_DISABLED' => 'disabled',
+			'TERM_FWD_DISABLED'  => 'disabled',
 		];
 
 		// I'd like an iterator which returns current, previous and next as a triple
@@ -286,12 +286,12 @@ class ContextSelector
 			$nextTerm = $terms[$i+1];
 			if ($term->getId() == $selection->getId()) {
 				if (isset($prevTerm)) {
-					$result['SEMESTER_FWD']          = $prevTerm->getCode();
-					$result['SEMESTER_FWD_DISABLED'] = '';
+					$result['TERM_FWD']          = $prevTerm->getCode();
+					$result['TERM_FWD_DISABLED'] = '';
 				}
 				if (isset($nextTerm)) {
-					$result['SEMESTER_BACK']          = $nextTerm->getCode();
-					$result['SEMESTER_BACK_DISABLED'] = '';
+					$result['TERM_BACK']          = $nextTerm->getCode();
+					$result['TERM_BACK_DISABLED'] = '';
 				}
 				return $result;
 			}
