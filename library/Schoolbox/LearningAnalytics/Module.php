@@ -195,7 +195,9 @@ class Module extends BaseModule
             'params' => $params,
             'courseFolder' => $courseFolder,
             'allFoldersUsingCourse' => $allFoldersUsingCourse,
-            'allUnitInstances' => $allUnitInstances
+            'allUnitInstances' => $allUnitInstances,
+            'from' => $fromTerm,
+            'to' => $toTerm
         );
     }
 

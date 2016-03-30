@@ -13,6 +13,7 @@ namespace Schoolbox\LearningAnalytics;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Assessment\Term\Model as Term;
 
 class Metadata {
 
@@ -69,14 +70,30 @@ class Metadata {
     protected $selectedFolder = null;
 
     /**
-     * Constructor
+     * Start of date range filter
      *
-     * @param array $params
+     * @var Term
+     */
+    protected $from;
+
+    /**
+     * End of date range filter
+     *
+     * @var Term
+     */
+    protected $to;
+
+    /**
+     * Metadata constructor.
+     *
+     * @param $params
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
+     * @param Term $from
+     * @param Term $to
      */
-    public function __construct($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
+    public function __construct($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
         $this->setParams($params);
 
         $this->setCourseFolder($courseFolder);
@@ -85,6 +102,9 @@ class Metadata {
         $this->setAllUnitInstances($allUnitInstances);
         $this->setAllFolders($allFoldersUsingCourse);
         $this->setAllAggregateFolders(new Collection());
+
+        $this->setFrom($from);
+        $this->setTo($to);
 
         $this->process();
     }
@@ -274,5 +294,37 @@ class Metadata {
     public function getSelectedFolder()
     {
         return $this->selectedFolder;
+    }
+
+    /**
+     * @return Term
+     */
+    protected function getFrom()
+    {
+        return $this->from;
+    }
+
+    /**
+     * @param Term $from
+     */
+    protected function setFrom($from)
+    {
+        $this->from = $from;
+    }
+
+    /**
+     * @return Term
+     */
+    protected function getTo()
+    {
+        return $this->to;
+    }
+
+    /**
+     * @param Term $to
+     */
+    protected function setTo($to)
+    {
+        $this->to = $to;
     }
 }

@@ -22,6 +22,7 @@ use Schoolbox\LearningAnalytics\Results\TaskResults;
 use Schoolbox\LearningAnalytics\Results\TaskTypes;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
 use Schoolbox\LearningAnalytics\Effort\AllEffort;
+use Schoolbox\Assessment\Term\Model as Term;
 
 class Controller extends Base {
 
@@ -32,9 +33,14 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
+     * @param Term $from
+     * @param Term $to
      */
-    public function course($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+    public function course($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+        );
     }
 
     /**
@@ -44,9 +50,14 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
+     * @param Term $from
+     * @param Term $to
      */
-    public function courseWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+    public function courseWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+        );
     }
 
     /**
@@ -56,9 +67,14 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
+     * @param Term $from
+     * @param Term $to
      */
-    public function folder($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+    public function courseWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+        );
     }
 
     /**
@@ -68,9 +84,82 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
+     * @param Term $from
+     * @param Term $to
      */
-    public function folderWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+    public function courseWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+        );
+    }
+
+    /**
+     * Same calculations as process(), just for a different set of units
+     *
+     * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
+     * @param Collection $allUnitInstances
+     * @param Term $from
+     * @param Term $to
+     */
+    public function folder($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+        );
+    }
+
+    /**
+     * Same calculations as process(), just for a different set of units
+     *
+     * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
+     * @param Collection $allUnitInstances
+     * @param Term $from
+     * @param Term $to
+     */
+    public function folderWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+        );
+    }
+
+    /**
+     * Same calculations as process(), just for a different set of units
+     *
+     * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
+     * @param Collection $allUnitInstances
+     * @param Term $from
+     * @param Term $to
+     */
+    public function folderWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+        );
+    }
+
+    /**
+     * Same calculations as process(), just for a different set of units
+     *
+     * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
+     * @param Collection $allUnitInstances
+     * @param Term $from
+     * @param Term $to
+     */
+    public function folderWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+        );
     }
 
     /**
