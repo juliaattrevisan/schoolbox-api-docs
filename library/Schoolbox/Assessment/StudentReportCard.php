@@ -82,11 +82,11 @@ class StudentReportCard
 
     // populated data
     /**
-     * A collection of Folder models
+     * A collection of Folder models belonging to the term set in $this->setTerm().
      *
-     * @var \Schoolbox\Collection
+     * @var \Schoolbox\Collection|Folder\Model
      */
-    protected $categoriesInSemester = array();
+    protected $categoriesInTerm = array();
 
     /**
      * @var SubjectReportCard
@@ -273,7 +273,7 @@ class StudentReportCard
     }
 
     /**
-     * Renders the selectors for the semester
+     * Renders the selectors for the term
      *
      * @param \SitePage $page
      */
@@ -284,7 +284,7 @@ class StudentReportCard
         $contextSelector->setCategoryFirst(false);
 
         try {
-            $contextSelector->setCategories($this->categoriesInSemester);
+            $contextSelector->setCategories($this->categoriesInTerm);
         } catch (\Exception $e) {
             // noop?
         }
@@ -448,7 +448,7 @@ class StudentReportCard
 
         /* Oh. My. GOD.
          *
-         * Get all the submission boxes for this particular year and semester,
+         * Get all the submission boxes for this particular term,
          * for this user and category. lol.
          */
         $allSubmissionBoxes = new \Schoolbox\Collection();
@@ -996,7 +996,7 @@ class StudentReportCard
     }
 
     /**
-     * No subject selected, so display an overview of the semester instead
+     * No subject selected, so display an overview of the term instead
      *
      * @param \SitePage $page
      */
@@ -1028,7 +1028,7 @@ class StudentReportCard
             $visibilities[] = SubmissionBox::MARK_VISIBILITY_PRIVATE;
             $visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
         }
-        foreach ($this->categoriesInSemester as $category) {
+        foreach ($this->categoriesInTerm as $category) {
             $categoryID   = $category->getId();
             $categoryCode = $category->getCodeString();
             /* yes it actually requires THIS MUCH code to get a teachers name. */
@@ -1157,7 +1157,7 @@ class StudentReportCard
             $page->parse('SUBJECT_LIST', 'subjectTpl', true);
         }
 
-        if (count($this->categoriesInSemester)) {
+        if (count($this->categoriesInTerm)) {
             $page->parse('subject_container_block', 'subjectListTpl');
 
             $page->setVar(array(
@@ -1215,8 +1215,8 @@ class StudentReportCard
         );
         /* Combine lists alphabetically
             */
-        $categoryList = array_merge($categoryList, $submittedList);
-        $this->categoriesInSemester = $this->folderMapper->findByColumn(
+        $categoryList           = array_merge($categoryList, $submittedList);
+        $this->categoriesInTerm = $this->folderMapper->findByColumn(
             'id',
             array_map(
                 function($v) { return $v['id']; },
@@ -1225,7 +1225,7 @@ class StudentReportCard
             ['order' => ['name' => 'asc']]
         );
         // Ensure folder codes are populated
-        Folder\Code\Mapper::getInstance()->applyCodesToCategories($this->categoriesInSemester);
+        Folder\Code\Mapper::getInstance()->applyCodesToCategories($this->categoriesInTerm);
     }
 
     /**
