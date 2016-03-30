@@ -123,8 +123,6 @@ class ContextSelector
 	 * @param SitePage $page            The SitePage instance into which we be rendering
 	 * @param string   $handle          The parent handle into which we be rendering
 	 * @param array    $selectedValues  Optionally, the elements to select by default; expects any of:
-	 *                                     :year (usually from URI)
-	 *                                     :semester (usually from URI)
 	 *                                     :subject - the ID of the subject being targeted
 	 */
 	public function render($page, $handle = TEMPLATE_content, $selectedValues = array()) {
@@ -139,7 +137,7 @@ class ContextSelector
 		$page->setVar('SUBJECT_PART', is_numeric($selectedValues['category']) ? ($selectedValues['category'].'/') : '');
         $page->setVar('TERM_CONTEXT_CATEGORY_ID', isset($selectedValues['list']) ? '/'.($selectedValues['list']) : '');
 
-		// parse the semesters, if there are any
+		// parse the terms, if there are any
 		if(count($this->terms)) {
 			$this->renderTermSelector($page, $selectedValues);
 		}
@@ -167,13 +165,13 @@ class ContextSelector
 
 
 	/**
-	 * Return an array of the generated values for the semester selector
+	 * Return an array of the generated values for the term selector
 	 *
 	 * @param $selectedValues
 	 * @param string $direction
 	 * @return array
 	 */
-	protected function createSemesterSelectorValues($selectedValues, $direction = 'DESC')
+	protected function createTermSelectorValues($selectedValues, $direction = 'DESC')
 	{
 		$selection = $selectedValues['term'];
 
@@ -211,7 +209,7 @@ class ContextSelector
 			}
 			$output['options'][] = $option;
 		}
-		$output['nav'] = $this->calculateSemesterNavigation($selection);
+		$output['nav'] = $this->calculateTermNavigation($selection);
 		return $output;
 	}
 
@@ -269,7 +267,7 @@ class ContextSelector
 	 * @param  Term\Model $selection The selected term
 	 * @return array
 	 */
-	protected function calculateSemesterNavigation(Term\Model $selection) {
+	protected function calculateTermNavigation(Term\Model $selection) {
 		$result = [
 			'TERM_BACK'          => '',
 			'TERM_FWD'           => '',
@@ -301,7 +299,7 @@ class ContextSelector
 
 
 	/**
-	 * Render the selector for semesters
+	 * Render the selector for terms
 	 *
 	 * @param SitePage $page
 	 * @param $selectedValues
@@ -309,14 +307,14 @@ class ContextSelector
 	protected function renderTermSelector($page, $selectedValues) {
 		$page->setBlock('term_context', 'term_option', 'term_option_block');
 
-		$semesters = $this->createSemesterSelectorValues($selectedValues);
+		$terms = $this->createTermSelectorValues($selectedValues);
 
-		foreach($semesters['options'] as $option) {
+		foreach($terms['options'] as $option) {
 			$page->setVar($option);
 			$page->parse('term_option_block', 'term_option', true);
 		}
 
-		$page->setVar($semesters['nav']);
+		$page->setVar($terms['nav']);
 
 		// punch it
 		$page->parse('term_context_block', 'term_context', false);
