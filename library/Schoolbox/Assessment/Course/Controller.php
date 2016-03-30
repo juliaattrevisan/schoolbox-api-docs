@@ -963,12 +963,12 @@ class Controller extends BaseController
 
         foreach ($this->getRequest()->post["unit"] as $unit) {
             if ($unit["import"] != 1) {
-                $unit = $this->getUnitInstanceMapper()->findByColumnList([
+                $unitsToDelete = $this->getUnitInstanceMapper()->findByColumnList([
                     "unit_category_id" => $unit["unit_id"],
                     "component_id" => $this->getRequest()->post["component_id"],
                     "category_id" => $this->getRequest()->post["homepage"]
                 ]);
-                $this->getUnitInstanceMapper()->delete($unit);
+                $this->getUnitInstanceMapper()->delete($unitsToDelete);
             }
         }
 
