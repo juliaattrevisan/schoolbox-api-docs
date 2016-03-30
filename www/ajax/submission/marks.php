@@ -28,6 +28,7 @@ if(!isset($_SERVER['REQUEST_METHOD'])) {
 
 switch($_SERVER['REQUEST_METHOD']) {
 	case 'GET':
+		// As far as I can tell $_GET is never used, ever.
 		if(isset($_GET['year']) && isset($_GET['semester'])) {
 			$output = getMarks((int)$_GET['user'], (int)$_GET['category'], (int)$_SESSION['id'], (int)$_GET['year'], (int)$_GET['semester']);
 		}
@@ -88,7 +89,26 @@ function getMarks($userId, $catId, $sessionUserId, $year = 0, $semester = 0) {
 		exit;
 	}
 
-	$grades = Grades::getInstance()->getStudentGradesForSubject($students, $category, $year, $semester);
+	// Convert year/semester into ADFs
+	$from = null;
+	$to   = null;
+	if ($year) {
+		$from = Alaress_Date_Format::now()->setYear($year)->startOfYear();
+		$to   = Alaress_Date_Format::now()->setYear($year)->endOfYear();
+		switch ($semester) {
+			case 1:
+				// Jan-Jun
+				$to = $to->setMonth(6)->setDay(30);
+				break;
+			case 2:
+				// Jul-Dec
+				$from = $from->setMonth(7)->setDay(1);
+				break;
+			default:
+				break;
+		}
+	}
+	$grades = Grades::getInstance()->getStudentGradesForSubject($students, $category, $from, $to);
 
 	return json_encode($grades);
 }
