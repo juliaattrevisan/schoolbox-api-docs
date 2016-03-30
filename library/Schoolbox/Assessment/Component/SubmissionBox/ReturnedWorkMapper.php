@@ -227,9 +227,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      */
     public function getStudentMarks($category_id, $student_id, $extra_params = array())
     {
-        /** @var SubmissionBoxMapper $submission_box_mapper */
-        $submission_box_mapper = $this->getJoinMapper('submission_box');
-
         //
         // Build filters for query
         $params = array(
@@ -243,16 +240,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
             'sb.deleted IS FALSE',
             'sb.task_id IS NULL',
         );
-        if (!empty($extra_params['year'])) {
-            $params['year'] = $extra_params['year'];
-            $filters[] = 'YEAR(sb.date) = :year';
-        }
-        if (!empty($extra_params['semester'])) {
-            $semester_params = $submission_box_mapper->getSemesterMonths($extra_params['semester']);
-            $params['month_start'] = $semester_params['start'];
-            $params['month_end'] = $semester_params['end'];
-            $filters[] = 'MONTH(sb.date) BETWEEN :month_start AND :month_end';
-        }
         if (!empty($extra_params['owner'])) {
             $params['owner'] = $extra_params['owner'];
             $filters[] = 'sb.owner = :owner';

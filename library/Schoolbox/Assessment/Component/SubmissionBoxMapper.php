@@ -360,28 +360,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         return $years;
     }
 
-
-    /**
-    * Gets the months that are a part of this semester.
-    *
-    * @todo move this somewhere where other semester reliant code can use it
-    *
-    * @param $semester
-    *
-    * @return array
-    */
-    public function getSemesterMonths($semester)
-    {
-        $month_start = 1;
-        $month_end   = 6;
-        if ($semester == 2) {
-            $month_start = 7;
-            $month_end   = 12;
-        }
-        return array('start' => $month_start, 'end' => $month_end);
-    }
-
-
     /**
     * Conversion of SubmissionBoxHandler->getAllYearsByUser().
     *

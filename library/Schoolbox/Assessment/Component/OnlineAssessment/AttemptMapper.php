@@ -125,10 +125,6 @@ class AttemptMapper extends Mapper
     public function getStudentMarks($category_id, $student_id, $extra_params = array())
     {
         //
-        // Move getSemesterMonths() to some sort of helper method
-        $submission_box_mapper = new SubmissionBoxMapper();
-
-        //
         // Build filters for query
         $params  = array(
             'category' => $category_id,
@@ -140,16 +136,6 @@ class AttemptMapper extends Mapper
             'aa.deleted_at IS NULL',
             'aq.deleted_at IS NULL',
         );
-        if (!empty($extra_params['year'])) {
-            $params['year'] = $extra_params['year'];
-            $filters[]      = 'YEAR(a.start) = :year';
-        }
-        if (!empty($extra_params['semester'])) {
-            $semester_params       = $submission_box_mapper->getSemesterMonths($extra_params['semester']);
-            $params['month_start'] = $semester_params['start'];
-            $params['month_end']   = $semester_params['end'];
-            $filters[]             = 'MONTH(a.start) BETWEEN :month_start AND :month_end';
-        }
         if (!empty($extra_params['owner'])) {
             $params['owner'] = $extra_params['owner'];
             $filters[]       = 'a.user_id = :owner';
