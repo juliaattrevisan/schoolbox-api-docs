@@ -21,8 +21,7 @@
 <div class="row">
     <div class="small-12 island">
         <h1>{{ folder.id ? 'Modify' : 'New' }} Course</h1>
-        <form method="post">
-            <section>
+            <section id="main-course">
                 <fieldset class="content" data-mage="course-info">
                     <legend>Course Information</legend>
                     <input type="hidden" name="id" value="{{ folder.id }}">
@@ -103,11 +102,11 @@
             </section>
             <div class="row" data-mage="unit-info">
                 {# Don't delete the inline style, it's needed -#}
-                <div class="small-12 column" data-mage-collapsed {% if not folder.id %}style="display: none;"{% endif %}>
-                    <input type="submit" name="submit" value="Save Course" />
+                <div class="small-12 column" {% if not folder.id %}data-mage-collapsed style="display: none;"{% endif %}>
+                    <input type="submit" name="submit" value="Save Course" data-mage-working="Saving..." data-mage-next="main-course" />
                 </div>
             </div>
-        </form>
+        {#</form>#}
     </div>
 </div>
 <div id="parent-select" data-reveal class="reveal-modal"></div>
@@ -193,6 +192,13 @@
                 newDOM.find('[data-collapser]').collapsable();
                 noonitName.val('');
                 $(this).val($(this).data('mage-reset')).removeAttr('readonly').removeData('mage-submitted');
+            }
+        });
+
+        $('[data-mage-next="main-course"]').mage({
+            submittable: '#main-course',
+            onXhrDone: function () {
+                window.location = '{{ routeLookup('course.courseList') }}';
             }
         });
 
