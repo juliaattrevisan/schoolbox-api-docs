@@ -195,53 +195,21 @@ class ContextSelector
 	 * @param string $direction
 	 * @return array
 	 */
-	protected function createSemesterSelectorValues($selectedValues, $direction = 'DESC') {
-
-//		// create a little list
-//		switch($this->granularity) {
-//			case self::GRANULARITY_YEAR:
-//				$iterate = array('');
-//				$labelFormat = '%s%s'; // sprintf compatibility
-//				if(isset($selectedValues['year'])) {
-//					$selection = array($selectedValues['year']);
-//				}
-//				break;
-//			case self::GRANULARITY_TERM:
-//				$iterate = array(1,2,3,4);
-//				$labelFormat = 'Term %s, %s';
-//				if(isset($selectedValues['year']) && isset($selectedValues['semester'])) {
-//					$selection = array($selectedValues['year'], $selectedValues['semester']);
-//				}
-//				break;
-//			// should almost always be default (self::GRANULARITY_SEMESTER)
-//			default:
-//				$iterate = array(1,2);
-//				$labelFormat = 'Semester %s, %s';
-//				if(isset($selectedValues['year']) && isset($selectedValues['semester'])) {
-//					$selection = array($selectedValues['year'], $selectedValues['semester']);
-//				}
-//				break;
-//		}
-
+	protected function createSemesterSelectorValues($selectedValues, $direction = 'DESC')
+	{
 		$selection = $selectedValues['term'];
 
 		// reverse chronological order is the default behaviour
 		if ($direction == 'DESC') {
 			$this->terms->sortBy('start', 'DESC');
-//			$years = array_reverse($this->years, false);
-//			$semesters = array_reverse($iterate, false);
-		}
-		else {
+		} else {
 			$this->terms->sortBy('start', 'ASC');
-//			$years = $this->years;
-//			$semesters = $iterate;
 		}
 
 		$output = array();
 
 		// if there is no selection, standard behaviour is default to the first element
 		if(!isset($selection)) {
-//			$selection = array(reset($years), reset($semesters));
 			$selection = $this->terms->first();
 		}
 
@@ -266,30 +234,6 @@ class ContextSelector
 			$output['options'][] = $option;
 		}
 		$output['nav'] = $this->calculateSemesterNavigation($selection);
-
-		// iterate by year, then by semester
-//		foreach ($years as $year) {
-//			foreach($semesters as $semester) {
-//				$option = array(
-//					'SEMESTER_SLUG'     => strlen($semester) ? "$year/$semester" : "$year",
-//					'SEMESTER_VALUE'    => sprintf($labelFormat, $semester, $year),
-//					'SEMESTER_SELECTED' => ''
-//				);
-//
-//				if(array($year, $semester) == $selection) {
-//					$option['SEMESTER_SELECTED'] = 'selected="selected"';
-//					$output['nav'] = $this->calculateSemesterNavigation(count($iterate), $selection, $years);
-//				}
-//
-//				$output['options'][] = $option;
-//			}
-//		}
-//
-//        // Nothing was selected? Calculate navigation
-//		if(!isset($output['nav'])) {
-//			$output['nav'] = $this->calculateSemesterNavigation(count($iterate), array(reset($years), reset($semesters)), $years);
-//		}
-
 		return $output;
 	}
 
@@ -375,59 +319,6 @@ class ContextSelector
 			}
 		}
 		return [];
-
-//		list($year, $semester) = $selection;
-//
-//		$nextYear = $year + 1;
-//		$lastYear = $year - 1;
-//		$backDisabled = false;
-//		$fwdDisabled  = false;
-//		if(is_numeric($semester)) {
-//			$nextSemester = $semester + 1;
-//			$lastSemester = $semester - 1;
-//
-//			// wrapping backwards
-//			if ($lastSemester <= 0) {
-//				$back = "$lastYear/" . $size;
-//				if ($lastYear < min($years)) {
-//					$backDisabled = true;
-//				}
-//			}
-//			else {
-//				$back = "$year/$lastSemester";
-//			}
-//
-//			// wrapping forwards
-//			if($nextSemester > $size){
-//				$fwd = "$nextYear/1";
-//				if ($nextYear > max($years)) {
-//					$fwdDisabled = true;
-//				}
-//			}
-//			else {
-//				$fwd = "$year/$nextSemester";
-//			}
-//
-//		}
-//		// if there's no semester, just in/de-crement the year
-//		else {
-//			$back = $lastYear;
-//			$fwd = $nextYear;
-//			if ($year < min($years)) {
-//				$backDisabled = true;
-//			}
-//			if ($year > max($years)) {
-//				$fwdDisabled = true;
-//			}
-//		}
-//
-//		return array(
-//			'SEMESTER_BACK' => $back,
-//			'SEMESTER_FWD'  => $fwd,
-//			'SEMESTER_BACK_DISABLED' => ($backDisabled ? 'disabled' : ''),
-//			'SEMESTER_FWD_DISABLED'  => ($fwdDisabled  ? 'disabled' : ''),
-//		);
-
 	}
 
 
