@@ -39,9 +39,11 @@
                 </ul>
 
                 <div class="content">
-                    <a href="/submission/createSubmission/new/{ID}/task?return_url={RETURN_URL}" class="button icon-due-work">Post Due Work</a>
-                    <a href="/assess/create/{ID}/task?return_url={RETURN_URL}" class="button icon-quiz">Create Quiz</a>
-                    <a href="/task/create/{ID}" class="button icon-task" data-reveal-id="createTask-component{COMPONENT_INSTANCE_ID}">Add Task</a>
+                    <ul class="flex-list buttons">
+                        <li><a href="/task/create/{ID}" class="button icon-task" data-reveal-id="createTask-component{COMPONENT_INSTANCE_ID}">New Task</a></li>
+                        <li><a href="/submission/createSubmission/new/{ID}/task?return_url={RETURN_URL}" class="button icon-due-work">New Due Work</a></li>
+                        <li><a href="/assess/create/{ID}/task?return_url={RETURN_URL}" class="button icon-quiz">New Quiz</a></li>
+                    </ul>
                 </div>
 
                 <!-- This is the form for inline creation of tasks -->
