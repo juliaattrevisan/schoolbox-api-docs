@@ -225,6 +225,10 @@ class ContextSelector
 		$href = array();
 		$output = array();
 
+		if ($selectedValues['term'] instanceof Term\Model) {
+			$href[] = $selectedValues['term']->getCode();
+		}
+
 		$selectedId = isset($selectedValues['category']) ? $selectedValues['category'] : 0;
 
 		foreach($this->categories as $category) {
