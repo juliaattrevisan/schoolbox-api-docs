@@ -1051,6 +1051,7 @@ class Controller extends BaseController
                             "component_id" => $this->getRequest()->post["component_id"],
                             "category_id" => $homepageCache[$homepage]->getId(),
                             "unit_category_id" => $unitCache[$currentUnit['id']]->getId(),
+                            "deleted_at" => null,
                         ]);
 
                         // Update the units open/due date
