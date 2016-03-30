@@ -144,6 +144,8 @@ class Healthcheck
         $list[] = 'pia_sfaccess';
         $list[] = 'tchdept';
         $list[] = 'portalusers';
+        $list[] = 'studboard';
+        $list[] = 'tel_vw_telemf';
         sort($list);
 
         foreach ($list as $table) {
