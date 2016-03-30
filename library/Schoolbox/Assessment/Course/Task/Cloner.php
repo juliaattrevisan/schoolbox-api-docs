@@ -203,7 +203,7 @@ class Cloner
                 $task_id = $box->getTask()->getId();
 
                 if (isset($workDates[$task_id])) {
-                    $publish = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['publish_date']);
+                    $publish = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['publish_date']->sta);
                     $open = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['open_date']);
                     $due = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['due_date'])->endOfDay();
                     $late = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['late_date'])->endOfDay();
