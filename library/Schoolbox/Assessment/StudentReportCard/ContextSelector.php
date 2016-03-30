@@ -15,12 +15,8 @@ use Schoolbox\Collection;
 use Schoolbox\Resource\Category;
 use SitePage;
 
-class ContextSelector {
-
-	const GRANULARITY_YEAR = 'year';
-	const GRANULARITY_SEMESTER = 'sem';
-	const GRANULARITY_TERM = 'term';
-
+class ContextSelector
+{
 	/** @var string */
 	protected $basePath;
 
@@ -46,15 +42,6 @@ class ContextSelector {
 	protected $units;
 	/** @var string */
 	protected $_template = 'submission/_contextSelector.html';
-
-	/**
-	 * Granularity (year, semester (1/2 year), term (1/4 year))
-	 *
-	 * @deprecated Use terms instead.
-	 *
-	 * @var string
-	 */
-	protected $granularity = self::GRANULARITY_SEMESTER;
 
 	/** @var bool */
 	protected $categoryFirst = false;
@@ -122,19 +109,6 @@ class ContextSelector {
 	 */
 	public function addCategory($category) {
 		$this->categories->add($category);
-	}
-
-
-	/**
-	 * Set the granularity for the semester selector (year, semester or term)
-	 * (...don't use term)
-	 *
-	 * @deprecated use `setTerms()` instead
-	 *
-	 * @param string $granularity
-	 */
-	public function setGranularity($granularity) {
-		$this->granularity = $granularity;
 	}
 
 	/**
