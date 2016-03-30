@@ -275,7 +275,7 @@ class Controller extends Base\Base
         // if something got passed, don't care: overriding it
         $post['id'] = $id;
 
-        $this->saveCourse($post, $rq->isXhr(), 'course.list');
+        $this->saveCourse($post, $rq->isXhr(), 'course.courseList');
     }
 
 
