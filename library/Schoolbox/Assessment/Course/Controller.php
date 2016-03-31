@@ -623,7 +623,12 @@ class Controller extends Base\Base
     protected function displayCourseList($template) {
 
         $query = $this->getRequest()->query;
-        $data  = $this->getCourseMapper()->findCourseList($query->get('query'));
+
+        $component = $query->get('component');
+        $folder    = $query->get('folder');
+        $search    = $query->get('query');
+
+        $data  = $this->getCourseMapper()->findCourseList($search);
 
         /* Remember what the user searched for
          */
@@ -647,9 +652,6 @@ class Controller extends Base\Base
                 'hasClose'      => false,
             ];
         }
-
-        $component = $query->get('component');
-        $folder    = $query->get('folder');
 
         if ($folder) {
             $options['folder']['id'] = $folder;
