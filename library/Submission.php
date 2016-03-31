@@ -910,28 +910,6 @@ class Submission extends DeprecatedModel
         return $this->db->getRow($query);
     }
 
-    public function getAllYearsByUser($userID = 0)
-    {
-        if (!$userID) {
-            $userID = $_SESSION['id'];
-        }
-
-        $sql = "SELECT DISTINCT DATE_FORMAT(`submitted`, '%Y') `year`
-                FROM `student_submission`
-                WHERE `owner` = $userID
-                ORDER BY `submitted` DESC";
-
-        $years  = array();
-        $result = $this->db->query($sql);
-
-        // rather than user getAll(), we want this as an ordinal array, not associative, so iterate manually
-        while ($y = mysqli_fetch_assoc($result)) {
-            $years[] = $y['year'];
-        }
-
-        return $years;
-    }
-
     /**
      * This function is supposed to determine a list of categories the user WAS involved in based on due work submission
      *
