@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\Browser;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Alaress\Web\Output\ThemedHtml;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Config;
@@ -244,11 +245,14 @@ abstract class AbstractController extends BaseController
 
         }
 
-        $this->getResponse()->content->set([
-            'template' => '@resourceBrowser/browse.twig',
-            'data'     => $data,
-            'tab'      => $this->tab,
-        ]);
+        /** @var ThemedHtml $output */
+        $output = $this->getDi()->get("webOutput:html");
+        $this->getResponse()->content->set(
+            $output
+                ->setTemplate('@resourceBrowser/browse.twig')
+                ->setTab($this->tab)
+                ->setData($data)
+        );
     }
 
 
