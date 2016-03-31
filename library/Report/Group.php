@@ -175,7 +175,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
         $handler = DeprecatedDatabase::getInstance();
 
         $this->dataResource = $handler->query($query);
-        $this->dataCount = mysqli_num_rows($this->dataResource);
+        $this->dataCount    = $this->dataResource->rowCount();
 
         if(!$this->dataCount) {
             return 0;
