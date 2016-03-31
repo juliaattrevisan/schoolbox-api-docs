@@ -199,42 +199,44 @@ class Report_Group extends Report_Abstract implements Report_IReport
         $groupName = $groupHandler->getGroupName($this->getIndexID());
 
         // render users
-        if (!empty($this->dataSet)) {
+        $isUserOutput = false;
+        foreach ($this->dataSet as $user) {
+            if (!$isUserOutput) {
+                $isUserOutput = true;
+                // Output this for first user only.
+                $page->setVar(array(
+                    'COUNTABLE_COUNT' => $this->dataCount,
+                    'REPORT_TITLE'    => Scrub::text($groupName),
+                    'SORT_BASE'       => "group/{$this->getIndexID()}",
+                    'COUNTABLE'       => 'members',
+                ));
+            }
+            // Format email address
+            $address = Scrub::text($this->emailObj->formatEmailFromArray($user));
+            $email = $address ? "<a href=\"{$_SESSION['mailhandle']}$address\">$address</a>" : '';
 
             $page->setVar(array(
-                'COUNTABLE_COUNT' => $this->dataCount,
-                'REPORT_TITLE'    => Scrub::text($groupName),
-                'SORT_BASE'       => "group/{$this->getIndexID()}",
-                'COUNTABLE'       => 'members',
+                'UID'             => Scrub::text($user['id']),
+                'USER_TITLE'      => Scrub::text($user['title']),
+                'USER_FIRSTNAME'  => Scrub::text($user['firstname']),
+                'USER_SURNAME'    => Scrub::text($user['lastname']),
+                'USER_USERNAME'   => Scrub::text($user['username']),
+                'USER_SYNERGY_ID' => Scrub::text($user['synergy_id']),
+                'USER_EMAIL'      => $email,
+                'USER_YEAR'       => empty($user['year']) ? '' : "Year {$user['year']}",
+                'USER_CAMPUS'     => Scrub::text($user['campus']),
             ));
 
-            foreach ($this->dataSet as $user) {
-                // Format email address
-                $address = Scrub::text($this->emailObj->formatEmailFromArray($user));
-                $email = $address ? "<a href=\"{$_SESSION['mailhandle']}$address\">$address</a>" : '';
+            if(!$_SESSION['su'])
+                $page->setVar('modify_block');
+            else
+                $page->parse('modify_block', 'modify');
 
-                $page->setVar(array(
-                    'UID'             => Scrub::text($user['id']),
-                    'USER_TITLE'      => Scrub::text($user['title']),
-                    'USER_FIRSTNAME'  => Scrub::text($user['firstname']),
-                    'USER_SURNAME'    => Scrub::text($user['lastname']),
-                    'USER_USERNAME'   => Scrub::text($user['username']),
-                    'USER_SYNERGY_ID' => Scrub::text($user['synergy_id']),
-                    'USER_EMAIL'      => $email,
-                    'USER_YEAR'       => empty($user['year']) ? '' : "Year {$user['year']}",
-                    'USER_CAMPUS'     => Scrub::text($user['campus']),
-                ));
+            $page->parse('user_block', 'user', true);
+        }
 
-                if(!$_SESSION['su'])
-                    $page->setVar('modify_block');
-                else
-                    $page->parse('modify_block', 'modify');
-
-                $page->parse('user_block', 'user', true);
-            }
-
+        if ($isUserOutput) {
             $page->parse('RESULT', 'user_t', true);
-
         } else {
             $page->setVar(array(
                 'RESULT'                => 'No results.',
@@ -245,7 +247,6 @@ class Report_Group extends Report_Abstract implements Report_IReport
                 'page_number_block'     => ''
             ));
         }
-
     }
 
     public function export()
