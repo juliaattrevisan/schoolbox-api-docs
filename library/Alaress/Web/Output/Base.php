@@ -161,6 +161,24 @@ class Base implements OutputInterface
     }
 
     /**
+     * Helper function for getting a field value out of this output's response object.
+     *
+     * Assumes that `$this->response->content` is an array or array-like object.
+     *
+     * @param  string $field
+     * @param  mixed  $default
+     * @return mixed Value of $field in $response, or $default if not set.
+     */
+    protected function retrieveFieldFromResponse($field, $default = null)
+    {
+        if ($this->response instanceof Response) {
+            $content = $this->getResponse()->content->get();
+            return isset($content[$field]) ? $content[$field] : $default;
+        }
+        return $default;
+    }
+
+    /**
      * @param  \Aura\Web\Response $response
      * @return $this
      */
