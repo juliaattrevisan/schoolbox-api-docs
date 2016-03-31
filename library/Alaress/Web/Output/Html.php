@@ -52,15 +52,15 @@ class Html extends Base
      *
      * @return string
      */
-    public function getAsString() {
-        $response = $this->getResponse()->content->get();
+    public function getAsString()
+    {
         $template = $this->getTemplate();
         $data     = $this->getData();
         if (!isset($template)) {
-            $template = $response['template'];
+            $template = $this->retrieveFieldFromResponse('template');
         }
         if (!isset($data)) {
-            $data = $response['data'];
+            $data = $this->retrieveFieldFromResponse('data', []);
         }
         return $this->getTemplateEngine()->render($template, $data);
     }
