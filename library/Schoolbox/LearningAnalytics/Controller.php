@@ -22,7 +22,7 @@ use Schoolbox\LearningAnalytics\Results\TaskResults;
 use Schoolbox\LearningAnalytics\Results\TaskTypes;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
 use Schoolbox\LearningAnalytics\Effort\AllEffort;
-use Schoolbox\Assessment\Term\Model as Term;
+use Alaress_Date_Format;
 
 class Controller extends Base {
 
@@ -33,10 +33,10 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Term $from
-     * @param Term $to
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      */
-    public function course($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+    public function course($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
         $this->process(
             $allUnitInstances,
             new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
@@ -50,10 +50,10 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Term $from
-     * @param Term $to
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      */
-    public function courseWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+    public function courseWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
         $this->process(
             $allUnitInstances,
             new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
@@ -67,10 +67,10 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Term $from
-     * @param Term $to
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      */
-    public function courseWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+    public function courseWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
         $this->process(
             $allUnitInstances,
             new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
@@ -84,10 +84,10 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Term $from
-     * @param Term $to
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      */
-    public function courseWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+    public function courseWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
         $this->process(
             $allUnitInstances,
             new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
@@ -101,10 +101,10 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Term $from
-     * @param Term $to
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      */
-    public function folder($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+    public function folder($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
         $this->process(
             $allUnitInstances,
             new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
@@ -118,10 +118,10 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Term $from
-     * @param Term $to
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      */
-    public function folderWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+    public function folderWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
         $this->process(
             $allUnitInstances,
             new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
@@ -135,10 +135,10 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Term $from
-     * @param Term $to
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      */
-    public function folderWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+    public function folderWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
         $this->process(
             $allUnitInstances,
             new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
@@ -152,10 +152,10 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Term $from
-     * @param Term $to
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      */
-    public function folderWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+    public function folderWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
         $this->process(
             $allUnitInstances,
             new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)

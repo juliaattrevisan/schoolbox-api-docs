@@ -135,22 +135,19 @@ class Module extends BaseModule
 
         /* Try to find all the folders which used $courseFolder as a source
          *
-         * If a date range was specified, use that. Otherwise default to the
-         * current Term
+         * If a date range was specified, use that.
          */
-        $termMapper = new TermMapper();
-
         if (isset($params['from']) && isset($params['to'])) {
             try {
-                $fromTerm = $termMapper->findOneByColumn('code', $params['from']);
-                $toTerm = $termMapper->findOneByColumn('code', $params['to']);
+                $fromTerm = \Alaress_Date_Format::newUrlDate($params['from']);
+                $toTerm = \Alaress_Date_Format::newUrlDate($params['to']);
             }
             catch (\Exception $e) {
                 throw new Exception('Invalid date range.');
             }
         }
         else {
-            $fromTerm = $termMapper->findForToday();
+            $fromTerm = \Alaress_Date_Format::now();
             $toTerm   = clone $fromTerm;
         }
 
@@ -235,24 +232,22 @@ class Module extends BaseModule
 
         /* Try to find all the folders which used $courseFolder as a source
          *
-         * If a date range was specified, use that. Otherwise default to the
-         * current Term
+         * If a date range was specified, use that.
          */
-        $termMapper = new TermMapper();
-
         if (isset($params['from']) && isset($params['to'])) {
             try {
-                $fromTerm = $termMapper->findOneByColumn('code', $params['from']);
-                $toTerm = $termMapper->findOneByColumn('code', $params['to']);
+                $fromTerm = \Alaress_Date_Format::newUrlDate($params['from']);
+                $toTerm = \Alaress_Date_Format::newUrlDate($params['to']);
             }
             catch (\Exception $e) {
                 throw new Exception('Invalid date range.');
             }
         }
         else {
-            $fromTerm = $termMapper->findForToday();
+            $fromTerm = \Alaress_Date_Format::now();
             $toTerm   = clone $fromTerm;
         }
+
 
         $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $fromTerm, $toTerm);
 

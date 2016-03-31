@@ -13,7 +13,7 @@ namespace Schoolbox\LearningAnalytics;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Assessment\Term\Model as Term;
+use Alaress_Date_Format;
 
 class Metadata {
 
@@ -72,14 +72,14 @@ class Metadata {
     /**
      * Start of date range filter
      *
-     * @var Term
+     * @var Alaress_Date_Format
      */
     protected $from;
 
     /**
      * End of date range filter
      *
-     * @var Term
+     * @var Alaress_Date_Format
      */
     protected $to;
 
@@ -90,10 +90,10 @@ class Metadata {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Term $from
-     * @param Term $to
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      */
-    public function __construct($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $from, Term $to) {
+    public function __construct($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
         $this->setParams($params);
 
         $this->setCourseFolder($courseFolder);
@@ -297,7 +297,9 @@ class Metadata {
     }
 
     /**
-     * @return Term
+     * Get From
+     *
+     * @return Alaress_Date_Format
      */
     protected function getFrom()
     {
@@ -305,7 +307,9 @@ class Metadata {
     }
 
     /**
-     * @param Term $from
+     * Set From
+     *
+     * @param Alaress_Date_Format $from
      */
     protected function setFrom($from)
     {
@@ -313,7 +317,9 @@ class Metadata {
     }
 
     /**
-     * @return Term
+     * Get To
+     *
+     * @return Alaress_Date_Format
      */
     protected function getTo()
     {
@@ -321,7 +327,9 @@ class Metadata {
     }
 
     /**
-     * @param Term $to
+     * Set To
+     *
+     * @param Alaress_Date_Format $to
      */
     protected function setTo($to)
     {

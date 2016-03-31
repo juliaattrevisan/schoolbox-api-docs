@@ -21,6 +21,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Alaress_Date_Format;
 
 
 class UnitInstanceMapper extends BaseMapper {
@@ -162,12 +163,12 @@ class UnitInstanceMapper extends BaseMapper {
      * the date range, so you can get statistics across terms.
      *
      * @param Folder $folder
-     * @param Term $from
-     * @param Term $to
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      * @return Collection
      * @throws BaseMapper\Exception
      */
-    public function findAllFoldersUsingCourse(Folder $folder, Term $from, Term $to) {
+    public function findAllFoldersUsingCourse(Folder $folder, Alaress_Date_Format $from, Alaress_Date_Format $to) {
         $folderMapper = $this->getJoinMapper('unit_category');
         $code_mapper = $this->getJoinMapper('category')->getJoinMapper('codes');
 
@@ -191,8 +192,8 @@ class UnitInstanceMapper extends BaseMapper {
         $statement = $this->database->prepare($query);
         $statement->execute(array(
             'folderId' => $folder->getId(),
-            'from' => $from->getStart(),
-            'to' => $to->getActualFinish()
+            'from' => $from->getDatabaseDate(),
+            'to' => $to->getDatabaseDate()
         ));
 
         $collection = new Collection();
