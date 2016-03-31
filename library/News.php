@@ -169,7 +169,7 @@ class News extends DeprecatedModel
     public function update($news)
     {
         if (!$this->hasWrite($news['item_id'])) {
-            return;
+            return false;
         }
 
         $groupList = $news['groupList'];
@@ -215,7 +215,7 @@ class News extends DeprecatedModel
         $newsID = (int)$newsID;
 
         if (!$this->hasWrite($newsID)) {
-            return;
+            return false;
         }
 
         $query = "UPDATE " . $this->_table . " SET item_deleted = 1 WHERE " . $this->_index . " = $newsID";
