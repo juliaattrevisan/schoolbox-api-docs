@@ -195,38 +195,34 @@ class Kernel extends \Alaress\Application\Kernel
             catch (Base $e) {
                 error($e->getCode(), $e->getMessage(), 500);
             }
-
-           // Figure out output type.
-           // In order of preference, output type is:
-           // * set in the response content
-           // * set in route
-           // * default to 'html'
-            /** @var \Aura\Web\Response $response */
-            $content  = $response->content->get();
-            if ($content instanceof OutputInterface) {
-                $content->output($response);
-            } elseif (is_array($content)) {
-                $format   = $content['format'];
-                if (empty($format)) {
-                    // Strip leading . from format
-                    $format = preg_replace('/^\\./', '', $params['format']);
+            /** @var OutputInterface $output */
+            $output = $response->content->get();
+            if (!$output instanceof OutputInterface) {
+                if (is_array($output)) {
+                    // Figure out output type.
+                    // In order of preference, output type is:
+                    // * set in the response content
+                    // * set in route
+                    // * default to 'html'
+                    $format = $output['format'];
                     if (empty($format)) {
-                        $format = 'html';
+                        // Strip leading . from format
+                        $format = preg_replace('/^\\./', '', $params['format']);
+                        if (empty($format)) {
+                            $format = 'html';
+                        }
                     }
+                    // Create a different output type (Sitepage, JSON, whatever) based on a
+                    // route param, defaulting to HTML
+                    $output = $this->di->get("webOutput:$format");
+                    $output->output($response);
+                } else {
+                    // Maybe it has a __toString method, or it IS actually a string.
+                    // Ram it into the base output type.
+                    $output = $this->di->get("webOutput:base");
                 }
-                // Create a different output type (Sitepage, JSON, whatever) based on a
-                // route param, defaulting to HTML
-                /** @var OutputInterface $output */
-                $output = $this->di->get("webOutput:$format");
-                $output->output($response);
-            } else {
-                // Maybe it has a __toString method, or it IS an actual string.
-                // Output headers anyway
-                foreach ($response->headers->get() as $label => $value) {
-                    header("{$label}: {$value}");
-                }
-                echo $content;
             }
+            $output->output($response);
 
             // Post-processing: if this is a HTML request and not a redirect,
             // store this request in history.
