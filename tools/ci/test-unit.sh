@@ -15,22 +15,22 @@ then
 	exit 1;
 fi
 
-echo "Unpacking vendor php build";
-tar xzf ../$1;
-
 echo "Unpacking vendor dev build";
+tar xzf ../$2;
+
+echo "Unpacking vendor php build";
 cd $initialdir;
-tar xzf $2;
+tar xzf $1;
 cd $instdir;
 
 echo "Validating checksums";
 checksum=`sha1sum composer.lock`;
-if [ "$checksum" != "`cat vendor/composer.lock.checksum`" ];
+if [ "$checksum" != "`cat ../vendor/composer.lock.checksum`" ];
 then
 	echo "Vendor checksum does not match";
 	exit 1;
 fi
-if [ "$checksum" != "`cat ../vendor/composer.lock.checksum`" ];
+if [ "$checksum" != "`cat vendor/composer.lock.checksum`" ];
 then
 	echo "Vendor dev checksum does not match";
 	exit 1;
@@ -40,4 +40,4 @@ echo "Preparing conf.php"
 cp -f www/conf/tarball.conf.php www/conf/conf.php;
 
 echo "Running php unit"
-php ../vendor/bin/phpunit;
+php vendor/bin/phpunit;
