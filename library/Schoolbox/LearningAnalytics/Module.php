@@ -259,6 +259,8 @@ class Module extends BaseModule
             $to   = clone $from;
         }
 
+        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
+
         /* No acrobatics required
          */
         try {
