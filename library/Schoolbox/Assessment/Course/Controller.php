@@ -869,61 +869,59 @@ class Controller extends BaseController
 
         // Validate due work
 
-        foreach ($this->getRequest()->post["work"] as $work) {
-            try {
-                \Alaress_Date_Format::newLocalShort($work['publish_date']);
-            }
-            catch (\Exception $e) {
-                $this->throwError('You must enter a publish date for each due work item before you can proceed.');
-                return;
-            }
-
-            try {
-                \Alaress_Date_Format::newLocalShort($work['due_date']);
-            }
-            catch (\Exception $e) {
-                $this->throwError('You must enter a due date for each due work item before you can proceed.');
-                return;
-            }
-
-            // Accepting submissions, must have the other two dates
-
-            if ($work['submissions'] == '1') {
+        if (isset($this->getRequest()->post["work"])) {
+            foreach ($this->getRequest()->post["work"] as $work) {
                 try {
-                    \Alaress_Date_Format::newLocalShort($work['open_date']);
-                }
-                catch (\Exception $e) {
-                    $this->throwError('You must enter an open date for each due work item that accepts submissions before you can proceed.');
+                    \Alaress_Date_Format::newLocalShort($work['publish_date']);
+                } catch (\Exception $e) {
+                    $this->throwError('You must enter a publish date for each due work item before you can proceed.');
                     return;
                 }
 
                 try {
-                    \Alaress_Date_Format::newLocalShort($work['late_date']);
-                }
-                catch (\Exception $e) {
-                    $this->throwError('You must enter a late date for each due work item that accepts submissions before you can proceed.');
+                    \Alaress_Date_Format::newLocalShort($work['due_date']);
+                } catch (\Exception $e) {
+                    $this->throwError('You must enter a due date for each due work item before you can proceed.');
                     return;
+                }
+
+                // Accepting submissions, must have the other two dates
+
+                if ($work['submissions'] == '1') {
+                    try {
+                        \Alaress_Date_Format::newLocalShort($work['open_date']);
+                    } catch (\Exception $e) {
+                        $this->throwError('You must enter an open date for each due work item that accepts submissions before you can proceed.');
+                        return;
+                    }
+
+                    try {
+                        \Alaress_Date_Format::newLocalShort($work['late_date']);
+                    } catch (\Exception $e) {
+                        $this->throwError('You must enter a late date for each due work item that accepts submissions before you can proceed.');
+                        return;
+                    }
                 }
             }
         }
 
         // Validate quizzes
 
-        foreach ($this->getRequest()->post["quiz"] as $quiz) {
-            try {
-                \Alaress_Date_Format::newLocalShort($quiz['start_date']);
-            }
-            catch (\Exception $e) {
-                $this->throwError('You must enter a start date for each quiz before you can proceed.');
-                return;
-            }
+        if (isset($this->getRequest()->post["quiz"])) {
+            foreach ($this->getRequest()->post["quiz"] as $quiz) {
+                try {
+                    \Alaress_Date_Format::newLocalShort($quiz['start_date']);
+                } catch (\Exception $e) {
+                    $this->throwError('You must enter a start date for each quiz before you can proceed.');
+                    return;
+                }
 
-            try {
-                \Alaress_Date_Format::newLocalShort($quiz['finish_date']);
-            }
-            catch (\Exception $e) {
-                $this->throwError('You must enter a finish date for each quiz before you can proceed.');
-                return;
+                try {
+                    \Alaress_Date_Format::newLocalShort($quiz['finish_date']);
+                } catch (\Exception $e) {
+                    $this->throwError('You must enter a finish date for each quiz before you can proceed.');
+                    return;
+                }
             }
         }
 
