@@ -164,7 +164,7 @@ class News extends DeprecatedModel
     /**
 	 * @deprecated use \Schoolbox\News\ArticleMapper::save()
 	 * @param $news
-	 * @return bool|mysqli_result|resource|void
+	 * @return bool
 	 */
     public function update($news)
     {
@@ -208,7 +208,7 @@ class News extends DeprecatedModel
     /**
 	 * @deprecated use \Schoolbox\News\ArticleMapper::delete()
 	 * @param $newsID
-	 * @return bool|mysqli_result|resource
+	 * @return bool
 	 */
     public function delete($newsID)
     {

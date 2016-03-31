@@ -60,7 +60,7 @@ class CategoryNews extends DeprecatedModel {
 	/**
 	 * @deprecated use Schoolbox\Resource\Category\NewsMapper::delete()
 	 * @param $id
-	 * @return bool|mysqli_result|resource|void
+	 * @return bool
 	 */
 	function delete($id) {
 		$this->update(array('id'=>$id,'deleted'=>1));

@@ -116,7 +116,7 @@ class Blog extends DeprecatedModel {
 	/**
 	 * @deprecated use \Schoolbox\Blog\BlogMapper::save()
 	 * @param $blog
-	 * @return bool|mysqli_result|resource
+	 * @return bool
 	 */
 	function update($blog) {
 		return $this->permission($blog['id']) ? parent::update($blog) : false;
@@ -125,7 +125,7 @@ class Blog extends DeprecatedModel {
 	/**
 	 * @deprecated use \Schoolbox\Blog\BlogMapper::delete()
 	 * @param $id
-	 * @return bool|mysqli_result|resource
+	 * @return bool
 	 */
 	function delete($id) {
 		$blog = array(

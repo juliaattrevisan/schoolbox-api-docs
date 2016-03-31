@@ -157,7 +157,7 @@ class DeprecatedModel
 	/**
 	 * @deprecated
 	 * @param $object
-	 * @return bool|mysqli_result|resource
+	 * @return bool
 	 */
 	function update($object)
     {
@@ -167,7 +167,7 @@ class DeprecatedModel
 	/**
 	 * @deprecated
 	 * @param $id
-	 * @return bool|mysqli_result|resource
+	 * @return bool
 	 */
 	function delete($id)
     {
