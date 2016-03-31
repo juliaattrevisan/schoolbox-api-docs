@@ -128,12 +128,14 @@
         if (events != null && typeof(events.validate) !== undefined) {
             var validator = $(e.target).triggerHandler('validate');
 
-            if (!validator['result']) {
+            if (validator !== undefined) {
+                if (!validator['result']) {
 
-                // Validation failed, show message and bomb out
+                    // Validation failed, show message and bomb out
 
-                form.find('[data-mage-error]').hide().html(validator['message']).slideDown();
-                return;
+                    form.find('[data-mage-error]').hide().html(validator['message']).slideDown();
+                    return;
+                }
             }
         }
 
