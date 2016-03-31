@@ -22,7 +22,7 @@ use Schoolbox\LearningAnalytics\Results\TaskResults;
 use Schoolbox\LearningAnalytics\Results\TaskTypes;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
 use Schoolbox\LearningAnalytics\Effort\AllEffort;
-use Alaress_Date_Format;
+use Schoolbox\Assessment\Term\Model as Term;
 
 class Controller extends Base {
 
@@ -33,13 +33,12 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
+     * @param Term $term
      */
-    public function course($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
+    public function course($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
         $this->process(
             $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
         );
     }
 
@@ -50,13 +49,12 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
+     * @param Term $term
      */
-    public function courseWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
+    public function courseWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
         $this->process(
             $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
         );
     }
 
@@ -67,13 +65,12 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
+     * @param Term $term
      */
-    public function courseWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
+    public function courseWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
         $this->process(
             $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
         );
     }
 
@@ -84,13 +81,12 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
+     * @param Term $term
      */
-    public function courseWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
+    public function courseWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
         $this->process(
             $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
         );
     }
 
@@ -101,13 +97,12 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
+     * @param Term $term
      */
-    public function folder($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
+    public function folder($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
         $this->process(
             $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
         );
     }
 
@@ -118,13 +113,12 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
+     * @param Term $term
      */
-    public function folderWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
+    public function folderWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
         $this->process(
             $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
         );
     }
 
@@ -135,13 +129,12 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
+     * @param Term $term
      */
-    public function folderWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
+    public function folderWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
         $this->process(
             $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
         );
     }
 
@@ -152,23 +145,24 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
+     * @param Term $term
      */
-    public function folderWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
+    public function folderWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
         $this->process(
             $allUnitInstances,
-            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $from, $to)
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
         );
     }
 
     /**
      * Generate a context selector phplib fragment
      *
+     * @param Term $term
+     * @return
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Web\Exception\InvalidComponent
      */
-    private function generateContextSelector()
+    private function generateContextSelector(Term $term)
     {
         /* Url Acrobatics, since the contextselector just appends args continually
          *
@@ -185,7 +179,6 @@ class Controller extends Base {
         $page = $this->getDi()->get('sitePage');
 
         $termMapper = new \Schoolbox\Assessment\Term\Mapper();
-        $currentTerm = $termMapper->findForToday();
 
         $contextSelector = new \Schoolbox\Assessment\StudentReportCard\ContextSelector($currentUrl);
         $contextSelector->setTerms($termMapper->findAll());
@@ -194,8 +187,7 @@ class Controller extends Base {
             $page,
             TEMPLATE_content,
             array(
-                'term'     => $currentTerm,
-                'category' => ''
+                'term' => $term,
             )
         );
 
@@ -268,7 +260,7 @@ class Controller extends Base {
         /**
          * Context Selector is a phplib -_-
          */
-        $contextSelectorHtml = $this->generateContextSelector();
+        $contextSelectorHtml = $this->generateContextSelector($metadata->getTerm());
 
         /* Twig data
          */

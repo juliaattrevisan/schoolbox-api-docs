@@ -14,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress_Date_Format;
+use Schoolbox\Assessment\Term\Model as Term;
 
 class Metadata {
 
@@ -70,30 +71,38 @@ class Metadata {
     protected $selectedFolder = null;
 
     /**
-     * Start of date range filter
+     * Selected Term to filter
      *
-     * @var Alaress_Date_Format
+     * @var Term
      */
-    protected $from;
+    protected $term;
 
-    /**
-     * End of date range filter
-     *
-     * @var Alaress_Date_Format
-     */
-    protected $to;
+//
+//    We'll need this later, I think
+//
+//    /**
+//     * Start of date range filter
+//     *
+//     * @var Alaress_Date_Format
+//     */
+//    protected $from;
+//
+//    /**
+//     * End of date range filter
+//     *
+//     * @var Alaress_Date_Format
+//     */
+//    protected $to;
 
     /**
      * Metadata constructor.
-     *
      * @param $params
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
+     * @param Term $term
      */
-    public function __construct($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Alaress_Date_Format $from, Alaress_Date_Format $to) {
+    public function __construct($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
         $this->setParams($params);
 
         $this->setCourseFolder($courseFolder);
@@ -103,8 +112,7 @@ class Metadata {
         $this->setAllFolders($allFoldersUsingCourse);
         $this->setAllAggregateFolders(new Collection());
 
-        $this->setFrom($from);
-        $this->setTo($to);
+        $this->setTerm($term);
 
         $this->process();
     }
@@ -297,42 +305,64 @@ class Metadata {
     }
 
     /**
-     * Get From
+     * Get term
      *
-     * @return Alaress_Date_Format
+     * @return Term
      */
-    protected function getFrom()
+    public function getTerm()
     {
-        return $this->from;
+        return $this->term;
     }
 
     /**
-     * Set From
+     * Set term
      *
-     * @param Alaress_Date_Format $from
+     * @param Term $term
      */
-    protected function setFrom($from)
+    protected function setTerm($term)
     {
-        $this->from = $from;
+        $this->term = $term;
     }
 
-    /**
-     * Get To
-     *
-     * @return Alaress_Date_Format
-     */
-    protected function getTo()
-    {
-        return $this->to;
-    }
-
-    /**
-     * Set To
-     *
-     * @param Alaress_Date_Format $to
-     */
-    protected function setTo($to)
-    {
-        $this->to = $to;
-    }
+//    We'll need this later, I think
+//
+//    /**
+//     * Get From
+//     *
+//     * @return Alaress_Date_Format
+//     */
+//    protected function getFrom()
+//    {
+//        return $this->from;
+//    }
+//
+//    /**
+//     * Set From
+//     *
+//     * @param Alaress_Date_Format $from
+//     */
+//    protected function setFrom($from)
+//    {
+//        $this->from = $from;
+//    }
+//
+//    /**
+//     * Get To
+//     *
+//     * @return Alaress_Date_Format
+//     */
+//    protected function getTo()
+//    {
+//        return $this->to;
+//    }
+//
+//    /**
+//     * Set To
+//     *
+//     * @param Alaress_Date_Format $to
+//     */
+//    protected function setTo($to)
+//    {
+//        $this->to = $to;
+//    }
 }

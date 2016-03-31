@@ -123,6 +123,7 @@ class Module extends BaseModule
         $unitInstanceMapper = new UnitInstanceMapper();
         $folderMapper = new FolderMapper();
         $allUnitInstances = new Collection();
+        $termMapper = new TermMapper();
 
         /* Try to find the parent course folder which spawned minions
          */
@@ -139,7 +140,6 @@ class Module extends BaseModule
          */
         if (isset($params['term'])) {
             try {
-                $termMapper = new TermMapper();
                 $term = $termMapper->findOneByColumn('code', $params['term']);
 
                 $from = $term->getStart();
@@ -150,6 +150,8 @@ class Module extends BaseModule
             }
         }
         else {
+            $term = $termMapper->createModel();
+
             $from = \Alaress_Date_Format::now();
             $to   = clone $from;
         }
@@ -196,8 +198,9 @@ class Module extends BaseModule
             'courseFolder' => $courseFolder,
             'allFoldersUsingCourse' => $allFoldersUsingCourse,
             'allUnitInstances' => $allUnitInstances,
-            'from' => $from,
-            'to' => $to
+            'term' => $term,
+//            'from' => $from,
+//            'to' => $to
         );
     }
 
@@ -223,6 +226,7 @@ class Module extends BaseModule
         $unitInstanceMapper = new UnitInstanceMapper();
         $folderMapper = new FolderMapper();
         $allUnitInstances = new Collection();
+        $termMapper = new TermMapper();
 
         /* Try to find the parent course folder which spawned minions
          */
@@ -239,7 +243,6 @@ class Module extends BaseModule
          */
         if (isset($params['term'])) {
             try {
-                $termMapper = new TermMapper();
                 $term = $termMapper->findOneByColumn('code', $params['term']);
 
                 $from = $term->getStart();
@@ -250,11 +253,11 @@ class Module extends BaseModule
             }
         }
         else {
+            $term = $termMapper->createModel();
+
             $from = \Alaress_Date_Format::now();
             $to   = clone $from;
         }
-
-        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
 
         /* No acrobatics required
          */
@@ -274,8 +277,9 @@ class Module extends BaseModule
             'courseFolder' => $courseFolder,
             'allFoldersUsingCourse' => $allFoldersUsingCourse,
             'allUnitInstances' => $allUnitInstances,
-            'from' => $from,
-            'to' => $to
+            'term' => $term,
+//            'from' => $from,
+//            'to' => $to
         );
     }
 
