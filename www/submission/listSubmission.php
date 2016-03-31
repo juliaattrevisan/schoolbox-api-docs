@@ -3,31 +3,21 @@ use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-if (isset($_GET['year']) || isset($_GET['semester'])) {
-    $this->localRedir("/submission/listSubmission/{$_GET['year']}/{$_GET['semester']}");
-}
+$termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
 
-$currentYear = date('Y');
-$currentSemester = date('m') > 6 ? 2 : 1;
+$termSlug = $this->arg[0];
 
-if (isset($this->arg[0])) {
-    if(!(is_numeric($this->arg[0]) && is_numeric($this->arg[1]))) {
+if (isset($termSlug)) {
+    try {
+        $currentTerm = $termMapper->findOneByColumn('code', $termSlug);
+    } catch (\Schoolbox\Mapper\Exception $e) {
         $this->localRedir('/submission/listSubmission');
+        exit;
     }
-
-    if ($this->arg[1] < 1 || $this->arg[1] > 2) {
-        error(2); // TODO find a more appropriate error
-    }
-
-    $year = (int)$this->arg[0];
-    $semester = (int)$this->arg[1];
-    $semesterSlug = "/$year/$semester";
 } else {
-    $year = $currentYear;
-    $semester = $currentSemester;
-    $semesterSlug = '';
+    $currentTerm = $termMapper->findForToday();
 }
-
+$termSlug = $currentTerm->getCode();
 
 $this->setFile(TEMPLATE_content, 'submission/listSubmission.html');
 $this->setTitle('Submissions');
@@ -52,51 +42,37 @@ $this->setBlock('normalSubmission', 'writable_close', 'writable_close_block');
 $this->setBlock('category_listing', 'learning_analytics', 'learning_analytics_block');
 $this->setBlock(TEMPLATE_content, 'no_category_listing', 'no_category_listing_block');
 
-$this->setVar('SEM_SLUG', $semesterSlug);
+$this->setVar('TERM_SLUG', $termSlug);
 
 $submissionHandler = new Submission();
 $groupHandler = new Group();
 
 $contextSelector = new ContextSelector('submission/listSubmission');
+$contextSelector->setTerms($termMapper->findAll(['order' => ['start' => 'desc']]));
 
 if(!$_SESSION['user']->getRole()->isStaff() ) {
     error(19);
 }
 
-// generate a "past 6 years" array
-for($i = 5; $i >= 0; $i--) {
-    $years[] = $currentYear - $i;
-}
-
-/* Find the submission that occurs furthest into the future
- * so you can find your way back there
- */
-$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
-$allYears = $submissionMapper->findYears();
-
-if ($allYears->count() && ($allYears->first() > $currentYear)) {
-    for ($j = $currentYear+1; $j <= $allYears->first(); $j++) {
-        $years[] = $j;
-    }
-}
-
-$contextSelector->setYears($years);
-
 $subjectList = array();
 /* Use provided ID, or check for the subjects the user is involved with */
-if(isset($this->arg[2]) && is_numeric($this->arg[2])){
-    $subjectList[] = $this->arg[2];
+if (isset($this->arg[1]) && is_numeric($this->arg[1])){
+    $subjectList[] = $this->arg[1];
 
     //Selector rendored to maintain single category link
-    $contextSelector->render($this, 'CONTEXT_SELECTOR', array(
-            'year' => $year, 'semester' => $semester, 'list'=>$this->arg[2]
-        ));
+    $contextSelector->render(
+        $this,
+        'CONTEXT_SELECTOR',
+        array('term' => $currentTerm, 'list' => $this->arg[1],)
+    );
 }
 else {
     //Selector rendered without category
-    $contextSelector->render($this, 'CONTEXT_SELECTOR', array(
-            'year' => $year, 'semester' => $semester
-        ));
+    $contextSelector->render(
+        $this,
+        'CONTEXT_SELECTOR',
+        array('term' => $currentTerm,)
+    );
 
     $involvedIn = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
     if(is_array($involvedIn)) {
@@ -107,7 +83,11 @@ else {
 
     /* Merge in all the rest that are not related to the user by folder but by owner
        note i am using an older function for a simple task that is why it does more than it should */
-    $allUserBoxes = $submissionHandler->getAllForUser($_SESSION['id'], $year, $semester);
+    $allUserBoxes = $submissionHandler->getAllForUser(
+        $_SESSION['id'],
+        $currentTerm->getStart(),
+        $currentTerm->getActualFinish()
+    );
     if(is_array($allUserBoxes)) {
         foreach($allUserBoxes as $box) {
             $subjectList[] = $box['catid'];
@@ -121,7 +101,12 @@ else {
 
 $subList = array();
 foreach($subjectList as $subject) {
-    $assessments = $submissionHandler->getAllForUserCategory($subject, 0, $year, $semester);
+    $assessments = $submissionHandler->getAllForUserCategory(
+        $subject,
+        0,
+        $currentTerm->getStart(),
+        $currentTerm->getActualFinish()
+    );
     if(is_array($assessments)) {
         $subList = array_merge($subList, $assessments);
     }

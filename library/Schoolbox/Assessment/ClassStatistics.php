@@ -60,11 +60,10 @@ class ClassStatistics {
 	 * Constructor
 	 *
 	 * @param Category $category
-	 * @param int $year
-	 * @param int $semester
+	 * @param Term\Model $term
 	 * @param User $user
 	 */
-	public function __construct($category, $year = 0, $semester = 0, User $user) {
+	public function __construct($category, Term\Model $term, User $user) {
 		$this->category = $category;
 
 		// compile the due work, assessments, marks returned, et al
@@ -89,25 +88,11 @@ class ClassStatistics {
 				'mark_visibility' => $quizVisibilities
 			)
 		);
-		foreach($boxCollection as $box) {
-			$due = $box->getDueDate();
-			$dueYear = $due->getYear();
-			$dueSemester = $due->getUsingFormat('m') > 6 ? 2 : 1;
 
-			// if year (and possibly also semester) are given, filter dates
-			if($year) {
-				if($dueYear == $year) {
-					if($semester) {
-						if($dueSemester == $semester) {
-							$this->addWork($box);
-						}
-					}
-					else {
-						$this->addWork($box);
-					}
-				}
-			}
-			else {
+		// I don't think that term can ever be null.
+		// If it's found that it can, then I'll have to just add all boxes.
+		foreach($boxCollection as $box) {
+			if ($term->contains($box->getDueDate())) {
 				$this->addWork($box);
 			}
 		}
@@ -119,25 +104,9 @@ class ClassStatistics {
 			'mark_visibility' => $quizVisibilities
 		));
 		foreach($assessCollection as $assess) {
-            $due = $assess->getFinish();
-            $dueYear = $due->getYear();
-            $dueSemester = $due->getUsingFormat('m') > 6 ? 2 : 1;
-            // if year (and possibly also semester) are given, filter dates
-            if($year) {
-                if($dueYear == $year) {
-                    if($semester) {
-                        if($dueSemester == $semester) {
-                            $this->addWork($assess);
-                        }
-                    }
-                    else {
-                        $this->addWork($assess);
-                    }
-                }
-            }
-            else {
-                $this->addWork($assess);
-            }
+			if ($term->contains($assess->getFinish())) {
+				$this->addWork($assess);
+			}
 		}
 	}
 

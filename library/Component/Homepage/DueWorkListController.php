@@ -210,12 +210,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         // if the user is SOMEHOW involved in this category...
         $this->setVar('allwork_button_block', '');
-        $this->setVar(
-            array(
-                'WORK_YEAR'     => date('Y'),
-                'WORK_SEMESTER' => DueWork_All::getSemester()
-            )
-        );
+        $this->setVar('WORK_TERM', Schoolbox\Assessment\Term\Mapper::getInstance()->findForToday()->getCode());
 
         // Allow students or staff acting as students to see the view results buttons.
         // (Staff have no context for actually following the view result button)

@@ -76,6 +76,8 @@ class Marksheet
     protected $sbMapper;
     /** @var \DueWork_ErrorMapper */
     protected $errorMapper;
+    /** @var Term\Mapper */
+    protected $termMapper;
 
     /** @var IConfigLoader */
     protected $conf;
@@ -91,10 +93,10 @@ class Marksheet
     /** @var Collection */
     protected $errorList;
 
-    /** @var int */
-    protected $year;
-    /** @var int */
-    protected $semester;
+    /**
+     * @var Term\Model
+     */
+    protected $term;
 
 
     /**
@@ -139,13 +141,13 @@ class Marksheet
 
     /**
      * Generate the data from the given category and session user
+     *
+     * @param Term\Model $term
      */
-    public function generateData($year, $semester)
+    public function generateData(Term\Model $term)
     {
-
-        $catId          = $this->category->getId();
-        $this->year     = $year;
-        $this->semester = $semester;
+        $catId      = $this->category->getId();
+        $this->term = $term;
 
         /** @var Collection|User[] $studentCollection */
         $studentCollection = new Collection();
@@ -171,7 +173,12 @@ class Marksheet
         // Get list of extra users for each work item
         // Online assessments: get all users who have attempted assessment
         // Due work: all users who have submitted or returned work
-        $workList = $this->submissionHandler->getAllForUserCategory($catId, null, $year, $semester);
+        $workList = $this->submissionHandler->getAllForUserCategory(
+            $catId,
+            null,
+            $term->getStart(),
+            $term->getActualFinish()
+        );
         if (is_array($workList)) {
             foreach ($workList as $work) {
                 if ($work['type_id'] == \Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
@@ -313,8 +320,8 @@ class Marksheet
             $studentGrades = Grades::getInstance()->getStudentGradesForSubject(
                 $studentCollection,
                 $this->category,
-                $this->year,
-                $this->semester
+                $this->term->getStart(),
+                $this->term->getActualFinish()
             );
 
             foreach ($studentCollection as $student) {
@@ -431,18 +438,7 @@ class Marksheet
      */
     public function renderSitepage($page)
     {
-
-//		var_dump($this->statisticDataSet);
-//		var_dump($this->studentDataSet);
-//		var_dump($this->displayOrder);
-
         $contextSelector = new ContextSelector('submission/markSheet');
-
-        // generate a "past 6 years" array
-        for ($i = 5; $i >= 0; $i--) {
-            $years[] = date('Y') - $i;
-        }
-        $contextSelector->setYears($years);
         $contextSelector->setCategoryFirst(true);
 
         $catIdList = array();
@@ -456,13 +452,14 @@ class Marksheet
         }
 
         $contextSelector->setCategories($this->categoryMapper->findByColumnWithCodes('id', $catIdList));
-
+        $contextSelector->setTerms($this->termMapper->findAll());
         $contextSelector->render(
-            $page, 'CONTEXT_SELECTOR', array(
-            'year'     => $this->year,
-            'semester' => $this->semester,
-            'category' => $this->category->getId()
-        )
+            $page,
+            'CONTEXT_SELECTOR',
+            array(
+                'term'     => $this->term,
+                'category' => $this->category->getId()
+            )
         );
 
         $page->setFile(TEMPLATE_content, 'submission/markSheet.html');
@@ -478,8 +475,7 @@ class Marksheet
                 'CATEGORY_CODE' => strlen($codeString) > 0
                     ? ('('.\Scrub::text($codeString).')')
                     : '',
-                'WORK_YEAR'     => $this->year,
-                'WORK_SEMESTER' => $this->semester
+                'WORK_TERM'     => $this->term->getCode(),
             )
         );
 
@@ -492,7 +488,7 @@ class Marksheet
             ],
             [
                 'text' => \Scrub::text($this->category->getName().' '.( strlen($codeString) > 0 ? ('('.$codeString.')') : '' )) ,
-                'href' => "/submission/listSubmission/{$this->year}/{$this->semester}/".$this->category->getId(),
+                'href' => "/submission/listSubmission/{$this->term->getCode()}/".$this->category->getId(),
                 'class' => '',
             ],
             [
@@ -504,7 +500,7 @@ class Marksheet
 
 
         // define blocks
-        $page->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
+        $page->setBlock(TEMPLATE_content, 'term_option', 'term_option_block');
         $page->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
 
         $page->setBlock(TEMPLATE_content, 'work_header', 'work_header_block');

@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Assessment\Component\OnlineAssessment;
 
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper;
 
@@ -113,18 +114,14 @@ class AttemptMapper extends Mapper
      * @param int   $category_id
      * @param int   $student_id
      * @param array $extra_params Any extra filters:
-     *                            * year
-     *                            * semester
      *                            * owner - the creator of the submission box
+     *                            * from (Alaress_Date_Format)
+     *                            * to (Alaress_Date_Format)
      *
      * @return array
      */
     public function getStudentMarks($category_id, $student_id, $extra_params = array())
     {
-        //
-        // Move getSemesterMonths() to some sort of helper method
-        $submission_box_mapper = new SubmissionBoxMapper();
-
         //
         // Build filters for query
         $params  = array(
@@ -137,16 +134,6 @@ class AttemptMapper extends Mapper
             'aa.deleted_at IS NULL',
             'aq.deleted_at IS NULL',
         );
-        if (!empty($extra_params['year'])) {
-            $params['year'] = $extra_params['year'];
-            $filters[]      = 'YEAR(a.start) = :year';
-        }
-        if (!empty($extra_params['semester'])) {
-            $semester_params       = $submission_box_mapper->getSemesterMonths($extra_params['semester']);
-            $params['month_start'] = $semester_params['start'];
-            $params['month_end']   = $semester_params['end'];
-            $filters[]             = 'MONTH(a.start) BETWEEN :month_start AND :month_end';
-        }
         if (!empty($extra_params['owner'])) {
             $params['owner'] = $extra_params['owner'];
             $filters[]       = 'a.user_id = :owner';
@@ -154,6 +141,17 @@ class AttemptMapper extends Mapper
         if (!empty($extra_params['visibility'])) {
             $params    = array_merge($params, $this->getArrayParameters($extra_params['visibility'], 'vis'));
             $filters[] = 'a.mark_visibility IN ' . $this->getArrayPlaceholders($extra_params['visibility'], 'vis');
+        }
+
+        // From/to dates
+        // TODO consider allowing assess that spans from and to, not just finish
+        if ($extra_params['from'] instanceof Alaress_Date_Format && !$extra_params['from']->isNull()) {
+            $params['from'] = $extra_params['from']->getDatabaseDate();
+            $filters[]      = 'DATE(a.start) >= :from';
+        }
+        if ($extra_params['to'] instanceof Alaress_Date_Format && !$extra_params['to']->isNull()) {
+            $params['to'] = $extra_params['to']->getDatabaseDate();
+            $filters[]    = 'DATE(a.start) <= :to';
         }
 
         $filters = implode(' AND ', $filters);

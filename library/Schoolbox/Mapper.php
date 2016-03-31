@@ -1500,6 +1500,34 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
+     * Verifies that a field's value is unique.
+     *
+     * @param  array  $columnList The column list to check for uniqueness.
+     *                            (@see `findByColumnList`)
+     * @param  mixed  $currentId  The ID of the row I'm trying to save.
+     *                            It's okay if the row I'm trying to save has
+     *                            this value already.
+     *
+     * @return bool
+     */
+    public function isUnique($columnList = [], $currentId)
+    {
+        $query = $this->selectScalarByColumnList($this->getIdentifier()['column'], $columnList);
+        $query->execute();
+        while (($dupeId = $query->fetchColumn()) !== false) {
+            if ($currentId == $dupeId) {
+                // I'm trying to save this row. I don't mind if it dupes itself
+                continue;
+            } else {
+                // This is a legitimate dupe
+                return false;
+            }
+        }
+        // No duplicates
+        return true;
+    }
+
+    /**
      * Returns a statement that attempts to select the scalar given by $selection
      *
      * @param  string $selection

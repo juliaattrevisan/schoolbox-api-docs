@@ -128,6 +128,8 @@ if (!isset($targetDate)) {
     $targetDate = new Alaress_Date_Format(time(), 'U');
 }
 
+$targetTerm = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($targetDate);
+
 $user = $userHandler->getByID($userID);
 
 // check this is a valid user
@@ -179,8 +181,6 @@ $output = array(
     'WORK_USER_ID'   => $userID,
     'WORK_USER_NAME' => $userID == $_SESSION['id'] ? 'My' : $userHandler->formatName($user) . "'s",
     'USER_TOKEN'     => ($userID == $_SESSION['id'] ? $_SESSION['key'] : $user['key']),
-    'WORK_SEMESTER'  => DueWork_All::getSemester(),
-    'WORK_YEAR'      => date('Y'),
     'CALENDAR_VIEW'  => $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month',
     'CALENDAR_COLLAPSE_EVENTS' => Config::get('calendar_collapse_events') ? 1 : '',
     'CALENDAR_START_DAY'       => Config::get('calendar_start_day') ?: 0,
@@ -388,8 +388,7 @@ foreach ($categoryList as $category) {
         $card  = new Schoolbox\Assessment\SubjectReportCard(
             $category['id'],
             $userID,
-            $selectedYear,
-            DueWork_All::getSemester($targetDate->getUnixTimestamp()),
+            $targetTerm,
             $visibilities
         );
         $grade = $card->getGradeAverage();

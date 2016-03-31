@@ -1,0 +1,36 @@
+<li class="actions-small-2" data-term>
+    <div class="list-item">
+        <div class="small-12 info card" data-term-infocard>
+            <h3>
+                {% if term.getArchived() %}
+                    <del class="icon icon-archive"
+                         title="This term is archived, and will be de-emphasised in selectors.">{{ term.getTitle() }} ({{ term.getCode() }})</del>
+                {% else %}
+                    {{ term.getTitle() }} ({{ term.getCode() }})
+                {% endif %}
+            </h3>
+            <p class="meta">
+                {{ term.getStart().getDateOnly() }}—{{ term.getDisplayFinish().getDateOnly() }}
+            </p>
+        </div>
+    </div>
+    <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="term-{{ term.getId() }}">
+        {% include '@adminTerms/form.twig' with {term: term} %}
+    </div>
+    <nav>
+        <a href="#" class="icon-down-arrow" data-collapser="term-{{ term.getId() }}"></a>
+        <a href="#" class="icon-overflow" data-dropdown="term-{{ term.getId() }}-dropdown" aria-expanded="false" title="Actions"></a>
+    </nav>
+    <ul class="f-dropdown" data-term-dropdown data-dropdown-content id="term-{{ term.getId() }}-dropdown">
+        <li>
+            {% if term.getArchived() %}
+                <a href="#" data-term-action="restore" data-post-action="{{ routeLookup('adminTerms.postRestoreTerm', {id: term.getId()}) }}" class="icon-undo">Restore</a>
+            {% else %}
+                <a href="#" data-term-action="archive" data-post-action="{{ routeLookup('adminTerms.postArchiveTerm', {id: term.getId()}) }}" class="icon-archive">Archive</a>
+            {% endif %}
+        </li>
+        <li>
+            <a href="#" data-term-action="delete" data-post-action="{{ routeLookup('adminTerms.postDeleteTerm', {id: term.getId()}) }}" class="icon-delete">Delete</a>
+        </li>
+    </ul>
+</li>

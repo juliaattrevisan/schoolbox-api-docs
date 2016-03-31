@@ -231,77 +231,6 @@ class Submission extends DeprecatedModel
     }
 
     /**
-     * Gets all the due/submitted/returned work via Submission Boxes.
-     *
-     * @param $userID
-     * @param $categoryIDList
-     *
-     * @return array|bool
-     */
-    public function getAllDueWork($userID, $categoryIDList, $year = 0, $semester = 0)
-    {
-
-        if (!$categoryIDList) {
-            return array();
-        }
-
-        if (!$year) {
-            $year = date('Y');
-        }
-        $semesterTest = DueWork_All::getSemesterLogic($semester);
-
-        $outerQuery = "
-            SELECT
-            b.id AS bid,
-            s.id AS sid,
-            r.id AS rid,
-            UNIX_TIMESTAMP(b.late_date) AS lateDate,
-            UNIX_TIMESTAMP(b.date) AS dueDate,
-            c.name AS categoryName,
-            b.name,
-            b.description,
-            b.created, s.submitted, r.returned
-            FROM submission_box b
-            LEFT JOIN category c ON c.id = b.category
-            LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = '$userID' OR s.owner IS NULL)
-            LEFT JOIN submission_return r ON r.box_id = b.id AND (r.owner = '$userID' OR r.owner IS NULL)
-            WHERE b.deleted = 0
-            AND b.task_id IS NULL
-            AND b.category IN (" . implode(',', $categoryIDList) . ")
-            AND DATE_FORMAT(b.date, '%Y') = $year
-            AND DATE_FORMAT(b.date, '%m') $semesterTest
-            GROUP BY b.id
-            ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
-        ";
-
-        $outerResult = $this->db->query($outerQuery);
-
-        /* Instead of unconditionally nesting an unindexable subquery in the above, which may or may not
-         * actually return anything, only perform the inner query if it's contextually appropriate (ie. the row
-         * in question actually has a returnID).
-         */
-        $collection = array();
-
-        // use the derived returnIDs to additionally retrieve marks, comments, etc
-        while ($row = $this->db->getNextArray($outerResult)) {
-            if ($row['rid']) {
-                $innerQuery   = "
-                    SELECT mark, comment
-                    FROM submission_return
-                    WHERE box_id = '{$row['bid']}'
-                    AND owner = '$userID'
-                    ORDER BY returned DESC
-                    LIMIT 1
-                ";
-                $collection[] = array_merge($row, $this->db->getRow($innerQuery));
-            } else {
-                $collection[] = $row;
-            }
-        }
-        return $collection;
-    }
-
-    /**
      * The most recent activity regarding work submissions and returns.
      *
      * @param  <type> $categoryIDList
@@ -490,20 +419,30 @@ class Submission extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    function getAllForUserCategory($categoryID, $userID = 0, $year = 0, $semester = 0)
+    /**
+     * @param int                 $categoryID
+     * @param int                 $userID
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
+     *
+     * @return bool|mixed
+     */
+    function getAllForUserCategory($categoryID, $userID = 0, Alaress_Date_Format $from = null, Alaress_Date_Format $to = null)
     {
         $dateCondA  = '';
         $dateCondB  = '';
         $ownerCondA = '';
         $ownerCondB = '';
 
-        if ($year) {
-            $dateCondA .= " AND DATE_FORMAT(sb.date, '%Y') = $year";
-            $dateCondB .= " AND DATE_FORMAT(assess.finish, '%Y') = $year";
+        if (isset($from) && !$from->isNull()) {
+            $date       = $this->db->smartQuote($from->getDatabaseDate());
+            $dateCondA .= ' AND DATE(sb.date)       >= '.$date;
+            $dateCondB .= ' AND DATE(assess.finish) >= '.$date;
         }
-        if ($semester) {
-            $dateCondA .= " AND DATE_FORMAT(sb.date, '%m') " . DueWork_All::getSemesterLogic($semester);
-            $dateCondB .= " AND DATE_FORMAT(assess.finish, '%m') " . DueWork_All::getSemesterLogic($semester);
+        if (isset($to) && !$to->isNull()) {
+            $date       = $this->db->smartQuote($to->getDatabaseDate());
+            $dateCondA .= ' AND DATE(sb.date)       <= '.$date;
+            $dateCondB .= ' AND DATE(assess.finish) <= '.$date;
         }
         if ($userID) {
             $ownerCondA = "AND sb.owner = '$userID'";
@@ -603,24 +542,26 @@ class Submission extends DeprecatedModel
     /**
      * Simplified this query so we can use it just to find out what categories a user has submission boxes in
      *
-     * @param  $userID
+     * @param int                 $userID
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      *
      * @return array|bool
      */
-    public function getAllForUser($userID, $year = 0, $semester = 0)
+    public function getAllForUser($userID, Alaress_Date_Format $from = null, Alaress_Date_Format $to = null)
     {
         $dateConditionA = '';
         $dateConditionB = '';
 
-        if ($year) {
-            $dateConditionA .= " AND DATE_FORMAT(submission_box.date, '%Y') = $year";
-            $dateConditionB .= " AND DATE_FORMAT(assess.start, '%Y') = $year";
+        if (isset($from) && !$from->isNull()) {
+            $date            = $this->db->smartQuote($from->getDatabaseDate());
+            $dateConditionA .= ' AND DATE(submission_box.date) >= '.$date;
+            $dateConditionB .= ' AND DATE(assess.start)        >= '.$date;
         }
-        if ($semester) {
-            $dateConditionA .= " AND DATE_FORMAT(submission_box.date, '%m') " . DueWork_All::getSemesterLogic(
-                    $semester
-                );
-            $dateConditionB .= " AND DATE_FORMAT(assess.start, '%m') " . DueWork_All::getSemesterLogic($semester);
+        if (isset($to) && !$to->isNull()) {
+            $date            = $this->db->smartQuote($to->getDatabaseDate());
+            $dateConditionA .= ' AND DATE(submission_box.date) <= '.$date;
+            $dateConditionB .= ' AND DATE(assess.start)        <= '.$date;
         }
 
         $query = "
@@ -994,17 +935,34 @@ class Submission extends DeprecatedModel
     /**
      * This function is supposed to determine a list of categories the user WAS involved in based on due work submission
      *
-     * @param     $userID
-     * @param     $year
-     * @param     $semester
-     * @param     $includeSubjectList
-     * @param int $accessType
+     * @param int                 $userID
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
+     *
+     * @return array
      */
-    function submittedToCategoryList($userID, $year, $semester)
+    function submittedToCategoryList($userID, Alaress_Date_Format $from, Alaress_Date_Format $to)
     {
-        $semesterTest = DueWork_All::getSemesterLogic($semester);
-
-        $sql = "SELECT category.name, category.id, GROUP_CONCAT(cc.code) AS `code`
+        $quotedId = $this->db->smartQuote($userID);
+        $parts    = ["(ss.`owner` = $quotedId OR sr.`owner` = $quotedId)"];
+        if ($from->isNull() && $to->isNull()) {
+            // noop: allow all dates
+        } elseif (!$from->isNull() && $to->isNull()) {
+            // only from is set
+            $fromDate = $this->db->smartQuote($from->getDatabaseDate());
+            $parts[]  = "(DATE(ss.submitted) >= $fromDate OR DATE(sr.returned) >= $fromDate)";
+        } elseif ($from->isNull() && !$to->isNull()) {
+            // only to is set
+            $toDate  = $this->db->smartQuote($to->getDatabaseDate());
+            $parts[] = "(DATE(ss.submitted) <= $toDate OR DATE(sr.returned) <= $toDate)";
+        } else {
+            // neither are null
+            $fromDate = $this->db->smartQuote($from->getDatabaseDate());
+            $toDate   = $this->db->smartQuote($to->getDatabaseDate());
+            $parts[]  = "(DATE(ss.submitted) BETWEEN $fromDate AND $toDate OR DATE(sr.returned) BETWEEN $fromDate AND $toDate)";
+        }
+        $wherePart = implode(' AND ', $parts);
+        $sql       = "SELECT category.name, category.id, GROUP_CONCAT(cc.code) AS `code`
                 FROM category
                 LEFT JOIN categoryCode cc ON category.id = categoryID AND cc.deleted_at IS NULL
                 WHERE category.id IN (
@@ -1012,12 +970,7 @@ class Submission extends DeprecatedModel
                     FROM submission_box sb
                     LEFT JOIN student_submission ss ON ss.`box_id` = sb.`id`
                     LEFT JOIN submission_return sr ON sb.id = sr.`box_id`
-                    WHERE (ss.`owner` = $userID OR sr.`owner` = $userID)
-                    AND ((
-                        DATE_FORMAT(ss.submitted, '%Y') = $year AND DATE_FORMAT(ss.submitted, '%m') $semesterTest
-                    ) OR (
-                        DATE_FORMAT(sr.returned, '%Y') = $year AND DATE_FORMAT(sr.returned, '%m') $semesterTest
-                    ))
+                    WHERE $wherePart
                 )
                 GROUP BY category.id
                 ORDER BY category.name";

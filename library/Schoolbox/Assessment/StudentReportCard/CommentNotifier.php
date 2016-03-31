@@ -13,6 +13,7 @@ namespace Schoolbox\Assessment\StudentReportCard;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -35,6 +36,8 @@ class CommentNotifier extends AbstractModuleNotifier
     /** @var UserMapper */
     protected $userMapper;
 
+    /** @var Term\Mapper */
+    protected $termMapper;
 
     public function loadDependencies($dependencies = null)
     {
@@ -43,6 +46,9 @@ class CommentNotifier extends AbstractModuleNotifier
         }
         if (empty($dependencies['userMapper'])) {
             $dependencies['userMapper'] = UserMapper::getInstance();
+        }
+        if (empty($dependencies['termMapper'])) {
+            $dependencies['termMapper'] = Term\Mapper::getInstance();
         }
         parent::loadDependencies($dependencies);
     }
@@ -143,9 +149,8 @@ class CommentNotifier extends AbstractModuleNotifier
 
         $category->loadTeachers();
 
-        $href = sprintf("/submission/allWork/%s/%s/%s/%s",
-            $student->getId(), date('Y'), date('m') > 6 ? 2 : 1, $category->getId()
-        );
+        $term = $this->termMapper->findForToday();
+        $href = sprintf("/submission/allWork/%s/%s/%s", $student->getId(), $term->getCode(), $category->getId());
 
         // create base essentials first
         $bob->setNamespace(NSMapper::NS_REPORT_CARD)

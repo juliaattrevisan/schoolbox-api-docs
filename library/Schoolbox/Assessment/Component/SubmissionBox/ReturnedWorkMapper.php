@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
+use Alaress_Date_Format;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
@@ -214,19 +215,16 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
      * @param int $category_id
      * @param int $student_id
      * @param array $extra_params Any extra filters:
-     *                            * year
-     *                            * semester
      *                            * owner - the creator of the submission box
      *                            * visibility - a list containing the allowed
      *                              submission box mark visibility values.
+     *                            * from (Alaress_Date_Format)
+     *                            * to (Alaress_Date_Format)
      *
      * @return array
      */
     public function getStudentMarks($category_id, $student_id, $extra_params = array())
     {
-        /** @var SubmissionBoxMapper $submission_box_mapper */
-        $submission_box_mapper = $this->getJoinMapper('submission_box');
-
         //
         // Build filters for query
         $params = array(
@@ -240,16 +238,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
             'sb.deleted IS FALSE',
             'sb.task_id IS NULL',
         );
-        if (!empty($extra_params['year'])) {
-            $params['year'] = $extra_params['year'];
-            $filters[] = 'YEAR(sb.date) = :year';
-        }
-        if (!empty($extra_params['semester'])) {
-            $semester_params = $submission_box_mapper->getSemesterMonths($extra_params['semester']);
-            $params['month_start'] = $semester_params['start'];
-            $params['month_end'] = $semester_params['end'];
-            $filters[] = 'MONTH(sb.date) BETWEEN :month_start AND :month_end';
-        }
         if (!empty($extra_params['owner'])) {
             $params['owner'] = $extra_params['owner'];
             $filters[] = 'sb.owner = :owner';
@@ -257,6 +245,15 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         if (!empty($extra_params['visibility'])) {
             $params = array_merge($params, $this->getArrayParameters($extra_params['visibility'], 'vis'));
             $filters[] = 'sb.mark_visibility IN ' . $this->getArrayPlaceholders($extra_params['visibility'], 'vis');
+        }
+        // From/to dates
+        if ($extra_params['from'] instanceof Alaress_Date_Format && !$extra_params['from']->isNull()) {
+            $params['from'] = $extra_params['from']->getDatabaseDate();
+            $filters[]      = 'DATE(sb.date) >= :from';
+        }
+        if ($extra_params['to'] instanceof Alaress_Date_Format && !$extra_params['to']->isNull()) {
+            $params['to'] = $extra_params['to']->getDatabaseDate();
+            $filters[]    = 'DATE(sb.date) <= :to';
         }
         $filters = implode(' AND ', $filters);
 

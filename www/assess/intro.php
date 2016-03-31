@@ -155,6 +155,9 @@ if (is_array($allSummary) && count($allSummary)) {
 }
 
 $trail = new Breadcrumbs();
+$term  = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate(
+    new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT)
+);
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text'  => 'Work',
@@ -163,7 +166,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text'  => $folder->getName(),
-        'href'  => sprintf('/submission/allWork/%d/%d/%d/%d', $_SESSION['id'], date('Y', strtotime($assess['finish'])), date('m', strtotime($assess['finish'])) > 6 ? 2 : 1, $folder->getId()),
+        'href'  => sprintf('/submission/allWork/%d/%s/%d', $_SESSION['id'], $term->getCode(), $folder->getId()),
         'class' => ''
     ],
     [

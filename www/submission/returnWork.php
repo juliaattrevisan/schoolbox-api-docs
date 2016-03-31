@@ -35,8 +35,6 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
             'BOX_ID'                => $submissionBox->getId(),
             'BOX_GRADIENT'          => $submissionBox->getGradientIndex(),
             'CAT_ID'                => $submissionBox->getCategory()->getId(),
-            'DUEWORK_YEAR'          => date('Y', strtotime($submissionBox->getDueDate())),
-            'DUEWORK_SEMESTER'      => DueWork_All::getSemester(strtotime($submissionBox->getDueDate())),
             'DUEWORK_TYPE'          => $submissionBox->getWorkType()->getName(),
             'DUEWORK_DUEDATE'       => $submissionBox->getDueDate()->getLongDateOnly(),
             'GRADE_VISIBILITY'      => $submissionBox->getMarkVisibilityDescription(),
@@ -91,6 +89,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
 /* Render out breadcrumbs
  */
 $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$term  = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submissionBox->getDueDate());
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text' => 'Submissions',
@@ -99,7 +98,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text' => $submissionBox->getCategory()->getName(),
-        'href' => "/submission/listSubmission/{$submissionBox->getDueDate()->getYear()}/{$submissionBox->getDueDate()->getYearHalf()}/{$submissionBox->getCategory()->getId()}",
+        'href' => "/submission/listSubmission/{$term->getCode()}/{$submissionBox->getCategory()->getId()}",
         'class' => '',
     ],
     [

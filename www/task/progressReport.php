@@ -17,6 +17,8 @@ if (isset($_GET['category_id']) && isset($_GET['unit_id'])) {
     SitePage::localRedir(sprintf('/task/progressReport/%d/%d', $_GET['category_id'], $_GET['unit_id']));
 }
 
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
@@ -26,20 +28,26 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 // URL: task/progressReport/$classId/($unitId)
-// Alternate: task/progressReport/$classId/($year/$semester)
-// If no year and semester are supplied, then the current year/semester are used.
+// Alternate: task/progressReport/$classId/term/($termSlug)
+// If no term is supplied, the current one is used.
+// (Term is used only for redirection)
+$termMapper = TermMapper::getInstance();
+/** @var TermModel $currentTerm */
+$currentTerm = null;
 switch (count($this->arg)) {
     case 2:
         list($class_id, $unit_id) = $this->arg;
         break;
     case 3:
-        list($class_id, $year, $semester) = $this->arg;
+        list($class_id, $type, $termSlug) = $this->arg;
+        if ($type == 'term') {
+            // Load the term
+            $currentTerm = $termMapper->findByColumn('code', $termSlug);
+        }
         break;
     case 1:
     default:
         list($class_id) = $this->arg;
-        $year     = date('Y');
-        $semester = date('m') <= 6 ? 1 : 2;
         break;
 }
 
@@ -65,16 +73,18 @@ if (count($unit_list) === 0) {
 }
 if (!isset($unit_id)) {
     // Redirect to first task in the list
-    // (that is in the requested year/semester) if any.
+    // (that is in the requested term) if any.
     // If not, then just redir to the first one.
+    if (!$currentTerm instanceof TermModel) {
+        $currentTerm = $termMapper->findForToday();
+    }
     $firstId = null;
     foreach ($unit_list as $unit) {
         if (!isset($firstId)) {
             $firstId = $unit->getId();
         }
-        $unitYear     = $unit->getOpenDate()->getYear();
-        $unitSemester = $unit->getOpenDate()->getYearHalf();
-        if ($year == $unitYear && $semester == $unitSemester) {
+        // Course must open in this term
+        if ($currentTerm->contains($unit->getOpenDate())) {
             $unit_id = $unit->getId();
             break;
         }
@@ -111,7 +121,7 @@ $removedStudentIdList = array();
 if ($code && Config::get('external_enable')) {
     $class_handler = new External_Class();
     $class_list    = $class_handler->getStudents($code);
-    if (is_array($student_list)) {
+    if (is_array($class_list)) {
         $externalIdList = array_map(
             function($student) { return $student['synergy_id'];
             },
@@ -192,20 +202,12 @@ $this->setVar(
             ? ('('.\Scrub::text($code).')')
             : '',
         'student_block' => '',
-        'unit_selector_semester_block' => '',
     )
 );
 
-// Unit dropdown, with semester optgroups
-$current_year     = $current_unit->getOpenDate()->getYear();
-$current_semester = $current_unit->getOpenDate()->getYearHalf();
-$years            = [];
-foreach ($unit_list as $unit) {
-    $year = $unit->getOpenDate()->getYear();
-    $years[$year] = $year;
-}
-
-$trail = new \Schoolbox\Breadcrumbs();
+// Unit dropdown, with term optgroups
+$currentTerm = $termMapper->findForDate($current_unit->getOpenDate());
+$trail       = new \Schoolbox\Breadcrumbs();
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text' => 'Submissions',
@@ -214,7 +216,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text' => Scrub::text($category->getName().' '.( strlen($code) > 0 ? ('('.$code.')') : '' )) ,
-        'href' => "/submission/listSubmission/$current_year/$current_semester/".$category->getId(),
+        'href' => "/submission/listSubmission/{$currentTerm->getCode()}/".$category->getId(),
         'class' => '',
     ],
     [
@@ -226,16 +228,15 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
 
 // The doctor's context selector
 $contextSelector = new \Schoolbox\Assessment\StudentReportCard\ContextSelector('task/progressReport/'.$class_id);
-$contextSelector->setYears($years);
 $contextSelector->setUnits($unit_list);
+$contextSelector->setTerms($termMapper->findAll());
 $contextSelector->render(
     $this,
     'CONTEXT_SELECTOR',
     array(
-        'year'     => $current_year,
-        'semester' => $current_semester,
         'subject'  => $class_id,
         'unit'     => $unit_id,
+        'term'     => $currentTerm,
     )
 );
 

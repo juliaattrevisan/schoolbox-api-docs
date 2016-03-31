@@ -190,8 +190,7 @@ class DueWork_Detail
         $page->setVar(
             array(
                 'DUEWORK_DESCRIPTION'   => Scrub::text($this->submissionBox->getName()),
-                'DUEWORK_YEAR'          => $this->submissionBox->getDueDate()->getYear(),
-                'DUEWORK_SEMESTER'      => $this->submissionBox->getDueDate()->getYearHalf(),
+                'DUEWORK_TERM'          => \Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($this->submissionBox->getDueDate())->getCode(),
                 'CATEGORY_NAME'         => Scrub::text($this->submissionBox->getCategory()->getName()),
                 'DUEWORK_TYPE'          => $this->submissionBox->getWorkType()->getName(),
                 'DUEWORK_MARKTYPE'      => $this->submissionBox->getMarkType()->getName(),

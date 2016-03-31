@@ -38,9 +38,6 @@ if (!isset($_REQUEST['commentId']) || !is_numeric($_REQUEST['commentId'])) {
 
 	$body = $_POST['commentBody'];
 
-	$semester = $_POST['semester'];
-	$year = $_POST['year'];
-
 	if (!strlen(trim($body))) {
 		respond('400 Bad Request', 'Comment cannot be blank.');
 	}

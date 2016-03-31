@@ -360,28 +360,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         return $years;
     }
 
-
-    /**
-    * Gets the months that are a part of this semester.
-    *
-    * @todo move this somewhere where other semester reliant code can use it
-    *
-    * @param $semester
-    *
-    * @return array
-    */
-    public function getSemesterMonths($semester)
-    {
-        $month_start = 1;
-        $month_end   = 6;
-        if ($semester == 2) {
-            $month_start = 7;
-            $month_end   = 12;
-        }
-        return array('start' => $month_start, 'end' => $month_end);
-    }
-
-
     /**
     * Conversion of SubmissionBoxHandler->getAllYearsByUser().
     *
@@ -390,15 +368,30 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     * This could get a list of categories which have submissions, and pass to
     * CategoryMapper->getByIds()?
     *
-    * @param int $user_id  The user ID to retrieve for.
-    * @param int $year     The year to fetch for.
-    * @param int $semester The semester to fetch for.
+    * @param int                  $user_id  The user ID to retrieve for.
+    * @param \Alaress_Date_Format $from
+    * @param \Alaress_Date_Format $to
     *
     * @return array
     */
-    public function submittedToCategoryList($user_id, $year, $semester)
+    public function submittedToCategoryList($user_id, \Alaress_Date_Format $from, \Alaress_Date_Format $to)
     {
-        $query = "
+        $parts = [
+            '(ss.owner = :user_id OR sr.owner = :user_id)',
+            'sb.deleted IS FALSE',
+            'sb.task_id IS NULL',
+        ];
+        $params['user_id'] = $user_id;
+        if (!$from->isNull()) {
+            $params['from'] = $from->getDatabaseDate();
+            $parts[]        = 'DATE(sb.date) >= :from';
+        }
+        if (!$to->isNull()) {
+            $params['to'] = $to->getDatabaseDate();
+            $parts[]      = 'DATE(sb.date) <= :to';
+        }
+        $wherePart = implode(' AND ', $parts);
+        $query     = "
 			SELECT category.id, category.name, GROUP_CONCAT(cc.code) AS code
 			FROM category
 			LEFT JOIN categoryCode cc ON category.id = cc.categoryID AND cc.deleted_at IS NULL
@@ -407,23 +400,13 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 				FROM submission_box sb
 				LEFT JOIN student_submission ss ON ss.box_id = sb.id
 				LEFT JOIN submission_return  sr ON sr.box_id = sb.id
-				WHERE (ss.owner = :user_id OR sr.owner = :user_id)
-				AND sb.deleted IS FALSE
-				AND sb.task_id IS NULL
-				AND (YEAR(sb.`date`) = :year AND MONTH(sb.`date`) BETWEEN :month_start AND :month_end)
+				WHERE $wherePart
 			)
 			GROUP BY category.id
 			ORDER BY category.name";
 
-        $months    = $this->getSemesterMonths($semester);
         $statement = $this->database->prepare($query);
-
-        $statement->execute(array(
-            'user_id'     => $user_id,
-            'year'        => $year,
-            'month_start' => $months['start'],
-            'month_end'   => $months['end'],
-        ));
+        $statement->execute($params);
         return $statement->fetchAll();
     }
 
@@ -433,25 +416,34 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     *
     * @todo Implement this as an activity list instead of an array return
     *
-    * @param int   $user_id    The user ID to retrieve for.
-    * @param array $categories The categories to search for.
-    * @param int   $year       The year to fetch for.
-    * @param int   $semester   The semester to fetch for.
+    * @param int                  $user_id    The user ID to retrieve for.
+    * @param array                $categories The categories to search for.
+    * @param \Alaress_Date_Format $from
+    * @param \Alaress_Date_Format $to
     *
     * @return array
     */
-    public function getAllDueWork($user_id, $categories, $year = 0, $semester = 0)
+    public function getAllDueWork($user_id, $categories, \Alaress_Date_Format $from, \Alaress_Date_Format $to)
     {
-        //
         // Submission box: hydrate with category, student submissions and returns.
-        $months = $this->getSemesterMonths($semester);
+        $parts = [
+            'b.deleted = 0',
+            "b.category IN {$this->getArrayPlaceholders($categories, 'category')}",
+            'b.task_id IS NULL',
+        ];
         $params = $this->getArrayParameters($categories, 'category');
-        $params['year']        = $year ?: date('Y');
-        $params['user_id']     = $user_id;
-        $params['month_start'] = $months['start'];
-        $params['month_end']   = $months['end'];
+        $params['user_id'] = $user_id;
+        if (!$from->isNull()) {
+            $params['from'] = $from->getDatabaseDate();
+            $parts[]        = 'DATE(b.date) >= :from';
+        }
+        if (!$to->isNull()) {
+            $params['to'] = $to->getDatabaseDate();
+            $parts[]      = 'DATE(b.date) <= :to';
+        }
 
-        $query = "
+        $wherePart = implode(' AND ', $parts);
+        $query     = "
 			SELECT
 			b.id AS bid,
 			s.id AS sid,
@@ -472,11 +464,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = :user_id OR s.owner IS NULL)
 			LEFT JOIN submission_return  r ON r.box_id = b.id AND (r.owner = :user_id OR r.owner IS NULL)
 			LEFT JOIN lu_submission_type f ON b.type = f.id
-			WHERE b.deleted = 0
-			AND b.category IN {$this->getArrayPlaceholders($categories, 'category')}
-			AND YEAR(b.date) = :year
-			AND MONTH(b.date) BETWEEN :month_start AND :month_end
-			AND b.task_id IS NULL
+			WHERE $wherePart
 			GROUP BY b.id
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
 		";

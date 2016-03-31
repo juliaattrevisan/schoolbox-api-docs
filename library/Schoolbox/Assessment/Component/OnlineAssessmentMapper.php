@@ -389,43 +389,6 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 	}
 
 	/**
-	 * @deprecated TODO merge with duplicate code in SubmissionBoxMapper
-	 * @param $semester
-	 * @return array
-	 */
-	public function getSemesterMonths($semester) {
-		$month_start = 1;
-		$month_end   = 6;
-		if ($semester == 2) {
-			$month_start = 7;
-			$month_end   = 12;
-		}
-		return array('start' => $month_start, 'end' => $month_end);
-	}
-
-
-	/**
-	 * Retrieves
-	 * @param int   $user_id
-	 * @param array $categories
-	 * @param int   $year
-	 * @param int   $semester
-	 * @return Collection
-	 */
-	public function getAllAssessments($user_id, $categories, $year = 0, $semester = 0) {
-
-		$months = $this->getSemesterMonths($semester);
-		$params = $this->getArrayParameters($categories, 'category');
-		$params['year']        = $year ?: date('Y');
-		$params['user_id']     = $user_id;
-		$params['month_start'] = $months['start'];
-		$params['month_end']   = $months['end'];
-
-
-
-	}
-
-	/**
 	 * Gets all assessments that are due within the given date span.
 	 *
 	 * @param array $category_list  A list of category IDs to filter on.

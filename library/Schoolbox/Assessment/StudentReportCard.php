@@ -50,9 +50,11 @@ class StudentReportCard
      */
     protected $targetUser;
 
-    protected $targetYear;
-    protected $targetSemester;
-
+    /**
+     *
+     * @var Term\Model
+     */
+    protected $targetTerm;
 
     protected $targetCategoryId;
 
@@ -71,17 +73,20 @@ class StudentReportCard
     protected $permissionSet = array();
     protected $minimumVisibility = 3;
 
-    // helpful vars
-    protected $currentYear;
-    protected $currentSemester;
+    /**
+     * The current term.
+     *
+     * @var Term\Model
+     */
+    protected $currentTerm;
 
     // populated data
     /**
-     * A collection of Folder models
-     * 
-     * @var \Schoolbox\Collection
+     * A collection of Folder models belonging to the term set in $this->setTerm().
+     *
+     * @var \Schoolbox\Collection|Folder\Model
      */
-    protected $categoriesInSemester = array();
+    protected $categoriesInTerm = array();
 
     /**
      * @var SubjectReportCard
@@ -92,6 +97,11 @@ class StudentReportCard
     protected $submissionMapper;
     protected $showcaseMapper;
     protected $assessMapper;
+
+    /**
+     * @var Term\Mapper
+     */
+    protected $termMapper;
 
     /**
      * @var Folder\Mapper
@@ -117,11 +127,12 @@ class StudentReportCard
         $this->assessMapper     = new OnlineAssessmentMapper();
         $this->groupHandler     = new \Group();
         $this->folderMapper     = new Folder\Mapper();
+        $this->termMapper       = Term\Mapper::getInstance();
         // build permissions set
         $this->establishPermissions();
         // setup helper vars
-        $this->currentYear     = date('Y');
-        $this->currentSemester = date('m') > 6 ? 2 : 1;
+        $this->targetTerm  = new Term\Model();
+        $this->currentTerm = $this->termMapper->findForToday();
     }
 
     /**
@@ -181,26 +192,14 @@ class StudentReportCard
     }
 
     /**
-     * Defining the semester will self-populate with the subjects available to this semester
-     *
-     * @param $year
-     * @param $semester
-     *
-     * @throws \InvalidArgumentException
+     * @param  Term\Model $term
+     * @return $this
      */
-    public function setSemester($year, $semester)
+    public function setTerm(Term\Model $term)
     {
-        if ($year < 2000 || $year > 9999) {
-            throw new \InvalidArgumentException("Invalid year '$year'");
-        }
-        if ($semester < 1 || $semester > 2) {
-            throw new \InvalidArgumentException("Invalid semester '$semester'");
-        }
-        // set class vars
-        $this->targetYear     = $year;
-        $this->targetSemester = $semester;
-        // populate subjects in this semester
-        $this->findSubjectsForSemester();
+        $this->targetTerm = $term;
+        $this->findSubjectsForTerm();
+        return $this;
     }
 
     /**
@@ -210,10 +209,10 @@ class StudentReportCard
      */
     public function setSubject($subjectId)
     {
-        $this->setSubjectWithinSemester($subjectId, 0, 0);
+        $this->setSubjectWithinTerm($subjectId, 0, 0);
     }
 
-    public function setSubjectWithinSemester($subjectId)
+    public function setSubjectWithinTerm($subjectId)
     {
         $this->targetCategoryId = $subjectId;
         // populate data for the subject using the category and user
@@ -229,8 +228,7 @@ class StudentReportCard
         $this->subjectData = new SubjectReportCard(
             $subjectId,
             $this->targetUserId,
-            $this->targetYear,
-            $this->targetSemester,
+            $this->targetTerm,
             $duework_visibilities
         );
     }
@@ -264,7 +262,7 @@ class StudentReportCard
                 'YOUR_GRAPH_ASSESSMENT_ITEM_VALUE' => json_encode([]),
             )
         );
-        $this->renderSemesterSelectors($page);
+        $this->renderTermSelectors($page);
 
         // only attempt to render a subject's details if a subject has actually been selected
         if ($this->hasSubjectSelected()) {
@@ -275,43 +273,34 @@ class StudentReportCard
     }
 
     /**
-     * Renders the selectors for the semester
+     * Renders the selectors for the term
      *
      * @param \SitePage $page
      */
-    protected function renderSemesterSelectors(\SitePage $page)
+    protected function renderTermSelectors(\SitePage $page)
     {
         $contextSelector = new ContextSelector("submission/allWork/{$this->targetUserId}");
-
-        // Years is tricksy, because we first need to find out all the years in which the student in question has submitted work
-        // also, merging in this current year is a tad unfortunate
-        $submitYears  = $this->submissionMapper->getAllYearsByUser($this->targetUserId);
-        $earliestYear = empty($submitYears) ? $this->currentYear : min($submitYears);
-        $years = range($this->currentYear, $earliestYear);
-
-        $contextSelector->setYears($years);
+        $contextSelector->setTerms($this->termMapper->findAll());
         $contextSelector->setCategoryFirst(false);
 
         try {
-            $contextSelector->setCategories($this->categoriesInSemester);
-        }
-        catch (\Exception $e) {
+            $contextSelector->setCategories($this->categoriesInTerm);
+        } catch (\Exception $e) {
+            // noop?
         }
 
         $contextSelector->render(
-            $page, 'CONTEXT_SELECTOR', array(
-                'year'     => $this->targetYear,
-                'semester' => $this->targetSemester,
+            $page,
+            'CONTEXT_SELECTOR',
+            array(
+                'term'     => $this->targetTerm,
                 'category' => ''
             )
         );
 
         /* Additional phplibs not in contextSelector instance
          */
-        $page->setVar(array(
-            'WORK_YEAR'     => $this->targetYear,
-            'WORK_SEMESTER' => $this->targetSemester,
-        ));
+        $page->setVar('WORK_TERM', $this->targetTerm->getCode());
     }
 
     protected function renderSubject(\SitePage $page, $components = array())
@@ -325,10 +314,9 @@ class StudentReportCard
         // subject globals
         $page->setVar(
             array(
-                'RC_TITLE'      => $this->subjectData->getCategory()->getName(),
-                'SUBJ_ID'       => $this->subjectData->getCategory()->getId(),
-                'SUBJ_NAME'     => $this->subjectData->getCategory()->getName(),
-                'SUBJ_SEMESTER' => "Semester {$this->targetSemester}, {$this->targetYear}",
+                'RC_TITLE'  => $this->subjectData->getCategory()->getName(),
+                'SUBJ_ID'   => $this->subjectData->getCategory()->getId(),
+                'SUBJ_NAME' => $this->subjectData->getCategory()->getName(),
             )
         );
         // iterate the components and output them if we know how
@@ -451,11 +439,16 @@ class StudentReportCard
         $submissionBoxMapper = $this->submissionMapper;
         $rubricHandler = new \DueWork_Rubric_Handler();
 
-        $allDueWork = $submissionBoxMapper->getAllDueWork($this->targetUserId, array($this->targetCategoryId), $this->targetYear, $this->targetSemester);
+        $allDueWork = $submissionBoxMapper->getAllDueWork(
+            $this->targetUserId,
+            array($this->targetCategoryId),
+            $this->targetTerm->getStart(),
+            $this->targetTerm->getActualFinish()
+        );
 
         /* Oh. My. GOD.
          *
-         * Get all the submission boxes for this particular year and semester,
+         * Get all the submission boxes for this particular term,
          * for this user and category. lol.
          */
         $allSubmissionBoxes = new \Schoolbox\Collection();
@@ -1003,13 +996,13 @@ class StudentReportCard
     }
 
     /**
-     * No subject selected, so display an overview of the semester instead
+     * No subject selected, so display an overview of the term instead
      *
      * @param \SitePage $page
      */
     protected function renderOverview(\SitePage $page)
     {
-        $page->setVar('RC_TITLE', "Semester {$this->targetSemester}, {$this->targetYear}");
+        $page->setVar('RC_TITLE', $this->targetTerm->getTitle());
         // we need to inject content into subject_container_block rather than use its template
         $page->setFile('subjectListTpl', 'submission/allWorkOverview.html');
         $page->setFile('subjectTpl', 'activity/subjectlist.html');
@@ -1035,7 +1028,7 @@ class StudentReportCard
             $visibilities[] = SubmissionBox::MARK_VISIBILITY_PRIVATE;
             $visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
         }
-        foreach ($this->categoriesInSemester as $category) {
+        foreach ($this->categoriesInTerm as $category) {
             $categoryID   = $category->getId();
             $categoryCode = $category->getCodeString();
             /* yes it actually requires THIS MUCH code to get a teachers name. */
@@ -1098,8 +1091,7 @@ class StudentReportCard
                 $card  = new SubjectReportCard(
                     $categoryID,
                     $this->targetUserId,
-                    $this->targetYear,
-                    $this->targetSemester,
+                    $this->targetTerm,
                     $visibilities
                 );
                 $grade = $card->getGradeAverage();
@@ -1122,7 +1114,7 @@ class StudentReportCard
                 'SUBJ_SUBJECT_NAME' => \Scrub::Text($category->getName()),
                 'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
                 'SUBJ_SUBJECT_CODE' => $categoryCode,
-                'SUBJ_SUBJECT_URL'  => "/submission/allWork/{$this->targetUserId}/{$this->targetYear}/{$this->targetSemester}/$categoryID",
+                'SUBJ_SUBJECT_URL'  => "/submission/allWork/{$this->targetUserId}/{$this->targetTerm->getCode()}/$categoryID",
 //                'SUBJ_TOTAL' => $summary[$category['id']]['total'],
                 'SUBJ_TREND_DIR'    => $trendDir,
                 'SUBJ_TREND_AMT'    => $trendAmt,
@@ -1165,7 +1157,7 @@ class StudentReportCard
             $page->parse('SUBJECT_LIST', 'subjectTpl', true);
         }
 
-        if (count($this->categoriesInSemester)) {
+        if (count($this->categoriesInTerm)) {
             $page->parse('subject_container_block', 'subjectListTpl');
 
             $page->setVar(array(
@@ -1188,15 +1180,14 @@ class StudentReportCard
     }
 
     /**
-     * Find all the subjects a student is involved with for a given
-     * year and semester
+     * Find all the subjects a student is involved with for this report card's term.
      */
-    protected function findSubjectsForSemester()
+    protected function findSubjectsForTerm()
     {
         $categoryList = array();
         /* Subjects involved with currently
-            */
-        if ($this->targetYear == $this->currentYear && $this->targetSemester == $this->currentSemester) {
+         */
+        if ($this->targetTerm->contains(\Alaress_Date_Format::now())) {
             $categoryList = $this->groupHandler->involvedInCategoryList($this->targetUserId, true, READ_ACCESS);
             // filter this list, so that it only contains categories in which contain results
             foreach ($categoryList as $k => $cat) {
@@ -1214,18 +1205,18 @@ class StudentReportCard
             }
         }
         /* Always merge with a list of subjects that the student has submitted to
-            * to allow them access to work completed in classes in which they may no
-            * longer be participating
-            */
+         * to allow them access to work completed in classes in which they may no
+         * longer be participating
+         */
         $submittedList = $this->submissionMapper->submittedToCategoryList(
             $this->targetUserId,
-            $this->targetYear,
-            $this->targetSemester
+            $this->targetTerm->getStart(),
+            $this->targetTerm->getActualFinish()
         );
         /* Combine lists alphabetically
             */
-        $categoryList = array_merge($categoryList, $submittedList);
-        $this->categoriesInSemester = $this->folderMapper->findByColumn(
+        $categoryList           = array_merge($categoryList, $submittedList);
+        $this->categoriesInTerm = $this->folderMapper->findByColumn(
             'id',
             array_map(
                 function($v) { return $v['id']; },
@@ -1234,7 +1225,7 @@ class StudentReportCard
             ['order' => ['name' => 'asc']]
         );
         // Ensure folder codes are populated
-        Folder\Code\Mapper::getInstance()->applyCodesToCategories($this->categoriesInSemester);
+        Folder\Code\Mapper::getInstance()->applyCodesToCategories($this->categoriesInTerm);
     }
 
     /**
@@ -1303,17 +1294,5 @@ class StudentReportCard
     public function setViewingUser($viewingUser)
     {
         $this->viewingUser = $viewingUser;
-    }
-
-
-
-    public function getTargetYear()
-    {
-        return $this->targetYear;
-    }
-
-    public function getTargetSemester()
-    {
-        return $this->targetSemester;
     }
 }

@@ -90,8 +90,7 @@
          */
         $.fn.allWork.commentSetup({
             data: {
-                year: '{WORK_YEAR}',
-                semester: '{WORK_SEMESTER}',
+                term: '{WORK_TERM}',
                 studentId: '{WORK_USER_ID}',
                 folderId: '{SUBJ_ID}'
             }
@@ -319,8 +318,6 @@
         <section>
             <!-- BEGIN create_comment -->
             <form class="no-margin clearfix" id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
-                <input type="hidden" name="year" value="{WORK_YEAR}"/>
-                <input type="hidden" name="semester" value="{WORK_SEMESTER}"/>
                 <input type="hidden" name="studentId" value="{WORK_USER_ID}"/>
                 <input type="hidden" name="categoryId" value="{SUBJ_ID}"/>
                 <div class="small-12 avatar card">
@@ -386,7 +383,7 @@
 <div class="row">
     <div class="small-12 island">
         <section class="content">
-            <p>There are no subjects for this semester.</p>
+            <p>There are no subjects for this term.</p>
         </section>
     </div>
 </div>

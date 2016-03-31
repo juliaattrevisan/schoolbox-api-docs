@@ -68,8 +68,7 @@
                 /* Metadata required by backend
                  */
                 data: {
-                    year: '',
-                    semester: '',
+                    term: '',
                     studentId: '',
                     folderId: ''
                 }
@@ -132,8 +131,6 @@
                     var create = {
                         studentVisibility: $('#vis-student').is(':checked') ? 1 : 0,
                         parentVisibility: $('#vis-parent').is(':checked') ? 1 : 0,
-                        year: config.data.year,
-                        semester: config.data.semester,
                         studentId: config.data.studentId,
                         categoryId: config.data.folderId
                     }

@@ -50,8 +50,10 @@ class SubjectReportCard {
 	protected $_assessments;
 	protected $_comments;
 
-	protected $targetYear;
-	protected $targetSemester;
+	/**
+	 * @var Term\Model
+	 */
+	protected $targetTerm;
 
 	/**
 	 * Only due work items with a mark visibility value in this array will be
@@ -63,14 +65,13 @@ class SubjectReportCard {
 	 */
 	protected $visibilities = array();
 
-	public function __construct($categoryId, $userId, $year = 0, $semester = 0, $visibilities = array()) {
+	public function __construct($categoryId, $userId, Term\Model $term, $visibilities = array()) {
 
 		// dependencies
 		$catMap = new CategoryMapper();
 		$uMap = new UserMapper();
 
-		$this->targetYear = $year;
-		$this->targetSemester = $semester;
+		$this->targetTerm   = $term;
 		$this->visibilities = $visibilities;
 
 		// TODO check (somehow) that user is (or was) a member of this category
@@ -79,7 +80,7 @@ class SubjectReportCard {
 		$this->category = $catMap->findById($categoryId);
 		$this->user = $uMap->findById($userId);
 
-		$this->_fullClassHistory = new ClassStatistics($this->getCategory(), $year, $semester, $this->user);
+		$this->_fullClassHistory = new ClassStatistics($this->getCategory(), $term, $this->user);
 	}
 
 
@@ -150,14 +151,14 @@ class SubjectReportCard {
 			// Ensure that grades are properly ordered by date.
 			$studentGrades = array_merge(
 				$returnMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array(
-					'year'       => $this->targetYear,
-					'semester'   => $this->targetSemester,
 					'visibility' => $this->visibilities,
+					'from'       => $this->targetTerm->getStart(),
+					'to'         => $this->targetTerm->getActualFinish(),
 				)),
 				$assessMapper->getStudentMarks($this->category->getId(), $this->user->getId(), array(
-					'year'     => $this->targetYear,
-					'semester' => $this->targetSemester,
 					'visibility' => $quizVisibilities,
+					'from'       => $this->targetTerm->getStart(),
+					'to'         => $this->targetTerm->getActualFinish(),
 				))
 			);
 			$studentGrades = array_filter(

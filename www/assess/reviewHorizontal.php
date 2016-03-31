@@ -87,8 +87,8 @@ if (!isset($this->arg[1])) {
     /* Render out breadcrumbs
      */
     $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-
-    $trail = new Breadcrumbs();
+    $term    = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
+    $trail   = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text'  => 'Submissions',
@@ -97,7 +97,7 @@ if (!isset($this->arg[1])) {
         ],
         [
             'text'  => $folder->getName(),
-            'href'  => "/submission/listSubmission/{$dueDate->getYear()}/{$dueDate->getYearHalf()}/{$folder->getId()}",
+            'href'  => "/submission/listSubmission/{$term->getCode()}/{$folder->getId()}",
             'class' => ''
         ],
         [
@@ -313,8 +313,8 @@ else {
     /* Render out breadcrumbs
      */
     $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-
-    $trail = new Breadcrumbs();
+    $term    = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
+    $trail   = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text'  => 'Submissions',
@@ -323,7 +323,7 @@ else {
         ],
         [
             'text'  => $folder->getName(),
-            'href'  => "/submission/listSubmission/{$dueDate->getYear()}/{$dueDate->getYearHalf()}/{$folder->getId()}",
+            'href'  => "/submission/listSubmission/{$term->getCode()}/{$folder->getId()}",
             'class' => ''
         ],
         [
