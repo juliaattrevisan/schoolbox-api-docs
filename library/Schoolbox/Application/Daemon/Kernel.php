@@ -224,9 +224,6 @@ EOL;
 			// throw a specific kind of exception
 			throw new RuntimeException($errStr, $errNum);
 		}
-        if(strpos($errStr, 'mysqli_') === 0) {
-            throw new PDOException($errStr, $errNum);
-        }
 		if(strpos($errStr, 'fclose') === 0) {
 			throw new RangeException($errStr, $errNum);
 		}
