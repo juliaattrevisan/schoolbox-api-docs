@@ -163,6 +163,38 @@ class Controller extends Base {
     }
 
     /**
+     * Generate a context selector phplib fragment
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Web\Exception\InvalidComponent
+     */
+    private function generateContextSelector()
+    {
+        $currentUrl = ltrim($this->getRequest()->url->get(PHP_URL_PATH), '/') . '/term';
+
+        $page = $this->getDi()->get('sitePage');
+
+        $termMapper = new \Schoolbox\Assessment\Term\Mapper();
+        $currentTerm = $termMapper->findForToday();
+
+        $contextSelector = new \Schoolbox\Assessment\StudentReportCard\ContextSelector($currentUrl);
+        $contextSelector->setTerms($termMapper->findAll());
+
+        $contextSelector->render(
+            $page,
+            TEMPLATE_content,
+            array(
+                'term'     => $currentTerm,
+                'category' => ''
+            )
+        );
+
+        $contextSelectorHtml = $page->template->finish($page->template->parse('finaloutput', TEMPLATE_content));
+
+        return $contextSelectorHtml;
+    }
+
+    /**
      * Calculate all data about $allUnitInstances
      *
      * $allUnitInstances will be:
@@ -223,11 +255,17 @@ class Controller extends Base {
          */
         $allEffort = new AllEffort($registry, $metadata, $allAverages);
 
+        /**
+         * Context Selector is a phplib -_-
+         */
+        $contextSelectorHtml = $this->generateContextSelector();
+
         /* Twig data
          */
         $this->getResponse()->content->set([
             'template' => '@learningAnalytics/course.twig',
             'data' => [
+                'contextSelector' => $contextSelectorHtml,
                 'metadata' => [
                     'pageTitle' => $metadata->getPageTitle(),
                     'route' => $metadata->getRoute(),
@@ -263,7 +301,7 @@ class Controller extends Base {
                 ],
                 'effort' => [
                     'allEffort' => $allEffort->getTally(),
-                ]
+                ],
             ]
         ]);
     }
