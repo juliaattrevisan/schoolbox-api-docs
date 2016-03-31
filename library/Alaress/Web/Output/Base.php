@@ -25,6 +25,15 @@ class Base implements OutputInterface
     protected $response;
 
     /**
+     * The data to set in the template.
+     *
+     * If not set via `setData`, it uses the version from the response.
+     *
+     * @var string
+     */
+    protected $data = null;
+
+    /**
      * Outputs a response and its headers in the most basic fashion.
      *
      * Copied from https://github.com/auraphp/Aura.Web/blob/develop-2/README-RESPONSE.md
@@ -194,4 +203,21 @@ class Base implements OutputInterface
         return $this->response;
     }
 
+    /**
+     * @return string
+     */
+    protected function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param  string $data
+     * @return $this
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+        return $this;
+    }
 }

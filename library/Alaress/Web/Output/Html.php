@@ -23,15 +23,6 @@ class Html extends Base
     protected $template = null;
 
     /**
-     * The data to set in the template.
-     *
-     * If not set via `setData`, it uses the version from the response.
-     *
-     * @var string
-     */
-    protected $data = null;
-
-    /**
      * @var \Twig_Environment
      */
     protected $templateEngine;
@@ -96,24 +87,6 @@ class Html extends Base
     public function setTemplate($template)
     {
         $this->template = $template;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * @param  string $data
-     * @return $this
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
         return $this;
     }
 }
