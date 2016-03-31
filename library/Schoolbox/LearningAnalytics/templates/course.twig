@@ -200,6 +200,7 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Learning Analytics</h1>
+        {% if metadata.folder.all|length %}
         <dl class="sub-nav">
             {% for folder in metadata.folder.all %}
                 <dd class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}active{% endif %}">
@@ -209,6 +210,7 @@
                 </dd>
             {% endfor %}
         </dl>
+        {% endif %}
         <ul class="meta">
             <li class="icon-course-builder" title="Course"><a href="/homepage/{{ metadata.folder.course.getId()}}" title="Course Page">{{ metadata.pageTitle }}</a></li>
 
