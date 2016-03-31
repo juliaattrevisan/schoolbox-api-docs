@@ -215,7 +215,6 @@ class Kernel extends \Alaress\Application\Kernel
                     // Create a different output type (Sitepage, JSON, whatever) based on a
                     // route param, defaulting to HTML
                     $output = $this->di->get("webOutput:$format");
-                    $output->output($response);
                 } else {
                     // Maybe it has a __toString method, or it IS actually a string.
                     // Ram it into the base output type.
