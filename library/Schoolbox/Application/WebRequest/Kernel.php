@@ -13,6 +13,7 @@ use Alaress\Authorizer\Failure\Base;
 use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
+use Alaress\Web\Output\OutputInterface;
 use Aura\Di;
 use Aura\Router\Route;
 use ReflectionMethod;
@@ -202,20 +203,32 @@ class Kernel extends \Alaress\Application\Kernel
            // * default to 'html'
             /** @var \Aura\Web\Response $response */
             $content  = $response->content->get();
-            $format   = $content['format'];
-            if (empty($format)) {
-                // Strip leading . from format
-                $format = preg_replace('/^\\./', '', $params['format']);
+            if ($content instanceof OutputInterface) {
+                $content->output($response);
+            } elseif (is_array($content)) {
+                $format   = $content['format'];
                 if (empty($format)) {
-                    $format = 'html';
+                    // Strip leading . from format
+                    $format = preg_replace('/^\\./', '', $params['format']);
+                    if (empty($format)) {
+                        $format = 'html';
+                    }
                 }
+                // Create a different output type (Sitepage, JSON, whatever) based on a
+                // route param, defaulting to HTML
+                /** @var \Alaress\Web\Output\Base $output */
+                $output = $this->di->get("webOutput:$format");
+                $output->setResponse($response);
+                $output->output();
+            } else {
+                // Maybe it has a __toString method, or it IS an actual string.
+                // Output headers anyway
+                foreach ($response->headers->get() as $label => $value) {
+                    header("{$label}: {$value}");
+                }
+                echo $content;
             }
-            // Create a different output type (Sitepage, JSON, whatever) based on a
-            // route param, defaulting to HTML
-            /** @var \Alaress\Web\Output\Base $output */
-            $output = $this->di->get("webOutput:$format");
-            $output->setResponse($response);
-            $output->output();
+
             // Post-processing: if this is a HTML request and not a redirect,
             // store this request in history.
             $isXhr    = $controller->getRequest()->isXhr();
