@@ -182,7 +182,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
         }
 
         // get limited records from the resource, rather than in bulk
-        $this->dataSet = $this->getRecordsFromResource($this->dataResource, $offset, $limit);
+        $this->dataSet = new LimitIterator(new IteratorIterator($this->dataResource), $offset, $limit);
 
         return $this->dataCount;
     }
