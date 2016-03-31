@@ -30,6 +30,7 @@ class GroupMapper extends Mapper {
                 'column'     => 'cid',
                 'property'   => 'category',
                 'type'       => self::TYPE_INTEGER,
+                'identifier' => true
             ));
         $this->hasMap(array(
                 'column'     => 'type',

@@ -93,12 +93,20 @@ class Group {
         return $this->type;
     }
 
+
+    /**
+     * @param Int $category
+     * @return $this
+     */
     public function setCategory($category)
     {
         $this->category = $category;
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function getCategory()
     {
         return $this->category;

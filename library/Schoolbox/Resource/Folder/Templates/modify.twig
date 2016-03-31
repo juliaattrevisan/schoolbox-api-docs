@@ -15,11 +15,9 @@
             if ($(event.target).prop('checked')) {
                 $('#permissions').addClass('hide');
                 $('#synergetic-codes').addClass('hide');
-                $("input[name^='group']").removeClass('required');
             } else {
                 $('#permissions').removeClass('hide');
                 $('#synergetic-codes').removeClass('hide');
-                $("input[name^='group']").addClass('required');
             }
         });
 
@@ -41,31 +39,35 @@
             }
         });
 
-        $('[data-interaction="delete"]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Are you sure you wish to delete this folder?',
-                confirmEvent: function() {
-                    $.post('/resource/folder/delete', {id: {{ folder.getId }}, function () {
-                        history.go(-1);
-                    }});
-                }
-            });
-        });
+        {% if folder.getId %}
 
-        $('[data-reset-homepage-content]').click(function(event) {
-            event.preventDefault();
-
-            var element = $(this);
-            $(this).confirmDialog({
-                text: 'Are you sure you wish to delete all content from this homepage? This includes:\n - Assessments\n - Blogs\n - Calendar events\n - News\n - Chats\n - Dropbox\n - Files\n - Forums\n - Polls\n - Due Work\n - Surveys\n - TextBoxes\n - Wikis',
-                confirmEvent: function() {
-                    $.post('/resource/folder/reset', {id: {{ folder.getId }} }).done(function() {
-                        window.location.href = '/homepage/{{ folder.getId }}';
-                    });
-                }
+            $('[data-interaction="delete"]').click(function(event) {
+                event.preventDefault();
+                $(this).confirmDialog({
+                    text: 'Are you sure you wish to delete this folder?',
+                    confirmEvent: function() {
+                        $.post('/resource/folder/delete', {id: {{ folder.getId }}, function () {
+                            history.go(-1);
+                        }});
+                    }
+                });
             });
-        });
+
+            $('[data-reset-homepage-content]').click(function(event) {
+                event.preventDefault();
+
+                var element = $(this);
+                $(this).confirmDialog({
+                    text: 'Are you sure you wish to delete all content from this homepage? This includes:\n - Assessments\n - Blogs\n - Calendar events\n - News\n - Chats\n - Dropbox\n - Files\n - Forums\n - Polls\n - Due Work\n - Surveys\n - TextBoxes\n - Wikis',
+                    confirmEvent: function() {
+                        $.post('/resource/folder/reset', {id: {{ folder.getId }} }).done(function() {
+                            window.location.href = '/homepage/{{ folder.getId }}';
+                        });
+                    }
+                });
+            });
+
+        {% endif %}
 
         var categoryId = form.find('input[name="categoryID"]').val();
         if (categoryId) {
@@ -208,28 +210,29 @@
                             {% endfor %}
                         </tbody>
                     </table>
-
-                    {# Allow group creation if this is an insert #}
-
-                    {% if not folder.isGroup and action == 'Create' %}
-
-                        <div class="content small-12 columns">
-                            <label for="groupcheck">
-                                Create Group
-                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Manage individual user access to this folder. You will automatically be assigned administration rights">?</span>
-                            </label>
-                            <div class="switch">
-                                <input type="checkbox" id="groupcheck" name="groupcheck" value="1" />
-                                <label for="groupcheck">
-                                    <span>Yes</span>
-                                    <span>No</span>
-                                </label>
-                            </div>
-                        </div>
-
-                    {% endif %}
-
                 </div>
+
+                {# Allow group creation if this is an insert #}
+
+                {% if not folder.isGroup and action == 'Create' %}
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label for="groupcheck">
+                            Create Group
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Manage individual user access to this folder. You will automatically be assigned administration rights">?</span>
+                        </label>
+                        <div class="switch">
+                            <input type="checkbox" id="groupcheck" name="groupcheck" value="1" />
+                            <label for="groupcheck">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                {% endif %}
 
                 <fieldset id="synergetic-codes" class="content {HIDE_PERMISSIONS}">
                     <div class="small-12 columns">
