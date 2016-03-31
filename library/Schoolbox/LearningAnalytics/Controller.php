@@ -23,6 +23,8 @@ use Schoolbox\LearningAnalytics\Results\TaskTypes;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
 use Schoolbox\LearningAnalytics\Effort\AllEffort;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
 class Controller extends Base {
 
@@ -178,9 +180,9 @@ class Controller extends Base {
          */
         $page = $this->getDi()->get('sitePage');
 
-        $termMapper = new \Schoolbox\Assessment\Term\Mapper();
+        $termMapper = new TermMapper();
 
-        $contextSelector = new \Schoolbox\Assessment\StudentReportCard\ContextSelector($currentUrl);
+        $contextSelector = new ContextSelector($currentUrl);
         $contextSelector->setTerms($termMapper->findAll());
 
         $contextSelector->render(
