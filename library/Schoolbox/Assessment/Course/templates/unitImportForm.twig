@@ -6,6 +6,18 @@
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 
+<script>
+    $(function() {
+        $('[data-warn-removal]').change(function(e) {
+            if (!$(e.target).attr('checked')) {
+                $('#unit-warn-removal').removeClass('hide');
+            } else {
+                $('#unit-warn-removal').addClass('hide');
+            }
+        });
+    });
+</script>
+
 <!-- END custom_head -->
 
 {% if units.length > 0 %}
@@ -40,7 +52,7 @@
 
                         <div class="avatar card small-12 medium-6">
                             <input name="unit[{{ loop.index }}][import]" type="hidden" value="0" />
-                            <input id="import-{{ loop.index }}" name="unit[{{ loop.index }}][import]" {% if unit.checked %}checked="checked"{% endif %} type="checkbox" value="1" data-interaction="enable" />
+                            <input id="import-{{ loop.index }}" name="unit[{{ loop.index }}][import]" {% if unit.checked %}checked="checked" data-warn-removal {% endif %} type="checkbox" value="1" data-interaction="enable" />
                             <label for="import-{{ loop.index }}" class="checkbox-label">{{ unit.name }}</label>
                         </div>
 
@@ -83,6 +95,7 @@
         <div class="row" data-mage-submitrow>
             <div class="small-12 medium-8 column">
                 <p class="alert alert-box icon-alert" data-mage-error></p>
+                <p class="warning alert-box icon-alert hide" id="unit-warn-removal">Warning! Removal of existing units will also remove all associated tasks.</p>
             </div>
             <div class="small-12 medium-4 column">
                 <input type="submit" name="part-tasks-select" value="Next" data-mage-next="part-tasks-select" data-mage-working="Working..." formaction="/course/importTasks" />
