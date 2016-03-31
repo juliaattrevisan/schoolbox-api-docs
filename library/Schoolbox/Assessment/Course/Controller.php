@@ -131,6 +131,58 @@ class Controller extends Base\Base
 
 
     /**
+     * Retrieve the Course Builder component instance. If it doesn't exist, create it, then return that
+     *
+     * @param Folder\Model $unit
+     * @return Component_Instance
+     */
+    protected function getCourseBuilderInstance(Folder\Model $unit)
+    {
+        // confirm that there's a Course Builder component
+        $instances = $this->getComponentInstanceMapper()->findByContextAndClass('homepage', $unit->getId(), \Component_Homepage_CourseBuilderController::class);
+
+        if (count($instances) == 0) {
+            // no instance found - give me a new one
+            return $this->injectNewBuilderComponent($unit);
+        }
+
+        // instance found - use that
+        return reset($instances);
+    }
+
+
+    /**
+     * @param Folder\Model $unit
+     * @return Component_Instance
+     */
+    protected function injectNewBuilderComponent(Folder\Model $unit)
+    {
+        $definitionMapper = $this->getComponentDefinitionMapper();
+        $instanceMapper   = $this->getComponentInstanceMapper();
+
+        // Doesn't exist. We need that to exist. Make it exist.
+        $definition = $definitionMapper->findOneByColumn('class', \Component_Homepage_CourseBuilderController::class);
+
+        // invent a new component
+        $newInstance = $this->getComponentInstanceMapper()
+                            ->createModel()
+                            ->setModule('homepage')
+                            ->setIdentifier($unit->getId())
+                            ->setDefinitionId($definition->getId())
+                            ->setSequence(0)
+                            ->setPosition('top');
+
+        // save it
+        $instanceMapper->save($newInstance);
+
+        // reapply the sequencing so the homepage doesn't break
+        $instanceMapper->cascadeSequence($unit->getId(), 'top');
+
+        return $newInstance;
+    }
+
+
+    /**
      * Form to modify a course
      *
      * @api   GET /course/modify/{id}
@@ -148,7 +200,6 @@ class Controller extends Base\Base
 
             $instances        = [];
             $instanceMapper   = $this->getComponentInstanceMapper();
-            $definitionMapper = $this->getComponentDefinitionMapper();
 
             $data['folder'] = $folder;
             $data['units']  = $this->getCourseMapper()->findByParent($id)->filter(function ($folder) use ($instanceMapper, &$instances) {
@@ -160,18 +211,13 @@ class Controller extends Base\Base
                  * @var Folder\Model $folder
                  */
 
-                if ($folder->getTaskCount()) {
-                    // easy win
-                    return true;
-                }
-
                 $id = $folder->getId();
 
                 // check for instance (and cache it while you're at it)
                 $instances[$id] = array_values($instanceMapper->findByContextAndClass('homepage', $id, \Component_Homepage_CourseBuilderController::class));
 
                 // if there's an instance, you know she's a keeper
-                return count($instances[$id]) > 0;
+                return $folder->getTaskCount() ? true : count($instances[$id]) > 0;
             });
 
             foreach ($data['units'] as $unit) {
@@ -180,26 +226,8 @@ class Controller extends Base\Base
 
                 // obtain the Course Builder Component Instance from the homepage.
                 if (count($instances[$unit->getId()]) == 0) {
-                    // Doesn't exist. We need that to exist. Make it exist.
-                    $definition = $definitionMapper->findOneByColumn('class', \Component_Homepage_CourseBuilderController::class);
-
-                    // invent a new component
-                    $newInstance = $this->getComponentInstanceMapper()
-                                        ->createModel()
-                                        ->setModule('homepage')
-                                        ->setIdentifier($unit->getId())
-                                        ->setDefinitionId($definition->getId())
-                                        ->setSequence(0)
-                                        ->setPosition('top');
-
-                    // save it
-                    $instanceMapper->save($newInstance);
-
-                    // reapply the sequencing so the homepage doesn't break
-                    $instanceMapper->cascadeSequence($unit->getId(), 'top');
-
                     // shove that new instance into where we expect it to be
-                    $instances[$unit->getId()] = [ $newInstance ];
+                    $instances[$unit->getId()] = [ $this->injectNewBuilderComponent($unit) ];
                 }
 
                 foreach ($data['tasks'][$unit->getId()] as $task) {
@@ -527,14 +555,19 @@ class Controller extends Base\Base
 
             ], $this->getUser());
 
+            $instance  = $this->getCourseBuilderInstance($folder);
+            $folderId  = $folder->getId();
+            $returnUrl = $this->getReturnUrl($post['id'], $folderId);
+
             $data = [
                 'unit'  => [
-                    'id'   => $folder->getId(),
+                    'id'   => $folderId,
                     'name' => $folder->getName()
                 ],
                 'returnUrl' => [
-                    $folder->getId() => $this->getReturnUrl($post['id'], $folder->getId())
+                    $folderId => $returnUrl
                 ],
+                'reveals'   => [ $folderId => new TaskBuilder($instance, null, $returnUrl) ],
                 '_writable' => true,
                 '_expanded' => true
             ];
