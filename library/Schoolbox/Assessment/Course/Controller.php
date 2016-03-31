@@ -1408,15 +1408,21 @@ class Controller extends Base\Base
         $unitOutput = [];
 
         foreach ($compendium as $id => $values) {
+            /** @var Folder\Model $folder */
+            $folder = $values['folder'];
+
+            /** @var UnitInstance $selected */
+            $selected = $values['selected'];
+
             $unitOutput[$id] = [
                 'id' => $id,
-                'name' => $values['folder']->getName(),
+                'name' => $folder->getName(),
             ];
 
             if (isset($values['selected'])) {
                 $unitOutput[$id]['checked'] = true;
-                $unitOutput[$id]['openDate'] = $values['selected']->getOpenDate();
-                $unitOutput[$id]['dueDate']  = $values['selected']->getDueDate();
+                $unitOutput[$id]['openDate'] = $selected->getOpenDate();
+                $unitOutput[$id]['dueDate']  = $selected->getDueDate();
             }
         }
 
@@ -1431,6 +1437,7 @@ class Controller extends Base\Base
         else {
             /* TODO: Error; component never existed
              */
+
         }
 
         $this->tpl('import', [
