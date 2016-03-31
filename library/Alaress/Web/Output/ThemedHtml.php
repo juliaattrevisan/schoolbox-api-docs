@@ -14,7 +14,25 @@ namespace Alaress\Web\Output;
 
 use Aura\Web\Response;
 
-class ThemedHtml extends Html {
+class ThemedHtml extends Html
+{
+    /**
+     * The tab that is selected for this response.
+     *
+     * If not set via `setTab`, it uses the version from the response.
+     *
+     * @var string
+     */
+    protected $tab = null;
+
+    /**
+     * The value of the `<title>` tag of this response.
+     *
+     * If not set via `setTitle`, it uses the version from the response.
+     *
+     * @var string
+     */
+    protected $title = null;
 
     /**
      * @var \SitePage
@@ -27,11 +45,18 @@ class ThemedHtml extends Html {
      * This method assumes the output is an array with "template" and "data"
      * keys.
      */
-    protected function outputResponseBody() {
+    protected function outputResponseBody()
+    {
         $page     = $this->getSitepage();
-        $response = $this->getResponse()->content->get();
-        $data     = $response['data'] ?: array();
-        $template = $response['template'];
+        $template = $this->getTemplate();
+        $data     = $this->getData();
+        if (!isset($template)) {
+            $template = $this->retrieveFieldFromResponse('template');
+        }
+        if (!isset($data)) {
+            $data = $this->retrieveFieldFromResponse('data', []);
+        }
+
         if (empty($template)) {
             // No template? I can't generate a standard response,
             // so return an error response.
@@ -42,13 +67,22 @@ class ThemedHtml extends Html {
                 $page->error(null, 'Template not found', $code ?: 500);
             }
         } else {
-            if ($response['tab']) {
-                $page->setTab($response['tab']);
+            $tab = $this->getTab();
+            if (!isset($tab)) {
+                $tab = $this->retrieveFieldFromResponse('tab');
+            }
+            if ($tab) {
+                $page->setTab($tab);
             }
             $page->setFile(TEMPLATE_content, 'output.html');
             $page->buildPage();
             $page->setVar('OUTPUT', $this->getTemplateEngine()->render($template, $data));
-            $page->setTitle($response['title']);
+
+            $title = $this->getTitle();
+            if (!isset($title)) {
+                $title = $this->retrieveFieldFromResponse('title');
+            }
+            $page->setTitle($title);
             $page->outputPage(true);
         }
     }
@@ -69,4 +103,39 @@ class ThemedHtml extends Html {
         return $this->sitepage;
     }
 
+    /**
+     * @return string
+     */
+    protected function getTab()
+    {
+        return $this->tab;
+    }
+
+    /**
+     * @param  string $tab
+     * @return $this
+     */
+    public function setTab($tab)
+    {
+        $this->tab = $tab;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param  string $title
+     * @return $this
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+        return $this;
+    }
 }
