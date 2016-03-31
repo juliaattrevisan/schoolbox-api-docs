@@ -11,7 +11,25 @@ namespace Alaress\Web\Output;
 
 use Aura\Web\Response;
 
-class Html extends Base {
+class Html extends Base
+{
+    /**
+     * The template to use.
+     *
+     * If not set via `setTemplate`, it uses the version from the response.
+     *
+     * @var string
+     */
+    protected $template = null;
+
+    /**
+     * The data to set in the template.
+     *
+     * If not set via `setData`, it uses the version from the response.
+     *
+     * @var string
+     */
+    protected $data = null;
 
     /**
      * @var \Twig_Environment
@@ -25,8 +43,7 @@ class Html extends Base {
      * keys.
      */
     protected function outputResponseBody() {
-        $response = $this->getResponse()->content->get();
-        echo $this->getTemplateEngine()->render($response['template'], $response['data']);
+        echo $this->getAsString();
     }
 
     /**
@@ -37,7 +54,15 @@ class Html extends Base {
      */
     public function getAsString() {
         $response = $this->getResponse()->content->get();
-        return $this->getTemplateEngine()->render($response['template'], $response['data']);
+        $template = $this->getTemplate();
+        $data     = $this->getData();
+        if (!isset($template)) {
+            $template = $response['template'];
+        }
+        if (!isset($data)) {
+            $data = $response['data'];
+        }
+        return $this->getTemplateEngine()->render($template, $data);
     }
 
     /**
@@ -56,4 +81,39 @@ class Html extends Base {
         return $this->templateEngine;
     }
 
+    /**
+     * @return string
+     */
+    protected function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * @param  string $template
+     * @return $this
+     */
+    public function setTemplate($template)
+    {
+        $this->template = $template;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param  string $data
+     * @return $this
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+        return $this;
+    }
 }
