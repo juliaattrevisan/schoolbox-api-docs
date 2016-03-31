@@ -48,9 +48,9 @@ class Module extends BaseModule
              * also further focus on a particular time range via Term args
              */
             'course'                 => "/course/{courseId}",
-            'courseWithTerms'        => "/course/{courseId}/from/{from}/to/{to}",
+            'courseWithTerms'        => "/course/{courseId}/term/{term}",
             'courseWithTask'         => "/course/{courseId}/task/{taskId}",
-            'courseWithTaskAndTerms' => "/course/{courseId}/task/{taskId}/from/{from}/to/{to}",
+            'courseWithTaskAndTerms' => "/course/{courseId}/task/{taskId}/term/{term}",
 
             /**
              * Per Folder that uses a particular Course
@@ -63,9 +63,9 @@ class Module extends BaseModule
              * also further focus on a particular time range via Term args
              */
             'folder'                 => "/course/{courseId}/folder/{folderId}",
-            'folderWithTerms'        => "/course/{courseId}/folder/{folderId}/from/{from}/to/{to}",
+            'folderWithTerms'        => "/course/{courseId}/folder/{folderId}/term/{term}",
             'folderWithTask'         => "/course/{courseId}/folder/{folderId}/task/{taskId}",
-            'folderWithTaskAndTerms' => "/course/{courseId}/folder/{folderId}/task/{taskId}/from/{from}/to/{to}",
+            'folderWithTaskAndTerms' => "/course/{courseId}/folder/{folderId}/task/{taskId}/term/{term}",
         ];
 
         foreach ($get as $method => $route) {
@@ -137,21 +137,24 @@ class Module extends BaseModule
          *
          * If a date range was specified, use that.
          */
-        if (isset($params['from']) && isset($params['to'])) {
+        if (isset($params['term'])) {
             try {
-                $fromTerm = \Alaress_Date_Format::newUrlDate($params['from']);
-                $toTerm = \Alaress_Date_Format::newUrlDate($params['to']);
+                $termMapper = new TermMapper();
+                $term = $termMapper->findOneByColumn('code', $params['term']);
+
+                $from = $term->getStart();
+                $to = $term->getActualFinish();
             }
             catch (\Exception $e) {
                 throw new Exception('Invalid date range.');
             }
         }
         else {
-            $fromTerm = \Alaress_Date_Format::now();
-            $toTerm   = clone $fromTerm;
+            $from = \Alaress_Date_Format::now();
+            $to   = clone $from;
         }
 
-        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $fromTerm, $toTerm);
+        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
 
         /* Acrobatics
          */
@@ -193,8 +196,8 @@ class Module extends BaseModule
             'courseFolder' => $courseFolder,
             'allFoldersUsingCourse' => $allFoldersUsingCourse,
             'allUnitInstances' => $allUnitInstances,
-            'from' => $fromTerm,
-            'to' => $toTerm
+            'from' => $from,
+            'to' => $to
         );
     }
 
@@ -234,22 +237,24 @@ class Module extends BaseModule
          *
          * If a date range was specified, use that.
          */
-        if (isset($params['from']) && isset($params['to'])) {
+        if (isset($params['term'])) {
             try {
-                $fromTerm = \Alaress_Date_Format::newUrlDate($params['from']);
-                $toTerm = \Alaress_Date_Format::newUrlDate($params['to']);
+                $termMapper = new TermMapper();
+                $term = $termMapper->findOneByColumn('code', $params['term']);
+
+                $from = $term->getStart();
+                $to = $term->getActualFinish();
             }
             catch (\Exception $e) {
                 throw new Exception('Invalid date range.');
             }
         }
         else {
-            $fromTerm = \Alaress_Date_Format::now();
-            $toTerm   = clone $fromTerm;
+            $from = \Alaress_Date_Format::now();
+            $to   = clone $from;
         }
 
-
-        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $fromTerm, $toTerm);
+        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
 
         /* No acrobatics required
          */
@@ -268,11 +273,11 @@ class Module extends BaseModule
             'params' => $params,
             'courseFolder' => $courseFolder,
             'allFoldersUsingCourse' => $allFoldersUsingCourse,
-            'allUnitInstances' => $allUnitInstances
+            'allUnitInstances' => $allUnitInstances,
+            'from' => $from,
+            'to' => $to
         );
     }
-
-
 
     /**
      * Template locations for this module
