@@ -402,16 +402,18 @@ class Controller extends BaseController
             throw new RangeException("Failed to save folder.");
         }
 
-        if ($postData["inherit"] == 0) {
-            // only allow recursive permissions to supers
-            $recursive = $user->isSuperuser() && $postData['recursive'];
+        // only allow recursive permissions to supers
+        $recursive = $user->isSuperuser() && $postData['recursive'];
 
+        if ($postData["inherit"] == 0) {
             // If rolepermission collection is defined, reapply permissions (possibly recursively)
             $roleAccessMapper->savePermissions($model, $postData['group'], $recursive);
         }
 
-        // Recurse inheritance
-        $this->recurseInheritance($model);
+        if ($recursive) {
+            // Recurse inheritance
+            $this->recurseInheritance($model);
+        }
 
         // HomepageConfig definition
         $this->saveHomepageConfig($model, $postData['template']);
