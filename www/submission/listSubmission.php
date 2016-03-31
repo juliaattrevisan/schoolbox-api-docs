@@ -54,25 +54,6 @@ if(!$_SESSION['user']->getRole()->isStaff() ) {
     error(19);
 }
 
-//// generate a "past 6 years" array
-//for($i = 5; $i >= 0; $i--) {
-//    $years[] = $currentYear - $i;
-//}
-//
-///* Find the submission that occurs furthest into the future
-// * so you can find your way back there
-// */
-//$submissionMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
-//$allYears = $submissionMapper->findYears();
-//
-//if ($allYears->count() && ($allYears->first() > $currentYear)) {
-//    for ($j = $currentYear+1; $j <= $allYears->first(); $j++) {
-//        $years[] = $j;
-//    }
-//}
-//
-//$contextSelector->setYears($years);
-
 $subjectList = array();
 /* Use provided ID, or check for the subjects the user is involved with */
 if (isset($this->arg[1]) && is_numeric($this->arg[1])){

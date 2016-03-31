@@ -438,11 +438,6 @@ class Marksheet
      */
     public function renderSitepage($page)
     {
-
-//		var_dump($this->statisticDataSet);
-//		var_dump($this->studentDataSet);
-//		var_dump($this->displayOrder);
-
         $contextSelector = new ContextSelector('submission/markSheet');
         $contextSelector->setCategoryFirst(true);
 
