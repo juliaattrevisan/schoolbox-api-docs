@@ -170,8 +170,18 @@ class Controller extends Base {
      */
     private function generateContextSelector()
     {
-        $currentUrl = ltrim($this->getRequest()->url->get(PHP_URL_PATH), '/') . '/term';
+        /* Url Acrobatics, since the contextselector just appends args continually
+         *
+         * Trim the leading slash
+         * Replace any /term/* args that were previously chosen from contextselector
+         * Append /term, since the contextselector term value is something like 2016-1
+         */
+        $currentUrl = ltrim($this->getRequest()->url->get(PHP_URL_PATH), '/');
+        $currentUrl = preg_replace('/\/term\/(.*)/', '', $currentUrl);
+        $currentUrl .= '/term';
 
+        /* Construct it in phplib sigh
+         */
         $page = $this->getDi()->get('sitePage');
 
         $termMapper = new \Schoolbox\Assessment\Term\Mapper();
