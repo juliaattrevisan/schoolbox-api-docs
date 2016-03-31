@@ -189,7 +189,10 @@ class Base implements OutputInterface
     {
         if ($this->response instanceof Response) {
             $content = $this->getResponse()->content->get();
-            return isset($content[$field]) ? $content[$field] : $default;
+            // $content could be this same object (as it's set via $response->set)
+            if (is_array($content) || $content instanceof \ArrayAccess) {
+                return isset($content[$field]) ? $content[$field] : $default;
+            }
         }
         return $default;
     }
