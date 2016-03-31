@@ -491,6 +491,29 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         return $categories;
     }
 
+
+    /**
+     * Search for folders with the given curriculum code(s)
+     *
+     * @param string|array $code
+     * @return Collection|Model[]
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function findByCurriculumCode($code)
+    {
+        // cast singular to plural
+        $code = (array)$code;
+
+        // generate prepare-param string
+        $qmarks = implode(', ', array_pad([], count($code), '?'));
+
+        // search on curriculum node code
+        $q = $this->getFindQuery() . "WHERE cn.code in ($qmarks)";
+
+        // search, hydrate, return
+        return $this->hydrateFromFindQuery($this->getDatabase()->query($q, $code));
+    }
+
     /**
      * Helper method for creating a search query with codes, homepage config and
      * group all built in.
