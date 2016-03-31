@@ -216,10 +216,9 @@ class Kernel extends \Alaress\Application\Kernel
                 }
                 // Create a different output type (Sitepage, JSON, whatever) based on a
                 // route param, defaulting to HTML
-                /** @var \Alaress\Web\Output\Base $output */
+                /** @var OutputInterface $output */
                 $output = $this->di->get("webOutput:$format");
-                $output->setResponse($response);
-                $output->output();
+                $output->output($response);
             } else {
                 // Maybe it has a __toString method, or it IS an actual string.
                 // Output headers anyway

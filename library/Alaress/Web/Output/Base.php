@@ -17,7 +17,8 @@ namespace Alaress\Web\Output;
 
 use Aura\Web\Response;
 
-class Base {
+class Base implements OutputInterface
+{
     /**
      * @var Response
      */
@@ -27,8 +28,12 @@ class Base {
      * Outputs a response and its headers in the most basic fashion.
      *
      * Copied from https://github.com/auraphp/Aura.Web/blob/develop-2/README-RESPONSE.md
+     *
+     * @param Response $response
      */
-    public function output() {
+    public function output(Response $response)
+    {
+        $this->setResponse($response);
         $this->preprocessOutput();
         $this->outputResponseCode();
         $this->outputHeaders();
