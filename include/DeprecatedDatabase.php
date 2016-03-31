@@ -11,8 +11,6 @@
  *                                                           *
  ************************************************************/
 
-use Alaress\DebugBar\DataCollector\DeprecatedDatabaseCollector;
-
 /**
  * @deprecated
  * Class DeprecatedDatabase
@@ -35,11 +33,6 @@ class DeprecatedDatabase implements Serializable
 
     /** @var self */
     static private $instance = false;
-
-    /**
-     * @var Alaress\DebugBar\DataCollector\DeprecatedDatabaseCollector
-     */
-    protected $collector;
 
     /**
      * Constuctor sets up variables and connects to database
@@ -454,7 +447,7 @@ class DeprecatedDatabase implements Serializable
 
     /**
      * @deprecated
-     * @return DeprecatedDatabaseCollector
+     * @return \DebugBar\DataCollector\PDO\PDOCollector
      */
     public function getCollector()
     {
