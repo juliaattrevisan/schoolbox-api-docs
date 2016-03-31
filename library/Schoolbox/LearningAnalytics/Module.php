@@ -152,8 +152,8 @@ class Module extends BaseModule
         else {
             $term = $termMapper->createModel();
 
-            $from = \Alaress_Date_Format::now();
-            $to   = clone $from;
+            $from = $termMapper->findOldest()->getStart();
+            $to   = \Alaress_Date_Format::now();
         }
 
         $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
@@ -255,8 +255,8 @@ class Module extends BaseModule
         else {
             $term = $termMapper->createModel();
 
-            $from = \Alaress_Date_Format::now();
-            $to   = clone $from;
+            $from = $termMapper->findOldest()->getStart();
+            $to   = \Alaress_Date_Format::now();
         }
 
         $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
