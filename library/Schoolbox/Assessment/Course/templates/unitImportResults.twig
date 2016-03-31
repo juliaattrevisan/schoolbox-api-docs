@@ -1,12 +1,26 @@
-<!-- BEGIN custom_head -->
-
 <script type="text/javascript" src="/javascript/shared/course/jquery.course-import.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
 
-<!-- END custom_head -->
+<script>
+    $(function() {
+        $('[data-collapser]').click(function(e) {
+            e.preventDefault();
+            var unit = $('#' + $(e.target).attr('data-collapser'));
+            if (unit.hasClass('hide')) {
+                unit.removeClass('hide');
+                $(e.target).removeClass('icon-up-arrow');
+                $(e.target).addClass('icon-down-arrow');
+            } else {
+                unit.addClass('hide');
+                $(e.target).removeClass('icon-down-arrow');
+                $(e.target).addClass('icon-up-arrow');
+            }
+        });
+    });
+</script>
 
 {# Persist data from previous stages #}
 
@@ -27,29 +41,46 @@
 <div class="row">
     <div class="small-12 columns">
         <section>
-            <h3>{{ unit.name }}</h3>
-
-            <ul class="information-list no-pad">
-
-            {# All work items in the current unit #}
-
-            {% for work in unit.items %}
-                <li>
-                    <div class="list-item" data-type="unit_row">
-                        <input type="hidden" name="submissions" value="{% if work.item.getAcceptOnline %}1{% else %}0{% endif %}">
-
-                        {% if work.class == 'SubmissionBox' %}
-                            {% include '@course/import/submissionBox.twig' %}
-                        {% elseif work.class == 'Task' %}
-                            {% include '@course/import/task.twig' %}
-                        {% elseif work.class == 'OnlineAssessment' %}
-                            {% include '@course/import/quiz.twig' %}
-                        {% endif %}
-
+            <ul class="component-titlebar" style="background-color:#ddd">
+                <li class="actions-small-3">
+                    <div class="list-item">
+                        <div class="small-12 card">
+                            <h2>{{ unit.name }}</h2>
+                        </div>
                     </div>
+                    <nav>
+                        <a data-collapser="unit-{{ unit.id }}" href="#" class="icon-{% if loop.first %}down{% else %}up{% endif %}-arrow collapse" title="Collapse Content"></a>
+                    </nav>
                 </li>
-            {% endfor %}
             </ul>
+            <div id="unit-{{ unit.id }}" {% if not loop.first %}class="hide"{% endif %}>
+                <div class="row">
+                    <div class="small-12 island">
+                        <section>
+                            <ul class="information-list">
+                                {# All work items in the current unit #}
+
+                                {% for work in unit.items %}
+                                    <li>
+                                        <div class="list-item" data-type="unit_row">
+                                            <input type="hidden" name="submissions" value="{% if work.item.getAcceptOnline %}1{% else %}0{% endif %}">
+
+                                            {% if work.class == 'SubmissionBox' %}
+                                                {% include '@course/import/submissionBox.twig' %}
+                                            {% elseif work.class == 'Task' %}
+                                                {% include '@course/import/task.twig' %}
+                                            {% elseif work.class == 'OnlineAssessment' %}
+                                                {% include '@course/import/quiz.twig' %}
+                                            {% endif %}
+
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                    </div>
+                </div>
+            </div>
         </section>
     </div>
 </div>
