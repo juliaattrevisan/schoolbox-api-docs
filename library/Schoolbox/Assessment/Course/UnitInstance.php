@@ -325,7 +325,7 @@ class UnitInstance implements ISoftDeletable {
     /**
      * Set array of dates for work. Used to override default dates when saving
      *
-     * @return array
+     * @return UnitInstance
      */
     public function setWorkDates($workDates) {
         $this->workDates = $workDates;
@@ -335,7 +335,7 @@ class UnitInstance implements ISoftDeletable {
     /**
      * Set array of dates for quizzes. Used to override default dates when saving
      *
-     * @return array
+     * @return UnitInstance
      */
     public function setQuizDates($quizDates) {
         $this->quizDates = $quizDates;

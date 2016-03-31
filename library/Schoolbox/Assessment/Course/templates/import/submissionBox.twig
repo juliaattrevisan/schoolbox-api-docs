@@ -1,51 +1,55 @@
 <div class="compact avatar card small-12 medium-4">
     <div class="icon-due-work"></div>
-    {{ work.item.getName }}
+    {{ work.item.title }}
 </div>
 <div class="small-12 medium-2 columns">
     {# Due Work: Publish Date #}
-    <label for="work_publish_date-{{ work.item.getId }}">Publish Date</label>
-    <input id="work_publish_date-{{ work.item.getId }}"
-           name="work[{{ work.item.getId }}][publish_date]"
+    <label for="work_publish_date-{{ work.item.id }}">Publish Date</label>
+    <input id="work_publish_date-{{ work.item.id }}"
+           name="work[{{ work.item.id }}][publish_date]"
            type="text"
-           value="{{ unit.open_date }}"
+           value="{% if work.isAbstract %}{{ unit.open_date }}{% else %}{{ work.detail.getPublishDate.localShort }}{% endif %}"
            data-role="publish_date"
            data-datepicker
            data-datepicker-sync
-           data-datepicker-sync-enddate="#work_publish_date-{{ work.item.getId }}" />
+           data-datepicker-sync-enddate="#work_publish_date-{{ work.item.id }}" />
+    <label for="work_publish_date-{{ work.item.id }}" class="hide error">This field is required.</label>
 </div>
 <div class="small-12 medium-2 columns">
     {# Due Work: Open Date #}
-    <label for="work_open_date-{{ work.item.getId }}">Open Date</label>
-    <input id="work_open_date-{{ work.item.getId }}"
-           name="work[{{ work.item.getId }}][open_date]"
+    <label for="work_open_date-{{ work.item.id }}">Open Date</label>
+    <input id="work_open_date-{{ work.item.id }}"
+           name="work[{{ work.item.id }}][open_date]"
            type="text"
-           value="{{ unit.open_date }}"
+           value="{% if work.isAbstract %}{{ unit.open_date }}{% else %}{{ work.detail.getOpenDate.localShort }}{% endif %}"
            data-role="open_date"
            data-datepicker
            data-datepicker-sync
-           data-datepicker-sync-enddate="#work_open_date-{{ work.item.getId }}" />
+           data-datepicker-sync-enddate="#work_open_date-{{ work.item.id }}" />
+    <label for="work_open_date-{{ work.item.id }}" class="hide error">This field is required.</label>
 </div>
 <div class="small-12 medium-2 columns">
     {# Due Work: Due Date #}
-    <label for="work_due_date-{{ work.item.getId }}">Due Date</label>
-    <input id="work_due_date-{{ work.item.getId }}"
-           name="work[{{ work.item.getId }}][due_date]"
+    <label for="work_due_date-{{ work.item.id }}">Due Date</label>
+    <input id="work_due_date-{{ work.item.id }}"
+           name="work[{{ work.item.id }}][due_date]"
            type="text"
-           value="{{ unit.due_date }}"
+           value="{% if work.isAbstract %}{{ unit.due_date }}{% else %}{{ work.detail.getDueDate.localShort }}{% endif %}"
            data-role="due_date"
            data-datepicker
            data-datepicker-sync
-           data-datepicker-sync-enddate="#work_due_date-{{ work.item.getId }}" />
+           data-datepicker-sync-enddate="#work_due_date-{{ work.item.id }}" />
+    <label for="work_due_date-{{ work.item.id }}" class="hide error">This field is required.</label>
 </div>
 <div class="small-12 medium-2 columns">
-    <label for="work_late_date-{{ work.item.getId }}">Late Date</label>
-    <input id="work_late_date-{{ work.item.getId }}"
-           name="work[{{ work.item.getId }}][late_date]"
+    <label for="work_late_date-{{ work.item.id }}">Late Date</label>
+    <input id="work_late_date-{{ work.item.id }}"
+           name="work[{{ work.item.id }}][late_date]"
            type="text"
-           value="{{ unit.due_date }}"
+           value="{% if work.isAbstract %}{{ unit.due_date }}{% else %}{{ work.detail.getLateDate.localShort }}{% endif %}"
            data-role="late_date"
            data-datepicker
            data-datepicker-sync
-           data-datepicker-sync-enddate="#work_late_date-{{ work.item.getId }}" />
+           data-datepicker-sync-enddate="#work_late_date-{{ work.item.id }}" />
+    <label for="work_late_date-{{ work.item.id }}" class="hide error">This field is required.</label>
 </div>

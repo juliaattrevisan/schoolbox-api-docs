@@ -255,7 +255,6 @@ class InstanceMapper extends Mapper {
         }
     }
 
-
     /**
      * @param object $object
      * @param string $verb

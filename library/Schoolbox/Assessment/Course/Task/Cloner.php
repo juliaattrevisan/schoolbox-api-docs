@@ -148,9 +148,12 @@ class Cloner
             $quizDates = $this->task_instance->getUnitInstance()->getQuizDates();
 
             if (is_array($quizDates)) {
-                if (isset($quizDates[$assess_id])) {
-                    $start = \Alaress_Date_Format::newLocalShort($quizDates[$assess_id]['start_date']);
-                    $finish = \Alaress_Date_Format::newLocalShort($quizDates[$assess_id]['finish_date'])->endOfDay();
+                $assessment = OnlineAssessmentMapper::getInstance()->findById($assess_id);
+                $task_id = $assessment->getTask()->getId();
+
+                if (isset($quizDates[$task_id])) {
+                    $start = \Alaress_Date_Format::newLocalShort($quizDates[$task_id]['start_date']);
+                    $finish = \Alaress_Date_Format::newLocalShort($quizDates[$task_id]['finish_date'])->endOfDay();
                 }
             }
 
@@ -196,11 +199,14 @@ class Cloner
             $workDates = $this->task_instance->getUnitInstance()->getWorkDates();
 
             if (is_array($workDates)) {
-                if (isset($workDates[$box_id])) {
-                    $publish = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['publish_date']);
-                    $open = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['open_date']);
-                    $due = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['due_date'])->endOfDay();
-                    $late = \Alaress_Date_Format::newLocalShort($workDates[$box_id]['late_date'])->endOfDay();
+                $box = SubmissionBoxMapper::getInstance()->findById($box_id);
+                $task_id = $box->getTask()->getId();
+
+                if (isset($workDates[$task_id])) {
+                    $publish = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['publish_date']->sta);
+                    $open = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['open_date']);
+                    $due = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['due_date'])->endOfDay();
+                    $late = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['late_date'])->endOfDay();
                 }
             }
 

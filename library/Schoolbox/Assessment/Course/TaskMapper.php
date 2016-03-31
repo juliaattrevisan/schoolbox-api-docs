@@ -208,6 +208,29 @@ class TaskMapper extends Schoolbox\Mapper {
     }
 
     /**
+     * Find the originally-specified list of tasks for a given
+     * Unit Category ID (the originating unit for a unit instance)
+     *
+     * @param $unitCategoryId
+     * @return \Schoolbox\Collection
+     */
+    public function findAbstractTasksForUnit($unitCategoryId)
+    {
+        $query = "
+            SELECT {$this->getColumnString('t')}
+            FROM {$this->getTable()} t
+            WHERE t.category_id = :unitCategoryId;
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'unitCategoryId' => $unitCategoryId
+        ]);
+
+        return $this->hydrateList($statement, 't');
+    }
+
+    /**
      * Pre-save method: if this doesn't have an order, sets it to whatever the
      * highest order for this category is, +1 (so it shows as the last item in
      * the list)
