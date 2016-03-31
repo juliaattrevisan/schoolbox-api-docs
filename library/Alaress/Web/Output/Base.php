@@ -107,10 +107,17 @@ class Base implements OutputInterface
     /**
      * Outputs the response body from the response object.
      *
-     * This method assumes the output is simply a string.
+     * This method assumes the output is simply a string, or was set in
+     * `$this->setData`.
      */
-    protected function outputResponseBody() {
-        echo $this->getResponse()->content->get();
+    protected function outputResponseBody()
+    {
+        $data = $this->getData();
+        if (isset($data)) {
+            echo $data;
+        } else {
+            echo $this->getResponse()->content->get();
+        }
     }
 
     /**
