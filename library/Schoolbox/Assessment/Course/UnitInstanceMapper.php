@@ -683,4 +683,33 @@ class UnitInstanceMapper extends BaseMapper {
             ->setOwner($owner);
         $this->getJoinMapper('task')->save($taskInstance);
     }
+
+    /**
+     * For particular folders, find all the unit instances which have
+     * open dates occurring between $from and $to
+     *
+     * @param $folderIds An array of folderIds
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
+     * @return Collection
+     */
+    public function findForFolderOpeningBetween($folderIds, Alaress_Date_Format $from, Alaress_Date_Format $to)
+    {
+        $query = "
+            SELECT {$this->getColumnString('cui')}
+            FROM {$this->getTable()} cui
+            WHERE category_id IN (:folderIds)
+            AND open_date BETWEEN :from AND :to
+            AND deleted_at IS NULL
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'folderIds' => implode(',', $folderIds),
+            'from' => $from->getDatabase(),
+            'to' => $to->getDatabase()
+        ]);
+
+        return $this->hydrateList($statement, 'cui');
+    }
 }

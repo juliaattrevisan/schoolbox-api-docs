@@ -176,9 +176,9 @@ class Module extends BaseModule
                 $allCategoryIds = array_unique($allCategoryIds);
 
                 /* All the units associated with folders which used the same
-                 * $courseFolder as a source
+                 * $courseFolder as a source. Filter it based on $from and $to
                  */
-                $allUnitInstances = $unitInstanceMapper->findByColumn('category_id', $allCategoryIds);
+                $allUnitInstances = $unitInstanceMapper->findForFolderOpeningBetween($allCategoryIds, $from, $to);
             }
             catch (Exception $e) {
                 error(159);
@@ -264,7 +264,11 @@ class Module extends BaseModule
         /* No acrobatics required
          */
         try {
-            $allUnitInstances = $unitInstanceMapper->findByColumn('category_id', $params['folderId']);
+
+            /* All the units associated with folders which used the same
+             * $courseFolder as a source. Filter it based on $from and $to
+             */
+            $allUnitInstances = $unitInstanceMapper->findForFolderOpeningBetween([$params['folderId']], $from, $to);
         }
         catch (Exception $e) {
             error(159);
