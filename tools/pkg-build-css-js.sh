@@ -15,7 +15,7 @@
 
 sass=0
 if [ "$1" == "--sass" ]; then
-    sass=1
+	sass=1
 fi
 
 filepath=`readlink -f $0`;
@@ -23,22 +23,51 @@ fullpath=${filepath%/*}
 instdir=`readlink -f $fullpath/../`;
 PATH="$PATH:$instdir/node_modules/.bin";
 
-# Installing NPM dependencies
+echo "Installing NPM dependencies";
 npm install;
+if [ $? -ne 0 ];
+then
+	echo "An error occurred";
+	exit 1;
+fi
 
-# Install SASS
+echo "Install SASS";
 gem install sass --no-rdoc --no-ri --version "3.4.13"
+if [ $? -ne 0 ];
+then
+	echo "An error occurred";
+	exit 1;
+fi
+
 # Last test: bundler works but is MUCH slower to install than through gem
 #apt-get -y install ruby-bundler;
 #bundle install;
 
-# Installing and building Bower submodules
+echo "Installing and building Bower submodules";
 grunt bower build.deps;
+if [ $? -ne 0 ];
+then
+	echo "An error occurred";
+	exit 1;
+fi
 
-# Building JS files via UglifyJS
+echo "Building JS files via UglifyJS";
 grunt build.js;
+if [ $? -ne 0 ];
+then
+	echo "An error occurred";
+	exit 1;
+fi
 
-# Build SASS files (Vagrant provision only, not package build)
+echo "Building CSS files via LessCSS";
+grunt build.css;
+if [ $? -ne 0 ];
+then
+	echo "An error occurred";
+	exit 1;
+fi
+
 if [ $sass = 1 ]; then
-    grunt sass;
+	echo "Build SASS files (Vagrant provision only, not package build)";
+	grunt sass;
 fi
