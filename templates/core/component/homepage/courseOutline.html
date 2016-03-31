@@ -234,7 +234,10 @@
                                         <div class="switch">
                                             <input name="self_assess" value="0" type="hidden" />
                                             <input name="self_assess" value="1" type="checkbox" id="self_assess-{UNIT_TASK_ID}" {UNIT_TASK_SELF_ASSESS} />
-                                            <label for="self_assess-{UNIT_TASK_ID}"></label>
+                                            <label for="self_assess-{UNIT_TASK_ID}">
+                                                <span>On</span>
+                                                <span>Off</span>
+                                            </label>
                                         </div>
 
                                         <input type="submit" name="Submit" value="Update" />
@@ -296,7 +299,10 @@
                                 <div class="switch">
                                     <input name="self_assess" value="0" type="hidden" />
                                     <input name="self_assess" value="1" type="checkbox" id="self_assess-new_task-{UNIT_ID}" />
-                                    <label for="self_assess-new_task-{UNIT_ID}"></label>
+                                    <label for="self_assess-new_task-{UNIT_ID}">
+                                        <span>On</span>
+                                        <span>Off</span>
+                                    </label>
                                 </div>
 
                                 <input type="submit" name="Submit" value="Create" />
