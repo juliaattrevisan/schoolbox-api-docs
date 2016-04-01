@@ -491,6 +491,34 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         return $categories;
     }
 
+
+    /**
+     * Search for folders with the given curriculum code(s)
+     *
+     * @param string|array $code
+     * @return Collection|Model[]
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function findByCurriculumCode($code)
+    {
+        if (!$code) {
+            // no code? no matches
+            return $this->createCollection();
+        }
+
+        // cast singular to plural
+        $code = (array)$code;
+
+        // generate prepare-param string
+        $qmarks = implode(', ', array_pad([], count($code), '?'));
+
+        // search on curriculum node code
+        $q = $this->getFindQuery() . "WHERE cn.code in ($qmarks)";
+
+        // search, hydrate, return
+        return $this->hydrateFromFindQuery($this->getDatabase()->query($q, $code));
+    }
+
     /**
      * Helper method for creating a search query with codes, homepage config and
      * group all built in.
@@ -581,64 +609,70 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      *
      * @param  \PDOStatement $statement
      * @throws \Schoolbox\Mapper\Exception if statement returned no category
-     * @return Model
+     * @return Collection|Model[]
      */
     protected function hydrateFromFindQuery($statement)
     {
         $code_mapper = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
-        $category = null;
 
-        $addedCodes           = [];
+        /** @var Model[] $categories */
+        $categories = [];
+
+        $addedClassCodes      = [];
         $addedCurriculumNodes = [];
 
         foreach ($statement as $row) {
-            if (!$category instanceof $this->model) {
-                $category = $this->hydrate($row, 'c');
+
+            $testId = $row['c.id'];
+
+            // create if not exists
+            if (!array_key_exists($testId, $categories)) {
+                $category = $categories[$testId] = $this->hydrate($row, 'c');
+
+                // set 1:1 objects
+                $category->setHomepage($homepageConfig_mapper->hydrate($row, 'hp'));
+                $category->setGroup($group_mapper->hydrate($row, 'ug'));
+
                 if (isset($row['c.taskCount'])) {
-                    $category->setTaskCount($row['c.taskCount']);
+                    $categories[$testId]->setTaskCount($row['c.taskCount']);
                 }
             }
 
-            // Hydrate class codes (avoiding duplicates)
+            // Hydrate class codes (avoiding duplicates) and cache
             $code = $code_mapper->hydrate($row, 'cc');
+
             if ($code->getCategory()->getId()) {
-                $addedCodes[$code->getCode()] = $code;
+                $addedClassCodes[$testId][$code->getCode()] = $code;
             }
 
-            $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
-            $category->setHomepage($homepageConfig);
-
-            $group = $group_mapper->hydrate($row, 'ug');
-            $category->setGroup($group);
-
-            // Hydrate curriculum node codes (avoiding duplicates)
+            // Hydrate curriculum node codes (avoiding duplicates) and cache
             // BTW fetching multiple 1-M relations in a single query
             // is how you get ants!
             /** @var Node\Model $curriculumNode */
             $curriculumNode = $this->getJoinMapper('curriculum_node_for_category')
                 ->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
             if ($curriculumNode->getId()) {
-                $addedCurriculumNodes[$curriculumNode->getId()] = $curriculumNode;
-            }
-        }
-        if (!($category instanceof Model)) {
-            throw new \Schoolbox\Mapper\Exception('Instance of object not found');
-        }
-        if (!empty($addedCodes)) {
-            foreach ($addedCodes as $code) {
-                $category->addCode($code);
-            }
-        }
-        if (!empty($addedCurriculumNodes)) {
-            foreach ($addedCurriculumNodes as $curriculumNode) {
-                $category->addCurriculumNode($curriculumNode);
+                $addedCurriculumNodes[$testId][$curriculumNode->getId()] = $curriculumNode;
             }
         }
 
-        $this->throwIfDeleted($category);
-        return $category;
+        // set n:1 and n:n objects
+        foreach ($categories as $catId => $category) {
+            if (!empty($addedClassCodes[$catId])) {
+                foreach ($addedClassCodes[$catId] as $code) {
+                    $category->addCode($code);
+                }
+            }
+            if (!empty($addedCurriculumNodes[$catId])) {
+                foreach ($addedCurriculumNodes[$catId] as $curriculumNode) {
+                    $category->addCurriculumNode($curriculumNode);
+                }
+            }
+        }
+
+        return $this->createCollection($categories);
     }
 
     /**
@@ -664,7 +698,11 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 'codeLike' => '%/' . $this->database->quoteForLike($code),
             )
         );
-        $model = $this->hydrateFromFindQuery($statement);
+        $model = $this->hydrateFromFindQuery($statement)->first();
+
+        if (!$model instanceof Model) {
+            throw new \Schoolbox\Mapper\Exception("Instance of object not found");
+        }
 
         // Re-load codes into the model,
         // because the above query won't fetch codes for this category that
@@ -716,7 +754,14 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $query .= 'WHERE c.id=?';
         $statement = $this->database->prepare($query);
         $statement->execute(array($id));
-        return $this->hydrateFromFindQuery($statement);
+        $collection = $this->hydrateFromFindQuery($statement);
+
+        // emulate findOneBy functionality: there must be exactly one
+        if ($collection->count() != 1) {
+            throw new \Schoolbox\Mapper\Exception("Instance of object not found");
+        }
+
+        return $collection->first();
     }
 
     /**

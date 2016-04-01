@@ -222,24 +222,7 @@ class Mapper extends FolderMapper
          * contained within it. That can be used to determine
          * whether a Unit is reachable or not via various ui
          */
-        $taskCountQuery = "
-            SELECT
-                unit.id,
-                COUNT(task.id) AS taskCount
-            FROM {$this->getTable()} course
-            LEFT JOIN {$this->getTable()} unit ON unit.parent = course.id AND unit.deleted_at IS NULL
-            LEFT JOIN task ON task.category_id = unit.id AND task.deleted_at IS NULL
-            WHERE course.deleted_at IS NULL AND course.id = ?
-            GROUP BY unit.id
-        ";
-
-        $taskCountStatement = $this->database->prepare($taskCountQuery);
-        $taskCountStatement->execute([$course->getId()]);
-        $taskCounts = [];
-
-        foreach ($taskCountStatement as $row) {
-            $taskCounts[$row['id']] = $row['taskCount'];
-        }
+        $taskCounts = $this->findUnitTaskCount($course);
 
         $collection = new Collection();
         $category = null;
@@ -285,6 +268,63 @@ class Mapper extends FolderMapper
 
         return $collection;
     }
+
+
+    /**
+     * Find the number of tasks for each subfolder (unit) of the given course
+     *
+     * @param Folder $course
+     * @return array
+     */
+    protected function findUnitTaskCount(Folder $course)
+    {
+        $taskCountQuery = "
+            SELECT
+                unit.id,
+                COUNT(task.id) AS taskCount
+            FROM {$this->getTable()} course
+            LEFT JOIN {$this->getTable()} unit ON unit.parent = course.id AND unit.deleted_at IS NULL
+            LEFT JOIN task ON task.category_id = unit.id AND task.deleted_at IS NULL
+            WHERE course.deleted_at IS NULL AND course.id = ?
+            GROUP BY unit.id
+        ";
+
+        $taskCountStatement = $this->database->prepare($taskCountQuery);
+        $taskCountStatement->execute([$course->getId()]);
+        $taskCounts = [];
+
+        foreach ($taskCountStatement as $row) {
+            $taskCounts[$row['id']] = $row['taskCount'];
+        }
+
+        return $taskCounts;
+    }
+
+
+    /**
+     * Find the total number of tasks for the given course
+     *
+     * @param Folder $course
+     * @return int
+     */
+    public function findCourseTaskCount(Folder $course)
+    {
+        return array_sum($this->findUnitTaskCount($course));
+    }
+
+
+    /**
+     * Returns whether or not the given folder is, in fact, a course
+     *
+     * @param Folder $folder
+     * @return bool
+     */
+    public function verifyCourse(Folder $folder)
+    {
+        // more than 0 tasks means this is a course
+        return $this->findCourseTaskCount($folder) > 0;
+    }
+
 
     /* Getters/Setters
      */
