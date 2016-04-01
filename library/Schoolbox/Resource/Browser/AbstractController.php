@@ -245,13 +245,8 @@ abstract class AbstractController extends BaseController
 
         }
 
-        /** @var ThemedHtml $output */
-        $output = $this->getDi()->get("webOutput:html");
         $this->getResponse()->content->set(
-            $output
-                ->setTemplate('@resourceBrowser/browse.twig')
-                ->setTab($this->tab)
-                ->setData($data)
+            $this->buildHtmlOutput('@resourceBrowser/browse.twig', $data)->setTab($this->tab)
         );
     }
 
