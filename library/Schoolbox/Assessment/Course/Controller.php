@@ -303,6 +303,13 @@ class Controller extends Base\Base
         // if something got passed, don't care: overriding it
         $post['id'] = $id;
 
+        // save unit name changes
+        foreach ($post['unitname'] as $unitId => $unitName) {
+            $this->getFolderMapper()->save(
+                $this->getFolderMapper()->findById($unitId)->setName($unitName)
+            );
+        }
+
         $this->saveCourse($post, $rq->isXhr(), 'course.courseList');
     }
 
