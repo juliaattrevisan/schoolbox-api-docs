@@ -107,10 +107,28 @@ class MssqlResultIterator implements SeekableIterator
      */
     public function seek($position)
     {
-        if (mssql_data_seek($this->result, $position)) {
-            return;
+        if (is_resource($this->result)) {
+            if (mssql_num_rows($this->result)) {
+                if (mssql_data_seek($this->result, $position)) {
+                    return;
+                }
+
+                /* Tried to access an area beyond the bounds of a
+                 * result set that contains data
+                 */
+                throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
+            } else {
+
+                /* Empty result set probably shouldn't throw an exception;
+                 * just quietly do nothing with it?
+                 */
+                return;
+            }
         }
-        throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
+
+        /* Not even a resource object, die loudly
+         */
+        throw new InvalidArgumentException('Invalid result set');
     }
 
     /**
