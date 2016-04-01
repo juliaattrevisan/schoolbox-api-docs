@@ -101,13 +101,18 @@ class Controller extends BaseController
      */
     public function getFolderModify($id)
     {
+        $access = $this->getAccess();
         $folderMapper = $this->getFolderMapper();
         $homepageConfigMapper = $this->getHomepageConfigMapper();
         $homepageTemplateMapper = $this->getHomepageTemplateMapper();
         $roleAccessMapper = $this->getRoleAccessMapper();
         $roleMapper = $this->getRoleMapper();
         $errorMapper = $this->getErrorMapper();
-        
+
+        if ($access->getFolderAccess($this->getUser(), [$id]) < UserAccess::ACCESS_WRITE) {
+            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+        }
+
         try {
             $folder = $folderMapper->findById($id);
             $parent = $folderMapper->findById($folder->getParent()->getId());
@@ -171,10 +176,15 @@ class Controller extends BaseController
      */
     public function getFolderCreate($parentId)
     {
+        $access = $this->getAccess();
         $folderMapper = $this->getFolderMapper();
         $homepageTemplateMapper = $this->getHomepageTemplateMapper();
         $roleMapper = $this->getRoleMapper();
         $errorMapper = $this->getErrorMapper();
+
+        if ($access->getFolderAccess($this->getUser(), [$parentId]) < UserAccess::ACCESS_WRITE) {
+            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+        }
 
         try {
             $parent = $folderMapper->findById($parentId);
@@ -238,7 +248,7 @@ class Controller extends BaseController
             $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
         }
 
-        // Make sure they have access to delete the forlder
+        // Make sure they have access to delete the folder
 
         if ($access->getFolderAccess($this->getUser(), [$folder->getId()]) < WRITE_ACCESS) {
             $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
@@ -262,6 +272,7 @@ class Controller extends BaseController
      */
     public function postMoveFolder()
     {
+        $access = $this->getAccess();
         $errorMapper = $this->getErrorMapper();
         $folderMapper = $this->getFolderMapper();
 
@@ -273,6 +284,14 @@ class Controller extends BaseController
             {
                 $source = $folderMapper->findById($this->getRequest()->post["source"]);
                 $destination = $folderMapper->findById($this->getRequest()->post["destination"]);
+
+                if ($access->getFolderAccess($this->getUser(), [$source->getId()]) < WRITE_ACCESS) {
+                    $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
+                }
+
+                if ($access->getFolderAccess($this->getUser(), [$destination->getId()]) < WRITE_ACCESS) {
+                    $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
+                }
             }
             catch (\Exception $e)
             {
@@ -331,10 +350,6 @@ class Controller extends BaseController
         }
     }
 
-
-
-
-
     /**
      * This is public for now because /cms/categoryForm.php needs to reference it
      *
@@ -353,11 +368,11 @@ class Controller extends BaseController
         $access           = $this->getAccess();
 
         $model = $folderMapper->createModel()
-                      ->setName($postData['name'])
-                      ->setParent(
-                          $folderMapper->createModel()
-                               ->setId($postData['parent'])
-                      );
+            ->setName($postData['name'])
+            ->setParent(
+                $folderMapper->createModel()
+                    ->setId($postData['parent'])
+            );
 
         if ($postData["inherit"] == 1) {
             $model->enableInherit();
@@ -625,7 +640,7 @@ class Controller extends BaseController
         } catch (\Exception $e ) {
             $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
         }
-        
+
         $folderMapper->recursiveDelete($folder);
 
         $_SESSION['resourcesID'] = $folder->getParent()->getId();
