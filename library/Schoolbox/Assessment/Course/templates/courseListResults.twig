@@ -5,11 +5,11 @@
             <ul class="information-list">
                 {% for course in courses %}
                     {% set cparents = lineage[course.id] %}
-                    {# TODO: replace the first clause of the ternary with a routeLookup() once a route exists #}
                     {% set linkhref =
-                    folder.id
-                    ? routeLookup('course.import', { courseId: course.id, classCode: folder.id })
-                    : routeLookup('course.modifyCourse', { id: course.id }) %}
+                        folder.id
+                            ? routeLookup('course.import', { courseId: course.id, classCode: folder.id })
+                            : routeLookup('course.modifyCourse', { id: course.id })
+                    %}
 
                     {% if hasTot %}
                         <li class="actions-small-2">
