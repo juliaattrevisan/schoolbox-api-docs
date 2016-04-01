@@ -25,14 +25,14 @@ fi
 echo "Branch: $branch";
 
 
-if [ ! -f ../"$prefix"vendor-php-artifact/"$branch"-vendor-php.tar.gz ];
+if [ ! -f ../vendor-php-artifact/"$branch"-vendor-php.tar.gz ];
 then
-	echo "Unable to locate vendor artifact: ../"$prefix"vendor-php-artifact/"$branch"-vendor-php.tar.gz";
+	echo "Unable to locate vendor artifact: ../vendor-php-artifact/"$branch"-vendor-php.tar.gz";
 	exit 1;
 fi
 
 echo "Unpacking vendor php build";
-tar xzf ../"$prefix"vendor-php-artifact/"$branch"-vendor-php.tar.gz;
+tar xzf ../vendor-php-artifact/"$branch"-vendor-php.tar.gz;
 
 echo "Validating checksums";
 checksum=`sha1sum composer.lock`;
@@ -42,14 +42,14 @@ then
         exit 1;
 fi
 
-if [ ! -f ../"$prefix"browscap-cache/"$branch"-browscap-cache.php.gz ];
+if [ ! -f ../browscap-cache/"$branch"-browscap-cache.php.gz ];
 then
-	echo "Unable to locate browscap cache artifact: ../"$prefix"browscap-cache/"$branch"-browscap-cache.php.gz";
+	echo "Unable to locate browscap cache artifact: ../browscap-cache/"$branch"-browscap-cache.php.gz";
 	exit 1;
 fi
 
 echo "Unpacking browscap cache file";
-gzip -d ../"$prefix"browscap-cache/"$branch"-browscap-cache.php.gz;
+gzip -d ../browscap-cache/"$branch"-browscap-cache.php.gz;
 if [ $? -ne 0 ];
 then
 	echo "Unable to extract browscap cache file";
@@ -59,7 +59,7 @@ fi
 echo "Configuring browscap cache";
 mkdir -vp tools/browscap;
 touch tools/browscap/browscap.ini;
-cp -vf ../"$prefix"browscap-cache/"$branch"-browscap-cache.php tools/browscap/cache.php;
+cp -vf ../browscap-cache/"$branch"-browscap-cache.php tools/browscap/cache.php;
 if [ $? -ne 0 ];
 then
 	echo "Unable to copy browscap cache file";
@@ -96,7 +96,7 @@ echo "Creating artifact directory";
 mkdir -vp $initialdir/tarball-artifacts;
 
 echo "Creating build tarball artifact";
-tar czf $initialdir/tarball-artifacts/"$prefix"build.tar.gz .;
+tar czf $initialdir/tarball-artifacts/build.tar.gz .;
 
 echo "Artifact List: `readlink -f $initialdir/tarball-artifacts/`";
 ls -lhR $initialdir/tarball-artifacts/;

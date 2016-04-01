@@ -15,13 +15,6 @@ then
         branch="$1";
 fi
 
-if [ "$branch" == "master" ];
-then
-	prefix='';
-else
-	prefix="$branch-";
-fi
-
 echo "Branch: $branch";
 
 echo "Checking version to build";
@@ -34,9 +27,9 @@ else
 	exit 1;
 fi
 
-if [ ! -f ../"$prefix"build-artifact/"$branch"-build.tar.gz ];
+if [ ! -f ../build-artifact/"$branch"-build.tar.gz ];
 then
-	echo "Unable to locate build artifact: ../"$prefix"build-artifact/"$branch"-build.tar.gz";
+	echo "Unable to locate build artifact: ../build-artifact/"$branch"-build.tar.gz";
 	exit 1;
 fi
 
@@ -50,7 +43,7 @@ do
 
 	echo "[$i] Unpacking build artifact";
 	cd $initialdir/$i-$version;
-	tar xzf ../"$prefix"build-artifact/"$branch"-build.tar.gz;
+	tar xzf ../build-artifact/"$branch"-build.tar.gz;
 	if [ $? -ne 0 ];
 	then
 		echo "Error unpacking build artifact";
