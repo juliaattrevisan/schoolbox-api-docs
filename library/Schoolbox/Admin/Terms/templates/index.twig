@@ -33,6 +33,7 @@
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript">
 
     var initForm = function(form) {
@@ -56,7 +57,18 @@
                 }
             }
         });
-        form.alaressValidate();
+        form.alaressValidate({
+            rules: {
+                code: {
+                    pattern: /^[a-z0-9\\-_]+$/i
+                }
+            },
+            messages: {
+                code: {
+                    pattern: 'A code may only contain alphanumeric, hyphen and underscore characters.'
+                }
+            }
+        });
     };
 
     $(function(){
