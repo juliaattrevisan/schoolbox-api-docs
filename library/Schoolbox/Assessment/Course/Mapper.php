@@ -222,7 +222,7 @@ class Mapper extends FolderMapper
          * contained within it. That can be used to determine
          * whether a Unit is reachable or not via various ui
          */
-        $taskCounts = $this->findCourseTaskCount($course);
+        $taskCounts = $this->findUnitTaskCount($course);
 
         $collection = new Collection();
         $category = null;
@@ -271,11 +271,12 @@ class Mapper extends FolderMapper
 
 
     /**
+     * Find the number of tasks for each subfolder (unit) of the given course
      *
      * @param Folder $course
-     * @return bool
+     * @return array
      */
-    protected function findCourseTaskCount(Folder $course)
+    protected function findUnitTaskCount(Folder $course)
     {
         $taskCountQuery = "
             SELECT
