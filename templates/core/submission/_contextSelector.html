@@ -20,6 +20,7 @@
             </nav>
             <div class="semester">
                 <select id="context-selector-semester">
+                    <option disabled selected label="Select a term">Select a term</option>
                     <!-- BEGIN term_option -->
                     <option value="{SUBJECT_PART}{TERM_SLUG}" {TERM_SELECTED}>{TERM_VALUE}</option>
                     <!-- END term_option -->
@@ -32,7 +33,7 @@
             <!-- BEGIN subject_context -->
             <div class="subject">
                 <select id="context-selector-enrolled-subjects">
-                    <option disabled="disabled" selected="selected">Select a subject</option>
+                    <option disabled selected label="Select a subject">Select a subject</option>
                     <!-- BEGIN subject_option -->
                     <option data-id="{SUBJECT_ID}" value="{SUBJECT_HREF}" {SUBJECT_SELECTED}>{SUBJECT_NAME}</option>
                     <!-- END subject_option -->
@@ -44,7 +45,7 @@
                 <!-- Unit selector is actually multiple selectors, which are shown/hidden when the semester context changes -->
                 <!-- BEGIN unit_select -->
                 <select data-interaction="select_unit" data-semester="{UNIT_KEY}" class="hide">
-                    <option disabled label="Select a unit">Select a unit</option>
+                    <option disabled selected label="Select a unit">Select a unit</option>
                     <!-- BEGIN unit_option -->
                     <option label="{UNIT_NAME}" value="{UNIT_ID}" {UNIT_SELECTED}>
                         {UNIT_NAME}
