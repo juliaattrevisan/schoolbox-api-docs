@@ -6,9 +6,9 @@
 
             $('#component{COMPONENT_INSTANCE_ID}-countdown').countdown(endTime).on('update.countdown', function(event) {
                     var format =
-                        '<li><span class="count">%H</span> <span class="labels">Hours</span></li>'
-                        + '<li><span class="count">%M</span> <span class="labels">Minutes</span></li>'
-                        + '<li><span class="count">%S</span> <span class="labels">Seconds</span></li>'
+                        '<li><span class="count">%H</span> <span class="labels">Hrs</span></li>'
+                        + '<li><span class="count">%M</span> <span class="labels">Mins</span></li>'
+                        + '<li><span class="count">%S</span> <span class="labels">Secs</span></li>'
                     if(event.offset.days > 0) {
                         format = ' <li><span class="count">%-d</span> <span class="labels">Day%!d</span></li> ' + format;
                     }
