@@ -700,6 +700,10 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         );
         $model = $this->hydrateFromFindQuery($statement)->first();
 
+        if (!$model instanceof Model) {
+            throw new \Schoolbox\Mapper\Exception("Instance of object not found");
+        }
+
         // Re-load codes into the model,
         // because the above query won't fetch codes for this category that
         // don't match the above where part.
