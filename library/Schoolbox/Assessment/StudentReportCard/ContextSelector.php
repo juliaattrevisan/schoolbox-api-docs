@@ -275,20 +275,23 @@ class ContextSelector
 		/** @var Term\Model[] $terms */
 		$terms = array_values($this->terms->getAll());
 
-		foreach ($terms as $i => $term) {
-			$prevTerm = $terms[$i-1];
-			$nextTerm = $terms[$i+1];
-			if ($term->getId() == $selection->getId()) {
-				if (isset($prevTerm)) {
-					$result['TERM_FWD']          = $prevTerm->getCode();
-					$result['TERM_FWD_DISABLED'] = '';
-				}
-				if (isset($nextTerm)) {
-					$result['TERM_BACK']          = $nextTerm->getCode();
-					$result['TERM_BACK_DISABLED'] = '';
+		if ($selection->getId() !== null) {
+			foreach ($terms as $i => $term) {
+				$prevTerm = $terms[$i - 1];
+				$nextTerm = $terms[$i + 1];
+				if ($term->getId() == $selection->getId()) {
+					if (isset($prevTerm)) {
+						$result['TERM_FWD']          = $prevTerm->getCode();
+						$result['TERM_FWD_DISABLED'] = '';
+					}
+					if (isset($nextTerm)) {
+						$result['TERM_BACK']          = $nextTerm->getCode();
+						$result['TERM_BACK_DISABLED'] = '';
+					}
 				}
 			}
 		}
+
 		return $result;
 	}
 
