@@ -1,0 +1,59 @@
+{% set cparents = lineage[course.id] %}
+{% set linkhref =
+    folder.id
+        ? routeLookup('course.import', { courseId: course.id, classCode: folder.id })
+        : routeLookup('course.modifyCourse', { id: course.id })
+%}
+
+    {% if hasTot %}
+<li class="actions-small-2">
+    {% else %}
+<li class="actions-small-1">
+    {% endif %}
+
+    <div class="list-item">
+        <div class="compact avatar card small-12">
+            <a href="{{ linkhref }}" data-course-id="{{ course.id }}" data-course-name="{{ course.name }}">
+                <div class="icon-course icon-16"></div>
+                <h3>{{ course.name }}</h3>
+            </a>
+            <p class="meta">
+                {{ cparents[0].name }}
+                    {% for cparent in cparents | slice(1) %}
+                &gt; {{ cparent.name }}
+                    {% endfor %}
+            </p>
+        </div>
+        <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="course-{{ course.id }}">
+            <ul class="unit-list">
+                    {% for unit in units[course.id] %}
+                <li>
+                        {% if unit.hasHomepage and linkToUnits %}
+                    <a title="Visit {{ unit.name }} homepage" href="/homepage/{{ unit.id }}">{{ unit.name }}</a>
+                        {% else %}
+                    {{ unit.name }}
+                        {% endif %}
+                </li>
+                    {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <nav>
+        <a href="#" class="icon-down-arrow" data-collapser="course-{{ course.id }}"></a>
+            {% if hasTot %}
+        <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ course.getId() }}" aria-expanded="false" title="Actions"></a>
+            {% endif %}
+    </nav>
+
+        {% if hasTot %}
+    <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ course.getId() }}">
+        <li><a href="{{ routeLookup('course.modifyCourse', {id: course.getId()}) }}" class="icon-modify">Modify</a></li>
+
+            {# Course delete: standard folder delete -#}
+            {% if currentUser.isSuperuser() %}
+        <li><a href="#" class="icon-delete" data-course-delete-id="{{ course.getId }}" data-action="course-delete">Delete</a></li>
+            {% endif %}
+
+    </ul>
+        {% endif %}
+</li>
