@@ -9,6 +9,7 @@
 
 namespace Alaress\Web\Controller;
 
+use Alaress\Web\Output;
 use Aura\Di;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Session\SegmentInterface;
@@ -230,5 +231,70 @@ abstract class Base {
         }
     }
 
+    /**
+     * Factory method for loading a JSON output object.
+     *
+     * @param  mixed $data
+     * @return Output\Json
+     */
+    protected function buildJsonOutput($data)
+    {
+        /** @var Output\Json $output */
+        $output = $this->getDi()->get('webOutput:json');
+        return $output->setData($data);
+    }
 
+    /**
+     * Factory method for loading a chromeless HTML output object.
+     *
+     * @param  string $template A Twig template
+     * @param  mixed  $data
+     * @return Output\Html
+     */
+    protected function buildUnthemedHtmlOutput($template, $data)
+    {
+        /** @var Output\Html $output */
+        $output = $this->getDi()->get('webOutput:nochrome');
+        return $output->setTemplate($template)->setData($data);
+    }
+
+    /**
+     * Factory method for loading a chromed HTML output object.
+     *
+     * @param  string $template A Twig template
+     * @param  mixed  $data
+     * @return Output\ThemedHtml
+     */
+    protected function buildHtmlOutput($template, $data)
+    {
+        /** @var Output\ThemedHtml $output */
+        $output = $this->getDi()->get('webOutput:html');
+        return $output->setTemplate($template)->setData($data);
+    }
+
+    /**
+     * Factory method for loading a file output object.
+     *
+     * @param  string $filename
+     * @return Output\File
+     */
+    protected function buildFileOutputFromFilename($filename)
+    {
+        /** @var Output\File $output */
+        $output = $this->getDi()->get('webOutput:html');
+        return $output->setFile($filename);
+    }
+
+    /**
+     * Factory method for loading a file output object.
+     *
+     * @param  string $fileContents
+     * @return Output\File
+     */
+    protected function buildFileOutputFromString($fileContents)
+    {
+        /** @var Output\File $output */
+        $output = $this->getDi()->get('webOutput:html');
+        return $output->setData($fileContents);
+    }
 }
