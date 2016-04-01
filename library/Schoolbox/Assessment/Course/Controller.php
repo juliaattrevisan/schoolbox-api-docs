@@ -630,6 +630,12 @@ class Controller extends Base\Base
 
         $data  = $this->getCourseMapper()->findCourseList($search);
 
+        // only offer suggestions if you're not searching
+        if ($folder && !$search) {
+            $folderModel = $this->getFolderMapper()->findById($folder);
+            $data['suggestions'] = $this->getLinkSuggestions($folderModel);
+        }
+
         /* Remember what the user searched for
          */
         $data['query'] = $query->get('query');
@@ -659,6 +665,24 @@ class Controller extends Base\Base
         }
 
         $this->tpl($template, array_merge($data, $options));
+    }
+
+
+    /**
+     * Gets the suggested course links to A FULLY HYDRATED folder
+     *
+     * @param Folder\Model $folder
+     * @return Collection
+     */
+    protected function getLinkSuggestions(Folder\Model $folder)
+    {
+        // obtain curriculum codes...
+        $codes   = $folder->getCurriculumNodes()->getColumnValues('code');
+
+        // find all the folders that match this code, then filter for coarseness
+        return $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($folder) {
+            return $this->courseMapper->verifyCourse($folder);
+        });
     }
 
 
