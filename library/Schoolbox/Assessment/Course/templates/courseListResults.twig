@@ -1,7 +1,21 @@
 <div class="small-12 island">
 
+    {% if suggestions|length %}
+        <section>
+            <h3>Suggested Courses</h3>
+            <ul class="information-list">
+                {% for course in suggestions %}
+                    {% include '@course/courseListResult.twig' %}
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
     {% if courses|length %}
         <section>
+            {% if suggestions|length %}
+                <h3>All Courses</h3>
+            {% endif %}
             <ul class="information-list">
                 {% for course in courses %}
                     {% include '@course/courseListResult.twig' %}
