@@ -1,4 +1,5 @@
 {% set cparents = lineage[course.id] %}
+{% set collapsePrefix = collapsePrefix ?: 'course' %}
 {% set linkhref =
     folder.id
         ? routeLookup('course.import', { courseId: course.id, classCode: folder.id })
@@ -24,7 +25,7 @@
                     {% endfor %}
             </p>
         </div>
-        <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="course-{{ course.id }}">
+        <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="{{ collapsePrefix }}-{{ course.id }}">
             <ul class="unit-list">
                     {% for unit in units[course.id] %}
                 <li>
@@ -39,7 +40,7 @@
         </div>
     </div>
     <nav>
-        <a href="#" class="icon-down-arrow" data-collapser="course-{{ course.id }}"></a>
+        <a href="#" class="icon-down-arrow" data-collapser="{{ collapsePrefix }}-{{ course.id }}"></a>
             {% if hasTot %}
         <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ course.getId() }}" aria-expanded="false" title="Actions"></a>
             {% endif %}

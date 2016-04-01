@@ -5,7 +5,7 @@
             <h3>Suggested Courses</h3>
             <ul class="information-list">
                 {% for course in suggestions %}
-                    {% include '@course/courseListResult.twig' %}
+                    {% include '@course/courseListResult.twig' with { collapsePrefix: 'suggest' } %}
                 {% endfor %}
             </ul>
         </section>
