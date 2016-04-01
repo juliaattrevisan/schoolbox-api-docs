@@ -222,24 +222,7 @@ class Mapper extends FolderMapper
          * contained within it. That can be used to determine
          * whether a Unit is reachable or not via various ui
          */
-        $taskCountQuery = "
-            SELECT
-                unit.id,
-                COUNT(task.id) AS taskCount
-            FROM {$this->getTable()} course
-            LEFT JOIN {$this->getTable()} unit ON unit.parent = course.id AND unit.deleted_at IS NULL
-            LEFT JOIN task ON task.category_id = unit.id AND task.deleted_at IS NULL
-            WHERE course.deleted_at IS NULL AND course.id = ?
-            GROUP BY unit.id
-        ";
-
-        $taskCountStatement = $this->database->prepare($taskCountQuery);
-        $taskCountStatement->execute([$course->getId()]);
-        $taskCounts = [];
-
-        foreach ($taskCountStatement as $row) {
-            $taskCounts[$row['id']] = $row['taskCount'];
-        }
+        $taskCounts = $this->findCourseTaskCount($course);
 
         $collection = new Collection();
         $category = null;
@@ -285,6 +268,37 @@ class Mapper extends FolderMapper
 
         return $collection;
     }
+
+
+    /**
+     *
+     * @param Folder $course
+     * @return bool
+     */
+    protected function findCourseTaskCount(Folder $course)
+    {
+        $taskCountQuery = "
+            SELECT
+                unit.id,
+                COUNT(task.id) AS taskCount
+            FROM {$this->getTable()} course
+            LEFT JOIN {$this->getTable()} unit ON unit.parent = course.id AND unit.deleted_at IS NULL
+            LEFT JOIN task ON task.category_id = unit.id AND task.deleted_at IS NULL
+            WHERE course.deleted_at IS NULL AND course.id = ?
+            GROUP BY unit.id
+        ";
+
+        $taskCountStatement = $this->database->prepare($taskCountQuery);
+        $taskCountStatement->execute([$course->getId()]);
+        $taskCounts = [];
+
+        foreach ($taskCountStatement as $row) {
+            $taskCounts[$row['id']] = $row['taskCount'];
+        }
+
+        return $taskCounts;
+    }
+
 
     /* Getters/Setters
      */
