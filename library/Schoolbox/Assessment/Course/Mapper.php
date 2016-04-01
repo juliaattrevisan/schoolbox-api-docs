@@ -301,6 +301,31 @@ class Mapper extends FolderMapper
     }
 
 
+    /**
+     * Find the total number of tasks for the given course
+     *
+     * @param Folder $course
+     * @return int
+     */
+    public function findCourseTaskCount(Folder $course)
+    {
+        return array_sum($this->findUnitTaskCount($course));
+    }
+
+
+    /**
+     * Returns whether or not the given folder is, in fact, a course
+     *
+     * @param Folder $folder
+     * @return bool
+     */
+    public function verifyCourse(Folder $folder)
+    {
+        // more than 0 tasks means this is a course
+        return $this->findCourseTaskCount($folder) > 0;
+    }
+
+
     /* Getters/Setters
      */
 
