@@ -501,6 +501,11 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      */
     public function findByCurriculumCode($code)
     {
+        if (!$code) {
+            // no code? no matches
+            return $this->createCollection();
+        }
+
         // cast singular to plural
         $code = (array)$code;
 
