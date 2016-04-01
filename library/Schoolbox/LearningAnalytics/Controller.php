@@ -22,6 +22,9 @@ use Schoolbox\LearningAnalytics\Results\TaskResults;
 use Schoolbox\LearningAnalytics\Results\TaskTypes;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
 use Schoolbox\LearningAnalytics\Effort\AllEffort;
+use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
 class Controller extends Base {
 
@@ -32,9 +35,13 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
+     * @param Term $term
      */
-    public function course($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+    public function course($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
+        );
     }
 
     /**
@@ -44,9 +51,13 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
+     * @param Term $term
      */
-    public function courseWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+    public function courseWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
+        );
     }
 
     /**
@@ -56,9 +67,13 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
+     * @param Term $term
      */
-    public function folder($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+    public function courseWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
+        );
     }
 
     /**
@@ -68,9 +83,119 @@ class Controller extends Base {
      * @param Folder $courseFolder
      * @param Collection $allFoldersUsingCourse
      * @param Collection $allUnitInstances
+     * @param Term $term
      */
-    public function folderWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances) {
-        $this->process($allUnitInstances, new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances));
+    public function courseWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
+        );
+    }
+
+    /**
+     * Same calculations as process(), just for a different set of units
+     *
+     * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
+     * @param Collection $allUnitInstances
+     * @param Term $term
+     */
+    public function folder($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
+        );
+    }
+
+    /**
+     * Same calculations as process(), just for a different set of units
+     *
+     * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
+     * @param Collection $allUnitInstances
+     * @param Term $term
+     */
+    public function folderWithTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
+        );
+    }
+
+    /**
+     * Same calculations as process(), just for a different set of units
+     *
+     * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
+     * @param Collection $allUnitInstances
+     * @param Term $term
+     */
+    public function folderWithTask($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
+        );
+    }
+
+    /**
+     * Same calculations as process(), just for a different set of units
+     *
+     * @param array $params
+     * @param Folder $courseFolder
+     * @param Collection $allFoldersUsingCourse
+     * @param Collection $allUnitInstances
+     * @param Term $term
+     */
+    public function folderWithTaskAndTerms($params, Folder $courseFolder, Collection $allFoldersUsingCourse, Collection $allUnitInstances, Term $term) {
+        $this->process(
+            $allUnitInstances,
+            new Metadata($params, $courseFolder, $allFoldersUsingCourse, $allUnitInstances, $term)
+        );
+    }
+
+    /**
+     * Generate a context selector phplib fragment
+     *
+     * @param Term $term
+     * @return
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Web\Exception\InvalidComponent
+     */
+    private function generateContextSelector(Term $term)
+    {
+        /* Url Acrobatics, since the contextselector just appends args continually
+         *
+         * Trim the leading slash
+         * Replace any /term/* args that were previously chosen from contextselector
+         * Append /term, since the contextselector term value is something like 2016-1
+         */
+        $currentUrl = ltrim($this->getRequest()->url->get(PHP_URL_PATH), '/');
+        $currentUrl = preg_replace('/\/term\/(.*)/', '', $currentUrl);
+        $currentUrl .= '/term';
+
+        /* Construct it in phplib sigh
+         */
+        $page = $this->getDi()->get('sitePage');
+
+        $termMapper = new TermMapper();
+
+        $contextSelector = new ContextSelector($currentUrl);
+        $contextSelector->setTerms($termMapper->findAll());
+
+        $contextSelector->render(
+            $page,
+            TEMPLATE_content,
+            array(
+                'term' => $term,
+            )
+        );
+
+        $contextSelectorHtml = $page->template->finish($page->template->parse('finaloutput', TEMPLATE_content));
+
+        return $contextSelectorHtml;
     }
 
     /**
@@ -134,11 +259,17 @@ class Controller extends Base {
          */
         $allEffort = new AllEffort($registry, $metadata, $allAverages);
 
+        /**
+         * Context Selector is a phplib -_-
+         */
+        $contextSelectorHtml = $this->generateContextSelector($metadata->getTerm());
+
         /* Twig data
          */
         $this->getResponse()->content->set([
             'template' => '@learningAnalytics/course.twig',
             'data' => [
+                'contextSelector' => $contextSelectorHtml,
                 'metadata' => [
                     'pageTitle' => $metadata->getPageTitle(),
                     'route' => $metadata->getRoute(),
@@ -174,7 +305,7 @@ class Controller extends Base {
                 ],
                 'effort' => [
                     'allEffort' => $allEffort->getTally(),
-                ]
+                ],
             ]
         ]);
     }

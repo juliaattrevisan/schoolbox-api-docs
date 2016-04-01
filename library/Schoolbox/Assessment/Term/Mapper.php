@@ -44,6 +44,18 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Find the oldest term known
+     */
+    public function findOldest()
+    {
+        $allTerms = $this->findAll();
+
+        $allTerms->sortBy('start', 'ASC');
+
+        return $allTerms->first();
+    }
+
+    /**
      * Finds whichever term is the current one.
      *
      * @return Model

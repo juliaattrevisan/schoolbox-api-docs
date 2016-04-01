@@ -200,6 +200,7 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Learning Analytics</h1>
+        {% if metadata.folder.all|length %}
         <dl class="sub-nav">
             {% for folder in metadata.folder.all %}
                 <dd class="{% if (folder.getId() == metadata.folder.selected.getId()) and (metadata.route == 'folder') %}active{% endif %}">
@@ -209,6 +210,7 @@
                 </dd>
             {% endfor %}
         </dl>
+        {% endif %}
         <ul class="meta">
             <li class="icon-course-builder" title="Course"><a href="/homepage/{{ metadata.folder.course.getId()}}" title="Course Page">{{ metadata.pageTitle }}</a></li>
 
@@ -219,6 +221,8 @@
         </ul>
     </div>
 </div>
+
+{{ contextSelector|raw }}
 
 <div class="row">
     <div class="small-12 large-6 island">
@@ -247,9 +251,11 @@
                 {% endfor %}
             </ul>
             {% else %}
-            <p>
-                Nobody has attempted these tasks yet.
-            </p>
+            <div class="content">
+                <p>
+                    Nobody has attempted these tasks yet.
+                </p>
+            </div>
             {% endif %}
         </section>
     </div>
@@ -272,9 +278,11 @@
                 {% endfor %}
             </ul>
             {% else %}
-            <p>
-                Nobody has attempted these tasks yet.
-            </p>
+            <div class="content">
+                <p>
+                    Nobody has attempted these tasks yet.
+                </p>
+            </div>
             {% endif %}
         </section>
     </div>
@@ -323,7 +331,7 @@
     <div class="small-12 island">
         <h2 class="subheader">Unit Progress</h2>
         <section class="content">
-            <div data-graph='unit-progress' style="height:{{ ((progress.allUnits|length)*50)+75 }}px"></div>
+            <div data-graph='unit-progress' style="height:{{ ((progress.allUnits|length)*50)+100 }}px"></div>
         </section>
     </div>
 </div>
@@ -341,7 +349,11 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Effort</h2>
+        <h2 class="subheader">
+            Effort
+            <span class='hint has-tip tip-top' title="The Effort Graph aggregates data across all terms/semesters" data-tooltip>?</span>
+        </h2>
+
         <section class="content">
             <div data-graph="effort"></div>
         </section>

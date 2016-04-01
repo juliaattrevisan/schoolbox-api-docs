@@ -14,12 +14,15 @@ use Component_InstanceMapper;
 use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Course\Task\Cloner;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Alaress_Date_Format;
+
 
 class UnitInstanceMapper extends BaseMapper {
 
@@ -154,35 +157,43 @@ class UnitInstanceMapper extends BaseMapper {
 
     /**
      * Find all the folders which use a Unit that was spawned from
-     * the original Course folder, $folder.  This limited to the provided year
+     * the original Course folder, $folder.
+     *
+     * Currently uses the beginning of $from and the end of $to as
+     * the date range, so you can get statistics across terms.
      *
      * @param Folder $folder
-     * @param $year
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
      * @return Collection
+     * @throws BaseMapper\Exception
      */
-    public function findAllFoldersUsingCourse(Folder $folder, $year) {
+    public function findAllFoldersUsingCourse(Folder $folder, Alaress_Date_Format $from, Alaress_Date_Format $to) {
         $folderMapper = $this->getJoinMapper('unit_category');
         $code_mapper = $this->getJoinMapper('category')->getJoinMapper('codes');
 
         $query = "
-            SELECT {$folderMapper->getColumnString('c')}, {$code_mapper->getColumnString('cc')}
+            SELECT
+                {$folderMapper->getColumnString('c')},
+                {$code_mapper->getColumnString('cc')}
             FROM {$this->getTable()} `ui`
             LEFT JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
             LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
             LEFT JOIN {$this->getJoinSql('category', 'ui', 'c')}
             LEFT JOIN categoryCode cc ON c.id = cc.categoryID
             WHERE `cf`.`id` = :folderId
-              AND c.deleted_at IS NULL
-              AND ui.deleted_at IS NULL
-              AND uc.deleted_at IS NULL
-              AND YEAR(ui.due_date) = :year
+                AND c.deleted_at IS NULL
+                AND ui.deleted_at IS NULL
+                AND uc.deleted_at IS NULL
+                AND ui.due_date BETWEEN :from AND :to
             GROUP BY `c`.`id`
         ";
 
         $statement = $this->database->prepare($query);
         $statement->execute(array(
             'folderId' => $folder->getId(),
-            'year'     => $year,
+            'from' => $from->getDatabaseDate(),
+            'to' => $to->getDatabaseDate()
         ));
 
         $collection = new Collection();
@@ -671,5 +682,34 @@ class UnitInstanceMapper extends BaseMapper {
             ->setTask($task)
             ->setOwner($owner);
         $this->getJoinMapper('task')->save($taskInstance);
+    }
+
+    /**
+     * For particular folders, find all the unit instances which have
+     * open dates occurring between $from and $to
+     *
+     * @param $folderIds An array of folderIds
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
+     * @return Collection
+     */
+    public function findForFolderOpeningBetween($folderIds, Alaress_Date_Format $from, Alaress_Date_Format $to)
+    {
+        $query = "
+            SELECT {$this->getColumnString('cui')}
+            FROM {$this->getTable()} cui
+            WHERE category_id IN (:folderIds)
+            AND open_date BETWEEN :from AND :to
+            AND deleted_at IS NULL
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'folderIds' => implode(',', $folderIds),
+            'from' => $from->getDatabase(),
+            'to' => $to->getDatabase()
+        ]);
+
+        return $this->hydrateList($statement, 'cui');
     }
 }

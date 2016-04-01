@@ -10,21 +10,19 @@
 
 namespace Schoolbox\LearningAnalytics;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
-use Schoolbox\Permission\Access\UserAccess;
 
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Group;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Module extends BaseModule
 {
@@ -37,26 +35,70 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        // All of these URLs relate to the resource ID, not a booking ID.
-        // Therefore, they should probably be moved to the item module.
+        $get = [
 
-        /* folderId is associated with a course, a set of units. This finds all
-         * the units associated with all the folders that use the course.
-         */
-        $this->addGetRoute($router, 'course', $basePath, "/course/{courseId}");
+            /**
+             * For a Course - aggregating all Folders which use this Course
+             */
 
-        /* With optional task filter
-         */
-        $this->addGetRoute($router, 'courseWithTask', $basePath, "/course/{courseId}/task/{taskId}");
+            /* folderId is associated with a course, a set of units. This finds all
+             * the units associated with all the folders that use the course.
+             *
+             * Extra args can focus the results on all Tasks within a Course; and
+             * also further focus on a particular time range via Term args
+             */
+            'course'                 => "/course/{courseId}",
+            'courseWithTerms'        => "/course/{courseId}/term/{term}",
+            'courseWithTask'         => "/course/{courseId}/task/{taskId}",
+            'courseWithTaskAndTerms' => "/course/{courseId}/task/{taskId}/term/{term}",
 
-        /* folderId is associated with a course, a set of units. This finds all
-         * the units associated with a particular folder that uses the course.
-         */
-        $this->addGetRoute($router, 'folder', $basePath, "/course/{courseId}/folder/{folderId}");
+            /**
+             * Per Folder that uses a particular Course
+             */
 
-        /* With optional task filter
+            /* folderId is associated with a course, a set of units. This finds all
+             * the units associated with a particular folder that uses the course.
+             *
+             * Extra args can focus the results on all Tasks within a Folder; and
+             * also further focus on a particular time range via Term args
+             */
+            'folder'                 => "/course/{courseId}/folder/{folderId}",
+            'folderWithTerms'        => "/course/{courseId}/folder/{folderId}/term/{term}",
+            'folderWithTask'         => "/course/{courseId}/folder/{folderId}/task/{taskId}",
+            'folderWithTaskAndTerms' => "/course/{courseId}/folder/{folderId}/task/{taskId}/term/{term}",
+        ];
+
+        foreach ($get as $method => $route) {
+            $this->addGetRoute($router, $method, $basePath, $route);
+        }
+    }
+
+    /**
+     * Inject params into controller
+     *
+     * {@inheritdoc}
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        /* Inject ingredients into course controller method
          */
-        $this->addGetRoute($router, 'folderWithTask', $basePath, "/course/{courseId}/folder/{folderId}/task/{taskId}");
+        $this->addRoutePreload(
+            $matcher,
+            '(?:course|courseWithTerms|courseWithTask|courseWithTaskAndTerms)',
+            function($params) {
+                return $this->courseDependencies($params);
+            }
+        );
+
+        /* Inject ingredients into folder controller method
+         */
+        $this->addRoutePreload(
+            $matcher,
+            '(?:folder|folderWithTerms|folderWithTask|folderWithTaskAndTerms)',
+            function($params) {
+                return $this->folderDependencies($params);
+            }
+        );
     }
 
     /**
@@ -64,6 +106,7 @@ class Module extends BaseModule
      *
      * @param $params
      * @return array
+     * @throws Exception
      */
     private function courseDependencies($params) {
 
@@ -80,6 +123,7 @@ class Module extends BaseModule
         $unitInstanceMapper = new UnitInstanceMapper();
         $folderMapper = new FolderMapper();
         $allUnitInstances = new Collection();
+        $termMapper = new TermMapper();
 
         /* Try to find the parent course folder which spawned minions
          */
@@ -91,8 +135,28 @@ class Module extends BaseModule
         }
 
         /* Try to find all the folders which used $courseFolder as a source
+         *
+         * If a date range was specified, use that.
          */
-        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, date('Y'));
+        if (isset($params['term'])) {
+            try {
+                $term = $termMapper->findOneByColumn('code', $params['term']);
+
+                $from = $term->getStart();
+                $to = $term->getActualFinish();
+            }
+            catch (\Exception $e) {
+                throw new Exception('Invalid date range.');
+            }
+        }
+        else {
+            $term = $termMapper->createModel();
+
+            $from = $termMapper->findOldest()->getStart();
+            $to   = \Alaress_Date_Format::now();
+        }
+
+        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
 
         /* Acrobatics
          */
@@ -112,9 +176,9 @@ class Module extends BaseModule
                 $allCategoryIds = array_unique($allCategoryIds);
 
                 /* All the units associated with folders which used the same
-                 * $courseFolder as a source
+                 * $courseFolder as a source. Filter it based on $from and $to
                  */
-                $allUnitInstances = $unitInstanceMapper->findByColumn('category_id', $allCategoryIds);
+                $allUnitInstances = $unitInstanceMapper->findForFolderOpeningBetween($allCategoryIds, $from, $to);
             }
             catch (Exception $e) {
                 error(159);
@@ -133,7 +197,10 @@ class Module extends BaseModule
             'params' => $params,
             'courseFolder' => $courseFolder,
             'allFoldersUsingCourse' => $allFoldersUsingCourse,
-            'allUnitInstances' => $allUnitInstances
+            'allUnitInstances' => $allUnitInstances,
+            'term' => $term,
+//            'from' => $from,
+//            'to' => $to
         );
     }
 
@@ -142,6 +209,7 @@ class Module extends BaseModule
      *
      * @param $params
      * @return array
+     * @throws Exception
      */
     private function folderDependencies($params) {
 
@@ -158,6 +226,7 @@ class Module extends BaseModule
         $unitInstanceMapper = new UnitInstanceMapper();
         $folderMapper = new FolderMapper();
         $allUnitInstances = new Collection();
+        $termMapper = new TermMapper();
 
         /* Try to find the parent course folder which spawned minions
          */
@@ -169,13 +238,37 @@ class Module extends BaseModule
         }
 
         /* Try to find all the folders which used $courseFolder as a source
+         *
+         * If a date range was specified, use that.
          */
-        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, date('Y'));
+        if (isset($params['term'])) {
+            try {
+                $term = $termMapper->findOneByColumn('code', $params['term']);
+
+                $from = $term->getStart();
+                $to = $term->getActualFinish();
+            }
+            catch (\Exception $e) {
+                throw new Exception('Invalid date range.');
+            }
+        }
+        else {
+            $term = $termMapper->createModel();
+
+            $from = $termMapper->findOldest()->getStart();
+            $to   = \Alaress_Date_Format::now();
+        }
+
+        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
 
         /* No acrobatics required
          */
         try {
-            $allUnitInstances = $unitInstanceMapper->findByColumn('category_id', $params['folderId']);
+
+            /* All the units associated with folders which used the same
+             * $courseFolder as a source. Filter it based on $from and $to
+             */
+            $allUnitInstances = $unitInstanceMapper->findForFolderOpeningBetween([$params['folderId']], $from, $to);
         }
         catch (Exception $e) {
             error(159);
@@ -189,35 +282,10 @@ class Module extends BaseModule
             'params' => $params,
             'courseFolder' => $courseFolder,
             'allFoldersUsingCourse' => $allFoldersUsingCourse,
-            'allUnitInstances' => $allUnitInstances
-        );
-    }
-
-    /**
-     * Inject params into controller
-     *
-     * {@inheritdoc}
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        /* Inject ingredients into course controller method
-         */
-        $this->addRoutePreload(
-            $matcher,
-            '(?:course|courseWithTask)',
-            function($params) {
-                return $this->courseDependencies($params);
-            }
-        );
-
-        /* Inject ingredients into folder controller method
-         */
-        $this->addRoutePreload(
-            $matcher,
-            '(?:folder|folderWithTask)',
-            function($params) {
-                return $this->folderDependencies($params);
-            }
+            'allUnitInstances' => $allUnitInstances,
+            'term' => $term,
+//            'from' => $from,
+//            'to' => $to
         );
     }
 
