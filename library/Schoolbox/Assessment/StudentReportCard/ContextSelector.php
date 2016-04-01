@@ -287,10 +287,9 @@ class ContextSelector
 					$result['TERM_BACK']          = $nextTerm->getCode();
 					$result['TERM_BACK_DISABLED'] = '';
 				}
-				return $result;
 			}
 		}
-		return [];
+		return $result;
 	}
 
 
