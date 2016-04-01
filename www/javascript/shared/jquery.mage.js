@@ -140,7 +140,7 @@
 
         // HTML5 FTW
         var method = elem.attr('formmethod') || (form.length ? form.attr('method') : 'post'),
-            action = elem.attr('formaction') || (form.length ? form.attr('action') : window.location),
+            action = elem.attr('formaction') || (form.length ? form.attr('action') : window.location.pathname),
             target = elem.closest(self.options.submittable);
 
         // do the prep-work
