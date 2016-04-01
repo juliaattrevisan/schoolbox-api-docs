@@ -176,18 +176,13 @@
         // set up an object that can be manipulated outside
         formSerial = form.serializeArray();
 
-        // convert this into a single object rather than an array of objects
-        for (var i = 0; i < formSerial.length; ++i) {
-            formData[formSerial[i]['name']] = formSerial[i]['value'];
-        }
-
         // pre-flight check
-        mage.options.setFormData(formData);
+        mage.options.setFormData(formSerial);
 
         return $
             .ajax(action, {
                 type: method,
-                data: formData
+                data: formSerial
             })
             .done(function (data, status, xhr) {
                 xhrDone.call(mage, mage.options.onXhrDone, targetElement, parseJSON(data));
