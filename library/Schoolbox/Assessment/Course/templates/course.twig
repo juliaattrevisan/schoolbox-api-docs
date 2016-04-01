@@ -182,7 +182,7 @@
             submittable: '[data-unit]',
 
             setFormData: function (formData) {
-                formData.name = noonitName.val();
+                formData.push({name: 'name', value: noonitName.val()});
             },
 
             onXhrDone: function (data) {
