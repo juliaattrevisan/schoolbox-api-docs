@@ -1,28 +1,44 @@
-{# list of task actions #}
-{% set actions = ['modify', 'delete'] %}
-
-<li class="actions-small-1 actions-large-2">
+<li class="actions-small-1 actions-large-3" data-task_id="{{ task.id }}">
     <div class="list-item">
         <div class="grip"></div>
         <div class="compact avatar card small-11 wrap-down">
-            <div class="{{ task.iconClass }} icon-16"></div>
-            <p>{{ task.title }}</p>
+            {% if task.link -%}
+            <a data-plugin="preview" href="{{ task.link }}">
+            {% endif -%}
+                <span class="{{ task.iconClass }} icon-16"></span>
+                <p>{{ task.title }}</p>
+            {% if task.link -%}
+            </a>
+            {% endif -%}
             <p class="meta">{{ task.label }}</p>
         </div>
     </div>
     <nav>
         <span class="show-for-large-up">
-            {% for action in actions %}
-                <a href="/task/{{ action }}/{{ task.id }}" class="icon-{{ action }}" title="{{ action | capitalize }}"></a>
-            {% endfor %}
+            {% if task.type == 1 %}
+            <a href="/task/export/{{ task.id }}?return_url={{ returnUrl[unit.id] }}" class="icon-export" title="Copy this task into classes"></a>
+                {% set doReveal %}data-reveal-id="modifyTask-{{ task.id }}"{% endset %}
+            {% endif %}
+            <a href="/task/modify/{{ task.id }}?return_url={{ returnUrl[unit.id] }}" {{ doReveal }} class="icon-modify" title="Modify"></a>
+            <a href="/task/delete/{{ task.id }}?return_url={{ returnUrl[unit.id] }}" data-interaction="open_delete_task_form"  class="icon-delete" title="Delete"></a>
         </span>
         <span class="hide-for-large-up">
             <a href="#" class="icon-overflow" data-dropdown="dropdown-{{ task.id }}"></a>
         </span>
     </nav>
     <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ task.id }}">
-        {% for action in actions %}
-            <li><a href="/task/{{ action }}/{{ task.id }}" class="icon-{{ action }}">{{ action | capitalize }}</a></li>
-        {% endfor %}
+        <li><a href="/task/export/{{ task.id }}?return_url={{ returnUrl[unit.id] }}" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>
+        <li><a href="/task/modify/{{ task.id }}?return_url={{ returnUrl[unit.id] }}" data-reveal-id="modifyTask-{{ task.id }}" class="icon-modify">Modify Task</a></li>
+        <li><a href="/task/delete/{{ task.id }}?return_url={{ returnUrl[unit.id] }}" data-interaction="open_delete_task_form"  class="icon-delete">Delete Task</a></li>
     </ul>
+    {% if task.type == 1 %}
+        {% include '@course/task/reveal-modal.twig' with { reveal: taskReveals[task.id] } %}
+    {% endif %}
+    <form action="/task/saveForm.php" method="post" data-form_type="delete_task" class="hide">
+        <input type="hidden" name="action"     value="delete" />
+        <input type="hidden" name="id"         value="{{ task.id }}" />
+        <input type="hidden" name="category"   value="{{ unit.id }}"/>
+        <input type="hidden" name="component"  value="{{ reveals[unit.id].component.id }}"/>
+        <input type="hidden" name="return_url" value="{{ returnUrl[unit.id] }}"/>
+    </form>
 </li>
