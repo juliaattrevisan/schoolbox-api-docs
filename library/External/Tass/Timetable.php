@@ -202,7 +202,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                                 AND day_code = '$dayNumber'
                         ORDER BY prd_code";
         } else {
-            $query = "SELECT room_code, tch_code, ttmast.sub_code, year_grp, class, prd_code, sub_desc
+            $query = "SELECT room_code, tch_code, ttmast.sub_code, ttmast.year_grp, class, prd_code, sub_desc
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = '$fileYear' AND semester = '$fileSemester'
@@ -288,7 +288,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                             ORDER BY prd_code, day_code";
 
         } else {
-            $query = "SELECT room_code, tch_code, day_code, ttmast.sub_code, year_grp, class, prd_code, sub_desc
+            $query = "SELECT room_code, tch_code, day_code, ttmast.sub_code, ttmast.year_grp, class, prd_code, sub_desc
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = '$fileYear' AND semester = '$fileSemester'
