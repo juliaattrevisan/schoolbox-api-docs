@@ -127,7 +127,7 @@ class Evaluation_Import_Xml {
 				'assess_id' => $assess_id,
 				'sequence' => $i+1,
 				'title' => $currentSection->title,
-				'description' => $currentSection->description,
+				'description' => trim((string) $currentSection->description->text) ? trim((string) $currentSection->description->text) : $currentSection->description,
 				'random' => $currentSection->random,
 				'pool' => $currentSection->pool,
 			));
