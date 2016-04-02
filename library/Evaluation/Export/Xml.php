@@ -85,7 +85,7 @@ abstract class Evaluation_Export_Xml {
 				$this->getPage()->setVar(array(
 					'SECTION_SECTION_ID' => $currentSection['section_id'],
 					'SECTION_TITLE' => htmlspecialchars($currentSection['title'], ENT_QUOTES),
-					'SECTION_DESCRIPTION' => htmlspecialchars($currentSection['description'], ENT_QUOTES),
+					'SECTION_DESCRIPTION' => Scrub::HTML($currentSection['description']),
 					'SECTION_RANDOM' => $currentSection['random'],
 					'SECTION_POOL' => $currentSection['pool'],
 				));
