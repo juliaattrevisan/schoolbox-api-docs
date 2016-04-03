@@ -175,16 +175,18 @@
                             Title
                             <input type="text" class="required" name="heading" size="35" maxlength="100" value="{{ record.heading }}"/>
                         </label>
-
-                        <label>
-                            Pastoral Event Type
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                    <label>
+                            Type
                             <select class="required" name="typeId">
                                 {% for type in types %}
                                     <option {% if type.id == record.getType.getId %}selected{% endif %} value="{{ type.id }}">{{ type.name }}</option>
                                 {% endfor %}
                             </select>
                         </label>
-
+                    </div>
+                    <div class="small-12 medium-6 columns">
                         <label>
                             Severity
                             <select class="required" name="severityId">
@@ -193,9 +195,11 @@
                                 {% endfor %}
                             </select>
                         </label>
-
+                    </div>
+                    <div class="small-12 columns">
                         <label>
                             Tags
+                            <span class="hint has-tip tip-top" data-tooltip title="Multiple tags can be added to aid filtering and reporting. Try to reuse existing tags by searching first. If necessary you may create new tags.">?</span>
                             <input id="tags" name="tags" value="{% for tag in record.tagsList %}{{ tag.getName }},{% endfor %}">
                         </label>
 
@@ -207,8 +211,7 @@
                 </fieldset>
             </section>
 
-            <h2 class="subheader">Access Permissions</h2>
-
+            <h2 class="subheader">Visibility</h2>
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -238,30 +241,25 @@
                             {% endfor %}
                         </label>
 
-                        <fieldset >
-                            <legend>
-                                <label>
-                                    Hide Content From These Roles
-                                    <span class="hint has-tip tip-top" data-tooltip title="If selected, the body of this report will only be visible to you, and no other users. Other users will only see the title and the event type.">?</span>
-                                </label>
-                            </legend>
+                        <legend>
+                            <label for="private">
+                                Hide Content From These Roles
+                                <span class="hint has-tip tip-top" data-tooltip title="If selected, the body of this report will only be visible to you, and no other users. Other users will only see the title and the event type.">?</span>
+                            </label>
+                        </legend>
 
-                            <div class="switch">
-                                <input id="private" name="private" {% if record.getPrivate %}checked{% endif %} value="1" type="checkbox">
-                                <label for="private">
-                                    <span>On</span>
-                                    <span>Off</span>
-                                </label>
-                            </div>
+                        <div class="switch">
+                            <input id="private" name="private" {% if record.getPrivate %}checked{% endif %} value="1" type="checkbox">
+                            <label for="private">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
 
-                        </fieldset>
 
                     </div>
                 </fieldset>
-            </section>
-
-            {% if record.getAccessList.count > 0 %}
-                <section>
+                {% if record.getAccessList.count > 0 %}
                     <ul class="grid information-list">
                         {% for access in record.getAccessList if access.getUser.getId != '' %}
                             <li class="actions-small-1">
@@ -280,10 +278,7 @@
                             </li>
                         {% endfor %}
                     </ul>
-                </section>
-            {% endif %}
-
-            <section>
+                {% endif %}
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
@@ -293,6 +288,17 @@
                         </label>
                     </div>
                 </fieldset>
+                {% if record.getId == '' %}
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Other Students Involved
+                            <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate report and add it to the pastoral care area for these students.">?</span>
+                            <select id="addStudent" name="duplicate_id[]" multiple placeholder="Add Students"></select>
+                        </label>
+                    </div>
+                </fieldset>
+                {% endif %}
             </section>
 
             <h2 class="subheader">Attach Files</h2>
@@ -306,44 +312,6 @@
                     </div>
                 </fieldset>
             </section>
-
-            <h2 class="subheader">Notifications</h2>
-
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <legend>
-                            <label>
-                                Send Notifications To Audience
-                                <span class="hint has-tip tip-top" data-tooltip title="If ticked, notifications about creation, modifications, and comments will be sent to all roles and users who have permissions to access this record.">?</span>
-                            </label>
-                        </legend>
-
-                        <div class="switch">
-                            <input id="notify" name="notify" value="1" type="checkbox">
-                            <label for="notify">
-                                <span>On</span>
-                                <span>Off</span>
-                            </label>
-                        </div>
-                    </div>
-                </fieldset>
-            </section>
-
-
-            {% if record.getId == '' %}
-                <section>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>
-                                Other Students Involved
-                                <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate report and add it to the pastoral care area for these students.">?</span>
-                                <select id="addStudent" name="duplicate_id[]" multiple placeholder="Add Students"></select>
-                            </label>
-                        </div>
-                    </fieldset>
-                </section>
-            {% endif %}
 
             <div class="row">
                 <div class="small-12 column">
