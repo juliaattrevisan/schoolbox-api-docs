@@ -27,6 +27,7 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -38,8 +39,8 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     const TRIGGER_DELETED = 'deleted';
 
 
-    /** @var CategoryMapper */
-    protected $categoryMapper;
+    /** @var FolderMapper */
+    protected $folderMapper;
 
 
     /**
@@ -59,7 +60,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      */
     public function loadDependencies($dependencies = null)
     {
-        $this->categoryMapper = CategoryMapper::getInstance();
+        $this->folderMapper = FolderMapper::getInstance();
         parent::loadDependencies($dependencies);
     }
 
@@ -203,7 +204,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         // manuel hydration
         if (!$category->getName()) {
-            $category = $this->categoryMapper->findById($categoryId);
+            $category = $this->folderMapper->findById($categoryId);
         }
 
         $bob = new Builder();
