@@ -337,7 +337,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'luPastoralType'        => [
+            'lu_pastoral_type'        => [
                 'title'             => 'Pastoral Record Types',
                 'mapper'            => TypeMapper::class,
                 'fields'            => [
@@ -347,7 +347,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'luPastoralSeverity'    => [
+            'lu_pastoral_severity'    => [
                 'title'             => 'Pastoral Record Severity',
                 'mapper'            => SeverityMapper::class,
                 'sortable'          => 'order',
