@@ -198,7 +198,7 @@
             </div>
             
             {% block buttons_island %}
-            <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-7 xlarge-block-grid-7">
+            <ul class="no-margin small-block-grid-2 medium-block-grid-3 large-block-grid-{% if showPastoral %}7{% else %}6{% endif %} xlarge-block-grid-{% if showPastoral %}7{% else %}6{% endif %}">
 
                 {% block buttons %}
                     {% if showButtons %}
