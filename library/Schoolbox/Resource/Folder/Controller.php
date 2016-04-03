@@ -128,7 +128,7 @@ class Controller extends BaseController
 
         try {
             $homepageConfig = $homepageConfigMapper->findOneByColumn('cid', $folder->getId());
-            $templateId = $homepageConfig->getTemplate()->getId();
+            $templateId = HomepageTemplateMapper::TEMPLATE_KEEP_EXISTING;
         } catch (\Exception $e) {
             $templateId = HomepageTemplateMapper::TEMPLATE_NONE;
         }
@@ -141,6 +141,9 @@ class Controller extends BaseController
             $rolePermissions[$permission->getRole()->getId()] = $permission->getType();
         }
 
+        $homepageTemplates = $homepageTemplateMapper->findAll();
+        $homepageTemplates->prepend($homepageTemplateMapper->getKeepExistingHomepageTemplate());
+
         $config = new ConfigLoader();
 
         $this->getResponse()->content->set(
@@ -151,12 +154,13 @@ class Controller extends BaseController
                     'breadcrumbs'       => $breadcrumbs,
                     'folder'            => $folder,
                     'parent'            => $parent,
-                    'templates'         => $homepageTemplateMapper->findAll(),
+                    'templates'         => $homepageTemplates,
                     'templateId'        => $templateId,
                     'roles'             => $roleMapper->findAll(),
                     'rolePermissions'   => $rolePermissions,
                     'database'          => ucfirst($config->get('external_type')),
-                    'curriculumTagging' => $config->get('curriculum_tagging_enabled')
+                    'curriculumTagging' => $config->get('curriculum_tagging_enabled'),
+                    'writePermission'   => UserAccess::ACCESS_WRITE,
                 ),
             )
         );
@@ -197,6 +201,13 @@ class Controller extends BaseController
 
         $folder = new Model();
 
+        // Default to parent's permissions
+        $permissions = $this->getRoleAccessMapper()->findByColumn('cid', $parent->getId());
+        $rolePermissions = [];
+        foreach ($permissions as $permission) {
+            $rolePermissions[$permission->getRole()->getId()] = $permission->getType();
+        }
+
         // Folders that are not in the root note should inherit by default to reduce the user interface
 
         if ($parentId != Mapper::FOLDER_ROOT)
@@ -212,8 +223,10 @@ class Controller extends BaseController
                     'parent'            => $parent,
                     'templates'         => $homepageTemplateMapper->findAll(),
                     'roles'             => $roleMapper->findAll(),
+                    'rolePermissions'   => $rolePermissions,
                     'database'          => ucfirst($config->get('external_type')),
-                    'curriculumTagging' => $config->get('curriculum_tagging_enabled')
+                    'curriculumTagging' => $config->get('curriculum_tagging_enabled'),
+                    'writePermission'   => UserAccess::ACCESS_WRITE,
                 ),
             )
         );
