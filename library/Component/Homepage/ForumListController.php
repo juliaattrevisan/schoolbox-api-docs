@@ -18,7 +18,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
     /**
      * Category Mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var \Schoolbox\Resource\Folder\Mapper
      */
     private $categoryMapper = null;
 
@@ -42,7 +42,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
 
         $this->source = $this->getContext();
 

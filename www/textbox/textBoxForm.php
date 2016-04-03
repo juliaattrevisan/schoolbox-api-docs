@@ -20,7 +20,7 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 
     $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
     $textbox
-        ->setCategory(\Schoolbox\Resource\CategoryMapper::getInstance()->createModel()->setId($_POST['categoryID']))
+        ->setCategory(\Schoolbox\Resource\Folder\Mapper::getInstance()->createModel()->setId($_POST['categoryID']))
         ->setHeading($_POST['textBoxHeading'])
         ->setBody($_POST['textBoxBody'])
         ->setDeletedAt(null);

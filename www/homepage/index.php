@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  *
  */
-$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 
 $groupID = $_SESSION['gid'];
 $prefix = 'code';
@@ -108,7 +108,7 @@ if (!$homepageHandler->getTemplate()) {
 }
 
 // moving forward! log the pageview
-$mapper = new Schoolbox\Resource\CategoryLogMapper();
+$mapper = new Schoolbox\Resource\Folder\Log\Mapper();
 $mapper->incrementHitcount($_SESSION['user'], $category->getId());
 $categoryMapper->logPageView($category);
 

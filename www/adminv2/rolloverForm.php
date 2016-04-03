@@ -54,7 +54,7 @@ if (isset($_POST['rollover'])) {
  */
 function traverse($categoryId, $catsWithCodes = array())
 {
-    $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+    $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
     $allFolders = $folderMapper->findByParent($categoryId);
 
     /* For JSON ajax
@@ -91,8 +91,8 @@ function rollover($categoryId)
     // post-client processing
     $cats = traverse($categoryId);
 
-    $catMapper = new \Schoolbox\Resource\CategoryMapper();
-    $codeMapper = new \Schoolbox\Resource\CategoryCodeMapper();
+    $catMapper = new \Schoolbox\Resource\Folder\Mapper();
+    $codeMapper = new \Schoolbox\Resource\Folder\Code\Mapper();
 
     // for each category retrieved: rename to ":categoryName [:code/s]"; remove class relation
     foreach ($cats as $cat) {

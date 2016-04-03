@@ -5,7 +5,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /** @var SitePage $this */
 
@@ -49,7 +49,7 @@ if (Config::get('curriculum_tagging_enabled')) {
 }
 
 $mapper      = new SubmissionBoxMapper();
-$cat_mapper  = new CategoryMapper();
+$cat_mapper  = new FolderMapper();
 $type_mapper = new SubmissionBox\WorkTypeMapper();
 $mark_mapper = new SubmissionBox\MarkTypeMapper();
 $groupMapper = new SubmissionBox\GradeLevel\Group\Mapper();
@@ -115,7 +115,7 @@ if ($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $title       = 'Post Due Work';
     $heading     = 'Post';
     try {
-        $category = CategoryMapper::getInstance()->findById($category_id);
+        $category = FolderMapper::getInstance()->findById($category_id);
     } catch (Schoolbox\Mapper\Exception $e) {
         $this->error(13);
     }

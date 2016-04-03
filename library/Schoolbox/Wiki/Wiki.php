@@ -10,14 +10,14 @@
 namespace Schoolbox\Wiki;
 
 
-use Schoolbox\Resource\Folder\Model as Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Wiki {
 
 	/** @var int */
 	protected $id;
 
-	/** @var Category */
+	/** @var Folder */
 	protected $category;
 
 	/** @var Revision */
@@ -55,7 +55,7 @@ class Wiki {
 
 
 	/**
-	 * @param Category $category
+	 * @param Folder $category
 	 * @return self
 	 */
 	public function setCategory($category) {
@@ -65,7 +65,7 @@ class Wiki {
 
 
 	/**
-	 * @return Category
+	 * @return Folder
 	 */
 	public function getCategory() {
 		return $this->category;

@@ -12,7 +12,7 @@ use Schoolbox\UserMapper;
 class DAV_Folder extends Sabre\DAV\Collection
 {
 
-    /** @var \Schoolbox\Resource\Category */
+    /** @var \Schoolbox\Resource\Folder\Model */
     private $folder;
 
     /** @var Schoolbox\Resource\File\Mapper */

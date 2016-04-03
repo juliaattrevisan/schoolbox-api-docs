@@ -19,8 +19,8 @@ use Schoolbox\Assessment\Grades;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Model as Category;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -38,7 +38,7 @@ class Factory
     protected $userMapper;
 
     /**
-     * @var CategoryMapper
+     * @var FolderMapper
      */
     protected $categoryMapper;
 
@@ -52,13 +52,13 @@ class Factory
      *
      * @param Gateway        $gateway
      * @param UserMapper     $userMapper
-     * @param CategoryMapper $categoryMapper
+     * @param FolderMapper $categoryMapper
      * @param Grades         $gradesService
      */
     public function __construct(
         Gateway $gateway,
         UserMapper $userMapper,
-        CategoryMapper $categoryMapper,
+        FolderMapper $categoryMapper,
         Grades $gradesService
     ) {
         // Set up required mappers, DB access, etc. here.
@@ -113,7 +113,7 @@ class Factory
 
         // Add write level staff as coordinators
         $folder = $tutorGroup->getFolder();
-        if ($folder instanceof Category) {
+        if ($folder instanceof Folder) {
             $tutorGroup->setCoordinators(
                 UserAccessMapper::getInstance()->findUsersInCategory(
                     $folder,
@@ -245,7 +245,7 @@ class Factory
      * @param User   $student
      *
      * @return array {
-     *  folder: Category
+     *  folder: Folder
      *  grades: array
      * }
      */
@@ -293,14 +293,14 @@ class Factory
      * * Is this student currently a member of the class?
      * * Does this student have a grade in this folder?
      *
-     * @param Category $folder
+     * @param Folder $folder
      * @param User     $student
      *
      * @return array {
      *  grades: array (if the student is involved)
      * }
      */
-    protected function getStudentInvolvement(Category $folder, User $student)
+    protected function getStudentInvolvement(Folder $folder, User $student)
     {
         // Is $student a member of $folder (by class code?)
         foreach ($student->getSubjectCollection() as $subject) {
@@ -328,12 +328,12 @@ class Factory
     /**
      * Gets all assessment and quiz grades.
      *
-     * @param Category $folder
+     * @param Folder $folder
      * @param User     $student
      *
      * @return array
      */
-    protected function getGrades(Category $folder, User $student)
+    protected function getGrades(Folder $folder, User $student)
     {
         $allGrades = array();
         $assessGrades = ReturnedWorkMapper::getInstance()->getStudentMarks(
@@ -363,19 +363,19 @@ class Factory
     /**
      * Gets the cohort folders for this folder.
      *
-     * @param Category $category
+     * @param Folder $category
      * @param string $subjectCode The original subject code (pre-rollover)
      *                            for $category.
      *
-     * @return Category[]
+     * @return Folder[]
      */
-    protected function getCohortFolders(Category $category, $subjectCode)
+    protected function getCohortFolders(Folder $category, $subjectCode)
     {
         // Find the equivalent assessments for each cohort class
         // (class with the same second part of the class code)
         $cohortList = array();
         $parent     = $category->getParent();
-        $parentId   = $parent instanceof Category ? $parent->getId() : null;
+        $parentId   = $parent instanceof Folder ? $parent->getId() : null;
         foreach ($this->getGateway()->getOtherSubjectClasses($subjectCode) as $otherCode) {
             // All archived or live codes with the same parent as $category
             // are cohorts.
@@ -484,7 +484,7 @@ class Factory
      * Builds a distribution of grades for this grade.
      *
      * @param array            $grade
-     * @param array|Category[] $cohortFolders
+     * @param array|Folder[] $cohortFolders
      *
      * @return array
      */
@@ -660,7 +660,7 @@ class Factory
     }
 
     /**
-     * @return CategoryMapper
+     * @return FolderMapper
      */
     public function getCategoryMapper()
     {
@@ -668,7 +668,7 @@ class Factory
     }
 
     /**
-     * @param  CategoryMapper $categoryMapper
+     * @param  FolderMapper $categoryMapper
      *
      * @return $this
      */

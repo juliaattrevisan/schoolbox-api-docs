@@ -14,8 +14,8 @@
 namespace SocialStream\Post\Factory;
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -298,7 +298,7 @@ class Creational extends AbstractFactory
      * Construct a post from a homepage URL
      *
      * @param  string $url
-     * @return Category
+     * @return Folder
      */
     private function constructFromHomepage($url)
     {
@@ -306,7 +306,7 @@ class Creational extends AbstractFactory
         $object->setType('url');
         $this->setProduct($object);
         $homepageId = $this->getUrlDetection()->getHomepageIdFromUrl();
-        return CategoryMapper::getInstance()->findById($homepageId);
+        return FolderMapper::getInstance()->findById($homepageId);
     }
 
     /**
@@ -512,7 +512,7 @@ class Creational extends AbstractFactory
     /**
      * Get the title and description out of the homepage.
      *
-     * @param Category $homepage
+     * @param Folder $homepage
      */
     private function spawnMetadataFromHomepage($homepage)
     {
@@ -524,7 +524,7 @@ class Creational extends AbstractFactory
      * A homepage's icon will be a homepage icon, or a folder if it's not a
      * visitable homepage.
      *
-     * @param Category $homepage
+     * @param Folder $homepage
      */
     private function spawnThumbnailFromHomepage($homepage)
     {

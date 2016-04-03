@@ -17,8 +17,8 @@ use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -33,7 +33,7 @@ use Schoolbox\UserMapper;
 class Marksheet
 {
 
-    /** @var Category */
+    /** @var Folder */
     protected $category;
     /** @var User */
     protected $sessionUser;
@@ -66,7 +66,7 @@ class Marksheet
     /** @var \Assess_Response */
     protected $responseHandler;
 
-    /** @var CategoryMapper */
+    /** @var FolderMapper */
     protected $categoryMapper;
     /** @var UserMapper */
     protected $userMapper;

@@ -48,12 +48,12 @@ class Visibility {
 
 		$visibilities = array();
 
-		if ($groupHandler->isSuperuser() || $groupHandler->isStaff()) {
+		if ($user->isSuperuser() || $user->getRole()->isStaff()) {
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
 		}
-		else if ($groupHandler->isStudent()) {
+		else if ($user->getRole()->isStudent()) {
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
 		}

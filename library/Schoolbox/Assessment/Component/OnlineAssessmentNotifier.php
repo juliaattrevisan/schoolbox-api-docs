@@ -25,7 +25,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -40,7 +40,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	// this should be configurable, but this will do for now
 	const UPCOMING_WINDOW     = 2;
 
-	/** @var CategoryMapper */
+	/** @var FolderMapper */
 	protected $categoryMapper;
 
 	/** @var AttemptMapper */
@@ -64,7 +64,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	 * @return void
 	 */
 	public function loadDependencies($dependencies = null) {
-		$this->categoryMapper = CategoryMapper::getInstance();
+		$this->categoryMapper = FolderMapper::getInstance();
 		$this->attemptMapper = AttemptMapper::getInstance();
 		$this->workTypeMapper = WorkTypeMapper::getInstance();
 		parent::loadDependencies($dependencies);

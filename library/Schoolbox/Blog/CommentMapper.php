@@ -78,7 +78,7 @@ class CommentMapper extends Mapper implements FeedableMapperInterface {
 
 		// fake the 2nd-depth hydration
 		$this->hasJoin('category', array(
-			'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+			'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
 			'this_key'  => 'cid',
 			'other_key' => 'id'
 		));

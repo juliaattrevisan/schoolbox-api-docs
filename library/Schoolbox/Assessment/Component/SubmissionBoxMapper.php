@@ -990,7 +990,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         // Is the student involved in this group?
         // (Need much better checking than this, this abuses session variables)
 
-        /** @var Schoolbox\Resource\CategoryMapper $catMap */
+        /** @var Schoolbox\Resource\Folder\Mapper $catMap */
         $catMap = $this->getJoinMapper('category');
         $catMap->setExternalUser(new \External_User());
         $categories = array();

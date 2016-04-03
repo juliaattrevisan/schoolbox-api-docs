@@ -9,7 +9,7 @@
 
 /** @var SitePage $this */
 
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 
@@ -24,7 +24,7 @@ $task_type    = 'task';
 $task_type_id = null;
 if ($action === 'create') {
     $category_id = $this->arg[1];
-    $category    = CategoryMapper::getInstance()->findById($category_id);
+    $category    = FolderMapper::getInstance()->findById($category_id);
     if (isset($this->arg[2])) {
         switch ($this->arg[2]) {
             case 'assessment':

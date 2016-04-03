@@ -28,7 +28,7 @@ $this->setTitle('Modify User Group');
 $this->setTab('resources');
 
 $groupHandler = new Group(HOMEPAGE_SERVICE);
-$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 
 if (is_numeric($this->arg[0])) {
     $userHandler = new User();

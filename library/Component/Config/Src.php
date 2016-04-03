@@ -43,7 +43,7 @@ class Component_Config_Src extends Component_Config_Abstract
         );
         if ($configValue) {
             try {
-                $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+                $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
                 $folder       = $folderMapper->findById($configValue);
                 $vars         = array(
                     'COMPONENT_CONFIG_SRC_ID'   => '/homepage/' . $folder->getId(),

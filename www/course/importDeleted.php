@@ -7,8 +7,8 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 
 /** @var SitePage $this */
@@ -46,7 +46,7 @@ $this->setVar(
 );
 
 // Output course and category breadcrumbs
-$homepage = CategoryMapper::getInstance()->findById($homepage_id);
+$homepage = FolderMapper::getInstance()->findById($homepage_id);
 
 $this->setVar('unit_block', '');
 $deletedUnitList = UnitInstanceMapper::getInstance()->findOrphanedForCategoryId($homepage_id);

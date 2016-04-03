@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\StudentReportCard;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class CommentMapper extends Mapper {
@@ -81,7 +81,7 @@ class CommentMapper extends Mapper {
 
 		// register joins
 		$this->hasJoin('category', array(
-			'mapper'            => '\\Schoolbox\\Resource\\CategoryMapper',
+			'mapper'            => '\\Schoolbox\\Resource\\Folder\\Mapper',
 			'this_key'          => 'category_id',
 			'other_key'         => 'id',
 			'this_property'     => 'category',

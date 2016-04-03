@@ -81,7 +81,7 @@ class TaskMapper extends Schoolbox\Mapper {
         ));
 
         $this->hasJoin('category', array(
-            'mapper'    => 'Schoolbox\\Resource\\CategoryMapper',
+            'mapper'    => 'Schoolbox\\Resource\\Folder\\Mapper',
             'this_key'  => 'category_id',
             'other_key' => 'id',
         ));

@@ -88,7 +88,7 @@ function getFolderMeta($folderId)
     // handler setup
     $groupHandler = new Group();
 
-    $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+    $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
     try {
 /* Only throw error exception if a folderId is specified

@@ -8,8 +8,8 @@
  */
 
 use Schoolbox\Collection;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
 
@@ -40,7 +40,7 @@ if ($group->getPermission($homepage_id) < WRITE_ACCESS
 
 // Get all tasks for children of this category.
 /** @var Collection|Category[] $child_list */
-$child_list    = CategoryMapper::getInstance()->findByColumn('parent', $course_homepage_id);
+$child_list    = FolderMapper::getInstance()->findByColumn('parent', $course_homepage_id);
 $child_id_list = $child_list->getColumnValues('id');
 $task_list     = TaskMapper::getInstance()->findGroupedListForCategoryList($child_id_list);
 
@@ -67,12 +67,12 @@ $this->setVar(
 );
 
 // Output course and category breadcrumbs
-$homepage = CategoryMapper::getInstance()->findById($homepage_id);
+$homepage = FolderMapper::getInstance()->findById($homepage_id);
 
-$course_homepage = CategoryMapper::getInstance()->findById($course_homepage_id);
+$course_homepage = FolderMapper::getInstance()->findById($course_homepage_id);
 $course_base_homepage = new Category();
 $course_base_homepage->setId(str_replace('/homepage/', '', Config::get('course_homepage')));
-$course_homepage_path = CategoryMapper::getInstance()->findParents($course_homepage, $course_base_homepage);
+$course_homepage_path = FolderMapper::getInstance()->findParents($course_homepage, $course_base_homepage);
 $course_homepage_path->add($course_homepage);
 foreach ($course_homepage_path as $parent) {
     /** @var Category $parent */

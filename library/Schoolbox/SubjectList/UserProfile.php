@@ -10,8 +10,8 @@
 
 namespace Schoolbox\SubjectList;
 
-use \Schoolbox\Resource\Folder\Code\Model as CategoryCode;
-use \Schoolbox\Resource\Folder\Code\Mapper as CategoryCodeMapper;
+use \Schoolbox\Resource\Folder\Code\Model as FolderCode;
+use \Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 
 class UserProfile extends SubjectListAbstract
 {
@@ -90,7 +90,7 @@ class UserProfile extends SubjectListAbstract
                     try {
                         $category = $this->getCategoryMapper()->findByCode($currentSubject['subject']['code']);
                         $currentSubject['category']['id'] = $category->getId();
-                        $currentSubject['category']['code'] = CategoryCodeMapper::getInstance()->createModel()->setCode($currentSubject['subject']['code']);
+                        $currentSubject['category']['code'] = FolderCodeMapper::getInstance()->createModel()->setCode($currentSubject['subject']['code']);
                         $finalSubjectList[] = $currentSubject;
                     } catch (\Exception $e) {
                         if (\Config::get('show_all_subjects') == 1) {
@@ -106,7 +106,7 @@ class UserProfile extends SubjectListAbstract
                             'subject_teacher_block' => ''
                         ));
 
-                        if ($currentSubject['category']['code'] instanceof CategoryCode) {
+                        if ($currentSubject['category']['code'] instanceof FolderCode) {
                             $code = $currentSubject['category']['code']->getCode();
                         } else {
                             $code = $currentSubject['subject']['campusCode'].'/'.$currentSubject['subject']['code'];

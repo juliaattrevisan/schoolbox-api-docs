@@ -12,8 +12,8 @@ namespace Schoolbox\Permission\Access;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Folder\Model as CategoryModel;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -81,10 +81,10 @@ class UserAccessMapper extends Mapper
     /**
      * Determine whether $folder has a $user of type 3
      *
-     * @param CategoryModel $folder
+     * @param FolderModel $folder
      * @return bool
      */
-    public function hasFolderOwner(CategoryModel $folder)
+    public function hasFolderOwner(FolderModel $folder)
     {
         $userAccess = $this->findByColumnList(array(
             'sid' => $folder->getId(),
@@ -104,10 +104,10 @@ class UserAccessMapper extends Mapper
      * note: superusers aren't necessarily owners of all folders.
      *
      * @param User $user
-     * @param CategoryModel $folder
+     * @param FolderModel $folder
      * @return bool
      */
-    public function isFolderOwner(User $user, CategoryModel $folder)
+    public function isFolderOwner(User $user, FolderModel $folder)
     {
         $userAccess = $this->findByColumnList(array(
             'sid' => $folder->getId(),
@@ -153,7 +153,7 @@ class UserAccessMapper extends Mapper
 
         foreach ($extSubjs as $extSubj) {
             try {
-                $catId = CategoryMapper::getInstance()->findByCode($extSubj['code'])->getId();
+                $catId = FolderMapper::getInstance()->findByCode($extSubj['code'])->getId();
 
                 $ua = new UserAccess();
                 $ua->setService(UserAccess::SERVICE_HOMEPAGE)
@@ -199,47 +199,47 @@ class UserAccessMapper extends Mapper
     }
 
     /**
-    * @param CategoryModel $category
+    * @param FolderModel $folder
     * @param bool $includeSynergy
     * @return Collection|User[]
     */
-    public function findStaffInCategory($category, $includeSynergy = true)
+    public function findStaffInCategory($folder, $includeSynergy = true)
     {
-        return $this->findUsersInCategory($category, Role::STAFF, UserAccess::ACCESS_READ, $includeSynergy);
+        return $this->findUsersInCategory($folder, Role::STAFF, UserAccess::ACCESS_READ, $includeSynergy);
     }
 
 
     /**
-    * @param CategoryModel $category
+    * @param FolderModel $folder
     * @param bool $includeSynergy
     * @return Collection|User[]
     */
-    public function findStudentsInCategory($category, $includeSynergy = true)
+    public function findStudentsInCategory($folder, $includeSynergy = true)
     {
-        return $this->findUsersInCategory($category, Role::STUDENT, UserAccess::ACCESS_READ, $includeSynergy);
+        return $this->findUsersInCategory($folder, Role::STUDENT, UserAccess::ACCESS_READ, $includeSynergy);
     }
 
     /**
      * Returns a list of users who are members of a group
      *
-     * @param CategoryModel $category
+     * @param FolderModel $folder
      * @return Collection|User[]
      */
-    public function findAdminsInCategory($category)
+    public function findAdminsInCategory($folder)
     {
         //TODO role type should be optional
-        return $this->findUsersInCategory($category, Role::STAFF, $accessType = UserAccess::ACCESS_FULL, false);
+        return $this->findUsersInCategory($folder, Role::STAFF, $accessType = UserAccess::ACCESS_FULL, false);
     }
 
 
     /**
-    * @param CategoryModel $category
+    * @param FolderModel $folder
     * @param string $roleType
     * @param int $accessType
     * @param bool $includeSynergy
     * @return Collection|User[]
     */
-    public function findUsersInCategory($category, $roleType, $accessType = UserAccess::ACCESS_READ, $includeSynergy = true)
+    public function findUsersInCategory($folder, $roleType, $accessType = UserAccess::ACCESS_READ, $includeSynergy = true)
     {
         // union 3 sources: userAccess, and if synergy, external class and external user
 
@@ -261,7 +261,7 @@ class UserAccessMapper extends Mapper
 
         $stmt->execute(array(
             'service'   => UserAccess::SERVICE_HOMEPAGE,
-            'serviceId' => $category->getId(),
+            'serviceId' => $folder->getId(),
             'minAccess' => $accessType,
             'roleType'  => $roleType
         ));
@@ -287,10 +287,10 @@ class UserAccessMapper extends Mapper
         // start with a list of students in this category
         switch($roleType) {
             case Role::STUDENT:
-                $classListArray = $_DEPRECATED_EXTERNAL_CLASS_HANDLER->getStudents($category->getCodeString()) ?: array();
+                $classListArray = $_DEPRECATED_EXTERNAL_CLASS_HANDLER->getStudents($folder->getCodeString()) ?: array();
                 break;
             case Role::STAFF:
-                $classListArray = $_DEPRECATED_EXTERNAL_CLASS_HANDLER->getTeacherName($category->getCodeString()) ?: array();
+                $classListArray = $_DEPRECATED_EXTERNAL_CLASS_HANDLER->getTeacherName($folder->getCodeString()) ?: array();
                 break;
             default:
                 $classListArray = array();
@@ -401,9 +401,9 @@ class UserAccessMapper extends Mapper
 
         foreach ($serviceIds as $key => $serviceIdentifier) {
             if ($serviceIdentifier != 0) {
-                $folder =  CategoryMapper::getInstance()->findCheaplyById($serviceIdentifier);
-                $categoryNnian = CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
-                $serviceIds[$key] = $categoryNnian->getId();
+                $folder =  FolderMapper::getInstance()->findCheaplyById($serviceIdentifier);
+                $folderNnian = FolderMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
+                $serviceIds[$key] = $folderNnian->getId();
             }
         }
 
@@ -458,6 +458,7 @@ class UserAccessMapper extends Mapper
      * @param int  $serviceIdentifier
      * @param int  $service
      * @return UserAccess
+     * @throws Mapper\Exception
      */
     public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE)
     {
@@ -484,10 +485,10 @@ class UserAccessMapper extends Mapper
 
             // Find the NNIAN for the folder
 
-            $folder =  CategoryMapper::getInstance()->findCheaplyById($serviceIdentifier);
-            $categoryNnian = CategoryMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
+            $folder =  FolderMapper::getInstance()->findCheaplyById($serviceIdentifier);
+            $folderNnian = FolderMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
 
-            $serviceIdentifier = $categoryNnian->getId();
+            $serviceIdentifier = $folderNnian->getId();
         }
 
         // Setup cache array for this user/service/sid if it doesn't already exist)
@@ -536,7 +537,7 @@ class UserAccessMapper extends Mapper
         }
 
         // Permission check #3 - External DB
-        $fullCategory = CategoryMapper::getInstance()->findById($serviceIdentifier);
+        $fullCategory = FolderMapper::getInstance()->findById($serviceIdentifier);
         $result = $this->involvedInSubject($user, $fullCategory->getCodeString());
 
         if ($result)

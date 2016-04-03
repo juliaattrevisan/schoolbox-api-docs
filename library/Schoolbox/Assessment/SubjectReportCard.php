@@ -15,8 +15,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -32,7 +32,7 @@ class SubjectReportCard {
 
 	// domain objects
 	/**
-	 * @var Category
+	 * @var Folder
 	 */
 	protected $category;
 
@@ -68,7 +68,7 @@ class SubjectReportCard {
 	public function __construct($categoryId, $userId, Term\Model $term, $visibilities = array()) {
 
 		// dependencies
-		$catMap = new CategoryMapper();
+		$catMap = new FolderMapper();
 		$uMap = new UserMapper();
 
 		$this->targetTerm   = $term;

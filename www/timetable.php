@@ -19,7 +19,7 @@ if (!Cfg::get('external_enable')) {
 $groupHandler     = new Group;
 $userHandler      = new User;
 $timetableHandler = new External_Timetable;
-$categoryMapper   = new \Schoolbox\Resource\CategoryMapper();
+$categoryMapper   = new \Schoolbox\Resource\Folder\Mapper();
 $userMapper       = new \Schoolbox\UserMapper();
 
 

@@ -37,7 +37,7 @@ if (strlen($userKey)) {
      */
     if (is_numeric($categoryId)) {
         try {
-            $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+            $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
             $category = $categoryMapper->findById($categoryId);
         } catch (\Exception $e) {
         }

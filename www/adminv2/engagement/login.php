@@ -18,7 +18,7 @@ $roleMapper = new \Schoolbox\RoleMapper();
 $roleList = $roleMapper->findAll();
 
 $roleHandler = new Group;
-$roleSummary = $groupHandler->userSummary();
+$roleSummary = $roleHandler->userSummary();
 
 foreach($roleList as $role) {
     $totalTable[$role->getName()] = array_fill(0,$months, 0);

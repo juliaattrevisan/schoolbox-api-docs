@@ -80,7 +80,7 @@ abstract class Calendar_Layout_Full_Abstract
                 throw new \Exception('User does not exist', 31, $e);
             }
             if (!$currentUser->getSuperuser() &&
-                !$groupHandler->isStaff() &&
+                !$currentUser->getRole()->isStaff() &&
                 !$groupHandler->isParentOfChild($userId)
             ) {
                 throw new \Exception('Current user does not have permission to view calendar for this user', 125);

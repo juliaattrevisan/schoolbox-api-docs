@@ -9,12 +9,13 @@
 
 namespace Schoolbox\Permission\Access;
 
-use Schoolbox\Resource\Folder\Model as Category;
+
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 
 class RoleAccess {
 
-	/** @var Category */
+	/** @var Folder */
 	protected $category;
 
 	/** @var Role */
@@ -24,7 +25,7 @@ class RoleAccess {
 	protected $type;
 
 	/**
-	 * @param Category $category
+	 * @param Folder $category
 	 * @return self
 	 */
 	public function setCategory($category) {
@@ -33,7 +34,7 @@ class RoleAccess {
 	}
 
 	/**
-	 * @return Category
+	 * @return Folder
 	 */
 	public function getCategory() {
 		return $this->category;

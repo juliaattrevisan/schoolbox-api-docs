@@ -12,7 +12,7 @@ namespace Schoolbox\Forum;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class Thread implements ISoftDeletable {
@@ -20,7 +20,7 @@ class Thread implements ISoftDeletable {
     /** @var int */
     protected $id;
 
-    /** @var Category */
+    /** @var Folder */
     protected $category;
 
     /** @var User */
@@ -76,7 +76,7 @@ class Thread implements ISoftDeletable {
 
 
     /**
-     * @param Category $category
+     * @param Folder $category
      * @return self
      */
     public function setCategory($category) {
@@ -86,7 +86,7 @@ class Thread implements ISoftDeletable {
 
 
     /**
-     * @return Category
+     * @return Folder
      */
     public function getCategory() {
         return $this->category;

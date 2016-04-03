@@ -16,7 +16,7 @@ use Schoolbox\Resource\Search\Renderer\Base;
 /* Link specific
  */
 use Schoolbox\Resource\Link;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Renderer extends Base
 {

@@ -152,7 +152,7 @@ if (!empty($subList) && is_array($subList)) {
         if ($prevCat['category'] != $sub['category'] && $prevCat['category'] != '') {
             try {
                 $curCategory = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($prevCat['category']);
-                /* @param  \Schoolbox\Resource\Category $curCategory */
+                /* @param  \Schoolbox\Resource\Folder\Model $curCategory */
 
                 /* Get full student list of class to show those who have not submitted
                  */

@@ -11,8 +11,8 @@
 namespace Schoolbox\Resource\Search\Renderer;
 
 use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
-use Schoolbox\Resource\Folder\Model as CategoryModel;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use SitePage;
 
 abstract class Base
@@ -171,12 +171,12 @@ abstract class Base
     /**
      * Breadcrumbs haha
      *
-     * @param CategoryModel $folder
+     * @param FolderModel $folder
      * @return string
      */
-    protected function spawnBreadcrumbs(CategoryModel $folder)
+    protected function spawnBreadcrumbs(FolderModel $folder)
     {
-        $categoryMapper = new CategoryMapper();
+        $categoryMapper = new FolderMapper();
         $allCrumbs = $categoryMapper->breadcrumb($folder);
 
         $html = array();

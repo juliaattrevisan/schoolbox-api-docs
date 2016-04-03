@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\User;
@@ -28,7 +28,7 @@ class Task implements ISoftDeletable {
     protected $id;
 
     /**
-     * @var Category
+     * @var Folder
      */
     protected $category;
 
@@ -78,7 +78,7 @@ class Task implements ISoftDeletable {
     protected $deleted;
 
     /**
-     * @param  \Schoolbox\Resource\Category $category
+     * @param  \Schoolbox\Resource\Folder\Model $category
      * @return $this
      */
     public function setCategory($category) {
@@ -87,7 +87,7 @@ class Task implements ISoftDeletable {
     }
 
     /**
-     * @return \Schoolbox\Resource\Category
+     * @return \Schoolbox\Resource\Folder\Model
      */
     public function getCategory() {
         return $this->category;

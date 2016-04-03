@@ -10,8 +10,8 @@
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskBuilder;
 use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Resource\Folder\Model as CategoryModel;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Collection;
@@ -24,7 +24,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
     protected $group_handler;
 
     /**
-     * @var CategoryModel
+     * @var FolderModel
      */
     protected $category;
 
@@ -43,7 +43,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
     /**
      * The list of categories this unit is on. Derived from $this->unitList.
      *
-     * @var CategoryModel[]|Collection
+     * @var FolderModel[]|Collection
      */
     protected $categoryWithUnitList;
 
@@ -55,13 +55,13 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
         $this->group_handler = new Group();
         $categoryId          = $this->getContext()->getId();
         if ($categoryId > 0) {
-            $this->category = CategoryMapper::getInstance()->findById($categoryId);
+            $this->category = FolderMapper::getInstance()->findById($categoryId);
         }
         $this->task_list = TaskMapper::getInstance()->findByCategory($this->category);
 
         // What pages have this course?
         $this->unitList             = UnitInstanceMapper::getInstance()->findByUnitCategoryId($categoryId);
-        $this->categoryWithUnitList = CategoryMapper::getInstance()->findByColumn(
+        $this->categoryWithUnitList = FolderMapper::getInstance()->findByColumn(
             'id',
             $this->unitList->map(
                 function ($unit) {
@@ -112,9 +112,9 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
 
         // Start spamming out tasks into the template
         $this->setVar('category_breadcrumb_block', '');
-        if ($this->category instanceof CategoryModel) {
-            foreach (CategoryMapper::getInstance()->findParents($this->category) as $parent) {
-                /** @var CategoryModel $parent */
+        if ($this->category instanceof FolderModel) {
+            foreach (FolderMapper::getInstance()->findParents($this->category) as $parent) {
+                /** @var FolderModel $parent */
                 $this->setVar('PARENT_CATEGORY_ID', $parent->getId());
                 $this->setVar('PARENT_CATEGORY_NAME', $parent->getName());
                 $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);

@@ -11,7 +11,7 @@
 namespace Alaress\Authorizer\Rule;
 
 use External_UserInterface;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 
 class IsTeacherOfClass extends All
@@ -20,7 +20,7 @@ class IsTeacherOfClass extends All
      * Constructor (obviously)
      *
      * @param External_UserInterface  $externalDb
-     * @param array|callable|Category $classCodeSource
+     * @param array|callable|Folder $classCodeSource
      */
     public function __construct(External_UserInterface $externalDb, $classCodeSource)
     {

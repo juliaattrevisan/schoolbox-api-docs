@@ -1,5 +1,5 @@
 <?php
-use Schoolbox\Resource\Folder\Model as CategoryModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
 
@@ -111,7 +111,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                                 $event->setAuthorId($period['staff']->getId());
                                 $event->setAuthorName($period['staff']->formatName());
                             }
-                            if ($period['category'] instanceof CategoryModel) {
+                            if ($period['category'] instanceof Folder) {
                                 // Put this into a category
                                 $event->setCategoryId($period['category']->getId());
                                 $event->setCategoryName($period['category']->getName());
@@ -218,7 +218,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                         // Don't load more than once
                         if (!array_key_exists($categoryId, $timetableCategories)) {
                             $timetableCategories[$categoryId] =
-                                \Schoolbox\Resource\CategoryMapper::getInstance()->findByCode(
+                                \Schoolbox\Resource\Folder\Mapper::getInstance()->findByCode(
                                     $categoryId
                                 );
                         }

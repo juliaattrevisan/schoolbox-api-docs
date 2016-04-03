@@ -294,7 +294,7 @@ foreach ($alreadyInFolderList as $current) {
     $tempFolderIds[] = $current->getCategoryId();
 }
 
-$folderMapper = new \Schoolbox\Resource\CategoryMapper();
+$folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 $allFolders   = $folderMapper->findByColumnList(array('id' => $tempFolderIds));
 
 /**

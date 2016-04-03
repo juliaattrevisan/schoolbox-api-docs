@@ -12,7 +12,7 @@ namespace Schoolbox\Textbox;
 
 use Schoolbox\Textbox\Model;
 use Schoolbox\Collection;
-use \Schoolbox\Resource\CategoryMapper;
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Mapper extends \Schoolbox\Mapper
 {
@@ -72,7 +72,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasJoin(
             'category', array(
                 'multiple'  => false,
-                'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
                 'this_key'  => 'categoryID',
                 'other_key' => 'id',
             )
@@ -134,7 +134,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'cname', $sort_dir = 'ASC')
     {
-        $categoryMapper = new CategoryMapper();
+        $categoryMapper = new FolderMapper();
 
         $offset     = (int)$offset;
         $limit      = (int)$limit;

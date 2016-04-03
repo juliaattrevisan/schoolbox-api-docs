@@ -21,14 +21,14 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
     /**
      * An instance of Category
      *
-     * @var \Schoolbox\Resource\Category
+     * @var \Schoolbox\Resource\Folder\Model
      */
     private $source;
 
     /**
      * Category Mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var \Schoolbox\Resource\Folder\Mapper
      */
     private $categoryMapper = null;
 
@@ -41,7 +41,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
     {
         $this->groupHandler = new Group();
 
-        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
 
         $this->source = $this->getContext();
 
@@ -50,7 +50,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $id = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
 
             try {
-                $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+                $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
                 $folder       = $folderMapper->findById($id);
 
                 $this->source = $folder;

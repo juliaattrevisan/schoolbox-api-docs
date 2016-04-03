@@ -10,7 +10,7 @@
 namespace Schoolbox\Textbox;
 
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Model implements ISoftDeletable
 {
@@ -25,7 +25,7 @@ class Model implements ISoftDeletable
     /**
      * Category
      *
-     * @var Category
+     * @var Folder
      */
     private $category;
 
@@ -65,7 +65,7 @@ class Model implements ISoftDeletable
      */
     public function __construct()
     {
-        $this->setCategory(new Category());
+        $this->setCategory(new Folder());
     }
 
     /* Getters/Setters
@@ -96,7 +96,7 @@ class Model implements ISoftDeletable
     /**
      * Set category
      *
-     * @param Category $category
+     * @param Folder $category
      * @return $this
      */
     public function setCategory($category)
@@ -108,7 +108,7 @@ class Model implements ISoftDeletable
     /**
      * Get category
      *
-     * @return Category
+     * @return Folder
      */
     public function getCategory()
     {

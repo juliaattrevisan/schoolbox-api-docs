@@ -3,7 +3,7 @@ use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\RerouteOverride;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * 

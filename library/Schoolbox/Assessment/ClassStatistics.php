@@ -16,13 +16,13 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
-use Schoolbox\Resource\Category;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class ClassStatistics {
 
 	/**
-	 * @var \Schoolbox\Resource\Category
+	 * @var Folder
 	 */
 	protected $category;
 
@@ -59,8 +59,9 @@ class ClassStatistics {
 	/**
 	 * Constructor
 	 *
-	 * @param Category $category
-	 * @param Term\Model $term
+	 * @param Folder $category
+	 * @param int $year
+	 * @param int $semester
 	 * @param User $user
 	 */
 	public function __construct($category, Term\Model $term, User $user) {
@@ -113,7 +114,7 @@ class ClassStatistics {
 	/**
 	 * Return the category this statistics object is referencing
 	 *
-	 * @return Category
+	 * @return Folder
 	 */
 	public function getCategory() {
 		return $this->category;

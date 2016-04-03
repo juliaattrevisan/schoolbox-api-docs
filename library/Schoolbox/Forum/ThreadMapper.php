@@ -108,7 +108,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface {
         ));
 
         $this->hasJoin('category', array(
-            'mapper'    => '\Schoolbox\Resource\CategoryMapper',
+            'mapper'    => '\Schoolbox\Resource\Folder\Mapper',
             'this_key'  => 'categoryID',
             'other_key' => 'id'
         ));

@@ -10,7 +10,7 @@
 
 namespace Schoolbox\SubjectList;
 
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 abstract class SubjectListAbstract
 {
@@ -39,7 +39,7 @@ abstract class SubjectListAbstract
     /**
      * An instance of category mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var \Schoolbox\Resource\Folder\Mapper
      */
     protected $categoryMapper = null;
 
@@ -53,7 +53,7 @@ abstract class SubjectListAbstract
     {
         $this->setPage($page);
         $this->setAllSubjects($allSubjects);
-        $this->setCategoryMapper(new CategoryMapper());
+        $this->setCategoryMapper(new FolderMapper());
 
         $this->setup();
         $this->split();
@@ -156,7 +156,7 @@ abstract class SubjectListAbstract
     /**
      * Set category mapper
      *
-     * @param \Schoolbox\Resource\CategoryMapper $categoryMapper
+     * @param \Schoolbox\Resource\Folder\Mapper $categoryMapper
      */
     protected function setCategoryMapper($categoryMapper)
     {
@@ -166,7 +166,7 @@ abstract class SubjectListAbstract
     /**
      * Get category mapper
      *
-     * @return \Schoolbox\Resource\CategoryMapper
+     * @return \Schoolbox\Resource\Folder\Mapper
      */
     protected function getCategoryMapper()
     {

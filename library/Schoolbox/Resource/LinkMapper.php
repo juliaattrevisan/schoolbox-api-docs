@@ -19,7 +19,7 @@ use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\ILocator;
 use Schoolbox\User;
 use Schoolbox\Resource\Link\Search\Result;
-use Schoolbox\Resource\Folder\Model as CategoryModel;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
 class LinkMapper extends Mapper implements ILocator, Searchable
 {
@@ -123,7 +123,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         );
         $this->hasJoin(
             'category', array(
-                'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
                 'this_key'  => 'category',
                 'other_key' => 'id'
             )
@@ -186,11 +186,11 @@ class LinkMapper extends Mapper implements ILocator, Searchable
     /**
      * Find all the links in a given category
      *
-     * @param CategoryModel $category
+     * @param FolderModel $category
      * @param $options
      * @return Collection
      */
-    public function findAllInCategory(CategoryModel $category, $options)
+    public function findAllInCategory(FolderModel $category, $options)
     {
         $categoryMapper = $this->getJoinMapper('category');
         $userMapper     = $this->getJoinMapper('user');

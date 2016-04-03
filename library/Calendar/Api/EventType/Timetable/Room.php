@@ -1,7 +1,7 @@
 <?php
 
-use Schoolbox\Resource\Folder\Model as CategoryModel;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 
@@ -154,14 +154,14 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $categoryCode = $room['ClassCode'];
                 if (!(array_key_exists($categoryCode, $categoryList))) {
                     try {
-                        $categoryList[$categoryCode] = CategoryMapper::getInstance()->findByCode(
+                        $categoryList[$categoryCode] = FolderMapper::getInstance()->findByCode(
                             $categoryCode
                         );
                     } catch (Schoolbox\Mapper\Exception $e) {
                         $categoryList[$categoryCode] = null;
                     }
                 }
-                if ($categoryList[$categoryCode] instanceof CategoryModel) {
+                if ($categoryList[$categoryCode] instanceof FolderModel) {
                     $event->setCategoryId($categoryList[$categoryCode]->getId());
                     $event->setCategoryName($categoryList[$categoryCode]->getName());
                 }

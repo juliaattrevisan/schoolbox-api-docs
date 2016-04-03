@@ -23,8 +23,8 @@ use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -38,7 +38,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
     const TRIGGER_POSTED = 'posted';
     const TRIGGER_REPLIED = 'replied';
 
-    /** @var CategoryMapper */
+    /** @var FolderMapper */
     protected $catMapper;
 
     /** @var UserAccessMapper */
@@ -64,7 +64,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function loadDependencies($dependencies = null)
     {
-        $this->catMapper = CategoryMapper::getInstance();
+        $this->catMapper = FolderMapper::getInstance();
         $this->userAccessMapper = UserAccessMapper::getInstance();
         $this->userMapper = UserMapper::getInstance();
         parent::loadDependencies($dependencies);
@@ -133,7 +133,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $envelope = new Envelope();
         $bob = new Builder();
 
-        /** @var Category $cat */
+        /** @var Folder $cat */
         $cat = $this->catMapper->findById($post->getHomepageId());
 
         if ($post instanceof \SocialStream_Post_Url) {
@@ -184,7 +184,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $envelope = new Envelope();
         $bob = new Builder();
 
-        /** @var Category $cat */
+        /** @var Folder $cat */
         $cat = $this->catMapper->findById($post->getHomepageId());
 
         // list of user's to notify: parent ("user replied to your post") and siblings ("user ALSO replied to")

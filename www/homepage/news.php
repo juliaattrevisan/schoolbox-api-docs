@@ -1,14 +1,14 @@
 <?php
 
 use Schoolbox\Resource\Category\NewsMapper;
-use Schoolbox\Resource\Folder\Mapper as CategoryMapper;
-use Schoolbox\Resource\Folder\Model as CategoryModel;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
 $groupHandler = new Group;
 $newsHandler = new CategoryNews;
 $userHandler = new User();
 
-$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+$categoryMapper = new FolderMapper();
 
 $this->setFile(TEMPLATE_content, "homepage/news.html");
 $this->setBlock(TEMPLATE_content, "submit_news", "submit_news_block");

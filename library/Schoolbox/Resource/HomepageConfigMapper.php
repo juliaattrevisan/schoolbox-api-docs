@@ -163,7 +163,7 @@ class HomepageConfigMapper extends Mapper
         $this->hasJoin(
             'category',
             array(
-                'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
                 'this_key'  => 'category',
                 'other_key' => 'id',
             )

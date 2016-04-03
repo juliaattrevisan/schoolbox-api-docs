@@ -14,7 +14,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
     /**
      * An instance of Category
      *
-     * @var \Schoolbox\Resource\Category
+     * @var \Schoolbox\Resource\Folder\Model
      */
     private $source;
 

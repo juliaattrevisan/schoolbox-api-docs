@@ -11,7 +11,7 @@
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 // not in SitePage context, redirect to equivalent
 if(!isset($this)) {
@@ -46,7 +46,7 @@ $this->setBlock('criterion', 'criterion_enabled', 'criterion_enabled_block');
 
 
 // get category details
-$category = CategoryMapper::getInstance()->findById($catID);
+$category = FolderMapper::getInstance()->findById($catID);
 
 $this->setVar(array(
     'CATEGORY_ID' => $category->getId(),

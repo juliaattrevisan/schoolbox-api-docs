@@ -4,7 +4,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverride;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 
 /**
@@ -25,8 +25,8 @@ $user = $_SESSION['user'];
 // as much as we'd like get this as cached in session, we can't include subjects here
 $accesses   = UserAccessMapper::getInstance()->findAllForUser($user, false);
 
-/** @var \Schoolbox\Collection|\Schoolbox\Resource\Category[] $cats */
-$cats       = CategoryMapper::getInstance()
+/** @var \Schoolbox\Collection|\Schoolbox\Resource\Folder\Model[] $cats */
+$cats       = FolderMapper::getInstance()
                             ->findByColumn('id', $accesses
                             ->getColumnValues('serviceIdentifier'))
                             ->sortBy('name', 'asc');
@@ -110,7 +110,7 @@ foreach ($cats as $cat) {
     $forced = false;
 
     // forced hydration
-    $cat = CategoryMapper::getInstance()->findById($cat->getId());
+    $cat = FolderMapper::getInstance()->findById($cat->getId());
 
     if ($grp = $cat->getGroup()) {
         $forced = $grp->getForceFollow() || in_array($cat->getId(), $muted['disabled']);

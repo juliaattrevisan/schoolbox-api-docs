@@ -41,7 +41,7 @@ class FileNotifier extends ResourceNotifier {
 	 * @return Envelope
 	 */
 	public function notifyCreated($roletype, $file, $effector, $diff = null) {
-		$category = CategoryMapper::getInstance()->findById($file->getFolder()->getId());
+		$category = $this->getResourceCategory($file);
 
 		return $this->notify(
 			LogMapper::KIND_FILE, $file->getId(), self::TRIGGER_CREATED,    // "file.{id}.created"
@@ -58,7 +58,7 @@ class FileNotifier extends ResourceNotifier {
 	 * @return Envelope
 	 */
 	public function notifyDeleted($roletype, $file, $effector, $diff = null) {
-		$category = CategoryMapper::getInstance()->findById($file->getFolder()->getId());
+		$category = $this->getResourceCategory($file);
 		// abstract this so far it doesn't even make sense any more
 		return $this->notify(
 			LogMapper::KIND_FILE, $file->getId(), self::TRIGGER_DELETED,    // "file.{id}.deleted"
@@ -82,7 +82,7 @@ class FileNotifier extends ResourceNotifier {
 	 * @return Category
 	 */
 	protected function getResourceCategory($resource) {
-		return $this->categoryMapper->findById($resource->getFolder()->getId());
+		return $this->folderMapper->findById($resource->getFolder()->getId());
 	}
 
 

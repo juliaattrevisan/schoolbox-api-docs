@@ -79,7 +79,7 @@ class DAV_SubjectServer_SubjectList extends Sabre\DAV\SimpleCollection
 
             $codes = array();
             foreach ($category->getCodes() as $code) {
-                /** @var Schoolbox\Resource\CategoryCode $code */
+                /** @var Schoolbox\Resource\Folder\Code\Model $code */
                 $codes[] = $code->getCode();
             }
             $name = $category->getName();

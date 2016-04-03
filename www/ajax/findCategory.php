@@ -2,7 +2,7 @@
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $page = new SitePage();
-$categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 
 $suggestions = array();
 $data = array();

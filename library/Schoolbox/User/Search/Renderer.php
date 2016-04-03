@@ -100,7 +100,7 @@ class Renderer extends Handler
 
 
                 // Show pastoral to staff and parents
-                if ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
+                if ($_SESSION['user']->getRole()->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
                     $this->getPage()->parse('pastoral_block', 'pastoral');
                 } else {
                     $this->getPage()->setVar('pastoral_block', '');
@@ -113,7 +113,7 @@ class Renderer extends Handler
 
                     //Show student timetables to staff and parents of child
                 if ($groupHandler->isStudent($user['id'])) {
-                    if ($groupHandler->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
+                    if ($_SESSION['user']->getRole()->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
                         // Timetable shouldn't appear if synergy is disabled in the conf, or the students timetable is marked as hidden
                         if (Cfg::get('external_enable') && $user['synergy_id'] && !$user['hide_timetable']) {
                             $this->getPage()->parse('timetable_block', 'timetable');
@@ -129,11 +129,11 @@ class Renderer extends Handler
                     }
                 } else {
                     //Show staff timetables to other staff
-                    if ($groupHandler->isStaff() && $groupHandler->isStaff($user['id'])) {
+                    if ($_SESSION['user']->getRole()->isStaff() && $groupHandler->isStaff($user['id'])) {
                         $this->getPage()->parse('timetable_block', 'timetable');
                     }
                 }
-                if (!$_SESSION['su']) {
+                if (!$_SESSION['user']->isSuperuser()) {
                     $this->getPage()->setVar('modify_block');
                 } else {
                     $this->getPage()->parse('modify_block', 'modify');
@@ -151,8 +151,8 @@ class Renderer extends Handler
                  * Calendar only exist for students' parents, staff, supers, and themselves
                  */
                 $isParentOfChild = $groupHandler->isParentOfChild($user['id']);
-                $isSuperuser = $_SESSION['user']->getSuperuser();
-                $isStaff = $groupHandler->isStaff();
+                $isSuperuser = $_SESSION['user']->isSuperuser();
+                $isStaff =  $_SESSION['user']->getRole()->isStaff();
                 $isSelf = ($user['id'] == $_SESSION['user']->getId());
 
                 if ($isParentOfChild || $isSuperuser || $isStaff || $isSelf) {

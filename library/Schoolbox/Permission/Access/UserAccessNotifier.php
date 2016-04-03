@@ -24,8 +24,8 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Rerouter\RerouterCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\User;
@@ -129,8 +129,8 @@ class UserAccessNotifier extends AbstractModuleNotifier
 
         $bob = new Builder();
 
-        /** @var Category $cat */
-        $cat = CategoryMapper::getInstance()->findById($userAccess->getServiceIdentifier());
+        /** @var Folder $cat */
+        $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
 
         /** @var User $user */
         $user = UserMapper::getInstance()->findById($userAccess->getUser()->getId());
@@ -221,8 +221,8 @@ class UserAccessNotifier extends AbstractModuleNotifier
 //		$newAccess = $diff['accessLevel'][0];
 //		$oldAccess = $diff['accessLevel'][1];
 
-        /** @var Category $cat */
-        $cat = CategoryMapper::getInstance()
+        /** @var Folder $cat */
+        $cat = FolderMapper::getInstance()
                              ->findById($userAccess->getServiceIdentifier());
 
         // Customize the approval message

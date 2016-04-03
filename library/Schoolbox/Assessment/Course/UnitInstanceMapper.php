@@ -42,7 +42,7 @@ class UnitInstanceMapper extends BaseMapper {
             'type'       => self::TYPE_MODEL,
             'join'       => 'category',
             'join_def'   => array(
-                'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
                 'this_key'  => 'category_id',
                 'other_key' => 'id',
             ),
@@ -90,12 +90,12 @@ class UnitInstanceMapper extends BaseMapper {
         ));
 
         $this->hasJoin('unit_category', array(
-            'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+            'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
             'this_key'  => 'unit_category_id',
             'other_key' => 'id',
         ));
         $this->hasJoin('course_folder', array(
-            'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+            'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
             'this_key'  => 'parent',
             'other_key' => 'id',
         ));

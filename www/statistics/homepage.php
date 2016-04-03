@@ -13,9 +13,9 @@ if (isset($_GET['date_start']) && isset($_GET['date_end']) && isset($_GET['drop'
 
 $groupID = $_SESSION['gid'];
 
-$folderMapper = new \Schoolbox\Resource\CategoryMapper();
+$folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
-$folder = new \Schoolbox\Resource\Category();
+$folder = new \Schoolbox\Resource\Folder\Model();
 
 /* Try to find by folder id first
  */

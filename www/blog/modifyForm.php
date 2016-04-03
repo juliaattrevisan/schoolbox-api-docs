@@ -12,7 +12,7 @@ if(is_numeric($_POST['blogID'])) {
 	$blog = \Schoolbox\Blog\BlogMapper::getInstance()->findById($_POST['blogID']);
 }
 else {
-	$cat = new \Schoolbox\Resource\Category();
+	$cat = new \Schoolbox\Resource\Folder\Model();
 	$cat->setId($_POST['cid']);
 
 	$blog = new \Schoolbox\Blog\Blog();

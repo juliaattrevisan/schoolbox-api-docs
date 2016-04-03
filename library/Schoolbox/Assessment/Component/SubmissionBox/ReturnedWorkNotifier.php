@@ -21,8 +21,8 @@ use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\Category;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -33,7 +33,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	/** @var UserMapper */
 	protected $userMapper;
 
-	/** @var CategoryMapper */
+	/** @var FolderMapper */
 	protected $catMapper;
 
 	/** @var SubmissionBoxMapper */
@@ -58,7 +58,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 	 */
 	public function loadDependencies($dependencies = null) {
 		$this->userMapper = UserMapper::getInstance();
-		$this->catMapper = CategoryMapper::getInstance();
+		$this->catMapper = FolderMapper::getInstance();
 		$this->boxMapper = SubmissionBoxMapper::getInstance();
 		$this->termMapper = Term\Mapper::getInstance();
 		parent::loadDependencies($dependencies);
@@ -133,7 +133,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier {
 		$teacher = $this->userMapper->findById($user->getId());
 		/** @var SubmissionBox $box */
 		$box = $this->boxMapper->findById($returnedWork->getSubmissionBox()->getId());
-		/** @var Category $cat */
+		/** @var Folder $cat */
 		$cat = $this->catMapper->findById($box->getCategory()->getId());
 
 		$teacherId = $teacher->getId();

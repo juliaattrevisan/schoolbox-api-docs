@@ -59,7 +59,7 @@ $m = new Marksheet($categoryID, $_SESSION['id'], array(
     // inject mapper dependencies
     'user' => \Schoolbox\UserMapper::getInstance(),
     'term' => $termMapper,
-    'category' => \Schoolbox\Resource\CategoryMapper::getInstance(),
+    'category' => \Schoolbox\Resource\Folder\Mapper::getInstance(),
     'sb' => SubmissionBoxMapper::getInstance(),
     'oa' => OnlineAssessmentMapper::getInstance(),
     'error' => DueWork_ErrorMapper::getInstance(),

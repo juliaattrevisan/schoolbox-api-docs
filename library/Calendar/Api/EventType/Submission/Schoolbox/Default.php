@@ -62,7 +62,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
         // Use the mapper classes to get events for this day.
         // Also, need the categories to filter on.
         // Don't like using session here but other event types use them, so meh.
-        $cat_mapper = Schoolbox\Resource\CategoryMapper::getInstance();
+        $cat_mapper = Schoolbox\Resource\Folder\Mapper::getInstance();
         $cat_mapper->setExternalUser(new External_User());
         $category_id_list = array();
         foreach ($cat_mapper->findForUser($this->getUser()) as $category) {

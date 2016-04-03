@@ -20,7 +20,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     /**
      * A category mapper
      *
-     * @var \Schoolbox\Resource\CategoryMapper
+     * @var \Schoolbox\Resource\Folder\Mapper
      */
     private $categoryMapper = null;
 
@@ -41,7 +41,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     /**
      * Source category
      *
-     * @var \Schoolbox\Resource\Category
+     * @var \Schoolbox\Resource\Folder\Model
      */
     protected $source = null;
 
@@ -60,7 +60,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     public function execute()
     {
         $this->setGroupHandler(new Group());
-        $this->setCategoryMapper(new \Schoolbox\Resource\CategoryMapper());
+        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
         $this->setFileMapper(new \Schoolbox\Resource\FileMapper());
         $this->determineSourceFolder();
     }
@@ -78,7 +78,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
         try {
             $this->setSource($this->getCategoryMapper()->findById($categoryId));
         } catch (\Exception $e) {
-            $this->setSource(new \Schoolbox\Resource\Category());
+            $this->setSource(new \Schoolbox\Resource\Folder\Model());
         }
     }
 

@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Resource\File\Mapper as FileMapper;
@@ -92,7 +92,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     try {
         // sooo, this case is much simpler
         if ($modifyExisting) {
-            $file->setFolder(CategoryMapper::getInstance()->createModel()->setId($_POST['category']));
+            $file->setFolder(FolderMapper::getInstance()->createModel()->setId($_POST['category']));
             $affectedIds = FileMapper::getInstance()->save($file);
 
         } else {
@@ -109,7 +109,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
                 }
 
                 $clone = clone $file;
-                $clone->setFolder(CategoryMapper::getInstance()->createModel()->setId($cat));
+                $clone->setFolder(FolderMapper::getInstance()->createModel()->setId($cat));
 
                 $collection->add($clone);
             }
@@ -147,7 +147,7 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
         } elseif ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
             $result = "Insufficient permssions";
         } else {
-            $file->setFolder(CategoryMapper::getInstance()->createModel($_POST['categoryID']));
+            $file->setFolder(FolderMapper::getInstance()->createModel($_POST['categoryID']));
             $file->setModifiedAt(Alaress_Date_Format::now());
 
             FileMapper::getInstance()->save($file);

@@ -25,7 +25,7 @@ use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
@@ -110,7 +110,7 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$authorExtId  = $author->getExternalId();
 
 		$categoryId   = $blog->getCategory()->getId();
-		$category     = CategoryMapper::getInstance()->findById($categoryId);
+		$category     = FolderMapper::getInstance()->findById($categoryId);
 
 		$bob = new Builder();
 

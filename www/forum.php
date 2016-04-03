@@ -23,7 +23,7 @@ $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 
 // category exists
 if (is_numeric($this->arg[0])) {
-    $categoryMapper = new \Schoolbox\Resource\CategoryMapper();
+    $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 
     try {
         $category = $categoryMapper->findById($this->arg[0]);

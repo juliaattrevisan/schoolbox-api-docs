@@ -71,7 +71,7 @@ class Node
     /**
      * Category
      *
-     * @var \Schoolbox\Resource\Category
+     * @var \Schoolbox\Resource\Folder\Model
      */
     private $category = null;
 
@@ -112,7 +112,7 @@ class Node
     /**
      * Get category
      *
-     * @return \Schoolbox\Resource\Category
+     * @return \Schoolbox\Resource\Folder\Model
      */
     public function getCategory()
     {

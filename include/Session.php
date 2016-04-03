@@ -402,7 +402,7 @@ class Session
     {
         $synUser = new External_User;
         $groupHandler = new Group;
-        $folderMapper = new \Schoolbox\Resource\CategoryMapper();
+        $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
         $synergy_id = $_SESSION['sid'];
 

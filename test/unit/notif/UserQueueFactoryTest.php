@@ -22,7 +22,7 @@ class UserQueueFactoryTest extends PHPUnit_Framework_TestCase
 
         $uqf = new \Schoolbox\Notif\Queue\UserQueueFactory(new \Schoolbox\Notif\MQ\Test\MockAMQPConnector($messages));
 
-        $stubCatMapper = $this->getMock('Schoolbox\Resource\CategoryMapper', array('findForUser'));
+        $stubCatMapper = $this->getMock('Schoolbox\Resource\Folder\Mapper', array('findForUser'));
         $stubCatMapper->expects($this->any())->method('findForUser')->willReturn(new \Schoolbox\Collection());
 
         $stubUserMapper = $this->getMock('Schoolbox\UserMapper', array('findById', 'findByColumnList'));
