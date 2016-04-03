@@ -354,8 +354,6 @@ class SitePage extends Page
 
     function buildPage($customHead = true)
     {
-        $this->groupHandler = new Group;
-
         $this->setFile(TEMPLATE_body, 'include/body.html');
         $this->setFile('headerTpl', 'include/header.html');
         $this->setFile('footerTpl', 'include/footer.html');
@@ -712,7 +710,7 @@ class SitePage extends Page
                 case 'peninsula':
                     if ($user->getRole()->isStaff()) {
                         $location = Cfg::get('mail_webmail');
-                    } elseif ($this->groupHandler->isStudent()) {
+                    } elseif ($user->getRole()->isStudent()) {
                         $location = 'https://outlook.com/owa/tps.vic.edu.au';
                     }
                     break;
