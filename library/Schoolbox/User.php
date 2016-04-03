@@ -887,6 +887,7 @@ class User implements JsonSerializable
             $uaMapper = UserAccessMapper::getInstance();
             $this->setAccessList($uaMapper->findAllForUser($this));
         }
+
         return $this->accessList;
     }
 

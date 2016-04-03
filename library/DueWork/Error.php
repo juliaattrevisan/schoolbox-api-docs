@@ -104,7 +104,7 @@ class DueWork_Error {
     /**
      * @return boolean
      */
-    public function isIsDefaultForNewSubmissions()
+    public function getIsDefaultForNewSubmissions()
     {
         return $this->isDefaultForNewSubmissions;
     }

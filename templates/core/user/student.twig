@@ -198,7 +198,7 @@
             </div>
             
             {% block buttons_island %}
-            <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-6 xlarge-block-grid-8">
+            <ul class="no-margin small-block-grid-2 medium-block-grid-4 large-block-grid-7 xlarge-block-grid-7">
 
                 {% block buttons %}
                     {% if showButtons %}
@@ -206,7 +206,7 @@
                             {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_duework_access) %}
                                 <li class="no-pad">
                                     <a href="/submission/dueWork/0/{{ user.getId() }}"
-                                       class="no-margin fat button icon-fat icon-32 icon-due-work"
+                                       class="no-margin button fat icon-fat icon-32 icon-due-work"
                                       >Due Work</a>
                                 </li>
                             {% endif %}
@@ -233,6 +233,16 @@
                                   >ePortfolio</a>
                             </li>
                         {% endblock buttons_eportfolio %}
+                    {% endif %}
+
+                    {% if showButtons and showPastoral %}
+                        {% if isStaff or isParentOfStudent %}
+                        <li class="no-pad">
+                            <a href="/pastoral/{{ user.getId() }}"
+                               class="no-margin fat icon-fat button icon-32 icon-chat"
+                            >Pastoral Care</a>
+                        </li>
+                        {% endif %}
                     {% endif %}
 
                     {% if showButtons %}

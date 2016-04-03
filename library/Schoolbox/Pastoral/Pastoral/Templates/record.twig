@@ -1,0 +1,239 @@
+{% if role != 'parent' %}
+
+    <script type="text/javascript">
+        $(function () {
+
+            // Disable post comment button if there is no comment
+
+            $('#body').on('change keyup paste', function() {
+                $('[data-post]').prop('disabled', $('#body').val().trim() === '');
+            });
+
+            // Delete pastoral record
+
+            $('[data-delete]').click(function(event) {
+                event.preventDefault();
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this record?',
+                    confirmEvent: function() {
+                        $.post('/pastoral/delete', {
+                            id: {{ record.getId() }}
+                        })
+                        .done(function() {
+                            window.location.href = '/pastoral/{{ record.getStudent.getId() }}';
+                        });
+                    }
+                });
+            });
+
+            // Delete comment
+
+            $('[data-delete-comment]').click(function(event) {
+                event.preventDefault();
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this comment?',
+                    confirmEvent: function() {
+                        $.post('/pastoral/comment-delete', {
+                            id: $(event.target).attr('data-delete-comment')
+                        })
+                        .done(function() {
+
+                            // Remove comment after AJAX return
+
+                            $(event.target).closest('li').remove();
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+{% endif %}
+
+<ul class="breadcrumb">
+    <li><a href="/search/user/{{ record.getStudent.getId }}">{{ record.getStudent.getFirstname }} {{ record.getStudent.getLastname }}</a></li>
+    <li><a href="/pastoral/{{ record.getStudent.getId }}">Pastoral Care</a></li>
+    <li class="active"><a href="#">{{ record.getHeading() }}</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ record.getStudent.formatName() }}</h1>
+        <h2 class="subheader">Pastoral Record Details</h2>
+
+        <section>
+            <ul class="action-list">
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 avatar card wrap-down">
+                            {# Theres no need for the all the twig access checks like the list page, if the user got to this screen they can view everything #}
+                            <a href="/search/user/{{ record.owner.getId() }}">
+                                <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
+                            </a>
+                            <h3>{{ record.getHeading() }}</h3>
+                            <p class="spaced meta">
+                                Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getCreatedAt().getShort() }}
+                            </p>
+
+                            {# Show tags #}
+                            {% if record.tagsList | length > 0 %}
+                                <p class="spaced">
+                                    {% for tag in record.tagsList %}
+                                        <span class="neutral label">{{ tag.name }}</span>
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
+
+                            {# Hide meta from parents#}
+                            {% if role != 'parent' %}
+                                <p class="spaced meta">
+                                    {# Pastoral event type #}
+                                    {{ record.getType.getName }} |
+
+                                    {# Pastoral event severity #}
+                                    {{ record.getSeverity.getName }} |
+
+                                    {# Indicate if record is private #}
+                                    {% if record.private %}Contents Private | {% endif %}
+
+                                    {# Indicate if not audience has been set #}
+                                    {% if record.getAccessList.count == 0 %}No Audience Set{% endif %}
+
+                                    {# Show audienced roles  #}
+                                    {% if record.getAccessList.count > 0 %}
+                                        {% for access in record.getAccessList %}
+                                            {% if access.getRole.getId != '' %}
+                                                {{ access.getRole.getName }}{% if not loop.last %},{% endif %}
+                                            {% elseif access.getUser.getId != '' %}
+                                                <a href="/search/user/{{ access.getUser.getId }}">{{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}</a>{% if not loop.last %},{% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {# Only display the edit/delete links to the owner of the record or pastoral moderators #}
+                    {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or pastoralModerator %}
+                    <nav>
+                        <a class="icon-modify" href="/pastoral/update/{{ record.getId() }}" title="Modify Comment"></a>
+                        <a data-delete class="icon-delete" href="#" title="Delete Comment"></a>
+                    </nav>
+                    {% endif %}
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            {# Show article body #}
+            <div class="content">
+                {{ record.getBody() | raw }}
+
+                {# Show any file attachments #}
+                {% if record.getAttachmentList.count > 0 %}
+                    <p class="spaced meta">
+                        {% for attachment in record.getAttachmentList %}
+                            Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{  attachment.getFilename() }}</a><br>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+            </div>
+        </section>
+
+        {# Parents cannot ever add/view comments or related records #}
+        {% if role != 'parent' %}
+
+            {# Show related records #}
+            {% if record.getRelatedRecords | length > 1 %}
+
+                <h2 class="subheader">Related Records</h2>
+                <section>
+                    <ul class="action-list">
+
+                        {% for related in record.getRelatedRecords %}
+
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 avatar card wrap-down">
+                                        {# Show student photo #}
+                                        <a href="/pastoral/{{ related.getStudent.getId }}/{{ related.getId }}" title="View Record">
+                                            <img src="/portrait.php?userId={{ related.student.getExternalId() }}&size=square64" alt="" />
+                                        </a>
+                                        {# Show styudent author #}
+                                        <p class="meta">
+                                            <a title="View Record" href="/pastoral/{{ related.getStudent.getId }}/{{ related.getId }}">
+                                                {{ related.getStudent.getFirstName }} {{ related.getStudent.getLastName }}
+                                            </a>
+                                        </p>
+                                        <p class="spaced">
+                                            {{ related.getHeading }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+
+                        {% endfor %}
+
+                    </ul>
+                </section>
+
+            {% endif %}
+
+            <h2 class="subheader">Comments</h2>
+            {% if record.getCommentList.count > 0 %}
+                <section>
+                    <ul class="action-list">
+
+                        {# Show all comments for this record #}
+                        {% for comment in record.getCommentList %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 avatar card wrap-down">
+                                        {# Comment author photo #}
+                                        <a href="/search/user/{{ comment.owner.getId() }}" title="View Profile">
+                                            <img src="/portrait.php?userId={{ comment.owner.getExternalId() }}&size=square64" alt="" />
+                                        </a>
+
+                                        {# Show comment author #}
+                                        <p class="meta">Posted By <a href="/search/user/{{ comment.getOwner.getId }}">{{ comment.getOwner.getFirstName }} {{ comment.getOwner.getLastName }}</a> {{ comment.getCreatedAt().getShort() }}</p>
+
+                                        {# Show comment body #}
+                                        <p class="spaced">
+                                            {{ comment.body | raw }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
+
+                                {%
+                                    if  record.getOwner.getId == session.user.getId or
+                                        comment.getOwner.getId == session.user.getId or
+                                        pastoralModerator
+                                %}
+                                    <nav>
+                                        <a data-delete-comment="{{ comment.getId }}" class="icon-delete" href="#" title="Delete Comment"></a>
+                                    </nav>
+                                {% endif %}
+
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+            <form method="post" action="/pastoral/comment">
+                <input type="hidden" name="pastoral_id" value="{{ record.getId() }}">
+                <input type="hidden" name="student_id" value="{{ record.getStudent.getId() }}">
+                <section>
+                    <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
+                </section>
+                <input disabled data-post type="submit" class="expand" value="Post Comment">
+            </form>
+
+        {% endif %}
+    </div>
+</div>

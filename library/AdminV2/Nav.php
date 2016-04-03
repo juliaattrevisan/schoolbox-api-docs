@@ -25,12 +25,13 @@ class AdminV2_Nav
         'terms' => 'Terms',
         'course-builder' => 'Course Builder',
         'messages' => 'Messages',
-        'list' => 'Lists',
+        'lists' => 'Lists',
         'cleanup' => 'Cleanup',
         'usage' => 'Usage',
         'engagement' => 'Engagement',
         'ups' => 'User Provisioning System',
         'import' => 'Import',
+        'import-pastoral' => 'Pastoral Care Import',
     );
 
     public function parse(SitePage $page, $currentPage = 'home')

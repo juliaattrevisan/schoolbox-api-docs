@@ -1,0 +1,286 @@
+<script type="text/javascript">
+
+    $(function () {
+
+        // Filter pastoral records on type
+
+        var filter_type_id = $('#filter_type_id');
+
+        filter_type_id.change(function() {
+            $('.record').each(function(index, record) {
+                if (filter_type_id.val() === '') {
+                    $(record).show();
+                } else {
+                    if ($(record).attr('data-record-type') != $('#filter_type_id').val()) {
+                        $(record).hide();
+                    } else {
+                        $(record).show();
+                    }
+                }
+            });
+        });
+
+        // If there are no pastoral records hide filter box, and show warning that there are no records.
+
+        if ($('[data-pastoral]').length == 0) {
+            $('[data-no-records]').removeClass('hide');
+            $('[data-type-selector]').addClass('hide');
+        } else {
+            $('[data-no-records]').addClass('hide');
+            $('[data-type-selector]').removeClass('hide');
+        }
+
+        // Delete pastoral record
+
+        $('[data-delete]').click(function(event) {
+            event.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this record?',
+                confirmEvent: function() {
+                    $.post('/pastoral/delete', {
+                        id: event.target.id
+                    })
+                    .done(function() {
+
+                        // Remove from list after AJAX returns
+
+                        $('#pastoral-' + event.target.id).remove();
+                        if ($('[data-pastoral]').length == 0) {
+                            $('[data-no-records]').removeClass('hide');
+                            $('[data-type-selector]').addClass('hide');
+                        } else {
+                            $('[data-no-records]').addClass('hide');
+                            $('[data-type-selector]').removeClass('hide');
+                        }
+                    });
+                }
+            });
+        });
+    });
+
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="/search/user/{{ student.getId }}">{{ student.formatName() }}</a></li>
+    <li class="active"><a href="/pastoral/{{ student.getId }}">Pastoral Care</a></li>
+</ul>
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Pastoral Care</h1>
+        </div>
+    </div>
+</div>
+
+{# Hide contact/student information and add/filter controls from parents #}
+{% if role != 'parent' %}
+
+    <div class="row actions-small-3">
+        <div class="list-item">
+            <div class="small-12 island">
+                <h2 class="subheader">{{ student.formatName() }}</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="/pastoral/insert/{{ student.getId() }}" class="icon-add" title="Add Pastoral Record"></a>
+            <a href="/pastoral/report-builder" class="icon-report" title="Pastoral Report Generator"></a>
+        </nav>
+    </div>
+
+    <div class="row">
+        <div class="small-12 island">
+            <section class="no-pad">
+                <div class="content no-pad">
+                    <div class="row no-margin">
+                        <div class="small-12 medium-4 large-2 columns no-pad">
+                            <img src="/portrait.php?userId={{ student.getExternalId() }}" class="full-width"/>
+                        </div>
+                        <div class="small-12 medium-8 large-10 columns">
+                            <dl class="profile">
+                                <dt class="no-margin small-6 medium-4">Student Age</dt>
+                                <dd class="no-margin small-6 medium-8">{{ studentAge }} Years Old</dd>
+
+                                <dt class="no-margin small-6 medium-4 {% if student.StudentYearLevel == '' and student.FormDescription == '' %}hide{% endif %}">Student Year Level</dt>
+                                <dd class="no-margin small-6 medium-8">{{ student.StudentYearLevel }} {{ student.FormDescription }}</dd>
+
+                                {% for contact in studentContacts if not session.user.hideContacts %}
+                                    <dt class="no-margin small-6 medium-4">{{ contact.StudentContactRelation }}</dt>
+                                    <dd class="no-margin small-6 medium-8">
+                                        {{ contact.main.getFullName() }}
+                                        {% if contact.StudentContactMobilePhone %}
+                                            ({{ contact.StudentContactMobilePhone }})
+                                        {% endif %}
+                                    </dd>
+                                    {% if contact.spouse %}
+                                        <dt class="no-margin small-6 medium-4">{{ contact.StudentContactSpouseRelation }}</dt>
+                                        <dd class="no-margin small-6 medium-8">
+                                            {{ contact.spouse.getFullName() }}
+                                            {% if contact.StudentContactSpouseMobilePhone %}
+                                                ({{ contact.StudentContactSpouseMobilePhone }})
+                                            {% endif %}
+                                        </dd>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div data-type-selector class="row{% if records.count() == 0 %} hide{% endif %}">
+        <div class="small-12 island">
+            <section class="content">
+                <label for="filter_type_id">Filter Pastoral Records By Type</label>
+                <select id="filter_type_id">
+                    <option value="">All</option>
+                    {% for type in types %}
+                        <option value="{{ type.id }}">{{ type.name }}</option>
+                    {% endfor %}
+                </select>
+            </section>
+        </div>
+    </div>
+
+{% endif %}
+
+<div data-no-records class="row{% if records.count() != 0 %} hide{% endif %}">
+    <div class="small-12 column{% if role != 'parent' %} hide{% endif %}">
+        <h1>Pastoral Care</h1>
+    </div>
+    <div class="small-12 column">
+        <div class="alert-box">No pastoral care records are visible regarding {{ student.formatName }}.{% if role != 'parent' %} <a href="/pastoral/insert/{{ student.getId }}">Add a Pastoral Record</a>{% endif %}</div>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Records</h2>
+        <section>
+            <ul class="information-list">
+                {% for record in records %}
+
+                    {# Only display records the logged in user is allowed to see. Parents cannot see private records ever (even if they have been given access). #}
+                    {% if not (record.private and role == 'parent') %}
+
+                        <li data-record-type="{{ record.getType().getId() }}" data-pastoral class="record actions-small-1" id="pastoral-{{ record.getId() }}">
+                            <div class="list-item">
+                                <div class="avatar card small-12 wrap-down">
+
+                                    {# If the record is private and the person is not the owner, don't put links to view the content #}
+                                    {% if record.private and not record.showPrivate %}
+
+                                        {# Portrait image of author #}
+                                        <a href="/search/user/{{ record.owner.getId() }}">
+                                            <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
+                                        </a>
+                                        {# Heading of pastoral comment#}
+                                        <h3>
+                                            {{  record.getHeading() }}
+
+                                            {# Show how many comments have been made on the record #}
+                                            {% if record.getCommentList.count > 0 %}
+                                                ({{ record.getCommentList.count }} Comment{% if record.comments | length > 1 %}s{% endif %})
+                                            {% endif %}
+                                        </h3>
+
+                                    {# Otherwise, display links to view the content #}
+                                    {% else %}
+
+                                        {# Portrait image of author #}
+                                        <a href="/search/user/{{ record.owner.getId() }}">
+                                            <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
+                                        </a>
+
+                                        {# Heading of pastoral comment#}
+                                        <a href="/pastoral/{{ student.id }}/{{ record.getId() }}">
+                                            <h3>
+                                                {{  record.getHeading() }}
+
+                                                {# Show how many comments have been made on the record #}
+                                                {% if record.getCommentList.count > 0 %}
+                                                    ({{ record.getCommentList.count }} Comment{% if record.getCommentList.count > 1 %}s{% endif %})
+                                                {% endif %}
+                                            </h3>
+
+                                        </a>
+
+                                    {% endif %}
+
+                                    {# Display name of poster #}
+                                    <p class="spaced meta">
+                                        Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getCreatedAt().getShort() }}
+                                    </p>
+
+                                    {# Display tags #}
+                                    {% if record.tagsList | length > 0 %}
+                                        <p class="spaced">
+                                            {% for tag in record.tagsList %}
+                                                <span class="neutral label">{{ tag.name }}</span>
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+
+                                    <article>
+                                        {# Content of article #}
+                                        <p class="spaced">
+                                            {{ record.getBodyText() | cutSentence(375, true) | raw }}
+                                        </p>
+                                        {% if record.getAttachmentList.count() > 0 %}
+                                            <p class="spaced meta">
+                                                {% for attachment in record.getAttachmentList %}
+                                                    Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{ attachment.getFilename() }}</a><br>
+                                                {% endfor %}
+                                            </p>
+                                        {% endif %}
+                                    </article>
+
+                                    {# Hide meta from parents#}
+                                    {% if role != 'parent' %}
+                                        <p class="spaced meta">
+                                            {# Pastoral event type #}
+                                            {{ record.getType.getName }} |
+
+                                            {# Pastoral event severity #}
+                                            {{ record.getSeverity.getName }} |
+
+                                            {# Indicate if record is private #}
+                                            {% if record.private %}Contents Private | {% endif %}
+
+                                            {# Indicate if not audience has been set #}
+                                            {% if record.getAccessList.count == 0 %}No Audience Set{% endif %}
+
+                                            {# Show audienced roles  #}
+                                            {% if record.getAccessList.count > 0 %}
+                                                {% for access in record.getAccessList %}
+                                                    {% if access.getRole.getId != '' %}
+                                                        {{ access.getRole.getName }}{% if not loop.last %},{% endif %}
+                                                    {% elseif access.getUser.getId != '' %}
+                                                       <a href="/search/user/{{ access.getUser.getId }}">{{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}</a>{% if not loop.last %},{% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+
+                                        </p>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+
+                            {# Show edit links to the owner and pastoral moderators #}
+                            {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or pastoralModerator %}
+                                <nav>
+                                    <a class="icon-modify no-text" href="/pastoral/update/{{ record.getId() }}" title="Modify"></a>
+                                    <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+                                </nav>
+                            {% endif %}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>

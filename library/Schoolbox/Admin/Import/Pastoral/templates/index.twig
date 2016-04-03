@@ -1,0 +1,31 @@
+<script>
+    $(function(){
+        $('[data-import]').click(function(e) {
+            $("[data-import]").prop('value', 'Please Wait...');
+            $("[data-import]").prop('disabled', true);
+            $("[data-form-import]").submit();
+        });
+    });
+</script>
+
+{# Shared navigation menu #}
+
+{{ renderAdminNavigation(pageCurrent) }}
+
+<div class="small-12 island">
+    <h1>Pastoral Care Record Importer</h1>
+    <form data-form-import method="post" action="/adminv2/import-pastoral/process">
+        <section class="content">
+            <p>
+                This screen will import all pastoral care records currently stored in your SIS to the Schoolbox Pastoral
+                Care module. This is intended for a one-time import when first enabling the Pastoral Care module, any
+                records created using the import feature (and associated comments/attachment) will be removed on
+                subsequent imports.
+            </p>
+            <p>
+                Click on the button below to begin the import.
+            </p>
+            <input type="submit" data-import value="Import Pastoral Care Records">
+        </section>
+    </form>
+</div>
