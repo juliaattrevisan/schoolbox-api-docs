@@ -250,7 +250,7 @@ class Wiki extends DeprecatedModel
 	/**
 	 * @deprecated use \Schoolbox\Wiki\WikiMapper::delete()
 	 * @param $wikiID
-	 * @return bool|mysqli_result|resource
+	 * @return bool
 	 */
 	function delete($wikiID)
 	{

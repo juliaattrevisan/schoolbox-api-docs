@@ -8,7 +8,7 @@ $groupHandler    = new Group();
 
 /* Superusers only
  */
-if (!$groupHandler->isSuperuser()) {
+if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 

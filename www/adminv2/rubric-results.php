@@ -12,8 +12,7 @@ if(!isset($this)) {
     SitePage::localRedir('/adminv2/resultsets');
 }
 
-$groupHandler = new Group();
-if(!$groupHandler->isSuperuser()) {
+if(!$_SESSION['user']->isSuperuser()) {
     error(101);
 }
 

@@ -362,46 +362,6 @@ class Homepage
         }
     }
 
-
-    /**
-     * Can be used as a workaround for an absence of DB default field values,
-     * but also allows for dynamic value duplication
-     *
-     * @param $table
-     * @param array $map
-     * @param string $sqlCondition
-     * @param string $indexField
-     * @return array
-     */
-    private function duplicateRowsOnTable($table, array $map, $sqlCondition = '', $indexField = 'id')
-    {
-        $queries = array();
-        $sql = "SELECT * FROM $table $sqlCondition";
-        $queries[] = $sql;
-
-        $result = $this->db->query($sql);
-        while ($r = mysqli_fetch_assoc($result)) {
-            // hack at the data, then flick it back in
-            unset($r[$indexField]);
-
-            if (count($map)) {
-                foreach ($map as $k => $v) {
-                    $r[$k] = $v;
-                }
-            }
-            $keys = implode('`, `', array_keys($r));
-            $values = implode("', '", array_values($r));
-
-            $q = "INSERT INTO `$table` (`$keys`) VALUES ('$values')";
-            $queries[] = $q;
-
-            $this->db->query($q);
-        }
-
-        return $queries;
-    }
-
-
     /**
      * Delete all componentry from a homepage
      *

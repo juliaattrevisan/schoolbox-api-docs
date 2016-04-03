@@ -8,7 +8,6 @@
  */
 class Component_Dashboard_RecentSubmissionsController extends Component_Dashboard_ControllerAbstract {
 
-    private $groupHandler;
     private $submissionHandler;
     private $max = 10;
     private $submissions;
@@ -19,12 +18,11 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
     public function execute () {
         // init handlers
-        $this->groupHandler = new Group();
         $this->submissionHandler = new Submission();
 
 
         // don't try to parse data if we're not a teacher
-        if(!$this->getGroupHandler()->isStaff())
+        if(!$_SESSION['user']->getRole()->isStaff())
             return false;
 
         // returns appropriately sorted and formatted data for this module
@@ -87,13 +85,6 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         else {
             return false;
         }
-    }
-
-    /**
-     * @return Group
-     */
-    public function getGroupHandler() {
-        return $this->groupHandler;
     }
 
     /**

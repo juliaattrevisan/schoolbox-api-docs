@@ -8,10 +8,9 @@
  */
 
 
-$groupHandler = new Group();
 $userHandler = new User();
 
-if (!$groupHandler->isSuperuser()) {
+if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 

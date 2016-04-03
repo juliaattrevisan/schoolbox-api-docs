@@ -164,12 +164,12 @@ class News extends DeprecatedModel
     /**
 	 * @deprecated use \Schoolbox\News\ArticleMapper::save()
 	 * @param $news
-	 * @return bool|mysqli_result|resource|void
+	 * @return bool
 	 */
     public function update($news)
     {
         if (!$this->hasWrite($news['item_id'])) {
-            return;
+            return false;
         }
 
         $groupList = $news['groupList'];
@@ -208,14 +208,14 @@ class News extends DeprecatedModel
     /**
 	 * @deprecated use \Schoolbox\News\ArticleMapper::delete()
 	 * @param $newsID
-	 * @return bool|mysqli_result|resource
+	 * @return bool
 	 */
     public function delete($newsID)
     {
         $newsID = (int)$newsID;
 
         if (!$this->hasWrite($newsID)) {
-            return;
+            return false;
         }
 
         $query = "UPDATE " . $this->_table . " SET item_deleted = 1 WHERE " . $this->_index . " = $newsID";

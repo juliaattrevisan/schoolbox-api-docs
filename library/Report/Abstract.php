@@ -42,37 +42,6 @@ abstract class Report_Abstract {
 	 */
 	abstract public function render();
 
-	/**
-	 * @param $resource
-	 * @param $offset
-	 * @param $limit
-	 * @return array|bool
-	 */
-	protected function getRecordsFromResource(&$resource, $offset, $limit) {
-		if (!$resource instanceof mysqli_result) {
-			return false;
-		}
-
-		// fforward to the desired offset
-		mysqli_data_seek($resource, max($offset, 0));
-
-		// collect a page of data
-		$set = array();
-
-		for ($i = 0; $i < $limit; $i++) {
-			if (!($datum = mysqli_fetch_assoc($resource))) {
-				break;
-			}
-
-			$set[] = $datum;
-		}
-
-		// rewind the data cursor so if export is being called it won't miss the first opage of results
-		mysqli_data_seek($resource, 0);
-
-		return $set;
-	}
-
 	/* Getters/Setters
 	 */
 

@@ -44,7 +44,7 @@ $userList = [];
 $numTimetables = 0;
 $child_id = $this->arg[0];
 
-if ($groupHandler->isParent()) {
+if ($_SESSION['user']->getRole()->isParent()) {
     if (is_array($_SESSION['children'])) {
         foreach ($_SESSION['children'] as $child) {
             //
@@ -63,7 +63,7 @@ if ($groupHandler->isParent()) {
     }
 } else {
     if ($child_id) {
-        if ($groupHandler->isStaff() || $child_id == $_SESSION['id']) {
+        if ($_SESSION['user']->getRole()->isStaff() || $child_id == $_SESSION['id']) {
             //Output a timetable for each campus user is involved in
             $userList[] = $userMapper->findById($child_id);
         } else {

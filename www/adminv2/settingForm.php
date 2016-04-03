@@ -3,9 +3,8 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $page = new SitePage();
-$groupHandler = new Group();
 
-if ($groupHandler->isSuperuser()) {
+if ($_SESSION['user']->isSuperuser()) {
     /* Set up generic table handler thing.
 	 */
     $tableIndex = 'configID';

@@ -62,7 +62,7 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
             )
         );
 
-        if ($group->isStaff()) {
+        if ($_SESSION['user']->getRole()->isStaff()) {
             $this->parse('chat_staff_js_block', 'chat_staff_js');
         } else {
             $this->setVar('chat_staff_js_block', '');

@@ -14,10 +14,6 @@ use Schoolbox\Collection;
 class Component_Homepage_DueWorkListController extends Component_Homepage_ControllerAbstract
 {
 
-    /**
-     * @var Group
-     */
-    private $groupHandler;
 
     /**
      * @var Collection|SubmissionBox[]
@@ -31,8 +27,6 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
      */
     public function execute()
     {
-        $this->groupHandler = new Group();
-
         $this->submissionList = new Collection(
             SubmissionBoxMapper::getInstance()
                 ->getUpcomingActivities(null, $this->getConfig('size'), $this->getContext()->getId())
@@ -73,8 +67,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         // We need the count of returns and submissions within the submission
         // boxes that have been retrieved.
         $submission_counts = array();
-        $isStudent         = $this->groupHandler->isStudent();
-        $isStaff           = $this->groupHandler->isStaff();
+        $isStudent         = $_SESSION['user']->getRole()->isStudent();
+        $isStaff           = $_SESSION['user']->getRole()->isStaff();
         $userId            = $_SESSION['id'];
         if ($isStudent) {
             $box_id_list       = $this->submissionList->getColumnValues('id');

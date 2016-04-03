@@ -76,16 +76,8 @@ class Report_Exporter {
         // output the column headings
         fputcsv($outstream, $this->getHeadings());
 
-        // use resource iteratively
-        if($this->getData() instanceof mysqli_result) {
-            $db = DeprecatedDatabase::getInstance();
-            while($row = $db->getNextArray($this->getData())) {
-                $this->parseRow($outstream, $row);
-            }
-        }
-
         // use array iteratively
-        elseif (is_array($this->getData()) || $this->getData() instanceof Traversable) {
+        if (is_array($this->getData()) || $this->getData() instanceof Traversable) {
             foreach($this->getData() as $row) {
                 $this->parseRow($outstream, $row);
             }

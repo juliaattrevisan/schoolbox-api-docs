@@ -354,8 +354,6 @@ class SitePage extends Page
 
     function buildPage($customHead = true)
     {
-        $this->groupHandler = new Group;
-
         $this->setFile(TEMPLATE_body, 'include/body.html');
         $this->setFile('headerTpl', 'include/header.html');
         $this->setFile('footerTpl', 'include/footer.html');
@@ -633,6 +631,9 @@ class SitePage extends Page
         //if the have a timetable or their children have a timetable
 
         $user = $_SESSION['user'];
+        /**
+         * @var $user \Schoolbox\User
+         */
 
         if (($_SESSION['timetable'] || is_array($_SESSION['children'][0]['subjects'])) && !$user->getHideTimetable()) {
             $this->parse('tt_tab', 'timetable_tab');
@@ -643,10 +644,10 @@ class SitePage extends Page
         /* output submission box links */
         $this->setBlock('tabTpl', 'duework_tab', 'dw_tab');
         $this->setBlock('tabTpl', 'submission_tab', 'sm_tab');
-        if ($this->groupHandler->isStaff()) {
+        if ($user->getRole()->isStaff()) {
             $this->parse('sm_tab', 'submission_tab');
             $this->setVar('dw_tab', '');
-        } elseif ($this->groupHandler->isStudent()) {
+        } elseif ($user->getRole()->isStudent()) {
             $this->parse('dw_tab', 'duework_tab');
             $this->setVar('sm_tab', '');
         } else {
@@ -655,7 +656,7 @@ class SitePage extends Page
         }
 
         $this->setBlock('tabTpl', 'parent_tab', 'p_tab');
-        if ($this->groupHandler->isParent()) {
+        if ($user->getRole()->isParent()) {
             $this->parse('p_tab', 'parent_tab');
         } else {
             $this->setVar('p_tab', '');
@@ -671,9 +672,9 @@ class SitePage extends Page
 
             switch ($this->site) {
                 case 'shore':
-                    if ($this->groupHandler->isStaff()) {
+                    if ($user->getRole()->isStaff()) {
                         $location = 'https://mail.shore.nsw.edu.au/exchange/';
-                    } elseif ($this->groupHandler->isStudent()) {
+                    } elseif ($user->getRole()->isStudent()) {
                         if (strpos(Session::getIP(), '192.168.') === false) {
                             $location = 'https://mail.student.shore.nsw.edu.au/exchange/';
                         } else {
@@ -683,33 +684,33 @@ class SitePage extends Page
                     break;
 
                 case 'moriah':
-                    if ($this->groupHandler->isStaff()) {
+                    if ($user->getRole()->isStaff()) {
                         $location = 'https://mail.moriah.nsw.edu.au/owa';
-                    } elseif ($this->groupHandler->isStudent()) {
+                    } elseif ($user->getRole()->isStudent()) {
                         $location = 'http://www.google.com/a/student.moriah.nsw.edu.au/';
                     }
                     break;
 
                 case 'oakburn':
-                    if ($this->groupHandler->isStaff()) {
+                    if ($user->getRole()->isStaff()) {
                         $location = 'https://mail.soc.tas.edu.au/owa/';
-                    } elseif ($this->groupHandler->isStudent()) {
+                    } elseif ($user->getRole()->isStudent()) {
                         $location = 'https://www.outlook.com/my.soc.tas.edu.au';
                     }
                     break;
 
                 case 'tigs':
-                    if ($this->groupHandler->isStaff()) {
+                    if ($user->getRole()->isStaff()) {
                         $location = 'https://webmail.tigs.nsw.edu.au/owa';
-                    } elseif ($this->groupHandler->isStudent()) {
+                    } elseif ($user->getRole()->isStudent()) {
                         $location = 'https://mail.google.com/a/tigs.com.au';
                     }
                     break;
 
                 case 'peninsula':
-                    if ($this->groupHandler->isStaff()) {
+                    if ($user->getRole()->isStaff()) {
                         $location = Cfg::get('mail_webmail');
-                    } elseif ($this->groupHandler->isStudent()) {
+                    } elseif ($user->getRole()->isStudent()) {
                         $location = 'https://outlook.com/owa/tps.vic.edu.au';
                     }
                     break;
@@ -743,7 +744,7 @@ class SitePage extends Page
             );
 
             $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
-            if ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
+            if ($user->getRole()->isStaff() || $user->getRole()->isStudent()) {
                 $this->parse('mf_tab', 'myfiles_tab');
             } else {
                 $this->setVar('mf_tab', '');
@@ -751,10 +752,10 @@ class SitePage extends Page
         }
         if ($this->site == 'shore') {
             $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
-            if ($this->groupHandler->isStaff()) {
+            if ($user->getRole()->isStaff()) {
                 $this->setVar('MYFILES_LOCATION', 'https://myfiles.shore.nsw.edu.au/');
                 $this->parse('mf_tab', 'myfiles_tab');
-            } elseif ($this->groupHandler->isStudent()) {
+            } elseif ($user->getRole()->isStudent()) {
                 $this->setVar('MYFILES_LOCATION', 'https://myfiles.student.shore.nsw.edu.au/');
                 $this->parse('mf_tab', 'myfiles_tab');
             } else {
@@ -765,7 +766,7 @@ class SitePage extends Page
             /* Remove these links if parent logged in:
                * Webmail, Resources, Network
                */
-            if ($this->groupHandler->isParent()) {
+            if ($user->getRole()->isParent()) {
                 $this->setVar('wm_tab', '');
 
                 $this->setBlock('tabTpl', 'resource_tab', 'res_tab');
@@ -778,7 +779,7 @@ class SitePage extends Page
 
         } else {
             $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
-            if ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
+            if ($user->getRole()->isStaff() || $user->getRole()->isStudent()) {
                 $this->parse('mf_tab', 'myfiles_tab');
             } else {
                 $this->setVar('mf_tab', '');
@@ -787,7 +788,7 @@ class SitePage extends Page
 
         /* Output webdav client tab if enabled */
         $this->setBlock('tabTpl', 'network_tab', 'network_tab_block');
-        if (Cfg::get('webdav_enable') && !$this->groupHandler->isParent() && !$this->groupHandler->isGuest()) {
+        if (Cfg::get('webdav_enable') && !$user->getRole()->isParent() && !$user->getRole()->isGuest()) {
             $this->parse('network_tab_block', 'network_tab');
         } else {
             $this->setVar('network_tab_block', '');

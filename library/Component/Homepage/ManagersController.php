@@ -11,18 +11,12 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 {
 
     /**
-     * @var Group
-     */
-    protected $groupHandler;
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
     public function execute()
     {
-        $this->groupHandler = new Group();
     }
 
     /**
@@ -127,7 +121,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             }
             /* Student bulk email
         	 */
-            if ($this->groupHandler->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
+            if ($_SESSION['user']->getRole()->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
                 $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
                 $this->setVar("EMAILALL", implode(',', $emailall));
                 $this->parse("member_email_block", "member_email");

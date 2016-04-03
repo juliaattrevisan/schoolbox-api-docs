@@ -14,11 +14,11 @@ namespace Schoolbox\SubjectList;
 class SideNav extends SubjectListAbstract {
 
 	/**
-	 * An instance of groupHandler
+	 * The user view that this nav should be rendered for
 	 *
-	 * @var null
+	 * @var \Schoolbox\User
 	 */
-	private $groupHandler = null;
+	private $user = null;
 
 	/**
 	 * Hook method
@@ -26,7 +26,7 @@ class SideNav extends SubjectListAbstract {
 	 * Set up blocks and stuff
 	 */
 	protected function setup() {
-		$this->setGroupHandler(new \Group());
+		$this->setUser($_SESSION['user']);
 
 		$this->getPage()->setBlock('navTpl', 'has_msubject', 'has_msubject_block');
 		$this->getPage()->setBlock('has_msubject', 'msubject', 'msubject_block');
@@ -38,7 +38,7 @@ class SideNav extends SubjectListAbstract {
 	 * Expel each subject grouped by its type
 	 */
 	public function render() {
-		$isStaff = $this->getGroupHandler()->isStaff();
+		$isStaff = $this->getUser()->getRole()->isStaff();
 		if (count(array_keys($this->getAllSubjectLists()))) {
 			foreach($this->getAllSubjectLists() as $key => $currentSubjectList) {
 
@@ -99,16 +99,16 @@ class SideNav extends SubjectListAbstract {
 	 */
 
 	/**
-	 * @param null $groupHandler
+	 * @param \Schoolbox\User $user
 	 */
-	private function setGroupHandler($groupHandler) {
-		$this->groupHandler = $groupHandler;
+	private function setUser($user) {
+		$this->user = $user;
 	}
 
 	/**
-	 * @return null
+	 * @return \Schoolbox\User
 	 */
-	private function getGroupHandler() {
-		return $this->groupHandler;
+	private function getUser() {
+		return $this->user;
 	}
 }

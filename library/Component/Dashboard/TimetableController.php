@@ -220,7 +220,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 if (strlen($class['code'])
                                     && Cfg::get('external_type') == 'synergetic'
                                     && Cfg::get('external_attendance')
-                                    && $this->group->isStaff()
+                                    && $_SESSION['user']->getRole()->isStaff()
                                     && $class['AttendanceEnabled']
                                 ) {
                                     $this->setVar(

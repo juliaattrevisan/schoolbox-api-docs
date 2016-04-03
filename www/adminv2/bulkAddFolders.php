@@ -1,9 +1,7 @@
 <?php
 SitePage::extendExecutionTime(600);
 
-$groupHandler = new Group();
-
-if (!$groupHandler->isSuperuser()) {
+if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 
