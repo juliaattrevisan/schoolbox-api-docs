@@ -120,7 +120,7 @@ class Portrait extends BrokenFS
 
         /* Staff members can always see all portraits
            */
-        if ($group->isStaff()) {
+        if ($this->getSessionUser()->getRole()->isStaff()) {
             return true;
         }
 
@@ -145,7 +145,7 @@ class Portrait extends BrokenFS
             }
             if ($group->isStudent($userId)) {
                 if (!$this->getConfig()->get('protect_student_photo')
-                    && $group->isStudent()
+                    && $this->getSessionUser()->getRole()->isStudent()
                 ) {
                     return true;
                 }
@@ -155,7 +155,7 @@ class Portrait extends BrokenFS
             // visible by students and parents, if staff photos aren't protected.
             if ($group->isStaff($userId)) {
                 if (!$this->getConfig()->get('protect_teacher_photo')
-                    && ($group->isStudent() || $group->isParent())
+                    && ($this->getSessionUser()->getRole()->isStudent() || $this->getSessionUser()->getRole()->isParent())
                 ) {
                     return true;
                 }

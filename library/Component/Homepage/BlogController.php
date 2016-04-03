@@ -11,26 +11,21 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 {
 
     /**
-     * @var Group
-     */
-    private $groupHandler;
-
-    /**
-     * @var array
+     * @var \Schoolbox\Resource\Category
      */
     private $source;
 
     /**
      * Blog Mapper
      *
-     * @var null
+     * @var \Schoolbox\Blog\BlogMapper
      */
     private $blogMapper = null;
 
     /**
      * Comment Mapper
      *
-     * @var null
+     * @var \Schoolbox\Blog\CommentMapper
      */
     private $commentMapper = null;
 
@@ -48,7 +43,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
      */
     public function execute()
     {
-        $this->groupHandler = new Group();
 
         $this->setBlogMapper(new \Schoolbox\Blog\BlogMapper());
         $this->setCommentMapper(new \Schoolbox\Blog\CommentMapper());
@@ -244,7 +238,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Set blog mapper
      *
-     * @param null $blogMapper
+     * @param \Schoolbox\Blog\BlogMapper $blogMapper
      */
     private function setBlogMapper($blogMapper)
     {
@@ -254,7 +248,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Get blog mapper
      *
-     * @return null
+     * @return \Schoolbox\Blog\BlogMapper
      */
     private function getBlogMapper()
     {
@@ -264,7 +258,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Set comment mapper
      *
-     * @param null $commentMapper
+     * @param \Schoolbox\Blog\CommentMapper $commentMapper
      */
     private function setCommentMapper($commentMapper)
     {
@@ -274,7 +268,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Get comment mapper
      *
-     * @return null
+     * @return  \Schoolbox\Blog\CommentMapper
      */
     private function getCommentMapper()
     {
@@ -284,7 +278,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Set category mapper
      *
-     * @param null $categoryMapper
+     * @param \Schoolbox\Resource\CategoryMapper $categoryMapper
      */
     private function setCategoryMapper($categoryMapper)
     {
@@ -294,7 +288,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Get category mapper
      *
-     * @return null
+     * @return \Schoolbox\Resource\CategoryMapper
      */
     private function getCategoryMapper()
     {

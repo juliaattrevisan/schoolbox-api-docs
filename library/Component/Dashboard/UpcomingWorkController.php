@@ -77,9 +77,8 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
 
         // This component has access restrictions
         // when displayed to a student, actions are available, otherwise not
-        $groupHandler = new Group();
 
-        if (!$groupHandler->isStudent()) {
+        if (!$_SESSION['user']->getRole()->isStudent()) {
             if ($this->restrictedMode) {
                 return false;
             }
@@ -98,9 +97,10 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
         }
 
         // Show assess or quiz links? Depends on $actionable
-        $this->showAssessLink = $this->actionable || $groupHandler->isStaff();
+        $this->showAssessLink = $this->actionable || $_SESSION['user']->getRole()->isStaff();
         $this->showQuizLink   = $this->actionable;
 
+        $groupHandler = new Group;
         // if this is a parent viewing their child's work
         if ($groupHandler->isParentOfChild($this->userID)) {
             // Check if system config restrict_student_submissions is on.

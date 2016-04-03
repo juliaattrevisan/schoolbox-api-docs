@@ -80,7 +80,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->parse('class_list_block', 'class_list');
         }
 
-        if ($this->permission >= WRITE_ACCESS && $this->groupHandler->isStaff()) {
+        if ($this->permission >= WRITE_ACCESS && $_SESSION['user']->getRole()->isStaff()) {
             $this->parse('class_mark_block', 'class_mark');
         } else {
             $this->setVar('class_mark_block', '');
