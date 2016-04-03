@@ -6,9 +6,7 @@ use Schoolbox\RoleMapper;
 
 /** @var SitePage $this */
 
-$groupHandler = new Group();
-
-if (!$groupHandler->isSuperuser()) {
+if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 

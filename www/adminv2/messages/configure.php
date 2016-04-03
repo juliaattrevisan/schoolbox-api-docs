@@ -18,8 +18,8 @@ if(!isset($this)) {
 
     // you gotst permishunz?
     session_start();
-    $groupHandler = new Group();
-    if(!$groupHandler->isSuperuser()) {
+
+    if(!$_SESSION['user']->isSuperuser()) {
         error(19);
     }
 
@@ -113,8 +113,7 @@ if(!isset($this)) {
 }
 
 
-$groupHandler = new Group();
-if(!$groupHandler->isSuperuser()) {
+if(!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 

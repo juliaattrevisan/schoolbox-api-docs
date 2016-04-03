@@ -2,9 +2,8 @@
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
-$groupHandler = new Group();
 
-if (!$groupHandler->isSuperuser()) {
+if (!$_SESSION['user']->isSuperuser()) {
 	error(19);
 }
 

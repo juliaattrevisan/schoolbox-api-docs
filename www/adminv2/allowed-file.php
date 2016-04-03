@@ -5,9 +5,8 @@ use Schoolbox\File\ExtensionMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
-$groupHandler = new Group();
 
-if (!$groupHandler->isSuperuser()) {
+if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 

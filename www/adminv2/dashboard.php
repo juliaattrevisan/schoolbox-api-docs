@@ -9,9 +9,8 @@
  *
  */
 
-$group = new Group();
 
-if (!$group->isSuperuser()) {
+if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 

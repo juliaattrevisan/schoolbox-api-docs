@@ -1,10 +1,9 @@
 <?php
 
 $userHandler = new User();
-$groupHandler = new Group();
 
 /* Superusers only */
-if(!$groupHandler->isSuperuser())
+if(!$_SESSION['user']->isSuperuser())
     error(19);
 
 if(is_numeric($this->arg[0])) {
