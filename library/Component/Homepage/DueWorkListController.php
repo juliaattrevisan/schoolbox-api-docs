@@ -141,13 +141,13 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             $this->setVar('duework_actions_block', '');
             $this->setVar('duework_due_date_block', '');
 
-            if ($this->groupHandler->isStudent()) {
+            if ($_SESSION['user']->getRole()->isStudent()) {
                 // what to display if student
                 if (!$isTask) {
                     $displayActions = false;
                     $displayHistory = true;
                 }
-            } elseif ($this->permission >= WRITE_ACCESS && $this->groupHandler->isStaff()) {
+            } elseif ($this->permission >= WRITE_ACCESS && $_SESSION['user']->getRole()->isStaff()) {
                 // what to display if staff
                 if (!$isTask) {
                     $displayResults = true;
