@@ -105,6 +105,15 @@
                                 <dt class="no-margin small-6 medium-4 {% if student.StudentYearLevel == '' and student.FormDescription == '' %}hide{% endif %}">Student Year Level</dt>
                                 <dd class="no-margin small-6 medium-8">{{ student.StudentYearLevel }} {{ student.FormDescription }}</dd>
 
+                                {% if teachers.count() > 0 %}
+                                    <dt class="no-margin small-6 medium-4">Student Teachers</dt>
+                                    <dd class="no-margin small-6 medium-8">
+                                        {% for teacher in teachers %}
+                                            <a href="/search/user/{{ teacher.getId }}">{{ teacher.getFullName }}</a><br>
+                                        {% endfor %}
+                                    </dd>
+                                {% endif %}
+
                                 {% for contact in studentContacts if not session.user.hideContacts %}
                                     <dt class="no-margin small-6 medium-4">{{ contact.StudentContactRelation }}</dt>
                                     <dd class="no-margin small-6 medium-8">

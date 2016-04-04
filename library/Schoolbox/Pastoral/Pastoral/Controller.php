@@ -395,6 +395,7 @@ class Controller extends Base
         $externalUserMapper = new \External_User();
         $student = $this->getUserMapper()->findWithSubjects($id);
         $student->loadParents();
+        $student->loadTeachers();
 
         // Get pastoral moderator status
 
@@ -412,7 +413,7 @@ class Controller extends Base
         $contactList = $externalUserMapper->getStudentContactList($student->getExternalId());
         $studentExternal = $externalUserMapper->getStudent($student->getExternalId());
 
-        if (is_array($contactList))
+        if ($contactList instanceof \Schoolbox\Collection)
         {
             foreach ($contactList as $contact)
             {
@@ -455,6 +456,7 @@ class Controller extends Base
                     'studentContacts'   => $studentContacts,
                     'role'              => $this->getUser()->getRole()->getType(),
                     'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
+                    'teachers'          => $student->getTeacherCollection(),
                     'pastoralModerator' => $pastoralModerator
                 ),
             )

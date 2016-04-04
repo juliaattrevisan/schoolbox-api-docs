@@ -190,6 +190,9 @@ class User implements JsonSerializable
      */
     protected $config_loader;
 
+    /** @var Collection */
+    protected $teacherCollection;
+
     /**
      * Build default empty objects so things don't explode
      */
@@ -937,6 +940,50 @@ class User implements JsonSerializable
         return false;
     }
 
+
+    /**
+     * Load teachers into object from external db
+     */
+    public function loadTeachers()
+    {
+        $teacherCollection = new Collection();
+
+        // TODO remove handler dependency
+        $externalUser = new \External_User();
+        $externalClass = new \External_Class();
+
+        // Get all of the students subjects
+
+        $found = [];
+        $subjects = $externalUser->getSubjectList($this->getExternalId(), $this->getId());
+
+        // Iterate and find teachers associated with each subject
+
+        if (is_array($subjects))
+        {
+            foreach ($subjects as $subject)
+            {
+                $teachers = $externalClass->getTeacherName($subject['code']);
+
+                foreach ($teachers as $teacher)
+                {
+                    // If we haven't already, add this teacher to their collection
+
+                    if (!isset($found[$teacher]))
+                    {
+                        $teacherCollection->add(
+                            UserMapper::getInstance()->findByExternalId($teacher)
+                        );
+
+                        $found[$teacher] = 1;
+                    }
+                }
+            }
+        }
+
+        $this->setTeacherCollection($teacherCollection);
+    }
+
     /**
      * Load parents into object from external db
      */
@@ -1167,4 +1214,21 @@ class User implements JsonSerializable
             $this->setConfigLoader(new ConfigLoader());
         }
     }
+
+    /**
+     * @return Collection
+     */
+    public function getTeacherCollection() {
+        return $this->teacherCollection;
+    }
+
+    /**
+     * @param Collection $teacherCollection
+     * @return $this
+     */
+    public function setTeacherCollection($teacherCollection) {
+        $this->teacherCollection = $teacherCollection;
+        return $this;
+    }
+
 }
