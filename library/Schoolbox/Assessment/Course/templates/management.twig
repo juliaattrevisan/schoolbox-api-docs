@@ -28,18 +28,15 @@
         });
     });
 </script>
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Course Management</h1>
-        <ul class="meta">
-            <li class="icon-home"><a href="/homepage/{{ folder.id }}">{{ folder.name }}</a></li>
-        </ul>
-    </div>
-</div>
-
+<ul class="breadcrumb">
+    <li><a href="/homepage/{{ folder.id }}">{{ folder.name }}</a></li>
+    <li class="active">
+        <a href="{{ routeLookup('course.management', { folderId: folder.id }) }}">Modify Course</a>
+    </li>
+</ul>
 <div class="row">
     <div class="small-12 island">
+        <h1>Course Management</h1>
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 columns">
