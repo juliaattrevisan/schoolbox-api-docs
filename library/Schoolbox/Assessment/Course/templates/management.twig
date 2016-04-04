@@ -44,7 +44,7 @@
                 </div>
             </div>
             <nav>
-                <a href="/course/import/0/class/{{ folder.id }}" class="icon-add" title="Link to Course" data-course-selector></a>
+                <a href="{{ routeLookup('course.import', { courseId: 0, classCode: folder.id }) }}" class="icon-add" title="Link to Course" data-course-selector></a>
             </nav>
         </div>
 
@@ -61,10 +61,10 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="/course/import/modify/{{ courseComponentId }}" class="icon-modify" title="Modify Course"></a>
+                        <a href="{{ routeLookup('course.importModify', { componentId: courseComponentId }) }}" class="icon-modify" title="Modify Course"></a>
 
                         {% if allCourseComponentIds[currentCourse.id].restorable %}
-                        <a href="/course/import/restore/{{ folder.id }}/{{ courseComponentId }}" class="icon-upload" title="Restore Course"></a>
+                        <a href="{{ routeLookup('course.restoreCourse', { folderId: folder.id, componentId: courseComponentId }) }}" class="icon-upload" title="Restore Course"></a>
                         {% endif %}
 
                         <a href="" class="icon-delete" title="Delete Course" data-delete="{{ currentCourse.id }}"></a>
@@ -82,7 +82,7 @@
             </div>
         </section>
 
-        <a href="/course/import/0/class/{{ folder.id }}" class="button submit expand">Import a Course</a>
+        <a href="{{ routeLookup('course.import', { courseId: 0, classCode: folder.id }) }}" class="button submit expand">Import a Course</a>
         {% endif %}
     </div>
 </div>
