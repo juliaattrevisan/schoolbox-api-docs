@@ -55,11 +55,19 @@
             <ul class="action-list" id="courseList">
                 {% for currentCourse in allCourses %}
                 {% set courseComponentId = allCourseComponentIds[currentCourse.id].componentId %}
+                {% set courseComponentRemoved = allCourseComponentIds[currentCourse.id].restorable %}
                 {% set courseParents = lineage[currentCourse.id] %}
 
-                <li class="actions-small-1">
+                <li class="actions-small-{{ courseComponentRemoved ? 3 : 2 }}">
                     <div class="list-item">
-                        <div class="small-12 info card">
+                        <div
+                            {% if courseComponentRemoved %}
+                                class="small-12 info card removed"
+                                title="The associated Course Outline component has been removed"
+                            {% else %}
+                                class="small-12 info card"
+                            {% endif %}
+                        >
                             <h3>{{ currentCourse.name }}</h3>
                             <p class="meta">
                                 {{ courseParents[0].name }}
@@ -71,11 +79,11 @@
                         </div>
                     </div>
                     <nav>
-                        {% if allCourseComponentIds[currentCourse.id].restorable %}
+                        {% if courseComponentRemoved %}
                             <a href="{{ routeLookup('course.restoreCourse', { folderId: folder.id, componentId: courseComponentId }) }}" class="icon-upload" title="Restore Course"></a>
                         {% endif %}
-                        <a href="{{ routeLookup('course.importModify', { componentId: courseComponentId }) }}" class="icon-modify" title="Modify Course"></a>
-                        <a href="" class="icon-delete" title="Delete Course" data-delete="{{ currentCourse.id }}"></a>
+                        <a href="{{ routeLookup('course.importModify', { componentId: courseComponentId }) }}" class="icon-modify" title="Modify Import"></a>
+                        <a href="" class="icon-delete" title="Delete Course" data-delete="{{ currentCourse.id }}" data-coursename="{{ currentCourse.name }}"></a>
                     </nav>
                 </li>
                 {% endfor %}
