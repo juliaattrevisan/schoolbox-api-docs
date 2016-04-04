@@ -81,7 +81,7 @@
 
         modal
             .append(h2)
-            .append($('<p />').text(settings.text ))
+            .append($('<p />').html(settings.text ))
             .append(ul)
             .append('<a class="close-reveal-modal" aria-label="Close">&#215;</a>');
         modal.appendTo($('body'));
