@@ -13,6 +13,7 @@ use Alaress\Async\Notification\Cloud\AbstractService;
 use Guzzle\Http\Client;
 use OutOfBoundsException;
 use OverflowException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MobileApp\Registry;
 
 
@@ -57,15 +58,14 @@ class GCM extends AbstractService
      * @param array  $registrationIds
      * @param int    $id
      * @param string $title
-     * @param string $body
      * @return bool
      */
-    public function propagate(array $registrationIds, $id, $title, $body)
+    public function propagate(array $registrationIds, $id, $title)
     {
         $data = [
             'id'      => $id,
-            'title'   => $title,
-            'body'    => $body,
+            'title'   => ConfigMapper::getInstance()->get('title'),
+            'body'    => $title,
             'vibrate' => true
         ];
 

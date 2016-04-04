@@ -70,10 +70,9 @@ class APNS extends AbstractService
      * @param array  $tokens
      * @param int    $id
      * @param string $title
-     * @param string $body
      * @return bool
      */
-    public function propagate(array $tokens, $id, $title, $body)
+    public function propagate(array $tokens, $id, $title)
     {
         $alert = new Message\Alert();
 
