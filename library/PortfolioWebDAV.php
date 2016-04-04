@@ -491,7 +491,18 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     'http://WebDavHomeStudent.rlc.qld.edu.au'. $_SESSION['username'] . '/'
                 );
             }
-
+        } elseif ($site_location == 'slmp') {
+            $settings = array(
+                'baseUri' => 'https://sldm-wdav-01.stlouisaspendale.catholic.edu.au/',
+                'userName' => 'stlouisdom/'.$_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+            if ($groupHandler->isStaff()) {
+                $paths = array(
+                    $settings['baseUri'] . '/staffshared',
+                    $settings['baseUri'] . '/thome/' . $_SESSION['username'],
+                );
+            }
         } elseif (in_array($site_location, array('core', 'demo'))) {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
