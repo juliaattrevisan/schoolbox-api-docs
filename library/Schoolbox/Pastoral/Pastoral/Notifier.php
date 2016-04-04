@@ -16,6 +16,7 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Notifier extends AbstractModuleNotifier
 {
@@ -37,7 +38,7 @@ class Notifier extends AbstractModuleNotifier
 
         // Get the kids teachers
 
-        $student = \Schoolbox\UserMapper::getInstance()->findById($model->getStudent()->getId());
+        $student = $this->getUserMapper()->findById($model->getStudent()->getId());
         $student->loadTeachers();
         $teachers = $student->getTeacherCollection();
 
@@ -108,6 +109,8 @@ class Notifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
+        if (empty($dependencies["userMapper"]))
+            $dependencies["userMapper"] = UserMapper::getInstance();
         if (empty($dependencies["pastoralMapper"]))
             $dependencies["pastoralMapper"] = PastoralMapper::getInstance();
         if (empty($dependencies["pastoralAccessMapper"]))
@@ -181,6 +184,11 @@ class Notifier extends AbstractModuleNotifier
      */
     protected $roleMapper;
 
+    /**
+     * @var UserMapper $userMapper;
+     */
+    protected $userMapper;
+
     /** @var PastoralMapper $pastoralMapper */
     protected $pastoralMapper;
 
@@ -218,6 +226,23 @@ class Notifier extends AbstractModuleNotifier
     public function setRoleMapper($roleMapper)
     {
         $this->roleMapper = $roleMapper;
+        return $this;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper() {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param $userMapper
+     * @return $this
+     */
+    public function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
         return $this;
     }
 
