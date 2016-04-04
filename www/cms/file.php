@@ -46,7 +46,7 @@ if(is_numeric($this->arg[0])) {
 		'FILE_ID' => $file->getId(),
 		'DESCRIPTION' => Scrub::text($file->getTitle()),
 		'COMMENT' => Scrub::text($file->getDescription()),
-		'HIDDEN_SELECTED' => $file->isHidden() ? 'checked="checked"' : '',
+		'VISIBLE_SELECTED' => $file->getHidden() > 0 ? '' : 'checked',
 		'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
 		'CATEGORY_ID' => $folder->getId(),
 		'CATEGORY_NAME' => Scrub::text($folder->getName()),
@@ -102,7 +102,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 		'FILE_ID' => '',
 		'DESCRIPTION' => '',
 		'COMMENT' => '',
-		'HIDDEN_SELECTED' => (Cfg::get('file_default_to_hidden') ? 'checked="checked"' : ''),
+		'VISIBLE_SELECTED' => (Cfg::get('file_default_to_hidden') ? '' : 'checked'),
 		'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
 		'CATEGORY_NAME' => Scrub::text($folder->getName()),
 		'CATEGORY_ID' => $folder->getId(),
@@ -142,7 +142,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	$output = array(
 		'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
-		'HIDDEN_SELECTED' => (Cfg::get('file_default_to_hidden') ? 'checked="checked"' : ''),
+		'VISIBLE_SELECTED' => (Cfg::get('file_default_to_hidden') ? '' : 'checked'),
 	);
 
 	$this->setVar($output);
