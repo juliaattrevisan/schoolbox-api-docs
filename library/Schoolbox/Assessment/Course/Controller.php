@@ -1577,6 +1577,12 @@ class Controller extends Base\Base
             $allCourses = $allFolders->getOffset($folderId);
         }
 
+        $lineages = [];
+
+        foreach ($allCourses as $course) {
+            $lineages[$course->getId()] = $this->getCourseMapper()->getLineage($course);
+        }
+
         /* Find all the Units in this Folder; also includes
          * Units which have had their Course Outlines removed
          */
@@ -1586,6 +1592,7 @@ class Controller extends Base\Base
             'folder' => $folder,
             'allCourses' => $allCourses,
             'allCourseComponentIds' => $allCourseComponentIds,
+            'lineage' => $lineages
         ]);
     }
 

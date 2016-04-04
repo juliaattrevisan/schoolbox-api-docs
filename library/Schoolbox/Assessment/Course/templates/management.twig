@@ -53,11 +53,19 @@
             <ul class="action-list" id="courseList">
                 {% for currentCourse in allCourses %}
                 {% set courseComponentId = allCourseComponentIds[currentCourse.id].componentId %}
+                {% set courseParents = lineage[currentCourse.id] %}
 
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="small-12 info card">
                             <h3>{{ currentCourse.name }}</h3>
+                            <p class="meta">
+                                {{ courseParents[0].name }}
+                                {% for courseParent in courseParents | slice(1) %}
+                                    &gt; {{ courseParent.name }}
+                                {% endfor %}
+                            </p>
+
                         </div>
                     </div>
                     <nav>
