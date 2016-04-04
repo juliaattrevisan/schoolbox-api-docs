@@ -329,11 +329,30 @@ $container-bg: white !default;
 // CUSTOM OVERRIDES
 //
 
-
 @include selection;
 
 .align-bottom {
 	vertical-align: bottom;
+}
+
+// Empty States
+.empty-state {
+	background-color: $gainsboro;
+	color: $aluminum;
+	padding: 1rem;
+	font-style: italic;
+	text-align: center;
+
+	[class^="icon-"],
+	[class*=" icon-"]{
+		@extend .icon-32;
+		color: $aluminum;
+	}
+
+	p,a{
+		font-weight: 400;
+		margin-bottom: 0;
+	}
 }
 
 // Deleting Components
