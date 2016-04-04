@@ -57,15 +57,14 @@
 			component.find('[data-interaction=showcomments]').unbind('click').click(function(event) {
 				event.preventDefault();
 
-                var element = component.find('[data-thread]');
+				var button  = $(this),
+					element = button.closest('[data-blog]').find('[data-thread]'),
+					state;
 
                 element.toggle();
 
                 /* Update button text when toggling
                  */
-                var button = component.find('[data-interaction=showcomments]'),
-                    state;
-
                 if ($(element).is(':visible')) {
                     state = 'Hide';
                 }
