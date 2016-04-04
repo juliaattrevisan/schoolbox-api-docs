@@ -28,7 +28,7 @@
                 confirmLabel: 'Yes, permanently delete',
                 cancelLabel: 'No, keep it',
                 confirmEvent: function() {
-                    $.post('{{ routeLookup('course.importDelete') }}', {courseId: element.attr('data-delete')}, function(responseText) {
+                    $.post('{{ routeLookup('course.importDelete') }}', { componentId: element.attr('data-delete') }, function(responseText) {
                         window.location.href = window.location.href;
                     });
                 }
@@ -90,7 +90,7 @@
                             <a href="{{ routeLookup('course.restoreCourse', { folderId: folder.id, componentId: courseComponentId }) }}" class="icon-upload" title="Restore Course"></a>
                         {% endif %}
                         <a href="{{ routeLookup('course.importModify', { componentId: courseComponentId }) }}" class="icon-modify" title="Modify Import"></a>
-                        <a href="" class="icon-delete" title="Delete Course" data-delete="{{ currentCourse.id }}" data-coursename="{{ currentCourse.name }}"></a>
+                        <a href="" class="icon-delete" title="Delete Course" data-delete="{{ courseComponentId }}" data-coursename="{{ currentCourse.name }}"></a>
                     </nav>
                 </li>
                 {% endfor %}
