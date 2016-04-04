@@ -469,22 +469,14 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             }
         } elseif ($site_location == 'slmp') {
             $settings = array(
-                'baseUri' => 'http://sldm-wdav-01.stlouisaspendale.catholic.edu.au/stlouiswebdav',
+                'baseUri' => 'https://sldm-wdav-01.stlouisaspendale.catholic.edu.au/',
                 'userName' => 'stlouisdom/'.$_SESSION['username'],
                 'password' => $_SESSION['password'],
             );
-
             if ($groupHandler->isStaff()) {
                 $paths = array(
-                    $settings['baseUri'] . '/StaffShared',
-                    $settings['baseUri'] . '/TeacherHome/' . $_SESSION['username'],
-                );
-            } elseif ($groupHandler->isStudent()) {
-                $paths = array(
-                    $settings['baseUri'] . '/student_2016_share_webdav',
-                    $settings['baseUri'] . '/student_2016_webdav',
-                    $settings['baseUri'] . '/student_2017_share_webdav',
-                    $settings['baseUri'] . '/student_2017_webdav',
+                    $settings['baseUri'] . '/staffshared',
+                    $settings['baseUri'] . '/thome/' . $_SESSION['username'],
                 );
             }
         } elseif (in_array($site_location, array('core', 'demo'))) {
