@@ -6,7 +6,7 @@
         var preselectedYear = '{{ preselectedYear }}';
 
         if (!isNaN(preselectedYear)) {
-            $('[data-year="' + preselectedYear + '"').addClass('current');
+            $('[data-year="' + preselectedYear + '"]').addClass('current');
             $('[data-yearly-breakdown-year="' + preselectedYear + '"]').show();
 
             /* Move to navigation element
@@ -14,9 +14,7 @@
             $(document).scrollTop($('[data-year-selector="true"]').offset().top);
         }
 
-        /* Select a breakdown to view
-         */
-        $('[data-year-selector]').find('a').click(function(event) {
+        $('[data-year-selector]').on('click touchstart', 'a', function(event) {
             event.preventDefault();
 
             $('[data-year-selector]').find('a').removeClass('current');
