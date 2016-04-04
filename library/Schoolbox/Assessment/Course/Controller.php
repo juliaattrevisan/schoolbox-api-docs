@@ -1501,29 +1501,31 @@ class Controller extends Base\Base
             return;
         }
 
-        $componentId       = $post['componentId'];
-        $componentInstance = $this->getComponentInstanceMapper()->findById($componentId);
-        $unitInstances     = $this->getUnitInstanceMapper()->findForComponent($componentInstance);
+        $componentId    = $post['componentId'];
+        $requiresDelete = false;
 
         try {
-            $success = $this->getUnitInstanceMapper()->delete($unitInstances);
+            $componentInstance = $this->getComponentInstanceMapper()->findById($componentId);
+            $requiresDelete    = true;
+        } catch (MapperException $e) {
+            // the component doesn't exist, so just fake it
+            $componentInstance = $this->getComponentInstanceMapper()->createModel()->setId($componentId);
+        }
 
-            if ($success) {
-                try {
-                    // we actually don't care if this fails, since the component may well have already been deleted
-                    $this->getComponentInstanceMapper()->delete($componentInstance);
-                } catch (\Exception $e) {
-                    // nooooop...
-                }
+        $unitInstances = $this->getUnitInstanceMapper()->findForComponent($componentInstance);
 
-                $this->getResponse()->content->set([
-                    'format' => 'json',
-                    'data'   => true
-                ]);
+        try {
+            $this->getUnitInstanceMapper()->delete($unitInstances);
 
-            } else {
-                throw new MapperException("Failed to delete unit instances");
+            if ($requiresDelete) {
+                $this->getComponentInstanceMapper()->delete($componentInstance);
             }
+
+            $this->getResponse()->content->set([
+                'format' => 'json',
+                'data'   => true
+            ]);
+
 
         } catch (\Exception $e) {
             $this->sendError($e->getMessage(), [], 500);
