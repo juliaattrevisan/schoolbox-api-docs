@@ -1331,7 +1331,14 @@ ul.flex-list {
 		}
     }
 
-    /* Marksheet Input Card
+	&.removed {
+		h3 {
+			text-decoration: line-through;
+			@include contrast-bg();
+		}
+	}
+
+	/* Marksheet Input Card
      * This displays the Mark and Comment that someone received
      * for their submission.
      */
