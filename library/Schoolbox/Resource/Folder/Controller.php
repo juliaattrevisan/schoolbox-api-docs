@@ -284,21 +284,18 @@ class Controller extends BaseController
             {
                 $source = $folderMapper->findById($this->getRequest()->post["source"]);
                 $destination = $folderMapper->findById($this->getRequest()->post["destination"]);
-
-                if ($access->getFolderAccess($this->getUser(), [$source->getId()]) < WRITE_ACCESS) {
-                    $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
-                }
-
-                if ($access->getFolderAccess($this->getUser(), [$destination->getId()]) < WRITE_ACCESS) {
-                    $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
-                }
             }
             catch (\Exception $e)
             {
                 // One of the folders didn't exist
-
                 $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
             }
+
+            if ($access->getFolderAccess($this->getUser(), [$source->getId()]) < WRITE_ACCESS)
+                $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
+
+            if ($access->getFolderAccess($this->getUser(), [$destination->getId()]) < WRITE_ACCESS)
+                $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
 
             // Move the folder
 
