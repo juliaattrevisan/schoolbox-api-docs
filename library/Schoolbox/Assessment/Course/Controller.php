@@ -1494,8 +1494,44 @@ class Controller extends Base\Base
      */
     public function importDelete()
     {
-        
+        $post = $this->getRequest()->post;
+
+        if (!isset($post['componentId'])) {
+            $this->sendError('Component ID not defined');
+            return;
+        }
+
+        $componentId       = $post['componentId'];
+        $componentInstance = $this->getComponentInstanceMapper()->findById($componentId);
+        $unitInstances     = $this->getUnitInstanceMapper()->findForComponent($componentInstance);
+
+        try {
+            $success = $this->getUnitInstanceMapper()->delete($unitInstances);
+
+            if ($success) {
+                try {
+                    // we actually don't care if this fails, since the component may well have already been deleted
+                    $this->getComponentInstanceMapper()->delete($componentInstance);
+                } catch (\Exception $e) {
+                    // nooooop...
+                }
+
+                $this->getResponse()->content->set([
+                    'format' => 'json',
+                    'data'   => true
+                ]);
+
+            } else {
+                throw new MapperException("Failed to delete unit instances");
+            }
+
+        } catch (\Exception $e) {
+            $this->sendError($e->getMessage(), [], 500);
+            return;
+        }
+
     }
+
 
     /**
      * Save the given template for the given folder
