@@ -314,7 +314,8 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     'Technology',
                     'VisualArts',
                     'RoundSquare',
-                    'AdminDocs'
+                    'AdminDocs',
+                    'AdminDocument'
                 );
 
                 foreach ($fileShares as $share) {
