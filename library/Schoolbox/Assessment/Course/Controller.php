@@ -1485,6 +1485,18 @@ class Controller extends Base\Base
         ]);
     }
 
+
+    /**
+     * Deletes an import, along with ALL of its associated data
+     *
+     * @api   POST /import/delete
+     * @level 160
+     */
+    public function importDelete()
+    {
+        
+    }
+
     /**
      * Save the given template for the given folder
      *
@@ -1639,6 +1651,9 @@ class Controller extends Base\Base
 
     /**
      * Delete a course by blowing away all its units
+     *
+     * @api   POST /course/delete
+     * @level 160
      */
     public function deleteCourse()
     {

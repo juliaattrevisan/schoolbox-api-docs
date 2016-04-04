@@ -28,7 +28,7 @@
                 confirmLabel: 'Yes, permanently delete',
                 cancelLabel: 'No, keep it',
                 confirmEvent: function() {
-                    $.post('/course/delete', {courseId: element.attr('data-delete')}, function(responseText) {
+                    $.post('{{ routeLookup('course.importDelete') }}', {courseId: element.attr('data-delete')}, function(responseText) {
                         window.location.href = window.location.href;
                     });
                 }
