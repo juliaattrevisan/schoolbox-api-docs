@@ -19,6 +19,8 @@
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Course?',
+                confirmLabel: 'Yes, permanently delete',
+                cancelLabel: 'No, keep it',
                 confirmEvent: function() {
                     $.post('/course/delete', {courseId: element.attr('data-delete')}, function(responseText) {
                         window.location.href = window.location.href;
