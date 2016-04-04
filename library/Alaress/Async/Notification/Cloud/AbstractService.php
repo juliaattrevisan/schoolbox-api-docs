@@ -75,26 +75,18 @@ abstract class AbstractService implements ServiceInterface
 
         $id = $n->getId();
 
-        $body  = $n->getMeta('body');
+        $title = $this->decorator->renderTitleAsPlaintext($n);
 
-        if ($body) {
-            $title = $this->decorator->renderTitleAsPlaintext($n);
-        } else {
-            $title = 'Your Schoolname';
-            $body  = $this->decorator->renderTitleAsPlaintext($n);
-        }
-
-        return $this->propagate($tokens, $id, $title, $body);
+        return $this->propagate($tokens, $id, $title);
     }
 
 
     /**
      * @param array $tokens
      * @param string $title
-     * @param string $body
      * @return bool
      */
-    protected abstract function propagate(array $tokens, $id, $title, $body);
+    protected abstract function propagate(array $tokens, $id, $title);
 
 
 }
