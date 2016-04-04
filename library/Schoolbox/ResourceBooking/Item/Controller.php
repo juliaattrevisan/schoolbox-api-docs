@@ -125,19 +125,21 @@ class Controller extends Base
     {
         $excludedId = $this->getRequest()->query['thisId'];
         $search     = trim($this->getRequest()->query['query']);
+        $data       = $this->getMapper()->search($search)
+            ->filter(function($item) use ($excludedId) {
+                return $item->getId() != $excludedId;
+            })
+            ->map(function($item) {
+                return array(
+                    'id'   => $item->getId(),
+                    'name' => $item->getName(),
+                );
+            });
+        $data->reindex();
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
-                'data'   => $this->getMapper()->search($search)
-                    ->filter(function($item) use ($excludedId) {
-                        return $item->getId() != $excludedId;
-                    })
-                    ->map(function($item) {
-                        return array(
-                            'id'   => $item->getId(),
-                            'name' => $item->getName(),
-                        );
-                    }),
+                'data'   => $data,
             )
         );
     }
