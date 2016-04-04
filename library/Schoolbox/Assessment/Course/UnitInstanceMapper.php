@@ -242,6 +242,7 @@ class UnitInstanceMapper extends BaseMapper {
             LEFT JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
             LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
             WHERE `ui`.`category_id` IN {$this->getArrayPlaceholders($folderIds)}
+            AND ui.deleted_at IS NULL
             GROUP BY `cf`.`id`, ui.`category_id`
         ";
 
