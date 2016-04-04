@@ -32,6 +32,8 @@ class External_Humanedge_Class implements External_ClassInterface
     public function getStudents($classCode)
     {
         $db    = $this->loadAPlusDatabase();
+        // Period join is required even though it's unused - this filters out
+        // students who actually don't have periods for this class.
         $query = "
             SELECT DISTINCT
                 st.FirstName AS firstname,
@@ -45,6 +47,7 @@ class External_Humanedge_Class implements External_ClassInterface
             FROM tblSubject s
             LEFT  JOIN tblBlockItem b on s.ID = b.SubjectID
             INNER JOIN tblAllocation a on s.ID = a.SubjectID
+            INNER JOIN tblPeriod p ON a.PeriodID = p.ID
             INNER JOIN tblStudent st on a.FormID = st.FormID
             WHERE st.deleted = 0
             AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
