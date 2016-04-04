@@ -427,17 +427,26 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 );
             }
         } elseif ($site_location=='ngsl') {
-            $settings = array(
-                'baseUri' => 'http://facultycloud.ngs.nsw.edu.au/',
-                'userName' => $_SESSION['username'].'@ngs.nsw.edu.au',
-                'password' => $_SESSION['password'],
-            );
 
             if ($groupHandler->isStaff()) {
+                $settings = array(
+                    'baseUri' => 'http://facultycloud.ngs.nsw.edu.au/',
+                    'userName' => $_SESSION['username'].'@ngs.nsw.edu.au',
+                    'password' => $_SESSION['password'],
+                );
                 $paths = array(
                     $settings['baseUri'] . 'KDrive/',
                     $settings['baseUri'] . 'staffhome/' . $_SESSION['username'] . '/',
                     $settings['baseUri'] . 'StudentShare/',
+                );
+            } elseif ($groupHandler->isStudent()) {
+                $settings = array(
+                    'baseUri' => 'http://studentcloud.ngs.nsw.edu.au/',
+                    'userName' => $_SESSION['username'].'@ngs.nsw.edu.au',
+                    'password' => $_SESSION['password'],
+                );
+                $paths = array(
+                    $settings['baseUri']. '/' . $_SESSION['username'] . '/',
                 );
             }
 
