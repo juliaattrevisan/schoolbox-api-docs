@@ -446,7 +446,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     'password' => $_SESSION['password'],
                 );
                 $paths = array(
-                    $settings['baseUri']. '/' . $_SESSION['username'] . '/',
+                    $settings['baseUri']. $_SESSION['username'] . '/',
                 );
             }
 
