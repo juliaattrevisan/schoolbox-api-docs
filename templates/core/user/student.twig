@@ -198,8 +198,12 @@
             </div>
             
             {% block buttons_island %}
-            <ul class="no-margin small-block-grid-2 medium-block-grid-3 large-block-grid-{% if showPastoral %}7{% else %}6{% endif %} xlarge-block-grid-{% if showPastoral %}7{% else %}6{% endif %}">
-
+            <script type="text/javascript">
+                $(function() {
+                    $('#fat-buttons').addClass('large-block-grid-' + $('#fat-buttons').find('li').length);
+                });
+            </script>
+            <ul id='fat-buttons' class="no-margin small-block-grid-2 medium-block-grid-3" data-equalizer>
                 {% block buttons %}
                     {% if showButtons %}
                         {% block buttons_dueWork %}
@@ -207,7 +211,7 @@
                                 <li class="no-pad">
                                     <a href="/submission/dueWork/0/{{ user.getId() }}"
                                        class="no-margin button fat icon-fat icon-32 icon-due-work"
-                                      >Due Work</a>
+                                       data-equalizer-watch>Due Work</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_dueWork %}
@@ -218,8 +222,8 @@
                             {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_grades) %}
                                 <li class="no-pad">
                                     <a href="/submission/allWork/{{ user.getId() }}"
-                                       class="no-margin fat button icon-fat icon-32 icon-tick"
-                                      >Grades</a>
+                                       class="no-margin fat button icon-fat icon-32 icon-tick" d
+                                       data-equalizer-watch>Grades</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_grades %}
@@ -230,7 +234,7 @@
                             <li class="no-pad">
                                 <a href="/eportfolio/{{ user.getId() }}/profile"
                                    class="no-margin fat button icon-fat icon-32 icon-eportfolio"
-                                  >ePortfolio</a>
+                                   data-equalizer-watch>ePortfolio</a>
                             </li>
                         {% endblock buttons_eportfolio %}
                     {% endif %}
@@ -240,7 +244,7 @@
                         <li class="no-pad">
                             <a href="/pastoral/{{ user.getId() }}"
                                class="no-margin fat icon-fat button icon-32 icon-chat"
-                            >Pastoral Care</a>
+                               data-equalizer-watch>Pastoral Care</a>
                         </li>
                         {% endif %}
                     {% endif %}
@@ -250,7 +254,7 @@
                             <li class="no-pad">
                                 <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
                                    class="no-margin fat button icon-fat icon-32 icon-calendar"
-                                  >{TPL_LOCAL_CALENDAR_PC}</a>
+                                   data-equalizer-watch>{TPL_LOCAL_CALENDAR_PC}</a>
                             </li>
                         {% endblock buttons_calendar %}
                     {% endif %}
@@ -261,7 +265,7 @@
                                 <li class="no-pad">
                                     <a href="/timetable/{{ user.getId() }}"
                                        class="no-margin fat button icon-fat icon-32 icon-timetable"
-                                      >Timetable</a>
+                                       data-equalizer-watch>Timetable</a>
                                 </li>
                             {% endblock buttons_timetable %}
                         {% endif %}
@@ -273,7 +277,7 @@
                                 <li class="no-pad">
                                     <a href="/modules/leave/student/{{ user.getId() }}"
                                        class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
-                                      >Boarder Leave</a>
+                                       data-equalizer-watch>Boarder Leave</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_boarderLeave %}
@@ -286,7 +290,7 @@
                                     <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
                                        class="no-margin fat button icon-fat icon-32 icon-modify"
                                        target="_blank"
-                                      >Pastoral Care</a>
+                                       data-equalizer-watch>Pastoral Care</a>
                                 </li>
                             {% endif %}
                         {% endblock buttons_pastoralCare %}
