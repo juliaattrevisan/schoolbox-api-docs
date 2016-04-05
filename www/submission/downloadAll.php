@@ -32,18 +32,10 @@ if (is_numeric($_GET['id'])) {
             ['box_id' => $box_id, 'draft' => false,],
             ['order' => ['submitted' => 'desc']]
         );
-        // Does this box support multiple files?
-        // If not, only allow most recent submission for each student.
-        if (!$submissionBox->getAcceptMultiple()) {
-            $newList = [];
-            foreach ($submissionList as $submission) {
-                if (!isset($newList[$submission->getOwner()->getId()])) {
-                    $newList[$submission->getOwner()->getId()] = $submission;
-                }
-            }
-            $submissionList = new Collection(array_values($newList));
-        }
-
+        // Download all files, even for submission boxes which don't support
+        // multiple files.
+        // (This is because a single submission can contain both an online and
+        //  uploaded submission.)
         $zip = new SubmissionZipFolder($zipName, $submissionList);
         ShutdownHandler::instance()->registerFunction([$zip, 'cleanUp'], 10000);
         $zip->sendZip();
