@@ -1041,9 +1041,17 @@ class Leave_Controller extends Controller
         $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'pending_request_list', 'pending_request_list_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'previous_request_list', 'previous_request_list_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'reports_menu', 'reports_menu_block');
         $this->getPage()->setBlock('pending_request_list', 'pending_request', 'pending_request_block');
         $this->getPage()->setBlock('previous_request_list', 'previous_request', 'previous_request_block');
         $this->getPage()->setBlock('previous_request_list', 'export', 'export_block');
+
+        if (!$_SESSION["user"]->getRole()->isStaff()) {
+            $this->getPage()->setVar('reports_menu_block', '');
+        } else {
+            $this->getPage()->parse('reports_menu_block', 'reports_menu', true);
+
+        }
 
         if ($this->hasApprovePermission($house->getId())) {
             $this->getPage()->parse('export_block', 'export');
