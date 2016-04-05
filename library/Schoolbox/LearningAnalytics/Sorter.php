@@ -26,6 +26,10 @@ class Sorter {
      */
     private $key = '';
 
+    /**
+     * Sorter constructor.
+     * @param $data
+     */
     public function __construct($data) {
         $this->setData($data);
     }
@@ -80,7 +84,14 @@ class Sorter {
      * @return mixed
      */
     private function cmpAscendingKey($a, $b) {
-        return $a[$this->getKey()] - $b[$this->getKey()];
+        if ($a[$this->getKey()] > $b[$this->getKey()]) {
+            return 1;
+        }
+        else if ($a[$this->getKey()] == $b[$this->getKey()]) {
+            return 0;
+        }
+
+        return -1;
     }
 
     /**
@@ -91,7 +102,14 @@ class Sorter {
      * @return mixed
      */
     private function cmpDescendingKey($a, $b) {
-        return $b[$this->getKey()] - $a[$this->getKey()];
+        if ($a[$this->getKey()] > $b[$this->getKey()]) {
+            return -1;
+        }
+        else if ($a[$this->getKey()] == $b[$this->getKey()]) {
+            return 0;
+        }
+
+        return 1;
     }
 
     /**
@@ -102,7 +120,14 @@ class Sorter {
      * @return mixed
      */
     private function cmpAscending($a, $b) {
-        return $a - $b;
+        if ($a > $b) {
+            return 1;
+        }
+        else if ($a == $b) {
+            return 0;
+        }
+
+        return -1;
     }
 
     /**
@@ -113,7 +138,14 @@ class Sorter {
      * @return mixed
      */
     private function cmpDescending($a, $b) {
-        return $b - $a;
+        if ($a < $b) {
+            return 1;
+        }
+        else if ($a == $b) {
+            return 0;
+        }
+
+        return -1;
     }
 
     /**
