@@ -12,6 +12,7 @@ namespace Schoolbox\Resource;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
+use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Collection;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\User;
@@ -79,7 +80,7 @@ class FileNotifier extends ResourceNotifier {
 
 	/**
 	 * @param File $resource
-	 * @return Category
+	 * @return Folder\Model
 	 */
 	protected function getResourceCategory($resource) {
 		return $this->folderMapper->findById($resource->getFolder()->getId());

@@ -28,6 +28,8 @@ use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -121,7 +123,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * Notify the system that a CMS event occurred (will be sent to cmsLog table)
      *
      * @param string                     $action
-     * @param Category|File|Link|Textbox $resource
+     * @param Folder|File|Link|Textbox   $resource
      * @param User                       $effector
      * @throws ScheduleException
      * @return void
@@ -191,7 +193,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param string             $action
      * @param ParameterInterface $param
      * @param User               $effector
-     * @param Folder\Model       $category
+     * @param Folder             $category
      * @param string             $roletype
      * @return Envelope
      */
@@ -230,8 +232,8 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     /* ASYNC METHODS */
 
     /**
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $effector
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
      * @return void
      */
     public function notifySystemCreated($resource, $effector)
@@ -241,19 +243,18 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $effector
-     * @param array                      $diff
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
      * @return void
      */
-    public function notifySystemUpdated($resource, $effector, $diff)
+    public function notifySystemUpdated($resource, $effector)
     {
         $this->notifySystem(LogMapper::ACTION_UPDATE, $resource, $effector);
     }
 
 
     /**
-     * @param Category|File|Link|Textbox $resource
+     * @param Folder|File|Link|Textbox $resource
      * @param User                       $effector
      * @return void
      */
@@ -264,10 +265,10 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * @param string                     $roleType
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $effector
-     * @param array                      $diff
+     * @param string                   $roleType
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
+     * @param array                    $diff
      * @return Envelope
      */
     public function notifyUpdated($roleType, $resource, $effector, $diff = null)
@@ -350,15 +351,15 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * @param Category|File|Link|Textbox $resource
+     * @param Folder|File|Link|Textbox $resource
      * @return string
      */
     protected abstract function getResourceName($resource);
 
 
     /**
-     * @param Category|File|Link|Textbox $resource
-     * @return Category
+     * @param Folder|File|Link|Textbox $resource
+     * @return Folder
      */
     protected abstract function getResourceCategory($resource);
 
@@ -382,20 +383,20 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * @param string                     $roletype
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $author
-     * @param array                      $diff
+     * @param string                   $roletype
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $author
+     * @param array                    $diff
      * @return Envelope
      */
     public abstract function notifyCreated($roletype, $resource, $author, $diff = null);
 
 
     /**
-     * @param string                     $roletype
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $author
-     * @param array                      $diff
+     * @param string                   $roletype
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $author
+     * @param array                    $diff
      * @return Envelope
      */
     public abstract function notifyDeleted($roletype, $resource, $author, $diff = null);
@@ -404,8 +405,8 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     /* ASYNC METHODS */
 
     /**
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $effector
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
      * @return Envelope
      */
     public function notifyStudentCreated($resource, $effector)
@@ -415,9 +416,9 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $effector
-     * @param array                      $diff
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
+     * @param array                    $diff
      * @return Envelope
      */
     public function notifyStudentUpdated($resource, $effector, $diff = null)
@@ -427,8 +428,8 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $effector
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
      * @return Envelope
      */
     public function notifyStudentDeleted($resource, $effector)
@@ -438,8 +439,8 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $effector
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
      * @return Envelope
      */
     public function notifyStaffCreated($resource, $effector)
@@ -449,9 +450,9 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $effector
-     * @param array                      $diff
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
+     * @param array                    $diff
      * @return Envelope
      */
     public function notifyStaffUpdated($resource, $effector, $diff = null)
@@ -461,8 +462,8 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $effector
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
      * @return Envelope
      */
     public function notifyStaffDeleted($resource, $effector)
@@ -472,8 +473,8 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $effector
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
      * @return Envelope
      */
     public function notifyParentCreated($resource, $effector)
@@ -483,9 +484,9 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $effector
-     * @param array                      $diff
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
+     * @param array                    $diff
      * @return Envelope
      */
     public function notifyParentUpdated($resource, $effector, $diff = null)
@@ -495,8 +496,8 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
 
     /**
-     * @param Category|File|Link|Textbox $resource
-     * @param User                       $effector
+     * @param Folder|File|Link|Textbox $resource
+     * @param User                     $effector
      * @return Envelope
      */
     public function notifyParentDeleted($resource, $effector)

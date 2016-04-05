@@ -9,8 +9,6 @@
 
 namespace Schoolbox\Resource;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use PDO;
 use PDOStatement;
 use Schoolbox;

@@ -25,7 +25,6 @@ use Schoolbox\User;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Zend\Json\Server\Error;
 
 /**
  * Class Mapper
