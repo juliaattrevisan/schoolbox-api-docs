@@ -129,6 +129,34 @@ class GDriveFetcher implements FetcherInterface
 
 
     /**
+     * Append the given extension to the title *if not already suffixed*
+     *
+     * @param string $title
+     * @param string $ext
+     * @return string
+     */
+    protected function parseTitle($title, $ext)
+    {
+        $titleLen = strlen($title);
+        $extLen   = strlen($ext);
+        if ($extLen > $titleLen) {
+            throw new OutOfBoundsException("Extension '$ext' is longer than the title '$title'.");
+        }
+
+        // true if the extension is already suffixed
+        $endsWith = substr_compare($title, $ext, $titleLen - $extLen, $extLen) === 0;
+
+        if ($endsWith) {
+            // title is correct, just return that
+            return $title;
+        }
+
+        // append extension and return
+        return $title . $ext;
+    }
+
+
+    /**
      * @param array $opts
      * @return resource
      */
