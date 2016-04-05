@@ -5,13 +5,17 @@
             var endTime = new Date({DEADLINE_YEAR}, ({DEADLINE_MONTH}-1), {DEADLINE_DAY}, {DEADLINE_HOUR}, {DEADLINE_MIN}, {DEADLINE_SEC});
 
             $('#component{COMPONENT_INSTANCE_ID}-countdown').countdown(endTime).on('update.countdown', function(event) {
-                    var format = '%-H:%M:%S';
+                    var format =
+                        '<li><span class="count">%H</span> <span class="labels">Hrs</span></li>'
+                        + '<li><span class="count">%M</span> <span class="labels">Mins</span></li>'
+                        + '<li><span class="count">%S</span> <span class="labels">Secs</span></li>'
                     if(event.offset.days > 0) {
-                        format = '%-d day%!d ' + format;
+                        format = ' <li><span class="count">%-d</span> <span class="labels">Day%!d</span></li> ' + format;
                     }
                     if(event.offset.weeks > 0) {
-                        format = '%-w week%!w ' + format;
+                        format = ' <li><span class="count">%-w</span> <span class="labels">Week%!w</span></li>' + format;
                     }
+
                 $(this).html(event.strftime(format));
             })
             .on('finish.countdown', function(event) {
@@ -27,7 +31,7 @@
         <div class="small-12 island">
             <section>
                 <div class="content">
-                    <div id='component{COMPONENT_INSTANCE_ID}-countdown'></div>
+                    <ul id='component{COMPONENT_INSTANCE_ID}-countdown' class="countdown-timer flex-list"></ul>
                 </div>
             </section>
         </div>

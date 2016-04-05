@@ -212,6 +212,32 @@ ul.tileList {
     float: right;
 }
 
+/* Homepage Countdown
+ */
+.countdown-timer{
+    text-align: center;
+    color: $accent-foreground;
+    li{
+        padding-right: 2px !important;
+    }
+    span{
+        display: block;
+        padding: 0.2rem;
+        font-weight: 500;
+        background-color: $accent-background;
+    }
+    .count{
+        @extend %h2;
+    }
+    .labels{
+        @extend %p;
+        text-transform: uppercase;
+        @media #{$small-only} {
+            font-size: 0.625rem;
+        }
+    }
+}
+
 /* Eportfolio
  */
 .eportfolio {
