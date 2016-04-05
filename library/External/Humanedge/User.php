@@ -156,7 +156,7 @@ class External_Humanedge_User implements External_UserInterface
                 c.Email
             FROM Contact c
             INNER JOIN StudentContact sc ON c.ID = sc.ContactID
-            INNER JOIN Student s ON sc.ContactID = s.ID
+            INNER JOIN Student s ON sc.StudentID = s.ID
             WHERE c.Code IN (%s)
         ";
         $query  = sprintf($query, implode(',', array_map([$this->getDatabase(), 'smartQuote'], $synergyIds)));
@@ -372,17 +372,13 @@ class External_Humanedge_User implements External_UserInterface
     {
         $query = "
             SELECT
-                s.Code AS StudentID
+                s.Code AS RelatedID
             FROM Student s
             LEFT JOIN StudentContact sc ON s.ID = sc.StudentID
             LEFT JOIN Contact c ON sc.ContactID = c.ID
             WHERE c.Code = {$this->getDatabase()->smartQuote($externalUserId)}
         ";
-        $result = [];
-        foreach ($this->getDatabase()->getAll($query) as $row) {
-            $result[] = $row['StudentID'];
-        }
-        return $result;
+        return $this->getDatabase()->getAll($query);
     }
 
     /**
