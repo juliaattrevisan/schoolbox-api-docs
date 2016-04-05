@@ -10,14 +10,16 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\File\Mimetype;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 use Schoolbox\Resource\File\StorableTrait;
 
 
-class ReturnedWork implements ISoftDeletable
+class ReturnedWork implements ISoftDeletable, IFile
 {
 
     use StorableTrait;
@@ -388,4 +390,59 @@ class ReturnedWork implements ISoftDeletable
         return $this;
     }
 
+    // IFile interface methods - passthru to storage
+
+    /**
+     * Returns the full mime string for the file
+     *
+     * @return string
+     */
+    public function getMime()
+    {
+        return $this->getStorage()->getMime();
+    }
+
+    /**
+     * Returns the full mime string for the file
+     *
+     * @return Mimetype
+     */
+    public function getMimetype()
+    {
+        return $this->getStorage()->getMimetype();
+    }
+
+    /**
+     * Returns the size on disk of the file
+     *
+     * @return int
+     */
+    public function getSize()
+    {
+        return $this->getStorage()->getSize();
+    }
+
+    /**
+     * @return string
+     */
+    public function getHash()
+    {
+        return $this->getStorage()->getHash();
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getLastAccessed()
+    {
+        return $this->getStorage()->getLastAccessed();
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getCreatedAt()
+    {
+        return $this->getReturned();
+    }
 }
