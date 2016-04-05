@@ -20,7 +20,7 @@
             <section>
                 <ul class="information-list">
                     <!-- BEGIN blog -->
-                    <li class="actions-small-1" id="blog_{BLOG_ID}">
+                    <li class="actions-small-1" id="blog_{BLOG_ID}" data-blog>
                         <div class="list-item">
                             <div class="avatar card small-12">
                                 <a href="/blog/{BLOG_ID}">
@@ -45,7 +45,7 @@
                         <ul class="information-list reply" id="blogComment_{BLOG_ID}">
                             <!-- BEGIN has_comments -->
                             <!-- BEGIN comment -->
-                            <li class="actions-small-1" id="blog_{BLOG_ID}" data-thread>
+                            <li class="actions-small-1" data-thread>
                                 <div class="list-item">
                                     <div class="avatar card small-12">
                                         <a href="/search/user/{COMMENT_AUTHOR_ID}">
