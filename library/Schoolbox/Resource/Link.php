@@ -241,7 +241,7 @@ class Link implements ISoftDeletable
     /**
      * Set category id
      *
-     * @param Category $folder
+     * @param \Schoolbox\Resource\Folder\Model $folder
      */
     public function setFolder($folder)
     {
@@ -251,7 +251,7 @@ class Link implements ISoftDeletable
     /**
      * Get category
      *
-     * @return Category
+     * @return \Schoolbox\Resource\Folder\Model
      */
     public function getFolder()
     {
