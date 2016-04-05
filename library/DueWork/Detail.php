@@ -9,6 +9,7 @@
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Assessment\Term;
 
 class DueWork_Detail
 {
@@ -47,6 +48,10 @@ class DueWork_Detail
      */
     protected $submissionBox;
 
+    /**
+     * @var Term\Model
+     */
+    protected $term;
 
     /**
      * @param SubmissionBox $submissionBox
@@ -62,6 +67,7 @@ class DueWork_Detail
 
         $this->dueWork['submissionCount'] = 0;
         $this->marksheet                  = Marksheet_Factory::build($this->submissionBox->getMarkType()->getSlug(), $submissionBox);
+        $this->term                       = Term\Mapper::getInstance()->findForDate($this->submissionBox->getDueDate());
     }
 
     /**
@@ -190,7 +196,7 @@ class DueWork_Detail
         $page->setVar(
             array(
                 'DUEWORK_DESCRIPTION'   => Scrub::text($this->submissionBox->getName()),
-                'DUEWORK_TERM'          => \Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($this->submissionBox->getDueDate())->getCode(),
+                'DUEWORK_TERM'          => $this->term->getCode(),
                 'CATEGORY_NAME'         => Scrub::text($this->submissionBox->getCategory()->getName()),
                 'DUEWORK_TYPE'          => $this->submissionBox->getWorkType()->getName(),
                 'DUEWORK_MARKTYPE'      => $this->submissionBox->getMarkType()->getName(),
@@ -493,7 +499,7 @@ class DueWork_Detail
      */
     public function isArchived()
     {
-        return $this->submissionBox->getDueDate()->getYear() < date('Y');
+        return $this->term->getArchived();
     }
 
 
