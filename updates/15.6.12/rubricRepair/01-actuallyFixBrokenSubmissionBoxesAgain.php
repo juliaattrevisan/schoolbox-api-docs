@@ -84,10 +84,11 @@ $fixedBoxes       = [];
 $stillBrokenBoxes = [];
 
 $boxQuery->execute();
-foreach ($boxQuery->fetchAll() as $box) {
+$boxCount = $boxQuery->rowCount();
+foreach ($boxQuery->fetchAll() as $i => $box) {
     $boxId                 = $box['boxId'];
     $affectedBoxes[$boxId] = true;
-    $logger->info(sprintf('Fixing submission box #%d', $boxId));
+    $logger->info(sprintf('Fixing submission box #%d (%d/%d)', $boxId, $i+1, $boxCount));
 
     // Get borked descriptors for this box
     $descriptorQuery->execute(['boxId' => $boxId]);
