@@ -117,6 +117,8 @@ if (is_numeric($_GET['return'])) {
         $studentSub->getCreatedAt()->getUsingFormat('Ymd-Hi'),
         $studentSub->getBasename()
     );
+    // sanitise submission filename only
+    $filename = preg_replace("#[^a-z0-9_\\-\\(\\)\\.]#i", "", $filename);
 
     $file = $studentSub->getStorage();
 
@@ -143,9 +145,6 @@ if (is_numeric($_GET['return'])) {
         }
     }
 }
-
-// sanitise
-$filename = preg_replace("#[^a-z0-9_\\-\\(\\)\\.]#i", "", $filename);
 
 //send headers (cache-control off stops IE8 from failing to download)
 header ("Pragma: ");
