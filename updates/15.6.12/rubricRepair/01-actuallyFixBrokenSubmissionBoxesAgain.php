@@ -13,28 +13,38 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
-new \Schoolbox\Application\Daemon\Kernel("15.6.10 Rubric Level Restore");
-
+new \Schoolbox\Application\Daemon\Kernel("15.6.12 Rubric Level Restore");
 
 $db     = Database::getInstance();
 $logger = new Alaress\Lumberjack\Logger();
 
-// This query get descriptors whose box ID doesn't match their level's box ID.
-$descriptorQuery = $db->prepare("
-    SELECT DISTINCT
-        rd.submission_box_id boxId,
-        rl.id                levelId,
-        rl.sequence          levelSequence,
-        rl.name              levelName,
-        rl.box_id            levelBoxId
+// This query get boxes with a descriptor whose box ID doesn't match their level's box ID.
+$boxQuery = $db->prepare("
+    SELECT DISTINCT 
+        rd.submission_box_id boxId
     FROM rubric_descriptor rd
     INNER JOIN submission_box sb ON rd.submission_box_id = sb.id AND sb.deleted IS FALSE
     INNER JOIN rubric_level   rl ON rd.level_id = rl.id
     WHERE rl.box_id != rd.submission_box_id
     AND   sb.created >= '2016-01-01'
     ORDER BY
-        rd.submission_box_id ASC,
-        rl.sequence          ASC
+        rd.submission_box_id ASC
+");
+
+// This query get descriptors whose box ID doesn't match their level's box ID.
+$descriptorQuery = $db->prepare("
+    SELECT DISTINCT
+        rl.id       levelId,
+        rl.sequence levelSequence,
+        rl.name     levelName,
+        rl.box_id   levelBoxId
+    FROM rubric_descriptor rd
+    INNER JOIN submission_box sb ON rd.submission_box_id = sb.id AND sb.deleted IS FALSE
+    INNER JOIN rubric_level   rl ON rd.level_id = rl.id
+    WHERE rl.box_id != rd.submission_box_id
+    AND   rd.submission_box_id = :boxId
+    ORDER BY
+        rl.sequence ASC
 ");
 
 $obtainIncorrectLevelsQuery = $db->prepare("
@@ -71,6 +81,26 @@ $updateDescriptorQuery = $db->prepare("
 
 $affectedBoxes    = [];
 $stillBrokenBoxes = [];
+
+// Fix one box at a time only.
+// I don't want half-broken boxes.
+$boxQuery->execute();
+foreach ($boxQuery->fetchAll() as $box) {
+
+    $affectedBoxes[$box['boxId']] = true;
+    $logger->info(sprintf('Fixing submission box #%d', $box['boxId']));
+
+    $db->beginTransaction();
+    try {
+        $descriptorQuery->execute(['boxId' => $box['boxId']]);
+        $db->commit();
+    } catch (PDOException $e) {
+        $logger->warning(sprintf("Fixing submission box #%d failed - %s", $e->getMessage()));
+        $stillBrokenBoxes[$box['boxId']] = true;
+        $db->rollBack();
+    }
+}
+
 $descriptorQuery->execute();
 foreach ($descriptorQuery as $row) {
     $affectedBoxes[$row['boxId']] = true;
@@ -108,13 +138,11 @@ foreach ($descriptorQuery as $row) {
         } catch (PDOException $e) {
             $logger->warning(sprintf("Adding correct level failed - %s", $e->getMessage()));
             $stillBrokenBoxes[$row['boxId']] = true;
-            continue;
         }
     }
 
     // now update the descriptors
     foreach ($map as $sequence => $changes) {
-
         if ($changes['bad'] && $changes['good']) {
             $logger->info(sprintf("Remapping descriptor level IDs: %d -> %d", $changes['bad'], $changes['good']));
             try {
@@ -126,7 +154,6 @@ foreach ($descriptorQuery as $row) {
         } else {
             $logger->notice("Could not remap descriptor levels, data missing: ".json_encode($changes));
         }
-
     }
 }
 
@@ -167,3 +194,5 @@ if (count($affectedBoxes)) {
         );
     }
 }
+
+// Alert about still broken boxes too
