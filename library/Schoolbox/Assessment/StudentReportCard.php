@@ -367,14 +367,6 @@ class StudentReportCard
         // output student grade average
         $gradeAvg = $this->subjectData->getGradeAverage();
         if (is_null($gradeAvg['grade'])) {
-            $page->setVar(
-                array(
-                    'SUBJ_GRADEIENT'   => '',
-                    'SUBJ_GRADE_AVG'   => 'N/A',
-                    'SUBJ_GRADE_TREND' => ''
-                )
-            );
-            $page->parse('grade_average_block', 'grade_average');
             return;
         }
         if ($gradeAvg['trend'] > 0) {
