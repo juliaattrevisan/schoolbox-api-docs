@@ -1,7 +1,5 @@
 <?php
 /**
- * Copy of Schoolbox\FileNotifier for the new file mapper/model
- *
  * @author     Amri Sannang <amri.sannang@alaress.com.au>
  * @copiedFrom Matt Day <matt.day@alaress.com.au>
  * @copyright  Copyright 2015, Alaress Pty Ltd
