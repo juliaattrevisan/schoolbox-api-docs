@@ -30,13 +30,16 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
-            <section>
-                <!-- BEGIN drop_student -->
+            <!-- BEGIN drop_student -->
+            <section class="content">
                 <form action="/subject/modDropBox.php" method="post" enctype="multipart/form-data" id="component{COMPONENT_INSTANCE_ID}-dropBox" >
                     <input type="hidden" name="category" value="{ID}" />
 
                     <!-- BEGIN drop_success -->
-                    <p>File upload completed successfully.</p>
+                    <div data-alert="" class="alert-box success">
+                        File upload completed successfully
+                        <a href="" class="close">×</a>
+                    </div>
                     <!-- END drop_success -->
                     <label>
                         Description
@@ -45,30 +48,32 @@
                     {ATTACH_ZONE}
                     <input type="submit" value="Upload" />
                 </form>
-                <!-- END drop_student -->
-                <!-- BEGIN drop_staff -->
-                <ul class="action-list">
-                    <!-- BEGIN drop_file -->
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="avatar card small-12">
-                                <a href="/subject/modDropBox.php?id={DROPBOX_ID}" title="View File" rel="external">
-                                    <img src="/images/mime/60x60/{DROPBOX_MIME_IMAGE}" class="mime"/>
-                                    <h3>{DROPBOX_DESCRIPTION}</h3>
-                                </a>
-                                <p class="meta">
-                                    By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}
-                                </p>
-                            </div>
-                        </div>
-                        <nav>
-                            <a class="icon-delete" href="/subject/modDropBox.php?delete={DROPBOX_ID}" title="Delete" data-delete></a>
-                        </nav>
-                    </li>
-                    <!-- END drop_file -->
-                </ul>
-                <!-- END drop_staff -->
             </section>
+            <!-- END drop_student -->
+            <!-- BEGIN drop_staff -->
+            <section>
+            <ul class="action-list">
+                <!-- BEGIN drop_file -->
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="avatar card small-12">
+                            <a href="/subject/modDropBox.php?id={DROPBOX_ID}" title="View File" rel="external">
+                                <img src="/images/mime/60x60/{DROPBOX_MIME_IMAGE}" class="mime"/>
+                                <h3>{DROPBOX_DESCRIPTION}</h3>
+                            </a>
+                            <p class="meta">
+                                By {DROP_SUBMITTED_BY} on {DROP_SUBMITTED_TIME}
+                            </p>
+                        </div>
+                    </div>
+                    <nav>
+                        <a class="icon-delete" href="/subject/modDropBox.php?delete={DROPBOX_ID}" title="Delete" data-delete></a>
+                    </nav>
+                </li>
+                <!-- END drop_file -->
+            </ul>
+            </section>
+            <!-- END drop_staff -->
         </div>
     </div>
 </div>
