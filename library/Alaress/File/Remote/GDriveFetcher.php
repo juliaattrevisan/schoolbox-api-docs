@@ -101,7 +101,7 @@ class GDriveFetcher implements FetcherInterface
         } else {
             // fall back to the download URL
             $url = $metadata['downloadUrl'];
-            $ext = '';
+            $ext = $metadata['fullFileExtension'];
         }
 
         if (!$url) {
