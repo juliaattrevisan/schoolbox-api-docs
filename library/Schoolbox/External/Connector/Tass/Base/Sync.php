@@ -141,7 +141,7 @@ class Sync implements SyncInterface
                 ->addMap(function ($row) {
                     list($firstName, $surname)        = preg_split("/\\s+/", $row['student_contact_preferred'], 2);
                     $row['student_contact_preferred'] = $firstName;
-                    if (trim($surname) > 0) {
+                    if (strlen(trim($surname)) > 0) {
                         $row['student_contact_surname'] = $surname;
                     }
                     return $row;
