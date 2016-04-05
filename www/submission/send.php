@@ -57,7 +57,7 @@ if (is_numeric($_GET['return'])) {
     }
 
     $size     = $file->getSize();
-    $filename = $return->getBasename();
+    $filename = $file->getBasename();
     $mime     = $file->getMime();
 
 } else {
