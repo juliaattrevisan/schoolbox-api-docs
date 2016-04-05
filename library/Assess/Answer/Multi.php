@@ -151,7 +151,6 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                         $page->setVar([
                             'ANSWER_ICON'       => 'icon-tick',
                             'ANSWER_ICON_TITLE' => 'Respondent chose correctly',
-                            'ANSWER_HIGHLIGHT'  => 'evaluation-selected-answer-option',
                             'ANSWER_CHECKED'    => 'checked',
                         ]);
                     }
@@ -161,7 +160,6 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                         $page->setVar([
                             'ANSWER_ICON'       => 'icon-previous',
                             'ANSWER_ICON_TITLE' => 'Respondent did not choose this correct answer',
-                            'ANSWER_HIGHLIGHT'  => '',
                             'ANSWER_CHECKED'    => ''
                         ]);
                     }
@@ -176,7 +174,6 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                         $page->setVar([
                             'ANSWER_ICON'       => 'icon-cancel',
                             'ANSWER_ICON_TITLE' => 'Respondent chose an incorrect answer',
-                            'ANSWER_HIGHLIGHT'  => 'evaluation-selected-answer-option',
                             'ANSWER_CHECKED'    => 'checked',
                         ]);
                     }
@@ -186,7 +183,6 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                         $page->setVar([
                             'ANSWER_ICON'       => '',
                             'ANSWER_ICON_TITLE' => '',
-                            'ANSWER_HIGHLIGHT'  => '',
                             'ANSWER_CHECKED'    => ''
                         ]);
                     }
