@@ -113,6 +113,7 @@ fi
 
 echo "Updating database to new version";
 errorint=0;
+errormsg='';
 # Run update scripts in release order, SQL first then PHP for each release
 for release in `sed -n "$start","$end"p $versionlist`;
 do
@@ -136,6 +137,7 @@ do
 					then
 						echo "Error running update: $script";
 						errorint=1;
+						errormsg="$errormsg,$script";
 					fi
 				fi
 			done
@@ -157,6 +159,7 @@ do
 						cd $curdir;
 						echo "Error running update: $script";
 						errorint=1;
+						errormsg="$errormsg,$script";
 					fi
 					cd $curdir;
 				fi
@@ -170,8 +173,15 @@ done
 
 echo "Backup of database located at: $backupfile";
 
+# Reset facter fact
+echo "$package""_update_error=0" > /etc/facter/facts.d/"$package"_update.txt;
+
 if [ $errorint -ne 0 ];
 then
+	mkdir -p /etc/facter/facts.d/ >/dev/null 2>&1;
+	errormsg=`echo $errormsg | cut -d',' -f2-100`;
+	echo "$package""_update_error=$errorint" > /etc/facter/facts.d/"$package"_update.txt;
+	echo "$package""_update_errormsg=$errormsg" >> /etc/facter/facts.d/"$package"_update.txt;
 	echo "SQL updates completed with errors. Please manually fix issues or rollback to pre-update backup.";
 else
 	echo "SQL updates completed";
