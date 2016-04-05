@@ -54,19 +54,31 @@ class Averages {
             foreach ($currentTaskResult as $userResult) {
                 $key = $userResult['user']->getId();
 
-                /* Average the two values (running average)
+                /* Store the user object
+                 */
+                $allAverages[$key]['user'] = $userResult['user'];
+
+                /* Initialise mark stack
+                 * Initialise average
+                 */
+                if (!is_array($allAverages[$key]['marks'])) {
+                    $allAverages[$key]['marks'] = [];
+                    $allAverages[$key]['average'] = 0;
+                }
+
+                /* Store a set of marks for calculating averages later
                  */
                 if (is_numeric($userResult['value'])) {
-                    if (isset($allAverages[$key])) {
-                        $allAverages[$key]['average'] = 0.5 * ($allAverages[$key]['average'] + $userResult['value']);
-                    }
-                    /* Store user/value tuple
-                     */
-                    else {
-                        $allAverages[$key]['user'] = $userResult['user'];
-                        $allAverages[$key]['average'] = $userResult['value'];
-                    }
+                    $allAverages[$key]['marks'][] = $userResult['value'];
                 }
+            }
+        }
+
+        /* Calculate averages for each user
+         */
+        foreach ($allAverages as $key => $pieces) {
+            if (count($pieces['marks'])) {
+                $allAverages[$key]['average'] = array_sum($pieces['marks']) / count($pieces['marks']);
             }
         }
 
