@@ -29,7 +29,7 @@ class GDriveFetcher implements FetcherInterface
 
 
     /**
-     * @param string   $storageDir - the target storage directory
+     * @param string   $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
      * @param resource $curl       - a custom curl handle if a default won't suffice
      * @param string   $httpAuth   - an authorization header if not using an anonymous connection
      */
@@ -89,19 +89,23 @@ class GDriveFetcher implements FetcherInterface
         $metadata = $this->fetchMetaData($fileId);
 
         if (isset($metadata['labels']['restricted']) && $metadata['labels']['restricted'] == true) {
+            // if this file has been flagged by Drive as "restricted", disallow any download
             $url = null;
             $ext = '';
 
         } elseif (isset($metadata['exportLinks']['application/pdf'])) {
+            // if there is a PDF-export option for this file, always give that preference
             $url = $metadata['exportLinks']['application/pdf'];
             $ext = '.pdf';
 
         } else {
+            // fall back to the download URL
             $url = $metadata['downloadUrl'];
             $ext = '';
         }
 
         if (!$url) {
+            // no valid URL was found
             throw new OutOfBoundsException("No url found for download");
         }
 
