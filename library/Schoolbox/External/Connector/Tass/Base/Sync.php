@@ -165,7 +165,10 @@ class Sync implements SyncInterface
                 te.tch_code         AS staff_id,
                 p.username          AS network_login,
                 CASE
-                    WHEN (t.term_date) IS NULL THEN 0
+                    WHEN
+                        (t.term_date) IS NULL
+                        OR CAST(t.term_date AS DATE) >= CAST(GETDATE() AS DATE)
+                    THEN 0
                     ELSE 1
                 END                 AS active_flag,
                 t.salutation_flag   AS staff_title,
