@@ -108,16 +108,16 @@ class Log {
 
 
 	/**
-	 * @return Link|File|Category
+	 * @return Link|File\Model|Folder\Model|Textbox
 	 */
 	public function getObject() {
 		switch($this->objectKind) {
 			case LogMapper::KIND_LINK:
 				return LinkMapper::getInstance()->findById($this->objectId);
 			case LogMapper::KIND_FILE:
-				return FileMapper::getInstance()->findById($this->objectId);
+				return File\Mapper::getInstance()->findById($this->objectId);
 			case LogMapper::KIND_FOLDER:
-				return CategoryMapper::getInstance()->findById($this->objectId);
+				return Folder\Mapper::getInstance()->findById($this->objectId);
 			case LogMapper::KIND_CONTENT:
 				return TextboxMapper::getInstance()->findById($this->objectId);
 		}

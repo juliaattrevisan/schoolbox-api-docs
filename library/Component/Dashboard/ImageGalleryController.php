@@ -61,7 +61,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     {
         $this->setGroupHandler(new Group());
         $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
-        $this->setFileMapper(new \Schoolbox\Resource\FileMapper());
+        $this->setFileMapper(new \Schoolbox\Resource\File\Mapper());
         $this->determineSourceFolder();
     }
 

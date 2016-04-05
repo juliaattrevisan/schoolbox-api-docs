@@ -16,7 +16,7 @@ use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
 use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
 use Schoolbox\Preview\Chain\Strategy\Internal\Redirect;
-use Schoolbox\Resource\FileMapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 class Internal extends Base {
