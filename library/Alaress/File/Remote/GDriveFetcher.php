@@ -101,7 +101,7 @@ class GDriveFetcher implements FetcherInterface
         } else {
             // fall back to the download URL
             $url = $metadata['downloadUrl'];
-            $ext = '.' . $metadata['fullFileExtension'];
+            $ext = $this->deriveFileExtension($metadata);
         }
 
         if (!$url) {
@@ -125,6 +125,24 @@ class GDriveFetcher implements FetcherInterface
         fclose($fp);
 
         return $destination;
+    }
+
+
+    /**
+     * Derive the file extension from the metadata
+     *
+     * @param array $metadata
+     * @return string
+     */
+    protected function deriveFileExtension(array $metadata)
+    {
+        if ($metadata['fullFileExtension']) {
+            // attempt to use the file extension proper
+            return '.' . $metadata['fullFileExtension'];
+        }
+
+        // nothing else we can really go on
+        return '';
     }
 
 
