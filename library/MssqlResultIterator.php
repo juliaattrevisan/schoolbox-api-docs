@@ -101,7 +101,6 @@ class MssqlResultIterator implements SeekableIterator, Countable
                 // No results at all - noop
                 // (loadNextRow will set $this->result to false)
             }
-            $this->loadNextRow();
         }
     }
 
@@ -114,6 +113,7 @@ class MssqlResultIterator implements SeekableIterator, Countable
     {
         if (is_resource($this->result)) {
             if ($position < count($this) && mssql_data_seek($this->result, $position)) {
+                $this->loadNextRow();
                 return;
             }
 
