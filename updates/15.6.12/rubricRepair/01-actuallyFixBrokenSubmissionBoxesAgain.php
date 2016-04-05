@@ -86,74 +86,73 @@ $stillBrokenBoxes = [];
 // I don't want half-broken boxes.
 $boxQuery->execute();
 foreach ($boxQuery->fetchAll() as $box) {
+    $boxId                 = $box['boxId'];
+    $affectedBoxes[$boxId] = true;
+    $logger->info(sprintf('Fixing submission box #%d', $boxId));
 
-    $affectedBoxes[$box['boxId']] = true;
-    $logger->info(sprintf('Fixing submission box #%d', $box['boxId']));
+    // Get borked descriptors for this box
+    $descriptorQuery->execute(['boxId' => $boxId]);
+    foreach ($descriptorQuery->fetchAll() as $row) {
+        $logger->info(
+            sprintf(
+                'Fixing level %d (%s) for submission box #%d',
+                $row['levelSequence'],
+                $row['levelName'] ?: 'no name',
+                $boxId
+            )
+        );
+
+        $map = [];
+
+        // obtain references
+        $obtainIncorrectLevelsQuery->execute([ 'boxId' => $boxId ]);
+        while ($r = $obtainIncorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
+            $map[$r['sequence']]['bad'] = $r['id'];
+        }
+
+        $obtainCorrectLevelsQuery->execute([ 'boxId' => $boxId ]);
+        if ($obtainCorrectLevelsQuery->rowCount()) {
+            while ($r = $obtainCorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
+                $map[$r['sequence']]['good'] = $r['id'];
+            }
+        } else {
+            $logger->info("Correct level does not exist - adding it");
+            try {
+                $insertCorrectLevelQuery->execute([
+                    'boxId'         => $boxId,
+                    'levelName'     => $row['levelName'],
+                    'levelSequence' => $row['levelSequence'],
+                ]);
+                $map[$r['sequence']]['good'] = $db->lastInsertId();
+            } catch (PDOException $e) {
+                $logger->warning(sprintf("Adding correct level failed - %s", $e->getMessage()));
+                $stillBrokenBoxes[$boxId] = true;
+            }
+        }
+
+        // now update the descriptors
+        foreach ($map as $sequence => $changes) {
+            if ($changes['bad'] && $changes['good']) {
+                $logger->info(sprintf("Remapping descriptor level IDs: %d -> %d", $changes['bad'], $changes['good']));
+                try {
+                    $updateDescriptorQuery->execute([ 'boxId' => $boxId, 'correctLevelId' => $changes['good'], 'incorrectLevelId' => $changes['bad'] ]);
+                } catch (PDOException $e) {
+                    $logger->warning(sprintf("Remapping descriptor level failed - %s", $e->getMessage()));
+                    $stillBrokenBoxes[$boxId] = true;
+                }
+            } else {
+                $logger->notice("Could not remap descriptor levels, data missing: ".json_encode($changes));
+            }
+        }
+    }
 
     $db->beginTransaction();
     try {
-        $descriptorQuery->execute(['boxId' => $box['boxId']]);
         $db->commit();
     } catch (PDOException $e) {
         $logger->warning(sprintf("Fixing submission box #%d failed - %s", $e->getMessage()));
         $stillBrokenBoxes[$box['boxId']] = true;
         $db->rollBack();
-    }
-}
-
-$descriptorQuery->execute();
-foreach ($descriptorQuery as $row) {
-    $affectedBoxes[$row['boxId']] = true;
-    $logger->info(
-        sprintf(
-            'Fixing level %d (%s) for submission box #%d',
-            $row['levelSequence'],
-            $row['levelName'] ?: 'no name',
-            $row['boxId']
-        )
-    );
-
-    $map = [];
-
-    // obtain references
-    $obtainIncorrectLevelsQuery->execute([ 'boxId' => $row['boxId'] ]);
-    while ($r = $obtainIncorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
-        $map[$r['sequence']]['bad'] = $r['id'];
-    }
-
-    $obtainCorrectLevelsQuery->execute([ 'boxId' => $row['boxId'] ]);
-    if ($obtainCorrectLevelsQuery->rowCount()) {
-        while ($r = $obtainCorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
-            $map[$r['sequence']]['good'] = $r['id'];
-        }
-    } else {
-        $logger->info("Correct level does not exist - adding it");
-        try {
-            $insertCorrectLevelQuery->execute([
-                'boxId'         => $row['boxId'],
-                'levelName'     => $row['levelName'],
-                'levelSequence' => $row['levelSequence'],
-            ]);
-            $map[$r['sequence']]['good'] = $db->lastInsertId();
-        } catch (PDOException $e) {
-            $logger->warning(sprintf("Adding correct level failed - %s", $e->getMessage()));
-            $stillBrokenBoxes[$row['boxId']] = true;
-        }
-    }
-
-    // now update the descriptors
-    foreach ($map as $sequence => $changes) {
-        if ($changes['bad'] && $changes['good']) {
-            $logger->info(sprintf("Remapping descriptor level IDs: %d -> %d", $changes['bad'], $changes['good']));
-            try {
-                $updateDescriptorQuery->execute([ 'boxId' => $row['boxId'], 'correctLevelId' => $changes['good'], 'incorrectLevelId' => $changes['bad'] ]);
-            } catch (PDOException $e) {
-                $logger->warning(sprintf("Remapping descriptor level failed - %s", $e->getMessage()));
-                $stillBrokenBoxes[$row['boxId']] = true;
-            }
-        } else {
-            $logger->notice("Could not remap descriptor levels, data missing: ".json_encode($changes));
-        }
     }
 }
 
