@@ -46,7 +46,7 @@ class FileNotifier extends ResourceNotifier {
 
 		return $this->notify(
 			LogMapper::KIND_FILE, $file->getId(), self::TRIGGER_CREATED,    // "file.{id}.created"
-			new Param($file->getDescription(), '/send.php?id='.$file->getId()), // the :resource param
+			new Param($file->getTitle(), '/send.php?id='.$file->getId()),   // the :resource param
 			$effector, $category, $roletype
 		);
 	}
@@ -63,7 +63,7 @@ class FileNotifier extends ResourceNotifier {
 		// abstract this so far it doesn't even make sense any more
 		return $this->notify(
 			LogMapper::KIND_FILE, $file->getId(), self::TRIGGER_DELETED,    // "file.{id}.deleted"
-			new Param($file->getDescription()),                             // the :resource param
+			new Param($file->getTitle()),                                   // the :resource param
 			$effector, $category, $roletype
 		);
 	}
@@ -74,7 +74,7 @@ class FileNotifier extends ResourceNotifier {
 	 * @return string
 	 */
 	protected function getResourceName($resource) {
-		return $resource->getDescription();
+		return $resource->getTitle();
 	}
 
 
@@ -99,7 +99,7 @@ class FileNotifier extends ResourceNotifier {
 	 * @return string
 	 */
 	protected function getResourceNameProperty() {
-		return 'description';
+		return 'title';
 	}
 
 
