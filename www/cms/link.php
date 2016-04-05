@@ -28,15 +28,15 @@ if (is_numeric($this->arg[0])) {
     $this->setTab('resources');
 
     $output = array(
-        'ACTION'          => 'Modify',
-        'LINK_ID'         => $link->getId(),
-        'URL'             => $link->getUrl(),
-        'DESCRIPTION'     => Scrub::text($link->getDescription()),
-        'COMMENT'         => Scrub::text($link->getComment()),
-        'CATEGORY_NAME'   => Scrub::text($folder->getName()),
-        'CATEGORY_ID'     => $link->getFolder()->getId(),
-        'HIDDEN_SELECTED' => $link->getHidden() > 0 ? 'checked="checked"' : '',
-        'BLANK_SELECTED'  => $link->getTarget() == '_blank' ? 'selected="selected"' : '',
+        'ACTION'           => 'Modify',
+        'LINK_ID'          => $link->getId(),
+        'URL'              => $link->getUrl(),
+        'DESCRIPTION'      => Scrub::text($link->getDescription()),
+        'COMMENT'          => Scrub::text($link->getComment()),
+        'CATEGORY_NAME'    => Scrub::text($folder->getName()),
+        'CATEGORY_ID'      => $link->getFolder()->getId(),
+        'VISIBLE_SELECTED' => $link->getHidden() > 0 ? '' : 'checked',
+        'BLANK_SELECTED'   => $link->getTarget() == '_blank' ? 'selected="selected"' : '',
     );
 
     $this->setVar($output);
@@ -78,15 +78,15 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $this->setVar('delete_button_block', '');
 
     $output = array(
-        'ACTION'          => 'Add',
-        'LINK_ID'         => '',
-        'URL'             => '',
-        'DESCRIPTION'     => '',
-        'COMMENT'         => '',
-        'HIDDEN_SELECTED' => '',
-        'BLANK_SELECTED'  => '',
-        'CATEGORY_NAME'   => Scrub::text($folder->getName()),
-        'CATEGORY_ID'     => $folder->getId(),
+        'ACTION'           => 'Add',
+        'LINK_ID'          => '',
+        'URL'              => '',
+        'DESCRIPTION'      => '',
+        'COMMENT'          => '',
+        'VISIBLE_SELECTED' => 'checked',
+        'BLANK_SELECTED'   => '',
+        'CATEGORY_NAME'    => Scrub::text($folder->getName()),
+        'CATEGORY_ID'      => $folder->getId(),
     );
     $this->setVar($output);
 

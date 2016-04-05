@@ -86,7 +86,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     $file->setOwner($_SESSION['user']);
     $file->setTitle($_POST['description']);
     $file->setDescription($_POST['comment']);
-    $file->setHidden($_POST['hidden'] ? true : false);
+    $file->setHidden($_POST['visible'] ? false : true);
     $file->setModifiedAt(Alaress_Date_Format::now());
 
     try {

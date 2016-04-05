@@ -70,13 +70,17 @@ $(function() {
                         <p class="alert-box">You must be involved in a Class/Group prior to using this.</p>
                         <!-- END no_categories -->
 
-                        <label>
-                            Hidden
-                            <span class='hint has-tip tip-top' data-tooltip title="Hide this file from students">?</span>
+                        <label for="visible">
+                            Visibility
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Hide this link from anyone with read-only access">?</span>
                         </label>
-
-                        <input type='checkbox' id='hidden-checkbox' name='hidden' value='1' {HIDDEN_SELECTED} />
-                        <label for="hidden-checkbox" class="checkbox-label">Hide this file from students</label>
+                        <div class="switch long">
+                            <input name="visible" id="visible" type="checkbox" {VISIBLE_SELECTED}>
+                            <label for="visible">
+                                <span>Visible</span>
+                                <span>Hidden</span>
+                            </label>
+                        </div>
                     </div>
                 </fieldset>
             </section>
