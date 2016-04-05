@@ -6,7 +6,7 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class MssqlResultIterator implements SeekableIterator
+class MssqlResultIterator implements SeekableIterator, Countable
 {
     /**
      * @var resource
@@ -113,7 +113,7 @@ class MssqlResultIterator implements SeekableIterator
     public function seek($position)
     {
         if (is_resource($this->result)) {
-            if ($position < mssql_num_rows($this->result) && mssql_data_seek($this->result, $position)) {
+            if ($position < count($this) && mssql_data_seek($this->result, $position)) {
                 return;
             }
 
@@ -126,6 +126,14 @@ class MssqlResultIterator implements SeekableIterator
         /* Not even a resource object, die loudly
          */
         throw new InvalidArgumentException('Invalid result set');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function count()
+    {
+        return mssql_num_rows($this->result);
     }
 
     /**
