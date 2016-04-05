@@ -12,6 +12,12 @@
 namespace Schoolbox\File;
 use Schoolbox;
 
+/**
+ * Class MimetypeMapper
+ *
+ * @package Schoolbox\File
+ * @method Mimetype findOneByColumn($columnName, $columnValue, $order = [])
+ */
 class MimetypeMapper extends Schoolbox\Mapper {
 
 	protected function mapping() {
