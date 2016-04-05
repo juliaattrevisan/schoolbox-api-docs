@@ -113,7 +113,7 @@ class MssqlResultIterator implements SeekableIterator
     public function seek($position)
     {
         if (is_resource($this->result)) {
-            if (mssql_data_seek($this->result, $position)) {
+            if ($position < mssql_num_rows($this->result) && mssql_data_seek($this->result, $position)) {
                 return;
             }
 
