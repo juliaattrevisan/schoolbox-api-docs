@@ -152,11 +152,13 @@ foreach ($boxQuery->fetchAll() as $i => $box) {
 }
 
 // Alert about affected boxes
-$affectedBoxes = array_keys($affectedBoxes);
+$affectedBoxes    = array_keys($affectedBoxes);
+$fixedBoxes       = array_keys($fixedBoxes);
+$stillBrokenBoxes = array_keys($stillBrokenBoxes);
 $logger->info(sprintf('%d potentially broken submission boxes were found.', count($affectedBoxes)));
-if (count($affectedBoxes)) {
+if (count($fixedBoxes)) {
     $logger->info('The following boxes have been automatically repaired - they will need to be re-marked:');
-    foreach ($affectedBoxes as $boxId) {
+    foreach ($fixedBoxes as $boxId) {
         try {
             $box    = SubmissionBoxMapper::getInstance()->findById($boxId);
             $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($box->getCategory()->getId());
@@ -190,3 +192,41 @@ if (count($affectedBoxes)) {
 }
 
 // Alert about still broken boxes too
+if (count($stillBrokenBoxes)) {
+    $logger->warning('The following boxes are still broken - they will need to be re-saved and re-marked:');
+    foreach ($stillBrokenBoxes as $boxId) {
+        try {
+            $box    = SubmissionBoxMapper::getInstance()->findById($boxId);
+            $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($box->getCategory()->getId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // Not much I can do
+            continue;
+        }
+        $folderName = $folder->getName();
+        $codeString = $folder->getCodeString();
+        if ($codeString) {
+            $folderName .= ' (' . $codeString . ')';
+        }
+        $logger->warning(
+            sprintf(
+                '#%d (%s), in folder #%d (%s)',
+                $box->getId(),
+                $box->getName(),
+                $folder->getId(),
+                $folderName
+            )
+        );
+        $logger->warning(
+            sprintf(
+                '(Direct link: http://%s.%s/submission/createSubmission/modify/%d)',
+                Config::get('site_hostname'),
+                Config::get('site_domain'),
+                $box->getId()
+            )
+        );
+    }
+
+    // Still broken boxes are an error state
+    exit(1);
+}
+exit(0);
