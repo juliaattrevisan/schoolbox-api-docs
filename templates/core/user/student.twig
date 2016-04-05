@@ -200,7 +200,22 @@
             {% block buttons_island %}
             <script type="text/javascript">
                 $(function() {
-                    $('#fat-buttons').addClass('large-block-grid-' + $('#fat-buttons').find('li').length);
+                    var minColumns = 1;
+                    var maxColumns = 12;
+
+                    var element = $('#fat-buttons');
+                    var length = element.find('li').length;
+
+                    /* Enforce boundary values
+                     */
+                    if (length < minColumns) {
+                        length = minColumns;
+                    }
+                    else if (length > maxColumns) {
+                        length = maxColumns;
+                    }
+
+                    element.addClass('large-block-grid-' + length);
                 });
             </script>
             <ul id='fat-buttons' class="no-margin small-block-grid-2 medium-block-grid-3" data-equalizer>
@@ -222,7 +237,7 @@
                             {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_grades) %}
                                 <li class="no-pad">
                                     <a href="/submission/allWork/{{ user.getId() }}"
-                                       class="no-margin fat button icon-fat icon-32 icon-tick" d
+                                       class="no-margin fat button icon-fat icon-32 icon-tick"
                                        data-equalizer-watch>Grades</a>
                                 </li>
                             {% endif %}
