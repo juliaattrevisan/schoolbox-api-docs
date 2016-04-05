@@ -151,7 +151,8 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                         $page->setVar([
                             'ANSWER_ICON'       => 'icon-tick',
                             'ANSWER_ICON_TITLE' => 'Respondent chose correctly',
-                            'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
+                            'ANSWER_HIGHLIGHT'  => 'evaluation-selected-answer-option',
+                            'ANSWER_CHECKED'    => 'checked',
                         ]);
                     }
                     /* The respondent did not choose the correct answer
@@ -160,7 +161,8 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                         $page->setVar([
                             'ANSWER_ICON'       => 'icon-previous',
                             'ANSWER_ICON_TITLE' => 'Respondent did not choose this correct answer',
-                            'ANSWER_CHECKED' => ''
+                            'ANSWER_HIGHLIGHT'  => '',
+                            'ANSWER_CHECKED'    => ''
                         ]);
                     }
                 }
@@ -174,7 +176,8 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                         $page->setVar([
                             'ANSWER_ICON'       => 'icon-cancel',
                             'ANSWER_ICON_TITLE' => 'Respondent chose an incorrect answer',
-                            'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
+                            'ANSWER_HIGHLIGHT'  => 'evaluation-selected-answer-option',
+                            'ANSWER_CHECKED'    => 'checked',
                         ]);
                     }
                     /* The respondent didn't choose this answer
@@ -183,7 +186,8 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                         $page->setVar([
                             'ANSWER_ICON'       => '',
                             'ANSWER_ICON_TITLE' => '',
-                            'ANSWER_CHECKED' => ''
+                            'ANSWER_HIGHLIGHT'  => '',
+                            'ANSWER_CHECKED'    => ''
                         ]);
                     }
                 }

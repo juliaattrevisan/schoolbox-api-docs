@@ -2,13 +2,18 @@
     <table>
         <thead>
         <tr>
-            <th class="full-width"><h4>Option</h4></th>
-            <th><h4>Result</h4></th>
+            <th></th>
+            <th class="full-width"></th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
         <!-- BEGIN answerOption -->
-        <tr class="evaluation-answer-option {ANSWER_CHECKED}">
+        <tr class="evaluation-answer-option">
+            <td>
+                <input type="checkbox" {ANSWER_CHECKED} readonly />
+                <label class="checkbox-label"></label>
+            </td>
             <td>{ANSWER_DESCRIPTION}</td>
             <td class="text-center"><span class="icon-16 no-text {ANSWER_ICON}" title="{ANSWER_ICON_TITLE}"></span></td>
         </tr>
