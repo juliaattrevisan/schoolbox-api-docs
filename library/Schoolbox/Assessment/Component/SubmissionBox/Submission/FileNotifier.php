@@ -18,6 +18,8 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
@@ -51,6 +53,8 @@ class FileNotifier extends AbstractModuleNotifier
     /** @var Folder\Mapper */
     protected $folderMapper;
 
+    /** @var UserAccessMapper */
+    protected $userAccessMapper;
 
     /**
      * @return string
@@ -73,6 +77,7 @@ class FileNotifier extends AbstractModuleNotifier
         $dependencies['userMapper']          = isset($dependencies['userMapper']) ? $dependencies['userMapper'] : UserMapper::getInstance();
         $dependencies['folderMapper']        = isset($dependencies['folderMapper']) ? $dependencies['folderMapper'] : Folder\Mapper::getInstance();
         $dependencies['mapper']              = isset($dependencies['mapper']) ? $dependencies['mapper'] : FileMapper::getInstance();
+        $dependencies['userAccessMapper']    = isset($dependencies['userAccessMapper']) ? $dependencies['userAccessMapper'] : UserAccessMapper::getInstance();
 
         parent::loadDependencies($dependencies);
     }
@@ -107,6 +112,17 @@ class FileNotifier extends AbstractModuleNotifier
     protected function setUserMapper($userMapper)
     {
         $this->userMapper = $userMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param  UserAccessMapper $userAccessMapper
+     * @return $this
+     */
+    public function setUserAccessMapper($userAccessMapper)
+    {
+        $this->userAccessMapper = $userAccessMapper;
         return $this;
     }
 
@@ -222,8 +238,10 @@ class FileNotifier extends AbstractModuleNotifier
             ->setSeverity(Logger::NOTICE)
             ->addTopic("duework.$boxId.$type");
 
-        // send this message to the owner of the submission box
-        $envelope->targetToUser($box->getOwner(), $bob->build());
+        // send this message to teachers and to write-level group members.
+        foreach ($this->userAccessMapper->findStaffInCategory($cat) as $teacher) {
+            $envelope->targetToUser($teacher, $bob->build());
+        }
 
         return $envelope;
     }

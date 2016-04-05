@@ -49,6 +49,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	/** @var WorkTypeMapper */
 	protected $workTypeMapper;
 
+	/** @var UserAccessMapper */
+	protected $userAccessMapper;
+
 	/**
 	 * @return string
 	 */
@@ -67,7 +70,21 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$this->categoryMapper = FolderMapper::getInstance();
 		$this->attemptMapper = AttemptMapper::getInstance();
 		$this->workTypeMapper = WorkTypeMapper::getInstance();
+		$dependencies['userAccessMapper'] = isset($dependencies['userAccessMapper'])
+			? $dependencies['userAccessMapper']
+			: UserAccessMapper::getInstance();
 		parent::loadDependencies($dependencies);
+	}
+
+
+	/**
+	 * @param  UserAccessMapper $userAccessMapper
+	 * @return $this
+	 */
+	public function setUserAccessMapper($userAccessMapper)
+	{
+		$this->userAccessMapper = $userAccessMapper;
+		return $this;
 	}
 
 
@@ -198,7 +215,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 	 * @return User[]|Collection
 	 */
 	public function getStudentsUnattemptedList($quiz) {
-		$userCollection = UserAccessMapper::getInstance()->findStudentsInCategory($quiz->getCategory());
+		$userCollection = $this->userAccessMapper->findStudentsInCategory($quiz->getCategory());
 
 		$attemptCollection = $this->attemptMapper->findByColumnList(array(
 			'assess_id' => $quiz->getId(),
@@ -622,7 +639,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
         $href = "/assess/intro/$quizId";
 
         // notify all student's parents
-        $students = UserAccessMapper::getInstance()->findStudentsInCategory($quiz->getCategory());
+        $students = $this->userAccessMapper->findStudentsInCategory($quiz->getCategory());
 
         // renamed
         if (isset($diff['title'])) {

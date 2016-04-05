@@ -65,6 +65,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     /** @var ReturnedWorkMapper */
     protected $returnedWorkMapper;
 
+    /** @var UserAccessMapper */
+    protected $userAccessMapper;
+
     /**
      * Instantiate all your dependencies within yourself. Effectively a sub-constructor.
      *
@@ -81,6 +84,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
         if(empty($dependencies['returnedWorkMapper'])) {
             $dependencies['returnedWorkMapper'] = ReturnedWorkMapper::getInstance();
+        }
+        if(empty($dependencies['userAccessMapper'])) {
+            $dependencies['userAccessMapper'] = UserAccessMapper::getInstance();
         }
         parent::loadDependencies($dependencies);
     }
@@ -115,6 +121,17 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
     protected function setCategoryMapper($categoryMapper)
     {
         $this->categoryMapper = $categoryMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param  UserAccessMapper $userAccessMapper
+     * @return $this
+     */
+    public function setUserAccessMapper($userAccessMapper)
+    {
+        $this->userAccessMapper = $userAccessMapper;
         return $this;
     }
 
@@ -254,7 +271,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $folder = $this->categoryMapper->findById($submissionBox->getCategory()->getId());
 
         // full list of students in this folder
-        $userCollection = UserAccessMapper::getInstance()->findStudentsInCategory($folder);
+        $userCollection = $this->userAccessMapper->findStudentsInCategory($folder);
 
         // list of submissions to this submissions box
         $submissionCollection = $this->submissionMapper->findByColumnList(array(
@@ -686,7 +703,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->setSeverity(Logger::NOTICE)
             ->addFilter('roletype', Role::PARENT);
 
-        $students = UserAccessMapper::getInstance()->findStudentsInCategory(
+        $students = $this->userAccessMapper->findStudentsInCategory(
             $this->categoryMapper->findById($submissionBox->getCategory()->getId())
         );
 
@@ -933,7 +950,9 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
             ->setSeverity(Logger::ERROR)
             ->addTopic("duework.$boxId.closed");
 
-        $envelope->targetToUser($user->getId(), $bob->build());
+        foreach ($this->userAccessMapper->findStaffInCategory($submissionBox->getCategory()) as $teacher) {
+            $envelope->targetToUser($teacher, $bob->build());
+        }
 
         return $envelope;
     }
