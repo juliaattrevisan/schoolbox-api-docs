@@ -85,7 +85,7 @@ class Sync implements SyncInterface
                 ''               AS student_contact_title,
                 p.f_name         AS student_contact_given_name,
                 p.f_name         AS student_contact_preferred,
-                ''               AS student_contact_surname,
+                p.surname        AS student_contact_surname,
                 ''               AS student_contact_default_email,
                 sf.sfa_num       AS student_contact_split_family_number,
                 s.year_grp       AS student_year_level,
@@ -112,7 +112,7 @@ class Sync implements SyncInterface
                 ''               AS student_contact_title,
                 p.m_name         AS student_contact_given_name,
                 p.m_name         AS student_contact_preferred,
-                ''               AS student_contact_surname,
+                p.surname        AS student_contact_surname,
                 ''               AS student_contact_default_email,
                 sf.sfa_num       AS student_contact_split_family_number,
                 s.year_grp       AS student_year_level,
@@ -141,7 +141,9 @@ class Sync implements SyncInterface
                 ->addMap(function ($row) {
                     list($firstName, $surname)        = preg_split("/\\s+/", $row['student_contact_preferred'], 2);
                     $row['student_contact_preferred'] = $firstName;
-                    $row['student_contact_surname']   = $surname;
+                    if (strlen(trim($surname)) > 0) {
+                        $row['student_contact_surname'] = $surname;
+                    }
                     return $row;
                 })
                 ->addMap(function ($row) {
