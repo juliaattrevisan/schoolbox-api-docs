@@ -195,7 +195,7 @@ else {
 			break;
 	}
 
-	$readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
+	$readonly = ($term->getArchived() && !($_SESSION['user']->isSuperuser()));
 
 	/* Load all the questions for this section.
 	 * Note: only show the randomly-selected ones

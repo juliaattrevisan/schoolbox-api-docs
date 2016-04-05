@@ -262,7 +262,7 @@ $this->setVar(array(
 /**
  * If this assessment finishes in the past, don't allow editing except to superadmins
  */
-$readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
+$readonly = ($term->getArchived() && !($_SESSION['user']->isSuperuser()));
 
 $this->setBlock(TEMPLATE_content, 'is_archived', 'is_archived_block');
 
