@@ -10,7 +10,14 @@
 
 namespace Schoolbox\File;
 
+use Schoolbox\Collection;
 
+/**
+ * Class ExtensionMapper
+ *
+ * @package Schoolbox\File
+ * @method Collection|Extension[] findByColumn($columnName, $columnValue, $options = [])
+ */
 class ExtensionMapper extends \Schoolbox\Mapper {
 
 	/**

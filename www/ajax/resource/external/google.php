@@ -1,5 +1,5 @@
 <?php
-use Alaress\File\Remote\GDriveFetcher;
+use Schoolbox\File\Remote\GDriveFetcher;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Storage;

@@ -12,7 +12,8 @@ namespace Alaress\File\Remote;
 
 use OutOfBoundsException;
 
-class GDriveFetcher implements FetcherInterface {
+class GDriveFetcher implements FetcherInterface
+{
 
     const GOOGLE_API = 'https://www.googleapis.com/drive/v2';
 
@@ -28,7 +29,7 @@ class GDriveFetcher implements FetcherInterface {
 
 
     /**
-     * @param string   $storageDir - the target storage directory
+     * @param string   $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
      * @param resource $curl       - a custom curl handle if a default won't suffice
      * @param string   $httpAuth   - an authorization header if not using an anonymous connection
      */
@@ -37,7 +38,7 @@ class GDriveFetcher implements FetcherInterface {
         $this->dir = $storageDir;
         $this->ch  = $curl ?: curl_init();
 
-        if($httpAuth) {
+        if ($httpAuth) {
             curl_setopt($this->ch, CURLOPT_HTTPHEADER, array(
                 'Authorization: ' . $httpAuth
             ));
@@ -87,26 +88,30 @@ class GDriveFetcher implements FetcherInterface {
     {
         $metadata = $this->fetchMetaData($fileId);
 
-        if(isset($metadata['labels']['restricted']) && $metadata['labels']['restricted'] == true) {
+        if (isset($metadata['labels']['restricted']) && $metadata['labels']['restricted'] == true) {
+            // if this file has been flagged by Drive as "restricted", disallow any download
             $url = null;
             $ext = '';
-        }
-        elseif(isset($metadata['exportLinks']['application/pdf'])) {
+
+        } elseif (isset($metadata['exportLinks']['application/pdf'])) {
+            // if there is a PDF-export option for this file, always give that preference
             $url = $metadata['exportLinks']['application/pdf'];
             $ext = '.pdf';
-        }
-        else {
+
+        } else {
+            // fall back to the download URL
             $url = $metadata['downloadUrl'];
-            $ext = '';
+            $ext = $this->deriveFileExtension($metadata);
         }
 
-        if(!$url) {
+        if (!$url) {
+            // no valid URL was found
             throw new OutOfBoundsException("No url found for download");
         }
 
-        $destination = $this->getFirstFreeName($metadata['title'] . $ext);
+        $destination = $this->getFirstFreeName($this->parseTitle($metadata['title'], $ext));
 
-        if(!($fp = fopen($destination, 'w'))) {
+        if (!($fp = fopen($destination, 'w'))) {
             throw new OutOfBoundsException("Could not open target");
         }
 
@@ -120,6 +125,52 @@ class GDriveFetcher implements FetcherInterface {
         fclose($fp);
 
         return $destination;
+    }
+
+
+    /**
+     * Derive the file extension from the metadata
+     *
+     * @param array $metadata
+     * @return string
+     */
+    protected function deriveFileExtension(array $metadata)
+    {
+        if ($metadata['fullFileExtension']) {
+            // attempt to use the file extension proper
+            return '.' . $metadata['fullFileExtension'];
+        }
+
+        // nothing else we can really go on
+        return '';
+    }
+
+
+    /**
+     * Append the given extension to the title *if not already suffixed*
+     *
+     * @param string $title
+     * @param string $ext
+     * @return string
+     */
+    protected function parseTitle($title, $ext)
+    {
+        $titleLen = strlen($title);
+        $extLen   = strlen($ext);
+        if ($extLen > $titleLen) {
+            throw new OutOfBoundsException("Extension '$ext' is longer than the title '$title'.");
+        }
+
+        // true if the extension is already suffixed
+        $endsWith = substr_compare($title, $ext, $titleLen - $extLen, $extLen) === 0;
+
+        if ($endsWith) {
+            // title is correct, just return that
+            return $title;
+        }
+
+        // append extension and return
+        return $title . $ext;
     }
 
 
@@ -153,7 +204,7 @@ class GDriveFetcher implements FetcherInterface {
         // iterate filenames until we find a name that hasn't been taken yet
         do {
             $destination = "{$this->dir}/$title" . ($i > 0 ? "-{$i}" : '') . $ext;
-        } while(file_exists($destination) && ++$i);
+        } while (file_exists($destination) && ++$i);
 
         return $destination;
     }
