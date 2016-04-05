@@ -95,7 +95,12 @@ class MssqlResultIterator implements SeekableIterator
     {
         if (gettype($this->result) == 'resource') {
             $this->rowNum = 0;
-            $this->seek(0);
+            try {
+                $this->seek(0);
+            } catch (OutOfBoundsException $e) {
+                // No results at all - noop
+                // (loadNextRow will set $this->result to false)
+            }
             $this->loadNextRow();
         }
     }
@@ -108,22 +113,14 @@ class MssqlResultIterator implements SeekableIterator
     public function seek($position)
     {
         if (is_resource($this->result)) {
-            if (mssql_num_rows($this->result)) {
-                if (mssql_data_seek($this->result, $position)) {
-                    return;
-                }
-
-                /* Tried to access an area beyond the bounds of a
-                 * result set that contains data
-                 */
-                throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
-            } else {
-
-                /* Empty result set probably shouldn't throw an exception;
-                 * just quietly do nothing with it?
-                 */
+            if (mssql_data_seek($this->result, $position)) {
                 return;
             }
+
+            /* Tried to access an area beyond the bounds of a
+             * result set that contains data
+             */
+            throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
         }
 
         /* Not even a resource object, die loudly
