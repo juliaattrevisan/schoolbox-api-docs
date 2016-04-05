@@ -2,25 +2,37 @@
  */
 .evaluation-answer-option {
 
-    /* Used to inherit alert-box
+    /* Respondent chose a correct answer
      */
-    .close {
+    .evaluation-correct-answer-option {
+        @extend .icon-tick;
         font-size: rem-calc(($base-font-size + 14));
         position: absolute;
         right: 1.25rem;
-
-        &.evaluation-correct-answer-option {
-            @extend .icon-tick;
-            color: $success-color;
-        }
-
-        &.evaluation-incorrect-answer-option {
-            @extend .icon-close;
-            color: $alert-color;
-        }
+        color: $success-color;
     }
 
-    &.evaluation-selected-answer-option {
+    /* Respondent chose an incorrect answer
+     */
+    .evaluation-incorrect-answer-option {
+        @extend .icon-close;
+        font-size: rem-calc(($base-font-size + 14));
+        position: absolute;
+        right: 1.25rem;
+        color: $alert-color;
+    }
+
+    /* Respondent did not choose a correct answer
+     */
+    .evaluation-unselected-answer-option {
+        @extend .icon-previous;
+        font-size: rem-calc(($base-font-size + 14));
+        position: absolute;
+        right: 1.25rem;
+        color: $warning-color;
+    }
+
+    .evaluation-selected-answer-option {
         color: $accent-foreground;
         background-color: $accent-background;
     }
