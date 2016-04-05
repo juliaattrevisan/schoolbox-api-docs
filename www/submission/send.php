@@ -50,15 +50,16 @@ if (is_numeric($_GET['return'])) {
 
     // hydrate
     $file = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($return->getStorage()->getHash());
+    $return->setStorage($file);
 
     // does this file exist, and is it readable?
     if (!$file->exists()) {
         error(9, "the requested file could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
     }
 
-    $size     = $file->getSize();
-    $filename = $file->getBasename();
-    $mime     = $file->getMime();
+    $size     = $return->getSize();
+    $filename = $return->getBasename();
+    $mime     = $return->getMime();
 
 } else {
     $mapper = new FileMapper();
