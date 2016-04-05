@@ -40,6 +40,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
          */
         $i = 0;
         $numCorrect = 0;
+        $total = 0;
 
         if (is_array($answer)) {
             foreach ($answer as $currentAnswer) {
@@ -64,8 +65,6 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                 $marksPerAnswer = $currentResponse['marks'] / $i;
                 $total = $marksPerAnswer * $numCorrect;
             }
-        } else {
-            $total = 0;
         }
 
         /* Total marks for this question
@@ -100,14 +99,15 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
-     * @param  $page
+     * @param  SitePage $page
      * @param  $attemptId
      * @param  $question_id
      * @return void
      */
-    public function reviewResponse($page, $attemptId, $question_id)
+    public function reviewResponse(SitePage $page, $attemptId, $question_id)
     {
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+        $existingAnswer = false;
 
         if ($existing) {
             $existingAnswer = unserialize($existing['response']);
@@ -163,10 +163,10 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
     /**
     * Output configuration settings in modify
     *
-    * @param $page
+    * @param SitePage $page
     * @param $config
     */
-    public function configure($page, $config)
+    public function configure(SitePage $page, $config)
     {
         $options = json_decode($config);
 

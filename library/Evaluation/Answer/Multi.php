@@ -74,11 +74,11 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * load its existing answers and populate fields; otherwise empty them or
      * set to other default values.
      *
-     * @param  $page
+     * @param $page
      * @param string $question_id
      * @return void
      */
-    public function modify($page, $question_id = '')
+    public function modify(SitePage $page, $question_id = '')
     {
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
@@ -112,11 +112,11 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     /**
      * Render answers in the QuestionBank
      *
-     * @param  $page
+     * @param SitePage $page
      * @param string $answerGroup
      * @return void
      */
-    public function modifyInQuestionBank($page, $answerGroup)
+    public function modifyInQuestionBank(SitePage $page, $answerGroup)
     {
         if (strlen($answerGroup)) {
             $allAnswers = unserialize($answerGroup);
@@ -207,12 +207,12 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
      *
-     * @param  $page
+     * @param SitePage $page
      * @param  $attemptId
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $attemptId, $question_id)
+    public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
         /* Optional configuration hook
          */
@@ -268,10 +268,10 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Clear child blocks after parsing out the parent. Keep this in its own
      * method for polymorphic algorithm
      *
-     * @param  $page
+     * @param SitePage $page
      * @return void
      */
-    public function cleanupParse($page)
+    public function cleanupParse(SitePage $page)
     {
     }
 
@@ -298,11 +298,11 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Exports the answer to Moodle XML format. This is a modified version of
      * $this->reviewResponse()
      *
-     * @param  $page
+     * @param SitePage $page
      * @param  $question_id
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id)
+    public function exportMoodleAnswer(SitePage $page, $question_id)
     {
         $answerGroup = $this->getByQuestionID($question_id);
 
@@ -345,6 +345,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      */
     public function importMoodleAnswer($xmlObj, $question_id)
     {
+        $allAnswers = [];
+
         foreach ($xmlObj->answer as $currentAnswer) {
             /* Set up data object in accordance with $this->create();
              */
@@ -381,6 +383,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     public function exportResponseToCSV($attempt_id, $question_id)
     {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
+
+        $postprocessed = [];
 
         $data = unserialize($response['response']);
 
@@ -455,14 +459,15 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
-     * @param  $page
+     * @param SitePage  $page
      * @param  $attemptId
      * @param  $question_id
      * @return void
      */
-    public function reviewResponse($page, $attemptId, $question_id)
+    public function reviewResponse(SitePage $page, $attemptId, $question_id)
     {
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+        $existingAnswer = false;
 
         if ($existing) {
             $existingAnswer = $this->getAnswersFromResponse($existing['response']);
@@ -520,13 +525,14 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
-     * @param $page
+     * @param SitePage $page
      * @param $attemptId
      * @param $currentQuestion
      */
-    public function reviewResponseHorizontal($page, $attemptId, $currentQuestion)
+    public function reviewResponseHorizontal(SitePage $page, $attemptId, $currentQuestion)
     {
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
+        $existingAnswer = false;
 
         if ($existing) {
             $existingAnswer = $this->getAnswersFromResponse($existing['response']);
@@ -587,11 +593,11 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * The answer for a question during horizontal marking, so it appears at the
      * top under the question itself, and not repeated for each attempt
      *
-     * @param $page
+     * @param SitePage $page
      * @param $currentQuestion
      * @return void
      */
-    public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion)
+    public function reviewResponseHorizontalAnswerForQuestion(SitePage $page, $currentQuestion)
     {
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
