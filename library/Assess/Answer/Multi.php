@@ -135,22 +135,57 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
+                /* A response was made and successfully unserialized, and
+                 * The current option was selected by the respondent
+                 */
+                $validResponseExists = $existing['response'] && is_array($existingAnswer);
+                $selectedByRespondent = $validResponseExists && in_array($currentAnswer->value, $existingAnswer);
+
+                /* This answer is correct
+                 */
                 if ($currentAnswer->correct) {
-                    $page->setVar('ANSWER_CORRECT_ICON', 'icon-tick');
-                } else {
-                    $page->setVar('ANSWER_CORRECT_ICON', '');
+
+                    /* The respondent chose the correct answer
+                     */
+                    if ($selectedByRespondent) {
+                        $page->setVar([
+                            'ANSWER_ICON'       => 'icon-tick',
+                            'ANSWER_ICON_TITLE' => 'Respondent chose correctly',
+                            'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
+                        ]);
+                    }
+                    /* The respondent did not choose the correct answer
+                     */
+                    else {
+                        $page->setVar([
+                            'ANSWER_ICON'       => 'icon-previous',
+                            'ANSWER_ICON_TITLE' => 'Respondent did not choose this correct answer',
+                            'ANSWER_CHECKED' => ''
+                        ]);
+                    }
                 }
-                if ($existing['response']
-                    && is_array($existingAnswer)
-                    && in_array($currentAnswer->value, $existingAnswer)
-                ) {
-                    // The student chose this answer.
-                    $page->setVar('ANSWER_CHECKED', 'evaluation-selected-answer-option');
-                    $page->setVar('ANSWER_GIVEN_ICON', 'icon-tick');
-                } else {
-                    // The student didn't choose this answer.
-                    $page->setVar('ANSWER_CHECKED', '');
-                    $page->setVar('ANSWER_GIVEN_ICON', '');
+                /* This answer is not correct
+                 */
+                else {
+
+                    /* The respondent chose this answer
+                     */
+                    if ($selectedByRespondent) {
+                        $page->setVar([
+                            'ANSWER_ICON'       => 'icon-cancel',
+                            'ANSWER_ICON_TITLE' => 'Respondent chose an incorrect answer',
+                            'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
+                        ]);
+                    }
+                    /* The respondent didn't choose this answer
+                     */
+                    else {
+                        $page->setVar([
+                            'ANSWER_ICON'       => '',
+                            'ANSWER_ICON_TITLE' => '',
+                            'ANSWER_CHECKED' => ''
+                        ]);
+                    }
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
