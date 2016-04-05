@@ -32,12 +32,6 @@ abstract class AbstractFile implements IFile, ISoftDeletable
 {
     use StorableTrait;
 
-    /** @var int */
-    protected $id;
-
-    /** @var string */
-    protected $filename;
-
     /** @var string */
     protected $title;
 
@@ -52,27 +46,6 @@ abstract class AbstractFile implements IFile, ISoftDeletable
 
     /** @var IFolder */
     protected $folder;
-
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
 
     /**
      * @return Alaress_Date_Format
@@ -113,26 +86,6 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     public function getMimetype()
     {
         return $this->getStorage()->getMimetype();
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getFilename()
-    {
-        return $this->filename;
-    }
-
-
-    /**
-     * @param string $filename
-     * @return self
-     */
-    public function setFilename($filename)
-    {
-        $this->filename = $filename;
-        return $this;
     }
 
 
@@ -212,7 +165,7 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     {
         return $this->deletedAt instanceof Alaress_Date_Format
             && !$this->getDeletedAt()->isNull()
-            && $this->deletedAt->getUnixTimestamp() < Alaress_Date_Format::now()->getUnixTimestamp();
+            && $this->deletedAt->getUnixTimeStamp() < Alaress_Date_Format::now()->getUnixTimeStamp();
     }
 
 

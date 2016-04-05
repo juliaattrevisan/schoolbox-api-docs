@@ -1,7 +1,5 @@
 <?php
 /**
- * Copy of Schoolbox\FileNotifier for the new file mapper/model
- *
  * @author     Amri Sannang <amri.sannang@alaress.com.au>
  * @copiedFrom Matt Day <matt.day@alaress.com.au>
  * @copyright  Copyright 2015, Alaress Pty Ltd
@@ -45,13 +43,13 @@ class Notifier extends ResourceNotifier
      */
     public function notifyCreated($roletype, $file, $effector, $diff = null)
     {
-        $category = Folder\Mapper::getInstance()->findById($file->getFolder()->getId());
+        $category = $this->folderMapper->findById($file->getFolder()->getId());
 
         return $this->notify(
             LogMapper::KIND_FILE,
             $file->getId(),
             self::TRIGGER_CREATED, // "file.{id}.created"
-            new Param($file->getDescription(), '/send.php?id='.$file->getId()), // the :resource param
+            new Param($file->getTitle(), '/send.php?id='.$file->getId()), // the :resource param
             $effector,
             $category,
             $roletype
@@ -67,13 +65,13 @@ class Notifier extends ResourceNotifier
      */
     public function notifyDeleted($roletype, $file, $effector, $diff = null)
     {
-        $category = Folder\Mapper::getInstance()->findById($file->getFolder()->getId());
+        $category = $this->folderMapper->findById($file->getFolder()->getId());
         // abstract this so far it doesn't even make sense any more
         return $this->notify(
             LogMapper::KIND_FILE,
             $file->getId(),
             self::TRIGGER_DELETED, // "file.{id}.deleted"
-            new Param($file->getDescription()), // the :resource param
+            new Param($file->getTitle()), // the :resource param
             $effector,
             $category,
             $roletype
@@ -97,7 +95,7 @@ class Notifier extends ResourceNotifier
      */
     protected function getResourceCategory($resource)
     {
-        return $this->categoryMapper->findById($resource->getFolder()->getId());
+        return $this->folderMapper->findById($resource->getFolder()->getId());
     }
 
 

@@ -8,7 +8,7 @@
  */
 
 namespace Schoolbox;
-use Schoolbox\Resource\FolderLocatorInterface;
+use Schoolbox\Resource\Folder\ILocator as FolderLocatorInterface;
 
 /**
  * Class MyFolderMapper

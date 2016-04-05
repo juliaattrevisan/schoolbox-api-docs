@@ -16,7 +16,6 @@ namespace SocialStream\Post\Factory;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -265,7 +264,7 @@ class Creational extends AbstractFactory
      * Construct a post from an already-uploaded resource
      *
      * @param $url
-     * @return \Schoolbox\Resource\File
+     * @return \Schoolbox\Resource\File\Model
      */
     private function constructFromResource($url)
     {
@@ -275,7 +274,7 @@ class Creational extends AbstractFactory
         parse_str($query, $values);
         $fileId = $values['id'];
 
-        $fileMapper = new \Schoolbox\Resource\FileMapper();
+        $fileMapper = new \Schoolbox\Resource\File\Mapper();
         $file = $fileMapper->findById($fileId);
 
         if ($file->getMimeType()->isVideo()) {
@@ -471,7 +470,7 @@ class Creational extends AbstractFactory
      *
      * Force an icon representation instead
      *
-     * @param \Schoolbox\Resource\File $file
+     * @param \Schoolbox\Resource\File\Model $file
      */
     private function spawnThumbnailFromResource($file)
     {

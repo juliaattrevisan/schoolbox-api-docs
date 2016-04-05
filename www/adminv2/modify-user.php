@@ -1,6 +1,7 @@
 <?php
 
 $userHandler = new User();
+$groupHandler = new Group();
 
 /* Superusers only */
 if(!$_SESSION['user']->isSuperuser())

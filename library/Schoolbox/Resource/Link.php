@@ -39,7 +39,7 @@ class Link implements ISoftDeletable
     /**
      * Url
      *
-     * @var int
+     * @var string|Url
      */
     protected $url;
 
@@ -81,9 +81,13 @@ class Link implements ISoftDeletable
     /**
      * Deleted at
      *
-     * @var
+     * @var \Alaress_Date_Format
      */
     protected $deletedAt;
+
+    /** @var string */
+    protected $target;
+
 
     /**
      * Is deleted
@@ -103,8 +107,8 @@ class Link implements ISoftDeletable
     public function getHref()
     {
         if ($this->isLocalUrl()) {
-            return $this->getRelativeURL();
-        } elseif ($this->isFTPURL()) {
+            return $this->getRelativeUrl();
+        } elseif ($this->isFtpUrl()) {
             return $this->getUrl();
         }
         /* If this has an id, then log the visit for this instance
@@ -389,7 +393,7 @@ class Link implements ISoftDeletable
     /**
      * Set modified
      *
-     * @param  \Alaress_Date_Format|null $modified
+     * @param  \Alaress_Date_Format $modified
      * @return $this
      */
     public function setModified($modified)
@@ -411,7 +415,7 @@ class Link implements ISoftDeletable
     /**
      * Set deleted at
      *
-     * @param \Alaress_Date_Format|null $deletedAt
+     * @param \Alaress_Date_Format $deletedAt
      */
     public function setDeletedAt($deletedAt)
     {
@@ -421,7 +425,7 @@ class Link implements ISoftDeletable
     /**
      * Get deleted at
      *
-     * @return \Alaress_Date_Format|null $deletedAt
+     * @return \Alaress_Date_Format $deletedAt
      */
     public function getDeletedAt()
     {
