@@ -14,6 +14,7 @@
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -27,6 +28,9 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
      * @var Collection|UnitInstance[]
      */
     protected $unit_list;
+
+    /** @var Folder\Model */
+    protected $originalCourse;
 
     /**
      * A list of students who have completed the tasks within the course.
@@ -63,6 +67,13 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
 
         // Build student list
         if (count($this->unit_list)) {
+
+            $this->originalCourse = Folder\Mapper::getInstance()->findById(
+                Folder\Mapper::getInstance()->findCheaplyById(
+                    $this->unit_list[0]->getUnitCategory()->getId()
+                )->getParent()->getId()
+            );
+
             $classStudentIdList = array();
             $groupStudentIdList = array();
             if ($code && Config::get('external_enable')) {
@@ -148,6 +159,8 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 'SESSION_NAME'    => session_name(),
                 'SESSION_ID'      => session_id(),
                 'COURSE_HOMEPAGE' => str_replace('/homepage/', '', Config::get('course_homepage')),
+                'IMPORTED_COURSE_ID'   => $this->originalCourse->getId(),
+                'IMPORTED_COURSE_NAME' => $this->originalCourse->getName()
             )
         );
 
