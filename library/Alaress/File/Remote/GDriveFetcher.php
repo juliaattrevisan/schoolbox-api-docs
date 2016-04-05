@@ -101,7 +101,7 @@ class GDriveFetcher implements FetcherInterface
         } else {
             // fall back to the download URL
             $url = $metadata['downloadUrl'];
-            $ext = $metadata['fullFileExtension'];
+            $ext = '.' . $metadata['fullFileExtension'];
         }
 
         if (!$url) {
@@ -109,7 +109,7 @@ class GDriveFetcher implements FetcherInterface
             throw new OutOfBoundsException("No url found for download");
         }
 
-        $destination = $this->getFirstFreeName($metadata['title'] . $ext);
+        $destination = $this->getFirstFreeName($this->parseTitle($metadata['title'], $ext));
 
         if (!($fp = fopen($destination, 'w'))) {
             throw new OutOfBoundsException("Could not open target");
