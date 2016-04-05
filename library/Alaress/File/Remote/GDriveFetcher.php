@@ -12,7 +12,8 @@ namespace Alaress\File\Remote;
 
 use OutOfBoundsException;
 
-class GDriveFetcher implements FetcherInterface {
+class GDriveFetcher implements FetcherInterface
+{
 
     const GOOGLE_API = 'https://www.googleapis.com/drive/v2';
 
@@ -37,7 +38,7 @@ class GDriveFetcher implements FetcherInterface {
         $this->dir = $storageDir;
         $this->ch  = $curl ?: curl_init();
 
-        if($httpAuth) {
+        if ($httpAuth) {
             curl_setopt($this->ch, CURLOPT_HTTPHEADER, array(
                 'Authorization: ' . $httpAuth
             ));
@@ -87,26 +88,26 @@ class GDriveFetcher implements FetcherInterface {
     {
         $metadata = $this->fetchMetaData($fileId);
 
-        if(isset($metadata['labels']['restricted']) && $metadata['labels']['restricted'] == true) {
+        if (isset($metadata['labels']['restricted']) && $metadata['labels']['restricted'] == true) {
             $url = null;
             $ext = '';
-        }
-        elseif(isset($metadata['exportLinks']['application/pdf'])) {
+
+        } elseif (isset($metadata['exportLinks']['application/pdf'])) {
             $url = $metadata['exportLinks']['application/pdf'];
             $ext = '.pdf';
-        }
-        else {
+
+        } else {
             $url = $metadata['downloadUrl'];
             $ext = '';
         }
 
-        if(!$url) {
+        if (!$url) {
             throw new OutOfBoundsException("No url found for download");
         }
 
         $destination = $this->getFirstFreeName($metadata['title'] . $ext);
 
-        if(!($fp = fopen($destination, 'w'))) {
+        if (!($fp = fopen($destination, 'w'))) {
             throw new OutOfBoundsException("Could not open target");
         }
 
@@ -153,7 +154,7 @@ class GDriveFetcher implements FetcherInterface {
         // iterate filenames until we find a name that hasn't been taken yet
         do {
             $destination = "{$this->dir}/$title" . ($i > 0 ? "-{$i}" : '') . $ext;
-        } while(file_exists($destination) && ++$i);
+        } while (file_exists($destination) && ++$i);
 
         return $destination;
     }
