@@ -34,10 +34,33 @@ class Leave_Controller extends Controller
      */
     const RANGE = 3;
 
+    /**
+     * @var \Leave_RequestMapper
+     */
     protected $requestMapper;
+
+    /**
+     * @var \Schoolbox\UserMapper
+     */
     protected $userMapper;
+
+    /**
+     * @var \HouseResidentialMapper
+     */
     protected $houseMapper;
+
+    /**
+     * External_User handler instance
+     *
+     * @var External_User
+     */
     protected $externalUser;
+
+    /**
+     * A grouphandler instance
+     *
+     * @var \Group
+     */
     protected $group;
 
     /**
@@ -806,6 +829,9 @@ class Leave_Controller extends Controller
         );
     }
 
+    /**
+     * @param array $data
+     */
     public function exportHouseRequestList($data)
     {
         /** @var \HouseResidential $house */
@@ -1042,8 +1068,8 @@ class Leave_Controller extends Controller
     /**
      * Renders a collection of request for a user
      *
-     * @param $data
-     * @return void
+     * @param array $data
+     * @throws Exception_Schoolbox_NotFound
      */
     public function renderUserRequestList($data)
     {
@@ -1365,7 +1391,7 @@ class Leave_Controller extends Controller
 
             $data['dateList'][] = $currentDate;
 
-            $allHouses = $this->getRequestMapper($date)->getCateringReport($currentDate);
+            $allHouses = $this->getRequestMapper()->getCateringReport($currentDate);
             $data['houseList'][] = $allHouses;
 
             /* Summate totals for each house in this segment
@@ -1430,7 +1456,7 @@ class Leave_Controller extends Controller
      * At Kings Live, parent_notification started saving as integer 1/0, instead
      * of the usual true/false string?
      *
-     * @param $request
+     * @param \Leave_Request $request
      */
     public function sendParentNotice($request)
     {
@@ -1485,7 +1511,7 @@ class Leave_Controller extends Controller
      *
      * @param Group $group
      */
-    private function setGroup($group)
+    private function setGroup(\Group $group)
     {
         $this->group = $group;
     }
