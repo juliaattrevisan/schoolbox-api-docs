@@ -368,6 +368,19 @@ class Leave_Controller extends Controller
     }
 
     /**
+     * The currently logged-in user has access to see reports
+     *
+     * @return mixed
+     */
+    protected function hasReportingPermission()
+    {
+        /** @var \Schoolbox\User $user */
+        $user = $_SESSION["user"];
+
+        return $user->getRole()->isStaff();
+    }
+
+    /**
      * Does this user have permission to modify or approve a request?
      *
      * The user has permission if:
@@ -1046,11 +1059,10 @@ class Leave_Controller extends Controller
         $this->getPage()->setBlock('previous_request_list', 'previous_request', 'previous_request_block');
         $this->getPage()->setBlock('previous_request_list', 'export', 'export_block');
 
-        if (!$_SESSION["user"]->getRole()->isStaff()) {
+        if (!$this->hasReportingPermission()) {
             $this->getPage()->setVar('reports_menu_block', '');
         } else {
             $this->getPage()->parse('reports_menu_block', 'reports_menu', true);
-
         }
 
         if ($this->hasApprovePermission($house->getId())) {
