@@ -111,7 +111,7 @@ foreach ($boxQuery->fetchAll() as $i => $box) {
             }
 
             $obtainCorrectLevelsQuery->execute([ 'boxId' => $boxId ]);
-            if ($obtainCorrectLevelsQuery->rowCount()) {
+            if ($obtainCorrectLevelsQuery->rowCount() > 0) {
                 while ($r = $obtainCorrectLevelsQuery->fetch(PDO::FETCH_ASSOC)) {
                     $map[$r['sequence']]['good'] = $r['id'];
                 }
@@ -129,7 +129,11 @@ foreach ($boxQuery->fetchAll() as $i => $box) {
             foreach ($map as $sequence => $changes) {
                 if ($changes['bad'] && $changes['good']) {
                     $logger->info(sprintf("Remapping descriptor level IDs: %d -> %d", $changes['bad'], $changes['good']));
-                    $updateDescriptorQuery->execute([ 'boxId' => $boxId, 'correctLevelId' => $changes['good'], 'incorrectLevelId' => $changes['bad'] ]);
+                    $updateDescriptorQuery->execute([
+                        'boxId'            => $boxId,
+                        'correctLevelId'   => $changes['good'],
+                        'incorrectLevelId' => $changes['bad'],
+                    ]);
                 } else {
                     // This is more serious than a notice, it requires user intervention.
                     throw new UnexpectedValueException(
