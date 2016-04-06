@@ -12,6 +12,7 @@ tools/vagrant*
 tools/pkg-*
 tools/composer*
 tools/git*
+tools/ci
 www/test
 Vagrantfile
 vagrant*yaml
