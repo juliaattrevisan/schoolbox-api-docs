@@ -1,6 +1,20 @@
-<!-- BEGIN answerTop -->
-<li class="row content evaluation-answer-option {ANSWER_CHECKED}">
-    {ANSWER_DESCRIPTION}
-    <span class="close {ACTUAL_CORRECT_VALUE}"></span>
-</li>
-<!-- END answerTop -->
+<ul class="information-list no-pad">
+    <li>
+        <table>
+            <tbody>
+            <!-- BEGIN answerTop -->
+            <tr class="evaluation-answer-option">
+                <td>
+                    <input type="radio" {ANSWER_CHECKED} readonly />
+                    <label class="radio-label"></label>
+                </td>
+                <td class="full-width">{ANSWER_DESCRIPTION}</td>
+                <td class="text-center">
+                    <span class="icon-32 no-text {ANSWER_ICON} {ANSWER_ICON_CLASS}" title="{ANSWER_ICON_TITLE}"></span>
+                </td>
+            </tr>
+            <!-- END answerTop -->
+            </tbody>
+        </table>
+    </li>
+</ul>

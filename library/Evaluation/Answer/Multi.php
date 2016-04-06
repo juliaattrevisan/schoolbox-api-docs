@@ -554,32 +554,66 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             ));
 
             foreach ($allAnswers as $currentAnswer) {
-                if ($currentAnswer->correct) {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'icon-approve'
-                    ));
-                } else {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => ''
-                    ));
-                }
-
                 $page->setVar(array(
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
-                if ($existing['response']
-                    && is_array($existingAnswer)
-                    && in_array($currentAnswer->value, $existingAnswer)
-                ) {
-                    $page->setVar(array(
-                        'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
-                    ));
-                } else {
-                    $page->setVar(array(
-                        'ANSWER_CHECKED' => '',
-                    ));
+                /* A response was made and successfully unserialized, and
+                 * The current option was selected by the respondent
+                 */
+                $validResponseExists = $existing['response'] && is_array($existingAnswer);
+                $selectedByRespondent = $validResponseExists && in_array($currentAnswer->value, $existingAnswer);
+
+                /* This answer is correct
+                 */
+                if ($currentAnswer->correct) {
+
+                    /* The respondent chose the correct answer
+                     */
+                    if ($selectedByRespondent) {
+                        $page->setVar([
+                            'ANSWER_ICON'       => 'icon-tick',
+                            'ANSWER_ICON_TITLE' => 'Respondent chose correctly',
+                            'ANSWER_ICON_CLASS' => 'evaluation-correct-answer-option',
+                            'ANSWER_CHECKED'    => 'checked',
+                        ]);
+                    }
+                    /* The respondent did not choose the correct answer
+                     */
+                    else {
+                        $page->setVar([
+                            'ANSWER_ICON'       => 'icon-previous',
+                            'ANSWER_ICON_TITLE' => 'Respondent did not choose this correct answer',
+                            'ANSWER_ICON_CLASS' => 'evaluation-unselected-answer-option',
+                            'ANSWER_CHECKED'    => ''
+                        ]);
+                    }
+                }
+                /* This answer is not correct
+                 */
+                else {
+
+                    /* The respondent chose this answer
+                     */
+                    if ($selectedByRespondent) {
+                        $page->setVar([
+                            'ANSWER_ICON'       => 'icon-cancel',
+                            'ANSWER_ICON_TITLE' => 'Respondent chose an incorrect answer',
+                            'ANSWER_ICON_CLASS' => 'evaluation-incorrect-answer-option',
+                            'ANSWER_CHECKED'    => 'checked',
+                        ]);
+                    }
+                    /* The respondent didn't choose this answer
+                     */
+                    else {
+                        $page->setVar([
+                            'ANSWER_ICON'       => '',
+                            'ANSWER_ICON_TITLE' => '',
+                            'ANSWER_ICON_CLASS' => '',
+                            'ANSWER_CHECKED'    => ''
+                        ]);
+                    }
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
@@ -609,21 +643,31 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             ));
 
             foreach ($allAnswers as $currentAnswer) {
-                if ($currentAnswer->correct) {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'icon-approve'
-                    ));
-                } else {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => ''
-                    ));
-                }
-
                 $page->setVar(array(
-                    'ANSWER_CHECKED' => '',
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
+
+                /* This answer is correct
+                 */
+                if ($currentAnswer->correct) {
+                    $page->setVar([
+                        'ANSWER_ICON'       => '',
+                        'ANSWER_ICON_TITLE' => '',
+                        'ANSWER_ICON_CLASS' => '',
+                        'ANSWER_CHECKED'    => 'checked',
+                    ]);
+                }
+                /* This answer is not correct
+                 */
+                else {
+                    $page->setVar([
+                        'ANSWER_ICON'       => '',
+                        'ANSWER_ICON_TITLE' => '',
+                        'ANSWER_ICON_CLASS' => '',
+                        'ANSWER_CHECKED'    => ''
+                    ]);
+                }
 
                 $page->parse('answerTop_block', 'answerTop', true);
             }
