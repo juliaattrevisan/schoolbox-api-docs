@@ -13,6 +13,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
 new \Schoolbox\Application\Daemon\Kernel("Rubric Repair");
 
+// Regarding dry run: rubric_descriptor is MyISAM -_-
+// Thankfully I can just not save the descriptor if dry run is on.
 $options = getopt('', ['dry-run', 'porcelain']);
 $dryRun  = isset($options['dry-run']);
 $db      = Database::getInstance();
@@ -130,11 +132,13 @@ foreach ($boxQuery->fetchAll() as $i => $box) {
             foreach ($map as $sequence => $changes) {
                 if ($changes['bad'] && $changes['good']) {
                     $logger->info(sprintf("Remapping descriptor level IDs: %d -> %d", $changes['bad'], $changes['good']));
-                    $updateDescriptorQuery->execute([
-                        'boxId'            => $boxId,
-                        'correctLevelId'   => $changes['good'],
-                        'incorrectLevelId' => $changes['bad'],
-                    ]);
+                    if (!$dryRun) {
+                        $updateDescriptorQuery->execute([
+                            'boxId'            => $boxId,
+                            'correctLevelId'   => $changes['good'],
+                            'incorrectLevelId' => $changes['bad'],
+                        ]);
+                    }
                 } else {
                     // This is more serious than a notice, it requires user intervention.
                     throw new UnexpectedValueException(
@@ -146,8 +150,10 @@ foreach ($boxQuery->fetchAll() as $i => $box) {
         $fixedBoxes[$boxId] = true;
         $logger->info(sprintf("Submission box #%d fixed!", $boxId));
         if ($dryRun) {
+            $logger->info('Rolling back fixes for dry run');
             $db->rollBack();
         } else {
+            $logger->info('Committing fixes');
             $db->commit();
         }
     } catch (Exception $e) {
