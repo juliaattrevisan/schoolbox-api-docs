@@ -50,7 +50,7 @@ $obtainIncorrectLevelsQuery = $db->prepare("
     SELECT DISTINCT l.id, l.sequence
     FROM rubric_descriptor d
     LEFT JOIN rubric_level l ON d.level_id = l.id
-    WHERE submission_box_id = 876
+    WHERE submission_box_id = :boxId
 ");
 
 $obtainCorrectLevelsQuery = $db->prepare("
