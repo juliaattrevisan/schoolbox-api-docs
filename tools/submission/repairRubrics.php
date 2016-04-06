@@ -1,8 +1,6 @@
 <?php
 /**
- * Continuation of `updates/15.6.10/rubricRepair/01-actuallyFixBrokenSubmissionBoxes.php`
- *
- * That script attempted to fix broken boxes, but would trip up if the action of
+ * Rubric repair script
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
@@ -15,8 +13,9 @@ require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
 new \Schoolbox\Application\Daemon\Kernel("Rubric Repair");
 
-$db     = Database::getInstance();
-$logger = new Alaress\Lumberjack\Logger(STDOUT, null, Monolog\Logger::INFO, [], true);
+$options = getopt('', ['dry-run', 'porcelain']);
+$db      = Database::getInstance();
+$logger  = new Alaress\Lumberjack\Logger(STDOUT, null, Monolog\Logger::INFO, [], isset($options['porcelain']));
 
 // This query get boxes with a descriptor whose box ID doesn't match their level's box ID.
 $boxQuery = $db->prepare("
@@ -140,7 +139,12 @@ foreach ($boxQuery->fetchAll() as $i => $box) {
             }
         }
         $fixedBoxes[$boxId] = true;
-        $db->commit();
+        $logger->info(sprintf("Submission box #%d fixed!", $boxId));
+        if ($options['dry-run']) {
+            $db->rollBack();
+        } else {
+            $db->commit();
+        }
     } catch (Exception $e) {
         $logger->warning(sprintf("Fixing submission box #%d failed - %s", $boxId, $e->getMessage()));
         $stillBrokenBoxes[$boxId] = true;
