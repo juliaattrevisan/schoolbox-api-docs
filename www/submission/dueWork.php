@@ -535,13 +535,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
                     // format for output
                     $rtn       = $returnHandler->getByUserAndTime($user['uid'], $activity->getDate()->getDatabase());
                     // Activity should never not be a submission box
-                    $marksheet = Marksheet_Factory::build(
-                        $rtn['slug'],
-                        ($activity->isSubmission()
-                            ? $activity->getSubmissionBox()
-                            : new SubmissionBox()
-                        )
-                    );
+                    $marksheet = Marksheet_Factory::build($rtn['slug'], $activity->getSubmissionBox());
 
                     // legacy support
                     if ($rtn['slug'] == 'free') {
