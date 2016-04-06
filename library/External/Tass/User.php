@@ -531,8 +531,29 @@ class External_Tass_User implements External_UserInterface
      */
     public function getStaffContactListExtended()
     {
-        // TODO: Implement getStaffContactListExtended() method.
-        return array();
+        $database = $this->getDatabase();
+        $query = "
+            SELECT TOP (100) PERCENT
+                CASE WHEN tch_code IS NOT NULL THEN tch_code ELSE dbo.tel_vw_telemf.emp_code END AS StaffID,
+                dbo.tel_vw_telemf.salutation_flag AS StaffTitle,
+                dbo.tel_vw_telemf.prefer_name_text AS StaffPreferredName,
+                dbo.tel_vw_telemf.surname_text AS StaffSurname,
+                dbo.tel_vw_telemf.phone_w_text AS StaffOccupPhone,
+                dbo.tel_vw_telemf.e_mail AS StaffOccupEmail,
+                '' AS StaffExtension,
+                '' AS StaffCampusDescription,
+                CASE (dbo.tel_vw_telemf.awd_code) WHEN 'TE' THEN 'Teacher' WHEN 'SO' THEN 'Corporate Staff - Full Time' WHEN 'SOTT' THEN 'Corporate Staff - Term Time or Casual' WHEN 'SOC' THEN 'Corporate Staff - Term Time or Casual' ELSE '' END AS StaffCategoryType,
+                '' AS StaffDepartment,
+                dbo.tel_vw_telemf.position_title AS JobPositionDescription,
+                '' AS StaffJobPositionStartDate,
+                '' AS StaffJobPositionEndDate
+            FROM dbo.tel_vw_telemf
+            LEFT OUTER JOIN dbo.teacher ON dbo.tel_vw_telemf.emp_code = dbo.teacher.emp_code
+            WHERE (dbo.tel_vw_telemf.awd_code <> 'Board') AND (dbo.tel_vw_telemf.position_title NOT LIKE '%Trainee%') AND (dbo.tel_vw_telemf.cust_code = '01') AND (dbo.tel_vw_telemf.term_date IS NULL)
+            ORDER BY StaffSurname, StaffPreferredName
+        ";
+
+        return $database->trimAll($database->getAll($query));
     }
 
     private function setDatabase($database)
