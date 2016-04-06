@@ -143,7 +143,7 @@ foreach ($boxQuery->fetchAll() as $i => $box) {
         $fixedBoxes[$boxId] = true;
         $db->commit();
     } catch (PDOException $e) {
-        $logger->warning(sprintf("Fixing submission box #%d failed - %s", $e->getMessage()));
+        $logger->warning(sprintf("Fixing submission box #%d failed - %s", $boxId, $e->getMessage()));
         $stillBrokenBoxes[$boxId] = true;
         $db->rollBack();
     }
