@@ -169,7 +169,7 @@ class Leave_Controller extends Controller
 		 */
         foreach ($this->getHostTypes() as $currentHostType) {
 
-
+            /** @var \Leave_Request $request */
             if ($request->getHostType() instanceof \Leave\HostType && $request->getHostType()->getId() == $currentHostType->getId()) {
                 $selected = 'selected=\'selected\'';
             } else {
@@ -252,7 +252,7 @@ class Leave_Controller extends Controller
     /**
      * Execute create request
      *
-     * @return Array
+     * @return array
      */
     public function executeCreateRequest()
     {
@@ -262,7 +262,7 @@ class Leave_Controller extends Controller
     /**
      * Renders a create request page
      *
-     * @param Array $data
+     * @param array $data
      * @return void
      */
     public function renderCreateRequest($data)
@@ -362,7 +362,10 @@ class Leave_Controller extends Controller
      */
     protected function hasViewPermission($userId, $houseId = null)
     {
-        return $_SESSION['user']->getId() == $userId
+        /** @var \Schoolbox\User $user */
+        $user = $_SESSION["user"];
+
+        return $user->getId() == $userId
             || $this->getGroup()->getPermission($houseId)
             || $this->getGroup()->isParentOfChild($userId);
     }
@@ -443,9 +446,9 @@ class Leave_Controller extends Controller
     /**
      * Processes form data submitted from renderCreateRequest
      *
-     * @param Array $data
-     *
-     * @return void
+     * @param array $data
+     * @throws Exception_Schoolbox_NotFound
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function processCreateRequest($data)
     {
@@ -474,10 +477,13 @@ class Leave_Controller extends Controller
             } catch (Schoolbox\Mapper\Exception $e) {
                 throw new Exception_Schoolbox_NotFound('User not found');
             }
+            /** @var $sessionUser \Schoolbox\User */
+            $sessionUser = $_SESSION['user'];
+
             $request->setUser(
                 ($this->hasViewPermission($userId, $user->getResidentialHouse()->getId())
                     ? $userId
-                    : $_SESSION['user']->getId())
+                    : $sessionUser->getId())
             );
             $request->setAuthor($_SESSION['user']);
             $request->setStart($start->getDatabase());
@@ -520,7 +526,7 @@ class Leave_Controller extends Controller
      * Returns a data array with the request to be modified
      *
      * @param Integer $requestId
-     * @return Array
+     * @return array
      * @throws Exception_Schoolbox_NotFound if the request doesn't exist.
      */
     public function executeModifyRequest($requestId)
@@ -536,7 +542,7 @@ class Leave_Controller extends Controller
     /**
      * Renders a modify request form
      *
-     * @param Array $data
+     * @param array $data
      * @return void
      * @throws Exception_Schoolbox_NotFound if the requester's house doesn't exist.
      */
@@ -639,7 +645,7 @@ class Leave_Controller extends Controller
     /**
      * Renders a view leave request form
      *
-     * @param Array $data
+     * @param array $data
      * @return void
      * @throws Exception_Schoolbox_NotFound if the user or their house doesn't exist.
      */
@@ -665,7 +671,10 @@ class Leave_Controller extends Controller
             $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/viewRequest.html');
 
             $travelTypes = $this->getTravelTypes();
+
+            /** @var Leave_Request_TravelType $travelType */
             $travelType  = $travelTypes[$request->getTravelType()->getId()] ?: $travelTypes[0];
+
             $this->getPage()->setVar(
                 array(
                     'REQUEST_ID' => $request->getId(),
@@ -701,7 +710,7 @@ class Leave_Controller extends Controller
     /**
      * Processes a modify form for a request
      *
-     * @param Array $data
+     * @param array $data
      * @return void
      * @throws Exception_Schoolbox_NotFound if request isn't found.
      */
@@ -776,7 +785,7 @@ class Leave_Controller extends Controller
      *
      * @param Integer $houseId
      *
-     * @return Array contains these keys:
+     * @return array contains these keys:
      *               * house: the HouseResidential object
      *               * requestList: the requests for this house
      *
@@ -799,6 +808,7 @@ class Leave_Controller extends Controller
 
     public function exportHouseRequestList($data)
     {
+        /** @var \HouseResidential $house */
         $house = $data['house'];
         $requestList = $data['requestList'];
         $allRows = array();
@@ -820,6 +830,8 @@ class Leave_Controller extends Controller
         $allRows[] = TextFormatter::outputCSV($headings);
 
         foreach ($requestList as $request) {
+
+            /** @var Leave_Request $request */
             if ($request->getStatus() == Leave_Request::STATUS_APPROVED) {
                 $rowData = array();
 
@@ -865,11 +877,12 @@ class Leave_Controller extends Controller
     /**
      * Renders a collection of requests by house
      *
-     * @param Array $data
+     * @param array $data
      * @return void
      */
     public function renderHouseRequestList($data)
     {
+        /** @var \HouseResidential $house */
         $house = $data['house'];
         $requestList = $data['requestList'];
 
@@ -894,6 +907,7 @@ class Leave_Controller extends Controller
             $previousRequestCount = 0;
 
             foreach ($requestList as $request) {
+                /** @var \Leave_Request $request */
                 $this->getPage()->setVar(array(
                     'USER_ID' => $request->getUser()->getId(),
                     'USER_NAME' => $request->getUser()->formatName(),
@@ -1090,6 +1104,7 @@ class Leave_Controller extends Controller
                 $previousRequestCount = 0;
 
                 foreach ($requestList as $request) {
+                    /** @var \Leave_Request $request */
                     $this->getPage()->setVar(
                         array(
                             'USER_ID' => $request->getUser()->getId(),
@@ -1149,7 +1164,7 @@ class Leave_Controller extends Controller
      *
      * As far as I can tell, this is never used.
      *
-     * @param Array $data
+     * @param array $data
      * @return void
      * @throws Exception_Schoolbox_NotFound if request isn't found
      */
@@ -1214,14 +1229,14 @@ class Leave_Controller extends Controller
      * Render confirmed by checkbox array
      * Knows whether to show them depending on user type
      *
-     * @param $request
+     * @param \Leave_Request $request
      */
-    private function renderConfirmedByCheckboxes($request)
+    private function renderConfirmedByCheckboxes(\Leave_Request $request)
     {
         $this->getPage()->setBlock(TEMPLATE_content, 'confirmed_by', 'confirmed_by_block');
 
         /* Iterate through options
-           */
+         */
         if ($this->hasApprovePermission($request->getUser()->getResidentialHouse()->getId())) {
             foreach ($request->getConfirmedByMap() as $value => $label) {
                 if ($request->getConfirmedBy() == $value) {
@@ -1532,7 +1547,7 @@ class Leave_Controller extends Controller
     /**
      * Setter for $houseMapper
      *
-     * @param HouseMapper $houseMapper
+     * @param HouseResidentialMapper $houseMapper
      *
      * @return void
      */
@@ -1544,7 +1559,7 @@ class Leave_Controller extends Controller
     /**
      * Getter for $houseMapper
      *
-     * @return HouseMapper
+     * @return HouseResidentialMapper
      */
     public function getHouseMapper()
     {

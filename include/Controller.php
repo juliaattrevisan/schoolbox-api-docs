@@ -2,10 +2,18 @@
 
 class Controller
 {
+    /**
+     * @var SitePage $page
+     */
     public $page;
 
+    /**
+     * Controller constructor.
+     *
+     * @param SitePage $page
+     */
     public function __construct ($page = null) {
-        if ( !is_a($page, 'Page') ) {
+        if ( !is_a($page, 'SitePage') ) {
             $page = new SitePage();
         }
 
@@ -13,7 +21,7 @@ class Controller
     }
 
     /**
-     * @param Page $page
+     * @param SitePage $page
      */
     public function setPage($page)
     {
@@ -21,7 +29,7 @@ class Controller
     }
 
     /**
-     * @return Page
+     * @return SitePage
      */
     public function getPage()
     {
