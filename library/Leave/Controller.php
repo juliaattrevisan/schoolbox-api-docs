@@ -821,6 +821,11 @@ class Leave_Controller extends Controller
         } catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('House not found');
         }
+
+        if (!$this->hasReportingPermission()) {
+            error(19);
+        }
+
         $requestList = $this->getRequestMapper()->findAllByHouseId($house->getId());
 
         return array(
@@ -1302,6 +1307,10 @@ class Leave_Controller extends Controller
             throw new Exception_Schoolbox_NotFound('House not found');
         }
 
+        if (!$this->hasReportingPermission()) {
+            error(19);
+        }
+
         /* Mess with these two magic numbers to change the range, in conjunction
            * with the class constant RANGE
            */
@@ -1378,6 +1387,9 @@ class Leave_Controller extends Controller
      */
     public function executeCateringReport($date)
     {
+        if (!$this->hasReportingPermission()) {
+            error(19);
+        }
         /* Collate results for each day
            */
         $data = array();
