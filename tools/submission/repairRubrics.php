@@ -144,7 +144,7 @@ foreach ($boxQuery->fetchAll() as $i => $box) {
         }
         $fixedBoxes[$boxId] = true;
         $logger->info(sprintf("Submission box #%d fixed!", $boxId));
-        if ($options['dry-run']) {
+        if (isset($options['dry-run'])) {
             $db->rollBack();
         } else {
             $db->commit();
