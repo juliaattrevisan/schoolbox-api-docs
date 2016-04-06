@@ -752,6 +752,10 @@ class Leave_Controller extends Controller
             throw new Exception_Schoolbox_NotFound('Request not found');
         }
 
+        if (!$this->hasApprovePermission($request->getUser()->getResidentialHouse()->getId())) {
+            error(19);
+        }
+
         $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/Y H:i:s');
         $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/Y H:i:s');
 
