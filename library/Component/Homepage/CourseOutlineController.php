@@ -534,8 +534,13 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 $this->setVar('UNIT_QUIZ_ID', Scrub::text($task->getAssessment()->getId()));
                 $this->parse('unit_task_quiz_results_block', 'unit_task_quiz_results');
             }
+
+            // in all cases EXCEPT duework:nonsubmittable, render the completion count
+            if ($task->getType() != Task::TYPE_DUE_WORK || $task->getSubmissionBox()->getAcceptOnline()) {
+                $this->parse('unit_task_count_block', 'unit_task_count');
+            }
+
             $this->parse('unit_task_actions_more_block', 'unit_task_actions_more');
-            $this->parse('unit_task_count_block', 'unit_task_count');
             $this->parse('unit_task_delete_block', 'unit_task_delete');
             $this->parse('unit_task_delete_form_block', 'unit_task_delete_form');
             $this->parse('unit_task_modify_block', 'unit_task_modify');
