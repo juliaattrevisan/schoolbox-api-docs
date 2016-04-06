@@ -1,18 +1,16 @@
 <li class="row">
     <table>
-        <thead>
-        <tr>
-            <th class="full-width"><h4>Option</h4></th>
-            <th><h4>Given</h4></th>
-            <th><h4>Correct</h4></th>
-        </tr>
-        </thead>
         <tbody>
         <!-- BEGIN answerOption -->
-        <tr class="evaluation-answer-option {ANSWER_CHECKED}">
-            <td>{ANSWER_DESCRIPTION}</td>
-            <td class="text-center"><span class="icon-16 no-text {ANSWER_GIVEN_ICON}"></span></td>
-            <td class="text-center"><span class="icon-16 no-text {ANSWER_CORRECT_ICON}"></span></td>
+        <tr class="evaluation-answer-option">
+            <td>
+                <input type="radio" {ANSWER_CHECKED} readonly />
+                <label class="radio-label"></label>
+            </td>
+            <td class="full-width">{ANSWER_DESCRIPTION}</td>
+            <td class="text-center">
+                <span class="icon-32 no-text {ANSWER_ICON} {ANSWER_ICON_CLASS}" title="{ANSWER_ICON_TITLE}"></span>
+            </td>
         </tr>
         <!-- END answerOption -->
         </tbody>
