@@ -184,6 +184,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 			LEFT JOIN {$this->getJoinSql('storage', 'sr', 'file')}
 			LEFT JOIN {$storage_join->getJoinSql('allowedFileExtension', 'file', 'mime', true)}
 			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
+			AND sb.deleted IS FALSE
 			AND sb.mark_visibility IN {$this->getArrayPlaceholders($visibilities, 'vis')}
 			AND sr.owner = :user_id
 			AND sr.deleted IS FALSE

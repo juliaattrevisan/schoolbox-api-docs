@@ -266,6 +266,7 @@ class FileMapper extends Mapper
             LEFT JOIN {$storageJoin->getJoinSql('allowedFileExtension', 'h', 'afe', true)}
             LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
             WHERE sb.category IN {$boxJoin->getArrayPlaceholders($categories, 'category')}
+            AND sb.deleted IS FALSE
             AND ss.owner = :user_id
             AND ss.body IS NULL
             AND ss.draft IS FALSE
