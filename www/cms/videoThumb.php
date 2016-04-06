@@ -27,6 +27,36 @@ if (isset($type) && isset($id) ) {
 
 	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
+	try {
+		$queue = $videoQueueMapper->findOneByColumn('hash', $id);
+		switch ($queue->getStatus()) {
+			case 'pending':
+			case 'processing':
+
+				// Video hasn't been processed yet
+
+				SitePage::localRedir("/images/core/video-processing-thumb.png");
+				exit;
+				break;
+			case 'failed':
+
+				// Video processing failed
+
+				SitePage::localRedir("/images/core/video-failed-thumb.png");
+				exit;
+				break;
+
+			default:
+
+					// The only other status is 'completed' let that fall through
+				break;
+		}
+	}
+	catch (\Exception $e)
+	{
+		// Wasn't in the queue, just let it fall through to the keeper. What will be, will be...
+	}
+
     try {
 		$thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($id, $type);
 		$video = $thumbnailFactory->produce();
@@ -44,8 +74,6 @@ if (isset($type) && isset($id) ) {
    		$filename = $video->getThumbnailLocation();
            $pixels = 64;
    	}
-
-
 
 	if(is_readable($filename) ) {
 		$filesize = filesize($filename);
