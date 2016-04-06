@@ -48,14 +48,10 @@ $descriptorQuery = $db->prepare("
 ");
 
 $obtainIncorrectLevelsQuery = $db->prepare("
-    SELECT id, sequence
-    FROM rubric_level
-    WHERE id IN (
-      SELECT DISTINCT level_id
-      FROM rubric_descriptor d
-      LEFT JOIN rubric_level l ON d.level_id = l.id
-      WHERE submission_box_id = :boxId
-    )
+    SELECT DISTINCT l.id, l.sequence
+    FROM rubric_descriptor d
+    LEFT JOIN rubric_level l ON d.level_id = l.id
+    WHERE submission_box_id = 876
 ");
 
 $obtainCorrectLevelsQuery = $db->prepare("
