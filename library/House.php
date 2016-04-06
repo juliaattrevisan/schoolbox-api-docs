@@ -1,6 +1,5 @@
 <?php
 
-
 class House implements \Schoolbox\ValueLabelInterface {
 
     protected $id;

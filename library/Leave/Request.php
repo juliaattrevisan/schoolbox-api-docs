@@ -197,7 +197,7 @@ class Leave_Request
     /**
      * Set host type
      *
-     * @param $hostType
+     * @param Leave\HostType $hostType
      */
     public function setHostType($hostType)
     {
@@ -208,7 +208,7 @@ class Leave_Request
     /**
      * Get host type
      *
-     * @return string
+     * @return \Leave\HostType
      */
     public function getHostType()
     {
@@ -380,7 +380,7 @@ class Leave_Request
     /**
      * Set user
      *
-     * @param \Schoolbox\User $user
+     * @param int|\Schoolbox\User $user
      *
      * @return void
      */
@@ -392,7 +392,7 @@ class Leave_Request
     /**
      * Get user
      *
-     * @return \Schoolbox\User
+     * @return int|\Schoolbox\User
      */
     public function getUser()
     {
