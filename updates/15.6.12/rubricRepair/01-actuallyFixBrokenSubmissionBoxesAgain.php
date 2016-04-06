@@ -132,13 +132,16 @@ foreach ($boxQuery->fetchAll() as $i => $box) {
                     $logger->info(sprintf("Remapping descriptor level IDs: %d -> %d", $changes['bad'], $changes['good']));
                     $updateDescriptorQuery->execute([ 'boxId' => $boxId, 'correctLevelId' => $changes['good'], 'incorrectLevelId' => $changes['bad'] ]);
                 } else {
-                    $logger->notice("Could not remap descriptor levels, data missing: ".json_encode($changes));
+                    // This is more serious than a notice, it requires user intervention.
+                    throw new UnexpectedValueException(
+                        "Could not remap descriptor levels, data missing: ".json_encode($changes)
+                    );
                 }
             }
         }
         $fixedBoxes[$boxId] = true;
         $db->commit();
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
         $logger->warning(sprintf("Fixing submission box #%d failed - %s", $boxId, $e->getMessage()));
         $stillBrokenBoxes[$boxId] = true;
         $db->rollBack();
