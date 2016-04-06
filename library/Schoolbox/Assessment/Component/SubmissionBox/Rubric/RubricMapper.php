@@ -367,6 +367,20 @@ class RubricMapper
         return $this->applyStudentMark($grid, $student);
     }
 
+    /**
+     * Normalizes spaces.
+     *
+     * Trims trailing/leading space, and replaces multiple spaces/newlines/etc.
+     * with a single space.
+     *
+     * @param  string $string
+     * @return string
+     */
+    protected function normalizeSpace($string)
+    {
+        return trim(preg_replace('`\s+`', ' ', $string));
+    }
+
     protected function getcsv($fp, $limit = 13)
     {
         $line = fgetcsv($fp);
@@ -378,7 +392,8 @@ class RubricMapper
 
         if (is_array($line)) {
             // normal data
-            return array_slice($line, 0, $limit);
+            // Normalize line values
+            return array_map([$this, 'normalizeSpace'], array_slice($line, 0, $limit));
         }
 
         // bad data, but not EOF
@@ -432,7 +447,7 @@ class RubricMapper
 
             // list of criteria, grouped by... uh, group
             if ($row[0]) {
-                $workingGroupName = trim($row[0]);
+                $workingGroupName = $row[0];
             }
 
             if ($row[1]) {
@@ -441,7 +456,7 @@ class RubricMapper
                 $row[0] = $workingGroupName;
 
                 // extract the criterion uniquely
-                $workingCritName = trim($row[1]);
+                $workingCritName = $row[1];
                 $criteria[$workingGroupName][$workingCritName] = [
                     'id'   => null,
                     'name' => $workingCritName
