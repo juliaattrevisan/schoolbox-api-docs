@@ -64,7 +64,7 @@
                             {% endif %}
 
                             {% if showDetails %}
-                                {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname %}
+                                {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname and (not spouse.getHideContacts()) %}
                                     <dt class="no-margin small-12">Partner</dt>
                                     <dd class="no-margin small-12">
                                         <div class="avatar-card">
