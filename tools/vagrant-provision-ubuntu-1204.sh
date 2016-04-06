@@ -235,6 +235,7 @@ service schoolbox-rerouted restart > /dev/null 2>/dev/null &
 
 # call custom provisioning
 if [ -f /vagrant/post-provision.sh ];
+then
 	echo "$vag Running custom post provisioning";
 	/vagrant/post-provision.sh 2>&1;
 fi
