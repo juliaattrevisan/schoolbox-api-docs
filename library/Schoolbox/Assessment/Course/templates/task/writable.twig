@@ -1,3 +1,6 @@
+{% if task.type == 1 %}
+    {% set doReveal %}data-reveal-id="modifyTask-{{ task.id }}"{% endset %}
+{% endif %}
 <li class="actions-small-1 actions-large-3" data-task_id="{{ task.id }}">
     <div class="list-item">
         <div class="grip"></div>
@@ -15,10 +18,7 @@
     </div>
     <nav>
         <span class="show-for-large-up">
-            {% if task.type == 1 %}
             <a href="/task/export/{{ task.id }}?return_url={{ returnUrl[unit.id] }}" class="icon-export" title="Copy this task into classes"></a>
-                {% set doReveal %}data-reveal-id="modifyTask-{{ task.id }}"{% endset %}
-            {% endif %}
             <a href="/task/modify/{{ task.id }}?return_url={{ returnUrl[unit.id] }}" {{ doReveal }} class="icon-modify" title="Modify"></a>
             <a href="/task/delete/{{ task.id }}?return_url={{ returnUrl[unit.id] }}" data-interaction="open_delete_task_form"  class="icon-delete" title="Delete"></a>
         </span>
