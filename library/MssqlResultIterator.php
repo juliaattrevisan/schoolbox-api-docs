@@ -6,7 +6,7 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class MssqlResultIterator implements SeekableIterator
+class MssqlResultIterator implements SeekableIterator, Countable
 {
     /**
      * @var resource
@@ -95,8 +95,12 @@ class MssqlResultIterator implements SeekableIterator
     {
         if (gettype($this->result) == 'resource') {
             $this->rowNum = 0;
-            $this->seek(0);
-            $this->loadNextRow();
+            try {
+                $this->seek(0);
+            } catch (OutOfBoundsException $e) {
+                // No results at all - noop
+                // (loadNextRow will set $this->result to false)
+            }
         }
     }
 
@@ -107,10 +111,29 @@ class MssqlResultIterator implements SeekableIterator
      */
     public function seek($position)
     {
-        if (mssql_data_seek($this->result, $position)) {
-            return;
+        if (is_resource($this->result)) {
+            if ($position < count($this) && mssql_data_seek($this->result, $position)) {
+                $this->loadNextRow();
+                return;
+            }
+
+            /* Tried to access an area beyond the bounds of a
+             * result set that contains data
+             */
+            throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
         }
-        throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
+
+        /* Not even a resource object, die loudly
+         */
+        throw new InvalidArgumentException('Invalid result set');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function count()
+    {
+        return mssql_num_rows($this->result);
     }
 
     /**
