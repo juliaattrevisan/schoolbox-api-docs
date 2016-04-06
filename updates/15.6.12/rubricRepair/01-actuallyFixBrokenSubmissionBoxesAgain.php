@@ -152,7 +152,14 @@ foreach ($boxQuery->fetchAll() as $i => $box) {
 $affectedBoxes    = array_keys($affectedBoxes);
 $fixedBoxes       = array_keys($fixedBoxes);
 $stillBrokenBoxes = array_keys($stillBrokenBoxes);
-$logger->info(sprintf('%d potentially broken submission boxes were found.', count($affectedBoxes)));
+$logger->info(
+    sprintf(
+        '%d potentially broken submission boxes were found - %d automatically repaired, %d were not.',
+        count($affectedBoxes),
+        count($fixedBoxes),
+        count($stillBrokenBoxes)
+    )
+);
 if (count($fixedBoxes)) {
     $logger->info('The following boxes have been automatically repaired - they will need to be re-marked:');
     foreach ($fixedBoxes as $boxId) {
