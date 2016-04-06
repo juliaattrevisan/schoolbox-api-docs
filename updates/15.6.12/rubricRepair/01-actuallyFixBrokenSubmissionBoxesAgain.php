@@ -135,8 +135,6 @@ foreach ($boxQuery->fetchAll() as $i => $box) {
                 if ($changes['bad'] && $changes['good']) {
                     $logger->info(sprintf("Remapping descriptor level IDs: %d -> %d", $changes['bad'], $changes['good']));
                     $updateDescriptorQuery->execute([ 'boxId' => $boxId, 'correctLevelId' => $changes['good'], 'incorrectLevelId' => $changes['bad'] ]);
-                    $logger->warning(sprintf("Remapping descriptor level failed - %s", $e->getMessage()));
-                    $stillBrokenBoxes[$boxId] = true;
                 } else {
                     $logger->notice("Could not remap descriptor levels, data missing: ".json_encode($changes));
                 }
