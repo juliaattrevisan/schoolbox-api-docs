@@ -11,9 +11,9 @@
 
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
-require_once __DIR__ . '/../../../conf/core/require.php';
+require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
-new \Schoolbox\Application\Daemon\Kernel("15.6.12 Rubric Level Restore");
+new \Schoolbox\Application\Daemon\Kernel("Rubric Repair");
 
 $db     = Database::getInstance();
 $logger = new Alaress\Lumberjack\Logger(STDOUT, null, Monolog\Logger::INFO, [], true);
