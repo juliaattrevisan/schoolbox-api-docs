@@ -508,6 +508,12 @@ class Leave_Controller extends Controller
                     ? $userId
                     : $sessionUser->getId())
             );
+
+            // Does this user have a house?
+            if (!$request->getUser()->getResidentialHouse()->getId()) {
+                error(19);
+            }
+
             $request->setAuthor($_SESSION['user']);
             $request->setStart($start->getDatabase());
             $request->setFinish($finish->getDatabase());
