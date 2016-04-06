@@ -16,7 +16,7 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 new \Schoolbox\Application\Daemon\Kernel("15.6.12 Rubric Level Restore");
 
 $db     = Database::getInstance();
-$logger = new Alaress\Lumberjack\Logger();
+$logger = new Alaress\Lumberjack\Logger(STDOUT, null, Monolog\Logger::INFO, [], true);
 
 // This query get boxes with a descriptor whose box ID doesn't match their level's box ID.
 $boxQuery = $db->prepare("
