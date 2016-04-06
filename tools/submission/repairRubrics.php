@@ -14,6 +14,7 @@ spl_autoload_call('Schoolbox\\Application\\Daemon');
 new \Schoolbox\Application\Daemon\Kernel("Rubric Repair");
 
 $options = getopt('', ['dry-run', 'porcelain']);
+$dryRun  = isset($options['dry-run']);
 $db      = Database::getInstance();
 $logger  = new Alaress\Lumberjack\Logger(STDOUT, null, Monolog\Logger::INFO, [], isset($options['porcelain']));
 
@@ -144,7 +145,7 @@ foreach ($boxQuery->fetchAll() as $i => $box) {
         }
         $fixedBoxes[$boxId] = true;
         $logger->info(sprintf("Submission box #%d fixed!", $boxId));
-        if (isset($options['dry-run'])) {
+        if ($dryRun) {
             $db->rollBack();
         } else {
             $db->commit();
