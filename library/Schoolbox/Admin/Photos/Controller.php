@@ -58,7 +58,7 @@ class Controller extends Base
             ->setModalTitle('Select Image')
             ->setAttachmentsLabel('')
             ->setAttachPrompt('Upload Image')
-            ->setMimeFilter('*/*')
+            ->setMimeFilter('image/jpeg')
             ->setReadOnly(false)
             ->setMulti(true);
 
