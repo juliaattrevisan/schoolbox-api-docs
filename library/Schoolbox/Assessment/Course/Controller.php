@@ -1485,6 +1485,56 @@ class Controller extends Base\Base
         ]);
     }
 
+
+    /**
+     * Deletes an import, along with ALL of its associated data
+     *
+     * @api   POST /import/delete
+     * @level 160
+     */
+    public function importDelete()
+    {
+        $post = $this->getRequest()->post;
+
+        if (!isset($post['componentId'])) {
+            $this->sendError('Component ID not defined');
+            return;
+        }
+
+        $componentId    = $post['componentId'];
+        $requiresDelete = false;
+
+        try {
+            $componentInstance = $this->getComponentInstanceMapper()->findById($componentId);
+            $requiresDelete    = true;
+        } catch (MapperException $e) {
+            // the component doesn't exist, so just fake it
+            $componentInstance = $this->getComponentInstanceMapper()->createModel()->setId($componentId);
+        }
+
+        $unitInstances = $this->getUnitInstanceMapper()->findForComponent($componentInstance);
+
+        try {
+            $this->getUnitInstanceMapper()->delete($unitInstances);
+
+            if ($requiresDelete) {
+                $this->getComponentInstanceMapper()->delete($componentInstance);
+            }
+
+            $this->getResponse()->content->set([
+                'format' => 'json',
+                'data'   => true
+            ]);
+
+
+        } catch (\Exception $e) {
+            $this->sendError($e->getMessage(), [], 500);
+            return;
+        }
+
+    }
+
+
     /**
      * Save the given template for the given folder
      *
@@ -1577,6 +1627,12 @@ class Controller extends Base\Base
             $allCourses = $allFolders->getOffset($folderId);
         }
 
+        $lineages = [];
+
+        foreach ($allCourses as $course) {
+            $lineages[$course->getId()] = $this->getCourseMapper()->getLineage($course);
+        }
+
         /* Find all the Units in this Folder; also includes
          * Units which have had their Course Outlines removed
          */
@@ -1586,6 +1642,7 @@ class Controller extends Base\Base
             'folder' => $folder,
             'allCourses' => $allCourses,
             'allCourseComponentIds' => $allCourseComponentIds,
+            'lineage' => $lineages
         ]);
     }
 
@@ -1632,6 +1689,9 @@ class Controller extends Base\Base
 
     /**
      * Delete a course by blowing away all its units
+     *
+     * @api   POST /course/delete
+     * @level 160
      */
     public function deleteCourse()
     {

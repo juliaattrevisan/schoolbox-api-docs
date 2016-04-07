@@ -69,15 +69,16 @@ class Module extends BaseModule
                 '/import/modify/{componentId}'             => 'importModify',
             ],
             'POST' => [
-                '/unit/new'    => 'newUnit',
-                '/unit/delete' => 'deleteUnit',
-                '/importTasks' => 'importTasks',
-                '/importUnits' => 'importUnits',
-                '/importSave'  => 'importSave',
-                '/new'         => 'createCourse',
-                '/modify/{id}' => 'updateCourse',
-                '/finalise'    => 'persistCourse',
-                '/delete'      => 'deleteCourse',
+                '/unit/new'      => 'newUnit',
+                '/unit/delete'   => 'deleteUnit',
+                '/importTasks'   => 'importTasks',
+                '/importUnits'   => 'importUnits',
+                '/importSave'    => 'importSave',
+                '/import/delete' => 'importDelete',
+                '/new'           => 'createCourse',
+                '/modify/{id}'   => 'updateCourse',
+                '/finalise'      => 'persistCourse',
+                '/delete'        => 'deleteCourse',
             ]
         ];
 

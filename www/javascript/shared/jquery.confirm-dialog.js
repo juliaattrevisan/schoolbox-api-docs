@@ -56,7 +56,8 @@
             text: 'Are you sure?',
             confirmLabel: 'Yes',
             confirmEvent: $.confirmDialog.followHref,
-            cancelLabel: 'No'
+            cancelLabel: 'No',
+            format: 'text'
         };
         var settings = $.extend(true, {}, defaults, options);
 
@@ -79,9 +80,17 @@
         ul.append(li.clone().append(okayButton));
         ul.append(li.clone().append(cancelButton));
 
+        var pBody = $('<p />');
+
+        if (settings.format == 'html') {
+            pBody.html(settings.text);
+        } else {
+            pBody.text(settings.text);
+        }
+
         modal
             .append(h2)
-            .append($('<p />').text(settings.text ))
+            .append(pBody)
             .append(ul)
             .append('<a class="close-reveal-modal" aria-label="Close">&#215;</a>');
         modal.appendTo($('body'));

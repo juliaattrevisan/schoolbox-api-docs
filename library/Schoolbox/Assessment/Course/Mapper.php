@@ -173,10 +173,20 @@ class Mapper extends FolderMapper
 
             /* Also store the path to this Course
              */
-            $data['lineage'][$currentCourse->getId()] = $this->getAncestry()->findParentsCheaply($currentCourse, $this->getFacultyNode());
+            $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
         }
 
         return $data;
+    }
+
+
+    /**
+     * @param Folder $course
+     * @return Collection
+     */
+    public function getLineage(Folder $course)
+    {
+        return $this->getAncestry()->findParentsCheaply($course, $this->getFacultyNode());
     }
 
     /**
