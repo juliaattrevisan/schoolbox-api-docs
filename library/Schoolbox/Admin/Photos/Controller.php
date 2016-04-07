@@ -17,6 +17,9 @@ use Schoolbox\Resource\Attachment\Zone;
 
 class Controller extends Base
 {
+    /**
+     * @var StorageMapper $storageMapper
+     */
     protected $storageMapper;
 
     /**
@@ -45,10 +48,9 @@ class Controller extends Base
     /**
      * Insert an attach zone into the template
      *
-     * @param Collection|PastoralAttachmentModel $attachments
      * @return array
      */
-    private function getAttachZone($attachments = null)
+    private function getAttachZone()
     {
         $zone = new Zone('attachment');
         $zone
@@ -60,13 +62,12 @@ class Controller extends Base
             ->setReadOnly(false)
             ->setMulti(true);
 
-        if ($attachments != null)
-            foreach ($attachments as $attachment)
-                $zone->attachFiles(array($attachment->getHash()));
-
         return $zone->getTwigContext();
     }
 
+    /**
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
     public function postUpload()
     {
         // Upload any JPG files into the portrait cache folder overwriting whatever was previously there
@@ -94,6 +95,9 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost("/adminv2/photos");
     }
 
+    /**
+     * Render the upload page
+     */
     public function getIndex()
     {
         // Render this thing out
