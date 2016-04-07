@@ -71,13 +71,16 @@ class Controller extends Base
     {
         // Upload any JPG files into the portrait cache folder overwriting whatever was previously there
 
+        /** @var \Schoolbox\Config\Loader $config */
+        $config = $this->getDi()->get("config");
+
         if (is_array($this->getRequest()->post["attachment"])) {
             foreach ($this->getRequest()->post["attachment"] as $hash) {
                 $hash_array = explode(":", $hash);
                 $storageObject = $this->getStorageMapper()->findByHash($hash_array[1]);
                 if ($storageObject->getMime() == "image/jpeg") {
                     if (strtolower($storageObject->getExtension()) == "jpg") {
-                        $destination = realpath(\Config::get('portrait_dir')) . "/" . $storageObject->getFilename() . ".jpg";
+                        $destination = realpath($config->get("portrait_dir")) . "/" . $storageObject->getFilename() . ".jpg";
 
                         if (file_exists($destination))
                             unlink($destination);
