@@ -10,10 +10,12 @@
 namespace Schoolbox\Admin\Photos;
 
 use Alaress\Web\Controller\Base;
+use Guzzle\Common\Collection;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
@@ -39,10 +41,32 @@ class Controller extends Base
     }
 
     /**
+     * @var UserMapper $userMapper
+     */
+    protected $userMapper;
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper() {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param UserMapper $userMapper
+     * @return $this
+     */
+    public function setUserMapper($userMapper) {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
      * Controller constructor.
      */
     public function __construct() {
         $this->setStorageMapper(StorageMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
     }
 
     /**
@@ -66,12 +90,26 @@ class Controller extends Base
     }
 
     /**
+     * Delete existing user photo
+     */
+    public function postDelete()
+    {
+        /** @var \Schoolbox\Config\Loader $config */
+        $config = $this->getDi()->get("config");
+
+        $destination = realpath($config->get("portrait_dir")) . "/" . $this->getRequest()->post["id"] . ".jpg";
+
+        if (file_exists($destination))
+            unlink($destination);
+    }
+
+    /**
+     * Upload any JPG files into the portrait cache folder overwriting whatever was previously there
+     *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function postUpload()
     {
-        // Upload any JPG files into the portrait cache folder overwriting whatever was previously there
-
         /** @var \Schoolbox\Config\Loader $config */
         $config = $this->getDi()->get("config");
 
@@ -108,6 +146,39 @@ class Controller extends Base
                 'data'     => array(
                     'pageCurrent' => basename($this->getRequest()->query->get('page')),
                     'attachzone' => $this->getAttachZone(),
+                ),
+            )
+        );
+    }
+
+    /**
+     * Render the view page
+     */
+    public function getView()
+    {
+        $allUsers = $this->getUserMapper()->findByColumn("!synergy_id", NULL);
+
+        $users = [];
+
+        /** @var \Schoolbox\User $user */
+        foreach ($allUsers as $user) {
+            /** @var \Schoolbox\Config\Loader $config */
+            $config = $this->getDi()->get("config");
+
+            $destination = realpath($config->get("portrait_dir")) . "/" . $user->getExternalId() . ".jpg";
+
+            if (file_exists($destination))
+                $users[] = $user;
+        }
+
+        // Render this thing out
+
+        $this->getResponse()->content->set(
+            array(
+                'template' => '@adminPhotos/view.twig',
+                'data'     => array(
+                    'pageCurrent' => 'photos',
+                    'users' => $users,
                 ),
             )
         );

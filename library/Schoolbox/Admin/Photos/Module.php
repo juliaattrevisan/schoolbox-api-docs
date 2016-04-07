@@ -27,7 +27,9 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'getIndex', $basePath, "");
+        $this->addGetRoute($router, 'getView', $basePath, "/view");
         $this->addPostRoute($router, 'postUpload', $basePath, "/upload");
+        $this->addPostRoute($router, 'postDelete', $basePath, "/delete");
     }
 
     /**
