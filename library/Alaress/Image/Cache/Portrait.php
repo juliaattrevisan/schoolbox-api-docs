@@ -51,6 +51,8 @@ class Portrait extends BrokenFS
      */
     public function __construct($externalId, $key, User $sessionUser)
     {
+        //var_dump(realpath( \Config::get('portrait_dir') ));exit;
+
         $this->setConfig(new Loader());
         $this->setSessionUser($sessionUser);
         $this->setExternalHandler(new External_User());

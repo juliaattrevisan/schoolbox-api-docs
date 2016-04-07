@@ -1,0 +1,42 @@
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+
+{# Shared navigation menu #}
+
+{{ renderAdminNavigation(pageCurrent) }}
+
+{# Config page contents #}
+
+<div class="row">
+    <div class="small-12 island collapse">
+
+        <form method="post" action="/adminv2/photos/upload">
+
+            <h2 class="subheader">Manual Photo Upload</h2>
+            <section class="content">
+                <p>
+                    This page is for Schools whose SIS product does not store staff/student photos in a format that is
+                    accessible by Schoolbox (e.g. TASS). If your School uses a compatible SIS (e.g. Synergetic) should
+                    not use this feature as photos uploaded here will be overwritten by your SIS photo.
+                </p>
+                <p class="no-margin">
+                    All photos uploaded must be in "JPG" format and named using the ID of the individual in the format
+                    "ID.jpg" (e.g. 1234.jpg)
+                </p>
+            </section>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <section class="no-margin">
+                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                        </section>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" class="button" value="Upload Photos">
+
+        </form>
+
+</div>

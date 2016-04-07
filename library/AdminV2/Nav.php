@@ -32,6 +32,7 @@ class AdminV2_Nav
         'ups' => 'User Provisioning System',
         'import' => 'Import',
         'import-pastoral' => 'Pastoral Care Import',
+        'photos' => 'Manual Photo Upload',
     );
 
     public function parse(SitePage $page, $currentPage = 'home')
