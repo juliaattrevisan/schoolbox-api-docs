@@ -38,8 +38,8 @@ class UserRulesetTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        $this->markTestSkipped(Sync\Grammar\Factory::class.' currently relies on database');
         $this->logger = new Logger(STDOUT, STDERR, Monologger::DEBUG, [], true);
-
         $stratFactory = new Sync\Grammar\Factory($this->logger);
         $this->ruleset = $stratFactory->build(Role::STUDENT);
     }
@@ -50,7 +50,9 @@ class UserRulesetTest extends \PHPUnit_Framework_TestCase
      */
     public function dataLogging()
     {
-        return [];
+        return [
+            [new ExternalStudent(), new InternalUser(),],
+        ];
 //        $euh = new External_User();
 //
 //        // students
@@ -118,5 +120,4 @@ class UserRulesetTest extends \PHPUnit_Framework_TestCase
         $this->hydrate($external);
         echo "\n";
     }
-
 }
