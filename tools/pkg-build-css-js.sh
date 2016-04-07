@@ -59,14 +59,6 @@ then
 	exit 1;
 fi
 
-echo "Building CSS files via LessCSS";
-grunt build.css;
-if [ $? -ne 0 ];
-then
-	echo "An error occurred";
-	exit 1;
-fi
-
 if [ $sass = 1 ]; then
 	echo "Build SASS files (Vagrant provision only, not package build)";
 	grunt sass;

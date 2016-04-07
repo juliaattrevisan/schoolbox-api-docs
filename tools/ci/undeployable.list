@@ -9,7 +9,7 @@ README.md
 *.log
 test
 tools/vagrant*
-tools/pkg-*
+tools/pkg-build*
 tools/composer*
 tools/git*
 tools/ci

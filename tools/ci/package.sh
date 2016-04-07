@@ -36,13 +36,15 @@ fi
 echo "Creating artifact directory";
 mkdir -vp $initialdir/package-artifacts;
 
-for i in schoolbox{,dev,cloud};
+for i in schoolbox{,dev};
 do
 	echo "[$i] Creating package directory";
-	mkdir -vp $initialdir/$i-$version;
+	shortversion=`echo "$version" | cut -d'-' -f1`;
+	majversion=`echo "$version" | cut -d'.' -f1-2`;
+	mkdir -vp $initialdir/$i-$shortversion;
 
 	echo "[$i] Unpacking build artifact";
-	cd $initialdir/$i-$version;
+	cd $initialdir/$i-$shortversion;
 	tar xzf ../build-artifact/"$branch"-build.tar.gz;
 	if [ $? -ne 0 ];
 	then
@@ -88,28 +90,30 @@ do
 	echo "[$i] Building changelog/version file for package";
 	echo "$i ($version) stable; urgency=low" > debian/changelog;
 	echo "" >> debian/changelog;
-	shortversion=`echo "$version" | cut -d'.' -f1-2`;
-	echo "  * Release of the $shortversion series" >> debian/changelog;
+	echo "  * Release of the $majversion series" >> debian/changelog;
 	echo "" >> debian/changelog;
 	curdate=`date -R`;
 	echo " -- Alaress (Schoolbox Signing Key) <support@schoolbox.com.au>  $curdate" >> debian/changelog;
 
 	echo "[$i] Creating source tarballs for packages";
 	cd $initialdir;
-	tar czf "$i"_"$version".orig.tar.gz $i-$version;
+	tar czf "$i"_"$shortversion".orig.tar.gz $i-$shortversion;
 	if [ $? -ne 0 ];
 	then
 		echo "Unable to build source tarball for $i";
 		exit 1;
 	fi
-	cd "$i-$version";
+	cd "$i-$shortversion";
+
 	echo "[$i] Building Package";
-	debuild -i -I -us -uc;
+	debuild -i -I -us -uc --no-lintian;
+	if [ $? -ne 0 ];
+	then
+		echo "Build failed for $i";
+		exit 1;
+	fi
 
-	echo "[$i] Find deb part 1";
-	cp -vf *.deb $initialdir/package-artifacts;
-
-	echo "[$i] Find deb part 2";
+	echo "[$i] Copy deb files to package-artifacts";
 	cp -vf ../*.deb $initialdir/package-artifacts;
 
 	cd $instdir;
