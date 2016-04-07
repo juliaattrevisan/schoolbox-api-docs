@@ -6,467 +6,290 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Button Specimens</h1>
+        <h1>Pantry - Buttons</h1>
+        <ul class="sub-nav">
+            <li><a href="/pantry">Generic Content</a></li>
+            <li class="active"><a href="/pantry/buttons">Buttons</a></li>
+            <li><a href="/pantry/icons">Icons</a></li>
+            <li><a href="/pantry/typography">Typography</a></li>
+            <li><a href="/pantry/editor">Editor</a></li>
+            <li><a href="/pantry/layout">Layouts</a></li>
+            <li><a href="/pantry/form">Form</a></li>
+            <li><a href="/pantry/form-progressive">Form Progressive</a></li>
+            <li><a href="/pantry/tables">Tables</a></li>
+            <li><a href="/pantry/reveal">Reveal</a></li>
+            <li><a href="/pantry/redux">Sample Entities</a></li>
+            <li><a href="/pantry/reference">Visibility Classes</a></li>
+        </ul>
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 island">
+        <h2 class="subheader">Vanilla</h2>
         <section class="content">
-            <p>
-                This specimen page shows you how all the types of button are
-                built and how they compare to each other.
-            </p>
-            <p>
-                There are multiple button implementations; some are used
-                on their own, some within other containing elements etc.
-                You can check their dimensions and construction here, and
-                their interaction with each other.
-            </p>
-            <p>
-                The first column contains a <a href="https://en.wikipedia.org/wiki/Scientific_control">control</a>
-                button, which is the common button element living on its own.
-                The second column contains other button constructs which are
-                compared against the control button to test implementation and
-                dimensioning.
-            </p>
-
-            <ol>
-                <li>Each button is always at least 48px (3rem) tall</li>
-                <li>Adjacent buttons are always separated by a 1px (0.0625rem) margin</li>
-            </ol>
+            <a href="#" class="button">Regular button</a>
+            <a href="#" class="button submit">Submit button (.submit)</a>
+            <a href="#" class="button disabled">Disabled</a>
+            <a href="#" class="button expand">Expand Full</a>
+            <input type="submit" value="Submit" />
         </section>
     </div>
 </div>
 
 <div class="row">
-    <div class="small-12 columns">
-        <div class="content">
-            <div class="row">
-                <div class="small-2 columns">
-                    <h3>Control</h3>
-                </div>
-                <div class="small-10 columns">
-                    <h3>Button Construct</h3>
-                </div>
-            </div>
+    <div class="small-12 island">
+        <h2 class="subheader">Button Groups (Flex List Buttons)</h2>
+        <section class="content">
+            <ul class="flex-list buttons">
+                <li><a href="#" class="button">Button 1</a></li>
+                <li><a href="#" class="button">Button 2</a></li>
+                <li><a href="#" class="button">Button 3</a></li>
+                <li><a href="#" class="button">Button 4</a></li>
+            </ul>
+            <ul class="flex-list buttons">
+                <li><a href="#" class="button primary">Button 1</a></li>
+                <li><a href="#" class="button primary">Button 2</a></li>
+            </ul>
+            <ul class="flex-list buttons">
+                <li><a href="#" class="button icon-previous">Back</a></li>
+                <li><a href="#" class="button icon-next">Next</a></li>
+                <li><a href="#" class="button submit">Finish</a></li>
+            </ul>
+        </section>
+    </div>
+</div>
 
-            <hr />
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Subnav</h2>
+        <section class="content">
+            <ul class="sub-nav">
+                <li><a>Mong Trooper</a></li>
+                <li class="active"><a>Mong Trooper</a></li>
+                <li><a>Mong Trooper</a></li>
+                <li><a>Mong Trooper</a></li>
+            </ul>
+        </section>
+    </div>
+</div>
 
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <a class="button icon-next">Button</a>
-                    <p>Button With Icon</p>
-                </div>
-            </div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Tabs</h2>
+        <section class="content">
+            <dl class="tabs" data-tab>
+                <dd><a href="#a">Tab 1</a></dd>
+                <dd class="active"><a>Tab 2</a></dd>
+                <dd><a href="#b">Tab 3</a></dd>
+                <dd><a href="#c">Tab 4</a></dd>
+            </dl>
+        </section>
+    </div>
+</div>
 
-            <hr />
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader" id="breadcrumbs">Breadcrumbs</h2>
+        <ul class="breadcrumb">
+            <li><a href="#">Home</a></li>
+            <li class="active"><a href="#">Features</a></li>
+            <li class="unavailable"><a href="#">Gene Splicing</a></li>
+            <li><a href="#">Cloning</a></li>
+        </ul>
+    </div>
+</div>
 
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <a class="button icon-next"></a>
-                    <p>Button With Icon Only</p>
-                </div>
-            </div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Pagination</h2>
+        <section class="content">
+            <ul class="pagination">
+                <li class="arrow unavailable"><a href="">‹</a></li>
+                <li class="active"><a href="">1</a></li>
+                <li><a href="">2</a></li>
+                <li><a href="">3</a></li>
+                <li><a href="">4</a></li>
+                <li class="unavailable"><a href="">…</a></li>
+                <li><a href="">12</a></li>
+                <li><a href="">13</a></li>
+                <li class="arrow"><a href="">›</a></li>
+            </ul>
+        </section>
+    </div>
+</div>
 
-            <hr />
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Progress report</h2>
+        <section class="content">
+            <ul class="inline-list no-margin" id="progress-icon">
+                <li>
+                    <a href="#" class="progress-tick no-text"></a>
+                </li>
+                <li>
+                    <a href="#" class="progress-tick pending no-text"></a>
+                </li>
+                <li>
+                    <a href="#" class="progress-tick complete no-text"></a>
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>
 
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <a class="button expand">Expand Button</a>
-                    <p>Fullwidth (Expand) Button</p>
-                </div>
-            </div>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Component Titlebar</h2>
+        <section class="content">
+            <ul class="component-titlebar" style="background-color:#ddd">
+                <li class="actions-small-3">
+                    <div class="list-item">
+                        <div class="small-12 card">
+                            <h2><a href="">Homepage/Dashboard Components Only</a></h2>
+                        </div>
+                    </div>
+                    <nav>
+                        <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
+                        <a data-collapser="true" href="#" class="icon-up-arrow collapse" title="Collapse Content"></a>
+                        <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
+                    </nav>
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>
 
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <ul class="flex-list buttons">
-                        <li>
-                            <a href="#" class="button icon-previous">Previous</a>
-                        </li>
-                        <li>
-                            <a href="#" class="button icon-next">Next</a>
-                        </li>
-                        <li>
-                            <a href="#" class="button expand submit">Finish</a>
-                        </li>
-                    </ul>
-                    <p>Flex List Buttons</p>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <ul class="flex-list buttons">
-                        <li>
-                            <a href="#" class="button icon-previous">Previous</a>
-                        </li>
-                        <li>
-                            <a href="#" class="button icon-calendar">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled</a>
-                        </li>
-                        <li>
-                            <a href="#" class="button icon-next">Next</a>
-                        </li>
-                    </ul>
-                    <p>Flex List Buttons with overflowing content</p>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <ul class="sub-nav">
-                        <li><a>Mong Trooper</a></li>
-                        <li class="active"><a>Mong Trooper</a></li>
-                        <li><a>Mong Trooper</a></li>
-                        <li><a>Mong Trooper</a></li>
-                    </ul>
-
-                    <p>Subnav</p>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <dl class="tabs" data-tab>
-                        <dd><a href="#a">Tab 1</a></dd>
-                        <dd class="active"><a>Tab 2</a></dd>
-                        <dd><a href="#b">Tab 3</a></dd>
-                        <dd><a href="#c">Tab 4</a></dd>
-                    </dl>
-
-                    <p>Tabs</p>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <input type="submit" value="Submit" />
-                    <p>Input Submit</p>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <a class="button submit">Submit</a>
-                    <p>Anchor (Simulated) Submit</p>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <button>Test</button>
-                    <p>&lt;button> html element</p>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <ul class="component-titlebar" style="background-color:#ddd">
-                        <li class="actions-small-3">
-                            <div class="list-item">
-                                <div class="small-12 card">
-                                    <h2><a href="">Homepage/Dashboard Components Only (Example Component Titlebar)</a></h2>
-                                </div>
-                            </div>
-                            <nav>
-                                <a data-target='settings' data-state='closed' href="#" class="icon-settings settings edit" title="Settings"></a>
-                                <a data-collapser="true" href="#" class="icon-up-arrow collapse" title="Collapse Content"></a>
-                                <a data-target="delete" data-state='closed' href="#" class="icon-close" title="Close"></a>
-                            </nav>
-                        </li>
-                    </ul>
-
-                    <p>Component Titlebar</p>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <ul class="pagination">
-                        <li class="arrow unavailable"><a href="">‹</a></li>
-                        <li class="active"><a href="">1</a></li>
-                        <li><a href="">2</a></li>
-                        <li><a href="">3</a></li>
-                        <li><a href="">4</a></li>
-                        <li class="unavailable"><a href="">…</a></li>
-                        <li><a href="">12</a></li>
-                        <li><a href="">13</a></li>
-                        <li class="arrow"><a href="">›</a></li>
-                    </ul>
-                    <p>Pagination</p>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                   <input type="text" value="A generic text input" />
-                    <p>Input (text)</p>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <select>
-                        <option>Option</option>
-                        <option>Option</option>
-                        <option>Option</option>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Context/Avatar Switch</h2>
+        <section class="content" style="overflow: auto;">
+            <div class="context-switch">
+                <nav>
+                    <a data-interaction="previous" href="/submission/listSubmission/2015/1"></a>
+                </nav>
+                <div class="semester">
+                    <select id="context-selector-semester">
+                        <option value="2022/2">Semester 2, 2022</option>
+                        <option value="2022/1">Semester 1, 2022</option>
+                        <option value="2021/2">Semester 2, 2021</option>
+                        <option value="2015/2" selected="selected">Semester 2, 2015</option>
                     </select>
-                        
-                    <p>Select</p>
                 </div>
+                <nav>
+                    <a data-interaction="next" href="/submission/listSubmission/2016/1"></a>
+                </nav>
             </div>
 
-            <hr />
+            <script src="/javascript/shared/jquery.label-timeout.js" type="text/javascript"></script>
+            <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
+            <script src="/submission/inlineGrading/js/inlineGrading.js" type="text/javascript"></script>
+            <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
+            <script src="/javascript/shared/submissions/jquery.marksheet.js" type="text/javascript"></script>
+            <script src="/javascript/resource/jquery.resourceAttach.js" type="text/javascript"></script>
+            <script type="text/javascript">
+                $(function() {
+                    $('[data-delete-submission]').click(function(event) {
+                        event.preventDefault();
 
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <div class="context-switch">
-                        <nav>
-                            <a data-interaction="previous" href="/submission/listSubmission/2015/1"></a>
-                        </nav>
-                        <div class="semester">
-                            <select id="context-selector-semester">
-                                <option value="2022/2">Semester 2, 2022</option>
-                                <option value="2022/1">Semester 1, 2022</option>
-                                <option value="2021/2">Semester 2, 2021</option>
-                                <option value="2015/2" selected="selected">Semester 2, 2015</option>
-                            </select>
-                        </div>
-                        <nav>
-                            <a data-interaction="next" href="/submission/listSubmission/2016/1"></a>
-                        </nav>
-                    </div>
-                    <p>Context Switch</p>
-                </div>
-            </div>
+                        var self = $(this);
 
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <div class="context-switch">
-                        <nav>
-                            <a data-interaction="previous" href="/submission/allWork/230/2015/1"></a>
-                        </nav>
-                        <div class="semester">
-                            <select id="context-selector-semester">
-                                <option value="2013/2">Semester 2, 2013</option>
-                                <option value="2013/1">Semester 1, 2013</option>
-                                <option value="2014/2">Semester 2, 2014</option>
-                                <option value="2014/1">Semester 1, 2014</option>
-                                <option value="2015/2" selected="selected">Semester 2, 2015</option>
-                                <option value="2015/1">Semester 1, 2015</option>
-                            </select>
-                        </div>
-                        <nav>
-                            <a data-interaction="next" disabled="" href="/submission/allWork/230/2016/1"></a>
-                        </nav>
-                        <div class="subject">
-                            <select id="context-selector-enrolled-subjects">
-                                <option disabled="disabled" selected="selected">Select a subject</option>
-                                <option data-id="237" value="2015/2/237">9AH French</option>
-                                <option data-id="507" value="2015/2/507">Google Power Searching Course</option>
-                                <option data-id="469" value="2015/2/469">Sport</option>
-                            </select>
-                        </div>
-                    </div>
-                    <p>Context Switch With Subject</p>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="row">
-                <div class="small-2 columns">
-                    <a class="button">Button</a>
-                </div>
-                <div class="small-10 columns">
-                    <script src="/javascript/shared/jquery.label-timeout.js" type="text/javascript"></script>
-                    <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
-                    <script src="/submission/inlineGrading/js/inlineGrading.js" type="text/javascript"></script>
-                    <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
-                    <script src="/javascript/shared/submissions/jquery.marksheet.js" type="text/javascript"></script>
-                    <script src="/javascript/resource/jquery.resourceAttach.js" type="text/javascript"></script>
-                    <script type="text/javascript">
-                        $(function() {
-                            $('[data-delete-submission]').click(function(event) {
-                                event.preventDefault();
-
-                                var self = $(this);
-
-                                $(this).confirmDialog({
-                                    text: "Remove Alaress Admin's submission?",
-                                    confirmEvent: function() {
-                                        window.location.href = self.attr('href');
-                                    }
-                                });
-                            });
-
-                            var navNext = $('a[rel="next"]');
-                            var navPrev = $('a[rel="prev"]');
-
-                            var tgt = $('select[name=student-select]'), ize,
-                                    skipUnsubmitted = $('#skipUnsubmitted'),
-                                    students = [{"text":"Admin, Alaress","value":"\/submission\/inlineGrading\/view\/22\/19","html":"<div class=\"row\">\n    <div class=\"small-10 columns no-pad\">\n        <div class=\"avatar card\">\n            <img src=\"\/portrait.php?userId=485&size=square64\" alt=\"View Profile\" \/>\n            <p>Admin, Alaress<\/p>\n            <span class=\"label status unsubmitted\">Not Submitted<\/span>\n        <\/div>\n    <\/div>\n    <div class=\"small-2 columns\">\n        <span class=\"progress-tick no-text pending\" title=\"Marked \"><\/span>\n    <\/div>\n<\/div>\n","unsubmitted":true},{"text":"Agius, Byron","value":"\/submission\/inlineGrading\/view\/22\/239","html":"<div class=\"row\">\n    <div class=\"small-10 columns no-pad\">\n        <div class=\"avatar card\">\n            <img src=\"\/portrait.php?userId=287&size=square64\" alt=\"View Profile\" \/>\n            <p>Agius, Byron<\/p>\n            <span class=\"label status submitted\">Submitted on Time<\/span>\n        <\/div>\n    <\/div>\n    <div class=\"small-2 columns\">\n        <span class=\"progress-tick no-text pending\" title=\"Marked \"><\/span>\n    <\/div>\n<\/div>\n","unsubmitted":false}],
-                                    selectizeOptions = {
-                                        preload: true,
-                                        closeAfterSelect: false,
-                                        options: students,
-                                        render: {
-                                            option: function (item) {
-                                                item.disabled = skipUnsubmitted.is(':checked') && item.unsubmitted;
-                                                return $('<div/>').html(item.html).html();
-                                            },
-                                            item: function (item) {
-                                                return $('<div/>').html(item.html).html();
-                                            }
-                                        }
-                                    };
-
-
-                            ize = tgt.selectize(selectizeOptions);
-
-                            // hack, option not available
-                            $('.selectize-input input').prop('disabled', true).hide();
-
-                            // manually set the value, because selectize
-                            ize[0].selectize.setValue("/submission/inlineGrading/view/22/19", true);
-
-                            // add the listener AFTER we've set the value
-                            ize.on('change', function (e) {
-                                window.location.href = e.target.value;
-                            });
-
-                            $('#returnWorkForm').marksheet();
-
-                            $('[data-combobox]').combobox(["Absent","Not Assessed","Not Submitted","Submitted","Pending"]);
-
-                            function refreshNav(nav, source) {
-                                if (source.length) {
-                                    nav.attr('href', source.data('value'))
-                                            .attr('title', source.children('img').attr('alt'))
-                                            .removeAttr('disabled');
-                                } else {
-                                    nav.removeAttr('href')
-                                            .removeAttr('title')
-                                            .attr('disabled', 'disabled');
-                                }
+                        $(this).confirmDialog({
+                            text: "Remove Alaress Admin's submission?",
+                            confirmEvent: function() {
+                                window.location.href = self.attr('href');
                             }
-
-                            /* Asynchronous update
-                             * Rerun plugin
-                             */
-                            skipUnsubmitted.change(function (event) {
-
-                                var ize  = tgt[0].selectize,
-                                        skip = $(this).is(':checked') ? 1 : 0,
-                                        form = $(this).closest('form');
-
-                                // clear the selectize render cache
-                                ize.renderCache.option = {};
-
-                                ize.refreshOptions(false);
-
-                                // fire an ajax to persist the "skip_unsubmitted" state for this box...because reasons...
-                                $.post(form.attr('action'), { boxId: form.children('input[name=boxId]').val(), skipUnsubmitted: skip });
-
-                                var val = ize.getOption(ize.getValue());
-
-                                refreshNav(navNext, ize.getAdjacentOption(val, 1));
-                                refreshNav(navPrev, ize.getAdjacentOption(val, -1));
-
-                            }).trigger('change');
                         });
-                    </script>
-                    <div class="avatar-switch">
-                        <nav>
-                            <a rel="prev" href="" title=""></a>
-                        </nav>
-                        <div class="student">
-                            <select name="student-select"></select>
-                        </div>
-                        <nav>
-                            <a rel="next" href="" title=""></a>
-                        </nav>
-                    </div>
+                    });
 
-                    <p>Avatar Switch</p>
+                    var navNext = $('a[rel="next"]');
+                    var navPrev = $('a[rel="prev"]');
+
+                    var tgt = $('select[name=student-select]'), ize,
+                            skipUnsubmitted = $('#skipUnsubmitted'),
+                            students = [{"text":"Admin, Alaress","value":"\/submission\/inlineGrading\/view\/22\/19","html":"<div class=\"row\">\n    <div class=\"small-10 columns no-pad\">\n        <div class=\"avatar card\">\n            <img src=\"\/portrait.php?userId=485&size=square64\" alt=\"View Profile\" \/>\n            <p>Admin, Alaress<\/p>\n            <span class=\"label status unsubmitted\">Not Submitted<\/span>\n        <\/div>\n    <\/div>\n    <div class=\"small-2 columns\">\n        <span class=\"progress-tick no-text pending\" title=\"Marked \"><\/span>\n    <\/div>\n<\/div>\n","unsubmitted":true},{"text":"Agius, Byron","value":"\/submission\/inlineGrading\/view\/22\/239","html":"<div class=\"row\">\n    <div class=\"small-10 columns no-pad\">\n        <div class=\"avatar card\">\n            <img src=\"\/portrait.php?userId=287&size=square64\" alt=\"View Profile\" \/>\n            <p>Agius, Byron<\/p>\n            <span class=\"label status submitted\">Submitted on Time<\/span>\n        <\/div>\n    <\/div>\n    <div class=\"small-2 columns\">\n        <span class=\"progress-tick no-text pending\" title=\"Marked \"><\/span>\n    <\/div>\n<\/div>\n","unsubmitted":false}],
+                            selectizeOptions = {
+                                preload: true,
+                                closeAfterSelect: false,
+                                options: students,
+                                render: {
+                                    option: function (item) {
+                                        item.disabled = skipUnsubmitted.is(':checked') && item.unsubmitted;
+                                        return $('<div/>').html(item.html).html();
+                                    },
+                                    item: function (item) {
+                                        return $('<div/>').html(item.html).html();
+                                    }
+                                }
+                            };
+
+
+                    ize = tgt.selectize(selectizeOptions);
+
+                    // hack, option not available
+                    $('.selectize-input input').prop('disabled', true).hide();
+
+                    // manually set the value, because selectize
+                    ize[0].selectize.setValue("/submission/inlineGrading/view/22/19", true);
+
+                    // add the listener AFTER we've set the value
+                    ize.on('change', function (e) {
+                        window.location.href = e.target.value;
+                    });
+
+                    $('#returnWorkForm').marksheet();
+
+                    $('[data-combobox]').combobox(["Absent","Not Assessed","Not Submitted","Submitted","Pending"]);
+
+                    function refreshNav(nav, source) {
+                        if (source.length) {
+                            nav.attr('href', source.data('value'))
+                                    .attr('title', source.children('img').attr('alt'))
+                                    .removeAttr('disabled');
+                        } else {
+                            nav.removeAttr('href')
+                                    .removeAttr('title')
+                                    .attr('disabled', 'disabled');
+                        }
+                    }
+
+                    /* Asynchronous update
+                     * Rerun plugin
+                     */
+                    skipUnsubmitted.change(function (event) {
+
+                        var ize  = tgt[0].selectize,
+                                skip = $(this).is(':checked') ? 1 : 0,
+                                form = $(this).closest('form');
+
+                        // clear the selectize render cache
+                        ize.renderCache.option = {};
+
+                        ize.refreshOptions(false);
+
+                        // fire an ajax to persist the "skip_unsubmitted" state for this box...because reasons...
+                        $.post(form.attr('action'), { boxId: form.children('input[name=boxId]').val(), skipUnsubmitted: skip });
+
+                        var val = ize.getOption(ize.getValue());
+
+                        refreshNav(navNext, ize.getAdjacentOption(val, 1));
+                        refreshNav(navPrev, ize.getAdjacentOption(val, -1));
+
+                    }).trigger('change');
+                });
+            </script>
+            <div class="avatar-switch">
+                <nav>
+                    <a rel="prev" href="" title=""></a>
+                </nav>
+                <div class="student">
+                    <select name="student-select"></select>
                 </div>
+                <nav>
+                    <a rel="next" href="" title=""></a>
+                </nav>
             </div>
-
-            <hr />
-
-        </div>
+        </section>
     </div>
 </div>
 
