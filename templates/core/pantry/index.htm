@@ -19,20 +19,41 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Avatar Card Universal List</h1>
+        <h1>Pantry - Content</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <ul class="sub-nav">
+            <li class="active"><a href="/pantry">Content</a></li>
+            <li><a href="/pantry/form">Form</a></li>
+            <li><a href="/pantry/form-progressive">Form Progressive</a></li>
+            <li><a href="/pantry/buttons">Buttons</a></li>
+            <li><a href="/pantry/icons">Icons</a></li>
+            <li><a href="/pantry/typography">Typography</a></li>
+            <li><a href="/pantry/editor">Editor</a></li>
+            <li><a href="/pantry/layout">Layout</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Avatar Card Universal List</h2>
         <ul class="meta">
             <li class="icon-wolfram-alpha"><strong>Things to Note</strong>
                 <ul style="margin:0;text-indent:0;">
                     <li>
-                        <code>.information-list > li</code> no longer requires <code>.row</code> on its list items.
+                        <code>.information-list > li</code> does not require <code>.row</code> on its list items.
                     </li>
                     <li>
-                        <code>.card</code> class now extends <code>.column</code> so you don't need to wrap it
+                        <code>.card</code> class extends <code>.column</code> so you don't need to wrap it
                     </li>
                     <li>
-                        List-item actions are now contained by <code>&lt;nav/&gt;</code>. If you do include row actions,
+                        List-item actions are contained by <code>&lt;nav/&gt;</code>. If you do include row actions,
                         you need to indicate this on the <code>&lt;li/&gt;</code> with <code>.actions-{size}-{action-count}</code>
-                        (see markup for examples). These stack in the same way as column sizings, so you can have different
+                        . These stack in the same way as column sizings, so you can have different
                         numbers of actions on different viewports.
                     </li>
                     <li>
@@ -194,19 +215,6 @@
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="avatar card small-12">
-                                        <a href='#'>
-                                            <img src="/portrait.php?userId=136&size=square64" />
-                                            <h3>The Iron Lady (with link)</h3>
-                                        </a>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a class="icon-modify no-text" href="#" title="Modify"></a>
-                                </nav>
-                            </li>
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="avatar card small-12">
                                         <img src="/portrait.php?userId=137&size=square64" />
                                         <h3>The Short Man (no link)</h3>
                                     </div>
@@ -220,19 +228,6 @@
                                     <div class="avatar card">
                                         <img src="/portrait.php?userId={EXTERNAL_ID}&size=square64" />
                                         <textarea placeholder="Your comment...">Behold my acrid comment. Wither before my scorn!</textarea>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="list-item">
-                                    <div class="avatar card small-12">
-                                        <a href='#'>
-                                            <img src="/portrait.php?userId=8&size=square64" width="48" />
-                                            <h3>
-                                                <a href="/search/user/3">Ms Celia Glenn</a> opened a Research Project <a href="/submission/submissionHistory/18">Assessment out of Total</a>
-                                            </h3>
-                                        </a>
-                                        <p class="meta">31st Jan 2014 1:03pm</p>
                                     </div>
                                 </div>
                             </li>
@@ -308,22 +303,6 @@
                                 <div class="list-item">
                                     <div class="info card small-12">
                                         <a href="#">
-                                            <h3>Shakespeare Assignment 1</h3>
-                                            <p class="meta">
-                                                <span class="gradient-10">Due 6 years from now</span> on 13th Oct 2021 2:00pm
-                                            </p>
-                                        </a>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a href="#" class="icon-poll no-text" title="View Results"></a>
-                                    <a href="#" class="icon-modify no-text" title="Modify"></a>
-                                </nav>
-                            </li>
-                            <li class="actions-small-2">
-                                <div class="list-item">
-                                    <div class="info card small-12">
-                                        <a href="#">
                                             <h3>Info card with content</h3>
                                         </a>
                                         <p class="meta">
@@ -343,21 +322,6 @@
                                         brunch. Freegan trust fund tote bag, skateboard keffiyeh hoodie art party pork belly
                                         pop-up seitan cardigan ethical readymade. Seitan Bushwick dreamcatcher tofu.
                                     </p>
-                                </article>
-                            </li>
-                            <li>
-                                <div class="list-item">
-                                    <div class="avatar card small-12">
-                                        <a href="#">
-                                            <img src="/portrait.php?userId=130&size=square64" />
-                                            <h3>Anita Wit</h3>
-                                        </a>
-                                        <p class="meta"><a href="#">@a_nit_wit</a> tweeted 4 seconds from now</p>
-                                    </div>
-                                </div>
-                                <article>
-                                    <p>You know who's a twit, Ni? You are! That's who!</p>
-                                    <p><img src="https://placekitten.com/g/64/64" alt="Moggy"></p>
                                 </article>
                             </li>
                             <li>
@@ -586,365 +550,71 @@
                         </ul>
                     </section>
                 </div>
-                <div class="small-4 small-offset-8 medium-3 medium-offset-9 column">
-                    <a href="#" class="expand button icon-add">Post File</a>
-                </div>
             </div>
         </div>
     </div>
 </div>
 
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1>Icons</h1>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Actions</h2>
-        <section class="content">
-            <a href="#" class="button icon-add">Add (icon-add)</a>
-            <a href="#" class="button icon-anchor">Anchor (icon-anchor)</a>
-            <a href="#" class="button icon-attach">Attached (icon-attach)</a>
-            <a href="#" class="button icon-approve">Approve (icon-approve)</a>
-            <a href="#" class="button icon-close">Cancel (icon-close)</a>
-            <a href="#" class="button icon-close">Close (icon-close)</a>
-            <a href="#" class="button icon-collapse">Collapse (icon-collapse)</a>
-            <a href="#" class="button icon-comment">Comment (icon-comment)</a>
-            <a href="#" class="button icon-copy">Copy (icon-copy)</a>
-            <a href="#" class="button icon-select">Date Select (icon-select)</a>
-            <a href="#" class="button icon-delete">Delete (icon-delete)</a>
-            <a href="#" class="button icon-download">Download (icon-download)</a>
-            <a href="#" class="button icon-dropdown">Dropdown (icon-dropdown)</a>
-            <a href="#" class="button icon-email">Email (icon-email)</a>
-            <a href="#" class="button icon-expand">Expand (icon-expand)</a>
-            <a href="#" class="button icon-export">Export (icon-export)</a>
-            <a href="#" class="button icon-favourite">Favourite (icon-favourite)</a>
-            <a href="#" class="button icon-filter">Filter (icon-filter)</a>
-            <a href="#" class="button icon-approve">Grade (icon-approve)</a>
-            <a href="#" class="button icon-grip">Grip (icon-grip)</a>
-            <a href="#" class="button icon-help">Help (icon-help)</a>
-            <a href="#" class="button icon-link">Link (icon-link)</a>
-            <a href="#" class="button icon-list">List (icon-list)</a>
-            <a href="#" class="button icon-logout">Log out (icon-logout)</a>
-            <a href="#" class="button icon-mic">Record (icon-mic)</a>
-            <a href="#" class="button icon-recording">Recording (icon-recording)</a>
-            <a href="#" class="button icon-modify">Modify (icon-modify)</a>
-            <a href="#" class="button icon-mute">Mute (icon-mute)</a>
-            <a href="#" class="button icon-open">Open (icon-open)</a>
-            <a href="#" class="button icon-pause">Pause (icon-pause)</a>
-            <a href="#" class="button icon-upload">Post (icon-upload)</a>
-            <a href="#" class="button icon-print">Print (icon-print)</a>
-            <a href="#" class="button icon-refresh">Refresh (icon-refresh)</a>
-            <a href="#" class="button icon-reply">Reply (icon-reply)</a>
-            <a href="#" class="button icon-progress">Report (icon-progress)</a>
-            <a href="#" class="button icon-modify">Re-sit (icon-modify)</a>
-            <a href="#" class="button icon-view">Review (icon-view)</a>
-            <a href="#" class="button icon-search">Search (icon-search)</a>
-            <a href="#" class="button icon-settings">Settings (icon-settings)</a>
-            <a href="#" class="button icon-showcase">Showcase (icon-showcase)</a>
-            <a href="#" class="button icon-shuffle">Shuffle (icon-shuffle)</a>
-            <a href="#" class="button icon-modify">Sit (icon-modify)</a>
-            <a href="#" class="button icon-upload">Submit (icon-upload)</a>
-            <a href="#" class="button icon-undo">Undo (icon-undo)</a>
-            <a href="#" class="button icon-upload">Upload (icon-upload)</a>
-            <a href="#" class="button icon-view">View (icon-view)</a>
-        </section>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Feature</h2>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <a href="#" class="button icon-advanced-list">Advanced List (icon-advanced-list)</a>
-            <a href="#" class="button icon-archive">Archive (icon-archive)</a>
-            <a href="#" class="button icon-components">Adanced Settings (icon-components)</a>
-            <a href="#" class="button icon-audio">Audio (icon-audio)</a>
-            <a href="#" class="button icon-list">Basic List (icon-list)</a>
-            <a href="#" class="button icon-blog">Blog (icon-blog)</a>
-            <a href="#" class="button icon-boarder-leave">Close (icon-boarder-leave)</a>
-            <a href="#" class="button icon-breadcrumbs">Breadcrumbs (icon-breadcrumbs)</a>
-            <a href="#" class="button icon-calendar">{TPL_LOCAL_CALENDAR_PC} (icon-calendar)</a>
-            <a href="#" class="button icon-chat">Chat (icon-chat)</a>
-            <a href="#" class="button icon-class-list">Class List (icon-class-list)</a>
-            <a href="#" class="button icon-teacher">Class Teachers (icon-teacher)</a>
-            <a href="#" class="button icon-click-view">ClickView (icon-click-view)</a>
-            <a href="#" class="button icon-collab-docs">Collab Docs (icon-collab-docs)</a>
-            <a href="#" class="button icon-components">Components (icon-components)</a>
-            <a href="#" class="button icon-countdown">Countdown (icon-countdown)</a>
-            <a href="#" class="button icon-course-builder">Course Builder (icon-course-builder)</a>
-            <a href="#" class="button icon-course-outline">Course Outline (icon-course-outline)</a>
-            <a href="#" class="button icon-criteria">Criteria (icon-criteria)</a>
-            <a href="#" class="button icon-curriculum">Curriculum (icon-curriculum)</a>
-            <a href="#" class="button icon-curriculum-details">Curriculum Details (icon-curriculum-details)</a>
-            <a href="#" class="button icon-curriculum">Curriculum Overview (icon-curriculum)</a>
-            <a href="#" class="button icon-day-view">Day View (icon-day-view)</a>
-            <a href="#" class="button icon-directory">Directory (icon-directory)</a>
-            <a href="#" class="button icon-document">Document (icon-document)</a>
-            <a href="#" class="button icon-drag-drop">Drap and Drop (icon-drag-drop)</a>
-            <a href="#" class="button icon-due-work">Due Work (icon-due-work)</a>
-            <a href="#" class="button icon-edit-columns">Edit Columns (icon-edit-columns)</a>
-            <a href="#" class="button icon-email">Email (icon-email)</a>
-            <a href="#" class="button icon-eportfolio">ePortfolio (icon-eportfolio)</a>
-            <a href="#" class="button icon-drop-box">Drop Box (icon-drop-box)</a>
-            <a href="#" class="button icon-files">Files (icon-files)</a>
-            <a href="#" class="button icon-folder">Folder (icon-folder)</a>
-            <a href="#" class="button icon-forms">Forms (icon-forms)</a>
-            <a href="#" class="button icon-google-drive">Google Drive (icon-google-drive)</a>
-            <a href="#" class="button icon-group">Group (icon-group)</a>
-            <a href="#" class="button icon-group-managers">Group Managers (icon-group-managers)</a>
-            <a href="#" class="button icon-group">Group Members (icon-group)</a>
-            <a href="#" class="button icon-homepagefeed">Homepage Feed (icon-homepagefeed)</a>
-            <a href="#" class="button icon-home">Homepage (icon-home)</a>
-            <a href="#" class="button icon-image">Image (icon-image)</a>
-            <a href="#" class="button icon-image-gallery">Image Gallery (icon-image-gallery)</a>
-            <a href="#" class="button icon-image-slideshow">Image Slideshow (icon-image-slideshow)</a>
-            <a href="#" class="button icon-link">Links (icon-lnk)</a>
-            <a href="#" class="button icon-location">Location (icon-location)</a>
-            <a href="#" class="button icon-mobile">Mobile (icon-mobile)</a>
-            <a href="#" class="button icon-month-view">Month View (icon-month-view)</a>
-            <a href="#" class="button icon-network">Network (icon-network)</a>
-            <a href="#" class="button icon-news">News (icon-news)</a>
-            <a href="#" class="button icon-notifications">Notifications (icon-notifications)</a>
-            <a href="#" class="button icon-office-365">Office 365 (icon-office-365)</a>
-            <a href="#" class="button icon-phone">Phone (icon-phone)</a>
-            <a href="#" class="button icon-pinterest">Pinterest (icon-pinterest)</a>
-            <a href="#" class="button icon-podcast">Podcast (icon-podcast)</a>
-            <a href="#" class="button icon-poll">Poll (icon-poll)</a>
-            <a href="#" class="button icon-progress">Progress Report (icon-progress)</a>
-            <a href="#" class="button icon-quiz">Quiz (icon-quiz)</a>
-            <a href="#" class="button icon-random-image">Random Image (icon-random-image)</a>
-            <a href="#" class="button icon-resource-booking">Resource Booking (icon-resource-booking)</a>
-            <a href="#" class="button icon-folder">Folder (icon-folder)</a>
-            <a href="#" class="button icon-rss">RSS (icon-rss)</a>
-            <a href="#" class="button icon-schoolbox">Schoolbox (icon-schoolbox)</a>
-            <a href="#" class="button icon-social-stream">Social Stream (icon-social-stream)</a>
-            <a href="#" class="button icon-sport">Sport (icon-sport)</a>
-            <a href="#" class="button icon-progress">Statistics (icon-progress)</a>
-            <a href="#" class="button icon-approve">Submissions (icon-approve)</a>
-            <a href="#" class="button icon-surveys">Surveys (icon-surveys)</a>
-            <a href="#" class="button icon-synergetic">Synergetic (icon-synergetic)</a>
-            <a href="#" class="button icon-task">Task (icon-task)</a>
-            <a href="#" class="button icon-textbox">Text Box (icon-textbox)</a>
-            <a href="#" class="button icon-tiles">Tiles (icon-tiles)</a>
-            <a href="#" class="button icon-timetable">Timetable (icon-timetable)</a>
-            <a href="#" class="button icon-twitter">Twitter (icon-twitter)</a>
-            <a href="#" class="button icon-video">Video (icon-video)</a>
-            <a href="#" class="button icon-weather">Weather (icon-weather)</a>
-            <a href="#" class="button icon-week-view">Week View (icon-week-view)</a>
-            <a href="#" class="button icon-wiki">Wiki (icon-wiki)</a>
-            <a href="#" class="button icon-wolfram-alpha">Wolfram Alpha (icon-wolfram-alpha)</a>
-        </section>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Navigation</h2>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <a href="#" class="button icon-next">Go-to (icon-next)</a>
-            <a href="#" class="button icon-home">Home (icon-home)</a>
-            <a href="#" class="button icon-menu">Menu (icon-menu)</a>
-            <a href="#" class="button icon-more">More (icon-more)</a>
-            <a href="#" class="button icon-next">Next (icon-next)</a>
-            <a href="#" class="button icon-previous">Previous (icon-previous)</a>
-            <a href="#" class="button icon-previous">Return (icon-previous)</a>
-            <a href="#" class="button icon-up-arrow">Up/Collapse (icon-up-arrow)</a>
-            <a href="#" class="button icon-down-arrow">Down/Expand (icon-down-arrow)</a>
-            <a href="#" class="button icon-up-down">Up/Down/Sortable (icon-up-down)</a>
-        </section>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Permission</h2>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <a href="#" class="button icon-locked">Locked (icon-locked)</a>
-            <a href="#" class="button icon-locked">Managed (icon-locked)</a>
-            <a href="#" class="button icon-comment">Moderated (icon-comment)</a>
-            <a href="#" class="button icon-open">Open (icon-open)</a>
-            <a href="#" class="button icon-staff-students">Staff & Students (icon-staff-students)</a>
-            <a href="#" class="button icon-locked">Staff Only (icon-locked)</a>
-            <a href="#" class="button icon-staff">Staff, Students & Parents (icon-staff)</a>
-            <a href="#" class="button icon-unlocked">Unlocked (icon-unlocked)</a>
-        </section>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Status</h2>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <a href="#" class="button icon-alert">Alert (icon-alert)</a>
-            <a href="#" class="button icon-danger">Danger (icon-danger)</a>
-            <a href="#" class="button icon-info">Info (icon-info)</a>
-            <a href="#" class="button icon-approve">Success (icon-approve)</a>
-            <a href="#" class="button icon-time-value">Time Value (icon-time-value)</a>
-        </section>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">User</h2>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <a href="#" class="button icon-teacher">Teacher (icon-teacher)</a>
-            <a href="#" class="button icon-staff-students">User (icon-staff-students)</a>
-        </section>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Standalone</h2>
-        <section class="content">
-            <ul class="inline-list">
-                <li>
-                    <a href="#" title="Download">
-                        <i class="icon-countdown"></i>
-                        Default
-                    </a>
-                </li>
-                <li>
-                    <a href="#" title="Success">
-                        <i class="icon-drop-box success icon-32"></i>
-                        32px
-                    </a>
-                </li>
-                <li>
-                    <a href="#" title="Due Work">
-                        <i class="icon-due-work warning icon-48"></i>
-                        48px
-                    </a>
-                </li>
-                <li>
-                    <a href="#" title="Quiz">
-                        <i class="icon-quiz alert icon-64"></i>
-                        64px
-                    </a>
-                </li>
-            </ul>
-        </section>
-
-        <h2 class="subheader">Progress report</h2>
-        <section class="content">
-            <ul class="inline-list" id="progress-icon" style="padding:1rem 0;">
-                <li>
-                    <a href="#" class="progress-tick no-text"></a>
-                </li>
-                <li>
-                    <a href="#" class="progress-tick pending no-text"></a>
-                </li>
-                <li>
-                    <a href="#" class="progress-tick complete no-text"></a>
-                </li>
-            </ul>
-        </section>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="buttons">Buttons</h1>
-
-        <h2 class="subheader">Vanilla</h2>
-        <section class="content">
-            <a href="#" class="button">Regular button</a>
-            <a href="#" class="button submit">Submit button (.submit)</a>
-            <a href="#" class="button disabled">Disabled</a>
-        </section>
-
-        <a href="#" class="button expand">Expand Full</a>
-
-        <h2 class="subheader">Button Groups (Flex List Buttons)</h2>
-        <section class="content">
-            <ul class="flex-list buttons">
-                <li><a href="#" class="button">Button 1</a></li>
-                <li><a href="#" class="button">Button 2</a></li>
-                <li><a href="#" class="button">Button 3</a></li>
-                <li><a href="#" class="button">Button 4</a></li>
-            </ul>
-            <ul class="flex-list buttons">
-                <li><a href="#" class="button primary">Button 1</a></li>
-                <li><a href="#" class="button primary">Button 2</a></li>
-            </ul>
-        </section>
-        <ul class="flex-list buttons">
-            <li><a href="#" class="button icon-previous">Back</a></li>
-            <li><a href="#" class="button icon-next">Next</a></li>
-            <li><a href="#" class="button submit">Finish</a></li>
-        </ul>
-    </div>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1 id="labels">Labels</h1>
-
-        <section class="content">
+<div class="row" data-equalizer>
+    <div class="small-12 medium-6 island">
+        <h2 class="subheader" id="labels">Labels</h2>
+        <section class="content" data-equalizer-watch>
             <p>
-                For submissions/due work:<br />
+                Submissions/due work:<br />
                 <span class="submitted label">Submitted</span>
                 <span class="submitted-late label">Submitted Late</span>
                 <span class="unsubmitted label">Unsubmitted</span>
             </p>
             <p>
-                For general usage:<br />
+                General usage:<br />
                 <span class="success label">Success Label</span>
                 <span class="alert label">Alert Label</span>
                 <span class="neutral label">Neutral Label</span>
             </p>
             <p>
                 <span class="label highlight">Highlight Label</span><br />
-                This used to be <code>.label.secondary</code> but has been
-                repurposed. This is now used almost exclusively in ajax indicators
+                This is used almost exclusively in ajax indicators
                 in label-timeouts.
             </p>
         </section>
     </div>
+    <div class="small-12 medium-6 island">
+        <h2 class="subheader" id="labels">Alert Boxes</h2>
+        <section class="content" data-equalizer-watch>
+            <div data-alert class="alert-box">
+                This is a standard alert (div.alert-box).
+                <a href="" class="close">&times;</a>
+            </div>
+            <div data-alert class="alert-box success">
+                This is a success alert (div.alert-box.success).
+                <a href="" class="close">&times;</a>
+            </div>
+
+            <div data-alert class="alert-box warning">
+                This is a warning alert (div.alert-box.warning).
+                <a href="" class="close">&times;</a>
+            </div>
+
+            <div data-alert class="alert-box alert">
+                This is a danger alert (div.alert-box.alert).
+                <a href="" class="close">&times;</a>
+            </div>
+        </section>
+    </div>
 </div>
 
-<hr />
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader" id="progress-bars">Progress Bars</h2>
+        <section class="content">
+            <div class="progress large-6"><span class="meter" style="width: 40%"></span></div>
+        </section>
+    </div>
+</div>
 
 <div class="row">
     <div class="small-12">
-        <h1 id="empty-states">Empty States</h1>
+        <h2 class="subheader" id="empty-states">Empty States</h2>
     </div>
     <div class="small-6 island">
         <section class="content">
@@ -966,83 +636,24 @@
     </div>
 </div>
 
-<hr />
-
-<div class="row actions-small-3">
-    <div class="list-item">
-        <div class="small-12 island">
-            <h1>Heading with Actions a.k.a. Jelly Tot Menu</h1>
-        </div>
+<div class="row" data-equalizer>
+    <div class="small-12 medium-4 columns island">
+        <h2 class="subheader" id="reveal">Modal / Reveal</h2>
+        <section class="content" data-equalizer-watch>
+            <!-- Triggers the modals -->
+            <a href="#" data-reveal-id="firstModal" class="button expand">Modal in a modal&hellip;</a>
+            <a href="#" data-reveal-id="videoModal" class="button expand">Example Modal with Video&hellip;</a>
+        </section>
     </div>
-    <nav>
-        <a href='#' class='icon-folder' title="Primary Action"></a>
-        <a href='#' class='icon-previous' title="Return to Homepage"></a>
-        <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
-    </nav>
-    <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
-        <li class="separator">Quiz</li>
-        <li><a href='#' class='icon-modify'>Modify</a></li>
-        <li><a href='#' class='icon-export'>Export</a></li>
-        <li><a href='#' class='icon-delete'>Delete</a></li>
-        <li class="separator">Section</li>
-        <li><a href="#" class="icon-add">Add</a></li>
-        <li><a href="#" class="icon-add">Add from Question Bank</a></li>
-        <li><a href="#" class="icon-modify">Modify</a></li>
-        <li><a href="#" class="icon-delete">Delete</a></li>
-    </ul>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1 id="reveal">Modal / Reveal</h1>
-        <!-- Triggers the modals -->
-        <a href="#" data-reveal-id="firstModal" class="radius button">Modal in a modal&hellip;</a>
-        <a href="#" data-reveal-id="videoModal" class="radius button">Example Modal with Video&hellip;</a>
+    <div class="small-12 medium-4 columns island">
+        <h2 class="subheader" id="tooltips">Tooltips</h2>
+        <section class="content" data-equalizer-watch>
+            <p>The tooltips can be positioned on the <span data-tooltip class="has-tip" data-width="400" title="I'm on bottom and the default position.">&quot;tip-bottom&quot;</span>, which is the default position, <span data-tooltip class="has-tip tip-top noradius" data-width="210" title="I'm on the top and I'm not rounded!">&quot;tip-top&quot; (hehe)</span>, <span data-tooltip="left" class="has-tip tip-left" data-width="90" title="I'm on the left!">&quot;tip-left&quot;</span>, or <span data-tooltip="right" class="has-tip tip-right" data-width="520" title="I'm on the right!">&quot;tip-right&quot;</span> of the target element by adding the appropriate class to them. You can even add your own custom class to style each tip differently. On a small device, the tooltips are full width and bottom aligned.</p>
+        </section>
     </div>
-</div>
-
-<!-- Reveal Modals begin -->
-<div id="firstModal" class="reveal-modal" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="firstModalTitle">This is a modal.</h2>
-    <p>Reveal makes these very easy to summon and dismiss. The close button is simply an anchor with a unicode character icon and a class of <code>close-reveal-modal</code>. Clicking anywhere outside the modal will also dismiss it.</p>
-    <p>Finally, if your modal summons another Reveal modal, the plugin will handle that for you gracefully.</p>
-    <p><a href="#" data-reveal-id="secondModal" class="button">Second Modal...</a></p>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-<div id="secondModal" class="reveal-modal" data-reveal aria-labelledby="secondModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="secondModalTitle">This is a second modal.</h2>
-    <p>See? It just slides into place after the other first modal. Very handy when you need subsequent dialogs, or when a modal option impacts or requires another decision.</p>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-<div id="videoModal" class="reveal-modal large" data-reveal aria-labelledby="videoModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="videoModalTitle">This modal has video</h2>
-    <div class="flex-video widescreen vimeo">
-        <iframe width="1280" height="720" src="//www.youtube-nocookie.com/embed/wnXCopXXblE?rel=0" frameborder="0" allowfullscreen></iframe>
-    </div>
-
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-<!-- Reveal Modals end -->
-
-<hr />
-
-<div class="row">
-    <div class="small-12 island">
-        <h1>Dropzones</h1>
-        <ul class="meta">
-            <li><a href="/pantry/form">See form shelf for attachzone implementation</a></li>
-        </ul>
-    </div>
-    <div class="small-12 island">
+    <div class="small-12 medium-4 island">
         <h2 class="subheader">fileDrop</h2>
-        <ul class="meta">
-            <li>You can drop things onto this list</li>
-        </ul>
-        <section>
+        <section data-equalizer-watch>
             <div class="dropzone-wrap">
                 <form id="drop-here" class="dropzone overlay" action="/storage/asyncUpload.php"></form>
                 <ul data-dz-template class="hide">
@@ -1087,58 +698,325 @@
     </div>
 </div>
 
-<hr />
+<!-- Reveal Modals begin -->
+<div id="firstModal" class="reveal-modal" data-reveal aria-labelledby="firstModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="firstModalTitle">This is a modal.</h2>
+    <p>Reveal makes these very easy to summon and dismiss. The close button is simply an anchor with a unicode character icon and a class of <code>close-reveal-modal</code>. Clicking anywhere outside the modal will also dismiss it.</p>
+    <p>Finally, if your modal summons another Reveal modal, the plugin will handle that for you gracefully.</p>
+    <p><a href="#" data-reveal-id="secondModal" class="button">Second Modal...</a></p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div id="secondModal" class="reveal-modal" data-reveal aria-labelledby="secondModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="secondModalTitle">This is a second modal.</h2>
+    <p>See? It just slides into place after the other first modal. Very handy when you need subsequent dialogs, or when a modal option impacts or requires another decision.</p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div id="videoModal" class="reveal-modal large" data-reveal aria-labelledby="videoModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="videoModalTitle">This modal has video</h2>
+    <div class="flex-video widescreen vimeo">
+        <iframe width="1280" height="720" src="//www.youtube-nocookie.com/embed/wnXCopXXblE?rel=0" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<!-- Reveal Modals end -->
 
 <div class="row">
     <div class="small-12 island">
-        <h1 id="tooltips">Tooltips</h1>
+        <h2 class="subheader">Preloader .gif</h2>
         <section class="content">
-            <p>The tooltips can be positioned on the <span data-tooltip class="has-tip" data-width="400" title="I'm on bottom and the default position.">&quot;tip-bottom&quot;</span>, which is the default position, <span data-tooltip class="has-tip tip-top noradius" data-width="210" title="I'm on the top and I'm not rounded!">&quot;tip-top&quot; (hehe)</span>, <span data-tooltip="left" class="has-tip tip-left" data-width="90" title="I'm on the left!">&quot;tip-left&quot;</span>, or <span data-tooltip="right" class="has-tip tip-right" data-width="520" title="I'm on the right!">&quot;tip-right&quot;</span> of the target element by adding the appropriate class to them. You can even add your own custom class to style each tip differently. On a small device, the tooltips are full width and bottom aligned.</p>
+            <div class="loader"></div>
         </section>
     </div>
 </div>
 
-<hr />
-
 <div class="row">
-    <div class="small-12 columns">
-        <ul class="information-list">
-            <li>
-                <h1 id="common" class="no-margin"><a href="/pantry/common">Common Ingredients</a></h1>
-                <p class="meta">These ingredients are universally applicable, but we don't use them as much as Primaries, which are listed on this very page.</p>
-            </li>
-            <li>
-                <h1 id="rare" class="no-margin"><a href="/pantry/rare">Rare Ingredients</a></h1>
-                <p class="meta">These ingredients are used only a handful of times.</p>
-            </li>
-            <li>
-                <h1 id="Unique" class="no-margin"><a href="/pantry/unique">Unique Ingredients</a></h1>
-                <p class="meta">These ingredients are used only once.</p>
-            </li>
+    <div class="small-12 island">
+        <h2 class="subheader" id="gradients">Grade-ients</h2>
+        <section class="content">
+            <ul>
+                <li><span class="gradient-10">.gradient-10</span></li>
+                <li><span class="gradient-9">.gradient-9</span></li>
+                <li><span class="gradient-8">.gradient-8</span></li>
+                <li><span class="gradient-7">.gradient-7</span></li>
+                <li><span class="gradient-6">.gradient-6</span></li>
+                <li><span class="gradient-5">.gradient-5</span></li>
+                <li><span class="gradient-4">.gradient-4</span></li>
+                <li><span class="gradient-3">.gradient-3</span></li>
+                <li><span class="gradient-2">.gradient-2</span></li>
+                <li><span class="gradient-1">.gradient-1</span></li>
+                <li><span class="gradient-0">.gradient-0</span></li>
+            </ul>
+        </section>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        $('#content').find('ul[data-sortable]').sortable({
+            handle:      '.grip',
+            axis:        'y'
+        });
+    });
+</script>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Sortable</h2>
+        <ul class="meta">
+            <li class="icon-approve icon-16">Any kind of list will work, not just information lists with avatar cards</li>
         </ul>
+        <section>
+            <ul class="information-list sortable" data-sortable>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/230">
+                                <img src="/portrait.php?userId=135&amp;size=square64" />
+                                <h3>David Rhodes</h3>
+                                <p class="meta">Senior Students</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/206">
+                                <img src="/portrait.php?userId=134&amp;size=square64" />
+                                <h3>Maddison Rhodes</h3>
+                                <p class="meta">Senior Students</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/151">
+                                <img src="/portrait.php?userId=165&amp;size=square64" />
+                                <h3>Zane Smith</h3>
+                                <p class="meta">Teachers</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/229">
+                                <img src="/portrait.php?userId=133&amp;size=square64" />
+                                <h3>Rachel Rhodes</h3>
+                                <p class="meta">Senior Students</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="row">
+                    <div class="grip"></div>
+                    <div class="small-11 column no-pad">
+                        <div class="avatar card">
+                            <a href="/search/user/245">
+                                <img src="/portrait.php?userId=493&amp;size=square64" />
+                                <h3>Caleb Rhodes</h3>
+                                <p class="meta">Junior Students</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <div class="alert-box">
+            <code>
+                $('#my-sortable-ul').sortable({ handle: '.grip', axis: 'y' });
+            </code>
+        </div>
     </div>
 </div>
 
-<hr />
-
 <div class="row">
     <div class="small-12 columns">
-        <h1 id="typography"><a href="/pantry/typography">Shelf: Typography</a></h1>
-        <h1 id="button"><a href="/pantry/buttons">Shelf: Button Comparison</a></h1>
-        <h1 id="meta"><a href="/pantry/redux">Shelf: REDUX Writeup (Entity Meta)</a></h1>
-        <h1 id="forms"><a href="/pantry/form">Shelf: Forms</a></h1>
-        <h1 id="tables"><a href="/pantry/tables">Shelf: Tables</a></h1>
-        <h1 id="editor"><a href="/pantry/editor">Shelf: Editor</a></h1>
+        <h2 class="subheader" id="accordion">Accordion</h2>
+        <dl class="accordion" data-accordion>
+            <dd class="accordion-navigation">
+                <a href="#panel1">Accordion 1</a>
+                <div id="panel1" class="content active">
+                    <dl class="tabs" data-tab>
+            <dd class="active"><a href="#panel1-1">Tab 1</a></dd>
+            <dd><a href="#panel1-2">Tab 2</a></dd>
+            <dd><a href="#panel1-3">Tab 3</a></dd>
+            <dd><a href="#panel1-4">Tab 4</a></dd>
+        </dl>
+        <div class="tabs-content">
+            <div class="content active" id="panel1-1">
+                <p>First panel content goes here...</p>
+            </div>
+            <div class="content" id="panel1-2">
+                <p>Second panel content goes here...</p>
+            </div>
+            <div class="content" id="panel1-3">
+                <p>Third panel content goes here...</p>
+            </div>
+            <div class="content" id="panel1-4">
+                <p>Fourth panel content goes here...</p>
+            </div>
+        </div>
+    </div>
+    </dd>
+    <dd class="accordion-navigation">
+        <a href="#panel2">Accordion 2</a>
+        <div id="panel2" class="content">
+            Panel 2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        </div>
+    </dd>
+    <dd class="accordion-navigation">
+        <a href="#panel3">Accordion 3</a>
+        <div id="panel3" class="content">
+            Panel 3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        </div>
+    </dd>
+    </dl>
+</div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Block Grid</h2>
+        <section>
+            <ul class="grid medium-block-grid-2 large-block-grid-4">
+                <li>
+                    <div class="avatar-card">
+                        <a href="#" title="View Profile">
+                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                            <p>Karl Pilkington</p>
+                        </a>
+                        <p class="meta">Friday April 12th 2015 11:11am</p>
+                        <p class="meta">Edited five days ago</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="avatar-card">
+                        <a href="#" title="View Profile">
+                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                            <p>Karl Pilkington</p>
+                        </a>
+                        <p class="meta">Friday April 12th 2015 11:11am</p>
+                        <p class="meta">Edited five days ago</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="avatar-card">
+                        <a href="#" title="View Profile">
+                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                            <p>Karl Pilkington</p>
+                        </a>
+                        <p class="meta">Friday April 12th 2015 11:11am</p>
+                        <p class="meta">Edited five days ago</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="avatar-card">
+                        <a href="#" title="View Profile">
+                            <img src="https://placekitten.com/g/64/64" alt="Moggy">
+                            <p>Karl Pilkington</p>
+                        </a>
+                        <p class="meta">Friday April 12th 2015 11:11am</p>
+                        <p class="meta">Edited five days ago</p>
+                    </div>
+                </li>
+            </ul>
+            <div class="content">
+                <a href="#" class="button icon-email">Email all</a>
+            </div>
+        </section>
     </div>
 </div>
 
-<hr/>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader" id="lightbox">Lightbox</h2>
+        <section class="content">
+            <ul class="inline-list img-gallery" data-image-gallery>
+                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/comet.jpg" title="Image 1" rel="lightbox-1"><img src="http://foundation.zurb.com/docs/assets/img/examples/comet-th-sm.jpg" alt="Image 1"></a></li>
+                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/earth.jpg" title="Image 2" rel="lightbox-2"><img src="http://foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt="Image 2"></a></li>
+                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg" title="Image 3" rel="lightbox-3"><img src="http://foundation.zurb.com/docs/assets/img/examples/launch-th-sm.jpg" alt="Image 3"></a></li>
+                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/satelite.jpg" title="Image 4" rel="lightbox-4"><img src="http://foundation.zurb.com/docs/assets/img/examples/satelite-th-sm.jpg" alt="Image 4"></a></li>
+                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/space.jpg" title="Image 5" rel="lightbox-5"><img src="http://foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt="Image 5"></a></li>
+            </ul>
+        </section>
+        <script type="text/javascript">
+            $('[data-image-gallery] li').magnificPopup({
+                delegate: 'a',
+                type: 'image'
+            });
+        </script>
+    </div>
+</div>
 
 <div class="row">
-    <div class="small-12 columns">
-        <h1 id="touchy"><a href="/pantry/touchy">Reference: Touchy</a></h1>
-        <h1 id="reference"><a href="/pantry/reference">Reference: Miscellaneous</a></h1>
+    <div class="small-12 island">
+        <h1 id="image-slider">Image Slider</h1>
+        <!-- Custom javascript -->
+        <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
+        <script type="text/javascript">
+            $(function(){
+                $('[data-imageslider]').anyslider({
+                    interval: 2000,
+                    prevLabel: '',
+                    nextLabel: ''
+                });
+            });
+        </script>
+        <div class="imageslider-container">
+            <div data-imageslider class="imageslider">
+                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+                <a href="/pantry"><img src="https://placeimg.com/1440/280/animals" alt="Animals"></a>
+            </div>
+        </div>
     </div>
+</div>
+
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader" id="flex-video">Flex Video</h2>
+        <div class="flex-video">
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/mqy98hcMV9w?list=PL07CD71F1ABDD9785" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
+<div class="row actions-small-3">
+    <div class="list-item">
+        <div class="small-12 island">
+            <h1>Heading with Actions a.k.a. Jelly Tot Menu</h1>
+        </div>
+    </div>
+    <nav>
+        <a href='#' class='icon-folder' title="Primary Action"></a>
+        <a href='#' class='icon-previous' title="Return to Homepage"></a>
+        <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
+        <li class="separator">Quiz</li>
+        <li><a href='#' class='icon-modify'>Modify</a></li>
+        <li><a href='#' class='icon-export'>Export</a></li>
+        <li><a href='#' class='icon-delete'>Delete</a></li>
+        <li class="separator">Section</li>
+        <li><a href="#" class="icon-add">Add</a></li>
+        <li><a href="#" class="icon-add">Add from Question Bank</a></li>
+        <li><a href="#" class="icon-modify">Modify</a></li>
+        <li><a href="#" class="icon-delete">Delete</a></li>
+    </ul>
 </div>
 
 <hr />
