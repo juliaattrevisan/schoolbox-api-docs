@@ -1,2 +1,0 @@
-ALTER TABLE `event` CHANGE `note` `title` VARCHAR(250) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;
-ALTER TABLE `eotc_event` CHANGE `note` `title` VARCHAR(250) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;

@@ -1,1 +1,0 @@
-UPDATE `msg_source` SET `description` = REPLACE(`description`, 'someone', 'somebody');

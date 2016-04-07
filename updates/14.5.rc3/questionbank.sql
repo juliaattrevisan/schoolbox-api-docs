@@ -1,1 +1,0 @@
-INSERT INTO `error` (`id`, `message`) VALUES ('166', 'You must select a category in the Question Bank.');

@@ -1,1 +1,0 @@
-UPDATE lu_submission_type SET name = 'Quiz' WHERE id = 11;
