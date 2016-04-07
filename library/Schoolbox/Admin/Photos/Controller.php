@@ -79,7 +79,7 @@ class Controller extends Base
             foreach ($this->getRequest()->post["attachment"] as $hash) {
                 $hash_array = explode(":", $hash);
                 $storageObject = $this->getStorageMapper()->findByHash($hash_array[1]);
-                if ($storageObject->getMime() == "image/jpeg") {
+                if ($storageObject->getMimetype()->isImage()) {
                     if (strtolower($storageObject->getExtension()) == "jpg") {
                         $destination = realpath($config->get("portrait_dir")) . "/" . $storageObject->getFilename() . ".jpg";
 
