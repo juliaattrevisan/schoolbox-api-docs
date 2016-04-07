@@ -689,11 +689,11 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
                     'RETURNED_WORK_SUBMISSION_ID' => $associatedSubmission->getId(),
                 )
             );
+            $this->parse('return_file_uuid_block', 'return_file_uuid');
         } catch (\Exception $e) {
-            error(44);
+            // This return doesn't relate to a submission for some reason.
+            // I suppose that's okay, but it doesn't link to anything.
         }
-
-        $this->parse('return_file_uuid_block', 'return_file_uuid');
     }
 
     $this->setVar('return_file_block', '');
