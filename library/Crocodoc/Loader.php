@@ -90,7 +90,7 @@ class Loader
         $result = json_decode($this->getCurl()->getResult());
 
         if($this->getCurl()->getErrors()) {
-            throw new \Exception($this->getCurl()->getErrors());
+            throw new \Exception(implode(', ', $this->getCurl()->getErrors()));
         }
         else if(isset($result->error)) {
             throw new \Exception($result->error);
