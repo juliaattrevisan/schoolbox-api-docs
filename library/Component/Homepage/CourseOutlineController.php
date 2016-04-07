@@ -111,6 +111,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             $task_list       = array_reduce(
                 array_map(
                     function ($v) {
+                        /** @var Collection $v */
                         return $v->getColumnValues('id');
                     },
                     $this->unit_list->getColumnValues('tasks')
@@ -156,12 +157,12 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
 
         // Unit list blocks
         $this->setBlock($templateHandle, 'course_unit_list', 'course_unit_list_block');
+        $this->setBlock($templateHandle, 'course_modify', 'course_modify_block');
         $this->setBlock('course_unit_list', 'unit', 'unit_block');
         $this->setBlock('unit', 'unit_expand', 'unit_expand_block');
         $this->setBlock('unit', 'unit_no_expand', 'unit_no_expand_block');
         $this->setBlock('unit', 'unit_completion', 'unit_completion_block');
         $this->setBlock('unit', 'unit_actions', 'unit_actions_block');
-        $this->setBlock('unit_actions', 'unit_modify', 'unit_modify_block');
         $this->setBlock('unit_actions', 'unit_delete', 'unit_delete_block');
         $this->setBlock('unit_actions', 'unit_report_actions', 'unit_report_actions_block');
         $this->setBlock('unit_actions', 'unit_add_task_actions', 'unit_add_task_actions_block');
@@ -294,17 +295,15 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 'unit_no_expand_block'        => '',
                 'unit_actions_block'          => '',
                 'unit_delete_block'           => '',
-                'unit_modify_block'           => '',
                 'unit_report_actions_block'   => '',
                 'unit_add_task_actions_block' => '',
-
-
+                'course_modify_block'         => '',
             )
         );
 
         if (!$this->readOnly) {
+            $this->parse('course_modify_block', 'course_modify');
             $this->parse('unit_delete_block', 'unit_delete');
-            $this->parse('unit_modify_block', 'unit_modify');
             $this->parse('unit_task_allow_move_block', 'unit_task_allow_move');
             $this->parse('unit_report_actions_block', 'unit_report_actions');
             if (!$unit->isAfterDueDate()) {
