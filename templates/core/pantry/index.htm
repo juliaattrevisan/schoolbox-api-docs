@@ -19,21 +19,25 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Pantry - Content</h1>
+        <h1>Pantry - Generic Content</h1>
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 columns">
         <ul class="sub-nav">
-            <li class="active"><a href="/pantry">Content</a></li>
-            <li><a href="/pantry/form">Form</a></li>
-            <li><a href="/pantry/form-progressive">Form Progressive</a></li>
+            <li class="active"><a href="/pantry">Generic Content</a></li>
             <li><a href="/pantry/buttons">Buttons</a></li>
             <li><a href="/pantry/icons">Icons</a></li>
             <li><a href="/pantry/typography">Typography</a></li>
             <li><a href="/pantry/editor">Editor</a></li>
-            <li><a href="/pantry/layout">Layout</a></li>
+            <li><a href="/pantry/layout">Layouts</a></li>
+            <li><a href="/pantry/form">Form</a></li>
+            <li><a href="/pantry/form-progressive">Form Progressive</a></li>
+            <li><a href="/pantry/tables">Tables</a></li>
+            <li><a href="/pantry/reveal">Reveal</a></li>
+            <li><a href="/pantry/redux">Sample Entities</a></li>
+            <li><a href="/pantry/reference">Visibility Classes</a></li>
         </ul>
     </div>
 </div>
@@ -961,13 +965,13 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h1 id="image-slider">Image Slider</h1>
+        <h2 class="subheader" id="image-slider">Image Slider</h2>
         <!-- Custom javascript -->
         <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
         <script type="text/javascript">
             $(function(){
                 $('[data-imageslider]').anyslider({
-                    interval: 2000,
+                    interval: 4000,
                     prevLabel: '',
                     nextLabel: ''
                 });
@@ -994,32 +998,6 @@
         </div>
     </div>
 </div>
-
-<div class="row actions-small-3">
-    <div class="list-item">
-        <div class="small-12 island">
-            <h1>Heading with Actions a.k.a. Jelly Tot Menu</h1>
-        </div>
-    </div>
-    <nav>
-        <a href='#' class='icon-folder' title="Primary Action"></a>
-        <a href='#' class='icon-previous' title="Return to Homepage"></a>
-        <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
-    </nav>
-    <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
-        <li class="separator">Quiz</li>
-        <li><a href='#' class='icon-modify'>Modify</a></li>
-        <li><a href='#' class='icon-export'>Export</a></li>
-        <li><a href='#' class='icon-delete'>Delete</a></li>
-        <li class="separator">Section</li>
-        <li><a href="#" class="icon-add">Add</a></li>
-        <li><a href="#" class="icon-add">Add from Question Bank</a></li>
-        <li><a href="#" class="icon-modify">Modify</a></li>
-        <li><a href="#" class="icon-delete">Delete</a></li>
-    </ul>
-</div>
-
-<hr />
 
 <script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script>
