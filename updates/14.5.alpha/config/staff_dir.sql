@@ -1,1 +1,0 @@
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`) VALUES ('synergetic_staff_dir_restrict', 'SC', 'Staff Directory Restriction', 'Remove staff in this category from the staff directory page, eg \'SC,NP\'', '1', '7', 'true');
