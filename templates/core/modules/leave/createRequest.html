@@ -23,9 +23,11 @@
 		$('[data-relation="host_type_selector"]').change(function(){
             var details = $('[data-relation="host_type_field"]');
 			if(($(this).val() == '4')){
-                details.slideUp();
+                details.slideUp()
+                    .find('input').prop('required', false);
 			} else {
-                details.slideDown();
+                details.slideDown()
+                    .find('input').prop('required', true);
 			}
 		}).change();
 
@@ -62,7 +64,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form action="/modules/leave/processCreate" method="post" class="top">
+        <form action="/modules/leave/processCreate" method="post" class="top" data-validate>
             <section>
                 <fieldset class="content">
                     <legend>Student</legend>

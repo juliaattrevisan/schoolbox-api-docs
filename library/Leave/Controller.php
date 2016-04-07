@@ -508,6 +508,12 @@ class Leave_Controller extends Controller
                     ? $userId
                     : $sessionUser->getId())
             );
+
+            // Does this user have a house?
+            if (!$request->getUser()->getResidentialHouse()->getId()) {
+                error(19);
+            }
+
             $request->setAuthor($_SESSION['user']);
             $request->setStart($start->getDatabase());
             $request->setFinish($finish->getDatabase());
@@ -746,6 +752,10 @@ class Leave_Controller extends Controller
             throw new Exception_Schoolbox_NotFound('Request not found');
         }
 
+        if (!$this->hasApprovePermission($request->getUser()->getResidentialHouse()->getId())) {
+            error(19);
+        }
+
         $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/Y H:i:s');
         $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/Y H:i:s');
 
@@ -821,6 +831,11 @@ class Leave_Controller extends Controller
         } catch (Schoolbox\Mapper\Exception $e) {
             throw new Exception_Schoolbox_NotFound('House not found');
         }
+
+        if (!$this->hasReportingPermission()) {
+            error(19);
+        }
+
         $requestList = $this->getRequestMapper()->findAllByHouseId($house->getId());
 
         return array(
@@ -1302,6 +1317,10 @@ class Leave_Controller extends Controller
             throw new Exception_Schoolbox_NotFound('House not found');
         }
 
+        if (!$this->hasReportingPermission()) {
+            error(19);
+        }
+
         /* Mess with these two magic numbers to change the range, in conjunction
            * with the class constant RANGE
            */
@@ -1378,6 +1397,9 @@ class Leave_Controller extends Controller
      */
     public function executeCateringReport($date)
     {
+        if (!$this->hasReportingPermission()) {
+            error(19);
+        }
         /* Collate results for each day
            */
         $data = array();

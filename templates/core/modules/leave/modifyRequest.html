@@ -202,9 +202,12 @@
         $('[data-relation="host_type_selector"]').change(function(){
             var details = $('[data-relation="host_type_field"]');
             if(($(this).val() == '4')){
-                details.slideUp();
+                // first and last name aren't required
+                details.slideUp()
+                    .find('input').prop('required', false);
             } else {
-                details.slideDown();
+                details.slideDown()
+                    .find('input').prop('required', true);
             }
         }).change();
 
