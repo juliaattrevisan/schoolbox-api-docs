@@ -211,7 +211,7 @@
                 </fieldset>
             </section>
 
-            <h2 class="subheader">Visibility</h2>
+            <h2 class="subheader">Audience</h2>
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -224,17 +224,17 @@
 
                                 <input type="hidden" name="role[{{ role.getId }}]" value="0" />
                                 <input type="checkbox" name="role[{{ role.getId }}]" id="role[{{ role.getId }}]" value="1"
-                                        {% if record.getId != '' %}
-                                            {% for access in record.getAccessList if access.getRole.getId != '' %}
-                                                {% if access.getRole.getId == role.getId %}
-                                                    checked
-                                                {% endif %}
-                                            {% endfor %}
-                                        {% else %}
-                                            {% if role.getType == 'staff' %}
+                                    {% if record.getId != '' %}
+                                        {% for access in record.getAccessList if access.getRole.getId != '' %}
+                                            {% if access.getRole.getId == role.getId %}
                                                 checked
                                             {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        {% if role.getType == 'staff' %}
+                                            checked
                                         {% endif %}
+                                    {% endif %}
                                 />
                                 <label for="role[{{ role.getId }}]" class="checkbox-label">{{ role.getName }} {% if role.getType == 'parent' %}of student{% endif %}</label>
 

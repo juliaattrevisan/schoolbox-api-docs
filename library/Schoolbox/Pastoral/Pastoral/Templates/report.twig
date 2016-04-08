@@ -70,8 +70,7 @@
                                     <a href="/search/user/{{ record.owner.getId() }}">
                                         <img class="show-on-print" src="/portrait.php?userId={{ record.getStudent().getExternalId() }}&amp;size=square64" width="64">
                                     </a>
-                                    <h4>{{ record.getStudent().getFirstname }} {{ record.getStudent().getLastname }}</h4>
-                                    <h2 class="subheader">{{ record.getHeading() }}</h2>
+                                    <h4>{{ record.getStudent().getFirstname }} {{ record.getStudent().getLastname }} - {{ record.getHeading() }}</h4>
                                     <p class="spaced meta">
                                         Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getCreatedAt().getShort() }}
                                     </p>
