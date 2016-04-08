@@ -156,6 +156,7 @@
 
                         {% for related in record.getRelatedRecords %}
 
+                            {% if related.getStudent.getId != record.getStudent.getId %}
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="small-12 avatar card wrap-down">
@@ -175,6 +176,7 @@
                                     </div>
                                 </div>
                             </li>
+                        {% endif %}
 
                         {% endfor %}
 
