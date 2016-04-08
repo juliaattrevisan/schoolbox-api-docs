@@ -1,17 +1,25 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
-<!-- END custom_head -->
-
 {BREADCRUMB}
 
+<!-- BEGIN standalone_header -->
 <div class="row">
     <div class="small-12 island">
         <h1>Export {TASK_TYPE_LABEL}: {TASK_TITLE}</h1>
     </div>
 </div>
+<!-- END standalone_header -->
+
+<!-- BEGIN modal_header -->
+<div class="row">
+    <div class="small-12 columns">
+        <h2>Export {TASK_TYPE_LABEL}: {TASK_TITLE}</h2>
+    </div>
+</div>
+<!-- END modal_header -->
 
 <div class="row">
     <div class="small-12 island">
+        <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+
         <form method="post" action="/task/exportForm.php" id="importForm">
             <input type="hidden" name="task" value="{TASK_ID}" />
             <section>
@@ -88,9 +96,13 @@
                     </div>
                 </fieldset>
             </section>
+
             <!-- BEGIN submit -->
-            <input type="submit" value="Export to selected classes" />
+            <input type="submit" class='expand' value="Export to selected classes" />
             <!-- END submit -->
         </form>
     </div>
 </div>
+<!-- BEGIN modal_close -->
+<a class="close-reveal-modal" aria-label="Close">&#215;</a>
+<!-- END modal_close -->

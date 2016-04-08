@@ -37,10 +37,17 @@ if ($group->getPermission($categoryId) < WRITE_ACCESS) {
     exit;
 }
 
+// is this an XHR request?
+$isXhr = $this->detectAjax();
+
+
 // Shitty block parsing
 $this->setFile(TEMPLATE_content,  "task/export.html");
 $this->setBlock(TEMPLATE_content, 'exportable',       'exportable_block');
 $this->setBlock(TEMPLATE_content, 'unexportable',     'unexportable_block');
+$this->setBlock(TEMPLATE_content, 'standalone_header', 'standalone_header_block');
+$this->setBlock(TEMPLATE_content, 'modal_header',      'modal_header_block');
+$this->setBlock(TEMPLATE_content, 'modal_close',       'modal_close_block');
 $this->setBlock('exportable',     'class',            'class_block');
 $this->setBlock('class',          'class_import_allowed', 'class_import_allowed_block');
 $this->setBlock('class',          'class_import_forbidden', 'class_import_forbidden_block');
@@ -52,6 +59,10 @@ $this->setVar(
         'exportable_block'      => '',
         'submit_block'          => '',
         'unexportable_block'    => '',
+        'standalone_header_block' => '',
+        'modal_header_block'      => '',
+        'modal_close_block'       => '',
+        'BREADCRUMB'              => '',
     )
 );
 
@@ -138,6 +149,17 @@ if (count($unitList) > 0) {
 else {
     $this->parse('unexportable_block', 'unexportable');
 }
+
+if ($isXhr) {
+    // ajax request: don't output the chrome
+    $this->parse('modal_close_block', 'modal_close');
+    $this->parse('modal_header_block', 'modal_header');
+
+    die($this->template->parse('finaloutput', TEMPLATE_content));
+}
+
+// output the regular h1 header
+$this->parse('standalone_header_block', 'standalone_header');
 
 $trail = new Schoolbox\Breadcrumbs();
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
