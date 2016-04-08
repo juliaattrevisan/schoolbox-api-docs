@@ -99,16 +99,20 @@ class Renderer extends Handler
                 }
 
 
-                // Show pastoral to staff and parents
-                if ($_SESSION['user']->getRole()->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
-                    $this->getPage()->parse('pastoral_block', 'pastoral');
-                } else {
-                    $this->getPage()->setVar('pastoral_block', '');
-                }
-
                 if (\Config::get('pastoral_enabled') != 1) {
                     $this->getPage()->setVar('pastoral_block', '');
                 }
+                else
+                {
+                    // Show pastoral to staff and parents
+                    if (($_SESSION['user']->getRole()->isStaff() || $groupHandler->isParentOfChild($user['id'])) &&
+                        $groupHandler->isStudent($user['id'])) {
+                        $this->getPage()->parse('pastoral_block', 'pastoral');
+                    } else {
+                        $this->getPage()->setVar('pastoral_block', '');
+                    }
+                }
+
 
 
                     //Show student timetables to staff and parents of child
