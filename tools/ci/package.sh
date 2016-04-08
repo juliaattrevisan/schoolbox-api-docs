@@ -106,7 +106,7 @@ do
 	cd "$i-$shortversion";
 
 	echo "[$i] Building Package";
-	debuild -i -I -us -uc --no-lintian;
+	debuild -i -I -us -uc;
 	if [ $? -ne 0 ];
 	then
 		echo "Build failed for $i";
@@ -124,3 +124,14 @@ ls -lhR $initialdir/package-artifacts/;
 
 echo "Other build items";
 ls -lh $initialdir;
+
+echo "Creating package tarball";
+cd $initialdir;
+tar czf package.tar.gz package-artifacts;
+if [ $? -ne 0 ];
+then
+	echo "Unable to tarball packages";
+	exit 1;
+fi
+
+mv -v package.tar.gz package-artifacts/;

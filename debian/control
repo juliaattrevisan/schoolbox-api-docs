@@ -11,9 +11,9 @@ Vcs-Browser: https://github.com/alaress/schoolbox
 Package: schoolbox
 Architecture: all
 Depends: ${misc:Depends}
-Provides: schoolbox-mobile
-Replaces: schoolbox-mobile
-Conflicts: javascript-common, schoolbox-mobile
+Provides: schoolbox-mobile, schoolbox-leave, schoolbox-resource
+Replaces: schoolbox-mobile, schoolbox-leave, schoolbox-resource
+Conflicts: javascript-common, schoolbox-mobile, schoolbox-leave, schoolbox-resource
 Description: Schoolbox LMS by Alaress Pty. Ltd.
  Schoolbox is at the leading edge of eLearning solutions for the K-12
  education market. The Schoolbox system is carefully integrated with school
@@ -22,36 +22,6 @@ Description: Schoolbox LMS by Alaress Pty. Ltd.
  accessible. Furthermore Schoolbox streamlines the education process by
  increasing staff efficiency, leaving greater time for the core purpose of
  schools - learning.
-
-Package: schoolbox-dr
-Architecture: all
-Depends: ${misc:Depends}
-Conflicts: javascript-common
-Description: Schoolbox Disaster Recovery dependencies and scripts
- Ensures all core dependencies for Schoolbox are installed as well as any
- scripts required for disaster recovery.
-
-Package: schoolbox-sso
-Architecture: all
-Depends: schoolbox,
- libapache2-mod-auth-kerb, krb5-config, krb5-user,
- ${misc:Depends}
-Description: Kerberos dependencies for SSO usage
- Ensures the Kerberos dependencies for SSO are installed and provides an
- example apache vhost file
-
-Package: schoolbox-leave
-Architecture: all
-Depends: schoolbox, ${misc:Depends}
-Description: Leave module for the Schoolbox LMS
- Leave module for the Schoolbox LMS
-
-
-Package: schoolbox-resource
-Architecture: all
-Depends: schoolbox, ${misc:Depends}
-Description: Resource Booking module for the Schoolbox LMS
- Resource Booking module for the Schoolbox LMS
 
 Package: schoolbox-eotc
 Architecture: all
