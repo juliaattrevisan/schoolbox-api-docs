@@ -10,6 +10,8 @@ use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Alaress\DebugBar\Instance as DebugBar;
@@ -29,6 +31,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
     /** @var PastoralTypeMapper $pastoralTypeMapper */
     protected $pastoralTypeMapper;
+
+    /** @var PastoralAccessMapper $pastoralAccessMapper */
+    protected $pastoralAccessMapper;
 
     /** @var PastoralSeverityMapper $pastoralSeverityMapper */
     protected $pastoralSeverityMapper;
@@ -82,6 +87,22 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     }
 
     /**
+     * @return PastoralAccessMapper
+     */
+    public function getPastoralAccessMapper() {
+        return $this->pastoralAccessMapper;
+    }
+
+    /**
+     * @param $pastoralAccessMapper
+     * @return $this
+     */
+    public function setPastoralAccessMapper($pastoralAccessMapper) {
+        $this->pastoralAccessMapper = $pastoralAccessMapper;
+        return $this;
+    }
+
+    /**
      * @return PastoralSeverityMapper
      */
     public function getPastoralSeverityMapper() {
@@ -108,6 +129,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $this->setUserMapper(UserMapper::getInstance());
         $this->setPastoralMapper(PastoralMapper::getInstance());
         $this->setPastoralTypeMapper(PastoralTypeMapper::getInstance());
+        $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
         $this->setPastoralSeverityMapper(PastoralSeverityMapper::getInstance());
 
         if (DebugBar::isEnabled()) {
@@ -217,6 +239,7 @@ FROM            dbo.tPastoralCare INNER JOIN
 
         $imported = [];
         $skipped = [];
+        $userCache = [];
 
         foreach ($records as $record)
         {
@@ -252,8 +275,14 @@ FROM            dbo.tPastoralCare INNER JOIN
                 $owner = null;
                 $student = null;
 
-                $owner = $this->getUserMapper()->findByExternalId($record["CreatedByID"]);
-                $student = $this->getUserMapper()->findByExternalId($record["ID"]);
+                if (!isset($userCache[$record["CreatedByID"]]))
+                    $userCache[$record["CreatedByID"]] = $this->getUserMapper()->findByExternalId($record["CreatedByID"]);
+
+                if (!isset($userCache[$record["ID"]]))
+                    $userCache[$record["ID"]] = $this->getUserMapper()->findByExternalId($record["ID"]);
+
+                $owner = $userCache[$record["CreatedByID"]];
+                $student = $userCache[$record["ID"]];
 
                 $record["heading"] = substr($record["Details"], 0, 50);
                 $pastoralRecord = new PastoralModel();
@@ -269,6 +298,24 @@ FROM            dbo.tPastoralCare INNER JOIN
                 $pastoralRecord->setUpdatedAt(\Alaress_Date_Format::newLocal($record["ModifiedDate"]));
                 $this->getPastoralMapper()->save($pastoralRecord);
                 $imported[] = $record;
+
+                $audience_query = "SELECT ID FROM PastoralCareContacts WHERE PastoralCareSeq = {$record["PastoralCareSeq"]}";
+                $audience_records = $this->getDatabase()->getAll($audience_query);
+
+                if (is_array($audience_records))
+                foreach ($audience_records as $audience_record)
+                {
+                    try {
+                        if (!isset($userCache[$audience_record["ID"]]))
+                            $userCache[$audience_record["ID"]] = $this->getUserMapper()->findByExternalId($audience_record["ID"]);
+
+                        $accessRecord = new PastoralAccessModel();
+                        $accessRecord->setPastoralId($pastoralRecord->getId());
+                        $accessRecord->setUser($userCache[$audience_record["ID"]]);
+                        $this->getPastoralAccessMapper()->save($accessRecord);
+                    } catch (\Exception $e) {
+                    }
+                }
 
                 if ($record["Details"] != $record["PrivateDetails"] && trim($record["PrivateDetails"]) != "")
                 {
@@ -289,6 +336,21 @@ FROM            dbo.tPastoralCare INNER JOIN
                     $this->getPastoralMapper()->save($pastoralRecordPrivate);
                     $record["private"] = 1;
                     $imported[] = $record;
+
+                    if (is_array($audience_records))
+                    foreach ($audience_records as $audience_record)
+                    {
+                        try {
+                            if (!isset($userCache[$audience_record["ID"]]))
+                                $userCache[$audience_record["ID"]] = $this->getUserMapper()->findByExternalId($audience_record["ID"]);
+
+                            $accessRecord = new PastoralAccessModel();
+                            $accessRecord->setPastoralId($pastoralRecordPrivate->getId());
+                            $accessRecord->setUser($userCache[$audience_record["ID"]]);
+                            $this->getPastoralAccessMapper()->save($accessRecord);
+                        } catch (\Exception $e) {
+                        }
+                    }
                 }
             }
             catch (\Exception $e)
