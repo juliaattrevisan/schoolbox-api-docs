@@ -128,7 +128,7 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @return \Alaress_Date_Format $modifiedDate
+     * @return \Alaress_Date_Format $deletedAt
      */
     public function getDeletedAt() {
         return $this->deletedAt;
@@ -144,7 +144,7 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @return \Alaress_Date_Format $modifiedDate
+     * @return \Alaress_Date_Format $updatedAt
      */
     public function getUpdatedAt() {
         return $this->updatedAt;
@@ -160,7 +160,7 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @return \Alaress_Date_Format $modifiedDate
+     * @return \Alaress_Date_Format $createdAt
      */
     public function getCreatedAt() {
         return $this->createdAt;

@@ -1025,7 +1025,7 @@ class Controller extends Base
 
                     // The attachment was found in the database, remove it
 
-                    $attachment->setModifiedDate(\Alaress_Date_Format::now());
+                    $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                     $this->getPastoralAttachmentMapper()->delete($attachment);
 
                 } else {
