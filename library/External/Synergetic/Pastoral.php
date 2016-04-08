@@ -278,10 +278,11 @@ FROM            dbo.tPastoralCare INNER JOIN
                 if (!isset($userCache[$record["CreatedByID"]]))
                     $userCache[$record["CreatedByID"]] = $this->getUserMapper()->findByExternalId($record["CreatedByID"]);
 
+                $owner = $userCache[$record["CreatedByID"]];
+
                 if (!isset($userCache[$record["ID"]]))
                     $userCache[$record["ID"]] = $this->getUserMapper()->findByExternalId($record["ID"]);
 
-                $owner = $userCache[$record["CreatedByID"]];
                 $student = $userCache[$record["ID"]];
 
                 $record["heading"] = substr($record["Details"], 0, 50);
