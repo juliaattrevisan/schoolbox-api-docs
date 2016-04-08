@@ -561,7 +561,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         } elseif ($task->getType() == Task::TYPE_ONLINE_ASSESS) {
             $dueDate = $task->getAssessment()->getFinish();
         }
-        if ($dueDate instanceof Alaress_Date_Format) {
+        if ($dueDate instanceof Alaress_Date_Format && !$dueDate->isNull()) {
             $this->setVar(
                 array(
                     'UNIT_TASK_DUE_DATE'          => Scrub::text($dueDate->getDateOnly()),

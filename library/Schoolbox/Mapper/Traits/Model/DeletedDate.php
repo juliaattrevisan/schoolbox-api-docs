@@ -49,6 +49,6 @@ trait DeletedDate
      */
     public function isDeleted()
     {
-        return $this->getDeletedDate() instanceof Alaress_Date_Format;
+        return $this->getDeletedDate() instanceof Alaress_Date_Format && !$this->getDeletedDate()->isNull();
     }
 }

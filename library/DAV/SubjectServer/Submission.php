@@ -99,7 +99,7 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
         $submission = $this->getSubmission();
         if ($submission instanceof Submission\File) {
             $date = $submission->getCreatedAt();
-            if ($date instanceof Alaress_Date_Format) {
+            if ($date instanceof Alaress_Date_Format && !$date->isNull()) {
                 return $date->getUnixTimestamp();
             }
         }

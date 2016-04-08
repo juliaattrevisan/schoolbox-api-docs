@@ -85,6 +85,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             $isTask = $submission->getTask()->getId();
             if (!$isTask
                 && $submission->getLateDate() instanceof Alaress_Date_Format
+                && !$submission->getLateDate()->isNull()
                 && $submission->getLateDate()->getDateTimeObject() < $time->getDateTimeObject()
             ) {
                 continue;
@@ -94,6 +95,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             // but allow it to always show to owner
             if (!$isTask
                 && $submission->getPublishDate() instanceof Alaress_Date_Format
+                && !$submission->getPublishDate()->isNull()
                 && $submission->getPublishDate()->getDateTimeObject() > $time->getDateTimeObject()
             ) {
                 if (!($isStaff || $submission->getOwner()->getId() == $userId)) {
