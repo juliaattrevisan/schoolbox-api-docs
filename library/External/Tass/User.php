@@ -531,28 +531,53 @@ class External_Tass_User implements External_UserInterface
      */
     public function getStaffContactListExtended()
     {
-        // Exclude selected position titles
+        // Exclude selected position text
 
-        $staffCategory = explode(',',\Config::get('tass_staff_dir_position_exclude'));
+        $staffCategory = explode(',',\Config::get('tass_staff_dir_position_text_exclude'));
 
-        $wherePosition = '';
+        $wherePositionText = '';
 
         if (is_array($staffCategory) && $staffCategory[0] != '')
         {
-            $wherePosition = 'AND (';
+            $wherePositionText = 'AND (';
             $db = $this->getDatabase();
 
             $count = 0;
 
             foreach ($staffCategory as $category) {
                 if ($count > 0)
-                    $wherePosition .= " AND ";
+                    $wherePositionText .= " AND ";
 
-                $wherePosition .= " dbo.tel_vw_telemf.position_text NOT LIKE '" . $db->quote($category) . "'";
+                $wherePositionText .= " dbo.tel_vw_telemf.position_text NOT LIKE '" . $db->quote($category) . "'";
                 $count++;
             }
 
-            $wherePosition .= ')';
+            $wherePositionText .= ') ';
+        }
+
+        // Exclude selected position title
+
+        $staffCategory = explode(',',\Config::get('tass_staff_dir_position_title_exclude'));
+
+        $wherePositionTitle = '';
+
+        if (is_array($staffCategory) && $staffCategory[0] != '')
+        {
+            $wherePositionTitle = " AND (";
+
+            $db = $this->getDatabase();
+
+            $count = 0;
+
+            foreach ($staffCategory as $category) {
+                if ($count > 0)
+                    $wherePositionTitle .= " AND ";
+
+                $wherePositionTitle .= " dbo.tel_vw_telemf.position_title NOT LIKE '" . $db->quote($category) . "'";
+                $count++;
+            }
+
+            $wherePositionTitle .= ') ';
         }
 
         // Exclude selected award codes
@@ -563,7 +588,7 @@ class External_Tass_User implements External_UserInterface
 
         if (is_array($staffAward) && $staffAward[0] != '')
         {
-            $whereAward = '(';
+            $whereAward = " AND (";
             $db = $this->getDatabase();
 
             $count = 0;
@@ -576,28 +601,28 @@ class External_Tass_User implements External_UserInterface
                 $count++;
             }
 
-            $whereAward .= ') AND';
+            $whereAward .= ') ';
         }
 
         // Custom category code descriptions
 
-        $codeMappings = explode(',',\Config::get('tass_staff_dir_code_mappings'));
+        $awardMappings = explode(',',\Config::get('tass_staff_dir_award_mappings'));
 
-        if (is_array($codeMappings) && $codeMappings[0] != '' && count($codeMappings) % 2 == 0)
+        if (is_array($awardMappings) && $awardMappings[0] != '' && count($awardMappings) % 2 == 0)
         {
-            $caseMappings = 'CASE (dbo.tel_vw_telemf.awd_code) ';
+            $caseAwardMappings = 'CASE (dbo.tel_vw_telemf.awd_code) ';
             $db = $this->getDatabase();
 
-            for ($i = 0; $i < count($codeMappings); $i += 2)
-                $caseMappings .= " WHEN '" . $db->quote($codeMappings[$i]) . "' THEN '" . $db->quote($codeMappings[$i+1]) . "'";
+            for ($i = 0; $i < count($awardMappings); $i += 2)
+                $caseAwardMappings .= " WHEN '" . $db->quote($awardMappings[$i]) . "' THEN '" . $db->quote($awardMappings[$i+1]) . "'";
 
-            $caseMappings .= " ELSE '' END AS StaffCategoryType";
+            $caseAwardMappings .= " ELSE '' END AS StaffCategoryType";
         }
         else {
 
             // No mappings specified, just display the code
 
-            $caseMappings = "dbo.tel_vw_telemf.awd_code AS StaffCategoryType";
+            $caseAwardMappings = "dbo.tel_vw_telemf.awd_code AS StaffCategoryType";
         }
 
         $database = $this->getDatabase();
@@ -612,7 +637,7 @@ class External_Tass_User implements External_UserInterface
                 dbo.tel_vw_telemf.e_mail AS StaffOccupEmail,
                 '' AS StaffExtension,
                 '' AS StaffCampusDescription,
-                {$caseMappings},
+                {$caseAwardMappings},
                 '' AS StaffDepartment,
                 dbo.tel_vw_telemf.position_title AS JobPositionDescription,
                 '' AS StaffJobPositionStartDate,
@@ -621,9 +646,10 @@ class External_Tass_User implements External_UserInterface
             LEFT OUTER JOIN dbo.teacher ON dbo.tel_vw_telemf.emp_code = dbo.teacher.emp_code
             WHERE
               (dbo.tel_vw_telemf.cust_code = '01') AND
-              {$whereAward}
               (dbo.tel_vw_telemf.term_date IS NULL)
-              {$wherePosition}
+              {$wherePositionText}
+              {$wherePositionTitle}
+              {$whereAward}
             ORDER BY StaffSurname, StaffPreferredName
         ";
 
