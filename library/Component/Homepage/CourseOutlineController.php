@@ -160,10 +160,24 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 'SESSION_NAME'    => session_name(),
                 'SESSION_ID'      => session_id(),
                 'COURSE_HOMEPAGE' => str_replace('/homepage/', '', Config::get('course_homepage')),
-                'IMPORTED_COURSE_ID'   => $this->originalCourse->getId(),
-                'IMPORTED_COURSE_NAME' => $this->originalCourse->getName()
             )
         );
+
+        /* Only set vars if the originalCourse is specified
+         */
+        if ($this->originalCourse instanceof \Schoolbox\Resource\Folder\Model) {
+            $this->setVar([
+                'IMPORTED_COURSE_ID'   => $this->originalCourse->getId(),
+                'IMPORTED_COURSE_NAME' => $this->originalCourse->getName()
+            ]);
+        }
+        else {
+            $this->setVar([
+                'IMPORTED_COURSE_ID'   => '',
+                'IMPORTED_COURSE_NAME' => ''
+            ]);
+        }
+
 
         // Course selector blocks
         $this->setBlock($templateHandle, 'course_selector', 'course_selector_block');
