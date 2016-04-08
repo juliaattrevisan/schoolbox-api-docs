@@ -270,7 +270,7 @@ FROM            dbo.tPastoralCare INNER JOIN
                 $this->getPastoralMapper()->save($pastoralRecord);
                 $imported[] = $record;
 
-                if ($record["Details"] != $record["PrivateDetails"])
+                if ($record["Details"] != $record["PrivateDetails"] && trim($record["PrivateDetails"]) != "")
                 {
                     // Need to create a separate private record
 
