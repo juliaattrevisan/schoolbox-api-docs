@@ -37,6 +37,12 @@ class Notifier extends AbstractModuleNotifier
         $pastoral = $this->getPastoralMapper()->findById($model->getPastoralId());
         $owner = $this->getUserMapper()->findById($model->getOwner()->getId());
 
+        // Get the kids teachers
+
+        $student = $this->getUserMapper()->findById($pastoral->getStudent()->getId());
+        $student->loadTeachers();
+        $teachers = $student->getTeacherCollection();
+
         $builder = new Builder();
         $builder->setTitle("A pastoral comment has been {$method}")
             ->setIcon("/portrait.php?size=32&userId=" . $owner->getExternalId())
@@ -59,9 +65,13 @@ class Notifier extends AbstractModuleNotifier
             if (!empty($roleId)) {
                 /** @var Role $role */
                 $role = $this->getRoleMapper()->findById($roleId);
-                $accessModel->setRole($role);
-                if ($accessModel->getRole()->isStaff()) {
-                    $envelope->broadcastToRole($accessModel->getRole()->getId(), $message);
+
+                if ($role->isStaff())
+                {
+                    /** @var User $teacher */
+                    foreach ($teachers as $teacher)
+                        if ($teacher->getRole()->getId() == $roleId)
+                            $envelope->targetToUser($teacher->getId(), $message);
                 }
             } else {
                 $envelope->targetToUser($accessModel->getUser()->getId(), $message);

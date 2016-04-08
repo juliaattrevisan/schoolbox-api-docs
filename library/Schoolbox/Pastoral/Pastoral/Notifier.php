@@ -61,8 +61,6 @@ class Notifier extends AbstractModuleNotifier
         /** @var Collection|PastoralAccessModel $accessModels */
         $accessModels = $this->getPastoralAccessMapper()->findByColumn("pastoral_id", $model->getId());
 
-        // Get the students teachers
-
         /** @var PastoralAccessModel $accessModel */
         foreach ($accessModels as $accessModel)
         {
