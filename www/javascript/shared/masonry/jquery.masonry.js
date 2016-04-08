@@ -387,6 +387,8 @@
             helper: function (event, ui) {
                 var cl = ui.clone();
                 ui.addClass(sortingClass);
+                // Use ONLY the header as the sort element
+                cl.find('[data-collapsable="true"]').remove();
                 return cl;
             },
             connectWith: this.columns,
