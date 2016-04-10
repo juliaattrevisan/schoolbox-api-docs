@@ -152,7 +152,8 @@
                  */
                 activator: {
                     selector: '[data-course-selector]',
-                    dataVar: 'course-selector'
+                    instanceID: 'course-selector',
+                    folderID:   'course-folder'
                 },
 
                 courseSelector: {
@@ -191,10 +192,19 @@
              */
             $(document).on('click', config.activator.selector, function(event) {
                 event.preventDefault();
+                var query = {};
 
-                var compInstId = $(this).data(config.activator.dataVar);
-                var query = $.extend(true, {}, config.courseSelector.query);
+                // Find the folder ID that the course should be imported to
+                var folderID = $(this).data(config.activator.folderID);
+                if(folderID) {
+                    query.folder = folderID;
+                }
+                else {
+                    query = $.extend(true, {}, config.courseSelector.query);
+                }
 
+                // Find the component instance ID that the course should be attached to
+                var compInstId = $(this).data(config.activator.instanceID);
                 if (compInstId) {
                     query.component = compInstId;
                 }
