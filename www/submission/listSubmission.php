@@ -95,21 +95,7 @@ else {
     }
 
     $subjectList = array_unique($subjectList);
-}
 
-
-
-$subList = array();
-foreach($subjectList as $subject) {
-    $assessments = $submissionHandler->getAllForUserCategory(
-        $subject,
-        0,
-        $currentTerm->getStart(),
-        $currentTerm->getActualFinish()
-    );
-    if(is_array($assessments)) {
-        $subList = array_merge($subList, $assessments);
-    }
 }
 
 $attemptHandler = new Assess_Attempt();
@@ -121,11 +107,9 @@ if (Cfg::get('external_enable')) {
 
 $this->setVar(array('category_listing_block' => ''));
 
-
-
 /* Iterate
  */
-if (!empty($subList) && is_array($subList)) {
+if (!empty($subjectList) && is_array($subjectList)) {
     $i = 0;
 
     /* $allCoursesUsedInFolder is a collection of folderId-courseFolders
@@ -137,244 +121,198 @@ if (!empty($subList) && is_array($subList)) {
      */
     $allFolderIds = array();
 
-    foreach ($subList as $currentSub) {
-        $allFolderIds[] = $currentSub['category'];
-    }
-
-    $allFolderIds = array_values(array_unique($allFolderIds));
-
     $unitInstanceMapper = new \Schoolbox\Assessment\Course\UnitInstanceMapper();
-    $allCoursesUsedInFolder = $unitInstanceMapper->findAllCoursesUsedInFolders($allFolderIds);
+    $allCoursesUsedInFolder = $unitInstanceMapper->findAllCoursesUsedInFolders($subjectList);
 
-    foreach ($subList as $sub) {
+    foreach ($subjectList as $sub) {
+        try {
+            $curCategory = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($sub);
+            /* @param  \Schoolbox\Resource\Folder\Model $curCategory */
 
-        // TODO fully rewrite this awful copypasted loop
-        if ($prevCat['category'] != $sub['category'] && $prevCat['category'] != '') {
-            try {
-                $curCategory = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($prevCat['category']);
-                /* @param  \Schoolbox\Resource\Folder\Model $curCategory */
-
-                /* Get full student list of class to show those who have not submitted
+            /* Get full student list of class to show those who have not submitted
+             */
+            if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
+                /* If synergy code, get synergy students
                  */
-                if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
-                    /* If synergy code, get synergy students
-                     */
-                    $studentList = $synHandler->getStudents($curCategory->getCodeString());
-                } else {
-                    /* Retrieve student list from group membership
-                     */
-                    $studentList = $groupHandler->getMemberList($curCategory->getId());
-                }
-
-                $this->setVar('STUDENTS', count($studentList));
-
-                if (count($curCategory->getCodes()) > 0) {
-                    $this->setVar('CATEGORY', Scrub::text($curCategory->getName()) . " (" . $curCategory->getCodeString() . ")");
-                } else {
-                    $this->setVar('CATEGORY', Scrub::text($curCategory->getName()));
-                }
-
-                $this->setVar('CATEGORY_ID', $curCategory->getId());
-
-                /* Learning Analytics courses buttons go here
+                $studentList = $synHandler->getStudents($curCategory->getCodeString());
+            } else {
+                /* Retrieve student list from group membership
                  */
-                $this->setVar(array(
-                    'learning_analytics_block' => ''
-                ));
+                $studentList = $groupHandler->getMemberList($curCategory->getId());
+            }
 
-                $allCoursesUsed = $allCoursesUsedInFolder->getOffset($curCategory->getId());
+            $this->setVar('STUDENTS', count($studentList));
 
-                if(isset($allCoursesUsed)) {
-                    foreach ($allCoursesUsed as $courseFolder) {
-                        $this->setVar(array(
-                            'COURSE_FOLDER_ID' => $courseFolder->getId(),
-                            'COURSE_FOLDER_NAME' => $courseFolder->getName()
-                        ));
+            if (count($curCategory->getCodes()) > 0) {
+                $this->setVar('CATEGORY', Scrub::text($curCategory->getName()) . " (" . $curCategory->getCodeString() . ")");
+            } else {
+                $this->setVar('CATEGORY', Scrub::text($curCategory->getName()));
+            }
 
-                        $this->parse('learning_analytics_block', 'learning_analytics', true);
-                    }
+            $this->setVar('CATEGORY_ID', $curCategory->getId());
+            $this->setVar('CATEGORY_CODE', $curCategory->getCodeString());
+
+            /* Learning Analytics courses buttons go here
+             */
+            $this->setVar(array(
+                'learning_analytics_block' => ''
+            ));
+
+            $allCoursesUsed = $allCoursesUsedInFolder->getOffset($curCategory->getId());
+
+            if(isset($allCoursesUsed)) {
+                foreach ($allCoursesUsed as $courseFolder) {
+                    $this->setVar(array(
+                        'COURSE_FOLDER_ID' => $courseFolder->getId(),
+                        'COURSE_FOLDER_NAME' => $courseFolder->getName()
+                    ));
+
+                    $this->parse('learning_analytics_block', 'learning_analytics', true);
                 }
-
-                $this->parse('category_listing_block', 'category_listing', true);
-                $this->setVar('submission_block', '');
-
-                $i = 0;
             }
-            catch (Exception $e) {
-                // Couldn't find category, probably as it wasn't set.
-            }
+
+            $this->setVar('submission_block', '');
+
+            $i = 0;
+        }
+        catch (Exception $e) {
+            // Couldn't find category, probably as it wasn't set.
         }
 
-        $totals = $submissionHandler->getBoxCount($sub['id']);
+
+        $assessments = $submissionHandler->getAllForUserCategory(
+            $curCategory->getId(),
+            0,
+            $currentTerm->getStart(),
+            $currentTerm->getActualFinish()
+        );
 
         $readonly = !$currentTerm->isMarkableBy($_SESSION['user']);
 
-        $openADF = new Alaress_Date_Format($sub['open'], 'U');
-        $closeADF = new Alaress_Date_Format($sub['date'], 'U');
+        if(is_array($assessments) && count($assessments) > 0 ) {
+            /* Iterate over all the assessments and output them */
+            foreach ($assessments as $assess) {
 
-        if($openADF->isAtStartOfDay()) {
-            $openString = $openADF->getLongDateOnly();
-        }
-        else {
-            $openString = $openADF->getLong();
-        }
 
-        if($closeADF->isAtEndOfDay()) {
-            $closeString = $closeADF->getLongDateOnly();
-        }
-        else {
-            $closeString = $closeADF->getLong();
-        }
+                $totals = $submissionHandler->getBoxCount($assess['id']);
 
-        $this->setVar(array(
-            'ASSESS_START_TIMESTAMP' => $openADF->getUnixTimestamp(),
-            'ASSESS_FINISH_TIMESTAMP' => $closeADF->getUnixTimestamp(),
-        ));
+                $openADF = new Alaress_Date_Format($assess['open'], 'U');
+                $closeADF = new Alaress_Date_Format($assess['date'], 'U');
 
-        if (($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) /*&& ($sub['availability'] == 'assess')*/) {
-            $this->setVar(array(
-                'ASSESS_ASSESS_ID' => $sub['id'],
-                'ASSESS_TITLE' => Scrub::text($sub['name']),
-                'ASSESS_TYPE' => $sub['typeName'],
-                'JAVAASSDESC' => addslashes(Scrub::text($sub['name'])),
-                'ASSESS_START' => $openString,
-                'ASSESS_FINISH' => $closeString,
-                'ASSESS_ATTEMPTS' => $attemptHandler->numAttempted($sub['id']),
-                'ASSESS_REVIEWED' => $attemptHandler->numReviewed($sub['id']),
-                'ASSESS_VISIBILITY_ID' => $sub['mark_visibility'],
-                'ASSESS_VISIBILITY_CSS' => \Schoolbox\Assessment\Widgets::getCss($sub['mark_visibility']),
-                'ASSESS_VISIBILITY' => \Schoolbox\Assessment\Widgets::getName($sub['mark_visibility'])
-            ));
+                if ($openADF->isAtStartOfDay()) {
+                    $openString = $openADF->getLongDateOnly();
+                } else {
+                    $openString = $openADF->getLong();
+                }
 
-            $this->setVar('normalSubmission_block', '');
-            if ($readonly) {
-                $this->parse('readonly_assess_block', 'readonly_assess');
-                $this->setVar('writable_assess_block', '');
+                if ($closeADF->isAtEndOfDay()) {
+                    $closeString = $closeADF->getLongDateOnly();
+                } else {
+                    $closeString = $closeADF->getLong();
+                }
 
-                $this->parse('readonly_open_block', 'readonly_open');
-                $this->parse('readonly_close_block', 'readonly_close');
-                $this->setVar('writable_open_block', '');
-                $this->setVar('writable_close_block', '');
-            } else {
-                $this->parse('writable_assess_block', 'writable_assess');
-                $this->setVar('readonly_assess_block', '');
-
-                $this->parse('writable_open_block', 'writable_open');
-                $this->parse('writable_close_block', 'writable_close');
-                $this->setVar('readonly_open_block', '');
-                $this->setVar('readonly_close_block', '');
-            }
-
-            $this->parse('onlineAssessment_block', 'onlineAssessment');
-        } else if ($sub['availability'] == '') {
-            $this->setVar(array(
-                'ID' => $sub['id'],
-                'ASSDESC' => Scrub::text($sub['name']),
-                'TYPE' => $sub['typeName'],
-                'JAVAASSDESC' => addslashes(Scrub::text($sub['name'])),
-                'OPENDATE' => $sub['accept_submission'] ? $openString : '',
-                'DUEDATE' => $closeString,
-                'MARKED' => (int)$totals['marked'],
-                'TOTAL' => $sub['accept_submission'] ? $totals['total'] : 'N/A',
-                'ASSESS_VISIBILITY_ID' => $sub['mark_visibility'],
-                'ASSESS_VISIBILITY_CSS' => \Schoolbox\Assessment\Widgets::getCss($sub['mark_visibility']),
-                'ASSESS_VISIBILITY' => \Schoolbox\Assessment\Widgets::getName($sub['mark_visibility']),
-            ));
-
-            // Don't include in start sorts if it doesn't accept submissions
-            if (!$sub['accept_submission']) {
-                $this->setVar('ASSESS_START_TIMESTAMP', 0);
-            }
-
-            $this->setVar('onlineAssessment_block', '');
-
-            if ($readonly) {
-                $this->parse('readonly_duework_block', 'readonly_duework');
-                $this->setVar('writable_duework_block', '');
-
-                $this->parse('readonly_open_block', 'readonly_open');
-                $this->parse('readonly_close_block', 'readonly_close');
-                $this->setVar('writable_open_block', '');
-                $this->setVar('writable_close_block', '');
-            } else {
-                $this->parse('writable_duework_block', 'writable_duework');
-                $this->setVar('readonly_duework_block', '');
-
-                $this->parse('writable_open_block', 'writable_open');
-                $this->parse('writable_close_block', 'writable_close');
-                $this->setVar('readonly_open_block', '');
-                $this->setVar('readonly_close_block', '');
-            }
-
-            $this->parse('normalSubmission_block', 'normalSubmission');
-        } else {
-            // something went wrong (ie. this scenario should not exist) but at any rate, hide the tokens from view
-            $this->setVar('onlineAssessment_block', '');
-            $this->setVar('normalSubmission_block', '');
-        }
-        $this->parse('submission_block', 'submission_listing', true);
-
-        $prevCat = $sub;
-    }
-
-    /* Get full student list of class to show those who have not submitted
-      */
-    try {
-        $curCategory = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($prevCat['category']);
-        if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
-            /* If synergy code, get synergy students
-               */
-            $studentList = $synHandler->getStudents($curCategory->getCodeString());
-        } else {
-            /* Retrieve student list from group membership
-               */
-            $studentList = $groupHandler->getMemberList($curCategory->getId());
-        }
-
-        $this->setVar('STUDENTS', count($studentList));
-
-        if (count($curCategory->getCodes()) > 0) {
-            $this->setVar("CATEGORY", Scrub::text($curCategory->getName()) . " (" . $curCategory->getCodeString() . ")");
-        } else {
-            $this->setVar("CATEGORY", Scrub::text($curCategory->getName()));
-        }
-
-        $this->setVar('CATEGORY_ID', $prevCat['category']);
-
-        /* Learning Analytics courses buttons go here
-         */
-        $this->setVar(array(
-            'learning_analytics_block' => ''
-        ));
-
-        $allCoursesUsed = $allCoursesUsedInFolder->getOffset($curCategory->getId());
-
-        if (is_array($allCoursesUsed) || $allCoursesUsed instanceof Traversable) {
-            foreach ($allCoursesUsed as $courseFolder) {
                 $this->setVar(array(
-                    'COURSE_FOLDER_ID' => $courseFolder->getId(),
-                    'COURSE_FOLDER_NAME' => $courseFolder->getName()
+                    'ASSESS_START_TIMESTAMP' => $openADF->getUnixTimestamp(),
+                    'ASSESS_FINISH_TIMESTAMP' => $closeADF->getUnixTimestamp(),
                 ));
 
-                $this->parse('learning_analytics_block', 'learning_analytics', true);
+                if (($assess['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) /*&& ($assess['availability'] == 'assess')*/) {
+                    $this->setVar(array(
+                        'ASSESS_ASSESS_ID' => $assess['id'],
+                        'ASSESS_TITLE' => Scrub::text($assess['name']),
+                        'ASSESS_TYPE' => $assess['typeName'],
+                        'JAVAASSDESC' => addslashes(Scrub::text($assess['name'])),
+                        'ASSESS_START' => $openString,
+                        'ASSESS_FINISH' => $closeString,
+                        'ASSESS_ATTEMPTS' => $attemptHandler->numAttempted($assess['id']),
+                        'ASSESS_REVIEWED' => $attemptHandler->numReviewed($assess['id']),
+                        'ASSESS_VISIBILITY_ID' => $assess['mark_visibility'],
+                        'ASSESS_VISIBILITY_CSS' => \Schoolbox\Assessment\Widgets::getCss($assess['mark_visibility']),
+                        'ASSESS_VISIBILITY' => \Schoolbox\Assessment\Widgets::getName($assess['mark_visibility'])
+                    ));
+
+                    $this->setVar('normalSubmission_block', '');
+                    if ($readonly) {
+                        $this->parse('readonly_assess_block', 'readonly_assess');
+                        $this->setVar('writable_assess_block', '');
+
+                        $this->parse('readonly_open_block', 'readonly_open');
+                        $this->parse('readonly_close_block', 'readonly_close');
+                        $this->setVar('writable_open_block', '');
+                        $this->setVar('writable_close_block', '');
+                    } else {
+                        $this->parse('writable_assess_block', 'writable_assess');
+                        $this->setVar('readonly_assess_block', '');
+
+                        $this->parse('writable_open_block', 'writable_open');
+                        $this->parse('writable_close_block', 'writable_close');
+                        $this->setVar('readonly_open_block', '');
+                        $this->setVar('readonly_close_block', '');
+                    }
+
+                    $this->parse('onlineAssessment_block', 'onlineAssessment');
+                } else if ($assess['availability'] == '') {
+                    $this->setVar(array(
+                        'ID' => $assess['id'],
+                        'ASSDESC' => Scrub::text($assess['name']),
+                        'TYPE' => $assess['typeName'],
+                        'JAVAASSDESC' => addslashes(Scrub::text($assess['name'])),
+                        'OPENDATE' => $assess['accept_submission'] ? $openString : '',
+                        'DUEDATE' => $closeString,
+                        'MARKED' => (int)$totals['marked'],
+                        'TOTAL' => $assess['accept_submission'] ? $totals['total'] : 'N/A',
+                        'ASSESS_VISIBILITY_ID' => $assess['mark_visibility'],
+                        'ASSESS_VISIBILITY_CSS' => \Schoolbox\Assessment\Widgets::getCss($assess['mark_visibility']),
+                        'ASSESS_VISIBILITY' => \Schoolbox\Assessment\Widgets::getName($assess['mark_visibility']),
+                    ));
+
+                    // Don't include in start sorts if it doesn't accept submissions
+                    if (!$assess['accept_submission']) {
+                        $this->setVar('ASSESS_START_TIMESTAMP', 0);
+                    }
+
+                    $this->setVar('onlineAssessment_block', '');
+
+                    if ($readonly) {
+                        $this->parse('readonly_duework_block', 'readonly_duework');
+                        $this->setVar('writable_duework_block', '');
+
+                        $this->parse('readonly_open_block', 'readonly_open');
+                        $this->parse('readonly_close_block', 'readonly_close');
+                        $this->setVar('writable_open_block', '');
+                        $this->setVar('writable_close_block', '');
+                    } else {
+                        $this->parse('writable_duework_block', 'writable_duework');
+                        $this->setVar('readonly_duework_block', '');
+
+                        $this->parse('writable_open_block', 'writable_open');
+                        $this->parse('writable_close_block', 'writable_close');
+                        $this->setVar('readonly_open_block', '');
+                        $this->setVar('readonly_close_block', '');
+                    }
+
+                    $this->parse('normalSubmission_block', 'normalSubmission');
+                } else {
+                    // something went wrong (ie. this scenario should not exist) but at any rate, hide the tokens from view
+                    $this->setVar('onlineAssessment_block', '');
+                    $this->setVar('normalSubmission_block', '');
+                }
+                $this->parse('submission_block', 'submission_listing', true);
+
             }
         }
 
-        $this->parse("category_listing_block", "category_listing", true);
 
-        /* Clear children after parsing out the parent
-         */
-        $this->setVar(array(
-            'learning_analytics_block' => ''
-        ));
-    }
-    catch (Exception $e) {
-        // Couldn't find category, probably as it wasn't set.
+        $this->parse('category_listing_block', 'category_listing', true);
+
+
     }
 
     $this->setVar(array(
         'no_category_listing_block' => ''
     ));
+
+
 }
 else {
     // pre-emptively clear the blocks that might not get rendered
