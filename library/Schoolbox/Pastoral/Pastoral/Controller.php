@@ -364,7 +364,7 @@ class Controller extends Base
                 'template' => '@pastoral/reportBuilder.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
-                    'types'           => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
+                    'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
                     'tags'              => $this->getPastoralTagsMapper()->findAll(),
                     'studentsSelected'  => $studentsSelected,
