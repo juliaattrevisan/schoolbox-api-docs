@@ -172,6 +172,8 @@
             <ul class="information-list">
                 {% for record in records %}
 
+                    {% set owner = session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() %}
+
                     {# Only display records the logged in user is allowed to see. Parents cannot see private records ever (even if they have been given access). #}
                     {% if not (record.private and role == 'parent') %}
 
@@ -279,11 +281,14 @@
                                 </div>
                             </div>
 
-                            {# Show edit links to the owner and pastoral moderators #}
-                            {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or pastoralModerator %}
+                            {# Show edit links to the owner and pastoral moderators. Moderator 'write' (2) can edit, Moderator 'moderate' (3) can delete #}
+
+                            {% if owner or pastoralModerator >= 2 %}
                                 <nav>
                                     <a class="icon-modify no-text" href="/pastoral/update/{{ record.getId() }}" title="Modify"></a>
-                                    <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+                                    {% if owner or pastoralModerator >= 3 %}
+                                        <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+                                    {% endif %}
                                 </nav>
                             {% endif %}
                         </li>

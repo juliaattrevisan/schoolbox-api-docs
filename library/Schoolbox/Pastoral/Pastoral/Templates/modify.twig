@@ -159,12 +159,14 @@
                     </div>
                 </div>
                 {% if record.getId != '' %}
-                    <nav>
-                        <a class="icon-more" title="" data-dropdown="header-options"></a>
-                    </nav>
-                    <ul id="header-options" class="f-dropdown" data-dropdown-content>
-                        <li><a href="#" data-delete class="icon-delete">Delete Pastoral Record</a></li>
-                    </ul>
+                    {% if owner or pastoralModerator >= 1 %}
+                        <nav>
+                            <a class="icon-more" title="" data-dropdown="header-options"></a>
+                        </nav>
+                        <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                            <li><a href="#" data-delete class="icon-delete">Delete Pastoral Record</a></li>
+                        </ul>
+                    {% endif %}
                 {% endif %}
             </div>
 

@@ -1,3 +1,5 @@
+{% set owner = session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() %}
+
 {% if role != 'parent' %}
 
     <script type="text/javascript">
@@ -118,10 +120,12 @@
                     </div>
 
                     {# Only display the edit/delete links to the owner of the record or pastoral moderators #}
-                    {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or pastoralModerator %}
+                    {% if owner or pastoralModerator >= 2 %}
                     <nav>
                         <a class="icon-modify" href="/pastoral/update/{{ record.getId() }}" title="Modify Comment"></a>
-                        <a data-delete class="icon-delete" href="#" title="Delete Comment"></a>
+                        {% if owner or pastoralModerator >= 3 %}
+                            <a data-delete class="icon-delete" href="#" title="Delete Comment"></a>
+                        {% endif %}
                     </nav>
                     {% endif %}
                 </li>
