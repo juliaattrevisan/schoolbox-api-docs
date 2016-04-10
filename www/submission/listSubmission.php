@@ -25,6 +25,9 @@ $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'submission_listing', 'submission_block');
 $this->setBlock(TEMPLATE_content, 'category_listing', 'category_listing_block');
 
+$this->setBlock('category_listing', 'no_assessments', 'no_assessments_block');
+$this->setBlock('category_listing', 'assessment_output', 'assessment_output_block');
+
 $this->setBlock('submission_listing', 'onlineAssessment', 'onlineAssessment_block');
 $this->setBlock('onlineAssessment', 'readonly_assess', 'readonly_assess_block');
 $this->setBlock('onlineAssessment', 'writable_assess', 'writable_assess_block');
@@ -74,7 +77,7 @@ else {
         array('term' => $currentTerm,)
     );
 
-    $involvedIn = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
+    $involvedIn = $groupHandler->involvedInSubjects($_SESSION['id']);
     if(is_array($involvedIn)) {
         foreach($involvedIn as $subject) {
             $subjectList[] = $subject['id'];
@@ -84,7 +87,7 @@ else {
     /* Merge in all the rest that are not related to the user by folder but by owner
        note i am using an older function for a simple task that is why it does more than it should */
     $allUserBoxes = $submissionHandler->getAllForUser(
-        $_SESSION['id'],
+        $_SESSION['user']->getId(),
         $currentTerm->getStart(),
         $currentTerm->getActualFinish()
     );
@@ -300,7 +303,14 @@ if (!empty($subjectList) && is_array($subjectList)) {
                 $this->parse('submission_block', 'submission_listing', true);
 
             }
+            $this->parse('assessment_output_block','assessment_output');
+            $this->setVar('no_assessments_block','');
         }
+        else {
+            $this->setVar('assessment_output_block','');
+            $this->parse('no_assessments_block','no_assessments');
+        }
+
 
 
         $this->parse('category_listing_block', 'category_listing', true);

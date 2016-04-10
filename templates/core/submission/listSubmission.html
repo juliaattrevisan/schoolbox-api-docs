@@ -63,6 +63,14 @@
             <li class="icon-staff-students"><a href="/subject/classList//{CATEGORY_CODE}" title="View class list">{STUDENTS} Students</a></li>
         </ul>
 
+        <!-- BEGIN no_assessments -->
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>No assessments have been created for this class during the current period</p>
+            <p>To get started you may quickly create <a href="/submission/createSubmission/new/{CATEGORY_ID}/" title="Create due work">due work</a> or a <a href="/assess/create/{CATEGORY_ID}/" title="Create quiz">quiz</a>. You may also <a href="#" data-interaction="homepage_selector" data-course-selector="3639">import a course</a> to this class or <a href="/course/new" title="Create new course">build a new course</a> to use across multiple classes</p>
+        </div>
+        <!-- END no_assessments -->
+        <!-- BEGIN assessment_output -->
         <div class="scrollable">
             <table data-tablesorter>
                 <thead>
@@ -139,6 +147,7 @@
                 </tbody>
             </table>
         </div>
+        <!-- END assessment_output -->
     </div>
 </div>
 <!-- END category_listing -->
