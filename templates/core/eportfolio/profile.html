@@ -4,7 +4,8 @@
 <script type="text/javascript">
     $(function () {
         // Upload file when it gets attached
-        $('#cover-photo-zone').on('accept.attachzone', function(event, file) {
+        var dropzone = $('#cover-photo-zone');
+        dropzone.on('accept.attachzone', function(event, file) {
             $.ajax({
                 url: '/eportfolio/coverphoto/modifyForm.php',
                 method: 'post',
@@ -23,6 +24,10 @@
                 );
             })
             .fail(function() {
+                $('#uploadFailedModal').foundation('reveal', 'open');
+            })
+            .always(function() {
+                dropzone.data('plugin_resourceAttach').dropzone.removeAllFiles();
             });
         });
 
@@ -223,4 +228,10 @@
         </div>
         <!-- END has_groups -->
     </div>
+</div>
+
+<div id="uploadFailedModal" aria-labelledby="uploadFailedModalTitle" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+    <h2 id="uploadFailedModalTitle">Upload failed</h2>
+    <p>Please reload the page and try again.</p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
