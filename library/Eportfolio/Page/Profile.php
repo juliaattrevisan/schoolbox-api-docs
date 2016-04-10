@@ -153,7 +153,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
          */
         $this->getPage()->setVar('ATTACH_ZONE', '');
         if ($this->getCurrentUser()->getId() == $this->getUserId()) {
-            $zone = new \Schoolbox\Resource\Attachment\Zone('inline-return');
+            $zone = new \Schoolbox\Resource\Attachment\Zone('cover-photo');
             $zone
                 ->setMulti(false)
                 ->setMimeFilter('image/*')
