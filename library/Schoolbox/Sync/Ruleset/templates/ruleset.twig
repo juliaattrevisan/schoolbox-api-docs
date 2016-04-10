@@ -134,29 +134,37 @@ set upsConfig = {
                     <div class="small-12 columns no-pad">
                         <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
                             <h4>Conditions</h4>
-
+                            {% if  currentRule.conditions is empty  %}
+                            <div class="empty-state">
+                                <i class="icon-help"></i>
+                                <p>Conditions are optional, but you may prevent the effects below by creating one.</p>
+                                <p>You can <a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }} data-condition-create="{{ currentRule.id }}">create a general condition</a>
+                                    or if you prefer to run these rules only on initial user creation use the
+                                    <a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" title="Create user exists condition" data-condition-create="{{ currentRule.id }}">user exists condition</a></p>
+                            </div>
+                            {% endif %}
                             <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-conditions">
                                 {% for currentCondition in currentRule.conditions %}
                                 {% include allConditionStructures.fragments[currentCondition.id].fragment.getFilename() %}
                                 {% endfor %}
                             </ul>
-    
-                            <div class="actions-small-1 row">
-                                <div class="list-item">
-                                    <div class="small-12 columns">
-                                        <h4>Effects</h4>
-                                    </div>
-                                </div>
-                                <nav>
 
-                                </nav>
+
+                            <h4>Effects</h4>
+                            {% if  currentRule.effects is empty  %}
+                            <div class="empty-state">
+                                <i class="icon-help"></i>
+                                <p>Use effects to map data fields from your SIS to user account attributes.</p>
+                                <p>When <a href="/adminv2/ups/effect/add/{{ currentRule.id }}" title="Add new Effect" data-effect-create="{{ currentRule.id }}">creating a data mapping</a> they may either be directly copied, altered using <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">filters</a> or mapped using a lookup table.</p>
+                                <p>Start by selecting you user account field you wish to populate, then select a method and finally add a <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">token</a> to use as a modifier.</p>
                             </div>
-    
+                            {% endif %}
                             <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-effects">
                                 {% for currentEffect in currentRule.effects %}
                                 {% include allEffectStructures.containers[currentEffect.id] %}
                                 {% endfor %}
                             </ul>
+
                         </section>
                     </div>
 
@@ -181,10 +189,11 @@ set upsConfig = {
             <div class="row">
                 <div class="small-12 island">
                     <section class="content">
-                        <p>
-                            Start by
-                            <a href='/adminv2/ups/rule/add/{{ rulesetId }}' title="Add New Rule">adding a new Rule</a>.
-                        </p>
+                        <div class="empty-state">
+                            <i class="icon-info"></i>
+                            <p>No rules, means no users will be synced</p>
+                            <p><a href='/adminv2/ups/rule/add/{{ rulesetId }}' title="Add New Rule">Start by adding your first rule</a></p>
+                        </div>
                     </section>
                 </div>
             </div>
