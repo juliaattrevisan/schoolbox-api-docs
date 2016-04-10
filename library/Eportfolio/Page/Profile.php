@@ -155,6 +155,15 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         /* Control button
          */
         if ($this->getCurrentUser()->getId() == $this->getUserId()) {
+            $zone = new \Schoolbox\Resource\Attachment\Zone('inline-return');
+            $zone
+                ->setMulti(false)
+                ->setMimeFilter('image/*')
+                ->setThumbnailSize(64)
+                ->setAttachPrompt('Attach file to return')
+                ->setModalTitle('Select image')
+                ->setAttachmentsLabel('');
+            $zone->renderIntoSitePage($this->getPage(), 'ATTACH_ZONE');
             if ($coverPhotoCollection->count()) {
                 $this->getPage()->parse('has_cover_photo_control_block', 'has_cover_photo_control');
                 $this->getPage()->setVar('no_cover_photo_control_block', '');

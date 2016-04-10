@@ -1,7 +1,9 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/preview/preview.js"></script>
+<script src="/javascript/resource/jquery.resourceAttach.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(function() {
+        // Replace with dropzone
         $('#add-coverphoto').on('touchend click', function(event){
             event.preventDefault();
             $('#coverphoto-image').show().trigger('click').hide();
@@ -50,6 +52,7 @@
             <!-- END no_cover_photo -->
 
             <div class="eportfolio cover-photo-controls">
+                {ATTACH_ZONE}
                 <!-- BEGIN no_cover_photo_control -->
                 <a class="button icon-add no-text" title="Add a cover photo" id="add-coverphoto"></a>
                 <!-- END no_cover_photo_control -->
