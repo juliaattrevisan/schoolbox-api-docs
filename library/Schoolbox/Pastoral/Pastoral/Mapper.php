@@ -354,7 +354,7 @@ class Mapper extends BaseMapper
             $criteria[] = "created_at >= '{$after_date}'";
         }
 
-        if ($severity != '') $criteria[] = "severity_id >= {$severity}";
+        if ($severity != '') $criteria[] = "sv.order >= {$severity}";
         if ($students != '') $criteria[] = "student_id IN ({$students})";
         if ($authors != '') $criteria[] = "owner_id IN ({$authors})";
         if ($types != '') $criteria[] = "type_id IN ({$types})";
