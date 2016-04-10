@@ -12,8 +12,18 @@
                     action: 'addCoverPhoto',
                     userId: '{USER_ID}',
                     imagehash: file.hash
-                }
+                },
+                dataType: 'json'
             })
+            .done(function(data) {
+                // Update the background
+                $('[data-role="eportfolio-cover-photo"]').css(
+                    'background-image',
+                    'url(/storage/image.php?size=eportfolioCoverPhoto&hash='+data.hash+')'
+                );
+            })
+            .fail(function() {
+            });
         });
 
         $('[data-plugin="preview"]').preview();
@@ -46,7 +56,7 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <div class="eportfolio cover-photo text-center"
+        <div class="eportfolio cover-photo text-center" data-role="eportfolio-cover-photo"
              <!-- BEGIN has_cover_photo -->
              style="background-image: url(/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH});"
              <!-- END has_cover_photo -->

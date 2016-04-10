@@ -18,6 +18,7 @@ $pageId = 'profile';
 $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 
 $message = 'Bad Request';
+$hash    = null;
 $code    = 400;
 if ($authenticator->canModify()) {
 	if ($action == 'addCoverPhoto') {
@@ -38,6 +39,7 @@ if ($authenticator->canModify()) {
 				\Eportfolio\CoverPhotoMapper::getInstance()->save($coverPhoto);
 				$code    = 200;
 				$message = 'OK';
+				$hash    = $coverPhoto->getImagehash();
 			}
 		} catch (\Schoolbox\Resource\Exception $e) {
 			$message = 'Internal Server Error';
@@ -50,7 +52,7 @@ if ($authenticator->canModify()) {
 }
 
 if ($page->detectAjax()) {
-	$page->outputJson(['message' => $message,], false, $code);
+	$page->outputJson(['message' => $message, 'hash' => $hash], false, $code);
 } else {
 	$page->localRedir("/eportfolio/{$ownerId}/profile");
 }
