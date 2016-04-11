@@ -200,8 +200,10 @@ class Mapper extends BaseMapper
     public function verifyNoOverlap(Model $model)
     {
         // if any term that isn't this one:
-        // * finish <= this start
-        // * start >= this finish
+        // * overlaps (finish <= this start)
+        // * overlaps (start >= this finish)
+        // * covers (start < this start, finish > this finish)
+        // * is covered by (start >= this start, finish <= this finish)
         // error out
         $query = "
             SELECT * FROM {$this->getTable()}
@@ -209,6 +211,10 @@ class Mapper extends BaseMapper
                 (`start`          BETWEEN CAST(:thisStart AS DATE) AND CAST(:thisFinish AS DATE))
                 OR
                 (`display_finish` BETWEEN CAST(:thisStart AS DATE) AND CAST(:thisFinish AS DATE))
+                OR
+                (`start` < CAST(:thisStart AS DATE) AND `display_finish` > CAST(:thisFinish AS DATE))
+                OR
+                (`start` >= CAST(:thisStart AS DATE) AND `display_finish` <= CAST(:thisFinish AS DATE))
             )
         ";
         $params = [
