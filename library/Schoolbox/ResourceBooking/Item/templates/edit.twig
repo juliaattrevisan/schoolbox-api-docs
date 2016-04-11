@@ -352,13 +352,17 @@
                     <div class="small-4 columns">
                         <label class="interval-input">
                             Hours
-                            <input type="text" value="{{ isEmpty ? '' : item.maxReservationTime.hourRemainder   }}" name="max_reservation_time[hour]" data-timepicker="hour">
+                            <div class="timepick">
+                                <input type="text" value="{{ isEmpty ? '' : item.maxReservationTime.hourRemainder   }}" name="max_reservation_time[hour]" data-timepicker="hour">
+                            </div>
                         </label>
                     </div>
                     <div class="small-4 columns">
                         <label class="interval-input">
                             Minutes
-                            <input type="text" value="{{ isEmpty ? '' : item.maxReservationTime.minuteRemainder }}" name="max_reservation_time[minute]" data-timepicker="minute">
+                            <div class="timepick">
+                                <input type="text" value="{{ isEmpty ? '' : item.maxReservationTime.minuteRemainder }}" name="max_reservation_time[minute]" data-timepicker="minute">
+                            </div>
                         </label>
                     </div>
                 </fieldset>
