@@ -96,7 +96,13 @@
             }
         });
 
+        $('#private').change(function(event) {
+            $('[data-role-parent]').prop('checked', false);
 
+            $('[data-role-parent]').prop('disabled', $('#private').prop('checked'));
+        });
+
+        $('[data-role-parent]').prop('disabled', $('#private').prop('checked'));
 
         $('[data-submit]').click(function(event)
         {
@@ -226,7 +232,7 @@
                                 {# Default for new items: staff roles are selected, others are not #}
 
                                 <input type="hidden" name="role[{{ role.getId }}]" value="0" />
-                                <input type="checkbox" name="role[{{ role.getId }}]" id="role[{{ role.getId }}]" value="1"
+                                <input {% if role.getType == 'parent' %}data-role-parent{% endif %} type="checkbox" name="role[{{ role.getId }}]" id="role[{{ role.getId }}]" value="1"
                                     {% if record.getId != '' %}
                                         {% for access in record.getAccessList if access.getRole.getId != '' %}
                                             {% if access.getRole.getId == role.getId %}
@@ -247,7 +253,7 @@
                         <legend>
                             <label for="private">
                                 Hide Content From Selected Roles
-                                <span class="hint has-tip tip-top" data-tooltip title="If selected, only yourself and individually selected users will be able to view the detail of this record. ">?</span>
+                                <span class="hint has-tip tip-top" data-tooltip title="If selected, only yourself and individually selected users will be able to view the detail of this record. If enabled parents can not be audienced.">?</span>
                             </label>
                         </legend>
 
