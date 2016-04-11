@@ -26,7 +26,7 @@ class TreeBuilder extends AbstractTreeBuilder
     {
         $dav = PortfolioWebDAV::factory();
 
-        parent::__construct($dav, 'webdavfile');
+        parent::__construct($dav, 'webdavfile', 'Drives');
 
         $this->fileLocator = $dav;
     }
