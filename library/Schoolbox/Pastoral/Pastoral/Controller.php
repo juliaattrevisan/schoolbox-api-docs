@@ -466,6 +466,9 @@ class Controller extends Base
                     'role'              => $this->getUser()->getRole()->getType(),
                     'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'teachers'          => $student->getTeacherCollection(),
+                    'WRITE_ACCESS'      => WRITE_ACCESS,
+                    'READ_ACCESS'       => READ_ACCESS,
+                    'FULL_ACCESS'       => FULL_ACCESS,
                     'pastoralModerator' => $pastoralModerator
                 ),
             )
@@ -542,6 +545,9 @@ class Controller extends Base
                 'data'     => array(
                     'session'           => $_SESSION,
                     'record'            => $pastoral,
+                    'WRITE_ACCESS'      => WRITE_ACCESS,
+                    'READ_ACCESS'       => READ_ACCESS,
+                    'FULL_ACCESS'       => FULL_ACCESS,
                     'pastoralModerator' => $pastoralModerator,
                     'role'              => $this->getUser()->getRole()->getType(),
                 ),
@@ -638,6 +644,9 @@ class Controller extends Base
                     'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
                     'roles'             => $this->getRoleMapper()->findAll(),
+                    'WRITE_ACCESS'      => WRITE_ACCESS,
+                    'READ_ACCESS'       => READ_ACCESS,
+                    'FULL_ACCESS'       => FULL_ACCESS,
                     'pastoralModerator' => $pastoralModerator,
                     'attachzone'        => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($id)),
                 ),
