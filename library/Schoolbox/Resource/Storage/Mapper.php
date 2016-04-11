@@ -114,7 +114,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
          */
         $saveResult = $this->mgr->save($storage);
 
-        if ($storage->getMimeType()->isVideo() || $storage->getMimetype()->isAudio()) {
+        if ($storage->getMimetype()->isVideo() || $storage->getMimetype()->isAudio()) {
             $mapper = QueueMapper::getInstance();
             $videoQ = $mapper->createModel();
             $videoQ->setHash($storage->getHash());
