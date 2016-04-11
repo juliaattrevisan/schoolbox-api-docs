@@ -562,23 +562,29 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * @return Model
      */
     public function searchByName($keyword, $userGroupsOnly = false) {
-        $query = $this->getFindQuery();
+        $code_mapper  = $this->getJoinMapper('codes');
+        $group_mapper = $this->getJoinMapper('groups');
 
-        $query .= "
+        $groupSelect  = $userGroupsOnly ? ", {$group_mapper->getColumnString('ug')}" : '';
+
+        /* Filter result set further by only returning records that are also
+         * in the userGroups table
+         */
+        $groupJoin    = $userGroupsOnly ? "RIGHT JOIN {$this->getJoinSql('groups', 'c', 'ug')}" : '';
+
+        $query = "
+            SELECT
+                {$this->getColumnString('c')},
+                {$code_mapper->getColumnString('cc')}
+                $groupSelect
+            FROM {$this->getTable()} c
+            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+            $groupJoin
 			WHERE (
 			    c.name LIKE :nameLike
 			    OR cc.code LIKE :codeLike
             )
         ";
-
-        /* Filter result set further by only returning records that are also
-		 * in the userGroups table
-		 */
-        if ($userGroupsOnly) {
-            $query .= "
-                AND ug.cid IS NOT NULL
-            ";
-        }
 
         /* Don't know why codeLike contained / and not a trailing %
          */
