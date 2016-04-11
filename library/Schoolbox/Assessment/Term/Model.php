@@ -8,6 +8,7 @@
 namespace Schoolbox\Assessment\Term;
 
 use Alaress_Date_Format;
+use Schoolbox\User;
 
 /**
  * Representation of a user-defined school term.
@@ -110,6 +111,17 @@ class Model
 
         // Both start and end
         return $date->between($start, $finish);
+    }
+
+    /**
+     * Can this user mark work in this term?
+     *
+     * @param  User $user
+     * @return bool
+     */
+    public function isMarkableBy(User $user)
+    {
+        return !$this->getArchived() || $user->isSuperuser();
     }
 
     /**
