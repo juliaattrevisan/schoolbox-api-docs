@@ -698,7 +698,7 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
 
     $this->setVar('return_file_block', '');
 
-    if(count($fileReturn) && !$parentOnly) {
+    if (count($fileReturn)) {
         foreach($fileReturn as $returnedFile) {
             if($returnedFile->getStorage()->getHash()) {
                 try{
