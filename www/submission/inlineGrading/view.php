@@ -241,16 +241,20 @@ $navigationElements = array(
 
 $navigationDirect = json_encode($navigationElements);
 
-$zone = new Zone('inline-return');
+if ($term->getArchived() && !$user->isSuperuser()) {
+	$this->setVar('ATTACH_ZONE', '');
+} else {
+	$zone = new Zone('inline-return');
 
-$zone->setMulti(true)
-    ->setMimeFilter('*/*')
-    ->setThumbnailSize(64)
-    ->setAttachPrompt('Attach file to return')
-    ->setModalTitle('Select file')
-    ->setAttachmentsLabel('');
+	$zone->setMulti(true)
+		->setMimeFilter('*/*')
+		->setThumbnailSize(64)
+		->setAttachPrompt('Attach file to return')
+		->setModalTitle('Select file')
+		->setAttachmentsLabel('');
 
-$zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+	$zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+}
 
 /* Render injectable views
  */
