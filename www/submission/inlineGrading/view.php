@@ -46,7 +46,7 @@ $submissionId = $this->arg[2];
 $submissionBoxMapper = new SubmissionBoxMapper();
 $submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 $term          = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submissionBox->getDueDate());
-$archived      = $term->getArchived();
+$archived      = $term->getArchived() && !$_SESSION['user']->isSuperuser();
 
 /* Add category codes
  */
@@ -411,8 +411,8 @@ if ($submissionBox->isRubric()) {
 
 		$context['markType']['conf'] = $levels;
 	}
-
-    $this->setVar('INJECTED_MARK_RUBRIC', $this->getTwig()->render('@rubric/grid-markable.twig', $context));
+	$template = $archived ? '@rubric/grid.twig' : '@rubric/grid-markable.twig';
+	$this->setVar('INJECTED_MARK_RUBRIC', $this->getTwig()->render($template, $context));
 } else {
     $this->setVar('INJECTED_MARK_RUBRIC', '');
 }
