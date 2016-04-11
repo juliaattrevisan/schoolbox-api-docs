@@ -43,102 +43,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     protected $pastoralSeverityMapper;
 
     /**
-     * @return UserMapper
-     */
-    public function getUserMapper() {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param $userMapper
-     * @return $this
-     */
-    public function setUserMapper($userMapper) {
-        $this->userMapper = $userMapper;
-        return $this;
-    }
-
-    /**
-     * @return PastoralMapper
-     */
-    public function getPastoralMapper() {
-        return $this->pastoralMapper;
-    }
-
-    /**
-     * @param $pastoralMapper
-     * @return $this
-     */
-    public function setPastoralMapper($pastoralMapper) {
-        $this->pastoralMapper = $pastoralMapper;
-        return $this;
-    }
-
-    /**
-     * @return PastoralTypeMapper
-     */
-    public function getPastoralTypeMapper() {
-        return $this->pastoralTypeMapper;
-    }
-
-    /**
-     * @param $pastoralTypeMapper
-     * @return $this
-     */
-    public function setPastoralTypeMapper($pastoralTypeMapper) {
-        $this->pastoralTypeMapper = $pastoralTypeMapper;
-        return $this;
-    }
-
-    /**
-     * @return PastoralAccessMapper
-     */
-    public function getPastoralAccessMapper() {
-        return $this->pastoralAccessMapper;
-    }
-
-    /**
-     * @param $pastoralAccessMapper
-     * @return $this
-     */
-    public function setPastoralAccessMapper($pastoralAccessMapper) {
-        $this->pastoralAccessMapper = $pastoralAccessMapper;
-        return $this;
-    }
-
-    /**
-     * @return PastoralAttachmentMapper
-     */
-    public function getPastoralAttachmentMapper() {
-        return $this->pastoralAttachmentMapper;
-    }
-
-    /**
-     * @param $pastoralAttachmentMapper
-     * @return $this
-     */
-    public function setPastoralAttachmentMapper($pastoralAttachmentMapper) {
-        $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
-        return $this;
-    }
-
-    /**
-     * @return PastoralSeverityMapper
-     */
-    public function getPastoralSeverityMapper() {
-        return $this->pastoralSeverityMapper;
-    }
-
-    /**
-     * @param $pastoralSeverityMapper
-     * @return $this
-     */
-    public function setPastoralSeverityMapper($pastoralSeverityMapper) {
-        $this->pastoralSeverityMapper = $pastoralSeverityMapper;
-        return $this;
-    }    
-
-    /**
      * Constructor
 
      * @throws Exception
@@ -217,14 +121,14 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Get all pastoral care records from Synergetic
 
         $query = "
-SELECT        dbo.tPastoralCare.PastoralCareSeq, dbo.tPastoralCare.ID, dbo.tPastoralCare.ClassCode, dbo.tPastoralCare.ItemDate, dbo.tPastoralCare.MethodCode,
+            SELECT       dbo.tPastoralCare.PastoralCareSeq, dbo.tPastoralCare.ID, dbo.tPastoralCare.ClassCode, dbo.tPastoralCare.ItemDate, dbo.tPastoralCare.MethodCode,
                          dbo.tPastoralCare.Details, dbo.tPastoralCare.PrivateDetails, dbo.tPastoralCare.InitiatorCode, dbo.tPastoralCare.TypeCode, dbo.tPastoralCare.CategoryCode,
                          dbo.tPastoralCare.ClassificationCode, dbo.tPastoralCare.IsFollowUpFlag, dbo.tPastoralCare.FollowUpDate, dbo.tPastoralCare.ConfidentialFlag,
                          dbo.tPastoralCare.CreatedDate, dbo.tPastoralCare.CreatedByID, dbo.tPastoralCare.ModifiedDate, dbo.tPastoralCare.ModifiedByID,
                          dbo.tPastoralCare.EmailSentDate, dbo.tPastoralCare.EmailSentByID, dbo.tPastoralCare.DuplicateFromSeq, dbo.tPastoralCare.SubjectClassesSeq,
                          dbo.luPastoralCareType.Description AS TypeDescription, Community_1.Surname AS StudentLastname, Community_1.Given1 AS StudentFirstname,
                          dbo.Community.Surname AS OwnerLastname, dbo.Community.Given1 AS OwnerFirstname
-FROM            dbo.tPastoralCare INNER JOIN
+            FROM         dbo.tPastoralCare INNER JOIN
                          dbo.luPastoralCareType ON dbo.tPastoralCare.TypeCode = dbo.luPastoralCareType.Code INNER JOIN
                          dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID INNER JOIN
                          dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
@@ -624,5 +528,101 @@ FROM            dbo.tPastoralCare INNER JOIN
     public function getDatabase()
     {
         return $this->database;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper() {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param $userMapper
+     * @return $this
+     */
+    public function setUserMapper($userMapper) {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralMapper
+     */
+    public function getPastoralMapper() {
+        return $this->pastoralMapper;
+    }
+
+    /**
+     * @param $pastoralMapper
+     * @return $this
+     */
+    public function setPastoralMapper($pastoralMapper) {
+        $this->pastoralMapper = $pastoralMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralTypeMapper
+     */
+    public function getPastoralTypeMapper() {
+        return $this->pastoralTypeMapper;
+    }
+
+    /**
+     * @param $pastoralTypeMapper
+     * @return $this
+     */
+    public function setPastoralTypeMapper($pastoralTypeMapper) {
+        $this->pastoralTypeMapper = $pastoralTypeMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralAccessMapper
+     */
+    public function getPastoralAccessMapper() {
+        return $this->pastoralAccessMapper;
+    }
+
+    /**
+     * @param $pastoralAccessMapper
+     * @return $this
+     */
+    public function setPastoralAccessMapper($pastoralAccessMapper) {
+        $this->pastoralAccessMapper = $pastoralAccessMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralAttachmentMapper
+     */
+    public function getPastoralAttachmentMapper() {
+        return $this->pastoralAttachmentMapper;
+    }
+
+    /**
+     * @param $pastoralAttachmentMapper
+     * @return $this
+     */
+    public function setPastoralAttachmentMapper($pastoralAttachmentMapper) {
+        $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralSeverityMapper
+     */
+    public function getPastoralSeverityMapper() {
+        return $this->pastoralSeverityMapper;
+    }
+
+    /**
+     * @param $pastoralSeverityMapper
+     * @return $this
+     */
+    public function setPastoralSeverityMapper($pastoralSeverityMapper) {
+        $this->pastoralSeverityMapper = $pastoralSeverityMapper;
+        return $this;
     }
 }
