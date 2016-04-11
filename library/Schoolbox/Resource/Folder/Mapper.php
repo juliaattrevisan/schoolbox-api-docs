@@ -559,7 +559,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      *
      * @param $keyword
      * @param bool $userGroupsOnly
-     * @return Model
+     * @return Collection|Model[]
      */
     public function searchByName($keyword, $userGroupsOnly = false) {
         $code_mapper  = $this->getJoinMapper('codes');
@@ -602,6 +602,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
          */
         foreach ($statement as $row) {
             $category = $this->hydrate($row, 'c');
+            $category->setCodes(new Collection([ $code_mapper->hydrate($row, 'cc')->setCategory($category) ]));
 
             $hashtable[$category->getId()] = $category;
         }
