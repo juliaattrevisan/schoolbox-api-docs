@@ -1,0 +1,102 @@
+#!/bin/bash
+
+initialdir=`pwd`;
+
+filepath=`readlink -f $0`;
+fullpath=${filepath%/*}
+instdir=`readlink -f $fullpath/../../`;
+cd $instdir;
+
+echo "operating in dir: `pwd`";
+
+branch='master';
+if [ ! -z $1 ];
+then
+        branch="$1";
+fi
+
+if [ "$branch" == "master" ];
+then
+	prefix='';
+else
+	prefix="$branch-";
+fi
+
+echo "Branch: $branch";
+
+
+if [ ! -f ../vendor-php-artifact/"$branch"-vendor-php.tar.gz ];
+then
+	echo "Unable to locate vendor artifact: ../vendor-php-artifact/"$branch"-vendor-php.tar.gz";
+	exit 1;
+fi
+
+echo "Unpacking vendor php build";
+tar xzf ../vendor-php-artifact/"$branch"-vendor-php.tar.gz;
+
+echo "Validating checksums";
+checksum=`sha1sum composer.lock`;
+if [ "$checksum" != "`cat vendor/composer.lock.checksum`" ];
+then
+        echo "Vendor checksum does not match";
+        exit 1;
+fi
+
+if [ ! -f ../browscap-cache/"$branch"-browscap-cache.php.gz ];
+then
+	echo "Unable to locate browscap cache artifact: ../browscap-cache/"$branch"-browscap-cache.php.gz";
+	exit 1;
+fi
+
+echo "Unpacking browscap cache file";
+gzip -d ../browscap-cache/"$branch"-browscap-cache.php.gz;
+if [ $? -ne 0 ];
+then
+	echo "Unable to extract browscap cache file";
+	exit 1;
+fi
+
+echo "Configuring browscap cache";
+mkdir -vp tools/browscap;
+touch tools/browscap/browscap.ini;
+cp -vf ../browscap-cache/"$branch"-browscap-cache.php tools/browscap/cache.php;
+if [ $? -ne 0 ];
+then
+	echo "Unable to copy browscap cache file";
+	exit 1;
+fi
+
+echo "Installing grunt";
+npm install grunt-cli;
+
+echo "Build and install CSS and JS using grunt/bower";
+tools/pkg-build-css-js.sh;
+if [ $? -ne 0 ];
+then
+	echo "Error building and install CSS and JS";
+	exit 1;
+fi
+
+echo "Removing undeployable files";
+if [ -f tools/ci/undeployable.list ];
+then
+	for i in `cat tools/ci/undeployable.list`;
+	do
+		if [ "$i" != "" ];
+		then
+			rm -vfR "$i";
+		fi
+	done
+fi
+
+echo "Building SQL Update list";
+tools/build-sql-update.sh;
+
+echo "Creating artifact directory";
+mkdir -vp $initialdir/tarball-artifacts;
+
+echo "Creating build tarball artifact";
+tar czf $initialdir/tarball-artifacts/build.tar.gz .;
+
+echo "Artifact List: `readlink -f $initialdir/tarball-artifacts/`";
+ls -lhR $initialdir/tarball-artifacts/;

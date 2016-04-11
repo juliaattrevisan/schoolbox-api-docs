@@ -25,36 +25,6 @@ export DH_OPTIONS
 
 override_dh_install:
 	# Fixes for --no-- deb handling of exclude
-	## SSO
-	mkdir -pv $(CURDIR)/sso
-	cp -a --parents tools/apache-vhost-*-sso $(CURDIR)/sso
-	rm -fR tools/apache-vhost-*-sso
-	## End SSO
-	## DR
-	#mkdir -pv $(CURDIR)/dr
-	## End DR
-	## Leave Module
-	mkdir -pv $(CURDIR)/leave
-	cp -a --parents templates/*/modules/leave $(CURDIR)/leave
-	rm -fR templates/*/modules/leave
-	cp -a --parents www/modules/leave.php $(CURDIR)/leave
-	rm -fR www/modules/leave.php
-	cp -a --parents library/Leave $(CURDIR)/leave
-	rm -fR library/Leave
-	cp -a --parents sql/modules/leave $(CURDIR)/leave
-	rm -fR sql/modules/leave
-	## End Leave Module
-	## Resource Module
-	mkdir -pv $(CURDIR)/resource
-	cp -a --parents sql/modules/resource $(CURDIR)/resource
-	rm -fR sql/modules/resource
-	cp -a --parents library/Schoolbox/ResourceBooking $(CURDIR)/resource
-	rm -fR library/Schoolbox/ResourceBooking
-	cp -a --parents library/Calendar/Api/EventType/ResourceBooking $(CURDIR)/resource
-	rm -fR library/Calendar/Api/EventType/ResourceBooking
-	cp -a --parents library/Calendar/Event/Type/ResourceBooking $(CURDIR)/resource
-	rm -fR library/Calendar/Event/Type/ResourceBooking
-	## End Resource Module
 	## EOTC Module
 	mkdir -pv $(CURDIR)/eotc
 	cp -a --parents library/Calendar/Api/Config/Connector/EOTC.php $(CURDIR)/eotc
@@ -70,38 +40,8 @@ override_dh_install:
 	cp -a --parents www/modules/eotc $(CURDIR)/eotc
 	rm -fR www/modules/eotc
 	## End EOTC Module
-	# Install submodules using composer
-	tools/composer.sh --no-dev
-	# Install grunt
-	npm install grunt-cli
-	# Build and install CSS and JS using grunt/bower
-	tools/pkg-build-css-js.sh
-	# Cleanup live vs dev files and information
-	tools/pkg-live-vs-dev.sh schoolbox
-	# Remove non-deployable files and folders
-	rm -fR behat.yml
-	rm -fR bower.json
-	rm -fR composer.*
-	rm -fR Gruntfile.js
-	rm -fR node_modules
-	rm -fR package.json
-	rm -fR phpunit.xml
-	rm -fR README.md
-	rm -fR *.log
-	rm -fR test
-	rm -fR tools/vagrant*
-	rm -fR tools/pkg-*
-	rm -fR tools/composer*
-	rm -fR tools/git*
-	rm -fR www/test
-	rm -fR Vagrantfile
-	rm -fR www/javascript/components/*/node_modules
 	# Start install
 	dh_install
-	# Auto build the sql update scripts
-	debian/schoolbox/usr/share/schoolbox/tools/build-sql-update.sh package schoolbox
-	# Build default config paths for packaged install
-	debian/schoolbox/usr/share/schoolbox/tools/generate-dir-sql.sh /var/lib/schoolbox /usr/share/schoolbox > debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
 	# Remove moved files
 	rm -rf debian/schoolbox/usr/share/schoolbox/www/conf
 
