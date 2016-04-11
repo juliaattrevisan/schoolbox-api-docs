@@ -27,7 +27,22 @@
                         options
                     )
                 )
-                .val(minuteValue);
+                .val(minuteValue)
+                .on('keyup', function() {
+                    // Store and restore to work around time set to 0 when
+                    // selecting a number < 10 or so.
+                    minutePicker.data('actualValue', minutePicker.val());
+                })
+                .on('change', function() {
+                    var actualValue = minutePicker.data('actualValue');
+                    minutePicker.removeData('actualValue');
+                    if (typeof actualValue != 'undefined') {
+                        // Set both here and setTimeout as I don't know
+                        // the order which events will be fired.
+                        minutePicker.val(actualValue);
+                        setTimeout(function() { minutePicker.val(actualValue); }, 0);
+                    }
+                });
         });
     }
 })(jQuery);
