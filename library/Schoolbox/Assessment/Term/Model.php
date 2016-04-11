@@ -89,9 +89,7 @@ class Model
     {
         // TODO make ADF immutable already
         $start  = clone $this->getStart();
-        $start  = $start->startOfDay();
         $finish = clone $this->getActualFinish();
-        $finish = $finish->endOfDay();
 
         // No bounds on this term?
         if ($start->isNull() && $finish->isNull()) {
@@ -100,16 +98,16 @@ class Model
 
         // No start? accept any date before finish
         if ($start->isNull()) {
-            return $date->lte($finish);
+            return $date->lte($finish->endOfDay());
         }
 
         // No end: accept any date after start
         if ($finish->isNull()) {
-            return $date->gte($start);
+            return $date->gte($start->startOfDay());
         }
 
         // Both start and end
-        return $date->between($start, $finish);
+        return $date->between($start->startOfDay(), $finish->endOfDay());
     }
 
     /**
