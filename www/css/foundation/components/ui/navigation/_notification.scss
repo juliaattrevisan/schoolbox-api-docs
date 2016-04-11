@@ -78,12 +78,12 @@ $notification-header-background: $navigation-background !default;
             z-index: 1003;
             @media #{$large-up} {
                 &:after {
-                    content: "\00AB";
+                    content: "\00BB";
                     @include scale-font-size($h2-font-scale);
                     padding-left: 0.5rem;
                 }
                 &.raquo:after {
-                    content: "\00BB";
+                    content: "\00AB";
                 }
             }
         }

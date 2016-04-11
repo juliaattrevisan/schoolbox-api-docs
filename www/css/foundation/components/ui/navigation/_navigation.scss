@@ -535,7 +535,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 }
 
-@media #{$large-up} {
+@media #{$xlarge-up} {
 	.inner-wrap.docking{
 		.right-off-canvas-menu{
 			transition: $menu-slide;
@@ -550,6 +550,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			}
 		}
 	}
+}
+
+@media #{$large-up} {
 	.right-off-canvas-menu.docking + #search{
 		right: 0;
 		padding-left: 0;
@@ -561,6 +564,17 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 	.main-section {
 		overflow: hidden;
+	}
+}
+
+// Large down
+@media #{$large-down} {
+	.hybrid-bar #search {
+		right: 5rem;
+
+		&:hover, &.focus{
+			padding-left: 5rem;
+		}
 	}
 }
 
@@ -578,17 +592,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 	.main-section {
 		overflow: hidden;
-	}
-}
-
-// Large down
-@media #{$large-down} {
-	.hybrid-bar #search {
-		right: 5rem;
-
-		&:hover, &.focus{
-			padding-left: 5rem;
-		}
 	}
 }
 
