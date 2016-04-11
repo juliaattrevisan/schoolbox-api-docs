@@ -17,8 +17,16 @@ fi
 
 echo "Branch: $branch";
 
-echo "Unpacking vendor php build";
-tar xzf ../$2;
+if [ "$branch" != 'release' ];
+then
+	echo "Unpacking vendor php build";
+	tar xzf ../$2;
+	if [ $? -ne 0 ];
+	then
+		echo "Unable to unpack vendor php tarball";
+		exit 1;
+	fi
+fi
 
 echo "Building PHP Browscap Cache file";
 php tools/ci/build-browscap-cache.php;

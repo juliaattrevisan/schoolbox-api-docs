@@ -34,6 +34,11 @@ then
 else
 	echo "No prebuilt vendor tarball supplied, rebuilding vendor php from composer";
 	tools/composer.sh;
+	if [ $? -ne 0 ];
+	then
+		echo "Composer build of vendor php failed";
+		exit 1;
+	fi
 fi
 
 echo "Preparing conf.php"
@@ -41,3 +46,8 @@ cp -f www/conf/tarball.conf.php www/conf/conf.php;
 
 echo "Running php unit"
 php vendor/bin/phpunit;
+if [ $? -ne 0 ];
+then
+	echo "PHP Unit tests failed";
+	exit 1;
+fi
