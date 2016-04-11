@@ -219,7 +219,7 @@
                                 {%
                                     if  record.getOwner.getId == session.user.getId or
                                         comment.getOwner.getId == session.user.getId or
-                                        pastoralModerator
+                                        pastoralModerator >= FULL_ACCESS
                                 %}
                                     <nav>
                                         <a data-delete-comment="{{ comment.getId }}" class="icon-delete" href="#" title="Delete Comment"></a>
