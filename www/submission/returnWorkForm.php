@@ -59,6 +59,13 @@ $studentRetHandler = new SubmissionReturn();
 $studentRetHandler->securityCheck($submissionBox->getId());
 unset($studentRetHandler);
 
+$term = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submissionBox->getDueDate());
+if (!$term->isMarkableBy($_SESSION['user'])) {
+    // ¯\_(ツ)_/¯
+    error(17);
+    exit;
+}
+
 /* Some weird format that's built in javascript for some reason
  * See jquery.marksheet.js
  */
