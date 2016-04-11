@@ -389,8 +389,6 @@ class Mapper extends BaseMapper
             `r`.created_at
         ";
 
-        echo $query;
-
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute();
 
