@@ -32,19 +32,14 @@ if (isset($type) && isset($id) ) {
 		switch ($queue->getStatus()) {
 			case 'pending':
 			case 'processing':
-
 				// Video hasn't been processed yet
-
 				SitePage::localRedir("/images/core/video-processing-thumb.png");
 				exit;
-				break;
+
 			case 'failed':
-
 				// Video processing failed
-
 				SitePage::localRedir("/images/core/video-failed-thumb.png");
 				exit;
-				break;
 
 			default:
 
