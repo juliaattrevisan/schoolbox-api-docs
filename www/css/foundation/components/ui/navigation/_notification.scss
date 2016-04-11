@@ -76,14 +76,14 @@ $notification-header-background: $navigation-background !default;
             background: $notification-unread-background;
             color: $notification-unread-color;
             z-index: 1003;
-            @media #{$large-up} {
+            @media #{$xlarge-up} {
                 &:after {
-                    content: "\00AB";
+                    content: "\00BB";
                     @include scale-font-size($h2-font-scale);
                     padding-left: 0.5rem;
                 }
                 &.raquo:after {
-                    content: "\00BB";
+                    content: "\00AB";
                 }
             }
         }
