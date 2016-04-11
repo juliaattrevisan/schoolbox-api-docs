@@ -1,0 +1,19 @@
+<input type="hidden" name="importCourse"  value="{{ importCourse }}"  />
+<div class="meta" data-mage-helptext>
+    <p>Select the nominated owner of the imported coursework{% if targetFolders|length > 1 %} for each class{% endif %}.</p>
+</div>
+<ul class="information-list">
+    {% for folder in targetFolders %}
+    <li>
+        <div class="small-12 medium-6 column"><h4>{{ folder.name }}</h4></div>
+        <div class="small-12 medium-6 column">
+            <label for="ownership-{{ folder.id }}" data-mage-helptext>Coursework Ownership</label>
+            <select id="ownership-{{ folder.id }}" name="ownership[{{ folder.id }}]">
+                {% for candidate in ownershipCandidates[folder.id] %}
+                <option value="{{ candidate.id }}">Transfer to {{ candidate.formatName }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
