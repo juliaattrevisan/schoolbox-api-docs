@@ -46,7 +46,6 @@ $submissionId = $this->arg[2];
 $submissionBoxMapper = new SubmissionBoxMapper();
 $submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 $term          = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submissionBox->getDueDate());
-$archived      = $term->getArchived() && !$_SESSION['user']->isSuperuser();
 
 /* Add category codes
  */
@@ -242,7 +241,7 @@ $navigationElements = array(
 
 $navigationDirect = json_encode($navigationElements);
 
-if ($term->getArchived() && !$user->isSuperuser()) {
+if (!$term->isMarkableBy($_SESSION['user'])) {
 	$this->setVar('ATTACH_ZONE', '');
 } else {
 	$zone = new Zone('inline-return');
@@ -346,7 +345,7 @@ else {
 	));
 }
 
-if ($archived) {
+if (!$term->isMarkableBy($user)) {
 	$this->setVar('submit_button_block', '');
 } else {
 	$this->parse('submit_button_block', 'submit_button');
@@ -418,7 +417,7 @@ if ($submissionBox->isRubric()) {
 
 		$context['markType']['conf'] = $levels;
 	}
-	$template = $archived ? '@rubric/grid.twig' : '@rubric/grid-markable.twig';
+	$template = !$term->isMarkableBy($_SESSION['user']) ? '@rubric/grid.twig' : '@rubric/grid-markable.twig';
 	$this->setVar('INJECTED_MARK_RUBRIC', $this->getTwig()->render($template, $context));
 } else {
     $this->setVar('INJECTED_MARK_RUBRIC', '');

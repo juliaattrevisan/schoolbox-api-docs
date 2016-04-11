@@ -176,7 +176,7 @@ switch ($assess['mark_visibility']) {
         break;
 }
 
-$readonly = ($term->getArchived() && !($_SESSION['user']->isSuperuser()));
+$readonly = !$term->isMarkableBy($_SESSION['user']);
 
 /* Load all the questions for this section.
  * Note: only show the randomly-selected ones
