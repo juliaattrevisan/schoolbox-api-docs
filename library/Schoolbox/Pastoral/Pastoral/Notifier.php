@@ -82,7 +82,7 @@ class Notifier extends AbstractModuleNotifier
                         if ($teacher->getRole()->getId() == $roleId)
                             $envelope->targetToUser($teacher->getId(), $message);
                 }
-                else if ($accessModel->getRole()->isParent())
+                else if ($role->isParent())
                 {
                     $sendToParents = true;
                 }

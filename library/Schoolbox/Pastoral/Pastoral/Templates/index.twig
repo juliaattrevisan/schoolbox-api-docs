@@ -162,6 +162,8 @@
         <div class="alert-box">No pastoral care records are visible regarding {{ student.formatName }}.{% if role != 'parent' %} <a href="/pastoral/insert/{{ student.getId }}">Add a Pastoral Record</a>{% endif %}</div>
     </div>
 </div>
+
+{% if records.count() > 0 %}
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">Records</h2>
@@ -295,3 +297,4 @@
         </section>
     </div>
 </div>
+{% endif %}
