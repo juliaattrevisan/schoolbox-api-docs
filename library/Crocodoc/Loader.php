@@ -10,6 +10,7 @@
 namespace Crocodoc;
 
 use Alaress_Curl_Url;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
 
@@ -45,16 +46,25 @@ class Loader
     private $curl = null;
 
     /**
+     * Is this work archived?
+     *
+     * @var bool
+     */
+    private $archived = false;
+
+    /**
      * Constructor
      *
      * @param $uuid
      * @param User $user
+     * @param bool $archived
      */
-    public function __construct($uuid, User $user)
+    public function __construct($uuid, User $user, $archived = false)
     {
         $this->setAuthenticator(new Authenticator());
         $this->setUuid($uuid);
         $this->setUser($user);
+        $this->setArchived($archived);
         $this->setCurl(new Alaress_Curl_Url('https://crocodoc.com/api/v2/session/create'));
     }
 
@@ -63,17 +73,28 @@ class Loader
      */
     public function render()
     {
-
-        /* Handle postfields different from student viewers and teacher/superuser viewers
-         */
-        if ($this->getUser()->getRole()->isStudent() || $this->getUser()->getRole()->isParent()) {
-            $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=false";
+        $access = UserAccess::ACCESS_DENY;
+        if ($this->getUser()->isSuperuser()) {
+            $access = UserAccess::ACCESS_WRITE;
+        } elseif ($this->getUser()->getRole()->isStaff()) {
+            $access = $this->getArchived()
+                ? UserAccess::ACCESS_READ
+                : UserAccess::ACCESS_WRITE;
+        } elseif ($this->getUser()->getRole()->isStudent() || $this->getUser()->getRole()->isParent()) {
+            $access = UserAccess::ACCESS_READ;
         }
-        else if ($this->getUser()->getRole()->isStaff() || $this->getUser()->isSuperuser()) {
-            $userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
-            $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=true&user={$userTuple}";
-        } else {
-            $postFields = '';
+
+        $postFields = '';
+        switch ($access) {
+            case UserAccess::ACCESS_WRITE:
+                $userTuple = "{$this->getUser()->getId()},{$this->getUser()->getUsername()}";
+                $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=true&user={$userTuple}";
+                break;
+            case UserAccess::ACCESS_READ:
+                $postFields = "token={$this->getAuthenticator()->getApiToken()}&uuid={$this->getUuid()}&editable=false";
+                break;
+            default:
+                break;
         }
 
         /* Bicep curl
@@ -200,5 +221,23 @@ class Loader
     private function getCurl()
     {
         return $this->curl;
+    }
+
+    /**
+     * @return bool
+     */
+    private function getArchived()
+    {
+        return $this->archived;
+    }
+
+    /**
+     * @param  bool $archived
+     * @return $this
+     */
+    private function setArchived($archived)
+    {
+        $this->archived = $archived;
+        return $this;
     }
 }

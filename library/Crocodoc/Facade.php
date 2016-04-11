@@ -10,9 +10,11 @@
 namespace Crocodoc;
 
 use Exception;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Assessment\Term;
 
 class Facade
 {
@@ -30,6 +32,13 @@ class Facade
      * @var Submission\File
      */
     private $submission;
+
+    /**
+     * The term which the submission object is in
+     *
+     * @var Term\Model
+     */
+    private $term;
 
     /**
      * @var User
@@ -56,8 +65,14 @@ class Facade
      */
     protected function loadSubmission($submissionId)
     {
-        $submissionMapper = new Submission\FileMapper();
-        $this->setSubmission($submissionMapper->findById($submissionId));
+        $this->setSubmission(Submission\FileMapper::getInstance()->findById($submissionId));
+        $this->setTerm(
+            Term\Mapper::getInstance()->findForDate(
+                SubmissionBoxMapper::getInstance()->findById(
+                    $this->getSubmission()->getSubmissionBox()->getId()
+                )->getDueDate()
+            )
+        );
     }
 
     /**
@@ -93,7 +108,7 @@ class Facade
         }
 
         try {
-            $loader = new Loader($submission->getUuid(), $this->getUser());
+            $loader = new Loader($submission->getUuid(), $this->getUser(), $this->getTerm()->getArchived());
             header('Location: '.$loader->render());
             exit;
         }
@@ -118,7 +133,7 @@ class Facade
         }
 
         try {
-            $loader = new Loader($submission->getUuid(), $this->getUser());
+            $loader = new Loader($submission->getUuid(), $this->getUser(), $this->getTerm()->getArchived());
             header('Location: '.$loader->getDownloadUrl('return_'.$submission->getFilename().'.pdf'));
             exit;
         } catch (Exception $e) {
@@ -187,5 +202,22 @@ class Facade
     {
         return $this->user;
     }
-}
 
+    /**
+     * @return Term\Model
+     */
+    private function getTerm()
+    {
+        return $this->term;
+    }
+
+    /**
+     * @param  Term\Model $term
+     * @return $this
+     */
+    private function setTerm($term)
+    {
+        $this->term = $term;
+        return $this;
+    }
+}
