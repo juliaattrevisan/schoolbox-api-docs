@@ -722,7 +722,7 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
     }
 
     /** Customisation for SEDA */
-    if(Config::get('site_location' == 'seda') ) {
+    if (Config::get('site_location') == 'seda') {
 
         $this->setBlock('returned_work', 'approve_mark', 'approve_mark_block');
 
