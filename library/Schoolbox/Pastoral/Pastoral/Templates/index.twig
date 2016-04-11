@@ -199,7 +199,7 @@
                                     {% if role != 'parent' %}
                                         {# Show how many comments have been made on the record #}
                                         {% if record.getCommentList.count > 0 %}
-                                            ({{ record.getCommentList.count }} Comment{% if record.comments | length > 1 %}s{% endif %})
+                                            ({{ record.getCommentList.count }} Comment{% if record.getCommentList.count > 1 %}s{% endif %})
                                         {% endif %}
                                     {% endif %}
                                 </h3>
