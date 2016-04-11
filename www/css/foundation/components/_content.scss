@@ -1450,6 +1450,11 @@ ul.flex-list {
 		}
 	}
 
+	// if a <p/> is the last child of a card, whack a little spacing on the bottom
+	> p:last-child {
+		padding-bottom: 0.5rem;
+	}
+
     textarea {
         width: #{'calc(100% - 4rem)'};
         max-width: #{'calc(100% - 4rem)'};
