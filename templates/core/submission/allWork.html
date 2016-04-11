@@ -48,7 +48,7 @@
                              */
                             var template =
                                     '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
-                                    '<p class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></p>' +
+                                    '<div class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></div>' +
                                     '<p class="comment">{INFO}</p>' +
                                     '</div>';
                             /* Concatenate everything
@@ -148,9 +148,9 @@
         <!-- BEGIN grade_average -->
         <h2 class="subheader">Current Grade Average</h2>
         <section class="content gradient-{SUBJ_GRADEIENT}-bg">
-            <p class="grade">
+            <div class="grade">
                 <span class="gradient-{SUBJ_GRADEIENT}">{SUBJ_GRADE_AVG}</span>
-            </p>
+            </div>
             {SUBJ_GRADE_TREND}
         </section>
         <!-- END grade_average -->
@@ -254,7 +254,7 @@
                             </div>
 
                             <div class="small-12 large-4 columns grade">
-                                <p class="gradient-{WORK_GRADIENT}"><span>{WORK_GRADE}</span></p>
+                                <div class="gradient-{WORK_GRADIENT}"><span>{WORK_GRADE}</span></div>
                                 <p class="comment">{WORK_COMMENT}</p>
                             </div>
 
