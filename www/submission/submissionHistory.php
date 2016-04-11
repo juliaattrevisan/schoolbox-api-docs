@@ -698,7 +698,7 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
 
     $this->setVar('return_file_block', '');
 
-    if(count($fileReturn) && !$parentOnly) {
+    if (count($fileReturn)) {
         foreach($fileReturn as $returnedFile) {
             if($returnedFile->getStorage()->getHash()) {
                 try{
@@ -722,7 +722,7 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
     }
 
     /** Customisation for SEDA */
-    if(Config::get('site_location' == 'seda') ) {
+    if (Config::get('site_location') == 'seda') {
 
         $this->setBlock('returned_work', 'approve_mark', 'approve_mark_block');
 
