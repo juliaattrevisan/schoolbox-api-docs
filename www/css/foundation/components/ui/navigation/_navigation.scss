@@ -542,7 +542,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			position: relative;
 			transform: none;
 			float: right;
-			@include box-shadow(0,0,0,0);
 		}
 		#search{
 			right: 0;
@@ -562,7 +561,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		@include transform(none);
 		transition: $menu-slide;
 		background-color: $off-canvas-background;
-		@include box-shadow(-10px, 0, 0, rgba(0,0,0,0.1));
 	}
 	.main-section {
 		overflow: hidden;
