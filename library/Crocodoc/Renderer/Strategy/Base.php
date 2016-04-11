@@ -12,6 +12,7 @@ namespace Crocodoc\Renderer\Strategy;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use SitePage;
 
@@ -46,6 +47,13 @@ abstract class Base {
 	private $navigationElements = array();
 
 	/**
+	 * The term that this submission box is in (or null, if I don't care)
+	 *
+	 * @var Term\Model
+	 */
+	private $term;
+
+	/**
 	 * The template file to inject
 	 *
 	 * @var string
@@ -73,21 +81,20 @@ abstract class Base {
 	 * @param Submission\File $submission
 	 * @param ReturnedWork[]|Collection $returnedWorkCollection
 	 * @param $navigationElements
+	 * @param Term\Model $term
 	 */
-	public function __construct($page, Submission\File $submission = null, $returnedWorkCollection = null, $navigationElements)
-    {
+	public function __construct(
+		$page,
+		Submission\File $submission = null,
+		$returnedWorkCollection = null,
+		$navigationElements = [],
+		Term\Model $term = null
+	) {
 		$this->setPage($page);
 		$this->setSubmission($submission);
 		$this->setReturnedWorkCollection($returnedWorkCollection);
 		$this->setNavigationElements($navigationElements);
-
-//        /* Fetch mimetype
-//         */
-//        if (($this->getReturnedWorkCollection() != null) && strlen($this->getReturnedWorkCollection()->getMimetype()->getMime())) {
-//            $mimetypeMapper = new MimetypeMapper();
-//            $mime = $mimetypeMapper->findOneByColumn('mime', $this->getReturnedWorkCollection()->getMimeType()->getMime());
-//            $this->getReturnedWorkCollection()->setMimetype($mime);
-//        }
+		$this->setTerm($term instanceof Term\Model ? $term : new Term\Model());
 	}
 
 	/**
@@ -272,5 +279,23 @@ abstract class Base {
 	 */
 	protected function getReturnedWorkCollection() {
 		return $this->returnedWorkCollection;
+	}
+
+	/**
+	 * @return Term\Model
+	 */
+	protected function getTerm()
+	{
+		return $this->term;
+	}
+
+	/**
+	 * @param  Term\Model $term
+	 * @return $this
+	 */
+	protected function setTerm($term)
+	{
+		$this->term = $term;
+		return $this;
 	}
 }

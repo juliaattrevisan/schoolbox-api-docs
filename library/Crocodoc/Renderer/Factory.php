@@ -11,6 +11,7 @@ namespace Crocodoc\Renderer;
 
 use \Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use \Schoolbox\Assessment\Term;
 use \Schoolbox\Collection;
 
 class Factory
@@ -56,6 +57,13 @@ class Factory
      */
     private $navigationElements = array();
 
+    /**
+     * The term that this submission box is in (or null, if I don't care)
+     *
+     * @var Term\Model
+     */
+    private $term;
+
 	/**
 	 * Force a submission object, or null
 	 * (silly php)
@@ -68,13 +76,20 @@ class Factory
 	 * @param Submission\File $submission
 	 * @param ReturnedWork[]|Collection $returnedWorkCollection
 	 * @param $navigationElements
+	 * @param Term\Model $term
 	 */
-	public function __construct($page, Submission\File $submission = null, $returnedWorkCollection = null, $navigationElements)
-    {
+	public function __construct(
+		$page,
+		Submission\File $submission = null,
+		$returnedWorkCollection = null,
+		$navigationElements = [],
+		Term\Model $term = null
+	) {
 		$this->setPage($page);
 		$this->setSubmission($submission);
 		$this->setReturnedWorkCollection($returnedWorkCollection);
 		$this->setNavigationElements($navigationElements);
+		$this->setTerm($term instanceof Term\Model ? $term : new Term\Model());
 	}
 
     /**
@@ -88,31 +103,73 @@ class Factory
         $returnCollection = $this->getReturnedWorkCollection();
         if ($work === null) {
             // No submission
-            return new Strategy\None($this->getPage(), $work, $returnCollection, $this->getNavigationElements());
+            return new Strategy\None(
+                $this->getPage(),
+                $work,
+                $returnCollection,
+                $this->getNavigationElements(),
+                $this->getTerm()
+            );
 
         } elseif ($work instanceof Submission\File) {
             if ($this->crocodocable($work)) {
                 // Crocodoc-friendly file types (only if Crocodoc is active with an api token)
-                return new Strategy\Crocodoc($this->getPage(), $work, $returnCollection, $this->getNavigationElements());
+                return new Strategy\Crocodoc(
+                    $this->getPage(),
+                    $work,
+                    $returnCollection,
+                    $this->getNavigationElements(),
+                    $this->getTerm()
+                );
 
             } elseif ($work->getMimeType()->isImage()) {
                 // Other special presentation methods for inline viewing of media such as images and videos
-                return new Strategy\Image($this->getPage(), $work, $returnCollection, $this->getNavigationElements());
+                return new Strategy\Image(
+                    $this->getPage(),
+                    $work,
+                    $returnCollection,
+                    $this->getNavigationElements(),
+                    $this->getTerm()
+                );
 
             } elseif ($work->getMimetype()->isVideo()) {
-                return new Strategy\Video($this->getPage(), $work, $returnCollection, $this->getNavigationElements());
+                return new Strategy\Video(
+                    $this->getPage(),
+                    $work,
+                    $returnCollection,
+                    $this->getNavigationElements(),
+                    $this->getTerm()
+                );
 
             } elseif ($work->getMimetype()->isAudio()) {
-                return new Strategy\Audio($this->getPage(), $this->getSubmission(), $returnCollection, $this->getNavigationElements());
+                return new Strategy\Audio(
+                    $this->getPage(),
+                    $this->getSubmission(),
+                    $returnCollection,
+                    $this->getNavigationElements(),
+                    $this->getTerm()
+                );
             }
             elseif ($work->getMimeType()->matches('text/html')) {
-                return new Strategy\Html($this->getPage(), $work, $returnCollection, $this->getNavigationElements());
+                return new Strategy\Html(
+                    $this->getPage(),
+                    $work,
+                    $returnCollection,
+                    $this->getNavigationElements(),
+                    $this->getTerm()
+                );
             }
-		}
+        }
 
         // Otherwise just download the file
-        return new Strategy\Download($this->getPage(), $work, $this->getReturnedWorkCollection(), $this->getNavigationElements());
-	}
+        return new Strategy\Download(
+            $this->getPage(),
+            $work,
+            $this->getReturnedWorkCollection(),
+            $this->getNavigationElements(),
+            $this->getTerm()
+        );
+    }
 
     /**
      * @param Submission\File $submission
@@ -226,5 +283,23 @@ class Factory
     private function getReturnedWorkCollection()
     {
         return $this->returnedWorkCollection;
+    }
+
+    /**
+     * @return Term\Model
+     */
+    private function getTerm()
+    {
+        return $this->term;
+    }
+
+    /**
+     * @param  Term\Model $term
+     * @return $this
+     */
+    private function setTerm($term)
+    {
+        $this->term = $term;
+        return $this;
     }
 }
