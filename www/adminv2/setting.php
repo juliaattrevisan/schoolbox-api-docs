@@ -199,12 +199,14 @@ if(is_array($optionList)) {
                     break;
 
                 case 'file':
+                    $mimeFilter = (strpos($option['name'], '_logo') || strpos($option['name'], '_bg')) ? 'image/*' : '*/*';
+
                     $zone = new \Schoolbox\Resource\Attachment\Zone(Scrub::text($option['name']));
                     $zone->setThumbnailSize(64);
                     $zone->setAttachPrompt('Attach '. Scrub::text(strtolower($option['title'])));
                     $zone->setAttachmentsLabel('');
                     $zone->setFileVar(Scrub::text($option['name']));
-                    $zone->setMimeFilter('image/*');
+                    $zone->setMimeFilter($mimeFilter);
                     $zone->setModalTitle('Select '. Scrub::text(strtolower($option['title'])));
                     if($option['value']) {
                         $zone->attachFiles(array($option['value']));
@@ -214,13 +216,15 @@ if(is_array($optionList)) {
                     break;
 
                 case 'fileMulti':
+                    $mimeFilter = (strpos($option['name'], '_logo') || strpos($option['name'], '_bg')) ? 'image/*' : '*/*';
+
                     $zone = new \Schoolbox\Resource\Attachment\Zone(Scrub::text($option['name']));
                     $zone->setThumbnailSize(64);
                     $zone->setAttachPrompt('Attach '. Scrub::text(strtolower($option['title'])));
                     $zone->setAttachmentsLabel('');
                     $zone->setMulti(true);
                     $zone->setFileVar(Scrub::text($option['name'])."[]");
-                    $zone->setMimeFilter('image/*');
+                    $zone->setMimeFilter($mimeFilter);
                     $zone->setModalTitle('Select '. Scrub::text(strtolower($option['title'])));
 
                     $backgrounds = explode(",", Config::get('skin_login_bg'));
