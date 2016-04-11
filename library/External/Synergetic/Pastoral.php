@@ -12,6 +12,7 @@ use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
+use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Alaress\DebugBar\Instance as DebugBar;
@@ -34,6 +35,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
     /** @var PastoralAccessMapper $pastoralAccessMapper */
     protected $pastoralAccessMapper;
+
+    /** @var PastoralAttachmentMapper $pastoralAttachmentMapper */
+    protected $pastoralAttachmentMapper;
 
     /** @var PastoralSeverityMapper $pastoralSeverityMapper */
     protected $pastoralSeverityMapper;
@@ -99,6 +103,22 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function setPastoralAccessMapper($pastoralAccessMapper) {
         $this->pastoralAccessMapper = $pastoralAccessMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralAttachmentMapper
+     */
+    public function getPastoralAttachmentMapper() {
+        return $this->pastoralAttachmentMapper;
+    }
+
+    /**
+     * @param $pastoralAttachmentMapper
+     * @return $this
+     */
+    public function setPastoralAttachmentMapper($pastoralAttachmentMapper) {
+        $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
         return $this;
     }
 
@@ -173,7 +193,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                           DuplicateFromSeq,
                           SubjectClassesSeq
                   FROM tPastoralCare
-                  WHERE PastoralCareSeq = " . $this->getPastoralIdentifier($pastoral->getExternalId());
+                  WHERE PastoralCareSeq = " . $this->getPastoralIdentifier($pastoral);
 
         return $this->getDatabase()->getAll($query);
     }
@@ -385,9 +405,8 @@ FROM            dbo.tPastoralCare INNER JOIN
         // Get the information necessary to create the query
 
         // External student ID
-
-        $userMapper = new \Schoolbox\UserMapper();
-        $id = $userMapper->findById($pastoral->getStudent()->getId())->getExternalId();
+        
+        $id = $this->getUserMapper()->findById($pastoral->getStudent()->getId())->getExternalId();
 
         // Set the item date to the post date
 
@@ -457,15 +476,13 @@ FROM            dbo.tPastoralCare INNER JOIN
         $result = $this->getDatabase()->query("SELECT SCOPE_IDENTITY() AS insert_id");
         $row = mssql_fetch_object($result);
 
-        $pastoralMapper = new PastoralMapper();
         $pastoral->setExternalId($row->insert_id);
-        $pastoralMapper->save($pastoral);
+        $this->getPastoralMapper()->save($pastoral);
 
         // TODO: Upload attachments to DocMan (SynergyOneMedia)
 
         /*
-        $attachmentMapper = new AttachmentMapper();
-        $attachments = $attachmentMapper->findByPastoralId($pastoral->getId());
+        $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($pastoral->getId());
 
         foreach ($attachments as $attachment) {
 
@@ -497,8 +514,7 @@ FROM            dbo.tPastoralCare INNER JOIN
 
             // External student ID
 
-            $userMapper = new \Schoolbox\UserMapper();
-            $id = $userMapper->findById($pastoral->getStudent()->getId())->getExternalId();
+            $id = $this->getUserMapper()->findById($pastoral->getStudent()->getId())->getExternalId();
 
             // Set the item date to the post date
 
@@ -516,8 +532,7 @@ FROM            dbo.tPastoralCare INNER JOIN
 
             // Pastoral event type code
 
-            $typeMapper = new PastoralTypeMapper();
-            $type = $typeMapper->findById($pastoral->getType()->getId());
+            $type = $this->getPastoralTypeMapper()->findById($pastoral->getType()->getId());
             $type_code = "'" . $type->getExternalCode() . "'";
 
             // Created/modified dates
@@ -560,8 +575,7 @@ FROM            dbo.tPastoralCare INNER JOIN
         // TODO: Upload attachments to DocMan (SynergyOneMedia)
 
         /*
-        $attachmentMapper = new AttachmentMapper();
-        $attachments = $attachmentMapper->findByPastoralId($pastoral->getId());
+        $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($pastoral->getId());
 
         foreach ($attachments as $attachment) {
 

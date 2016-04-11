@@ -741,7 +741,7 @@ class Controller extends Base
 
         // External interface
 
-        //$pastoralExternal = new \External_Pastoral();
+        $pastoralExternal = new \External_Pastoral();
 
         // Keep track of IDs created
 
@@ -816,7 +816,7 @@ class Controller extends Base
                     $parent = $record;
                 }
 
-                // $pastoralExternal->createPastoral($record);
+                $pastoralExternal->createPastoral($record);
 
                 // Save the authorised users
 
@@ -913,7 +913,10 @@ class Controller extends Base
 
             // Update external record
 
-            //$pastoralExternal->updatePastoral($record);
+            if ($record->getExternalId() != "")
+                $pastoralExternal->updatePastoral($record);
+            else
+                $pastoralExternal->createPastoral($record);
 
             // Delete old tags
 
@@ -1139,8 +1142,8 @@ class Controller extends Base
 
         // Delete on external database
 
-        //$pastoralExternal = new \External_Pastoral();
-        //$pastoralExternal->deletePastoral($record);
+        $pastoralExternal = new \External_Pastoral();
+        $pastoralExternal->deletePastoral($record);
 
         // Delete locally
 
