@@ -203,7 +203,7 @@ class External_Tass_User implements External_UserInterface
 					ORDER BY studsub.sub_code ASC, studsub.class ASC
 			";
         } else {
-            $sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, subtab.year_grp, sub_desc, sub_type
+            $sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, tchsub.year_grp, sub_desc, sub_type
 					FROM tchsub
 					JOIN subtab ON subtab.sub_code=tchsub.sub_code AND subtab.cmpy_code=tchsub.cmpy_code
 					WHERE tch_code = '$tassCode'

@@ -29,23 +29,23 @@ class External_Tass_Class implements External_ClassInterface {
 			$subCodeArray = explode(',',$subCode);
 			foreach($subCodeArray as $code) {
 				list($year,$code,$class) = explode('-',$code);
-				$yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
+				$yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
-				$classQuery .= " ( $yearQuery studsub.sub_code = '$code' AND class = '$class' ) OR ";
+				$classQuery .= " ( $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ) OR ";
 			}
 			$classQuery .= '1=0';
 		}
 		else {
 			list($year,$code,$class) = explode('-',$subCode);
-            $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
+            $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
-			$classQuery = " $yearQuery studsub.sub_code = '$code' AND class = '$class' ";
+			$classQuery = " $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ";
 		}
 
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
-		$query = "SELECT DISTINCT studsub.stud_code as synergy_id, preferred_name as firstname, surname as lastname, student.year_grp as yearlevel, house
+		$query = "SELECT DISTINCT studsub.stud_code as synergy_id, student.preferred_name as firstname, student.surname as lastname, student.year_grp as yearlevel, student.house
 		FROM studsub
 		JOIN student ON student.stud_code = studsub.stud_code AND student.cmpy_code = studsub.cmpy_code
 		WHERE semester = '{$fileSemester}'
