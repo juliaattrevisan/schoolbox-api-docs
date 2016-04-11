@@ -410,7 +410,8 @@ FROM            dbo.tPastoralCare INNER JOIN
 
         // Set the item date to the post date
 
-        $item_date = "'" . $pastoral->getCreatedAt() . "'";
+        $item_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
+        $item_date = $item_date_alaress->getYear() . "-" . $item_date_alaress->getMonth() . "-" . $item_date_alaress->getDay(true);
 
         // If the message is marked as private, do not put in public details
 
@@ -429,16 +430,19 @@ FROM            dbo.tPastoralCare INNER JOIN
 
         // Created/modified dates
 
-        $created_date = "'" . $pastoral->getCreatedAt() . "'";
+        $created_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
+        $created_date = $created_date_alaress->getYear() . "-" . $created_date_alaress->getMonth() . "-" . $created_date_alaress->getDay(true);
         $created_by_id = $pastoral->getOwner()->getExternalId();
 
         // If there is no modified date, give it the created date
 
         if ($pastoral->getUpdatedAt() != null) {
-            $modified_date = "'" . $pastoral->getUpdatedAt() . "'";
+            $modified_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getUpdatedAt());
+            $modified_date = "'" . $modified_date_alaress->getYear() . "-" . $modified_date_alaress->getMonth() . "-" . $modified_date_alaress->getDay(true) . "'";
             $modified_by_id = $pastoral->getOwner()->getExternalId();
         } else {
-            $modified_date = "'" . $pastoral->getCreatedAt() . "'";
+            $modified_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
+            $modified_date = "'". $modified_date_alaress->getYear() . "-" . $modified_date_alaress->getMonth() . "-" . $modified_date_alaress->getDay(true) . "'";
             $modified_by_id = $pastoral->getOwner()->getExternalId();
         }
 
