@@ -12,6 +12,12 @@
                 return $input.closest('.timepick');
             }
         });
+
+        var absenceCounter = $('[data-attendance-count]');
+        var absenceChecks  = $('[data-attendance-absence]');
+        absenceChecks.on('change', function() {
+            absenceCounter.text(absenceChecks.not(':checked').length);
+        });
 	});
 </script>
 <!-- END custom_head -->
@@ -82,13 +88,16 @@
                         </td>
                         <td>
                             <input type="hidden" name="studentID[]" value="{STUDENT_SYNERGY_ID}" />
-                            <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" type="checkbox" name="attending[]" value="{STUDENT_SYNERGY_ID}" {IS_ABSENT} />
+                            <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" type="checkbox" name="attending[]" value="{STUDENT_SYNERGY_ID}" {IS_ABSENT} data-attendance-absence />
                             <label for="attendanceOptions_{STUDENT_SYNERGY_ID}" class="checkbox-label"></label>
                         </td>
                     </tr>
                     <!-- END student -->
                     </tbody>
                 </table>
+                <div class="alert-box">
+                    <span data-attendance-count>{ATTENDANCE_COUNT}</span> students attending out of {ATTENDANCE_TOTAL}
+                </div>
             </section>
             <input type="submit" value="Submit Attendances" />
         </form>
