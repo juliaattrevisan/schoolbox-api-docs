@@ -227,10 +227,10 @@ if(is_array($optionList)) {
                     $zone->setMimeFilter($mimeFilter);
                     $zone->setModalTitle('Select '. Scrub::text(strtolower($option['title'])));
 
-                    $backgrounds = explode(",", Config::get('skin_login_bg'));
+                    $paths = explode(",", $option['value']);
 
-                    if (count($backgrounds)) {
-                        if ($zone->attachFiles($backgrounds));
+                    if (count($paths)) {
+                        if ($zone->attachFiles($paths));
                     }
 
                     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
