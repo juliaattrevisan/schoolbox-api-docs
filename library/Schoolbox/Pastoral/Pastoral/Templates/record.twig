@@ -79,17 +79,18 @@
                                 Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getCreatedAt().getShort() }}
                             </p>
 
-                            {# Show tags #}
-                            {% if record.tagsList | length > 0 %}
-                                <p class="spaced">
-                                    {% for tag in record.tagsList %}
-                                        <span class="neutral label">{{ tag.name }}</span>
-                                    {% endfor %}
-                                </p>
-                            {% endif %}
-
                             {# Hide meta from parents#}
                             {% if role != 'parent' %}
+
+                                {# Show tags #}
+                                {% if record.tagsList | length > 0 %}
+                                    <p class="spaced">
+                                        {% for tag in record.tagsList %}
+                                            <span class="neutral label">{{ tag.name }}</span>
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+
                                 <p class="spaced meta">
                                     {# Pastoral event type #}
                                     {{ record.getType.getName }} |
