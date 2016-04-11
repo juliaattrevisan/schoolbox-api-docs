@@ -297,7 +297,9 @@ class Model extends File implements IStorage
 
         $size = 0;
 
-        while (!feof($from)) { $size += fwrite($to, fread($from, 8192)); }
+        while (!feof($from)) {
+            $size += fwrite($to, fread($from, 8192));
+        }
 
         return $size;
     }
