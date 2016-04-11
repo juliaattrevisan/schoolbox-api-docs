@@ -66,6 +66,7 @@ $stack = array();
 
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 $this->setBlock(TEMPLATE_content, 'download_annotated', 'download_annotated_block');
+$this->setBlock(TEMPLATE_content, 'submit_button', 'submit_button_block');
 $this->setVar('download_annotated_block', '');
 
 $this->setFile('studentNavTpl', 'submission/inlineGrading/injectables/controls/navigation-option.html');
@@ -343,6 +344,12 @@ else {
 		'SKIP_UNSUBMITTED_CHECKED' => '',
 		'INLINE_GRADING_SUBMISSION_NAVIGATION_DISABLED' => json_encode(array()),
 	));
+}
+
+if ($archived) {
+	$this->setVar('submit_button_block', '');
+} else {
+	$this->parse('submit_button_block', 'submit_button');
 }
 
 /* Render out breadcrumbs
