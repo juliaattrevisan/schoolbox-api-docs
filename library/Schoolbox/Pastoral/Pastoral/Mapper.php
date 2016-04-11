@@ -345,13 +345,13 @@ class Mapper extends BaseMapper
         $criteria = [];
 
         if ($before_date != '') {
-            $before_date = date("Y-m-d", strtotime($before_date));
-            $criteria[] = "created_at <= '{$before_date}'";
+            $before_date = \Alaress_Date_Format::newLocal($before_date . " 12:00AM");
+            $criteria[] = "created_at <= '" . $before_date->toIso8601String() . "'";
         }
 
         if ($after_date != '') {
-            $after_date = date("Y-m-d", strtotime($after_date));
-            $criteria[] = "created_at >= '{$after_date}'";
+            $after_date = \Alaress_Date_Format::newLocal($after_date . " 11:59PM");
+            $criteria[] = "created_at >= '" . $after_date->toIso8601String() . "'";
         }
 
         if ($severity != '') $criteria[] = "sv.order >= {$severity}";
@@ -388,6 +388,8 @@ class Mapper extends BaseMapper
 
             `r`.created_at
         ";
+
+        echo $query;
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute();
