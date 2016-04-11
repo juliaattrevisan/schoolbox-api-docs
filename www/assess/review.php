@@ -113,6 +113,7 @@ $openDate      = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::
 $dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+$term          = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
 $this->setVar(
     array(
         'ASSESS_ASSESS_ID'                     => $assess['assess_id'],
@@ -131,7 +132,7 @@ $this->setVar(
         'RESPONDENT_NAME'                      => $userHandler->formatName($user),
         'ASSESS_CATEGORY_NAME'                 => Scrub::text($folder->getName()),
         'ASSESS_CATEGORY_ID'                   => $folder->getId(),
-        'ASSESS_DUEWORK_TERM'                  => Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate)->getCode(),
+        'ASSESS_DUEWORK_TERM'                  => $term->getCode(),
         'resubmit_label_block'                 => '',
         'visible_staff_block'                  => '',
         'visible_staff_students_block'         => '',
@@ -175,7 +176,7 @@ switch ($assess['mark_visibility']) {
         break;
 }
 
-$readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
+$readonly = !$term->isMarkableBy($_SESSION['user']);
 
 /* Load all the questions for this section.
  * Note: only show the randomly-selected ones

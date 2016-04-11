@@ -45,6 +45,7 @@ $submissionId = $this->arg[2];
 
 $submissionBoxMapper = new SubmissionBoxMapper();
 $submissionBox = $submissionBoxMapper->findById($submissionBoxId);
+$term          = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submissionBox->getDueDate());
 
 /* Add category codes
  */
@@ -64,6 +65,7 @@ $stack = array();
 
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 $this->setBlock(TEMPLATE_content, 'download_annotated', 'download_annotated_block');
+$this->setBlock(TEMPLATE_content, 'submit_button', 'submit_button_block');
 $this->setVar('download_annotated_block', '');
 
 $this->setFile('studentNavTpl', 'submission/inlineGrading/injectables/controls/navigation-option.html');
@@ -239,20 +241,24 @@ $navigationElements = array(
 
 $navigationDirect = json_encode($navigationElements);
 
-$zone = new Zone('inline-return');
+if (!$term->isMarkableBy($_SESSION['user'])) {
+	$this->setVar('ATTACH_ZONE', '');
+} else {
+	$zone = new Zone('inline-return');
 
-$zone->setMulti(true)
-    ->setMimeFilter('*/*')
-    ->setThumbnailSize(64)
-    ->setAttachPrompt('Attach file to return')
-    ->setModalTitle('Select file')
-    ->setAttachmentsLabel('');
+	$zone->setMulti(true)
+		->setMimeFilter('*/*')
+		->setThumbnailSize(64)
+		->setAttachPrompt('Attach file to return')
+		->setModalTitle('Select file')
+		->setAttachmentsLabel('');
 
-$zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+	$zone->renderIntoSitePage($this, 'ATTACH_ZONE');
+}
 
 /* Render injectable views
  */
-$templateFactory = new Factory($this, $currentAugmented['submission'], $allReturnedWork, $navigationElements);
+$templateFactory = new Factory($this, $currentAugmented['submission'], $allReturnedWork, $navigationElements, $term);
 $renderer = $templateFactory->produce();
 $renderer->render();
 
@@ -339,10 +345,15 @@ else {
 	));
 }
 
+if (!$term->isMarkableBy($user)) {
+	$this->setVar('submit_button_block', '');
+} else {
+	$this->parse('submit_button_block', 'submit_button');
+}
+
 /* Render out breadcrumbs
  */
 $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-$term  = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submissionBox->getDueDate());
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text' => 'Submissions',
@@ -406,8 +417,8 @@ if ($submissionBox->isRubric()) {
 
 		$context['markType']['conf'] = $levels;
 	}
-
-    $this->setVar('INJECTED_MARK_RUBRIC', $this->getTwig()->render('@rubric/grid-markable.twig', $context));
+	$template = !$term->isMarkableBy($_SESSION['user']) ? '@rubric/grid.twig' : '@rubric/grid-markable.twig';
+	$this->setVar('INJECTED_MARK_RUBRIC', $this->getTwig()->render($template, $context));
 } else {
     $this->setVar('INJECTED_MARK_RUBRIC', '');
 }

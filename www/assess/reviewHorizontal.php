@@ -59,6 +59,9 @@ catch (\Exception $e) {
     error(117);
 }
 
+$dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+$term    = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
+
 /* Index of questions
  */
 if (!isset($this->arg[1])) {
@@ -86,8 +89,6 @@ if (!isset($this->arg[1])) {
 
     /* Render out breadcrumbs
      */
-    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-    $term    = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
     $trail   = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
@@ -195,7 +196,7 @@ else {
 			break;
 	}
 
-	$readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
+	$readonly = !$term->isMarkableBy($_SESSION['user']);
 
 	/* Load all the questions for this section.
 	 * Note: only show the randomly-selected ones

@@ -207,7 +207,7 @@ if (!empty($subList) && is_array($subList)) {
 
         $totals = $submissionHandler->getBoxCount($sub['id']);
 
-        $readonly = !($_SESSION['user']->isSuperuser() || date('Y',$sub['date']) >= date('Y'));
+        $readonly = !$currentTerm->isMarkableBy($_SESSION['user']);
 
         $openADF = new Alaress_Date_Format($sub['open'], 'U');
         $closeADF = new Alaress_Date_Format($sub['date'], 'U');

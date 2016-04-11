@@ -262,11 +262,11 @@ $this->setVar(array(
 /**
  * If this assessment finishes in the past, don't allow editing except to superadmins
  */
-$readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
+$readonly = !$term->isMarkableBy($_SESSION['user']);
 
 $this->setBlock(TEMPLATE_content, 'is_archived', 'is_archived_block');
 
-if (date('Y', strtotime($assess['finish'])) < date('Y')) {
+if ($term->getArchived()) {
     $this->parse('is_archived_block', 'is_archived');
 }
 else {
