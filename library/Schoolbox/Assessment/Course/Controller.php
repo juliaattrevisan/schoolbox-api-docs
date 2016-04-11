@@ -29,6 +29,8 @@ use Schoolbox\Error;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Category;
@@ -41,6 +43,7 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
+use Schoolbox\Role;
 
 class Controller extends Base\Base
 {
@@ -84,6 +87,9 @@ class Controller extends Base\Base
     /** @var Error\Mapper */
     protected $errorMapper;
 
+    /** @var UserAccessMapper */
+    protected $userAccessMapper;
+
     /** @var Access */
     protected $access;
 
@@ -105,6 +111,7 @@ class Controller extends Base\Base
         $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
         $this->setAccess(Access::getInstance());
         $this->setCourseConfigMapper(CourseConfigMapper::getInstance());
+        $this->setUserAccessMapper(UserAccessMapper::getInstance());
         $this->setErrorMapper(Error\Mapper::getInstance());
     }
 
@@ -1956,6 +1963,26 @@ class Controller extends Base\Base
     public function setErrorMapper($errorMapper)
     {
         $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return UserAccessMapper
+     */
+    public function getUserAccessMapper()
+    {
+        return $this->userAccessMapper;
+    }
+
+
+    /**
+     * @param UserAccessMapper $userAccessMapper
+     * @return static
+     */
+    public function setUserAccessMapper($userAccessMapper)
+    {
+        $this->userAccessMapper = $userAccessMapper;
         return $this;
     }
 
