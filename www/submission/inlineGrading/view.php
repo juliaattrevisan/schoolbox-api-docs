@@ -45,6 +45,8 @@ $submissionId = $this->arg[2];
 
 $submissionBoxMapper = new SubmissionBoxMapper();
 $submissionBox = $submissionBoxMapper->findById($submissionBoxId);
+$term          = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submissionBox->getDueDate());
+$archived      = $term->getArchived();
 
 /* Add category codes
  */
@@ -252,7 +254,7 @@ $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 /* Render injectable views
  */
-$templateFactory = new Factory($this, $currentAugmented['submission'], $allReturnedWork, $navigationElements);
+$templateFactory = new Factory($this, $currentAugmented['submission'], $allReturnedWork, $navigationElements, $term);
 $renderer = $templateFactory->produce();
 $renderer->render();
 
@@ -342,7 +344,6 @@ else {
 /* Render out breadcrumbs
  */
 $trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
-$term  = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submissionBox->getDueDate());
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text' => 'Submissions',

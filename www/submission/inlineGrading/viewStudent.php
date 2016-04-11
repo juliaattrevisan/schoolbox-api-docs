@@ -93,7 +93,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
 
 /* Render injectable views
  */
-$templateFactory = new \Crocodoc\Renderer\Factory($this, $submission, null, array());
+$templateFactory = new \Crocodoc\Renderer\Factory($this, $submission, null, array(), null);
 $renderer = $templateFactory->produce();
 $renderer->render();
 
