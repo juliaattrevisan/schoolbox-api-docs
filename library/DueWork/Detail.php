@@ -433,7 +433,11 @@ class DueWork_Detail
     private function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray, $location, $tabindex)
     {
         // should we show the link to the dedicated mark-rubric page?
-        $showRubricLink = $location != self::INLINE_GRADER && $this->submissionBox->isRubric() ? 1 : 0;
+        $showRubricLink =
+            $location != self::INLINE_GRADER
+            && $this->submissionBox->isRubric()
+            && !$this->isReadOnly()
+                ? 1 : 0;
 
         $templateFile = $this->isReadOnly() ? 'readonly' : 'writable';
         $page->setFile('markTpl', "submission/marktype/$templateFile.html");
