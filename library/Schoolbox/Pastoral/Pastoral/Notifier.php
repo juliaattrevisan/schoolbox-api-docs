@@ -13,6 +13,7 @@ use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
+use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -40,6 +41,7 @@ class Notifier extends AbstractModuleNotifier
 
         $student = $this->getUserMapper()->findById($model->getStudent()->getId());
         $student->loadTeachers();
+        $student->loadParents();
         $teachers = $student->getTeacherCollection();
 
         // Create the message
@@ -89,8 +91,27 @@ class Notifier extends AbstractModuleNotifier
             }
             else
             {
-                // Sending to individual user
-                $envelope->targetToUser($accessModel->getUser()->getId(), $message);
+                // Sending to individual users
+
+                $skip = false;
+
+                // If its private, and the selected user is a parent, don't notify them
+
+                // Get hydrated user so we can work out their role
+
+                /** @var \Schoolbox\User $user */
+                $user = $this->getUserMapper()->findOneByColumn("id", $accessModel->getUser()->getId());
+
+                /** @var Role $role */
+                $role = $this->getRoleMapper()->findOneByColumn("id", $user->getRole()->getId());
+
+                if ($role->isParent() && $pastoral->getPrivate())
+                    $skip = true;
+
+                // Otherwise, send it to the user
+
+                if (!$skip)
+                    $envelope->targetToUser($accessModel->getUser()->getId(), $message);
             }
         }
 
