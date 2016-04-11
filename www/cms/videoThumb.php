@@ -25,11 +25,11 @@ if (isset($type) && isset($id) ) {
 	$page = new SitePage;
 	$groupHandler = new Group;
 
-	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
-
 	try {
-		$queue = $videoQueueMapper->findOneByColumn('hash', $id);
-		switch ($queue->getStatus()) {
+		$thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($id, $type);
+		$video = $thumbnailFactory->produce();
+
+		switch ($video->getStatus()) {
 			case 'pending':
 			case 'processing':
 				// Video hasn't been processed yet
@@ -43,23 +43,16 @@ if (isset($type) && isset($id) ) {
 
 			default:
 
-					// The only other status is 'completed' let that fall through
+				// The only other status is 'completed' let that fall through
 				break;
 		}
+
 	}
-	catch (\Exception $e)
-	{
-		// Wasn't in the queue, just let it fall through to the keeper. What will be, will be...
+	catch (Schoolbox\Mapper\Exception $e){
+		/* Video not found */
+		SitePage::redirectToBrokenImageOfSize(64, 64, 500);
 	}
 
-    try {
-		$thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($id, $type);
-		$video = $thumbnailFactory->produce();
-    }
-    catch (Schoolbox\Mapper\Exception $e){
-        /* Video not found */
-        SitePage::redirectToBrokenImageOfSize(64, 64, 500);
-    }
 
     if ($size == 'poster') {
    		$filename = $video->getPosterLocation();
