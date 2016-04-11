@@ -10,76 +10,72 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $type = $_GET['type'];
-$id   = $_GET['id'];
+$id = $_GET['id'];
 $size = $_GET['size'];
 if (isset($_GET['hash'])) {
-	// Old URL for brownhole videos: ?hash={brownholeHash}&size={whatever}
-	// If you get one of these, permanent redirect to the new one.
-	$params = $_GET;
-	$params['type'] = 'storage';
-	$params['id']   = $_GET['hash'];
-	unset($params['hash']);
-	SitePage::localRedir('/cms/videoThumb.php?'.http_build_query($params), false, 301);
+    // Old URL for brownhole videos: ?hash={brownholeHash}&size={whatever}
+    // If you get one of these, permanent redirect to the new one.
+    $params = $_GET;
+    $params['type'] = 'storage';
+    $params['id'] = $_GET['hash'];
+    unset($params['hash']);
+    SitePage::localRedir('/cms/videoThumb.php?' . http_build_query($params), false, 301);
 }
-if (isset($type) && isset($id) ) {
-	$page = new SitePage;
-	$groupHandler = new Group;
+if (isset($type) && isset($id)) {
+    $page = new SitePage;
 
-	try {
-		$thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($id, $type);
-		$video = $thumbnailFactory->produce();
+    try {
+        $thumbnailFactory = new \Schoolbox\Video\Factory\Thumbnail($id, $type);
+        $video = $thumbnailFactory->produce();
 
-		switch ($video->getStatus()) {
-			case 'pending':
-			case 'processing':
-				// Video hasn't been processed yet
-				SitePage::localRedir("/images/core/video-processing-thumb.png");
-				exit;
+        switch ($video->getStatus()) {
+            case 'pending':
+            case 'processing':
+                // Video hasn't been processed yet
+                SitePage::localRedir("/images/core/video-processing-thumb.png");
+                exit;
 
-			case 'failed':
-				// Video processing failed
-				SitePage::localRedir("/images/core/video-failed-thumb.png");
-				exit;
+            case 'failed':
+                // Video processing failed
+                SitePage::localRedir("/images/core/video-failed-thumb.png");
+                exit;
 
-			default:
+            default:
 
-				// The only other status is 'completed' let that fall through
-				break;
-		}
+                // The only other status is 'completed' let that fall through
+                break;
+        }
 
-	}
-	catch (Schoolbox\Mapper\Exception $e){
-		/* Video not found */
-		SitePage::redirectToBrokenImageOfSize(64, 64, 500);
-	}
+    } catch (Schoolbox\Mapper\Exception $e) {
+        /* Video not found */
+        SitePage::redirectToBrokenImageOfSize(64, 64, 500);
+    }
 
 
     if ($size == 'poster') {
-   		$filename = $video->getPosterLocation();
-           $pixels = 400;
-   	}
-   	else {
-   		$filename = $video->getThumbnailLocation();
-           $pixels = 64;
-   	}
+        $filename = $video->getPosterLocation();
+        $pixels = 400;
+    } else {
+        $filename = $video->getThumbnailLocation();
+        $pixels = 64;
+    }
 
-	if(is_readable($filename) ) {
-		$filesize = filesize($filename);
-		if ($filesize == FALSE) { //if we cannot find the file (something is wrong dont link to it)
+    if (is_readable($filename)) {
+        $filesize = filesize($filename);
+        if ($filesize == false) { //if we cannot find the file (something is wrong dont link to it)
             SitePage::redirectToBrokenImageOfSize(64, 64, 500);
         }
 
-		header('Cache-Control: max-age=10800, private');
-		header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
-		header('Pragma: private');
-		header('Content-Type: image/jpeg');
-		header("Content-Length: $filesize");
-		readfile($filename);
-	}
-	else {
-        SitePage::redirectToBrokenImageOfSize(64,64, 500);
+        header('Cache-Control: max-age=10800, private');
+        header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
+        header('Pragma: private');
+        header('Content-Type: image/jpeg');
+        header("Content-Length: $filesize");
+        readfile($filename);
+    } else {
+        SitePage::redirectToBrokenImageOfSize(64, 64, 500);
 
     }
 } else {
-   SitePage::redirectToBrokenImageOfSize(64, 64, 500);
+    SitePage::redirectToBrokenImageOfSize(64, 64, 500);
 }
