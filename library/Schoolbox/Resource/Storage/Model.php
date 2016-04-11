@@ -283,4 +283,23 @@ class Model extends File implements IStorage
         $this->extension = $extension;
         return $this;
     }
+
+
+    /**
+     * Pipe the readstream of this file to some other stream resource
+     *
+     * @param resource $to
+     * @return int
+     */
+    public function pipe($to)
+    {
+        $from = $this->readStream();
+
+        $size = 0;
+
+        while (!feof($from)) { $size += fwrite($to, fread($from, 8192)); }
+
+        return $size;
+    }
+
 }
