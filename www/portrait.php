@@ -13,6 +13,9 @@
 
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 require_once '../include/Bootstrap.php';
 
@@ -26,7 +29,6 @@ if(! ($_SESSION['user'] instanceof Schoolbox\User)) {
 }
 
 try {
-
     $image = new Image\Processor\Standard(
         new Image\Cache\Portrait(trim($_GET['userId']), $_GET['size'], $_SESSION['user']),
         new Image\Transformation\Portrait(),
@@ -36,13 +38,13 @@ try {
 
     $image->load()->stream();
 
-} catch (Exception_Schoolbox_AccessDenied $e) {
+} catch (SchoolboxAccessDeniedException $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
 
-} catch (Exception_Schoolbox_NotFound $e) {
+} catch (SchoolboxNotFoundException $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
 
-} catch (Exception $e) {
+} catch (SchoolboxException $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 500);
 
 }
