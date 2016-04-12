@@ -219,9 +219,7 @@
                         </tbody>
                     </table>
 
-                    {# Allow group creation if this is an insert #}
-
-                    {% if not folder.isGroup and action == 'Create' %}
+                    {% if not folder.isGroup %}
 
                         <div class="small-12 columns">
                             <label for="groupcheck">
