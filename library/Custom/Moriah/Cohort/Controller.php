@@ -48,7 +48,10 @@ class Controller extends Base
      */
     public function classList(User $student)
     {
-        $this->assertIsStudent($student);
+        if (!$student->getRole()->isStudent()) {
+            $this->getResponse()->status->setCode(404);
+            return;
+        }
         $classes = $this->folderMapper->findForUser($student);
         // Sort by name
         $classes->sortByCallback(
@@ -83,7 +86,10 @@ class Controller extends Base
      */
     public function classReport(User $student, Folder\Model $class)
     {
-        $this->assertIsStudent($student);
+        if (!$student->getRole()->isStudent()) {
+            $this->getResponse()->status->setCode(404);
+            return;
+        }
 
         // Build course list
         $courseLists = $this->unitInstanceMapper->findAllCoursesUsedInFolders([$class->getId()]);
@@ -102,19 +108,6 @@ class Controller extends Base
                     'courses' => $courseList,
                 ],
             ]);
-        }
-    }
-
-    /**
-     * Asserts whether this user is even a student.
-     *
-     * @param  User $user
-     * @throws \RangeException if they aren't.
-     */
-    protected function assertIsStudent(User $user)
-    {
-        if (!$user->getRole()->isStudent()) {
-            throw new \RangeException('This report is only for students');
         }
     }
 }
