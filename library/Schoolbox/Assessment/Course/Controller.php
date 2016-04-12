@@ -46,6 +46,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
 use Schoolbox\Role;
+use Schoolbox\UserMapper;
 
 class Controller extends Base\Base
 {
@@ -92,6 +93,9 @@ class Controller extends Base\Base
     /** @var UserAccessMapper */
     protected $userAccessMapper;
 
+    /** @var UserMapper */
+    protected $userMapper;
+
     /** @var Access */
     protected $access;
 
@@ -114,6 +118,7 @@ class Controller extends Base\Base
         $this->setAccess(Access::getInstance());
         $this->setCourseConfigMapper(CourseConfigMapper::getInstance());
         $this->setUserAccessMapper(UserAccessMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
         $this->setErrorMapper(Error\Mapper::getInstance());
     }
 
@@ -2072,6 +2077,26 @@ class Controller extends Base\Base
     public function setUserAccessMapper($userAccessMapper)
     {
         $this->userAccessMapper = $userAccessMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper()
+    {
+        return $this->userMapper;
+    }
+
+
+    /**
+     * @param UserMapper $userMapper
+     * @return static
+     */
+    public function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
         return $this;
     }
 
