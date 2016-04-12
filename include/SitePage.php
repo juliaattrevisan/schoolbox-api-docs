@@ -578,11 +578,26 @@ class SitePage extends Page
      * @param mixed  $ec
      *                        Integer: retrieves error text from code from database
      *                        null:    outputs whatever's in $message as error
-     * @param array $info Replaces '%MESSAGE%' in $ec
+     * @param array $args Replaces '%MESSAGE%' in $ec
      * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
      */
-    function error($ec, $info = [], $code = 400)
+    function error($ec, $args = [], $code = 400)
     {
+        /* Enforce structure
+         */
+        if (!is_array($args)) {
+            $args = [
+                'code' => '',
+                'header' => '',
+                'info' => '',
+                'summary' => '',
+                'url' => '',
+                'date' => '',
+                'meta' => '',
+                'outputStackTrace',
+            ];
+        }
+
         /* If an error code is set, extract textual information from
          * the db via ErrorMapper. Otherwise just use a custom message
          */
@@ -604,7 +619,7 @@ class SitePage extends Page
 
         /* Set up any replacements
          */
-        $error->setMessage(str_replace("%MESSAGE%", $info['error']['message'], $error->getMessage()));
+        $error->setMessage(str_replace("%MESSAGE%", $args['error']['message'], $error->getMessage()));
 
         header(':', true, $code);
 
@@ -616,12 +631,13 @@ class SitePage extends Page
         else {
             $errorContents = $this->getTwig()->render('common/error/general.twig', [
                 'code' => $ec,
-                'header' => $info['message'],
-                'info' => $info['info'],
+                'header' => isset($args['message']) ? $args['message'] : '',
+                'info' => isset($args['info']) ? $args['info'] : '',
                 'summary' => $error,
+                'url' => $args['url'],
                 'date' => \Alaress_Date_Format::now(),
-                'meta' => $info['error'],
-                'outputStackTrace' => $info['outputStackTrace']
+                'meta' => $args['error'],
+                'outputStackTrace' => $args['outputStackTrace']
             ]);
 
             $this->renderError('Error Encountered', $errorContents);

@@ -6,10 +6,23 @@
     <div class="small-12 island">
         <h2 class="subheader"></h2>
         <section class="content">
+            {% if info|length %}
             <p>{{ info }}</p>
+            {% endif %}
 
-            <p class="meta">{{ code }}</p>
-            <p class="meta">{{ date.getLocal }}: "{{ meta.message }}" in file {{ meta.file }} on line {{ meta.line }}</p>
+            <p class="meta">{{ date.getLocal }}</p>
+
+            {% if url|length %}
+            <p class="meta">{{ url }}</p>
+            {% endif %}
+
+            <p class="meta">
+                {% if outputStackTrace %}
+                    Error Code {{ code }} "{{ meta.message }}" in file {{ meta.file }} on line {{ meta.line }}
+                {% else %}
+                    {{ summary.getMessage|raw }}
+                {% endif %}
+            </p>
         </section>
 
         {% include 'common/error/fragment/options.twig' %}

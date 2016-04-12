@@ -616,7 +616,7 @@ class Bootstrap implements BootstrapInterface {
 
 				/* Use structured information for rendering
                  */
-				$data = [
+				$args = [
 					'message' => $message,
 					'info' => $info,
 					'url' => $url,
@@ -630,23 +630,23 @@ class Bootstrap implements BootstrapInterface {
                 if ($di instanceof Di\Container) {
 					/** @var \SitePage $page */
                     $page = $di->get('layoutEngine');
-                    $page->error(null, $data, $code);
+                    $page->error(null, $args, $code);
                 }
 				/* Just dump it out in raw form
 				 * TODO: Make synonymous with twig output
 				 */
 				else {
 					$output =
-						"<p><b>{$data['message']} {$data['info']}</b></p>" .
+						"<p><b>{$args['message']} {$args['info']}</b></p>" .
 						'<ul>' .
-						"<li>Datetime: {$data['date']}</li>" .
-						"<li>URL: {$data['url']}" .
+						"<li>Datetime: {$args['date']}</li>" .
+						"<li>URL: {$args['url']}" .
 						'</li>';
 
 					if ($outputStackTrace) {
-						$output .= "<li>Error: {$data['error']['message']} in {$data['error']['file']} on line {$data['error']['line']}.</li>";
+						$output .= "<li>Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}.</li>";
 					} else {
-						$output .= "<li>Error: {$data['error']['message']}. (Further details have been logged.)</li>";
+						$output .= "<li>Error: {$args['error']['message']}. (Further details have been logged.)</li>";
 					}
 
 					$output .= '</ul>';
