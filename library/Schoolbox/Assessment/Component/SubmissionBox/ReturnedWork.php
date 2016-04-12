@@ -13,7 +13,6 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\File\Mimetype;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\File\IFile;
-use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 use Schoolbox\Resource\File\StorableTrait;
@@ -23,11 +22,6 @@ class ReturnedWork implements ISoftDeletable, IFile
 {
 
     use StorableTrait;
-
-    /**
-     * @var int
-     */
-    protected $id;
 
     /**
      * @var SubmissionBox
@@ -93,9 +87,6 @@ class ReturnedWork implements ISoftDeletable, IFile
      */
     protected $uuid = null;
 
-    /** @var IStorage */
-    protected $storage;
-
 
     /**
      * Creates object and sets up related objects.
@@ -118,25 +109,6 @@ class ReturnedWork implements ISoftDeletable, IFile
     public function getGradientFromNormalizedMark()
     {
         return max(0, min(10, (int)($this->getNormalizedMark() / 10)));
-    }
-
-    /**
-     * @param  int $id
-     *
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 
     /**
@@ -372,23 +344,6 @@ class ReturnedWork implements ISoftDeletable, IFile
         return $this;
     }
 
-    /**
-     * @return IStorage
-     */
-    public function getStorage()
-    {
-        return $this->storage;
-    }
-
-    /**
-     * @param IStorage $storage
-     * @return static
-     */
-    public function setStorage($storage)
-    {
-        $this->storage = $storage;
-        return $this;
-    }
 
     // IFile interface methods - passthru to storage
 
