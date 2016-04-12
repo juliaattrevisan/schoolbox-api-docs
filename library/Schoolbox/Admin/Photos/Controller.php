@@ -156,19 +156,27 @@ class Controller extends Base
      */
     public function getView()
     {
+        if ($this->getRequest()->query["surname"] == null)
+            $surname = "a";
+        else
+            $surname = $this->getRequest()->query["surname"];
+
         $allUsers = $this->getUserMapper()->findByColumn("!synergy_id", NULL)->sortBy('lastname', 'asc')->sortBy('firstname', 'asc');
 
         $users = [];
 
+        /** @var \Schoolbox\Config\Loader $config */
+        $config = $this->getDi()->get("config");
+
         /** @var \Schoolbox\User $user */
         foreach ($allUsers as $user) {
-            /** @var \Schoolbox\Config\Loader $config */
-            $config = $this->getDi()->get("config");
 
-            $destination = realpath($config->get("portrait_dir")) . "/" . $user->getExternalId() . ".jpg";
+            if (strtolower(substr($user->getLastname(), 0, 1)) == $surname) {
+                $destination = realpath($config->get("portrait_dir")) . "/" . $user->getExternalId() . ".jpg";
 
-            if (file_exists($destination))
-                $users[] = $user;
+                if (file_exists($destination))
+                    $users[] = $user;
+            }
         }
 
         // Render this thing out
@@ -179,6 +187,7 @@ class Controller extends Base
                 'data'     => array(
                     'pageCurrent' => 'photos',
                     'users' => $users,
+                    'surname' => $surname
                 ),
             )
         );

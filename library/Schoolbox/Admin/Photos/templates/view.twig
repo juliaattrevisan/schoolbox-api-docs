@@ -34,29 +34,80 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Filter By Surname</h2>
+        <section class="content">
+            <dl class="sub-nav no-margin">
+                <dd {% if surname == 'a' %}class="active"{% endif %}><a href="?surname=a">A</a></dd>
+                <dd {% if surname == 'b' %}class="active"{% endif %}><a href="?surname=b">B</a></dd>
+                <dd {% if surname == 'c' %}class="active"{% endif %}><a href="?surname=c">C</a></dd>
+                <dd {% if surname == 'd' %}class="active"{% endif %}><a href="?surname=d">D</a></dd>
+                <dd {% if surname == 'e' %}class="active"{% endif %}><a href="?surname=e">E</a></dd>
+                <dd {% if surname == 'f' %}class="active"{% endif %}><a href="?surname=f">F</a></dd>
+                <dd {% if surname == 'g' %}class="active"{% endif %}><a href="?surname=g">G</a></dd>
+                <dd {% if surname == 'h' %}class="active"{% endif %}><a href="?surname=h">H</a></dd>
+                <dd {% if surname == 'i' %}class="active"{% endif %}><a href="?surname=i">I</a></dd>
+                <dd {% if surname == 'j' %}class="active"{% endif %}><a href="?surname=j">J</a></dd>
+                <dd {% if surname == 'k' %}class="active"{% endif %}><a href="?surname=k">K</a></dd>
+                <dd {% if surname == 'l' %}class="active"{% endif %}><a href="?surname=l">L</a></dd>
+                <dd {% if surname == 'm' %}class="active"{% endif %}><a href="?surname=m">M</a></dd>
+                <dd {% if surname == 'n' %}class="active"{% endif %}><a href="?surname=n">N</a></dd>
+                <dd {% if surname == 'o' %}class="active"{% endif %}><a href="?surname=o">O</a></dd>
+                <dd {% if surname == 'p' %}class="active"{% endif %}><a href="?surname=p">P</a></dd>
+                <dd {% if surname == 'q' %}class="active"{% endif %}><a href="?surname=q">Q</a></dd>
+                <dd {% if surname == 'r' %}class="active"{% endif %}><a href="?surname=r">R</a></dd>
+                <dd {% if surname == 's' %}class="active"{% endif %}><a href="?surname=s">S</a></dd>
+                <dd {% if surname == 't' %}class="active"{% endif %}><a href="?surname=t">T</a></dd>
+                <dd {% if surname == 'u' %}class="active"{% endif %}><a href="?surname=u">U</a></dd>
+                <dd {% if surname == 'v' %}class="active"{% endif %}><a href="?surname=v">V</a></dd>
+                <dd {% if surname == 'w' %}class="active"{% endif %}><a href="?surname=w">W</a></dd>
+                <dd {% if surname == 'x' %}class="active"{% endif %}><a href="?surname=x">X</a></dd>
+                <dd {% if surname == 'y' %}class="active"{% endif %}><a href="?surname=y">Y</a></dd>
+                <dd {% if surname == 'z' %}class="active"{% endif %}><a href="?surname=z">Z</a></dd>
+            </dl>
+        </section>
+    </div>
+</div>
+
 {# Config page contents #}
 
 <div class="row">
     <div class="small-12 island">
         <section>
-            <ul class="grid small-block-grid-4">
-                {% for user in users %}
-                    <li class="actions-small-1">
-                        <div class="avatar card">
-                            <a href="/search/user/{{ user.getId }}" title="View Profile">
-                                <img src='/portrait.php?userId={{ user.getExternalId }}&size=square64' alt="View Profile" />
-                                <p>{{ user.getFirstName }} {{ user.getLastName }}</p>
-                            </a>
-                            <p class="meta">{{ user.getRole.getName }}</p>
-                        </div>
-                        <nav>
-                            <span class="show-for-large-up">
-                                <a data-delete="{{ user.getExternalId }}" href="#" class="icon-close" title="Delete Photo"></a>
-                            </span>
-                        </nav>
-                    </li>
-                {% endfor %}
-            </ul>
+
+            {% if users | length == 0 %}
+
+                <section class="content">
+                    <div class="empty-state">
+                        <i class="icon-user"></i>
+                        <p>No user photos found for surnames starting with '{{ surname | upper }}'</p>
+                    </div>
+                </section>
+
+            {% else %}
+
+                <ul class="grid small-block-grid-4">
+                    {% for user in users %}
+                        <li class="actions-small-1">
+                            <div class="avatar card">
+                                <a href="/search/user/{{ user.getId }}" title="View Profile">
+                                    <img src='/portrait.php?userId={{ user.getExternalId }}&size=square64' alt="View Profile" />
+                                    <p>{{ user.getFirstName }} {{ user.getLastName }}</p>
+                                </a>
+                                <p class="meta">{{ user.getRole.getName }}</p>
+                            </div>
+                            <nav>
+                                <span class="show-for-large-up">
+                                    <a data-delete="{{ user.getExternalId }}" href="#" class="icon-close" title="Delete Photo"></a>
+                                </span>
+                            </nav>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+            {% endif %}
+
         </section>
     </div>
 </div>
