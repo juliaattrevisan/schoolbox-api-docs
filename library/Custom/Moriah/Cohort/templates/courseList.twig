@@ -25,31 +25,22 @@
     <div class="small-12 island">
         <section>
             <ul class="action-list">
-                {% for subject in subjects %}
-                    {% if courses[subject.getId()] is not empty %}
-                        <li>
-                            <div class="list-item">
-                                <div class="compact avatar card small-12">
-                                    <a href="/homepage/{{ subject.getId() }}">
-                                        <span class="icon-home"></span>
-                                        <h3>{{ subject.getNameWithCodes() }}</h3>
-                                    </a>
-                                </div>
+                <li>
+                    {% for subject in subjects %}
+                        {% set courseCount = courses[subject.getId()]|length %}
+                        <div class="list-item">
+                            <div class="compact avatar card small-12 {% if courseCount == 0 %}removed{% endif %}">
+                                <a href="/homepage/{{ subject.getId() }}">
+                                    <span class="icon-home"></span>
+                                    <h3>{{ subject.getNameWithCodes() }}</h3>
+                                    <p class="meta">
+                                        {{ courseCount }} {% if courseCount == 1 %}course{% else %}courses{% endif %}
+                                    </p>
+                                </a>
                             </div>
-
-                            <ul class="information-list reply">
-                                {% for course in courses[subject.getId()] %}
-                                    <li class="compact avatar card small-12">
-                                        <a href="{{ routeLookup('customMoriahCohort.course', {studentId: student.getId(), courseId: course.getId()}) }}">
-                                            <span class="icon-course"></span>
-                                            <h3>{{ course.getNameWithCodes() }}</h3>
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endif %}
-                {% endfor %}
+                        </div>
+                    {% endfor %}
+                </li>
             </ul>
         </section>
     </div>
