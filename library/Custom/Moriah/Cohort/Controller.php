@@ -110,8 +110,9 @@ class Controller extends Base
                 $allFolders = $this->unitInstanceMapper->findAllFoldersUsingCourse($course, $from, $to);
 
                 $results[$courseId] = [
-                    'course' => $course,
+//                    'course' => $course,
                     'units'  => [],
+//                    'tasks' => [],
                 ];
 
                 // Get all the units for all of these too.
@@ -120,24 +121,28 @@ class Controller extends Base
                     $allUnits = $this->unitInstanceMapper->findForCategoryId($folder->getId());
                     // Get any assessment tasks from these units.
                     foreach ($allUnits as $unit) {
-                        $unitId = $unit->getId();
-                        $results[$courseId]['units'][$unitId] = [
-                            'unit'  => $unit,
-                            'tasks' => [],
-                        ];
+//                        $unitId = $unit->getId();
+                        $baseUnitId = $unit->getUnitCategory()->getId();
+                        if (!isset($results[$courseId]['units'][$baseUnitId])) {
+                            $results[$courseId]['units'][$baseUnitId] = [
+//                            'unit'  => $unit,
+                                'tasks' => [],
+                            ];
+                        }
                         foreach ($unit->getTasks() as $task) {
                             if ($task->getSubmissionBox()->getId()) {
                                 $baseTaskId = $task->getTask()->getId();
                                 // Need to load box independently
                                 $box = SubmissionBoxMapper::getInstance()->findById($task->getSubmissionBox()->getId());
                                 // Group results by name
-                                $results[$courseId][$task->getTitle()][$folder->getId()] = $box;
-                                $results[$courseId]['units'][$unitId]['tasks'][$baseTaskId][$folder->getId()] = $box->getId();
+//                                $results[$courseId][$task->getTitle()][$folder->getId()] = $box;
+                                $results[$courseId]['units'][$baseUnitId]['tasks'][$baseTaskId][$folder->getId()] = $box->getId();
+//                                $results[$courseId]['tasks'][$baseTaskId][$folder->getId()] = $box->getId();
                             }
                         }
                     }
                 }
-//                var_dump($results);
+//                new \Alaress_Probe($results);
 
                 // Now I have all boxes for this course.
                 // Start getting results.
