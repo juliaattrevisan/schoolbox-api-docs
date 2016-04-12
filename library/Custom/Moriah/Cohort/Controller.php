@@ -124,8 +124,9 @@ class Controller extends Base
                         $baseUnitId = $unit->getUnitCategory()->getId();
                         if (!isset($results[$courseId]['units'][$baseUnitId])) {
                             $results[$courseId]['units'][$baseUnitId] = [
-                                'unit'  => $unit,
-                                'tasks' => [],
+                                'unit'   => $unit,
+                                'tasks'  => [],
+                                'folder' => $unit->getUnitCategory(),
                             ];
                         }
                         foreach ($unit->getTasks() as $task) {

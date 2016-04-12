@@ -37,6 +37,16 @@
                                 other {% if otherUsageCount == 1 %}class{% else %}classes{% endif %}.
                             </p>
                         </div>
+                        <ul class="action-list reply">
+                        {% for unitResult in result.units %}
+                            <li>
+                                <div class="avatar card small-12">
+                                    <span class="icon-folder icon-32"></span>
+                                    <h3>{{ unitResult.unit.getTitle() }}</h3>
+                                </div>
+                            </li>
+                        {% endfor %}
+                        </ul>
                     {% endfor %}
                 </li>
             </ul>
