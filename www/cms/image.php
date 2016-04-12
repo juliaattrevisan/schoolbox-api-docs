@@ -7,6 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Alaress\Image\Cache;
 use Alaress\Image\Implementation\Imagine;
 use Alaress\Image\Processor\Freeform;
@@ -39,6 +40,8 @@ try {
 /* Process and stream image
  */
 try {
+    /** @var Schoolbox\Resource\File\Model $file */
+    /** @var Schoolbox\Resource\Storage\Model $store */
     $store = $file->getStorage();
 
     $imageProcessor = new Freeform(
@@ -48,7 +51,7 @@ try {
         new Imagine\Processor\Strategy\Factory()
     );
     $imageProcessor->load()->stream();
-} catch (Exception_Schoolbox_NotFound $e) {
+} catch (SchoolboxNotFoundException $e) {
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
 }
 catch (Exception $e) {

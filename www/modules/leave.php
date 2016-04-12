@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+
 /* Routing */
 $leaveController = new Leave_Controller($this);
 
@@ -125,6 +127,6 @@ try {
         }
     }
 }
-catch (Exception_Schoolbox_NotFound $e) {
+catch (SchoolboxNotFoundException $e) {
     $this->error(2);
 }

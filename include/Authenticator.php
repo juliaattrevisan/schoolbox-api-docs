@@ -37,8 +37,6 @@ class Authenticator {
      * @param $password
      * @param bool $remember
      * @throws SchoolboxAccessDeniedException
-     * @throws Exception_Schoolbox_NotFound
-     * @throws SchoolboxException
      */
     public function authenticate($username, $password, $remember = false) {
         $s = new Session();

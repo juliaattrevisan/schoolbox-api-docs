@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+
 class Leave_Controller extends Controller
 {
     /**
@@ -470,7 +472,7 @@ class Leave_Controller extends Controller
      * Processes form data submitted from renderCreateRequest
      *
      * @param array $data
-     * @throws Exception_Schoolbox_NotFound
+     * @throws SchoolboxNotFoundException
      * @throws \Schoolbox\Mapper\Exception
      */
     public function processCreateRequest($data)
@@ -498,7 +500,7 @@ class Leave_Controller extends Controller
             try {
                 $user = $this->getUserMapper()->findById($userId);
             } catch (Schoolbox\Mapper\Exception $e) {
-                throw new Exception_Schoolbox_NotFound('User not found');
+                throw new SchoolboxNotFoundException('User not found');
             }
             /** @var $sessionUser \Schoolbox\User */
             $sessionUser = $_SESSION['user'];
@@ -556,14 +558,14 @@ class Leave_Controller extends Controller
      *
      * @param Integer $requestId
      * @return array
-     * @throws Exception_Schoolbox_NotFound if the request doesn't exist.
+     * @throws SchoolboxNotFoundException if the request doesn't exist.
      */
     public function executeModifyRequest($requestId)
     {
         try {
             $request = $this->getRequestMapper()->findById($requestId);
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new Exception_Schoolbox_NotFound('Request not found');
+            throw new SchoolboxNotFoundException('Request not found');
         }
         return array('request' => $request);
     }
@@ -573,7 +575,7 @@ class Leave_Controller extends Controller
      *
      * @param array $data
      * @return void
-     * @throws Exception_Schoolbox_NotFound if the requester's house doesn't exist.
+     * @throws SchoolboxNotFoundException if the requester's house doesn't exist.
      */
     public function renderModifyRequest($data)
     {
@@ -581,12 +583,12 @@ class Leave_Controller extends Controller
         $request = $data['request'];
         $user = $request->getUser();
         if (!$user instanceof \Schoolbox\User) {
-            throw new Exception_Schoolbox_NotFound('User not found');
+            throw new SchoolboxNotFoundException('User not found');
         }
         try {
             $house = $this->getHouseMapper()->findById($user->getResidentialHouse()->getId());
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new Exception_Schoolbox_NotFound('User\'s house not found');
+            throw new SchoolboxNotFoundException('User\'s house not found');
         }
         if (!$this->hasApprovePermission($house->getId())) {
             error(19);
@@ -608,7 +610,7 @@ class Leave_Controller extends Controller
         );
 
         /* Render dropdowns
-            */
+         */
         $this->renderStartTimeDropdown($request->getStart()->getDatabaseTime());
         $this->renderFinishTimeDropdown($request->getFinish()->getDatabaseTime());
         $this->renderHostTypeDropdown($request);
@@ -676,7 +678,7 @@ class Leave_Controller extends Controller
      *
      * @param array $data
      * @return void
-     * @throws Exception_Schoolbox_NotFound if the user or their house doesn't exist.
+     * @throws SchoolboxNotFoundException if the user or their house doesn't exist.
      */
     public function renderViewRequest($data)
     {
@@ -687,12 +689,12 @@ class Leave_Controller extends Controller
         $request = $data['request'];
         $user = $request->getUser();
         if (!$user instanceof \Schoolbox\User) {
-            throw new Exception_Schoolbox_NotFound('User not found');
+            throw new SchoolboxNotFoundException('User not found');
         }
         try {
             $house = $this->getHouseMapper()->findById($user->getResidentialHouse()->getId());
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new Exception_Schoolbox_NotFound('User\'s house not found');
+            throw new SchoolboxNotFoundException('User\'s house not found');
         }
 
         if ($this->hasViewPermission($user->getId(), $house->getId())) {
@@ -741,7 +743,7 @@ class Leave_Controller extends Controller
      *
      * @param array $data
      * @return void
-     * @throws Exception_Schoolbox_NotFound if request isn't found.
+     * @throws SchoolboxNotFoundException if request isn't found.
      */
     public function processModifyRequest($data)
     {
@@ -749,7 +751,7 @@ class Leave_Controller extends Controller
         try {
             $request = $this->getRequestMapper()->findById($data['request']['id']);
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new Exception_Schoolbox_NotFound('Request not found');
+            throw new SchoolboxNotFoundException('Request not found');
         }
 
         if (!$this->hasApprovePermission($request->getUser()->getResidentialHouse()->getId())) {
@@ -822,14 +824,14 @@ class Leave_Controller extends Controller
      *               * house: the HouseResidential object
      *               * requestList: the requests for this house
      *
-     * @throws Exception_Schoolbox_NotFound if the house $houseID doesn't exist.
+     * @throws SchoolboxNotFoundException if the house $houseID doesn't exist.
      */
     public function executeHouseRequestList($houseId)
     {
         try {
             $house = $this->getHouseMapper()->findById($houseId);
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new Exception_Schoolbox_NotFound('House not found');
+            throw new SchoolboxNotFoundException('House not found');
         }
 
         if (!$this->hasReportingPermission()) {
@@ -1004,19 +1006,19 @@ class Leave_Controller extends Controller
      *
      * @param $userId
      * @return array
-     * @throws Exception_Schoolbox_NotFound if user or their house isn't found.
+     * @throws SchoolboxNotFoundException if user or their house isn't found.
      */
     public function executeUserRequestList($userId)
     {
         try {
             $user = $this->getUserMapper()->findById($userId);
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new Exception_Schoolbox_NotFound('User not found');
+            throw new SchoolboxNotFoundException('User not found');
         }
         try {
             $house = $this->getHouseMapper()->findById($user->getResidentialHouse()->getId());
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new Exception_Schoolbox_NotFound('User\'s house not found');
+            throw new SchoolboxNotFoundException('User\'s house not found');
         }
         $requestList = $this->getRequestMapper()->findAllByUserId($user->getId());
 
@@ -1084,7 +1086,7 @@ class Leave_Controller extends Controller
      * Renders a collection of request for a user
      *
      * @param array $data
-     * @throws Exception_Schoolbox_NotFound
+     * @throws SchoolboxNotFoundException
      */
     public function renderUserRequestList($data)
     {
@@ -1096,10 +1098,10 @@ class Leave_Controller extends Controller
         $house = $data['house'];
         $requestList = $data['requestList'];
         if (!$user instanceof \Schoolbox\User) {
-            throw new Exception_Schoolbox_NotFound('User not found');
+            throw new SchoolboxNotFoundException('User not found');
         }
         if (!$house instanceof HouseResidential) {
-            throw new Exception_Schoolbox_NotFound('User\'s house not found');
+            throw new SchoolboxNotFoundException('User\'s house not found');
         }
         if (!($this->hasViewPermission($user->getId(), $house->getId()))) {
             error(19);
@@ -1207,7 +1209,7 @@ class Leave_Controller extends Controller
      *
      * @param array $data
      * @return void
-     * @throws Exception_Schoolbox_NotFound if request isn't found
+     * @throws SchoolboxNotFoundException if request isn't found
      */
     public function processModifyRequestList($data)
     {
@@ -1216,12 +1218,12 @@ class Leave_Controller extends Controller
         try {
             $user = $this->getUserMapper()->findById($data['user']['id']);
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new Exception_Schoolbox_NotFound('User not found');
+            throw new SchoolboxNotFoundException('User not found');
         }
         try {
             $house = $this->getHouseMapper()->findById($user->getResidentialHouse()->getId());
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new Exception_Schoolbox_NotFound('User\'s house not found');
+            throw new SchoolboxNotFoundException('User\'s house not found');
         }
         if (!$this->hasApprovePermission($house->getId())) {
             error(19);
@@ -1235,7 +1237,7 @@ class Leave_Controller extends Controller
                 try {
                     $request = $this->getRequestMapper()->findById($request['id']);
                 } catch (Schoolbox\Mapper\Exception $e) {
-                    throw new Exception_Schoolbox_NotFound('Request not found');
+                    throw new SchoolboxNotFoundException('Request not found');
                 }
 
                 if (isset($data['approve']) || isset($data['reject'])) {
@@ -1307,14 +1309,14 @@ class Leave_Controller extends Controller
      * @param $houseId
      * @param $date
      * @return array
-     * @throws Exception_Schoolbox_NotFound if house isn't found
+     * @throws SchoolboxNotFoundException if house isn't found
      */
     public function executeHouseReport($houseId, $date)
     {
         try {
             $house = $this->getHouseMapper()->findById($houseId);
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new Exception_Schoolbox_NotFound('House not found');
+            throw new SchoolboxNotFoundException('House not found');
         }
 
         if (!$this->hasReportingPermission()) {
