@@ -14,8 +14,16 @@ use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedExcepti
 
 class Authenticator {
 
+    /**
+     * Are you authentiated?
+     *
+     * @var bool
+     */
     private $authenticated = false;
 
+    /**
+     * Authenticator constructor.
+     */
     public function __construct() {
 
     }
@@ -29,7 +37,6 @@ class Authenticator {
      * @param $password
      * @param bool $remember
      * @throws SchoolboxAccessDeniedException
-     * @throws Exception_Schoolbox_AccountDisabled
      * @throws Exception_Schoolbox_NotAuthenticated
      * @throws Exception_Schoolbox_NotFound
      * @throws SchoolboxException
