@@ -131,7 +131,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
     public function findAttendanceRecords()
     {
         $result = $this->getDatabase()->executeProcedure(
-            'spswkAttendances_ws', array(
+            'spswkAttendances', array(
                 array('@wkAttendanceMasterSeq', $this->getAttendanceMasterSeq(), SQLINT4),
                 array('@FillActualAbsenceColumnsFlag', 1, SQLINT4),
                 array('@CheckPossibleNonAttendFlag', 1, SQLINT4),
@@ -159,7 +159,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
             WHERE ActiveFlag = 1
         ";
 
-        return $this->getDatabase()->getAll($query);
+        return $this->formatDropDownOptions($this->getDatabase()->getAll($query));
     }
 
     /**
@@ -175,7 +175,22 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
             WHERE ActiveFlag = 1
         ";
 
-        return $this->getDatabase()->getAll($query);
+        return $this->formatDropDownOptions($this->getDatabase()->getAll($query));
+    }
+
+    /**
+     * Append code in front of description in drop downs
+     */
+    private function formatDropDownOptions($drop) {
+
+        /* Append code in front of description */
+        array_walk($drop, function(&$value, &$key) {
+            if($value['Code']) {
+                $value['Description'] = '' . $value['Code'] . ' - ' . $value['Description'];
+            }
+        });
+
+        return $drop;
     }
 
     /**

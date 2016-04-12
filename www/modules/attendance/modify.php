@@ -14,6 +14,7 @@ $this->setBlock(TEMPLATE_content, 'student', 'student_block');
 
 /* Dropdowns and such for each student
  */
+$this->setBlock('student', 'student_absent', 'student_absent_block');
 $this->setBlock('student', 'absence_options', 'absence_options_block');
 $this->setBlock('student', 'reason_options', 'reason_options_block');
 
@@ -152,6 +153,7 @@ if ($class) {
             if ($isAbsent) {
                 $attendanceCount--;
             }
+
             $this->setVar(
                 array(
                     'STUDENT_UID'                => $user['uid'],
@@ -159,24 +161,31 @@ if ($class) {
                     'STUDENT_SYNERGY_ID'         => $currentStudent['ID'],
                     'STUDENT_ABSENCE_CODE'       => $currentStudent['PossibleAbsenceCode'],
                     'STUDENT_REASON_CODE'        => $currentStudent['PossibleReasonCode'],
-                    'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['PossibleDescription']),
+                    'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['ActualEventComment'] ? $currentStudent['ActualEventComment'] : $currentStudent['PossibleDescription']),
                     'STUDENT_ATTENDANCESTRING'   => Scrub::text($currentStudent['TodaysAttendanceString']),
                     'STUDENT_NONATTENDREASON'    => Scrub::text($currentStudent['PossibleNonAttendReason']),
                     'STUDENT_ARRIVAL_TIME'       => isset($arrivalTime[3]) ? date('g:ia', strtotime($arrivalTime[0])) : '',
                     'STUDENT_DEPT_TIME'          => isset($deptTime[3]) ? date('g:ia', strtotime($deptTime[0])) : '',
-                    'IS_ABSENT'                  => $isAbsent ? 'checked="checked"' : '',
-                    'ON_OFF'                     => ++$i % 2 ? 'dark' : '',
+                    'IS_ABSENT'                  => $isAbsent  ? 'checked="checked"' : '',
+                    
                 )
             );
 
-
+            if($currentStudent['PossibleNonAttendFlag']) {
+                $this->parse('student_absent_block','student_absent');
+            }
+            else {
+                $this->setVar('student_absent_block','');
+            }
+            $abscenceCode = $currentStudent['ActualAbsenceTypeCode'] && $currentStudent['ActualAbsenceTypeCode'] != '?'  ? $currentStudent['ActualAbsenceTypeCode'] : $currentStudent['PossibleAbsenceCode'];
             $this->dropDown(
-                'absence_options', $absenceDropdownOptions, $currentStudent['PossibleAbsenceCode'], 'student',
+                'absence_options', $absenceDropdownOptions,  $abscenceCode, 'student',
                 array('Code' => 'ABSENCE_OPTIONS_VALUE', 'Description' => 'ABSENCE_OPTIONS_DESCRIPTION')
             );
 
+            $reasonCode = $currentStudent['ActualAbsenceReasonCode'] ? $currentStudent['ActualAbsenceReasonCode'] : $currentStudent['PossibleReasonCode'];
             $this->dropDown(
-                'reason_options', $reasonDropdownOptions, $currentStudent['PossibleReasonCode'], 'student',
+                'reason_options', $reasonDropdownOptions, $reasonCode, 'student',
                 array('Code' => 'REASON_OPTIONS_VALUE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
             );
 

@@ -400,17 +400,12 @@ class Healthcheck
             )
         );
         $list[] = array(
-            'spswkAttendances_ws',
+            'spswkAttendances',
             array(
                 array('@wkAttendanceMasterSeq', 1, SQLINT4, false, false, -1),
-                array('@CheckPossibleNonAttendFlag', 1, SQLINT1, false, false, -1),
-                array('@OnlyReturnNonAttendedFlag', 1, SQLINT1, false, false, -1),
-                array('@OnlyReturnAttendedFlag', 1, SQLINT1, false, false, -1),
-                array('@OnlyReturnPossibleNonAttendedButMarkedPresentFlag', 1, SQLINT1, false, false, -1),
-                array('@OnlyReturnUnMarkedFlag', 1, SQLINT1, false, false, -1),
-                array('@FillActualAbsenceColumnsFlag', 1, SQLINT1, false, false, -1),
-                array('@CalculateTodaysAttendanceStringFlag', 1, SQLINT1, false, false, -1),
-                array('@OnlyReturnEditedRecordsFlag', 1, SQLINT1, false, false, -1)
+                array('@FillActualAbsenceColumnsFlag', 1, SQLINT4),
+                array('@CheckPossibleNonAttendFlag', 1, SQLINT4),
+                array('@CalculateTodaysAttendanceStringFlag', 1, SQLINT4),
             )
         );
         $list[] = array(
