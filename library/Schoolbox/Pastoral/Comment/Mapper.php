@@ -34,6 +34,9 @@ class Mapper extends BaseMapper
         Parent::__construct();
     }
 
+    /**
+     * Setup mapper
+     */
     protected function mapping()
     {
         $this->hasTable('pastoral_comment');

@@ -102,6 +102,9 @@ class Mapper extends BaseMapper
         parent::__construct();
     }
 
+    /**
+     * Setup mapper
+     */
     protected function mapping()
     {
         $this->hasTable('pastoral');
@@ -466,10 +469,10 @@ class Mapper extends BaseMapper
             return true;
         }
 
-        /** @var \Schoolbox\User $user */
+        /** @var User $user */
         $user = $_SESSION["user"];
 
-        if ($user instanceof \Schoolbox\User) {
+        if ($user instanceof User) {
 
             // Pastoral moderators can access everything
 
@@ -561,7 +564,7 @@ class Mapper extends BaseMapper
         /** @var \Schoolbox\User $user */
         $user = $_SESSION["user"];
 
-        if ($user instanceof \Schoolbox\User) {
+        if ($user instanceof User) {
 
             // Pastoral moderators can access everything
 

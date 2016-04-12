@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Pastoral\Pastoral;
 
-use Sabre\VObject\Property\Boolean;
 use Schoolbox\Pastoral;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;

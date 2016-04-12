@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Pastoral\Tags;
 
-use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
@@ -28,6 +27,9 @@ class Mapper extends BaseMapper
         Parent::__construct();
     }
 
+    /**
+     * Setup mapper
+     */
     protected function mapping()
     {
         $this->hasTable('pastoral_tags');
