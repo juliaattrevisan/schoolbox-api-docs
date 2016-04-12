@@ -49,6 +49,9 @@
             value: {{ destinations|json_encode|raw }}
         });
 
+        {# Global mage init #}
+        $('input[data-mage-next]').mage();
+
         {# Init stage 1 mage #}
 
         var stageOne = $('input[data-mage-next="part-unit-select"]');
@@ -86,7 +89,6 @@
             }
         });
 
-        $('input[data-mage-next]').mage();
 
         {# If modifying an existing course, skip straight to stage 2 #}
 
