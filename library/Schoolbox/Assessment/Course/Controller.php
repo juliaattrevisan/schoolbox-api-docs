@@ -1548,7 +1548,7 @@ class Controller extends Base\Base
         }
 
         $this->tpl('import', [
-            '_part2'  => true,
+            '_part3'  => true,
             'units'   => $unitOutput,
             'folder'  => $destination,
             'sources' => $course,

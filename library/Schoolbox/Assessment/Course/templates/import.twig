@@ -52,9 +52,12 @@
         {# Global mage init #}
         $('input[data-mage-next]').mage();
 
+{# If modifying an existing course, skip straight to stage 3 #}
+{% if not _part3 %}
+
         {# Init stage 1 mage #}
 
-        var stageOne = $('input[data-mage-next="part-unit-select"]');
+        var stageOne = $('input[data-mage-next="part-ownership"]');
 
         stageOne.bind('validate', function()
         {
@@ -89,21 +92,21 @@
             }
         });
 
+        stageOne.mage({onXhrDone: function (data) {
+            $('#ownershipAssignment').html(data);
+        }});
 
-        {# If modifying an existing course, skip straight to stage 2 #}
+        var stageTwo = $('input[data-mage-next="part-unit-select"]');
 
-{% if not _part2 %}
-        stageOne.mage({onXhrDone: function(data)
-        {
+        stageTwo.mage({onXhrDone: function (data) {
             $('#importUnits').html(data);
 {% endif %}
 
-            {# Init stage 2 mage #}
+            {# Init stage 3 mage #}
 
-            var stageTwo = $('input[data-mage-next="part-tasks-select"]');
+            var stageThree = $('input[data-mage-next="part-tasks-select"]');
 
-            stageTwo.mage({onXhrDone: function(data)
-            {
+            stageThree.mage({onXhrDone: function (data) {
                 {# Slide away the things we're not using #}
 
                 $('#importUnits').find('input[type=checkbox]').filter(':not(:checked)').closest('li').slideUp();
@@ -112,11 +115,11 @@
 
                 $('#importTasks').html(data);
 
-                {# Init stage 3 mage #}
+                {# Init stage 4 mage #}
 
-                var stageThree = $('input[data-mage-next="part-results-select"]');
+                var stageFour = $('input[data-mage-next="part-results-select"]');
 
-                stageThree.mage({
+                stageFour.mage({
                     onXhrDone: function(data) {
 
                         {# Go back to wherever you came from (hopefully) #}
@@ -125,7 +128,7 @@
                     }
                 }).bind('validate', function() {
 
-                    {# Stage 3 validation #}
+                    {# Stage 4 validation #}
 
                     if ($('#importUnits').find('input[type=checkbox]').filter(':checked').length > 0) {
 
@@ -165,7 +168,7 @@
                 });
             }}).bind('validate', function() {
 
-                {# Stage 2 validation #}
+                {# Stage 3 validation #}
 
                 if ($('#importUnits').find('input[type=checkbox]').filter(':checked').length > 0)
                 {
@@ -203,7 +206,7 @@
                     {# All dates were specified #}
 
                     return {
-                        'result': true,
+                        'result': true
                     };
 
                 }
@@ -218,7 +221,7 @@
                 }
 
             });
-{% if not _part2 %}
+{% if not _part3 %}
         }});
 {% endif %}
     });
@@ -226,7 +229,7 @@
 <div class="row">
     <div class="small-12 island">
 
-        {% if _part2 %}
+        {% if _part3 %}
             <h1>Modify Course</h1>
         {% else %}
             <h1>Import Course into Class</h1>
@@ -257,41 +260,53 @@
                             <input id="import-folders" type="text" name="importFolders" />
                         </label>
                     </div>
-{% if not _part2 %}
+{% if not _part3 %}
                     <div class="small-12 column">
                         <div class="row" data-mage-submitrow>
                             <div class="small-12 medium-8 column">
                                 <p class="alert alert-box icon-alert" data-mage-error></p>
                             </div>
                             <div class="small-12 medium-4 column">
-                                <input type="submit" name="part-course-select" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="/course/importUnits" />
+                                <input type="submit" name="part-course-select" value="Next" data-mage-next="part-ownership" data-mage-working="Working..." formaction="{{ routeLookup('course.importUnits') }}" />
                             </div>
                         </div>
                     </div>
 {% endif %}
                 </fieldset>
+                <fieldset class="content" data-mage="part-ownership">
+                    <legend>2. Ownership</legend>
+                    <div class="small-12 column hide" data-mage-collapsed>
+{% if _part3 %}
+                        <div id="ownershipAssignment">
+                            {% include '@course/import/ownership.twig' %}
+                        </div>
+{% else %}
+                        <div id="ownershipAssignment">{# will be populated by ajax #}</div>
+                        <div class="row" data-mage-submitrow>
+                            <div class="small-12 medium-8 column">
+                                <p class="alert alert-box icon-alert" data-mage-error></p>
+                            </div>
+                            <div class="small-12 medium-4 column">
+                                <input type="submit" name="part-ownership" value="Next" data-mage-next="part-unit-select" data-mage-working="Working..." formaction="{{ routeLookup('course.importOwnership') }}" />
+                            </div>
+                        </div>
+{% endif %}
+                    </div>
+                </fieldset>
                 <fieldset class='content' data-mage="part-unit-select">
-                    <legend>2. Units</legend>
-
-                    <div class="small-12 column{% if not _part2 %} hide" data-mage-collapsed{% else %}"{% endif %} >
+                    <legend>3. Units</legend>
+                    <div class="small-12 column{% if not _part3 %} hide" data-mage-collapsed{% else %}"{% endif %} >
                         <div id="importUnits">
-                            {% if _part2 %}
+{% if _part3 %}
                                 {% include '@course/unitImportForm.twig' %}
-                            {% endif %}
+{% endif %}
                         </div>
                     </div>
                 </fieldset>
-
                 <fieldset class='content' data-mage="part-tasks-select">
-                    <legend>3. Coursework</legend>
-
+                    <legend>4. Coursework</legend>
                     <div class="small-12 column hide" data-mage-collapsed>
-                        <div id="importTasks"></div>
-    {#
-                        {% if folder.id %}
-                            {% include '@course/import/results.twig' %}
-                        {% endif %}
-    #}
+                        <div id="importTasks">{# will be populated by ajax #}</div>
                     </div>
                     <div id="importResults" class="hide" data-mage-collapsed></div>
                 </fieldset>
