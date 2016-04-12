@@ -14,6 +14,7 @@ use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use External_UserInterface;
+use Schoolbox\Assessment\Course;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -37,6 +38,11 @@ class Module extends BaseModule
     protected $userMapper;
 
     /**
+     * @var Course\Mapper
+     */
+    protected $courseMapper;
+
+    /**
      * @var External_UserInterface
      */
     protected $externalDb;
@@ -46,16 +52,19 @@ class Module extends BaseModule
      *
      * @param ContainerInterface     $injector
      * @param UserMapper             $userMapper
+     * @param Course\Mapper          $courseMapper
      * @param External_UserInterface $externalDb
      */
     public function __construct(
         ContainerInterface $injector,
         UserMapper $userMapper,
+        Course\Mapper $courseMapper,
         External_UserInterface $externalDb
     ) {
         parent::__construct($injector);
-        $this->userMapper = $userMapper;
-        $this->externalDb = $externalDb;
+        $this->userMapper   = $userMapper;
+        $this->courseMapper = $courseMapper;
+        $this->externalDb   = $externalDb;
     }
 
     /**
@@ -63,7 +72,8 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'courseList', $basePath, '/course-list/{studentId}');
+        $this->addGetRoute($router, 'courseList', $basePath, '/student/{studentId}');
+        $this->addGetRoute($router, 'course', $basePath, '/student/{studentId}/course/{courseId}');
     }
 
     /**
@@ -77,7 +87,7 @@ class Module extends BaseModule
     {
         $this->addRoutePermission(
             $authorizer,
-            '(?:courseList)',
+            '(?:courseList|course)',
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
@@ -93,9 +103,16 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:courseList)',
+            '(?:courseList|course)',
             function ($params) {
                 return ['student' => $this->userMapper->findById($params['studentId']),];
+            }
+        );
+        $this->addRoutePreload(
+            $matcher,
+            'course',
+            function ($params) {
+                return ['course' => $this->courseMapper->findById($params['courseId']),];
             }
         );
     }
@@ -113,6 +130,9 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set(
+            'controller:'.$this->basename,
+            $injector->lazyNew(Controller::class)
+        );
     }
 }

@@ -10,6 +10,8 @@ namespace Config\Modules\Custom\Moriah;
 use Alaress\Application\Kernel;
 use Custom\Moriah\Cohort\Module;
 use Config\Modules\ModuleConfigInterface;
+use External_User;
+use Schoolbox\Assessment\Course;
 use Schoolbox\UserMapper;
 
 /**
@@ -33,7 +35,8 @@ class Cohort implements ModuleConfigInterface
             $module = new Module(
                 $di,
                 $di->newInstance(UserMapper::class),
-                $di->newInstance(\External_User::class)
+                $di->newInstance(Course\Mapper::class),
+                $di->newInstance(External_User::class)
             );
             $module->init('/modules/custom/moriah/cohort');
         }

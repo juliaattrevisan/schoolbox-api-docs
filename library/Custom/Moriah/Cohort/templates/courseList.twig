@@ -40,7 +40,7 @@
                             <ul class="information-list reply">
                                 {% for course in courses[subject.getId()] %}
                                     <li class="compact avatar card small-12">
-                                        <a href="/homepage/{{ course.getId() }}">
+                                        <a href="{{ routeLookup('customMoriahCohort.course', {studentId: student.getId(), courseId: course.getId()}) }}">
                                             <span class="icon-course"></span>
                                             <h3>{{ course.getNameWithCodes() }}</h3>
                                         </a>
