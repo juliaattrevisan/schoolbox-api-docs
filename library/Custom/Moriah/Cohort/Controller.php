@@ -8,6 +8,7 @@
 namespace Custom\Moriah\Cohort;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
 /**
@@ -32,7 +33,8 @@ class Controller extends Base
             'format'   => 'html',
             'template' => '@customMoriahCohort/courseList.twig',
             'data'     => [
-                'student' => $student,
+                'student'  => $student,
+                'subjects' => Folder\Mapper::getInstance()->findForUser($student),
             ],
         ]);
     }

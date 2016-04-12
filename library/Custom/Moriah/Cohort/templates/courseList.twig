@@ -1,1 +1,7 @@
 <h1>Course List - {{ student.formatName() }}</h1>
+
+<ul>
+    {% for subject in subjects %}
+        <li>{{ subject.getNameWithCodes() }}</li>
+    {% endfor %}
+</ul>
