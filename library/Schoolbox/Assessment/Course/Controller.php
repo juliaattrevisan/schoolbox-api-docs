@@ -1490,12 +1490,15 @@ class Controller extends Base\Base
                     'redirect' => $this->getSession()->getHistory(2)
                 ]
             ]);
-        }
-        catch (\InvalidArgumentException $e)
-        {
+
+        } catch (\InvalidArgumentException $e) {
             // bad dates, most likely
             $this->throwError("Invalid date given");
+
+        } catch (\Exception $e) {
+            $this->sendError($e->getMessage());
         }
+
     }
 
     /**
