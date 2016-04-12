@@ -37,7 +37,6 @@ class Authenticator {
      * @param $password
      * @param bool $remember
      * @throws SchoolboxAccessDeniedException
-     * @throws Exception_Schoolbox_NotAuthenticated
      * @throws Exception_Schoolbox_NotFound
      * @throws SchoolboxException
      */
