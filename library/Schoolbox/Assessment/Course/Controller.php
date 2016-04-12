@@ -909,7 +909,7 @@ class Controller extends Base\Base
      */
     private function determineTaskDates($unitDates, $courseComponentId)
     {
-        /** @var Category[] $unitCache */
+        /** @var Folder\Model[] $unitCache */
         $unitCache = [];
 
         /* Format this into a convenient structure for now
@@ -1279,9 +1279,9 @@ class Controller extends Base\Base
 
         // Keep a cache of queried data
 
-        /** @var Category[] $unitCache */
+        /** @var Folder\Model[] $unitCache */
         $unitCache = [];
-        /** @var Category[] $homepageCache */
+        /** @var Folder\Model[] $homepageCache */
         $homepageCache = [];
         /** @var Component_Instance[] $componentCache */
         $componentCache = [];
