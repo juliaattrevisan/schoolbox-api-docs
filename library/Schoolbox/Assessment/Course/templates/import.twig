@@ -237,11 +237,13 @@
 
         <form method="post">
             <section>
-                <fieldset class="content" data-mage="part-course-select" {% if _part2 %}disabled{% endif %}>
+                <fieldset class="content" data-mage="part-course-select" {% if _part3 %}disabled{% endif %}>
                     <legend>1. Course</legend>
+                    {% if not _part3 %}
                     <div class="meta small-12 column" data-mage-helptext>
                         <p>Select the course that is to be imported, and one or more classes as the target destination.</p>
                     </div>
+                    {% endif %}
                     <div class="small-5 medium-5 large-3 columns">
                         {% include 'sub/selectorShard.twig' with {
                                 'formLabel': 'Course',
@@ -273,12 +275,12 @@
                     </div>
 {% endif %}
                 </fieldset>
-                <fieldset class="content" data-mage="part-ownership">
+                <fieldset class="content" data-mage="part-ownership" {% if _part3 %}disabled{% endif %}>
                     <legend>2. Ownership</legend>
-                    <div class="small-12 column hide" data-mage-collapsed>
+                    <div class="small-12 column {% if not _part3 %}hide{% endif %}" data-mage-collapsed>
 {% if _part3 %}
                         <div id="ownershipAssignment">
-                            {% include '@course/import/ownership.twig' %}
+                            {% include '@course/import/ownership.twig' with { targetFolders: [ folder ], ownershipCandidates: { (folder.id): [owner] }, _disabled: true } %}
                         </div>
 {% else %}
                         <div id="ownershipAssignment">{# will be populated by ajax #}</div>

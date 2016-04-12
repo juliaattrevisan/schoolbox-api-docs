@@ -46,6 +46,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base\Base
@@ -1520,6 +1521,9 @@ class Controller extends Base\Base
         /** @var Collection|UnitInstance[] $selectedUnitInstances */
         $selectedUnitInstances = $this->getUnitInstanceMapper()->findForComponent($compInst);
 
+        // casually crack out Big Bertha and drill, drill, drill... :/
+        $owner = $this->getUserMapper()->findById($selectedUnitInstances->first()->getTasks()->first()->getOwner()->getId());
+
         foreach ($selectedUnitInstances as $selectedUnitInstance) {
             $compendium[$selectedUnitInstance->getUnitCategory()->getId()]['selected'] = $selectedUnitInstance;
         }
@@ -1578,6 +1582,7 @@ class Controller extends Base\Base
             'homepage' => $destination->getId(),
             'courseHomepage' => $course->getId(),
             'componentId' => $componentId,
+            'owner'       => $owner
         ]);
     }
 
