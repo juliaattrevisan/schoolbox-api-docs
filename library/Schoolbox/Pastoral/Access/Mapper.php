@@ -29,8 +29,8 @@ class Mapper extends BaseMapper
         $this->hasPrototype(new Model());
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('pastoral_id', self::TYPE_INTEGER);
-        $this->joins('user_id', UserMapper::class, 'id', null, null, 'user');
-        $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role');
+        $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');
         $this->hasSoftDeleteDateField('deleted_at');
     }
 

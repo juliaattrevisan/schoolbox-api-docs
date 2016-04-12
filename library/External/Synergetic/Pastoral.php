@@ -322,10 +322,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         if ($pastoral->getPrivate()) {
             $details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "'";
         } else {
-            $details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\n\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
+            $details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\r\n\r\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
         }
 
-        $private_details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\n\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
+        $private_details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\r\n\r\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
 
         // Pastoral event type code
 
@@ -337,18 +337,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $created_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
         $created_date = $created_date_alaress->getYear() . "-" . $created_date_alaress->getMonth() . "-" . $created_date_alaress->getDay(true);
         $created_by_id = $pastoral->getOwner()->getExternalId();
-
-        // If there is no modified date, give it the created date
-
-        if ($pastoral->getUpdatedAt() != null) {
-            $modified_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getUpdatedAt());
-            $modified_date = "'" . $modified_date_alaress->getYear() . "-" . $modified_date_alaress->getMonth() . "-" . $modified_date_alaress->getDay(true) . "'";
-            $modified_by_id = $pastoral->getOwner()->getExternalId();
-        } else {
-            $modified_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
-            $modified_date = "'". $modified_date_alaress->getYear() . "-" . $modified_date_alaress->getMonth() . "-" . $modified_date_alaress->getDay(true) . "'";
-            $modified_by_id = $pastoral->getOwner()->getExternalId();
-        }
 
         // Execute the query
 
@@ -373,8 +361,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     {$type_code},
                     {$created_date},
                     {$created_by_id},
-                    {$modified_date},
-                    {$modified_by_id},
+                    {$created_date},
+                    {$created_by_id},
                     '',
                     '',
                     -1
@@ -386,6 +374,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         $pastoral->setExternalId($row->insert_id);
         $this->getPastoralMapper()->save($pastoral);
+
+        $this->updatePastoralCareContacts($pastoral);
 
         // TODO: Upload attachments to DocMan (SynergyOneMedia)
 
@@ -426,37 +416,33 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
             // Set the item date to the post date
 
-            $item_date = "'" . date("Y-m-d H:i:s", strtotime($pastoral->getCreatedAt())) . "'";
+            $item_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
+            $item_date = $item_date_alaress->getYear() . "-" . $item_date_alaress->getMonth() . "-" . $item_date_alaress->getDay(true);
 
             // If the message is marked as private, do not put in public details
 
             if ($pastoral->getPrivate()) {
                 $details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "'";
             } else {
-                $details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\n\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
+                $details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\r\n\r\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
             }
 
-            $private_details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\n\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
+            $private_details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\r\n\r\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
 
             // Pastoral event type code
 
             $type = $this->getPastoralTypeMapper()->findById($pastoral->getType()->getId());
             $type_code = "'" . $type->getExternalCode() . "'";
 
-            // Created/modified dates
+            // Modified date
 
-            $created_date = "'" . date("Y-m-d H:i:s", strtotime($pastoral->getCreatedAt())) . "'";
-            $created_by_id = $pastoral->getOwner()->getExternalId();
+            if ($pastoral->getUpdatedAt() != null)
+                $modified_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getUpdatedAt());
+            else
+                $modified_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
 
-            // If there is no modified date, give it the created date
-
-            if ($pastoral->getUpdatedAt() != null) {
-                $modified_date = "'" . date("Y-m-d H:i:s", strtotime($pastoral->getUpdatedAt())) . "'";
-                $modified_by_id = $pastoral->getOwner()->getExternalId();
-            } else {
-                $modified_date = "'" . date("Y-m-d H:i:s", strtotime($pastoral->getCreatedAt())) . "'";
-                $modified_by_id = $pastoral->getOwner()->getExternalId();
-            }
+            $modified_date = "'" . $modified_date_alaress->getYear() . "-" . $modified_date_alaress->getMonth() . "-" . $modified_date_alaress->getDay(true) . "'";
+            $modified_by_id = $pastoral->getOwner()->getExternalId();
 
             // Execute the query
 
@@ -466,8 +452,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         Details = {$details},
                         PrivateDetails = {$private_details},
                         TypeCode = {$type_code},
-                        CreatedDate = {$created_date},
-                        CreatedById = {$created_by_id},
                         ModifiedDate = {$modified_date},
                         ModifiedById = {$modified_by_id},
                         ClassCode = '',
@@ -477,25 +461,79 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             ";
 
             $result = $this->getDatabase()->query($query);
+
+            $this->updatePastoralCareContacts($pastoral);
+
+            // TODO: Upload attachments to DocMan (SynergyOneMedia)
+
+            /*
+            $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($pastoral->getId());
+
+            foreach ($attachments as $attachment) {
+
+                $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($attachment->getHash());
+                $content = bin2hex($content);
+                $document = "0x".$content;
+
+                $this->getDatabase()->query("INSERT INTO tDocuments (Description, SourceRed, Document) VALUES ('Text', 'Imported from Schoolbox', '{$document}')");
+            }
+            */
+
             return $result;
         }
 
-        // TODO: Upload attachments to DocMan (SynergyOneMedia)
+        return false;
+    }
 
-        /*
-        $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($pastoral->getId());
+    /**
+     * Updates pastoral care contacts in Synergetic
+     *
+     * @param PastoralModel $pastoral
+     */
+    public function updatePastoralCareContacts(\Schoolbox\Pastoral\Pastoral\Model $pastoral) {
 
-        foreach ($attachments as $attachment) {
+        $external_id = $pastoral->getExternalId();
 
-            $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($attachment->getHash());
-            $content = bin2hex($content);
-            $document = "0x".$content;
+        // Pummel old contacts for the pastoral care record
 
-            $this->getDatabase()->query("INSERT INTO tDocuments (Description, SourceRed, Document) VALUES ('Text', 'Imported from Schoolbox', '{$document}')");
+        $query = "DELETE FROM PastoralCareContacts WHERE PastoralCareSeq = {$external_id}";
+        $this->getDatabase()->query($query);
+
+        // Get users that have been given specific access to the record
+
+        $access = $this->getPastoralAccessMapper()->findByPastoralId($pastoral->getId());
+
+        $order = 1;
+
+        /** @var PastoralAccessModel $record */
+        foreach ($access as $record) {
+            if ($user = $record->getUser()) {
+                if ($user->getExternalId()) {
+                    $query = "
+                        INSERT INTO PastoralCareContacts
+                        (
+                          PastoralCareSeq,
+                          IndexOrder,
+                          EmailFlag,
+                          Email,
+                          ID
+                        )
+                        VALUES
+                        (
+                          {$external_id},
+                          {$order},
+                          0,
+                          '{$user->getEmail()}',
+                          {$user->getExternalId()}
+                        );
+                    ";
+                    $this->getDatabase()->query($query);
+                    echo $query;
+                    $order++;
+                }
+            }
         }
-        */
-
-        return true;
+        exit;
     }
 
     /**

@@ -816,8 +816,6 @@ class Controller extends Base
                     $parent = $record;
                 }
 
-                $pastoralExternal->createPastoral($record);
-
                 // Save the authorised users
 
                 if (isset($this->getRequest()->post["user_id"])) {
@@ -837,6 +835,8 @@ class Controller extends Base
                         }
                     }
                 }
+
+                $pastoralExternal->createPastoral($record);
 
                 // Save the tags
 
