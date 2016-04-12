@@ -144,7 +144,7 @@ class Controller extends Base
             array(
                 'template' => '@adminPhotos/index.twig',
                 'data'     => array(
-                    'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                    'pageCurrent' => 'photos',
                     'attachzone' => $this->getAttachZone(),
                 ),
             )
@@ -156,7 +156,7 @@ class Controller extends Base
      */
     public function getView()
     {
-        $allUsers = $this->getUserMapper()->findByColumn("!synergy_id", NULL);
+        $allUsers = $this->getUserMapper()->findByColumn("!synergy_id", NULL)->sortBy('lastname', 'asc')->sortBy('firstname', 'asc');
 
         $users = [];
 
