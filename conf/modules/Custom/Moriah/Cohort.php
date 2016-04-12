@@ -30,7 +30,11 @@ class Cohort implements ModuleConfigInterface
     {
         $di = $kernel->getDependencyInjector();
         if ($di->get('config')->get('site_location') == 'moriah') {
-            $module = new Module($di, $di->newInstance(UserMapper::class));
+            $module = new Module(
+                $di,
+                $di->newInstance(UserMapper::class),
+                $di->newInstance(\External_User::class)
+            );
             $module->init('/modules/custom/moriah/cohort');
         }
     }
