@@ -21,21 +21,29 @@
             </div>
         </section>
     </div>
-</div>
 
-<ul>
-    {% for subject in subjects %}
-        {% for course in courses[subject.getId()] %}
-            {% if loop.first %}
-                <li>
-                    {{ subject.getNameWithCodes() }}
-                    <ul>
-            {% endif %}
-            <li>{{ course.getNameWithCodes() }}</li>
-            {% if loop.last %}
-                    </ul>
-                </li>
-            {% endif %}
-        {% endfor %}
-    {% endfor %}
-</ul>
+    <div class="small-12 island">
+        <section>
+            <ul class="action-list">
+                {% for subject in subjects %}
+                    {% if courses[subject.getId()] is not empty %}
+                        <li class="compact avatar card small-12">
+                            <a href="/homepage/{{ subject.getId() }}">
+                                <span class="icon-home"></span>
+                                <h3>{{ subject.getNameWithCodes() }}</h3>
+                            </a>
+                        </li>
+                        {% for course in courses[subject.getId()] %}
+                            <li class="compact avatar card small-12">
+                                <a href="/homepage/{{ course.getId() }}">
+                                    <span class="icon-course"></span>
+                                    <h4>{{ course.getNameWithCodes() }}</h4>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
