@@ -849,15 +849,29 @@ class Controller extends Base\Base
         }
         else
         {
+            $targetFolderIds = explode(',', $homepage);
+
+            $folders = $this->getFolderMapper()->findByColumn('id', $targetFolderIds);
+
+            $possibleOwnerships = [];
+
+            foreach ($folders as $folder) {
+                $possibleOwnerships[$folder->getId()] = $this->getUserAccessMapper()->findUsersInCategory(
+                    $folder, Role::STAFF, UserAccess::ACCESS_WRITE
+                );
+
+                if (count($possibleOwnerships[$folder->getId()]) == 0) {
+                    // if nobody else was returned, jam the session user in there.
+                    $possibleOwnerships[$folder->getId()] = new Collection([ $this->getUser() ]);
+                }
+            }
+
             // Everything kosher, proceed with the mage
-            $this->getResponse()->content->set([
-                'template' => "@course/unitImportForm.twig",
-                'format' => 'nochrome',
-                'data' => [
-                    'homepage' => $homepage,
-                    'courseHomepage' => $courseHomepage,
-                    'units' => $this->getCourseMapper()->findByParentId($courseHomepage)
-                ]
+            // respond with stage 2: ownership
+            $this->tpl('import/ownership', [
+                'targetFolders'       => $folders,
+                'importCourse'        => $courseHomepage,
+                'ownershipCandidates' => $possibleOwnerships
             ]);
         }
     }
