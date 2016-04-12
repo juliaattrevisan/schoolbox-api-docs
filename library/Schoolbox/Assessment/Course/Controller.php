@@ -14,6 +14,7 @@ use Alaress\Authorizer\Failure;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Request\Values;
 use Component_DefinitionMapper;
+use Component_Homepage_CourseBuilderController;
 use Component_Instance;
 use Component_InstanceMapper;
 use RangeException;
@@ -150,7 +151,7 @@ class Controller extends Base\Base
 
         if (count($instances) == 0) {
             // no instance found - give me a new one
-            return $this->injectNewBuilderComponent($unit);
+            return $this->injectNewComponent($unit);
         }
 
         // instance found - use that
@@ -160,15 +161,16 @@ class Controller extends Base\Base
 
     /**
      * @param Folder\Model $unit
+     * @param string       $controller
      * @return Component_Instance
      */
-    protected function injectNewBuilderComponent(Folder\Model $unit)
+    protected function injectNewComponent(Folder\Model $unit, $controller = Component_Homepage_CourseBuilderController::class)
     {
         $definitionMapper = $this->getComponentDefinitionMapper();
         $instanceMapper   = $this->getComponentInstanceMapper();
 
         // Doesn't exist. We need that to exist. Make it exist.
-        $definition = $definitionMapper->findOneByColumn('class', \Component_Homepage_CourseBuilderController::class);
+        $definition = $definitionMapper->findOneByColumn('class', $controller);
 
         // invent a new component
         $newInstance = $this->getComponentInstanceMapper()
@@ -235,7 +237,7 @@ class Controller extends Base\Base
                 // obtain the Course Builder Component Instance from the homepage.
                 if (count($instances[$unit->getId()]) == 0) {
                     // shove that new instance into where we expect it to be
-                    $instances[$unit->getId()] = [ $this->injectNewBuilderComponent($unit) ];
+                    $instances[$unit->getId()] = [ $this->injectNewComponent($unit) ];
                 }
 
                 foreach ($data['tasks'][$unit->getId()] as $task) {
