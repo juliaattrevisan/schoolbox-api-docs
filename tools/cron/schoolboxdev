@@ -16,7 +16,7 @@ MAILTO="support@schoolbox.com.au"
 */2 * * * *	www-data	php /usr/share/schoolboxdev/tools/video/processor.php >> /var/lib/schoolboxdev/cache/logs/transcode.log 2>&1
 
 # Cleanup cache  files (minify,zip,stream) (once a week on a Sunday)
-0 1 * * 0	root	php /usr/share/schoolboxdev/tools/clean-cache-dir.sh >> /var/log/schoolboxdev/cache-cleanup.log 2>&1
+0 1 * * 0	root	/usr/share/schoolboxdev/tools/clean-cache-dir.sh >> /var/log/schoolboxdev/cache-cleanup.log 2>&1
 
 # Plagscan callback - every hour
 0 * * * *	root	php /usr/share/schoolboxdev/tools/plagscan/scan.php >> /var/log/schoolboxdev/plagscan.log 2>&1
