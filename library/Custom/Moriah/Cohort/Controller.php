@@ -8,6 +8,7 @@
 namespace Custom\Moriah\Cohort;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
@@ -96,8 +97,60 @@ class Controller extends Base
         if (!isset($courseLists[$class->getId()])) {
             $this->getResponse()->status->setCode(404);
         } else {
+
             // Get all units in this course
             $courseList = $courseLists[$class->getId()];
+            // ¯\_(ツ)_/¯
+            // Replace this with the term selector if that eventuates
+            $from    = \Alaress_Date_Format::now()->addYears(-100);
+            $to      = \Alaress_Date_Format::now()->addYears(100);
+            $results = [];
+            foreach ($courseList as $course) {
+                $courseId   = $course->getId();
+                $allFolders = $this->unitInstanceMapper->findAllFoldersUsingCourse($course, $from, $to);
+
+                $results[$courseId] = [
+                    'course' => $course,
+                    'units'  => [],
+                ];
+
+                // Get all the units for all of these too.
+                foreach ($allFolders as $folder) {
+                    // Get all units within this course
+                    $allUnits = $this->unitInstanceMapper->findForCategoryId($folder->getId());
+                    // Get any assessment tasks from these units.
+                    foreach ($allUnits as $unit) {
+                        $unitId = $unit->getId();
+                        $results[$courseId]['units'][$unitId] = [
+                            'unit'  => $unit,
+                            'tasks' => [],
+                        ];
+                        foreach ($unit->getTasks() as $task) {
+                            if ($task->getSubmissionBox()->getId()) {
+                                $baseTaskId = $task->getTask()->getId();
+                                // Need to load box independently
+                                $box = SubmissionBoxMapper::getInstance()->findById($task->getSubmissionBox()->getId());
+                                // Group results by name
+                                $results[$courseId][$task->getTitle()][$folder->getId()] = $box;
+                                $results[$courseId]['units'][$unitId]['tasks'][$baseTaskId][$folder->getId()] = $box->getId();
+                            }
+                        }
+                    }
+                }
+//                var_dump($results);
+
+                // Now I have all boxes for this course.
+                // Start getting results.
+                foreach ($results[$courseId] as $taskTitle => $boxes) {
+                    foreach ($boxes as $folderId => $box) {
+                        //
+                    }
+                }
+            }
+
+            // Now I have a set of boxes - get marks for them.
+            // Note for later: ALL boxes must be marked and visible to user?
+
             // And get the classes which use them?
             $this->getResponse()->content->set([
                 'format'   => 'html',
@@ -106,6 +159,7 @@ class Controller extends Base
                     'student' => $student,
                     'class'   => $class,
                     'courses' => $courseList,
+                    'results' => $results,
                 ],
             ]);
         }
