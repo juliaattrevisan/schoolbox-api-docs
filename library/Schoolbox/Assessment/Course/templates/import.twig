@@ -236,6 +236,9 @@
             <section>
                 <fieldset class="content" data-mage="part-course-select" {% if _part2 %}disabled{% endif %}>
                     <legend>1. Course</legend>
+                    <div class="meta small-12 column" data-mage-helptext>
+                        <p>Select the course that is to be imported, and one or more classes as the target destination.</p>
+                    </div>
                     <div class="small-5 medium-5 large-3 columns">
                         {% include 'sub/selectorShard.twig' with {
                                 'formLabel': 'Course',
