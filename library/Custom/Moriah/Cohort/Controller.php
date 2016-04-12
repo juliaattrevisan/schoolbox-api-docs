@@ -84,6 +84,13 @@ class Controller extends Base
      */
     public function course(User $student, Folder\Model $course)
     {
-        //
+        $this->getResponse()->content->set([
+            'format'   => 'html',
+            'template' => '@customMoriahCohort/course.twig',
+            'data'     => [
+                'student' => $student,
+                'course'  => $course,
+            ],
+        ]);
     }
 }
