@@ -1,4 +1,6 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/course/jquery.course-selector.js"></script>
+
 <script type="text/javascript">
     $(function(){
         $('[data-tablesorter]').DataTable({
@@ -14,9 +16,15 @@
                 confirmEvent: $.confirmDialog.followHref
             });
         });
+
+        /* Attach Course Selector Modal listeners
+         */
+        $.fn.courseSelectorModal();
     });
 </script>
+
 <!-- END custom_head -->
+<div id="course-selector-modal" class="reveal-modal" data-reveal></div>
 
 <div class="row">
     <div class="small-12 island">
@@ -28,13 +36,10 @@
 <!-- BEGIN no_category_listing -->
 <div class="row">
     <div class="small-12 island">
-        <section>
-            <div class="content">
-                <p>
-                    No submissions found.
-                </p>
-            </div>
-        </section>
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>You are currently not teaching any classes, so don't worry about homework.</p>
+        </div>
     </div>
 </div>
 <!-- END no_category_listing -->
@@ -62,10 +67,24 @@
             </ul>
         </div>
 
-        <ul class="meta">
-            <li class="icon-staff-students">{STUDENTS} Students</li>
-        </ul>
+        <p class="meta">
+            <!-- BEGIN class_list -->
+            <i class="icon-staff-students"></i><a href="/subject/classList/{CATEGORY_CODE}" title="View class list">{STUDENTS} Students</a>
+            <!-- END class_list -->
+            <!-- BEGIN members_list -->
+            <i class="icon-staff-students"></i>{STUDENTS} Students
+            <!-- END members_list -->
+        </p>
 
+        <!-- BEGIN no_assessments -->
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>No assessments are due during the current period</p>
+            <p>To get started quickly, you could create <a href="/submission/createSubmission/new/{CATEGORY_ID}/" title="Create due work">due work</a> or a <a href="/assess/create/{CATEGORY_ID}/" title="Create quiz">quiz</a>.
+                You may also <a href="#" data-course-selector data-course-folder="{CATEGORY_ID}" >import a course</a> to this class or <a href="/course/new" title="Create new course">build a new course</a> to use across multiple classes</p>
+        </div>
+        <!-- END no_assessments -->
+        <!-- BEGIN assessment_output -->
         <div class="scrollable">
             <table data-tablesorter>
                 <thead>
@@ -142,6 +161,7 @@
                 </tbody>
             </table>
         </div>
+        <!-- END assessment_output -->
     </div>
 </div>
 <!-- END category_listing -->

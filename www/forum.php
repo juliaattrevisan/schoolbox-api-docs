@@ -15,6 +15,8 @@ $this->setBlock('thread', 'modified', 'modified_block');
 $this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
 $this->setBlock(TEMPLATE_content, 'no_thread', 'no_thread_block');
+$this->setBlock('no_thread', 'no_post', 'no_post_block');
+
 $this->setBlock(TEMPLATE_content, 'forum_post', 'forum_post_block');
 $this->setBlock(TEMPLATE_content, 'modify_heading', 'modify_heading_block');
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
@@ -194,10 +196,17 @@ if (is_array($threadList)) {
     ));
 }
 else {
+
     $this->parse('no_thread_block', 'no_thread');
     $this->setVar(array(
-        'thread_block' => ''
+        'thread_block' => '',
+        'delete_button_block' => '',
+        'no_post_block' => '',
     ));
+
+    if($is_post_allowed) {
+        $this->parse('no_post_block','no_post');
+    }
 }
 
 /* Render out breadcrumbs

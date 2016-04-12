@@ -359,9 +359,10 @@ class StudentReportCard
     protected function renderGradeAverage(\SitePage $page)
     {
         $page->setBlock('subject_container', 'grade_average', 'grade_average_block');
+        $page->setVar('grade_average_block', '');
+
         // if you can't see the grade average...you, well, can't see the grade average
         if (!$this->checkPermission(self::CAN_VIEW_OVERALL_GRADE)) {
-            $page->setVar('grade_average_block', '');
             return;
         }
         // output student grade average
@@ -427,6 +428,7 @@ class StudentReportCard
             'subject_rubric_criterion_block' => '',
             'subject_rubric_criterion_mark_block' => '',
         ));
+
 
         $submissionBoxMapper = $this->submissionMapper;
         $rubricHandler = new \DueWork_Rubric_Handler();
@@ -521,45 +523,47 @@ class StudentReportCard
 
             /* Render that all out in the land of phpliberty
              */
-            foreach ($allStructures as $group => $currentStructure) {
-                $page->setVar(array(
-                    'SUBJECT_RUBRIC_GROUP_NAME' => $group
-                ));
-
-                foreach ($currentStructure as $criterionId => $data) {
+            if(count($allStructures) > 0) {
+                foreach ($allStructures as $group => $currentStructure) {
                     $page->setVar(array(
-                        'SUBJECT_RUBRIC_CRITERION_NAME' => $data['criterion']->getName()
+                        'SUBJECT_RUBRIC_GROUP_NAME' => $group
                     ));
 
-                    foreach ($data['results'] as $boxName => $currentResult) {
+                    foreach ($currentStructure as $criterionId => $data) {
                         $page->setVar(array(
-                            'SUBJECT_RUBRIC_SUBMISSIONBOX_ID'   => $currentResult['id'],
-                            'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $boxName,
-                            'SUBJECT_RUBRIC_CRITERION_MARK'     => $currentResult['descriptor'],
+                            'SUBJECT_RUBRIC_CRITERION_NAME' => $data['criterion']->getName()
                         ));
 
-                        $page->parse('subject_rubric_criterion_mark_block', 'subject_rubric_criterion_mark', true);
+                        foreach ($data['results'] as $boxName => $currentResult) {
+                            $page->setVar(array(
+                                'SUBJECT_RUBRIC_SUBMISSIONBOX_ID'   => $currentResult['id'],
+                                'SUBJECT_RUBRIC_SUBMISSIONBOX_NAME' => $boxName,
+                                'SUBJECT_RUBRIC_CRITERION_MARK'     => $currentResult['descriptor'],
+                            ));
+
+                            $page->parse('subject_rubric_criterion_mark_block', 'subject_rubric_criterion_mark', true);
+                        }
+
+                        $page->parse('subject_rubric_criterion_block', 'subject_rubric_criterion', true);
+
+                        /* Clear children after parsing out the parent
+                         */
+                        $page->setVar(array(
+                            'subject_rubric_criterion_mark_block' => ''
+                        ));
                     }
 
-                    $page->parse('subject_rubric_criterion_block', 'subject_rubric_criterion', true);
+                    $page->parse('subject_rubric_group_block', 'subject_rubric_group', true);
 
                     /* Clear children after parsing out the parent
                      */
                     $page->setVar(array(
-                        'subject_rubric_criterion_mark_block' => ''
+                        'subject_rubric_criterion_block' => ''
                     ));
                 }
 
-                $page->parse('subject_rubric_group_block', 'subject_rubric_group', true);
-
-                /* Clear children after parsing out the parent
-                 */
-                $page->setVar(array(
-                    'subject_rubric_criterion_block' => ''
-                ));
+                $page->parse('subject_rubric_block', 'subject_rubric');
             }
-
-            $page->parse('subject_rubric_block', 'subject_rubric');
         }
     }
 

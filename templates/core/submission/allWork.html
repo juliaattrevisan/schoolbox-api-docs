@@ -48,7 +48,7 @@
                              */
                             var template =
                                     '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
-                                    '<p class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></p>' +
+                                    '<div class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></div>' +
                                     '<p class="comment">{INFO}</p>' +
                                     '</div>';
                             /* Concatenate everything
@@ -148,9 +148,9 @@
         <!-- BEGIN grade_average -->
         <h2 class="subheader">Current Grade Average</h2>
         <section class="content gradient-{SUBJ_GRADEIENT}-bg">
-            <p class="grade">
+            <div class="grade">
                 <span class="gradient-{SUBJ_GRADEIENT}">{SUBJ_GRADE_AVG}</span>
-            </p>
+            </div>
             {SUBJ_GRADE_TREND}
         </section>
         <!-- END grade_average -->
@@ -178,7 +178,7 @@
 </script>
 <div class="row">
     <div class="small-12 columns">
-        <h2 class="subheader">Criteria</h2>
+        <h2 class="subheader">{TPL_LOCAL_RUBRICGROUP}</h2>
         <section>
             <div class="row" id="rubric-table">
                 <!-- BEGIN subject_rubric_group -->
@@ -254,7 +254,7 @@
                             </div>
 
                             <div class="small-12 large-4 columns grade">
-                                <p class="gradient-{WORK_GRADIENT}"><span>{WORK_GRADE}</span></p>
+                                <div class="gradient-{WORK_GRADIENT}"><span>{WORK_GRADE}</span></div>
                                 <p class="comment">{WORK_COMMENT}</p>
                             </div>
 
@@ -300,10 +300,9 @@
             <!-- END has_work -->
 
             <!-- BEGIN no_work -->
-            <div class="content">
-                <p>
-                    No assessments for this subject.
-                </p>
+            <div class="empty-state">
+                <i class="icon-due-work"></i>
+                <p>There are no assessments set for this class during this period.</p>
             </div>
             <!-- END no_work -->
         </section>
@@ -312,33 +311,31 @@
 
 <!-- BEGIN subject_comments -->
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12">
         <h2 class="subheader">Comments</h2>
-        <section>
-            <!-- BEGIN create_comment -->
-            <form class="no-margin clearfix" id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
-                <input type="hidden" name="studentId" value="{WORK_USER_ID}"/>
-                <input type="hidden" name="categoryId" value="{SUBJ_ID}"/>
-                <div class="small-12 avatar card">
-                    <img src="/portrait.php?userId={SESSION_USER_EXTID}&amp;size=square64" alt="{SESSION_USER_NAME}" />
-                    <textarea name="comment" rows="3"></textarea>
-                </div>
-                <div class="row">
-                    <div class="small-6 medium-offset-6 medium-3 column">
-                        <input id="vis-student" type="checkbox" name="visibility[student]" value="1" {COMMENT_VIS_STUDENT_CHECKED} />
-                        <label for="vis-student" class="checkbox-label">Visible To Student</label>
+        <!-- BEGIN create_comment -->
+        <form class="no-margin clearfix" id="create-comment" data-comment-form action="/ajax/comment.php" method="post">
+                    <input type="hidden" name="studentId" value="{WORK_USER_ID}"/>
+                    <input type="hidden" name="categoryId" value="{SUBJ_ID}"/>
+                        <textarea name="comment" rows="3"></textarea>
+                    <div class="row">
+                        <div class="small-6 medium-offset-6 medium-3 column">
+                            <input id="vis-student" type="checkbox" name="visibility[student]" value="1" {COMMENT_VIS_STUDENT_CHECKED} />
+                            <label for="vis-student" class="checkbox-label">Visible To Student</label>
+                        </div>
+                        <div class="small-6 medium-3 column">
+                            <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" {COMMENT_VIS_PARENT_CHECKED} />
+                            <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
+                        </div>
                     </div>
-                    <div class="small-6 medium-3 column">
-                        <input id="vis-parent" type="checkbox" name="visibility[parent]" value="1" {COMMENT_VIS_PARENT_CHECKED} />
-                        <label for="vis-parent" class="checkbox-label">Visible To Parents</label>
-                    </div>
-                </div>
-                <div class="small-12 column">
-                    <a class="button expand submit" data-comment-post="new">Post</a>
-                </div>
-            </form>
-            <!-- END create_comment -->
-        </section>
+
+        <a class="button expand submit" data-comment-post="new">Post</a>
+        </form>
+        <!-- END create_comment -->
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
         <section>
             <ul class="action-list" data-comment-list>
                 <!-- BEGIN comment -->
@@ -381,9 +378,10 @@
 <!-- BEGIN no_subjects -->
 <div class="row">
     <div class="small-12 island">
-        <section class="content">
-            <p>There are no subjects for this term.</p>
-        </section>
+        <div class="empty-state">
+            <i class="icon-due-work"></i>
+            <p>You are not enrolled in any classes this term.  If you believe this is incorrect please contact your administrator.</p>
+        </div>
     </div>
 </div>
 <!-- END no_subjects -->
