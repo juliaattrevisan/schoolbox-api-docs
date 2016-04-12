@@ -456,11 +456,10 @@ class Mapper extends BaseMapper
     /**
      * Checks if the logged in user has permission to view the specified record
      *
-     * @var Pastoral\Model $record
-     *
+     * @param Pastoral\Model $record
      * @return bool
+     * @throws \Schoolbox\Application\Exception
      */
-
     public function hasPermission(Pastoral\Model $record)
     {
         // Hack for notifier
@@ -499,7 +498,7 @@ class Mapper extends BaseMapper
                 try {
                     $record->setStudent($this->getUserMapper()->findById($record->getStudent()->getId()));
                 } catch (\Exception $e) {
-                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
                 }
 
                 $record->getStudent()->loadParents();
@@ -617,13 +616,12 @@ class Mapper extends BaseMapper
     // Since this hydration is common to all of the methods, shoved it down here
 
     /**
-     * @var Pastoral\Model $record
-     * @var null $row
-     *
+     * @param $record
+     * @param $row
      * @return Pastoral\Model
+     * @throws \Schoolbox\Application\Exception
      */
-
-    protected function hydrateRecord($record, $row)
+    protected function hydrateRecord(Pastoral\Model $record, $row)
     {
         // Hydrate everything on the record
 
@@ -658,13 +656,13 @@ class Mapper extends BaseMapper
                     $role = $this->getRoleMapper()->findById($access->getRole()->getId());
                     $access->setRole($role);
                 } catch (\Exception $e) {
-                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
                 }
             } else if ($access->getUser()->getId() != '') {
                 try {
                     $access->setUser($this->getUserMapper()->findById($access->getUser()->getId()));
                 } catch (\Exception $e) {
-                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
                 }
             }
         }
@@ -675,7 +673,7 @@ class Mapper extends BaseMapper
             try {
                 $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
             } catch (\Exception $e) {
-                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
             }
         }
 

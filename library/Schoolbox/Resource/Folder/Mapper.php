@@ -1293,9 +1293,10 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     /**
      * Move folder to new parent with permission check
      *
-     * @param Int $source
-     * @param Int $destination
-     * @throws \Exception
+     * @param $source
+     * @param $destination
+     * @throws \Schoolbox\Application\Exception
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function moveFolder($source, $destination)
     {
@@ -1321,14 +1322,14 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             Access::getInstance()->getFolderAccess($_SESSION["user"], [$destination]) < WRITE_ACCESS ||
             Access::getInstance()->getFolderAccess($_SESSION["user"], [$movedFolder->getParent()]) < WRITE_ACCESS
         ) {
-            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
 
         // Make sure the moved folder is not going to be its own ancestor
 
         foreach ($folderMapper->findParents($parentFolder) as $ancestor) {
             if ($ancestor->getId() == $movedFolder->getId()) {
-                $errorMapper->generateException(ErrorMapper::ERROR_DATABASE, $e);
+                throw $errorMapper->generateException(ErrorMapper::ERROR_DATABASE, $e);
             }
         }
 

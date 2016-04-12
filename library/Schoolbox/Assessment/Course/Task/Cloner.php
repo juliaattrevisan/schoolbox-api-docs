@@ -136,7 +136,7 @@ class Cloner
                 $newAssess = $mapper->findById($newAssessId);
             }
             catch (\Exception $e) {
-                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
             }
 
             // Get start/finish dates from cloned task

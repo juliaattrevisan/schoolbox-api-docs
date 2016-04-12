@@ -476,14 +476,13 @@ class Controller extends Base\Base
 
     }
 
-
     /**
      * Send a neat and tidy error back to the client
      *
-     * @param string|Base\Exception $problem
-     * @param array  $resolutions
-     * @param int    $statusCode
-     * @return void
+     * @param $problem
+     * @param array $resolutions
+     * @param int $statusCode
+     * @throws \Schoolbox\Application\Exception
      */
     protected function sendError($problem, array $resolutions = [], $statusCode = 400)
     {
@@ -500,8 +499,7 @@ class Controller extends Base\Base
         $this->getResponse()->status->set($statusCode);
 
         if (!$this->getRequest()->isXhr()) {
-            $this->getErrorMapper()->generateException(105, null, $problem . implode(', ', $resolutions));
-            return;
+            throw $this->getErrorMapper()->generateException(105, null, $problem . implode(', ', $resolutions));
         }
 
         $this->getResponse()->content->set([
