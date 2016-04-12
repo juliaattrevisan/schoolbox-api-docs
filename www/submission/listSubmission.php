@@ -25,6 +25,9 @@ $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'submission_listing', 'submission_block');
 $this->setBlock(TEMPLATE_content, 'category_listing', 'category_listing_block');
 
+$this->setBlock('category_listing', 'class_list', 'class_list_block');
+$this->setBlock('category_listing', 'members_list', 'members_list_block');
+
 $this->setBlock('category_listing', 'no_assessments', 'no_assessments_block');
 $this->setBlock('category_listing', 'assessment_output', 'assessment_output_block');
 
@@ -138,10 +141,16 @@ if (!empty($subjectList) && is_array($subjectList)) {
                 /* If synergy code, get synergy students
                  */
                 $studentList = $synHandler->getStudents($curCategory->getCodeString());
+                $this->setVar('CATEGORY_CODE', urlencode($curCategory->getCodeString()));
+
+                $this->setVar('members_list_block' ,'');
+                $this->parse('class_list_block','class_list');
             } else {
                 /* Retrieve student list from group membership
                  */
                 $studentList = $groupHandler->getMemberList($curCategory->getId());
+                $this->setVar('class_list_block' ,'');
+                $this->parse('members_list_block','members_list');
             }
 
             $this->setVar('STUDENTS', count($studentList));
@@ -153,7 +162,6 @@ if (!empty($subjectList) && is_array($subjectList)) {
             }
 
             $this->setVar('CATEGORY_ID', $curCategory->getId());
-            $this->setVar('CATEGORY_CODE', $curCategory->getCodeString());
 
             /* Learning Analytics courses buttons go here
              */
