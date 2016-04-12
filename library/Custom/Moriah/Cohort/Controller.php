@@ -24,6 +24,10 @@ class Controller extends Base
      */
     public function courseList(User $student)
     {
+        if (!$student->getRole()->isStudent()) {
+            // Are they even students?
+            throw new \RangeException('This report is only for students');
+        }
         $this->getResponse()->content->set([
             'format'   => 'html',
             'template' => '@customMoriahCohort/courseList.twig',
