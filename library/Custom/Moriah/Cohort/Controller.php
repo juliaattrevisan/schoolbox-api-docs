@@ -8,6 +8,7 @@
 namespace Custom\Moriah\Cohort;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\User;
 
 /**
  * Controller for Moriah's cohort page.
@@ -19,14 +20,16 @@ class Controller extends Base
     /**
      * Action for displaying a list of courses which a student is involved in.
      *
-     * @param int $studentId
+     * @param User $student
      */
-    public function courseList($studentId)
+    public function courseList(User $student)
     {
         $this->getResponse()->content->set([
             'format'   => 'html',
             'template' => '@customMoriahCohort/courseList.twig',
-            'data'     => [],
+            'data'     => [
+                'student' => $student,
+            ],
         ]);
     }
 }

@@ -10,6 +10,7 @@ namespace Config\Modules\Custom\Moriah;
 use Alaress\Application\Kernel;
 use Custom\Moriah\Cohort\Module;
 use Config\Modules\ModuleConfigInterface;
+use Schoolbox\UserMapper;
 
 /**
  * Configuration for the Moriah-specific cohort report.
@@ -29,7 +30,7 @@ class Cohort implements ModuleConfigInterface
     {
         $di = $kernel->getDependencyInjector();
         if ($di->get('config')->get('site_location') == 'moriah') {
-            $module = new Module($di);
+            $module = new Module($di, $di->newInstance(UserMapper::class));
             $module->init('/modules/custom/moriah/cohort');
         }
     }
