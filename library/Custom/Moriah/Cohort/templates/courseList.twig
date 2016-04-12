@@ -25,6 +25,17 @@
 
 <ul>
     {% for subject in subjects %}
-        <li>{{ subject.getNameWithCodes() }}</li>
+        {% for course in courses[subject.getId()] %}
+            {% if loop.first %}
+                <li>
+                    {{ subject.getNameWithCodes() }}
+                    <ul>
+            {% endif %}
+            <li>{{ course.getNameWithCodes() }}</li>
+            {% if loop.last %}
+                    </ul>
+                </li>
+            {% endif %}
+        {% endfor %}
     {% endfor %}
 </ul>

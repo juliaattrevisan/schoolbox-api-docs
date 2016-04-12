@@ -8,6 +8,7 @@
 namespace Custom\Moriah\Cohort;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
@@ -42,13 +43,15 @@ class Controller extends Base
                 return $result;
             }
         );
-        // Load all courses associated with this list of subjects
+        // Load all courses associated with these subjects
+        $courses = UnitInstanceMapper::getInstance()->findAllCoursesUsedInFolders($subjects->getColumnValues('id'));
         $this->getResponse()->content->set([
             'format'   => 'html',
             'template' => '@customMoriahCohort/courseList.twig',
             'data'     => [
                 'student'  => $student,
                 'subjects' => $subjects,
+                'courses'  => $courses,
             ],
         ]);
     }
