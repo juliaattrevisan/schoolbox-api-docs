@@ -1,0 +1,70 @@
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+
+<script>
+    $(function() {
+        $('[data-delete]').click(function(event) {
+            event.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to remove this users photo?',
+                confirmEvent: function() {
+                    $.post('/adminv2/photos/delete', {
+                        id: $(event.target).attr('data-delete')
+                    })
+                    .done(function() {
+                        $(event.target).closest('li').remove();
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+{# Shared navigation menu #}
+
+{{ renderAdminNavigation(pageCurrent) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <dl class="sub-nav">
+            <dd><a href="/adminv2/photos">Manual Photo Upload</a></dd>
+            <dd class="active"><a href="/adminv2/photos/view">View/Remove Photos</a></dd>
+        </dl>
+    </div>
+</div>
+
+{# Config page contents #}
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">View/Remove Photos</h2>
+        <section class="content">
+            <p class="no-margin">
+                The following is a preview of all Schoolbox users photos, click on the delete icon to remove a users photo.
+                Please note, profile photos shown may be cached. You can check your cache duration by looking at the 'External
+                Cache Timeout' value on the <a href="/adminv2/setting/External+DB">External DB</a> settings page.
+            </p>
+        </section>
+        <section>
+            <ul class="grid small-block-grid-4">
+                {% for user in users %}
+                    <li class="actions-small-1">
+                        <div class="avatar card">
+                            <a href="/search/user/{{ user.getId }}" title="View Profile">
+                                <img src='/portrait.php?userId={{ user.getExternalId }}&size=square64' alt="View Profile" />
+                                <p>{{ user.getFirstName }} {{ user.getLastName }}</p>
+                            </a>
+                            <p class="meta">{{ user.getRole.getName }}</p>
+                        </div>
+                        <nav>
+                            <span class="show-for-large-up">
+                                <a data-delete="{{ user.getExternalId }}" href="#" class="icon-close" title="Delete Photo"></a>
+                            </span>
+                        </nav>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
