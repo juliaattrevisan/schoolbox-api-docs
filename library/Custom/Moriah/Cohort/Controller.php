@@ -93,4 +93,20 @@ class Controller extends Base
             ],
         ]);
     }
+
+    /**
+     * @param User         $student
+     * @param Folder\Model $class
+     */
+    public function classReport(User $student, Folder\Model $class)
+    {
+        $this->getResponse()->content->set([
+            'format'   => 'html',
+            'template' => '@customMoriahCohort/classReport.twig',
+            'data'     => [
+                'student' => $student,
+                'class'   => $class,
+            ],
+        ]);
+    }
 }

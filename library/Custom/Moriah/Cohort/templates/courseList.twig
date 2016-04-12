@@ -30,7 +30,7 @@
                         {% set courseCount = courses[subject.getId()]|length %}
                         <div class="list-item">
                             <div class="compact avatar card small-12 {% if courseCount == 0 %}removed{% endif %}">
-                                <a href="/homepage/{{ subject.getId() }}">
+                                <a href="{{ routeLookup('customMoriahCohort.classReport', {studentId: student.getId(), classId: subject.getId()}) }}">
                                     <span class="icon-home"></span>
                                     <h3>{{ subject.getNameWithCodes() }}</h3>
                                     <p class="meta">

@@ -74,6 +74,7 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'courseList', $basePath, '/student/{studentId}');
         $this->addGetRoute($router, 'course', $basePath, '/student/{studentId}/course/{courseId}');
+        $this->addGetRoute($router, 'classReport', $basePath, '/student/{studentId}/class/{classId}');
     }
 
     /**
@@ -87,7 +88,7 @@ class Module extends BaseModule
     {
         $this->addRoutePermission(
             $authorizer,
-            '(?:courseList|course)',
+            '(?:courseList|course|classReport)',
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
@@ -103,7 +104,7 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:courseList|course)',
+            '(?:courseList|course|classReport)',
             function ($params) {
                 return ['student' => $this->userMapper->findById($params['studentId']),];
             }
@@ -113,6 +114,13 @@ class Module extends BaseModule
             'course',
             function ($params) {
                 return ['course' => $this->courseMapper->findById($params['courseId']),];
+            }
+        );
+        $this->addRoutePreload(
+            $matcher,
+            'classReport',
+            function ($params) {
+                return ['class' => $this->courseMapper->findById($params['classId']),];
             }
         );
     }
