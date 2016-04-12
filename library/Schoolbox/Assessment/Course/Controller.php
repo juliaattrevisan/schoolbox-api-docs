@@ -787,12 +787,14 @@ class Controller extends Base\Base
         $courseHomepage = trim($this->getRequest()->post["importCourse"]);
 
         // process ownership assignments
-
+        // respond with stage 3: unit selection
         $this->tpl('unitImportForm', [
             'homepage'       => implode(',', array_keys($ownerships)),
             'courseHomepage' => $courseHomepage,
             'units'          => $this->getCourseMapper()->findByParentId($courseHomepage),
-            'ownerships'     => $ownerships
+            'ownerships'     => implode(',', array_map(
+                function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
+            )
         ]);
     }
 
@@ -1173,11 +1175,13 @@ class Controller extends Base\Base
                     $post->get('componentId')
                 );
 
+                // respond with stage 4: coursework list
                 $this->getResponse()->content->set
                 ([
                     'template' => "@course/unitImportResults.twig",
                     'format' => 'nochrome',
                     'data' => [
+                        'ownerships' => $post['ownerships'],
                         'homepage' => $post["homepage"],
                         'componentId' => $post["componentId"],
                         'courseHomepage' => $post["course_homepage"],
@@ -1279,6 +1283,19 @@ class Controller extends Base\Base
                 throw new Failure\Unauthorized();
             }
         }
+
+        /**
+         * unsquash ownership
+         * @var \Schoolbox\User[] $owners
+         */
+        $owners = [];
+
+        foreach (explode(',', $post['ownerships']) as $ownership) {
+            list ($folderId, $userId) = explode(':', $ownership);
+
+            $owners[$folderId] = $this->getUserAccessMapper()->findById($userId);
+        }
+
 
         // Keep a cache of queried data
 
