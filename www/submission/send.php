@@ -34,6 +34,10 @@ if (is_numeric($_GET['return'])) {
     try {
         $return = $mapper->findById($_GET['id']);
 
+        // hydrate
+        $file = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($return->getStorage()->getHash());
+        $return->setStorage($file);
+
     } catch (Schoolbox\Mapper\Exception $e) {
         error(44);
         exit;
@@ -48,17 +52,14 @@ if (is_numeric($_GET['return'])) {
         error(44);
     }
 
-    // hydrate
-    $file = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($return->getStorage()->getHash());
-
     // does this file exist, and is it readable?
     if (!$file->exists()) {
         error(9, "the requested file could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
     }
 
-    $size     = $file->getSize();
-    $filename = $return->getFilename();
-    $mime     = $file->getMime();
+    $size     = $return->getSize();
+    $filename = $return->getBasename();
+    $mime     = $return->getMime();
 
 } else {
     $mapper = new FileMapper();
@@ -116,6 +117,8 @@ if (is_numeric($_GET['return'])) {
         $studentSub->getCreatedAt()->getUsingFormat('Ymd-Hi'),
         $studentSub->getBasename()
     );
+    // sanitise submission filename only
+    $filename = preg_replace("#[^a-z0-9_\\-\\(\\)\\.]#i", "", $filename);
 
     $file = $studentSub->getStorage();
 
@@ -130,7 +133,7 @@ if (is_numeric($_GET['return'])) {
     // wrap HTML in niceness
     if ($studentSub->getMimetype()->matches('text/html')) {
 
-        $wrapper = new Alaress\Html\Wrapper(preg_replace("#[^a-z0-9_\\-\\(\\)\\.]#i", "", $filename), $file->read());
+        $wrapper = new Alaress\Html\Wrapper($filename, $file->read());
         $wrapper->loadBaseHrefFromServerVars($_SERVER);
 
         $content = $wrapper->render();
@@ -142,9 +145,6 @@ if (is_numeric($_GET['return'])) {
         }
     }
 }
-
-// sanitise
-$filename = preg_replace("#[^a-z0-9_\\-\\(\\)\\.]#i", "", $filename);
 
 //send headers (cache-control off stops IE8 from failing to download)
 header ("Pragma: ");

@@ -10,18 +10,18 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\File\Mimetype;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
+use Schoolbox\Resource\File\StorableTrait;
 
-class ReturnedWork implements ISoftDeletable
+
+class ReturnedWork implements ISoftDeletable, IFile
 {
 
-    /**
-     * @var int
-     */
-    protected $id;
+    use StorableTrait;
 
     /**
      * @var SubmissionBox
@@ -52,6 +52,7 @@ class ReturnedWork implements ISoftDeletable
      * @var float
      */
     protected $normalized_mark;
+
 
     /**
      * Is this a confirmation of an existing submission?
@@ -86,9 +87,6 @@ class ReturnedWork implements ISoftDeletable
      */
     protected $uuid = null;
 
-    /** @var IStorage */
-    protected $storage;
-
 
     /**
      * Creates object and sets up related objects.
@@ -111,25 +109,6 @@ class ReturnedWork implements ISoftDeletable
     public function getGradientFromNormalizedMark()
     {
         return max(0, min(10, (int)($this->getNormalizedMark() / 10)));
-    }
-
-    /**
-     * @param  int $id
-     *
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 
     /**
@@ -192,34 +171,6 @@ class ReturnedWork implements ISoftDeletable
     {
         return $this->marker;
     }
-
-
-
-    /**
-     * Gets the filename for the attached returned work
-     *
-     * @return string
-     */
-    public function getFilename()
-    {
-        return $this->getStorage()->getFilename();
-    }
-
-    /**
-     * Gets the file size for the attached returned work
-     *
-     * @return string
-     * @deprecated
-     */
-    public function getFilesize()
-    {
-        return $this->getStorage()->getSize();
-    }
-
-    public function getMimeType() {
-        return $this->getStorage()->getMimeType();
-    }
-
 
 
     /**
@@ -393,22 +344,60 @@ class ReturnedWork implements ISoftDeletable
         return $this;
     }
 
+
+    // IFile interface methods - passthru to storage
+
     /**
-     * @return IStorage
+     * Returns the full mime string for the file
+     *
+     * @return string
      */
-    public function getStorage()
+    public function getMime()
     {
-        return $this->storage;
+        return $this->getStorage()->getMime();
     }
 
     /**
-     * @param IStorage $storage
-     * @return static
+     * Returns the full mime string for the file
+     *
+     * @return Mimetype
      */
-    public function setStorage($storage)
+    public function getMimetype()
     {
-        $this->storage = $storage;
-        return $this;
+        return $this->getStorage()->getMimetype();
     }
 
+    /**
+     * Returns the size on disk of the file
+     *
+     * @return int
+     */
+    public function getSize()
+    {
+        return $this->getStorage()->getSize();
+    }
+
+    /**
+     * @return string
+     */
+    public function getHash()
+    {
+        return $this->getStorage()->getHash();
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getLastAccessed()
+    {
+        return $this->getStorage()->getLastAccessed();
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getCreatedAt()
+    {
+        return $this->getReturned();
+    }
 }

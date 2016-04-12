@@ -87,6 +87,13 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         );
         $this->hasMap(
             array(
+                'column' => 'filename',
+                'property' => 'filename',
+                'type' => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
                 'column' => 'submitted',
                 'property' => 'submitted',
                 'type' => self::TYPE_DATETIME,

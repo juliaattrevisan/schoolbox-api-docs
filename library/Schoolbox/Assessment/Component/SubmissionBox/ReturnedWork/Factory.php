@@ -208,6 +208,7 @@ class Factory
                     $returnedItem = $this->processReturnedWork(false);
                 }
                 $returnedItem->setStorage($attachment);
+                $returnedItem->setFilename($attachment->getFilename());
                 $returnedItems->add($returnedItem);
 
                 // Only allow update of one return.
