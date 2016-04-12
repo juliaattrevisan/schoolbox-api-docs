@@ -614,10 +614,6 @@ class SitePage extends Page
             die(json_encode($error->getMessage()));
         }
         else {
-            $this->setVar(TEMPLATE_content, '');
-            $this->setFile(TEMPLATE_content, 'common/error/container.html');
-            $this->setTitle('Error Encountered');
-
             $errorContents = $this->getTwig()->render('common/error/general.twig', [
                 'code' => $ec,
                 'header' => $info['message'],
@@ -628,15 +624,29 @@ class SitePage extends Page
                 'outputStackTrace' => $info['outputStackTrace']
             ]);
 
-            $this->setVar([
-                'OUTPUT' => $errorContents
-            ]);
-
-            $this->buildPage(false);
-            $this->outputPage(true);
+            $this->renderError('Error Encountered', $errorContents);
         }
+    }
 
-        exit;
+    /**
+     * Render an Error layout with $errorContents in it
+     *
+     * @param string $title
+     * @param string $errorContents
+     */
+    private function renderError($title, $errorContents)
+    {
+        $this->setVar(TEMPLATE_content, '');
+        $this->setFile(TEMPLATE_content, 'common/error/container.html');
+        $this->setTitle($title);
+
+        $this->setVar([
+            'OUTPUT' => $errorContents
+        ]);
+
+        $this->buildPage(false);
+        $this->outputPage(true);
+        exit();
     }
 
 
@@ -1330,19 +1340,17 @@ class SitePage extends Page
         exit;
     }
 
-
-    function pageNotFound()
+    /**
+     * Render a 404 Page Not Found
+     */
+    public function pageNotFound()
     {
         header("HTTP/1.0 404 Not Found");
-        $this->setVar(TEMPLATE_content, '');
-        $this->setFile(TEMPLATE_content, 'common/404.html');
-        $this->setTitle('Page Not Found');
 
-        $this->buildPage(false);
-        $this->outputPage(true);
-        exit;
+        $errorContents = $this->getTwig()->render('common/error/404.twig', []);
+
+        $this->renderError('Page Not Found', $errorContents);
     }
-
 
     function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array())
     {
