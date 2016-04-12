@@ -10,6 +10,7 @@
 namespace Schoolbox\Error;
 
 use Schoolbox\Mapper as BaseMapper;
+use \Schoolbox\Application\Exception as SchoolboxException;
 
 class Mapper extends BaseMapper
 {
@@ -145,20 +146,19 @@ class Mapper extends BaseMapper
         $this->uses('message', self::TYPE_STRING);
     }
 
-
     /**
-     * Throw exception
+     * Return a throwable
      *
-     * @param Int        $id
-     * @param \Exception $parent
-     * @param string     $additionalInfo
-     * @throws \Exception
+     * @param $id
+     * @param null $parent
+     * @param string $additionalInfo
+     * @return SchoolboxException
      */
-
     public function generateException($id, $parent = null, $additionalInfo = '')
     {
         $msg = str_replace("%MESSAGE%", $additionalInfo, $this->getMessageById($id));
-        throw new \Exception($msg, 0, $parent);
+
+        return new SchoolboxException($msg, $id, $parent);
     }
 
     /**
