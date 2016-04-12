@@ -132,7 +132,13 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'folderMapper'       => $this->courseMapper,
+                    'unitInstanceMapper' => $injector->lazyNew(Course\UnitInstanceMapper::class),
+                ]
+            )
         );
     }
 }

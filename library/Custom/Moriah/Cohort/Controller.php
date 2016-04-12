@@ -20,6 +20,28 @@ use Schoolbox\User;
 class Controller extends Base
 {
     /**
+     * @var Folder\Mapper
+     */
+    protected $folderMapper;
+
+    /**
+     * @var Course\UnitInstanceMapper
+     */
+    protected $unitInstanceMapper;
+
+    /**
+     * Constructor
+     *
+     * @param Folder\Mapper             $folderMapper
+     * @param Course\UnitInstanceMapper $unitInstanceMapper
+     */
+    public function __construct(Folder\Mapper $folderMapper, Course\UnitInstanceMapper $unitInstanceMapper)
+    {
+        $this->folderMapper       = $folderMapper;
+        $this->unitInstanceMapper = $unitInstanceMapper;
+    }
+
+    /**
      * Action for displaying a list of courses which a student is involved in.
      *
      * @param User $student
@@ -30,7 +52,7 @@ class Controller extends Base
             // Are they even students?
             throw new \RangeException('This report is only for students');
         }
-        $subjects = Folder\Mapper::getInstance()->findForUser($student);
+        $subjects = $this->folderMapper->findForUser($student);
         // Sort by name
         $subjects->sortByCallback(
             function($a, $b) {
@@ -44,7 +66,7 @@ class Controller extends Base
             }
         );
         // Load all courses associated with these subjects
-        $courses = Course\UnitInstanceMapper::getInstance()->findAllCoursesUsedInFolders($subjects->getColumnValues('id'));
+        $courses = $this->unitInstanceMapper->findAllCoursesUsedInFolders($subjects->getColumnValues('id'));
         $this->getResponse()->content->set([
             'format'   => 'html',
             'template' => '@customMoriahCohort/courseList.twig',
