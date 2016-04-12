@@ -42,16 +42,13 @@ class Controller extends Base
     }
 
     /**
-     * Action for displaying a list of courses which a student is involved in.
+     * Action for displaying a list of classes for a student.
      *
      * @param User $student
      */
-    public function courseList(User $student)
+    public function classList(User $student)
     {
-        if (!$student->getRole()->isStudent()) {
-            // Are they even students?
-            throw new \RangeException('This report is only for students');
-        }
+        $this->assertIsStudent($student);
         $subjects = $this->folderMapper->findForUser($student);
         // Sort by name
         $subjects->sortByCallback(
@@ -69,7 +66,7 @@ class Controller extends Base
         $courses = $this->unitInstanceMapper->findAllCoursesUsedInFolders($subjects->getColumnValues('id'));
         $this->getResponse()->content->set([
             'format'   => 'html',
-            'template' => '@customMoriahCohort/courseList.twig',
+            'template' => '@customMoriahCohort/classList.twig',
             'data'     => [
                 'student'  => $student,
                 'subjects' => $subjects,
@@ -79,27 +76,14 @@ class Controller extends Base
     }
 
     /**
-     * @param User         $student
-     * @param Folder\Model $course
-     */
-    public function course(User $student, Folder\Model $course)
-    {
-        $this->getResponse()->content->set([
-            'format'   => 'html',
-            'template' => '@customMoriahCohort/course.twig',
-            'data'     => [
-                'student' => $student,
-                'course'  => $course,
-            ],
-        ]);
-    }
-
-    /**
+     * Action for displaying a single class, with cohort reporting.
+     *
      * @param User         $student
      * @param Folder\Model $class
      */
     public function classReport(User $student, Folder\Model $class)
     {
+        $this->assertIsStudent($student);
         $this->getResponse()->content->set([
             'format'   => 'html',
             'template' => '@customMoriahCohort/classReport.twig',
@@ -108,5 +92,18 @@ class Controller extends Base
                 'class'   => $class,
             ],
         ]);
+    }
+
+    /**
+     * Asserts whether this user is even a student.
+     *
+     * @param  User $user
+     * @throws \RangeException if they aren't.
+     */
+    protected function assertIsStudent(User $user)
+    {
+        if (!$user->getRole()->isStudent()) {
+            throw new \RangeException('This report is only for students');
+        }
     }
 }

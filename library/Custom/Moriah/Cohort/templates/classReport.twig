@@ -1,6 +1,6 @@
 <ul class="breadcrumb">
     <li><a href="/search/user/{{ student.getId()|e('url') }}">{{ student.formatName() }}</a></li>
-    <li><a href="{{ routeLookup('customMoriahCohort.courseList', {studentId: student.getId()}) }}">Course List</a></li>
+    <li><a href="{{ routeLookup('customMoriahCohort.classList', {studentId: student.getId()}) }}">Class List</a></li>
     <li class="active"><a href="#">{{ class.getNameWithCodes() }}</a></li>
 </ul>
 

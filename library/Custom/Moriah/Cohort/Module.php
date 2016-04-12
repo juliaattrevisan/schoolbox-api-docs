@@ -72,8 +72,7 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'courseList', $basePath, '/student/{studentId}');
-        $this->addGetRoute($router, 'course', $basePath, '/student/{studentId}/course/{courseId}');
+        $this->addGetRoute($router, 'classList', $basePath, '/student/{studentId}');
         $this->addGetRoute($router, 'classReport', $basePath, '/student/{studentId}/class/{classId}');
     }
 
@@ -104,16 +103,9 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:courseList|course|classReport)',
+            '(?:classList|classReport)',
             function ($params) {
                 return ['student' => $this->userMapper->findById($params['studentId']),];
-            }
-        );
-        $this->addRoutePreload(
-            $matcher,
-            'course',
-            function ($params) {
-                return ['course' => $this->courseMapper->findById($params['courseId']),];
             }
         );
         $this->addRoutePreload(
