@@ -194,11 +194,6 @@ class Kernel extends \Alaress\Application\Kernel
             catch (Base $e) {
                 error($e->getCode(), $e->getMessage(), 500);
             }
-            /* Catch-all for any base Eexceptions thrown
-             */
-            catch (\Exception $e) {
-                error(null, $e->getMessage(), 500);
-            }
 
            // Figure out output type.
            // In order of preference, output type is:
