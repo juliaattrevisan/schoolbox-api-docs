@@ -1284,16 +1284,17 @@ class Controller extends Base\Base
             }
         }
 
-        /**
-         * unsquash ownership
-         * @var \Schoolbox\User[] $owners
-         */
+        /** @var \Schoolbox\User[] $owners */
         $owners = [];
 
-        foreach (explode(',', $post['ownerships']) as $ownership) {
-            list ($folderId, $userId) = explode(':', $ownership);
+        if (isset($post['ownerships'])) {
+            // unsquash ownerships
 
-            $owners[$folderId] = $this->getUserAccessMapper()->findById($userId);
+            foreach (explode(',', $post['ownerships']) as $ownership) {
+                list ($folderId, $userId) = explode(':', $ownership);
+
+                $owners[$folderId] = $this->getUserAccessMapper()->findById($userId);
+            }
         }
 
 
@@ -1411,6 +1412,12 @@ class Controller extends Base\Base
                                     $submissionBox->setLateDate($late_date->endOfDay());
                                     $submissionBox->setOpenDate($open_date->startOfDay());
                                     $submissionBox->setPublishDate($publish_date->startOfDay());
+
+                                    if (isset($owners[$homepage])) {
+                                        // update the owner
+                                        $submissionBox->setOwner($owners[$homepage]);
+                                    }
+
                                     $this->getSubmissionBoxMapper()->save($submissionBox);
 
                                     break;
@@ -1426,6 +1433,12 @@ class Controller extends Base\Base
 
                                     $assessment->setStart($start_date->startOfDay());
                                     $assessment->setFinish($finish_date->endOfDay());
+
+                                    if (isset($owners[$homepage])) {
+                                        // update the owner
+                                        $assessment->setUser($owners[$homepage]);
+                                    }
+
                                     $this->getOnlineAssessmentMapper()->save($assessment);
 
                                     break;
