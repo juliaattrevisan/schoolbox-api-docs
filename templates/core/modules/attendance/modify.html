@@ -90,6 +90,9 @@
                             <input type="hidden" name="studentID[]" value="{STUDENT_SYNERGY_ID}" />
                             <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" type="checkbox" name="attending[]" value="{STUDENT_SYNERGY_ID}" {IS_ABSENT} data-attendance-absence />
                             <label for="attendanceOptions_{STUDENT_SYNERGY_ID}" class="checkbox-label"></label>
+                            <!-- BEGIN student_absent -->
+                            <i class="icon-alert" title="Student is reported absent"></i>
+                            <!-- END student_absent -->
                         </td>
                     </tr>
                     <!-- END student -->
