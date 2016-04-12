@@ -533,7 +533,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 }
             }
         }
-        exit;
     }
 
     /**
