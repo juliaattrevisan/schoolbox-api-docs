@@ -208,7 +208,7 @@ class Controller extends Base
         if ($this->getUser()->isSuperuser())
             $pastoralModerator = true;
         else
-            $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0
+            $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         $this->getResponse()->content->set(
             array(
@@ -250,7 +250,7 @@ class Controller extends Base
         if ($this->getUser()->isSuperuser())
             $pastoralModerator = true;
         else
-            $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0
+            $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         $this->getResponse()->content->set(
             array(
