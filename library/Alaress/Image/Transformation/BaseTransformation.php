@@ -10,7 +10,7 @@
 
 namespace Alaress\Image\Transformation;
 
-use Exception_Schoolbox;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class BaseTransformation implements Transformation
 {
@@ -21,7 +21,7 @@ class BaseTransformation implements Transformation
     * Get all transformations for a particular key
     *
     * @param  $key
-    * @throws Exception_Schoolbox if transformation isn't found
+    * @throws SchoolboxException if transformation isn't found
     * @return array
     */
     public function retrieve($key)
@@ -30,7 +30,7 @@ class BaseTransformation implements Transformation
             return $this->allTransformations[$key];
         }
 
-        throw new Exception_Schoolbox('Could not load transformation list.');
+        throw new SchoolboxException('Could not load transformation list.');
     }
 
     /**

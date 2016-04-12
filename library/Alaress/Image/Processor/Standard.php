@@ -10,6 +10,7 @@
 
 namespace Alaress\Image\Processor;
 
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\Image\Cache\CacheInterface;
 use Alaress\Image\Filetype;
 use Alaress\Image\Transformation\Transformation;
@@ -138,7 +139,7 @@ class Standard extends BaseProcessor
                     $this->getTransformKey()
                 )
             );
-        } catch (\Exception_Schoolbox $e) {
+        } catch (SchoolboxException $e) {
             // sooo, failed to merge. I think we can live with that, will just output default
         }
 

@@ -7,6 +7,8 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+
 class DAV_Auth_Basic extends Sabre\DAV\Auth\Backend\AbstractBasic
 {
     /**
@@ -25,7 +27,7 @@ class DAV_Auth_Basic extends Sabre\DAV\Auth\Backend\AbstractBasic
         try {
             $auth->authenticate($username, $password);
             return true;
-        } catch (\Exception_Schoolbox $e) {
+        } catch (SchoolboxException $e) {
             return false;
         }
     }

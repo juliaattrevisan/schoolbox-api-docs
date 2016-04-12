@@ -9,6 +9,7 @@
 
 namespace Schoolbox\API;
 
+use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Alaress\Web\Controller\Base;
 use Authenticator;
 use Schoolbox\MobileApp\Registry;
@@ -84,7 +85,7 @@ class Controller extends Base {
         // verify username|password combination
         try {
             $this->auth->authenticate($data['username'], $data['password'], true);
-        } catch (\Exception_Schoolbox $e) {
+        } catch (SchoolboxAccessDeniedException $e) {
             $this->getResponse()->status->setCode(401);
             $response->set(array(
                 'format' => 'json',

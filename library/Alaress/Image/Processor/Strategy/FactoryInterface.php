@@ -9,6 +9,7 @@
 
 namespace Alaress\Image\Processor\Strategy;
 
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\Image\Filetype\FiletypeInterface;
 
 interface FactoryInterface
@@ -21,7 +22,7 @@ interface FactoryInterface
      * @param  FiletypeInterface $filetype May be required for processing or setting
      *                                     options on processor once built
      * @return StrategyInterface
-     * @throws \Exception_Schoolbox if image isn't recognised
+     * @throws SchoolboxException if image isn't recognised
      */
     public function build($strategy, $strategyArgs, FiletypeInterface $filetype);
 }
