@@ -30,13 +30,20 @@
                         {% set courseCount = courses[class.getId()]|length %}
                         <div class="list-item">
                             <div class="compact avatar card small-12 {% if courseCount == 0 %}removed{% endif %}">
-                                <a href="{{ routeLookup('customMoriahCohort.classReport', {studentId: student.getId(), classId: class.getId()}) }}">
+                                {% set cardContents %}
                                     <span class="icon-home"></span>
                                     <h3>{{ class.getNameWithCodes() }}</h3>
                                     <p class="meta">
                                         {{ courseCount }} {% if courseCount == 1 %}course{% else %}courses{% endif %}
                                     </p>
-                                </a>
+                                {% endset %}
+                                {% if courseCount > 0 %}
+                                    <a href="{{ routeLookup('customMoriahCohort.classReport', {studentId: student.getId(), classId: class.getId()}) }}">
+                                        {{ cardContents }}
+                                    </a>
+                                {% else %}
+                                    {{ cardContents }}
+                                {% endif %}
                             </div>
                         </div>
                     {% endfor %}
