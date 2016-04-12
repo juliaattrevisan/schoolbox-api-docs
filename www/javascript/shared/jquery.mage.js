@@ -245,6 +245,9 @@
         // slide away the submit for this section
         $(this.element).data('mage-submitted', true).closest('[data-mage-submitrow]').slideUp(slideDuration);
 
+        // also slide away this section's helptext
+        $(this.element).closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideDuration);
+
         // call the callback (this would include any specific manipulation for the section being targeted)
         onXhrDone.call(this.element, data);
 
