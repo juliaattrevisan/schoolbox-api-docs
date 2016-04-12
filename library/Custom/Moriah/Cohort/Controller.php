@@ -110,9 +110,9 @@ class Controller extends Base
                 $allFolders = $this->unitInstanceMapper->findAllFoldersUsingCourse($course, $from, $to);
 
                 $results[$courseId] = [
-//                    'course' => $course,
-                    'units'  => [],
-//                    'tasks' => [],
+                    'course'  => $course,
+                    'units'   => [],
+                    'folders' => $allFolders,
                 ];
 
                 // Get all the units for all of these too.
@@ -121,11 +121,10 @@ class Controller extends Base
                     $allUnits = $this->unitInstanceMapper->findForCategoryId($folder->getId());
                     // Get any assessment tasks from these units.
                     foreach ($allUnits as $unit) {
-//                        $unitId = $unit->getId();
                         $baseUnitId = $unit->getUnitCategory()->getId();
                         if (!isset($results[$courseId]['units'][$baseUnitId])) {
                             $results[$courseId]['units'][$baseUnitId] = [
-//                            'unit'  => $unit,
+                                'unit'  => $unit,
                                 'tasks' => [],
                             ];
                         }
@@ -134,10 +133,8 @@ class Controller extends Base
                                 $baseTaskId = $task->getTask()->getId();
                                 // Need to load box independently
                                 $box = SubmissionBoxMapper::getInstance()->findById($task->getSubmissionBox()->getId());
-                                // Group results by name
-//                                $results[$courseId][$task->getTitle()][$folder->getId()] = $box;
+                                // Group results
                                 $results[$courseId]['units'][$baseUnitId]['tasks'][$baseTaskId][$folder->getId()] = $box->getId();
-//                                $results[$courseId]['tasks'][$baseTaskId][$folder->getId()] = $box->getId();
                             }
                         }
                     }

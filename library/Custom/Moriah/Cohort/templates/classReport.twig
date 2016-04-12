@@ -27,12 +27,14 @@
         <section>
             <ul class="action-list">
                 <li>
-                    {% for course in courses %}
+                    {% for result in results %}
+                        {% set otherUsageCount = max(0, (result.folders|length)-1) %}
                         <div class="avatar card small-12">
                             <span class="icon-course icon-32"></span>
-                            <h3>{{ course.getNameWithCodes() }}</h3>
+                            <h3>{{ result.course.getNameWithCodes() }}</h3>
                             <p class="meta">
-                                Used by 2 other classes.
+                                Used by {{ otherUsageCount ?: 'no' }}
+                                other {% if otherUsageCount == 1 %}class{% else %}classes{% endif %}.
                             </p>
                         </div>
                     {% endfor %}
