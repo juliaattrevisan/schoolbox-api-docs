@@ -15,6 +15,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Request\Values;
 use Component_DefinitionMapper;
 use Component_Homepage_CourseBuilderController;
+use Component_Homepage_CourseOutlineController;
 use Component_Instance;
 use Component_InstanceMapper;
 use RangeException;
@@ -1306,15 +1307,11 @@ class Controller extends Base\Base
         try {
             foreach ($homepages as $homepage) {
                 // Get the homepage we are importing into and store it for later
-
                 $homepageCache[$homepage] = $this->getFolderMapper()->findById($homepage);
-
-                // Work out if we are updating an existing course, or importing a new one
 
                 try {
 
                     // Updating existing course outline, just grab it from the database
-
                     $componentCache[$homepage] = $this->getComponentInstanceMapper()->findById(
                         $post["component_id"]
                     );
@@ -1322,23 +1319,7 @@ class Controller extends Base\Base
                 } catch (\Exception $e) {
 
                     // Inserting new course outline, create it on the current homepage
-
-                    $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn(
-                        'class',
-                        'Component_Homepage_CourseOutlineController'
-                    );
-
-                    $componentDefinitionId = $componentDefinition->first()->getId();
-
-                    $componentCache[$homepage] = new \Component_Instance();
-                    $componentCache[$homepage]
-                        ->setDefinitionId($componentDefinitionId)
-                        ->setModule('homepage')
-                        ->setIdentifier($homepage)
-                        ->setPosition('top')
-                        ->setSequence(1);
-
-                    $this->getComponentInstanceMapper()->save($componentCache[$homepage]);
+                    $componentCache[$homepage] = $this->injectNewComponent($homepageCache[$homepage], Component_Homepage_CourseOutlineController::class);
                 }
             }
 
