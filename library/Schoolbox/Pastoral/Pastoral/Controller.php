@@ -11,6 +11,7 @@
 namespace Schoolbox\Pastoral\Pastoral;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\Pastoral;
 use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
@@ -417,7 +418,7 @@ class Controller extends Base
      * Display list of all pastoral records for selected student
      *
      * @param $id
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      * @throws \Schoolbox\Mapper\Exception
      */
     public function getIndex($id)
@@ -504,7 +505,7 @@ class Controller extends Base
      *
      * @param $studentId
      * @param $id
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      * @throws \Schoolbox\Mapper\Exception
      */
     public function getRecord($studentId, $id)
@@ -577,7 +578,7 @@ class Controller extends Base
      * Insert pastoral care record page
      *
      * @param $id
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function getInsert($id)
     {
@@ -618,7 +619,7 @@ class Controller extends Base
      * Update pastoral care record page
      *
      * @param $id
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function getUpdate($id)
     {
@@ -665,7 +666,7 @@ class Controller extends Base
     /**
      * Delete a comment
      *
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function postCommentDelete()
     {
@@ -691,7 +692,7 @@ class Controller extends Base
     /**
      * Post a comment
      *
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function postComment()
     {
@@ -724,8 +725,8 @@ class Controller extends Base
 
     /**
      * Insert/update a pastoral care record
-     * \
-     * @throws \Schoolbox\Application\Exception
+     *
+     * @throws SchoolboxException
      */
     public function postSave()
     {
@@ -792,7 +793,7 @@ class Controller extends Base
                     $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
                     /** @var PastoralSeverityModel $severity */
                     $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
-                } catch (\Exception $e) {
+                } catch (\Schoolbox\Mapper\Exception $e) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
 
@@ -857,7 +858,7 @@ class Controller extends Base
                         try {
                             /** @var \Schoolbox\Role $role */
                             $role = $this->getRoleMapper()->findById($role_id);
-                        } catch (\Exception $e) {
+                        } catch (\Schoolbox\Mapper\Exception $e) {
                             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                         }
 
@@ -1109,7 +1110,7 @@ class Controller extends Base
     /**
      * Delete a pastoral care record
      *
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function postDelete()
     {
@@ -1120,7 +1121,7 @@ class Controller extends Base
 
         try {
             $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
-        } catch (\Exception $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 

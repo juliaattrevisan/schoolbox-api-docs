@@ -9,8 +9,8 @@
 
 namespace Schoolbox\Error;
 
+use \Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Mapper as BaseMapper;
-use \Schoolbox\Application\Exception as SchoolboxException;
 
 class Mapper extends BaseMapper
 {
