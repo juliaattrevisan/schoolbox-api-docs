@@ -218,29 +218,28 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                </div>
 
-                {# Allow group creation if this is an insert #}
+                    {# Allow group creation if this is an insert #}
 
-                {% if not folder.isGroup and action == 'Create' %}
+                    {% if not folder.isGroup and action == 'Create' %}
 
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label for="groupcheck">
-                            Create Group
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Manage individual user access to this folder. You will automatically be assigned administration rights">?</span>
-                        </label>
-                        <div class="switch">
-                            <input type="checkbox" id="groupcheck" name="groupcheck" value="1" />
+                        <div class="small-12 columns">
                             <label for="groupcheck">
-                                <span>Yes</span>
-                                <span>No</span>
+                                Create Group
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Manage individual user access to this folder. You will automatically be assigned administration rights">?</span>
                             </label>
+                            <div class="switch">
+                                <input type="checkbox" id="groupcheck" name="groupcheck" value="1" />
+                                <label for="groupcheck">
+                                    <span>Yes</span>
+                                    <span>No</span>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                </fieldset>
 
-                {% endif %}
+                    {% endif %}
+
+                </div>
 
                 <fieldset id="synergetic-codes" class="content {{ folder.getInherit() ? 'hide' : '' }}">
                     <div class="small-12 columns">
