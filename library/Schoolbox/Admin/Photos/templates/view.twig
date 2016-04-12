@@ -87,7 +87,7 @@
 
             {% else %}
 
-                <ul class="grid small-block-grid-4">
+                <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4">
                     {% for user in users %}
                         <li class="actions-small-1">
                             <div class="avatar card">
@@ -98,7 +98,7 @@
                                 <p class="meta">{{ user.getRole.getName }}</p>
                             </div>
                             <nav>
-                                <span class="show-for-large-up">
+                                <span>
                                     <a data-delete="{{ user.getExternalId }}" href="#" class="icon-close" title="Delete Photo"></a>
                                 </span>
                             </nav>
