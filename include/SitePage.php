@@ -578,44 +578,64 @@ class SitePage extends Page
      * @param mixed  $ec
      *                        Integer: retrieves error text from code from database
      *                        null:    outputs whatever's in $message as error
-     * @param string $message Replaces '%MESSAGE%' in $ec
+     * @param array $info Replaces '%MESSAGE%' in $ec
      * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
      */
-    function error($ec, $message = "", $code = 400)
+    function error($ec, $info = [], $code = 400)
     {
+        /* If an error code is set, extract textual information from
+         * the db via ErrorMapper. Otherwise just use a custom message
+         */
+        $errorMapper = \Schoolbox\Error\Mapper::getInstance();
+
         if (isset($ec)) {
-            $db    = DeprecatedDatabase::getInstance();
-            $query = "SELECT message FROM error WHERE id = '$ec'";
-            $error = $db->getRow($query);
+            try {
+                $error = $errorMapper->findById($ec);
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+                $error = $errorMapper->createModel();
+                $error->setMessage('%MESSAGE%');
+            }
         }
-        if (empty($error)) {
-            $error = array('message' => '%MESSAGE%',);
+        else {
+            $error = $errorMapper->createModel();
+            $error->setMessage('%MESSAGE%');
         }
 
-        $output = str_replace("%MESSAGE%", $message, $error['message']);
+        /* Set up any replacements
+         */
+        $error->setMessage(str_replace("%MESSAGE%", $info['error']['message'], $error->getMessage()));
 
         header(':', true, $code);
 
         // if we're in ajax mode, spit out in ajax-friendly (ie JSON) format
         if ($this->ajax) {
             header('Content-Type: application/json');
-            die(json_encode($output));
+            die(json_encode($error->getMessage()));
+        }
+        else {
+            $this->setVar(TEMPLATE_content, '');
+            $this->setFile(TEMPLATE_content, 'common/error/container.html');
+            $this->setTitle('Error Encountered');
+
+            $errorContents = $this->getTwig()->render('common/error/general.twig', [
+                'code' => $ec,
+                'header' => $info['message'],
+                'info' => $info['info'],
+                'summary' => $error,
+                'date' => \Alaress_Date_Format::now(),
+                'meta' => $info['error'],
+                'outputStackTrace' => $info['outputStackTrace']
+            ]);
+
+            $this->setVar([
+                'OUTPUT' => $errorContents
+            ]);
+
+            $this->buildPage(false);
+            $this->outputPage(true);
         }
 
-        $this->setVar(TEMPLATE_content, '');
-
-        $this->setFile(TEMPLATE_content, 'common/error/container.html');
-        $this->setTitle('Error Encountered');
-
-        $this->setVar([
-            'OUTPUT' => $this->getTwig()->render('common/error/general.html', [
-                'code' => $ec,
-                'message' => $output
-            ])
-        ]);
-
-        $this->buildPage(false);
-        $this->outputPage(true);
         exit;
     }
 
