@@ -1298,7 +1298,7 @@ class Controller extends Base\Base
             foreach (explode(',', $post['ownerships']) as $ownership) {
                 list ($folderId, $userId) = explode(':', $ownership);
 
-                $owners[$folderId] = $this->getUserAccessMapper()->findById($userId);
+                $owners[$folderId] = $this->getUserMapper()->findById($userId);
             }
         }
 
