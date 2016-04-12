@@ -1463,6 +1463,7 @@ class Controller extends Base\Base
                         $unit_instance
                             ->setWorkDates($post["work"]) // Override due work dates in cloner
                             ->setQuizDates($post["quiz"]) // Override quiz dates in cloner
+                            ->setWorkOwner($owners[$homepage])
                             ->setComponent($componentCache[$homepage])
                             ->setTitle($unitCache[$currentUnit['id']]->getName())
                             ->setCategory($homepageCache[$homepage])
