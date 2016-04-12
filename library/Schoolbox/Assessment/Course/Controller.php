@@ -764,6 +764,27 @@ class Controller extends Base\Base
         $this->tpl('import', $importer->importSelectize($courseId, $classCode));
     }
 
+
+    /**
+     * @api   POST /course/import/ownership
+     * @level 160
+     */
+    public function importOwnership()
+    {
+        $ownerships     = $this->getRequest()->post["ownership"];
+        $courseHomepage = trim($this->getRequest()->post["importCourse"]);
+
+        // process ownership assignments
+
+        $this->tpl('unitImportForm', [
+            'homepage'       => implode(',', array_keys($ownerships)),
+            'courseHomepage' => $courseHomepage,
+            'units'          => $this->getCourseMapper()->findByParentId($courseHomepage),
+            'ownerships'     => $ownerships
+        ]);
+    }
+
+
     /**
      * Get a list of all the Folders which should
      * receive the selected Course
