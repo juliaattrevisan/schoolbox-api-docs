@@ -29,12 +29,26 @@ class Controller extends Base
             // Are they even students?
             throw new \RangeException('This report is only for students');
         }
+        $subjects = Folder\Mapper::getInstance()->findForUser($student);
+        // Sort by name
+        $subjects->sortByCallback(
+            function($a, $b) {
+                /** @var Folder\Model $a */
+                /** @var Folder\Model $b */
+                $result = strnatcasecmp($a->getNameWithCodes(), $b->getNameWithCodes());
+                if (!$result) {
+                    return strnatcasecmp($a->getId(), $b->getId());
+                }
+                return $result;
+            }
+        );
+        // Load all courses associated with this list of subjects
         $this->getResponse()->content->set([
             'format'   => 'html',
             'template' => '@customMoriahCohort/courseList.twig',
             'data'     => [
                 'student'  => $student,
-                'subjects' => Folder\Mapper::getInstance()->findForUser($student),
+                'subjects' => $subjects,
             ],
         ]);
     }
