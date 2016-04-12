@@ -22,4 +22,22 @@
             </div>
         </section>
     </div>
+
+    <div class="small-12 island">
+        <section>
+            <ul class="action-list">
+                <li>
+                    {% for course in courses %}
+                        <div class="avatar card small-12">
+                            <span class="icon-course icon-32"></span>
+                            <h3>{{ course.getNameWithCodes() }}</h3>
+                            <p class="meta">
+                                Used by 2 other classes.
+                            </p>
+                        </div>
+                    {% endfor %}
+                </li>
+            </ul>
+        </section>
+    </div>
 </div>

@@ -84,14 +84,25 @@ class Controller extends Base
     public function classReport(User $student, Folder\Model $class)
     {
         $this->assertIsStudent($student);
-        $this->getResponse()->content->set([
-            'format'   => 'html',
-            'template' => '@customMoriahCohort/classReport.twig',
-            'data'     => [
-                'student' => $student,
-                'class'   => $class,
-            ],
-        ]);
+
+        // Build course list
+        $courseLists = $this->unitInstanceMapper->findAllCoursesUsedInFolders([$class->getId()]);
+        if (!isset($courseLists[$class->getId()])) {
+            $this->getResponse()->status->setCode(404);
+        } else {
+            // Get all units in this course
+            $courseList = $courseLists[$class->getId()];
+            // And get the classes which use them?
+            $this->getResponse()->content->set([
+                'format'   => 'html',
+                'template' => '@customMoriahCohort/classReport.twig',
+                'data'     => [
+                    'student' => $student,
+                    'class'   => $class,
+                    'courses' => $courseList,
+                ],
+            ]);
+        }
     }
 
     /**
