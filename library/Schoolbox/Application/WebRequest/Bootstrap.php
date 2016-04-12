@@ -547,6 +547,7 @@ class Bootstrap implements BootstrapInterface {
                 'line'    => $e->getLine(),
                 'type'    => $e->getCode(),
             );
+
             if ($outputStackTrace) {
                 $error['message'] = "<pre>$e</pre>";
             }

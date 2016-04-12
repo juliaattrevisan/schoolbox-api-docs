@@ -604,14 +604,19 @@ class SitePage extends Page
 
         $this->setVar(TEMPLATE_content, '');
 
-        $this->setFile(TEMPLATE_content, 'common/error.html');
+        $this->setFile(TEMPLATE_content, 'common/error/container.html');
         $this->setTitle('Error Encountered');
-        $this->setVar("CODE", $ec);
-        $this->setVar("OUTPUT", $output);
+
+        $this->setVar([
+            'OUTPUT' => $this->getTwig()->render('common/error/general.html', [
+                'code' => $ec,
+                'message' => $output
+            ])
+        ]);
+
         $this->buildPage(false);
         $this->outputPage(true);
         exit;
-
     }
 
 
