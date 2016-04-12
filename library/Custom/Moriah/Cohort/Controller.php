@@ -49,9 +49,9 @@ class Controller extends Base
     public function classList(User $student)
     {
         $this->assertIsStudent($student);
-        $subjects = $this->folderMapper->findForUser($student);
+        $classes = $this->folderMapper->findForUser($student);
         // Sort by name
-        $subjects->sortByCallback(
+        $classes->sortByCallback(
             function($a, $b) {
                 /** @var Folder\Model $a */
                 /** @var Folder\Model $b */
@@ -62,15 +62,15 @@ class Controller extends Base
                 return $result;
             }
         );
-        // Load all courses associated with these subjects
-        $courses = $this->unitInstanceMapper->findAllCoursesUsedInFolders($subjects->getColumnValues('id'));
+        // Load all courses associated with these classes
+        $courses = $this->unitInstanceMapper->findAllCoursesUsedInFolders($classes->getColumnValues('id'));
         $this->getResponse()->content->set([
             'format'   => 'html',
             'template' => '@customMoriahCohort/classList.twig',
             'data'     => [
-                'student'  => $student,
-                'subjects' => $subjects,
-                'courses'  => $courses,
+                'student' => $student,
+                'classes' => $classes,
+                'courses' => $courses,
             ],
         ]);
     }
