@@ -163,12 +163,12 @@
     function xhrSend(method, action, targetElement) {
 
         var mage = this,
-            targetCopy = targetElement.clone().removeAttr('disabled'),
-            form = $('<form/>'), formSerial, formData = {};
+            targetCopy = cloneTarget(targetElement),
+            form = $('<form/>'), formSerial;
 
         if (this.element.name) {
             // submit clicked-button value
-            targetCopy.append($('<input type=text />').attr('name', this.element.name).attr('value', 1))
+            targetCopy.append($('<input type=text />').attr('name', this.element.name).val(1))
         }
 
         form.append(targetCopy);
@@ -193,6 +193,34 @@
             .always(function (xhrOrData, status, xhrOrError) {
                 xhrAlways.call(mage, mage.options.onXhrAlways, targetElement);
             });
+    }
+
+
+    /**
+     * This function works around a long-standing jquery bug: http://dev.jquery.com/ticket/1294
+     * tl;dr: the clone() function does not preserve the chosen value of <select/> elements :(
+     *
+     * @param target
+     * @returns {*}
+     */
+    function cloneTarget(target)
+    {
+        var hauser = target.clone().removeAttr('disabled');
+
+        hauser.find('select').each(function () {
+
+            var $select = $(this),
+                name    = $select.attr('name'),
+                // extract the value from the ORIGINAL
+                value   = target.find('[name="' + name + '"]').val(),
+                // replicate the select with a new input
+                $hidden = $('<input type="hidden" />').attr('name', name).val(value);
+
+            // and switch it out
+            $select.replaceWith($hidden);
+        });
+
+        return hauser;
     }
 
 
