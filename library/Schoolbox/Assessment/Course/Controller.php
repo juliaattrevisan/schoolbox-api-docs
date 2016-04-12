@@ -194,7 +194,8 @@ class Controller extends Base\Base
      *
      * @api   GET /course/modify/{id}
      * @level 160
-     * @param int $id
+     *
+     * @param int    $id
      * @param string $name
      */
     public function modifyCourse($id = null, $name = null)
@@ -274,7 +275,10 @@ class Controller extends Base\Base
     /**
      * Form to create a new course, but also include search param
      *
-     * @param $name
+     * @api   GET /course/new/{name}
+     * @level 160
+     *
+     * @param string $name
      */
     public function newCourseFromSearch($name)
     {
@@ -752,10 +756,13 @@ class Controller extends Base\Base
     }
 
     /**
-     * Import a Course into a set of Folders (classes)
+     * This GET is the start of the import process. Import a Course into a set of Folders (classes)
      *
-     * @param $courseId
-     * @param $classCode
+     * @api   GET /course/import/{courseId}/class/{classCode}
+     * @level 160
+     *
+     * @param int    $courseId
+     * @param string $classCode
      */
     public function import($courseId, $classCode)
     {
@@ -766,6 +773,8 @@ class Controller extends Base\Base
 
 
     /**
+     * This POST is the result of import stage 2
+     *
      * @api   POST /course/import/ownership
      * @level 160
      */
@@ -786,13 +795,17 @@ class Controller extends Base\Base
 
 
     /**
-     * Get a list of all the Folders which should
-     * receive the selected Course
+     * Search function. Retrieve a list of Folders that match the string in $_GET['query']
+     * TODO: rename this, and everything in it; it confusingly uses "import" in its noun form, rather than verb
+     *
+     * @api   GET /course/import/classes
+     * @level 160
      */
     public function importClasses()
     {
         $importer = new CourseImport();
 
+        // TODO: despite its name, "importClasses" actually just performs a search based on the query string given
         $this->getResponse()->content->set([
             'format' => 'json',
             'data' => $importer->importClasses($this->getRequest()->query->get('query'))
@@ -802,8 +815,10 @@ class Controller extends Base\Base
     /**
      * Get the Units and Tasks for a particular Course
      *
-     * @param $courseId
-     * @return array
+     * @api   GET /course/importResults/{courseId}
+     * @level 160
+     *
+     * @param string $courseId
      */
     public function importResults($courseId)
     {
@@ -813,7 +828,10 @@ class Controller extends Base\Base
     }
 
     /**
-     * Retrieve fragment with units in the selected course, and checkboxes/dates for selection
+     * This POST is the result of import stage 1. Retrieve fragment with units in the selected course, and checkboxes/dates for selection
+     *
+     * @api   POST /course/importUnits
+     * @level 160
      */
     public function importUnits()
     {
@@ -1063,8 +1081,11 @@ class Controller extends Base\Base
     }
 
     /**
-     * Retrieve friend with a list of tasks, quizzes and due work (and relevant date entry boxes) associated with
-     * the selected course
+     * This POST is the result of import stage 3. Retrieve friend with a list of tasks, quizzes
+     * and due work (and relevant date entry boxes) associated with the selected course.
+     *
+     * @api   POST /course/importTasks
+     * @level 160
      *
      * @throws Unauthorized
      **/
@@ -1164,7 +1185,11 @@ class Controller extends Base\Base
     }
 
     /**
-     * Do the actual import and create all relevant database entries
+     * This POST is the result of import stage 4 (final). Do the actual import
+     * and create all relevant database entries.
+     *
+     * @api   POST /course/importSave
+     * @level 160
      */
     public function importSave()
     {
@@ -1452,9 +1477,13 @@ class Controller extends Base\Base
     }
 
     /**
+     * This GET provides the import form, stepped in at stage 3 (since target and ownership cannot be changed)
      * Modify the Unit information for a previously imported Course
      *
-     * @param $componentId
+     * @api   GET /course/import/modify/{componentId}
+     * @level 160
+     *
+     * @param int $componentId
      */
     public function importModify($componentId)
     {
@@ -1635,7 +1664,10 @@ class Controller extends Base\Base
     }
 
     /**
-     * Delete unit from course
+     * Delete unit. This will delete the underlying folder and all its content.
+     *
+     * @api   POST /course/unit/delete
+     * @level 160
      */
     public function deleteUnit()
     {
@@ -1651,7 +1683,9 @@ class Controller extends Base\Base
      * View a list of courses associated with a homepage
      *
      * @api   GET /course/management/{folderId}
-     * @param $folderId
+     * @level 160
+     *
+     * @param int $folderId
      */
     public function management($folderId)
     {
@@ -1690,9 +1724,13 @@ class Controller extends Base\Base
 
     /**
      * Restore a Course instance via rebuilding its component
+     * TODO: this is a mutating GET - to be refactored to POST [SB-12012]
      *
-     * @param $folderId
-     * @param $componentId
+     * @api   GET /course/import/restore/{folderId}/{componentId}
+     * @level 160
+     *
+     * @param int $folderId
+     * @param int $componentId
      */
     public function restoreCourse($folderId, $componentId)
     {
