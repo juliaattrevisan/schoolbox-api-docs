@@ -34,6 +34,10 @@ if (is_numeric($_GET['return'])) {
     try {
         $return = $mapper->findById($_GET['id']);
 
+        // hydrate
+        $file = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($return->getStorage()->getHash());
+        $return->setStorage($file);
+
     } catch (Schoolbox\Mapper\Exception $e) {
         error(44);
         exit;
@@ -47,10 +51,6 @@ if (is_numeric($_GET['return'])) {
     )) {
         error(44);
     }
-
-    // hydrate
-    $file = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($return->getStorage()->getHash());
-    $return->setStorage($file);
 
     // does this file exist, and is it readable?
     if (!$file->exists()) {
