@@ -1091,13 +1091,15 @@ class Controller extends Base\Base
      **/
     public function importTasks()
     {
-        if (trim($this->getRequest()->post["homepage"]) == "")
+        $post = $this->getRequest()->post;
+
+        if (trim($post["homepage"]) == "")
         {
             // The homepage ID has gone missing
 
             $this->throwError('No class code was specified');
         }
-        else if (trim($this->getRequest()->post["course_homepage"]) == "")
+        else if (trim($post["course_homepage"]) == "")
         {
             // The course homepage ID has gone missing
 
@@ -1105,14 +1107,14 @@ class Controller extends Base\Base
         }
         else
         {
-            $homepages = explode(",", $this->getRequest()->post["homepage"]);
+            $homepages = explode(",", $post["homepage"]);
 
             // Test permissions. Must have write permission on the destination page and read permission
             // on the course we are trying to import.
 
             // Test course page read access
 
-            if ($this->getAccess()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
+            if ($this->getAccess()->getFolderAccess($this->getUser(), [$post["course_homepage"]]) < READ_ACCESS) {
                 throw new Unauthorized();
             }
 
@@ -1129,7 +1131,7 @@ class Controller extends Base\Base
             $errorDate = false;
             $foundUnit = false;
 
-            foreach ($this->getRequest()->post["unit"] as $unit) {
+            foreach ($post["unit"] as $unit) {
                 if (!empty($unit['import'])) {
                     $foundUnit = true;
 
@@ -1164,8 +1166,8 @@ class Controller extends Base\Base
                  * but has not yet been imported)
                  */
                 $allTaskDates = $this->determineTaskDates(
-                    $this->getRequest()->post["unit"],
-                    $this->getRequest()->post->get('componentId')
+                    $post["unit"],
+                    $post->get('componentId')
                 );
 
                 $this->getResponse()->content->set
@@ -1173,10 +1175,10 @@ class Controller extends Base\Base
                     'template' => "@course/unitImportResults.twig",
                     'format' => 'nochrome',
                     'data' => [
-                        'homepage' => $this->getRequest()->post["homepage"],
-                        'componentId' => $this->getRequest()->post["componentId"],
-                        'courseHomepage' => $this->getRequest()->post["course_homepage"],
-                        'unitDates' => $this->getRequest()->post["unit"],
+                        'homepage' => $post["homepage"],
+                        'componentId' => $post["componentId"],
+                        'courseHomepage' => $post["course_homepage"],
+                        'unitDates' => $post["unit"],
                         'units' => $allTaskDates['units']
                     ]
                 ]);
@@ -1193,12 +1195,13 @@ class Controller extends Base\Base
      */
     public function importSave()
     {
+        $post = $this->getRequest()->post;
         // Validate dates before we save (nothing to do for tasks)
 
         // Validate due work
 
-        if (isset($this->getRequest()->post["work"])) {
-            foreach ($this->getRequest()->post["work"] as $work) {
+        if (isset($post["work"])) {
+            foreach ($post["work"] as $work) {
                 try {
                     \Alaress_Date_Format::newLocalShort($work['publish_date']);
                 } catch (\Exception $e) {
@@ -1235,8 +1238,8 @@ class Controller extends Base\Base
 
         // Validate quizzes
 
-        if (isset($this->getRequest()->post["quiz"])) {
-            foreach ($this->getRequest()->post["quiz"] as $quiz) {
+        if (isset($post["quiz"])) {
+            foreach ($post["quiz"] as $quiz) {
                 try {
                     \Alaress_Date_Format::newLocalShort($quiz['start_date']);
                 } catch (\Exception $e) {
@@ -1255,14 +1258,14 @@ class Controller extends Base\Base
 
         // Parse homepages out of CSV format into an array
 
-        $homepages = explode(",", $this->getRequest()->post["homepage"]);
+        $homepages = explode(",", $post["homepage"]);
 
         // Test permissions for each homepage. Must have write permission on the destination page and read permission
         // on the course we are trying to import.
 
         // Test course page read access
 
-        if ($this->getAccess()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
+        if ($this->getAccess()->getFolderAccess($this->getUser(), [$post["course_homepage"]]) < READ_ACCESS) {
             throw new Failure\Unauthorized();
         }
 
@@ -1285,12 +1288,12 @@ class Controller extends Base\Base
 
         // Delete any units that aren't selected
 
-        foreach ($this->getRequest()->post["unit"] as $unit) {
+        foreach ($post["unit"] as $unit) {
             if ($unit["import"] != 1) {
                 $unitsToDelete = $this->getUnitInstanceMapper()->findByColumnList([
                     "unit_category_id" => $unit["unit_id"],
-                    "component_id" => $this->getRequest()->post["component_id"],
-                    "category_id" => $this->getRequest()->post["homepage"]
+                    "component_id" => $post["component_id"],
+                    "category_id" => $post["homepage"]
                 ]);
                 $this->getUnitInstanceMapper()->delete($unitsToDelete);
             }
@@ -1311,7 +1314,7 @@ class Controller extends Base\Base
                     // Updating existing course outline, just grab it from the database
 
                     $componentCache[$homepage] = $this->getComponentInstanceMapper()->findById(
-                        $this->getRequest()->post["component_id"]
+                        $post["component_id"]
                     );
 
                 } catch (\Exception $e) {
@@ -1344,7 +1347,7 @@ class Controller extends Base\Base
                 /* Use same derivation as previous step
                  */
                 $allTaskDates = $this->determineTaskDates(
-                    $this->getRequest()->post["unit"],
+                    $post["unit"],
                     $componentCache[$homepage]->getId()
                 );
 
@@ -1372,7 +1375,7 @@ class Controller extends Base\Base
 
                         /** @var UnitInstance $unit_instance */
                         $unit_instance = $this->getUnitInstanceMapper()->findOneByColumnList([
-                            "component_id" => $this->getRequest()->post["component_id"],
+                            "component_id" => $post["component_id"],
                             "category_id" => $homepageCache[$homepage]->getId(),
                             "unit_category_id" => $unitCache[$currentUnit['id']]->getId(),
                             "deleted_at" => null,
@@ -1399,10 +1402,10 @@ class Controller extends Base\Base
 
                                     $submissionBox = $this->submissionBoxMapper->findById($taskInstance->getSubmissionBox()->getId());
 
-                                    $due_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["work"][$taskInstance->getId()]['due_date']);
-                                    $late_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["work"][$taskInstance->getId()]['late_date']);
-                                    $open_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["work"][$taskInstance->getId()]['open_date']);
-                                    $publish_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["work"][$taskInstance->getId()]['publish_date']);
+                                    $due_date = \Alaress_Date_Format::newLocalShort($post["work"][$taskInstance->getId()]['due_date']);
+                                    $late_date = \Alaress_Date_Format::newLocalShort($post["work"][$taskInstance->getId()]['late_date']);
+                                    $open_date = \Alaress_Date_Format::newLocalShort($post["work"][$taskInstance->getId()]['open_date']);
+                                    $publish_date = \Alaress_Date_Format::newLocalShort($post["work"][$taskInstance->getId()]['publish_date']);
 
                                     $submissionBox->setDueDate($due_date->endOfDay());
                                     $submissionBox->setLateDate($late_date->endOfDay());
@@ -1418,8 +1421,8 @@ class Controller extends Base\Base
 
                                     $assessment = $this->getOnlineAssessmentMapper()->findById($taskInstance->getAssessment()->getId());
 
-                                    $start_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["quiz"][$taskInstance->getId()]['start_date']);
-                                    $finish_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["quiz"][$taskInstance->getId()]['finish_date']);
+                                    $start_date = \Alaress_Date_Format::newLocalShort($post["quiz"][$taskInstance->getId()]['start_date']);
+                                    $finish_date = \Alaress_Date_Format::newLocalShort($post["quiz"][$taskInstance->getId()]['finish_date']);
 
                                     $assessment->setStart($start_date->startOfDay());
                                     $assessment->setFinish($finish_date->endOfDay());
@@ -1440,8 +1443,8 @@ class Controller extends Base\Base
                         $unit_instance = new UnitInstance();
 
                         $unit_instance
-                            ->setWorkDates($this->getRequest()->post["work"]) // Override due work dates in cloner
-                            ->setQuizDates($this->getRequest()->post["quiz"]) // Override quiz dates in cloner
+                            ->setWorkDates($post["work"]) // Override due work dates in cloner
+                            ->setQuizDates($post["quiz"]) // Override quiz dates in cloner
                             ->setComponent($componentCache[$homepage])
                             ->setTitle($unitCache[$currentUnit['id']]->getName())
                             ->setCategory($homepageCache[$homepage])
