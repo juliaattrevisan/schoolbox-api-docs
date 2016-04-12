@@ -49,6 +49,7 @@
 <input type="hidden" name="homepage"        value="{{ homepage }}" />
 <input type="hidden" name="course_homepage" value="{{ courseHomepage }}" />
 <input type="hidden" name="component_id"    value="{{ componentId }}" />
+<input type="hidden" name="ownerships"      value="{{ ownerships }}" />
 
 {% for unit in unitDates %}
 <input type="hidden" name="unit[{{ loop.index }}][unit_id]" value="{{ unit.unit_id }}">
