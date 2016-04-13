@@ -121,7 +121,7 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function getFolderPermission($folderId)
     {
-       return Access::getInstance()->getFolderAccess($this->user, [ $folderId ]);
+        return $this->getPermissionString(Access::getInstance()->getFolderAccess($this->user, [ $folderId ]));
     }
 
 
