@@ -8,8 +8,10 @@
 namespace Custom\Moriah\Cohort;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\ClassStatistics;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
@@ -104,6 +106,8 @@ class Controller extends Base
             // Replace this with the term selector if that eventuates
             $from    = \Alaress_Date_Format::now()->addYears(-100);
             $to      = \Alaress_Date_Format::now()->addYears(100);
+            $term    = new Term\Model();
+            $term->setStart($from)->setDisplayFinish($to)->setActualFinish($to);
             $results = [];
             foreach ($courseList as $course) {
                 $courseId   = $course->getId();
@@ -117,6 +121,7 @@ class Controller extends Base
 
                 // Get all the units for all of these too.
                 foreach ($allFolders as $folder) {
+                    $classStats = new ClassStatistics($folder, $term, $student);
                     // Get all units within this course
                     $allUnits = $this->unitInstanceMapper->findForCategoryId($folder->getId());
                     // Get any assessment tasks from these units.
@@ -135,12 +140,17 @@ class Controller extends Base
                                 // Need to load box independently
                                 $box = SubmissionBoxMapper::getInstance()->findById($task->getSubmissionBox()->getId());
                                 // Group results
-                                $results[$courseId]['units'][$baseUnitId]['tasks'][$baseTaskId][$folder->getId()] = $box->getId();
+                                // Guess I can use class statistics?
+                                $results[$courseId]['units'][$baseUnitId]['tasks'][$baseTaskId][$folder->getId()] = [
+                                    'box'    => $box,
+                                    'marks'  => [],
+                                    'myMark' => [],
+                                ];
                             }
                         }
                     }
+//                    new \Alaress_Probe($classStats->getAllUsersMarks(), $classStats->extractUserMarks($student));
                 }
-//                new \Alaress_Probe($results);
 
                 // Now I have all boxes for this course.
                 // Start getting results.
