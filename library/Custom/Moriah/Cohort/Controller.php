@@ -110,8 +110,9 @@ class Controller extends Base
             $term->setStart($from)->setDisplayFinish($to)->setActualFinish($to);
             $results = [];
             foreach ($courseList as $course) {
-                $courseId   = $course->getId();
-                $allFolders = $this->unitInstanceMapper->findAllFoldersUsingCourse($course, $from, $to);
+                $courseStats = new Course\Statistics($course, $term, $student);
+                $courseId    = $course->getId();
+                $allFolders  = $this->unitInstanceMapper->findAllFoldersUsingCourse($course, $from, $to);
 
                 $results[$courseId] = [
                     'course'  => $course,
@@ -121,7 +122,6 @@ class Controller extends Base
 
                 // Get all the units for all of these too.
                 foreach ($allFolders as $folder) {
-                    $classStats = new ClassStatistics($folder, $term, $student);
                     // Get all units within this course
                     $allUnits = $this->unitInstanceMapper->findForCategoryId($folder->getId());
                     // Get any assessment tasks from these units.
@@ -129,40 +129,15 @@ class Controller extends Base
                         $baseUnitId = $unit->getUnitCategory()->getId();
                         if (!isset($results[$courseId]['units'][$baseUnitId])) {
                             $results[$courseId]['units'][$baseUnitId] = [
-                                'unit'   => $unit,
-                                'tasks'  => [],
-                                'folder' => $unit->getUnitCategory(),
+                                'unit'    => $unit,
+                                'marks'   => $courseStats->getAllUsersMarks($unit),
+                                'myMarks' => $courseStats->extractUserMarks($student, $unit),
+                                'folder'  => $unit->getUnitCategory(),
                             ];
                         }
-                        foreach ($unit->getTasks() as $task) {
-                            if ($task->getSubmissionBox()->getId()) {
-                                $baseTaskId = $task->getTask()->getId();
-                                // Need to load box independently
-                                $box = SubmissionBoxMapper::getInstance()->findById($task->getSubmissionBox()->getId());
-                                // Group results
-                                // Guess I can use class statistics?
-                                $results[$courseId]['units'][$baseUnitId]['tasks'][$baseTaskId][$folder->getId()] = [
-                                    'box'    => $box,
-                                    'marks'  => [],
-                                    'myMark' => [],
-                                ];
-                            }
-                        }
-                    }
-//                    new \Alaress_Probe($classStats->getAllUsersMarks(), $classStats->extractUserMarks($student));
-                }
-
-                // Now I have all boxes for this course.
-                // Start getting results.
-                foreach ($results[$courseId] as $taskTitle => $boxes) {
-                    foreach ($boxes as $folderId => $box) {
-                        //
                     }
                 }
             }
-
-            // Now I have a set of boxes - get marks for them.
-            // Note for later: ALL boxes must be marked and visible to user?
 
             // And get the classes which use them?
             $this->getResponse()->content->set([
