@@ -644,16 +644,22 @@ class SitePage extends Page
         /* output submission box links */
         $this->setBlock('tabTpl', 'duework_tab', 'dw_tab');
         $this->setBlock('tabTpl', 'submission_tab', 'sm_tab');
+        $this->setBlock('tabTpl', 'grades_tab', 'grades_tab_block');
+        $this->setBlock('tabTpl', 'courses_tab', 'courses_tab_block');
+
+        $this->setVar('dw_tab', '');
+        $this->setVar('grades_tab_block', '');
+        $this->setVar('courses_tab_block', '');
+        $this->setVar('sm_tab', '');
+
         if ($user->getRole()->isStaff()) {
             $this->parse('sm_tab', 'submission_tab');
-            $this->setVar('dw_tab', '');
+            $this->parse('courses_tab_block', 'courses_tab');
         } elseif ($user->getRole()->isStudent()) {
             $this->parse('dw_tab', 'duework_tab');
-            $this->setVar('sm_tab', '');
-        } else {
-            $this->setVar('sm_tab', '');
-            $this->setVar('dw_tab', '');
+            $this->parse('grades_tab_block', 'grades_tab');
         }
+
 
         $this->setBlock('tabTpl', 'parent_tab', 'p_tab');
         if ($user->getRole()->isParent()) {
@@ -818,6 +824,9 @@ class SitePage extends Page
             'TAB_PORTFOLIO_ON'                             => '',
             'TAB_EPORTFOLIO_ON'                            => '',
             'TAB_SUBMISSION_ON'                            => '',
+            'TAB_COURSE_ON'                                => '',
+            'TAB_GRADE_ON'                                 => '',
+
             'TAB_' . strtoupper($this->currentTab) . '_ON' => ' navthis',
         );
 

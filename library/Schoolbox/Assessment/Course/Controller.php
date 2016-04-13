@@ -135,6 +135,7 @@ class Controller extends Base\Base
         $content = [
             'template' => "@course/$template.twig",
             'data'     => array_merge($data, ['currentUser' => $this->getUser()]),
+            'tab'      => 'course',
         ];
 
         if ($this->getRequest()->isXhr()) {
