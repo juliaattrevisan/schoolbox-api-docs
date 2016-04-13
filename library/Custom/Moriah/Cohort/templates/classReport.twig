@@ -42,7 +42,7 @@
                         marker: {
                             radius: 6
                         },
-                        data: graphData[unitId].myMarks.map(function(v) { return v.marks.mark; }),
+                        data: graphData[unitId].myMarks.map(function(v) { return Number(v.marks.mark); }),
                         tooltip: {
                             headerFormat: '',
                             borderColor: '#000000',
