@@ -14,6 +14,8 @@ use Alaress\Authorizer\Failure;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Request\Values;
 use Component_DefinitionMapper;
+use Component_Homepage_CourseBuilderController;
+use Component_Homepage_CourseOutlineController;
 use Component_Instance;
 use Component_InstanceMapper;
 use RangeException;
@@ -29,6 +31,8 @@ use Schoolbox\Error;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Category;
@@ -41,6 +45,9 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
+use Schoolbox\Role;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Controller extends Base\Base
 {
@@ -84,6 +91,12 @@ class Controller extends Base\Base
     /** @var Error\Mapper */
     protected $errorMapper;
 
+    /** @var UserAccessMapper */
+    protected $userAccessMapper;
+
+    /** @var UserMapper */
+    protected $userMapper;
+
     /** @var Access */
     protected $access;
 
@@ -105,6 +118,8 @@ class Controller extends Base\Base
         $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
         $this->setAccess(Access::getInstance());
         $this->setCourseConfigMapper(CourseConfigMapper::getInstance());
+        $this->setUserAccessMapper(UserAccessMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
         $this->setErrorMapper(Error\Mapper::getInstance());
     }
 
@@ -143,7 +158,7 @@ class Controller extends Base\Base
 
         if (count($instances) == 0) {
             // no instance found - give me a new one
-            return $this->injectNewBuilderComponent($unit);
+            return $this->injectNewComponent($unit);
         }
 
         // instance found - use that
@@ -153,15 +168,16 @@ class Controller extends Base\Base
 
     /**
      * @param Folder\Model $unit
+     * @param string       $controller
      * @return Component_Instance
      */
-    protected function injectNewBuilderComponent(Folder\Model $unit)
+    protected function injectNewComponent(Folder\Model $unit, $controller = Component_Homepage_CourseBuilderController::class)
     {
         $definitionMapper = $this->getComponentDefinitionMapper();
         $instanceMapper   = $this->getComponentInstanceMapper();
 
         // Doesn't exist. We need that to exist. Make it exist.
-        $definition = $definitionMapper->findOneByColumn('class', \Component_Homepage_CourseBuilderController::class);
+        $definition = $definitionMapper->findOneByColumn('class', $controller);
 
         // invent a new component
         $newInstance = $this->getComponentInstanceMapper()
@@ -187,7 +203,8 @@ class Controller extends Base\Base
      *
      * @api   GET /course/modify/{id}
      * @level 160
-     * @param int $id
+     *
+     * @param int    $id
      * @param string $name
      */
     public function modifyCourse($id = null, $name = null)
@@ -227,7 +244,7 @@ class Controller extends Base\Base
                 // obtain the Course Builder Component Instance from the homepage.
                 if (count($instances[$unit->getId()]) == 0) {
                     // shove that new instance into where we expect it to be
-                    $instances[$unit->getId()] = [ $this->injectNewBuilderComponent($unit) ];
+                    $instances[$unit->getId()] = [ $this->injectNewComponent($unit) ];
                 }
 
                 foreach ($data['tasks'][$unit->getId()] as $task) {
@@ -267,7 +284,10 @@ class Controller extends Base\Base
     /**
      * Form to create a new course, but also include search param
      *
-     * @param $name
+     * @api   GET /course/new/{name}
+     * @level 160
+     *
+     * @param string $name
      */
     public function newCourseFromSearch($name)
     {
@@ -745,10 +765,13 @@ class Controller extends Base\Base
     }
 
     /**
-     * Import a Course into a set of Folders (classes)
+     * This GET is the start of the import process. Import a Course into a set of Folders (classes)
      *
-     * @param $courseId
-     * @param $classCode
+     * @api   GET /course/import/{courseId}/class/{classCode}
+     * @level 160
+     *
+     * @param int    $courseId
+     * @param string $classCode
      */
     public function import($courseId, $classCode)
     {
@@ -757,14 +780,43 @@ class Controller extends Base\Base
         $this->tpl('import', $importer->importSelectize($courseId, $classCode));
     }
 
+
     /**
-     * Get a list of all the Folders which should
-     * receive the selected Course
+     * This POST is the result of import stage 2
+     *
+     * @api   POST /course/import/ownership
+     * @level 160
+     */
+    public function importOwnership()
+    {
+        $ownerships     = $this->getRequest()->post["ownership"];
+        $courseHomepage = trim($this->getRequest()->post["importCourse"]);
+
+        // process ownership assignments
+        // respond with stage 3: unit selection
+        $this->tpl('unitImportForm', [
+            'homepage'       => implode(',', array_keys($ownerships)),
+            'courseHomepage' => $courseHomepage,
+            'units'          => $this->getCourseMapper()->findByParentId($courseHomepage),
+            'ownerships'     => implode(',', array_map(
+                function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
+            )
+        ]);
+    }
+
+
+    /**
+     * Search function. Retrieve a list of Folders that match the string in $_GET['query']
+     * TODO: rename this, and everything in it; it confusingly uses "import" in its noun form, rather than verb
+     *
+     * @api   GET /course/import/classes
+     * @level 160
      */
     public function importClasses()
     {
         $importer = new CourseImport();
 
+        // TODO: despite its name, "importClasses" actually just performs a search based on the query string given
         $this->getResponse()->content->set([
             'format' => 'json',
             'data' => $importer->importClasses($this->getRequest()->query->get('query'))
@@ -774,8 +826,10 @@ class Controller extends Base\Base
     /**
      * Get the Units and Tasks for a particular Course
      *
-     * @param $courseId
-     * @return array
+     * @api   GET /course/importResults/{courseId}
+     * @level 160
+     *
+     * @param string $courseId
      */
     public function importResults($courseId)
     {
@@ -785,7 +839,10 @@ class Controller extends Base\Base
     }
 
     /**
-     * Retrieve fragment with units in the selected course, and checkboxes/dates for selection
+     * This POST is the result of import stage 1. Retrieve fragment with units in the selected course, and checkboxes/dates for selection
+     *
+     * @api   POST /course/importUnits
+     * @level 160
      */
     public function importUnits()
     {
@@ -821,15 +878,29 @@ class Controller extends Base\Base
         }
         else
         {
+            $targetFolderIds = explode(',', $homepage);
+
+            $folders = $this->getFolderMapper()->findByColumn('id', $targetFolderIds);
+
+            $possibleOwnerships = [];
+
+            foreach ($folders as $folder) {
+                $possibleOwnerships[$folder->getId()] = $this->getUserAccessMapper()->findUsersInCategory(
+                    $folder, Role::STAFF, UserAccess::ACCESS_WRITE
+                );
+
+                if (count($possibleOwnerships[$folder->getId()]) == 0) {
+                    // if nobody else was returned, jam the session user in there.
+                    $possibleOwnerships[$folder->getId()] = new Collection([ $this->getUser() ]);
+                }
+            }
+
             // Everything kosher, proceed with the mage
-            $this->getResponse()->content->set([
-                'template' => "@course/unitImportForm.twig",
-                'format' => 'nochrome',
-                'data' => [
-                    'homepage' => $homepage,
-                    'courseHomepage' => $courseHomepage,
-                    'units' => $this->getCourseMapper()->findByParentId($courseHomepage)
-                ]
+            // respond with stage 2: ownership
+            $this->tpl('import/ownership', [
+                'targetFolders'       => $folders,
+                'importCourse'        => $courseHomepage,
+                'ownershipCandidates' => $possibleOwnerships
             ]);
         }
     }
@@ -849,7 +920,7 @@ class Controller extends Base\Base
      */
     private function determineTaskDates($unitDates, $courseComponentId)
     {
-        /** @var Category[] $unitCache */
+        /** @var Folder\Model[] $unitCache */
         $unitCache = [];
 
         /* Format this into a convenient structure for now
@@ -1021,20 +1092,25 @@ class Controller extends Base\Base
     }
 
     /**
-     * Retrieve friend with a list of tasks, quizzes and due work (and relevant date entry boxes) associated with
-     * the selected course
+     * This POST is the result of import stage 3. Retrieve friend with a list of tasks, quizzes
+     * and due work (and relevant date entry boxes) associated with the selected course.
+     *
+     * @api   POST /course/importTasks
+     * @level 160
      *
      * @throws Unauthorized
      **/
     public function importTasks()
     {
-        if (trim($this->getRequest()->post["homepage"]) == "")
+        $post = $this->getRequest()->post;
+
+        if (trim($post["homepage"]) == "")
         {
             // The homepage ID has gone missing
 
             $this->throwError('No class code was specified');
         }
-        else if (trim($this->getRequest()->post["course_homepage"]) == "")
+        else if (trim($post["course_homepage"]) == "")
         {
             // The course homepage ID has gone missing
 
@@ -1042,14 +1118,14 @@ class Controller extends Base\Base
         }
         else
         {
-            $homepages = explode(",", $this->getRequest()->post["homepage"]);
+            $homepages = explode(",", $post["homepage"]);
 
             // Test permissions. Must have write permission on the destination page and read permission
             // on the course we are trying to import.
 
             // Test course page read access
 
-            if ($this->getAccess()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
+            if ($this->getAccess()->getFolderAccess($this->getUser(), [$post["course_homepage"]]) < READ_ACCESS) {
                 throw new Unauthorized();
             }
 
@@ -1066,7 +1142,7 @@ class Controller extends Base\Base
             $errorDate = false;
             $foundUnit = false;
 
-            foreach ($this->getRequest()->post["unit"] as $unit) {
+            foreach ($post["unit"] as $unit) {
                 if (!empty($unit['import'])) {
                     $foundUnit = true;
 
@@ -1101,19 +1177,21 @@ class Controller extends Base\Base
                  * but has not yet been imported)
                  */
                 $allTaskDates = $this->determineTaskDates(
-                    $this->getRequest()->post["unit"],
-                    $this->getRequest()->post->get('componentId')
+                    $post["unit"],
+                    $post->get('componentId')
                 );
 
+                // respond with stage 4: coursework list
                 $this->getResponse()->content->set
                 ([
                     'template' => "@course/unitImportResults.twig",
                     'format' => 'nochrome',
                     'data' => [
-                        'homepage' => $this->getRequest()->post["homepage"],
-                        'componentId' => $this->getRequest()->post["componentId"],
-                        'courseHomepage' => $this->getRequest()->post["course_homepage"],
-                        'unitDates' => $this->getRequest()->post["unit"],
+                        'ownerships' => $post['ownerships'],
+                        'homepage' => $post["homepage"],
+                        'componentId' => $post["componentId"],
+                        'courseHomepage' => $post["course_homepage"],
+                        'unitDates' => $post["unit"],
                         'units' => $allTaskDates['units']
                     ]
                 ]);
@@ -1122,16 +1200,21 @@ class Controller extends Base\Base
     }
 
     /**
-     * Do the actual import and create all relevant database entries
+     * This POST is the result of import stage 4 (final). Do the actual import
+     * and create all relevant database entries.
+     *
+     * @api   POST /course/importSave
+     * @level 160
      */
     public function importSave()
     {
+        $post = $this->getRequest()->post;
         // Validate dates before we save (nothing to do for tasks)
 
         // Validate due work
 
-        if (isset($this->getRequest()->post["work"])) {
-            foreach ($this->getRequest()->post["work"] as $work) {
+        if (isset($post["work"])) {
+            foreach ($post["work"] as $work) {
                 try {
                     \Alaress_Date_Format::newLocalShort($work['publish_date']);
                 } catch (\Exception $e) {
@@ -1168,8 +1251,8 @@ class Controller extends Base\Base
 
         // Validate quizzes
 
-        if (isset($this->getRequest()->post["quiz"])) {
-            foreach ($this->getRequest()->post["quiz"] as $quiz) {
+        if (isset($post["quiz"])) {
+            foreach ($post["quiz"] as $quiz) {
                 try {
                     \Alaress_Date_Format::newLocalShort($quiz['start_date']);
                 } catch (\Exception $e) {
@@ -1188,14 +1271,14 @@ class Controller extends Base\Base
 
         // Parse homepages out of CSV format into an array
 
-        $homepages = explode(",", $this->getRequest()->post["homepage"]);
+        $homepages = explode(",", $post["homepage"]);
 
         // Test permissions for each homepage. Must have write permission on the destination page and read permission
         // on the course we are trying to import.
 
         // Test course page read access
 
-        if ($this->getAccess()->getFolderAccess($this->getUser(), [$this->getRequest()->post["course_homepage"]]) < READ_ACCESS) {
+        if ($this->getAccess()->getFolderAccess($this->getUser(), [$post["course_homepage"]]) < READ_ACCESS) {
             throw new Failure\Unauthorized();
         }
 
@@ -1207,23 +1290,37 @@ class Controller extends Base\Base
             }
         }
 
+        /** @var \Schoolbox\User[] $owners */
+        $owners = [];
+
+        if (isset($post['ownerships'])) {
+            // unsquash ownerships
+
+            foreach (explode(',', $post['ownerships']) as $ownership) {
+                list ($folderId, $userId) = explode(':', $ownership);
+
+                $owners[$folderId] = $this->getUserMapper()->findById($userId);
+            }
+        }
+
+
         // Keep a cache of queried data
 
-        /** @var Category[] $unitCache */
+        /** @var Folder\Model[] $unitCache */
         $unitCache = [];
-        /** @var Category[] $homepageCache */
+        /** @var Folder\Model[] $homepageCache */
         $homepageCache = [];
         /** @var Component_Instance[] $componentCache */
         $componentCache = [];
 
         // Delete any units that aren't selected
 
-        foreach ($this->getRequest()->post["unit"] as $unit) {
+        foreach ($post["unit"] as $unit) {
             if ($unit["import"] != 1) {
                 $unitsToDelete = $this->getUnitInstanceMapper()->findByColumnList([
                     "unit_category_id" => $unit["unit_id"],
-                    "component_id" => $this->getRequest()->post["component_id"],
-                    "category_id" => $this->getRequest()->post["homepage"]
+                    "component_id" => $post["component_id"],
+                    "category_id" => $post["homepage"]
                 ]);
                 $this->getUnitInstanceMapper()->delete($unitsToDelete);
             }
@@ -1234,39 +1331,19 @@ class Controller extends Base\Base
         try {
             foreach ($homepages as $homepage) {
                 // Get the homepage we are importing into and store it for later
-
                 $homepageCache[$homepage] = $this->getFolderMapper()->findById($homepage);
-
-                // Work out if we are updating an existing course, or importing a new one
 
                 try {
 
                     // Updating existing course outline, just grab it from the database
-
                     $componentCache[$homepage] = $this->getComponentInstanceMapper()->findById(
-                        $this->getRequest()->post["component_id"]
+                        $post["component_id"]
                     );
 
                 } catch (\Exception $e) {
 
                     // Inserting new course outline, create it on the current homepage
-
-                    $componentDefinition = $this->getComponentDefinitionMapper()->findByColumn(
-                        'class',
-                        'Component_Homepage_CourseOutlineController'
-                    );
-
-                    $componentDefinitionId = $componentDefinition->first()->getId();
-
-                    $componentCache[$homepage] = new \Component_Instance();
-                    $componentCache[$homepage]
-                        ->setDefinitionId($componentDefinitionId)
-                        ->setModule('homepage')
-                        ->setIdentifier($homepage)
-                        ->setPosition('top')
-                        ->setSequence(1);
-
-                    $this->getComponentInstanceMapper()->save($componentCache[$homepage]);
+                    $componentCache[$homepage] = $this->injectNewComponent($homepageCache[$homepage], Component_Homepage_CourseOutlineController::class);
                 }
             }
 
@@ -1277,7 +1354,7 @@ class Controller extends Base\Base
                 /* Use same derivation as previous step
                  */
                 $allTaskDates = $this->determineTaskDates(
-                    $this->getRequest()->post["unit"],
+                    $post["unit"],
                     $componentCache[$homepage]->getId()
                 );
 
@@ -1305,7 +1382,7 @@ class Controller extends Base\Base
 
                         /** @var UnitInstance $unit_instance */
                         $unit_instance = $this->getUnitInstanceMapper()->findOneByColumnList([
-                            "component_id" => $this->getRequest()->post["component_id"],
+                            "component_id" => $post["component_id"],
                             "category_id" => $homepageCache[$homepage]->getId(),
                             "unit_category_id" => $unitCache[$currentUnit['id']]->getId(),
                             "deleted_at" => null,
@@ -1332,15 +1409,21 @@ class Controller extends Base\Base
 
                                     $submissionBox = $this->submissionBoxMapper->findById($taskInstance->getSubmissionBox()->getId());
 
-                                    $due_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["work"][$taskInstance->getId()]['due_date']);
-                                    $late_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["work"][$taskInstance->getId()]['late_date']);
-                                    $open_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["work"][$taskInstance->getId()]['open_date']);
-                                    $publish_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["work"][$taskInstance->getId()]['publish_date']);
+                                    $due_date = \Alaress_Date_Format::newLocalShort($post["work"][$taskInstance->getId()]['due_date']);
+                                    $late_date = \Alaress_Date_Format::newLocalShort($post["work"][$taskInstance->getId()]['late_date']);
+                                    $open_date = \Alaress_Date_Format::newLocalShort($post["work"][$taskInstance->getId()]['open_date']);
+                                    $publish_date = \Alaress_Date_Format::newLocalShort($post["work"][$taskInstance->getId()]['publish_date']);
 
                                     $submissionBox->setDueDate($due_date->endOfDay());
                                     $submissionBox->setLateDate($late_date->endOfDay());
                                     $submissionBox->setOpenDate($open_date->startOfDay());
                                     $submissionBox->setPublishDate($publish_date->startOfDay());
+
+                                    if (isset($owners[$homepage])) {
+                                        // update the owner
+                                        $submissionBox->setOwner($owners[$homepage]);
+                                    }
+
                                     $this->getSubmissionBoxMapper()->save($submissionBox);
 
                                     break;
@@ -1351,11 +1434,17 @@ class Controller extends Base\Base
 
                                     $assessment = $this->getOnlineAssessmentMapper()->findById($taskInstance->getAssessment()->getId());
 
-                                    $start_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["quiz"][$taskInstance->getId()]['start_date']);
-                                    $finish_date = \Alaress_Date_Format::newLocalShort($this->getRequest()->post["quiz"][$taskInstance->getId()]['finish_date']);
+                                    $start_date = \Alaress_Date_Format::newLocalShort($post["quiz"][$taskInstance->getId()]['start_date']);
+                                    $finish_date = \Alaress_Date_Format::newLocalShort($post["quiz"][$taskInstance->getId()]['finish_date']);
 
                                     $assessment->setStart($start_date->startOfDay());
                                     $assessment->setFinish($finish_date->endOfDay());
+
+                                    if (isset($owners[$homepage])) {
+                                        // update the owner
+                                        $assessment->setUser($owners[$homepage]);
+                                    }
+
                                     $this->getOnlineAssessmentMapper()->save($assessment);
 
                                     break;
@@ -1373,8 +1462,9 @@ class Controller extends Base\Base
                         $unit_instance = new UnitInstance();
 
                         $unit_instance
-                            ->setWorkDates($this->getRequest()->post["work"]) // Override due work dates in cloner
-                            ->setQuizDates($this->getRequest()->post["quiz"]) // Override quiz dates in cloner
+                            ->setWorkDates($post["work"]) // Override due work dates in cloner
+                            ->setQuizDates($post["quiz"]) // Override quiz dates in cloner
+                            ->setWorkOwner($owners[$homepage])
                             ->setComponent($componentCache[$homepage])
                             ->setTitle($unitCache[$currentUnit['id']]->getName())
                             ->setCategory($homepageCache[$homepage])
@@ -1401,18 +1491,25 @@ class Controller extends Base\Base
                     'redirect' => $this->getSession()->getHistory(2)
                 ]
             ]);
-        }
-        catch (\InvalidArgumentException $e)
-        {
+
+        } catch (\InvalidArgumentException $e) {
             // bad dates, most likely
             $this->throwError("Invalid date given");
+
+        } catch (\Exception $e) {
+            $this->sendError($e->getMessage());
         }
+
     }
 
     /**
+     * This GET provides the import form, stepped in at stage 3 (since target and ownership cannot be changed)
      * Modify the Unit information for a previously imported Course
      *
-     * @param $componentId
+     * @api   GET /course/import/modify/{componentId}
+     * @level 160
+     *
+     * @param int $componentId
      */
     public function importModify($componentId)
     {
@@ -1423,6 +1520,9 @@ class Controller extends Base\Base
 
         /** @var Collection|UnitInstance[] $selectedUnitInstances */
         $selectedUnitInstances = $this->getUnitInstanceMapper()->findForComponent($compInst);
+
+        // casually crack out Big Bertha and drill, drill, drill... :/
+        $owner = $this->getUserMapper()->findById($selectedUnitInstances->first()->getTasks()->first()->getOwner()->getId());
 
         foreach ($selectedUnitInstances as $selectedUnitInstance) {
             $compendium[$selectedUnitInstance->getUnitCategory()->getId()]['selected'] = $selectedUnitInstance;
@@ -1474,7 +1574,7 @@ class Controller extends Base\Base
         }
 
         $this->tpl('import', [
-            '_part2'  => true,
+            '_part3'  => true,
             'units'   => $unitOutput,
             'folder'  => $destination,
             'sources' => $course,
@@ -1482,6 +1582,7 @@ class Controller extends Base\Base
             'homepage' => $destination->getId(),
             'courseHomepage' => $course->getId(),
             'componentId' => $componentId,
+            'owner'       => $owner
         ]);
     }
 
@@ -1593,7 +1694,10 @@ class Controller extends Base\Base
     }
 
     /**
-     * Delete unit from course
+     * Delete unit. This will delete the underlying folder and all its content.
+     *
+     * @api   POST /course/unit/delete
+     * @level 160
      */
     public function deleteUnit()
     {
@@ -1609,7 +1713,9 @@ class Controller extends Base\Base
      * View a list of courses associated with a homepage
      *
      * @api   GET /course/management/{folderId}
-     * @param $folderId
+     * @level 160
+     *
+     * @param int $folderId
      */
     public function management($folderId)
     {
@@ -1648,9 +1754,13 @@ class Controller extends Base\Base
 
     /**
      * Restore a Course instance via rebuilding its component
+     * TODO: this is a mutating GET - to be refactored to POST [SB-12012]
      *
-     * @param $folderId
-     * @param $componentId
+     * @api   GET /course/import/restore/{folderId}/{componentId}
+     * @level 160
+     *
+     * @param int $folderId
+     * @param int $componentId
      */
     public function restoreCourse($folderId, $componentId)
     {
@@ -1956,6 +2066,46 @@ class Controller extends Base\Base
     public function setErrorMapper($errorMapper)
     {
         $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return UserAccessMapper
+     */
+    public function getUserAccessMapper()
+    {
+        return $this->userAccessMapper;
+    }
+
+
+    /**
+     * @param UserAccessMapper $userAccessMapper
+     * @return static
+     */
+    public function setUserAccessMapper($userAccessMapper)
+    {
+        $this->userAccessMapper = $userAccessMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper()
+    {
+        return $this->userMapper;
+    }
+
+
+    /**
+     * @param UserMapper $userMapper
+     * @return static
+     */
+    public function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
         return $this;
     }
 

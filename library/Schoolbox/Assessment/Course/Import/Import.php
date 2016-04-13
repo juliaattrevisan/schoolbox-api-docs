@@ -66,9 +66,15 @@ class Import
         /* Swap keys for selectize compatibility -_-
          */
         foreach ($allFolders as $currentFolder) {
+
+            $name = $currentFolder->getName();
+            if ($currentFolder->getCodeString()) {
+                $name .= " ({$currentFolder->getCodeString()})";
+            }
+
             $data[] = [
                 'id' => $currentFolder->getId(),
-                'name' => $currentFolder->getName()
+                'name' => $name,
             ];
         }
 

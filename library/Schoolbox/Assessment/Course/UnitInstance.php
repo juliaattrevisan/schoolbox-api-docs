@@ -14,6 +14,7 @@ use Component_Instance;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
 
 class UnitInstance implements ISoftDeletable {
 
@@ -77,6 +78,8 @@ class UnitInstance implements ISoftDeletable {
      */
     protected $quizDates;
 
+    /** @var User */
+    protected $owner;
 
     /**
      * UnitInstance constructor.
@@ -346,6 +349,32 @@ class UnitInstance implements ISoftDeletable {
     public function setQuizDates($quizDates) {
         $this->quizDates = $quizDates;
         return $this;
+    }
+
+
+    /**
+     * This is an UNMAPPED field. It sneaks its way through the mapper and gets caught in postSave,
+     * where it updates the tasks. It is not otherwise persisted.
+     *
+     * @param User $owner
+     * @return self
+     */
+    public function setWorkOwner(User $owner)
+    {
+        $this->owner = $owner;
+        return $this;
+    }
+
+
+    /**
+     * This is an UNMAPPED field. It sneaks its way through the mapper and gets caught in postSave,
+     * where it updates the tasks. It is not otherwise persisted.
+     *
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
     }
 
 }
