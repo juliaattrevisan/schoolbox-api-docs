@@ -13,9 +13,6 @@
 
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
-use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
-use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 require_once '../include/Bootstrap.php';
 
@@ -37,14 +34,25 @@ try {
     );
 
     $image->load()->stream();
-
-} catch (SchoolboxAccessDeniedException $e) {
+}
+/* When you cannot access the requested image (access denied)
+ */
+catch (\RuntimeException $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
-
-} catch (SchoolboxNotFoundException $e) {
+}
+/* Image/Portrait not found
+ */
+catch (\InvalidArgumentException $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
-
-} catch (Exception $e) {
+}
+/* Invalid file type
+ */
+catch (\DomainException $e) {
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
+}
+/* All other exceptions
+ * BadMethodCallException
+ */
+catch (Exception $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 500);
-
 }

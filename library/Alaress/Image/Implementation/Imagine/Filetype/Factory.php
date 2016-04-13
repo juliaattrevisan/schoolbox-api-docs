@@ -9,7 +9,6 @@
 
 namespace Alaress\Image\Implementation\Imagine\Filetype;
 
-use \Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\Image\Filetype\FactoryInterface;
 
 class Factory implements FactoryInterface
@@ -19,7 +18,7 @@ class Factory implements FactoryInterface
      *
      * @param  array $imageArray
      * @return BaseFiletype
-     * @throws SchoolboxException if image isn't recognised
+     * @throws \DomainException if image isn't recognised
      */
     public function build($imageArray)
     {
@@ -33,7 +32,7 @@ class Factory implements FactoryInterface
             case 'image/x-png':
                 return new Png();
             default:
-                throw new SchoolboxException('Unknown image type "'.$imageArray['mime'].'"');
+                throw new \DomainException('Unknown image type "'.$imageArray['mime'].'"');
         }
     }
 }

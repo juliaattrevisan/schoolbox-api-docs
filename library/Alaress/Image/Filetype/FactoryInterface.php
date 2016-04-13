@@ -9,8 +9,6 @@
 
 namespace Alaress\Image\Filetype;
 
-use \Schoolbox\Application\Exception\Exception as SchoolboxException;
-
 interface FactoryInterface
 {
     /**
@@ -18,7 +16,7 @@ interface FactoryInterface
      *
      * @param  array $imageArray
      * @return FiletypeInterface
-     * @throws SchoolboxException if image isn't recognised
+     * @throws \RuntimeException if image isn't recognised
      */
     public function build($imageArray);
 }

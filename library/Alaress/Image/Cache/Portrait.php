@@ -47,7 +47,7 @@ class Portrait extends BrokenFS
      * @param string $key
      * @param User $sessionUser
      * @throws SchoolboxAccessDeniedException
-     * @throws SchoolboxNotFoundException
+     * @throws \InvalidArgumentException
      */
     public function __construct($externalId, $key, User $sessionUser)
     {
@@ -59,7 +59,7 @@ class Portrait extends BrokenFS
 
         $portraitPath = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
         if (!$portraitPath) {
-            throw new SchoolboxNotFoundException('Portrait not found');
+            throw new \InvalidArgumentException('Portrait not found');
         }
 
         $portraitDir = realpath($this->getConfig()->get('portrait_dir'));
@@ -70,13 +70,13 @@ class Portrait extends BrokenFS
         try {
             parent::__construct($portraitDir, $portraitPath, $key);
         } catch (Exception $e) {
-            throw new SchoolboxNotFoundException('Portrait not found');
+            throw new \InvalidArgumentException('Portrait not found');
         }
 
         $this->purgeOldTransformations();
 
         if (!$this->canViewImage()) {
-            throw new SchoolboxAccessDeniedException('Cannot view image');
+            throw new \RuntimeException('Cannot view image');
         }
     }
 
