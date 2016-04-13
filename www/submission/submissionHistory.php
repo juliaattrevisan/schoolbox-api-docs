@@ -584,11 +584,11 @@ if (isset($recent_activity)) {
     }
 
     // only allow a resubmission:
-    // if the current user is the owner
+    // if the current user is the owner (or I'm a teacher)
     // if the submission box is accepting submissions
     // and if the current time is between open and late
     if (
-        $userID == $currentUserId
+        ($userID == $currentUserId || $returnHandler->securityCheck($box->getId()))
         && $box->isOpen()
         && $box->getAcceptOnline()
         && $box->getAcceptMultiple()
