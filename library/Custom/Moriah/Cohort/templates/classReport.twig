@@ -1,3 +1,94 @@
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/reportCardBoxplot.js"></script>
+<script type="text/javascript">
+    // Graph data gets json_encoded somewhere round here.
+
+    $(function() {
+//        var infoIndex = {GRAPH_INFO_INDEX}
+        $('[data-unit-graph]').each(function() {
+
+            /**
+             * Boxplots for each Task in the Unit
+             */
+            $.fn.reportCardBoxplotRender({
+                element: this,
+                /* Title of the graph
+                 */
+                title: '',
+                /* Orientation of the box plots
+                 */
+                orientation: 'vertical',
+                /* A list of all the assessment names that are being graphed
+                 * These correspond to a series of data and their respective
+                 * five-point summaries
+                 */
+//                allAssessments: {GRAPH_ASSESSMENT_NAMES},
+                allAssessments: ["La Musique Franc\u0327aise! - OPTION 1","La Musique Franc\u0327aise! - OPTION 2","La Musique Franc\u0327aise! - OPTION 3","La Musique Franc\u0327aise! - OPTION 4","La Musique Franc\u0327aise! - OPTION 5","La Musique Franc\u0327aise! - OPTION 6","Lesson 10 - Write a film review"],
+                /* All the raw data
+                 */
+//                allData: $.fn.reportCardBoxplotCalculateAllSeriesData({GRAPH_ASSESSMENT_ITEM_VALUE}),
+                allData: $.fn.reportCardBoxplotCalculateAllSeriesData([[{"info":null,"uid":null,"value":0},{"info":null,"uid":null,"value":0},{"info":null,"uid":null,"value":50},{"info":null,"uid":null,"value":75},{"info":null,"uid":null,"value":75}],[{"info":null,"uid":null,"value":0},{"info":null,"uid":null,"value":0}],[{"info":null,"uid":null,"value":0},{"info":null,"uid":null,"value":0}],[{"info":null,"uid":null,"value":0},{"info":null,"uid":null,"value":0}],[{"info":null,"uid":null,"value":0},{"info":null,"uid":null,"value":0}],[{"info":null,"uid":null,"value":0},{"info":null,"uid":null,"value":0}],[{"info":null,"uid":null,"value":0},{"info":null,"uid":null,"value":0},{"info":null,"uid":null,"value":75},{"info":null,"uid":null,"value":75},{"info":null,"uid":null,"value":75}]]),
+                /* You
+                 */
+                additionalSeries: [
+                    {
+                        type: 'scatter',
+                        name: 'You',
+                        color: 'rgb(255, 87, 87)',
+                        marker: {
+                            radius: 6
+                        },
+//                        data: {YOUR_GRAPH_ASSESSMENT_ITEM_VALUE},
+                        data: [75,0,0,0,0,0,75],
+                        tooltip: {
+                            headerFormat: '',
+                            borderColor: '#000000'
+//                            pointFormatter: function() {
+//                                /* Basic template for each outlier
+//                                 */
+//                                var template =
+//                                        '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
+//                                        '<p class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></p>' +
+//                                        '<p class="comment">{INFO}</p>' +
+//                                        '</div>';
+//                                /* Concatenate everything
+//                                 */
+//                                if(typeof infoIndex[this.x].displayMark != 'undefined')
+//                                {
+//                                    tooltipContent = template;
+//
+//                                    if(infoIndex[this.x].displayMark != null) {
+//                                        tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, infoIndex[this.x].displayMark);
+//                                        tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, infoIndex[this.x].gradientMark);
+//                                    }
+//                                    else {
+//                                        tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, '');
+//                                        tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, '');
+//                                    }
+//                                    tooltipContent = tooltipContent.replace(/{INFO}/, infoIndex[this.x].info);
+//
+//                                    /* Show tooltip
+//                                     */
+//                                    $('.highcharts-tooltip').show();
+//
+//                                    return tooltipContent;
+//                                }
+//                                else {
+//
+//                                    /* Hide tooltip when no data
+//                                     */
+//                                    $('.highcharts-tooltip').hide();
+//                                }
+//                            }
+                        }
+                    }
+                ]
+            });
+        });
+    });
+</script>
+
 <ul class="breadcrumb">
     <li><a href="/search/user/{{ student.getId()|e('url') }}">{{ student.formatName() }}</a></li>
     <li><a href="{{ routeLookup('customMoriahCohort.classList', {studentId: student.getId()}) }}">Class List</a></li>
@@ -44,7 +135,8 @@
                                     <span class="icon-folder icon-32"></span>
                                     <h3>{{ unitResult.unit.getTitle() }}</h3>
                                 </div>
-                                {# Graph goes here #}
+                                <div data-unit-graph="{{ unitResult.unit.getId()|e('html_attr') }}"
+                                     id="unit-graph-{{ unitResult.unit.getId()|e('html_attr') }}"></div>
                             </li>
                         {% endfor %}
                         </ul>
