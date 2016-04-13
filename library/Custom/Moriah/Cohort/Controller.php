@@ -112,7 +112,11 @@ class Controller extends Base
             foreach ($courseList as $course) {
                 $courseStats = new Course\Statistics($course, $term, $student);
                 $courseId    = $course->getId();
-                $allFolders  = $this->unitInstanceMapper->findAllFoldersUsingCourse($course, $from, $to);
+                $allFolders  = $this->unitInstanceMapper->findAllFoldersUsingCourse(
+                    $course,
+                    $term->getStart(),
+                    $term->getActualFinish()
+                );
 
                 $results[$courseId] = [
                     'course'  => $course,
