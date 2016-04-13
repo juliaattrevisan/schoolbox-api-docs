@@ -43,6 +43,13 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	protected $questionHandler = null;
 
     /**
+     * Javascript plugin for reviewing
+     *
+     * @var string
+     */
+    protected $pluginReview = '';
+
+    /**
      * Constructor.
      *
      * Run parent constructor
@@ -91,10 +98,10 @@ abstract class Evaluation_Answer extends DeprecatedModel
     /**
      * Output configuration tags in xml
      *
-     * @param $page
+     * @param SitePage $page
      * @param $config
      */
-    public function configureXml($page, $config) {
+    public function configureXml(SitePage $page, $config) {
         if (strlen($config)) {
             $options = json_decode($config);
 
@@ -308,7 +315,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	/**
 	 * Set response handler
 	 *
-	 * @param Survey_Response $responseHandler
+	 * @param Assess_Response|Survey_Response $responseHandler
 	 */
 	protected function setResponseHandler($responseHandler) {
 		$this->responseHandler = $responseHandler;
@@ -317,7 +324,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
 	/**
 	 * Get response handler
 	 *
-	 * @return Survey_Response
+	 * @return Assess_Response|Survey_Response
 	 */
 	protected function getResponseHandler() {
 		return $this->responseHandler;

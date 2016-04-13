@@ -32,6 +32,7 @@ class Assess_Answer_Radio extends Assess_Answer_Multi
          */
         $i = 0;
         $numCorrect = 0;
+        $total = 0;
 
         if (is_array($answer)) {
             foreach ($answer as $currentAnswer) {
@@ -56,8 +57,6 @@ class Assess_Answer_Radio extends Assess_Answer_Multi
                 $marksPerAnswer = $currentResponse['marks'] / $i;
                 $total = $marksPerAnswer * $numCorrect;
             }
-        } else {
-            $total = 0;
         }
 
         /* Total marks for this question

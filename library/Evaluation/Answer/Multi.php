@@ -74,11 +74,11 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * load its existing answers and populate fields; otherwise empty them or
      * set to other default values.
      *
-     * @param  $page
+     * @param $page
      * @param string $question_id
      * @return void
      */
-    public function modify($page, $question_id = '')
+    public function modify(SitePage $page, $question_id = '')
     {
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
@@ -112,11 +112,11 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     /**
      * Render answers in the QuestionBank
      *
-     * @param  $page
+     * @param SitePage $page
      * @param string $answerGroup
      * @return void
      */
-    public function modifyInQuestionBank($page, $answerGroup)
+    public function modifyInQuestionBank(SitePage $page, $answerGroup)
     {
         if (strlen($answerGroup)) {
             $allAnswers = unserialize($answerGroup);
@@ -207,12 +207,12 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
      *
-     * @param  $page
+     * @param SitePage $page
      * @param  $attemptId
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $attemptId, $question_id)
+    public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
         /* Optional configuration hook
          */
@@ -268,10 +268,10 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Clear child blocks after parsing out the parent. Keep this in its own
      * method for polymorphic algorithm
      *
-     * @param  $page
+     * @param SitePage $page
      * @return void
      */
-    public function cleanupParse($page)
+    public function cleanupParse(SitePage $page)
     {
     }
 
@@ -298,11 +298,11 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Exports the answer to Moodle XML format. This is a modified version of
      * $this->reviewResponse()
      *
-     * @param  $page
+     * @param SitePage $page
      * @param  $question_id
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id)
+    public function exportMoodleAnswer(SitePage $page, $question_id)
     {
         $answerGroup = $this->getByQuestionID($question_id);
 
@@ -345,6 +345,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      */
     public function importMoodleAnswer($xmlObj, $question_id)
     {
+        $allAnswers = [];
+
         foreach ($xmlObj->answer as $currentAnswer) {
             /* Set up data object in accordance with $this->create();
              */
@@ -381,6 +383,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     public function exportResponseToCSV($attempt_id, $question_id)
     {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
+
+        $postprocessed = [];
 
         $data = unserialize($response['response']);
 
@@ -455,14 +459,15 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
-     * @param  $page
+     * @param SitePage  $page
      * @param  $attemptId
      * @param  $question_id
      * @return void
      */
-    public function reviewResponse($page, $attemptId, $question_id)
+    public function reviewResponse(SitePage $page, $attemptId, $question_id)
     {
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+        $existingAnswer = false;
 
         if ($existing) {
             $existingAnswer = $this->getAnswersFromResponse($existing['response']);
@@ -520,13 +525,14 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
-     * @param $page
+     * @param SitePage $page
      * @param $attemptId
      * @param $currentQuestion
      */
-    public function reviewResponseHorizontal($page, $attemptId, $currentQuestion)
+    public function reviewResponseHorizontal(SitePage $page, $attemptId, $currentQuestion)
     {
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
+        $existingAnswer = false;
 
         if ($existing) {
             $existingAnswer = $this->getAnswersFromResponse($existing['response']);
@@ -548,32 +554,66 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             ));
 
             foreach ($allAnswers as $currentAnswer) {
-                if ($currentAnswer->correct) {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'icon-approve'
-                    ));
-                } else {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => ''
-                    ));
-                }
-
                 $page->setVar(array(
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
-                if ($existing['response']
-                    && is_array($existingAnswer)
-                    && in_array($currentAnswer->value, $existingAnswer)
-                ) {
-                    $page->setVar(array(
-                        'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
-                    ));
-                } else {
-                    $page->setVar(array(
-                        'ANSWER_CHECKED' => '',
-                    ));
+                /* A response was made and successfully unserialized, and
+                 * The current option was selected by the respondent
+                 */
+                $validResponseExists = $existing['response'] && is_array($existingAnswer);
+                $selectedByRespondent = $validResponseExists && in_array($currentAnswer->value, $existingAnswer);
+
+                /* This answer is correct
+                 */
+                if ($currentAnswer->correct) {
+
+                    /* The respondent chose the correct answer
+                     */
+                    if ($selectedByRespondent) {
+                        $page->setVar([
+                            'ANSWER_ICON'       => 'icon-tick',
+                            'ANSWER_ICON_TITLE' => 'Respondent chose correctly',
+                            'ANSWER_ICON_CLASS' => 'evaluation-correct-answer-option',
+                            'ANSWER_CHECKED'    => 'checked',
+                        ]);
+                    }
+                    /* The respondent did not choose the correct answer
+                     */
+                    else {
+                        $page->setVar([
+                            'ANSWER_ICON'       => 'icon-previous',
+                            'ANSWER_ICON_TITLE' => 'Respondent did not choose this correct answer',
+                            'ANSWER_ICON_CLASS' => 'evaluation-unselected-answer-option',
+                            'ANSWER_CHECKED'    => ''
+                        ]);
+                    }
+                }
+                /* This answer is not correct
+                 */
+                else {
+
+                    /* The respondent chose this answer
+                     */
+                    if ($selectedByRespondent) {
+                        $page->setVar([
+                            'ANSWER_ICON'       => 'icon-cancel',
+                            'ANSWER_ICON_TITLE' => 'Respondent chose an incorrect answer',
+                            'ANSWER_ICON_CLASS' => 'evaluation-incorrect-answer-option',
+                            'ANSWER_CHECKED'    => 'checked',
+                        ]);
+                    }
+                    /* The respondent didn't choose this answer
+                     */
+                    else {
+                        $page->setVar([
+                            'ANSWER_ICON'       => '',
+                            'ANSWER_ICON_TITLE' => '',
+                            'ANSWER_ICON_CLASS' => '',
+                            'ANSWER_CHECKED'    => ''
+                        ]);
+                    }
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
@@ -587,11 +627,11 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
      * The answer for a question during horizontal marking, so it appears at the
      * top under the question itself, and not repeated for each attempt
      *
-     * @param $page
+     * @param SitePage $page
      * @param $currentQuestion
      * @return void
      */
-    public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion)
+    public function reviewResponseHorizontalAnswerForQuestion(SitePage $page, $currentQuestion)
     {
         $answerGroup = $this->getByQuestionID($currentQuestion['question_id']);
 
@@ -603,21 +643,31 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             ));
 
             foreach ($allAnswers as $currentAnswer) {
-                if ($currentAnswer->correct) {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'icon-approve'
-                    ));
-                } else {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => ''
-                    ));
-                }
-
                 $page->setVar(array(
-                    'ANSWER_CHECKED' => '',
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
+
+                /* This answer is correct
+                 */
+                if ($currentAnswer->correct) {
+                    $page->setVar([
+                        'ANSWER_ICON'       => '',
+                        'ANSWER_ICON_TITLE' => '',
+                        'ANSWER_ICON_CLASS' => '',
+                        'ANSWER_CHECKED'    => 'checked',
+                    ]);
+                }
+                /* This answer is not correct
+                 */
+                else {
+                    $page->setVar([
+                        'ANSWER_ICON'       => '',
+                        'ANSWER_ICON_TITLE' => '',
+                        'ANSWER_ICON_CLASS' => '',
+                        'ANSWER_CHECKED'    => ''
+                    ]);
+                }
 
                 $page->parse('answerTop_block', 'answerTop', true);
             }
