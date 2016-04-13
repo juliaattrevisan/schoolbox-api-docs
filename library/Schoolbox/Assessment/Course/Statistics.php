@@ -124,7 +124,7 @@ class Statistics
                 // If it's found that it can, then I'll have to just add all boxes.
                 foreach ($boxCollection as $box) {
                     if ($term->contains($box->getDueDate())) {
-                        $this->addWork($box, $unit->getUnitCategory());
+                        $this->addWork($box, $unit);
                     }
                 }
 
@@ -138,7 +138,7 @@ class Statistics
                 );
                 foreach ($assessCollection as $assess) {
                     if ($term->contains($assess->getFinish())) {
-                        $this->addWork($assess, $unit->getUnitCategory());
+                        $this->addWork($assess, $unit);
                     }
                 }
             }
@@ -159,11 +159,11 @@ class Statistics
      * Add a dueWork or onlineAssess to the map, accounting for timestamp collisions
      *
      * @param SubmissionBox|OnlineAssessment $work
-     * @param Folder                         $unit The unit that this work originated from.
+     * @param UnitInstance                   $unit The unit that this work originated from.
      *
      * @return bool
      */
-    protected function addWork($work, Folder $unit)
+    protected function addWork($work, UnitInstance $unit)
     {
         if ($work instanceof OnlineAssessment) {
             $stamp = $work->getFinish()->getUnixTimeStamp();
@@ -185,7 +185,7 @@ class Statistics
             ++$stamp;
         }
 
-        $unitId = $unit->getId();
+        $unitId = $unit->getUnitCategory()->getId();
         if (!isset($this->workMap[$unitId])) {
             $this->workMap[$unitId] = [
                 'unit' => $unit,
@@ -272,15 +272,15 @@ class Statistics
     /**
      * Extracts the nominated user's marks for the category
      *
-     * @param User   $user
-     * @param Folder $unit The unit to get work for.
+     * @param User         $user
+     * @param UnitInstance $unit The unit that this work originated from.
      *
      * @return array
      */
-    public function extractUserMarks(User $user, Folder $unit)
+    public function extractUserMarks(User $user, UnitInstance $unit)
     {
         $id     = $user->getId();
-        $unitId = $unit->getId();
+        $unitId = $unit->getUnitCategory()->getId();
         if (!isset($this->workMap[$unitId]['work'])) {
             return [];
         }
@@ -299,13 +299,13 @@ class Statistics
     /**
      * Get all the students data for box and whisker averages
      *
-     * @param Folder $unit The unit to get work for.
+     * @param UnitInstance $unit The unit that this work originated from.
      *
      * @return array
      */
-    public function getAllUsersMarks(Folder $unit)
+    public function getAllUsersMarks(UnitInstance $unit)
     {
-        $unitId = $unit->getId();
+        $unitId = $unit->getUnitCategory()->getId();
         if (!isset($this->workMap[$unitId]['work'])) {
             return [];
         }
