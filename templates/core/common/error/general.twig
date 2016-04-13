@@ -1,6 +1,6 @@
 <h1>Sorry, we are unable to complete this request</h1>
 
-<div class="alert-box alert">{{ summary.getMessage|raw }}</div>
+<div class="alert-box alert">{{ summary.message|raw }}</div>
 
 <div class="row">
     <div class="small-12 island">
@@ -9,7 +9,7 @@
             <p>{{ info }}</p>
             {% endif %}
 
-            <p class="meta">{{ date.getLocal }}</p>
+            <p class="meta">{{ date.local }}</p>
 
             {% if url|length %}
             <p class="meta">{{ url }}</p>
@@ -19,7 +19,7 @@
                 {% if outputStackTrace %}
                     Error Code {{ code }} "{{ meta.message }}" in file {{ meta.file }} on line {{ meta.line }}
                 {% else %}
-                    {{ summary.getMessage|raw }}
+                    {{ summary.message|raw }}
                 {% endif %}
             </p>
         </section>
