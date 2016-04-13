@@ -1,7 +1,9 @@
 <?php
 
 use Schoolbox\Notif\Notif;
+use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 
 class Session
 {
@@ -155,6 +157,8 @@ class Session
      * @param string $password
      * @return bool Was the user authenticated?
      * @throws SchoolboxAccessDeniedException
+     * @throws SchoolboxAccountDisabledException
+     * @throws SchoolboxNotFoundException
      */
     public function authenticate($username, $password)
     {
@@ -165,10 +169,10 @@ class Session
         try {
             $user = $uMap->findOneByColumn('username', $username);
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new SchoolboxAccessDeniedException();
+            throw new SchoolboxNotFoundException();
         }
         if (!($user instanceof \Schoolbox\User && $user->getEnabled())) {
-            throw new SchoolboxAccessDeniedException();
+            throw new SchoolboxAccountDisabledException();
         }
 
         $result = false;
