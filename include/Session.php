@@ -156,9 +156,9 @@ class Session
      * @param string $username
      * @param string $password
      * @return bool Was the user authenticated?
-     * @throws SchoolboxAccessDeniedException
-     * @throws SchoolboxAccountDisabledException
-     * @throws SchoolboxNotFoundException
+     * @throws SchoolboxAccessDeniedException    if user doesn't exist
+     * @throws SchoolboxAccountDisabledException if user account is disabled
+     * @throws SchoolboxNotFoundException        if password doesn't match
      */
     public function authenticate($username, $password)
     {
