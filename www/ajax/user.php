@@ -67,7 +67,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
         $keyword,
         $groupID,
         $residentialHouseID,
-        30+9
+        30
     );
 
     $student = null;
