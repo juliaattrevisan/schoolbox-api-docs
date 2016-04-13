@@ -8,8 +8,18 @@
  */
 class Component_Dashboard_SubjectController extends Component_Dashboard_ControllerAbstract {
 
+    /**
+     * A list of subjects to show
+     *
+     * @var array
+     */
     protected $subject_list;
 
+    /**
+     * Component name
+     *
+     * @var string
+     */
     protected $componentName = 'My Subjects';
 
     /**
