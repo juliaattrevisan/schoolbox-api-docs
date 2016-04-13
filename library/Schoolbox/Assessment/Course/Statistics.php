@@ -62,9 +62,14 @@ class Statistics
     protected $attemptMapper;
 
     /**
+     * @var UnitInstanceMapper
+     */
+    protected $unitInstanceMapper;
+
+    /**
      * Constructor
      *
-     * @param Folder     $course
+     * @param Folder     $course The course or unit home page to get stats for.
      * @param Term\Model $term
      * @param User       $user
      */
@@ -73,12 +78,12 @@ class Statistics
         $this->course = $course;
 
         // compile the due work, assessments, marks returned, et al
-        $this->submissionBoxMapper = new SubmissionBoxMapper();
+        $this->unitInstanceMapper  = UnitInstanceMapper::getInstance();
+        $this->submissionBoxMapper = SubmissionBoxMapper::getInstance();
         $this->submissionMapper    = Submission\FileMapper::getInstance();
-        $this->returnMapper        = new SubmissionBox\ReturnedWorkMapper();
-
-        $this->assessMapper  = new OnlineAssessmentMapper();
-        $this->attemptMapper = new AttemptMapper();
+        $this->returnMapper        = SubmissionBox\ReturnedWorkMapper::getInstance();
+        $this->assessMapper        = OnlineAssessmentMapper::getInstance();
+        $this->attemptMapper       = AttemptMapper::getInstance();
 
         /* Visibility
          * Exclude hidden quizzes from the Assessments cube
@@ -86,34 +91,56 @@ class Statistics
         $quizVisibility   = new Visibility();
         $quizVisibilities = $quizVisibility->getVisibilityArray($user);
 
-        // retrieve ALL the submission boxes for this category
-        $boxCollection = $this->submissionBoxMapper->findByColumnList(
-            array(
-                'category'        => $this->getCourse()->getId(),
-                'task_id'         => null,
-                'mark_visibility' => $quizVisibilities
-            )
+        // Get any classes which use this course.
+        $allFolders = $this->unitInstanceMapper->findAllFoldersUsingCourse(
+            $course,
+            $term->getStart(),
+            $term->getActualFinish()
         );
 
-        // I don't think that term can ever be null.
-        // If it's found that it can, then I'll have to just add all boxes.
-        foreach ($boxCollection as $box) {
-            if ($term->contains($box->getDueDate())) {
-                $this->addWork($box);
-            }
-        }
+        // And add work for all of these folders. (Group by unit.)
+        foreach ($allFolders as $folder) {
+            $allUnits = $this->unitInstanceMapper->findForCategoryId($folder->getId());
+            foreach ($allUnits as $unit) {
+//                $baseUnitId = $unit->getUnitCategory()->getId();
+                $boxIds    = [];
+                $assessIds = [];
+                foreach ($unit->getTasks() as $task) {
+                    $boxIds[]    = $task->getSubmissionBox()->getId();
+                    $assessIds[] = $task->getAssessment()->getId();
+                }
+                $boxIds    = array_unique(array_filter($boxIds));
+                $assessIds = array_unique(array_filter($assessIds));
 
-        // retrieve ALL the online assessments (not surveys) for this category
-        $assessCollection = $this->assessMapper->findByColumnList(
-            array(
-                'category_id'     => $this->getCourse()->getId(),
-                'availability'    => 'assess',
-                'mark_visibility' => $quizVisibilities
-            )
-        );
-        foreach ($assessCollection as $assess) {
-            if ($term->contains($assess->getFinish())) {
-                $this->addWork($assess);
+                // retrieve ALL the submission boxes for this unit
+                $boxCollection = $this->submissionBoxMapper->findByColumnList(
+                    array(
+                        'id'              => $boxIds,
+                        'mark_visibility' => $quizVisibilities
+                    )
+                );
+
+                // I don't think that term can ever be null.
+                // If it's found that it can, then I'll have to just add all boxes.
+                foreach ($boxCollection as $box) {
+                    if ($term->contains($box->getDueDate())) {
+                        $this->addWork($box);
+                    }
+                }
+
+                // retrieve ALL the online assessments (not surveys) for this category
+                $assessCollection = $this->assessMapper->findByColumnList(
+                    array(
+                        'assess_id'       => $assessIds,
+                        'availability'    => 'assess',
+                        'mark_visibility' => $quizVisibilities
+                    )
+                );
+                foreach ($assessCollection as $assess) {
+                    if ($term->contains($assess->getFinish())) {
+                        $this->addWork($assess);
+                    }
+                }
             }
         }
     }
