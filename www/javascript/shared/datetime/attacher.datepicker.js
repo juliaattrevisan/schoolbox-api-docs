@@ -14,6 +14,8 @@
     $(function(){
         $('[data-datepicker]').datepicker({
             constrainInput: false,
+            nextText: '&raquo;',
+            prevText: '&laquo;',
             onClose:function (string) {
                 var input = $(this);
                 $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
