@@ -161,7 +161,7 @@ class Cloner
             $newAssess
                 ->setTask(null)
                 ->setTaskInstance($this->task_instance)
-                ->setUser($_SESSION['id'])
+                ->setUser($this->task_instance->getOwner() ?: $_SESSION['user'])
                 ->setStart($start)
                 ->setFinish($finish)
                 ->setCurriculumNodes($oldAssess->getCurriculumNodes())
@@ -214,7 +214,7 @@ class Cloner
             $box
                 ->setTask(null)
                 ->setTaskInstance($this->task_instance)
-                ->setOwner($_SESSION['id'])
+                ->setOwner($this->task_instance->getOwner() ?: $_SESSION['user'])
                 ->setCategory($this->category)
                 ->setPublishDate($publish)
                 ->setOpenDate($open)
