@@ -124,7 +124,7 @@ class Statistics
                 // If it's found that it can, then I'll have to just add all boxes.
                 foreach ($boxCollection as $box) {
                     if ($term->contains($box->getDueDate())) {
-                        $this->addWork($box);
+                        $this->addWork($box, $unit->getUnitCategory());
                     }
                 }
 
@@ -138,7 +138,7 @@ class Statistics
                 );
                 foreach ($assessCollection as $assess) {
                     if ($term->contains($assess->getFinish())) {
-                        $this->addWork($assess);
+                        $this->addWork($assess, $unit->getUnitCategory());
                     }
                 }
             }
@@ -159,10 +159,11 @@ class Statistics
      * Add a dueWork or onlineAssess to the map, accounting for timestamp collisions
      *
      * @param SubmissionBox|OnlineAssessment $work
+     * @param Folder                         $unit The unit that this work originated from.
      *
      * @return bool
      */
-    protected function addWork($work)
+    protected function addWork($work, Folder $unit)
     {
         if ($work instanceof OnlineAssessment) {
             $stamp = $work->getFinish()->getUnixTimeStamp();
@@ -184,7 +185,14 @@ class Statistics
             ++$stamp;
         }
 
-        $this->workMap[$stamp] = array(
+        $unitId = $unit->getId();
+        if (!isset($this->workMap[$unitId])) {
+            $this->workMap[$unitId] = [
+                'unit' => $unit,
+                'work' => [],
+            ];
+        }
+        $this->workMap[$unitId]['work'][$stamp] = array(
             'object' => $work,
             'marks'  => $marks,
         );
