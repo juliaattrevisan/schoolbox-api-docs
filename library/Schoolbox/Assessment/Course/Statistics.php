@@ -322,6 +322,34 @@ class Statistics
     }
 
     /**
+     * Get all the assessment titles for the x-axis of the graph.
+     *
+     * @param UnitInstance $unit The unit that this work originated from.
+     *
+     * @return array
+     */
+    public function extractTitles(UnitInstance $unit)
+    {
+        $unitId = $unit->getUnitCategory()->getId();
+        if (!isset($this->workMap[$unitId]['tasks'])) {
+            return [];
+        }
+        $allData = array();
+        foreach ($this->workMap[$unitId]['tasks'] as $taskId => $current) {
+            $object = $current['object'];
+            if ($object instanceof SubmissionBox) {
+                $allData[$taskId] = $object->getName();
+            } elseif ($object instanceof OnlineAssessment) {
+                $allData[$taskId] = $object->getTitle();
+            } else {
+                $allData[$taskId] = '';
+            }
+        }
+        ksort($allData);
+        return array_values($allData);
+    }
+
+    /**
      * Get all the students data for box and whisker averages
      *
      * @param UnitInstance $unit The unit that this work originated from.

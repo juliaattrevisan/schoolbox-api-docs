@@ -14,13 +14,6 @@
         $('[data-unit-graph]').each(function() {
             var unitId = $(this).data('unitGraph');
 
-            // Prefill allAssessments values
-            var i = 0;
-            var allAssessments = [];
-            graphData[unitId].allMarks.forEach(function() {
-                allAssessments.push('Assessment '+String(++i));
-            });
-
             /**
              * Boxplots for each Task in the Unit
              */
@@ -36,7 +29,7 @@
                  * These correspond to a series of data and their respective
                  * five-point summaries
                  */
-                allAssessments: allAssessments,
+                allAssessments: graphData[unitId].titles,
                 /* All the raw data
                  */
                 allData: $.fn.reportCardBoxplotCalculateAllSeriesData(graphData[unitId].allMarks),

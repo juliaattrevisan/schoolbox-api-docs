@@ -130,6 +130,7 @@ class Controller extends Base
                         if (!isset($results[$courseId]['units'][$baseUnitId])) {
                             $results[$courseId]['units'][$baseUnitId] = [
                                 'unit'     => $unit,
+                                'titles'   => $courseStats->extractTitles($unit),
                                 'allMarks' => $courseStats->getAllUsersMarks($unit),
                                 'myMarks'  => $courseStats->extractUserMarks($student, $unit),
                                 'folder'   => $unit->getUnitCategory(),
