@@ -44,7 +44,7 @@ try {
 } catch (SchoolboxNotFoundException $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
 
-} catch (SchoolboxException $e) {
+} catch (Exception $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 500);
 
 }
