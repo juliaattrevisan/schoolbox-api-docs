@@ -15,12 +15,6 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
     private $upcomingWork = array();
 
     /**
-     * Used to indicate whether or not the 'View all Due Work' button should be displayed (if actionable is true)
-     * @var bool
-     */
-    private $restrictedMode;
-
-    /**
      * The maximum number of items to show
      * @var int
      */
@@ -66,22 +60,14 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             $this->actionable = $this->getConfig('actionable') ? true : false;
         } else {
             $this->actionable = true;
-            $this->restrictedMode = true;
         }
 
         $this->limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') : 0;
-
-        if ($this->getConfig('allow_parents')) {
-            $this->restrictedMode = false;
-        }
 
         // This component has access restrictions
         // when displayed to a student, actions are available, otherwise not
 
         if (!$_SESSION['user']->getRole()->isStudent()) {
-            if ($this->restrictedMode) {
-                return false;
-            }
             $this->actionable = false;
         }
 
@@ -105,7 +91,6 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
         if ($groupHandler->isParentOfChild($this->userID)) {
             // Check if system config restrict_student_submissions is on.
             // Parents can view assess links if it's off.
-            $this->restrictedMode = Config::get('restrict_parent_grades');
             $this->showAssessLink = !Config::get('restrict_student_submissions');
         }
 
@@ -274,20 +259,12 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             return false;
         }
 
-        $this->setBlock($templateHandle, 'view_all_due_work', 'view_all_due_work_block');
         $this->setBlock($templateHandle, 'no_upcoming_work', 'no_upcoming_work_block');
         $this->setBlock($templateHandle, 'has_upcoming_work', 'has_upcoming_work_block');
         $this->setBlock('has_upcoming_work', 'upcoming_work', 'upcoming_work_block');
         $this->setBlock('upcoming_work', 'upcoming_work_actionable', 'upcoming_work_actionable_block');
         $this->setBlock('upcoming_work', 'upcoming_work_link', 'upcoming_work_link_block');
         $this->setBlock('upcoming_work', 'upcoming_work_nolink', 'upcoming_work_nolink_block');
-
-        // To display the "view all" button, we must be not restricted
-        if ($this->restrictedMode) {
-            $this->setVar('view_all_due_work_block', '');
-        } else {
-            $this->parse('view_all_due_work_block', 'view_all_due_work');
-        }
 
         if (count($this->upcomingWork)) {
             foreach ($this->upcomingWork as $output) {
