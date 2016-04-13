@@ -12,7 +12,7 @@
  */
 namespace Schoolbox\Application\Exception;
 
-class Exception extends \Exception
+class Exception extends \RuntimeException
 {
 
 }
