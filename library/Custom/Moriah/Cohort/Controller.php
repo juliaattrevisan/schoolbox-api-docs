@@ -129,10 +129,10 @@ class Controller extends Base
                         $baseUnitId = $unit->getUnitCategory()->getId();
                         if (!isset($results[$courseId]['units'][$baseUnitId])) {
                             $results[$courseId]['units'][$baseUnitId] = [
-                                'unit'    => $unit,
-                                'marks'   => $courseStats->getAllUsersMarks($unit),
-                                'myMarks' => $courseStats->extractUserMarks($student, $unit),
-                                'folder'  => $unit->getUnitCategory(),
+                                'unit'     => $unit,
+                                'allMarks' => $courseStats->getAllUsersMarks($unit),
+                                'myMarks'  => $courseStats->extractUserMarks($student, $unit),
+                                'folder'   => $unit->getUnitCategory(),
                             ];
                         }
                     }
