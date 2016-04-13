@@ -37,8 +37,11 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
         $this->setBlock($templateHandle, "subject", "subject_block");
         $this->setVar('subject_block', '');
         foreach ($this->subject_list as $subject) {
-            $this->setVar('SUBJECT_CODE', Scrub::text($subject['code']));
-            $this->setVar('SUBJECT_NAME', urlencode(urlencode($subject['name'])));
+            $this->setVar([
+                'SUBJECT_CODE' => Scrub::text($subject['code']),
+                'SUBJECT_CODE_URL' => Scrub::text(urlencode(urlencode($subject['code']))),
+                'SUBJECT_NAME' => $subject['name']
+            ]);
             $this->parse('subject_block', 'subject', true);
         }
 

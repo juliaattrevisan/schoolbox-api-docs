@@ -8,6 +8,7 @@
  *
  */
 $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
+$category = null;
 
 $groupID = $_SESSION['gid'];
 $prefix = 'code';
@@ -18,7 +19,7 @@ $prefix = 'code';
 if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
     try {
         $category = $categoryMapper->findById($this->arg[0]);
-    } catch (\Exception $e) {
+    } catch (\Schoolbox\Mapper\Exception $e) {
         $this->pageNotFound();
     }
 
@@ -29,10 +30,11 @@ if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
         if (!$category) {
             $category = $categoryMapper->findByCode($this->arg[0]);
         }
-    } catch (\Exception $e) {
+    } catch (\Schoolbox\Mapper\Exception $e) {
         $this->pageNotFound();
     }
-} /* If a prefixed argument is given, load category code directly
+}
+/* If a prefixed argument is given, load category code directly
  * e.g. /homepage/$prefix/EN344
  */
 elseif (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
@@ -47,7 +49,8 @@ elseif (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
     } catch (\Exception $e) {
         $this->pageNotFound();
     }
-} /* When just an alphabetical category code provided
+}
+/* When just an alphabetical category code provided
  * e.g. /homepage/EN344
  */
 elseif (!is_numeric($this->arg[0])) {
@@ -319,7 +322,10 @@ if ($manageClassController->renderTemplate('manage_class')) {
 
 $this->parse('page_controls_block', 'page_controls');
 
-if ($_SESSION['user']->getRole()->isStaff()) {
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+if ($sessionUser->getRole()->isStaff()) {
     $codeString = Scrub::text($category->getTruncatedCodeString());
 }
 else {
