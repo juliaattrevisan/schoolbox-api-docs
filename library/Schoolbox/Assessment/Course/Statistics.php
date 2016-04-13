@@ -169,27 +169,30 @@ class Statistics
                 $work->getId(),
                 [
                     'most_recent'  => true,
-                    'calc_average' => true
+                    'calc_average' => false,
                 ]
             );
+            // I only want a single mark per student, not every mark.
+            $marks = array_map('array_pop', $marks);
         } elseif ($work instanceof SubmissionBox) {
             $marks = $this->getDueWorkMarks($work);
         } else {
             return false;
         }
 
-        $unitId = $unit->getUnitCategory()->getId();
-        $taskId = null;
+        $baseTask = null;
         // I need the base task this work belonged to.
         foreach ($unit->getTasks() as $taskInstance) {
             if ($taskInstance->getId() == $work->getTaskInstance()->getId()) {
-                $taskId = $taskInstance->getTask()->getId();
+                $baseTask = $taskInstance->getTask();
                 break;
             }
         }
-        if (!$taskId) {
+        if (!$baseTask instanceof Task) {
             return false;
         }
+        $unitId = $unit->getUnitCategory()->getId();
+        $taskId = $baseTask->getId();
         if (!isset($this->workMap[$unitId])) {
             $this->workMap[$unitId] = [
                 'unit'  => $unit,
@@ -199,7 +202,8 @@ class Statistics
         // Use task ID as key instead of stamp
         if (!isset($this->workMap[$unitId]['work'][$taskId])) {
             $this->workMap[$unitId]['tasks'][$taskId] = [
-                'task'    => $work->getTask(),
+                'task'    => $baseTask,
+                'object'  => $work,
                 'marks'   => [],
                 'average' => null,
             ];
@@ -309,8 +313,8 @@ class Statistics
                 : array('attempts' => 0)
             ;
             $works[$taskId] = array(
-                'object' => $current['object'],
-                'marks'  => $marks
+                'task'  => $current['task'],
+                'marks' => $marks
             );
         }
         ksort($works);
@@ -332,24 +336,23 @@ class Statistics
         }
         $allData = array();
         foreach ($this->workMap[$unitId]['tasks'] as $taskId => $current) {
-            $box              = $current['object'];
+            /** @var Task\Instance $task */
+            $task             = $current['task'];
             $allMarks         = $current['marks'];
             $allData[$taskId] = array();
             /* Stack results
              */
             foreach ($allMarks as $userId => $currentMark) {
-                if ($box instanceof OnlineAssessment) {
-                    if ($userId !== 'avg') {
-                        if (count($currentMark)) {
-                            $latestAttempt      = array_pop($currentMark);
-                            $allData[$taskId][] = array(
-                                'info'  => null,
-                                'uid'   => null,
-                                'value' => (float)$latestAttempt['mark']
-                            );
-                        }
+                if ($task->getAssessment()->getId()) {
+                    if (count($currentMark)) {
+                        $latestAttempt      = array_pop($currentMark);
+                        $allData[$taskId][] = array(
+                            'info'  => null,
+                            'uid'   => null,
+                            'value' => (float)$latestAttempt['mark']
+                        );
                     }
-                } elseif ($box instanceof SubmissionBox) {
+                } elseif ($task->getSubmissionBox()->getId()) {
                     if (strlen(trim($currentMark['mark']))) {
                         $allData[$taskId][] = array(
                             'info'  => null,
