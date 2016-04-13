@@ -15,13 +15,22 @@
             <p class="meta">{{ url }}</p>
             {% endif %}
 
+            {% if outputStackTrace %}
             <p class="meta">
-                {% if outputStackTrace %}
-                    Error Code {{ code }} "{{ meta.message }}" in file {{ meta.file }} on line {{ meta.line }}
-                {% else %}
-                    {{ summary.message|raw }}
-                {% endif %}
+                Error Code {{ code }} "{{ meta.message }}" in file {{ meta.file }} on line {{ meta.line }}
             </p>
+
+            <pre class="content">
+                {%- spaceless -%}
+                {{ stackTrace }}
+                {%- endspaceless -%}
+            </pre>
+            {% else %}
+            <p class="meta">
+                Further details have been logged.
+            </p>
+            {% endif %}
+
         </section>
 
         {% include 'common/error/fragment/options.twig' %}

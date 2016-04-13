@@ -548,9 +548,6 @@ class Bootstrap implements BootstrapInterface {
                 'type'    => $e->getCode(),
             );
 
-            if ($outputStackTrace) {
-                $error['message'] = "<pre>$e</pre>";
-            }
             $this->kernel->callExceptionCallbacks($e);
         } else {
             $error = error_get_last();
@@ -623,6 +620,7 @@ class Bootstrap implements BootstrapInterface {
 					'error' => $error,
 					'date' => date('Y-m-d H:i:s'),
 					'outputStackTrace' => $outputStackTrace,
+					'stackTrace' => "$e"
 				];
 
 				/* Pass $data straight in for twig rendering

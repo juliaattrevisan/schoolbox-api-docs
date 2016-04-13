@@ -595,6 +595,7 @@ class SitePage extends Page
                 'date' => '',
                 'meta' => '',
                 'outputStackTrace',
+                'stackTrace' => '',
             ];
         }
 
@@ -637,7 +638,8 @@ class SitePage extends Page
                 'url' => $args['url'],
                 'date' => \Alaress_Date_Format::now(),
                 'meta' => $args['error'],
-                'outputStackTrace' => $args['outputStackTrace']
+                'outputStackTrace' => $args['outputStackTrace'],
+                'stackTrace' => $args['stackTrace'],
             ]);
 
             $this->renderError('Error Encountered', $errorContents);
