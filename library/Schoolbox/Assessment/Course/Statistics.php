@@ -166,35 +166,40 @@ class Statistics
     protected function addWork($work, UnitInstance $unit)
     {
         if ($work instanceof OnlineAssessment) {
-            $stamp = $work->getFinish()->getUnixTimeStamp();
+            $task  = $work->getTask();
             $marks = $this->attemptMapper->getAllAttempts(
-                $work->getId(), array(
+                $work->getId(),
+                [
                     'most_recent'  => true,
                     'calc_average' => true
-                )
+                ]
             );
         } elseif ($work instanceof SubmissionBox) {
-            $stamp = $work->getDueDate()->getUnixTimeStamp();
+            $task  = $work->getTask();
             $marks = $this->getDueWorkMarks($work);
         } else {
             return false;
         }
 
-        // accommodate map collisions by incrementing seconds
-        while (array_key_exists($stamp, $this->workMap)) {
-            ++$stamp;
-        }
-
         $unitId = $unit->getUnitCategory()->getId();
+        $taskId = $task->getId();
         if (!isset($this->workMap[$unitId])) {
             $this->workMap[$unitId] = [
-                'unit' => $unit,
-                'work' => [],
+                'unit'  => $unit,
+                'tasks' => [],
             ];
         }
-        $this->workMap[$unitId]['work'][$stamp] = array(
-            'object' => $work,
-            'marks'  => $marks,
+        // Use task ID as key instead of stamp
+        if (!isset($this->workMap[$unitId]['work'][$taskId])) {
+            $this->workMap[$unitId]['tasks'][$taskId] = [
+                'task'  => $work->getTask(),
+                'marks' => [],
+            ];
+        }
+        // Assume each student only did the task once.
+        $this->workMap[$unitId]['tasks'][$taskId]['marks'] = array_merge(
+            $this->workMap[$unitId]['tasks'][$taskId]['marks'],
+            $marks
         );
         return true;
     }
@@ -281,14 +286,17 @@ class Statistics
     {
         $id     = $user->getId();
         $unitId = $unit->getUnitCategory()->getId();
-        if (!isset($this->workMap[$unitId]['work'])) {
+        if (!isset($this->workMap[$unitId]['tasks'])) {
             return [];
         }
         $works = array();
-        foreach ($this->workMap[$unitId]['work'] as $stamp => $work) {
-            $marks         = array_key_exists($id, $work['marks']) ? $work['marks'][$id] : array('attempts' => 0);
-            $works[$stamp] = array(
-                'object' => $work['object'],
+        foreach ($this->workMap[$unitId]['tasks'] as $taskId => $current) {
+            $marks = array_key_exists($id, $current['marks'])
+                ? $current['marks'][$id]
+                : array('attempts' => 0)
+            ;
+            $works[$taskId] = array(
+                'object' => $current['object'],
                 'marks'  => $marks
             );
         }
@@ -310,18 +318,18 @@ class Statistics
             return [];
         }
         $allData = array();
-        foreach ($this->workMap[$unitId]['work'] as $dueDate => $current) {
-            $box               = $current['object'];
-            $allMarks          = $current['marks'];
-            $allData[$dueDate] = array();
+        foreach ($this->workMap[$unitId]['tasks'] as $taskId => $current) {
+            $box              = $current['object'];
+            $allMarks         = $current['marks'];
+            $allData[$taskId] = array();
             /* Stack results
              */
             foreach ($allMarks as $userId => $currentMark) {
                 if ($box instanceof OnlineAssessment) {
                     if ($userId !== 'avg') {
                         if (count($currentMark)) {
-                            $latestAttempt       = array_pop($currentMark);
-                            $allData[$dueDate][] = array(
+                            $latestAttempt      = array_pop($currentMark);
+                            $allData[$taskId][] = array(
                                 'info'  => null,
                                 'uid'   => null,
                                 'value' => (float)$latestAttempt['mark']
@@ -330,7 +338,7 @@ class Statistics
                     }
                 } elseif ($box instanceof SubmissionBox) {
                     if (strlen(trim($currentMark['mark']))) {
-                        $allData[$dueDate][] = array(
+                        $allData[$taskId][] = array(
                             'info'  => null,
                             'uid'   => null,
                             'value' => (float)$currentMark['mark']
