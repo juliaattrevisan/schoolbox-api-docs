@@ -10,7 +10,6 @@
     {% endfor %}
 
     $(function() {
-//        var infoIndex = {GRAPH_INFO_INDEX}
         $('[data-unit-graph]').each(function() {
             var unitId = $(this).data('unitGraph');
 
@@ -46,44 +45,45 @@
                         data: graphData[unitId].myMarks.map(function(v) { return v.marks.mark; }),
                         tooltip: {
                             headerFormat: '',
-                            borderColor: '#000000'
-//                            pointFormatter: function() {
-//                                /* Basic template for each outlier
-//                                 */
-//                                var template =
-//                                        '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
-//                                        '<p class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></p>' +
-//                                        '<p class="comment">{INFO}</p>' +
-//                                        '</div>';
-//                                /* Concatenate everything
-//                                 */
-//                                if(typeof infoIndex[this.x].displayMark != 'undefined')
-//                                {
-//                                    tooltipContent = template;
-//
-//                                    if(infoIndex[this.x].displayMark != null) {
-//                                        tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, infoIndex[this.x].displayMark);
-//                                        tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, infoIndex[this.x].gradientMark);
-//                                    }
-//                                    else {
-//                                        tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, '');
-//                                        tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, '');
-//                                    }
-//                                    tooltipContent = tooltipContent.replace(/{INFO}/, infoIndex[this.x].info);
-//
-//                                    /* Show tooltip
-//                                     */
-//                                    $('.highcharts-tooltip').show();
-//
-//                                    return tooltipContent;
-//                                }
-//                                else {
-//
-//                                    /* Hide tooltip when no data
-//                                     */
-//                                    $('.highcharts-tooltip').hide();
-//                                }
-//                            }
+                            borderColor: '#000000',
+                            pointFormatter: function() {
+                                // Pluck it out of myMarks
+                                var myMark = graphData[unitId].myMarks[this.x].marks;
+                                var displayMark = myMark.display_mark;
+                                /* Basic template for each outlier
+                                 */
+                                var template =
+                                        '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
+                                        '<p class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></p>' +
+                                        '<p class="comment">{INFO}</p>' +
+                                        '</div>';
+                                /* Concatenate everything
+                                 */
+                                if (typeof displayMark != 'undefined') {
+                                    var tooltipContent = template;
+
+                                    if (displayMark != null) {
+                                        tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, displayMark);
+                                        tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, Math.floor(myMark.mark / 10));
+                                    }
+                                    else {
+                                        tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, '');
+                                        tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, '');
+                                    }
+                                    tooltipContent = tooltipContent.replace(/{INFO}/, myMark.comment);
+
+                                    /* Show tooltip
+                                     */
+                                    $('.highcharts-tooltip').show();
+
+                                    return tooltipContent;
+                                } else {
+
+                                    /* Hide tooltip when no data
+                                     */
+                                    $('.highcharts-tooltip').hide();
+                                }
+                            }
                         }
                     }
                 ]
