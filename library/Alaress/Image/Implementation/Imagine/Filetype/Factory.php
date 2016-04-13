@@ -9,7 +9,7 @@
 
 namespace Alaress\Image\Implementation\Imagine\Filetype;
 
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use \Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\Image\Filetype\FactoryInterface;
 
 class Factory implements FactoryInterface

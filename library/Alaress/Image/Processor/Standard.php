@@ -10,7 +10,7 @@
 
 namespace Alaress\Image\Processor;
 
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use \Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\Image\Cache\CacheInterface;
 use Alaress\Image\Filetype;
 use Alaress\Image\Transformation\Transformation;
