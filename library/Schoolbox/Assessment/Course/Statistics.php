@@ -272,17 +272,20 @@ class Statistics
     /**
      * Extracts the nominated user's marks for the category
      *
-     * @param User $user
+     * @param User   $user
+     * @param Folder $unit The unit to get work for.
      *
      * @return array
      */
-    public function extractUserMarks(User $user)
+    public function extractUserMarks(User $user, Folder $unit)
     {
-        $id    = $user->getId();
+        $id     = $user->getId();
+        $unitId = $unit->getId();
+        if (!isset($this->workMap[$unitId]['work'])) {
+            return [];
+        }
         $works = array();
-
-        foreach ($this->workMap as $stamp => $work) {
-
+        foreach ($this->workMap[$unitId]['work'] as $stamp => $work) {
             $marks         = array_key_exists($id, $work['marks']) ? $work['marks'][$id] : array('attempts' => 0);
             $works[$stamp] = array(
                 'object' => $work['object'],
@@ -296,12 +299,18 @@ class Statistics
     /**
      * Get all the students data for box and whisker averages
      *
+     * @param Folder $unit The unit to get work for.
+     *
      * @return array
      */
-    public function getAllUsersMarks()
+    public function getAllUsersMarks(Folder $unit)
     {
+        $unitId = $unit->getId();
+        if (!isset($this->workMap[$unitId]['work'])) {
+            return [];
+        }
         $allData = array();
-        foreach ($this->workMap as $dueDate => $current) {
+        foreach ($this->workMap[$unitId]['work'] as $dueDate => $current) {
             $box               = $current['object'];
             $allMarks          = $current['marks'];
             $allData[$dueDate] = array();
