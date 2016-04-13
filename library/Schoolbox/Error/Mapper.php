@@ -149,8 +149,8 @@ class Mapper extends BaseMapper
     /**
      * Return a throwable
      *
-     * @param $id
-     * @param null $parent
+     * @param int $id
+     * @param SchoolboxException $parent
      * @param string $additionalInfo
      * @return SchoolboxException
      */
