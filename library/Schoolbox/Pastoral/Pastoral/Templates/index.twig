@@ -185,13 +185,14 @@
                     <div class="list-item">
                         <div class="avatar card small-12 wrap-down">
 
+                            {# Portrait image of author #}
+                            <a href="/search/user/{{ record.owner.getId() }}">
+                                <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64">
+                            </a>
+
                             {# If the record is private and the person is not the owner, don't put links to view the content #}
                             {% if record.private and not record.showPrivate %}
 
-                                {# Portrait image of author #}
-                                <a href="/search/user/{{ record.owner.getId() }}">
-                                    <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
-                                </a>
                                 {# Heading of pastoral comment#}
                                 <h3>
                                     {{  record.getHeading() }}
@@ -206,11 +207,6 @@
 
                             {# Otherwise, display links to view the content #}
                             {% else %}
-
-                                {# Portrait image of author #}
-                                <a href="/search/user/{{ record.owner.getId() }}">
-                                    <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
-                                </a>
 
                                 {# Heading of pastoral comment#}
                                 <a href="/pastoral/{{ student.id }}/{{ record.getId() }}">
