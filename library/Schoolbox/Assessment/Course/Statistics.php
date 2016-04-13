@@ -102,7 +102,6 @@ class Statistics
         foreach ($allFolders as $folder) {
             $allUnits = $this->unitInstanceMapper->findForCategoryId($folder->getId());
             foreach ($allUnits as $unit) {
-//                $baseUnitId = $unit->getUnitCategory()->getId();
                 $boxIds    = [];
                 $assessIds = [];
                 foreach ($unit->getTasks() as $task) {
@@ -166,7 +165,6 @@ class Statistics
     protected function addWork($work, UnitInstance $unit)
     {
         if ($work instanceof OnlineAssessment) {
-            $task  = $work->getTask();
             $marks = $this->attemptMapper->getAllAttempts(
                 $work->getId(),
                 [
@@ -175,14 +173,23 @@ class Statistics
                 ]
             );
         } elseif ($work instanceof SubmissionBox) {
-            $task  = $work->getTask();
             $marks = $this->getDueWorkMarks($work);
         } else {
             return false;
         }
 
         $unitId = $unit->getUnitCategory()->getId();
-        $taskId = $task->getId();
+        $taskId = null;
+        // I need the base task this work belonged to.
+        foreach ($unit->getTasks() as $taskInstance) {
+            if ($taskInstance->getId() == $work->getTaskInstance()->getId()) {
+                $taskId = $taskInstance->getTask()->getId();
+                break;
+            }
+        }
+        if (!$taskId) {
+            return false;
+        }
         if (!isset($this->workMap[$unitId])) {
             $this->workMap[$unitId] = [
                 'unit'  => $unit,
@@ -192,14 +199,15 @@ class Statistics
         // Use task ID as key instead of stamp
         if (!isset($this->workMap[$unitId]['work'][$taskId])) {
             $this->workMap[$unitId]['tasks'][$taskId] = [
-                'task'  => $work->getTask(),
-                'marks' => [],
+                'task'    => $work->getTask(),
+                'marks'   => [],
+                'average' => null,
             ];
         }
-        // Assume each student only did the task once.
-        $this->workMap[$unitId]['tasks'][$taskId]['marks'] = array_merge(
-            $this->workMap[$unitId]['tasks'][$taskId]['marks'],
-            $marks
+        // Marks need to be merged and re-averaged.
+        $this->workMap[$unitId]['tasks'][$taskId]['marks']   += $marks;
+        $this->workMap[$unitId]['tasks'][$taskId]['average'] = $this->calculateAverage(
+            $this->workMap[$unitId]['tasks'][$taskId]['marks']
         );
         return true;
     }
@@ -213,8 +221,6 @@ class Statistics
     protected function getDueWorkMarks(SubmissionBox $box)
     {
         $marks = array();
-        $count = 0;
-        $sum   = 0;
 
         // Later, this should be updated to return in most recent order.
         // $this->returnMapper->findByColumn('box_id', $box->getId(), array('returned' => 'desc');
@@ -244,14 +250,6 @@ class Statistics
             );
         }
 
-        // Calculate sum and count only after the returned marks are collated.
-        foreach ($marks as $mark) {
-            if (isset($mark['mark'])) {
-                $count++;
-                $sum += $mark['mark'];
-            }
-        }
-
         // retrieve submissions and append any user IDs that haven't been marked
         $submissions = $this->submissionMapper->findByColumnList(
             array(
@@ -267,11 +265,26 @@ class Statistics
                 $marks[$userId]['attempts']++;
             }
         }
-
-        // calculate and insert an average
-        $marks['avg'] = $count ? $sum / $count : null;
-
         return $marks;
+    }
+
+    /**
+     * Gets the average mark for this set.
+     *
+     * @param  array $marks
+     * @return float
+     */
+    protected function calculateAverage($marks)
+    {
+        $count = 0;
+        $total = 0;
+        foreach ($marks as $mark) {
+            if (isset($mark['mark'])) {
+                $count++;
+                $total += $mark['mark'];
+            }
+        }
+        return $count ? ($total / $count) : null;
     }
 
     /**
