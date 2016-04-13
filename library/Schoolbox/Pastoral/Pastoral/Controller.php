@@ -205,6 +205,11 @@ class Controller extends Base
 
         // And spit this thing out
 
+        if ($this->getUser()->isSuperuser())
+            $pastoralModerator = true;
+        else
+            $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/report.twig',
@@ -215,7 +220,7 @@ class Controller extends Base
                     'pagesToDisplay'  => $pagesToDisplay % 2 == 0 ? $pagesToDisplay : $pagesToDisplay + 1,
                     'totalPages'            => $totalPages,
                     'totalResults'          => $records->count(),
-                    'pastoralModerator'     => $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0,
+                    'pastoralModerator'     => $pastoralModerator,
                     'pageCurrent'           => $pageCurrent,
                     'students'              => $this->getRequest()->query["students"],
                     'authors'               => $this->getRequest()->query["authors"],
@@ -242,13 +247,18 @@ class Controller extends Base
         if (!$this->getUser()->getRole()->isStaff())
             $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
+        if ($this->getUser()->isSuperuser())
+            $pastoralModerator = true;
+        else
+            $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/reportPrint.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
                     'results'           => $this->getReportData(),
-                    'pastoralModerator' => $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0,
+                    'pastoralModerator' => $pastoralModerator,
                     'students'          => $this->getRequest()->query["students"],
                     'authors'           => $this->getRequest()->query["authors"],
                     'severity'          => $this->getRequest()->query["severity"],
@@ -364,7 +374,7 @@ class Controller extends Base
                 'template' => '@pastoral/reportBuilder.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
-                    'types'           => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
+                    'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
                     'tags'              => $this->getPastoralTagsMapper()->findAll(),
                     'studentsSelected'  => $studentsSelected,
@@ -377,6 +387,30 @@ class Controller extends Base
                 ),
             )
         );
+    }
+
+    /**
+     * Returns the logged in users pastoral care moderator level
+     *
+     * @return int
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function getPastoralModeratorLevel() {
+        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+
+        if ($pastoralModerator) {
+            $pastoralModerator  = $this->getUserAccessMapper()->findOneByColumnList([
+                "uid" => $this->getUser()->getId(),
+                "service" => PASTORAL_SERVICE
+            ])->getAccessLevel();
+        } else {
+            $pastoralModerator = 0;
+        }
+
+        if ($this->getUser()->isSuperuser())
+            $pastoralModerator = FULL_ACCESS;
+
+        return $pastoralModerator;
     }
 
     /**
@@ -395,10 +429,11 @@ class Controller extends Base
         $externalUserMapper = new \External_User();
         $student = $this->getUserMapper()->findWithSubjects($id);
         $student->loadParents();
+        $student->loadTeachers();
 
         // Get pastoral moderator status
 
-        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+        $pastoralModerator = $this->getPastoralModeratorLevel();
 
         // The list screen is restricted to parents and staff
 
@@ -412,7 +447,7 @@ class Controller extends Base
         $contactList = $externalUserMapper->getStudentContactList($student->getExternalId());
         $studentExternal = $externalUserMapper->getStudent($student->getExternalId());
 
-        if (is_array($contactList))
+        if ($contactList instanceof Collection)
         {
             foreach ($contactList as $contact)
             {
@@ -455,6 +490,10 @@ class Controller extends Base
                     'studentContacts'   => $studentContacts,
                     'role'              => $this->getUser()->getRole()->getType(),
                     'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
+                    'teachers'          => $student->getTeacherCollection(),
+                    'WRITE_ACCESS'      => WRITE_ACCESS,
+                    'READ_ACCESS'       => READ_ACCESS,
+                    'FULL_ACCESS'       => FULL_ACCESS,
                     'pastoralModerator' => $pastoralModerator
                 ),
             )
@@ -473,18 +512,17 @@ class Controller extends Base
         if ($this->getUser()->getRole()->isStudent())
             $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
-        /** @var \Schoolbox\User $user */
-        $user = $this->getUser();
-
         // Get the students parents
 
         $student = $this->getUserMapper()->findWithSubjects($studentId);
         $student->loadParents();
 
-        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($user)->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+        // Get pastoral moderator status
+
+        $pastoralModerator = $this->getPastoralModeratorLevel();
 
         if (!$pastoralModerator)
-            if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student) && !$pastoralModerator)
+            if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student))
                 $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // Get the pastoral care record
@@ -523,6 +561,9 @@ class Controller extends Base
                 'data'     => array(
                     'session'           => $_SESSION,
                     'record'            => $pastoral,
+                    'WRITE_ACCESS'      => WRITE_ACCESS,
+                    'READ_ACCESS'       => READ_ACCESS,
+                    'FULL_ACCESS'       => FULL_ACCESS,
                     'pastoralModerator' => $pastoralModerator,
                     'role'              => $this->getUser()->getRole()->getType(),
                 ),
@@ -593,9 +634,9 @@ class Controller extends Base
 
         // Only the staff member that owns the record should be updating it
 
-        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+        $pastoralModerator = $this->getPastoralModeratorLevel();
 
-        if (!$pastoralModerator)
+        if ($pastoralModerator < WRITE_ACCESS)
             if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $record->getOwner()->getId())
                 $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
@@ -605,17 +646,24 @@ class Controller extends Base
             array(
                 'template' => '@pastoral/modify.twig',
                 'data'     => array(
-                    'session'         => $_SESSION,
-                    'record'          => $record,
-                    'types'           => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
-                    'severities'      => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
-                    'roles'           => $this->getRoleMapper()->findAll(),
-                    'attachzone'      => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($id)),
+                    'session'           => $_SESSION,
+                    'record'            => $record,
+                    'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
+                    'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
+                    'roles'             => $this->getRoleMapper()->findAll(),
+                    'WRITE_ACCESS'      => WRITE_ACCESS,
+                    'READ_ACCESS'       => READ_ACCESS,
+                    'FULL_ACCESS'       => FULL_ACCESS,
+                    'pastoralModerator' => $pastoralModerator,
+                    'attachzone'        => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($id)),
                 ),
             )
         );
     }
 
+    /**
+     * @throws \Exception
+     */
     public function postCommentDelete()
     {
         if ($this->getUser()->getRole()->isStudent())
@@ -638,6 +686,9 @@ class Controller extends Base
         $this->getPastoralCommentMapper()->delete($comment);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function postComment()
     {
         if ($this->getUser()->getRole()->isStudent())
@@ -831,10 +882,9 @@ class Controller extends Base
 
             // Only the owner or a moderator should be updating a record
 
-            $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service",
-                    PASTORAL_SERVICE)->count() > 0;
+            $pastoralModerator = $this->getPastoralModeratorLevel();
 
-            if (!$pastoralModerator) {
+            if ($pastoralModerator < WRITE_ACCESS) {
                 if ($this->getUser()->getId() != $record->getOwner()->getId()) {
                     $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
                 }
@@ -1008,7 +1058,7 @@ class Controller extends Base
                 $foundAttachment = false;
 
                 if (is_array($this->getRequest()->post["attachment"])) {
-                    foreach ($this->getRequest()->post["attachment"] as $nh) {
+                    foreach ($this->getRequest()->post["attachment"] as $hash) {
 
                         $hash_array = explode(":", $hash);
 
@@ -1023,7 +1073,7 @@ class Controller extends Base
 
                     // The attachment was found in the database, remove it
 
-                    $attachment->setModifiedDate(\Alaress_Date_Format::now());
+                    $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                     $this->getPastoralAttachmentMapper()->delete($attachment);
 
                 } else {
@@ -1059,6 +1109,9 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost("/pastoral/{$this->getRequest()->post["student_id"]}");
     }
 
+    /**
+     * @throws \Exception
+     */
     public function postDelete()
     {
         if ($this->getUser()->getRole()->isStudent())
@@ -1078,10 +1131,8 @@ class Controller extends Base
         $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
         if (!$pastoralModerator)
-        {
             if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $record->getOwner()->getId())
                 $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-        }
 
         $this->getPastoralCommentMapper()->deleteByColumn("pastoral_id", $this->getRequest()->post["id"]);
 

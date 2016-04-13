@@ -6,6 +6,7 @@ $userHandler = new User();
 $groupHandler = new Group();
 $pageHandler = new SitePage();
 $emailObj = new Email();
+$userMapper = \Schoolbox\UserMapper::getInstance();
 
 $result = $suggestions = $data = $return = array();
 
@@ -17,6 +18,8 @@ $residentialHouseID = $_GET['residentialHouseID'];
 if (!empty($residentialHouseID)) {
     $residentialHouseID = explode(';', $residentialHouseID);
 }
+
+$filterParents = false;
 
 if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
     && (strlen($groupID) || strlen($roleTypeID))
@@ -30,6 +33,10 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
                 case \Schoolbox\Role::STAFF:
                 case 'staff':
                     $thisRoleGroups = $groupHandler->getStaffGroupTypeIds();
+                    break;
+                case 'parentofstudent':
+                    $filterParents = true;
+                    $thisRoleGroups = $groupHandler->getParentGroupTypeIds();
                     break;
                 case \Schoolbox\Role::PARENT:
                 case 'parent':
@@ -63,8 +70,31 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64
         30
     );
 
+    $student = null;
+
+    // If we are getting parents of a student, load the student and populate their parents
+
+    if ($filterParents) {
+        $student = $userMapper->findById($_GET["studentId"]);
+        if ($student) {
+            $student->loadParents();
+        }
+    }
+
     if (is_array($userList)) {
         foreach ($userList as $user) {
+
+            // If required, filter to parents of the selected child
+
+            if ($filterParents && $student != null) {
+                if ($userSchoolbox = $userMapper->findById($user["uid"])) {
+                    if ($userSchoolbox->getRole()->isParent()) {
+                        if (!$userSchoolbox->isParentOf($student)) {
+                            continue;
+                        }
+                    }
+                }
+            }
 
             if ($_GET['email']) {
                 $email = $emailObj->formatEmailFromArray($user);

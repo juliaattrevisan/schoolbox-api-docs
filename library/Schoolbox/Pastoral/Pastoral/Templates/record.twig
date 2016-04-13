@@ -1,3 +1,5 @@
+{% set owner = session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() %}
+
 {% if role != 'parent' %}
 
     <script type="text/javascript">
@@ -60,8 +62,8 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h1>{{ record.getStudent.formatName() }}</h1>
-        <h2 class="subheader">Pastoral Record Details</h2>
+        <h1>Pastoral Care - {{ record.getStudent.formatName() }}</h1>
+        <h2 class="subheader">Record Details</h2>
 
         <section>
             <ul class="action-list">
@@ -77,17 +79,18 @@
                                 Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getCreatedAt().getShort() }}
                             </p>
 
-                            {# Show tags #}
-                            {% if record.tagsList | length > 0 %}
-                                <p class="spaced">
-                                    {% for tag in record.tagsList %}
-                                        <span class="neutral label">{{ tag.name }}</span>
-                                    {% endfor %}
-                                </p>
-                            {% endif %}
-
                             {# Hide meta from parents#}
                             {% if role != 'parent' %}
+
+                                {# Show tags #}
+                                {% if record.tagsList | length > 0 %}
+                                    <p class="spaced">
+                                        {% for tag in record.tagsList %}
+                                            <span class="neutral label">{{ tag.name }}</span>
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+
                                 <p class="spaced meta">
                                     {# Pastoral event type #}
                                     {{ record.getType.getName }} |
@@ -118,10 +121,12 @@
                     </div>
 
                     {# Only display the edit/delete links to the owner of the record or pastoral moderators #}
-                    {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or pastoralModerator %}
+                    {% if owner or pastoralModerator >= WRITE_ACCESS %}
                     <nav>
                         <a class="icon-modify" href="/pastoral/update/{{ record.getId() }}" title="Modify Comment"></a>
-                        <a data-delete class="icon-delete" href="#" title="Delete Comment"></a>
+                        {% if owner or pastoralModerator >= FULL_ACCESS %}
+                            <a data-delete class="icon-delete" href="#" title="Delete Comment"></a>
+                        {% endif %}
                     </nav>
                     {% endif %}
                 </li>
@@ -156,6 +161,7 @@
 
                         {% for related in record.getRelatedRecords %}
 
+                            {% if related.getStudent.getId != record.getStudent.getId %}
                             <li class="actions-small-1">
                                 <div class="list-item">
                                     <div class="small-12 avatar card wrap-down">
@@ -163,7 +169,6 @@
                                         <a href="/pastoral/{{ related.getStudent.getId }}/{{ related.getId }}" title="View Record">
                                             <img src="/portrait.php?userId={{ related.student.getExternalId() }}&size=square64" alt="" />
                                         </a>
-                                        {# Show styudent author #}
                                         <p class="meta">
                                             <a title="View Record" href="/pastoral/{{ related.getStudent.getId }}/{{ related.getId }}">
                                                 {{ related.getStudent.getFirstName }} {{ related.getStudent.getLastName }}
@@ -175,6 +180,7 @@
                                     </div>
                                 </div>
                             </li>
+                        {% endif %}
 
                         {% endfor %}
 
@@ -213,7 +219,7 @@
                                 {%
                                     if  record.getOwner.getId == session.user.getId or
                                         comment.getOwner.getId == session.user.getId or
-                                        pastoralModerator
+                                        pastoralModerator >= FULL_ACCESS
                                 %}
                                     <nav>
                                         <a data-delete-comment="{{ comment.getId }}" class="icon-delete" href="#" title="Delete Comment"></a>

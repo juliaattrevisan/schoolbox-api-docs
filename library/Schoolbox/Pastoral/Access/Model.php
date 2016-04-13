@@ -104,7 +104,7 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @return \Alaress_Date_Format $modifiedDate
+     * @return \Alaress_Date_Format $deletedAt
      */
     public function getDeletedAt() {
         return $this->deletedAt;

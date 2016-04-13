@@ -18,12 +18,18 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Mapper extends BaseMapper
 {
+    /**
+     * Mapper constructor.
+     */
     public function __construct()
     {
         $this->setErrorMapper(ErrorMapper::getInstance());
         Parent::__construct();
     }
 
+    /**
+     * Setup mapper
+     */
     protected function mapping()
     {
         $this->hasTable('lu_pastoral_severity');

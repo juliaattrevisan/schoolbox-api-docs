@@ -24,12 +24,18 @@ class Mapper extends BaseMapper
      */
     protected $errorMapper;
 
+    /**
+     * Mapper constructor.
+     */
     public function __construct()
     {
         $this->setErrorMapper(ErrorMapper::getInstance());
         Parent::__construct();
     }
 
+    /**
+     * Setup mapper
+     */
     protected function mapping()
     {
         $this->hasTable('pastoral_attachment');

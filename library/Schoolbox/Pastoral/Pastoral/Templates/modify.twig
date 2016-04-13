@@ -79,9 +79,9 @@
         $('#addUser').selectizeSelector({
             multiple: true,
             ajax: {
-                url:      '/ajax/user.php',
+                url:      '/ajax/user.php?studentId={{ student.getId }}',
                 type:     'GET',
-                data:     {roleTypeID: 'staff;parent;'},
+                data:     {roleTypeID: 'staff;parentofstudent'},
                 dataType: 'json'
             }
         });
@@ -96,7 +96,13 @@
             }
         });
 
+        $('#private').change(function(event) {
+            $('[data-role-parent]').prop('checked', false);
 
+            $('[data-role-parent]').prop('disabled', $('#private').prop('checked'));
+        });
+
+        $('[data-role-parent]').prop('disabled', $('#private').prop('checked'));
 
         $('[data-submit]').click(function(event)
         {
@@ -159,12 +165,14 @@
                     </div>
                 </div>
                 {% if record.getId != '' %}
-                    <nav>
-                        <a class="icon-more" title="" data-dropdown="header-options"></a>
-                    </nav>
-                    <ul id="header-options" class="f-dropdown" data-dropdown-content>
-                        <li><a href="#" data-delete class="icon-delete">Delete Pastoral Record</a></li>
-                    </ul>
+                    {% if owner or pastoralModerator >= FULL_ACCESS %}
+                        <nav>
+                            <a class="icon-more" title="" data-dropdown="header-options"></a>
+                        </nav>
+                        <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                            <li><a href="#" data-delete class="icon-delete">Delete Pastoral Record</a></li>
+                        </ul>
+                    {% endif %}
                 {% endif %}
             </div>
 
@@ -212,6 +220,7 @@
             </section>
 
             <h2 class="subheader">Visibility</h2>
+
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -223,18 +232,18 @@
                                 {# Default for new items: staff roles are selected, others are not #}
 
                                 <input type="hidden" name="role[{{ role.getId }}]" value="0" />
-                                <input type="checkbox" name="role[{{ role.getId }}]" id="role[{{ role.getId }}]" value="1"
-                                        {% if record.getId != '' %}
-                                            {% for access in record.getAccessList if access.getRole.getId != '' %}
-                                                {% if access.getRole.getId == role.getId %}
-                                                    checked
-                                                {% endif %}
-                                            {% endfor %}
-                                        {% else %}
-                                            {% if role.getType == 'staff' %}
+                                <input {% if role.getType == 'parent' %}data-role-parent{% endif %} type="checkbox" name="role[{{ role.getId }}]" id="role[{{ role.getId }}]" value="1"
+                                    {% if record.getId != '' %}
+                                        {% for access in record.getAccessList if access.getRole.getId != '' %}
+                                            {% if access.getRole.getId == role.getId %}
                                                 checked
                                             {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        {% if role.getType == 'staff' %}
+                                            checked
                                         {% endif %}
+                                    {% endif %}
                                 />
                                 <label for="role[{{ role.getId }}]" class="checkbox-label">{{ role.getName }} {% if role.getType == 'parent' %}of student{% endif %}</label>
 
@@ -243,8 +252,8 @@
 
                         <legend>
                             <label for="private">
-                                Hide Content From These Roles
-                                <span class="hint has-tip tip-top" data-tooltip title="If selected, the body of this report will only be visible to you, and no other users. Other users will only see the title and the event type.">?</span>
+                                Hide Content From Selected Roles
+                                <span class="hint has-tip tip-top" data-tooltip title="This will hide details of this record from all selected users, except for you and any users given individual access below.">?</span>
                             </label>
                         </legend>
 
@@ -259,6 +268,21 @@
 
                     </div>
                 </fieldset>
+            </section>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Individual User Access
+                            <span class="hint has-tip tip-top" data-tooltip title="Add individual users who you would like to access this record and its contents. These users will be able to see content marked as hidden.">?</span>
+                            <select id="addUser" name="user_id[]" multiple placeholder="Individual Users"></select>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <section>
                 {% if record.getAccessList.count > 0 %}
                     <ul class="grid information-list">
                         {% for access in record.getAccessList if access.getUser.getId != '' %}
@@ -279,27 +303,23 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            Individual Users
-                            <span class="hint has-tip tip-top" data-tooltip title="Add individual users who you would like to access this record and its contents.">?</span>
-                            <select id="addUser" name="user_id[]" multiple placeholder="Individual Users"></select>
-                        </label>
-                    </div>
-                </fieldset>
-                {% if record.getId == '' %}
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            Other Students Involved
-                            <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate report and add it to the pastoral care area for these students.">?</span>
-                            <select id="addStudent" name="duplicate_id[]" multiple placeholder="Add Students"></select>
-                        </label>
-                    </div>
-                </fieldset>
-                {% endif %}
             </section>
+
+            {# Can only involve students when creating a new record #}
+
+            {% if record.getId == '' %}
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label>
+                                Other Students Involved
+                                <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate report and add it to the pastoral care area for these students.">?</span>
+                                <select id="addStudent" name="duplicate_id[]" multiple placeholder="Add Students"></select>
+                            </label>
+                        </div>
+                    </fieldset>
+                </section>
+            {% endif %}
 
             <h2 class="subheader">Attach Files</h2>
 

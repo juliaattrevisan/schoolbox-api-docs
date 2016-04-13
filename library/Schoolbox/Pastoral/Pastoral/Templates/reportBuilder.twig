@@ -190,11 +190,11 @@
                         <select id="filterAuthors" name="authors[]" multiple placeholder="Select Authors"></select>
                     </label>
                     <label>
-                        Severity Level
+                        Minimum Severity Level
                         <select id="filterSeverity" name="severity_id">
                             <option value="">Show All Severity Levels</option>
                             {% for severity in severities %}
-                                <option {% if severity.id == severitySelected %}selected{% endif %} value="{{ severity.id }}">{{ severity.name }}</option>
+                                <option {% if severity.id == severitySelected %}selected{% endif %} value="{{ severity.order }}">{{ severity.name }}</option>
                             {% endfor %}
                         </select>
                     </label>
@@ -242,7 +242,7 @@
                     </fieldset>
                 </div>
                 <div class="small-12 columns">
-                    <label id="type_error" for="datetime_after" class="error" style="display:none;">You must select at least one record type</label></div>
+                    <label id="type_error" for="datetime_after" class="error" style="display:none;">You must select at least one record type to show in the report</label></div>
 
             </fieldset>
         </section>

@@ -102,6 +102,9 @@ class Mapper extends BaseMapper
         parent::__construct();
     }
 
+    /**
+     * Setup mapper
+     */
     protected function mapping()
     {
         $this->hasTable('pastoral');
@@ -345,16 +348,16 @@ class Mapper extends BaseMapper
         $criteria = [];
 
         if ($before_date != '') {
-            $before_date = date("Y-m-d", strtotime($before_date));
-            $criteria[] = "created_at <= '{$before_date}'";
+            $before_date = \Alaress_Date_Format::newLocal($before_date . " 12:00AM");
+            $criteria[] = "created_at <= '" . $before_date->toIso8601String() . "'";
         }
 
         if ($after_date != '') {
-            $after_date = date("Y-m-d", strtotime($after_date));
-            $criteria[] = "created_at >= '{$after_date}'";
+            $after_date = \Alaress_Date_Format::newLocal($after_date . " 11:59PM");
+            $criteria[] = "created_at >= '" . $after_date->toIso8601String() . "'";
         }
 
-        if ($severity != '') $criteria[] = "severity_id >= {$severity}";
+        if ($severity != '') $criteria[] = "sv.order >= {$severity}";
         if ($students != '') $criteria[] = "student_id IN ({$students})";
         if ($authors != '') $criteria[] = "owner_id IN ({$authors})";
         if ($types != '') $criteria[] = "type_id IN ({$types})";
@@ -466,10 +469,10 @@ class Mapper extends BaseMapper
             return true;
         }
 
-        /** @var \Schoolbox\User $user */
+        /** @var User $user */
         $user = $_SESSION["user"];
 
-        if ($user instanceof \Schoolbox\User) {
+        if ($user instanceof User) {
 
             // Pastoral moderators can access everything
 
@@ -561,7 +564,7 @@ class Mapper extends BaseMapper
         /** @var \Schoolbox\User $user */
         $user = $_SESSION["user"];
 
-        if ($user instanceof \Schoolbox\User) {
+        if ($user instanceof User) {
 
             // Pastoral moderators can access everything
 

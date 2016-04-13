@@ -20,6 +20,9 @@ use Schoolbox\RoleMapper;
 
 class Mapper extends BaseMapper
 {
+    /**
+     * Setup mapper
+     */
     protected function mapping()
     {
         $this->hasTable('pastoral_access');

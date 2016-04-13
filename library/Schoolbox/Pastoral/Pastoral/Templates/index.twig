@@ -69,7 +69,7 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1>Pastoral Care</h1>
+            <h1>Pastoral Care - {{ student.formatName() }}</h1>
         </div>
     </div>
 </div>
@@ -80,7 +80,7 @@
     <div class="row actions-small-3">
         <div class="list-item">
             <div class="small-12 island">
-                <h2 class="subheader">{{ student.formatName() }}</h2>
+                <h2 class="subheader">Student Details</h2>
             </div>
         </div>
         <nav>
@@ -99,11 +99,20 @@
                         </div>
                         <div class="small-12 medium-8 large-10 columns">
                             <dl class="profile">
-                                <dt class="no-margin small-6 medium-4">Student Age</dt>
+                                <dt class="no-margin small-6 medium-4">Age</dt>
                                 <dd class="no-margin small-6 medium-8">{{ studentAge }} Years Old</dd>
 
-                                <dt class="no-margin small-6 medium-4 {% if student.StudentYearLevel == '' and student.FormDescription == '' %}hide{% endif %}">Student Year Level</dt>
+                                <dt class="no-margin small-6 medium-4 {% if student.StudentYearLevel == '' and student.FormDescription == '' %}hide{% endif %}">Year Level</dt>
                                 <dd class="no-margin small-6 medium-8">{{ student.StudentYearLevel }} {{ student.FormDescription }}</dd>
+
+                                {% if teachers.count() > 0 %}
+                                    <dt class="no-margin small-6 medium-4">Teachers</dt>
+                                    <dd class="no-margin small-6 medium-8">
+                                        {% for teacher in teachers %}
+                                            <a href="/search/user/{{ teacher.getId }}">{{ teacher.getFullName }}</a><br>
+                                        {% endfor %}
+                                    </dd>
+                                {% endif %}
 
                                 {% for contact in studentContacts if not session.user.hideContacts %}
                                     <dt class="no-margin small-6 medium-4">{{ contact.StudentContactRelation }}</dt>
@@ -149,138 +158,153 @@
 {% endif %}
 
 <div data-no-records class="row{% if records.count() != 0 %} hide{% endif %}">
-    <div class="small-12 column{% if role != 'parent' %} hide{% endif %}">
-        <h1>Pastoral Care</h1>
-    </div>
     <div class="small-12 column">
         <div class="alert-box">No pastoral care records are visible regarding {{ student.formatName }}.{% if role != 'parent' %} <a href="/pastoral/insert/{{ student.getId }}">Add a Pastoral Record</a>{% endif %}</div>
     </div>
 </div>
+
+{% if records.count() > 0 %}
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Records</h2>
-        <section>
-            <ul class="information-list">
-                {% for record in records %}
 
-                    {# Only display records the logged in user is allowed to see. Parents cannot see private records ever (even if they have been given access). #}
-                    {% if not (record.private and role == 'parent') %}
+        {% for record in records %}
 
-                        <li data-record-type="{{ record.getType().getId() }}" data-pastoral class="record actions-small-1" id="pastoral-{{ record.getId() }}">
-                            <div class="list-item">
-                                <div class="avatar card small-12 wrap-down">
+            {% set owner = session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() %}
 
-                                    {# If the record is private and the person is not the owner, don't put links to view the content #}
-                                    {% if record.private and not record.showPrivate %}
+            {# Only display records the logged in user is allowed to see. Parents cannot see private records ever (even if they have been given access). #}
+            {% if not (record.private and role == 'parent') %}
 
-                                        {# Portrait image of author #}
-                                        <a href="/search/user/{{ record.owner.getId() }}">
-                                            <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
-                                        </a>
-                                        {# Heading of pastoral comment#}
-                                        <h3>
-                                            {{  record.getHeading() }}
+                {% if loop.first %}
+                    {% set found = true %}
+                    <h2 class="subheader">Records</h2>
+                    <section>
+                        <ul class="information-list">
+                {% endif%}
 
-                                            {# Show how many comments have been made on the record #}
+                <li data-record-type="{{ record.getType().getId() }}" data-pastoral class="record actions-small-1" id="pastoral-{{ record.getId() }}">
+                    <div class="list-item">
+                        <div class="avatar card small-12 wrap-down">
+
+                            {# Portrait image of author #}
+                            <a href="/search/user/{{ record.owner.getId() }}">
+                                <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64">
+                            </a>
+
+                            {# If the record is private and the person is not the owner, don't put links to view the content #}
+                            {% if record.private and not record.showPrivate %}
+
+                                {# Heading of pastoral comment#}
+                                <h3>
+                                    {{  record.getHeading() }}
+
+                                    {% if role != 'parent' %}
+                                        {# Show how many comments have been made on the record #}
+                                        {% if record.getCommentList.count > 0 %}
+                                            ({{ record.getCommentList.count }} Comment{% if record.getCommentList.count > 1 %}s{% endif %})
+                                        {% endif %}
+                                    {% endif %}
+                                </h3>
+
+                            {# Otherwise, display links to view the content #}
+                            {% else %}
+
+                                {# Heading of pastoral comment#}
+                                <a href="/pastoral/{{ student.id }}/{{ record.getId() }}">
+                                    <h3>
+                                        {{  record.getHeading() }}
+
+                                    {% if role != 'parent' %}
+                                        {# Show how many comments have been made on the record #}
                                             {% if record.getCommentList.count > 0 %}
-                                                ({{ record.getCommentList.count }} Comment{% if record.comments | length > 1 %}s{% endif %})
+                                                ({{ record.getCommentList.count }} Comment{% if record.getCommentList.count > 1 %}s{% endif %})
                                             {% endif %}
                                         </h3>
-
-                                    {# Otherwise, display links to view the content #}
-                                    {% else %}
-
-                                        {# Portrait image of author #}
-                                        <a href="/search/user/{{ record.owner.getId() }}">
-                                            <img src="/portrait.php?userId={{ record.getOwner().getExternalId() }}&amp;size=square64" width="64">
-                                        </a>
-
-                                        {# Heading of pastoral comment#}
-                                        <a href="/pastoral/{{ student.id }}/{{ record.getId() }}">
-                                            <h3>
-                                                {{  record.getHeading() }}
-
-                                                {# Show how many comments have been made on the record #}
-                                                {% if record.getCommentList.count > 0 %}
-                                                    ({{ record.getCommentList.count }} Comment{% if record.getCommentList.count > 1 %}s{% endif %})
-                                                {% endif %}
-                                            </h3>
-
-                                        </a>
-
                                     {% endif %}
 
-                                    {# Display name of poster #}
-                                    <p class="spaced meta">
-                                        Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getCreatedAt().getShort() }}
-                                    </p>
+                                </a>
 
-                                    {# Display tags #}
-                                    {% if record.tagsList | length > 0 %}
-                                        <p class="spaced">
-                                            {% for tag in record.tagsList %}
-                                                <span class="neutral label">{{ tag.name }}</span>
-                                            {% endfor %}
-                                        </p>
-                                    {% endif %}
-
-                                    <article>
-                                        {# Content of article #}
-                                        <p class="spaced">
-                                            {{ record.getBodyText() | cutSentence(375, true) | raw }}
-                                        </p>
-                                        {% if record.getAttachmentList.count() > 0 %}
-                                            <p class="spaced meta">
-                                                {% for attachment in record.getAttachmentList %}
-                                                    Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{ attachment.getFilename() }}</a><br>
-                                                {% endfor %}
-                                            </p>
-                                        {% endif %}
-                                    </article>
-
-                                    {# Hide meta from parents#}
-                                    {% if role != 'parent' %}
-                                        <p class="spaced meta">
-                                            {# Pastoral event type #}
-                                            {{ record.getType.getName }} |
-
-                                            {# Pastoral event severity #}
-                                            {{ record.getSeverity.getName }} |
-
-                                            {# Indicate if record is private #}
-                                            {% if record.private %}Contents Private | {% endif %}
-
-                                            {# Indicate if not audience has been set #}
-                                            {% if record.getAccessList.count == 0 %}No Audience Set{% endif %}
-
-                                            {# Show audienced roles  #}
-                                            {% if record.getAccessList.count > 0 %}
-                                                {% for access in record.getAccessList %}
-                                                    {% if access.getRole.getId != '' %}
-                                                        {{ access.getRole.getName }}{% if not loop.last %},{% endif %}
-                                                    {% elseif access.getUser.getId != '' %}
-                                                       <a href="/search/user/{{ access.getUser.getId }}">{{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}</a>{% if not loop.last %},{% endif %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                            {% endif %}
-
-                                        </p>
-                                    {% endif %}
-
-                                </div>
-                            </div>
-
-                            {# Show edit links to the owner and pastoral moderators #}
-                            {% if session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() or pastoralModerator %}
-                                <nav>
-                                    <a class="icon-modify no-text" href="/pastoral/update/{{ record.getId() }}" title="Modify"></a>
-                                    <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
-                                </nav>
                             {% endif %}
-                        </li>
+
+                            {# Display name of poster #}
+                            <p class="spaced meta">
+                                Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getCreatedAt().getShort() }}
+                            </p>
+
+                            {# Display tags #}
+                            {% if role != 'parent' %}
+                                {% if record.tagsList | length > 0 %}
+                                    <p class="spaced">
+                                        {% for tag in record.tagsList %}
+                                            <span class="neutral label">{{ tag.name }}</span>
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                            {% endif %}
+
+                            <article>
+                                {# Content of article #}
+                                <p class="spaced">
+                                    {{ record.getBodyText() | cutSentence(375, true) | raw }}
+                                </p>
+                                {% if record.getAttachmentList.count() > 0 %}
+                                    <p class="spaced meta">
+                                        {% for attachment in record.getAttachmentList %}
+                                            Attached: <a target="_blank" href="/storage/fetch.php?hash={{ attachment.getHash() }}">{{ attachment.getFilename() }}</a><br>
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                            </article>
+
+                            {# Hide meta from parents#}
+                            {% if role != 'parent' %}
+                                <p class="spaced meta">
+                                    {# Pastoral event type #}
+                                    {{ record.getType.getName }} |
+
+                                    {# Pastoral event severity #}
+                                    {{ record.getSeverity.getName }} |
+
+                                    {# Indicate if record is private #}
+                                    {% if record.private %}Contents Private | {% endif %}
+
+                                    {# Indicate if not audience has been set #}
+                                    {% if record.getAccessList.count == 0 %}No Audience Set{% endif %}
+
+                                    {# Show audienced roles  #}
+                                    {% if record.getAccessList.count > 0 %}
+                                        {% for access in record.getAccessList %}
+                                            {% if access.getRole.getId != '' %}
+                                                {{ access.getRole.getName }}{% if not loop.last %},{% endif %}
+                                            {% elseif access.getUser.getId != '' %}
+                                               <a href="/search/user/{{ access.getUser.getId }}">{{ access.getUser.getFirstname }} {{ access.getUser.getLastname }}</a>{% if not loop.last %},{% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+
+                                </p>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+                    {# Show edit links to the owner and pastoral moderators. Moderator 'write' (2) can edit, Moderator 'moderate' (3) can delete #}
+
+                    {% if owner or pastoralModerator >= WRITE_ACCESS %}
+                        <nav>
+                            <a class="icon-modify no-text" href="/pastoral/update/{{ record.getId() }}" title="Modify"></a>
+                            {% if owner or pastoralModerator >= FULL_ACCESS %}
+                                <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
+                            {% endif %}
+                        </nav>
                     {% endif %}
-                {% endfor %}
-            </ul>
-        </section>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if found %}
+                </ul>
+            </section>
+        {% endif%}
     </div>
 </div>
+{% endif %}

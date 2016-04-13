@@ -340,6 +340,7 @@ class Controller extends Base
             'lu_pastoral_type'        => [
                 'title'             => 'Pastoral Record Types',
                 'mapper'            => TypeMapper::class,
+                'sort'              => 'name',
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
@@ -382,6 +383,12 @@ class Controller extends Base
         if (isset($tables[$table]['sortable'])) {
             if ($reflect->hasMethod('get' . $tables[$table]['sortable'])) {
                 $rows = $rows->sortBy($tables[$table]['sortable'], 'asc');
+            }
+        } else {
+            if (isset($tables[$table]['sort'])) {
+                if ($reflect->hasMethod('get' . $tables[$table]['sort'])) {
+                    $rows = $rows->sortBy($tables[$table]['sort'], 'asc');
+                }
             }
         }
 

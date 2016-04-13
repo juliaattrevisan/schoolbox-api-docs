@@ -16,6 +16,7 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Notifier extends AbstractModuleNotifier
 {
@@ -35,6 +36,15 @@ class Notifier extends AbstractModuleNotifier
 
         $pastoral = $this->getPastoralMapper()->findById($model->getId());
 
+        // Get the kids teachers
+
+        $student = $this->getUserMapper()->findById($model->getStudent()->getId());
+        $student->loadTeachers();
+        $student->loadParents();
+        $teachers = $student->getTeacherCollection();
+
+        // Create the message
+
         $builder = new Builder();
         $builder->setTitle("A pastoral care record has been {$method}")
             ->setIcon("/portrait.php?size=32&userId=" . $pastoral->getOwner()->getExternalId())
@@ -47,31 +57,60 @@ class Notifier extends AbstractModuleNotifier
 
         // Work out who to send the message to
 
+        $sendToParents = false;
+
         /** @var Collection|PastoralAccessModel $accessModels */
         $accessModels = $this->getPastoralAccessMapper()->findByColumn("pastoral_id", $model->getId());
 
-        $sendToParents = false;
-
         /** @var PastoralAccessModel $accessModel */
-        foreach ($accessModels as $accessModel) {
+        foreach ($accessModels as $accessModel)
+        {
             $roleId = $accessModel->getRole()->getId();
 
-            if (!empty($roleId)) {
+            if (!empty($roleId))
+            {
+                // Sending to a role
 
                 /** @var Role $role */
                 $role = $this->getRoleMapper()->findById($roleId);
 
-                $accessModel->setRole($role);
+                // The system should only notify staff if they are a teacher of the student
 
-                if ($accessModel->getRole()->isStaff()) {
-                    $envelope->broadcastToRole($accessModel->getRole()->getId(), $message);
-                } else {
-                    if ($accessModel->getRole()->isParent()) {
-                        $sendToParents = true;
-                    }
+                if ($role->isStaff())
+                {
+                    /** @var User $teacher */
+                    foreach ($teachers as $teacher)
+                        if ($teacher->getRole()->getId() == $roleId)
+                            $envelope->targetToUser($teacher->getId(), $message);
                 }
-            } else {
-                $envelope->targetToUser($accessModel->getUser()->getId(), $message);
+                else if ($role->isParent())
+                {
+                    $sendToParents = true;
+                }
+            }
+            else
+            {
+                // Sending to individual users
+
+                $skip = false;
+
+                // If its private, and the selected user is a parent, don't notify them
+
+                // Get hydrated user so we can work out their role
+
+                /** @var \Schoolbox\User $user */
+                $user = $this->getUserMapper()->findOneByColumn("id", $accessModel->getUser()->getId());
+
+                /** @var Role $role */
+                $role = $this->getRoleMapper()->findOneByColumn("id", $user->getRole()->getId());
+
+                if ($role->isParent() && $pastoral->getPrivate())
+                    $skip = true;
+
+                // Otherwise, send it to the user
+
+                if (!$skip)
+                    $envelope->targetToUser($accessModel->getUser()->getId(), $message);
             }
         }
 
@@ -88,6 +127,8 @@ class Notifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
+        if (empty($dependencies["userMapper"]))
+            $dependencies["userMapper"] = UserMapper::getInstance();
         if (empty($dependencies["pastoralMapper"]))
             $dependencies["pastoralMapper"] = PastoralMapper::getInstance();
         if (empty($dependencies["pastoralAccessMapper"]))
@@ -161,6 +202,11 @@ class Notifier extends AbstractModuleNotifier
      */
     protected $roleMapper;
 
+    /**
+     * @var UserMapper $userMapper;
+     */
+    protected $userMapper;
+
     /** @var PastoralMapper $pastoralMapper */
     protected $pastoralMapper;
 
@@ -198,6 +244,23 @@ class Notifier extends AbstractModuleNotifier
     public function setRoleMapper($roleMapper)
     {
         $this->roleMapper = $roleMapper;
+        return $this;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper() {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param $userMapper
+     * @return $this
+     */
+    public function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
         return $this;
     }
 
