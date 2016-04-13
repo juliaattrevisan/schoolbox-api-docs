@@ -331,36 +331,24 @@ class Statistics
     public function getAllUsersMarks(UnitInstance $unit)
     {
         $unitId = $unit->getUnitCategory()->getId();
-        if (!isset($this->workMap[$unitId]['work'])) {
+        if (!isset($this->workMap[$unitId]['tasks'])) {
             return [];
         }
         $allData = array();
         foreach ($this->workMap[$unitId]['tasks'] as $taskId => $current) {
             /** @var Task\Instance $task */
-            $task             = $current['task'];
+//            $task             = $current['task'];
+//            $object           = $current['object'];
             $allMarks         = $current['marks'];
             $allData[$taskId] = array();
             /* Stack results
              */
             foreach ($allMarks as $userId => $currentMark) {
-                if ($task->getAssessment()->getId()) {
-                    if (count($currentMark)) {
-                        $latestAttempt      = array_pop($currentMark);
-                        $allData[$taskId][] = array(
-                            'info'  => null,
-                            'uid'   => null,
-                            'value' => (float)$latestAttempt['mark']
-                        );
-                    }
-                } elseif ($task->getSubmissionBox()->getId()) {
-                    if (strlen(trim($currentMark['mark']))) {
-                        $allData[$taskId][] = array(
-                            'info'  => null,
-                            'uid'   => null,
-                            'value' => (float)$currentMark['mark']
-                        );
-                    }
-                }
+                $allData[$taskId][] = array(
+                    'info'  => null,
+                    'uid'   => null,
+                    'value' => (float)$currentMark['mark'],
+                );
             }
         }
         ksort($allData);
