@@ -458,7 +458,6 @@ class Mapper extends BaseMapper
      *
      * @param Pastoral\Model $record
      * @return bool
-     * @throws \Schoolbox\Application\Exception
      */
     public function hasPermission(Pastoral\Model $record)
     {
@@ -497,7 +496,7 @@ class Mapper extends BaseMapper
             if ($role->isParent()) {
                 try {
                     $record->setStudent($this->getUserMapper()->findById($record->getStudent()->getId()));
-                } catch (\Exception $e) {
+                } catch (\Schoolbox\Mapper\Exception $e) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
                 }
 
@@ -616,10 +615,9 @@ class Mapper extends BaseMapper
     // Since this hydration is common to all of the methods, shoved it down here
 
     /**
-     * @param $record
+     * @param Pastoral\Model $record
      * @param $row
      * @return Pastoral\Model
-     * @throws \Schoolbox\Application\Exception
      */
     protected function hydrateRecord(Pastoral\Model $record, $row)
     {
@@ -655,13 +653,13 @@ class Mapper extends BaseMapper
                     /** @var \Schoolbox\Role $role */
                     $role = $this->getRoleMapper()->findById($access->getRole()->getId());
                     $access->setRole($role);
-                } catch (\Exception $e) {
+                } catch (\Schoolbox\Mapper\Exception $e) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
                 }
             } else if ($access->getUser()->getId() != '') {
                 try {
                     $access->setUser($this->getUserMapper()->findById($access->getUser()->getId()));
-                } catch (\Exception $e) {
+                } catch (\Schoolbox\Mapper\Exception $e) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
                 }
             }
@@ -672,7 +670,7 @@ class Mapper extends BaseMapper
         foreach ($record->getCommentList() as $comment) {
             try {
                 $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
-            } catch (\Exception $e) {
+            } catch (\Schoolbox\Mapper\Exception $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
             }
         }
@@ -685,9 +683,14 @@ class Mapper extends BaseMapper
 
             // Get file icon using mime type
 
-            $file = $this->getStorageMapper()->findByHash($attachment->getHash());
-            $attachment->setIcon($file->getMimetype()->getIconFile());
-            $attachment->setFilename($file->getFilename());
+            try {
+                $file = $this->getStorageMapper()->findByHash($attachment->getHash());
+                $attachment->setIcon($file->getMimetype()->getIconFile());
+                $attachment->setFilename($file->getFilename());
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
+            }
         }
 
         return $record;
