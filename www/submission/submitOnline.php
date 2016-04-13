@@ -30,9 +30,16 @@ $conf              = ConfigMapper::getInstance();
 
 //
 // Submission mapper - will get the most recent submission for this student.
-/** @var \Schoolbox\User $user */
+$box_id = $this->arg[0];
 $user = $_SESSION['user'];
-$box_id  = $this->arg[0];
+
+/** @var \Schoolbox\User $user */
+if (isset($this->arg[1])) {
+    // Teachers of this class may now impersonate handing in work as a student.
+    $user = \Schoolbox\UserMapper::getInstance()->findById($this->arg[1]);
+} else {
+    $user = $_SESSION['user'];
+}
 
 //
 // Should be some permissions on whether a user is a member of group
@@ -48,6 +55,13 @@ $gradient       = $submission_box->getGradientIndex();
 // has to allow submissions
 if (!$submission_box->getAcceptOnline()) {
     error(19);
+}
+
+// If impersonating a student, I have to have write access to this page
+if ($_SESSION['user']->getId() != $user->getId()) {
+    $studentRetHandler = new SubmissionReturn();
+    // This may exit
+    $studentRetHandler->securityCheck($box_id);
 }
 
 // if not multi, check there isn't already a (non-draft) submission
