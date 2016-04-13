@@ -238,7 +238,7 @@ class StudentReportCard
      * @param string    $template
      * @param string    $tab
      */
-    public function renderPage(\SitePage $page, $template = 'submission/allWork.html', $tab = 'submission')
+    public function renderPage(\SitePage $page, $template = 'submission/allWork.html', $tab = 'grade')
     {
         // visibility minimum is too high, can't see anything
         if ($this->minimumVisibility > SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT) {
