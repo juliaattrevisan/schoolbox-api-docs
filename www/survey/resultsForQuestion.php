@@ -31,13 +31,15 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 }
 
 if (!$assessHandler->isOwner($assess['assess_id'])
-    && ($groupHandler->getPermission() < WRITE_ACCESS)
+    && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)
 ) {
     error(125);
 }
 
 try {
     $folderMapper = new FolderMapper();
+
+    /** @var \Schoolbox\Resource\Folder\Model $folder */
     $folder = $folderMapper->findById($assess['category_id']);
 }
 catch (\Exception $e) {
