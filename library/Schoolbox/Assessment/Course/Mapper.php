@@ -419,6 +419,7 @@ class Mapper extends FolderMapper
         $errorMapper = ErrorMapper::getInstance();
         $folderMapper = FolderMapper::getInstance();
         $unitInstanceMapper = UnitInstanceMapper::getInstance();
+        $access = Access::getInstance();
 
         // Locate the unit we want to delete
 
@@ -428,7 +429,7 @@ class Mapper extends FolderMapper
             throw $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
-        if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
+        if ($access->getFolderAccess($_SESSION["user"], [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
         {
             try {
                 $folderMapper->deleteFolder($unit->getUnitCategory()->getId());
