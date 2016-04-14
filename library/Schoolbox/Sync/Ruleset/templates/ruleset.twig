@@ -133,7 +133,7 @@ set upsConfig = {
 
                     <div class="small-12 columns no-pad">
                         <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
-                            <h4>Conditions</h4>
+                            <h3>Conditions</h3>
                             {% if  currentRule.conditions is empty  %}
                             <div class="empty-state">
                                 <i class="icon-help"></i>
@@ -148,9 +148,10 @@ set upsConfig = {
                                 {% include allConditionStructures.fragments[currentCondition.id].fragment.getFilename() %}
                                 {% endfor %}
                             </ul>
+                        </section>
 
-
-                            <h4>Effects</h4>
+                        <section class="content">
+                            <h3>Effects</h3>
                             {% if  currentRule.effects is empty  %}
                             <div class="empty-state">
                                 <i class="icon-help"></i>
@@ -164,7 +165,6 @@ set upsConfig = {
                                 {% include allEffectStructures.containers[currentEffect.id] %}
                                 {% endfor %}
                             </ul>
-
                         </section>
                     </div>
 
