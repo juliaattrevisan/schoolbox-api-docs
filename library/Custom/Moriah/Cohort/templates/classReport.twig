@@ -11,7 +11,15 @@
 
     $(function() {
         $('[data-unit-graph]').each(function() {
-            var unitId = $(this).data('unitGraph');
+            var unitId     = $(this).data('unitGraph');
+            var unitTitles = graphData[unitId].titles;
+            var unitData   = $.fn.reportCardBoxplotCalculateAllSeriesData(graphData[unitId].allMarks);
+            var myData     = graphData[unitId].myMarks.map(function(v) { return Number(v.marks.mark); });
+
+            // Don't render empty graphs
+            if (unitTitles.length === 0) {
+                return;
+            }
 
             /**
              * Boxplots for each Task in the Unit
@@ -28,10 +36,10 @@
                  * These correspond to a series of data and their respective
                  * five-point summaries
                  */
-                allAssessments: graphData[unitId].titles,
+                allAssessments: unitTitles,
                 /* All the raw data
                  */
-                allData: $.fn.reportCardBoxplotCalculateAllSeriesData(graphData[unitId].allMarks),
+                allData: unitData,
                 /* You
                  */
                 additionalSeries: [
@@ -42,7 +50,7 @@
                         marker: {
                             radius: 6
                         },
-                        data: graphData[unitId].myMarks.map(function(v) { return Number(v.marks.mark); }),
+                        data: myData,
                         tooltip: {
                             headerFormat: '',
                             borderColor: '#000000',
