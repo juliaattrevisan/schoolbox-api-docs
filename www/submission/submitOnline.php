@@ -1,10 +1,10 @@
 <?php
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Config\ConfigMapper;
 
 // not in sitepage context, redirect
 if(!isset($this)) {
@@ -135,20 +135,20 @@ $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 
 $this->setVar(array(
-    'USER_NAME'            => Scrub::text($user->formatName()),
-    'USER_ID'              => Scrub::text($user->getId()),
-    'USER_EXTERNAL_ID'     => Scrub::text($user->getExternalId()),
-    'FOLDER_NAME'          => Scrub::text($submission_box->getCategory()->getName()),
-    'FOLDER_ID'            => $submission_box->getCategory()->getId(),
-    'BOX_DUEDATE'          => $dueDate->getRelativeTime(),
-    'BOX_DUETIME'          => $dueDate->isAtEndOfDay() ? $dueDate->getDateOnly() : $dueDate->getShort(),
-    'BOX_DUEDATE_GRADIENT' => $gradient,
-    'BOX_ID'               => $submission_box->getId(),
-    'SUBMISSION_ID'        => null,
-    'BOX_NAME'             => Scrub::text($submission_box->getName()),
-    'BOX_TYPE'             => $submission_box->getWorkType()->getName(),
-    'BOX_CREATED'          => $createdDate->getRelativeTime(),
-    'TEXTBOX_BODY'         => $body,
+    'SUBMISSION_USER_NAME'        => Scrub::text($user->formatName()),
+    'SUBMISSION_USER_ID'          => Scrub::text($user->getId()),
+    'SUBMISSION_USER_EXTERNAL_ID' => Scrub::text($user->getExternalId()),
+    'FOLDER_NAME'                 => Scrub::text($submission_box->getCategory()->getName()),
+    'FOLDER_ID'                   => $submission_box->getCategory()->getId(),
+    'BOX_DUEDATE'                 => $dueDate->getRelativeTime(),
+    'BOX_DUETIME'                 => $dueDate->isAtEndOfDay() ? $dueDate->getDateOnly() : $dueDate->getShort(),
+    'BOX_DUEDATE_GRADIENT'        => $gradient,
+    'BOX_ID'                      => $submission_box->getId(),
+    'SUBMISSION_ID'               => null,
+    'BOX_NAME'                    => Scrub::text($submission_box->getName()),
+    'BOX_TYPE'                    => $submission_box->getWorkType()->getName(),
+    'BOX_CREATED'                 => $createdDate->getRelativeTime(),
+    'TEXTBOX_BODY'                => $body,
 ));
 
 $trail = new Breadcrumbs();
