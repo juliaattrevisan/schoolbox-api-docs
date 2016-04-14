@@ -36,7 +36,6 @@ if ($groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
 
 
 $newsList = $newsHandler->getAllForCategory($category->getId(), false, true);
-$newsList = $newsHandler->getAll();
 
 if (is_array($newsList)) {
     $j = 0;
