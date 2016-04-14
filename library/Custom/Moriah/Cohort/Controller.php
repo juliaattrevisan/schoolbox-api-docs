@@ -183,42 +183,20 @@ class Controller extends Base
     }
 
     /**
-     * Generate a context selector phplib fragment
+     * Generate a context selector phplib fragment.
      *
-     * @param Term\Model $term
-     * @return
+     * @param  Term\Model $term
+     * @return string
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Web\Exception\InvalidComponent
      */
     private function generateContextSelector(Term\Model $term)
     {
-        /* Url Acrobatics, since the contextselector just appends args continually
-         *
-         * Trim the leading slash
-         * Replace any /term/* args that were previously chosen from contextselector
-         * Append /term, since the contextselector term value is something like 2016-1
-         */
         $currentUrl = ltrim($this->getRequest()->url->get(PHP_URL_PATH), '/');
         $currentUrl = preg_replace('/\/term\/(.*)/', '', $currentUrl);
         $currentUrl .= '/term';
-
-        /* Construct it in phplib sigh
-         */
-        $page = $this->getDi()->get('sitePage');
-
         $contextSelector = new ContextSelector($currentUrl);
         $contextSelector->setTerms($this->termMapper->findAll());
-
-        $contextSelector->render(
-            $page,
-            TEMPLATE_content,
-            array(
-                'term' => $term,
-            )
-        );
-
-        $contextSelectorHtml = $page->template->finish($page->template->parse('finaloutput', TEMPLATE_content));
-
-        return $contextSelectorHtml;
+        return $contextSelector->getAsString($this->getDi()->get('sitePage'), ['term' => $term]);
     }
 }
