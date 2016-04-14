@@ -101,6 +101,7 @@ class Module {
         }
         $this->isControllerDependenciesInstalled = true;
         $injector                                = $this->getInjector();
+        $this->preInitControllerDependencies($injector);
         $this->initDependingModules();
         $this->initRoutePreloads($injector->get('preloader'));
         $this->initRoutePermissions($injector->get('authorizer'));
@@ -243,6 +244,19 @@ class Module {
         $routes = $router->getRoutes();
         $routes->attachResource($this->basename, $basePath);
         $routes->attachResourcePostAlias($this->basename, $basePath);
+    }
+
+    /**
+     * Override with any steps required for a controller and its routes
+     *
+     * You should use this method to initialize any mappers or other objects
+     * which the controller needs, but are too heavy to initialize at module
+     * init time.
+     *
+     * @param ContainerInterface $injector The dependency injection container.
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector)
+    {
     }
 
     /**

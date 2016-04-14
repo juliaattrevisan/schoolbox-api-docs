@@ -48,32 +48,23 @@ class Module extends BaseModule
     protected $externalDb;
 
     /**
-     * Constructor
-     *
-     * @param ContainerInterface     $injector
-     * @param UserMapper             $userMapper
-     * @param Course\Mapper          $courseMapper
-     * @param External_UserInterface $externalDb
-     */
-    public function __construct(
-        ContainerInterface $injector,
-        UserMapper $userMapper,
-        Course\Mapper $courseMapper,
-        External_UserInterface $externalDb
-    ) {
-        parent::__construct($injector);
-        $this->userMapper   = $userMapper;
-        $this->courseMapper = $courseMapper;
-        $this->externalDb   = $externalDb;
-    }
-
-    /**
      * @inheritdoc
      */
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'classList', $basePath, '/student/{studentId}');
         $this->addGetRoute($router, 'classReport', $basePath, '/student/{studentId}/class/{classId}');
+        $this->addGetRoute($router, 'classReportForTerm', $basePath, '/student/{studentId}/class/{classId}/term/{term}');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector)
+    {
+        $this->userMapper   = $injector->newInstance(UserMapper::class);
+        $this->courseMapper = $injector->newInstance(Course\Mapper::class);
+        $this->externalDb   = $injector->newInstance(\External_User::class);
     }
 
     /**
