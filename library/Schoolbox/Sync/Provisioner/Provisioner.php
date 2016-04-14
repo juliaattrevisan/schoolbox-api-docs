@@ -182,7 +182,7 @@ class Provisioner
 
                     /* Deliberately empty $accessList so that Role-based
                      * permissions don't get saved in addition to the Group
-                     * permissions tha we can set
+                     * permissions that we can set
                      */
                     $preserved = new Collection();
 
@@ -191,6 +191,8 @@ class Provisioner
                     foreach ($internalUser->getAccessList() as $current) {
                         if ($current->getAccessLevel() == FULL_ACCESS) {
                             $preserved->add($current);
+
+                            $this->logger->debug("{$internalUser->getFullname()} is staying at access level {$current->getAccessLevel()} for {$current->getServiceIdentifier()}", $commonContext);
                         }
                     }
 
