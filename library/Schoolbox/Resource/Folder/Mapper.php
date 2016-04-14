@@ -21,6 +21,7 @@ use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
+use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageConfigMapper;
@@ -72,6 +73,14 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * @var array
      */
     protected $interimNodes = array();
+
+    /**
+     * Mapper constructor.
+     */
+    public function __construct() {
+        $this->setGroupMapper(GroupMapper::getInstance());
+        parent::__construct();
+    }
 
     /**
      * @inheritdoc
@@ -296,6 +305,10 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      */
     public function postSave($model, $previous = null)
     {
+        // If we are inheriting permissions delete any previously created group perms
+        if ($model->getInherit()) {
+            $this->getGroupMapper()->deleteByColumn("cid", $model->getId());
+        }
 
         // if no codes populated, no need to do anything
         if (!$model->getCodes()->count()) {
@@ -457,7 +470,6 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         return $collection;
     }
-
 
     /**
      * Returns a collection of all folders that are children of the specified ID (with optional recursion)
@@ -1389,5 +1401,26 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             $this->save($folder);
             $this->recurseInheritance($folder);
         }
+    }
+
+    /**
+     * @var GroupMapper
+     */
+    protected $groupMapper;
+
+    /**
+     * @return GroupMapper
+     */
+    public function getGroupMapper() {
+        return $this->groupMapper;
+    }
+
+    /**
+     * @param $groupMapper
+     * @return $this
+     */
+    public function setGroupMapper($groupMapper) {
+        $this->groupMapper = $groupMapper;
+        return $this;
     }
 }
