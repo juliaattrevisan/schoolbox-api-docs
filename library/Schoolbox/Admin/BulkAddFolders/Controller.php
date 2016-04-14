@@ -116,7 +116,7 @@ class Controller extends Base
         set_time_limit(600);
 
         if (!$this->getUser()->isSuperuser()) {
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
         $allFolders = null;
@@ -128,7 +128,7 @@ class Controller extends Base
             );
             $allFolders = $bulkHandler->addCategories();
         } else {
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
         // Render this thing out
