@@ -92,11 +92,8 @@ class Statistics
         $quizVisibilities = $quizVisibility->getVisibilityArray($user);
 
         // Get any classes which use this course.
-        $allFolders = $this->unitInstanceMapper->findAllFoldersUsingCourse(
-            $course,
-            $term->getStart(),
-            $term->getActualFinish()
-        );
+        // (ever, not just in this date span - assessments could have varying due dates)
+        $allFolders = $this->unitInstanceMapper->findAllFoldersUsingCourse($course);
 
         // And add work for all of these folders. (Group by unit.)
         foreach ($allFolders as $folder) {
