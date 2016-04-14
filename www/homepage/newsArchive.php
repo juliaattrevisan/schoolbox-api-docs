@@ -39,22 +39,13 @@ $newsList = $newsHandler->getAllForCategory($category->getId(), false, true);
 
 if (is_array($newsList)) {
     $j = 0;
+
+    $userHandler = new User();
+
     foreach ($newsList as $news) {
-        if ($article['owner'] == $_SESSION['id'] || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
-            $this->parse('can_modify_block', 'can_modify');
-        } else {
-            $this->setVar(array(
-                'can_modify_block' => ''
-            ));
-        }
-
-        $userHandler = new User();
-
         $poster = $userHandler->formatName($news);
 
         $postedDate = new Alaress_Date_Format($news['posted'], 'U');
-
-        $this->parse("news_block", "news", true);
 
         $output = array(
             "NEWS_ID"           => $news['id'],
@@ -70,6 +61,15 @@ if (is_array($newsList)) {
         );
         $this->setVar($output);
 
+        if ($article['owner'] == $_SESSION['id'] || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
+            $this->parse('can_modify_block', 'can_modify');
+        } else {
+            $this->setVar(array(
+                'can_modify_block' => ''
+            ));
+        }
+
+        $this->parse("news_block", "news", true);
 
         /* Clear children after parsing out the parent
          */
