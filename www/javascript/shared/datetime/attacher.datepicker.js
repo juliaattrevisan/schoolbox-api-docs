@@ -16,7 +16,7 @@
             constrainInput: false,
             nextText: '&raquo;',
             prevText: '&laquo;',
-            onClose:function (string) {
+            onSelect: function (string) {
                 var input = $(this);
                 $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
                     input.val(data.time).blur();
