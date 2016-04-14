@@ -181,7 +181,7 @@ class Controller extends Base {
         $termMapper = new TermMapper();
         $contextSelector = new ContextSelector($currentUrl);
         $contextSelector->setTerms($termMapper->findAll());
-        return $contextSelector->getAsString($this->getDi()->get('sitePage'), ['term' => $term]);
+        return $contextSelector->renderAsString($this->getDi()->get('sitePage'), ['term' => $term]);
     }
 
     /**

@@ -171,7 +171,7 @@ class ContextSelector
 	 *                                     :subject - the ID of the subject being targeted
 	 * @return string
 	 */
-	public function getAsString(SitePage $page, $selectedValues = [])
+	public function renderAsString(SitePage $page, $selectedValues = [])
 	{
 		$this->render(
 			$page,

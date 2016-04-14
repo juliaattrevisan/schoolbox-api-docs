@@ -197,6 +197,6 @@ class Controller extends Base
         $currentUrl .= '/term';
         $contextSelector = new ContextSelector($currentUrl);
         $contextSelector->setTerms($this->termMapper->findAll());
-        return $contextSelector->getAsString($this->getDi()->get('sitePage'), ['term' => $term]);
+        return $contextSelector->renderAsString($this->getDi()->get('sitePage'), ['term' => $term]);
     }
 }
