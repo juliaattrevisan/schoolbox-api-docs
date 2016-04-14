@@ -1866,7 +1866,7 @@ class Controller extends Base\Base
      *
      * @return CourseMapper
      */
-    private function getCourseMapper()
+    protected function getCourseMapper()
     {
         return $this->courseMapper;
     }
@@ -1876,7 +1876,7 @@ class Controller extends Base\Base
      *
      * @param CourseMapper $courseMapper
      */
-    private function setCourseMapper($courseMapper)
+    public function setCourseMapper($courseMapper)
     {
         $this->courseMapper = $courseMapper;
     }
@@ -1886,7 +1886,7 @@ class Controller extends Base\Base
      *
      * @return FolderMapper
      */
-    private function getFolderMapper()
+    protected function getFolderMapper()
     {
         return $this->folderMapper;
     }
@@ -1896,7 +1896,7 @@ class Controller extends Base\Base
      *
      * @param FolderMapper $folderMapper
      */
-    private function setFolderMapper($folderMapper)
+    public function setFolderMapper($folderMapper)
     {
         $this->folderMapper = $folderMapper;
     }
@@ -1906,7 +1906,7 @@ class Controller extends Base\Base
      *
      * @return TaskMapper
      */
-    private function getTaskMapper()
+    protected function getTaskMapper()
     {
         return $this->taskMapper;
     }
@@ -1916,7 +1916,7 @@ class Controller extends Base\Base
      *
      * @param TaskMapper $taskMapper
      */
-    private function setTaskMapper($taskMapper)
+    public function setTaskMapper($taskMapper)
     {
         $this->taskMapper = $taskMapper;
     }
@@ -1927,7 +1927,7 @@ class Controller extends Base\Base
      *
      * @return Component_InstanceMapper
      */
-    private function getComponentInstanceMapper()
+    protected function getComponentInstanceMapper()
     {
         return $this->componentInstanceMapper;
     }
@@ -1937,7 +1937,7 @@ class Controller extends Base\Base
      *
      * @param Component_InstanceMapper $componentInstanceMapper
      */
-    private function setComponentInstanceMapper($componentInstanceMapper)
+    public function setComponentInstanceMapper($componentInstanceMapper)
     {
         $this->componentInstanceMapper = $componentInstanceMapper;
     }
@@ -1947,7 +1947,7 @@ class Controller extends Base\Base
      *
      * @return Component_DefinitionMapper
      */
-    private function getComponentDefinitionMapper()
+    protected function getComponentDefinitionMapper()
     {
         return $this->componentDefinitionMapper;
     }
@@ -1957,7 +1957,7 @@ class Controller extends Base\Base
      *
      * @param Component_DefinitionMapper $componentDefinitionMapper
      */
-    private function setComponentDefinitionMapper($componentDefinitionMapper)
+    public function setComponentDefinitionMapper($componentDefinitionMapper)
     {
         $this->componentDefinitionMapper = $componentDefinitionMapper;
     }
@@ -1967,7 +1967,7 @@ class Controller extends Base\Base
      *
      * @return UnitInstanceMapper
      */
-    private function getUnitInstanceMapper()
+    protected function getUnitInstanceMapper()
     {
         return $this->unitInstanceMapper;
     }
@@ -1977,7 +1977,7 @@ class Controller extends Base\Base
      *
      * @param UnitInstanceMapper $unitInstanceMapper
      */
-    private function setUnitInstanceMapper($unitInstanceMapper)
+    public function setUnitInstanceMapper($unitInstanceMapper)
     {
         $this->unitInstanceMapper = $unitInstanceMapper;
     }
@@ -1987,7 +1987,7 @@ class Controller extends Base\Base
      *
      * @param SubmissionBoxMapper $submissionBoxMapper
      */
-    private function setSubmissionBoxMapper($submissionBoxMapper)
+    public function setSubmissionBoxMapper($submissionBoxMapper)
     {
         $this->submissionBoxMapper = $submissionBoxMapper;
     }
@@ -1997,7 +1997,7 @@ class Controller extends Base\Base
      *
      * @return SubmissionBoxMapper
      */
-    private function getSubmissionBoxMapper()
+    protected function getSubmissionBoxMapper()
     {
         return $this->submissionBoxMapper;
     }
@@ -2007,7 +2007,7 @@ class Controller extends Base\Base
      *
      * @return OnlineAssessmentMapper
      */
-    private function getOnlineAssessmentMapper()
+    protected function getOnlineAssessmentMapper()
     {
         return $this->onlineAssessmentMapper;
     }
@@ -2017,7 +2017,7 @@ class Controller extends Base\Base
      *
      * @param OnlineAssessmentMapper $onlineAssessmentMapper
      */
-    private function setOnlineAssessmentMapper($onlineAssessmentMapper)
+    public function setOnlineAssessmentMapper($onlineAssessmentMapper)
     {
         $this->onlineAssessmentMapper = $onlineAssessmentMapper;
     }
@@ -2064,7 +2064,7 @@ class Controller extends Base\Base
     /**
      * @return CourseConfigMapper
      */
-    public function getCourseConfigMapper()
+    protected function getCourseConfigMapper()
     {
         return $this->courseConfigMapper;
     }
@@ -2083,7 +2083,7 @@ class Controller extends Base\Base
     /**
      * @return Error\Mapper
      */
-    public function getErrorMapper()
+    protected function getErrorMapper()
     {
         return $this->errorMapper;
     }
@@ -2103,7 +2103,7 @@ class Controller extends Base\Base
     /**
      * @return UserAccessMapper
      */
-    public function getUserAccessMapper()
+    protected function getUserAccessMapper()
     {
         return $this->userAccessMapper;
     }
@@ -2123,7 +2123,7 @@ class Controller extends Base\Base
     /**
      * @return UserMapper
      */
-    public function getUserMapper()
+    protected function getUserMapper()
     {
         return $this->userMapper;
     }
@@ -2162,7 +2162,7 @@ class Controller extends Base\Base
     /**
      * @return TaskInstanceMapper
      */
-    public function getTaskInstanceMapper()
+    protected function getTaskInstanceMapper()
     {
         return $this->taskInstanceMapper;
     }
