@@ -100,10 +100,19 @@ class User extends SchoolboxUser
             $found = [];
 
             /* Update existing userAccess instance
+             *
+             * In accordance with SB-11230:
+             * - don't change Full Access settings
+             * - downgrade Write to Read
              */
             foreach ($this->getAccessList() as $current) {
                 if (in_array($current->getServiceIdentifier(), $identifiers)) {
-                    $current->setAccessLevel($level);
+                    if ($current->getAccesslevel() < FULL_ACCESS) {
+                        $current->setAccessLevel($level);
+                    }
+//                    else {
+//                        echo "* Setting {$current->getAccessLevel()} to {$level}\n";
+//                    }
 
                     $found[] = $current->getServiceIdentifier();
                 }
@@ -124,6 +133,12 @@ class User extends SchoolboxUser
                     $this->accessList->add($userAccess);
                 }
             }
+
+//            if ($this->getId() == 151) {
+//                foreach ($this->accessList as $current) {
+//                    echo "{$this->getId()}\t{$current->getService()}\t{$current->getServiceIdentifier()}\t{$current->getAccessLevel()}\n";
+//                }
+//            }
         }
     }
 }

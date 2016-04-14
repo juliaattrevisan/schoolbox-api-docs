@@ -15,6 +15,7 @@ use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\External\Normalise;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\CacheableLoggerInterface;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
@@ -183,7 +184,28 @@ class Provisioner
                      * permissions don't get saved in addition to the Group
                      * permissions tha we can set
                      */
-                    $internalUser->setAccessList(new Collection());
+//                    $ua = new UserAccess();
+//                    $ua->setUser($internalUser);
+//                    $ua->setService(1);
+//                    $ua->setServiceIdentifier(543);
+//                    $ua->setAccessLevel(3);
+
+                    $preserved = new Collection();
+//                    $preserved->add($ua);
+//
+                    foreach ($internalUser->getAccessList() as $current) {
+                        if ($current->getAccessLevel() == FULL_ACCESS) {
+                            $preserved->add($current);
+                        }
+                    }
+
+                    $internalUser->setAccessList($preserved);
+
+//                    if ($internalUser->getId() == 151) {
+//                        foreach ($internalUser->getAccessList() as $current) {
+//                            echo "{$internalUser->getId()}\t{$current->getService()}\t{$current->getServiceIdentifier()}\t{$current->getAccessLevel()}\n";
+//                        }
+//                    }
 
                     $commonContext['action'] = $action;
 
@@ -192,6 +214,14 @@ class Provisioner
                     // Run this user through the hydrators
                     try {
                         $ruleset->hydrate($externalUser, $internalUser);
+//                        if ($internalUser->getId() == 151) {
+//                            echo "\nAfter hydrate\n\n";
+//                            foreach ($internalUser->getAccessList() as $current) {
+//                                echo "{$internalUser->getId()}\t{$current->getService()}\t{$current->getServiceIdentifier()}\t{$current->getAccessLevel()}\n";
+//                            }
+//                            echo "\n--------end rule-------------\n\n";
+//                        }
+
 
                     } catch (SkipException $e) {
                         $commonContext['action'] = 'skip';
