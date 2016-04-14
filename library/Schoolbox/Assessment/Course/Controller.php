@@ -218,26 +218,9 @@ class Controller extends Base\Base
             $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
 
             $instances        = [];
-            $instanceMapper   = $this->getComponentInstanceMapper();
 
             $data['folder'] = $folder;
-            $data['units']  = $this->getCourseMapper()->findByParent($id)->filter(function ($folder) use ($instanceMapper, &$instances) {
-                /**
-                 * This folder is considered a unit:
-                 *      IF it has a course builder component (this is new logic)
-                 *      OR it has tasks (since the component may have been deleted)
-                 *
-                 * @var Folder\Model $folder
-                 */
-
-                $id = $folder->getId();
-
-                // check for instance (and cache it while you're at it)
-                $instances[$id] = array_values($instanceMapper->findByContextAndClass('homepage', $id, \Component_Homepage_CourseBuilderController::class));
-
-                // if there's an instance, you know she's a keeper
-                return $folder->getTaskCount() ? true : count($instances[$id]) > 0;
-            });
+            $data['units']  = $this->getCourseMapper()->findUnitsInCourse($folder);
 
             foreach ($data['units'] as $unit) {
                 $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);

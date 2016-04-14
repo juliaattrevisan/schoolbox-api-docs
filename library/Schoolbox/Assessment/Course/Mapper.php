@@ -337,6 +337,33 @@ class Mapper extends FolderMapper
     }
 
 
+    /**
+     * @param Folder $course
+     * @return Collection|Folder[]
+     */
+    public function findUnitsInCourse(Folder $course)
+    {
+        $instanceMapper = \Component_InstanceMapper::getInstance();
+
+        return $this->findByParent($course->getId())->filter(function ($folder) use ($instanceMapper) {
+            /**
+             * This folder is considered a unit:
+             *      IF it has a course builder component (this is new logic)
+             *      OR it has tasks (since the component may have been deleted)
+             *
+             * @var Folder $folder
+             */
+
+            $id = $folder->getId();
+
+            // check for instance (and cache it while you're at it)
+            $instances[$id] = array_values($instanceMapper->findByContextAndClass('homepage', $id, \Component_Homepage_CourseBuilderController::class));
+
+            // if there's an instance, you know she's a keeper
+            return $folder->getTaskCount() ? true : count($instances[$id]) > 0;
+        });
+    }
+
     /* Getters/Setters
      */
 
