@@ -111,12 +111,16 @@ if ($drafts->count()) {
 }
 
 $this->setBlock(TEMPLATE_content, 'confirm_terms', 'confirm_terms_block');
+$this->setBlock(TEMPLATE_content, 'submit_on_behalf', 'submit_on_behalf_block');
+$this->setVar('confirm_terms_block', '');
+$this->setVar('submit_on_behalf_block', '');
 $policy = $conf->get('lms_student_policy');
 if (strlen(trim($policy)) > 0) {
     $this->setVar('STUDENT_SUBMIT_TERMS', Scrub::html($policy));
     $this->parse('confirm_terms_block', 'confirm_terms');
-} else {
-    $this->setVar('confirm_terms_block', '');
+}
+if ($user->getId() != $_SESSION['user']->getId()) {
+    $this->parse('submit_on_behalf_block', 'submit_on_behalf');
 }
 unset($html2text, $policy);
 
@@ -131,6 +135,9 @@ $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 
 $this->setVar(array(
+    'USER_NAME'            => Scrub::text($user->formatName()),
+    'USER_ID'              => Scrub::text($user->getId()),
+    'USER_EXTERNAL_ID'     => Scrub::text($user->getExternalId()),
     'FOLDER_NAME'          => Scrub::text($submission_box->getCategory()->getName()),
     'FOLDER_ID'            => $submission_box->getCategory()->getId(),
     'BOX_DUEDATE'          => $dueDate->getRelativeTime(),
