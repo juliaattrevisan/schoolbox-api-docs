@@ -1,11 +1,11 @@
-<div class="compact avatar card small-12 medium-4">
+<div class="compact avatar card small-12 large-4">
     <div class="icon-quiz"></div>
     {{ work.item.title }}
 </div>
-<div class="small-12 medium-2 columns hide-for-small">
+<div class="small-12 medium-3 large-2 columns hide-for-small">
     &nbsp;
 </div>
-<div class="small-12 medium-2 columns">
+<div class="small-12 medium-3 large-2 columns">
     {# Quiz: Start Date #}
     <label for="quiz_start_date-{{ work.item.id }}">Start Date</label>
     <input id="quiz_start_date-{{ work.item.id }}"
@@ -18,7 +18,7 @@
            data-datepicker-sync-enddate="#quiz_start_date-{{ work.item.id }}" />
     <label for="quiz_start_date-{{ work.item.id }}" class="hide error">This field is required.</label>
 </div>
-<div class="small-12 medium-2 columns">
+<div class="small-12 medium-3 large-2 columns">
     {# Quiz: Finish Date #}
     <label for="quiz_finish_date-{{ work.item.id }}">Finish Date</label>
     <input id="quiz_finish_date-{{ work.item.id }}"
@@ -31,6 +31,6 @@
            data-datepicker-sync-enddate="#quiz_finish_date-{{ quiz.id }}" />
     <label for="quiz_finish_date-{{ work.item.id }}" class="hide error">This field is required.</label>
 </div>
-<div class="small-12 medium-2 columns hide-for-small">
+<div class="small-12 medium-3 large-2 columns hide-for-small">
     &nbsp;
 </div>
