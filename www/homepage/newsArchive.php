@@ -22,9 +22,9 @@ try {
 }
 
 $output = array('CATEGORY_NAME'	=> Scrub::text($category->getName()),
-                'TITLE'			=> 'News Archive',
-                'ID'			=> $category->getId(),
-                );
+    'TITLE'			=> 'News Archive',
+    'ID'			=> $category->getId(),
+);
 $this->setVar($output);
 
 //hide add button
@@ -36,6 +36,7 @@ if ($groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
 
 
 $newsList = $newsHandler->getAllForCategory($category->getId(), false, true);
+$newsList = $newsHandler->getAll();
 
 if (is_array($newsList)) {
     $j = 0;
@@ -54,21 +55,22 @@ if (is_array($newsList)) {
 
         $postedDate = new Alaress_Date_Format($news['posted'], 'U');
 
-        $output = array(
-                    "NEWS_ID"           => $news['id'],
-                    "NEWS_HEADING"	=> Scrub::text($news['heading']),
-                    "NEWS_BODY"		=> Scrub::html($news['body']),
-                    "EMAIL_CONTACT"	=> "<a href=\"/search/user/{$news['uid']}\">$poster</a>",
-                    "POSTED_DATE"	=> $postedDate->getShort(),
+        $this->parse("news_block", "news", true);
 
-                    "AUTHOR" => $userHandler->formatName($news),
-                    "AUTHOR_ID" => $news['uid'],
-                    "AUTHOR_EXTERNAL_ID" => $news['synid'],
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark'
-                );
+        $output = array(
+            "NEWS_ID"           => $news['id'],
+            "NEWS_HEADING"	=> Scrub::text($news['heading']),
+            "NEWS_BODY"		=> Scrub::html($news['body']),
+            "EMAIL_CONTACT"	=> "<a href=\"/search/user/{$news['uid']}\">$poster</a>",
+            "POSTED_DATE"	=> $postedDate->getShort(),
+
+            "AUTHOR" => $userHandler->formatName($news),
+            "AUTHOR_ID" => $news['uid'],
+            "AUTHOR_EXTERNAL_ID" => $news['synid'],
+            'ON_OFF' => ++$j % 2 ? '' : 'dark'
+        );
         $this->setVar($output);
 
-        $this->parse("news_block", "news", true);
 
         /* Clear children after parsing out the parent
          */
