@@ -46,14 +46,14 @@ class TimetableCampus {
      *
      * @var int
      */
-    protected $offset;
+    protected $offset = 0;
 
     /**
      * The day number on which this timetable starts.
      *
      * @var int
      */
-    protected $startDay;
+    protected $startDay = 1;
 
     /**
      * @param  \Schoolbox\Campus $campus
