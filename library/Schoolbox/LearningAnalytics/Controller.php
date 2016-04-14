@@ -160,7 +160,7 @@ class Controller extends Base {
      * Generate a context selector phplib fragment
      *
      * @param Term $term
-     * @return
+     * @return string
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Web\Exception\InvalidComponent
      */
@@ -178,24 +178,10 @@ class Controller extends Base {
 
         /* Construct it in phplib sigh
          */
-        $page = $this->getDi()->get('sitePage');
-
         $termMapper = new TermMapper();
-
         $contextSelector = new ContextSelector($currentUrl);
         $contextSelector->setTerms($termMapper->findAll());
-
-        $contextSelector->render(
-            $page,
-            TEMPLATE_content,
-            array(
-                'term' => $term,
-            )
-        );
-
-        $contextSelectorHtml = $page->template->finish($page->template->parse('finaloutput', TEMPLATE_content));
-
-        return $contextSelectorHtml;
+        return $contextSelector->getAsString($this->getDi()->get('sitePage'), ['term' => $term]);
     }
 
     /**
