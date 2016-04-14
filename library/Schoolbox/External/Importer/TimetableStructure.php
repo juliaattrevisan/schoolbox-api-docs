@@ -118,7 +118,7 @@ class TimetableStructure extends AbstractImporter
                 if (isset($row['Term Offset']) && strlen($row['Term Offset'])) {
                     $this->log->warning(
                         sprintf(
-                            '"Term Offset" is deprecated - assuming value "%d" is start day "%d"',
+                            '"Term Offset" is deprecated - use "Term Start Day Number" instead. (Assuming value "%d" is start day "%d")',
                             $row['Term Offset'],
                             $row['Term Offset'] + 1
                         )
@@ -130,7 +130,7 @@ class TimetableStructure extends AbstractImporter
                     ->setCampus($campusObject)
                     ->setStart(new Alaress_Date_Format($row['Term Start'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
                     ->setFinish(new Alaress_Date_Format($row['Term Finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
-                    ->setStartDay($row['Term Start Day']);
+                    ->setStartDay($row['Term Start Day Number']);
 
                 $result[$key] = [
                     'cycle'   => $cycle,
