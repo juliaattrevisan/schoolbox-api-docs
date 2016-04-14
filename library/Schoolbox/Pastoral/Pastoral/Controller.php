@@ -461,7 +461,6 @@ class Controller extends Base
                 try {
                     $spouse = $this->getUserMapper()->findByExternalId($contact['StudentContactSpouseID']);
                 } catch (\Exception $e) {
-                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
 
                 $contact['main'] = $main;
