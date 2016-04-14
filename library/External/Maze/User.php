@@ -808,7 +808,7 @@ class External_Maze_User implements External_UserInterface {
 		$userMapper = new \Schoolbox\UserMapper();
         try {
 		    $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
-        } catch (Exception_Schoolbox $e) {
+        } catch (Schoolbox\Mapper\Exception $e) {
             /* User not found */
             return false;
         }

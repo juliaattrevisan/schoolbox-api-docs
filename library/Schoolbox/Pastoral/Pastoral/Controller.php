@@ -11,6 +11,7 @@
 namespace Schoolbox\Pastoral\Pastoral;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\Pastoral;
 use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
@@ -168,7 +169,7 @@ class Controller extends Base
     public function getReport()
     {
         if ($this->getUser()->getRole()->isStudent())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
         $records = $this->getReportData();
 
@@ -240,12 +241,12 @@ class Controller extends Base
     public function getReportPrint()
     {
         if ($this->getUser()->getRole()->isStudent())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
         // Kick them back to the kerb if they aren't allowed to view this page
 
         if (!$this->getUser()->getRole()->isStaff())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         if ($this->getUser()->isSuperuser())
             $pastoralModerator = true;
@@ -327,13 +328,13 @@ class Controller extends Base
     public function getReportBuilder()
     {
         if ($this->getUser()->getRole()->isStudent())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
         // Get current users role. The screen is restricted to pastoral moderators only
         // Kick them back to the kerb if they shouldn't be looking at this page
 
         if (!$this->getUser()->getRole()->isStaff())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // Create some arrays used to repopulate the selectizes
 
@@ -417,12 +418,13 @@ class Controller extends Base
      * Display list of all pastoral records for selected student
      *
      * @param $id
+     * @throws SchoolboxException
      * @throws \Schoolbox\Mapper\Exception
      */
     public function getIndex($id)
     {
         if ($this->getUser()->getRole()->isStudent())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
         // Get the students parents
 
@@ -439,7 +441,7 @@ class Controller extends Base
 
         if (!$pastoralModerator)
             if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student))
-                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // Get the students contact details for display
 
@@ -455,7 +457,7 @@ class Controller extends Base
                 try {
                     $main = $this->getUserMapper()->findByExternalId($contact['StudentContactID']);
                 } catch (\Exception $e) {
-                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
                 $spouse = null;
                 try {
@@ -474,8 +476,7 @@ class Controller extends Base
         try {
             $records = $this->getPastoralMapper()->findByStudentId($id);
         } catch (\Exception $e) {
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-            return;
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
         $this->getResponse()->content->set(
@@ -501,15 +502,16 @@ class Controller extends Base
 
     /**
      * Get an individual pastoral care record
-     * 
+     *
      * @param $studentId
      * @param $id
+     * @throws SchoolboxException
      * @throws \Schoolbox\Mapper\Exception
      */
     public function getRecord($studentId, $id)
     {
         if ($this->getUser()->getRole()->isStudent())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
         // Get the students parents
 
@@ -520,10 +522,12 @@ class Controller extends Base
 
         $pastoralModerator = $this->getPastoralModeratorLevel();
 
-        if (!$pastoralModerator)
-            if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student))
-                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-
+        if (!$pastoralModerator) {
+            if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student)) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            }
+        }
+        
         // Get the pastoral care record
 
         $pastoral = $this->getPastoralMapper()->findById($id);
@@ -572,24 +576,24 @@ class Controller extends Base
 
     /**
      * Insert pastoral care record page
-     * 
+     *
      * @param $id
+     * @throws SchoolboxException
      */
     public function getInsert($id)
     {
         if ($this->getUser()->getRole()->isStudent())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
         // Only staff should be inserting comments
 
         if (!$this->getUser()->getRole()->isStaff())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         try {
             $student = $this->getUserMapper()->findById($id);
         } catch (\Exception $e) {
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-            return;
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
         // Render this thing...
@@ -613,22 +617,21 @@ class Controller extends Base
 
     /**
      * Update pastoral care record page
-     * 
+     *
      * @param $id
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws SchoolboxException
      */
     public function getUpdate($id)
     {
         if ($this->getUser()->getRole()->isStudent())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
         // Get the record we are updating
 
         try {
             $record = $this->getPastoralMapper()->findById($id);
         } catch (\Exception $e) {
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-            return;
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
         // Only the staff member that owns the record should be updating it
@@ -637,7 +640,7 @@ class Controller extends Base
 
         if ($pastoralModerator < WRITE_ACCESS)
             if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $record->getOwner()->getId())
-                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // Lets get the party started...
 
@@ -661,43 +664,46 @@ class Controller extends Base
     }
 
     /**
-     * @throws \Exception
+     * Delete a comment
+     *
+     * @throws SchoolboxException
      */
     public function postCommentDelete()
     {
         if ($this->getUser()->getRole()->isStudent())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
         // Get the comment we are deleting
 
         try {
             $comment = $this->getPastoralCommentMapper()->findById($this->getRequest()->post['id']);
         } catch (\Exception $e) {
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-            return;
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
         // Only the staff member that owns the record should be updating it
 
         if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $comment->getOwner()->getId())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         $this->getPastoralCommentMapper()->delete($comment);
     }
 
     /**
-     * @throws \Exception
+     * Post a comment
+     *
+     * @throws SchoolboxException
      */
     public function postComment()
     {
         if ($this->getUser()->getRole()->isStudent())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
         // Post a comment on a pastoral record
         // Only staff should be doing this
 
         if (!$this->getUser()->getRole()->isStaff())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 
         // No blank comments thanks
 
@@ -719,17 +725,18 @@ class Controller extends Base
 
     /**
      * Insert/update a pastoral care record
-     * @throws \Schoolbox\Mapper\Exception
+     *
+     * @throws SchoolboxException
      */
     public function postSave()
     {
         if ($this->getUser()->getRole()->isStudent())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
         // Only staff should be doing this
 
         if (!$this->getUser()->getRole()->isStaff()) {
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         // External interface
@@ -786,9 +793,8 @@ class Controller extends Base
                     $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
                     /** @var PastoralSeverityModel $severity */
                     $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
-                } catch (\Exception $e) {
-                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-                    return;
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
 
                 $record->setStudent($student);
@@ -821,8 +827,7 @@ class Controller extends Base
                             try {
                                 $user = $this->getUserMapper()->findbyId($user_id);
                             } catch (\Exception $e) {
-                                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-                                return;
+                                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                             }
 
                             $access = new PastoralAccessModel();
@@ -853,9 +858,8 @@ class Controller extends Base
                         try {
                             /** @var \Schoolbox\Role $role */
                             $role = $this->getRoleMapper()->findById($role_id);
-                        } catch (\Exception $e) {
-                            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-                            return;
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                         }
 
                         $access = new PastoralAccessModel();
@@ -873,8 +877,7 @@ class Controller extends Base
             try {
                 $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
             } catch (\Exception $e) {
-                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-                return;
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
 
             $records->add($record);
@@ -885,7 +888,7 @@ class Controller extends Base
 
             if ($pastoralModerator < WRITE_ACCESS) {
                 if ($this->getUser()->getId() != $record->getOwner()->getId()) {
-                    $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
                 }
             }
 
@@ -895,8 +898,7 @@ class Controller extends Base
                 /** @var PastoralSeverityModel $severity */
                 $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
             } catch (\Exception $e) {
-                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-                return;
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
 
             $record->setHeading($this->getRequest()->post["heading"]);
@@ -973,8 +975,7 @@ class Controller extends Base
                             try {
                                 $user = $this->getUserMapper()->findById($user_id);
                             } catch (\Exception $e) {
-                                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-                                return;
+                                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                             }
 
                             $access = new PastoralAccessModel();
@@ -1008,8 +1009,7 @@ class Controller extends Base
                         /** @var \Schoolbox\Role $role */
                         $role = $this->getRoleMapper()->findById($role_id);
                     } catch (\Exception $e) {
-                        $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-                        return;
+                        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                     }
 
                     if (!$found) {
@@ -1048,8 +1048,7 @@ class Controller extends Base
             try {
                 $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($record->getId());
             } catch (\Exception $e) {
-                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-                return;
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
 
             foreach ($attachments as $attachment) {
@@ -1109,29 +1108,32 @@ class Controller extends Base
     }
 
     /**
-     * @throws \Exception
+     * Delete a pastoral care record
+     *
+     * @throws SchoolboxException
      */
     public function postDelete()
     {
         if ($this->getUser()->getRole()->isStudent())
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_VIEW);
 
         // Get the record we are deleting
 
         try {
             $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
-        } catch (\Exception $e) {
-            $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-            return;
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
         // Work out if this person should be allowed to delete the record
 
         $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
 
-        if (!$pastoralModerator)
-            if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $record->getOwner()->getId())
-                $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        if (!$pastoralModerator) {
+            if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $record->getOwner()->getId()) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            }
+        }
 
         $this->getPastoralCommentMapper()->deleteByColumn("pastoral_id", $this->getRequest()->post["id"]);
 

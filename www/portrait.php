@@ -26,7 +26,6 @@ if(! ($_SESSION['user'] instanceof Schoolbox\User)) {
 }
 
 try {
-
     $image = new Image\Processor\Standard(
         new Image\Cache\Portrait(trim($_GET['userId']), $_GET['size'], $_SESSION['user']),
         new Image\Transformation\Portrait(),
@@ -35,14 +34,25 @@ try {
     );
 
     $image->load()->stream();
-
-} catch (Exception_Schoolbox_AccessDenied $e) {
+}
+/* When you cannot access the requested image (access denied)
+ */
+catch (\RuntimeException $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
-
-} catch (Exception_Schoolbox_NotFound $e) {
+}
+/* Image/Portrait not found
+ */
+catch (\InvalidArgumentException $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
-
-} catch (Exception $e) {
+}
+/* Invalid file type
+ */
+catch (\DomainException $e) {
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
+}
+/* All other exceptions
+ * BadMethodCallException
+ */
+catch (Exception $e) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 500);
-
 }

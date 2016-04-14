@@ -9,6 +9,7 @@
 
 namespace Schoolbox\ResourceBooking\Item;
 
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use DateTime;
 use Alaress\Paginator\IUrlPaginator;
 use Alaress\Web\Controller\Base;
@@ -75,7 +76,7 @@ class Controller extends Base
                 $query['resource_category_id'] = $catId;
                 try {
                     $category = $this->getMapper()->getJoinMapper('category')->findById($catId);
-                } catch (\Exception_Schoolbox_NotFound $e) {
+                } catch (SchoolboxNotFoundException $e) {
                     $this->getResponse()->status->setCode(404);
                 }
             }

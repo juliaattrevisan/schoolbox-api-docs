@@ -9,11 +9,22 @@
 use Schoolbox\External\SubjectMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
+use Schoolbox\Application\Exception\NotAuthenticated as SchoolboxNotAuthenticatedException;
 
 class Authenticator {
 
+    /**
+     * Are you authentiated?
+     *
+     * @var bool
+     */
     private $authenticated = false;
 
+    /**
+     * Authenticator constructor.
+     */
     public function __construct() {
 
     }
@@ -22,20 +33,22 @@ class Authenticator {
 
     /**
      * Encapsulating authentication method. Takes password by reference because it will unset it at the end of its use
+     *
      * @param $username
      * @param $password
      * @param bool $remember
+     * @throws SchoolboxAccessDeniedException
      */
     public function authenticate($username, $password, $remember = false) {
-
         $s = new Session();
         $this->authenticated = $s->authenticate($username, $password);
 
         // if successful, go ahead and create a session
-        if($this->isAuthenticated())
+        if ($this->isAuthenticated()) {
             $this->createSession($username, $remember);
-        else
-            throw new Exception_Schoolbox_AccessDenied('Username or password is incorrect.');
+        } else {
+            throw new SchoolboxAccessDeniedException('Username or password is incorrect');
+        }
     }
 
     /**
@@ -51,27 +64,41 @@ class Authenticator {
 
     /* Session Functions */
 
+    /**
+     * Start session
+     *
+     * @param $username
+     * @param bool $remember
+     * @return bool
+     * @throws SchoolboxNotAuthenticatedException
+     */
     public function createSession($username, $remember = false) {
         // do nothing if I don't know you
-        if(!$this->isAuthenticated())
-            throw new Exception_Schoolbox_NotAuthenticated('Cannot create session, not authenticated.');
+        if (!$this->isAuthenticated()) {
+            throw new SchoolboxNotAuthenticatedException('Cannot create session, not authenticated');
+        }
 
         $this->destroySession();
 
         // start by creating a desktop session, then we will add the mobile elements into it
-        if(session_start()) {
+        if (session_start()) {
             $session = new Session();
             $session->create($username, $remember);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
+    /**
+     * Append session
+     *
+     * @param $userID
+     * @return bool
+     */
     public function appendSession($userID) {
+
         /**
-         *
          * @var UserMapper $userMapper
          */
         $userMapper = UserMapper::getInstance();
@@ -96,14 +123,31 @@ class Authenticator {
         return false;
     }
 
+    /**
+     * Set a session var
+     *
+     * @param $key
+     * @param $value
+     */
     public function setSessionVar($key, $value) {
         $_SESSION[$key] = $value;
     }
 
+    /**
+     * Get a session var
+     *
+     * @param $key
+     * @return mixed
+     */
     public function getSessionVar($key) {
         return $_SESSION[$key];
     }
 
+    /**
+     * Set session vars with a key/value array
+     *
+     * @param $vars
+     */
     public function setSessionVars($vars) {
         foreach($vars as $k => $v)
             $_SESSION[$k] = $v;

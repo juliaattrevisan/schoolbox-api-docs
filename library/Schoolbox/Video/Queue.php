@@ -9,8 +9,8 @@
 
 namespace Schoolbox\Video;
 
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress_Date_Format;
-use Exception_Schoolbox;
 
 class Queue extends ResourceVideo
 {
@@ -52,7 +52,7 @@ class Queue extends ResourceVideo
     /**
      * Determines if file is audio or video and does corresponding processing
      * @returns boolean
-     * @throws Exception_Schoolbox
+     * @throws SchoolboxException
      */
     public function process()
     {

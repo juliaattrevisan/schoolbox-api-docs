@@ -18,7 +18,7 @@ class Factory implements FactoryInterface
      *
      * @param  array $imageArray
      * @return BaseFiletype
-     * @throws \Exception_Schoolbox if image isn't recognised
+     * @throws \DomainException if image isn't recognised
      */
     public function build($imageArray)
     {
@@ -32,7 +32,7 @@ class Factory implements FactoryInterface
             case 'image/x-png':
                 return new Png();
             default:
-                throw new \Exception_Schoolbox('Unknown image type "'.$imageArray['mime'].'"');
+                throw new \DomainException('Unknown image type "'.$imageArray['mime'].'"');
         }
     }
 }

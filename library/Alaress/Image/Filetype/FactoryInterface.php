@@ -16,7 +16,7 @@ interface FactoryInterface
      *
      * @param  array $imageArray
      * @return FiletypeInterface
-     * @throws \Exception_Schoolbox if image isn't recognised
+     * @throws \RuntimeException if image isn't recognised
      */
     public function build($imageArray);
 }

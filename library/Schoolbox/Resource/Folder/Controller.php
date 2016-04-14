@@ -92,12 +92,11 @@ class Controller extends BaseController
         $this->setFileMapper(FileMapper::getInstance());
     }
 
-
     /**
      * Display update folder screen
      *
-     * @param Int $id
-     * @throws \Exception
+     * @param $id
+     * @throws \Schoolbox\Application\Exception
      */
     public function getFolderModify($id)
     {
@@ -110,14 +109,14 @@ class Controller extends BaseController
         $errorMapper = $this->getErrorMapper();
 
         if ($access->getFolderAccess($this->getUser(), [$id]) < UserAccess::ACCESS_WRITE) {
-            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
 
         try {
             $folder = $folderMapper->findById($id);
             $parent = $folderMapper->findById($folder->getParent()->getId());
         } catch (\Exception $e) {
-            $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
         }
 
         $breadcrumbs = [
@@ -171,12 +170,11 @@ class Controller extends BaseController
         );
     }
 
-
     /**
      * Display create folder screen
      *
-     * @param Int $parentId
-     * @throws \Exception
+     * @param $parentId
+     * @throws \Schoolbox\Application\Exception
      */
     public function getFolderCreate($parentId)
     {
@@ -187,13 +185,13 @@ class Controller extends BaseController
         $errorMapper = $this->getErrorMapper();
 
         if ($access->getFolderAccess($this->getUser(), [$parentId]) < UserAccess::ACCESS_WRITE) {
-            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
 
         try {
             $parent = $folderMapper->findById($parentId);
         } catch (\Exception $e) {
-            $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
         }
 
         $breadcrumbs = [
@@ -242,10 +240,10 @@ class Controller extends BaseController
         );
     }
 
-
     /**
      * Delete folder AJAX
      *
+     * @throws \Schoolbox\Application\Exception
      */
     public function postDeleteFolder()
     {
@@ -258,13 +256,13 @@ class Controller extends BaseController
         try {
             $folder = $folderMapper->findById($this->getRequest()->post["id"]);
         } catch (\Exception $e) {
-            $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
         }
 
         // Make sure they have access to delete the folder
 
         if ($access->getFolderAccess($this->getUser(), [$folder->getId()]) < WRITE_ACCESS) {
-            $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
         }
 
         $_SESSION['resourcesID'] = $folder->getParent()->getId();
@@ -277,11 +275,10 @@ class Controller extends BaseController
         ]);
     }
 
-
     /**
      * Move folder with an AJAX response
      *
-     * @throws \Exception
+     * @throws \Schoolbox\Application\Exception
      */
     public function postMoveFolder()
     {
@@ -301,14 +298,14 @@ class Controller extends BaseController
             catch (\Exception $e)
             {
                 // One of the folders didn't exist
-                $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
+                throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
             }
 
             if ($access->getFolderAccess($this->getUser(), [$source->getId()]) < WRITE_ACCESS)
-                $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
+                throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
 
             if ($access->getFolderAccess($this->getUser(), [$destination->getId()]) < WRITE_ACCESS)
-                $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
+                throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
 
             // Move the folder
 
@@ -325,15 +322,14 @@ class Controller extends BaseController
         {
             // Doesn't make sense, source and destination folders the same
 
-            $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
     }
-
 
     /**
      * Update a folders details
      *
-     * @throws \Exception
+     * @throws \Schoolbox\Application\Exception
      */
     public function postUpdateFolder()
     {
@@ -348,15 +344,15 @@ class Controller extends BaseController
 
         } catch (RangeException $e) {
             // not enough info submitted to the form
-            $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING, $e);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING, $e);
 
         } catch (OutOfBoundsException $e) {
             // you lack permission to do the things
-            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE, $e);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE, $e);
 
         } catch (UnexpectedValueException $e) {
             // you lack permission to do the other things
-            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_CREATE, $e);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_CREATE, $e);
         }
     }
 
@@ -630,11 +626,10 @@ class Controller extends BaseController
         return '/homepage/' . $model->getId();
     }
 
-
     /**
      * Delete folder and all children (superusers only)
      *
-     * @throws \Exception
+     * @throws \Schoolbox\Application\Exception
      */
     public function postDeleteFolderAll()
     {
@@ -642,13 +637,13 @@ class Controller extends BaseController
         $folderMapper = $this->getFolderMapper();
 
         if (!$this->getUser()->isSuperuser()) {
-            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_DELETE_SUBFOLDERS);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_DELETE_SUBFOLDERS);
         }
 
         try {
             $folder = $folderMapper->findById($this->getRequest()->post["id"]);
         } catch (\Exception $e ) {
-            $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
         }
 
         $folderMapper->recursiveDelete($folder);
@@ -661,11 +656,10 @@ class Controller extends BaseController
         ]);
     }
 
-
     /**
      * Reset folder content
      *
-     * @throws \Exception
+     * @throws \Schoolbox\Application\Exception
      */
     public function postFolderReset()
     {
@@ -679,12 +673,12 @@ class Controller extends BaseController
             $folder = $folderMapper->findById($this->getRequest()->post["id"]);
 
             if ($access->getFolderAccess($this->getUser(), [$folder->getId()]) < WRITE_ACCESS) {
-                $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE, null);
+                throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE, null);
             }
         }
         catch (\Exception $e)
         {
-            $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
         }
 
         // Remove component content

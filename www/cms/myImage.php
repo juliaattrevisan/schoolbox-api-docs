@@ -7,6 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Alaress\Image\Cache;
 use Alaress\Image\Processor;
 
@@ -41,10 +42,11 @@ if (isset($_GET['key'])) {
 }
 
 try {
+    /** @var Schoolbox\Resource\My\File\Model $image */
     $cache = new Cache\Storage($image->getStorage(), $key);
     createProcessor($cache, $transform)->load()->stream();
 
-} catch (Exception_Schoolbox_NotFound $e) {
+} catch (SchoolboxNotFoundException $e) {
     redirectToBroken(404);
 
 } catch (Exception $e) {

@@ -3,6 +3,10 @@
 require_once __DIR__ . '/../include/Bootstrap.php';
 session_start();
 
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
+use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
+
 if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['password'] && trim($_POST['username']))) {
     $sessionHandler = new Session;
 
@@ -34,13 +38,13 @@ if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
                 $sessionHandler->authenticate(trim($_POST['username']), $_POST['password'])
                 && $sessionHandler->create(trim($_POST['username']), $remember);
         }
-        catch (Exception_Schoolbox_NotFound $e) {
+        catch (SchoolboxNotFoundException $e) {
             $message = 'The username or password you typed is incorrect, please try again.';
         }
-        catch (Exception_Schoolbox_AccountDisabled $e) {
+        catch (SchoolboxAccountDisabledException $e) {
             $message = 'This account is currently disabled.';
         }
-        catch (Exception_Schoolbox_AccessDenied $e) {
+        catch (SchoolboxAccessDeniedException $e) {
             $message = 'The username or password you typed is incorrect, please try again.';
         }
         if ($authenticated) {

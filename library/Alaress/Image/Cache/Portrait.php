@@ -11,9 +11,8 @@
 
 namespace Alaress\Image\Cache;
 
-use Exception_Schoolbox;
-use Exception_Schoolbox_AccessDenied;
-use Exception_Schoolbox_NotFound;
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use External_User;
 use Group;
 use Schoolbox\Config\Loader;
@@ -41,12 +40,14 @@ class Portrait extends BrokenFS
     /** @var IConfigLoader */
     private $conf;
 
-
     /**
-     * @param int    $externalId
+     * Portrait constructor.
+     *
+     * @param string $externalId
      * @param string $key
-     * @param User   $sessionUser
-     * @throws Exception_Schoolbox
+     * @param User $sessionUser
+     * @throws SchoolboxAccessDeniedException
+     * @throws \InvalidArgumentException
      */
     public function __construct($externalId, $key, User $sessionUser)
     {
@@ -58,7 +59,7 @@ class Portrait extends BrokenFS
 
         $portraitPath = $this->getExternalHandler()->getPortrait($this->getExternalUserId());
         if (!$portraitPath) {
-            throw new Exception_Schoolbox_NotFound('Portrait not found');
+            throw new \InvalidArgumentException('Portrait not found');
         }
 
         $portraitDir = realpath($this->getConfig()->get('portrait_dir'));
@@ -69,13 +70,13 @@ class Portrait extends BrokenFS
         try {
             parent::__construct($portraitDir, $portraitPath, $key);
         } catch (Exception $e) {
-            throw new Exception_Schoolbox_NotFound('Portrait not found');
+            throw new \InvalidArgumentException('Portrait not found');
         }
 
         $this->purgeOldTransformations();
 
         if (!$this->canViewImage()) {
-            throw new Exception_Schoolbox_AccessDenied('Cannot view image');
+            throw new \RuntimeException('Cannot view image');
         }
     }
 

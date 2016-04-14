@@ -12,6 +12,8 @@
 
 namespace Schoolbox\Resource\Folder;
 
+use \Schoolbox\Application\Exception\Exception as SchoolboxException;
+use \Schoolbox\Mapper\Exception as MapperException;
 use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
@@ -19,7 +21,9 @@ use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
+use Schoolbox\Resource\Group;
 use Schoolbox\Resource\HomepageConfig;
+use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -55,13 +59,25 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      */
     protected $external_user;
 
-    /** Array of cached NNIAN nodes
+    /**
+     * Array of cached NNIAN nodes
      *
      * @var array
      */
     protected $cacheNnian = array();
+
+    /**
+     * Interim nodes.
+     *
+     * @var array
+     */
     protected $interimNodes = array();
 
+    /**
+     * @inheritdoc
+     *
+     * @throws \Schoolbox\Mapper\Exception
+     */
     protected function mapping()
     {
         $this->hasModel('\\Schoolbox\\Resource\\Folder\\Model');
@@ -213,6 +229,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      */
     public function findImages(Model $category, $limit = 0, $excludeWork = false)
     {
+        /** @var File\Mapper $fileMapper */
         $fileMapper = $this->getJoinMapper('files');
 
         $limit = (int)$limit;
@@ -232,10 +249,8 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      */
     public function preSave($model)
     {
-
         // iterate codes given; if any already exist, error 136
         $codeList = $model->getCodes()->getColumnValues('code');
-
 
         $collisions = Code\Mapper::getInstance()->findByColumn('code', $codeList);
 
@@ -359,9 +374,9 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * It should only get the children of $id and probably should be
      * established in Ancestry
      *
-     * @param $id
+     * @param int $id
      * @return Collection|Model[]
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function findByParent($id)
     {
@@ -406,7 +421,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             $taskCounts[$row['id']] = $row['taskCount'];
         }
 
-        $collection = new \Schoolbox\Collection();
+        $collection = new Collection();
         $category = null;
 
         foreach ($statement as $row) {
@@ -422,12 +437,16 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 if (isset($taskCounts[$row['c.id']])) {
                     $category->setTaskCount($taskCounts[$row['c.id']]);
                 }
+
+                /** @var HomepageConfig $homepageConfig */
                 $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
                 $category->setHomepage($homepageConfig);
 
+                /** @var \Schoolbox\Resource\Group $group */
                 $group = $group_mapper->hydrate($row, 'ug');
                 $category->setGroup($group);
 
+                /** @var \Schoolbox\Resource\Folder\Code\Model $code */
                 $code = $code_mapper->hydrate($row, 'cc');
                 if ($code->getCategory()->getId()) {
                     $category->addCode($code);
@@ -496,7 +515,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      *
      * @param string|array $code
      * @return Collection|Model[]
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function findByCurriculumCode($code)
     {
@@ -614,12 +633,14 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * Helper method for hydrating a result from a query created by getFindQuery().
      *
      * @param  \PDOStatement $statement
-     * @throws \Schoolbox\Mapper\Exception if statement returned no category
+     * @throws MapperException if statement returned no category
      * @return Collection|Model[]
      */
     protected function hydrateFromFindQuery($statement)
     {
         $code_mapper = $this->getJoinMapper('codes');
+
+        /** @var HomepageConfigMapper $homepageConfig_mapper */
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
 
@@ -637,9 +658,15 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             if (!array_key_exists($testId, $categories)) {
                 $category = $categories[$testId] = $this->hydrate($row, 'c');
 
+                /** @var HomepageConfig $homepageConfig */
+                $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
+
+                /** @var Group $group */
+                $group = $group_mapper->hydrate($row, 'ug');
+
                 // set 1:1 objects
-                $category->setHomepage($homepageConfig_mapper->hydrate($row, 'hp'));
-                $category->setGroup($group_mapper->hydrate($row, 'ug'));
+                $category->setHomepage($homepageConfig);
+                $category->setGroup($group);
 
                 if (isset($row['c.taskCount'])) {
                     $categories[$testId]->setTaskCount($row['c.taskCount']);
@@ -657,8 +684,9 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             // BTW fetching multiple 1-M relations in a single query
             // is how you get ants!
             /** @var Node\Model $curriculumNode */
-            $curriculumNode = $this->getJoinMapper('curriculum_node_for_category')
-                ->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+            /** @var Node\Mapper $joinMapper */
+            $joinMapper = $this->getJoinMapper('curriculum_node_for_category');
+            $curriculumNode = $joinMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
             if ($curriculumNode->getId()) {
                 $addedCurriculumNodes[$testId][$curriculumNode->getId()] = $curriculumNode;
             }
@@ -686,7 +714,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * Does not find codes that have been deleted
      *
      * @param  string $code
-     * @throws \Schoolbox\Mapper\Exception if statement returned no category
+     * @throws MapperException if statement returned no category
      * @return Model
      */
     public function findByCode($code)
@@ -707,7 +735,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $model = $this->hydrateFromFindQuery($statement)->first();
 
         if (!$model instanceof Model) {
-            throw new \Schoolbox\Mapper\Exception("Instance of object not found");
+            throw new MapperException("Instance of object not found");
         }
 
         // Re-load codes into the model,
@@ -725,7 +753,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * Expects the name of the category contains $code between [] at the end.
      *
      * @param  string $code
-     * @throws \Schoolbox\Mapper\Exception if statement returned no category
+     * @throws MapperException if statement returned no category
      * @return Collection|Model[]
      */
     public function findAllByArchivedCode($code)
@@ -764,7 +792,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
         // emulate findOneBy functionality: there must be exactly one
         if ($collection->count() != 1) {
-            throw new \Schoolbox\Mapper\Exception("Instance of object not found");
+            throw new MapperException("Instance of object not found");
         }
 
         return $collection->first();
@@ -847,8 +875,11 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                              * @var self $mapper
                              * @var Model $model
                              * @var array $row
+                             * @var \Schoolbox\Resource\HomepageConfig $config
                              */
-                            $model->setHomepage($mapper->getJoinMapper('homepages')->hydrate($row, 'h'));
+                            $config = $mapper->getJoinMapper('homepages')->hydrate($row, 'h');
+                            $model->setHomepage($config);
+
                             return $model;
                         }
                     )
@@ -1073,7 +1104,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      *
      * @param $folderId
      * @return \Schoolbox\Resource\Folder\Model
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function findCheaplyById($folderId) {
 
@@ -1108,7 +1139,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
             return $folder;
         } else {
-            throw new \Schoolbox\Mapper\Exception("Instance of object not found");
+            throw new MapperException("Instance of object not found");
         }
     }
 
@@ -1149,7 +1180,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * @param Model $folder
      * @param int $iteration
      * @return Model
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function findNearestNonInheritingAncestralNode(Model $folder, $iteration = 0)
     {
@@ -1162,7 +1193,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         // If we've recursed too much error out
 
         if ($iteration > $this->getMaxRecursionDepth()) {
-            throw new \Schoolbox\Mapper\Exception("Recursion limit reached");
+            throw new MapperException("Recursion limit reached");
         }
 
         // Check if the node inherits permissions
@@ -1174,7 +1205,9 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             $this->interimNodes[] = $folder->getId();
 
             // Make sure we aren't hitting the root
-            if ($folder->getParent()->isRootNode())
+            /** @var Model $parent */
+            $parent = $folder->getParent();
+            if ($parent->isRootNode())
             {
                 // Got to the top- somethings wrong with the data in the database as this should not be possible
                 error(2);
@@ -1249,8 +1282,8 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     /**
      * Delete folder and children
      *
-     * @param Int $id
-     * @throws \Exception
+     * @param int $id
+     * @throws SchoolboxException
      */
     public function deleteFolder($id)
     {
@@ -1272,9 +1305,12 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
 
                 if ($folderMapper->countByColumn('parent', $id))
                 {
-                    if (!$_SESSION["user"]->isSuperuser())
+                    /** @var \Schoolbox\User $sessionUser */
+                    $sessionUser = $_SESSION["user"];
+
+                    if (!$sessionUser->isSuperuser())
                     {
-                        throw new \Exception('Access Denied');
+                        throw new SchoolboxException('Access Denied');
                     }
                 }
 
@@ -1293,9 +1329,10 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     /**
      * Move folder to new parent with permission check
      *
-     * @param Int $source
-     * @param Int $destination
-     * @throws \Exception
+     * @param int $source
+     * @param int $destination
+     * @throws SchoolboxException
+     * @throws MapperException
      */
     public function moveFolder($source, $destination)
     {
@@ -1321,14 +1358,15 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             Access::getInstance()->getFolderAccess($_SESSION["user"], [$destination]) < WRITE_ACCESS ||
             Access::getInstance()->getFolderAccess($_SESSION["user"], [$movedFolder->getParent()]) < WRITE_ACCESS
         ) {
-            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
 
         // Make sure the moved folder is not going to be its own ancestor
 
         foreach ($folderMapper->findParents($parentFolder) as $ancestor) {
             if ($ancestor->getId() == $movedFolder->getId()) {
-                $errorMapper->generateException(ErrorMapper::ERROR_DATABASE, $e);
+                /** @var SchoolboxException $e */
+                throw $errorMapper->generateException(ErrorMapper::ERROR_DATABASE, $e);
             }
         }
 

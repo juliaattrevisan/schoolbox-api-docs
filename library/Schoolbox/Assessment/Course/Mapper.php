@@ -382,7 +382,8 @@ class Mapper extends FolderMapper
     /**
      * Delete unit from course
      *
-     * @param Int $id
+     * @param $id
+     * @throws \Schoolbox\Application\Exception
      */
     public function deleteUnit($id)
     {
@@ -397,7 +398,7 @@ class Mapper extends FolderMapper
         try {
             $unit = $unitInstanceMapper->findById($id);
         } catch (\Exception $e) {
-            $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
         if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
@@ -405,14 +406,14 @@ class Mapper extends FolderMapper
             try {
                 $folderMapper->deleteFolder($unit->getUnitCategory()->getId());
             } catch (\Exception $e) {
-                $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                throw $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
 
             $unitInstanceMapper->delete($unit);
         }
         else
         {
-            $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
     }
 

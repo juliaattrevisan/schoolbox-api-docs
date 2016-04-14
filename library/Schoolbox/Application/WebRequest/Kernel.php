@@ -18,6 +18,8 @@ use Aura\Router\Route;
 use ReflectionMethod;
 use RuntimeException;
 use Zend\Uri\Uri;
+use Schoolbox\Application\Exception as SchoolboxException;
+
 
 class Kernel extends \Alaress\Application\Kernel
 {
@@ -179,9 +181,20 @@ class Kernel extends \Alaress\Application\Kernel
                 header('WWW-Authenticate: FormBased');
                 error($e->getCode(), $e->getMessage(), 401);
             }
+            /* Generic Schoolbox Exception spawned by ErrorMapper,
+             * thrown by Controllers. ErrorMapper already did the
+             * db call to retrieve the content, so error() doesn't
+             * need to do it itself. It just renders the content.
+             */
+            catch (SchoolboxException $e) {
+                error(null, $e->getMessage(), 500);
+            }
+            /* SPL Runtime exceptions
+             */
             catch (Base $e) {
                 error($e->getCode(), $e->getMessage(), 500);
             }
+
            // Figure out output type.
            // In order of preference, output type is:
            // * set in the response content

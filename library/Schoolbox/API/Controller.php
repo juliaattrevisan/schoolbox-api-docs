@@ -9,6 +9,9 @@
 
 namespace Schoolbox\API;
 
+use \Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
+use \Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
+use \Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Alaress\Web\Controller\Base;
 use Authenticator;
 use Schoolbox\MobileApp\Registry;
@@ -84,11 +87,28 @@ class Controller extends Base {
         // verify username|password combination
         try {
             $this->auth->authenticate($data['username'], $data['password'], true);
-        } catch (\Exception_Schoolbox $e) {
+        }
+        catch (SchoolboxAccessDeniedException $e) {
             $this->getResponse()->status->setCode(401);
             $response->set(array(
                 'format' => 'json',
                 'data'   => 'Invalid username or password'
+            ));
+            return;
+        }
+        catch (SchoolboxAccountDisabledException $e) {
+            $this->getResponse()->status->setCode(400);
+            $response->set(array(
+                'format' => 'json',
+                'data'   => 'Account disabled'
+            ));
+            return;
+        }
+        catch (SchoolboxNotFoundException $e) {
+            $this->getResponse()->status->setCode(400);
+            $response->set(array(
+                'format' => 'json',
+                'data'   => 'User not found'
             ));
             return;
         }

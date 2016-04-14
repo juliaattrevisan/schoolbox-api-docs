@@ -547,9 +547,7 @@ class Bootstrap implements BootstrapInterface {
                 'line'    => $e->getLine(),
                 'type'    => $e->getCode(),
             );
-            if ($outputStackTrace) {
-                $error['message'] = "<pre>$e</pre>";
-            }
+
             $this->kernel->callExceptionCallbacks($e);
         } else {
             $error = error_get_last();
@@ -569,8 +567,8 @@ class Bootstrap implements BootstrapInterface {
                 // RedisException extends RuntimeException: occurs when Redis
                 // session management isn't working for whatever reason.
                 $code    = 400;
-                $message = 'Schoolbox has encountered a fatal error.';
-                $info    = "If the problem persists, please contact your System Administrator including the following information:";
+				$info    = "If the problem persists, please contact your System Administrator including the following information:";
+
                 if ($e instanceof \RuntimeException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently down due to an internal service being inactive.';
@@ -578,6 +576,8 @@ class Bootstrap implements BootstrapInterface {
                     $code    = 500;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
                 } else {
+					$message = 'Schoolbox has encountered a fatal error.';
+
                     // decide what to tell the user based on where this error came from
                     switch ($cause) {
                         // certain queries in the reports can return too much data to fit under the memory limit
@@ -606,28 +606,50 @@ class Bootstrap implements BootstrapInterface {
                 }
 
                 // explain that something went cataclysmically wrong.
-                $output =
-                    "<p><b>$message $info</b></p>" .
-                    '<ul>' .
-                    '<li>Datetime: ' . date('Y-m-d H:i:s') . '</li>' .
-                    '<li>URL: '.$url.
-                    '</li>';
-                if ($outputStackTrace) {
-                    $output .= "<li>Error: {$error['message']} in {$error['file']} on line {$error['line']}.</li>";
-                } else {
-                    $output .= "<li>Error: {$error['message']}. (Further details have been logged.)</li>";
-                }
-                $output .= '</ul>';
 
                 // Use Sitepage to output an error message in the school's design.
                 // If there's no SitePage in DI yet: just output a styleless error.
                 $di = $this->kernel->getDependencyInjector();
+
+				/* Use structured information for rendering
+                 */
+				$args = [
+					'message' => $message,
+					'info' => $info,
+					'url' => $url,
+					'error' => $error,
+					'date' => date('Y-m-d H:i:s'),
+					'outputStackTrace' => $outputStackTrace,
+					'stackTrace' => "$e"
+				];
+
+				/* Pass $data straight in for twig rendering
+				 */
                 if ($di instanceof Di\Container) {
-                    /** @var \SitePage $page */
+					/** @var \SitePage $page */
                     $page = $di->get('layoutEngine');
-                    $page->error(null, $output, $code);
-                } else {
-                    echo $output;
+                    $page->error(null, $args, $code);
+                }
+				/* Just dump it out in raw form
+				 * TODO: Make synonymous with twig output
+				 */
+				else {
+					$output =
+						"<p><b>{$args['message']} {$args['info']}</b></p>" .
+						'<ul>' .
+						"<li>Datetime: {$args['date']}</li>" .
+						"<li>URL: {$args['url']}" .
+						'</li>';
+
+					if ($outputStackTrace) {
+						$output .= "<li>Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}.</li>";
+					} else {
+						$output .= "<li>Error: {$args['error']['message']}. (Further details have been logged.)</li>";
+					}
+
+					$output .= '</ul>';
+
+					echo $output;
                 }
             }
         }

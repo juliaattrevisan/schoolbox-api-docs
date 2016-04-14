@@ -578,40 +578,93 @@ class SitePage extends Page
      * @param mixed  $ec
      *                        Integer: retrieves error text from code from database
      *                        null:    outputs whatever's in $message as error
-     * @param string $message Replaces '%MESSAGE%' in $ec
+     * @param array $args Replaces '%MESSAGE%' in $ec
      * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
      */
-    function error($ec, $message = "", $code = 400)
+    function error($ec, $args = [], $code = 400)
     {
-        if (isset($ec)) {
-            $db    = DeprecatedDatabase::getInstance();
-            $query = "SELECT message FROM error WHERE id = '$ec'";
-            $error = $db->getRow($query);
-        }
-        if (empty($error)) {
-            $error = array('message' => '%MESSAGE%',);
+        /* Enforce structure
+         */
+        if (!is_array($args)) {
+            $args = [
+                'code' => '',
+                'header' => '',
+                'info' => '',
+                'summary' => '',
+                'url' => '',
+                'date' => '',
+                'meta' => '',
+                'outputStackTrace',
+                'stackTrace' => '',
+            ];
         }
 
-        $output = str_replace("%MESSAGE%", $message, $error['message']);
+        /* If an error code is set, extract textual information from
+         * the db via ErrorMapper. Otherwise just use a custom message
+         */
+        $errorMapper = \Schoolbox\Error\Mapper::getInstance();
+
+        if (isset($ec)) {
+            try {
+                $error = $errorMapper->findById($ec);
+            }
+            catch (\Schoolbox\Mapper\Exception $e) {
+                $error = $errorMapper->createModel();
+                $error->setMessage('%MESSAGE%');
+            }
+        }
+        else {
+            $error = $errorMapper->createModel();
+            $error->setMessage('%MESSAGE%');
+        }
+
+        /* Set up any replacements
+         */
+        $error->setMessage(str_replace("%MESSAGE%", $args['error']['message'], $error->getMessage()));
 
         header(':', true, $code);
 
         // if we're in ajax mode, spit out in ajax-friendly (ie JSON) format
         if ($this->ajax) {
             header('Content-Type: application/json');
-            die(json_encode($output));
+            die(json_encode($error->getMessage()));
         }
+        else {
+            $errorContents = $this->getTwig()->render('common/error/general.twig', [
+                'code' => $ec,
+                'header' => isset($args['message']) ? $args['message'] : '',
+                'info' => isset($args['info']) ? $args['info'] : '',
+                'summary' => $error,
+                'url' => $args['url'],
+                'date' => \Alaress_Date_Format::now(),
+                'meta' => $args['error'],
+                'outputStackTrace' => $args['outputStackTrace'],
+                'stackTrace' => $args['stackTrace'],
+            ]);
 
+            $this->renderError('Error Encountered', $errorContents);
+        }
+    }
+
+    /**
+     * Render an Error layout with $errorContents in it
+     *
+     * @param string $title
+     * @param string $errorContents
+     */
+    private function renderError($title, $errorContents)
+    {
         $this->setVar(TEMPLATE_content, '');
+        $this->setFile(TEMPLATE_content, 'common/error/container.html');
+        $this->setTitle($title);
 
-        $this->setFile(TEMPLATE_content, 'common/error.html');
-        $this->setTitle('Error Encountered');
-        $this->setVar("CODE", $ec);
-        $this->setVar("OUTPUT", $output);
+        $this->setVar([
+            'OUTPUT' => $errorContents
+        ]);
+
         $this->buildPage(false);
         $this->outputPage(true);
-        exit;
-
+        exit();
     }
 
 
@@ -1305,19 +1358,17 @@ class SitePage extends Page
         exit;
     }
 
-
-    function pageNotFound()
+    /**
+     * Render a 404 Page Not Found
+     */
+    public function pageNotFound()
     {
         header("HTTP/1.0 404 Not Found");
-        $this->setVar(TEMPLATE_content, '');
-        $this->setFile(TEMPLATE_content, 'common/404.html');
-        $this->setTitle('Page Not Found');
 
-        $this->buildPage(false);
-        $this->outputPage(true);
-        exit;
+        $errorContents = $this->getTwig()->render('common/error/404.twig', []);
+
+        $this->renderError('Page Not Found', $errorContents);
     }
-
 
     function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = array())
     {

@@ -1,6 +1,9 @@
 <?php
 
 use Schoolbox\Notif\Notif;
+use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
+use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 
 class Session
 {
@@ -69,7 +72,7 @@ class Session
 
         /* if user is found and enabled and session is started create our user record */
         if (is_array($user) && $user['enabled'] && session_start()) {
-/* Store remember me cookie so user can return in the future */
+            /* Store remember me cookie so user can return in the future */
             if ($remember == true) {
                 $key = sha1(microtime(true).mt_rand(10000, 90000));
                 $expire = strtotime('+2 month');
@@ -152,11 +155,10 @@ class Session
      *
      * @param string $username
      * @param string $password
-     *
      * @return bool Was the user authenticated?
-     * @throws Exception_Schoolbox_NotFound        if user doesn't exist
-     * @throws Exception_Schoolbox_AccountDisabled if user account is disabled
-     * @throws Exception_Schoolbox_AccessDenied    if password doesn't match
+     * @throws SchoolboxAccessDeniedException    if password doesn't match
+     * @throws SchoolboxAccountDisabledException if user account is disabled
+     * @throws SchoolboxNotFoundException        if user doesn't exist
      */
     public function authenticate($username, $password)
     {
@@ -167,16 +169,16 @@ class Session
         try {
             $user = $uMap->findOneByColumn('username', $username);
         } catch (Schoolbox\Mapper\Exception $e) {
-            throw new Exception_Schoolbox_NotFound();
+            throw new SchoolboxNotFoundException();
         }
         if (!($user instanceof \Schoolbox\User && $user->getEnabled())) {
-            throw new Exception_Schoolbox_AccountDisabled();
+            throw new SchoolboxAccountDisabledException();
         }
 
         $result = false;
 
         if (empty($username) || empty($password)) {
-            throw new Exception_Schoolbox_AccessDenied();
+            throw new SchoolboxAccessDeniedException();
         }
 
         // Function to check username exists and password is correct
@@ -203,7 +205,7 @@ class Session
                 'ip'       => $ip,
                 'login'    => 0,
             ));
-            throw new Exception_Schoolbox_AccessDenied();
+            throw new SchoolboxAccessDeniedException();
         } else {
             // Store password as hash for DAV authentication later
             $save = [

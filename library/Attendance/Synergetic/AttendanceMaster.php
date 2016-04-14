@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+
 /**
  * Attendance_Synergetic_AttendanceMaster
  *
@@ -225,18 +227,15 @@ class Attendance_Synergetic_AttendanceMaster
             array('@wkAttendanceMasterSeq', $var, SQLINT4, true, true, -1),
         );
 
-
         $result = $this->getDatabase()->executeProcedure(
             'spiwkAttendances', $value
-
         );
 
         if ($result['success'] && isset($result['output']['@wkAttendanceMasterSeq'])) {
             $this->setAttendanceMasterSeq($result['output']['@wkAttendanceMasterSeq']);
         } else {
-            throw new Exception_Schoolbox('Cannot setup attendance record, ' . $result['message']);
+            throw new SchoolboxException('Cannot setup attendance record, ' . $result['message']);
         }
-
     }
 
     /**
