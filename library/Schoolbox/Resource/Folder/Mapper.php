@@ -12,8 +12,8 @@
 
 namespace Schoolbox\Resource\Folder;
 
-use \Schoolbox\Application\Exception\Exception as SchoolboxException;
-use \Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Mapper\Exception as MapperException;
 use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;

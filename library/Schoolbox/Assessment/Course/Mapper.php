@@ -9,6 +9,7 @@
  */
 namespace Schoolbox\Assessment\Course;
 
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -199,7 +200,7 @@ class Mapper extends FolderMapper
      *
      * @param Folder $course
      * @return Collection|Folder[]
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function findTaskCountForAllUnits(Folder $course)
     {
@@ -383,7 +384,7 @@ class Mapper extends FolderMapper
      * Delete unit from course
      *
      * @param $id
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function deleteUnit($id)
     {
