@@ -33,15 +33,25 @@ class Controller extends Base
     protected $unitInstanceMapper;
 
     /**
+     * @var Term\Mapper
+     */
+    protected $termMapper;
+
+    /**
      * Constructor
      *
      * @param Folder\Mapper             $folderMapper
      * @param Course\UnitInstanceMapper $unitInstanceMapper
+     * @param Term\Mapper               $termMapper
      */
-    public function __construct(Folder\Mapper $folderMapper, Course\UnitInstanceMapper $unitInstanceMapper)
-    {
+    public function __construct(
+        Folder\Mapper $folderMapper,
+        Course\UnitInstanceMapper $unitInstanceMapper,
+        Term\Mapper $termMapper
+    ) {
         $this->folderMapper       = $folderMapper;
         $this->unitInstanceMapper = $unitInstanceMapper;
+        $this->termMapper         = $termMapper;
     }
 
     /**
@@ -82,12 +92,34 @@ class Controller extends Base
     }
 
     /**
-     * Action for displaying a single class, with cohort reporting.
+     * Action for redirecting to the report for a single class for the current term.
      *
      * @param User         $student
      * @param Folder\Model $class
      */
     public function classReport(User $student, Folder\Model $class)
+    {
+        $term = $this->termMapper->findForToday();
+        $this->getResponse()->redirect->found(
+            $this->getRouter()->generate(
+                'customMoriahCohort.classReportForTerm',
+                [
+                    'studentId' => $student->getId(),
+                    'classId'   => $class->getId(),
+                    'termCode'  => $term->getCode(),
+                ]
+            )
+        );
+    }
+
+    /**
+     * Action for displaying a single class, with cohort reporting.
+     *
+     * @param User         $student
+     * @param Folder\Model $class
+     * @param Term\Model   $term
+     */
+    public function classReportForTerm(User $student, Folder\Model $class, Term\Model $term)
     {
         if (!$student->getRole()->isStudent()) {
             $this->getResponse()->status->setCode(404);
@@ -102,13 +134,7 @@ class Controller extends Base
 
             // Get all units in this course
             $courseList = $courseLists[$class->getId()];
-            // ¯\_(ツ)_/¯
-            // Replace this with the term selector if that eventuates
-            $from    = \Alaress_Date_Format::now()->addYears(-100);
-            $to      = \Alaress_Date_Format::now()->addYears(100);
-            $term    = new Term\Model();
-            $term->setStart($from)->setDisplayFinish($to)->setActualFinish($to);
-            $results = [];
+            $results    = [];
             foreach ($courseList as $course) {
                 $courseStats = new Course\Statistics($course, $term, $student);
                 $courseId    = $course->getId();

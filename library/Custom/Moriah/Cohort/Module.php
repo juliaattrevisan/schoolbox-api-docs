@@ -15,6 +15,7 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use External_UserInterface;
 use Schoolbox\Assessment\Course;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -43,6 +44,11 @@ class Module extends BaseModule
     protected $courseMapper;
 
     /**
+     * @var Term\Mapper
+     */
+    protected $termMapper;
+
+    /**
      * @var External_UserInterface
      */
     protected $externalDb;
@@ -54,7 +60,7 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'classList', $basePath, '/student/{studentId}');
         $this->addGetRoute($router, 'classReport', $basePath, '/student/{studentId}/class/{classId}');
-        $this->addGetRoute($router, 'classReportForTerm', $basePath, '/student/{studentId}/class/{classId}/term/{term}');
+        $this->addGetRoute($router, 'classReportForTerm', $basePath, '/student/{studentId}/class/{classId}/term/{termCode}');
     }
 
     /**
@@ -64,6 +70,7 @@ class Module extends BaseModule
     {
         $this->userMapper   = $injector->newInstance(UserMapper::class);
         $this->courseMapper = $injector->newInstance(Course\Mapper::class);
+        $this->termMapper   = $injector->newInstance(Term\Mapper::class);
         $this->externalDb   = $injector->newInstance(\External_User::class);
     }
 
@@ -94,16 +101,23 @@ class Module extends BaseModule
     {
         $this->addRoutePreload(
             $matcher,
-            '(?:classList|classReport)',
+            '(?:classList|classReport|classReportForTerm)',
             function ($params) {
                 return ['student' => $this->userMapper->findById($params['studentId']),];
             }
         );
         $this->addRoutePreload(
             $matcher,
-            'classReport',
+            '(?:classReport|classReportForTerm)',
             function ($params) {
                 return ['class' => $this->courseMapper->findById($params['classId']),];
+            }
+        );
+        $this->addRoutePreload(
+            $matcher,
+            'classReportForTerm',
+            function ($params) {
+                return ['term' => $this->termMapper->findOneByColumn('code', $params['termCode']),];
             }
         );
     }
@@ -128,6 +142,7 @@ class Module extends BaseModule
                 [
                     'folderMapper'       => $this->courseMapper,
                     'unitInstanceMapper' => $injector->lazyNew(Course\UnitInstanceMapper::class),
+                    'termMapper'         => $this->termMapper,
                 ]
             )
         );
