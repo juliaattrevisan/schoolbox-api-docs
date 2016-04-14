@@ -9,6 +9,8 @@
  ************************************************************/
 class External_Schoolbox_Timetable implements External_TimetableInterface
 {
+    use External_Schoolbox_TimetableDefinitionTrait;
+
     private $database;
 
     public function __construct()
@@ -18,65 +20,12 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
-        $statement = $this->getDatabase()->prepare(
-            "
-                        SELECT tc.start, tc.reset, tc.finish, tc.start_day,
-                            ty.title, ty.cycle_length, ty.day_length, ty.regular
-                        FROM timetable_campus tc
-                        LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
-                        WHERE tc.campus_id = :campusId
-                            AND tc.start < NOW()
-                            AND tc.finish > NOW()
-                    "
-        );
-
-        $statement->execute(array(':campusId' => $campus->getId()));
-
-        if ($definition = $statement->fetch(PDO::FETCH_ASSOC)) {
-            /* Adapt to spec */
-            $definition['dayCount'] = $definition['cycle_length'];
-            $definition['periodCount'] = $definition['day_length'];
-
-            return $definition;
-        } else {
-            return false;
-        }
+        return $this->getTimetableDefinitionFromDatabase($this->getDatabase(), $campus);
     }
 
     public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
     {
-        if (!$definition = $this->getTimetableDefinition(null, $campus)) {
-            return false;
-        }
-
-        if (empty($date)) {
-            $date = time();
-        }
-        $dateObject = new Alaress_Date_Format($date, Alaress_Date_Format::TIMESTAMP);
-        $dateObject = $dateObject->startOfDay();
-
-        // Is this a Saturday or Sunday?
-        // I assume because we don't count non business days, then this is
-        // outside the timetable.
-        if ($dateObject->isWeekend()) {
-            return 0;
-        }
-
-        if (empty($definition['reset']) || $definition['reset'] == '0000-00-00') {
-            $startObject = new Alaress_Date_Format($definition['start'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-        } else {
-            $startObject = new Alaress_Date_Format($definition['reset'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-        }
-        $startObject = $startObject->startOfDay();
-        $weekdays    = $startObject->diffInWeekdays($dateObject);
-        $currentDay  = (($definition['start_day'] + $weekdays) % $definition['cycle_length']);
-
-        // Last day of cycle? Show last day, instead of 0
-        if ($currentDay == 0) {
-            $currentDay = $definition['cycle_length'];
-        }
-
-        return $currentDay;
+        return $this->getDayNumberFromDatabase($this->getDatabase(), $campus, $date);
     }
 
 
