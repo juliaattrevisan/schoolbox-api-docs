@@ -110,9 +110,6 @@ class User extends SchoolboxUser
                     if ($current->getAccesslevel() < FULL_ACCESS) {
                         $current->setAccessLevel($level);
                     }
-//                    else {
-//                        echo "* Setting {$current->getAccessLevel()} to {$level}\n";
-//                    }
 
                     $found[] = $current->getServiceIdentifier();
                 }
@@ -133,12 +130,6 @@ class User extends SchoolboxUser
                     $this->accessList->add($userAccess);
                 }
             }
-
-//            if ($this->getId() == 151) {
-//                foreach ($this->accessList as $current) {
-//                    echo "{$this->getId()}\t{$current->getService()}\t{$current->getServiceIdentifier()}\t{$current->getAccessLevel()}\n";
-//                }
-//            }
         }
     }
 }
