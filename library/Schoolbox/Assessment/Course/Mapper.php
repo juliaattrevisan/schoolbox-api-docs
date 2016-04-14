@@ -332,8 +332,8 @@ class Mapper extends FolderMapper
      */
     public function verifyCourse(Folder $folder)
     {
-        // more than 0 tasks means this is a course
-        return $this->findCourseTaskCount($folder) > 0;
+        // a course is defined as a folder that contains units
+        return $this->findUnitsInCourse($folder)->count() > 0;
     }
 
 
