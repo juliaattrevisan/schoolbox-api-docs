@@ -17,12 +17,23 @@
         $(document).on('click', '[data-handler="hide"]', function (e) {
 
             if (typeof $.datepicker._curInst.id == 'string') {
-                var $input = $('#' + $.datepicker._curInst.id);
 
-                // will be either 'finish_date' or 'start_date'
-                var side = $input.data('role');
+                var $input, side, $unit;
 
-                var $unit = $input.closest('[data-' + side + ']');
+                $input = $('#' + $.datepicker._curInst.id);
+
+                {# for quiz, will be either 'finish_date' or 'start_date' -#}
+                {# for work, will one one of 'publish_date', 'open_date' ,'due_date' or 'late_date' -#}
+                side = $input.data('role');
+
+                // cast work to quiz for ease-of-use
+                if ([ 'publish_date', 'open_date' ].indexOf(side) >= 0) {
+                    side = 'start_date'
+                } else if ([ 'due_date', 'late_date' ].indexOf(side) >= 0) {
+                    side = 'finish_date'
+                }
+
+                $unit = $input.closest('[data-' + side + ']');
 
                 if ($unit.length) {
                     $input.val($unit.data(side));
