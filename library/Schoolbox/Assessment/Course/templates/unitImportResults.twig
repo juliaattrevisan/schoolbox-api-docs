@@ -6,6 +6,31 @@
 
 <script>
     $(function() {
+
+        var courseWorkStage = $('#importTasks');
+
+        courseWorkStage.find('[data-datepicker]')
+            .datepicker('option', 'showButtonPanel', true)
+            .datepicker('option', 'closeText', 'Use Unit Date')
+        ;
+
+        $(document).on('click', '[data-handler="hide"]', function (e) {
+
+            if (typeof $.datepicker._curInst.id == 'string') {
+                var $input = $('#' + $.datepicker._curInst.id);
+
+                // will be either 'finish_date' or 'start_date'
+                var side = $input.data('role');
+
+                var $unit = $input.closest('[data-' + side + ']');
+
+                if ($unit.length) {
+                    $input.val($unit.data(side));
+                }
+            }
+
+        });
+
         $('[data-collapser]').click(function(e) {
             e.preventDefault();
             var unit = $('#' + $(e.target).attr('data-collapser'));
@@ -20,27 +45,6 @@
             }
         });
 
-        $('[data-default-work]').click(function(e) {
-            e.preventDefault();
-            var publish_date = "#work_publish_date-" + $(e.target).attr('data-default-work');
-            var open_date = "#work_open_date-" + $(e.target).attr('data-default-work');
-            var due_date = "#work_due_date-" + $(e.target).attr('data-default-work');
-            var late_date = "#work_late_date-" + $(e.target).attr('data-default-work');
-
-            $(publish_date).val($(e.target).attr('data-open'));
-            $(open_date).val($(e.target).attr('data-open'));
-            $(due_date).val($(e.target).attr('data-close'));
-            $(late_date).val($(e.target).attr('data-close'));
-        });
-
-        $('[data-default-quiz]').click(function(e) {
-            e.preventDefault();
-            var start_date = "#quiz_start_date-" + $(e.target).attr('data-default-quiz');
-            var finish_date = "#quiz_finish_date-" + $(e.target).attr('data-default-quiz');
-
-            $(start_date).val($(e.target).attr('data-open'));
-            $(finish_date).val($(e.target).attr('data-close'));
-        });
     });
 </script>
 
@@ -81,7 +85,7 @@
                     </nav>
                 </li>
             </ul>
-            <div id="unit-{{ unit.id }}" {% if not loop.first %}class="hide"{% endif %}>
+            <div id="unit-{{ unit.id }}" data-start_date="{{ unit.open_date }}" data-finish_date="{{ unit.due_date }}" {% if not loop.first %}class="hide"{% endif %}>
                 <div class="row">
                     <div class="small-12 island">
                         <section>
@@ -89,27 +93,15 @@
                                 {# All work items in the current unit #}
 
                                 {% for work in unit.items %}
-                                    <li class="actions-small-1">
-                                        <div class="list-item" data-type="unit_row">
-                                            <input type="hidden" name="submissions" value="{% if work.item.getAcceptOnline %}1{% else %}0{% endif %}">
-
-                                            {% if work.class == 'SubmissionBox' %}
-                                                {% include '@course/import/submissionBox.twig' %}
-                                            {% elseif work.class == 'Task' %}
-                                                {% include '@course/import/task.twig' %}
-                                            {% elseif work.class == 'OnlineAssessment' %}
-                                                {% include '@course/import/quiz.twig' %}
-                                            {% endif %}
-
-                                        </div>
-                                        <nav>
-                                            {% if work.class == 'SubmissionBox' %}
-                                                <a data-default-work="{{ work.item.id }}" data-open="{{ unit.open_date }}" data-close="{{ unit.due_date }}" class="icon-calendar no-text" href="#" title="Default To Unit Dates"></a>
-                                            {% elseif work.class == 'Task' %}
-                                            {% elseif work.class == 'OnlineAssessment' %}
-                                                <a data-default-quiz="{{ work.item.id }}" data-open="{{ unit.open_date }}" data-close="{{ unit.due_date }}" class="icon-calendar no-text" href="#" title="Default To Unit Dates"></a>
-                                            {% endif %}
-                                        </nav>
+                                    <li data-type="unit_row">
+                                        <input type="hidden" name="submissions" value="{% if work.item.getAcceptOnline %}1{% else %}0{% endif %}">
+                                        {% if work.class == 'SubmissionBox' %}
+                                            {% include '@course/import/submissionBox.twig' %}
+                                        {% elseif work.class == 'Task' %}
+                                            {% include '@course/import/task.twig' %}
+                                        {% elseif work.class == 'OnlineAssessment' %}
+                                            {% include '@course/import/quiz.twig' %}
+                                        {% endif %}
                                     </li>
                                 {% endfor %}
                             </ul>
