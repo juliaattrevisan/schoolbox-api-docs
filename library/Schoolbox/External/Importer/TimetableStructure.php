@@ -54,15 +54,15 @@ class TimetableStructure extends AbstractImporter
     public static function getFormat()
     {
         return [
-            'Term Campus'   => 'The campus to create a term for (must correspond to a campus code in Schoolbox)',
-            'Term Title'    => 'The name of the term',
-            'Term Start'    => 'The date on which the term starts',
-            'Term Finish'   => 'The date on which the term finishes',
-            'Term Offset'   => 'The day number that "Term Start" is',
-            'Period Day'    => 'The day number that this period is on',
-            'Period Title'  => 'The name of this period',
-            'Period Start'  => 'The time at which this period starts',
-            'Period Finish' => 'The time at which this period finishes',
+            'Term Campus'           => 'The campus to create a term for (must correspond to a campus code in Schoolbox)',
+            'Term Title'            => 'The name of the term',
+            'Term Start'            => 'The date on which the term starts',
+            'Term Finish'           => 'The date on which the term finishes',
+            'Term Start Day Number' => 'The day number that "Term Start" is',
+            'Period Day'            => 'The day number that this period is on',
+            'Period Title'          => 'The name of this period',
+            'Period Start'          => 'The time at which this period starts',
+            'Period Finish'         => 'The time at which this period finishes',
         ];
     }
 
@@ -115,12 +115,22 @@ class TimetableStructure extends AbstractImporter
                 // Timetable campus
 //                $campus = $this->timetableCampusMapper->findOneByColumn('cycle_id', $cycle->getId());
                 $campus = new TimetableCampus();
+                if (isset($row['Term Offset']) && strlen($row['Term Offset'])) {
+                    $this->log->warning(
+                        sprintf(
+                            '"Term Offset" is deprecated - assuming value "%d" is start day "%d"',
+                            $row['Term Offset'],
+                            $row['Term Offset'] + 1
+                        )
+                    );
+                    $campus->setStartDay($row['Term Offset'] + 1);
+                }
                 $campus
                     ->setCycle($cycle)
                     ->setCampus($campusObject)
                     ->setStart(new Alaress_Date_Format($row['Term Start'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
                     ->setFinish(new Alaress_Date_Format($row['Term Finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
-                    ->setOffset($row['Term Offset']);
+                    ->setStartDay($row['Term Start Day']);
 
                 $result[$key] = [
                     'cycle'   => $cycle,
