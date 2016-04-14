@@ -429,7 +429,7 @@ class Mapper extends FolderMapper
             throw $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
-        if ($access->getFolderAccess($_SESSION["user"], [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
+        if ($access->getFolderAccess($this->getSessionUser(), [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
         {
             try {
                 $folderMapper->deleteFolder($unit->getUnitCategory()->getId());

@@ -370,6 +370,16 @@ abstract class Mapper implements IMapper, Serializable
         return $this->sessionData;
     }
 
+
+    /**
+     * @return User
+     */
+    public function getSessionUser()
+    {
+        return $this->sessionData['user'];
+    }
+
+
     /**
      * Gets a single object as a collection, if it isn't one already.
      *
