@@ -20,7 +20,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     {
         $statement = $this->getDatabase()->prepare(
             "
-                        SELECT tc.start, tc.reset, tc.finish, tc.offset,
+                        SELECT tc.start, tc.reset, tc.finish, tc.start_day,
                             ty.title, ty.cycle_length, ty.day_length, ty.regular
                         FROM timetable_campus tc
                         LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
@@ -52,42 +52,24 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         if (empty($date)) {
             $date = time();
         }
+        $dateObject = new Alaress_Date_Format($date, Alaress_Date_Format::TIMESTAMP);
+        $dateObject = $dateObject->startOfDay();
 
         // Is this a Saturday or Sunday?
         // I assume because we don't count non business days, then this is
         // outside the timetable.
-        if (date('N', $date) >= 6) {
+        if ($dateObject->isWeekend()) {
             return 0;
         }
 
         if (empty($definition['reset']) || $definition['reset'] == '0000-00-00') {
-            $start = strtotime($definition['start']);
+            $startObject = new Alaress_Date_Format($definition['start'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
         } else {
-            $start = strtotime($definition['reset']);
+            $startObject = new Alaress_Date_Format($definition['reset'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
         }
-
-        $days = ceil(($date - $start) / (60 * 60 * 24)) + 1;
-
-        /* Calculate the business days from the even weeks */
-        $businessDays = 5 * floor($days / 7);
-
-        /* Handle the excess days */
-        $excessDays = $days % 7;
-
-        for ($i = 0; $i < $excessDays; $i++) {
-            $currentExcessDay = $date - (60 * 60 * 24 * $i);
-
-            /* If its not Saturday or Sunday then increment the business days */
-            if (date('N', $currentExcessDay) < 6) {
-                $businessDays++;
-            }
-        }
-
-        if (is_numeric($definition['offset'])) {
-            $businessDays += $definition['offset'];
-        }
-
-        $currentDay = $businessDays % $definition['cycle_length'];
+        $startObject = $startObject->startOfDay();
+        $weekdays    = $startObject->diffInWeekdays($dateObject);
+        $currentDay  = (($definition['start_day'] + $weekdays) % $definition['cycle_length']);
 
         // Last day of cycle? Show last day, instead of 0
         if ($currentDay == 0) {
