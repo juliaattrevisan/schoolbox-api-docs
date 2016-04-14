@@ -13,8 +13,13 @@ $box_mapper        = new SubmissionBoxMapper();
 $submission_mapper = new Submission\FileMapper();
 
 /** @var Schoolbox\User $user */
-$user    = $_SESSION['user'];
-$boxId   = $_POST['box_id'];
+$boxId = $_POST['box_id'];
+// Allow impersonation for teachers
+$user = \Schoolbox\UserMapper::getInstance()->findById($_POST['user_id']);
+if ($user->getId() != $_SESSION['user']->getId()) {
+    $returnHandler = new SubmissionReturn();
+    $returnHandler->securityCheck($boxId);
+}
 $isDraft = isset($_POST['save_draft']);
 $body    = $_POST['body'];
 
