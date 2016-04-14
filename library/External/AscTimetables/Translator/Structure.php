@@ -45,15 +45,15 @@ class External_AscTimetables_Translator_Structure extends External_AscTimetables
                 foreach ($result['periods'] as $period) {
                     foreach ($result['days'] as $day) {
                         $endResult[] = [
-                            'Term Campus'   => $campus->getExtTimetableCode(),
-                            'Term Title'    => $result['termTitle'],
-                            'Term Start'    => $termStart,
-                            'Term Finish'   => $termFinish,
-                            'Term Offset'   => 0,
-                            'Period Day'    => $day['day'],
-                            'Period Title'  => $period['number'],
-                            'Period Start'  => $period['start'],
-                            'Period Finish' => $period['finish'],
+                            'Term Campus'           => $campus->getExtTimetableCode(),
+                            'Term Title'            => $result['termTitle'],
+                            'Term Start'            => $termStart,
+                            'Term Finish'           => $termFinish,
+                            'Term Start Day Number' => 1,
+                            'Period Day'            => $day['day'],
+                            'Period Title'          => $period['number'],
+                            'Period Start'          => $period['start'],
+                            'Period Finish'         => $period['finish'],
                         ];
                     }
                 }
