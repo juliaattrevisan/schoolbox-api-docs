@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
@@ -35,6 +36,11 @@ class Statistics
      * @var array
      */
     protected $workMap = array();
+
+    /**
+     * @var Collection|Folder[]
+     */
+    protected $allFolders;
 
     /**
      * @var SubmissionBoxMapper
@@ -93,10 +99,10 @@ class Statistics
 
         // Get any classes which use this course.
         // (ever, not just in this date span - assessments could have varying due dates)
-        $allFolders = $this->unitInstanceMapper->findAllFoldersUsingCourse($course);
+        $this->allFolders = $this->unitInstanceMapper->findAllFoldersUsingCourse($course);
 
         // And add work for all of these folders. (Group by unit.)
-        foreach ($allFolders as $folder) {
+        foreach ($this->allFolders as $folder) {
             $allUnits = $this->unitInstanceMapper->findForCategoryId($folder->getId());
             foreach ($allUnits as $unit) {
                 $boxIds    = [];
@@ -378,5 +384,13 @@ class Statistics
         }
         ksort($allData);
         return array_values($allData);
+    }
+
+    /**
+     * @return Collection|Folder[]
+     */
+    public function getAllFolders()
+    {
+        return $this->allFolders;
     }
 }
