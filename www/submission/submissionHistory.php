@@ -505,8 +505,9 @@ if (count($submission_history)) {
 // if the current user is the owner (or I'm a teacher)
 // if the submission box is accepting submissions
 // and if the current time is between open and late
+$isSubmissionOnStudentBehalf = $userID != $currentUserId;
 $hasSubmitPermission =
-    ($userID == $currentUserId || $returnHandler->securityCheck($box->getId()))
+    (!$isSubmissionOnStudentBehalf || $returnHandler->securityCheck($box->getId()))
     && $box->isOpen()
     && $box->getAcceptOnline();
 if (isset($recent_activity)) {
@@ -593,7 +594,7 @@ if (isset($recent_activity)) {
 
     // only allow a resubmission if box allows it
     if ($hasSubmitPermission && $box->getAcceptMultiple()) {
-        $this->setVar('SUBMIT_LABEL', 'Resubmit');
+        $this->setVar('SUBMIT_LABEL', $isSubmissionOnStudentBehalf ? 'Resubmit on student\'s behalf' : 'Resubmit');
         $this->parse('action_submit_block', 'action_submit');
     }
 
@@ -622,7 +623,7 @@ if (isset($recent_activity)) {
             ]);
         }
 
-        $this->setVar('SUBMIT_LABEL', 'Submit');
+        $this->setVar('SUBMIT_LABEL', $isSubmissionOnStudentBehalf ? 'Submit on student\'s behalf' :'Submit');
         $this->parse('action_submit_block', 'action_submit');
     } else {
         $this->setVar('action_submit_block', '');
