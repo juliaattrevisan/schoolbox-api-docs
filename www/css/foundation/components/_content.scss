@@ -1141,6 +1141,8 @@ ul.flex-list {
 }
 
 .card {
+    // card "extends" column
+    float: left;
 	position: relative;
     min-height: (3 * rem-calc($base-font-size));
     padding: 0.25rem 1rem 0 1rem;
