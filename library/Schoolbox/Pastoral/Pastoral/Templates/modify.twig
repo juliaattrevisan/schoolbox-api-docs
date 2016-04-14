@@ -264,13 +264,9 @@
                                 <span>No</span>
                             </label>
                         </div>
-
-
                     </div>
                 </fieldset>
-            </section>
 
-            <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
@@ -280,9 +276,7 @@
                         </label>
                     </div>
                 </fieldset>
-            </section>
 
-            <section>
                 {% if record.getAccessList.count > 0 %}
                     <ul class="grid information-list">
                         {% for access in record.getAccessList if access.getUser.getId != '' %}
@@ -303,26 +297,26 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
+
+
+                {# Can only involve students when creating a new record #}
+
+                {% if record.getId == '' %}
+
+                        <fieldset class="content">
+                            <div class="small-12 columns">
+                                <label>
+                                    Other Students Involved
+                                    <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate report and add it to the pastoral care area for these students.">?</span>
+                                    <select id="addStudent" name="duplicate_id[]" multiple placeholder="Add Students"></select>
+                                </label>
+                            </div>
+                        </fieldset>
+
+                {% endif %}
             </section>
 
-            {# Can only involve students when creating a new record #}
-
-            {% if record.getId == '' %}
-                <section>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>
-                                Other Students Involved
-                                <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate report and add it to the pastoral care area for these students.">?</span>
-                                <select id="addStudent" name="duplicate_id[]" multiple placeholder="Add Students"></select>
-                            </label>
-                        </div>
-                    </fieldset>
-                </section>
-            {% endif %}
-
             <h2 class="subheader">Attach Files</h2>
-
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
