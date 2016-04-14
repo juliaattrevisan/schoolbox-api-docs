@@ -48,6 +48,7 @@ use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class Controller extends Base\Base
 {
@@ -491,7 +492,7 @@ class Controller extends Base\Base
      * @param $problem
      * @param array $resolutions
      * @param int $statusCode
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     protected function sendError($problem, array $resolutions = [], $statusCode = 400)
     {
