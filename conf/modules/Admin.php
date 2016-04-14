@@ -61,6 +61,11 @@ class Admin implements ModuleConfigInterface
         $photos = new \Schoolbox\Admin\Photos\Module($di);
         $photos->init('/adminv2/photos');
 
+        // Admin bulk add folders
+
+        $bulkAddFolders = new \Schoolbox\Admin\BulkAddFolders\Module($di);
+        $bulkAddFolders->init('/adminv2/bulk-add-folders');
+
         // Admin terms manager page
         $terms = new \Schoolbox\Admin\Terms\Module($di, Term\Mapper::getInstance());
         $terms->init('/adminv2/terms');

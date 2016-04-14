@@ -57,7 +57,7 @@ class Bulk_Category extends Bulk_Abstract
 
             while (($row = fgetcsv($handle, 1000, ",")) !== false) {
                 if (($row[0] != '') && ($row[1] != '')) {
-/* Check parent exists
+                    /* Check parent exists
 					 */
                     try {
                         $category = $categoryMapper->findById($row[0]);
@@ -118,6 +118,9 @@ class Bulk_Category extends Bulk_Abstract
                     $newFolder->setName($row[1]);
                     $newFolder->setParent($parent);
                     $newFolder->setHomepage($homepageConfig);
+                    if ($_POST["inherit"]) {
+                        $newFolder->setInherit(true);
+                    }
 
                     /* Accumulate all folder codes
                      */
@@ -136,21 +139,23 @@ class Bulk_Category extends Bulk_Abstract
                         $homepageConfigMapper->resetToTemplate($homepageConfig);
                     }
 
-                    /* Save roles
-                     */
-                    $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
+                    if (!$_POST["inherit"]) {
+                        /* Save roles
+                         */
+                        $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
 
-                    foreach ($groups as $id => $perm) {
-                        try {
-                            $roleMapper = new \Schoolbox\RoleMapper();
-                            $role = $roleMapper->findById($id);
+                        foreach ($groups as $id => $perm) {
+                            try {
+                                $roleMapper = new \Schoolbox\RoleMapper();
+                                $role = $roleMapper->findById($id);
 
-                            $roleAccess = new \Schoolbox\Permission\Access\RoleAccess();
-                            $roleAccess->setCategory($newFolder);
-                            $roleAccess->setRole($role);
-                            $roleAccess->setType($perm);
-                            $roleAccessMapper->save($roleAccess);
-                        } catch (\Exception $e) {
+                                $roleAccess = new \Schoolbox\Permission\Access\RoleAccess();
+                                $roleAccess->setCategory($newFolder);
+                                $roleAccess->setRole($role);
+                                $roleAccess->setType($perm);
+                                $roleAccessMapper->save($roleAccess);
+                            } catch (\Exception $e) {
+                            }
                         }
                     }
 

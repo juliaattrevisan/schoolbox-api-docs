@@ -18,7 +18,7 @@ class AdminV2_Nav
         'allowed-file' => 'Allowed Files',
         'setting' => 'Settings',
         'calendar' => 'Calendar',
-        'folder' => 'Folder',
+        'bulk-add-folders' => 'Folder',
         'rollover' => 'Rollover',
         'grades' => 'Grades',
         'rubric-results' => 'Rubrics',
