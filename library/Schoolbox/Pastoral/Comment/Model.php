@@ -20,6 +20,9 @@ class Model implements ISoftDeletable {
     /** @var int */
     protected $pastoralId;
 
+    /** @var int */
+    protected $externalId;
+
     /** @var string */
     protected $body;
 
@@ -50,6 +53,22 @@ class Model implements ISoftDeletable {
     public function getPastoralId() {
         return $this->pastoralId;
     }
+
+    /**
+     * @param string $externalId
+     * @return self
+     */
+    public function setExternalId($externalId) {
+        $this->externalId = $externalId;
+        return $externalId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExternalId() {
+        return $this->externalId;
+    }    
 
     /**
      * @param int $id
@@ -101,7 +120,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param \Alaress_Date_Format $deletedAt
-     * @return self
+     * @return \Alaress_Date_Format
      */
     public function setDeletedAt($deletedAt) {
         $this->deletedAt = $deletedAt;
@@ -117,7 +136,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param \Alaress_Date_Format $updatedAt
-     * @return self
+     * @return \Alaress_Date_Format
      */
     public function setUpdatedAt($updatedAt) {
         $this->updatedAt = $updatedAt;
@@ -133,7 +152,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param \Alaress_Date_Format $createdAt
-     * @return self
+     * @return \Alaress_Date_Format
      */
     public function setCreatedAt($createdAt) {
         $this->createdAt = $createdAt;

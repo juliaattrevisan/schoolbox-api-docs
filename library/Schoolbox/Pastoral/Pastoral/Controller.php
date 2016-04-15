@@ -676,7 +676,8 @@ class Controller extends Base
         // Get the comment we are deleting
 
         try {
-            $comment = $this->getPastoralCommentMapper()->findById($this->getRequest()->post['id']);
+            /** @var PastoralCommentModel $comment */
+            $comment = $this->getPastoralCommentMapper()->findOneByColumn("id", $this->getRequest()->post['id']);
         } catch (\Exception $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
@@ -685,6 +686,9 @@ class Controller extends Base
 
         if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $comment->getOwner()->getId())
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+
+        $pastoralExternal = new \External_Pastoral();
+        $pastoralExternal->deleteComment($comment);
 
         $this->getPastoralCommentMapper()->delete($comment);
     }
@@ -716,6 +720,9 @@ class Controller extends Base
             $comment->setCreatedAt(\Alaress_Date_Format::now());
             $this->getPastoralCommentMapper()->setSessionData($_SESSION);
             $this->getPastoralCommentMapper()->save($comment);
+
+            $pastoralExternal = new \External_Pastoral();
+            $pastoralExternal->createComment($comment);
         }
 
         // Go back to pastoral record

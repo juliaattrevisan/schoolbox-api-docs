@@ -12,6 +12,8 @@ use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
+use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
+use Schoolbox\Pastoral\Comment\Model as PastoralCommentModel;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
@@ -29,6 +31,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
     /** @var PastoralMapper $pastoralMapper */
     protected $pastoralMapper;
+
+    /** @var PastoralCommentMapper $pastoralCommentMapper */
+    protected $pastoralCommentMapper;
 
     /** @var PastoralTypeMapper $pastoralTypeMapper */
     protected $pastoralTypeMapper;
@@ -52,6 +57,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $this->setDatabase(MSSQL::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
         $this->setPastoralMapper(PastoralMapper::getInstance());
+        $this->setPastoralCommentMapper(PastoralCommentMapper::getInstance());
         $this->setPastoralTypeMapper(PastoralTypeMapper::getInstance());
         $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
         $this->setPastoralSeverityMapper(PastoralSeverityMapper::getInstance());
@@ -309,7 +315,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Get the information necessary to create the query
 
         // External student ID
-        
+
         $id = $this->getUserMapper()->findById($pastoral->getStudent()->getId())->getExternalId();
 
         // Set the item date to the post date
@@ -395,6 +401,61 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         return $result;
     }
 
+    /**
+     * Creates a new pastoral comment in the external database
+     *
+     * @param \Schoolbox\Pastoral\Comment
+     * @param \Schoolbox\Pastoral\Comment\Model $comment
+     * @return bool
+     */
+    public function createComment(\Schoolbox\Pastoral\Comment\Model $comment)
+    {
+        // Get the information necessary to create the query
+
+        // Can only do this if the pastoral record has an external ID
+
+        /** @var PastoralModel $pastoral */
+        $pastoral = $this->getPastoralMapper()->findOneByColumn("id", $comment->getPastoralId());
+
+        if (is_int($pastoral->getExternalId()))
+        {
+            $body = str_replace("'", "''", $comment->getBody());
+
+            $created_date_alaress = \Alaress_Date_Format::newLocal($comment->getCreatedAt());
+            $created_date = $created_date_alaress->getYear() . "-" . $created_date_alaress->getMonth() . "-" . $created_date_alaress->getDay(true);
+            $created_by_id = $comment->getOwner()->getExternalId();
+
+            // Execute the query
+
+            $query = "INSERT INTO PastoralCareComments (
+                            PastoralCareSeq,
+                            IndexOrder,
+                            Comment,
+                            CreatedDate,
+                            CreatedById,
+                            ModifiedDate,
+                            ModifiedById
+                        ) VALUES (
+                            {$pastoral->getExternalId()},
+                            COALESCE((SELECT MAX(IndexOrder) + 1 FROM PastoralCareComments WHERE PastoralCareSeq = {$pastoral->getExternalId()}), 1),
+                            '{$body}',
+                            {$created_date},
+                            {$created_by_id},
+                            {$created_date},
+                            {$created_by_id}
+                        )";
+
+            $this->getDatabase()->query($query);
+            $result = $this->getDatabase()->query("SELECT SCOPE_IDENTITY() AS insert_id");
+            $row = mssql_fetch_object($result);
+
+            $comment->setExternalId($row->insert_id);
+            $this->getPastoralCommentMapper()->save($comment);
+
+            return $result;
+        }
+        return false;
+    }
 
     /**
      * Updates an existing pastoral record
@@ -551,6 +612,23 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
     }
 
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteComment(\Schoolbox\Pastoral\Comment\Model $comment)
+    {
+        if (trim($comment->getExternalId()) != '') {
+            $result = $this->getDatabase()->query("DELETE FROM PastoralCareComments WHERE PastoralCareCommentsSeq = " . $comment->getExternalId());
+            return $result;
+        } else {
+
+            // Nothing to delete
+
+            return true;
+        }
+    }
+
     /**
      * @param MSSQL $database
      */
@@ -644,6 +722,22 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function setPastoralAttachmentMapper($pastoralAttachmentMapper) {
         $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralCommentMapper
+     */
+    public function getPastoralCommentMapper() {
+        return $this->pastoralCommentMapper;
+    }
+
+    /**
+     * @param $pastoralCommentMapper
+     * @return $this
+     */
+    public function setPastoralCommentMapper($pastoralCommentMapper) {
+        $this->pastoralCommentMapper = $pastoralCommentMapper;
         return $this;
     }
 

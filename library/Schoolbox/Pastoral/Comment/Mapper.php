@@ -43,6 +43,7 @@ class Mapper extends BaseMapper
         $this->hasPrototype(new PastoralCommentModel);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('pastoral_id', self::TYPE_INTEGER);
+        $this->uses('external_id', self::TYPE_INTEGER);
         $this->uses('body', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME);
         $this->uses('updated_at', self::TYPE_DATETIME);
