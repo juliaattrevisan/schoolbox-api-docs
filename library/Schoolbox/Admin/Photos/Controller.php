@@ -144,7 +144,7 @@ class Controller extends Base
             array(
                 'template' => '@adminPhotos/index.twig',
                 'data'     => array(
-                    'pageCurrent' => 'photos',
+                    'pageCurrent' => 'import',
                     'attachzone' => $this->getAttachZone(),
                 ),
             )
@@ -185,7 +185,7 @@ class Controller extends Base
             array(
                 'template' => '@adminPhotos/view.twig',
                 'data'     => array(
-                    'pageCurrent' => 'photos',
+                    'pageCurrent' => 'import',
                     'users' => $users,
                     'surname' => $surname
                 ),

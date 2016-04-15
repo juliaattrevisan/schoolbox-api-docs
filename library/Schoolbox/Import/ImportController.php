@@ -66,6 +66,7 @@ class ImportController extends Base
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/upload.twig',
             'data'     => $this->getBaseData() + [
+                'pageCurrent' => 'import',
                 'attachzone'    => $this->getAttachzone()->getTwigContext(),
                 'uploadMissing' => $this->getSession()->getSegment(static::class)->getFlash('uploadMissing', false)
             ],
@@ -89,6 +90,7 @@ class ImportController extends Base
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/preview.twig',
             'data'     => $this->getBaseData() + [
+                'pageCurrent' => 'import',
                 'log'        => ['lines' => $this->parseLogLines($logger),],
                 'attachzone' => $this->getAttachzone($upload->getHash())->getTwigContext(),
             ],
@@ -112,6 +114,7 @@ class ImportController extends Base
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/import.twig',
             'data'     => $this->getBaseData() + [
+                'pageCurrent' => 'import',
                 'log' => ['lines' => $this->parseLogLines($logger),],
             ],
         ]);
