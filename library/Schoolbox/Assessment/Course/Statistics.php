@@ -312,14 +312,41 @@ class Statistics
     }
 
     /**
+     * Is this task in all the folders that imported this course?
+     *
+     * @param  array $task
+     * @return bool
+     */
+    protected function isTaskInAllFolders($task)
+    {
+        $workFolderIds = [];
+        foreach ($task['work'] as $work) {
+            $object = $work['object'];
+            if ($object instanceof SubmissionBox || $object instanceof OnlineAssessment) {
+                $workFolderIds[$object->getCategory()->getId()] = true;
+            }
+        }
+        $folderIds = [];
+        foreach ($this->allFolders as $folder) {
+            $folderIds[$folder->getId()] = true;
+        }
+
+        // If there's any folder IDs that aren't in work folder list,
+        // there's a missing folder.
+        return empty(array_diff_key($folderIds, $workFolderIds));
+    }
+
+    /**
      * Extracts the nominated user's marks for the category
      *
      * @param User         $user
      * @param UnitInstance $unit The unit that this work originated from.
+     * @param bool         $requiredInAllFolders If true, only get marks from
+     *                                           tasks that are in all folders.
      *
      * @return array
      */
-    public function extractUserMarks(User $user, UnitInstance $unit)
+    public function extractUserMarks(User $user, UnitInstance $unit, $requiredInAllFolders = false)
     {
         $id     = $user->getId();
         $unitId = $unit->getUnitCategory()->getId();
@@ -328,6 +355,9 @@ class Statistics
         }
         $userMarks = [];
         foreach ($this->workMap[$unitId]['tasks'] as $taskId => $task) {
+            if ($requiredInAllFolders && !$this->isTaskInAllFolders($task)) {
+                continue;
+            }
             $marks = [
                 'attempts' => 0,
             ];
@@ -347,10 +377,12 @@ class Statistics
      * Get all the assessment titles for the x-axis of the graph.
      *
      * @param UnitInstance $unit The unit that this work originated from.
+     * @param bool         $requiredInAllFolders If true, only get marks from
+     *                                           tasks that are in all folders.
      *
      * @return array
      */
-    public function extractTitles(UnitInstance $unit)
+    public function extractTitles(UnitInstance $unit, $requiredInAllFolders = false)
     {
         $unitId = $unit->getUnitCategory()->getId();
         if (!isset($this->workMap[$unitId]['tasks'])) {
@@ -358,6 +390,9 @@ class Statistics
         }
         $allData = [];
         foreach ($this->workMap[$unitId]['tasks'] as $taskId => $task) {
+            if ($requiredInAllFolders && !$this->isTaskInAllFolders($task)) {
+                continue;
+            }
             // Use the first object's name?
             $allData[$taskId] = [];
             foreach ($task['work'] as $workId => $work) {
@@ -380,10 +415,12 @@ class Statistics
      * Get all the students data for box and whisker averages
      *
      * @param UnitInstance $unit The unit that this work originated from.
+     * @param bool         $requiredInAllFolders If true, only get marks from
+     *                                           tasks that are in all folders.
      *
      * @return array
      */
-    public function getAllUsersMarks(UnitInstance $unit)
+    public function getAllUsersMarks(UnitInstance $unit, $requiredInAllFolders = false)
     {
         $unitId = $unit->getUnitCategory()->getId();
         if (!isset($this->workMap[$unitId]['tasks'])) {
@@ -391,6 +428,9 @@ class Statistics
         }
         $allData = [];
         foreach ($this->workMap[$unitId]['tasks'] as $taskId => $task) {
+            if ($requiredInAllFolders && !$this->isTaskInAllFolders($task)) {
+                continue;
+            }
             $allData[$taskId] = [];
             foreach ($task['work'] as $workId => $work) {
                 foreach ($work['marks'] as $userId => $currentMark) {
