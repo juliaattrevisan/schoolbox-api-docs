@@ -15,8 +15,10 @@
             var unitTitles = graphData[unitId].titles;
             var unitData   = $.fn.reportCardBoxplotCalculateAllSeriesData(graphData[unitId].allMarks);
             var myData     = graphData[unitId].myMarks.map(function(v) {
-                var mark = v.mark;
-                return ($.isNumeric(mark)) ? Number(mark) : mark;
+                if (!('mark' in v)) {
+                    return null;
+                }
+                return ($.isNumeric(v.mark)) ? Number(v.mark) : v.mark;
             });
 
             // Don't render empty graphs
@@ -60,8 +62,8 @@
                             pointFormatter: function() {
                                 // Pluck it out of myMarks
                                 var myDataPoint = myData[this.x];
-                                if ($.isNumeric(myDataPoint)) {
-                                    var myMark      = graphData[unitId].myMarks[this.x].marks;
+                                if ($.isNumeric(myDataPoint) && this.x in graphData[unitId].myMarks) {
+                                    var myMark      = graphData[unitId].myMarks[this.x];
                                     var displayMark = myMark.display_mark;
                                     /* Basic template for each outlier
                                      */
