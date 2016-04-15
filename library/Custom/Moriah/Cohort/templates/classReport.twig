@@ -14,7 +14,10 @@
             var unitId     = $(this).data('unitGraph');
             var unitTitles = graphData[unitId].titles;
             var unitData   = $.fn.reportCardBoxplotCalculateAllSeriesData(graphData[unitId].allMarks);
-            var myData     = graphData[unitId].myMarks.map(function(v) { return Number(v.marks.mark); });
+            var myData     = graphData[unitId].myMarks.map(function(v) {
+                var mark = v.marks.mark;
+                return ($.isNumeric(mark)) ? Number(mark) : mark;
+            });
 
             // Don't render empty graphs
             if (unitTitles.length === 0) {
@@ -56,37 +59,34 @@
                             borderColor: '#000000',
                             pointFormatter: function() {
                                 // Pluck it out of myMarks
-                                var myMark = graphData[unitId].myMarks[this.x].marks;
-                                var displayMark = myMark.display_mark;
-                                /* Basic template for each outlier
-                                 */
-                                var template =
-                                        '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
-                                        '<p class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></p>' +
-                                        '<p class="comment">{INFO}</p>' +
-                                        '</div>';
-                                /* Concatenate everything
-                                 */
-                                if (typeof displayMark != 'undefined') {
-                                    var tooltipContent = template;
-                                    if (displayMark != null) {
-                                        tooltipContent = tooltipContent.replace(/\{DISPLAYMARK}/, displayMark);
-                                        tooltipContent = tooltipContent.replace(/\{GRADIENTMARK}/, Math.floor(myMark.mark / 10));
-                                    } else {
-                                        tooltipContent = tooltipContent.replace(/\{DISPLAYMARK}/, '');
-                                        tooltipContent = tooltipContent.replace(/\{GRADIENTMARK}/, '');
+                                var myDataPoint = myData[this.x];
+                                if ($.isNumeric(myDataPoint)) {
+                                    var myMark      = graphData[unitId].myMarks[this.x].marks;
+                                    var displayMark = myMark.display_mark;
+                                    /* Basic template for each outlier
+                                     */
+                                    var template =
+                                            '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
+                                            '<p class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></p>' +
+                                            '<p class="comment">{INFO}</p>' +
+                                            '</div>';
+                                    /* Concatenate everything
+                                     */
+                                    if (typeof displayMark != 'undefined') {
+                                        var tooltipContent = template;
+                                        if (displayMark != null) {
+                                            tooltipContent = tooltipContent.replace(/\{DISPLAYMARK}/, displayMark);
+                                            tooltipContent = tooltipContent.replace(/\{GRADIENTMARK}/, Math.floor(myMark.mark / 10));
+                                        } else {
+                                            tooltipContent = tooltipContent.replace(/\{DISPLAYMARK}/, '');
+                                            tooltipContent = tooltipContent.replace(/\{GRADIENTMARK}/, '');
+                                        }
+                                        tooltipContent = tooltipContent.replace(/\{INFO}/, myMark.comment);
+
+                                        /* Show tooltip
+                                         */
+                                        return tooltipContent;
                                     }
-                                    tooltipContent = tooltipContent.replace(/\{INFO}/, myMark.comment);
-
-                                    /* Show tooltip
-                                     */
-                                    $('.highcharts-tooltip').show();
-                                    return tooltipContent;
-                                } else {
-
-                                    /* Hide tooltip when no data
-                                     */
-                                    $('.highcharts-tooltip').hide();
                                 }
                                 return null;
                             }
