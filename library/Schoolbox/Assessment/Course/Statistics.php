@@ -384,19 +384,17 @@ class Statistics
         if (!isset($this->workMap[$unitId]['tasks'])) {
             return [];
         }
-        $allData = array();
-        foreach ($this->workMap[$unitId]['tasks'] as $taskId => $current) {
-            /** @var Task\Instance $task */
-            $allMarks         = $current['marks'];
-            $allData[$taskId] = array();
-            /* Stack results
-             */
-            foreach ($allMarks as $userId => $currentMark) {
-                $allData[$taskId][] = array(
-                    'info'  => null,
-                    'uid'   => null,
-                    'value' => (float)$currentMark['mark'],
-                );
+        $allData = [];
+        foreach ($this->workMap[$unitId]['tasks'] as $taskId => $task) {
+            $allData[$taskId] = [];
+            foreach ($task['work'] as $workId => $work) {
+                foreach ($work['marks'] as $userId => $currentMark) {
+                    $allData[$taskId][] = array(
+                        'info'  => null,
+                        'uid'   => null,
+                        'value' => (float)$currentMark['mark'],
+                    );
+                }
             }
         }
         ksort($allData);
