@@ -889,9 +889,8 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                          * @var array $row
                          */
                         $model->setHomepage($mapper->hydrateJoin($row, 'homepages', 'h'));
-                            return $model;
-                        }
-                    )
+                        return $model;
+                    }
                 );
             }
             $code           = $row['cc.code'];
