@@ -326,19 +326,21 @@ class Statistics
         if (!isset($this->workMap[$unitId]['tasks'])) {
             return [];
         }
-        $works = array();
-        foreach ($this->workMap[$unitId]['tasks'] as $taskId => $current) {
-            $marks = array_key_exists($id, $current['marks'])
-                ? $current['marks'][$id]
-                : array('attempts' => 0)
-            ;
-            $works[$taskId] = array(
-                'task'  => $current['task'],
-                'marks' => $marks
-            );
+        $userMarks = [];
+        foreach ($this->workMap[$unitId]['tasks'] as $taskId => $task) {
+            $marks = [
+                'attempts' => 0,
+            ];
+            foreach ($task['work'] as $workId => $work) {
+                if (array_key_exists($id, $work['marks'])) {
+                    $marks = $work['marks'][$id];
+                    break;
+                }
+            }
+            $userMarks[$taskId] = $marks;
         }
-        ksort($works);
-        return array_values($works);
+        ksort($userMarks);
+        return array_values($userMarks);
     }
 
     /**
