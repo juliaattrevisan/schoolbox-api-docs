@@ -15,7 +15,7 @@
             var unitTitles = graphData[unitId].titles;
             var unitData   = $.fn.reportCardBoxplotCalculateAllSeriesData(graphData[unitId].allMarks);
             var myData     = graphData[unitId].myMarks.map(function(v) {
-                var mark = v.marks.mark;
+                var mark = v.mark;
                 return ($.isNumeric(mark)) ? Number(mark) : mark;
             });
 
