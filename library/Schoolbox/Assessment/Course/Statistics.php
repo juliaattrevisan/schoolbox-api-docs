@@ -75,11 +75,13 @@ class Statistics
     /**
      * Constructor
      *
-     * @param Folder     $course The course or unit home page to get stats for.
-     * @param Term\Model $term
-     * @param User       $user
+     * @param Folder     $course    The course or unit home page to get stats for.
+     * @param Term\Model $term      The term to limit results to
+     * @param User       $user      The user to fetch results for
+     * @param int[]      $workTypes If not empty, limit to these work types
+     *                              (Quizzes are SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT)
      */
-    public function __construct(Folder $course, Term\Model $term, User $user)
+    public function __construct(Folder $course, Term\Model $term, User $user, $workTypes = [])
     {
         $this->course = $course;
 
@@ -115,12 +117,15 @@ class Statistics
                 $assessIds = array_unique(array_filter($assessIds));
 
                 // retrieve ALL the submission boxes for this unit
-                $boxCollection = $this->submissionBoxMapper->findByColumnList(
-                    array(
-                        'id'              => $boxIds,
-                        'mark_visibility' => $quizVisibilities
-                    )
-                );
+                // (dependent on work type)
+                $params = [
+                    'id'              => $boxIds,
+                    'mark_visibility' => $quizVisibilities,
+                ];
+                if (!empty($workTypes)) {
+                    $params['type'] = $workTypes;
+                }
+                $boxCollection = $this->submissionBoxMapper->findByColumnList($params);
 
                 // I don't think that term can ever be null.
                 // If it's found that it can, then I'll have to just add all boxes.
@@ -131,16 +136,18 @@ class Statistics
                 }
 
                 // retrieve ALL the online assessments (not surveys) for this category
-                $assessCollection = $this->assessMapper->findByColumnList(
-                    array(
-                        'assess_id'       => $assessIds,
-                        'availability'    => 'assess',
-                        'mark_visibility' => $quizVisibilities
-                    )
-                );
-                foreach ($assessCollection as $assess) {
-                    if ($term->contains($assess->getFinish())) {
-                        $this->addWork($assess, $unit);
+                if (empty($workTypes) || in_array(SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT, $workTypes)) {
+                    $assessCollection = $this->assessMapper->findByColumnList(
+                        array(
+                            'assess_id'       => $assessIds,
+                            'availability'    => 'assess',
+                            'mark_visibility' => $quizVisibilities
+                        )
+                    );
+                    foreach ($assessCollection as $assess) {
+                        if ($term->contains($assess->getFinish())) {
+                            $this->addWork($assess, $unit);
+                        }
                     }
                 }
             }

@@ -8,6 +8,7 @@
 namespace Custom\Moriah\Cohort;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Course;
 use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 use Schoolbox\Assessment\Term;
@@ -135,7 +136,13 @@ class Controller extends Base
             $courseList = $courseLists[$class->getId()];
             $results    = [];
             foreach ($courseList as $course) {
-                $courseStats = new Course\Statistics($course, $term, $student);
+                // ONLY assessment tasks
+                $courseStats = new Course\Statistics(
+                    $course,
+                    $term,
+                    $student,
+                    [WorkType::TYPE_ASSESSMENT_TASK]
+                );
                 $courseId    = $course->getId();
                 $allFolders  = $courseStats->getAllFolders();
 
