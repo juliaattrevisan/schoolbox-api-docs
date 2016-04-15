@@ -10,6 +10,8 @@
  */
 
 class Component_DefinitionMapper extends Schoolbox\Mapper {
+
+
 	protected function mapping () {
 		$this->hasTable('component_definition');
 		$this->hasModel('Component_Definition');
@@ -132,7 +134,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper {
 		$collection = $this->hydrateList($rowset);
 
 		// bail at this point if we don't need to care about component category mappings
-		if($module != 'homepage') {
+		if($module != self::MODULE_HOMEPAGE) {
 			return $collection;
 		}
 
