@@ -15,6 +15,7 @@ use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\External\Normalise;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\CacheableLoggerInterface;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
@@ -181,9 +182,21 @@ class Provisioner
 
                     /* Deliberately empty $accessList so that Role-based
                      * permissions don't get saved in addition to the Group
-                     * permissions tha we can set
+                     * permissions that we can set
                      */
-                    $internalUser->setAccessList(new Collection());
+                    $preserved = new Collection();
+
+                    /* Don't blow away any FULL_ACCESS settings
+                     */
+                    foreach ($internalUser->getAccessList() as $current) {
+                        if ($current->getAccessLevel() == FULL_ACCESS) {
+                            $preserved->add($current);
+
+                            $this->logger->debug("{$internalUser->getFullname()} is staying at access level {$current->getAccessLevel()} for {$current->getServiceIdentifier()}", $commonContext);
+                        }
+                    }
+
+                    $internalUser->setAccessList($preserved);
 
                     $commonContext['action'] = $action;
 
@@ -192,7 +205,6 @@ class Provisioner
                     // Run this user through the hydrators
                     try {
                         $ruleset->hydrate($externalUser, $internalUser);
-
                     } catch (SkipException $e) {
                         $commonContext['action'] = 'skip';
                         $this->logger->notice("Skipping user: ".$e->getMessage(), $commonContext);

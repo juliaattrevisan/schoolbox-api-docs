@@ -100,10 +100,16 @@ class User extends SchoolboxUser
             $found = [];
 
             /* Update existing userAccess instance
+             *
+             * In accordance with SB-11230:
+             * - don't change Full Access settings
+             * - downgrade Write to Read
              */
             foreach ($this->getAccessList() as $current) {
                 if (in_array($current->getServiceIdentifier(), $identifiers)) {
-                    $current->setAccessLevel($level);
+                    if ($current->getAccesslevel() < FULL_ACCESS) {
+                        $current->setAccessLevel($level);
+                    }
 
                     $found[] = $current->getServiceIdentifier();
                 }
