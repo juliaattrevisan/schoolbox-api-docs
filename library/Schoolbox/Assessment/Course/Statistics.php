@@ -356,15 +356,20 @@ class Statistics
         if (!isset($this->workMap[$unitId]['tasks'])) {
             return [];
         }
-        $allData = array();
-        foreach ($this->workMap[$unitId]['tasks'] as $taskId => $current) {
-            $object = $current['object'];
-            if ($object instanceof SubmissionBox) {
-                $allData[$taskId] = $object->getName();
-            } elseif ($object instanceof OnlineAssessment) {
-                $allData[$taskId] = $object->getTitle();
-            } else {
-                $allData[$taskId] = '';
+        $allData = [];
+        foreach ($this->workMap[$unitId]['tasks'] as $taskId => $task) {
+            // Use the first object's name?
+            $allData[$taskId] = [];
+            foreach ($task['work'] as $workId => $work) {
+                $object = $work['object'];
+                if ($object instanceof SubmissionBox) {
+                    $allData[$taskId] = $object->getName();
+                } elseif ($object instanceof OnlineAssessment) {
+                    $allData[$taskId] = $object->getTitle();
+                } else {
+                    $allData[$taskId] = '';
+                }
+                break;
             }
         }
         ksort($allData);
