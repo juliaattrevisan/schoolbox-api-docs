@@ -7,15 +7,9 @@
  */
 .fc .fc-content-skeleton table,
 .fc .fc-content-skeleton table tr:nth-of-type(even),
-.fc .fc-content-skeleton table tr:nth-of-type(even):hover,
-.fc table:not(.no-hover) tbody tr:hover td
-{
+.fc .fc-content-skeleton table tr:nth-of-type(even):hover {
     background-color: transparent;
 }
-
-/*.fc table tr:hover td {*/
-    /*background-color: transparent;*/
-/*}*/
 
 /* Vertically center datepicker icon and current month title
  */

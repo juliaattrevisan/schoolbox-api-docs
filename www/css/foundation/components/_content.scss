@@ -403,6 +403,14 @@ thead tr th, .row-header, .island table.dataTable thead th {
 	font-weight: $font-weight-bold;
 }
 
+// Override calendar default colour with accent colours
+.fc .fc-today {
+	background: $accent-background !important;
+}
+.fc .fc-day-number{
+	color: $accent-foreground !important;
+}
+
 /* .row-header is designed to have the same style as th elements
  * but the padding is completely different when used on a list-item
  */
@@ -416,10 +424,8 @@ thead tr th, .row-header, .island table.dataTable thead th {
 /* Don't use row hovers on Timetable Grid screens anymore
  * They don't do much now due to fully-expanding coloured blocks
  */
+
 table:not(.no-hover) tbody tr:hover {
-	th, td {
-		background-color: $row-hover-background;
-	}
 	nav a {
 		opacity: 1;
 		&:hover {
