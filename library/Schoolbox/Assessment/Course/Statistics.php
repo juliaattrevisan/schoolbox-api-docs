@@ -183,9 +183,11 @@ class Statistics
                 ]
             );
             // I only want a single mark per student, not every mark.
-            $marks = array_map('array_pop', $marks);
+            $marks  = array_map('array_pop', $marks);
+            $workId = 'oa'.$work->getId();
         } elseif ($work instanceof SubmissionBox) {
-            $marks = $this->getDueWorkMarks($work);
+            $marks  = $this->getDueWorkMarks($work);
+            $workId = 'sb'.$work->getId();
         } else {
             return false;
         }
@@ -210,18 +212,24 @@ class Statistics
             ];
         }
         // Use task ID as key instead of stamp
-        if (!isset($this->workMap[$unitId]['work'][$taskId])) {
+        if (!isset($this->workMap[$unitId]['tasks'][$taskId])) {
             $this->workMap[$unitId]['tasks'][$taskId] = [
                 'task'    => $baseTask,
-                'object'  => $work,
-                'marks'   => [],
+                'work'    => [],
                 'average' => null,
             ];
         }
+        if (!isset($this->workMap[$unitId]['tasks'][$taskId]['work'][$workId])) {
+            $this->workMap[$unitId]['tasks'][$taskId]['work'][$workId] = [
+                'object' => $work,
+                'marks'  => [],
+            ];
+        }
         // Marks need to be merged and re-averaged.
-        $this->workMap[$unitId]['tasks'][$taskId]['marks']   += $marks;
-        $this->workMap[$unitId]['tasks'][$taskId]['average'] = $this->calculateAverage(
-            $this->workMap[$unitId]['tasks'][$taskId]['marks']
+        // Need to add a due work level as well
+        $this->workMap[$unitId]['tasks'][$taskId]['work'][$workId]['marks'] += $marks;
+        $this->workMap[$unitId]['tasks'][$taskId]['average']                 = $this->calculateAverage(
+            $this->workMap[$unitId]['tasks'][$taskId]['work']
         );
         return true;
     }
@@ -285,17 +293,19 @@ class Statistics
     /**
      * Gets the average mark for this set.
      *
-     * @param  array $marks
+     * @param  array $work
      * @return float
      */
-    protected function calculateAverage($marks)
+    protected function calculateAverage($work)
     {
         $count = 0;
         $total = 0;
-        foreach ($marks as $mark) {
-            if (isset($mark['mark'])) {
-                $count++;
-                $total += $mark['mark'];
+        foreach ($work as $workMarks) {
+            foreach ($workMarks['marks'] as $mark) {
+                if (isset($mark['mark'])) {
+                    $count++;
+                    $total += $mark['mark'];
+                }
             }
         }
         return $count ? ($total / $count) : null;
@@ -375,8 +385,6 @@ class Statistics
         $allData = array();
         foreach ($this->workMap[$unitId]['tasks'] as $taskId => $current) {
             /** @var Task\Instance $task */
-//            $task             = $current['task'];
-//            $object           = $current['object'];
             $allMarks         = $current['marks'];
             $allData[$taskId] = array();
             /* Stack results

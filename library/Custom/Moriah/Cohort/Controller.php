@@ -137,6 +137,7 @@ class Controller extends Base
             $results    = [];
             foreach ($courseList as $course) {
                 // ONLY assessment tasks
+                // ONLY items that are on ALL folders in course
                 $courseStats = new Course\Statistics(
                     $course,
                     $term,
