@@ -51,7 +51,7 @@ class Download extends Base
 			$plagDocument = $plagMapper->findOneByColumn('file_id', $work->getId());
 
             $plagHref = sprintf(
-                "%s%s/submission/plagiarismReport/%s/#zx_h=673px",
+                "%s%s/submission/plagiarismReport/%s/#zx_h=672px",
                 $this->getPage()->conType(), $_SERVER['HTTP_HOST'], $plagDocument->getPlagscanId()
             );
         } catch (\Exception $e) {

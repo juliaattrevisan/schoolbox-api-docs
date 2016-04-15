@@ -294,7 +294,7 @@ class DueWork_Detail
                         }
 
                         $plagHref = sprintf(
-                            "%s%s/submission/plagiarismReport/%s/#zx_h=673px",
+                            "%s%s/submission/plagiarismReport/%s/#zx_h=672px",
                             $page->conType(),
                             $_SERVER['HTTP_HOST'],
                             $plagScan->getPlagscanId()
