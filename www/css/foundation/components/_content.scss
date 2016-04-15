@@ -406,8 +406,6 @@ thead tr th, .row-header, .island table.dataTable thead th {
 // Override calendar default colour with accent colours
 .fc .fc-today {
 	background: $accent-background !important;
-}
-.fc .fc-day-number{
 	color: $accent-foreground !important;
 }
 
