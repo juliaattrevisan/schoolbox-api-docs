@@ -1818,8 +1818,10 @@ class Controller extends Base\Base
      */
     public function deleteCourse()
     {
+        // mmm, this should be a URI param
         $courseId = $this->getRequest()->post->get('courseId');
 
+        // TODO a TODO here would have been nice...
         new \Alaress_Probe($courseId);
 
         die();
