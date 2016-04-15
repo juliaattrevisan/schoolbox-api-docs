@@ -170,7 +170,7 @@ class Controller extends Base
             // And get the classes which use them?
             $this->getResponse()->content->set([
                 'format'   => 'html',
-                'template' => '@customMoriahCohort/classReport.twig',
+                'template' => '@customMoriahCohort/classReportForTerm.twig',
                 'data'     => [
                     'student'         => $student,
                     'class'           => $class,
