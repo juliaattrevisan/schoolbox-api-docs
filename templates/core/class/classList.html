@@ -126,26 +126,28 @@ $(function() {
                     <td class="show-for-medium-up">{LASTVISIT}
 
                     </td>
-                    <td class="actions-small-1 actions-large-4">
+                    <td class="no-pad">
                         <!-- BEGIN actions -->
-                        <nav class="hide-for-medium-down">
-                                    <!-- BEGIN eportfolio -->
-                                    <a href="/eportfolio/{ID}/profile" class="icon-eportfolio" title="View ePortfolio"></a>
-                                    <!-- END eportfolio -->
+                        <div class="actions-small-1 actions-large-4">
+                            <nav class="hide-for-medium-down">
+                                        <!-- BEGIN eportfolio -->
+                                        <a href="/eportfolio/{ID}/profile" class="icon-eportfolio" title="View ePortfolio"></a>
+                                        <!-- END eportfolio -->
 
-                                    <a href="/submission/dueWork/{ID}" class="icon-timetable" title="View Due Work"></a>
-                                    <a href="/submission/allWork/{ID}" class="icon-approve" title="View Grades"></a>
+                                        <a href="/submission/dueWork/{ID}" class="icon-timetable" title="View Due Work"></a>
+                                        <a href="/submission/allWork/{ID}" class="icon-approve" title="View Grades"></a>
 
-                                    <!-- BEGIN pastoral_care -->
-                                    <a href="{SYNWEB_URL}/stud.aspx?id={SYNERGYID}" class="icon-modify" title="View Pastoral Care" target="_blank"></a>
-                                    <!-- END pastoral_care -->
-                                    <!-- BEGIN has_email -->
-                                    <a href="{HAS_EMAIL_URL}" class="icon-mail" title="Send Email"></a>
-                                    <!-- END has_email -->
-                        </nav>
-                        <nav class="show-for-medium-down">
-                            <a href="#" data-dropdown="overflow{ID}" class="icon-more" title="Actions"></a>
-                        </nav>
+                                        <!-- BEGIN pastoral_care -->
+                                        <a href="{SYNWEB_URL}/stud.aspx?id={SYNERGYID}" class="icon-modify" title="View Pastoral Care" target="_blank"></a>
+                                        <!-- END pastoral_care -->
+                                        <!-- BEGIN has_email -->
+                                        <a href="{HAS_EMAIL_URL}" class="icon-mail" title="Send Email"></a>
+                                        <!-- END has_email -->
+                            </nav>
+                            <nav class="show-for-medium-down">
+                                <a href="#" data-dropdown="overflow{ID}" class="icon-more" title="Actions"></a>
+                            </nav>
+                        </div>
                         <!-- END actions -->
                     </td>
                 </tr>
