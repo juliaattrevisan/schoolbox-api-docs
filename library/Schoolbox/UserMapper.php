@@ -237,6 +237,8 @@ class UserMapper extends Mapper
         );
         unset($this_object);
 
+        $this->hasSoftDeleteDateField('deleted_at');
+
         $this->hasJoin(
             'role',
             array(

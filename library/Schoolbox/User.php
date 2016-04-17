@@ -16,11 +16,13 @@ use JsonSerializable;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
-class User implements JsonSerializable
+class User implements JsonSerializable, ISoftDeletable
 {
+    use DeletedAtDate;
 
     /** @var int */
     private $id;

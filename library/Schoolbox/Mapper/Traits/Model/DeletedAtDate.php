@@ -14,31 +14,30 @@ namespace Schoolbox\Mapper\Traits\Model;
 
 use Alaress_Date_Format;
 
-trait DeletedDate
+trait DeletedAtDate
 {
     /**
      * Deleted date
      *
      * @var Alaress_Date_Format
      */
-    protected $deletedDate;
+    protected $deletedAt;
 
     /**
      * @return Alaress_Date_Format
      */
-    public function getDeletedDate()
+    public function getDeletedAt()
     {
-        return $this->deletedDate;
+        return $this->deletedAt;
     }
 
     /**
-     * @param  Alaress_Date_Format $deletedDate
-     *
+     * @param  Alaress_Date_Format $deletedAt
      * @return $this
      */
-    public function setDeletedDate($deletedDate)
+    public function setDeletedAt($deletedAt)
     {
-        $this->deletedDate = $deletedDate;
+        $this->deletedAt = $deletedAt;
         return $this;
     }
 
@@ -49,6 +48,6 @@ trait DeletedDate
      */
     public function isDeleted()
     {
-        return $this->getDeletedDate() instanceof Alaress_Date_Format && !$this->getDeletedDate()->isNull();
+        return ($this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull());
     }
 }
