@@ -1,6 +1,7 @@
 {# Shared navigation menu #}
 
 {{ renderAdminNavigation(pageCurrent) }}
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 
 <script>
     $(function() {
@@ -23,12 +24,8 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <h3>Upload Bulk Folder CSV</h3>
-                        <p>Download the template first, then fill it out and upload it here.</p>
-                        <a href="/adminv2/csv/folderBulkAdd.csv" class="button icon-download">Download Template</a>
-                        <label>
-                            <input name="bulkadd" type="file" />
-                        </label>
+                        <p>Download the <a href="/adminv2/csv/folderBulkAdd.csv">template</a> first, enter your required class pages or folders and upload below.</p>
+                        {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
                     </div>
                 </fieldset>
                 <fieldset class="content">

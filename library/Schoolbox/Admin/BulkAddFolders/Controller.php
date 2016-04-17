@@ -15,6 +15,8 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Scrub;
 
@@ -103,6 +105,7 @@ class Controller extends Base
                     'pageCurrent' => 'bulk-add-folders',
                     'templates' => $this->getHomepageTemplateMapper()->findAll()->sortBy("name", "asc"),
                     'roles' => $this->getRoleMapper()->findAll(),
+                    'attachzone' => $this->getAttachZone(),
                 ),
             )
         );
@@ -120,10 +123,12 @@ class Controller extends Base
         }
 
         $allFolders = null;
+        if (is_array($this->getRequest()->post['attachment'])) {
+            $factory = new CollectorFactory();
+            $csvFile = $factory->build($this->getRequest()->post['attachment'])->getFirst();
 
-        if (isset($this->getRequest()->files['bulkadd']['tmp_name']) && $this->getRequest()->files['bulkadd']['tmp_name']) {
             $bulkHandler = new Bulk_Category(
-                $this->getRequest()->files['bulkadd']['tmp_name'],
+                $csvFile->readStream(),
                 Scrub::text($this->getRequest()->post['template'])
             );
             $allFolders = $bulkHandler->addCategories();
@@ -142,6 +147,28 @@ class Controller extends Base
                 ),
             )
         );
+    }
+
+
+    /**
+     * Insert an attach zone into the template
+     *
+     * @param Collection|PastoralAttachmentModel $attachments
+     * @return array
+     */
+    private function getAttachZone()
+    {
+        $zone = new Zone('attachment');
+        $zone
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select CSV')
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Upload CSV')
+            ->setMimeFilter('*/*')
+            ->setReadOnly(false)
+            ->setMulti(false);
+
+        return $zone->getTwigContext();
     }
 
     /**

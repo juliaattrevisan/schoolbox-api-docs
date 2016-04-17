@@ -18,6 +18,12 @@ class Bulk_Category extends Bulk_Abstract
     private $templateID = 0;
 
     /**
+     * Storage object
+     * @var resource
+     */
+    protected $fp;
+
+    /**
     * Constructor
     *
     * @param $file
@@ -25,7 +31,7 @@ class Bulk_Category extends Bulk_Abstract
     */
     public function __construct($file, $templateID)
     {
-        $this->setFile($file);
+        $this->fp = $file;
         $this->setTemplateID($templateID);
     }
 
@@ -47,15 +53,14 @@ class Bulk_Category extends Bulk_Abstract
 		 */
         $output = array();
 
-        if (is_file($this->getFile())) {
+        if (is_resource($this->fp)) {
             $groups = array_map(array('Scrub', 'text'), $_POST['groupPerm']);
 
             /* Process rows
 			 */
-            $handle = fopen($this->getFile(), 'r');
-            $headerRow = fgetcsv($handle, 1000, ",");
-
-            while (($row = fgetcsv($handle, 1000, ",")) !== false) {
+            $headerRow = fgetcsv($this->fp, 1000, ",");
+            while (($row = fgetcsv($this->fp, 1000, ",")) !== false) {
+                    
                 if (($row[0] != '') && ($row[1] != '')) {
                     /* Check parent exists
 					 */
