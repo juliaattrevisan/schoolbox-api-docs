@@ -143,15 +143,13 @@
 
     <div data-type-selector class="row{% if records.count() == 0 %} hide{% endif %}">
         <div class="small-12 island">
-            <section class="content">
-                <label for="filter_type_id">Filter Pastoral Records By Type</label>
-                <select id="filter_type_id">
-                    <option value="">All</option>
-                    {% for type in types %}
-                        <option value="{{ type.id }}">{{ type.name }}</option>
-                    {% endfor %}
-                </select>
-            </section>
+            <label for="filter_type_id">Filter Pastoral Records By Type</label>
+            <select id="filter_type_id">
+                <option value="">All</option>
+                {% for type in types %}
+                    <option value="{{ type.id }}">{{ type.name }}</option>
+                {% endfor %}
+            </select>
         </div>
     </div>
 
@@ -159,7 +157,11 @@
 
 <div data-no-records class="row{% if records.count() != 0 %} hide{% endif %}">
     <div class="small-12 column">
-        <div class="alert-box">No pastoral care records are visible regarding {{ student.formatName }}.{% if role != 'parent' %} <a href="/pastoral/insert/{{ student.getId }}">Add a Pastoral Record</a>{% endif %}</div>
+        <div class="empty-state">
+            <i class="icon-pastoral"></i>
+            <p>We currently have no events recorded.</p>
+            <p>{% if role != 'parent' %} You can <a href="/pastoral/insert/{{ student.getId }}">create an event</a> now.{% endif %}</p>
+        </div>
     </div>
 </div>
 
