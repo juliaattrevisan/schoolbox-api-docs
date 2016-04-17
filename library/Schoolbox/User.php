@@ -971,11 +971,15 @@ class User implements JsonSerializable
 
                     if (!isset($found[$teacher]))
                     {
-                        $teacherCollection->add(
-                            UserMapper::getInstance()->findByExternalId($teacher)
-                        );
+                        try {
+                            $teacherCollection->add(
+                                UserMapper::getInstance()->findByExternalId($teacher)
+                            );
 
-                        $found[$teacher] = 1;
+                            $found[$teacher] = 1;
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            // Schoolbox user not found, lets not try and notify
+                        }
                     }
                 }
             }

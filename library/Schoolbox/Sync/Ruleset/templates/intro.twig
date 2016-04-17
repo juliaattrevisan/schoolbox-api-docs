@@ -18,11 +18,11 @@
         </section>
         <h2 class="subheader">Recent Runs</h2>
         {% if logs is empty %}
-        <div class="empty-state">
-            <i class="icon-info"></i>
-            <p>The user provisioning system is yet to run, please start by configuring rules for
-                <a href="/adminv2/ups/staff">staff</a>, <a href="/adminv2/ups/student">students</a> or <a href="/adminv2/ups/parent">parents</a>.</p>
-        </div>
+            <div class="empty-state">
+                <i class="icon-info"></i>
+                <p>The user provisioning system is yet to run, please start by configuring rules for
+                    <a href="/adminv2/ups/staff">staff</a>, <a href="/adminv2/ups/student">students</a> or <a href="/adminv2/ups/parent">parents</a>.</p>
+            </div>
         {% else %}
         {% include '@upsRuleset/log/table.twig' %}
         {% endif %}
