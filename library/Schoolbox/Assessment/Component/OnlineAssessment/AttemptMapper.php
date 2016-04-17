@@ -144,14 +144,13 @@ class AttemptMapper extends Mapper
         }
 
         // From/to dates
-        // TODO consider allowing assess that spans from and to, not just finish
         if ($extra_params['from'] instanceof Alaress_Date_Format && !$extra_params['from']->isNull()) {
             $params['from'] = $extra_params['from']->getDatabaseDate();
-            $filters[]      = 'DATE(a.start) >= :from';
+            $filters[]      = 'DATE(a.finish) >= :from';
         }
         if ($extra_params['to'] instanceof Alaress_Date_Format && !$extra_params['to']->isNull()) {
             $params['to'] = $extra_params['to']->getDatabaseDate();
-            $filters[]    = 'DATE(a.start) <= :to';
+            $filters[]    = 'DATE(a.finish) <= :to';
         }
 
         $filters = implode(' AND ', $filters);
