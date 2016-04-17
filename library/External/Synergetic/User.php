@@ -319,35 +319,43 @@ class External_Synergetic_User implements External_UserInterface
                     AND vStudents.FileYear='" . $this->database->quote($currentYear) . "'
         ";
 
-		$student = false;
-		foreach ($this->getDatabase()->getAll($query) ?: array() as $row) {
-			if (empty($student)) {
-				// fill in student record
-				$student = $row;
-            if ($student['StudentBirthDate']
-                && preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)
-            ) {
-                $student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
+		$student = [];
+
+        foreach ($this->getDatabase()->getAll($query) ?: array() as $row) {
+            if (empty($student)) {
+                // fill in student record
+                $student = $row;
+
+                if ($student['StudentBirthDate']
+                    && preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches)
+                ) {
+                    $student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
                 } else {
                     $student['StudentBirthDate'] = false;
                 }
-				$student['AlertMessage'] = array($student['AlertMessage']);
-			} else {
-				// join subsequent alerts
-				$student['AlertMessage'][] = $row['AlertMessage'];
-			}
-		}
-		if (!empty($student)) {
+                $student['AlertMessage'] = array($student['AlertMessage']);
+            } else {
+                // join subsequent alerts
+                $student['AlertMessage'][] = $row['AlertMessage'];
+            }
+        }
+
+        /* Implode with newlines if you were returned a list of
+         * AlertMessages to join - otherwise do nothing to it
+         */
+		if (!empty($student) && is_array($student['AlertMessage'])) {
 			$student['AlertMessage'] = implode(
 				"\n",
 				array_unique(array_filter($student['AlertMessage']))
 			);
 		}
 
-            $student = array_map(function($value) { return trim(str_replace('Not Selected', '', $value)); }, $student);
+        $student = array_map(function($value) {
+            return trim(str_replace('Not Selected', '', $value));
+        }, $student);
 
-            return $student;
-        }
+        return $student;
+    }
 
     public function getStaff($synID)
     {
