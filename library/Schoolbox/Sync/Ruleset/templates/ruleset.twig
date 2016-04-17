@@ -229,7 +229,9 @@ set upsConfig = {
             {% endfor %}
             {% endif %}
 
+            {% if (ruleset.getRules() is not empty) and (ruleset.getCustomRules() is not empty) %}
             <input type="submit" value="Save Rules" />
+            {% endif %}
         </form>
 
         <div id="token-list" class="reveal-modal" data-reveal>
