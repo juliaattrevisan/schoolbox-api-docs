@@ -76,9 +76,12 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
 
             // Group the headlines by topic
             $groupedList = [];
+            $groupedList['All'] = [];
             foreach ($this->headlineList as $item) {
                 $groupedList[$item['topicName']][] = $item;
+                $groupedList['All'][] = $item;
             }
+
             $topicList = array_keys($groupedList);
 
             $userFormatter = new User();
