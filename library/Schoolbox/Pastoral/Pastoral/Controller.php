@@ -13,6 +13,7 @@ namespace Schoolbox\Pastoral\Pastoral;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral\Pastoral;
 use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
@@ -394,7 +395,7 @@ class Controller extends Base
      * Returns the logged in users pastoral care moderator level
      *
      * @return int
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      */
     public function getPastoralModeratorLevel() {
         $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
@@ -419,7 +420,7 @@ class Controller extends Base
      *
      * @param $id
      * @throws SchoolboxException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      */
     public function getIndex($id)
     {
@@ -506,7 +507,7 @@ class Controller extends Base
      * @param $studentId
      * @param $id
      * @throws SchoolboxException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      */
     public function getRecord($studentId, $id)
     {
@@ -800,7 +801,7 @@ class Controller extends Base
                     $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
                     /** @var PastoralSeverityModel $severity */
                     $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
-                } catch (\Schoolbox\Mapper\Exception $e) {
+                } catch (Exception $e) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
 
@@ -865,7 +866,7 @@ class Controller extends Base
                         try {
                             /** @var \Schoolbox\Role $role */
                             $role = $this->getRoleMapper()->findById($role_id);
-                        } catch (\Schoolbox\Mapper\Exception $e) {
+                        } catch (Exception $e) {
                             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                         }
 
@@ -1131,7 +1132,7 @@ class Controller extends Base
 
         try {
             $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (Exception $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 

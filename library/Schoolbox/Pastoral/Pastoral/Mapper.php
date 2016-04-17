@@ -10,7 +10,7 @@ namespace Schoolbox\Pastoral\Pastoral;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
@@ -339,7 +339,7 @@ class Mapper extends BaseMapper
      * @param $students
      * @param $tags
      * @return Collection
-     * @throws Exception
+     * @throws MapperException
      */
     public function findAllReport($before_date, $after_date, $severity, $types, $authors, $students, $tags)
     {
@@ -496,7 +496,7 @@ class Mapper extends BaseMapper
             if ($role->isParent()) {
                 try {
                     $record->setStudent($this->getUserMapper()->findById($record->getStudent()->getId()));
-                } catch (\Schoolbox\Mapper\Exception $e) {
+                } catch (MapperException $e) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
                 }
 
@@ -653,13 +653,13 @@ class Mapper extends BaseMapper
                     /** @var \Schoolbox\Role $role */
                     $role = $this->getRoleMapper()->findById($access->getRole()->getId());
                     $access->setRole($role);
-                } catch (\Schoolbox\Mapper\Exception $e) {
+                } catch (MapperException $e) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
                 }
             } else if ($access->getUser()->getId() != '') {
                 try {
                     $access->setUser($this->getUserMapper()->findById($access->getUser()->getId()));
-                } catch (\Schoolbox\Mapper\Exception $e) {
+                } catch (MapperException $e) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
                 }
             }
@@ -670,7 +670,7 @@ class Mapper extends BaseMapper
         foreach ($record->getCommentList() as $comment) {
             try {
                 $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
             }
         }
@@ -688,7 +688,7 @@ class Mapper extends BaseMapper
                 $attachment->setIcon($file->getMimetype()->getIconFile());
                 $attachment->setFilename($file->getFilename());
             }
-            catch (\Schoolbox\Mapper\Exception $e) {
+            catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
             }
         }
