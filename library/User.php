@@ -55,15 +55,21 @@ class User extends DeprecatedModel
     {
         $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id
                   FROM user, userAccess
-                  WHERE id = uid AND service = '" . HOMEPAGE_SERVICE . "' AND sid = '" . $categoryID . "' AND type > 0
+                  WHERE id = uid AND service = '" . HOMEPAGE_SERVICE . "' AND sid = '" . $categoryID . "'
+                  AND type > 0
+                  AND user.deleted_at IS NULL
                   ORDER BY lastname, firstname";
         return $this->db->getAll($query);
     }
 
     public function getManagers($categoryID)
     {
-        $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id FROM user, userAccess
-        WHERE id = uid AND service = '" . HOMEPAGE_SERVICE . "' AND sid = '" . $categoryID . "' and type in(3,2) ORDER BY lastname, firstname";
+        $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id 
+                  FROM user, userAccess
+                  WHERE id = uid AND service = '" . HOMEPAGE_SERVICE . "' AND sid = '" . $categoryID . "' 
+                  and type in(3,2)
+                  AND user.deleted_at IS NULL
+                  ORDER BY lastname, firstname";
         return $this->db->getAll($query);
     }
 
@@ -77,7 +83,9 @@ class User extends DeprecatedModel
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                     LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
                     LEFT JOIN superusers ON user.id = superusers.id
-                WHERE user.id = '" . $this->db->quote($id) . "' ORDER BY userCampus.defaultCampus DESC";
+                WHERE user.id = '" . $this->db->quote($id) . "'
+                AND user.deleted_at IS NULL
+                ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
     }
 
@@ -89,14 +97,17 @@ class User extends DeprecatedModel
                     LEFT JOIN groups ON user.group_id = groups.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                     LEFT JOIN superusers ON user.id = superusers.id
-                WHERE user.username = " . $this->db->smartQuote($username) . " ORDER BY userCampus.defaultCampus DESC";
+                WHERE user.username = " . $this->db->smartQuote($username) . " 
+                AND user.deleted_at IS NULL
+                ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
     }
 
     public function getSuperusers()
     {
         $query = "SELECT user.id uid, title, firstname, lastname, username, local_email, alt_email
-                FROM superusers JOIN user ON superusers.id = user.id";
+                FROM superusers JOIN user ON superusers.id = user.id
+                WHERE user.deleted_at IS NULL";
         return $this->db->getAll($query);
     }
 
@@ -125,7 +136,9 @@ class User extends DeprecatedModel
                 FROM user
                     LEFT JOIN groups ON user.group_id = groups.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
-                WHERE user.synergy_id = '$sid' ORDER BY userCampus.defaultCampus DESC";
+                WHERE user.synergy_id = '$sid' 
+                AND user.deleted_at IS NULL
+                ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
     }
 
@@ -145,6 +158,7 @@ class User extends DeprecatedModel
                     LEFT JOIN groups ON user.group_id = groups.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                 WHERE user.synergy_id = '$sid'
+                AND user.deleted_at IS NULL
                 AND ";
         if (is_array($gid)) {
             $query .= "group_id IN (" . implode(", ", $gid) . ")";
@@ -203,7 +217,7 @@ class User extends DeprecatedModel
                 $this->db->quote('%' . $this->db->quoteForLike($keyword) . '%')
             );
         }
-        $wherePart .= ')';
+        $wherePart .= ') AND user.deleted_at IS NULL';
 
         //If parent search policy is disabled, only staff will see parents in search results
         //Guests never see parents
@@ -243,7 +257,7 @@ class User extends DeprecatedModel
 
         //If parent search policy is disabled, only staff will see parents in search results
         //Guests never see parents
-        $wherePart = '';
+        $wherePart = ' AND user.deleted_at IS NULL';
         if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
             $wherePart .= ' AND '.$searchFilter;
         }
@@ -297,7 +311,8 @@ class User extends DeprecatedModel
               AND defaultCampus.defaultCampus IS TRUE
             LEFT JOIN luCampus
               ON defaultCampus.campus = luCampus.id
-            WHERE
+            WHERE user.deleted_at IS NULL
+            AND
         ";
         if ($keyword != "") {
             if (is_numeric($keyword)) {
@@ -410,7 +425,7 @@ class User extends DeprecatedModel
         $esc_password = $this->db->quote($password);
         $query        =
             "SELECT `" . $this->_index . "` FROM `" . $this->_table . '` ' .
-            "WHERE `" . $this->_index . "` = $esc_user_id AND password = PASSWORD('$esc_password')";
+            "WHERE `" . $this->_index . "` = $esc_user_id AND password = PASSWORD('$esc_password') AND deleted_at IS NULL";
         $this->db->query($query);
         return ($this->db->countRows() > 0);
     }
@@ -821,7 +836,9 @@ class User extends DeprecatedModel
             $query .= " AND synergy_id IS NOT NULL
                         AND synergy_id > 0 ";
         }
-        $query .= " ORDER BY lastname ASC, firstname ASC";
+        $query .= " 
+            AND deleted_at IS NULL 
+            ORDER BY lastname ASC, firstname ASC";
         if ($limit) {
             $query .= " LIMIT $index, $limit";
         }
@@ -849,7 +866,8 @@ class User extends DeprecatedModel
               */
         if ($hasSynergy) {
             $query .= " AND synergy_id IS NOT NULL
-                        AND synergy_id > 0 ";
+                        AND synergy_id > 0 
+                        AND user.deleted_at IS NULL";
         }
         return $this->db->getAll($query);
     }
