@@ -56,6 +56,11 @@ class Admin implements ModuleConfigInterface
         $courseBuilder = new \Schoolbox\Admin\CourseBuilder\Module($di);
         $courseBuilder->init('/adminv2/course-builder');
 
+        // Admin course builder page
+
+        $photos = new \Schoolbox\Admin\Photos\Module($di);
+        $photos->init('/adminv2/photos');
+
         // Admin terms manager page
         $terms = new \Schoolbox\Admin\Terms\Module($di, Term\Mapper::getInstance());
         $terms->init('/adminv2/terms');

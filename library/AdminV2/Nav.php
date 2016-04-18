@@ -31,7 +31,6 @@ class AdminV2_Nav
         'engagement' => 'Engagement',
         'ups' => 'User Provisioning System',
         'import' => 'Import',
-        'import-pastoral' => 'Pastoral Care Import',
     );
 
     public function parse(SitePage $page, $currentPage = 'home')

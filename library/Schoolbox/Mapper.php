@@ -1631,6 +1631,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         $where_parts = array();
         $params      = array();
+
         foreach ($columnList as $columnName => $columnValue) {
 
             // accommodate joins
@@ -1645,15 +1646,29 @@ abstract class Mapper implements IMapper, Serializable
 
                 // remove the period so SQL doesn't freak out
                 $columnName = str_replace('.', '_', $columnName);
-
             } else {
                 // bad
                 continue;
             }
 
+            if (substr($columnName, 0, 1) == "!")
+                $columnName = substr($columnName, 1);
+
+            // If a field name starts with "!" character then we'll assume the query intention for the field is "not equal"
+
+            if (substr($field, 0, 1) == "!") {
+                $whereNot = "NOT ";
+                $whereComparison = "<>";
+                $field = substr($field, 1);
+            } else {
+                $whereNot = "";
+                $whereComparison = "=";
+            }
+
             $escaped_name = $this->database->quoteIdentifier($table) . '.' . $this->database->quoteIdentifier($field);
+
             if (!isset($columnValue)) {
-                $where_parts[] = "$escaped_name IS NULL";
+                $where_parts[] = "$escaped_name IS {$whereNot}NULL";
             } else {
                 // This method is smart enough to work with arrays and IN statements
                 // If the list of values is empty, though: there's no way
@@ -1665,14 +1680,16 @@ abstract class Mapper implements IMapper, Serializable
                     if (count($columnValue) === 0) {
                         throw new \UnderflowException('List of column values is empty');
                     }
-                    $where_parts[] = "$escaped_name IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
+
+                    $where_parts[] = "$escaped_name {$whereNot}IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
                     $params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
                 } else {
-                    $where_parts[]              = "$escaped_name = :{$columnName}_0";
+                    $where_parts[]              = "$escaped_name {$whereComparison} :{$columnName}_0";
                     $params[$columnName . '_0'] = $columnValue;
                 }
             }
         }
+
         return array(
             'where'  => $where_parts,
             'params' => $params,

@@ -38,7 +38,7 @@ class Controller extends Base
             array(
                 'template' => '@adminImportPastoral/importResults.twig',
                 'data'     => array(
-                    'pageCurrent' => 'import-pastoral',
+                    'pageCurrent' => 'import',
                     'imported' => $results['imported'],
                     'skipped' => $results['skipped']
                 ),
@@ -54,7 +54,7 @@ class Controller extends Base
             array(
                 'template' => '@adminImportPastoral/index.twig',
                 'data'     => array(
-                    'pageCurrent' => 'import-pastoral',
+                    'pageCurrent' => 'import',
                 ),
             )
         );

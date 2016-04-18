@@ -69,6 +69,16 @@ trait ImportNavigation
                 'Enrolment',
                 $router->generate('adminImportEnrolment.upload'),
                 ($currentPage == 'adminImportEnrolment')
+            ),
+            new Node(
+                'User Photos',
+                $router->generate('adminPhotos.getIndex'),
+                ($currentPage == 'adminUserPhotos')
+            ),
+            new Node(
+                'Pastoral Care Records',
+                $router->generate('adminImportPastoral.getIndex'),
+                ($currentPage == 'adminPastoralCare')
             )
         );
     }
