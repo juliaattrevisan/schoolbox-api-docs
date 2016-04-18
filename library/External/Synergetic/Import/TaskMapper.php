@@ -88,15 +88,14 @@ class External_Synergetic_Import_TaskMapper extends \Schoolbox\Mapper
 	 */
 	public function createBoxRelation($submissionBox, \External\Synergetic\Import\SynergeticTask $synergeticTask) {
 		$query = "
-			INSERT INTO submission_box_synergetic_task (submission_box_id, task_id, category_code, updated_at)
-			VALUES (:submissionBoxId, :synergeticTaskId, :categoryCode, :updatedAt)
+			INSERT INTO submission_box_synergetic_task (submission_box_id, task_id, category_code)
+			VALUES (:submissionBoxId, :synergeticTaskId, :categoryCode)
 		";
 
 		$statement = $this->getDatabase()->prepare($query);
 		$statement->bindParam(':submissionBoxId', $submissionBox->getId());
 		$statement->bindParam(':synergeticTaskId', $synergeticTask->getTaskId());
 		$statement->bindParam(':categoryCode', $synergeticTask->getClassCode());
-		$statement->bindParam(':updatedAt', $synergeticTask->getLastUpdatedDate());
 		$statement->execute();
 	}
 

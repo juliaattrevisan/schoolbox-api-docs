@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-class External_Synergetic_Import_Marks extends External_Synergetic_Connection {
+class External_Synergetic_Import_Marks  {
 
 	/**
 	 * Import marks from Task/CategoryCode to SubmissionBox/Student combo
