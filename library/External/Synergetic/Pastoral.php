@@ -555,7 +555,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $external_id = $pastoral->getExternalId();
 
         // Pummel old contacts for the pastoral care record
-
         $query = "DELETE FROM PastoralCareContacts WHERE PastoralCareSeq = {$external_id}";
         $this->getDatabase()->query($query);
 
@@ -588,7 +587,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         );
                     ";
                     $this->getDatabase()->query($query);
-                    echo $query;
                     $order++;
                 }
             }

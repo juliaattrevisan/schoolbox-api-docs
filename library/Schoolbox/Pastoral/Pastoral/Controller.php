@@ -844,8 +844,6 @@ class Controller extends Base
                     }
                 }
 
-                $pastoralExternal->createPastoral($record);
-
                 // Save the tags
 
                 $tags = explode(",", $this->getRequest()->post["tags"]);
@@ -876,6 +874,8 @@ class Controller extends Base
                         $this->getPastoralAccessMapper()->save($access);
                     }
                 }
+
+                $pastoralExternal->createPastoral($record);
             }
         }
         else
@@ -918,13 +918,6 @@ class Controller extends Base
             $record->setUpdatedAt(\Alaress_Date_Format::now());
             $this->getPastoralMapper()->setSessionData($_SESSION);
             $this->getPastoralMapper()->save($record);
-
-            // Update external record
-
-            if ($record->getExternalId() != "")
-                $pastoralExternal->updatePastoral($record);
-            else
-                $pastoralExternal->createPastoral($record);
 
             // Delete old tags
 
@@ -1044,6 +1037,12 @@ class Controller extends Base
                 }
             }
 
+            // Update external record
+
+            if ($record->getExternalId() != "")
+                $pastoralExternal->updatePastoral($record);
+            else
+                $pastoralExternal->createPastoral($record);
         }
 
         foreach ($records as $record)
