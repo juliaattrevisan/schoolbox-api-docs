@@ -363,13 +363,18 @@ class SitePage extends Page
         $this->setFile('instantTpl', 'include/instant.html');
 
         $this->renderScriptIncludes();
-        $this->renderSideNav();
-        $this->renderTabBar();
-        $this->renderGroupList();
-        $this->renderSubjectList();
-        $this->renderLinkList();
-        $this->renderStudents();
-        $this->renderInstantMessages();
+        if ($_SESSION['user'] instanceof \Schoolbox\User) {
+            $this->renderSideNav();
+            $this->renderTabBar();
+            $this->renderGroupList();
+            $this->renderSubjectList();
+            $this->renderLinkList();
+            $this->renderStudents();
+            $this->renderInstantMessages();
+        } else {
+            // Go away phantom block
+            $this->setVar('INSTANTMESSAGE_BLOCK', '');
+        }
 
         $this->parse('MAIN_HEADER_REGION', 'headerTpl');
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
