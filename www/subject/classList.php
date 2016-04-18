@@ -16,7 +16,7 @@ $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 $categoryLogMapper = new \Schoolbox\Resource\Folder\Log\Mapper();
 $userMapper = new \Schoolbox\UserMapper();
 
-if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
+if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser()) {
     $userHandler = new User;
     $synergeticClass = new External_Class;
 
@@ -30,13 +30,10 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
     $this->setBlock('student_list', 'name_with_link', 'name_with_link_block');
     $this->setBlock('student_list', 'name_without_link', 'name_without_link_block');
     $this->setBlock('student_list', 'actions', 'actions_block');
-    $this->setBlock('actions', 'eportfolio', 'eportfolio_block');
     $this->setBlock('student_list', 'eportfolio_small', 'eportfolio_small_block');
 
-    $this->setBlock('actions', 'pastoral_care', 'pastoral_care_block');
     $this->setBlock('student_list', 'pastoral_care_small', 'pastoral_care_small_block');
 
-    $this->setBlock('actions', 'has_email', 'has_email_block');
     $this->setBlock('student_list', 'has_email_small', 'has_email_small_block');
 
     $this->setBlock(TEMPLATE_content, 'parent', 'parent_block');
@@ -126,7 +123,6 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
                     'HAS_EMAIL_URL' => $_SESSION['mailhandle'] . $emailaddr
                 ));
 
-                $this->parse('has_email_block', 'has_email');
                 $this->parse('has_email_small_block', 'has_email_small');
 
             }
@@ -136,15 +132,13 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
                 ));
             }
 
-            // Show pastoral care link to Synergetic
-            if($groupHandler->isStaff() && Config::get('external_type') == 'synergetic' && Config::get('external_staff_portal') ) {
+            // Show pastoral care link
+            if(Config::get('pastoral_enabled') ) {
                 $this->setVar('SYNWEB_URL', Config::get('external_staff_portal'));
-                $this->parse('pastoral_care_block', 'pastoral_care');
                 $this->parse('pastoral_care_small_block', 'pastoral_care_small');
 
             }
             else {
-                $this->setVar('pastoral_care_block', '');
                 $this->setVar('pastoral_care_small_block', '');
             }
 
@@ -174,11 +168,9 @@ if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
             /* If the user has an enabled eportfolio, enable link
              */
             if ($user->getEportfolioEnable()) {
-                $this->parse('eportfolio_block', 'eportfolio');
                 $this->parse('eportfolio_small_block', 'eportfolio_small');
             } else {
                 $this->setVar(array(
-                    'eportfolio_block' => '',
                     'eportfolio_small_block' => ''
                 ));
             }
