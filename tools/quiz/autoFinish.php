@@ -51,6 +51,10 @@ foreach ($expiredAttempts as $attempt) {
             $attempt->getUser()->formatName()
         )
     );
+    if (!$attempt->getUser()->getId()) {
+        $log->warning('For some reason, this attempt has no owner - skipping');
+        continue;
+    }
     // Figure out what the finish date ought to be.
     // If it's less than 5 minutes ago, allow some leeway.
     $attemptFinishDate = clone $attempt->getStart();
@@ -95,8 +99,9 @@ if (count($updatedAttempts) > 0) {
 // Complete associated tasks as well
 foreach ($expiredAttempts as $attempt) {
     $taskId = $attempt->getAssessment()->getTaskInstance()->getId();
-    if (!empty($taskId)) {
+    $userId = $attempt->getUser()->getId();
+    if (!empty($taskId) && !empty($userId)) {
         $log->notice(sprintf("Saving associated task completion for attempt #%d...", $attempt->getId()));
-        $taskMapper->markAsCompleted($taskId, $attempt->getUser()->getId());
+        $taskMapper->markAsCompleted($taskId, $userId);
     }
 }
