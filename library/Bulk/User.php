@@ -180,40 +180,37 @@ class Bulk_User extends Bulk_Abstract
                     if (is_numeric($thisRow[0])) {
                         try {
                             $user = $userMapper->findByExternalId($thisRow[0]);
-                            $userMapper->delete($user);
-                            $userMapper->transferOwnership($thisRow[0], $trans);
-                            $output[] = array(
-                                'username' => $user->getUsername() . '(' . $thisRow[0] . ')',
-                                'status'   => 'Removed',
-                                'error'    => 'OK',
-                            );
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             $output[] = array(
                                 'username' => $thisRow[0],
                                 'status'   => 'Warning',
                                 'error'    => 'Could not locate user via external ID',
                             );
+                            continue;
                         }
                     } else {
                         /* Try username
                          */
                         try {
                             $user = $userMapper->findOneByColumn('username', $thisRow[0]);
-                            $userMapper->delete($user);
-                            $userMapper->transferOwnership($thisRow[0], $trans);
-                            $output[] = array(
-                                'username' => $user->getUsername() . '(' . $thisRow[0] . ')',
-                                'status'   => 'Removed',
-                                'error'    => 'OK',
-                            );
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             $output[] = array(
                                 'username' => $thisRow[0],
                                 'status'   => 'Warning',
                                 'error'    => "Could not locate user via username",
                             );
+                            continue;
                         }
                     }
+                    $userMapper->delete($user);
+                    if ($trans) {
+                        $userMapper->transferOwnership($thisRow[0], $trans);
+                    }
+                    $output[] = array(
+                        'username' => $user->getUsername() . '(' . $thisRow[0] . ')',
+                        'status'   => 'Removed',
+                        'error'    => 'OK',
+                    );
                 }
             }
         }
