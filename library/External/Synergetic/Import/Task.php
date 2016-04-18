@@ -42,10 +42,7 @@ class External_Synergetic_Import_Task {
 		$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 		$userMapper = new \Schoolbox\UserMapper();
 
-		$query = "
-			SELECT *
-			FROM db2inst1.schoolbox_tasks
-		";
+		$query = "SELECT * uvSchoolboxTasks";
 
 		$rows = $this->getDatabase()->getAll($query);
 
@@ -53,6 +50,7 @@ class External_Synergetic_Import_Task {
 		 * have submission boxes
 		 */
 		foreach ($rows as $row) {
+
 			$synergeticTask = new \External\Synergetic\Import\SynergeticTask($row);
 
 			$exists = $taskMapper->isTaskBoxExists($synergeticTask);

@@ -11,8 +11,8 @@
 require_once(dirname(__FILE__) . '/../include/Bootstrap.php');
 
 $allImporters = array(
-	new \External_Edumate_Import_Task(),
-	new \External_Edumate_Import_Marks()
+	new \External_Synergetic_Import_Task(),
+	new \External_Synergetic_Import_Marks()
 );
 
 foreach($allImporters as $currentImporter) {
