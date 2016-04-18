@@ -129,23 +129,26 @@
             'a[data-interaction="update_progress"]',
             function(event) {
                 event.preventDefault();
-                $.post({ url: this.href, dataType: 'json' })
+
+                var taskRow = $(this).closest('[data-unit_task_id]');
+                var taskId  = taskRow.data('unit_task_id');
+
+                $.ajax({type: 'post', url: this.href, dataType: 'json' })
                     .done(function(data) {
-                        console.log(data);
-
-                        if (data.status) {
-                            this.removeClass('pending complete incomplete').addClass(data.status);
-                        }
-
                         switch (data.type) {
                             case 'redirect':
                                 window.location.href = data.fragment;
                                 break;
                             case 'none':
                             default:
+                                // Maybe just reload the component?
+                                var component = $(data.fragment);
+                                taskRow.empty().append(
+                                    component.find('[data-unit_task_id="'+taskId+'"]').children()
+                                );
                                 break;
                         }
-                    })
+                    });
             }
         );
 
