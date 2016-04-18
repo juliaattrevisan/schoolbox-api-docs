@@ -25,6 +25,9 @@ try {
     error(2);
 }
 
+/** @var Schoolbox\User $user */
+$user = $_SESSION['user'];
+
 // Am I a student undoing their task completion?
 // I can only undo self-assessable items, all others will have no effect.
 $isUndo     = isset($this->arg[1]) && $this->arg[1] == 'undo';
@@ -50,50 +53,57 @@ if (($permission = $group_handler->getPermission($component->getIdentifier())) <
 // Online assessment or due work? Redirect to that thing
 // Task: mark it as done or that it requires confirmation.
 // Then if there's a link, point to it.
+$isAjax = SitePage::detectAjax();
 switch ($task->getType()) {
     case Task::TYPE_DUE_WORK:
         // redirect to due work item
         // When the due work item is complete, mark task as complete.
-        SitePage::localRedir(
-            '/submission/submissionHistory/'.$task->getSubmissionBox()->getId().'/'.$_SESSION['id']
-        );
+        $url = '/submission/submissionHistory/'.$task->getSubmissionBox()->getId().'/'.$user->getId();
+        if ($isAjax) {
+            echo json_encode(['type' => 'redirect', 'fragment' => $url]);
+        } else {
+            SitePage::localRedir($url);
+        }
         break;
     case Task::TYPE_ONLINE_ASSESS:
         // redirect to online assessment item
         // When it's complete, the mark task is marked as complete.
-        SitePage::localRedir(
-            '/assess/intro/'.$task->getAssessment()->getId().'/'
-        );
+        $url ='/assess/intro/'.$task->getAssessment()->getId().'/';
+        if ($isAjax) {
+            echo json_encode(['type' => 'redirect', 'fragment' => $url]);
+        } else {
+            SitePage::localRedir($url);
+        }
         break;
     default:
         // Mark this item as complete.
         // Redirect to the link if there is one, otherwise redirect back to the
         // homepage this is on.
-        $homepageLink = '/homepage/'.$component->getIdentifier().'/#component'.$component_id;
+        $status = '';
         if ($unit_instance->isOpen() && !$task->getRequiresConfirmation()) {
             if ($isUndo) {
-                Task\InstanceCompletionMapper::getInstance()->unmarkAsCompleted(
-                    $task->getId(),
-                    $_SESSION['id']
-                );
-                SitePage::localRedir($homepageLink);
-                exit;
+                Task\InstanceCompletionMapper::getInstance()->unmarkAsCompleted($task->getId(), $user->getId());
+                $status = 'incomplete';
             } elseif ($isComplete) {
-                Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
-                    $task->getId(),
-                    $_SESSION['id']
-                );
-                SitePage::localRedir($homepageLink);
-                exit;
+                Task\InstanceCompletionMapper::getInstance()->markAsCompleted($task->getId(), $user->getId());
+                $status = 'pending';
             }
         }
 
         $link = $task->getLink();
-        if (strlen($link) > 0) {
-            header('Location: '.$link);
-            exit;
+        if (strlen($link) === 0) {
+            $link = '/homepage/' . $component->getIdentifier() . '/#component' . $component_id;
+            if ($isAjax) {
+                echo json_encode(['type' => 'none', 'fragment' => $link, 'status' => $status,]);
+            } else {
+                SitePage::localRedir($url);
+            }
         } else {
-            SitePage::localRedir($homepageLink);
+            if ($isAjax) {
+                echo json_encode(['type' => 'redirect', 'fragment' => $link, 'status' => $status,]);
+            } else {
+                header('Location: '.$link);
+            }
         }
         break;
 }
