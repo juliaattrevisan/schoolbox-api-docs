@@ -531,8 +531,129 @@ class External_Tass_User implements External_UserInterface
      */
     public function getStaffContactListExtended()
     {
-        // TODO: Implement getStaffContactListExtended() method.
-        return array();
+        // Exclude selected position text
+
+        $staffCategory = explode(',',\Config::get('tass_staff_dir_position_text_exclude'));
+
+        $wherePositionText = '';
+
+        if (is_array($staffCategory) && $staffCategory[0] != '')
+        {
+            $wherePositionText = 'AND (';
+            $db = $this->getDatabase();
+
+            $count = 0;
+
+            foreach ($staffCategory as $category) {
+                if ($count > 0)
+                    $wherePositionText .= " AND ";
+
+                $wherePositionText .= " dbo.tel_vw_telemf.position_text NOT LIKE '" . $db->quote($category) . "'";
+                $count++;
+            }
+
+            $wherePositionText .= ') ';
+        }
+
+        // Exclude selected position title
+
+        $staffCategory = explode(',',\Config::get('tass_staff_dir_position_title_exclude'));
+
+        $wherePositionTitle = '';
+
+        if (is_array($staffCategory) && $staffCategory[0] != '')
+        {
+            $wherePositionTitle = " AND (";
+
+            $db = $this->getDatabase();
+
+            $count = 0;
+
+            foreach ($staffCategory as $category) {
+                if ($count > 0)
+                    $wherePositionTitle .= " AND ";
+
+                $wherePositionTitle .= " dbo.tel_vw_telemf.position_title NOT LIKE '" . $db->quote($category) . "'";
+                $count++;
+            }
+
+            $wherePositionTitle .= ') ';
+        }
+
+        // Exclude selected award codes
+
+        $staffAward = explode(',',\Config::get('tass_staff_dir_award_exclude'));
+
+        $whereAward = '';
+
+        if (is_array($staffAward) && $staffAward[0] != '')
+        {
+            $whereAward = " AND (";
+            $db = $this->getDatabase();
+
+            $count = 0;
+
+            foreach ($staffAward as $award) {
+                if ($count > 0)
+                    $whereAward .= " AND ";
+
+                $whereAward .= " dbo.tel_vw_telemf.awd_code NOT LIKE '" . $db->quote($award) . "'";
+                $count++;
+            }
+
+            $whereAward .= ') ';
+        }
+
+        // Custom category code descriptions
+
+        $awardMappings = explode(',',\Config::get('tass_staff_dir_award_mappings'));
+
+        if (is_array($awardMappings) && $awardMappings[0] != '' && count($awardMappings) % 2 == 0)
+        {
+            $caseAwardMappings = 'CASE (dbo.tel_vw_telemf.awd_code) ';
+            $db = $this->getDatabase();
+
+            for ($i = 0; $i < count($awardMappings); $i += 2)
+                $caseAwardMappings .= " WHEN '" . $db->quote($awardMappings[$i]) . "' THEN '" . $db->quote($awardMappings[$i+1]) . "'";
+
+            $caseAwardMappings .= " ELSE '' END AS StaffCategoryType";
+        }
+        else {
+
+            // No mappings specified, just display the code
+
+            $caseAwardMappings = "dbo.tel_vw_telemf.awd_code AS StaffCategoryType";
+        }
+
+        $database = $this->getDatabase();
+
+        $query = "
+            SELECT TOP (100) PERCENT
+                CASE WHEN tch_code IS NOT NULL THEN tch_code ELSE dbo.tel_vw_telemf.emp_code END AS StaffID,
+                dbo.tel_vw_telemf.salutation_flag AS StaffTitle,
+                dbo.tel_vw_telemf.prefer_name_text AS StaffPreferredName,
+                dbo.tel_vw_telemf.surname_text AS StaffSurname,
+                dbo.tel_vw_telemf.phone_w_text AS StaffOccupPhone,
+                dbo.tel_vw_telemf.e_mail AS StaffOccupEmail,
+                '' AS StaffExtension,
+                '' AS StaffCampusDescription,
+                {$caseAwardMappings},
+                '' AS StaffDepartment,
+                dbo.tel_vw_telemf.position_title AS JobPositionDescription,
+                '' AS StaffJobPositionStartDate,
+                '' AS StaffJobPositionEndDate
+            FROM dbo.tel_vw_telemf
+            LEFT OUTER JOIN dbo.teacher ON dbo.tel_vw_telemf.emp_code = dbo.teacher.emp_code
+            WHERE
+              (dbo.tel_vw_telemf.cust_code = '01') AND
+              (dbo.tel_vw_telemf.term_date IS NULL)
+              {$wherePositionText}
+              {$wherePositionTitle}
+              {$whereAward}
+            ORDER BY StaffSurname, StaffPreferredName
+        ";
+
+        return $database->trimAll($database->getAll($query));
     }
 
     private function setDatabase($database)
