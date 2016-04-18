@@ -7,16 +7,23 @@
  * @link      http://www.alaress.com.au/
  */
 class Synchronise_Synergetic_Kings_Strategy_Parent extends Synchronise_Base_Strategy_Parent {
+
+    /**
+     * @var \Schoolbox\UserMapper
+     */
+    protected $userMapper;
+
     /**
      * Setup verbose output
      */
-   protected function setup() {
+    protected function setup() {
+        $this->userMapper = \Schoolbox\UserMapper::getInstance();
         $this->verbose_filter = new Synchronise_Synergetic_Kings_Verbose();
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Parent())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
-         	->addHydrator(new Synchronise_Synergetic_Kings_Hydrator_ParentUserName())
+            ->addHydrator(new Synchronise_Synergetic_Kings_Hydrator_ParentUserName())
             ->addHydrator(new Synchronise_Synergetic_Kings_Hydrator_Campus())
             ->addHydrator(new Synchronise_Synergetic_Kings_Hydrator_Webmail())
             ->addHydrator(new Synchronise_Synergetic_Kings_Hydrator_DisableEportfolio())
@@ -45,7 +52,7 @@ class Synchronise_Synergetic_Kings_Strategy_Parent extends Synchronise_Base_Stra
             
             	if ($this->perform_update) {
             		$this->verbose_filter->outputMessage('- Deleting '.$existingParent['synergy_id']."|".$existingParent['lastname'].", ".$existingParent['firstname']);
-					$this->user_handler->delete($existingParent['id']);
+					$this->userMapper->delete($existingParent['id']);
 	            } else {
 	            	$this->verbose_filter->outputMessage('- Planning delete of '.$existingParent['synergy_id']."|".$existingParent['lastname'].", ".$existingParent['firstname']);
 	            }
