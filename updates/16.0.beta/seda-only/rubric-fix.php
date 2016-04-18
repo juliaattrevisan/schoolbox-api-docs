@@ -34,6 +34,9 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
         exit;
     }
 
+    // report the database name
+    $log->notice("Operating on database '" . SQL_db . "'");
+
     // general debugging config values
     $enforceWidth       = true;  // deployment value: TRUE
     $requiredTableWidth = 6;     // deployment value: 6
