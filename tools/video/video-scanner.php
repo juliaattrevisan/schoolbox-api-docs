@@ -33,6 +33,7 @@ $stmt->execute(array(':type'=> QueueMapper::FILE_TYPE_SBFS));
 while ($pendingFile = $stmt->fetch()) {
 	$videoQ = new Queue();
 	$videoQ->setHash($pendingFile['hash']);
+	$videoQ->setStatus(QueueMapper::STATUS_PENDING);
 	$mapper->save($videoQ);
 
 	unset($videoQ);
