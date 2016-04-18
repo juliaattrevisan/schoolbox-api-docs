@@ -69,9 +69,12 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
         }
     }
 
+    $now = new Alaress_Date_Format();
+
     $this->setVar(array(
         'SUBJECTNAME' => "{$category->getName()} ({$code})",
         'CLASS_CODE' => $code,
+        'TODAY'     => $now->getURLDate(),
         'select_all_block' => '',
     ));
 
