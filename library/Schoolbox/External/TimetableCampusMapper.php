@@ -55,6 +55,11 @@ class TimetableCampusMapper extends Schoolbox\Mapper {
             'property' => 'offset',
             'type'     => self::TYPE_INTEGER,
         ));
+        $this->hasMap(array(
+            'column'   => 'start_day',
+            'property' => 'startDay',
+            'type'     => self::TYPE_INTEGER,
+        ));
         $this->hasJoin(
             'cycle',
             array(

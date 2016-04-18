@@ -1,5 +1,5 @@
-Term Campus,Term Title,Term Start,Term Finish,Term Offset,Period Day,Period Title,Period Start,Period Finish
-SEN,Term 1 2016,2016-01-27,2016-03-24,2,1,Period 1,09:00:00,09:50:00
+Term Campus,Term Title,Term Start,Term Finish,Term Start Day Number,Period Day,Period Title,Period Start,Period Finish
+SEN,Term 1 2016,2016-01-27,2016-03-24,3,1,Period 1,09:00:00,09:50:00
 ,,,,,1,Period 2,09:50:00,10:40:00
 ,,,,,1,Recess,10:40:00,11:00:00
 ,,,,,1,Period 3,11:00:00,11:50:00
@@ -39,7 +39,7 @@ SEN,Term 1 2016,2016-01-27,2016-03-24,2,1,Period 1,09:00:00,09:50:00
 ,,,,,5,Lunch,12:40:00,13:40:00
 ,,,,,5,Period 5,13:40:00,14:30:00
 ,,,,,5,Period 6,14:30:00,15:20:00
-,Term 2 2016,2016-04-11,2016-06-24,0,1,Period 1,09:00:00,09:50:00
+,Term 2 2016,2016-04-11,2016-06-24,1,1,Period 1,09:00:00,09:50:00
 ,,,,,1,Period 2,09:50:00,10:40:00
 ,,,,,1,Recess,10:40:00,11:00:00
 ,,,,,1,Period 3,11:00:00,11:50:00

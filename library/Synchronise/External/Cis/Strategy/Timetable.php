@@ -219,7 +219,7 @@ class Synchronise_External_Cis_Strategy_Timetable extends Synchronise_Base_Strat
                 ->setCampus($campus)
                 ->setStart(new Alaress_Date_Format($startDate))
                 ->setFinish(new Alaress_Date_Format($startDate->modify('+100 year')))
-                ->setOffset(0);
+                ->setStartDay(1);
 //            printf("Updating timetable campus \"%s\"\n", $campusCode);
         }
         $timetableCampusMapper->save($timetableCampus);

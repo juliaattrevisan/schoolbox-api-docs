@@ -39,9 +39,21 @@ class TimetableCampus {
     protected $finish;
 
     /**
+     * The number of days to offset the timetable start day by.
+     * (starts from 1.)
+     *
+     * @deprecated Use $this->startDay
+     *
      * @var int
      */
-    protected $offset;
+    protected $offset = 0;
+
+    /**
+     * The day number on which this timetable starts.
+     *
+     * @var int
+     */
+    protected $startDay = 1;
 
     /**
      * @param  \Schoolbox\Campus $campus
@@ -92,6 +104,8 @@ class TimetableCampus {
     }
 
     /**
+     * @deprecated Use $this->setStartDay()
+     *
      * @param  int   $offset
      * @return $this
      */
@@ -101,10 +115,30 @@ class TimetableCampus {
     }
 
     /**
+     * @deprecated Use $this->getStartDay()
+     *
      * @return int
      */
     public function getOffset() {
         return $this->offset;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStartDay()
+    {
+        return $this->startDay;
+    }
+
+    /**
+     * @param  int $startDay
+     * @return $this
+     */
+    public function setStartDay($startDay)
+    {
+        $this->startDay = $startDay;
+        return $this;
     }
 
     /**

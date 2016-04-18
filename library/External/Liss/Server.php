@@ -87,7 +87,7 @@ class External_Liss_Server {
 			$timetableCampus->setStart('2014-01-01');
 			$timetableCampus->setReset(null);
 			$timetableCampus->setFinish('2014-12-31');
-			$timetableCampus->setOffset(0);
+			$timetableCampus->setStartDay(1);
 
 			$timetableCampusMapper->save($timetableCampus);
 		}
