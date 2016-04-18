@@ -153,10 +153,6 @@ class External_Synergetic_Import_Task extends External_Synergetic_Connection {
 
 					echo "+  Adding {$synergeticTask->getTaskId()} {$synergeticTask->getTask()}\n";
 				}
-				else {
-					$taskMapper->updateBoxRelation($submissionBox, $synergeticTask);
-					echo "^  Updating {$synergeticTask->getTaskId()} {$synergeticTask->getTask()}\n";
-				}
 			}
 			else {
 				echo "-  Skipping {$synergeticTask->getTaskId()} {$synergeticTask->getTask()}: Submission Box could not be instantiated\n";

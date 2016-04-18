@@ -98,27 +98,4 @@ class External_Synergetic_Import_TaskMapper extends \Schoolbox\Mapper
 		$statement->bindParam(':categoryCode', $synergeticTask->getClassCode());
 		$statement->execute();
 	}
-
-	/**
-	 * Create a relation between a SubmissionBox and an Synergetic Task
-	 *
-	 * @param $submissionBox
-	 * @param External\Synergetic\Import\SynergeticTask $synergeticTask
-	 */
-	public function updateBoxRelation($submissionBox, \External\Synergetic\Import\SynergeticTask $synergeticTask) {
-		$query = "
-			UPDATE submission_box_synergetic_task
-			SET updated_at = :updatedAt
-			WHERE submission_box_id = :submissionBoxId
-			AND task_id = :synergeticTaskId
-			AND category_code = :categoryCode
-		";
-
-		$statement = $this->getDatabase()->prepare($query);
-		$statement->bindParam(':submissionBoxId', $submissionBox->getId());
-		$statement->bindParam(':synergeticTaskId', $synergeticTask->getTaskId());
-		$statement->bindParam(':categoryCode', $synergeticTask->getClassCode());
-		$statement->bindParam(':updatedAt', $synergeticTask->getLastUpdatedDate());
-		$statement->execute();
-	}
 }
