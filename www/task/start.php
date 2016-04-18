@@ -115,7 +115,10 @@ if ($isAjax) {
         $controller = new Component_Homepage_CourseOutlineController($component, $_SESSION['user'], $this);
         $renderer   = new Component_Renderer();
         ob_start();
-        $renderer->renderHomepageComponent($unit_instance->getCategory(), $controller);
+        $renderer->renderHomepageComponent(
+            Schoolbox\Resource\Folder\Mapper::getInstance()->findById($unit_instance->getCategory()->getId()),
+            $controller
+        );
         echo json_encode([
             'type'     => 'fragment',
             'fragment' => ob_get_clean(),
