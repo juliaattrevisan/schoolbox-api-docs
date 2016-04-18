@@ -146,6 +146,8 @@
                                 taskRow.empty().append(
                                     component.find('[data-unit_task_id="'+taskId+'"]').children()
                                 );
+                                // Reapply preview
+                                taskRow.find(settings.previewSelector).preview();
                                 break;
                         }
                     });
