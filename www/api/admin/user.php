@@ -6,6 +6,7 @@ header("Content-Type: text/xml");
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
 $user_handler = new User();
+$userMapper = \Schoolbox\UserMapper::getInstance();
 
 if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
     $response = "<?xml version='1.0' standalone='yes'?>
@@ -209,23 +210,20 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
 
     /* Delete operation */
     elseif ($action == 'delete') {
-
-        if (!empty($_GET['user_id'])) {
-            $user = $user_handler->getByID($_GET['user_id']);
-        } elseif (!empty($_GET['username'])) {
-            $user = $user_handler->getByUsername($_GET['username']);                        
-        } else {
-            $response = "<?xml version='1.0' standalone='yes'?>
+        try {
+            if (!empty($_GET['user_id'])) {
+                $user = $userMapper->findById($_GET['user_id']);
+            } elseif (!empty($_GET['username'])) {
+                $user = $userMapper->findOneByColumn('username', $_GET['username']);
+            } else {
+                $response = "<?xml version='1.0' standalone='yes'?>
                          <response>
                             <code>400</code>
                             <message>The request cannot be fulfilled due to bad syntax.</message>
                          </response>";
-
-            exit($response);
-
-        }
-
-        if (empty($user)) {
+                exit($response);
+            }
+        } catch (\Schoolbox\Mapper\Exception $e) {
             $response = "<?xml version='1.0' standalone='yes'?>
                          <response>
                             <code>404</code>
@@ -235,7 +233,7 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             exit($response);
         }
 
-        $user_handler->delete($user['uid']);
+        $userMapper->delete($user['uid']);
 
         $response = "<?xml version='1.0' standalone='yes'?>
                      <response>
