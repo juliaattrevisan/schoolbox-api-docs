@@ -101,23 +101,19 @@ $(function() {
 
                         <!-- This is here because if its in the small column it inherits its width and doesnt have enough room -->
                         <ul class="f-dropdown" data-dropdown-content="" id="overflow{ID}">
-                            <li>
-                                <!-- BEGIN eportfolio_small -->
-                                <a href="/eportfolio/{ID}/profile" class="icon-eportfolio">View ePortfolio</a>
-                                <!-- END eportfolio_small -->
-                            </li>
-                            <li><a href="/submission/dueWork/{ID}" class="icon-timetable">View Due Work</a></li>
-                            <li><a href="/submission/allWork/{ID}" class="icon-approve">View Grades</a></li>
-                            <li>
-                                <!-- BEGIN pastoral_care_small -->
-                                <a href="{SYNWEB_URL}/stud.aspx?id={SYNERGYID}" class="icon-modify" target="_blank">View Pastoral</a>
-                                <!-- END pastoral_care_small -->
-                            </li>
-                            <li>
-                                <!-- BEGIN has_email_small -->
-                                <a href="{HAS_EMAIL_URL}" class="icon-mail" title="Send Email">Email</a>
-                                <!-- END has_email_small -->
-                            </li>
+                            <li><a href="/submission/dueWork/{ID}" class="icon-due-work">Due Work</a></li>
+                            <li><a href="/submission/allWork/{ID}" class="icon-approve">Grades</a></li>
+                            <!-- BEGIN eportfolio_small -->
+                            <li><a href="/eportfolio/{ID}/profile" class="icon-eportfolio">ePortfolio</a></li>
+                            <!-- END eportfolio_small -->
+                            <!-- BEGIN pastoral_care_small -->
+                            <li><a href="/pastoral/{ID}" class="icon-pastoral">Pastoral Care</a></li>
+                            <!-- END pastoral_care_small -->
+                            <li><a href="/calendar/full/{TODAY}/{ID}" class="icon-calendar">Calendar</a></li>
+                            <li><a href="/timetable/{ID}" class="icon-timetable">Timetable</a></li>
+                            <!-- BEGIN has_email_small -->
+                            <li><a href="{HAS_EMAIL_URL}" class="icon-mail" title="Send Email">Email</a></li>
+                            <!-- END has_email_small -->
                         </ul>
 
                     </td>
@@ -126,26 +122,13 @@ $(function() {
                     <td class="show-for-medium-up">{LASTVISIT}
 
                     </td>
-                    <td class="actions-small-1 actions-large-4">
+                    <td class="no-pad">
                         <!-- BEGIN actions -->
-                        <nav class="hide-for-medium-down">
-                                    <!-- BEGIN eportfolio -->
-                                    <a href="/eportfolio/{ID}/profile" class="icon-eportfolio" title="View ePortfolio"></a>
-                                    <!-- END eportfolio -->
-
-                                    <a href="/submission/dueWork/{ID}" class="icon-timetable" title="View Due Work"></a>
-                                    <a href="/submission/allWork/{ID}" class="icon-approve" title="View Grades"></a>
-
-                                    <!-- BEGIN pastoral_care -->
-                                    <a href="{SYNWEB_URL}/stud.aspx?id={SYNERGYID}" class="icon-modify" title="View Pastoral Care" target="_blank"></a>
-                                    <!-- END pastoral_care -->
-                                    <!-- BEGIN has_email -->
-                                    <a href="{HAS_EMAIL_URL}" class="icon-mail" title="Send Email"></a>
-                                    <!-- END has_email -->
-                        </nav>
-                        <nav class="show-for-medium-down">
-                            <a href="#" data-dropdown="overflow{ID}" class="icon-more" title="Actions"></a>
-                        </nav>
+                        <div class="actions-small-1">
+                            <nav>
+                                <a href="#" data-dropdown="overflow{ID}" class="icon-more" title="Actions"></a>
+                            </nav>
+                        </div>
                         <!-- END actions -->
                     </td>
                 </tr>
