@@ -61,56 +61,70 @@ if (($permission = $group_handler->getPermission($component->getIdentifier())) <
 // Online assessment or due work? Redirect to that thing
 // Task: mark it as done or that it requires confirmation.
 // Then if there's a link, point to it.
+$url      = '/homepage/' . $component->getIdentifier() . '/#component' . $component_id;
+$isLocal  = true;
+$redirect = false;
 switch ($task->getType()) {
     case Task::TYPE_DUE_WORK:
         // redirect to due work item
         // When the due work item is complete, mark task as complete.
-        $url = '/submission/submissionHistory/'.$task->getSubmissionBox()->getId().'/'.$user->getId();
-        if ($isAjax) {
-            echo json_encode(['type' => 'redirect', 'fragment' => $url]);
-        } else {
-            SitePage::localRedir($url);
-        }
+        $url      = '/submission/submissionHistory/'.$task->getSubmissionBox()->getId().'/'.$user->getId();
+        $redirect = true;
         break;
+
     case Task::TYPE_ONLINE_ASSESS:
         // redirect to online assessment item
         // When it's complete, the mark task is marked as complete.
-        $url ='/assess/intro/'.$task->getAssessment()->getId().'/';
-        if ($isAjax) {
-            echo json_encode(['type' => 'redirect', 'fragment' => $url]);
-        } else {
-            SitePage::localRedir($url);
-        }
+        $url      = '/assess/intro/'.$task->getAssessment()->getId().'/';
+        $redirect = true;
         break;
+
     default:
         // Mark this item as complete.
         // Redirect to the link if there is one, otherwise redirect back to the
         // homepage this is on.
-        $status = '';
         if ($unit_instance->isOpen() && !$task->getRequiresConfirmation()) {
             if ($isUndo) {
                 Task\InstanceCompletionMapper::getInstance()->unmarkAsCompleted($task->getId(), $user->getId());
-                $status = 'incomplete';
             } elseif ($isComplete) {
                 Task\InstanceCompletionMapper::getInstance()->markAsCompleted($task->getId(), $user->getId());
-                $status = 'pending';
             }
         }
 
         $link = $task->getLink();
-        if (strlen($link) === 0) {
-            $link = '/homepage/' . $component->getIdentifier() . '/#component' . $component_id;
-            if ($isAjax) {
-                echo json_encode(['type' => 'none', 'fragment' => $link, 'status' => $status,]);
-            } else {
-                SitePage::localRedir($url);
-            }
-        } else {
-            if ($isAjax) {
-                echo json_encode(['type' => 'redirect', 'fragment' => $link, 'status' => $status,]);
-            } else {
-                header('Location: '.$link);
-            }
+        if (strlen($link) > 0) {
+            $url      = $link;
+            $isLocal  = false;
+            $redirect = true;
         }
         break;
 }
+
+if ($isAjax) {
+    if ($redirect) {
+        echo json_encode([
+            'type'     => 'redirect',
+            'fragment' => $url,
+        ]);
+    } else {
+        // Spit out component HTML and let the calling page deal with it
+        $controller = new Component_Homepage_CourseOutlineController($component, $_SESSION['user'], $this);
+        $renderer   = new Component_Renderer();
+        ob_start();
+        $renderer->renderHomepageComponent($unit_instance->getCategory(), $controller);
+        echo json_encode([
+            'type'     => 'fragment',
+            'fragment' => ob_get_clean(),
+        ]);
+    }
+} else {
+    if ($isLocal) {
+        SitePage::localRedir($url);
+    } else {
+        header('Location: '.$url);
+    }
+}
+
+// Should I have not exited yet: dump the component's content into JSON
+// and let the calling script deal with it
+exit;
