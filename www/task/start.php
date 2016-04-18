@@ -83,10 +83,14 @@ switch ($task->getType()) {
         // Mark this item as complete.
         // Redirect to the link if there is one, otherwise redirect back to the
         // homepage this is on.
+        $neverRedirect = false;
         if ($unit_instance->isOpen() && !$task->getRequiresConfirmation()) {
+            // Mark/unmark are never redirects.
             if ($isUndo) {
+                $neverRedirect = true;
                 Task\InstanceCompletionMapper::getInstance()->unmarkAsCompleted($task->getId(), $user->getId());
             } elseif ($isComplete) {
+                $neverRedirect = true;
                 Task\InstanceCompletionMapper::getInstance()->markAsCompleted($task->getId(), $user->getId());
             }
         }
@@ -95,7 +99,7 @@ switch ($task->getType()) {
         if (strlen($link) > 0) {
             $url      = $link;
             $isLocal  = false;
-            $redirect = true;
+            $redirect = !$neverRedirect;
         }
         break;
 }
