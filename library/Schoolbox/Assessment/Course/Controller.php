@@ -1294,11 +1294,16 @@ class Controller extends Base\Base
 
         if (isset($post['ownerships'])) {
             // unsquash ownerships
-
             foreach (explode(',', $post['ownerships']) as $ownership) {
-                list ($folderId, $userId) = explode(':', $ownership);
-
-                $owners[$folderId] = $this->getUserMapper()->findById($userId);
+                if (preg_match('/^\\d+:\\d+/', $ownership)) {
+                    list ($folderId, $userId) = explode(':', $ownership);
+                    try {
+                        $owners[$folderId] = $this->getUserMapper()->findById($userId);
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        // Couldn't find user. That's sort of okay.
+                        $owners[$folderId] = null;
+                    }
+                }
             }
         }
 
