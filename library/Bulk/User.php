@@ -157,7 +157,7 @@ class Bulk_User extends Bulk_Abstract
      */
     public function removeUsers()
     {
-        $userHandler = new User();
+        $userMapper = \Schoolbox\UserMapper::getInstance();
         /* List of outcomes for each user in the csv
          */
         $output = array();
@@ -178,15 +178,16 @@ class Bulk_User extends Bulk_Abstract
                     /* If synergy id delete as id
                      */
                     if (is_numeric($thisRow[0])) {
-                        $user = $userHandler->getBySynergy($thisRow[0]);
-                        if (is_array($user)) {
-                            $userHandler->delete($user['uid'], $trans);
+                        try {
+                            $user = $userMapper->findByExternalId($thisRow[0]);
+                            $userMapper->delete($user);
+                            $userMapper->transferOwnership($thisRow[0], $trans);
                             $output[] = array(
-                                'username' => $user['username'] . '(' . $thisRow[0] . ')',
+                                'username' => $user->getUsername() . '(' . $thisRow[0] . ')',
                                 'status'   => 'Removed',
                                 'error'    => 'OK',
                             );
-                        } else {
+                        } catch (\Schoolbox\Mapper\Exception $e) {
                             $output[] = array(
                                 'username' => $thisRow[0],
                                 'status'   => 'Warning',
@@ -196,15 +197,16 @@ class Bulk_User extends Bulk_Abstract
                     } else {
                         /* Try username
                          */
-                        $user = $userHandler->getByUsername($thisRow[0]);
-                        if ($user) {
-                            $userHandler->delete($user['uid'], $trans);
+                        try {
+                            $user = $userMapper->findOneByColumn('username', $thisRow[0]);
+                            $userMapper->delete($user);
+                            $userMapper->transferOwnership($thisRow[0], $trans);
                             $output[] = array(
-                                'username' => $thisRow[0],
+                                'username' => $user->getUsername() . '(' . $thisRow[0] . ')',
                                 'status'   => 'Removed',
                                 'error'    => 'OK',
                             );
-                        } else {
+                        } catch (\Schoolbox\Mapper\Exception $e) {
                             $output[] = array(
                                 'username' => $thisRow[0],
                                 'status'   => 'Warning',
