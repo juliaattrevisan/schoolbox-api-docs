@@ -28,6 +28,14 @@ try {
 /** @var Schoolbox\User $user */
 $user = $_SESSION['user'];
 
+// This should be a POST if AJAX
+$isAjax = SitePage::detectAjax();
+if ($isAjax && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(['error' => 'POST requests only']);
+    header(':', true, 400);
+    exit;
+}
+
 // Am I a student undoing their task completion?
 // I can only undo self-assessable items, all others will have no effect.
 $isUndo     = isset($this->arg[1]) && $this->arg[1] == 'undo';
@@ -53,7 +61,6 @@ if (($permission = $group_handler->getPermission($component->getIdentifier())) <
 // Online assessment or due work? Redirect to that thing
 // Task: mark it as done or that it requires confirmation.
 // Then if there's a link, point to it.
-$isAjax = SitePage::detectAjax();
 switch ($task->getType()) {
     case Task::TYPE_DUE_WORK:
         // redirect to due work item
