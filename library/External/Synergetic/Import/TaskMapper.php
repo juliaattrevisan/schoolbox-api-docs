@@ -83,10 +83,10 @@ class External_Synergetic_Import_TaskMapper extends \Schoolbox\Mapper
 	/**
 	 * Create a relation between a SubmissionBox and an Synergetic Task
 	 *
-	 * @param $submissionBox
+	 * @param \Schoolbox\Assessment\Component\SubmissionBox $submissionBox
 	 * @param External\Synergetic\Import\SynergeticTask $synergeticTask
 	 */
-	public function createBoxRelation($submissionBox, \External\Synergetic\Import\SynergeticTask $synergeticTask) {
+	public function createBoxRelation(\Schoolbox\Assessment\Component\SubmissionBox $submissionBox, \External\Synergetic\Import\SynergeticTask $synergeticTask) {
 		$query = "
 			INSERT INTO submission_box_synergetic_task (submission_box_id, task_id, category_code)
 			VALUES (:submissionBoxId, :synergeticTaskId, :categoryCode)

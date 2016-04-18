@@ -8,7 +8,20 @@
  * @version     SVN: $Id$
  */
 
-class External_Synergetic_Import_Marks  {
+class External_Synergetic_Import_Marks {
+
+	/**
+	 * @var MSSQL
+	 */
+	private $database;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct()
+	{
+		$this->setDatabase(MSSQL::getInstance());
+	}
 
 	/**
 	 * Import marks from Task/CategoryCode to SubmissionBox/Student combo
@@ -23,13 +36,12 @@ class External_Synergetic_Import_Marks  {
 
 		$query = "SELECT * FROM uvSchoolboxTaskResults";
 
-		$statement = $this->getDatabase()->prepare($query);
-		$statement->execute();
+		$rows = $this->getDatabase()->getAll($query);
 
 		/* Only create new Submission Boxes for tasks who don't already
 		 * have submission boxes
 		 */
-		while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+		foreach ($rows as $row) {
 			$synergeticMark = new \External\Synergetic\Import\SynergeticMark($row);
 
 			/* Spawn a Return, or reuse an existing one that was imported
@@ -117,5 +129,25 @@ class External_Synergetic_Import_Marks  {
 		}
 
 		echo "\n\n";
+	}
+
+	/**
+	 * Set database
+	 *
+	 * @param $database
+	 */
+	private function setDatabase($database)
+	{
+		$this->database = $database;
+	}
+
+	/**
+	 * Get database
+	 *
+	 * @return MSSQL
+	 */
+	private function getDatabase()
+	{
+		return $this->database;
 	}
 }

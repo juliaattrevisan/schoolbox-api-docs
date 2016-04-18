@@ -87,10 +87,10 @@ class External_Synergetic_Import_MarksMapper extends \Schoolbox\Mapper
 	/**
 	 * Create a relation between a SubmissionReturn and an Synergetic Task
 	 *
-	 * @param $submissionReturn
+	 * @param \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $submissionReturn
 	 * @param \External\Synergetic\Import\SynergeticMark $synergeticMark
 	 */
-	public function createReturnRelation($submissionReturn, \External\Synergetic\Import\SynergeticMark $synergeticMark) {
+	public function createReturnRelation(\Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $submissionReturn, \External\Synergetic\Import\SynergeticMark $synergeticMark) {
 		$query = "
 			INSERT INTO submission_return_synergetic_task (submission_return_id, task_id, category_code, student_id)
 			VALUES (:submissionReturnId, :synergeticTaskId, :categoryCode, :studentId)
