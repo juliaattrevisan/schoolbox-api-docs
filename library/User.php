@@ -582,112 +582,25 @@ class User extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
+    /**
+     * Deletes this user.
+     *
+     * As of 16.0 it no longer deletes all traces - users are now soft deleted.
+     *
+     * @param  int $id
+     * @param  int $trans
+     * @return bool
+     */
     public function delete($id, $trans = 0)
     {
-        //first transfer ownership of date to another user
-        $this->transferOwnership($id, $trans);
-        //remove all submission boxes owned by user
-        $this->cleanSubmissionBoxes($id);
-        //remove all work returned to user
-        $this->cleanReturnedWork($id);
-        //remove all remaining traces of user
-        $this->cleanUserFromSystem($id);
-        //remove user from database
-        parent::delete($id);
-    }
-
-    public function transferOwnership($curr, $new)
-    {
-        //update all files
-        $query = "UPDATE file SET owner = '$new' WHERE owner = '$curr'";
-        $this->db->query($query);
-        //update all links
-        $query = "UPDATE link SET owner = '$new' WHERE owner = '$curr'";
-        $this->db->query($query);
-        //update all news
-        $query = "UPDATE news_items SET item_owner = '$new' WHERE item_owner = '$curr'";
-        $this->db->query($query);
-        $query = "UPDATE subject_news SET owner = '$new' WHERE owner = '$curr'";
-        $this->db->query($query);
-        $query = "UPDATE wikiRevision SET userID = '$new' WHERE userID = '$curr'";
-        $this->db->query($query);
-        //update all forums
-        $query = "UPDATE forumPost SET userID = '$new' WHERE userID = '$curr'";
-        $this->db->query($query);
-        $query = "UPDATE forumThread SET userID = '$new' WHERE userID = '$curr'";
-        $this->db->query($query);
-        $query = "UPDATE event SET owner = '$new' WHERE owner = '$curr'";
-        $this->db->query($query);
-    }
-
-    public function cleanSubmissionBoxes($id)
-    {
-        //first select all users submission boxes
-        $query  = "SELECT id FROM submission_box WHERE owner = '$id' AND task_id IS NULL";
-        $result = $this->db->query($query);
-        //foreach submission box delete all student submissions
-        while ($box = $this->db->getNextArray($result)) {
-            //select all student submissions
-            $query = "SELECT id FROM student_submission WHERE box_id = '" . $box['id'] . "'";
-            $this->db->query($query);
-            //for each student submission delete from hdd
-            while ($studsub = $this->db->getNextArray()) {
-                @unlink(Cfg::get('submission_dir') . "/" . $studsub['id'] . ".dat");
-            }
-            //delete all student submissions from db
-            $query = "DELETE FROM student_submission WHERE box_id = '" . $box['id'] . "'";
-            $this->db->query($query);
+        trigger_error('User::delete() is deprecated - use UserMapper instead', E_USER_DEPRECATED);
+        $userMapper = \Schoolbox\UserMapper::getInstance();
+        $user       = $userMapper->findById($id);
+        $result     = $userMapper->delete($user);
+        if ($trans) {
+            $userMapper->transferOwnership($id, $trans);
         }
-        //delete all submission boxes from db
-        $query = "DELETE FROM submission_box WHERE owner = '$id' AND task_id IS NULL";
-        $this->db->query($query);
-    }
-
-    public function cleanReturnedWork($id)
-    {
-        $query = "SELECT id FROM submission_return WHERE owner = '$id'";
-        $this->db->query($query);
-        while ($ret = $this->db->getNextArray()) {
-            @unlink(Cfg::get('returns_dir') . "/" . $ret['id'] . ".dat");
-        }
-        $query = "DELETE FROM submission_return WHERE owner = '$id'";
-        $this->db->query($query);
-    }
-
-    public function cleanUserFromSystem($id)
-    {
-        //remove users bookmarks
-        $query = "DELETE FROM bookmarks WHERE owner = '$id'";
-        $this->db->query($query);
-        //superusers
-        $query = "DELETE FROM superusers WHERE id = '$id'";
-        $this->db->query($query);
-        //user access
-        $query = "DELETE FROM userAccess WHERE uid = '$id'";
-        $this->db->query($query);
-        //delete personal calendar events
-        $query = "DELETE FROM event WHERE access = '1' AND owner = '$id'";
-        $this->db->query($query);
-        $query = "DELETE FROM newsUser WHERE userID = '$id'";
-        $this->db->query($query);
-        //delete log entries
-        $query = "DELETE FROM homepage_log WHERE user = '$id'";
-        $this->db->query($query);
-        $query = "DELETE FROM submission_log WHERE user = '$id'";
-        $this->db->query($query);
-        $query = "DELETE FROM submission_log WHERE user = '$id'";
-        $this->db->query($query);
-//		/* None of these tables are still used, and all will be deleted */
-//		$query = "DELETE eportfolio_blog, eportfolio_blogComment FROM eportfolio_blog, eportfolio_blogComment WHERE eportfolio_blogComment.bid = eportfolio_blog.id AND eportfolio_blog.owner = '$id'";
-//		$this->db->query($query);
-//		$query = "DELETE FROM eportfolio_config WHERE uid = '$id'";
-//		$this->db->query($query);
-//		$query = "DELETE FROM eportfolio_link WHERE owner = '$id'";
-//		$this->db->query($query);
-        // Delete eportfolio pages properly
-        $mapper = Eportfolio\PageMapper::getInstance();
-        $mapper->delete($mapper->findByColumn('uid', $id));
-        $this->db->delete('userCampus', 'uid', $id);
+        return $result;
     }
 
     /**
