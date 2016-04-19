@@ -1,0 +1,253 @@
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
+<script type="text/javascript" src="/javascript/shared/submissions/reportCardBoxplot.js"></script>
+<script type="text/javascript">
+    var studentId = {{ student.getId()|json_encode|raw }};
+    var graphData = {};
+    {% for courseId, result in results %}
+    {% for baseUnitId, unitResult in result.units %}
+    graphData[{{ baseUnitId }}] = {{ unitResult|json_encode|raw }};
+    {% endfor %}
+    {% endfor %}
+
+    $(function() {
+        $('[data-unit-graph]').each(function() {
+            var unitId     = $(this).data('unitGraph');
+            var unitTitles = graphData[unitId].titles;
+            var unitData   = $.fn.reportCardBoxplotCalculateAllSeriesData(graphData[unitId].allMarks);
+            var myMarks    = graphData[unitId].myMarks;
+            var myData     = myMarks.map(function(v) {
+                if (!('mark' in v)) {
+                    return null;
+                }
+                return ($.isNumeric(v.mark)) ? Number(v.mark) : v.mark;
+            });
+
+            // Don't render empty graphs
+            if (unitTitles.length === 0) {
+                return;
+            }
+
+            /**
+             * Boxplots for each Task in the Unit
+             */
+            $.fn.reportCardBoxplotRender({
+                element: this,
+                /* Title of the graph
+                 */
+                title: '',
+                /* Orientation of the box plots
+                 */
+                orientation: 'vertical',
+                /* A list of all the assessment names that are being graphed
+                 * These correspond to a series of data and their respective
+                 * five-point summaries
+                 */
+                allAssessments: unitTitles,
+                /* All the raw data
+                 */
+                allData: unitData,
+                /* You
+                 */
+                additionalSeries: [
+                    {
+                        type: 'scatter',
+                        name: 'You',
+                        color: 'rgb(255, 87, 87)',
+                        marker: {
+                            radius: 6
+                        },
+                        data: myData,
+                        tooltip: {
+                            headerFormat: '',
+                            borderColor: '#000000',
+                            pointFormatter: function() {
+                                // Pluck it out of myMarks
+                                var myDataPoint = myData[this.x];
+                                if ($.isNumeric(myDataPoint) && this.x in myMarks) {
+                                    var myMark      = myMarks[this.x];
+                                    var displayMark = myMark.display_mark;
+                                    /* Basic template for each outlier
+                                     */
+                                    var template =
+                                            '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
+                                            '<p class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></p>' +
+                                            '<p class="comment">{INFO}</p>' +
+                                            '{RESULT_LINK}' +
+                                            '</div>';
+                                    /* Concatenate everything
+                                     */
+                                    var linkTemplate = '<a href="{RESULT_HREF}" class="button icon-history">View Results</a>';
+                                    if (typeof displayMark != 'undefined') {
+                                        var tooltipContent = template;
+                                        if (displayMark != null) {
+                                            tooltipContent = tooltipContent.replace(/\{DISPLAYMARK}/, displayMark);
+                                            tooltipContent = tooltipContent.replace(/\{GRADIENTMARK}/, Math.floor(myMark.mark / 10));
+                                        } else {
+                                            tooltipContent = tooltipContent.replace(/\{DISPLAYMARK}/, '');
+                                            tooltipContent = tooltipContent.replace(/\{GRADIENTMARK}/, '');
+                                        }
+                                        tooltipContent = tooltipContent.replace(/\{INFO}/, myMark.comment);
+
+                                        var linkMarkup = '';
+                                        if ('work_id' in myMark) {
+                                            // Show a link in the tooltip
+                                            switch (myMark.work_type) {
+                                                case 'sb':
+                                                    linkMarkup = linkTemplate.replace(
+                                                        /\{RESULT_HREF}/,
+                                                        '/submission/submissionHistory/'+myMark.work_id+'/'+studentId
+                                                    );
+                                                    break;
+                                                case 'oa':
+                                                    linkMarkup = linkTemplate.replace(
+                                                        /\{RESULT_HREF}/,
+                                                        '/assess/attempts/'+myMark.work_id+'/'+studentId
+                                                    );
+                                                    break;
+                                            }
+                                        }
+                                        tooltipContent = tooltipContent.replace(/\{RESULT_LINK}/, linkMarkup);
+
+                                        /* Show tooltip
+                                         */
+                                        return tooltipContent;
+                                    }
+                                }
+                                return null;
+                            }
+                        }
+                    }
+                ],
+                // Moriah's custom Y-axis
+                yAxis: {
+                    min: 0,
+                    max: 100,
+                    labels: {
+                        enabled: false
+                    },
+                    title: {
+                        text: ''
+                    },
+                    gridLineWidth: 0,
+                    plotBands: [{
+                        from: 0,
+                        to: 12.5,
+                        // gradient-1
+                        color: 'rgba(255, 19, 16, 0.1)',
+                        label: {
+                            text: 'Below Stage',
+                            style: {
+                                color: '#606060'
+                            }
+                        }
+                    }, {
+                        from: 12.5,
+                        to: 37.5,
+                        // gradient-4
+                        color: 'rgba(225, 156, 12, 0.05)',
+                        label: {
+                            text: 'Beginning of Stage',
+                            style: {
+                                color: '#606060'
+                            }
+                        }
+                    }, {
+                        from: 37.5,
+                        to: 62.5,
+                        // gradient-5
+                        color: 'rgba(211, 190, 15, 0.0)',
+                        label: {
+                            text: 'Mid Stage',
+                            style: {
+                                color: '#606060'
+                            }
+                        }
+                    }, {
+                        from: 62.5,
+                        to: 87.5,
+                        // gradient-6
+                        color: 'rgba(176, 197, 18, 0.05)',
+                        label: {
+                            text: 'End of Stage',
+                            style: {
+                                color: '#606060'
+                            }
+                        }
+                    }, {
+                        from: 87.5,
+                        to: 100,
+                        // gradient-10
+                        color: 'rgba(26, 144, 26, 0.1)',
+                        label: {
+                            text: 'Beyond Stage',
+                            style: {
+                                color: '#606060'
+                            }
+                        }
+                    }]
+                }
+            });
+        });
+    });
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="/search/user/{{ student.getId()|e('url') }}">{{ student.formatName() }}</a></li>
+    <li><a href="{{ routeLookup('customMoriahCohort.classList', {studentId: student.getId()}) }}">Class List</a></li>
+    <li class="active"><a href="#">{{ class.getNameWithCodes() }}</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ class.getNameWithCodes() }}</h1>
+    </div>
+
+    <div class="small-12 medium-5 island">
+        <section>
+            <div class="avatar card small-12">
+                <a href="/search/user/{{ student.getId()|e('url') }}">
+                    <img src="/portrait.php?userId={{ student.getExternalId()|e('url') }}&size=square64" />
+                    <h3>{{ student.formatName() }}</h3>
+                </a>
+                <p class="meta">
+                    {{ student.formatMetadata() }}
+                </p>
+            </div>
+        </section>
+    </div>
+
+    {{ contextSelector|raw }}
+
+    <div class="small-12 island">
+        <section>
+            <ul class="action-list">
+                <li>
+                    {% for result in results %}
+                        {% set otherUsageCount = max(0, (result.folders|length)-1) %}
+                        <div class="avatar card small-12">
+                            <span class="icon-course icon-32"></span>
+                            <h3>{{ result.course.getNameWithCodes() }}</h3>
+                            <p class="meta">
+                                Used by {{ otherUsageCount ?: 'no' }}
+                                other {% if otherUsageCount == 1 %}class{% else %}classes{% endif %}.
+                            </p>
+                        </div>
+                        <ul class="action-list reply">
+                        {% for baseUnitId, unitResult in result.units %}
+                            <li>
+                                <div class="avatar card small-12">
+                                    <span class="icon-folder icon-32"></span>
+                                    <h3>{{ unitResult.unit.getTitle() }}</h3>
+                                </div>
+                                <div data-unit-graph="{{ baseUnitId|e('html_attr') }}"
+                                     id="unit-graph-{{ baseUnitId|e('html_attr') }}"></div>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% endfor %}
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>

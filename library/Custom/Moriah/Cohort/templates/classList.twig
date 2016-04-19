@@ -1,0 +1,54 @@
+<ul class="breadcrumb">
+    <li><a href="/search/user/{{ student.getId()|e('url') }}">{{ student.formatName() }}</a></li>
+    <li class="active"><a href="#">Class List</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Class List</h1>
+    </div>
+
+    <div class="small-12 island">
+        <section>
+            <div class="avatar card small-12">
+                <a href="/search/user/{{ student.getId()|e('url') }}">
+                    <img src="/portrait.php?userId={{ student.getExternalId()|e('url') }}&size=square64" />
+                    <h3>{{ student.formatName() }}</h3>
+                </a>
+                <p class="meta">
+                    {{ student.formatMetadata() }}
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <div class="small-12 island">
+        <section>
+            <ul class="action-list">
+                <li>
+                    {% for class in classes %}
+                        {% set courseCount = courses[class.getId()]|length %}
+                        <div class="list-item">
+                            <div class="compact avatar card small-12 {% if courseCount == 0 %}removed{% endif %}">
+                                {% set cardContents %}
+                                    <span class="icon-home"></span>
+                                    <h3>{{ class.getNameWithCodes() }}</h3>
+                                    <p class="meta">
+                                        {{ courseCount }} {% if courseCount == 1 %}course{% else %}courses{% endif %}
+                                    </p>
+                                {% endset %}
+                                {% if courseCount > 0 %}
+                                    <a href="{{ routeLookup('customMoriahCohort.classReport', {studentId: student.getId(), classId: class.getId()}) }}">
+                                        {{ cardContents }}
+                                    </a>
+                                {% else %}
+                                    {{ cardContents }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </li>
+            </ul>
+        </section>
+    </div>
+</div>

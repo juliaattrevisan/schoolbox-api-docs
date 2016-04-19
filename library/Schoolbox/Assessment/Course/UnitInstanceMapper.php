@@ -168,9 +168,25 @@ class UnitInstanceMapper extends BaseMapper {
      * @return Collection
      * @throws BaseMapper\Exception
      */
-    public function findAllFoldersUsingCourse(Folder $folder, Alaress_Date_Format $from, Alaress_Date_Format $to) {
+    public function findAllFoldersUsingCourse(
+        Folder $folder,
+        Alaress_Date_Format $from = null,
+        Alaress_Date_Format $to = null
+    ) {
         $folderMapper = $this->getJoinMapper('unit_category');
         $code_mapper = $this->getJoinMapper('category')->getJoinMapper('codes');
+
+        // Allow null dates in from/to
+        $dateFilter = '';
+        $params     = ['folderId' => $folder->getId(),];
+        if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
+            $dateFilter      = $dateFilter . ' AND ui.due_date >= :from';
+            $params['from']  = $from->getDatabaseDate();
+        }
+        if ($to instanceof Alaress_Date_Format && !$to->isNull()) {
+            $dateFilter    = $dateFilter . ' AND ui.due_date <= :to';
+            $params['to']  = $to->getDatabaseDate();
+        }
 
         $query = "
             SELECT
@@ -185,16 +201,12 @@ class UnitInstanceMapper extends BaseMapper {
                 AND c.deleted_at IS NULL
                 AND ui.deleted_at IS NULL
                 AND uc.deleted_at IS NULL
-                AND ui.due_date BETWEEN :from AND :to
+                $dateFilter
             GROUP BY `c`.`id`
         ";
 
         $statement = $this->database->prepare($query);
-        $statement->execute(array(
-            'folderId' => $folder->getId(),
-            'from' => $from->getDatabaseDate(),
-            'to' => $to->getDatabaseDate()
-        ));
+        $statement->execute($params);
 
         $collection = new Collection();
 

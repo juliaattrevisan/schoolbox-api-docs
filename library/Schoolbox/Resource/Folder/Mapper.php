@@ -825,7 +825,8 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $query = "
 			SELECT
 				{$this->getColumnString('c')},
-				{$this->getJoinColumnString('homepages', 'h')}
+				{$this->getJoinColumnString('homepages', 'h')},
+				{$this->getJoinColumnString('codes', 'cc')}
 			FROM {$this->getTable()} c
 			LEFT JOIN userAccess a ON c.id=a.sid AND a.service=:service
 			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
@@ -873,31 +874,32 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
+        /** @var Collection|Model[] $collection */
         $collection = new Collection();
-        $addedIds   = array();
         foreach ($statement as $row) {
-            if (!array_key_exists($row['c.id'], $addedIds)) {
-                $addedIds[$row['c.id']] = true;
-                $collection->add(
-                    $this->hydrate(
-                        $row,
-                        'c',
-                        function ($mapper, $model, $row) {
-                            /**
-                             * @var self $mapper
-                             * @var Model $model
-                             * @var array $row
-                             * @var \Schoolbox\Resource\HomepageConfig $config
-                             */
-                            $config = $mapper->getJoinMapper('homepages')->hydrate($row, 'h');
-                            $model->setHomepage($config);
-
-                            return $model;
-                        }
-                    )
+            $id = $row['c.id'];
+            if (!isset($collection[$id])) {
+                $collection[$id] = $this->hydrate(
+                    $row,
+                    'c',
+                    function ($mapper, $model, $row) {
+                        /**
+                         * @var self $mapper
+                         * @var Model $model
+                         * @var array $row
+                         */
+                        $model->setHomepage($mapper->hydrateJoin($row, 'homepages', 'h'));
+                        return $model;
+                    }
                 );
             }
+            $code           = $row['cc.code'];
+            $codeCollection = $collection[$id]->getCodes();
+            if (!isset($codeCollection[$code])) {
+                $codeCollection[$code] = $this->hydrateJoin($row, 'codes', 'cc');
+            }
         }
+        $collection->reindex();
         return $collection;
     }
 

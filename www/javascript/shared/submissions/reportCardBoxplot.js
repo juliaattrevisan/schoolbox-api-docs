@@ -62,7 +62,7 @@
                 categories: options.allAssessments
             },
 
-            yAxis: {
+            yAxis: options.yAxis || {
                 min: 0,
                 max: 100,
                 labels: {

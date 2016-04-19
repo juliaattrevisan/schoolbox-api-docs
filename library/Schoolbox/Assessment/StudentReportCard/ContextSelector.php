@@ -163,6 +163,24 @@ class ContextSelector
 		$page->parse($handle, $tpl, false);
 	}
 
+	/**
+	 * Gets a context selector as a string.
+	 *
+	 * @param  SitePage $page           The Sitepage to render into, because PHPLib
+	 * @param  array    $selectedValues Optionally, the elements to select by default; expects any of:
+	 *                                     :subject - the ID of the subject being targeted
+	 * @return string
+	 */
+	public function renderAsString(SitePage $page, $selectedValues = [])
+	{
+		$this->render(
+			$page,
+			TEMPLATE_content,
+			$selectedValues
+		);
+		return $page->template->finish($page->template->parse('finaloutput', TEMPLATE_content));
+	}
+
 
 	/**
 	 * Return an array of the generated values for the term selector
