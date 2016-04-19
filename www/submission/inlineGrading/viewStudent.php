@@ -63,7 +63,7 @@ unset($groupHandler);
 /* Rendering things out
  */
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/viewStudent.html');
-
+$this->setBlock(TEMPLATE_content, 'download_annotated', 'download_annotated_block');
 
 /* Render out breadcrumbs
  */
@@ -104,5 +104,9 @@ $this->setVar(
         'INLINE_GRADING_SUBMISSION_BOX_NAME' => $submissionBox->getName(),
         'INLINE_GRADING_STUDENT_FULL_NAME' => $currentStudent->getFullName(),
         'INLINE_GRADING_STUDENT_ID' => $currentStudent->getId(),
+        'download_annotated_block' => '',
     )
 );
+if (!empty($submission->getUuid())) {
+    $this->parse('download_annotated_block', 'download_annotated');
+}
