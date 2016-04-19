@@ -74,12 +74,25 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                 }
             }
 
+            $count = 0;
+
             // Group the headlines by topic
             $groupedList = [];
             $groupedList['All'] = [];
             foreach ($this->headlineList as $item) {
                 $groupedList[$item['topicName']][] = $item;
-                $groupedList['All'][] = $item;
+                if ($this->getConfig('size') == 0 || ($count < $this->getConfig('size'))) {
+                    $groupedList['All'][] = $item;
+                    $count++;
+                }
+            }
+
+            // If 'All' is not marked as default in the components configuration, move it to the end of the array
+
+            if ($this->getConfig('default') != 1) {
+                $x = $groupedList['All'];
+                unset($groupedList['All']);
+                $groupedList['All'] = $x;
             }
 
             $topicList = array_keys($groupedList);
