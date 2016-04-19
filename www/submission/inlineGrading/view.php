@@ -223,7 +223,7 @@ if ($currentAugmented['submission'] != null) {
 
 	$api_token = trim(Config::get('crocodoc_api_token'));
 
-	if (!empty($submissionId) && !empty($api_token)) {
+	if (!empty($submissionId) && !empty($api_token) && !empty($currentAugmented['submission']->getUuid())) {
 		$this->parse('download_annotated_block', 'download_annotated');
 	}
 }
