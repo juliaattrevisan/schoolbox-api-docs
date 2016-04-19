@@ -9,16 +9,13 @@
         var defaults = {
             // Default to not ignoring validation on any fields, even if hidden
             ignore: false,
-            // Error placement: if a checkbox, insert the error after the now required label.
-            // If it's there.
+            // Error placement:
+            // if a checkbox, insert the error before the checkbox,
+            // otherwise place as normal (after).
+            // This prevents interference with radio button stylage.
             errorPlacement: function(error, element) {
                 if (element.is('[type="checkbox"], [type="radio"]')) {
-                    var nextElement = element.next();
-                    if (nextElement.is('label')) {
-                        error.insertAfter(nextElement);
-                    } else {
-                        error.insertBefore(element);
-                    }
+                    error.insertBefore(element);
                 } else {
                     error.insertAfter(element);
                 }
