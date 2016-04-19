@@ -85,7 +85,7 @@ class Module extends BaseModule
     {
         $this->addRoutePermission(
             $authorizer,
-            '(?:courseList|course|classReport)',
+            '(?:classList|classReport|classReportForTerm)',
             new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
