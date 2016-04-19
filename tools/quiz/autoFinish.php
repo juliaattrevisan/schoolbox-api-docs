@@ -19,13 +19,16 @@
  * @link      http://www.alaress.com.au/
  */
 
-require_once __DIR__ . '/../../include/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('Schoolbox\\Application\\Daemon');
+new \Schoolbox\Application\Daemon\Kernel("Quiz Attempt Automatic Closer");
 
 use Alaress\Lumberjack\Logger;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Course\Task;
 
-$log             = new Logger(STDOUT, null, Monolog\Logger::INFO, [], true);
+$options         = getopt('', ['porcelain']);
+$log             = new Logger(STDOUT, null, Monolog\Logger::INFO, [], isset($options['porcelain']));
 $attemptMapper   = new AttemptMapper();
 $responseHandler = new Assess_Response();
 
