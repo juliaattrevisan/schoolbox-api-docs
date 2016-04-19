@@ -15,59 +15,59 @@ class Synchronise_Synergetic_Arden_Hydrator_Campus_Parent implements Synchronise
 
         switch($externalUser['StudentYearLevel']) {
             case -1:
-                $campus = 1;
+                $campus = 15;
                 break;
 
             case 0:
-                $campus = 2;
+                $campus = 15;
                 break;
 
             case 1:
-                $campus = 3;
+                $campus = 15;
                 break;
 
             case 2:
-                $campus = 4;
+                $campus = 15;
                 break;
 
             case 3:
-                $campus = 5;
+                $campus = 15;
                 break;
 
             case 4:
-                $campus = 6;
+                $campus = 15;
                 break;
 
             case 5:
-                $campus = 7;
+                $campus = 15;
                 break;
 
             case 6:
-                $campus = 8;
+                $campus = 15;
                 break;
 
             case 7:
-                $campus = 9;
+                $campus = 16;
                 break;
 
             case 8:
-                $campus = 10;
+                $campus = 16;
                 break;
 
             case 9:
-                $campus = 11;
+                $campus = 16;
                 break;
 
             case 10:
-                $campus = 12;
+                $campus = 17;
                 break;
 
             case 11:
-                $campus = 13;
+                $campus = 17;
                 break;
 
             case 12:
-                $campus = 14;
+                $campus = 17;
                 break;
 
             default:
