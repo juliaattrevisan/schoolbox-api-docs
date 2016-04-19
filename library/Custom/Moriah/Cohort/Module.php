@@ -86,10 +86,13 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             '(?:courseList|course|classReport)',
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
-                new Rule\IsParentOfUser($this->externalDb, $this->userMapper, 'studentId')
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\IsParentOfUser($this->externalDb, $this->userMapper, 'studentId')
+                )
             )
         );
     }
