@@ -83,6 +83,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'format'   => 'html',
             'template' => '@customMoriahCohort/classList.twig',
+            'title'    => 'Class List for '.$student->formatName(),
             'data'     => [
                 'student' => $student,
                 'classes' => $classes,
@@ -179,6 +180,7 @@ class Controller extends Base
             $this->getResponse()->content->set([
                 'format'   => 'html',
                 'template' => '@customMoriahCohort/classReportForTerm.twig',
+                'title'    => $class->getNameWithCodes() . ' Class Report for '.$student->formatName(),
                 'data'     => [
                     'student'         => $student,
                     'class'           => $class,
