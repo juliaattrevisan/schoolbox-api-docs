@@ -84,7 +84,7 @@
                     error.css('margin', 0);
                     error.insertAfter(element.closest('[data-role="campusList"]'));
                 } else {
-                    error.insertAfter(element)
+                    $.alaressValidate.defaultErrorPlacement(error, element);
                 }
             }
         });

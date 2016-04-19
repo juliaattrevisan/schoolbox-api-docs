@@ -80,7 +80,7 @@
                 if (fieldset.length) {
                     error.appendTo(fieldset);
                 } else {
-                    error.insertAfter(element);
+                    $.alaressValidate.defaultErrorPlacement(error, element);
                 }
             }
         });

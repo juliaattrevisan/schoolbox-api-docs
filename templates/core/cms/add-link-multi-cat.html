@@ -18,14 +18,6 @@
                 description: "You need to enter a description",
                 url: "You need to enter a URL",
                 'category[]': "You need to select a location"
-            },
-            errorPlacement: function(error, element) {
-                if (element.is('[name="category[]"]')) {
-                    error.insertAfter($('[data-folder-list]'));
-                }
-                else {
-                    error.insertAfter(element);
-                }
             }
         });
     });
