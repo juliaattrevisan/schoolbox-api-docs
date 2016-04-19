@@ -363,7 +363,18 @@ class Statistics
             ];
             foreach ($task['work'] as $workId => $work) {
                 if (array_key_exists($id, $work['marks'])) {
-                    $marks = $work['marks'][$id];
+                    $marks  = $work['marks'][$id];
+                    $object = $work['object'];
+                    if ($object instanceof SubmissionBox) {
+                        $marks['work_id']   = $object->getId();
+                        $marks['work_type'] = 'sb';
+                    } elseif ($object instanceof OnlineAssessment) {
+                        $marks['work_id']   = $object->getId();
+                        $marks['work_type'] = 'oa';
+                    } else {
+                        $marks['work_id']   = '';
+                        $marks['work_type'] = '';
+                    }
                     break;
                 }
             }

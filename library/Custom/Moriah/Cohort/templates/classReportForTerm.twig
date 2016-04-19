@@ -2,6 +2,7 @@
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
 <script type="text/javascript" src="/javascript/shared/submissions/reportCardBoxplot.js"></script>
 <script type="text/javascript">
+    var studentId = {{ student.getId()|json_encode|raw }};
     var graphData = {};
     {% for courseId, result in results %}
     {% for baseUnitId, unitResult in result.units %}
@@ -14,7 +15,8 @@
             var unitId     = $(this).data('unitGraph');
             var unitTitles = graphData[unitId].titles;
             var unitData   = $.fn.reportCardBoxplotCalculateAllSeriesData(graphData[unitId].allMarks);
-            var myData     = graphData[unitId].myMarks.map(function(v) {
+            var myMarks    = graphData[unitId].myMarks;
+            var myData     = myMarks.map(function(v) {
                 if (!('mark' in v)) {
                     return null;
                 }
@@ -62,8 +64,8 @@
                             pointFormatter: function() {
                                 // Pluck it out of myMarks
                                 var myDataPoint = myData[this.x];
-                                if ($.isNumeric(myDataPoint) && this.x in graphData[unitId].myMarks) {
-                                    var myMark      = graphData[unitId].myMarks[this.x];
+                                if ($.isNumeric(myDataPoint) && this.x in myMarks) {
+                                    var myMark      = myMarks[this.x];
                                     var displayMark = myMark.display_mark;
                                     /* Basic template for each outlier
                                      */
@@ -71,9 +73,11 @@
                                             '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
                                             '<p class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></p>' +
                                             '<p class="comment">{INFO}</p>' +
+                                            '{RESULT_LINK}' +
                                             '</div>';
                                     /* Concatenate everything
                                      */
+                                    var linkTemplate = '<a href="{RESULT_HREF}" class="button icon-history">View Results</a>';
                                     if (typeof displayMark != 'undefined') {
                                         var tooltipContent = template;
                                         if (displayMark != null) {
@@ -84,6 +88,26 @@
                                             tooltipContent = tooltipContent.replace(/\{GRADIENTMARK}/, '');
                                         }
                                         tooltipContent = tooltipContent.replace(/\{INFO}/, myMark.comment);
+
+                                        var linkMarkup = '';
+                                        if ('work_id' in myMark) {
+                                            // Show a link in the tooltip
+                                            switch (myMark.work_type) {
+                                                case 'sb':
+                                                    linkMarkup = linkTemplate.replace(
+                                                        /\{RESULT_HREF}/,
+                                                        '/submission/submissionHistory/'+myMark.work_id+'/'+studentId
+                                                    );
+                                                    break;
+                                                case 'oa':
+                                                    linkMarkup = linkTemplate.replace(
+                                                        /\{RESULT_HREF}/,
+                                                        '/assess/attempts/'+myMark.work_id+'/'+studentId
+                                                    );
+                                                    break;
+                                            }
+                                        }
+                                        tooltipContent = tooltipContent.replace(/\{RESULT_LINK}/, linkMarkup);
 
                                         /* Show tooltip
                                          */
