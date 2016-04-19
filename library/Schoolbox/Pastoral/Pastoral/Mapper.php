@@ -10,6 +10,7 @@ namespace Schoolbox\Pastoral\Pastoral;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -339,7 +340,7 @@ class Mapper extends BaseMapper
      * @param $students
      * @param $tags
      * @return Collection
-     * @throws MapperException
+     * @throws SchoolboxException
      */
     public function findAllReport($before_date, $after_date, $severity, $types, $authors, $students, $tags)
     {
