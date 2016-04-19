@@ -1,5 +1,25 @@
 (function($) {
     "use strict";
+
+    $.alaressValidate = {};
+
+    /**
+     * Default error placement method.
+     *
+     * If a checkbox, insert error before the checkbox, otherwise place after.
+     * This prevents interference with checkbox/radio button stylage.
+     *
+     * @param error
+     * @param element
+     */
+    $.alaressValidate.defaultErrorPlacement = function(error, element) {
+        if (element.is('[type="checkbox"], [type="radio"]')) {
+            error.insertBefore(element);
+        } else {
+            error.insertAfter(element);
+        }
+    };
+
     /**
      * Unified interface for form validation
      *
@@ -9,17 +29,7 @@
         var defaults = {
             // Default to not ignoring validation on any fields, even if hidden
             ignore: false,
-            // Error placement:
-            // if a checkbox, insert the error before the checkbox,
-            // otherwise place as normal (after).
-            // This prevents interference with radio button stylage.
-            errorPlacement: function(error, element) {
-                if (element.is('[type="checkbox"], [type="radio"]')) {
-                    error.insertBefore(element);
-                } else {
-                    error.insertAfter(element);
-                }
-            }
+            errorPlacement: $.alaressValidate.defaultErrorPlacement
         };
         var config = $.extend({}, defaults, options || {});
         return this.validate(config);
