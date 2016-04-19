@@ -5,6 +5,7 @@
  * @copyright   Copyright 2016, Alaress Pty Ltd
  */
 
+use Schoolbox\Notif\SilentNotif;
 use Schoolbox\UserMapper;
 use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
@@ -53,10 +54,19 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function __construct()
     {
+        $silence = new SilentNotif();
+
         $this->setDatabase(MSSQL::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
-        $this->setPastoralMapper(PastoralMapper::getInstance());
-        $this->setPastoralCommentMapper(PastoralCommentMapper::getInstance());
+
+        $pastoralMapper = PastoralMapper::getInstance();
+        $pastoralMapper->setNotifier($silence);
+        $this->setPastoralMapper($pastoralMapper);
+
+        $pastoralCommentMapper = PastoralCommentMapper::getInstance();
+        $pastoralCommentMapper->setNotifier($silence);
+        $this->setPastoralCommentMapper($pastoralCommentMapper);
+
         $this->setPastoralTypeMapper(PastoralTypeMapper::getInstance());
         $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
         $this->setPastoralSeverityMapper(PastoralSeverityMapper::getInstance());
