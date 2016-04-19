@@ -49,7 +49,8 @@ trait ImportNavigation
      */
     protected function buildNavigation(Router $router, $currentPage = '')
     {
-        return new Navigator(
+        $reflection = new \ReflectionClass(Navigator::class);
+        $args       = [
             new Node(
                 'User',
                 $router->generate('adminImportUser.upload'),
@@ -75,11 +76,14 @@ trait ImportNavigation
                 $router->generate('adminPhotos.getIndex'),
                 ($currentPage == 'adminUserPhotos')
             ),
-            new Node(
+        ];
+        if ($this->getConfigLoader()->get('pastoral_enabled')) {
+            $args[] = new Node(
                 'Pastoral Care Records',
                 $router->generate('adminImportPastoral.getIndex'),
                 ($currentPage == 'adminPastoralCare')
-            )
-        );
+            );
+        }
+        return $reflection->newInstanceArgs($args);
     }
 }
