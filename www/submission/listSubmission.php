@@ -48,7 +48,7 @@ $this->setBlock('normalSubmission', 'writable_close', 'writable_close_block');
 $this->setBlock('category_listing', 'learning_analytics', 'learning_analytics_block');
 $this->setBlock(TEMPLATE_content, 'no_category_listing', 'no_category_listing_block');
 
-$this->setVar('TERM_SLUG', $termSlug);
+$this->setVar('CURRENT_TERM_SLUG', $termSlug);
 
 $submissionHandler = new Submission();
 $groupHandler = new Group();
