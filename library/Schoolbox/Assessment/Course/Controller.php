@@ -419,7 +419,7 @@ class Controller extends Base\Base
         if ($id) {
             try {
                 // do checks to make sure it exists
-                $this->getCourseMapper()->findById($id);
+                $folder = $this->getCourseMapper()->findById($id);
                 $mode = BaseMapper::METHOD_UPDATE;
 
             } catch (BaseMapper\Exception $e) {
@@ -464,7 +464,6 @@ class Controller extends Base\Base
             } else {
 
                 /** @var Folder\Model $folder */
-                $folder = $this->getFolderMapper()->findOneByColumn("id", $post->get('id'));
                 $datums = array_merge($datums, [
                     // configurable things
                     'inherit'         => $folder->getInherit()
