@@ -118,9 +118,6 @@ class Bulk_Category extends Bulk_Abstract
                     $newFolder->setName($row[1]);
                     $newFolder->setParent($parent);
                     $newFolder->setHomepage($homepageConfig);
-                    if ($_POST["inherit"]) {
-                        $newFolder->setInherit(true);
-                    }
 
                     /* Accumulate all folder codes
                      */
@@ -130,6 +127,9 @@ class Bulk_Category extends Bulk_Abstract
 
                         $newFolder->getCodes()->add($folderCode);
                     }
+
+                    if (count($code) == 0 && $_POST["inherit"])
+                        $newFolder->setInherit(true);
 
                     $categoryMapper->save($newFolder);
 
