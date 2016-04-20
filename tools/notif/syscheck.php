@@ -10,6 +10,8 @@
  */
 
 use Alaress\Lumberjack\Logger;
+use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 
 $errors = array();
 $opts = getopt('v', array('mail'));
@@ -96,7 +98,7 @@ try {
 
 if (count($errors)) {
     if ($mail) {
-        $n = new \Schoolbox\Notif\Notif(\Schoolbox\Notif\Notif::TOPIC_SYSTEM);
+        $n = Notifactory::create(Notif::TOPIC_SYSTEM);
         $n->alert("The following services are offline or uncontactable: ".implode(', ', $errors));
     }
     exit(1);
