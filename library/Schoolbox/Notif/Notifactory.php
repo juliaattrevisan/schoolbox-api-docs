@@ -73,7 +73,7 @@ class Notifactory
      */
     public function generateNotif($topic = Notif::TOPIC_SYSTEM)
     {
-        return Notifactory::create($topic, $this->generateHandlerFactory());
+        return new Notif($topic, $this->generateHandlerFactory());
     }
 
 
@@ -101,8 +101,8 @@ class Notifactory
                 // try for a config mapper instance
                 Database::reinitialise();
 
-                $conf = ConfigMapper::getInstance();
-                $conf->get('mail_support_address');
+                $this->conf = ConfigMapper::getInstance();
+                $this->conf->get('mail_support_address');
 
             } catch (PDOException $e) {
                 // if something PDO-esque broke, fall back
