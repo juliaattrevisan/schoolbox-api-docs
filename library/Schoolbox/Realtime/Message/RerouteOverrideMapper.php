@@ -114,13 +114,13 @@ class RerouteOverrideMapper extends Mapper {
 
     /**
      * @param string $routeKey
-     * @param int    $outgoingLevel
+     * @param string $delivery
      * @param int    $userId        If supplied, the user to check.
      * @param bool   $userExclusive If true, only routes that are exclusive to
      *                              $userId are retrieved.
      * @return Collection|RerouteOverride[]
      */
-    public function getMatchingRoutes($routeKey, $outgoingLevel, $userId = null, $userExclusive = false)
+    public function getMatchingRoutes($routeKey, $delivery, $userId = null, $userExclusive = false)
     {
         $userIds = array(0);
         if (isset($userId)) {
@@ -148,11 +148,11 @@ class RerouteOverrideMapper extends Mapper {
                   `msg_route_key` LIKE :endKey
             )
             AND `user_id` IN {$this->getArrayPlaceholders($userIds, 'user')}
-            AND `outgoing_level` = :level
+            AND `delivery` = :delivery
         ";
         $quotedKey = $this->getDatabase()->quoteForLike($routeKey);
         $params    = array(
-            'level'     => $outgoingLevel,
+            'delivery'  => $delivery,
             'routeKey'  => $routeKey,
             'startKey'  => $quotedKey.'.%',
             'middleKey' => '%.'.$quotedKey.'.%',

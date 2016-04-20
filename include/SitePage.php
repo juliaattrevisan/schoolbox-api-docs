@@ -2,6 +2,7 @@
 
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+use Schoolbox\Realtime\Message\RoutePermission;
 
 class SitePage extends Page
 {
@@ -901,7 +902,7 @@ class SitePage extends Page
         // get overrides for this user
         $overrides = RerouteOverrideMapper::getInstance()->getMatchingRoutes(
             'service.'.HOMEPAGE_SERVICE,
-            0,
+            RoutePermission::MUTE,
             $_SESSION['id'],
             true
         )->map(function($v) {
