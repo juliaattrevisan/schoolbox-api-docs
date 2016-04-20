@@ -12,9 +12,8 @@ namespace Schoolbox\Notif;
 
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
-use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
+use Swift_TransportException;
 
 /**
  * This class is intentionally not a Singleton. It should be instantiated once only, yes, but then DI'd around.
@@ -194,22 +193,8 @@ class Notif implements NotifInterface
         try {
             $log = new Logger($this->topic, $this->getHandlers());
             return $log->addRecord($level, $message, $context);
-        } catch (\Swift_TransportException $e) {
+        } catch (Swift_TransportException $e) {
             // rabbit failed... email failed... at least it's logged to file
-            return false;
-        } catch (AMQPRuntimeException $e) {
-            // a rabbit push was attempted, but connection refused, so cache it in SQL instead
-            $event = unserialize($message);
-
-            $qim = QueueItemMapper::getInstance();
-
-            $qi = $qim->createModel();
-            $qi->setIdentifier($event);
-            $qi->setCommand($this->topic);
-            $qi->setData(null);
-
-            $qim->save($qi);
-
             return false;
         }
     }
