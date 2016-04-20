@@ -46,6 +46,9 @@ class InstamailHandler extends MailHandler {
     /** @var LoggerInterface */
     protected $log;
 
+	/** @var CoreContext */
+	protected $core;
+
 	/**
 	 * We don't accept a Swift_Message in this constructor, the entire message will be generated on the fly.
 	 *
