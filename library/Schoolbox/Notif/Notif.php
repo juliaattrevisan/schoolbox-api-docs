@@ -51,9 +51,6 @@ class Notif implements NotifInterface {
 	/** @var string */
 	protected $topic;
 
-	/** @var HandlerInterface[] */
-	protected $handlers;
-
     /** @var HandlerFactory */
     protected $factory;
 
