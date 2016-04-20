@@ -99,7 +99,7 @@ class InstamailHandler extends MailHandler {
             if(isset($records[0]['context']['user'])) {
 				/** @var User $sender */
 				$sender = $this->userMapper->findById($records[0]['context']['user']);
-				$this->email->setFrom($sender->getEmail(), $sender->formatName());
+				$this->email->setReplyTo($sender->getEmail(), $sender->formatName());
 			}
 
 			$decorator->appendInstance(Instance::jsonUnserialize($records[0]['message']));
