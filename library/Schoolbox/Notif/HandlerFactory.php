@@ -11,6 +11,7 @@ namespace Schoolbox\Notif;
 
 use Alaress\Async\AMQP\AMQPInterface;
 use InvalidArgumentException;
+use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
@@ -20,6 +21,7 @@ use Psr\Log\LoggerInterface;
 use RangeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
+use Schoolbox\Notif\Handler\AMQPFallbackHandler;
 use Schoolbox\Notif\Handler\AMQPHandler;
 use Schoolbox\Notif\Handler\InstamailHandler;
 use Schoolbox\Notif\Handler\MySQLHandler;
@@ -108,13 +110,7 @@ class HandlerFactory
         };
         $this->handlerGenerators[self::SYS_AMQP] = function ()
         {
-            if ($this->mqc instanceof AMQPInterface) {
-                $amqp = new AMQPHandler($this->mqc, Logger::NOTICE, false);
-                $amqp->setFormatter(new CompressedFormatter());
-
-                return $amqp;
-            }
-            throw new InvalidArgumentException("Cannot initialise AMQP handling without a connection");
+            return $this->createAmqpHandler(Logger::NOTICE, false, new CompressedFormatter());
         };
         $this->handlerGenerators[self::SYS_NULL_DEBUG] = function ()
         {
@@ -126,10 +122,7 @@ class HandlerFactory
         };
         $this->handlerGenerators[self::USER_INSTANT] = function ()
         {
-            if ($this->mqc instanceof AMQPInterface) {
-                return new AMQPHandler($this->mqc, Logger::INFO, true);
-            }
-            throw new InvalidArgumentException("Cannot initialise AMQP handling without a connection");
+            return $this->createAmqpHandler(Logger::INFO, true);
         };
         $this->handlerGenerators[self::USER_PUSH] = function ()
         {
@@ -308,6 +301,28 @@ class HandlerFactory
         }
 
         throw new InvalidArgumentException("Cannot handle topic '$topic' with SQL.");
+    }
+
+
+    /**
+     * @param int                $level
+     * @param bool               $bubble
+     * @param FormatterInterface $formatter
+     * @return HandlerInterface
+     */
+    protected function createAmqpHandler($level, $bubble, FormatterInterface $formatter = null)
+    {
+        if ($this->mqc instanceof AMQPInterface) {
+            $amqp = new AMQPHandler($this->mqc, $level, $bubble);
+
+            if ($formatter instanceof FormatterInterface) {
+                $amqp->setFormatter($formatter);
+            }
+
+            return $amqp;
+        }
+
+        return new AMQPFallbackHandler($level, $bubble);
     }
 
 }
