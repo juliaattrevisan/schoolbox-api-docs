@@ -422,7 +422,6 @@ thead tr th, .row-header, .island table.dataTable thead th {
 /* Don't use row hovers on Timetable Grid screens anymore
  * They don't do much now due to fully-expanding coloured blocks
  */
-
 table:not(.no-hover) tbody tr:hover {
 	nav a {
 		opacity: 1;
@@ -476,7 +475,6 @@ tr.sub-row {
 	table {
 		margin-bottom: 0;
 	}
-
 }
 
 $square-grid-td-size: 4rem;
@@ -617,16 +615,6 @@ $rotate-th-width: $square-grid-td-size;
 		@extend %content;
 	}
 }
-
-.list-item-content {
-	@media #{$small-only} {
-		padding: 0.75rem 0 0 3rem;
-	}
-	@media #{$medium-up} {
-		padding: 0.75rem 0 0 0.75rem;
-	}
-}
-
 
 // Labels
 .label {
@@ -856,9 +844,14 @@ nav {
 	 * Reconstruct such that <article> immediately follows <nav> has a special
 	 * layout rule to display content
 	 */
-	.list-item ~ article {
+	.list-item ~ article,
+	.card ~ article{
 		padding: 1rem 2rem 1rem 1rem;
 		clear: both;
+
+		P:last-child{
+			margin-bottom: 0;
+		}
 
 		/* Zero padding article, if it is empty
 		 * Whitespaces and empty elements inside <article> don't count
@@ -1163,7 +1156,6 @@ ul.flex-list {
 
 .card {
     // card "extends" column
-    float: left;
 	position: relative;
     min-height: (3 * rem-calc($base-font-size));
     padding: 0.25rem 1rem 0 1rem;
@@ -1199,23 +1191,6 @@ ul.flex-list {
 			&:before {
 				padding-right: 0;
 			}
-        }
-
-        ~ .list-item-content {
-            margin-left: (rem-calc($base-font-size));
-            @media #{$medium-up} {
-                margin-left: (5 * rem-calc($base-font-size));
-            }
-        }
-
-		/* When things like news have no feature image,
-         * keep these things inline with article
-         */
-        a h3:only-child, .meta{
-        	margin-left: 0;
-            @media #{$medium-up} {
-                margin-left: (4 * rem-calc($base-font-size));
-            }
         }
 
         /* .avatar.card .label is used in viewSubmission.html and
@@ -1307,10 +1282,6 @@ ul.flex-list {
 
 		p, ul {
             line-height: 1.25rem;
-            margin: 0 0 0 (3 * rem-calc($base-font-size));
-            @media #{$medium-up} {
-                margin: 0 0 0 (4 * rem-calc($base-font-size));
-            }
         }
 
 		img.mime {
@@ -1395,9 +1366,7 @@ ul.flex-list {
     }
 
     &.info {
-        // No need to override color if .info style excludes .card
-        //color: $black;
-        ~ article, ~ .list-item-content {
+        ~ article{
             margin-left: (rem-calc($base-font-size));
         }
         ~ .progress {
@@ -1481,17 +1450,6 @@ ul.flex-list {
     textarea {
         width: #{'calc(100% - 4rem)'};
         max-width: #{'calc(100% - 4rem)'};
-    }
-
-    ~ .list-item-content {
-        clear:both;
-        margin-top: 0.5rem;
-        padding-right: (rem-calc($base-font-size));
-		@media #{$small-only} {
-			p {
-				font-size: (0.8125 * rem-calc($base-font-size));
-			}
-		}
     }
 }
 
