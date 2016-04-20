@@ -403,6 +403,7 @@
             zIndex: 2000,
             start: function () {
                 masonry.refreshColumns();
+                $(this).sortable('refreshPositions');
             },
             stop: function (event, ui) {
                 var element = ui.item,
