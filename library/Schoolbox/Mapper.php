@@ -2706,11 +2706,21 @@ abstract class Mapper implements IMapper, Serializable
         $mappedFields = [];
 
         foreach ($map as $field) {
-            $mappedFields[$field['column']] = true;
+            if (isset($field['column'])) {
+                $mappedFields[$field['column']] = true;
+
+            } elseif (isset($field['join']) && isset($joins[$field['join']])) {
+                $mappedFields[$joins[$field['join']]['this_key']] = true;
+
+            } elseif (isset($field['join_def'])) {
+                $mappedFields[$field['join_def']['this_key']] = true;
+            }
         }
 
         foreach ($joins as $join) {
-            $mappedFields[$join['this_key']] = true;
+            if (isset($join['this_key'])) {
+                $mappedFields[$join['this_key']] = true;
+            }
         }
 
         $mappedFields = array_keys($mappedFields);
