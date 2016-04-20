@@ -138,6 +138,23 @@ abstract class AbstractMailer implements IMailer {
 		$this->email->setReturnPath($email);
 	}
 
+
+	/**
+	 * Set the reply-to header
+	 *
+	 * @param string $email
+	 * @param string $name
+	 */
+	public function setReplyTo($email, $name = '')
+	{
+		if ($name) {
+			$this->email->setReplyTo($email, $name);
+		} else {
+			$this->email->setReplyTo($email);
+		}
+	}
+
+
 	/**
 	 * Convenience method for setting this mailer's From address as the currently logged in user.
 	 *

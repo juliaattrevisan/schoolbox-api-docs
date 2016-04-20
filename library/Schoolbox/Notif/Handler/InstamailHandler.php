@@ -46,6 +46,9 @@ class InstamailHandler extends MailHandler {
     /** @var LoggerInterface */
     protected $log;
 
+	/** @var CoreContext */
+	protected $core;
+
 	/**
 	 * We don't accept a Swift_Message in this constructor, the entire message will be generated on the fly.
 	 *
@@ -96,7 +99,7 @@ class InstamailHandler extends MailHandler {
             if(isset($records[0]['context']['user'])) {
 				/** @var User $sender */
 				$sender = $this->userMapper->findById($records[0]['context']['user']);
-				$this->email->setFrom($sender->getEmail(), $sender->formatName());
+				$this->email->setReplyTo($sender->getEmail(), $sender->formatName());
 			}
 
 			$decorator->appendInstance(Instance::jsonUnserialize($records[0]['message']));

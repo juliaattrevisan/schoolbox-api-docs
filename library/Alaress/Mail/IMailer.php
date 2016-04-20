@@ -46,6 +46,8 @@ interface IMailer {
 
 	public function setFrom($email, $name = '');
 
+	public function setReplyTo($email, $name = '');
+
 	public function setFromAsCurrentUser();
 
 	public function setTo($to);
