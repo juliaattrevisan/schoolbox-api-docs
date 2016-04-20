@@ -10,19 +10,10 @@
 namespace Schoolbox\Notif;
 
 
-use Alaress\Lumberjack;
-use ConfigFallback;
-use Database;
-use Mailer;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
-use PDOException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\MQ\Connector as MQConnector;
-use Schoolbox\Realtime\Schedule\Persistence\QueueItem;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
 
 /**
@@ -54,51 +45,17 @@ class Notif implements NotifInterface {
     /** @var HandlerFactory */
     protected $factory;
 
+
     /**
      * Notif constructor.
      *
      * @param string $topic
-     * @param IConfigLoader $configLoader
+     * @param HandlerFactory $factory
      */
-    public function __construct($topic = self::TOPIC_SYSTEM, IConfigLoader $configLoader = null)
+    public function __construct($topic = self::TOPIC_SYSTEM, HandlerFactory $factory)
     {
-        $this->topic = $topic;
-
-        if ($configLoader) {
-            // use the provided config
-           $conf = $configLoader;
-
-        } elseif (extension_loaded('pdo')) {
-            try {
-                // try for a config mapper instance
-                Database::reinitialise();
-
-                $conf = ConfigMapper::getInstance();
-                $conf->get('mail_support_address');
-
-            } catch (PDOException $e) {
-                // if something PDO-esque broke, fall back
-                $conf = new ConfigFallback();
-            }
-
-        } else {
-            // fallback to hardcoded config vars
-            $conf = new ConfigFallback();
-        }
-
-        try {
-            // if the rabbit cannot be contacted, this will throw an exception
-            $mqc = MQConnector::getInstance();
-
-        } catch (AMQPRuntimeException $e) {
-            // TODO this is problematic
-            $mqc = null;
-        }
-
-        $swift = Mailer::getConfiguredSwiftTransport($conf, true);
-        $log   = new Lumberjack\Logger(null);
-
-        $this->factory = new HandlerFactory($conf, $swift, $log, $mqc);
+        $this->topic   = $topic;
+        $this->factory = $factory;
     }
 
 
@@ -241,11 +198,14 @@ class Notif implements NotifInterface {
 			// a rabbit push was attempted, but connection refused, so cache it in SQL instead
 			$event = unserialize($message);
 
-			$qi = new QueueItem();
+            $qim = QueueItemMapper::getInstance();
+
+			$qi = $qim->createModel();
 			$qi->setIdentifier($event);
 			$qi->setCommand($this->topic);
 			$qi->setData(null);
-			QueueItemMapper::getInstance()->save($qi);
+
+			$qim->save($qi);
 
 			return false;
 		}

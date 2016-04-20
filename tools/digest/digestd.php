@@ -7,6 +7,7 @@ use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Realtime\Digest\DigestScheduler;
 
 /**
@@ -74,8 +75,9 @@ $kernel->run(function($di, $loop, $log, $opts) {
 	}
 	catch(AMQPRuntimeException $e) {
 		$log->alert("Unable to connect to RabbitMQ: server is offline.");
-		$n = new Notif(Notif::TOPIC_NOTIFICATION);
-		$n->alert('RabbitMQ is offline');
+		/** @var Notif $n */
+		$n = $di->get('notif');
+		$n->setTopic(Notif::TOPIC_NOTIFICATION)->alert('RabbitMQ is offline');
 		throw $e;
 	}
 

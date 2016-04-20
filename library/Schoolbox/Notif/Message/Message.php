@@ -10,10 +10,6 @@
 namespace Schoolbox\Notif\Message;
 
 
-use Alaress\Scheduler\Trigger\TriggerInterface;
-use Schoolbox\Notif\Message\External\TargetedMessage;
-use Schoolbox\Notif\Message\Instance\Instance;
-use Schoolbox\Notif\Notif;
 use Serializable;
 
 /**

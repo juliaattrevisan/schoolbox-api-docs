@@ -1,6 +1,7 @@
 <?php
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Schedule\Event;
@@ -77,7 +78,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
 				->setServiceIdentifier($groupId);
 
 			$event = new Event($user, Mapper::METHOD_DELETE, $model, $uaMapper);
-			$notif = new Notif(Notif::TOPIC_APPLICATION);
+			$notif = Notifactory::create(Notif::TOPIC_APPLICATION);
 			$notif->notice(serialize($event));
 		}
 	}

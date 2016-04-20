@@ -20,6 +20,7 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Schedule\Event;
 use Serializable;
@@ -340,7 +341,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         // load on demand, so that we don't get infinite loops
         if (!$this->notif instanceof NotifInterface) {
-            $this->setNotifier(new Notif(Notif::TOPIC_APPLICATION, $this->getConfigLoader()));
+            $this->setNotifier(Notifactory::create(Notif::TOPIC_APPLICATION, $this->getConfigLoader()));
         }
         return $this->notif;
     }

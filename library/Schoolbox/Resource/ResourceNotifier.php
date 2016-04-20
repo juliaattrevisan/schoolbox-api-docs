@@ -19,6 +19,7 @@ use Schoolbox\Collection;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -130,7 +131,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      */
     protected function notifySystem($action, $resource, $effector)
     {
-        $notif = new Notif(Notif::TOPIC_CMS);
+        $notif = Notifactory::create(Notif::TOPIC_CMS);
 
         $notif->notice("CRUD", array(
             'object'   => $this->getResourceKind(),

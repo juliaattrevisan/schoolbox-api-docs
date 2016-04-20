@@ -13,12 +13,12 @@ namespace Schoolbox\Realtime\Timetable;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Date\Clock;
 use Alaress\Date\IClock;
-use External_User;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\TimetableTrigger;
 use Schoolbox\Realtime\WorkNotifier;
 
@@ -52,7 +52,7 @@ class TimetableNotifier extends WorkNotifier {
     {
         // lazyload
         if (empty($this->notifier)) {
-            $this->notifier = new Notif('alert', $this->conf);
+            $this->notifier = Notifactory::create('alert', $this->conf);
         }
         return $this->notifier;
     }

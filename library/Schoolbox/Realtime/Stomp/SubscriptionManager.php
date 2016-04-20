@@ -17,6 +17,7 @@ use React\Stomp\Exception\ConnectionException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\Queue\QueueFactory;
 use UnexpectedValueException;
 
@@ -84,7 +85,7 @@ class SubscriptionManager {
 		}
 		// the rabbit is probably offline
 		catch(ConnectionException $e) {
-			$notif = new Notif(Notif::TOPIC_NOTIFICATION);
+			$notif = Notifactory::create(Notif::TOPIC_NOTIFICATION);
 			$notif->alert("Cannot bind to messaging system: check your STOMP bindings and that RabbitMQ is running.");
 			$this->log->alert('Rabbitmq is offline or STOMP misconfigured: '. $e->getMessage(), array($e));
 			return false;

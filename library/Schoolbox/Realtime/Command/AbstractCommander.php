@@ -10,7 +10,7 @@
 namespace Schoolbox\Realtime\Command;
 
 
-use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 
 abstract class AbstractCommander implements CommanderInterface {
 
@@ -29,7 +29,7 @@ abstract class AbstractCommander implements CommanderInterface {
 	 * @param mixed $id
 	 */
 	protected function advise($cmd, $id = null) {
-		$n = new Notif($this->topic);
+		$n = Notifactory::create($this->topic);
 
 		$message = $cmd . ($id ? $id : '');
 		$n->warning($message);
