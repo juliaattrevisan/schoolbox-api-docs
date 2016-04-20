@@ -15,7 +15,7 @@ use ConfigFallback;
 use Database;
 use Mailer;
 use PDOException;
-use PhpAmqpLib\Exception\AMQPRuntimeException;
+use PhpAmqpLib\Exception\AMQPExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -132,8 +132,8 @@ class Notifactory
                 // if the rabbit cannot be contacted, this will throw an exception
                 $this->mqc = MQConnector::getInstance();
 
-            } catch (AMQPRuntimeException $e) {
-                // TODO this is probably problematic
+            } catch (AMQPExceptionInterface $e) {
+                // we're ok with suppressing this: it will be dealt with appropriately in the handler factory
                 $this->mqc = null;
             }
         }
