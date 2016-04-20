@@ -230,6 +230,8 @@ class DueWork_Detail
         foreach ($data as $record) {
             // printf('<pre style="margin-left: 300px">%s</pre>', print_r($record, true));
 
+            $time = $record['user']['time'];
+
             // output the student row
             $page->setVar(
                 array(
@@ -238,7 +240,7 @@ class DueWork_Detail
                     'OWNER_ESCAPED' => addslashes($record['user']['instance']->formatName('{firstname} {lastname}')),
                     'OWNER_STATUS'  => $record['user']['status'],
                     'OWNER_CLASS'   => $record['user']['class'],
-                    'OWNER_TIME'    => $record['user']['time'] instanceof Alaress_Date_Format ? $record['user']['time']->getShort() : '',
+                    'OWNER_TIME'    => ($time instanceof Alaress_Date_Format && !$time->isNull()) ? $time->getShort() : '',
                     'OWNER_IMG'     => sprintf('/portrait.php?userId=%s&size=square64', $record['user']['instance']->getexternalId())
                 )
             );
