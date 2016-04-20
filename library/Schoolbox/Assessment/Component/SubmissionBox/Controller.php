@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Alaress\Web\Controller\Base as BaseController;
 use DueWork_Rubric_Abstract;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 use Schoolbox\Collection;
 use Schoolbox\User;
 
@@ -141,8 +142,22 @@ class Controller extends BaseController
             $student     = $studentsGrouped[$studentId]->first();
             $studentName = $student->formatName('{lastname}, {firstname}');
 
-            $data[] = [ $studentName, $student->getExternalId() ]
-                + (count($marks) ? $marks : array_pad([], count($data[0]) - 1, ''));
+            $row = [ $studentName, $student->getExternalId() ];
+            if (count($marks)) {
+                foreach ($marks as $mark) {
+                    $field = $mark;
+                    if ($mark instanceof RubricDescriptor) {
+                        $value = $mark->getValue();
+                        if (isset($value)) {
+                            $field = sprintf('(%.02f) %s', $mark->getValue(), $mark->getText());
+                        }
+                    }
+                    $row[] = $field;
+                }
+            } else {
+                $row = array_merge($row, array_pad([], count($data[0]) - 1, ''));
+            }
+            $data[] = $row;
         }
 
         return $data;
