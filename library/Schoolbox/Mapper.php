@@ -2693,4 +2693,38 @@ abstract class Mapper implements IMapper, Serializable
         $statement = $this->database->prepare($query);
         $statement->execute();
     }
+
+
+    /**
+     * @return array
+     */
+    public function listUnmappedFields()
+    {
+        $map   = $this->map;
+        $joins = $this->joins;
+
+        $mappedFields = [];
+
+        foreach ($map as $field) {
+            $mappedFields[$field['column']] = true;
+        }
+
+        foreach ($joins as $join) {
+            $mappedFields[$join['this_key']] = true;
+        }
+
+        $mappedFields = array_keys($mappedFields);
+
+        $db = $this->getDatabase();
+
+        if (!$db instanceof Database) {
+            throw new Exception("No db in ".get_class($this));
+        }
+
+        $stmt = $db->query("SHOW COLUMNS FROM {$this->table}");
+
+        $knownFields = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        return array_values(array_diff($knownFields, $mappedFields));
+    }
 }
