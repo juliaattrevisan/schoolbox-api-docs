@@ -36,11 +36,6 @@ class RerouteOverrideMapper extends Mapper {
 			'type'       => self::TYPE_STRING,
 			'identifier' => true,
 		));
-		$this->hasMap(array(
-			'column'     => 'outgoing_level',
-			'property'   => 'outgoingLevel',
-			'type'       => self::TYPE_INTEGER,
-		));
 
         $this->uses('delivery', self::TYPE_SET);
 

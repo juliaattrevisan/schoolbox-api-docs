@@ -33,11 +33,6 @@ class RerouteMapper extends Mapper {
 			'identifier' => true,
 			'join'       => 'source'
 		));
-		$this->hasMap(array(
-			'column'     => 'outgoing_level',
-			'property'   => 'outgoingLevel',
-			'type'       => self::TYPE_INTEGER,
-		));
         $this->uses('delivery', self::TYPE_SET);
 		$this->hasJoin('source', array(
 			'mapper'     => '\\Schoolbox\\Realtime\\Message\\SourceMapper',

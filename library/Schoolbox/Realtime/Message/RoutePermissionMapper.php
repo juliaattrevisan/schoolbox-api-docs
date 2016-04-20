@@ -48,21 +48,6 @@ class RoutePermissionMapper extends Mapper {
 			'join'       => 'role',
 			'identifier' => true,
 		));
-		$this->hasMap(array(
-			'column'     => 'min_level',
-			'property'   => 'minLevel',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column'     => 'max_level',
-			'property'   => 'maxLevel',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column'     => 'default_level',
-			'property'   => 'defaultLevel',
-			'type'       => self::TYPE_INTEGER,
-		));
 
         $this->uses('mask', self::TYPE_SET);
         $this->uses('role_default', self::TYPE_SET,  null, 'default');
