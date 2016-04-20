@@ -139,6 +139,12 @@ abstract class AbstractMailer implements IMailer {
 	}
 
 
+	/**
+	 * Set the reply-to header
+	 *
+	 * @param string $email
+	 * @param string $name
+	 */
 	public function setReplyTo($email, $name = '')
 	{
 		if ($name) {
