@@ -233,7 +233,7 @@ if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
             exit($response);
         }
 
-        $userMapper->delete($user['uid']);
+        $userMapper->delete($user);
 
         $response = "<?xml version='1.0' standalone='yes'?>
                      <response>
