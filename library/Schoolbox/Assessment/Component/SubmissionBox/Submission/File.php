@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 
 use Alaress_Date_Format as ADF;
+use Eportfolio\ShowcaseMapper;
 use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\File\Mimetype;
@@ -291,12 +292,14 @@ class File implements IFile
      * * Staff may view returns, as long as they have write permission
      *   to the folder that it's within
      * * Parents may view their child's returns
+     * * If this work is showcased, anyone may view it
      *
      * @param  User             $user
      * @param  UserAccessMapper $userAccessMapper
+     * @param  ShowcaseMapper   $showcaseMapper
      * @return bool
      */
-    public function verifyPermission(User $user, UserAccessMapper $userAccessMapper)
+    public function verifyPermission(User $user, UserAccessMapper $userAccessMapper, ShowcaseMapper $showcaseMapper)
     {
         if ($user->getId() == $this->getOwner()->getId()) {
             return true;
@@ -313,6 +316,11 @@ class File implements IFile
         if ($this->getOwner()->isChildOf($user)) {
             return true;
         }
-        return false;
+        // le sigh again
+        // Check if file has been published/showcased in the ePortfolio, if so anyone can download the file
+        return $showcaseMapper->countByColumnList([
+            'uid'               => $this->getOwner()->getId(),
+            'submission_box_id' => $this->getSubmissionBox()->getId(),
+        ]) > 0;
     }
 }
