@@ -14,6 +14,8 @@ use Alaress_Date_Format as ADF;
 use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\File\Mimetype;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
@@ -290,16 +292,21 @@ class File implements IFile
      *   to the folder that it's within
      * * Parents may view their child's returns
      *
-     * @param  User $user
+     * @param  User             $user
+     * @param  UserAccessMapper $userAccessMapper
      * @return bool
      */
-    public function verifyPermission(User $user)
+    public function verifyPermission(User $user, UserAccessMapper $userAccessMapper)
     {
         if ($user->getId() == $this->getOwner()->getId()) {
             return true;
         }
         if ($user->getRole()->isStaff()) {
-            return true;
+            return $userAccessMapper->userHasMinimumAccessToAll(
+                $user->getId(),
+                [$this->getSubmissionBox()->getCategory()->getId(),],
+                UserAccess::ACCESS_WRITE
+            );
         }
         // le sigh
         $this->getOwner()->loadParents();
