@@ -249,17 +249,15 @@ $(document).ready(function() {
                             <div class="small-1 columns no-pad">
                                 &nbsp;
                             </div>
-                            <div class="small-11 medium-5 columns no-pad">
-                                <div class="avatar card">
-                                    <!-- BEGIN msg_enabled_followadmin -->
+                            <div class="avatar card small-11 medium-5 ">
+                                <!-- BEGIN msg_enabled_followadmin -->
 
-                                    <!-- END msg_enabled_followadmin -->
-                                    <a href="/search/user/{OWNER_ID}">
-                                        <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
-                                        {GROUP_OWNER}
-                                    </a>
-                                    <p class="meta icon-favourite">Group Admins</p>
-                                </div>
+                                <!-- END msg_enabled_followadmin -->
+                                <a href="/search/user/{OWNER_ID}">
+                                    <img src="/portrait.php?userId={OWNER_EXTERNAL_ID}&size=square64" />
+                                    {GROUP_OWNER}
+                                </a>
+                                <p class="meta icon-favourite">Group Admins</p>
                             </div>
                             <div class="small-12 medium-6 columns no-pad">
                                 <div class="actions-small-4">
@@ -296,19 +294,16 @@ $(document).ready(function() {
                                 <input id="delete-{USER_ID}" name="delete[]" type="checkbox" value="{USER_ID}">
                                 <label for="delete-{USER_ID}" class="checkbox-label"></label>
                             </div>
-                            <div class="small-11 medium-5 columns no-pad">
-                                <div class="avatar card">
-
-                                    <a href="/search/user/{USER_ID}">
-                                        <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
-                                        {USER_NAME}
-                                    </a>
-                                    <p class="meta {USER_ICON}">
-                                        {USER_LEVEL}<!-- BEGIN msg_enabled_usermute -->; Muted<!-- END msg_enabled_usermute -->
-                                        <!-- BEGIN msg_enabled_userfollow -->
-                                        <!-- END msg_enabled_userfollow -->
-                                    </p>
-                                </div>
+                            <div class="avatar card small-11 medium-5 ">
+                                <a href="/search/user/{USER_ID}">
+                                    <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
+                                    {USER_NAME}
+                                </a>
+                                <p class="meta {USER_ICON}">
+                                    {USER_LEVEL}<!-- BEGIN msg_enabled_usermute -->; Muted<!-- END msg_enabled_usermute -->
+                                    <!-- BEGIN msg_enabled_userfollow -->
+                                    <!-- END msg_enabled_userfollow -->
+                                </p>
                             </div>
                             <div class="small-11 medium-6 columns no-pad">
                                 <div class="actions-small-4">
