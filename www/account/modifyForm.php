@@ -61,10 +61,17 @@ if (isset($_POST['current_password'])) {
 
         // Try this
         // I shouldn't have to send all those damn password change mails anymore either
+        $redirect = '/account/modify/success';
         if ($user->getRole()->isParent()) {
             $communityPortalFactory = new \Schoolbox\External\Connector\CommunityPortalFactory();
             $communityPortal        = $communityPortalFactory->build();
-            $communityPortal->changePassword($user->getExternalId(), $_POST['new_password']);
+            try {
+                $communityPortal->changePassword($user->getExternalId(), $_POST['new_password']);
+            } catch (\UnexpectedValueException $e) {
+                // Portal integration wasn't set up properly?
+                // Warn the user, but don't stop password from getting set.
+                $redirect = '/account/modify/success/portalPasswordNotSet';
+            }
         }
 
         $result = $userHandler->sendChangePasswordEmail($user->getId());
@@ -83,7 +90,7 @@ if (isset($_POST['current_password'])) {
         ));
         $_SESSION['password'] = $_POST['new_password'];
 
-        SitePage::localRedir('/account/modify/success');
+        SitePage::localRedir($redirect);
     } catch (Exception $e) {
         error(105, ['message' => $e->getMessage()]);
     }
