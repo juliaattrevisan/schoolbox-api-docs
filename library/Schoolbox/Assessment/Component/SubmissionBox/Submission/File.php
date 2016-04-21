@@ -282,4 +282,30 @@ class File implements IFile
         return $this;
     }
 
+    /**
+     * Does this user have permission to view this submission?
+     *
+     * * Users may view their own returns
+     * * Staff may view returns, as long as they have write permission
+     *   to the folder that it's within
+     * * Parents may view their child's returns
+     *
+     * @param  User $user
+     * @return bool
+     */
+    public function verifyPermission(User $user)
+    {
+        if ($user->getId() == $this->getOwner()->getId()) {
+            return true;
+        }
+        if ($user->getRole()->isStaff()) {
+            return true;
+        }
+        // le sigh
+        $this->getOwner()->loadParents();
+        if ($this->getOwner()->isChildOf($user)) {
+            return true;
+        }
+        return false;
+    }
 }
