@@ -770,7 +770,7 @@ class Marksheet
         $fp = fopen('php://output', 'w');
 
         // First level heading:
-        $header    = array('External ID', 'Surname', 'Firstname');
+        $header    = array('External ID', 'Surname', 'Firstname', 'Email');
         $subheader = array('', '', '');
         foreach ($this->displayOrder as $item) {
             if ($item['object'] instanceof OnlineAssessment) {
@@ -800,6 +800,7 @@ class Marksheet
                 $student->getExternalId(),
                 $student->getLastname(),
                 $student->getFirstname(),
+                $student->getEmail()
             );
             foreach ($this->displayOrder as $item) {
                 $mark       = $row['marks'][$item['isOA']][$item['id']];
