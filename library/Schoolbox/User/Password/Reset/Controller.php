@@ -117,6 +117,9 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'title'    => 'Password Reset Successful',
             'template' => '@userPasswordReset/successMessage.twig',
+            'data'     => [
+                'isCommunityPortalPasswordSet' => $this->getSessionSegment()->getFlash('isCommunityPortalPasswordSet', true),
+            ],
         ]);
     }
 
@@ -215,7 +218,13 @@ class Controller extends Base
             // Reset their password in SCP too
             if ($user->getRole()->isParent()) {
                 $communityPortal = $this->communityPortalFactory->build();
-                $communityPortal->changePassword($reset->getUser()->getExternalId(), $password);
+                try {
+                    $communityPortal->changePassword($reset->getUser()->getExternalId(), $password);
+                } catch (\UnexpectedValueException $e) {
+                    // Portal integration wasn't set up properly?
+                    // Warn the user
+                    $this->getSessionSegment()->setFlash('isCommunityPortalPasswordSet', false);
+                }
             }
         } else {
             $this->getSessionSegment()->setFlash('isPasswordValid', false);
