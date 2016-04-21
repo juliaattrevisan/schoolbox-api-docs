@@ -75,13 +75,13 @@ class Statistics
     /**
      * Constructor
      *
-     * @param Folder     $course    The course or unit home page to get stats for.
-     * @param Term\Model $term      The term to limit results to
-     * @param User       $user      The user to fetch results for
-     * @param int[]      $workTypes If not empty, limit to these work types
-     *                              (Quizzes are SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT)
+     * @param Folder     $course      The course or unit home page to get stats for.
+     * @param Term\Model $term        The term to limit results to
+     * @param User       $currentUser The user who is viewing the report
+     * @param int[]      $workTypes   If not empty, limit to these work types
+     *                                (Quizzes are SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT)
      */
-    public function __construct(Folder $course, Term\Model $term, User $user, $workTypes = [])
+    public function __construct(Folder $course, Term\Model $term, User $currentUser, $workTypes = [])
     {
         $this->course = $course;
 
@@ -97,7 +97,7 @@ class Statistics
          * Exclude hidden quizzes from the Assessments cube
          */
         $quizVisibility   = new Visibility();
-        $quizVisibilities = $quizVisibility->getVisibilityArray($user);
+        $quizVisibilities = $quizVisibility->getVisibilityArray($currentUser);
 
         // Get any classes which use this course.
         // (ever, not just in this date span - assessments could have varying due dates)
