@@ -14,6 +14,7 @@ namespace Schoolbox\External\Connector\Synergetic\Base;
 use Alaress\DebugBar\Instance as DebugBar;
 use MSSQL;
 use Schoolbox\External\Connector\CommunityPortalInterface;
+use UnexpectedValueException;
 
 class CommunityPortal implements CommunityPortalInterface
 {
@@ -63,6 +64,7 @@ class CommunityPortal implements CommunityPortalInterface
      * @param  string $communityId
      * @param  string $newPassword
      * @return bool
+     * @throws UnexpectedValueException if either key or IV was not set
      */
     public function changePassword($communityId, $newPassword)
     {
@@ -81,9 +83,11 @@ class CommunityPortal implements CommunityPortalInterface
      *
      * @param  string $plaintext
      * @return string
+     * @throws UnexpectedValueException if either key or IV was not set
      */
     protected function encryptPassword($plaintext)
     {
+        $this->assertKeyAndIvSet();
         // Pad converted text to a block with chr(bytes to pad)
         // @see https://php.net/manual/en/function.mcrypt-encrypt.php#47973
         $blockSize = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
@@ -107,9 +111,11 @@ class CommunityPortal implements CommunityPortalInterface
      *
      * @param  string $encrypted
      * @return string
+     * @throws UnexpectedValueException if either key or IV was not set
      */
     protected function decryptPassword($encrypted)
     {
+        $this->assertKeyAndIvSet();
         return mb_convert_encoding(
             mcrypt_decrypt(
                 MCRYPT_RIJNDAEL_128,
@@ -120,5 +126,20 @@ class CommunityPortal implements CommunityPortalInterface
             ),
             'UTF-8'
         );
+    }
+
+    /**
+     * Asserts that the key and IV were set in the constructor.
+     *
+     * @throws UnexpectedValueException if either was not.
+     */
+    protected function assertKeyAndIvSet()
+    {
+        if (empty($this->key)) {
+            throw new UnexpectedValueException('Key was not set in constructor');
+        }
+        if (empty($this->initializationVector)) {
+            throw new UnexpectedValueException('Initialization vector was not set in constructor');
+        }
     }
 }
