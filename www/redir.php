@@ -31,25 +31,11 @@ if ($link instanceof \Schoolbox\Resource\Link) {
 }
 
 if (!empty($url)) {
-    $urlObject = new \Zend\Uri\Uri($url);
-    if (!$urlObject->isValidRelative()) {
-        // If using Cyberhound: redirect to its proxy rather than the URL directly.
-        // Only redirect for non-local links though.
-        $cyberHoundApiUrl       = Config::get('cyberhound_api_url');
-        $cyberHoundApiSharedKey = Config::get('cyberhound_api_shared_key');
-        if ($cyberHoundApiUrl && $cyberHoundApiSharedKey) {
-            $cyberHoundUrl = new \Zend\Uri\Uri($cyberHoundApiUrl);
-            $cyberHoundUrl
-                ->setPath('/api/overrideurl')
-                ->setQuery([
-                    'key'  => hash('sha256', $_SERVER['REQUEST_TIME'].base64_encode($url).$cyberHoundApiSharedKey),
-                    'time' => $_SERVER['REQUEST_TIME'],
-                    'url'  => base64_encode($url),
-                ]);
-            $url = $cyberHoundUrl->toString();
-        }
-    }
-    header('Location: ' . $url);
+    $translator = new Schoolbox\Cyberhound\Url\Translator(
+        Config::get('cyberhound_api_url'),
+        Config::get('cyberhound_api_shared_key')
+    );
+    header('Location: ' . $translator->translate($url));
     exit;
 } else {
     error(2);
