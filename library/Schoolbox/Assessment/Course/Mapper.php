@@ -339,28 +339,45 @@ class Mapper extends FolderMapper
 
     /**
      * @param Folder $course
+     * @param bool   $hydrate  whether or not to hydrate the models found
      * @return Collection|Folder[]
      */
-    public function findUnitsInCourse(Folder $course)
+    public function findUnitsInCourse(Folder $course, $hydrate = false)
     {
-        $instanceMapper = \Component_InstanceMapper::getInstance();
+        // the definition of a unit is that is has a course builder: that's it
+        $sql = "
+            SELECT {$this->getColumnString('c')}
+            FROM {$this->getTable()} c
+            LEFT JOIN component_instance ci ON ci.identifier = c.id AND ci.module = :module
+            LEFT JOIN component_definition cd ON ci.component_definition_id = cd.id
+            WHERE cd.class = :class
+            AND c.parent = :parent
+        ";
 
-        return $this->findByParent($course->getId())->filter(function ($folder) use ($instanceMapper) {
-            /**
-             * This folder is considered a unit:
-             *      IIF it has a course builder component
-             *
-             * @var Folder $folder
-             */
+        $args = [
+            'module' => 'homepage',
+            'class'  => \Component_Homepage_CourseBuilderController::class,
+            'parent' => $course->getId()
+        ];
 
-            try {
-                // if this succeeds, then we've got ourselves a unit
-                $instanceMapper->findCourseBuilder($folder->getId());
-                return true;
-            } catch (MapperException $e) {
-                return false;
+        $stmt = $this->getDatabase()->query($sql, $args);
+
+        $units = $this->createCollection();
+
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+
+            if ($hydrate) {
+                // complete and total hydration. Beware that this is EXPENSIVE!
+                $folder = $this->findById($row['c.id']);
+
+            } else {
+                $folder = $this->hydrate($row);
             }
-        });
+
+            $units->add($folder);
+        }
+
+        return $units;
     }
 
     /* Getters/Setters
