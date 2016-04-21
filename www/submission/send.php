@@ -43,7 +43,7 @@ if (is_numeric($_GET['return'])) {
         exit;
     }
 
-    if (!$return->verifyPermission($_SESSION['user'])) {
+    if (!$return->hasPermission($_SESSION['user'])) {
         error(44);
     }
 
@@ -79,7 +79,7 @@ if (is_numeric($_GET['return'])) {
         exit;
     }
 
-    if (!$studentSub->verifyPermission(
+    if (!$studentSub->hasPermission(
         $_SESSION['user'],
         \Schoolbox\Permission\Access\UserAccessMapper::getInstance(),
         \Eportfolio\ShowcaseMapper::getInstance()

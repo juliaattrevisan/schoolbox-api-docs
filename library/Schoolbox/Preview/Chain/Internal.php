@@ -58,7 +58,7 @@ class Internal extends Base {
             try {
                 $item = SubmissionBox\Submission\FileMapper::getInstance()->findById($id);
                 $item->setSubmissionBox(SubmissionBoxMapper::getInstance()->findById($item->getSubmissionBox()->getId()));
-                if ($item->verifyPermission($user, UserAccessMapper::getInstance(), ShowcaseMapper::getInstance())) {
+                if ($item->hasPermission($user, UserAccessMapper::getInstance(), ShowcaseMapper::getInstance())) {
                     $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
                 } else {
                     // throw some error
@@ -69,7 +69,7 @@ class Internal extends Base {
         } elseif ($id = $this->isReturn($uriObject)) {
             try {
                 $item = SubmissionBox\ReturnedWorkMapper::getInstance()->findById($id);
-                if ($item->verifyPermission($user)) {
+                if ($item->hasPermission($user)) {
                     $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
                 } else {
                     // error

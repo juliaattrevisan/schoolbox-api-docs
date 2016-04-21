@@ -299,7 +299,7 @@ class File implements IFile
      * @param  ShowcaseMapper   $showcaseMapper
      * @return bool
      */
-    public function verifyPermission(User $user, UserAccessMapper $userAccessMapper, ShowcaseMapper $showcaseMapper)
+    public function hasPermission(User $user, UserAccessMapper $userAccessMapper, ShowcaseMapper $showcaseMapper)
     {
         if ($user->getId() == $this->getOwner()->getId()) {
             return true;

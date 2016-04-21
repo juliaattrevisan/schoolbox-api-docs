@@ -411,7 +411,7 @@ class ReturnedWork implements ISoftDeletable, IFile
      * @param  User $user
      * @return bool
      */
-    public function verifyPermission(User $user)
+    public function hasPermission(User $user)
     {
         if ($user->getId() == $this->getOwner()->getId()) {
             return true;
