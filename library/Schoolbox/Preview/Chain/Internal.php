@@ -12,7 +12,10 @@
 
 namespace Schoolbox\Preview\Chain;
 
+use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
 use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
@@ -54,14 +57,23 @@ class Internal extends Base {
         } elseif ($id = $this->isSubmission($uriObject)) {
             try {
                 $item = SubmissionBox\Submission\FileMapper::getInstance()->findById($id);
-                $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
+                $item->setSubmissionBox(SubmissionBoxMapper::getInstance()->findById($item->getSubmissionBox()->getId()));
+                if ($item->verifyPermission($user, UserAccessMapper::getInstance(), ShowcaseMapper::getInstance())) {
+                    $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
+                } else {
+                    // throw some error
+                }
             } catch (\Schoolbox\Mapper\Exception $e ) {
                 //noop
             }
         } elseif ($id = $this->isReturn($uriObject)) {
             try {
                 $item = SubmissionBox\ReturnedWorkMapper::getInstance()->findById($id);
-                $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
+                if ($item->verifyPermission($user)) {
+                    $this->processStorage($url, StorageMapper::getInstance()->findByHash($item->getStorage()->getHash()));
+                } else {
+                    // error
+                }
             } catch (\Schoolbox\Mapper\Exception $e ) {
                 //noop
             }
