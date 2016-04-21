@@ -25,7 +25,7 @@ abstract class Base {
      *
      * Try until one of the strategies matches
      *
-     * @param $responsibilities
+     * @param  Strategy\Internal\Base[] $responsibilities
      * @return mixed
      */
     protected function start($responsibilities) {
