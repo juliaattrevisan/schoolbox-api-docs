@@ -47,68 +47,52 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
         $this->setVar("news_no_image_block", "");
 
         $topicList = [];
-        if (is_array($this->headlineList)) {
 
-            $limits = array();
+        if (is_array($this->headlineList))
+        {
+            // Group the headlines by topic with a special 'All' category
 
-            $j = $k = 0;
-            $total = count($this->headlineList);
-
-            // iterate and truncate down to the max limit
-            if($this->getConfig('size') > 0) {
-                foreach ($this->headlineList as $index => $item) {
-                    if(isset($limits[$item['topicName']])) {
-                        // skip over this article if the category has hit the size limit
-                        if($limits[$item['topicName']] >= $this->getConfig('size')) {
-                            // decrement the total expected by 1
-                            --$total;
-                            // remove the news article
-                            unset($this->headlineList[$index]);
-                            continue;
-                        }
-                        ++$limits[$item['topicName']];
-                    }
-                    else {
-                        $limits[$item['topicName']] = 1;
-                    }
-                }
-            }
-
-            $count = 0;
-
-            // Group the headlines by topic
             $groupedList = [];
             $groupedList['All'] = [];
+
             foreach ($this->headlineList as $item) {
                 $groupedList[$item['topicName']][] = $item;
-                if ($this->getConfig('size') == 0 || ($count < $this->getConfig('size'))) {
-                    $groupedList['All'][] = $item;
-                    $count++;
-                }
+                $groupedList['All'][] = $item;
             }
 
             // If 'All' is not marked as default in the components configuration, move it to the end of the array
 
             if ($this->getConfig('default') != 1) {
-                $x = $groupedList['All'];
+                $allArray = $groupedList['All'];
                 unset($groupedList['All']);
-                $groupedList['All'] = $x;
+                $groupedList['All'] = $allArray;
+            }
+
+            // If applicable truncate all of the grouped lists to limit specified in config
+
+            if ($this->getConfig('size') > 0) {
+                foreach ($groupedList as $key => $value) {
+                    $groupedList[$key] = array_slice($value, 0, $this->getConfig('size'));
+                }
             }
 
             $topicList = array_keys($groupedList);
 
             $userFormatter = new User();
-            $i             = 0;
-            foreach ($groupedList as $topicName => $headlineList) {
+            $active = 0;
+
+            foreach ($groupedList as $topicName => $headlineList)
+            {
                 $url = new Url($topicName);
                 $this->setVar([
                     'NEWS_TOPIC'   => Scrub::text($topicName),
                     'TOPIC_CLEAN'  => $url->getSlug(),
                     'news_block'   => '',
-                    'TOPIC_ACTIVE' => ($i++ == 0 ? 'active' : ''),
+                    'TOPIC_ACTIVE' => ($active++ == 0 ? 'active' : ''),
                 ]);
-                foreach ($headlineList as $item) {
 
+                foreach ($headlineList as $item)
+                {
                     $newsTime = new Alaress_Date_Format($item['item_datetime_posted'], 'Y-m-d H:i:s');
                     $output = array(
                         'NEWS_TITLE' => $item['item_heading'],
