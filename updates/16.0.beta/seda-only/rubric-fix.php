@@ -87,6 +87,7 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
         SELECT id
         FROM rubric_descriptor
         WHERE criterion_id = :critId
+        AND submission_box_id = :boxId
         ORDER BY `value` ASC
         LIMIT :rowNum, 1
     ");
@@ -167,6 +168,7 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
             // note: this one we bind the long way, because :rowNum is in the LIMIT clause and needs special treatment
             $obtainDescriptorIdStmt->bindValue(':rowNum', $columnIndex, PDO::PARAM_INT);
             $obtainDescriptorIdStmt->bindValue(':critId', $criterionId, PDO::PARAM_INT);
+            $obtainDescriptorIdStmt->bindValue(':boxId',  $boxId,       PDO::PARAM_INT);
             $obtainDescriptorIdStmt->execute();
 
             $descriptorId = $obtainDescriptorIdStmt->fetchColumn();
