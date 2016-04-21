@@ -134,6 +134,7 @@ class Controller extends Base
         } else {
 
             // Get all units in this course
+            /** @var Folder\Model[] $courseList */
             $courseList = $courseLists[$class->getId()];
             $results    = [];
             foreach ($courseList as $course) {
@@ -156,8 +157,8 @@ class Controller extends Base
 
                 // Get all the units for all of these too.
                 foreach ($allFolders as $folder) {
-                    // Get all units within this course
-                    $allUnits = $this->unitInstanceMapper->findForCategoryId($folder->getId());
+                    // Get all units within this course for this folder.
+                    $allUnits = $this->unitInstanceMapper->findForCategoryId($folder->getId(), $course->getId());
                     // Get any assessment tasks from these units.
                     foreach ($allUnits as $unit) {
                         $baseUnitId = $unit->getUnitCategory()->getId();
