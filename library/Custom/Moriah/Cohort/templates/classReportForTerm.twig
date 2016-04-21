@@ -198,11 +198,19 @@
     <li class="active"><a href="#">{{ class.getNameWithCodes() }}</a></li>
 </ul>
 
-<div class="row">
-    <div class="small-12 island">
+<div class="row actions-small-1">
+    <div class="small-12 columns list-item">
         <h1>{{ class.getNameWithCodes() }}</h1>
     </div>
+    <nav>
+        <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a href="/homepage/{{ class.getId() }}" class="icon-home">View Homepage</a></li>
+    </ul>
+</div>
 
+<div class="row">
     <div class="small-12 medium-5 island">
         <section>
             <div class="avatar card small-12">
