@@ -135,7 +135,7 @@
          * don't get transmitted; then immediately disable them lol
          */
         function initRulesetUpdate() {
-            $(config.element).on('click', 'input[type=submit]', function(event) {
+            $(config.element).on('click', '[data-ruleset-save]', function(event) {
                 event.preventDefault();
 
                 $(config.element).find(config.validInputTypes).attr('disabled', false);
@@ -143,6 +143,7 @@
                 $(config.element).submit();
                 $(config.element).find(config.validInputTypes).attr('disabled', true);
             });
+            refreshSaveRulesetButtonAvailability();
         }
 
         /**
@@ -182,6 +183,7 @@
                                     css: 'alert'
                                 });
                             }
+                            refreshSaveRulesetButtonAvailability();
                         });
                     }
                 });
@@ -545,6 +547,18 @@
                     }
                 });
             });
+        }
+
+        /**
+         * Show/hide save button
+         */
+        function refreshSaveRulesetButtonAvailability()
+        {
+            $(config.element).find('[data-ruleset-save]').toggle(
+                $(config.element).find('[data-rule], [data-custom-rule]').length > 0
+            );
+            // Is there at least one custom rule?
+
         }
 
         /**

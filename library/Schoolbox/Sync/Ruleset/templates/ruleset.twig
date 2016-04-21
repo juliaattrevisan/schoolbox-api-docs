@@ -200,7 +200,7 @@ set upsConfig = {
             <h2 class="subheader">Custom Rules</h2>
 
             {% for customRule in ruleset.getCustomRules() %}
-            <div class="row" id="customRule-{{ customRule.getId() }}">
+            <div class="row" id="customRule-{{ customRule.getId() }}" data-custom-rule="{{ customRule.getId() }}">
                 <div class="small-12 island">
                     <section class="content">
                         <h3 class="subheader">
@@ -229,9 +229,7 @@ set upsConfig = {
             {% endfor %}
             {% endif %}
 
-            {% if (ruleset.getRules() is not empty) and (ruleset.getCustomRules() is not empty) %}
-            <input type="submit" value="Save Rules" />
-            {% endif %}
+            <input type="submit" value="Save Rules" data-ruleset-save />
         </form>
 
         <div id="token-list" class="reveal-modal" data-reveal>
