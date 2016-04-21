@@ -20,17 +20,24 @@ class CommunityPortalFactory
     public function build()
     {
         // TODO inject config
-        $connector      = ucwords(\Config::get('external_type'));
-        $webServicesUrl = \Config::get('external_web_services_url');
+        $connector          = ucwords(\Config::get('external_type'));
+        $webServicesUrl     = \Config::get('external_web_services_url');
+        $webServicesKeyFile = '/etc/schoolbox-synergetic/config.json';
 
         // Synergetic only
-        if ($connector != 'Synergetic' || empty($webServicesUrl)) {
-            return new Offline\Base\CommunityPortal();
-        } else {
-            // TODO: store real keys somewhere (NOT CODE) and use them here
-            $key = 'NOT A REAL KEY';
-            $iv  = 'NOT A REAL IV EITHER';
+        if ($connector == 'Synergetic' && !empty($webServicesUrl)) {
+            $key = false;
+            $iv  = false;
+            if (is_readable($webServicesKeyFile) && is_file($webServicesKeyFile)) {
+                $config = json_decode(file_get_contents($webServicesKeyFile));
+                $key    = base64_decode($config['key']);
+                $iv     = base64_decode($config['iv']);
+            } else {
+                // can't read file, that's a warning at least.
+                trigger_error('Cannot read community portal key - password will not be changed', E_USER_WARNING);
+            }
             return new Synergetic\Base\CommunityPortal($key, $iv);
         }
+        return new Offline\Base\CommunityPortal();
     }
 }
