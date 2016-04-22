@@ -182,12 +182,12 @@ class Controller extends Base\Base
 
         // invent a new component
         $newInstance = $this->getComponentInstanceMapper()
-                            ->createModel()
-                            ->setModule('homepage')
-                            ->setIdentifier($unit->getId())
-                            ->setDefinitionId($definition->getId())
-                            ->setSequence(0)
-                            ->setPosition('top');
+            ->createModel()
+            ->setModule('homepage')
+            ->setIdentifier($unit->getId())
+            ->setDefinitionId($definition->getId())
+            ->setSequence(0)
+            ->setPosition('top');
 
         // save it
         $instanceMapper->save($newInstance);
@@ -419,7 +419,7 @@ class Controller extends Base\Base
         if ($id) {
             try {
                 // do checks to make sure it exists
-                $this->getCourseMapper()->findById($id);
+                $folder = $this->getCourseMapper()->findById($id);
                 $mode = BaseMapper::METHOD_UPDATE;
 
             } catch (BaseMapper\Exception $e) {
@@ -437,7 +437,7 @@ class Controller extends Base\Base
                 'name'            => $name,
                 'parent'          => $parent->getId(),
                 'curriculumCodes' => $codes,
-
+                'inherit'         => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
             ];
 
             if ($mode == BaseMapper::METHOD_CREATE) {
@@ -447,10 +447,12 @@ class Controller extends Base\Base
                     /** @var CourseConfigModel $courseConfig */
                     $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
                 }
+
                 $datums = array_merge($datums, [
 
+
                     // configurable things
-                    'inherit'   => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
+                    'inherit'         => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
                     'template'  => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
                     'group'     => $rolePermissions,
 
@@ -458,6 +460,13 @@ class Controller extends Base\Base
                     'recursive' => false, // LEAVE THIS
                     'code'      => null,  // LEAVE THIS
 
+                ]);
+            } else {
+
+                /** @var Folder\Model $folder */
+                $datums = array_merge($datums, [
+                    // configurable things
+                    'inherit'         => $folder->getInherit()
                 ]);
             }
 
@@ -798,7 +807,7 @@ class Controller extends Base\Base
             'courseHomepage' => $courseHomepage,
             'units'          => $this->getCourseMapper()->findByParentId($courseHomepage),
             'ownerships'     => implode(',', array_map(
-                function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
+                    function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
             )
         ]);
     }

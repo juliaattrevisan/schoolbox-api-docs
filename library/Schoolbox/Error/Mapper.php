@@ -152,7 +152,7 @@ class Mapper extends BaseMapper
      * @param int $id
      * @param SchoolboxException $parent
      * @param string $additionalInfo
-     * @return SchoolboxException
+     * @return \Schoolbox\Application\Exception
      */
     public function generateException($id, $parent = null, $additionalInfo = '')
     {
