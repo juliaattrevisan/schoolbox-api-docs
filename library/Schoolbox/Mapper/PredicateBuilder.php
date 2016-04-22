@@ -122,8 +122,7 @@ class PredicateBuilder
                 $a = $columnName . '_0';
 
                 $this->where[]    = "$escaped_name $whereComparison :$a";
-                $this->params[$a] = $columnValue;
-
+                $this->putParam($a, $columnValue);
             }
         }
 
@@ -245,6 +244,19 @@ class PredicateBuilder
     public function getParams()
     {
         return $this->params;
+    }
+
+
+    /**
+     * Just be careful using this: this is for if you need custom params in your joins
+     *
+     * @param string $param
+     * @param mixed  $value
+     * @return static
+     */
+    public function putParam($param, $value)
+    {
+        $this->params[$param] = $value;
     }
 
 }
