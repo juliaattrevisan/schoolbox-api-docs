@@ -125,11 +125,24 @@ class TimetableStructure extends AbstractImporter
                     );
                     $campus->setStartDay($row['Term Offset'] + 1);
                 }
+                try {
+                    $termStart = new Alaress_Date_Format(
+                        $row['Term Start'],
+                        [Alaress_Date_Format::DATABASE_DATE_FORMAT, 'd/m/Y']
+                    );
+                    $termFinish = new Alaress_Date_Format(
+                        $row['Term Finish'],
+                        [Alaress_Date_Format::DATABASE_DATE_FORMAT, 'd/m/Y']
+                    );
+                } catch (\InvalidArgumentException $e) {
+                    $this->log->warning('"Term Start" and "Term Finish" must both be dates in YYYY-MM-DD or DD/MM/YYYY format');
+                    continue;
+                }
                 $campus
                     ->setCycle($cycle)
                     ->setCampus($campusObject)
-                    ->setStart(new Alaress_Date_Format($row['Term Start'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
-                    ->setFinish(new Alaress_Date_Format($row['Term Finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
+                    ->setStart($termStart)
+                    ->setFinish($termFinish)
                     ->setStartDay($row['Term Start Day Number']);
 
                 $result[$key] = [
