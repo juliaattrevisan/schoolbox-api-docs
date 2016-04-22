@@ -38,7 +38,7 @@ class Mapper extends FolderMapper
     private $ancestry = null;
 
     /**
-     * Hook method which occurs after mapping()
+     * Hook method which occurs after successful construction
      */
     protected function postSetup()
     {
