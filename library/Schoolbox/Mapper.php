@@ -1361,6 +1361,22 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function executeSelect($query, PredicateBuilder $predicate, array $columnList, array $options = [])
     {
+        $statement = $this->prepareSelect($query, $predicate, $columnList, $options);
+        $statement->execute();
+
+        return $this->hydrateSelect($statement);
+    }
+
+
+    /**
+     * @param string           $query
+     * @param PredicateBuilder $predicate
+     * @param array            $columnList
+     * @param array            $options
+     * @return PDOStatement
+     */
+    protected function prepareSelect($query, PredicateBuilder $predicate, array $columnList, array $options = [])
+    {
         // Compatibility with old deleted option: if a non-array was passed,
         // assume that we're asking for whether the item was deleted.
         if (!is_array($options)) {
@@ -1438,9 +1454,8 @@ abstract class Mapper implements IMapper, Serializable
         if (isset($offset)) {
             $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
         }
-        $statement->execute();
 
-        return $this->hydrateSelect($statement);
+        return $statement;
     }
 
 
