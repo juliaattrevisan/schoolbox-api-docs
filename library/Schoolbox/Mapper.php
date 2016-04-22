@@ -19,6 +19,7 @@ use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Schedule\Event;
@@ -2431,6 +2432,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Gets a string of placeholders for an array - usually used for creating a
      * list of placeholders for an IN condition.
+     * @deprecated this has been moved to Mapper\PredicateBuilder
      *
      * @param array  $input
      * @param string $prefix If not supplied, ? will be used as the placeholder
@@ -2453,6 +2455,7 @@ abstract class Mapper implements IMapper, Serializable
      * Used in conjunction with getArrayPlaceholders() - calling this with the
      * same input and prefix will generate params and placeholders that work
      * with each other.
+     * @deprecated this has been moved to Mapper\PredicateBuilder
      *
      * @param array  $input
      * @param string $prefix If not supplied, ? will be assumed as placeholder
