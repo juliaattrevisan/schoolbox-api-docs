@@ -17,6 +17,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFolderMapper;
@@ -497,7 +498,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $qmarks = implode(', ', array_pad([], count($code), '?'));
 
         // search on curriculum node code
-        $q = $this->getFindQuery() . "WHERE cn.code in ($qmarks)";
+        $q = $this->getSelectString() . "WHERE cn.code in ($qmarks)";
 
         // search, hydrate, return
         return $this->hydrateFromFindQuery($this->getDatabase()->query($q, $code));
@@ -511,14 +512,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @return string
      */
-    protected function getFindQuery()
+    protected function getSelectString()
     {
         $code_mapper = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
+
         return "
             SELECT
-                {$this->getColumnString('c')},
+                {$this->getColumnString()},
                 {$code_mapper->getColumnString('cc')},
                 {$homepageConfig_mapper->getColumnString('hp')},
                 {$group_mapper->getColumnString('ug')},
@@ -527,11 +529,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$this->getJoinColumnString('curriculum_node_for_category.level.source', 'cnls')},
                 {$this->getJoinColumnString('curriculum_node_for_category.area', 'cna')},
                 {$this->getJoinColumnString('curriculum_node_for_category.area.source', 'cnas')}
-            FROM {$this->getTable()} c
-            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
-            LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
-            LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', 'c', 'cn')}
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('codes', '', 'cc')}
+            LEFT JOIN {$this->getJoinSql('homepages', '', 'hp')}
+            LEFT JOIN {$this->getJoinSql('groups', '', 'ug')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', '', 'cn')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level', 'cn', 'cnl')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level.source', 'cnl', 'cnls')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area', 'cn', 'cna')}
@@ -546,7 +548,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param bool $userGroupsOnly
      * @return Collection|Model[]
      */
-    public function searchByName($keyword, $userGroupsOnly = false) {
+    public function searchByName($keyword, $userGroupsOnly = false)
+    {
         $code_mapper  = $this->getJoinMapper('codes');
         $group_mapper = $this->getJoinMapper('groups');
 
@@ -602,7 +605,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @throws MapperException if statement returned no category
      * @return Collection|Model[]
      */
-    protected function hydrateFromFindQuery($statement)
+    protected function hydrateSelect($statement)
     {
         $code_mapper = $this->getJoinMapper('codes');
 
@@ -685,7 +688,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findByCode($code)
     {
-        $query = $this->getFindQuery();
+        $query = $this->getSelectString();
         // Retrieve all codes for category, not just $code
         $query .= "
             WHERE c.deleted_at IS NULL
@@ -725,7 +728,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function findAllByArchivedCode($code)
     {
         // Don't need no category codes here
-        $query = $this->getFindQuery();
+        $query = $this->getSelectString();
         $query .= 'WHERE c.name LIKE :code';
         $statement = $this->database->prepare($query);
         $statement->execute(
@@ -735,6 +738,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
         return $this->hydrateList($statement, 'c');
     }
+
 
     /**
      * {@inheritdoc}
@@ -750,19 +754,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                         ->setParent($this->createModel()->setId('#'));
         }
 
-        $query = $this->getFindQuery();
-        $query .= 'WHERE c.id=?';
-        $statement = $this->database->prepare($query);
-        $statement->execute(array($id));
-        $collection = $this->hydrateFromFindQuery($statement);
-
-        // emulate findOneBy functionality: there must be exactly one
-        if ($collection->count() != 1) {
-            throw new MapperException("Instance of object not found");
-        }
-
-        return $collection->first();
+        return parent::findById($id);
     }
+
 
     /**
      * Port of \Group->involvedInCategoryList() method.
