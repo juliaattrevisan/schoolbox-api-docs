@@ -1361,10 +1361,15 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function executeSelect($query, PredicateBuilder $predicate, array $columnList, array $options = [])
     {
-        $statement = $this->prepareSelect($query, $predicate, $columnList, $options);
-        $statement->execute();
+        try {
+            $statement = $this->prepareSelect($query, $predicate, $columnList, $options);
+            $statement->execute();
 
-        return $this->hydrateSelect($statement);
+            return $this->hydrateSelect($statement);
+
+        } catch (UnderflowException $e) {
+            return $this->hydrateList([]);
+        }
     }
 
 
@@ -1373,6 +1378,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param PredicateBuilder $predicate
      * @param array            $columnList
      * @param array            $options
+     * @throws UnderflowException
      * @return PDOStatement
      */
     protected function prepareSelect($query, PredicateBuilder $predicate, array $columnList, array $options = [])
@@ -1397,12 +1403,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // If this underflows, someone passed an empty column value - return an empty set.
-        try {
-            $where = $this->buildWherePart($predicate, $columnList, $options);
-
-        } catch (\UnderflowException $e) {
-            return $this->hydrateList(array());
-        }
+        $where = $this->buildWherePart($predicate, $columnList, $options);
 
         // capture this regardless of emptiness
         $params = $where['params'];
