@@ -43,6 +43,8 @@ class PredicateBuilder
 
 
     /**
+     * Convenience method for adding directly from a Mapper column list
+     *
      * @param array $columnList
      * @return self
      */
@@ -58,11 +60,113 @@ class PredicateBuilder
 
     /**
      * @param string $columnName
+     * @return PredicateBuilder
+     */
+    public function isNull($columnName)
+    {
+        return $this->addPredicate($columnName, null);
+    }
+
+    /**
+     * @param string $columnName
+     * @return PredicateBuilder
+     */
+    public function isTrue($columnName)
+    {
+        return $this->addPredicate($columnName, true);
+    }
+
+    /**
+     * @param string $columnName
+     * @return PredicateBuilder
+     */
+    public function isFalse($columnName)
+    {
+        return $this->addPredicate($columnName, false);
+    }
+
+    /**
+     * @param string $columnName
+     * @param array  $columnValues
+     * @return PredicateBuilder
+     */
+    public function anyOf($columnName, array $columnValues)
+    {
+        return $this->addPredicate($columnName, $columnValues);
+    }
+
+    /**
+     * @param string     $columnName
+     * @param string|int $columnValue
+     * @return PredicateBuilder
+     */
+    public function equals($columnName, $columnValue)
+    {
+        return $this->addPredicate($columnName, $columnValue);
+    }
+
+    /**
+     * @param string $columnName
+     * @param string $columnValue
+     * @return PredicateBuilder
+     */
+    public function like($columnName, $columnValue)
+    {
+        return $this->addPredicate($columnName, '%' . $this->database->quoteForLike($columnValue) . '%', 'LIKE');
+    }
+
+    /**
+     * @param string     $columnName
+     * @param int|string $columnValue  if string, must be datetime
+     * @return PredicateBuilder
+     */
+    public function lessThan($columnName, $columnValue)
+    {
+        return $this->addPredicate($columnName, $columnValue, '<');
+    }
+
+
+    /**
+     * @param string     $columnName
+     * @param int|string $columnValue  if string, must be datetime
+     * @return PredicateBuilder
+     */
+    public function greaterThan($columnName, $columnValue)
+    {
+        return $this->addPredicate($columnName, $columnValue, '>');
+    }
+
+
+    /**
+     * @param string     $columnName
+     * @param int|string $columnValue  if string, must be datetime
+     * @return PredicateBuilder
+     */
+    public function notLessThan($columnName, $columnValue)
+    {
+        return $this->addPredicate($columnName, $columnValue, '>=');
+    }
+
+
+    /**
+     * @param string     $columnName
+     * @param int|string $columnValue  if string, must be datetime
+     * @return PredicateBuilder
+     */
+    public function notGreaterThan($columnName, $columnValue)
+    {
+        return $this->addPredicate($columnName, $columnValue, '<=');
+    }
+
+
+    /**
+     * @param string $columnName
      * @param mixed  $columnValue
+     * @param string $operand
      * @throws UnderflowException if an empty IN is attempted
      * @return self
      */
-    public function addPredicate($columnName, $columnValue)
+    protected function addPredicate($columnName, $columnValue, $operand = '=')
     {
         // accommodate joins
         $xpl = explode('.', $columnName) ?: [];
@@ -87,13 +191,12 @@ class PredicateBuilder
 
         // If a field name starts with "!" character then we'll assume the query intention for the field is "not equal"
         if (substr($field, 0, 1) == "!") {
-            $whereNot        = "NOT ";
-            $whereComparison = "<>";
-            $field           = substr($field, 1);
+            $whereNot = "NOT ";
+            $operand  = "<>";
+            $field    = substr($field, 1);
 
         } else {
-            $whereNot        = "";
-            $whereComparison = "=";
+            $whereNot = "";
         }
 
         $escaped_name = $this->database->quoteIdentifier($table) . '.' . $this->database->quoteIdentifier($field);
@@ -127,7 +230,7 @@ class PredicateBuilder
                 // alias the param
                 $a = $columnName . '_0';
 
-                $this->where[]    = "$escaped_name $whereComparison :$a";
+                $this->where[] = "$escaped_name $operand :$a";
                 $this->putParam($a, $columnValue);
             }
         }

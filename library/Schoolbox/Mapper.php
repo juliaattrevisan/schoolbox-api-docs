@@ -1399,7 +1399,7 @@ abstract class Mapper implements IMapper, Serializable
 
         // filter on soft-deletions if this mapper supports them
         if (isset($this->soft_delete_column) && $options['deleted'] == false) {
-            $predicate->addPredicate($this->soft_delete_column, $this->soft_delete_undeleted_value);
+            $predicate->equals($this->soft_delete_column, $this->soft_delete_undeleted_value);
         }
 
         // If this underflows, someone passed an empty column value - return an empty set.
@@ -1410,7 +1410,7 @@ abstract class Mapper implements IMapper, Serializable
 
         // only actually add a where clause if there are predicates to test
         if ($predicate->count()) {
-            $query .= ' WHERE' . implode(' AND ', $where['where']);
+            $query .= ' WHERE ' . implode(' AND ', $where['where']);
         }
 
         // Build ORDER part (in an injection-safe way)
