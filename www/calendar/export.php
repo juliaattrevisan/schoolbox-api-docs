@@ -16,8 +16,7 @@ use Calendar\Event\Collection\Exporter;
 use Calendar\Event\Collection\CSVExporter;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-
-
+use Schoolbox\Config\ConfigMapper;
 
 try {
     $token = $_GET['token'];
@@ -40,9 +39,20 @@ try {
         throw new SchoolboxException('Invalid token', 401);
     }
 
+    $back = ConfigMapper::getInstance()->get('export_start');
+    $forward = ConfigMapper::getInstance()->get('export_end');
+    $timetable_forward = ConfigMapper::getInstance()->get('export_timetable_end');
+
+    if (!is_int($back)) $back = 1;
+    if (!is_int($forward)) $forward = 12;
+    if (!is_int($timetable_forward)) $timetable_forward = 3;
+    $back = abs($back);
+    $forward = abs($forward);
+    $timetable_forward = abs($timetable_forward);
+
     // Default start and end times
-    $start = strtotime('-1 months', $_SERVER['REQUEST_TIME']);
-    $end   = strtotime('+12 months', $_SERVER['REQUEST_TIME']);
+    $start = strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
+    $end   = strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
 
     switch ($export_type) {
         case 'personal':
@@ -81,14 +91,14 @@ try {
             $api = new Calendar_Api_EventType_Timetable_External_Default($user, array());
             $filename = 'timetable';
             $start = $_SERVER['REQUEST_TIME'];
-            $end = strtotime('+3 months', $_SERVER['REQUEST_TIME']);
+            $end = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
         case 'timetabledays':
             $api = new Calendar_Api_EventType_TimetableDays_External_Default($user, array());
             $filename = 'timetabledays';
             $start = $_SERVER['REQUEST_TIME'];
-            $end = strtotime('+3 months', $_SERVER['REQUEST_TIME']);
+            $end = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             break;
 
         case 'all':
