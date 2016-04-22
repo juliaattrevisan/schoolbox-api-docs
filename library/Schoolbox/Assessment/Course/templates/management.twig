@@ -36,6 +36,20 @@
             });
         });
 
+        /* Restore courses
+         */
+        $('#courseList').on('click', '[data-restore-course]', function(event) {
+            event.preventDefault();
+
+            $.post($(this).attr('href'), {
+                folderId: $(this).attr('data-restore-folder'),
+                componentId: $(this).attr('data-restore-component')
+            }, function(responseText) {
+                if (responseText.result == 'success') {
+                    window.location.href = window.location.href;
+                }
+            });
+        });
     });
 </script>
 <ul class="breadcrumb">
@@ -88,7 +102,7 @@
                     </div>
                     <nav>
                         {% if courseComponentRemoved %}
-                            <a href="{{ routeLookup('course.restoreCourse', { folderId: folder.id, componentId: courseComponentId }) }}" class="icon-upload" title="Restore Course"></a>
+                            <a href="{{ routeLookup('course.restoreCourse') }}" class="icon-upload" title="Restore Course" data-restore-course data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId }}"></a>
                         {% endif %}
                         <a href="{{ routeLookup('course.importModify', { componentId: courseComponentId }) }}" class="icon-modify" title="Modify Import"></a>
                         <a href="" class="icon-delete" title="Delete Course" data-delete="{{ courseComponentId }}" data-coursename="{{ currentCourse.name }}"></a>

@@ -1753,16 +1753,16 @@ class Controller extends Base\Base
 
     /**
      * Restore a Course instance via rebuilding its component
-     * TODO: this is a mutating GET - to be refactored to POST [SB-12012]
      *
-     * @api   GET /course/import/restore/{folderId}/{componentId}
+     * @api   POST /course/import/restore
      * @level 160
      *
-     * @param int $folderId
-     * @param int $componentId
      */
-    public function restoreCourse($folderId, $componentId)
+    public function restoreCourse()
     {
+        $folderId = $this->getRequest()->post->get('folderId');
+        $componentId = $this->getRequest()->post->get('componentId');
+
         $allUnits = $this->getUnitInstanceMapper()->findByColumn('component_id', $componentId);
 
         /* Spawn a new Course Builder instance
@@ -1793,7 +1793,10 @@ class Controller extends Base\Base
             $this->getUnitInstanceMapper()->save($currentUnit);
         }
 
-        $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('course.management', ['folderId' => $folderId]));
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data' => ['result' => 'success']
+        ]);
     }
 
     /**
