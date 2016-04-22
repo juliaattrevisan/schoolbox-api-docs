@@ -9,9 +9,13 @@
  */
 namespace Schoolbox\Assessment\Course;
 
+use Component_Homepage_CourseBuilderController;
+use PDO;
+use PDOStatement;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Ancestry;
@@ -62,6 +66,80 @@ class Mapper extends FolderMapper
     {
         $this->getAncestry()->reset();
     }
+
+
+    /**
+     * Return the first part of the string required to select from this mapper
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT DISTINCT {$this->getColumnString()}
+        ";
+    }
+
+
+    /**
+     * It seems we're going down this road...
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        $c = "`{$this->getTable()}`";
+
+        return "
+            FROM $c
+            RIGHT JOIN category unit ON $c.id = unit.parent
+            INNER JOIN component_instance ci ON ci.identifier = unit.id AND ci.module = :module
+            LEFT JOIN component_definition cd ON ci.component_definition_id = cd.id
+        ";
+    }
+
+
+    /**
+     * @param  PDOStatement $statement
+     * @return Collection|Folder[]
+     */
+    protected function hydrateSelect($statement)
+    {
+        $c = $this->createCollection();
+
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $c->add($this->hydrate($row));
+        }
+
+        return $c;
+    }
+
+
+    /**
+     * Builds a where part and params for this query out of a column list
+     *
+     * @param PredicateBuilder $predicate
+     * @param  array           $columnList
+     * @param  array           $options
+     *
+     * @return array where:  The where parts of the query
+     *               params: the parameters
+     * @throws \UnderflowException
+     */
+    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
+    {
+        $predicate->equals('cd.class', Component_Homepage_CourseBuilderController::class);
+
+        if ($options['deleted'] == false) {
+            $predicate->isNull('unit.deleted_at');
+        }
+
+        // add custom param from component_instance join
+        $predicate->putParam('module', 'homepage');
+
+        return parent::buildWherePart($predicate, $columnList, $options);
+    }
+
 
     /**
      * Similar to findById() but restricts finds to Course Folders only
@@ -338,6 +416,7 @@ class Mapper extends FolderMapper
 
 
     /**
+     * @deprecated use Unit\Mapper::findByCourseId()
      * @param Folder $course
      * @param bool   $hydrate  whether or not to hydrate the models found
      * @return Collection|Folder[]
