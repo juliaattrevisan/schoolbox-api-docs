@@ -312,19 +312,23 @@ class Config
 
     /**
      * @param User  $user
-     * @param array $follow
+     * @param array $allFollow
      * @return array
      */
-    public function persistFollow(User $user, $follow)
+    public function persistFollow(User $user, $allFollow)
     {
-        $involvements = $user->getAccessList()->getColumnValues('serviceIdentifier');
+        $follow = [];
+        $unfollow = [];
 
-        $follow = array_keys(array_filter($follow));
+        foreach ($allFollow as $key => $value) {
+            if ($value) {
+                $follow[] = $key;
+            } else {
+                $unfollow[] = $key;
+            }
+        }
 
         asort($follow);
-        asort($involvements);
-
-        $unfollow = array_values(array_diff($involvements, $follow));
 
         // delete any overrides for homepages the user is RE-following
         RerouteOverrideMapper::getInstance()->deleteByColumnList(array(
