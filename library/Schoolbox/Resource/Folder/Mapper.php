@@ -19,6 +19,7 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\GroupMapper;
@@ -40,7 +41,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  * @method Model createModel()
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
-class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
+class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 {
     const INHERIT_ON = 1;
     const INHERIT_OFF = 0;
@@ -89,40 +90,14 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      */
     protected function mapping()
     {
-        $this->hasModel('\\Schoolbox\\Resource\\Folder\\Model');
-        $this->hasTable('category');
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'name',
-                'property' => 'name',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'inherit',
-                'property' => 'inherit',
-                'type'     => self::TYPE_BOOLEAN,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'parent',
-                'property' => 'parent',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'parent',
-            )
-        );
+        parent::mapping();
 
-        //
+        $this->hasPrototype(new Model());
+        $this->hasTable('category');
+
+        $this->uses('inherit', self::TYPE_BOOLEAN);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
         // Joins:
         $this->hasJoin(
             'codes', array(
@@ -160,17 +135,6 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             )
         );
 
-        //
-        // Parent object: has reference to itself as a mapper.
-        $this->hasJoin(
-            'parent', array(
-                'multiple'  => true,
-                'mapper'    => $this,
-                'this_key'  => 'category',
-                'other_key' => 'id',
-            )
-        );
-
         $this->joinsVia(
             'curriculum_node_for_category',
             Node\Mapper::class,
@@ -183,22 +147,12 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             'curriculumNodes'
         );
 
-        $this->hasMap(
-            array(
-                'column'   => 'deleted_at',
-                'property' => 'deletedAt',
-                'type'     => self::TYPE_DATETIME,
-            )
-        );
-
-
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, self::CALLBACK_PRESAVE));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, self::CALLBACK_POSTSAVE));
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveHomepageConfig']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteCategoryCodes'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteCategoryCodes'));
 
-        $this->hasSoftDeleteDateField('deleted_at');
     }
 
     /**
