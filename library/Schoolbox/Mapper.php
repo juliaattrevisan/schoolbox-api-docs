@@ -1348,6 +1348,19 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findByColumnList($columnList, $options = array())
     {
+        return $this->executeSelect($this->getSelectString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
+    }
+
+
+    /**
+     * @param string           $query
+     * @param PredicateBuilder $predicate
+     * @param array            $columnList
+     * @param array            $options
+     * @return Collection
+     */
+    protected function executeSelect($query, PredicateBuilder $predicate, array $columnList, array $options = [])
+    {
         // Compatibility with old deleted option: if a non-array was passed,
         // assume that we're asking for whether the item was deleted.
         if (!is_array($options)) {
@@ -1361,14 +1374,13 @@ abstract class Mapper implements IMapper, Serializable
         );
         $options      = array_merge($defaults, $options);
         $quoted_table = $this->database->quoteIdentifier($this->table);
-        $query        = $this->getSelectString();
         $params      = array();
         if (!empty($columnList)) {
             // Build WHERE part
             // If it underflows, someone passed an empty column value - return an
             // empty set.
             try {
-                $where = $this->buildWherePart($columnList, $options);
+                $where = $this->buildWherePart($predicate, $columnList, $options);
             } catch (\UnderflowException $e) {
                 return $this->hydrateList(array());
             }
@@ -1636,6 +1648,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Builds a where part and params for this query out of a column list
      *
+     * @param PredicateBuilder $predicate
      * @param  array $columnList
      * @param  array $options
      *
@@ -1643,73 +1656,9 @@ abstract class Mapper implements IMapper, Serializable
      *               params: the parameters
      * @throws \UnderflowException
      */
-    protected function buildWherePart($columnList, $options)
+    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
     {
-        $where_parts = array();
-        $params      = array();
-
-        foreach ($columnList as $columnName => $columnValue) {
-
-            // accommodate joins
-            $xpl = explode('.', $columnName) ?: [];
-
-            if (count($xpl) == 1) {
-                $table = $this->getTable();
-                $field = $xpl[0];
-            } elseif (count($xpl) == 2) {
-                $table = $xpl[0];
-                $field = $xpl[1];
-
-                // remove the period so SQL doesn't freak out
-                $columnName = str_replace('.', '_', $columnName);
-            } else {
-                // bad
-                continue;
-            }
-
-            if (substr($columnName, 0, 1) == "!")
-                $columnName = substr($columnName, 1);
-
-            // If a field name starts with "!" character then we'll assume the query intention for the field is "not equal"
-
-            if (substr($field, 0, 1) == "!") {
-                $whereNot = "NOT ";
-                $whereComparison = "<>";
-                $field = substr($field, 1);
-            } else {
-                $whereNot = "";
-                $whereComparison = "=";
-            }
-
-            $escaped_name = $this->database->quoteIdentifier($table) . '.' . $this->database->quoteIdentifier($field);
-
-            if (!isset($columnValue)) {
-                $where_parts[] = "$escaped_name IS {$whereNot}NULL";
-            } else {
-                // This method is smart enough to work with arrays and IN statements
-                // If the list of values is empty, though: there's no way
-                // that the query could ever return anything, so just return
-                // an empty collection.
-                if (is_array($columnValue)
-                    || ($columnValue instanceof Traversable && $columnValue instanceof Countable)
-                ) {
-                    if (count($columnValue) === 0) {
-                        throw new \UnderflowException('List of column values is empty');
-                    }
-
-                    $where_parts[] = "$escaped_name {$whereNot}IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
-                    $params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
-                } else {
-                    $where_parts[]              = "$escaped_name {$whereComparison} :{$columnName}_0";
-                    $params[$columnName . '_0'] = $columnValue;
-                }
-            }
-        }
-
-        return array(
-            'where'  => $where_parts,
-            'params' => $params,
-        );
+        return $predicate->addColumnList($columnList)->getPredicates();
     }
 
     /**

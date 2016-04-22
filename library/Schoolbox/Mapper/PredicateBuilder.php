@@ -82,10 +82,24 @@ class PredicateBuilder
             return $this;
         }
 
+        if (substr($columnName, 0, 1) == "!")
+            $columnName = substr($columnName, 1);
+
+        // If a field name starts with "!" character then we'll assume the query intention for the field is "not equal"
+        if (substr($field, 0, 1) == "!") {
+            $whereNot        = "NOT ";
+            $whereComparison = "<>";
+            $field           = substr($field, 1);
+
+        } else {
+            $whereNot        = "";
+            $whereComparison = "=";
+        }
+
         $escaped_name = $this->database->quoteIdentifier($table) . '.' . $this->database->quoteIdentifier($field);
 
         if (!isset($columnValue)) {
-            $this->where[] = "$escaped_name IS NULL";
+            $this->where[] = "$escaped_name IS {$whereNot}NULL";
 
         } else {
             // This method is smart enough to work with arrays and IN statements
@@ -100,14 +114,14 @@ class PredicateBuilder
                     throw new UnderflowException('List of column values is empty');
                 }
 
-                $this->where[] = "$escaped_name IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
+                $this->where[] = "$escaped_name {$whereNot}IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
                 $this->params  = array_merge($this->params, $this->getArrayParameters($columnValue, $columnName));
 
             } else {
                 // alias the param
                 $a = $columnName . '_0';
 
-                $this->where[]    = "$escaped_name = :$a";
+                $this->where[]    = "$escaped_name $whereComparison :$a";
                 $this->params[$a] = $columnValue;
 
             }
