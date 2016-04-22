@@ -1057,17 +1057,30 @@ class Controller extends Base\Base
             $temp->sortBy('created', 'asc');
 
             foreach ($temp as $current) {
-                if ($current->getAssessment()->getId()) {
-                    $class = 'OnlineAssessment';
-                    $detail = $this->getOnlineAssessmentMapper()->findById($current->getAssessment()->getId());
-                } else {
-                    if ($current->getSubmissionBox()->getId()) {
-                        $class = 'SubmissionBox';
-                        $detail = $this->getSubmissionBoxMapper()->findById($current->getSubmissionBox()->getId());
-                    } else {
-                        $class = 'Task';
-                        $detail = null;
+                $class  = 'Task';
+                $itemId = 0;
+                $detail = null;
+                try {
+                    if ($current->getAssessment()->getId()) {
+                        $class  = 'OnlineAssessment';
+                        $itemId = $current->getAssessment()->getId();
+                        $detail = $this->getOnlineAssessmentMapper()->findById($itemId);
+                    } elseif ($current->getSubmissionBox()->getId()) {
+                        $class  = 'SubmissionBox';
+                        $itemId = $current->getSubmissionBox()->getId();
+                        $detail = $this->getSubmissionBoxMapper()->findById($itemId);
                     }
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    // Something's wrong with this task. Do not import.
+                    trigger_error(
+                        sprintf(
+                            'Item that was supposed to be imported "%s:%d" could not be found - skipping!',
+                            $class,
+                            $itemId
+                        ),
+                        E_USER_WARNING
+                    );
+                    continue;
                 }
 
                 /* Determine whether this was an abstract task, or a task instance
@@ -1303,11 +1316,16 @@ class Controller extends Base\Base
 
         if (isset($post['ownerships'])) {
             // unsquash ownerships
-
             foreach (explode(',', $post['ownerships']) as $ownership) {
-                list ($folderId, $userId) = explode(':', $ownership);
-
-                $owners[$folderId] = $this->getUserMapper()->findById($userId);
+                if (preg_match('/^\\d+:\\d+/', $ownership)) {
+                    list ($folderId, $userId) = explode(':', $ownership);
+                    try {
+                        $owners[$folderId] = $this->getUserMapper()->findById($userId);
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        // Couldn't find user. That's sort of okay.
+                        $owners[$folderId] = null;
+                    }
+                }
             }
         }
 
