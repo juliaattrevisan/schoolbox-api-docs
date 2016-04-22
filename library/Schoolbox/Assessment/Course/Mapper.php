@@ -348,10 +348,13 @@ class Mapper extends FolderMapper
         $sql = "
             SELECT {$this->getColumnString('c')}
             FROM {$this->getTable()} c
+            LEFT JOIN category p ON c.parent = p.id
             LEFT JOIN component_instance ci ON ci.identifier = c.id AND ci.module = :module
             LEFT JOIN component_definition cd ON ci.component_definition_id = cd.id
             WHERE cd.class = :class
             AND c.parent = :parent
+            AND c.deleted_at IS NULL
+            AND p.deleted_at IS NULL
         ";
 
         $args = [
