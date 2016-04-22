@@ -1348,21 +1348,22 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findByColumnList($columnList, $options = array())
     {
-        return $this->executeSelect($this->getSelectString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
+        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
     }
 
 
     /**
-     * @param string           $query
+     * @param string           $select
+     * @param string           $from
      * @param PredicateBuilder $predicate
      * @param array            $columnList
      * @param array            $options
      * @return Collection
      */
-    protected function executeSelect($query, PredicateBuilder $predicate, array $columnList, array $options = [])
+    protected function executeSelect($select, $from, PredicateBuilder $predicate, array $columnList, array $options = [])
     {
         try {
-            $statement = $this->prepareSelect($query, $predicate, $columnList, $options);
+            $statement = $this->prepareSelect($select, $from, $predicate, $columnList, $options);
             $statement->execute();
 
             return $this->hydrateSelect($statement);
@@ -1374,15 +1375,18 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * @param string           $query
+     * @param string           $select
+     * @param string           $from
      * @param PredicateBuilder $predicate
      * @param array            $columnList
      * @param array            $options
      * @throws UnderflowException
      * @return PDOStatement
      */
-    protected function prepareSelect($query, PredicateBuilder $predicate, array $columnList, array $options = [])
+    protected function prepareSelect($select, $from, PredicateBuilder $predicate, array $columnList, array $options = [])
     {
+        $query = "$select $from";
+
         // Compatibility with old deleted option: if a non-array was passed,
         // assume that we're asking for whether the item was deleted.
         if (!is_array($options)) {
@@ -1491,6 +1495,18 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
+     * It seems we're going down this road...
+     * To prevent cataclysmic backward-incompatibility, in the core, the FROM is absorbed into the SELECT... for now...
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "";
+    }
+
+
+    /**
      * @param PDOStatement $statement
      * @return Collection
      */
@@ -1587,9 +1603,14 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function selectScalarByColumnList($selection, array $columnList, array $options = [])
     {
-        $quotedTable = $this->database->quoteIdentifier($this->table);
-        $query       = "SELECT $selection FROM $quotedTable";
-        $statement   = $this->prepareSelect($query, new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
+        $select = "SELECT $selection";
+
+        // grab a from string if it hasn't been implemented yet
+        if (!($from = $this->getFromString())) {
+            $from = "FROM {$this->getTable()}";
+        }
+
+        $statement = $this->prepareSelect($select, $from, new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
 
         $statement->execute();
 
