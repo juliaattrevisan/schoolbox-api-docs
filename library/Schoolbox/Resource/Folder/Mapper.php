@@ -12,12 +12,12 @@
 
 namespace Schoolbox\Resource\Folder;
 
+use PDO;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Mapper\Exception as MapperException;
 use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
-use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFolderMapper;
@@ -40,6 +40,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  *
  * @package Schoolbox\Resource\Folder
  * @method Model createModel()
+ * @method Collection|Model[] findByColumnList($columnList, $options = []);
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends AbstractFolderMapper implements ILocator, Searchable
@@ -501,7 +502,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $q = $this->getSelectString() . "WHERE cn.code in ($qmarks)";
 
         // search, hydrate, return
-        return $this->hydrateFromFindQuery($this->getDatabase()->query($q, $code));
+        return $this->hydrateSelect($this->getDatabase()->query($q, $code));
     }
 
     /**
@@ -529,6 +530,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$this->getJoinColumnString('curriculum_node_for_category.level.source', 'cnls')},
                 {$this->getJoinColumnString('curriculum_node_for_category.area', 'cna')},
                 {$this->getJoinColumnString('curriculum_node_for_category.area.source', 'cnas')}
+        ";
+    }
+
+
+    /**
+     * It seems we're going down this road...
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('codes', '', 'cc')}
             LEFT JOIN {$this->getJoinSql('homepages', '', 'hp')}
@@ -540,6 +553,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area.source', 'cna', 'cnas')}
         ";
     }
+
 
     /**
      * Search by name
@@ -619,13 +633,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $addedClassCodes      = [];
         $addedCurriculumNodes = [];
 
-        foreach ($statement as $row) {
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
-            $testId = $row['c.id'];
+            $testId = $row['id'];
 
             // create if not exists
             if (!array_key_exists($testId, $categories)) {
-                $category = $categories[$testId] = $this->hydrate($row, 'c');
+                $category = $categories[$testId] = $this->hydrate($row);
 
                 /** @var HomepageConfig $homepageConfig */
                 $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
@@ -637,8 +651,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $category->setHomepage($homepageConfig);
                 $category->setGroup($group);
 
-                if (isset($row['c.taskCount'])) {
-                    $categories[$testId]->setTaskCount($row['c.taskCount']);
+                if (isset($row['taskCount'])) {
+                    $categories[$testId]->setTaskCount($row['taskCount']);
                 }
             }
 
@@ -701,7 +715,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 'codeLike' => '%/' . $this->database->quoteForLike($code),
             )
         );
-        $model = $this->hydrateFromFindQuery($statement)->first();
+        $model = $this->hydrateSelect($statement)->first();
 
         if (!$model instanceof Model) {
             throw new MapperException("Instance of object not found");
@@ -741,7 +755,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
 
     /**
-     * {@inheritdoc}
+     * @param int $id
+     * @return Model
      */
     public function findById($id)
     {
