@@ -1055,47 +1055,36 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function deleteByColumnList($columnList)
     {
-        $quoted_table = $this->database->quoteIdentifier($this->table);
-        // only soft-delete if this is a soft-deletable model
-        if ($softDelete = $this->getSoftDeleteUpdateSql()) {
-            $query = "UPDATE $quoted_table SET $softDelete WHERE ";
-        } else {
-            $query = "DELETE FROM $quoted_table WHERE ";
-        }
-        // Build WHERE part
-        $where_parts = array();
-        $params      = array();
+        return $this->executeDelete($this->getDeleteString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList);
+    }
+
+
+    /**
+     * Deletes (whether hard or soft) all records that match the given set of column values
+     * Returns the number of records deleted.
+     *
+     * @param string           $deleteString
+     * @param PredicateBuilder $predicate
+     * @param array            $columnList
+     * @return int
+     */
+    protected function executeDelete($deleteString, PredicateBuilder $predicate, array $columnList)
+    {
         // as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
         if (empty($columnList)) {
             return 0;
         }
-        foreach ($columnList as $columnName => $columnValue) {
-            $escaped_name = $this->database->quoteIdentifier($columnName);
-            if (!isset($columnValue)) {
-                $where_parts[] = "$escaped_name IS NULL";
-            } else {
-                // This method is smart enough to work with arrays and IN statements
-                // If the list of values is empty, though: there's no way
-                // that the query could ever return anything, so just return
-                // an empty collection.
-                if (is_array($columnValue)) {
-                    if (count($columnValue) === 0) {
-                        return 0;
-                    }
-                    $where_parts[] = "$escaped_name IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
-                    $params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
-                } else {
-                    $where_parts[]              = "$escaped_name = :{$columnName}_0";
-                    $params[$columnName . '_0'] = $columnValue;
-                }
-            }
-        }
-        $query .= implode(' AND ', $where_parts);
-        $statement = $this->database->prepare($query);
-        foreach ($params as $name => $value) {
-            $statement->bindValue($name, $value);
-        }
-        $statement->execute();
+
+        // Build WHERE part
+        $predicate->addColumnList($columnList);
+
+        // build query
+        $query = $deleteString . ' WHERE ' . implode(' AND ', $predicate->getWhere());
+
+        // execute with predicate params
+        $statement = $this->getDatabase()->query($query, $predicate->getParams());
+
+        // return the number of rows deleted
         return $statement->rowCount();
     }
 
@@ -1440,6 +1429,25 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
+     * Return the first part of the string required to delete from this mapper
+     *
+     * @return string
+     */
+    protected function getDeleteString()
+    {
+        $quoted_table = $this->database->quoteIdentifier($this->table);
+
+        // only soft-delete if this is a soft-deletable model
+        if ($softDelete = $this->getSoftDeleteUpdateSql()) {
+            return "UPDATE $quoted_table SET $softDelete";
+        }
+
+        return "DELETE FROM $quoted_table";
+    }
+
+    /**
+     * Return the first part of the string required to select from this mapper
+     *
      * @return string
      */
     protected function getSelectString()
