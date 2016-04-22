@@ -1121,6 +1121,23 @@ ul.flex-list {
 	}
 }
 
+.tree-list{
+	li a{
+		display: block;
+		height: 2.5rem;
+		line-height: 2.5rem;
+
+		&:before{
+			@extend .icon-folder;
+			font-size: 1rem;
+			padding: 0 0.5rem;
+		}
+		&:hover{
+			background-color: $accent-background;
+		}
+	}
+}
+
 // Block Grid
 .grid {
 	//TODO: find block grid mixin
