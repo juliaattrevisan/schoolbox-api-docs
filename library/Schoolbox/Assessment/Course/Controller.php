@@ -71,6 +71,9 @@ class Controller extends Base\Base
     /** @var CourseMapper */
     protected $courseMapper;
 
+    /** @var Unit\Mapper */
+    protected $unitMapper;
+
     /** @var Component_DefinitionMapper */
     protected $componentDefinitionMapper;
 
@@ -107,6 +110,7 @@ class Controller extends Base\Base
     public function __construct()
     {
         $this->setCourseMapper(CourseMapper::getInstance());
+        $this->setUnitMapper(Unit\Mapper::getInstance());
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setOnlineAssessmentMapper(OnlineAssessmentMapper::getInstance());
@@ -1865,6 +1869,27 @@ class Controller extends Base\Base
     {
         $this->courseMapper = $courseMapper;
     }
+
+
+    /**
+     * @return Unit\Mapper
+     */
+    public function getUnitMapper()
+    {
+        return $this->unitMapper;
+    }
+
+
+    /**
+     * @param Unit\Mapper $unitMapper
+     * @return static
+     */
+    public function setUnitMapper($unitMapper)
+    {
+        $this->unitMapper = $unitMapper;
+        return $this;
+    }
+
 
     /**
      * Get folder mapper
