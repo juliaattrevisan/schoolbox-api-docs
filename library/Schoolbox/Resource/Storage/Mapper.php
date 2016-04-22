@@ -16,6 +16,7 @@ use Schoolbox;
 use Schoolbox\File;
 use Schoolbox\Collection;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Video;
 use Schoolbox\Video\QueueMapper;
 /**
@@ -175,13 +176,14 @@ class Mapper extends Schoolbox\Mapper implements Receiver
 
 
     /**
-     * @param array $columnList
-     * @param array $options
+     * @param PredicateBuilder $predicate
+     * @param array            $columnList
+     * @param array            $options
      * @return array
      */
-    protected function buildWherePart($columnList, $options)
+    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
     {
-        $parts = parent::buildWherePart($columnList, $options);
+        $parts = parent::buildWherePart($predicate, $columnList, $options);
 
         if (isset($options['mime'])) {
             $mime = str_replace('*', '%', $options['mime']);

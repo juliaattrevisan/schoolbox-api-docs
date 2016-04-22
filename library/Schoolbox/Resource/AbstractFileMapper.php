@@ -13,6 +13,7 @@ use PDO;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\Storage\Model as Storage;
@@ -156,13 +157,14 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
 
 
     /**
-     * @param array $columnList
-     * @param array $options
+     * @param PredicateBuilder $predicate
+     * @param array            $columnList
+     * @param array            $options
      * @return array
      */
-    protected function buildWherePart($columnList, $options)
+    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
     {
-        $parts = parent::buildWherePart($columnList, $options);
+        $parts = parent::buildWherePart($predicate, $columnList, $options);
 
         if (isset($options['mime'])) {
             $mime = str_replace('*', '%', $options['mime']);
