@@ -230,6 +230,16 @@ class PredicateBuilder
 
 
     /**
+     * Return the number of conditions contained by this builder
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->where);
+    }
+
+    /**
      * @return array
      */
     public function getWhere()
