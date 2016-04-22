@@ -152,7 +152,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      * @see Alaress_Date_Strategy_Abstract->setFromFormat() for param description
      *
      * @param string|object                 $dateTime
-     * @param string                        $dateFormat
+     * @param string|array                  $dateFormat If array, try each in turn until it works
      * @param DateTimeZone                  $timezone The timezone of the date, or null to use default
      * @param Alaress_Date_Locale_Interface $locale
      */
@@ -215,7 +215,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
 
     /**
      * @param DateTimeInterface|Alaress_Date_Format|string $dateTime
-     * @param string $inputDateFormat
+     * @param string|array $inputDateFormat If array: try all of these formats, use first that doesn't fail
      * @param DateTimeZone $timezone The timezone of the date, or null to use default
      *
      * @return void
@@ -229,6 +229,18 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
         $inputDateFormat,
         DateTimeZone $timezone = null
     ) {
+        if (is_array($inputDateFormat)) {
+            foreach ($inputDateFormat as $format) {
+                try {
+                    $this->setFromFormat($dateTime, $format, $timezone);
+                    return;
+                } catch (\Exception $e) {
+                    // Suppress this exception, and try the next format
+                }
+            }
+            throw new InvalidArgumentException('$dateTime did not match any $inputDateFormat');
+        }
+
         try {
             $newDateTime = $this->buildLaravelDate($dateTime, $timezone);
             $this->setDateTimeObject($newDateTime);
