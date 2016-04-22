@@ -282,30 +282,30 @@ class Mapper extends FolderMapper
 
 
     /**
-     * Find the number of tasks for each subfolder (unit) of the given course
+     * Find the number of tasks for each subfolder (unit) of the given course, indexed by ID
      *
      * @param Folder $course
      * @return array
      */
     protected function findUnitTaskCount(Folder $course)
     {
-        $taskCountQuery = "
-            SELECT
-                unit.id,
-                COUNT(task.id) AS taskCount
-            FROM {$this->getTable()} course
-            LEFT JOIN {$this->getTable()} unit ON unit.parent = course.id AND unit.deleted_at IS NULL
+        $unitIds = $this->findUnitsInCourse($course)->getColumnValues('id');
+
+        $stmt = $this->getDatabase()->prepare("
+            SELECT COUNT(*)
+            FROM {$this->getTable()} unit
             LEFT JOIN task ON task.category_id = unit.id AND task.deleted_at IS NULL
-            WHERE course.deleted_at IS NULL AND course.id = ?
-            GROUP BY unit.id
-        ";
+            WHERE unit.id = ?
+            GROUP BY unit.id;
+        ");
 
-        $taskCountStatement = $this->database->prepare($taskCountQuery);
-        $taskCountStatement->execute([$course->getId()]);
-        $taskCounts = [];
+        // preset everything to zero: we still want the keys populated even if the query somehow returns nothing
+        $taskCounts = array_combine($unitIds, array_fill(0, count($unitIds), 0));
 
-        foreach ($taskCountStatement as $row) {
-            $taskCounts[$row['id']] = $row['taskCount'];
+        foreach ($unitIds as $unitId) {
+            // iterate and find the task count for each unit
+            $stmt->execute([ $unitId ]);
+            $taskCounts[$unitId] = intval($stmt->fetchColumn());
         }
 
         return $taskCounts;
