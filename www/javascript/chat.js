@@ -230,7 +230,7 @@ $.widget("ui.chat",  {
             }
 
             var $tpl =
-                '<div class="avatar cards small-12">' +
+                '<div class="avatar card small-12">' +
                 '<img src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
                 '<h3>{0} <span class="meta">&bull; {2}</span></h3>' +
                 '<p class="spaced">{3}</p>' +
