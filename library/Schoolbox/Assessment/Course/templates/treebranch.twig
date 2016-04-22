@@ -2,7 +2,7 @@
 <li>
     <a data-selection="{{ branch.id }}" href="/resources/{{ branch.id }}">{{ branch.text }}</a>
     {% if branch.children %}
-    <ul>
+    <ul class="no-bullet">
         {% for node in branch.children %}
             {% include '@course/treebranch.twig' with { branch: node } %}
         {% endfor %}
