@@ -101,6 +101,12 @@ class PredicateBuilder
         if (!isset($columnValue)) {
             $this->where[] = "$escaped_name IS {$whereNot}NULL";
 
+        } elseif ($columnValue === true) {
+            $this->where[] = "$escaped_name IS TRUE";
+
+        } elseif ($columnValue === false) {
+            $this->where[] = "$escaped_name IS FALSE";
+
         } else {
             // This method is smart enough to work with arrays and IN statements
             // If the list of values is empty, though: there's no way
