@@ -1374,24 +1374,28 @@ abstract class Mapper implements IMapper, Serializable
         );
         $options      = array_merge($defaults, $options);
         $quoted_table = $this->database->quoteIdentifier($this->table);
-        $params      = array();
-        if (!empty($columnList)) {
-            // Build WHERE part
-            // If it underflows, someone passed an empty column value - return an
-            // empty set.
-            try {
-                $where = $this->buildWherePart($predicate, $columnList, $options);
-            } catch (\UnderflowException $e) {
-                return $this->hydrateList(array());
-            }
-            $where_parts = $where['where'];
-            $params      = $where['params'];
-            $query .= ' WHERE ';
-            $query .= implode(' AND ', $where_parts);
+
+        // filter on soft-deletions if this mapper supports them
+        if (isset($this->soft_delete_column) && $options['deleted'] == false) {
+            $predicate->addPredicate($this->soft_delete_column, $this->soft_delete_undeleted_value);
         }
-        if (!$options['deleted'] && ($delete_part = $this->getSoftDeleteFilterSql())) {
-            $query .= (empty($columnList) ? ' WHERE ' : ' AND ') . $delete_part;
+
+        // If this underflows, someone passed an empty column value - return an empty set.
+        try {
+            $where = $this->buildWherePart($predicate, $columnList, $options);
+
+        } catch (\UnderflowException $e) {
+            return $this->hydrateList(array());
         }
+
+        // capture this regardless of emptiness
+        $params = $where['params'];
+
+        // only actually add a where clause if there are predicates to test
+        if ($predicate->count()) {
+            $query .= ' WHERE' . implode(' AND ', $where['where']);
+        }
+
         // Build ORDER part (in an injection-safe way)
         $order_parts = array();
         if (!empty($options['order'])) {
