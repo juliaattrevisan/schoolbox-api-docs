@@ -1586,36 +1586,10 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function selectScalarByColumnList($selection, array $columnList, array $options = [])
     {
-        // set options (deleted is the only relevant one)
-        if (!is_array($options)) {
-            $options = array('deleted' => $options,);
-        }
-        $defaults    = array(
-            'deleted' => false,
-        );
-        $options     = array_merge($defaults, $options);
         $quotedTable = $this->database->quoteIdentifier($this->table);
         $query       = "SELECT $selection FROM $quotedTable";
-        $params      = array();
-        // Build WHERE part
-        // If it underflows, someone passed an empty column value - return an
-        // empty set.
-        if (!empty($columnList)) {
-            $where = $this->buildWherePart($columnList, $options);
-            $whereParts = $where['where'];
-            $params     = $where['params'];
-            $query .= ' WHERE ';
-            $query .= implode(' AND ', $whereParts);
-        }
-        // Include soft delete filter
-        if (!$options['deleted'] && ($deletePart = $this->getSoftDeleteFilterSql())) {
-            $query .= (empty($columnList) ? ' WHERE ' : ' AND ') . $deletePart;
-        }
-        // Build query and bind parameters to it
-        $statement = $this->database->prepare($query);
-        foreach ($params as $name => $value) {
-            $statement->bindValue($name, $value);
-        }
+        $statement   = $this->prepareSelect($query, new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
+
         $statement->execute();
 
         return $statement;
