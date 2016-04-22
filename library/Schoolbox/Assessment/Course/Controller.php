@@ -219,30 +219,27 @@ class Controller extends Base\Base
 
         if ($id) {
             $folder = $this->getCourseMapper()->findById($id);
-            $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
+            $folder->setParent($this->getFolderMapper()->findById($folder->getParent()->getId()));
 
-            $instances        = [];
+            $instances = [];
 
             $data['folder'] = $folder;
-            $data['units']  = $this->getCourseMapper()->findUnitsInCourse($folder);
+            $data['units']  = $this->getUnitMapper()->findByCourseId($folder->getId());
 
             foreach ($data['units'] as $unit) {
                 $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
 
                 // obtain the Course Builder Component Instance from the homepage.
-                if (count($instances[$unit->getId()]) == 0) {
-                    // shove that new instance into where we expect it to be
-                    $instances[$unit->getId()] = [ $this->injectNewComponent($unit) ];
-                }
+                $instances[$unit->getId()] = $this->getCourseBuilderInstance($unit);
 
                 foreach ($data['tasks'][$unit->getId()] as $task) {
                     /** @var Task $task */
-                    $data['taskReveals'][$task->getId()] = new TaskBuilder($instances[$unit->getId()][0], $task);
+                    $data['taskReveals'][$task->getId()] = new TaskBuilder($instances[$unit->getId()], $task);
                 }
 
                 // set reference to this reveal instance
-                $data['reveals'][$unit->getId()] = new TaskBuilder($instances[$unit->getId()][0]);
+                $data['reveals'][$unit->getId()] = new TaskBuilder($instances[$unit->getId()]);
             }
         }
 
@@ -793,7 +790,7 @@ class Controller extends Base\Base
         $this->tpl('unitImportForm', [
             'homepage'       => implode(',', array_keys($ownerships)),
             'courseHomepage' => $courseHomepage,
-            'units'          => $this->getCourseMapper()->findByParentId($courseHomepage),
+            'units'          => $this->getUnitMapper()->findByCourseId($courseHomepage),
             'ownerships'     => implode(',', array_map(
                     function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
             )
