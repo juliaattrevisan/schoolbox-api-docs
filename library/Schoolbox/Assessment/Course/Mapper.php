@@ -329,25 +329,15 @@ class Mapper extends FolderMapper
     /**
      * Returns whether or not the given folder is, in fact, a course
      *
-     * @param Folder $folder
+     * @param Folder $course
      * @return bool
      */
-    public function verifyCourse(Folder $folder)
+    public function verifyCourse(Folder $course)
     {
         // a course is defined as a folder that contains units
-        return $this->findUnitsInCourse($folder)->count() > 0;
+        return Unit\Mapper::getInstance()->findByCourseId($course->getId())->count() > 0;
     }
 
-
-    /**
-     * @deprecated use Unit\Mapper::findByCourseId()
-     * @param Folder $course
-     * @return Collection|Folder[]
-     */
-    public function findUnitsInCourse(Folder $course)
-    {
-        return Unit\Mapper::getInstance()->findByCourseId($course->getId());
-    }
 
     /* Getters/Setters
      */
