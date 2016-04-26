@@ -10,14 +10,12 @@
 namespace Schoolbox\Resource\Folder;
 
 
-use Schoolbox\RoleMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\HomepageConfig;
-use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\ValueLabelInterface;
@@ -153,6 +151,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
             $subCodeString = array();
 
             $subCodes = clone $this->getCodes();
+            /** @var Collection|Code\Model[] $subCodes */
             $subCodes = $subCodes->slice(0, $maxCodes);
 
             foreach ($subCodes as $subCode) {
