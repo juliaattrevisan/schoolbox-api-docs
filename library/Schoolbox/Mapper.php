@@ -2414,11 +2414,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getArrayPlaceholders($input, $prefix = null)
     {
-        $placeholders = array();
-        foreach ($input as $i => $param) {
-            $placeholders[] = isset($prefix) ? (':' . $prefix . '_' . $i) : '?';
-        }
-        return '(' . implode(',', $placeholders) . ')';
+        return PredicateBuilder::getArrayPlaceholders($input, $prefix);
     }
 
     /**
@@ -2437,15 +2433,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getArrayParameters($input, $prefix = null)
     {
-        $params = array();
-        foreach ($input as $i => $param) {
-            if (isset($prefix)) {
-                $params[$prefix . '_' . $i] = $param;
-            } else {
-                $params[] = $param;
-            }
-        }
-        return $params;
+        return PredicateBuilder::getArrayParameters($input, $prefix);
     }
 
     /**

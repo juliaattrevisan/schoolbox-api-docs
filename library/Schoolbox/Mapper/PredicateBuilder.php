@@ -254,7 +254,7 @@ class PredicateBuilder
      *
      * @return string Something like "(:id_0, :id_1, :id_2)".
      */
-    protected function getArrayPlaceholders($input, $prefix = null)
+    public static function getArrayPlaceholders($input, $prefix = null)
     {
         $placeholders = array();
         foreach ($input as $i => $param) {
@@ -277,7 +277,7 @@ class PredicateBuilder
      *
      * @return array
      */
-    protected function getArrayParameters($input, $prefix = null)
+    public static function getArrayParameters($input, $prefix = null)
     {
         $params = array();
         foreach ($input as $i => $param) {
@@ -298,7 +298,7 @@ class PredicateBuilder
      * @param mixed $mixed
      * @return bool
      */
-    protected function canTraverse($mixed)
+    public static function canTraverse($mixed)
     {
         return is_array($mixed) || ($mixed instanceof Traversable && $mixed instanceof Countable);
     }
