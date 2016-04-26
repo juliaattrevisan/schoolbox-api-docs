@@ -134,7 +134,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper {
 		$collection = $this->hydrateList($rowset);
 
 		// bail at this point if we don't need to care about component category mappings
-		if($module != self::MODULE_HOMEPAGE) {
+		if($module != 'homepage') {
 			return $collection;
 		}
 
