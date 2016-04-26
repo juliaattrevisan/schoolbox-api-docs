@@ -37,6 +37,7 @@ try {
 }
 catch (\Exception $e) {
     error(13);
+    exit;
 }
 
 $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
@@ -53,6 +54,7 @@ $this->setVar(array(
     'FIRST_SECTION'        => $allSections[0]['section_id'],
     'ASSESS_CATEGORY_ID'   => $folder->getId(),
     'ASSESS_CATEGORY_NAME' => $folder->getName(),
+    'RETURN_URL'           => '',
 ));
 
 $this->setFile(TEMPLATE_content, 'assess/summary.html');
