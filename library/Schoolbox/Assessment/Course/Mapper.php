@@ -342,48 +342,11 @@ class Mapper extends FolderMapper
     /**
      * @deprecated use Unit\Mapper::findByCourseId()
      * @param Folder $course
-     * @param bool   $hydrate  whether or not to hydrate the models found
      * @return Collection|Folder[]
      */
-    public function findUnitsInCourse(Folder $course, $hydrate = false)
+    public function findUnitsInCourse(Folder $course)
     {
-        // the definition of a unit is that is has a course builder: that's it
-        $sql = "
-            SELECT {$this->getColumnString('c')}
-            FROM {$this->getTable()} c
-            LEFT JOIN category p ON c.parent = p.id
-            LEFT JOIN component_instance ci ON ci.identifier = c.id AND ci.module = :module
-            LEFT JOIN component_definition cd ON ci.component_definition_id = cd.id
-            WHERE cd.class = :class
-            AND c.parent = :parent
-            AND c.deleted_at IS NULL
-            AND p.deleted_at IS NULL
-        ";
-
-        $args = [
-            'module' => 'homepage',
-            'class'  => \Component_Homepage_CourseBuilderController::class,
-            'parent' => $course->getId()
-        ];
-
-        $stmt = $this->getDatabase()->query($sql, $args);
-
-        $units = $this->createCollection();
-
-        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-
-            if ($hydrate) {
-                // complete and total hydration. Beware that this is EXPENSIVE!
-                $folder = $this->findById($row['c.id']);
-
-            } else {
-                $folder = $this->hydrate($row);
-            }
-
-            $units->add($folder);
-        }
-
-        return $units;
+        return Unit\Mapper::getInstance()->findByCourseId($course->getId());
     }
 
     /* Getters/Setters
