@@ -303,33 +303,14 @@ class Mapper extends FolderMapper
 
 
     /**
-     * Find the number of tasks for each subfolder (unit) of the given course, indexed by ID
+     * Find the number of tasks for each subfolder (unit) of the given course, indexed by ID. Convenience method.
      *
      * @param Folder $course
      * @return array
      */
     protected function findUnitTaskCount(Folder $course)
     {
-        $unitIds = $this->findUnitsInCourse($course)->getColumnValues('id');
-
-        $stmt = $this->getDatabase()->prepare("
-            SELECT COUNT(*)
-            FROM {$this->getTable()} unit
-            LEFT JOIN task ON task.category_id = unit.id AND task.deleted_at IS NULL
-            WHERE unit.id = ?
-            GROUP BY unit.id;
-        ");
-
-        // preset everything to zero: we still want the keys populated even if the query somehow returns nothing
-        $taskCounts = array_combine($unitIds, array_fill(0, count($unitIds), 0));
-
-        foreach ($unitIds as $unitId) {
-            // iterate and find the task count for each unit
-            $stmt->execute([ $unitId ]);
-            $taskCounts[$unitId] = intval($stmt->fetchColumn());
-        }
-
-        return $taskCounts;
+        return TaskMapper::getInstance()->countForEachUnit(Unit\Mapper::getInstance()->findByCourseId($course->getId()));
     }
 
 
