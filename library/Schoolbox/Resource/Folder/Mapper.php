@@ -702,9 +702,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findByCode($code)
     {
-        $query = $this->getSelectString();
         // Retrieve all codes for category, not just $code
-        $query .= "
+        $query = "
+            {$this->getSelectString()}
+            {$this->getFromString()}
             WHERE c.deleted_at IS NULL
             AND (cc.code = :code OR cc.code LIKE :codeLike)
         ";
@@ -742,8 +743,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function findAllByArchivedCode($code)
     {
         // Don't need no category codes here
-        $query = $this->getSelectString();
-        $query .= 'WHERE c.name LIKE :code';
+        $query = "
+            {$this->getSelectString()}
+            {$this->getFromString()}
+            WHERE c.name LIKE :code
+        ";
         $statement = $this->database->prepare($query);
         $statement->execute(
             array(
