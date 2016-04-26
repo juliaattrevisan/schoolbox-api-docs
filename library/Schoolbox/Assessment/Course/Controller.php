@@ -843,7 +843,7 @@ class Controller extends Base\Base
         $courseHomepage = trim($this->getRequest()->post["importCourse"]);
 
         try {
-            $this->getCourseMapper()->findCourseById($courseHomepage);
+            $this->getCourseMapper()->findById($courseHomepage);
 
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...

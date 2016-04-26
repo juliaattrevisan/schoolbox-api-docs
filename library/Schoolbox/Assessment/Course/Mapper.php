@@ -142,20 +142,6 @@ class Mapper extends FolderMapper
 
 
     /**
-     * Similar to findById() but restricts finds to Course Folders only
-     * Courses must have Units and Tasks to be matched successfully
-     * @deprecated use findById()
-     *
-     * @param $id
-     * @return Folder
-     * @throws MapperException
-     */
-    public function findCourseById($id)
-    {
-        return $this->findById($id);
-    }
-
-    /**
      * List the courses. Convenience method for findByColumn('name', LIKE($name));
      *
      * @param string $searchParam
