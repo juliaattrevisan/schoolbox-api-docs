@@ -156,50 +156,15 @@ class Mapper extends FolderMapper
     }
 
     /**
-     * List the courses. Returns a combined array of Folder instances
-     * and information about any found Units and their task counts
+     * List the courses. Convenience method for findByColumn('name', LIKE($name));
      *
-     * @param $searchParam
-     * @return array
+     * @param string $searchParam
+     * @param array  $options
+     * @return Collection|Folder[]
      */
-    public function findCourseListByName($searchParam)
+    public function findCourseListByName($searchParam, $options = [])
     {
-        $query = "
-            SELECT
-                course.id,
-                COUNT(task.id) AS taskCount
-            FROM category course
-            LEFT JOIN category unit ON unit.parent = course.id AND unit.deleted_at IS NULL
-            INNER JOIN `task` ON task.category_id = unit.id AND task.deleted_at IS NULL
-            WHERE course.deleted_at IS NULL
-            AND course.name LIKE :searchParam
-            GROUP BY course.id
-        ";
-
-        /* Find all the Courses with names like $searchParam,
-         * if that was provided (otherwise returns all)
-         */
-        $statement = $this->database->prepare($query);
-        $statement->execute([
-            'searchParam' => "%{$this->database->quoteForLike($searchParam)}%"
-        ]);
-
-        /* Accumulate a list of ids
-         */
-        $allFolderIds = [];
-
-        foreach ($statement as $row) {
-            $allFolderIds[] = $row['id'];
-        }
-
-        /* Manufacture a list of Courses so we can get their
-         * Unit information and Task Counts
-         */
-
-        /** @var Collection|Folder[] $courses */
-        $allCourses = $this->findByColumn('id', $allFolderIds);
-
-        return $allCourses;
+        return $this->findByColumn('name', "%{$this->database->quoteForLike($searchParam)}%", $options);
     }
 
     /**
