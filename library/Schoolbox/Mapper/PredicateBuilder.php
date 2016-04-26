@@ -230,6 +230,11 @@ class PredicateBuilder
                 // alias the param
                 $a = $columnName . '_0';
 
+                if ($operand == '=' && strpos($columnValue, '%') !== false) {
+                    // if wildcards are in the value, do a LIKE search rather than equals
+                    $operand = 'LIKE';
+                }
+
                 $this->where[] = "$escaped_name $operand :$a";
                 $this->putParam($a, $columnValue);
             }
