@@ -551,14 +551,21 @@
 
         /**
          * Show/hide save button
+		 *
+		 * Show save button if there is at least one rule present
+		 * That one rule can be either a custom rule, or normal rule
          */
         function refreshSaveRulesetButtonAvailability()
         {
-            $(config.element).find('[data-ruleset-save]').toggle(
-                $(config.element).find('[data-rule], [data-custom-rule]').length > 0
-            );
-            // Is there at least one custom rule?
+			var numRules = $(config.element).find('[data-rule], [data-custom-rule]').length;
+			var saveButton = $(config.element).find('[data-ruleset-save]');
 
+			if (numRules) {
+				saveButton.show();
+			}
+			else {
+				saveButton.hide();
+			}
         }
 
         /**
