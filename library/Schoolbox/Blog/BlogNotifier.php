@@ -29,6 +29,8 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Blog\Blog\Model as BlogModel;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
 class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 
@@ -50,9 +52,9 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 	public function bundleTriggers($bundle) {
 		// we only care about notifying blog post creation
 		if($bundle->getMethod() == Mapper::METHOD_CREATE) {
-			/** @var Blog $blog */
+			/** @var BlogModel $blog */
 			$blog = $bundle->getEvent()->getObject();
-			$bundle->attach(self::TRIGGER_POSTED, $blog->getCreated()->getUnixTimestamp());
+			$bundle->attach(self::TRIGGER_POSTED, $blog->getCreatedAt()->getUnixTimeStamp());
 		}
 	}
 
@@ -73,11 +75,11 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 			return $c;
 		}
 
-		/** @var Blog[]|Collection $blogs */
+		/** @var BlogModel[]|Collection $blogs */
 		$blogs = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($blogs as $blog) {
-			$c->merge(new Collection($this->notifyPosted($roletype, $blog, $blog->getOwner())->getAll($blog->getCreated()->getUnixTimestamp())));
+			$c->merge(new Collection($this->notifyPosted($roletype, $blog, $blog->getOwner())->getAll($blog->getCreatedAt()->getUnixTimeStamp())));
 		}
 		return $c;
 	}
@@ -98,7 +100,7 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 	/**
 	 * @param string $roletype
-	 * @param Blog $blog
+	 * @param BlogModel $blog
 	 * @param User $author
 	 * @return Envelope
 	 */
@@ -109,8 +111,10 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 		$authorExtId  = $author->getExternalId();
 
-		$categoryId   = $blog->getCategory()->getId();
-		$category     = FolderMapper::getInstance()->findById($categoryId);
+		$categoryId   = $blog->getFolder()->getId();
+		
+		/** @var FolderModel $folder */
+		$folder     = FolderMapper::getInstance()->findById($categoryId);
 
 		$bob = new Builder();
 
@@ -118,14 +122,14 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 			->setParams(array(
 				'author' => new UserParam($author, ParameterInterface::STACKING_REPLACE),
 				'title'  => new Param($blog->getHeading()),
-				'catname' => new CategoryParam($category)
+				'catname' => new CategoryParam($folder)
 			))
 			->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
 			->setHref("/homepage/$categoryId#blog_$blogId")
 			->setSeverity(Logger::INFO)
 			->setNamespace($this->getSlug())
 			->addTopic("blog.$blogId.posted")
-			->setTimestamp($blog->getCreated()->getUnixTimestamp())
+			->setTimestamp($blog->getCreatedAt()->getUnixTimeStamp())
 			->addFilter('roletype', $roletype)
 			->setBody($blog->getBody());
 
@@ -136,7 +140,7 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 
 	/**
-	 * @param Blog $blog
+	 * @param BlogModel $blog
 	 * @param User $author
 	 * @param array $diff
 	 * @return Envelope
@@ -147,7 +151,7 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 
 
 	/**
-	 * @param Blog $blog
+	 * @param BlogModel $blog
 	 * @param User $author
 	 * @param array $diff
 	 * @return Envelope
@@ -157,7 +161,7 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 	}
 
 	/**
-	 * @param Blog $blog
+	 * @param BlogModel $blog
 	 * @param User $author
 	 * @param array $diff
 	 * @return Envelope

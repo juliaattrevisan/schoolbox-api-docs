@@ -2,12 +2,43 @@
     <script type="text/javascript" src="/javascript/shared/jquery.blog-commentary.js"></script>
 	<script type="text/javascript">
         $(function() {
+
             var comp = $('#component{COMPONENT_INSTANCE_ID}');
 
-            comp.find('[data-interaction=deletecomment]').click(function(event) {
+            // This is a kludge to keep count of comments when AJAX deleting and remove the show comments
+            // button when there are none
+
+            var commentCount = {BLOG_TOTAL_COMMENTS};
+
+            if (commentCount <= 0)
+                $('#commentCount').remove();
+
+            $('[data-interaction="deletecomment"]').click(function(event) {
                 event.preventDefault();
-                $(this).confirmDialog({text:'Delete this comment?'});
-            });
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this comment?',
+                    confirmEvent: function() {
+                        $.post('/blog/comment/delete', {
+                            id: $(event.target).attr('data-comment-id')
+                        })
+                        .done(function() {
+                            // Remove from list after AJAX returns
+
+                            $(event.target).closest('li').remove();
+
+                            // Update comment count
+
+                            $('#commentCount').html('Show Comments (' + --commentCount + ')');
+
+                            // Remove button if there are none
+
+                            if (commentCount <= 0)
+                                $('#commentCount').remove();
+                        });
+                    }
+                });
+            })
 
             comp.blogCommentary();
         });
@@ -38,7 +69,7 @@
                         <article>{BLOG_BODY}</article>
 
                         <div class="content">
-                            <a data-interaction="showcomments" class="button icon-chat" data-numcomments="{BLOG_TOTAL_COMMENTS}">Show Comments ({BLOG_TOTAL_COMMENTS})</a>
+                            <a id="commentCount" data-interaction="showcomments" class="button icon-chat" data-numcomments="{BLOG_TOTAL_COMMENTS}">Show Comments ({BLOG_TOTAL_COMMENTS})</a>
                             <a data-toggle="commentform-{BLOG_ID}" class='button icon-add'>Add Comment</a>
                         </div>
 
@@ -57,7 +88,7 @@
                                 </div>
                                 <nav>
                                     <!-- BEGIN has_comment_delete -->
-                                    <a data-interaction="deletecomment" class="icon-delete" href="/blog/comment/delete/{COMMENT_COMMENT_ID}"></a>
+                                    <a data-interaction="deletecomment" class="icon-delete" data-comment-id="{COMMENT_COMMENT_ID}"></a>
                                     <!-- END has_comment_delete -->
                                 </nav>
                                 <article>
@@ -68,12 +99,14 @@
                             <!-- END has_comments -->
                             <li class="row hide" id="commentform-{BLOG_ID}">
                                 <div class="column small-12 no-pad">
-                                    <form action="/blog/comment/new/{BLOG_ID}" method="post">
+                                    <form action="/blog/comment/insert/" method="post">
+                                        <input type="hidden" name="component" value="1">
+                                        <input type="hidden" name="id" value="{BLOG_ID}">
                                         <div class="avatar card small-12">
                                             <img src="/portrait.php?userId={EXTERNAL_ID}&size=square64" />
                                             <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
                                         </div>
-                                        <input type="submit" name="comment" value="Add comment"/>
+                                        <input type="submit" name="comment" value="Add Comment"/>
                                     </form>
                                 </div>
                             </li>
@@ -82,7 +115,7 @@
                     <!-- END blog -->
                 </ul>
                 <div class="content">
-                    <a href="/homepage/blogArchive/{BLOG_CATEGORY_ID}" class="button icon-archive">View Archive</a>
+                    <a href="/blog/archive/{BLOG_CATEGORY_ID}" class="button icon-archive">View Archive</a>
                     <!-- BEGIN create_blog -->
                     <a href="/blog/modify/new/{BLOG_CATEGORY_ID}" class="button icon-upload">Post Blog</a>
                     <!-- END create_blog -->

@@ -1,41 +1,39 @@
 <?php
 /**
  * 
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @author      Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Blog;
-
+namespace Schoolbox\Blog\Blog;
 
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
-class Blog {
+class Model {
 
 	/** @var int */
 	protected $id;
 
 	/** @var Folder */
-	protected $category;
+	protected $folder;
 
 	/** @var User */
 	protected $owner;
 
 	/** @var \Alaress_Date_Format */
-	protected $created;
+	protected $createdAt;
 
 	/** @var \Alaress_Date_Format */
-	protected $deleted;
+	protected $deletedAt;
 
 	/** @var string */
 	protected $heading;
 
 	/** @var string */
 	protected $body;
-
 
 	/**
 	 * @param int $id
@@ -46,7 +44,6 @@ class Blog {
 		return $this;
 	}
 
-
 	/**
 	 * @return int
 	 */
@@ -54,24 +51,21 @@ class Blog {
 		return $this->id;
 	}
 
-
 	/**
-	 * @param Folder $category
+	 * @param Folder $folder
 	 * @return self
 	 */
-	public function setCategory($category) {
-		$this->category = $category;
+	public function setFolder($folder) {
+		$this->folder = $folder;
 		return $this;
 	}
-
 
 	/**
 	 * @return Folder
 	 */
-	public function getCategory() {
-		return $this->category;
+	public function getFolder() {
+		return $this->folder;
 	}
-
 
 	/**
 	 * @param User $owner
@@ -82,7 +76,6 @@ class Blog {
 		return $this;
 	}
 
-
 	/**
 	 * @return User
 	 */
@@ -90,42 +83,37 @@ class Blog {
 		return $this->owner;
 	}
 
-
 	/**
-	 * @param \Alaress_Date_Format $created
+	 * @param \Alaress_Date_Format $createdAt
 	 * @return self
 	 */
-	public function setCreated($created) {
-		$this->created = $created;
+	public function setCreatedAt($createdAt) {
+		$this->createdAt = $createdAt;
 		return $this;
 	}
-
 
 	/**
 	 * @return \Alaress_Date_Format
 	 */
-	public function getCreated() {
-		return $this->created;
+	public function getCreatedAt() {
+		return $this->createdAt;
 	}
-
 
 	/**
 	 * @param \Alaress_Date_Format $deleted
 	 * @return self
 	 */
-	public function setDeleted($deleted) {
-		$this->deleted = $deleted;
+	public function setDeletedAt($deletedAt) {
+		$this->deletedAt = $deletedAt;
 		return $this;
 	}
-
 
 	/**
 	 * @return \Alaress_Date_Format
 	 */
-	public function getDeleted() {
-		return $this->deleted;
+	public function getDeletedAt() {
+		return $this->deletedAt;
 	}
-
 
 	/**
 	 * @param string $heading
@@ -136,14 +124,12 @@ class Blog {
 		return $this;
 	}
 
-
 	/**
 	 * @return string
 	 */
 	public function getHeading() {
 		return $this->heading;
 	}
-
 
 	/**
 	 * @param string $body
@@ -154,12 +140,10 @@ class Blog {
 		return $this;
 	}
 
-
 	/**
 	 * @return string
 	 */
 	public function getBody() {
 		return $this->body;
 	}
-
 }

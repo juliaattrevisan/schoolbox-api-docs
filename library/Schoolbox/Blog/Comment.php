@@ -25,10 +25,10 @@ class Comment {
 	protected $owner;
 
 	/** @var Alaress_Date_Format */
-	protected $created;
+	protected $createdAt;
 
 	/** @var Alaress_Date_Format */
-	protected $deleted;
+	protected $deletedAt;
 
 	/** @var string */
 	protected $body;
@@ -89,11 +89,11 @@ class Comment {
 
 
 	/**
-	 * @param Alaress_Date_Format $created
+	 * @param Alaress_Date_Format $createdAt
 	 * @return self
 	 */
-	public function setCreated($created) {
-		$this->created = $created;
+	public function setCreatedAt($createdAt) {
+		$this->createdAt = $createdAt;
 		return $this;
 	}
 
@@ -101,17 +101,17 @@ class Comment {
 	/**
 	 * @return Alaress_Date_Format
 	 */
-	public function getCreated() {
-		return $this->created;
+	public function getCreatedAt() {
+		return $this->createdAt;
 	}
 
 
 	/**
-	 * @param Alaress_Date_Format $deleted
+	 * @param Alaress_Date_Format $deletedAt
 	 * @return self
 	 */
-	public function setDeleted($deleted) {
-		$this->deleted = $deleted;
+	public function setDeletedAt($deletedAt) {
+		$this->deletedAt = $deletedAt;
 		return $this;
 	}
 
@@ -119,8 +119,8 @@ class Comment {
 	/**
 	 * @return Alaress_Date_Format
 	 */
-	public function getDeleted() {
-		return $this->deleted;
+	public function getDeletedAt() {
+		return $this->deletedAt;
 	}
 
 

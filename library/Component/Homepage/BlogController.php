@@ -1,5 +1,10 @@
 <?php
 
+use Schoolbox\Blog\Comment\Mapper as BlogCommentMapper;
+use Schoolbox\Blog\Blog\Mapper as BlogMapper;
+use Schoolbox\Blog\Comment\Model as CommentModel;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -11,21 +16,21 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 {
 
     /**
-     * @var \Schoolbox\Resource\Category
+     * @var \Schoolbox\Resource\Folder\Model
      */
     private $source;
 
     /**
      * Blog Mapper
      *
-     * @var \Schoolbox\Blog\BlogMapper
+     * @var \Schoolbox\Blog\Blog\Mapper
      */
     private $blogMapper = null;
 
     /**
      * Comment Mapper
      *
-     * @var \Schoolbox\Blog\CommentMapper
+     * @var \Schoolbox\Blog\Comment\Mapper
      */
     private $commentMapper = null;
 
@@ -43,10 +48,9 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
      */
     public function execute()
     {
-
-        $this->setBlogMapper(new \Schoolbox\Blog\BlogMapper());
-        $this->setCommentMapper(new \Schoolbox\Blog\CommentMapper());
-        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
+        $this->setBlogMapper(BlogMapper::getInstance());
+        $this->setCommentMapper(BlogCommentMapper::getInstance());
+        $this->setCategoryMapper(FolderMapper::getInstance());
 
         $this->source = $this->getContext();
 
@@ -123,7 +127,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                         'BLOG_AUTHOR_EXTERNAL_ID' => $currentItem->getOwner()->getExternalId(),
                         'BLOG_AUTHOR_NAME'        => $currentItem->getOwner()->formatName(),
                         'BLOG_AUTHOR_THUMB'       => "/portrait.php?userId={$currentItem->getOwner()->getExternalId()}&size=square64",
-                        'BLOG_CREATED'            => $currentItem->getCreated()->getRelativeTime(),
+                        'BLOG_CREATED'            => $currentItem->getCreatedAt()->getRelativeTime(),
                         'BLOG_SHADING'            => ++$i % 2 ? '' : 'dark',
                         'BLOG_COMMENTS'           => '',
                     )
@@ -134,6 +138,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                 if ($allComments->count()) {
                     $j = 0;
 
+                    /** @var CommentModel $currentComment */
                     foreach ($allComments as $currentComment) {
                         $this->setVar(
                             array(
@@ -141,7 +146,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                                 'COMMENT_BODY'               => nl2br(Scrub::text($currentComment->getBody())),
                                 'COMMENT_AUTHOR_ID'          => $currentComment->getOwner()->getId(),
                                 'COMMENT_AUTHOR_NAME'        => $currentComment->getOwner()->formatName(),
-                                'COMMENT_CREATED'            => $currentComment->getCreated()->getRelativeTime(),
+                                'COMMENT_CREATED'            => $currentComment->getCreatedAt()->getRelativeTime(),
                                 'COMMENT_AUTHOR_EXTERNAL_ID' => $currentComment->getOwner()->getExternalId(),
                                 'ON_OFF'                     => ++$j % 2 ? 'dark' : ''
                             )
@@ -238,7 +243,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Set blog mapper
      *
-     * @param \Schoolbox\Blog\BlogMapper $blogMapper
+     * @param BlogMapper $blogMapper
      */
     private function setBlogMapper($blogMapper)
     {
@@ -248,7 +253,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Get blog mapper
      *
-     * @return \Schoolbox\Blog\BlogMapper
+     * @return BlogMapper
      */
     private function getBlogMapper()
     {
@@ -258,7 +263,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Set comment mapper
      *
-     * @param \Schoolbox\Blog\CommentMapper $commentMapper
+     * @param \Schoolbox\Blog\Comment\Mapper $commentMapper
      */
     private function setCommentMapper($commentMapper)
     {
@@ -268,7 +273,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Get comment mapper
      *
-     * @return  \Schoolbox\Blog\CommentMapper
+     * @return  \Schoolbox\Blog\Comment\Mapper
      */
     private function getCommentMapper()
     {
@@ -278,7 +283,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Set category mapper
      *
-     * @param \Schoolbox\Resource\CategoryMapper $categoryMapper
+     * @param \Schoolbox\Resource\Folder\Mapper $categoryMapper
      */
     private function setCategoryMapper($categoryMapper)
     {
@@ -288,7 +293,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
     /**
      * Get category mapper
      *
-     * @return \Schoolbox\Resource\CategoryMapper
+     * @return \Schoolbox\Resource\Folder\Mapper
      */
     private function getCategoryMapper()
     {

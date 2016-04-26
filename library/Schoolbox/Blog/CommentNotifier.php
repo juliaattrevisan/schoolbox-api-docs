@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Blog;
 
-
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
@@ -18,21 +17,18 @@ use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
-use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
-use Schoolbox\Realtime\Message\Source;
-use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
-use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Blog\Blog\Mapper as BlogMapper;
+use Schoolbox\Blog\Blog\Model as BlogModel;
+use Schoolbox\Blog\Comment\Model as BlogCommentModel;
 
 class CommentNotifier extends AbstractModuleNotifier implements SourceInterface {
 
@@ -76,8 +72,8 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 			$comment = $bundle->getEvent()->getObject();
 
 			$bundle->attachEach(array(
-				self::TRIGGER_COMMENTED => $comment->getCreated()->getUnixTimestamp(),
-				self::TRIGGER_FOLLOWED  => $comment->getCreated()->getUnixTimestamp()
+				self::TRIGGER_COMMENTED => $comment->getCreatedAt()->getUnixTimeStamp(),
+				self::TRIGGER_FOLLOWED  => $comment->getCreatedAt()->getUnixTimeStamp()
 			));
 		}
 	}
@@ -103,7 +99,7 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		$comments = $this->mapper->findForFeed($context, $limit, $offset);
 
 		foreach($comments as $comment) {
-			$c->merge(new Collection($this->notifyCommented($comment, $comment->getOwner())->getAll($comment->getCreated()->getUnixTimestamp())));
+			$c->merge(new Collection($this->notifyCommented($comment, $comment->getOwner())->getAll($comment->getCreatedAt()->getUnixTimeStamp())));
 		}
 		return $c;
 	}
@@ -118,33 +114,32 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		return null;
 	}
 
-
 	/**
-	 * @param Comment $comment
+	 * @param BlogCommentModel $comment
 	 * @param User $author
 	 * @return Builder
 	 */
 	protected function createBuilder($comment, $author) {
-		$authorExtId  = $author->getExternalId();
+		/** @var BlogModel $blog */
+		$blog        = $this->blogMapper->findById($comment->getBlog()->getId());
+		$blogName    = $blog->getHeading();
+		$folderId    = $blog->getFolder()->getId();
+		$authorExtId = $author->getExternalId();
 
-		/** @var Blog $blog */
-		$blog         = $this->blogMapper->findById($comment->getBlog()->getId());
-		$blogName     = $blog->getHeading();
-
-		$categoryId   = $blog->getCategory()->getId();
-		$category     = FolderMapper::getInstance()->findById($categoryId);
+		/** @var FolderModel $folder */
+		$folder = FolderMapper::getInstance()->findById($folderId);
 
 		$bob = new Builder();
 
 		$bob->setParams(array(
 			    'author'  => new UserParam($author),
 			    'title'   => new Param($blogName),
-			    'catname' => new CategoryParam($category)
+			    'catname' => new CategoryParam($folder)
 		    ))
 		    ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
-		    ->setHref("/homepage/$categoryId#blogComment_".$blog->getId()) // dedupe per blog
+		    ->setHref("/homepage/{$folderId}#blogComment_".$blog->getId()) // dedupe per blog
 		    ->setSeverity(Logger::INFO)
-		    ->setTimestamp($comment->getCreated()->getUnixTimestamp())
+		    ->setTimestamp($comment->getCreatedAt()->getUnixTimeStamp())
 		    ->setNamespace($this->getSlug())
 		    ->setBody($comment->getBody())
 		    ->setByline($author->formatName("{firstname} wrote"));
@@ -155,7 +150,7 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	/* ASYNC NOTIFICATION METHODS */
 
 	/**
-	 * @param Comment $comment
+	 * @param BlogCommentModel $comment
 	 * @param User $author
 	 * @return Envelope
 	 */
@@ -175,16 +170,15 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		return $envelope;
 	}
 
-
 	/**
-	 * @param Comment $comment
+	 * @param BlogCommentModel $comment
 	 * @param User $author
 	 * @return Envelope
 	 */
 	protected function notifyFollowed($comment, $author) {
 		$envelope = new Envelope();
 
-		/** @var Blog $blog */
+		/** @var BlogModel $blog */
 		$blog      = $this->blogMapper->findById($comment->getBlog()->getId());
 		$commentId = $comment->getId();
 
@@ -193,7 +187,7 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		            ->addTopic("blog.$commentId.followed");
 
 		/** @var Comment[]|Collection $commentCollection */
-		$commentCollection = $this->mapper->findByColumn('bid', $blog->getId());
+		$commentCollection = $this->mapper->findByColumn('blog_id', $blog->getId());
 
 		/** @var User[]|Collection $userCollection */
 		$userCollection = new Collection($commentCollection->getColumnValues('owner'));
@@ -207,9 +201,8 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		return $envelope;
 	}
 
-
 	/**
-	 * @param Comment $comment
+	 * @param BlogCommentModel $comment
 	 * @param User $author
 	 * @param array $diff
 	 * @return Envelope
@@ -218,9 +211,8 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		return $this->notifyCommented($comment, $author);
 	}
 
-
 	/**
-	 * @param Comment $comment
+	 * @param BlogCommentModel $comment
 	 * @param User $author
 	 * @param array $diff
 	 * @return Envelope
@@ -229,9 +221,8 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		return $this->notifyCommented($comment, $author);
 	}
 
-
 	/**
-	 * @param Comment $comment
+	 * @param BlogCommentModel $comment
 	 * @param User $author
 	 * @param array $diff
 	 * @return Envelope
@@ -240,9 +231,8 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		return $this->notifyCommented($comment, $author);
 	}
 
-
 	/**
-	 * @param Comment $comment
+	 * @param BlogCommentModel $comment
 	 * @param User $author
 	 * @param array $diff
 	 * @return Envelope
@@ -251,9 +241,8 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 		return $this->notifyFollowed($comment, $author);
 	}
 
-
 	/**
-	 * @param Comment $comment
+	 * @param BlogCommentModel $comment
 	 * @param User $author
 	 * @param array $diff
 	 * @return Envelope
@@ -263,7 +252,7 @@ class CommentNotifier extends AbstractModuleNotifier implements SourceInterface 
 	}
 
 	/**
-	 * @param Comment $comment
+	 * @param BlogCommentModel $comment
 	 * @param User $author
 	 * @param array $diff
 	 * @return Envelope

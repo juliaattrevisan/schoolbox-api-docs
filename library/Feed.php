@@ -16,11 +16,11 @@ class Feed {
 
 	/**
 	 * @deprecated use \Schoolbox\Feed::aggregate()
-	 * @param $cid
+	 * @param $folderId
 	 * @param $limit
 	 * @return array
 	 */
-	function getFeed($cid, $limit) {
+	function getFeed($folderId, $limit) {
 
         if ($limit == 0 || $limit > 50) {
             $limit = 50;
@@ -28,16 +28,16 @@ class Feed {
 
 		/* ALL THESE HELPER FUNCTIONS TO BE SYSTEMATICALLY DEPRECATED */
 
-        $files = $this->getFiles($cid, $limit);
-        $links = $this->getLinks($cid, $limit);
-        $folders = $this->getFolders($cid, $limit);
-        $news = $this->getNews($cid, $limit);
-        $wiki = $this->getWiki($cid, $limit);
-        $forum = $this->getForum($cid, $limit);
-        $blog = $this->getBlog($cid, $limit);
-        $blogComments = $this->getBlogComments($cid, $limit);
-        $onlineAssessments = $this->getOnlineAssessments($cid, $limit);
-        $surveys = $this->getSurveys($cid, $limit);
+        $files = $this->getFiles($folderId, $limit);
+        $links = $this->getLinks($folderId, $limit);
+        $folders = $this->getFolders($folderId, $limit);
+        $news = $this->getNews($folderId, $limit);
+        $wiki = $this->getWiki($folderId, $limit);
+        $forum = $this->getForum($folderId, $limit);
+        $blog = $this->getBlog($folderId, $limit);
+        $blogComments = $this->getBlogComments($folderId, $limit);
+        $onlineAssessments = $this->getOnlineAssessments($folderId, $limit);
+        $surveys = $this->getSurveys($folderId, $limit);
 
         is_array($files) ? 0 : $files = array();
         is_array($links) ? 0 : $links = array();
@@ -68,21 +68,21 @@ class Feed {
     /**
      * Generic filter function for get* methods.
      *
-     * @param  mixed  $cid Either a number string, or an array of IDs
+     * @param  mixed  $folderId Either a number string, or an array of IDs
      * @return string
      */
-    protected function getFilterFromCategoryId($cid) {
-        if (is_array($cid) && !empty($cid)) {
-            return ' IN (' . implode(',', array_map('intval', $cid)) . ') ';
+    protected function getFilterFromCategoryId($folderId) {
+        if (is_array($folderId) && !empty($folderId)) {
+            return ' IN (' . implode(',', array_map('intval', $folderId)) . ') ';
         }
         else {
-            return " = ".intval($cid);
+            return " = ".intval($folderId);
         }
     }
 
-    function getFiles($cid, $limit) {
+    function getFiles($folderId, $limit) {
 
-        $where = $this->getFilterFromCategoryId($cid);
+        $where = $this->getFilterFromCategoryId($folderId);
 
         $query = "SELECT f.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
 						af.description as type, inline, c.name as cat_name, c.id as cat_id
@@ -130,9 +130,9 @@ class Feed {
         return $file;
     }
 
-    function getLinks($cid, $limit) {
+    function getLinks($folderId, $limit) {
 
-        $where = $this->getFilterFromCategoryId($cid);
+        $where = $this->getFilterFromCategoryId($folderId);
 
         $query = "SELECT l.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, UNIX_TIMESTAMP(l.submitted) submitted, description as name, url, c.name as cat_name, c.id as cat_id
 				  FROM link l
@@ -182,13 +182,13 @@ class Feed {
     /**
      * Get a list of online assessments that were created.
      *
-     * @param  $cid
+     * @param  $folderId
      * @param  $limit
      * @return
      */
-    public function getOnlineAssessments($cid, $limit) {
+    public function getOnlineAssessments($folderId, $limit) {
 
-        $where = $this->getFilterFromCategoryId($cid);
+        $where = $this->getFilterFromCategoryId($folderId);
 
         $query = "
           SELECT
@@ -236,13 +236,13 @@ class Feed {
     /**
      * Get a list of surveys that were created.
      *
-     * @param  $cid
+     * @param  $folderId
      * @param  $limit
      * @return
      */
-    public function getSurveys($cid, $limit) {
+    public function getSurveys($folderId, $limit) {
 
-        $where = $this->getFilterFromCategoryId($cid);
+        $where = $this->getFilterFromCategoryId($folderId);
 
         $query = "
           SELECT
@@ -290,13 +290,13 @@ class Feed {
 
 	/**
 	 * @deprecated use \Schoolbox\Resource\Category\NewsNotifier::getFeed()
-	 * @param $cid
+	 * @param $folderId
 	 * @param $limit
 	 * @return array
 	 */
-	function getNews($cid, $limit) {
+	function getNews($folderId, $limit) {
 
-        $where = $this->getFilterFromCategoryId($cid);
+        $where = $this->getFilterFromCategoryId($folderId);
 
         $query = "SELECT sn.id, heading, UNIX_TIMESTAMP(datetime_posted) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM subject_news sn
@@ -331,9 +331,9 @@ class Feed {
         return $news;
     }
 
-    function getFolders($cid, $limit) {
+    function getFolders($folderId, $limit) {
 
-        $where = $this->getFilterFromCategoryId($cid);
+        $where = $this->getFilterFromCategoryId($folderId);
 
         $query = "SELECT c.id, name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM cmsLog
@@ -370,9 +370,9 @@ class Feed {
         return $folder;
     }
 
-    function getForum($cid, $limit) {
+    function getForum($folderId, $limit) {
 
-        $where = $this->getFilterFromCategoryId($cid);
+        $where = $this->getFilterFromCategoryId($folderId);
 
         $query = "SELECT f.threadID, f.title as heading,  UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM forumThread f
@@ -416,13 +416,13 @@ class Feed {
 
 	/**
 	 * @deprecated use \Schoolbox\Wiki\WikiNotifier::getFeed()
-	 * @param $cid
+	 * @param $folderId
 	 * @param $limit
 	 * @return array
 	 */
-	function getWiki($cid, $limit) {
+	function getWiki($folderId, $limit) {
 
-        $where = $this->getFilterFromCategoryId($cid);
+        $where = $this->getFilterFromCategoryId($folderId);
 
         $query = "SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM wikiRevision r
@@ -464,21 +464,21 @@ class Feed {
      * Get a list of new blog entries to push into the feed.
      *
      * @deprecated use \Schoolbox\Blog\BlogNotifier::getFeed()
-     * @param  $cid
+     * @param  $folderId
      * @param  $limit
      * @return
      */
-    public function getBlog($cid, $limit) {
+    public function getBlog($folderId, $limit) {
 
-        $where = $this->getFilterFromCategoryId($cid);
+        $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, b.id AS blogID, heading, UNIX_TIMESTAMP(b.created) AS submitted, c.name as cat_name, c.id as cat_id
+        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, b.id AS blogID, heading, UNIX_TIMESTAMP(b.created_at) AS submitted, c.name as cat_name, c.id as cat_id
 			FROM user u
 			JOIN blog b
-			ON u.id = b.owner
-			LEFT JOIN category c ON c.id = cid
-			WHERE cid $where
-			AND deleted IS NULL
+			ON u.id = b.owner_id
+			LEFT JOIN category c ON c.id = folder_id
+			WHERE folder_id $where
+			AND b.deleted_at IS NULL
 			ORDER BY submitted LIMIT 0, $limit";
 
         $this->db->query($query);
@@ -513,21 +513,22 @@ class Feed {
      * Get a list of new blog comments to push into the feed.
      *
      * @deprecated use \Schoolbox\Blog\CommentNotifier::getFeed()
-     * @param  $cid
+     * @param  $folderId
      * @param  $limit
      * @return
      */
-    public function getBlogComments($cid, $limit) {
+    public function getBlogComments($folderId, $limit) {
 
-        $where = $this->getFilterFromCategoryId($cid);
+        $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, UNIX_TIMESTAMP(bc.created) AS submitted, b.id AS blogID, heading, cid, c.name as cat_name, c.id as cat_id
+        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, 
+            UNIX_TIMESTAMP(bc.created_at) AS submitted, b.id AS blogID, heading, folder_id, c.name as cat_name, c.id as cat_id
 			FROM `user` u
-			JOIN blogComment bc ON u.id = bc.owner
-			JOIN blog b ON bc.bid = b.id
-			LEFT JOIN category c ON c.id = cid
-			WHERE cid $where
-			AND b.deleted IS NULL
+			JOIN blog_comment bc ON u.id = bc.owner_id
+			JOIN blog b ON bc.blog_id = b.id
+			LEFT JOIN category c ON c.id = folder_id
+			WHERE folder_id $where
+			AND b.deleted_at IS NULL
 			ORDER BY submitted LIMIT 0, $limit";
 
         $this->db->query($query);

@@ -20,9 +20,9 @@ class Blog extends DeprecatedModel {
 	 */
 	function getByID($id) {
 		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, user.synergy_id
-			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
-			WHERE {$this->_table}.id = $id AND deleted IS NULL
-			ORDER BY {$this->_table}.created DESC";
+			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner_id = user.id
+			WHERE {$this->_table}.id = $id AND deleted_at IS NULL
+			ORDER BY {$this->_table}.created_at DESC";
 		$query = $this->_config['size'] > 0 ? "$query LIMIT 0, {$this->_config['size']}" : $query;
 
 		return $this->db->getRow($query);
@@ -32,14 +32,14 @@ class Blog extends DeprecatedModel {
      * Get all the blogs for a category.
      *
      * @deprecated use \Schoolbox\Blog\BlogMapper::findByField('cid')
-     * @param <type> $cid
+     * @param <type> $folderId
      * @return <type>
      */
-	function getByCID($cid) {
-		$query = "SELECT {$this->_table}.*, user.synergy_id, user.title, user.firstname, user.lastname, created, UNIX_TIMESTAMP(created) AS createdTimestamp
-			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
-			WHERE cid = $cid AND deleted IS NULL
-			ORDER BY {$this->_table}.created DESC";
+	function getByCID($folderId) {
+		$query = "SELECT {$this->_table}.*, user.synergy_id, user.title, user.firstname, user.lastname, created_at, UNIX_TIMESTAMP(created_at) AS createdTimestamp
+			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner_id = user.id
+			WHERE folder_id = $folderId AND deleted_at IS NULL
+			ORDER BY {$this->_table}.created_at DESC";
 		$query = $this->_config['size'] > 0 ? "$query LIMIT 0, {$this->_config['size']}" : $query;
 
 		return $this->db->getAll($query);
@@ -49,16 +49,16 @@ class Blog extends DeprecatedModel {
      * Get all the blogs for a category in a particular year.
      *
      * @deprecated use \Schoolbox\Blog\BlogMapper::findByField('cid')->filterBy()
-     * @param <type> $cid
+     * @param <type> $folderId
      * @return <type>
      */
-	function getByCIDAndYear($cid, $year) {
-		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, created, UNIX_TIMESTAMP(created) AS createdTimestamp
-			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
-			WHERE cid = $cid
-            AND deleted IS NULL
-            AND created LIKE '$year%'
-			ORDER BY {$this->_table}.created DESC";
+	function getByCIDAndYear($folderId, $year) {
+		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, created_at, UNIX_TIMESTAMP(created_at) AS createdTimestamp
+			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner_id = user.id
+			WHERE folder_id = $folderId
+            AND deleted_at IS NULL
+            AND created_at LIKE '$year%'
+			ORDER BY {$this->_table}.created_at DESC";
 		$query = $this->_config['size'] > 0 ? "$query LIMIT 0, {$this->_config['size']}" : $query;
 
 		return $this->db->getAll($query);
@@ -66,18 +66,18 @@ class Blog extends DeprecatedModel {
 
 	/**
 	 * @deprecated use \Schoolbox\Blog\BlogMapper::findByField('cid')->filterBy()
-	 * @param $cid
+	 * @param $folderId
 	 * @param $year
 	 * @param $month
 	 * @return array|bool
 	 */
-	public function getByYearAndMonth ($cid, $year, $month) {
-		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, created, UNIX_TIMESTAMP(created) AS createdTimestamp
-			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
-			WHERE cid = $cid AND deleted IS NULL
-				AND CAST( SUBSTRING(`created`, 1, 4) AS SIGNED) = {$year}
-				AND CAST( SUBSTRING(`created`, 6, 2) AS SIGNED) = {$month}
-			ORDER BY {$this->_table}.created DESC";
+	public function getByYearAndMonth ($folderId, $year, $month) {
+		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, created_at, UNIX_TIMESTAMP(created_at) AS createdTimestamp
+			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner_id = user.id
+			WHERE folder_id = $folderId AND deleted_at IS NULL
+				AND CAST( SUBSTRING(`created_at`, 1, 4) AS SIGNED) = {$year}
+				AND CAST( SUBSTRING(`created_at`, 6, 2) AS SIGNED) = {$month}
+			ORDER BY {$this->_table}.created_at DESC";
 		$query = $this->_config['size'] > 0 ? "$query LIMIT 0, {$this->_config['size']}" : $query;
 
 		return $this->db->getAll($query);
@@ -90,10 +90,10 @@ class Blog extends DeprecatedModel {
 	 * @param Integer $categoryId
 	 * @return Array|Bool
 	 */
-	public function getOccupiedDateList ($categoryId) {
-		$query = "SELECT YEAR(`created`) as 'year', `created`, MONTH(`created`) as 'month'
+	public function getOccupiedDateList ($folderId) {
+		$query = "SELECT YEAR(`created_at`) as 'year', `created_at`, MONTH(`created_at`) as 'month'
 				  FROM `blog`
-				  WHERE `cid` = '$categoryId'
+				  WHERE `folder_id` = '$folderId'
 				  GROUP BY `year` DESC, `month` DESC";
 
 		return $this->db->getAll($query);
@@ -106,8 +106,8 @@ class Blog extends DeprecatedModel {
 	 */
 	function create($blog) {
 		$blog = array_merge(array(
-			'owner'   => $_SESSION['id'],
-			'created' => 'NOW()'
+			'owner_id'   => $_SESSION['id'],
+			'created_at' => 'NOW()'
 		), $blog);
 
 		return parent::create($blog);
@@ -130,7 +130,7 @@ class Blog extends DeprecatedModel {
 	function delete($id) {
 		$blog = array(
 			'id'      => $id,
-			'deleted' => 'NOW()'
+			'deleted_at' => 'NOW()'
 		);
 
 		return $this->permission($blog['id']) ? parent::update($blog) : false;
@@ -144,8 +144,8 @@ class Blog extends DeprecatedModel {
 	function permission($id) {
 		$blog = $this->getByID($id);
 		if(is_array($blog)) {
-			$permission = $this->group->getPermission($blog['cid']);
-			if($blog['owner'] == $_SESSION['id'] || $permission >= WRITE_ACCESS)
+			$permission = $this->group->getPermission($blog['folder_id']);
+			if($blog['owner_id'] == $_SESSION['id'] || $permission >= WRITE_ACCESS)
 				return true;
 			else
 				return false;
@@ -181,32 +181,32 @@ class Blog extends DeprecatedModel {
             $query = "SELECT `blog`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
                         FROM `blog`
-                        LEFT JOIN `user` ON `blog`.owner = `user`.id
-                        LEFT JOIN `perms` ON `blog`.cid = `perms`.cid
+                        LEFT JOIN `user` ON `blog`.owner_id = `user`.id
+                        LEFT JOIN `perms` ON `blog`.folder_id = `perms`.cid
                             AND `perms`.gid = {$_SESSION['gid']}
                             AND `perms`.type > 0
-                        LEFT JOIN `userAccess` ON `blog`.cid = `userAccess`.sid
+                        LEFT JOIN `userAccess` ON `blog`.folder_id = `userAccess`.sid
                             AND `userAccess`.service = 1
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                            AND `deleted` IS NULL
+                            AND `deleted_at` IS NULL
                         ORDER BY `$sort_by` $sort_dir
                         LIMIT $offset, $limit;
             ";
 
             $count_query = "SELECT COUNT(*)
                             FROM `blog`
-                            LEFT JOIN `user` ON `blog`.owner = `user`.id
-                            LEFT JOIN `perms` ON `blog`.cid = `perms`.cid
+                            LEFT JOIN `user` ON `blog`.owner_id = `user`.id
+                            LEFT JOIN `perms` ON `blog`.folder_id = `perms`.cid
                                 AND `perms`.gid = {$_SESSION['gid']}
                                 AND `perms`.type > 0
-                            LEFT JOIN `userAccess` ON `blog`.cid = `userAccess`.sid
+                            LEFT JOIN `userAccess` ON `blog`.folder_id = `userAccess`.sid
                                 AND `userAccess`.service = 1
                                 AND `userAccess`.uid = {$_SESSION['id']}
                             WHERE (`perms`.cid OR `userAccess`.sid)
                                 AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                                AND `deleted` IS NULL
+                                AND `deleted_at` IS NULL
             ";
 
             $count = $this->db->getOne($count_query);
@@ -220,11 +220,11 @@ class Blog extends DeprecatedModel {
 	 * TODO: Refactor
 	 *
 	 * @deprecated use \Schoolbox\Blog\BlogMapper::delete()
-	 * @param  $cid
+	 * @param  $folderId
 	 * @return void
 	 */
-	public function homepageClean($cid) {
-		$query = "UPDATE {$this->_table} SET deleted = NOW() WHERE cid = '{$cid}'";
+	public function homepageClean($folderId) {
+		$query = "UPDATE {$this->_table} SET deleted_at = NOW() WHERE folder_id = '{$folderId}'";
 
 		$this->db->query($query);
 	}

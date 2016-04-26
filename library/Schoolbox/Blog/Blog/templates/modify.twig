@@ -1,0 +1,102 @@
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        $.fn.alaressEditor({
+            file_browser_category_id : {% if record != undefined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}
+        });
+
+        $('#blogForm').alaressValidate();
+
+        {% if record != undefined %}
+            $('[data-delete]').click(function(event) {
+                event.preventDefault();
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this blog post?',
+                    confirmEvent: function() {
+                        $.post('/blog/delete', {
+                            id: {{ record.getId }}
+                        })
+                        .done(function() {
+                            // Remove from list after AJAX returns
+
+                            window.location.href = '/homepage/{{ record.getFolder.getId }}';
+                        });
+                    }
+                });
+            })
+        {% endif %}
+    })
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="/homepage/{% if record != undefined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}">{% if record != undefined %}{{ record.getFolder.getName }}{% else %}{{ folder.getName }}{% endif %}</a></li>
+    <li class="active"><a href="#">{% if record.getId %}Modify{% else %}Post{% endif %} Blog</a></li>
+</ul>
+
+<div class="row">
+    <div class="column small-12">
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h1>{% if record.getId %}Modify{% else %}Post{% endif %} Blog</h1>
+                </div>
+            </div>
+            {% if record != undefined %}
+                <nav>
+                    <a class="icon-more" title="Actions" data-dropdown="header-options" aria-expanded="false"></a>
+                </nav>
+                <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
+                    <li>
+                        <a class="icon-delete" title="Delete Blog" data-delete />Delete Blog</a>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <form method="post" id="blogForm" action="/blog/modify">
+            <input type="hidden" name="categoryId" value="{% if record != undefined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}" />
+            <input type="hidden" name="id" value="{{ record.getId }}" />
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Title
+                            <input type="text" name="heading" maxlength="100" class="required" value="{{ record.getHeading }}" />
+                        </label>
+                        <label>
+                            Body
+                            <textarea id="body" name="body">{{ record.getBody }}</textarea>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <h2 class="subheader">Gallery Images</h2>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <section>
+                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                        </section>
+                    </div>
+                </fieldset>
+            </section>
+
+
+            <div class="row">
+                <div class="small-12 column">
+                    <input type="submit" name="submits" value="{% if record.getId %}Modify{% else %}Post{% endif %} Blog" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

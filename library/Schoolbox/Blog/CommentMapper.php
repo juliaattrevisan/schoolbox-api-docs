@@ -9,12 +9,15 @@
 
 namespace Schoolbox\Blog;
 
-
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Blog\Blog;
+use Schoolbox\UserMapper;
+use Schoolbox\Blog\Blog\Model as BlogModel;
+use Schoolbox\Blog\Blog\Mapper as BlogMapper;
+use Schoolbox\Blog\Comment\Model as BlogCommentModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class CommentMapper extends Mapper implements FeedableMapperInterface {
 
@@ -23,50 +26,20 @@ class CommentMapper extends Mapper implements FeedableMapperInterface {
 	 */
 	protected function mapping() {
 		$this->hasTable('blogComment');
-		$this->hasModel('\\Schoolbox\\Blog\\Comment');
+		$this->hasPrototype(new BlogCommentModel);
+		$this->hasSoftDeleteDateField('deleted_at');
+		$this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+		$this->uses('body', self::TYPE_STRING);
+		$this->uses('created_at', self::TYPE_DATETIME);
+		$this->uses('deleted_at', self::TYPE_DATETIME);
+		$this->joins('blog_id', BlogMapper::class, 'id', null, null, 'blog');
+		$this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner');
 
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
-
-		$this->hasMap(array(
-			'column'     => 'bid',
-			'property'   => 'blog',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'blog'
-		));
-
-		$this->hasMap(array(
-			'column'     => 'owner',
-			'property'   => 'owner',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'owner'
-		));
-
-		$this->hasMap(array(
-			'column'     => 'created',
-			'property'   => 'created',
-			'type'       => self::TYPE_DATETIME
-		));
-
-		$this->hasMap(array(
-			'column'     => 'deleted',
-			'property'   => 'deleted',
-			'type'       => self::TYPE_DATETIME
-		));
-
-		$this->hasMap(array(
-			'column'     => 'body',
-			'property'   => 'body',
-			'type'       => self::TYPE_STRING
-		));
+		// Joins
 
 		$this->hasJoin('blog', array(
 			'mapper'    => '\\Schoolbox\\Blog\\BlogMapper',
-			'this_key'  => 'bid',
+			'this_key'  => 'blog_id',
 			'other_key' => 'id',
 		));
 
@@ -76,14 +49,13 @@ class CommentMapper extends Mapper implements FeedableMapperInterface {
 			'other_key' => 'id',
 		));
 
-		// fake the 2nd-depth hydration
+		// Fake the 2nd-depth hydration
+
 		$this->hasJoin('category', array(
 			'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
 			'this_key'  => 'cid',
 			'other_key' => 'id'
 		));
-
-		$this->hasSoftDeleteDateField('deleted');
 	}
 
 	/**
@@ -129,8 +101,15 @@ class CommentMapper extends Mapper implements FeedableMapperInterface {
 		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			/** @var Comment $comment */
 			$comment = $this->hydrate($r, 'c');
-			$comment->setBlog($this->hydrateJoin($r, 'blog', 'b'));
-			$comment->getBlog()->setCategory($this->hydrateJoin($r, 'category','cat'));
+
+			/** @var BlogModel $blog */
+			$blog = $this->hydrateJoin($r, 'blog', 'b');
+			
+			/** @var Folder $folder */
+			$folder = $this->hydrateJoin($r, 'category','cat');
+			
+			$comment->setBlog($blog);
+			$comment->getBlog()->setFolder($folder);
 			$comment->setOwner($this->hydrateJoin($r, 'owner', 'u'));
 			$c->add($comment);
 		}
@@ -140,10 +119,10 @@ class CommentMapper extends Mapper implements FeedableMapperInterface {
     /**
      * Find all the comments for a particular blog
      *
-     * @param Blog $blog
+     * @param BlogModel $blog
      * @return Collection
      */
-    public function findForBlog(Blog $blog) {
+    public function findForBlog(BlogModel $blog) {
         $stmt = $this->database->prepare("
 			SELECT
 				{$this->getColumnString('c')},
@@ -153,7 +132,7 @@ class CommentMapper extends Mapper implements FeedableMapperInterface {
             LEFT JOIN {$this->getJoinSql('owner', 'c', 'u')}
 			WHERE
 				`c`.`deleted` IS NULL
-				AND `c`.bid = :blogId
+				AND `c`.blog_id = :blogId
 			ORDER BY `c`.`created` DESC
 		");
 
