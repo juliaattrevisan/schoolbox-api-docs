@@ -48,7 +48,7 @@ class DAV_ExtendedClient extends Sabre\DAV\Client
      * Uploads a file via a PUT request
      *
      * @param string $path Destination path on the server
-     * @param string $file Path to source file
+     * @param string $file Path to source file, or a resource
      *
      * @return array
      */
@@ -57,38 +57,6 @@ class DAV_ExtendedClient extends Sabre\DAV\Client
         $absolutePath = $this->getAbsoluteUrl($path);
         $request      = new Sabre\HTTP\Request('PUT', $absolutePath);
         $request->setBody(fopen($file, "r"));
-        $curl = curl_init($absolutePath);
-
-        $settings = $this->createCurlSettingsArray($request);
-        $settings[CURLOPT_HTTPAUTH]   = Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC;
-        $settings[CURLOPT_COOKIEFILE] = '';
-        if (Cfg::get('webdav_allow_insecure')) {
-            $settings[CURLOPT_SSL_VERIFYHOST] = false;
-            $settings[CURLOPT_SSL_VERIFYPEER] = false;
-        }
-        curl_setopt_array($curl, $settings);
-
-        return array(
-            curl_exec($curl),
-            curl_getinfo($curl),
-            curl_errno($curl),
-            curl_error($curl)
-        );
-    }
-
-    /**
-     * Uploads a file resource via a PUT request
-     *
-     * @param string   $path     Destination path on the server
-     * @param resource $resource A resource that points to a stream
-     *
-     * @return array
-     */
-    public function putResource($path, $resource)
-    {
-        $absolutePath = $this->getAbsoluteUrl($path);
-        $request      = new Sabre\HTTP\Request('PUT', $absolutePath);
-        $request->setBody($resource);
         $curl = curl_init($absolutePath);
 
         $settings = $this->createCurlSettingsArray($request);

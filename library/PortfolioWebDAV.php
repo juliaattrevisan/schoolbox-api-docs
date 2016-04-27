@@ -865,7 +865,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         if ($file) {
             $path = $_SESSION['portfolioIdPathMap'][$data['parent']] . rawurlencode($file['name']);
             if ($file['resource']) {
-                $this->client->putResource($path, $file['resource']);
+                $this->client->put($path, $file['resource']);
             } else {
                 $this->client->put($path, $file['tmp_name']);
             }
