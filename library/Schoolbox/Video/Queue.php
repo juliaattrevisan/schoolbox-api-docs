@@ -11,6 +11,8 @@ namespace Schoolbox\Video;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress_Date_Format;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 class Queue extends ResourceVideo
 {
@@ -23,6 +25,18 @@ class Queue extends ResourceVideo
     /** @var Alaress_Date_Format */
     protected $modified;
 
+    /** @var StorageMapper */
+    protected $storageMapper;
+
+    /**
+     * @var string
+     */
+    private $audioBitrate;
+
+    /**
+     * @var string
+     */
+    private $videoBitrate;
 
     /**
      * Primary binary program used for conversion
@@ -48,6 +62,16 @@ class Queue extends ResourceVideo
      */
     private $fallbackInfo   = 'ffprobe';
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setStorageMapper(StorageMapper::getInstance());
+
+        // Grab bitrates from config
+
+        $this->audioBitrate = $this->getConfig()->get('audio_bitrate');
+        $this->videoBitrate = $this->getConfig()->get('video_bitrate');
+    }
 
     /**
      * Determines if file is audio or video and does corresponding processing
@@ -57,13 +81,14 @@ class Queue extends ResourceVideo
     public function process()
     {
         $sourceFile = $this->getSourceFile();
-
+        
         if($sourceFile->getMimetype()->isAudio()){
             return $this->processAudio($this->getSourceLocation($sourceFile));
         }
         else if($sourceFile->getMimeType()->isVideo()){
             return $this->processVideo($this->getSourceLocation($sourceFile));
         }
+
         return false;
     }
 
@@ -73,13 +98,14 @@ class Queue extends ResourceVideo
      *
      * @param $sourceFile
      * @returns boolean
+     * @throws \RuntimeException
      */
     public function processAudio($sourceFile)
     {
         $executable = $this->getConverterExecutable();
 
-        $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .' -c:a libmp3lame -b 96k -ar:a 44100'
-            . ' -timelimit ' . escapeshellarg($this->config->get('video_processing_timeout')) . ' '
+        $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) . " -c:a libmp3lame -b {$this->audioBitrate}k -ar:a 44100"
+            . ' -timelimit ' . escapeshellarg($this->getConfig()->get('video_processing_timeout')) . ' '
             . escapeshellarg($this->getAudioLocation()) . ' 2>&1';
 
         exec($processString, $message, $return);
@@ -97,7 +123,7 @@ class Queue extends ResourceVideo
         if ($return == 0) {
             return true;
         } else {
-            return false;
+            throw new \RuntimeException($message);
         }
 
     }
@@ -108,6 +134,8 @@ class Queue extends ResourceVideo
      *
      * @param $sourceFile
      * @returns boolean
+     * @throws \RuntimeException
+     * @throws \UnexpectedValueException
      */
 
     public function processVideo($sourceFile)
@@ -127,7 +155,7 @@ class Queue extends ResourceVideo
         exec("$info_exec -show_streams " . escapeshellarg($sourceFile) . ' 2>&1', $info_message, $info_return);
         $info_message = implode("\n", $info_message);
         if (!($info_return == 0)) {
-            return false;
+            throw new \UnexpectedValueException("Unable to determine video size: $info_message");
         }
         $width  = 0;
         $height = 0;
@@ -193,8 +221,8 @@ class Queue extends ResourceVideo
 
         /* Process video to 512kb in libx264 format for mobile and html5 streaming */
         $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
-            " -c:v libx264 $scale -preset slow -b:v 512k -b:a 128k -r 24 -ar:a 44100" .
-            " -timelimit " . escapeshellarg($this->config->get('video_processing_timeout')) . ' ' .
+            " -c:v libx264 $scale -preset slow -b:v {$this->videoBitrate}k -b:a {$this->audioBitrate}k -r 24 -ar:a 44100" .
+            " -timelimit " . escapeshellarg($this->getConfig()->get('video_processing_timeout')) . ' ' .
             ($strict ? '-strict -2 ' : '') .
             '-ac 2 ' . escapeshellarg($this->getVideoLocation()) . ' 2>&1';
 
@@ -241,10 +269,10 @@ class Queue extends ResourceVideo
             if ($return == 0) {
                 return true;
             } else {
-                return false;
+                throw new \RuntimeException($output);
             }
         }
-        return false;
+        throw new \RuntimeException($message);
 
 
     }
@@ -258,8 +286,7 @@ class Queue extends ResourceVideo
      */
     private function getSourceFile()
     {
-        $newStorage = \Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($this->getHash());
-        return $newStorage;
+        return $this->getStorageMapper()->findByHash($this->getHash());
     }
 
     /**
@@ -272,8 +299,7 @@ class Queue extends ResourceVideo
      */
     private function getSourceLocation($sourceObject)
     {
-        $configLoader = new \Schoolbox\Config\Loader();
-        return $configLoader->get('storage_dir'). '/' . $sourceObject->getPath();
+        return $this->getConfig()->get('storage_dir'). '/' . $sourceObject->getPath();
     }
 
     /**
@@ -413,5 +439,23 @@ class Queue extends ResourceVideo
         list($coverWidth, $coverHeight) = $coverDimensions;
         $newRatio = max($coverWidth / $width, $coverHeight / $height);
         return array($width * $newRatio, $height * $newRatio);
+    }
+
+    /** Here be the getters/setters, nothing else to see here */
+    
+    /**
+     * @return StorageMapper
+     */
+    public function getStorageMapper() {
+        return $this->storageMapper;
+    }
+
+    /**
+     * @param $storageMapper
+     * @return $this
+     */
+    public function setStorageMapper($storageMapper) {
+        $this->storageMapper = $storageMapper;
+        return $this;
     }
 }

@@ -12,74 +12,90 @@
 
 use Schoolbox\Video\Queue;
 use Schoolbox\Video\QueueMapper;
+use Aura\Di;
+use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
 
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('\\Schoolbox\\Application\\Daemon');
+
+$kernel = new Schoolbox\Application\Daemon\Kernel('Video', array(
+	'verbose' => array(false,false,false),
+));
 
 
-$mapper = new QueueMapper();
-$lock   = new Alaress_Lock(Cfg::get('video_dir').'/.lock');
-if (!$lock->acquire()) {
-	echo strftime("[%F %T] A video processor is already running, checking timeout.\n");
-	// Check timeout: if any processing video has been processing for more than
-	// x minutes, then kill their process, mark as failed and start over.
-	// (Should never be more than one video processing at once (per server)).
-	$timeout = intval(Config::get('video_processing_timeout'));
-	if ($timeout <= 0) {
-		echo strftime("[%F %T] Timeout of video processing is disabled.\n");
-		exit;
-	}
-	elseif (($num_timed_out = $mapper->markAllProcessingAsTimedOut($timeout)) > 0) {
-		echo strftime("[%F %T] Processing of $num_timed_out video(s) has timed out - marking these as failed, and continuing.\n");
-		$lock->killProcess();
-		$lock->acquire();
-	}
-	else {
-		echo strftime("[%F %T] No video processing has timed out.\n");
-		exit;
-	}
-}
-echo strftime("[%F %T] Processing of videos started.\n");
+// CREATE DIGEST APP
+$kernel->run(function($di, $loop, $log, $opts) {
 
-/** @var Queue[] $pendingQueue */
-$pendingQueue = $mapper->getPending();
+	
+	/**
+	 * @var Di\Container $di
+	 * @var LoopInterface $loop
+	 * @var LoggerInterface $log
+	 * @var array $opts
+	 */
 
-$failed  = 0;
-$success = 0;
-foreach ($pendingQueue as $vid) {
-
-	$file_id = $vid->getHash();
-
-	/* Update video to indicate processing has begun */
-	echo strftime("[%F %T] Starting process of media #$file_id\n");
-	$vid->setStatus(QueueMapper::STATUS_PROCESSING);
-	$mapper->save($vid);
-
-	/* Process video */
-	try {
-		if ($vid->process() == true) {
-			$vid->setStatus(QueueMapper::STATUS_COMPLETED);
+	pcntl_signal(SIGCHLD, SIG_DFL);
+	
+	$mapper = new QueueMapper();
+	$lock = new Alaress_Lock(Cfg::get('video_dir') . '/.lock');
+	if (!$lock->acquire()) {
+		$log->critical("A video processor is already running, checking timeout");
+		// Check timeout: if any processing video has been processing for more than
+		// x minutes, then kill their process, mark as failed and start over.
+		// (Should never be more than one video processing at once (per server)).
+		$timeout = intval(Config::get('video_processing_timeout'));
+		if ($timeout <= 0) {
+			$log->alert("Timeout of video processing is disabled.");
+			exit;
+		} elseif (($num_timed_out = $mapper->markAllProcessingAsTimedOut($timeout)) > 0) {
+			$log->warning("Processing of $num_timed_out video(s) has timed out - marking these as failed, and continuing");
+			$lock->killProcess();
+			$lock->acquire();
+		} else {
+			$log->info("No video processing has timed out");
+			exit;
 		}
-		else {
+	}
+	$log->info("Processing of videos started");
+
+	/** @var Queue[] $pendingQueue */
+	$pendingQueue = $mapper->getPending();
+
+	$failed = 0;
+	$success = 0;
+	foreach ($pendingQueue as $vid) {
+
+		$file_id = $vid->getHash();
+
+		/* Update video to indicate processing has begun */
+		$log->info("Starting process of media #$file_id");
+		$vid->setStatus(QueueMapper::STATUS_PROCESSING);
+		$mapper->save($vid);
+
+		/* Process video */
+		try {
+			if ($vid->process() == true) {
+				$vid->setStatus(QueueMapper::STATUS_COMPLETED);
+			} else {
+				$vid->setStatus(QueueMapper::STATUS_FAILED);
+			}
+		} catch (Exception $e) {
+			$log->error("$e", array($e));
 			$vid->setStatus(QueueMapper::STATUS_FAILED);
 		}
-	}
-	catch (Exception $e) {
-		$vid->setStatus(QueueMapper::STATUS_FAILED);
-	}
 
-	if ($vid->getStatus() === QueueMapper::STATUS_FAILED) {
-		fwrite(STDERR, strftime("[%F %T] ERROR: process of media #$file_id failed\n"));
-		$failed++;
-	}
-	else {
-		echo strftime("[%F %T] process of media #$file_id completed\n");
-		$success++;
+		if ($vid->getStatus() === QueueMapper::STATUS_FAILED) {
+			$log->error("Process of media #$file_id failed");
+			$failed++;
+		} else {
+			$log->info("Process of media #$file_id completed\n");
+			$success++;
+		}
+
+		$mapper->save($vid);
 	}
 
-	$mapper->save($vid);
-}
-
-$lock->release();
-echo strftime("[%F %T] Processing of videos completed: ");
-printf("%d succeeded, %d failed.\n", $success, $failed);
-
+	$lock->release();
+	$log->info("Processing of videos completed: $success succeeded, $failed failed");
+});
