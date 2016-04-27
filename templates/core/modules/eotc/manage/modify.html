@@ -118,32 +118,24 @@
                 <div class="small-12 columns {EVENT_RECURRENCE_COLLAPSE_CLASS}" data-collapsable="true" data-collapse-state="{EVENT_RECURRENCE_COLLAPSE_STATE}">
                     <div class="row">
                         <!-- BEGIN recurring_dates -->
-                        <div data-advanced class="small-12 island hide {SHOW_ADVANCED}">
-                            <section>
-                                <div class="content">
-                                    <div class="row">
-                                        <div data-advanced class="small-12 columns">
-                                            <label>
-                                                Repeat
-                                                <span class='hint has-tip tip-top' data-tooltip title="The frequency with which this event recurs, if at all.">?</span>
-                                                <select name="repeat">
-                                                    <option value="">Single Event</option>
-                                                    <option value="daily">Daily</option>
-                                                    <option value="weekly">Weekly</option>
-                                                    <option value="fortnightly">Fortnightly</option>
-                                                    <option value="monthly">Monthly</option>
-                                                </select>
-                                            </label>
+                        <div class="small-12 columns">
+                            <label>
+                                Repeat
+                                <span class='hint has-tip tip-top' data-tooltip title="The frequency with which this event recurs, if at all.">?</span>
+                                <select name="repeat">
+                                    <option value="">Single Event</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="fortnightly">Fortnightly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </label>
 
-                                            <label data-repeat-until class="hide">
-                                                Repeat Until
-                                                <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
-                                                <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
+                            <label data-repeat-until class="hide">
+                                Repeat Until
+                                <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
+                                <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
+                            </label>
                         </div>
                         <!-- END recurring_dates -->
                         <!-- BEGIN recurring_reminder -->
@@ -414,6 +406,7 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/calendar/js/jquery.eventModify.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript">
     $(function() {
         $.fn.alaressEditor({
@@ -501,6 +494,12 @@
 
         $('[data-form=event]').eventModify({
             functionLabel: "{FUNCTION}"
+        });
+
+
+        // Collapsables
+        $('[data-collapser=true]').collapsable({
+            container: '[data-collapsable-container]'
         });
     });
 </script>

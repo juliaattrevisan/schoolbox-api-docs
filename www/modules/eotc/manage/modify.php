@@ -164,6 +164,8 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
             'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
             'STAFF_GROUP_TYPE_IDS' =>  implode(';', $groupHandler->getStaffGroupTypeIds()),
+            'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
+            'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
         ));
 
         /* Recurrence
@@ -348,6 +350,8 @@ elseif ($authenticator->isEOTCCreator($_SESSION['user'])) {
         'EVENT_STATUS_CLASS' => $status->getStyle(),
         'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
         'STAFF_GROUP_TYPE_IDS' =>  implode(';', $groupHandler->getStaffGroupTypeIds()),
+        'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
+        'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
     ));
 
     /* Recurrence
