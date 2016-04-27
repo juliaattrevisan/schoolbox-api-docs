@@ -150,6 +150,19 @@
 </div>
 
 <div class="row">
+    <!-- BEGIN submit_on_behalf -->
+    <div class="small-12 island">
+        <h2 class="subheader">You are submitting on behalf of</h2>
+        <section>
+            <div class="avatar card small-12">
+                <a href="/search/user/{SUBMISSION_USER_ID}">
+                    <img src="/portrait.php?userId={SUBMISSION_USER_EXTERNAL_ID}&amp;size=square64">
+                    <h3>{SUBMISSION_USER_NAME}</h3>
+                </a>
+            </div>
+        </section>
+    </div>
+    <!-- END submit_on_behalf -->
     <div class="small-12 columns">
         <div class="alert-box">
             You can attach files and/or edit online for your submission.
@@ -161,6 +174,7 @@
 <div class="row">
     <div class="small-12 island">
         <form id="editor-form" method="post" action="/submission/submitWorkForm.php" enctype="multipart/form-data">
+            <input type="hidden" name="user_id" value="{SUBMISSION_USER_ID}" />
             <input type="hidden" name="box_id" value="{BOX_ID}" />
             <input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
             <section class="content">

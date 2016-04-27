@@ -12,9 +12,17 @@ $conf = ConfigMapper::getInstance();
 $box_mapper        = new SubmissionBoxMapper();
 $submission_mapper = new Submission\FileMapper();
 
+$boxId = $_POST['box_id'];
+
+// Allow teachers to impersonate students
 /** @var Schoolbox\User $user */
-$user    = $_SESSION['user'];
-$boxId   = $_POST['box_id'];
+if (isset($_POST['user_id']) && $_POST['user_id'] != $_SESSION['user']->getId()) {
+    $user = \Schoolbox\UserMapper::getInstance()->findById($_POST['user_id']);
+    $returnHandler = new SubmissionReturn();
+    $returnHandler->securityCheck($boxId);
+} else {
+    $user = $_SESSION['user'];
+}
 $isDraft = isset($_POST['save_draft']);
 $body    = $_POST['body'];
 

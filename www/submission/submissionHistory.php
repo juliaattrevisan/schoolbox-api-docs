@@ -501,6 +501,15 @@ if (count($submission_history)) {
     $this->parse('subject_block', 'subject');
 }
 
+// only allow resubmission:
+// if the current user is the owner (or I'm a teacher)
+// if the submission box is accepting submissions
+// and if the current time is between open and late
+$isSubmissionOnStudentBehalf = $userID != $currentUserId;
+$hasSubmitPermission =
+    (!$isSubmissionOnStudentBehalf || $returnHandler->securityCheck($box->getId()))
+    && $box->isOpen()
+    && $box->getAcceptOnline();
 if (isset($recent_activity)) {
     /* Show most recent submission
      * Hide Submit form
@@ -583,17 +592,9 @@ if (isset($recent_activity)) {
         $this->setVar('plag_score_block', '');
     }
 
-    // only allow a resubmission:
-    // if the current user is the owner
-    // if the submission box is accepting submissions
-    // and if the current time is between open and late
-    if (
-        $userID == $currentUserId
-        && $box->isOpen()
-        && $box->getAcceptOnline()
-        && $box->getAcceptMultiple()
-    ) {
-        $this->setVar('SUBMIT_LABEL', 'Resubmit');
+    // only allow a resubmission if box allows it
+    if ($hasSubmitPermission && $box->getAcceptMultiple()) {
+        $this->setVar('SUBMIT_LABEL', $isSubmissionOnStudentBehalf ? 'Resubmit on student\'s behalf' : 'Resubmit');
         $this->parse('action_submit_block', 'action_submit');
     }
 
@@ -610,7 +611,7 @@ if (isset($recent_activity)) {
      * Show Submit form
      * Hide the Resubmit form
      */
-    if ($userID == $currentUserId && $box->isOpen() && $box->getAcceptOnline()) {
+    if ($hasSubmitPermission) {
         // Which edit button gets shown (is there already a draft?)
         $drafts = $submissionMapper->getDrafts($userID, $box->getId(), 1);
 
@@ -622,7 +623,7 @@ if (isset($recent_activity)) {
             ]);
         }
 
-        $this->setVar('SUBMIT_LABEL', 'Submit');
+        $this->setVar('SUBMIT_LABEL', $isSubmissionOnStudentBehalf ? 'Submit on student\'s behalf' :'Submit');
         $this->parse('action_submit_block', 'action_submit');
     } else {
         $this->setVar('action_submit_block', '');

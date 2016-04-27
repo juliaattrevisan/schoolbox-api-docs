@@ -1,10 +1,10 @@
 <?php
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Config\ConfigMapper;
 
 // not in sitepage context, redirect
 if(!isset($this)) {
@@ -30,9 +30,16 @@ $conf              = ConfigMapper::getInstance();
 
 //
 // Submission mapper - will get the most recent submission for this student.
-/** @var \Schoolbox\User $user */
+$box_id = $this->arg[0];
 $user = $_SESSION['user'];
-$box_id  = $this->arg[0];
+
+/** @var \Schoolbox\User $user */
+if (isset($this->arg[1])) {
+    // Teachers of this class may now impersonate handing in work as a student.
+    $user = \Schoolbox\UserMapper::getInstance()->findById($this->arg[1]);
+} else {
+    $user = $_SESSION['user'];
+}
 
 //
 // Should be some permissions on whether a user is a member of group
@@ -48,6 +55,13 @@ $gradient       = $submission_box->getGradientIndex();
 // has to allow submissions
 if (!$submission_box->getAcceptOnline()) {
     error(19);
+}
+
+// If impersonating a student, I have to have write access to this page
+if ($_SESSION['user']->getId() != $user->getId()) {
+    $studentRetHandler = new SubmissionReturn();
+    // This may exit
+    $studentRetHandler->securityCheck($box_id);
 }
 
 // if not multi, check there isn't already a (non-draft) submission
@@ -97,12 +111,16 @@ if ($drafts->count()) {
 }
 
 $this->setBlock(TEMPLATE_content, 'confirm_terms', 'confirm_terms_block');
+$this->setBlock(TEMPLATE_content, 'submit_on_behalf', 'submit_on_behalf_block');
+$this->setVar('confirm_terms_block', '');
+$this->setVar('submit_on_behalf_block', '');
 $policy = $conf->get('lms_student_policy');
 if (strlen(trim($policy)) > 0) {
     $this->setVar('STUDENT_SUBMIT_TERMS', Scrub::html($policy));
     $this->parse('confirm_terms_block', 'confirm_terms');
-} else {
-    $this->setVar('confirm_terms_block', '');
+}
+if ($user->getId() != $_SESSION['user']->getId()) {
+    $this->parse('submit_on_behalf_block', 'submit_on_behalf');
 }
 unset($html2text, $policy);
 
@@ -117,17 +135,20 @@ $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
 
 $this->setVar(array(
-    'FOLDER_NAME'          => Scrub::text($submission_box->getCategory()->getName()),
-    'FOLDER_ID'            => $submission_box->getCategory()->getId(),
-    'BOX_DUEDATE'          => $dueDate->getRelativeTime(),
-    'BOX_DUETIME'          => $dueDate->isAtEndOfDay() ? $dueDate->getDateOnly() : $dueDate->getShort(),
-    'BOX_DUEDATE_GRADIENT' => $gradient,
-    'BOX_ID'               => $submission_box->getId(),
-    'SUBMISSION_ID'        => null,
-    'BOX_NAME'             => Scrub::text($submission_box->getName()),
-    'BOX_TYPE'             => $submission_box->getWorkType()->getName(),
-    'BOX_CREATED'          => $createdDate->getRelativeTime(),
-    'TEXTBOX_BODY'         => $body,
+    'SUBMISSION_USER_NAME'        => Scrub::text($user->formatName()),
+    'SUBMISSION_USER_ID'          => Scrub::text($user->getId()),
+    'SUBMISSION_USER_EXTERNAL_ID' => Scrub::text($user->getExternalId()),
+    'FOLDER_NAME'                 => Scrub::text($submission_box->getCategory()->getName()),
+    'FOLDER_ID'                   => $submission_box->getCategory()->getId(),
+    'BOX_DUEDATE'                 => $dueDate->getRelativeTime(),
+    'BOX_DUETIME'                 => $dueDate->isAtEndOfDay() ? $dueDate->getDateOnly() : $dueDate->getShort(),
+    'BOX_DUEDATE_GRADIENT'        => $gradient,
+    'BOX_ID'                      => $submission_box->getId(),
+    'SUBMISSION_ID'               => null,
+    'BOX_NAME'                    => Scrub::text($submission_box->getName()),
+    'BOX_TYPE'                    => $submission_box->getWorkType()->getName(),
+    'BOX_CREATED'                 => $createdDate->getRelativeTime(),
+    'TEXTBOX_BODY'                => $body,
 ));
 
 $trail = new Breadcrumbs();

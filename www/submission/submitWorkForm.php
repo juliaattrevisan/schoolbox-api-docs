@@ -27,9 +27,19 @@ $boxMap = SubmissionBoxMapper::getInstance();
 /** @var Collection|Submission\File[] $submissions */
 $submissions = new Collection();
 
+// Allow teachers to impersonate students
+/** @var Schoolbox\User $user */
+if (isset($_POST['user_id']) && $_POST['user_id'] != $_SESSION['user']->getId()) {
+    $user = \Schoolbox\UserMapper::getInstance()->findById($_POST['user_id']);
+    $returnHandler = new SubmissionReturn();
+    $returnHandler->securityCheck($_POST['box_id']);
+} else {
+    $user = $_SESSION['user'];
+}
+
 // if there's a post body, we need to undraft the draftl; otherwise we ignore that
 if (trim($_POST['body'])) {
-    $drafts = $subMap->getDrafts($_SESSION['id'], $_POST['box_id'], 1);
+    $drafts = $subMap->getDrafts($user->getId(), $_POST['box_id'], 1);
     if ($drafts->count()) {
         // Create a new item that isn't a draft, instead of resaving the old one.
         $drafts->first()->setId(null)->setDraft(false);
@@ -43,7 +53,7 @@ if (is_array($_POST['attachment'])) {
         $box = $boxMap->findById($_POST['box_id']);
 
         // check uploading to this box is permitted
-        $boxMap->checkUploadability($box, $_SESSION['user']);
+        $boxMap->checkUploadability($box, $user);
 
         $factory = new CollectorFactory();
 
@@ -58,7 +68,7 @@ if (is_array($_POST['attachment'])) {
                 ->setStorage($storage)
                 ->setFilename($storage->getFilename())
                 ->setSubmissionBox($box)
-                ->setOwner($_SESSION['user'])
+                ->setOwner($user)
                 ->setLate($box->getDueDate()->lt($now))
             ;
 
@@ -90,7 +100,7 @@ $subMap->save($submissions);
 
 // submissions have been saved: the user can return now, and we'll keep doing some housekeeping back here
 // argument[1] ('true') here sends the redirect header and closes the connection, but allows us to continue processing
-$page->localRedir('/submission/submissionHistory/' . $_POST['box_id'] . '/' . $_SESSION['id'], true);
+$page->localRedir('/submission/submissionHistory/' . $_POST['box_id'] . '/' . $user->getId(), true);
 
 
 /* POST-CLIENT PROCESSING */
