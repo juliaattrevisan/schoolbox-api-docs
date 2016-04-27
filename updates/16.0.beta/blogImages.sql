@@ -17,3 +17,5 @@ ALTER TABLE `blog_comment` CHANGE `bid` `blog_id` INT(6) UNSIGNED NOT NULL;
 ALTER TABLE `blog_comment` CHANGE `owner` `owner_id` INT(6) UNSIGNED NOT NULL;
 ALTER TABLE `blog_comment` CHANGE `created` `created_at` DATETIME NOT NULL;
 ALTER TABLE `blog_comment` CHANGE `deleted` `deleted_at` DATETIME;
+
+UPDATE `component_definition` SET `class` = 'Component_Eportfolio_BlogController' WHERE `class` = 'Component_Homepage_BlogController';
