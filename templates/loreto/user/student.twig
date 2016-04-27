@@ -28,12 +28,16 @@
 {% endif %}
 {% endblock details_coordTeacher %}
 
-
 {% block details_tutorGroup %}
 {% if showClasses %}
     {% if externalUser.StudentTutorDescription %}
     <dt class="no-margin small-6 medium-3">Homeroom</dt>
     <dd class="no-margin small-6 medium-9">{{ externalUser.StudentTutorDescription }}</dd>
+    {% endif %}
+
+    {% if externalUser.StudentFormStaffName %}
+    <dt class="no-margin small-6 medium-3">Homeroom Teacher</dt>
+    <dd class="no-margin small-6 medium-9">{{ externalUser.StudentFormStaffName }}</dd>
     {% endif %}
 {% endif %}
 {% endblock details_tutorGroup %}
