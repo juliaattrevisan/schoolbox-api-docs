@@ -54,6 +54,22 @@ class Ancestry
         $this->cache = [];
     }
 
+
+    /**
+     * Find ancestry, and return whether or not the given parent is in it.
+     *
+     * @param Model $folder
+     * @param Model $parent
+     * @return bool
+     */
+    public function hasParent(Folder $folder, Folder $parent)
+    {
+        $parentId    = $parent->getId();
+        $ancestorIds = $this->findParentsCheaply($folder)->getColumnValues('id');
+
+        return in_array($parentId, $ancestorIds);
+    }
+
     /**
      * Find ancestry using findById() which also gives you hydrations
      * on joins and other objects
@@ -219,13 +235,4 @@ class Ancestry
         return $this->recursionLimit;
     }
 
-    /**
-     * Set recursion limit
-     *
-     * @param int $recursionLimit
-     */
-    private function setRecursionLimit($recursionLimit)
-    {
-        $this->recursionLimit = $recursionLimit;
-    }
 }
