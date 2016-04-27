@@ -12,6 +12,8 @@ class Marksheet_Percent extends Marksheet_Abstract
 
     public function normaliseMark($mark)
     {
+        // Strip any erroneously-inputted % char. Takes last instance of {.,} as decimal point
+        $mark = floatval($mark);
 
         // validation: must be within 0 - 100
         if ($mark < 0) {
