@@ -68,7 +68,7 @@ class ResourceVideo
      */
     public function getVideoLocation()
     {
-        return $this->config->get('video_dir').'/'.$this->getHash() . '.mp4';
+        return $this->getConfig()->get('video_dir').'/'.$this->getHash() . '.mp4';
     }
 
 
@@ -78,7 +78,7 @@ class ResourceVideo
      */
     public function getAudioLocation()
     {
-        return $this->config->get('video_dir').'/'.$this->getHash() . '.mp3';
+        return $this->getConfig()->get('video_dir').'/'.$this->getHash() . '.mp3';
     }
 
 
@@ -88,7 +88,7 @@ class ResourceVideo
      */
     public function getThumbnailLocation()
     {
-        return $this->config->get('video_dir').'/'.$this->getHash() . '-64.jpg';
+        return $this->getConfig()->get('video_dir').'/'.$this->getHash() . '-64.jpg';
     }
 
 
@@ -98,7 +98,7 @@ class ResourceVideo
      */
     public function getPosterLocation()
     {
-        return $this->config->get('video_dir').'/'.$this->getHash() . '-poster.jpg';
+        return $this->getConfig()->get('video_dir').'/'.$this->getHash() . '-poster.jpg';
     }
 
 
@@ -110,6 +110,13 @@ class ResourceVideo
         $this->config = $config;
     }
 
+    /**
+     * @return IConfigLoader $config
+     */
+    protected function getConfig()
+    {
+        return $this->config;
+    }
 
     /**
      * @param int $duration

@@ -25,9 +25,6 @@ class Queue extends ResourceVideo
     /** @var Alaress_Date_Format */
     protected $modified;
 
-    /** @var ConfigMapper */
-    protected $configMapper;
-
     /** @var StorageMapper */
     protected $storageMapper;
 
@@ -67,13 +64,13 @@ class Queue extends ResourceVideo
 
     public function __construct()
     {
-        $this->setConfigMapper(ConfigMapper::getInstance());
+        parent::__construct();
         $this->setStorageMapper(StorageMapper::getInstance());
 
         // Grab bitrates from config
 
-        $this->audioBitrate = $this->getConfigMapper()->get('audio_bitrate');
-        $this->videoBitrate = $this->getConfigMapper()->get('video_bitrate');
+        $this->audioBitrate = $this->getConfig()->get('audio_bitrate');
+        $this->videoBitrate = $this->getConfig()->get('video_bitrate');
     }
 
     /**
@@ -84,13 +81,14 @@ class Queue extends ResourceVideo
     public function process()
     {
         $sourceFile = $this->getSourceFile();
-
+        
         if($sourceFile->getMimetype()->isAudio()){
             return $this->processAudio($this->getSourceLocation($sourceFile));
         }
         else if($sourceFile->getMimeType()->isVideo()){
             return $this->processVideo($this->getSourceLocation($sourceFile));
         }
+
         return false;
     }
 
@@ -100,13 +98,14 @@ class Queue extends ResourceVideo
      *
      * @param $sourceFile
      * @returns boolean
+     * @throws \RuntimeException
      */
     public function processAudio($sourceFile)
     {
         $executable = $this->getConverterExecutable();
 
         $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) . " -c:a libmp3lame -b {$this->audioBitrate}k -ar:a 44100"
-            . ' -timelimit ' . escapeshellarg($this->config->get('video_processing_timeout')) . ' '
+            . ' -timelimit ' . escapeshellarg($this->getConfig()->get('video_processing_timeout')) . ' '
             . escapeshellarg($this->getAudioLocation()) . ' 2>&1';
 
         exec($processString, $message, $return);
@@ -124,7 +123,7 @@ class Queue extends ResourceVideo
         if ($return == 0) {
             return true;
         } else {
-            return false;
+            throw new \RuntimeException($message);
         }
 
     }
@@ -135,6 +134,8 @@ class Queue extends ResourceVideo
      *
      * @param $sourceFile
      * @returns boolean
+     * @throws \RuntimeException
+     * @throws \UnexpectedValueException
      */
 
     public function processVideo($sourceFile)
@@ -154,7 +155,7 @@ class Queue extends ResourceVideo
         exec("$info_exec -show_streams " . escapeshellarg($sourceFile) . ' 2>&1', $info_message, $info_return);
         $info_message = implode("\n", $info_message);
         if (!($info_return == 0)) {
-            return false;
+            throw new \UnexpectedValueException("Unable to determine video size: $info_message");
         }
         $width  = 0;
         $height = 0;
@@ -221,7 +222,7 @@ class Queue extends ResourceVideo
         /* Process video to 512kb in libx264 format for mobile and html5 streaming */
         $processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
             " -c:v libx264 $scale -preset slow -b:v {$this->videoBitrate}k -b:a {$this->audioBitrate}k -r 24 -ar:a 44100" .
-            " -timelimit " . escapeshellarg($this->config->get('video_processing_timeout')) . ' ' .
+            " -timelimit " . escapeshellarg($this->getConfig()->get('video_processing_timeout')) . ' ' .
             ($strict ? '-strict -2 ' : '') .
             '-ac 2 ' . escapeshellarg($this->getVideoLocation()) . ' 2>&1';
 
@@ -268,10 +269,10 @@ class Queue extends ResourceVideo
             if ($return == 0) {
                 return true;
             } else {
-                return false;
+                throw new \RuntimeException($output);
             }
         }
-        return false;
+        throw new \RuntimeException($message);
 
 
     }
@@ -298,7 +299,7 @@ class Queue extends ResourceVideo
      */
     private function getSourceLocation($sourceObject)
     {
-        return $this->getConfigMapper()->get('storage_dir'). '/' . $sourceObject->getPath();
+        return $this->getConfig()->get('storage_dir'). '/' . $sourceObject->getPath();
     }
 
     /**
@@ -441,23 +442,7 @@ class Queue extends ResourceVideo
     }
 
     /** Here be the getters/setters, nothing else to see here */
-
-    /**
-     * @return ConfigMapper
-     */
-    public function getConfigMapper() {
-        return $this->configMapper;
-    }
-
-    /**
-     * @param $configMapper
-     * @return $this
-     */
-    public function setConfigMapper($configMapper) {
-        $this->configMapper = $configMapper;
-        return $this;
-    }
-
+    
     /**
      * @return StorageMapper
      */
