@@ -116,7 +116,7 @@ class Log {
 	/**
 	 * Set created at
 	 *
-	 * @param null $createdAt
+	 * @param \Alaress_Date_Format $createdAt
 	 */
 	public function setCreatedAt($createdAt) {
 		$this->createdAt = $createdAt;
@@ -125,7 +125,7 @@ class Log {
 	/**
 	 * Get created at
 	 *
-	 * @return null
+	 * @return \Alaress_Date_Format
 	 */
 	public function getCreatedAt() {
 		return $this->createdAt;
@@ -134,7 +134,7 @@ class Log {
 	/**
 	 * Set deleted at
 	 *
-	 * @param null $deletedAt
+	 * @param \Alaress_Date_Format $deletedAt
 	 */
 	public function setDeletedAt($deletedAt) {
 		$this->deletedAt = $deletedAt;
@@ -143,7 +143,7 @@ class Log {
 	/**
 	 * Get deleted at
 	 *
-	 * @return null
+	 * @return \Alaress_Date_Format
 	 */
 	public function getDeletedAt() {
 		return $this->deletedAt;

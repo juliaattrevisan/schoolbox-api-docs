@@ -45,7 +45,7 @@ class Event extends Calendar\Event {
 	 * Initialise collections all over the place
 	 */
 	protected function setup() {
-		$this->setMetadata(new Collection());
+		$this->setMetadata(new EventMetadata());
 	}
 
 	/* Getters/Setters

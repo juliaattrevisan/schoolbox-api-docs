@@ -26,16 +26,16 @@ class EventMetadata {
 	/**
 	 * An instance of Calendar\EventType
 	 *
-	 * @var int
+	 * @var \Schoolbox\Calendar\EventType
 	 */
-	private $eventType = -1;
+	private $eventType = null;
 
 	/**
 	 * An instance of EventStatus
 	 *
-	 * @var int
+	 * @var EventStatus
 	 */
-	private $status = 1;
+	private $status = null;
 
 	/**
 	 * Whether RAMS is selected for this event
@@ -54,21 +54,21 @@ class EventMetadata {
 	/**
 	 * A collection of ActivityLog
 	 *
-	 * @var null
+	 * @var Collection
 	 */
 	protected $activityLog = null;
 
 	/**
 	 * A Collection of User objects
 	 *
-	 * @var null
+	 * @var Collection
 	 */
 	protected $staffAttendees = null;
 
 	/**
 	 * A Collection of User objects
 	 *
-	 * @var null
+	 * @var Collection
 	 */
 	protected $studentAttendees = null;
 
@@ -82,39 +82,43 @@ class EventMetadata {
 	/**
 	 * A collection of resource bookings
 	 *
-	 * @var null
+	 * @var Collection
 	 */
 	protected $resourceBookings = null;
 
 	/**
 	 * Created at
 	 *
-	 * @var null
+	 * @var \Alaress_Date_Format
 	 */
 	private $createdAt = null;
 
 	/**
 	 * Updated at
 	 *
-	 * @var null
+	 * @var \Alaress_Date_Format
 	 */
 	private $updatedAt = null;
 
 	/**
 	 * Deleted at
 	 *
-	 * @var null
+	 * @var \Alaress_Date_Format
 	 */
 	private $deletedAt = null;
 
 	/**
-	 * Construtor
+	 * Constructor
 	 */
 	public function __construct() {
-		$this->setStaffAttendees(new \Schoolbox\Collection());
-		$this->setStudentAttendees(new \Schoolbox\Collection());
-		$this->setRamsFiles(new \Schoolbox\Collection());
-		$this->setResourceBookings(new \Schoolbox\Collection());
+		$this->setStaffAttendees(new Collection());
+		$this->setStudentAttendees(new Collection());
+		$this->setRamsFiles(new Collection());
+		$this->setResourceBookings(new Collection());
+
+//		/** @var \EOTC\EventStatus $eventStatus */
+//		$eventStatus = EventStatusMapper::getInstance()->findById(1);
+//		$this->setStatus($eventStatus);
 	}
 
 	/* Getters/Setters
@@ -213,7 +217,7 @@ class EventMetadata {
 	/**
 	 * Set status
 	 *
-	 * @param int $status
+	 * @param EventStatus $status
 	 */
 	public function setStatus($status) {
 		$this->status = $status;
@@ -222,7 +226,7 @@ class EventMetadata {
 	/**
 	 * Get status
 	 *
-	 * @return int
+	 * @return EventStatus
 	 */
 	public function getStatus() {
 		return $this->status;
@@ -267,7 +271,7 @@ class EventMetadata {
 	/**
 	 * Set activity log
 	 *
-	 * @param null $activityLog
+	 * @param Collection $activityLog
 	 */
 	public function setActivityLog($activityLog) {
 		$this->activityLog = $activityLog;
@@ -276,7 +280,7 @@ class EventMetadata {
 	/**
 	 * Get activity log
 	 *
-	 * @return null
+	 * @return Collection
 	 */
 	public function getActivityLog() {
 		return $this->activityLog;
@@ -285,7 +289,7 @@ class EventMetadata {
 	/**
 	 * Set staff attendees
 	 *
-	 * @param null $staffAttendees
+	 * @param Collection $staffAttendees
 	 */
 	public function setStaffAttendees($staffAttendees) {
 		$this->staffAttendees = $staffAttendees;
@@ -294,7 +298,7 @@ class EventMetadata {
 	/**
 	 * Get staff attendees
 	 *
-	 * @return null
+	 * @return Collection
 	 */
 	public function getStaffAttendees() {
 		return $this->staffAttendees;
@@ -303,7 +307,7 @@ class EventMetadata {
 	/**
 	 * Set student attendees
 	 *
-	 * @param null $studentAttendees
+	 * @param Collection $studentAttendees
 	 */
 	public function setStudentAttendees($studentAttendees) {
 		$this->studentAttendees = $studentAttendees;
@@ -312,7 +316,7 @@ class EventMetadata {
 	/**
 	 * Get student attendees
 	 *
-	 * @return null
+	 * @return Collection
 	 */
 	public function getStudentAttendees() {
 		return $this->studentAttendees;
@@ -338,7 +342,7 @@ class EventMetadata {
 
 	/**
 	 * Set resource bookings
-	 * @param null $resourceBookings
+	 * @param Collection $resourceBookings
 	 */
 	public function setResourceBookings($resourceBookings) {
 		$this->resourceBookings = $resourceBookings;
@@ -347,7 +351,7 @@ class EventMetadata {
 	/**
 	 * Get resource bookings
 	 *
-	 * @return null
+	 * @return Collection
 	 */
 	public function getResourceBookings() {
 		return $this->resourceBookings;
