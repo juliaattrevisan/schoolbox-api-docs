@@ -86,8 +86,13 @@ set upsConfig = {
                         </label>
                     </span>
                     <a class="icon-down-arrow" title="Expand/Collapse All Rules" data-expand-all></a>
-                    <a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run"></a>
+                    <a class="icon-more" title="Actions" data-dropdown="ruleset-options"></a>
                 </nav>
+                <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
+                    <li class="separator">Ruleset</li>
+                    <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                    <li><a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run">Perform Dry Run</a></li>
+                </ul>
             </div>
 
             {% if ruleset.getRules() is not empty %}
