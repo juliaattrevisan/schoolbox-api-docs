@@ -2,8 +2,8 @@
 /**
  * Blog component for homepage
  *
- * @author    Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright Copyright 2016, Alaress Pty Ltd
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
 
@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use SitePage;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Blog\Blog\Mapper as BlogMapper;
 use Schoolbox\Blog\Blog\Model as BlogModel;
 use Schoolbox\Blog\Comment\Mapper as BlogCommentMapper;
@@ -92,6 +93,13 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
+        try {
+            /** @var FolderModel $folder */
+            $folder = $this->getFolderMapper()->findById($this->getInstance()->getIdentifier());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+        }
+
         $blogs = $this->getBlogMapper()
             ->findByColumn("folder_id", $this->getInstance()->getIdentifier())
             ->sortBy('createdAt', 'desc')
@@ -129,6 +137,8 @@ class Controller extends Component_Homepage_ControllerAbstract
             ),
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
+
+        return false;
     }
 
     /**
