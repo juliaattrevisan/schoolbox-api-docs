@@ -557,19 +557,45 @@
          */
         function refreshSaveRulesetButtonAvailability()
         {
-			var numRules = $(config.element).find('[data-rule], [data-custom-rule]').length;
+            var numRules = $(config.element).find('[data-rule]').length;
+			var numCustomRules = $(config.element).find('[data-custom-rule]').length;
+            var numRulesTotal = numRules + numCustomRules;
+
 			var saveButton = $(config.element).find('[data-ruleset-save]');
             var emptyRulesetAlert = $('#emptyRulesetAlert');
 
-
-			if (numRules) {
+			if (numRulesTotal) {
 				saveButton.show();
-                emptyRulesetAlert.addClass('hide');
+
+                if (numRules) {
+                    hideElement(emptyRulesetAlert);
+                }
+                else {
+                    showElement(emptyRulesetAlert);
+                }
 			}
 			else {
 				saveButton.hide();
-                emptyRulesetAlert.removeClass('hide');
+                showElement(emptyRulesetAlert);
 			}
+        }
+
+        /**
+         * Show element
+         *
+         * @param element
+         */
+        function showElement(element) {
+            $(element).removeClass('hide');
+        }
+
+        /**
+         * Hide element
+         *
+         * @param element
+         */
+        function hideElement(element) {
+            $(element).addClass('hide');
         }
 
         /**
