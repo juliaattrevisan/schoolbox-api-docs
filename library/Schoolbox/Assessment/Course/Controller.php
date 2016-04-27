@@ -37,6 +37,7 @@ use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Code;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
@@ -218,7 +219,18 @@ class Controller extends Base\Base
         $data = [];
 
         if ($id) {
-            $folder = $this->getCourseMapper()->findById($id);
+
+            // this is the one exception to the rule: you may modify a FOLDER to convert it into a course by adding units.
+            // as such, this searches for folders rather than explicitly courses, but said course:
+            //   - must live in the faculty root; and
+            //   - must not have any course descendants itself
+            $folder = $this->getFolderMapper()->findById($id);
+
+            // check ancestry
+            if (!$this->getCourseMapper()->mayBeConvertedToCourse($folder)) {
+                $this->sendError('Folder chosen may not be converted to a course');
+            }
+
             $folder->setParent($this->getFolderMapper()->findById($folder->getParent()->getId()));
 
             $instances = [];
@@ -641,7 +653,7 @@ class Controller extends Base\Base
         $folder    = $query->get('folder');
         $search    = $query->get('query');
 
-        $data  = $this->getCourseMapper()->findCourseList($search);
+        $data  = $this->getCourseData($search);
 
         // only offer suggestions if you're not searching
         if ($folder && !$search) {
@@ -678,6 +690,51 @@ class Controller extends Base\Base
         }
 
         $this->tpl($template, array_merge($data, $options));
+    }
+
+
+    /**
+     * List the courses. Returns a combined array of Folder instances
+     * and information about any found Units and their task counts
+     *
+     * @param string $searchParam
+     * @return array
+     */
+    protected function getCourseData($searchParam)
+    {
+        $allCourses = $this->getCourseMapper()->findCourseListByName($searchParam);
+
+        $data = [
+            'courses' => $allCourses
+        ];
+
+        foreach ($allCourses as $currentCourse) {
+
+            $allUnits = $this->getUnitMapper()->findByCourseId($currentCourse->getId());
+
+            // Append to unit index, by ID
+            foreach ($allUnits as $currentUnit) {
+                $data['units'][$currentCourse->getId()][] = $currentUnit;
+            }
+
+            /* Also store the path to this Course
+             */
+            $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
+        }
+
+        return $data;
+    }
+
+
+    /**
+     * Convenience method
+     *
+     * @param Folder\Model $course
+     * @return Collection
+     */
+    protected function getLineage(Folder\Model $course)
+    {
+        return $this->getAncestry()->findParentsCheaply($course, $this->getCourseMapper()->getFacultyNode());
     }
 
 
@@ -2181,4 +2238,14 @@ class Controller extends Base\Base
     {
         $this->taskInstanceMapper = $taskInstanceMapper;
     }
+
+
+    /**
+     * @return Ancestry
+     */
+    public function getAncestry()
+    {
+        return $this->getCourseMapper()->getAncestry();
+    }
+
 }
