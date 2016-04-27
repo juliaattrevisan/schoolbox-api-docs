@@ -18,10 +18,15 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\Assessment\Course
+ * @method Model findById($id)
+ */
 class Mapper extends FolderMapper
 {
     /**
@@ -32,21 +37,28 @@ class Mapper extends FolderMapper
      */
     private $facultyNode = null;
 
+
     /**
-     * A cache of ancestral Folder instances, to save
-     * on re-querying the same Folder from the db over
-     * and over again
+     * @inheritdoc
      *
-     * @var Ancestry
+     * @throws \Schoolbox\Mapper\Exception
      */
-    private $ancestry = null;
+    protected function mapping()
+    {
+        parent::mapping();
+
+        $this->hasPrototype(new Model());
+
+        // reverse join onto self for unit definition
+        $this->joins('id', Unit\Mapper::class, 'parent', null, self::COLUMN_JOIN_MULTI, 'units', 'unit');
+    }
+
 
     /**
      * Hook method which occurs after successful construction
      */
     protected function postSetup()
     {
-        $this->setAncestry(new Ancestry());
 
         /* TODO: Replace /homepage/29 in config/course_homepage with just int
          * Faculty Root Node can be obtained Cheaply
@@ -55,16 +67,6 @@ class Mapper extends FolderMapper
         $facultyNodeId = preg_replace('/[^0-9]/', '', $this->getConfigLoader()->get('course_homepage'));
 
         $this->setFacultyNode($this->findCheaplyById($facultyNodeId));
-    }
-
-    /**
-     * Delegation method
-     *
-     * Clear out all the objects in the Ancestry
-     */
-    public function resetAncestry()
-    {
-        $this->getAncestry()->reset();
     }
 
 
@@ -76,7 +78,8 @@ class Mapper extends FolderMapper
     protected function getSelectString()
     {
         return "
-            SELECT DISTINCT {$this->getColumnString()}
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('unit', 'unit')}
         ";
     }
 
@@ -88,11 +91,9 @@ class Mapper extends FolderMapper
      */
     protected function getFromString()
     {
-        $c = "`{$this->getTable()}`";
-
         return "
-            FROM $c
-            RIGHT JOIN category unit ON $c.id = unit.parent
+            FROM `{$this->getTable()}`
+            LEFT JOIN {$this->getJoinSql('unit', '', 'unit', true)}
             INNER JOIN component_instance ci ON ci.identifier = unit.id AND ci.module = :module
             LEFT JOIN component_definition cd ON ci.component_definition_id = cd.id
         ";
@@ -105,13 +106,22 @@ class Mapper extends FolderMapper
      */
     protected function hydrateSelect($statement)
     {
-        $c = $this->createCollection();
+        /** @var Model[] $cache */
+        $cache = [];
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $c->add($this->hydrate($row));
+
+            $courseId = $row['id'];
+
+            if (empty($cache[$courseId])) {
+                $cache[$courseId] = $this->hydrate($row);
+                $cache[$courseId]->setUnits($this->createCollection());
+            }
+
+            $cache[$courseId]->getUnits()->add($this->hydrateJoin($row, 'unit', 'unit'));
         }
 
-        return $c;
+        return $this->createCollection(array_values($cache));
     }
 
 
@@ -153,49 +163,6 @@ class Mapper extends FolderMapper
         return $this->findByColumn('name', "%{$this->database->quoteForLike($searchParam)}%", $options);
     }
 
-    /**
-     * List the courses. Returns a combined array of Folder instances
-     * and information about any found Units and their task counts
-     *
-     * @param $searchParam
-     * @return array
-     */
-    public function findCourseList($searchParam)
-    {
-        $allCourses = $this->findCourseListByName($searchParam);
-
-        $data = [
-            'courses' => $allCourses
-        ];
-
-        foreach ($allCourses as $currentCourse) {
-            $allUnits = $this->findTaskCountForAllUnits($currentCourse);
-
-            /* Only display units which have tasks in them
-             */
-            foreach ($allUnits as $currentUnit) {
-                if ($currentUnit->getTaskCount()) {
-                    $data['units'][$currentCourse->getId()][] = $currentUnit;
-                }
-            }
-
-            /* Also store the path to this Course
-             */
-            $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
-        }
-
-        return $data;
-    }
-
-
-    /**
-     * @param Folder $course
-     * @return Collection
-     */
-    public function getLineage(Folder $course)
-    {
-        return $this->getAncestry()->findParentsCheaply($course, $this->getFacultyNode());
-    }
 
     /**
      * Get a list of Units and Tasks for a particular Course
@@ -204,6 +171,8 @@ class Mapper extends FolderMapper
      * because sometimes we need to check whether a Course or Unit is
      * linked to a homepage. If there is a homepage for the unit, we
      * also need to check access perms before providing a link to users
+     *
+     * @deprecated idk where this needs to go, but it needs to not be here
      *
      * @param Folder $course
      * @return Collection|Folder[]
@@ -346,26 +315,6 @@ class Mapper extends FolderMapper
     private function setFacultyNode($facultyNode)
     {
         $this->facultyNode = $facultyNode;
-    }
-
-    /**
-     * Get ancestry
-     *
-     * @return Ancestry
-     */
-    private function getAncestry()
-    {
-        return $this->ancestry;
-    }
-
-    /**
-     * Set ancestry
-     *
-     * @param Ancestry $ancestry
-     */
-    private function setAncestry($ancestry)
-    {
-        $this->ancestry = $ancestry;
     }
 
     /**
