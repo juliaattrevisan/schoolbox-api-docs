@@ -279,6 +279,34 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateDefaultCampus']);
     }
 
+    /**
+     * Finds a user by their email address.
+     *
+     * Allows search on both `alt_email` field and `username`@`config.mail_address`.
+     *
+     * @param string $email
+     * @return Collection|User[]
+     */
+    public function findByEmail($email)
+    {
+        $query  = $this->getSelectString() . ' WHERE (user.alt_email = :altEmail AND user.local_email IS FALSE)';
+        $params = ['altEmail' => $email];
+        if (!filter_var(FILTER_VALIDATE_EMAIL, $email)) {
+            $emailParts = explode('@', $email, 2);
+            if (count($emailParts) === 2) {
+                // Compare this email's hostname against the actual hostname
+                list($username, $domain) = $emailParts;
+                $thisDomain = $this->getConfigLoader()->get('mail_address');
+                if ($domain == $thisDomain) {
+                    $query .= ' OR (user.username = :username AND user.local_email IS TRUE)';
+                    $params['username'] = $username;
+                }
+            }
+        }
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
+        return $this->hydrateSelect($statement);
+    }
 
     /**
      * @return string

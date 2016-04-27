@@ -125,10 +125,9 @@ class Controller extends Base
             $sessionSegment->setFlash('isEmailValid', false);
         } else {
             $sessionSegment->setFlash('isEmailValid', true);
-            // Find all users with this email address. (not counting email_address_from_username)
+            // Find all users with this email address.
             // If there is one, send a reset email to this address.
-            /** @var User[] $users */
-            $users  = $this->userMapper->findByColumn('alt_email', $emailAddress);
+            $users  = $this->userMapper->findByEmail($emailAddress);
             $config = $this->getConfigLoader();
             if (count($users) > 0) {
                 foreach ($users as $user) {
