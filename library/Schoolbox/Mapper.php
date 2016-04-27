@@ -1576,7 +1576,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function isUnique($columnList = [], $currentId)
     {
-        $query = $this->selectScalarByColumnList($this->getIdentifier()['column'], $columnList);
+        $query = $this->selectScalarByColumnList($this->getTable() . '.' . $this->getIdentifier()['column'], $columnList);
         $query->execute();
         while (($dupeId = $query->fetchColumn()) !== false) {
             if ($currentId == $dupeId) {
@@ -1652,7 +1652,7 @@ abstract class Mapper implements IMapper, Serializable
     public function findIdsByColumnList(array $columnList, array $options = [])
     {
         try {
-            $stmt = $this->selectScalarByColumnList($this->identifier['column'], $columnList, $options);
+            $stmt = $this->selectScalarByColumnList('DISTINCT ' . $this->getTable() . '.' . $this->getIdentifier()['column'], $columnList, $options);
         } catch (UnderflowException $e) {
             return [];
         }
