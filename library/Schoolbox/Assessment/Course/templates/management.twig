@@ -36,8 +36,38 @@
             });
         });
 
+        /* Restore courses
+         */
+        $('#courseList').on('click', '[data-restore-course]', function(event) {
+            event.preventDefault();
+
+            var self = $(this);
+
+            $.post($(this).attr('href'), {
+                folderId: $(this).attr('data-restore-folder'),
+                componentId: $(this).attr('data-restore-component')
+            }, function(responseText) {
+                if (responseText.result == 'success') {
+                    window.location.href = window.location.href;
+                }
+                else {
+                    $('#restoreCourseName').html(self.attr('data-restore-course'));
+
+                    $('#restoreCourseModal').foundation('reveal', 'open');
+                }
+            });
+        });
     });
 </script>
+
+<div id="restoreCourseModal" class="reveal-modal" data-reveal>
+    <h2>Error restoring course</h2>
+
+    <p>Could not restore <span id="restoreCourseName"></span>.</p>
+
+    <a class="close-reveal-modal">&#215;</a>
+</div>
+
 <ul class="breadcrumb">
     <li><a href="/homepage/{{ folder.id }}">{{ folder.name }}</a></li>
     <li class="active">
@@ -88,7 +118,7 @@
                     </div>
                     <nav>
                         {% if courseComponentRemoved %}
-                            <a href="{{ routeLookup('course.restoreCourse', { folderId: folder.id, componentId: courseComponentId }) }}" class="icon-upload" title="Restore Course"></a>
+                            <a href="{{ routeLookup('course.restoreCourse') }}" class="icon-upload" title="Restore Course" data-restore-course="{{ currentCourse.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId }}"></a>
                         {% endif %}
                         <a href="{{ routeLookup('course.importModify', { componentId: courseComponentId }) }}" class="icon-modify" title="Modify Import"></a>
                         <a href="" class="icon-delete" title="Delete Course" data-delete="{{ courseComponentId }}" data-coursename="{{ currentCourse.name }}"></a>
