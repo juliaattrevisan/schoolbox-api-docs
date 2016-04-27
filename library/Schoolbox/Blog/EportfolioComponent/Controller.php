@@ -1,0 +1,242 @@
+<?php
+/**
+ * Blog component for homepage
+ *
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Blog\EportfolioComponent;
+
+use Component_Eportfolio_ControllerAbstract;
+use Component_Instance;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
+use SitePage;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Blog\EportfolioBlog\Mapper as EportfolioBlogMapper;
+use Schoolbox\Blog\EportfolioBlog\Model as EportfolioBlogModel;
+use Schoolbox\Blog\EportfolioComment\Mapper as EportfolioBlogCommentMapper;
+use Schoolbox\Blog\EportfolioComment\Model as EportfolioBlogCommentModel;
+use Schoolbox\Blog\EportfolioImage\Mapper as EportfolioBlogImageMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\UserMapper;
+
+class Controller extends Component_Eportfolio_ControllerAbstract
+{
+    /**
+     * @var FolderMapper;
+     */
+    protected $folderMapper;
+
+    /**
+     * @var EportfolioBlogMapper;
+     */
+    protected $blogMapper;
+
+    /**
+     * @var ErrorMapper;
+     */
+    protected $errorMapper;
+
+    /**
+     * @var UserMapper;
+     */
+    protected $userMapper;
+
+    /**
+     * @var EportfolioBlogCommentMapper;
+     */
+    protected $blogCommentMapper;
+
+    /**
+     * @var EportfolioBlogImageMapper;
+     */
+    protected $blogImageMapper;
+
+    /**
+     * Injectable constructor
+     *
+     * @param Component_Instance $instance
+     * @param User               $user
+     * @param SitePage           $sitepage
+     */
+    public function __construct(
+        Component_Instance $instance,
+        User $user,
+        SitePage $sitepage
+    ) {
+        parent::__construct($instance, $user, $sitepage);
+        $this->setFolderMapper(FolderMapper::getInstance());
+        $this->setEportfolioBlogMapper(EportfolioBlogMapper::getInstance());
+        $this->setEportfolioBlogImageMapper(EportfolioBlogImageMapper::getInstance());
+        $this->setEportfolioBlogCommentMapper(EportfolioBlogCommentMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
+    }
+
+    /**
+     * Loads the grid component into its set configuration.
+     *
+     * @return true
+     */
+    public function execute()
+    {
+        return true;
+    }
+
+    /**
+     * @param String $templateHandle
+     *
+     * @return bool
+     */
+    public function renderTemplate($templateHandle)
+    {
+        $blogs = $this->getEportfolioBlogMapper()
+            ->findByColumn("page_id", $this->getInstance()->getIdentifier())
+            ->sortBy('createdAt', 'desc')
+            ->limit(0, $this->getConfig('size'));
+
+        $blogComments = [];
+        $blogImages = [];
+
+        // This creates an array of unique year/months for the date selector
+
+        /** @var EportfolioBlogModel $blog */
+        foreach ($blogs as $blog)
+        {
+            $user = $this->getUserMapper()->findById($blog->getOwner()->getId());
+            $blog->setOwner($user);
+
+            $blogComments[$blog->getId()] = $this->getEportfolioBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
+            $blogImages[$blog->getId()] = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId());
+
+            /** @var EportfolioBlogCommentModel $comment */
+            foreach ($blogComments[$blog->getId()] as $comment) {
+                $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
+            }
+        }
+
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            '@blog/component.twig',
+            array(
+                'session'               => $_SESSION,
+                'blogs'                 => $blogs,
+                'blogComments'          => $blogComments,
+                'blogImages'            => $blogImages,
+                'componentInstanceId'   => $this->getInstance()->getId(),
+                'componentClass'        => $this->getComponentName()
+            ),
+            $this->hasWriteAccess() || !$this->getConfig('compactMode')
+        );
+    }
+
+    /**
+     * @return FolderMapper
+     */
+    public function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+    /**
+     * @param  FolderMapper $folderMapper
+     * @return $this
+     */
+    public function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+    /**
+     * @return EportfolioBlogMapper
+     */
+    public function getEportfolioBlogMapper()
+    {
+        return $this->blogMapper;
+    }
+
+    /**
+     * @param  EportfolioBlogMapper $blogMapper
+     * @return $this
+     */
+    public function setEportfolioBlogMapper($blogMapper)
+    {
+        $this->blogMapper = $blogMapper;
+        return $this;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    public function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param  ErrorMapper $errorMapper
+     * @return $this
+     */
+    public function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper()
+    {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param  UserMapper $userMapper
+     * @return $this
+     */
+    public function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
+     * @return EportfolioBlogCommentMapper
+     */
+    public function getEportfolioBlogCommentMapper()
+    {
+        return $this->blogCommentMapper;
+    }
+
+    /**
+     * @param  EportfolioBlogCommentMapper $blogCommentMapper
+     * @return $this
+     */
+    public function setEportfolioBlogCommentMapper($blogCommentMapper)
+    {
+        $this->blogCommentMapper = $blogCommentMapper;
+        return $this;
+    }
+
+    /**
+     * @return EportfolioBlogImageMapper
+     */
+    public function getEportfolioBlogImageMapper()
+    {
+        return $this->blogImageMapper;
+    }
+
+    /**
+     * @param  EportfolioBlogImageMapper $blogImageMapper
+     * @return $this
+     */
+    public function setEportfolioBlogImageMapper($blogImageMapper)
+    {
+        $this->blogImageMapper = $blogImageMapper;
+        return $this;
+    }
+}
