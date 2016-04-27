@@ -54,17 +54,14 @@ class DAV_ExtendedClient extends Sabre\DAV\Client
      */
     public function put($path, $file)
     {
+        $absolutePath = $this->getAbsoluteUrl($path);
+        $request      = new Sabre\HTTP\Request('PUT', $absolutePath);
+        $request->setBody(fopen($file, "r"));
+        $curl = curl_init($absolutePath);
 
-        $curl = curl_init($this->getAbsoluteUrl($path));
-
-        $settings = array(
-            CURLOPT_HTTPAUTH   => Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC,
-//            CURLOPT_USERPWD    => $this->userName . ':' . $this->password,
-            CURLOPT_COOKIEFILE => '',
-            CURLOPT_PUT        => true,
-            CURLOPT_INFILE     => fopen($file, "r"),
-            CURLOPT_INFILESIZE => filesize($file),
-        );
+        $settings = $this->createCurlSettingsArray($request);
+        $settings[CURLOPT_HTTPAUTH]   = Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC;
+        $settings[CURLOPT_COOKIEFILE] = '';
         if (Cfg::get('webdav_allow_insecure')) {
             $settings[CURLOPT_SSL_VERIFYHOST] = false;
             $settings[CURLOPT_SSL_VERIFYPEER] = false;
@@ -89,19 +86,20 @@ class DAV_ExtendedClient extends Sabre\DAV\Client
      */
     public function putResource($path, $resource)
     {
-        rewind($resource);
-        $metadata = stream_get_meta_data($resource);
-        $size     = filesize($metadata['uri']);
-        $curl     = curl_init($this->getAbsoluteUrl($path));
+        $absolutePath = $this->getAbsoluteUrl($path);
+        $request      = new Sabre\HTTP\Request('PUT', $absolutePath);
+        $request->setBody($resource);
+        $curl = curl_init($absolutePath);
 
-        $settings = array(
-            CURLOPT_HTTPAUTH   => Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC,
+        $settings = $this->createCurlSettingsArray($request);
+        $settings[CURLOPT_HTTPAUTH]   = Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC;
+        $settings[CURLOPT_COOKIEFILE] = '';
 //            CURLOPT_USERPWD    => $this->userName . ':' . $this->password,
-            CURLOPT_COOKIEFILE => '',
-            CURLOPT_PUT        => true,
-            CURLOPT_INFILE     => $resource,
-            CURLOPT_INFILESIZE => $size,
-        );
+//            CURLOPT_COOKIEFILE => '',
+//            CURLOPT_PUT        => true,
+//            CURLOPT_INFILE     => fopen($file, "r"),
+//            CURLOPT_INFILESIZE => filesize($file),
+//        );
         if (Cfg::get('webdav_allow_insecure')) {
             $settings[CURLOPT_SSL_VERIFYHOST] = false;
             $settings[CURLOPT_SSL_VERIFYPEER] = false;
