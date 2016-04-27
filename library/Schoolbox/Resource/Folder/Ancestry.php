@@ -40,10 +40,12 @@ class Ancestry
 
     /**
      * Constructor
+     *
+     * @param FolderMapper $folderMapper
      */
-    public function __construct()
+    public function __construct(FolderMapper $folderMapper)
     {
-        $this->setFolderMapper(FolderMapper::getInstance());
+        $this->setFolderMapper($folderMapper);
     }
 
     /**
