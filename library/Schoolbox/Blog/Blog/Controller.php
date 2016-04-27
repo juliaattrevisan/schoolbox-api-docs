@@ -310,10 +310,7 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_BLOG_MODIFY);
         }
 
-        $returnUrl = "/blog/{$comment->getBlog()->getId()}";
-
         $this->getBlogCommentMapper()->delete($comment);
-        $this->getResponse()->redirect->afterPost($returnUrl);
     }
 
     /**
@@ -335,10 +332,7 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_BLOG_MODIFY);
         }
 
-        $returnUrl = "/homepage/{$blog->getFolder()->getId()}";
-
         $this->getBlogMapper()->delete($blog);
-        $this->getResponse()->redirect->afterPost($returnUrl);
     }
 
     /**
@@ -401,17 +395,17 @@ class Controller extends Base
 
     /**
      * Gets blog archive for the current calendar month
-     * @param $id            The `folder_id` of the blog we want to view
+     * @param int $id            The `folder_id` of the blog we want to view
      */
     public function getArchiveCurrent($id) {
-        return $this->getArchive($id, date("Y"), date("n"));
+        $this->getArchive($id, date("Y"), date("n"));
     }
 
     /**
      * Display insert new blog post page
-     * @param $id
-     * @param $year         Archive year we are currently looking at (if not supplied will be based on current date)
-     * @param $month        Archive month we are currently looking at (if not supplied will be based on current date)
+     * @param int $id
+     * @param int $year         Archive year we are currently looking at (if not supplied will be based on current date)
+     * @param int $month        Archive month we are currently looking at (if not supplied will be based on current date)
      * @throws \Schoolbox\Mapper\Exception
      */
     public function getArchive($id, $year, $month) {

@@ -151,7 +151,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
      * @param int $limit
      * @param int $offset
      * @param int $time
-     * @return Collection|BlogModel[]
+     * @return Collection|EportfolioBlogModel[]
      */
     public function findForFeed($ownerId, $limit, $offset = 0, $time = 0)
     {
@@ -193,7 +193,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
             /** @var FolderModel $folder */
             $folder = $this->hydrateJoin($r, 'owner', 'c');
 
-            /** @var BlogModel $blog */
+            /** @var EportfolioBlogModel $blog */
             $blog = $this->hydrate($r, 'b');
             $blog->setOwner($user);
             $blog->setFolder($folder);
@@ -244,7 +244,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
             /** @var User $user */
             $user = $this->hydrateJoin($r, 'user', 'u');
 
-            /** @var BlogModel $blog */
+            /** @var EportfolioBlogModel $blog */
             $blog = $this->hydrate($r, 'b');
             $blog->setOwner($user);
             $c->add($blog);

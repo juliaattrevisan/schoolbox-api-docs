@@ -1,0 +1,130 @@
+<script type="text/javascript">
+    $(function() {
+
+        $('[data-image-gallery] li').magnificPopup({
+            delegate: 'a',
+            type: 'image'
+        });
+
+        $('[data-interaction="delete"]').click(function(event) {
+            event.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this comment?',
+                confirmEvent: function() {
+                    $.post('/eportfolio/blog/comment/delete', {
+                        id: $(event.target).attr('data-comment-id')
+                    })
+                    .done(function() {
+                        // Remove from list after AJAX returns
+
+                        $(event.target).closest('li').remove();
+                    });
+                }
+            });
+        })
+    });
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="/eportfolio/{{ page.getUid }}/{{ page.getPageId }}">{{ page.getPageTitle }}</a></li>
+    <li class="active"><a href="#">{{ record.getHeading }}</a></li>
+</ul>
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ record.getHeading }}</h1>
+        </div>
+    </div>
+    {% if session.user.getId == comment.getOwner.getId or session.user.isSuperuser %}
+        <nav>
+            <a class="icon-modify" href="/eportfolio/blog/modify/{{ page.getUid }}/{{ page.getPageId }}/{{ record.getId }}" title="Modify Blog post"></a>
+        </nav>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="avatar card">
+                <a href="/search/user/{{ record.getOwner.getId }}">
+                    <img src="/portrait.php?userId={{ record.getOwner.getExternalId }}&size=square64" />
+                    <p>{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</p>
+                </a>
+                <p class="meta">{{ record.getCreatedAt.getLong }}</p>
+            </div>
+        </section>
+
+        <section class="content">
+            <article>{{ record.getBody | raw }}</article>
+        </section>
+
+        {% if images | length > 0 %}
+
+            <h2 class="subheader">Image Gallery</h2>
+            <div class="row">
+                <div class="small-12 island">
+                    <section class="content no-margin">
+                        <ul class="inline-list img-gallery" data-image-gallery="">
+                            {% for image in images %}
+                                <li><a href="/storage/image.php?size=maxsize&hash={{ image.hash }}" title="Image {{ loop.index + 1 }}" rel="lightbox"><img src="/storage/image.php?size=constrain200&hash={{ image.hash }}" alt="Image {{ loop.index + 1 }}"></a></li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                </div>
+            </div>
+
+        {% endif %}
+
+        {% if comments | length > 0 %}
+
+            <h2 class="subheader">Comments</h2>
+
+            <section>
+                <ul class="information-list">
+
+                    {% for comment in comments %}
+
+                        <li class="actions-small-1">
+
+                            <div class="list-item">
+                                <div class="avatar card">
+                                    <a href="/search/user/{{ comment.getOwner.getId }}">
+                                        <img src="/portrait.php?userId={{ comment.getOwner.getExternalId }}&size=square64" />
+                                        <p>{{ comment.getOwner.getFirstname }} {{ comment.getOwner.getLastname }}</p>
+                                    </a>
+                                    <p class="meta">{{ comment.getCreatedAt.getLong }}</p>
+                                </div>
+                            </div>
+
+                            {# Only the owner of a comment can delete it #}
+
+                            {% if session.user.getId == comment.getOwner.getId or session.user.isSuperuser %}
+                                <nav>
+                                    <a class="icon icon-delete" data-interaction="delete" data-comment-id="{{ comment.getId }}"></a>
+                                </nav>
+                            {% endif %}
+
+                            <article>{{ comment.getBody | raw }}</article>
+                        </li>
+
+                    {% endfor %}
+
+                    <li>
+                        <form method="post" action="/blog/comment/insert" class="no-pad">
+                            <input type="hidden" name="id" value="{{ record.getId }}">
+                            <label class="content">
+                                <textarea name="body" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                            </label>
+
+                            <input type="submit" class="no-margin" name="comment" value="Add comment"/>
+                        </form>
+                    </li>
+                </ul>
+            </section>
+
+        {% endif %}
+
+    </div>
+</div>

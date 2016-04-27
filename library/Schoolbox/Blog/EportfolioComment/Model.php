@@ -11,14 +11,14 @@ namespace Schoolbox\Blog\EportfolioComment;
 
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
-use Schoolbox\Blog\Blog\Model as BlogModel;
+use Schoolbox\Blog\EportfolioBlog\Model as EportfolioBlogModel;
 
 class Model {
 
 	/** @var int */
 	protected $id;
 
-	/** @var BlogModel */
+	/** @var EportfolioBlogModel */
 	protected $blog;
 
 	/** @var User */
@@ -50,7 +50,7 @@ class Model {
 	}
 
 	/**
-	 * @param BlogModel $blog
+	 * @param EportfolioBlogModel $blog
 	 * @return self
 	 */
 	public function setBlog($blog) {
@@ -59,7 +59,7 @@ class Model {
 	}
 
 	/**
-	 * @return BlogModel
+	 * @return EportfolioBlogModel
 	 */
 	public function getBlog() {
 		return $this->blog;

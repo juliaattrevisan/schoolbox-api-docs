@@ -1,0 +1,124 @@
+<ul class="breadcrumb">
+    <li><a href="/homepage/{{ folder.getId }}" title="Homepage">{{ folder.getName }}</a></li>
+    <li class="active"><a href="#">Blog Archive</a></li>
+</ul>
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Blog Archive</h1>
+        </div>
+    </div>
+    <nav>
+        <a href="/blog/modify/new/{{ folder.getId }}" class="icon-add" title="Post Blog"></a>
+    </nav>
+</div>
+
+<div class="row">
+
+    {# Year/month selection #}
+
+    <div class="small-12 large-3 island">
+        <h2 class="subheader">Archive</h2>
+        <section class="content">
+            <ul class="information-list">
+                <li>
+                    {% set previousYear = '' %}
+                    {% for date in dateSelectorArray %}
+
+                        {% if previousYear != date.getYear %}
+                            {% set previousYear = date.getYear %}
+
+                            {% if not loop.first %}
+                                </ul>
+                            {% endif %}
+
+                            {{ date.getYear }}
+                            <ul class="information-list">
+                        {% endif %}
+
+                        <li>
+                            <a href='/blog/archive/{{ folder.getId }}/{{ date.getYear }}/{{ date.getMonth }}'>{{ date | date('F') }}</a><br>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    {# Show all blog entries for the selected year/month#}
+
+    {% if blogs | length > 0 %}
+
+        <div class="small-12 large-9 island">
+            <h2 class="subheader">{{ blogs[0].getCreatedAt | date('F Y') }} Blog Posts</h2>
+            <section class="content">
+                <ul class="information-list">
+
+                    {% for blog in blogs %}
+
+                    <li>
+                        <a name="{BLOG_ID}"></a>
+
+                        <div class="actions-small-1 row">
+                            <div class="list-item">
+                                <div class="small-12 column">
+                                    <h2>{{ blog.getHeading }}</h2>
+                                </div>
+                            </div>
+                            <nav>
+                                <a class="icon-modify" title="Modify" href="/blog/modify/{{ blog.getId }}"></a>
+                            </nav>
+                        </div>
+
+                        <div class="avatar card">
+                            <a href="/search/user/{{ blog.getOwner.getId }}" title="View Profile">
+                                <img src="/portrait.php?userId={{ blog.getOwner.getExternalId }}&size=square64" alt="View Profile" />
+                                <p>{{ blog.getOwner.getFirstname }} {{ blog.getOwner.getLastname }}</p>
+                            </a>
+                            <p class="meta">Posted {{ blog.getCreatedAt.getLong }}</p>
+                        </div>
+
+                        <article>{{ blog.getBody | raw }}</article>
+
+                        <ul class="information-list reply">
+
+                            {% for comment in blogComments[blog.getId] %}
+
+                            <li>
+                                <div class="avatar card">
+                                    <a href="/search/user/{{ comment.getOwner.getId }}" title="View Profile">
+                                        <img src="/portrait.php?userId={{ comment.getOwner.getExternalId }}&size=square64" alt="View Profile" />
+                                        <p>{{ comment.getOwner.getFirstname }} {{ comment.getOwner.getLastname }}</p>
+                                    </a>
+                                    <p class="meta">Commented {{ comment.createdAt.getLong }}</p>
+                                </div>
+                                <article>
+                                    <p>
+                                        {{ comment.getBody }}
+                                    </p>
+                                </article>
+                            </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                        <form method="post" action="/blog/comment/new/{BLOG_ID}">
+                            <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                            <input type="submit" class="expand" name="comment" value="Add comment"/>
+                        </form>
+                    </li>
+
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+
+    {% else %}
+
+        <h2 class="subheader">No Blog Posts Found</h2>
+
+    {% endif %}
+</div>

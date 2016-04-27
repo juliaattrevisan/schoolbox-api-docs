@@ -46,5 +46,5 @@ ALTER TABLE `eportfolio_blog_comment` CHANGE `deleted` `deleted_at` DATETIME;
 
 -- Rename component classes
 
-UPDATE `component_definition` SET `class` = 'Schoolbox\\Blog\HomepageComponent\\Controller' WHERE `class` = 'Component_Homepage_BlogController';
-UPDATE `component_definition` SET `class` = 'Schoolbox\\Blog\EportfolioComponent\\Controller' WHERE `class` = 'Component_Eportfolio_BlogController';
+UPDATE `component_definition` SET `class` = 'Schoolbox\\Blog\\Component\\Homepage\\Controller' WHERE `class` = 'Component_Homepage_BlogController';
+UPDATE `component_definition` SET `class` = 'Schoolbox\\Blog\\Component\\Eportfolio\\Controller' WHERE `class` = 'Component_Eportfolio_BlogController';

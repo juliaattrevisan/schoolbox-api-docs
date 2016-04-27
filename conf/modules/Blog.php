@@ -11,11 +11,11 @@ namespace Config\Modules;
 
 
 use Alaress\Application\Kernel;
-use Schoolbox\Blog\Blog\Module as BlogModule;
+use Schoolbox\Blog\Component\Homepage\Module as BlogModule;
+use Schoolbox\Blog\Component\Eportfolio\Module as EportfolioBlogModule;
 
 class Blog implements ModuleConfigInterface
 {
-
     /**
      * Run configuration for the given module
      *
@@ -28,5 +28,8 @@ class Blog implements ModuleConfigInterface
 
         $blogModule = new BlogModule($di);
         $blogModule->init('/blog');
+
+        $eportfolioBlogModule = new EportfolioBlogModule($di);
+        $eportfolioBlogModule->init('/eportfolio/blog');
     }
 } 

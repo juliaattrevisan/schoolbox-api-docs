@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Blog\EportfolioBlog;
 
-use Schoolbox\Column\Integer;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
@@ -120,7 +119,7 @@ class Model {
 	}
 
 	/**
-	 * @param \Alaress_Date_Format $deleted
+	 * @param \Alaress_Date_Format $deletedAt
 	 * @return self
 	 */
 	public function setDeletedAt($deletedAt) {
