@@ -14,8 +14,12 @@ class Synchronise_Synergetic_Arden_Hydrator_Campus_Parent implements Synchronise
     public function hydrate($externalUser, $newUser) {
 
         switch($externalUser['StudentYearLevel']) {
+            case -2:
+                $campus = 1;
+                break;
+
             case -1:
-                $campus = 15;
+                $campus = 1;
                 break;
 
             case 0:
