@@ -182,8 +182,17 @@ set upsConfig = {
                 </li>
                 {% endfor %}
             </ul>
+            {% endif %}
+
+            {# Javascript controls visibility of this, because
+             # Rules can be deleted asynchronously
+             #}
+            {% if ruleset.getRules() is empty  %}
+                {% set emptyRulesetAlert = '' %}
             {% else %}
-            <div class="row">
+                {% set emptyRulesetAlert = 'hide' %}
+            {% endif %}
+            <div class="row {{ emptyRulesetAlert }}" id="emptyRulesetAlert">
                 <div class="small-12 island">
                     <div class="empty-state">
                         <i class="icon-info"></i>
@@ -192,7 +201,6 @@ set upsConfig = {
                     </div>
                 </div>
             </div>
-            {% endif %}
 
             {# Display custom rules #}
             {% if ruleset.getCustomRules() is not empty %}

@@ -559,12 +559,16 @@
         {
 			var numRules = $(config.element).find('[data-rule], [data-custom-rule]').length;
 			var saveButton = $(config.element).find('[data-ruleset-save]');
+            var emptyRulesetAlert = $('#emptyRulesetAlert');
+
 
 			if (numRules) {
 				saveButton.show();
+                emptyRulesetAlert.addClass('hide');
 			}
 			else {
 				saveButton.hide();
+                emptyRulesetAlert.removeClass('hide');
 			}
         }
 
