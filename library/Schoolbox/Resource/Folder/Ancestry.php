@@ -93,7 +93,7 @@ class Ancestry
      * @throws OverflowException if the folder is its own parent somehow
      * @return Collection
      */
-    private function findParentAncestry(Folder $folder, Folder $stopFolder, $cheaply)
+    private function findParentAncestry(Folder $folder, Folder $stopFolder = null, $cheaply)
     {
         /** @var Model[] $stack */
         $stack = array($folder);
