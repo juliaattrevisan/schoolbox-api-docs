@@ -165,11 +165,20 @@ function renderStudent(
         }
     }
 
+    /* Display their name if you couldn't find them in the db
+     * via their id (some sis don't have the id)
+     */
     $tutorTeacher = null;
-    if ($externalUser['StudentTutorName'] && $externalUser['TeacherTutorID']) {
-        try {
-            $tutorTeacher = $userMapper->findByExternalId($externalUser['TeacherTutorID']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+    if ($externalUser['StudentTutorName']) {
+        if ($externalUser['TeacherTutorID']) {
+            try {
+                $tutorTeacher = $userMapper->findByExternalId($externalUser['TeacherTutorID']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $tutorTeacher = new \Schoolbox\User();
+                $tutorTeacher->setLastname($externalUser['StudentTutorName']);
+            }
+        }
+        else {
             $tutorTeacher = new \Schoolbox\User();
             $tutorTeacher->setLastname($externalUser['StudentTutorName']);
         }
@@ -185,11 +194,19 @@ function renderStudent(
         }
     }
 
+    /* Display their name if you couldn't find them in the db
+     * via their id (some sis don't have the id)
+     */
     $coordTeacher = null;
-    if ($externalUser['StudentYearLevelCoordinator'] && $externalUser['YearLevelCoordID']) {
-        try {
-            $coordTeacher = $userMapper->findByExternalId($externalUser['YearLevelCoordID']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+    if ($externalUser['StudentYearLevelCoordinator']) {
+        if ($externalUser['YearLevelCoordID']) {
+            try {
+                $coordTeacher = $userMapper->findByExternalId($externalUser['YearLevelCoordID']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $coordTeacher = new \Schoolbox\User();
+                $coordTeacher->setLastname($externalUser['StudentYearLevelCoordinator']);
+            }
+        } else {
             $coordTeacher = new \Schoolbox\User();
             $coordTeacher->setLastname($externalUser['StudentYearLevelCoordinator']);
         }

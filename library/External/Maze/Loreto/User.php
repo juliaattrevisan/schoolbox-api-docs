@@ -46,13 +46,13 @@ class External_Maze_Loreto_User extends External_Maze_User {
 				'' AS HeadOfHouseID,
 				'' AS StudentHeadOfHouse,
 				'' AS StudentForm,
-				(COORDINATOR.FIRST_NAME + ' ' + COORDINATOR.SURNAME) AS StudentFormStaffName,
+				'' AS StudentFormStaffName,
 				'' AS TeacherFormID,
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
 				KGH.DESCRIPTION AS StudentHouseDescription,
 				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
-				'' AS StudentYearLevelCoordinator,
+				(COORDINATOR.FIRST_NAME + ' ' + COORDINATOR.SURNAME) AS StudentYearLevelCoordinator,
 				'' AS YearLevelCoordID,
 				'' AS StudentLockerBook,
 				ST.EMERGENCY_ONE_NAME AS StudentEmergencyName,
@@ -112,7 +112,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 			 */
 			$processed = array_values(array_unique($processed));
 
-			$student['StudentHeadOfHouse'] = implode(', ', $processed);
+			$student['StudentFormStaffName'] = implode(', ', $processed);
 		}
 
 		return $student;
