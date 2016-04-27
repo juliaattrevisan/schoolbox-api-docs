@@ -16,6 +16,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\PredicateBuilder;
+use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Permission\Access\Access;
@@ -37,6 +38,14 @@ class Mapper extends FolderMapper
      */
     private $facultyNode = null;
 
+    /**
+     * A cache of ancestral Folder instances, to save
+     * on re-querying the same Folder from the db over
+     * and over again
+     *
+     * @var Ancestry
+     */
+    protected $ancestry;
 
     /**
      * @inheritdoc
@@ -51,6 +60,8 @@ class Mapper extends FolderMapper
 
         // reverse join onto self for unit definition
         $this->joins('id', Unit\Mapper::class, 'parent', null, self::COLUMN_JOIN_MULTI, 'units', 'unit');
+
+        $this->ancestry = new Ancestry(FolderMapper::getInstance());
     }
 
 
@@ -66,7 +77,7 @@ class Mapper extends FolderMapper
          */
         $facultyNodeId = preg_replace('/[^0-9]/', '', $this->getConfigLoader()->get('course_homepage'));
 
-        $this->setFacultyNode($this->findCheaplyById($facultyNodeId));
+        $this->setFacultyNode(FolderMapper::getInstance()->findCheaplyById($facultyNodeId));
     }
 
 
@@ -356,4 +367,60 @@ class Mapper extends FolderMapper
         }
     }
 
+
+    /**
+     * It is permissible that a folder be converted to a course (ie. have units put inside it)
+     * if and only if the following two conditions are met:
+     *  1) it is in the Faculty area (that is, it is a descendant of facultyRoot)
+     *  2) it does not contain any courses anywhere beneath it
+     *
+     * @param Folder $folder
+     * @return bool
+     */
+    public function mayBeConvertedToCourse(Folder $folder)
+    {
+        // it's a Course... it's allowed to be a course
+        if ($folder instanceof Model) {
+            return true;
+        }
+
+        return $this->inFacultyArea($folder) && !$this->containsCourses($folder);
+    }
+
+    /**
+     * @param Folder $folder
+     * @return bool
+     */
+    protected function inFacultyArea(Folder $folder)
+    {
+        return $this->getAncestry()->hasParent($folder, $this->getFacultyNode());
+    }
+
+    /**
+     * Iteratively checks whether or not the given folder contains courses
+     *
+     * @param Folder $folder
+     * @return bool
+     */
+    protected function containsCourses(Folder $folder)
+    {
+        foreach ($this->findAll() as $course) {
+            $ancestorIds = $this->getAncestry()->findParents($course)->getColumnValues('id');
+
+            if (in_array($folder->getId(), $ancestorIds)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @return Ancestry
+     */
+    public function getAncestry()
+    {
+        return $this->ancestry;
+    }
 }
