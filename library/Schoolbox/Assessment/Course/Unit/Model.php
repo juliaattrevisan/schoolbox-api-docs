@@ -1,0 +1,41 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Assessment\Course\Unit;
+
+
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Collection;
+
+class Model extends \Schoolbox\Resource\Folder\Model
+{
+
+    /** @var Collection|Task[] */
+    protected $tasks;
+
+
+    /**
+     * @return \Schoolbox\Assessment\Course\Task[]|Collection
+     */
+    public function getTasks()
+    {
+        return $this->tasks;
+    }
+
+
+    /**
+     * @param \Schoolbox\Assessment\Course\Task[]|Collection $tasks
+     * @return Model
+     */
+    public function setTasks($tasks)
+    {
+        $this->tasks = $tasks;
+        return $this;
+    }
+
+}
