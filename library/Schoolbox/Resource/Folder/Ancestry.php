@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Resource\Folder;
 
+use OverflowException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Collection;
@@ -59,6 +60,7 @@ class Ancestry
      *
      * @param Model $folder
      * @param Model $stopFolder
+     * @throws OverflowException if the folder is its own parent somehow
      * @return Collection
      */
     public function findParents(Folder $folder, Folder $stopFolder = null)
@@ -71,6 +73,7 @@ class Ancestry
      *
      * @param Model $folder
      * @param Model $stopFolder
+     * @throws OverflowException if the folder is its own parent somehow
      * @return Collection
      */
     public function findParentsCheaply(Folder $folder, Folder $stopFolder = null)
@@ -87,6 +90,7 @@ class Ancestry
      * @param  Folder $stopFolder If supplied, the parent list is truncated
      *                                 above this category.
      * @param bool $cheaply If true, use the findCheaplyById() for speed
+     * @throws OverflowException if the folder is its own parent somehow
      * @return Collection
      */
     private function findParentAncestry(Folder $folder, Folder $stopFolder, $cheaply)
@@ -139,7 +143,7 @@ class Ancestry
 
             // This category is its own parent somehow. That shouldn't happen.
             if (array_key_exists($parent_id, $ancestry)) {
-                throw new \OverflowException(
+                throw new OverflowException(
                     'Folder "'.$folder->getId().'" is its own parent somehow'
                 );
             }
