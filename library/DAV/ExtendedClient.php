@@ -11,40 +11,6 @@
 class DAV_ExtendedClient extends Sabre\DAV\Client
 {
     /**
-     * Overridden to implement Content-Length header in $this->request call
-     *
-     * @param $url
-     * @param $settings
-     *
-     * @return array
-     */
-    protected function curlRequest($url, $settings)
-    {
-        if ($settings[CURLOPT_CUSTOMREQUEST] == 'PROPFIND') {
-            $settings[CURLOPT_HTTPHEADER][] = 'Content-Length: 0';
-        }
-
-        $settings[CURLOPT_HTTPAUTH] = Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC;
-        $settings[CURLOPT_COOKIEFILE] = '';
-
-        if (Cfg::get('webdav_allow_insecure')) {
-            $settings[CURLOPT_SSL_VERIFYHOST] = false;
-            $settings[CURLOPT_SSL_VERIFYPEER] = false;
-        }
-
-        $curl = curl_init($url);
-
-        curl_setopt_array($curl, $settings);
-
-        return array(
-            curl_exec($curl),
-            curl_getinfo($curl),
-            curl_errno($curl),
-            curl_error($curl)
-        );
-    }
-
-    /**
      * Uploads a file via a PUT request
      *
      * @param string $path Destination path on the server
