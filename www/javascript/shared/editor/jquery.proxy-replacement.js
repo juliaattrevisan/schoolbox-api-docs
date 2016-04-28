@@ -13,7 +13,11 @@
 
             /* Ridiculous quick fix
              */
-            var source = $(element).attr('data-schoolboxresource-source').replace('type=browse', 'type=sbfs').replace('type=store', 'type=storage');
+            var source = $(element).attr('data-schoolboxresource-source');
+            if (typeof source == 'undefined') {
+                source = '';
+            }
+            source = source.replace('type=browse', 'type=sbfs').replace('type=store', 'type=storage');
 
             /* Replace video/audio placeholder elements
              */
