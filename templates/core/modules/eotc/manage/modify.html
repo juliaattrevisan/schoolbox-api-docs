@@ -214,9 +214,9 @@
                     </div>
                     <div class="small-12 large-8 columns">
 
-                        <ul class="action-list">
+                        <ul class="action-list" id="existingRamsFiles">
                             <!-- BEGIN rams_list -->
-                            <li class="actions-small-1">
+                            <li class="actions-small-1" data-delete-rams-row="{EVENT_RAMS_HASH}">
                                 <div class="list-item">
                                     <div class="compact avatar card small-12">
                                         <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" title="Download">
@@ -226,25 +226,22 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    <input type="checkbox" id="deleteRamsFile-{EVENT_RAMS_HASH}" name="deleteRamsFile[{EVENT_RAMS_HASH}]" value="1" />
-                                    <label for="deleteRamsFile-{EVENT_RAMS_HASH}" class="checkbox-label">Delete?</label>
+                                    <a class="icon-delete" title="Remove RAMS file" data-delete-rams="{EVENT_RAMS_HASH}"></a>
                                 </nav>
                             </li>
                             <!-- END rams_list -->
                         </ul>
 
-                        <div data-ramsfile="true">
-                            <ul class="information-list">
-                                <li>
-                                    <div class="ten-column">
-                                        <input type="file" name="ramsFile[]" multiple />
-                                    </div>
-                                    <div class="two-column">
-                                        <a href="#" data-action="delete" class="icon-delete no-text hide"></a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
+                        <ul class="action-list" id="newRamsFiles">
+                            <li class="actions-small-1" data-ramsfile>
+                                <div class="list-item">
+                                    <input type="file" name="ramsFile[]" multiple />
+                                </div>
+                                <nav>
+                                    <a href="#" data-delete-rams class="icon-delete no-text hide"></a>
+                                </nav>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </fieldset>
@@ -473,13 +470,27 @@
         $('[data-form=event]').on('change', 'input[type="file"][multiple]', function(event) {
             var container     = $(this).closest('[data-ramsfile]');
             var allContainers = $('[data-form=event] [data-ramsfile]').not(container);
+
             if (this.value.length > 0) {
                 // clone me
-                // Hide remove button from new one, show it in old.
                 var newContainer = container.clone();
-                container.find('a[data-action="delete"]').removeClass('hide');
-                newContainer.find('a[data-action="delete"]').hide();
-                container.after(newContainer);
+                container.find('a[data-delete-rams]').removeClass('hide');
+
+                /* Only append if there is no longer an empty input field
+                 * since you can change the input value of a file that has
+                 * not yet been saved
+                 */
+                var hasEmpty = false;
+
+                $.each($('[data-form=event] input[type="file"][multiple]'), function(index, element) {
+                    if ($(element).val() == '') {
+                        hasEmpty = true;
+                    }
+                });
+
+                if (!hasEmpty) {
+                    $('#newRamsFiles').append(newContainer);
+                }
             } else {
                 // delete me (unless I'm the only one)
                 if (allContainers.length) {
@@ -487,19 +498,38 @@
                 }
             }
         });
-        $('[data-form=event]').on('click', 'a[data-action="delete"]', function(event) {
-            event.preventDefault();
-            $(this).closest('[data-ramsfile]').remove();
-        });
 
         $('[data-form=event]').eventModify({
             functionLabel: "{FUNCTION}"
         });
 
-
-        // Collapsables
+        /* Collapsables
+         */
         $('[data-collapser=true]').collapsable({
             container: '[data-collapsable-container]'
+        });
+
+        /* Confirmation for deleting existing RAMS files
+         */
+        $('#existingRamsFiles').on('click', '[data-delete-rams]', function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: "Remove this RAMS file?",
+                confirmEvent: function() {
+                    $('#existingRamsFiles').find('[data-delete-rams-row='+element.attr('data-delete-rams')+']').remove();
+                }
+            });
+        });
+
+        /* Add listener for deleting new RAMS files
+         */
+        $('#newRamsFiles').on('click', '[data-delete-rams]', function(event) {
+            event.preventDefault();
+
+            $(this).closest('[data-ramsfile]').remove();
         });
     });
 </script>
