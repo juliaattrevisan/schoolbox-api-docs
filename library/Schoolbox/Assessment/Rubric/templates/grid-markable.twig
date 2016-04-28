@@ -181,9 +181,10 @@
             return groupSum;
         }
 
-        // initial display
-        $('[data-rubric]').trigger('change.preload');
-        $('[data-final-summary]').trigger('dynagrade');
+        // Don't update initial display anymore, because the rubric mark may not be the actual mark
+        // (Yes, it can be different!)
+//        $('[data-rubric]').trigger('change.preload');
+//        $('[data-final-summary]').trigger('dynagrade');
 
         /**
          *
