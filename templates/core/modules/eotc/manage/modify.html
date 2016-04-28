@@ -135,19 +135,15 @@
                         <!-- END recurring_dates -->
                         <!-- BEGIN recurring_reminder -->
                         <div class="small-12 island">
-                            <section>
-                                <div class="content">
-                                    <div class="row">
-                                        <div data-advanced data-repeat-reminder class="small-12 columns">
-                                            <label>
-                                                Repeat
-                                                <span class='hint has-tip tip-top' data-tooltip title="This event is part of a recurring series.">?</span>
-                                            </label>
-                                            <p>
-                                                {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
-                                            </p>
-                                        </div>
-                                    </div>
+                            <section class="content no-margin">
+                                <div data-advanced data-repeat-reminder>
+                                    <label>
+                                        Repeat
+                                        <span class='hint has-tip tip-top' data-tooltip title="This event is part of a recurring series.">?</span>
+                                    </label>
+                                    <p class="no-margin">
+                                        {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
+                                    </p>
                                 </div>
                             </section>
                         </div>
