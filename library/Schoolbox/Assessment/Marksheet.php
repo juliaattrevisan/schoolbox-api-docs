@@ -771,7 +771,7 @@ class Marksheet
 
         // First level heading:
         $header    = array('External ID', 'Surname', 'Firstname', 'Email');
-        $subheader = array('', '', '');
+        $subheader = array('', '', '','');
         foreach ($this->displayOrder as $item) {
             if ($item['object'] instanceof OnlineAssessment) {
                 // Online assess has only two columns
