@@ -124,11 +124,13 @@
                                 </select>
                             </label>
 
-                            <label data-repeat-until class="hide">
-                                Repeat Until
-                                <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
-                                <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
-                            </label>
+                            <div id="repeatUntil" data-repeat-until>
+                                <label>
+                                    Repeat Until
+                                    <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
+                                    <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
+                                </label>
+                            </div>
                         </div>
                         <!-- END recurring_dates -->
                         <!-- BEGIN recurring_reminder -->
