@@ -1,41 +1,41 @@
-<h1>People attending {EVENT_NAME}</h1>
-<span class="header-actions">
-    <a href="/modules/eotc/status/modify/{EVENT_ID}" class="button icon-previous">Back</a>
-    <a href="#" class="button icon-menu" data-dropdown="header-options">Options</a>
-</span>
-<ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
-    <li>
-        <a href="/modules/eotc/status/attendance/csv/{EVENT_ID}" class="icon-export">Download CSV</a>
-    </li>
+<ul class="breadcrumb">
+    <li><a href="/modules/eotc/myReview" title="EOTC">EOTC</a></li>
+    <li><a href="/modules/eotc/status/modify/{EVENT_ID}">{EVENT_NAME}</a></li>
+    <li class="active"><a href="#">Attendance for</a></li>
 </ul>
 
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>People Attending</h1>
 
-<table>
-    <colgroup>
-        <col width="64" />
-        <col />
-        <col width="120" />
-        <col/>
-    </colgroup>
-	<thead>
-		<tr>
-            <th></th>
-			<th>Name</th>
-            <th>Student ID</th>
-			<th>Group</th>
-		</tr>
-	</thead>
-	<tbody>
-		<!-- BEGIN student_attendee -->
-		<tr>
-			<td><img src="/portrait.php?userId={STUDENT_ATTENDEE_EXTERNAL_ID}&size=square64" /></td>
-            <td><a href="/search/user/{STUDENT_ATTENDEE_ID}">{STUDENT_ATTENDEE_FIRSTNAME} {STUDENT_ATTENDEE_LASTNAME}</a></td>
-            <td>{STUDENT_ATTENDEE_ID}</td>
-			<td>{STUDENT_ATTENDEE_ROLE_NAME}</td>
-		</tr>
-		<!-- END student_attendee -->
-	</tbody>
-</table>
+            <ul class="meta">
+                <li class="icon-calendar">{EVENT_NAME}</li>
+            </ul>
+        </div>
+    </div>
+    <nav>
+        <a href="/modules/eotc/status/attendance/csv/{EVENT_ID}" class="icon-export" title="Download CSV"></a>
+    </nav>
+</div>
 
-
-
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <ul class="information-list">
+                <!-- BEGIN student_attendee -->
+                <li>
+                    <div class="small-12 avatar card">
+                        <a href="/search/user/{STUDENT_ATTENDEE_ID}" title="{STUDENT_ATTENDEE_FIRSTNAME} {STUDENT_ATTENDEE_LASTNAME}">
+                            <img src="/portrait.php?userId={STUDENT_ATTENDEE_EXTERNAL_ID}&size=square64" />
+                            <p>{STUDENT_ATTENDEE_FIRSTNAME} {STUDENT_ATTENDEE_LASTNAME}</p>
+                        </a>
+                        <p class="meta">{STUDENT_ATTENDEE_ID}</p>
+                        <p class="meta">{STUDENT_ATTENDEE_ROLE_NAME}</p>
+                    </div>
+                </li>
+                <!-- END student_attendee -->
+            </ul>
+        </section>
+    </div>
+</div>
