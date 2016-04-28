@@ -107,6 +107,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             '@blog/component.twig',
             array(
                 'session'               => $_SESSION,
+                'folder'                => $folder,
                 'blogs'                 => $blogs,
                 'blogComments'          => $blogComments,
                 'blogImages'            => $blogImages,
