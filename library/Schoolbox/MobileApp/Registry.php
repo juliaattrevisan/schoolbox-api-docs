@@ -26,6 +26,9 @@ class Registry {
     protected $token;
 
     /** @var string */
+    protected $deviceId;
+
+    /** @var string */
     protected $provider;
 
     /** @var Alaress_Date_Format */
@@ -71,6 +74,26 @@ class Registry {
     public function setToken($token)
     {
         $this->token = $token;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getDeviceId()
+    {
+        return $this->deviceId;
+    }
+
+
+    /**
+     * @param string $deviceId
+     * @return self
+     */
+    public function setDeviceId($deviceId)
+    {
+        $this->deviceId = $deviceId;
         return $this;
     }
 
