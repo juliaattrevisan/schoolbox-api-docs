@@ -135,7 +135,7 @@
          * don't get transmitted; then immediately disable them lol
          */
         function initRulesetUpdate() {
-            $(config.element).on('click', 'input[type=submit]', function(event) {
+            $(config.element).on('click', '[data-ruleset-save]', function(event) {
                 event.preventDefault();
 
                 $(config.element).find(config.validInputTypes).attr('disabled', false);
@@ -143,6 +143,7 @@
                 $(config.element).submit();
                 $(config.element).find(config.validInputTypes).attr('disabled', true);
             });
+            refreshSaveRulesetButtonAvailability();
         }
 
         /**
@@ -182,6 +183,7 @@
                                     css: 'alert'
                                 });
                             }
+                            refreshSaveRulesetButtonAvailability();
                         });
                     }
                 });
@@ -545,6 +547,55 @@
                     }
                 });
             });
+        }
+
+        /**
+         * Show/hide save button
+		 *
+		 * Show save button if there is at least one rule present
+		 * That one rule can be either a custom rule, or normal rule
+         */
+        function refreshSaveRulesetButtonAvailability()
+        {
+            var numRules = $(config.element).find('[data-rule]').length;
+			var numCustomRules = $(config.element).find('[data-custom-rule]').length;
+            var numRulesTotal = numRules + numCustomRules;
+
+			var saveButton = $(config.element).find('[data-ruleset-save]');
+            var emptyRulesetAlert = $('#emptyRulesetAlert');
+
+			if (numRulesTotal) {
+				saveButton.show();
+
+                if (numRules) {
+                    hideElement(emptyRulesetAlert);
+                }
+                else {
+                    showElement(emptyRulesetAlert);
+                }
+			}
+			else {
+				saveButton.hide();
+                showElement(emptyRulesetAlert);
+			}
+        }
+
+        /**
+         * Show element
+         *
+         * @param element
+         */
+        function showElement(element) {
+            $(element).removeClass('hide');
+        }
+
+        /**
+         * Hide element
+         *
+         * @param element
+         */
+        function hideElement(element) {
+            $(element).addClass('hide');
         }
 
         /**

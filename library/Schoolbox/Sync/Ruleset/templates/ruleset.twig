@@ -86,8 +86,13 @@ set upsConfig = {
                         </label>
                     </span>
                     <a class="icon-down-arrow" title="Expand/Collapse All Rules" data-expand-all></a>
-                    <a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run"></a>
+                    <a class="icon-more" title="Actions" data-dropdown="ruleset-options"></a>
                 </nav>
+                <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
+                    <li class="separator">Ruleset</li>
+                    <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                    <li><a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run">Perform Dry Run</a></li>
+                </ul>
             </div>
 
             {% if ruleset.getRules() is not empty %}
@@ -182,8 +187,17 @@ set upsConfig = {
                 </li>
                 {% endfor %}
             </ul>
+            {% endif %}
+
+            {# Javascript controls visibility of this, because
+             # Rules can be deleted asynchronously
+             #}
+            {% if ruleset.getRules() is empty  %}
+                {% set emptyRulesetAlert = '' %}
             {% else %}
-            <div class="row">
+                {% set emptyRulesetAlert = 'hide' %}
+            {% endif %}
+            <div class="row {{ emptyRulesetAlert }}" id="emptyRulesetAlert">
                 <div class="small-12 island">
                     <div class="empty-state">
                         <i class="icon-info"></i>
@@ -192,7 +206,6 @@ set upsConfig = {
                     </div>
                 </div>
             </div>
-            {% endif %}
 
             {# Display custom rules #}
             {% if ruleset.getCustomRules() is not empty %}
@@ -200,7 +213,7 @@ set upsConfig = {
             <h2 class="subheader">Custom Rules</h2>
 
             {% for customRule in ruleset.getCustomRules() %}
-            <div class="row" id="customRule-{{ customRule.getId() }}">
+            <div class="row" id="customRule-{{ customRule.getId() }}" data-custom-rule="{{ customRule.getId() }}">
                 <div class="small-12 island">
                     <section class="content">
                         <h3 class="subheader">
@@ -229,9 +242,7 @@ set upsConfig = {
             {% endfor %}
             {% endif %}
 
-            {% if (ruleset.getRules() is not empty) and (ruleset.getCustomRules() is not empty) %}
-            <input type="submit" value="Save Rules" />
-            {% endif %}
+            <input type="submit" value="Save Rules" data-ruleset-save />
         </form>
 
         <div id="token-list" class="reveal-modal" data-reveal>
