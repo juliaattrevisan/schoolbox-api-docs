@@ -237,6 +237,8 @@ class UserMapper extends Mapper
         );
         unset($this_object);
 
+        $this->hasSoftDeleteDateField('deleted_at');
+
         $this->hasJoin(
             'role',
             array(
@@ -386,7 +388,7 @@ class UserMapper extends Mapper
             LEFT JOIN superusers su ON su.id = u.id
             LEFT JOIN luCampus c ON c.id = uc.`campus`
             LEFT JOIN {$this->getJoinSql('user_link', 'u', 'lu')}
-            WHERE u.synergy_id = ?
+            WHERE u.synergy_id = ? AND u.deleted_at is null
         ";
         $params = [$id];
         if (isset($roleType)) {
@@ -629,5 +631,46 @@ class UserMapper extends Mapper
                 }
             }
         }
+    }
+
+    /**
+     * Port of `\User::transferOwnership` - transfers ownership of content from
+     * one user to another.
+     *
+     * Intended to be called as part of a user deletion process.
+     *
+     * @param int $fromId
+     * @param int $toId
+     */
+    public function transferOwnership($fromId, $toId)
+    {
+        // Update all files
+        $params = ['from' => $fromId, 'to' => $toId,];
+        $query = "UPDATE file SET owner = :toId WHERE owner = :fromId";
+        $this->database->query($query, $params);
+
+        // Update all links
+        $query = "UPDATE link SET owner = :toId WHERE owner = :fromId";
+        $this->database->query($query, $params);
+
+        // Update all news
+        $query = "UPDATE news_items SET item_owner = :toId WHERE item_owner = :fromId";
+        $this->database->query($query, $params);
+        $query = "UPDATE subject_news SET owner = :toId WHERE owner = :fromId";
+        $this->database->query($query, $params);
+
+        // Update wikis
+        $query = "UPDATE wikiRevision SET userID = :toId WHERE userID = :fromId";
+        $this->database->query($query, $params);
+
+        // Update all forums
+        $query = "UPDATE forumPost SET userID = :toId WHERE userID = :fromId";
+        $this->database->query($query, $params);
+        $query = "UPDATE forumThread SET userID = :toId WHERE userID = :fromId";
+        $this->database->query($query, $params);
+
+        // Update events
+        $query = "UPDATE event SET owner = :toId WHERE owner = :fromId";
+        $this->database->query($query, $params);
     }
 }

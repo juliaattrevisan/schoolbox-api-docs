@@ -320,8 +320,8 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT title, firstname, lastname, uid, synergy_id, type, group_id, local_email, alt_email, username
 				  FROM userAccess, user
-				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type < " . FULL_ACCESS . " AND type > " . DENY_ACCESS
-            . " ORDER BY lastname, firstname";
+				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type < " . FULL_ACCESS . " AND type > " . DENY_ACCESS . " AND user.deleted_at IS NULL
+				  ORDER BY lastname, firstname";
         return $this->db->getAll($query);
     }
 
@@ -329,7 +329,7 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT title, firstname, lastname, uid, synergy_id
 				  FROM userAccess, user
-				  WHERE service = " . $this->_service . " AND sid = $relationID AND type = " . DENY_ACCESS . " AND user.id = uid
+				  WHERE service = " . $this->_service . "AND sid = $relationID AND type = " . DENY_ACCESS . " AND user.id = uid AND user.deleted_at 
 				  ORDER BY lastname, firstname";
         return $this->db->getAll($query);
     }

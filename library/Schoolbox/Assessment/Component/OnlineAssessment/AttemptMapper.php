@@ -302,7 +302,7 @@ class AttemptMapper extends Mapper
                 {$this->getJoinColumnString('user', 'u')}
             FROM {$this->getTable()} aa
             INNER JOIN {$this->getJoinSql('assessment', 'aa', 'as')}
-            LEFT  JOIN {$this->getJoinSql('user', 'aa', 'u')}
+            INNER JOIN {$this->getJoinSql('user', 'aa', 'u')}
             WHERE `as`.`availability` = 'assess'
             AND   `as`.`duration` > 0
             AND   TIMESTAMPADD(SECOND, `as`.`duration`, `aa`.`start`) < :expiry

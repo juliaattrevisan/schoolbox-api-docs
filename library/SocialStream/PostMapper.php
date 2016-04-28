@@ -226,10 +226,10 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
                 {$user_mapper->getColumnString('u')}
             FROM `{$this->table}` p
             LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
-            WHERE homepage_id = :homepageId
-            AND parent_id = 0
-            AND deleted_at IS NULL
-            ORDER BY created_at DESC
+            WHERE p.homepage_id = :homepageId
+            AND p.parent_id = 0
+            AND p.deleted_at IS NULL
+            ORDER BY p.created_at DESC
         ";
 
         /* Optional limit
@@ -286,10 +286,10 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
                 {$user_mapper->getColumnString('u')}
             FROM `{$this->table}` p
             LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
-            WHERE homepage_id = :homepageId
-            AND parent_id = 0
-            AND deleted_at IS NULL
-            ORDER BY created_at DESC
+            WHERE p.homepage_id = :homepageId
+            AND p.parent_id = 0
+            AND p.deleted_at IS NULL
+            ORDER BY p.created_at DESC
             LIMIT :end
         ";
 
@@ -335,9 +335,9 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
                 {$user_mapper->getColumnString('u')}
             FROM `{$this->table}` p
             LEFT JOIN {$this->getJoinSql('user', 'p', 'u')}
-            WHERE `root_id` IN {$this->getArrayPlaceholders($ids, 'val')}
-            AND deleted_at IS NULL
-            ORDER BY parent_id DESC, created_at
+            WHERE p.root_id IN {$this->getArrayPlaceholders($ids, 'val')}
+            AND p.deleted_at IS NULL
+            ORDER BY p.parent_id DESC, p.created_at
         ";
 
         $statement = $this->database->prepare($query);

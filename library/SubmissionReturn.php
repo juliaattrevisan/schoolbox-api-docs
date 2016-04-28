@@ -18,7 +18,7 @@ class SubmissionReturn extends DeprecatedModel
                          user.group_id,
                          local_email, alt_email
                          FROM ( `" . $this->_table . "` r,  user)
-                  WHERE r.deleted = 0 AND user.id = r.owner AND box_id = " . $this->db->smartQuote($box_id) . "
+                  WHERE r.deleted = 0 AND user.id = r.owner AND box_id = " . $this->db->smartQuote($box_id) . " and user.deleted_at is null
                   ORDER BY lastname, firstname DESC ";
         return $this->db->getAll($query);
     }

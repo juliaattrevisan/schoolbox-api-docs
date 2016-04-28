@@ -87,6 +87,7 @@ class SubmissionStudent extends DeprecatedModel
                   WHERE $conditional
                   AND owner = user.id
                   AND box_id = '$subBoxID'
+                  AND user.deleted_at IS NULL
                   ORDER BY lastname, firstname, datestamp DESC ";
         return $this->db->getAll($query);
 
