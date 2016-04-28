@@ -329,7 +329,7 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT title, firstname, lastname, uid, synergy_id
 				  FROM userAccess, user
-				  WHERE service = " . $this->_service . "AND sid = $relationID AND type = " . DENY_ACCESS . " AND user.id = uid AND user.deleted_at 
+				  WHERE service = " . $this->_service . " AND sid = $relationID AND type = " . DENY_ACCESS . " AND user.id = uid AND user.deleted_at IS NULL
 				  ORDER BY lastname, firstname";
         return $this->db->getAll($query);
     }
