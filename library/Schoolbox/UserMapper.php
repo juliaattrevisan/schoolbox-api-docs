@@ -388,7 +388,7 @@ class UserMapper extends Mapper
             LEFT JOIN superusers su ON su.id = u.id
             LEFT JOIN luCampus c ON c.id = uc.`campus`
             LEFT JOIN {$this->getJoinSql('user_link', 'u', 'lu')}
-            WHERE u.synergy_id = ?
+            WHERE u.synergy_id = ? AND u.deleted_at is null
         ";
         $params = [$id];
         if (isset($roleType)) {

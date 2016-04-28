@@ -1149,7 +1149,7 @@ class Submission extends DeprecatedModel
 
                 } else {
                     // we don't have a user ID, so we can't check for duplicate before running this query :(
-                    $user = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id']);
+                    $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
 
                     $userId = $user->getId();
 
