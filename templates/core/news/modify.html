@@ -45,13 +45,6 @@
             messages:{
                 'group[]':"Please tick at least one role",
                 'campus[]':"Please tick at least one campus"
-            },
-            errorPlacement:function (error, element) {
-                if (element.parent().parent().hasClass('checkboxes')) {
-                    error.insertAfter(element.parent().parent().parent().children(':last-child'));
-                } else {
-                    error.insertAfter(element);
-                }
             }
         });
 

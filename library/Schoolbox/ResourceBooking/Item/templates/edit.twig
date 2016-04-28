@@ -119,7 +119,7 @@
                             element.parent().append(error)
                             break
                         default:
-                            element.after(error)
+                            $.alaressValidate.defaultErrorPlacement(error, element);
                             break
                     }
                 }
