@@ -373,6 +373,7 @@ class Mapper extends FolderMapper
      * if and only if the following two conditions are met:
      *  1) it is in the Faculty area (that is, it is a descendant of facultyRoot)
      *  2) it does not contain any courses anywhere beneath it
+     *  3) it is not a unit
      *
      * @param Folder $folder
      * @return bool
@@ -384,7 +385,16 @@ class Mapper extends FolderMapper
             return true;
         }
 
-        return $this->inFacultyArea($folder) && !$this->containsCourses($folder);
+        if ($this->inFacultyArea($folder)) {
+            try {
+                Unit\Mapper::getInstance()->findById($folder->getId());
+            } catch (MapperException $e) {
+                // this is the desired case here: not a unit
+                return !$this->containsCourses($folder);
+            }
+        }
+
+        return false;
     }
 
     /**
