@@ -172,7 +172,7 @@ class External_Liss_Server {
 				$struct = $currentData->me['struct'];
 
 				try {
-					$user = $userMapper->findOneByColumn('synergy_id', (string)$struct['StudentId']->me['string']);
+					$user = $userMapper->findByExternalId((string)$struct['StudentId']->me['string']);
 					$class = $classEntryMapper->findOneByColumn('code', (string)$struct['ClassCode']->me['string']);
 
 					$classInvolvement = new \Schoolbox\External\ClassInvolvement();
@@ -213,7 +213,7 @@ class External_Liss_Server {
 				try {
 					$externalId = (string)$struct['TeacherCode']->me['string'];
 
-					$user = $userMapper->findOneByColumn('synergy_id', $externalId);
+					$user = $userMapper->findByExternalId($externalId);
 				}
 				catch (\Exception $e) {
 					$user = new \Schoolbox\User();
@@ -293,7 +293,7 @@ class External_Liss_Server {
 				try {
 					$externalId = (string)$struct['StudentId']->me['string'];
 
-					$user = $userMapper->findOneByColumn('synergy_id', $externalId);
+					$user = $userMapper->findByExternalId($externalId);
 				}
 				catch (\Exception $e) {
 					$user = new \Schoolbox\User();

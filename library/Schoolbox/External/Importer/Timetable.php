@@ -190,7 +190,7 @@ class Timetable extends AbstractImporter
                 $teacher = $teacherCache[$teacherCode];
             } else {
                 try {
-                    $teacher = $this->userMapper->findOneByColumn('synergy_id', $teacherCode);
+                    $teacher = $this->userMapper->findByExternalId($teacherCode);
                 } catch (Mapper\Exception $e) {
                     $this->log->warning(sprintf('Teacher code "%s" not found: skipping!', $teacherCode));
                     continue;

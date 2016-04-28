@@ -1024,7 +1024,7 @@ class External_Denbigh2_User implements External_UserInterface
             $roleMapper = new \Schoolbox\RoleMapper();
 
             try {
-                $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+                $user = $userMapper->findByExternalId($externalUserId);
                 $role = $roleMapper->findById($user->getRole()->getId());
             }
             catch (\Exception $e) {

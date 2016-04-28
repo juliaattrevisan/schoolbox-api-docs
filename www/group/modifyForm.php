@@ -235,7 +235,7 @@ if(isset($_POST['bulkAdd'])) {
 		if(!empty($key)) {
 			try {
 				if(is_numeric($key)) {
-					$user = $userMapper->findOneByColumn('synergy_id', $key);
+					$user = $userMapper->findByExternalId($key);
 				}
 				elseif(is_string($key)) {
 					$user = $userMapper->findOneByColumn('username', $key);

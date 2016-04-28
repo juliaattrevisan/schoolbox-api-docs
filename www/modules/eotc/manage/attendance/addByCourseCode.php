@@ -31,7 +31,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			foreach($allStudents as $currentStudent) {
 				try {
-					$user = $userMapper->findOneByColumn('synergy_id', $currentStudent['synergy_id']);
+					$user = $userMapper->findByExternalId($currentStudent['synergy_id']);
 					$ids[] = $user->getId();
 				}
 				catch (\Exception $e) {
