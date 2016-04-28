@@ -1,5 +1,6 @@
 <?php
 /**
+ * Model for normal (non-eportfolio) blog posts
  * 
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd

@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Blog;
+namespace Schoolbox\Blog\Comment;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
@@ -30,7 +30,7 @@ use Schoolbox\Blog\Blog\Mapper as BlogMapper;
 use Schoolbox\Blog\Blog\Model as BlogModel;
 use Schoolbox\Blog\Comment\Model as BlogCommentModel;
 
-class CommentNotifier extends AbstractModuleNotifier implements SourceInterface {
+class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 	const TRIGGER_COMMENTED = 'commented';
 	const TRIGGER_FOLLOWED  = 'followed';

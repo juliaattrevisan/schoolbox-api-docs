@@ -1,5 +1,6 @@
 <?php
 /**
+ * Mapper for normal (non-eportfolio) blog posts
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -51,7 +52,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         );
 
         $this->hasJoin(
-            'user',
+            'owner',
             array(
                 'mapper' => '\\Schoolbox\\UserMapper',
                 'this_key' => 'owner_id',
@@ -78,27 +79,6 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         );
     }
 
-
-    /**
-     * Returns a list of years and months which have blog posts
-     *
-     * @param int $categoryId
-     * @return array
-     */
-    public function getOccupiedDateList($categoryId)
-    {
-        $stmt = $this->database->prepare(
-            "
-			SELECT YEAR(`created_at`) as 'year', `created_at`, MONTH(`created`) as 'month'
-			FROM {$this->getTable()}
-			WHERE `cid` = :cid
-			GROUP BY `year` DESC, `month` DESC
-		"
-        );
-
-        $stmt->execute(array('cid' => $categoryId));
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
 
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
@@ -130,13 +110,13 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
             "
 			SELECT
 				{$this->getColumnString('b')},
-				{$this->getJoinMapper('user')->getColumnString('u')},
-				{$this->getJoinMapper('category')->getColumnString('c')}
+				{$this->getJoinMapper('owner')->getColumnString('u')},
+				{$this->getJoinMapper('folder')->getColumnString('c')}
 				MATCH(`heading`,`body`) AGAINST (:keyword) AS `score`
 			FROM
 				`{$this->getTable()}` `b`
-				LEFT JOIN {$this->getJoinSql('user', 'b', 'u')}
-				INNER JOIN {$this->getJoinSql('category', 'b', 'c')}
+				LEFT JOIN {$this->getJoinSql('owner', 'b', 'u')}
+				INNER JOIN {$this->getJoinSql('folder', 'b', 'c')}
 				LEFT JOIN {$this->getJoinSql('perms', 'b', 'p')}
 					AND p.gid = :role_id
 					AND p.type > :min_access
@@ -167,21 +147,21 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $collection->add(
                 $this->hydrate($r, 'b')
-                    ->setOwner($this->hydrateJoin($r, 'user', 'u'))
-                    ->setFolder($this->hydrateJoin($r, 'category', 'c'))
+                    ->setOwner($this->hydrateJoin($r, 'owner', 'u'))
+                    ->setFolder($this->hydrateJoin($r, 'folder', 'c'))
             );
         }
 
     }
 
     /**
-     * @param int $categoryId
+     * @param int $folderId
      * @param int $limit
      * @param int $offset
      * @param int $time
      * @return Collection|BlogModel[]
      */
-    public function findForFeed($categoryId, $limit, $offset = 0, $time = 0)
+    public function findForFeed($folderId, $limit, $offset = 0, $time = 0)
     {
         $time = date('Y-m-d H:i:s', $time ? : time());
 
@@ -192,11 +172,11 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
             "
 			SELECT
 				{$this->getColumnString('b')},
-				{$this->getJoinColumnString('user', 'u')},
-				{$this->getJoinColumnString('category', 'c')}
+				{$this->getJoinColumnString('owner', 'u')},
+				{$this->getJoinColumnString('folder', 'c')}
 			FROM `{$this->getTable()}` AS `b`
-				LEFT JOIN {$this->getJoinSql('user', 'b', 'u')}
-				INNER JOIN {$this->getJoinSql('category', 'b', 'c')}
+				LEFT JOIN {$this->getJoinSql('owner', 'b', 'u')}
+				INNER JOIN {$this->getJoinSql('folder', 'b', 'c')}
 			WHERE `b`.`deleted_at` IS NULL
 				AND `b`.`folder_id` = :folder_id
 				AND `b`.`created_at` < :time
@@ -207,7 +187,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
 
         $stmt->execute(
             array(
-                'folder_id' => $categoryId,
+                'folder_id' => $folderId,
                 'time' => $time
             )
         );
@@ -216,10 +196,10 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var User $user */
-            $user = $this->hydrateJoin($r, 'user', 'u');
+            $user = $this->hydrateJoin($r, 'owner', 'u');
 
             /** @var FolderModel $folder */
-            $folder = $this->hydrateJoin($r, 'category', 'c');
+            $folder = $this->hydrateJoin($r, 'folder', 'c');
 
             /** @var BlogModel $blog */
             $blog = $this->hydrate($r, 'b');
@@ -234,19 +214,19 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
     /**
      * Find all the blog entries for a homepage
      *
-     * @param FolderModel $category
+     * @param FolderModel $folder
      * @param $limit
      * @return Collection
      */
-    public function findForCategory(FolderModel $category, $limit = 0)
+    public function findForCategory(FolderModel $folder, $limit = 0)
     {
         $query =
             "
 			SELECT
 				{$this->getColumnString('b')},
-				{$this->getJoinColumnString('user', 'u')}
+				{$this->getJoinColumnString('owner', 'u')}
 			FROM `{$this->getTable()}` AS `b`
-            LEFT JOIN {$this->getJoinSql('user', 'b', 'u')}
+            LEFT JOIN {$this->getJoinSql('owner', 'b', 'u')}
 			WHERE `b`.`deleted_at` IS NULL
 				AND `b`.`folder_id` = :folder_id
 			ORDER BY `b`.`created_at` DESC
@@ -262,7 +242,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
 
         $stmt->execute(
             array(
-                'folder_id' => $category->getId(),
+                'folder_id' => $folder->getId(),
             )
         );
 
@@ -270,7 +250,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var User $user */
-            $user = $this->hydrateJoin($r, 'user', 'u');
+            $user = $this->hydrateJoin($r, 'owner', 'u');
 
             /** @var BlogModel $blog */
             $blog = $this->hydrate($r, 'b');

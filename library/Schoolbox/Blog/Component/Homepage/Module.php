@@ -1,6 +1,6 @@
 <?php
 /**
- * Module definition for blog actions
+ * Module definition for normal (non-eportfolio) blog CRUD actions
  *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd

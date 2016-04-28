@@ -1,6 +1,7 @@
 <?php
 /**
- * Controller for blogs
+ *
+ * This is the main controller for e-portfolio blogs that handles all the CRUD operations
  *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
@@ -24,58 +25,11 @@ use Schoolbox\Blog\EportfolioBlog\Model as EportfolioBlogModel;
 use Schoolbox\Blog\EportfolioBlog\Mapper as EportfolioBlogMapper;
 use Schoolbox\Blog\EportfolioComment\Model as EportfolioBlogCommentModel;
 use Schoolbox\Blog\EportfolioComment\Mapper as EportfolioBlogCommentMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Mapper\Exception as MapperException;
 use Eportfolio\PageMapper as EportfolioPageMapper;
 
 class Controller extends Base
 {
-    /**
-     * @var UserAccessMapper
-     */
-    protected $userAccessMapper;
-
-    /**
-     * @var RoleMapper
-     */
-    protected $roleMapper;
-
-    /**
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * @var ErrorMapper
-     */
-    protected $errorMapper;
-
-    /**
-     * @var EportfolioBlogMapper;
-     */
-    protected $blogMapper;
-
-    /**
-     * @var EportfolioBlogCommentMapper;
-     */
-    protected $blogCommentMapper;
-
-    /**
-     * @var FolderMapper;
-     */
-    protected $folderMapper;
-
-    /**
-     * @var EportfolioBlogImageMapper
-     */
-    protected $blogImageMapper;
-
-    /**
-     * @var EportfolioEportfolioPageMapper
-     */
-    protected $eportfolioPageMapper;
-
     /**
      * Controller constructor.
      */
@@ -87,7 +41,6 @@ class Controller extends Base
         $this->setRoleMapper(RoleMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
-        $this->setFolderMapper(FolderMapper::getInstance());
         $this->setEportfolioBlogMapper(EportfolioBlogMapper::getInstance());
         $this->setEportfolioBlogCommentMapper(EportfolioBlogCommentMapper::getInstance());
         $this->setEportfolioBlogImageMapper(EportfolioBlogImageMapper::getInstance());
@@ -107,7 +60,7 @@ class Controller extends Base
             ->setModalTitle('Select images')
             ->setAttachmentsLabel('')
             ->setAttachPrompt('Upload images')
-            ->setMimeFilter('*/*')
+            ->setMimeFilter('image/*')
             ->setReadOnly(false)
             ->setMulti(true);
 
@@ -121,19 +74,20 @@ class Controller extends Base
     /**
      * Save changes to existing record/Insert new record
      */
-    public function postModify() {
-
-        // Retrieve the record we are updating
+    public function postModify()
+    {
+        // Check if we are updating or inserting
 
         if (!empty($this->getRequest()->post["id"])) {
 
-            // Updating an existing record
+            // Updating an existing record, just grab a handle to it
 
             /** @var EportfolioBlogModel $record */
             $record = $this->getEportfolioBlogMapper()->findById($this->getRequest()->post["id"]);
+
         } else {
 
-            // Creating a new record
+            // Inserting new record, create an object and shunt in the required values
 
             $user = $this->getUserMapper()->findById($this->getRequest()->post["ownerId"]);
 
@@ -144,12 +98,13 @@ class Controller extends Base
             $record->setCreatedAt(\Alaress_Date_Format::now());
         }
 
+        // Update details and save the record
+
         $record->setBody($this->getRequest()->post["body"]);
         $record->setHeading($this->getRequest()->post["heading"]);
-
         $this->getEportfolioBlogMapper()->save($record);
 
-        // Delete any attachments if required
+        // Update image gallery pictures
 
         // Keep track of attachments that aren't deleted so we don't add them again
 
@@ -213,8 +168,9 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->redirect->afterPost("/eportfolio/" . $this->getRequest()->post["ownerId"] . "/" . $this->getRequest()->post["pageId"]);
+        // Send them back to the item detail page
 
+        $this->getResponse()->redirect->afterPost("/eportfolio/" . $this->getRequest()->post["ownerId"] . "/" . $this->getRequest()->post["pageId"]);
     }
 
     /**
@@ -225,16 +181,20 @@ class Controller extends Base
      */
     public function getItem($ownerId, $pageId, $id)
     {
-        $page = $this->getEportfolioPageMapper()->findById($pageId);
-
         try
         {
+            // Grab the record
+
             /** @var EportfolioBlogModel $record */
             $record = $this->getEportfolioBlogMapper()->findById($id);
+
+            // Hydrate owner details
 
             /** @var User $user */
             $user = $this->getUserMapper()->findById($record->getOwner()->getId());
             $record->setOwner($user);
+
+            // Load any comments and hydrate their owners
 
             $comments = $this->getEportfolioBlogCommentMapper()->findByColumn("blog_id", $record->getId());
 
@@ -245,7 +205,13 @@ class Controller extends Base
                 $comment->setOwner($user);
             }
 
+            // Load any images
+
             $images = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $record->getId());
+
+            // Load details of the page the item is on
+
+            $page = $this->getEportfolioPageMapper()->findById($pageId);
         }
         catch (MapperException $e)
         {
@@ -272,17 +238,21 @@ class Controller extends Base
      * Create new blog comment
      * @throws MapperException
      */
-    public function postCommentInsert() {
+    public function postCommentInsert()
+    {
         $id = $this->getRequest()->post["id"];
-        $pageId = $this->getRequest()->post["pageId"];
-        $ownerId = $this->getRequest()->post["ownerId"];
 
         try {
+
+            // Retrieve the blog item the comment is being added to
+
             /** @var EportfolioBlogModel $blog */
             $blog = $this->getEportfolioBlogMapper()->findById($id);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
+
+        // Create the comment and save
 
         /** @var EportfolioBlogCommentModel $comment */
         $comment = $this->getEportfolioBlogCommentMapper()->createModel();
@@ -292,8 +262,6 @@ class Controller extends Base
         $comment->setBody($this->getRequest()->post["body"]);
         $comment->setCreatedAt(\Alaress_Date_Format::now());
         $this->getEportfolioBlogCommentMapper()->save($comment);
-
-        $this->getResponse()->redirect->afterPost("/eportfolio/{$ownerId}/{$pageId}");
     }
 
 
@@ -304,6 +272,8 @@ class Controller extends Base
     public function postCommentDelete() {
 
         try {
+            // Retrieve the comment we are trying to delete
+            
             /** @var EportfolioBlogCommentModel $comment */
             $comment = $this->getEportfolioBlogCommentMapper()->findById($this->getRequest()->post["id"]);
         } catch (MapperException $e) {
@@ -316,6 +286,8 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_BLOG_MODIFY);
         }
 
+        // Delete it
+        
         $this->getEportfolioBlogCommentMapper()->delete($comment);
     }
 
@@ -323,11 +295,13 @@ class Controller extends Base
      * Delete blog post
      * @throws MapperException
      */
-    public function postDelete() {
-
+    public function postDelete() 
+    {
         $id = $this->getRequest()->post["id"];
 
         try {
+            // Retrieve the blog we are deleting
+            
             /** @var EportfolioBlogModel $comment */
             $blog = $this->getEportfolioBlogMapper()->findById($id);
         } catch (MapperException $e) {
@@ -339,18 +313,22 @@ class Controller extends Base
         if ($blog->getOwner()->getId() != $this->getUser()->getId() && !$this->getUser()->isSuperuser()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_BLOG_MODIFY);
         }
+        
+        // Delete it
 
         $this->getEportfolioBlogMapper()->delete($blog);
     }
 
     /**
      * Displays modify blog post page
-     * @param $id
+     * @param int $ownerId      ID of the owner of the e-portfolio we are currently viewing   
+     * @param int $pageId       ID of the e-portfolio page of the blog we are currently viewing
+     * @param int $id           ID of the blog entry we are currently modifying 
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getModify($ownerId, $pageId, $id) {
+    public function getModify($ownerId, $pageId, $id) 
+    {
         $page = $this->getEportfolioPageMapper()->findById($pageId);
-
         $record = $this->getEportfolioBlogMapper()->findById($id);
 
         // Lets get the party started...
@@ -373,10 +351,12 @@ class Controller extends Base
 
     /**
      * Display insert new blog post page
-     * @param $id
+     * @param int $ownerId      ID of the owner of the e-portfolio we are currently viewing
+     * @param int $pageId       ID of the e-portfolio page of the blog into which we are inserting the new blog psot
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getInsert($ownerId, $pageId) {
+    public function getInsert($ownerId, $pageId) 
+    {
         $page = $this->getEportfolioPageMapper()->findById($pageId);
 
         // Lets get the party started...
@@ -398,29 +378,27 @@ class Controller extends Base
 
     /**
      * Gets blog archive for the current calendar month
-     * @param int $id            The `folder_id` of the blog we want to view
+     * @param int $ownerId      ID of the owner of the e-portfolio we are currently viewing
+     * @param int $pageId       ID of the e-portfolio page of the blog into which we are inserting the new blog psot
      */
-    public function getArchiveCurrent($id) {
-        return $this->getArchive($id, date("Y"), date("n"));
+    public function getArchiveCurrent($ownerId, $pageId) {
+        return $this->getArchive($ownerId, $pageId, date("Y"), date("n"));
     }
 
     /**
-     * Display insert new blog post page
-     * @param int $id
+     * Gets blog archive for the selected calendar month
+     * @param int $ownerId      ID of the owner of the e-portfolio we are currently viewing
+     * @param int $pageId       ID of the e-portfolio page of the blog into which we are inserting the new blog psot
      * @param int $year         Archive year we are currently looking at (if not supplied will be based on current date)
      * @param int $month        Archive month we are currently looking at (if not supplied will be based on current date)
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getArchive($id, $year, $month) {
+    public function getArchive($ownerId, $pageId, $year, $month) {
 
-        try {
-            /** @var FolderModel $folder */
-            $folder = $this->getFolderMapper()->findById($id);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-        }
-
-        $blogs = $this->getEportfolioBlogMapper()->findByColumn("folder_id", $id)->sortBy('createdAt', 'desc');
+        $blogs = $this->getEportfolioBlogMapper()->findByColumnList([
+            "owner_id" => $ownerId,
+            "page_id" => $pageId
+        ])->sortBy('createdAt', 'desc');
         $blogComments = [];
 
         $dateSelectorArray = [];
@@ -454,7 +432,6 @@ class Controller extends Base
                 'template' => '@blog/archive.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
-                    'folder'            => $folder,
                     'blogs'             => $blogsSelectedMonth,
                     'blogComments'      => $blogComments,
                     'dateSelectorArray' => $dateSelectorArray,
@@ -470,6 +447,46 @@ class Controller extends Base
     /**
      * Here be the getters/setters, nothing to see here ¯\_(ツ)_/¯
      */
+
+    /**
+     * @var UserAccessMapper
+     */
+    protected $userAccessMapper;
+
+    /**
+     * @var RoleMapper
+     */
+    protected $roleMapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * @var EportfolioBlogMapper;
+     */
+    protected $blogMapper;
+
+    /**
+     * @var EportfolioBlogCommentMapper;
+     */
+    protected $blogCommentMapper;
+
+    /**
+     * @var EportfolioBlogImageMapper
+     */
+    protected $blogImageMapper;
+
+    /**
+     * @var EportfolioPageMapper
+     */
+    protected $eportfolioPageMapper;
 
     /**
      * @param $userAccessMapper
@@ -525,20 +542,6 @@ class Controller extends Base
      */
     public function getErrorMapper() {
         return $this->errorMapper;
-    }
-
-    /**
-     * @param $folderMapper
-     */
-    public function setFolderMapper($folderMapper) {
-        $this->folderMapper = $folderMapper;
-    }
-
-    /**
-     * @return FolderMapper
-     */
-    public function getFolderMapper() {
-        return $this->folderMapper;
     }
 
     /**

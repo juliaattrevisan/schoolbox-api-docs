@@ -1,6 +1,7 @@
 <?php
 /**
- * 
+ * Mapper for e-portfolio blog comments
+ *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,7 +10,6 @@
 
 namespace Schoolbox\Blog\EportfolioComment;
 
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use Schoolbox\Blog\EportfolioBlog\Model as EportfolioBlogModel;
 

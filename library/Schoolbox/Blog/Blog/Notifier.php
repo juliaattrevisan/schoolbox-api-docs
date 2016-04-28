@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Blog;
+namespace Schoolbox\Blog\Blog;
 
 
 use Alaress\Async\Notification\Instance\Builder;
@@ -32,7 +32,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Blog\Blog\Model as BlogModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
-class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
+class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 	const TRIGGER_POSTED = 'posted';
 
@@ -169,5 +169,4 @@ class BlogNotifier extends AbstractModuleNotifier implements SourceInterface {
 	public function notifyParentPosted($blog, $author, $diff = null) {
 		return $this->notifyPosted(Role::PARENT, $blog, $author);
 	}
-
 } 

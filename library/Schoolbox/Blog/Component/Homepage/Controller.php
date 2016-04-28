@@ -1,6 +1,7 @@
 <?php
 /**
- * Blog component for homepage
+ * E-portfolio blog component controller. Is responsible for rendering the TWIG into component
+ * on e-portfolio pages
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -26,36 +27,6 @@ use Schoolbox\UserMapper;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
-    /**
-     * @var FolderMapper;
-     */
-    protected $folderMapper;
-
-    /**
-     * @var BlogMapper;
-     */
-    protected $blogMapper;
-
-    /**
-     * @var ErrorMapper;
-     */
-    protected $errorMapper;
-
-    /**
-     * @var UserMapper;
-     */
-    protected $userMapper;
-
-    /**
-     * @var BlogCommentMapper;
-     */
-    protected $blogCommentMapper;
-
-    /**
-     * @var BlogImageMapper;
-     */
-    protected $blogImageMapper;
-
     /**
      * Injectable constructor
      *
@@ -88,11 +59,12 @@ class Controller extends Component_Homepage_ControllerAbstract
 
     /**
      * @param String $templateHandle
-     *
      * @return bool
      */
     public function renderTemplate($templateHandle)
     {
+        // Work out which folder we are in and grab a handle to it
+
         try {
             /** @var FolderModel $folder */
             $folder = $this->getFolderMapper()->findById($this->getInstance()->getIdentifier());
@@ -100,15 +72,17 @@ class Controller extends Component_Homepage_ControllerAbstract
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
+        // Get all the blog entries for this page, limit to the number specified in blog component config
+
         $blogs = $this->getBlogMapper()
             ->findByColumn("folder_id", $this->getInstance()->getIdentifier())
             ->sortBy('createdAt', 'desc')
             ->limit(0, $this->getConfig('size'));
 
+        // Grab comments and image gallery items for each blog post
+
         $blogComments = [];
         $blogImages = [];
-
-        // This creates an array of unique year/months for the date selector
 
         /** @var BlogModel $blog */
         foreach ($blogs as $blog) {
@@ -118,11 +92,15 @@ class Controller extends Component_Homepage_ControllerAbstract
             $blogComments[$blog->getId()] = $this->getBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
             $blogImages[$blog->getId()] = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
 
+            // Hydrate owner of comments
+
             /** @var BlogCommentModel $comment */
             foreach ($blogComments[$blog->getId()] as $comment) {
                 $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
             }
         }
+
+        // Render this component out
 
         return $this->renderTwigTemplate(
             $templateHandle,
@@ -140,6 +118,40 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         return false;
     }
+
+    /**
+     * Here be the getters/setters, nothing to see here ¯\_(ツ)_/¯
+     */
+
+    /**
+     * @var FolderMapper;
+     */
+    protected $folderMapper;
+
+    /**
+     * @var BlogMapper;
+     */
+    protected $blogMapper;
+
+    /**
+     * @var ErrorMapper;
+     */
+    protected $errorMapper;
+
+    /**
+     * @var UserMapper;
+     */
+    protected $userMapper;
+
+    /**
+     * @var BlogCommentMapper;
+     */
+    protected $blogCommentMapper;
+
+    /**
+     * @var BlogImageMapper;
+     */
+    protected $blogImageMapper;
 
     /**
      * @return FolderMapper

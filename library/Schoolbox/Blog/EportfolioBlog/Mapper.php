@@ -1,5 +1,6 @@
 <?php
 /**
+ * Mapper for e-portfolio blog posts
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -206,11 +207,11 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
     /**
      * Find all the blog entries for a homepage
      *
-     * @param FolderModel $owner
+     * @param User $owner
      * @param $limit
      * @return Collection
      */
-    public function findForOwner(FolderModel $owner, $limit = 0)
+    public function findForOwner(User $owner, $limit = 0)
     {
         $query =
             "

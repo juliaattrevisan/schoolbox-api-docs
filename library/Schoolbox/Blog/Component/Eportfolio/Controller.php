@@ -1,6 +1,7 @@
 <?php
 /**
- * Blog component for homepage
+ * Normal (non-eportfolio) blog component controller. Is responsible for rendering the TWIG into component 
+ * on non-eportfolio pages
  *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
@@ -26,41 +27,6 @@ use Eportfolio\PageMapper as EportfolioPageMapper;
 
 class Controller extends Component_Eportfolio_ControllerAbstract
 {
-    /**
-     * @var FolderMapper;
-     */
-    protected $folderMapper;
-
-    /**
-     * @var EportfolioBlogMapper;
-     */
-    protected $blogMapper;
-
-    /**
-     * @var ErrorMapper;
-     */
-    protected $errorMapper;
-
-    /**
-     * @var UserMapper;
-     */
-    protected $userMapper;
-
-    /**
-     * @var EportfolioBlogCommentMapper;
-     */
-    protected $blogCommentMapper;
-
-    /**
-     * @var EportfolioBlogImageMapper;
-     */
-    protected $blogImageMapper;
-
-    /**
-     * @var EportfolioPageMapper
-     */
-    protected $eportfolioPageMapper;
-    
     /**
      * Injectable constructor
      *
@@ -99,16 +65,24 @@ class Controller extends Component_Eportfolio_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        $page = $this->getEportfolioPageMapper()->findById($this->getInstance()->getIdentifier());
+        // Work out which page we are on and grab a handle to it
 
+        try {
+            $page = $this->getEportfolioPageMapper()->findById($this->getInstance()->getIdentifier());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+        }
+
+        // Get all the blog entries for this page (e-portfolio pages have no limit parameter on their blogs)
+        
         $blogs = $this->getEportfolioBlogMapper()
             ->findByColumn("page_id", $this->getInstance()->getIdentifier())
             ->sortBy('createdAt', 'desc');
 
+        // Grab comments and image gallery items for each blog post 
+        
         $blogComments = [];
         $blogImages = [];
-
-        // This creates an array of unique year/months for the date selector
 
         /** @var EportfolioBlogModel $blog */
         foreach ($blogs as $blog)
@@ -119,11 +93,15 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             $blogComments[$blog->getId()] = $this->getEportfolioBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
             $blogImages[$blog->getId()] = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId());
 
+            // Hydrate owner of comments
+            
             /** @var EportfolioBlogCommentModel $comment */
             foreach ($blogComments[$blog->getId()] as $comment) {
                 $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
             }
         }
+        
+        // Render this component out
 
         return $this->renderTwigTemplate(
             $templateHandle,
@@ -140,6 +118,45 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
     }
+
+    /**
+     * Here be the getters/setters, nothing to see here ¯\_(ツ)_/¯
+     */
+
+    /**
+     * @var FolderMapper;
+     */
+    protected $folderMapper;
+
+    /**
+     * @var EportfolioBlogMapper;
+     */
+    protected $blogMapper;
+
+    /**
+     * @var ErrorMapper;
+     */
+    protected $errorMapper;
+
+    /**
+     * @var UserMapper;
+     */
+    protected $userMapper;
+
+    /**
+     * @var EportfolioBlogCommentMapper;
+     */
+    protected $blogCommentMapper;
+
+    /**
+     * @var EportfolioBlogImageMapper;
+     */
+    protected $blogImageMapper;
+
+    /**
+     * @var EportfolioPageMapper
+     */
+    protected $eportfolioPageMapper;
 
     /**
      * @return FolderMapper
