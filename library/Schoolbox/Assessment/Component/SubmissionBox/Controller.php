@@ -127,8 +127,10 @@ class Controller extends BaseController
         foreach ($this->getRubricHeaders($rubric) as $grouping => $criteria) {
             foreach ($criteria as $id => $criterion) {
                 $data[0][] = "$grouping - $criterion";
+                $data[0][] = '';
             }
         }
+        $data[0][] = 'Total';
 
         /**
          * Collate by id, each sub-collection will contain only 1 User element
@@ -143,17 +145,22 @@ class Controller extends BaseController
             $studentName = $student->formatName('{lastname}, {firstname}');
 
             $row = [ $studentName, $student->getExternalId() ];
+            $sum = '';
+
             if (count($marks)) {
                 foreach ($marks as $mark) {
-                    $field = $mark;
                     if ($mark instanceof RubricDescriptor) {
-                        $value = $mark->getValue();
-                        if (isset($value)) {
-                            $field = sprintf('(%.02f) %s', $mark->getValue(), $mark->getText());
-                        }
+                        $row[] = $mark->getText();
+                        $row[] = $mark->getValue();
+                        $sum += $mark->getValue();
                     }
-                    $row[] = $field;
+                    else {
+                        $row[] = $mark;
+                        $row[] = '';
+                    }
                 }
+                $row[] = $sum;
+
             } else {
                 $row = array_merge($row, array_pad([], count($data[0]) - 1, ''));
             }
