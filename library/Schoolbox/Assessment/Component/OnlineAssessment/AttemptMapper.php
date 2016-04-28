@@ -242,7 +242,7 @@ class AttemptMapper extends Mapper
                     'section_id'   => $row['section_id'],
                     'attempt_id'   => $row['attempt_id'],
                     'mark'         => $mark,
-                    'display_mark' => sprintf("%d / %d", $row['mark'], $row['max_mark']),
+                    'display_mark' => sprintf("%s / %d", round($row['mark'], 2), $row['max_mark']),
                     'comment'      => '',
                     'attempts'     => 1
                 );
