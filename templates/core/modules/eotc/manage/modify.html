@@ -348,13 +348,21 @@
     </fieldset>
 </form>
 
-<div class='hide' data-dialog="bulk" title="This event is part of a series">
-    <p>
-        <a class="icon-alert no-text"></a>
-        <span data-message="bulk-update">Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.</span>
-        <span data-message="bulk-delete">Would you like to delete only this event, or all in the series?</span>
+<div class="reveal-modal" data-reveal data-dialog="bulk-modify">
+    <h2>This event is part of a series</h2>
+    <p class="icon-alert">
+        Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.
     </p>
+    <ul class="flex-list buttons">
+        <li><a href="#" class="button" data-action="self">Only this event</a></li>
+        <li><a href="#" class="button" data-action="series">All events in the series</a></li>
+        <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
+    </ul>
 </div>
+
+
+
+
 <div class='hide' data-dialog="delete" title="Delete Event">
     <p>
         <a class="icon-alert no-text"></a>
@@ -535,18 +543,4 @@
         });
     });
 </script>
-<script type="text/javascript">
-    $(function() {
-        $('input[data-timepicker="hour"]').hourpicker({
-            hours: 12,
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            }
-        });
-        $('input[data-timepicker="minute"]').minutepicker({
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            }
-        });
-    });
-</script>
+
