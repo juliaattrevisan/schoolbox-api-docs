@@ -144,22 +144,22 @@ abstract class AbstractController extends BaseController
 
 
     /**
+     *
+     * Note this is an abstract method and should only be used for abstract implementation
+     *
      * @param int $folderId
      * @return array
      * @throws Resource\Exception
      */
     protected function getFolderData($folderId)
     {
-        // find out if we have access to the requested folder
-        $access = Access::getInstance()->getFolderAccess($this->getUser(), [ $folderId ]);
+
+        $access = $this->getAccess([$folderId]);
 
         // special case for root, just let that through to the keeper
         if ($access < UserAccess::ACCESS_READ && $folderId != 0) {
             throw new Resource\Exception("No access to requested folder");
         }
-
-        // Redirect to this folder next time page gets reloaded
-        $this->getSession()->set('resourcesID', $folderId, $this->namespace);
 
         // retrieve folder data
         $folder = $this->getFolder($folderId);
@@ -170,13 +170,10 @@ abstract class AbstractController extends BaseController
         } catch (Resource\Exception $e) {
             $tree = [];
         }
-
-    $parent = \Schoolbox\Resource\Folder\Mapper::getInstance()->findCheaplyById($folder->getParent()->getId());
-
+        
         return [
             'tree'      => $tree,
             'folder'    => $folder,
-            'parent'    => $parent,
             'icon'      => $this->treeBuilder->getFolderIcon($folder),
             'access'    => $access,
             'user'      => $this->getUser(),
@@ -326,7 +323,7 @@ abstract class AbstractController extends BaseController
             'type'   => 'file',
             'tree'   => $this->getBreadcrumbs($file->getFolder()),
             'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
-            'access' => Access::getInstance()->getFolderAccess($this->getUser(), [ $folderId ]),
+            'access' => $this->getAccess([ $folderId ]),
             'namespace' => $this->namespace
         ];
 
@@ -414,6 +411,13 @@ abstract class AbstractController extends BaseController
     {
         return $this->folderMapper->findById($folderId);
     }
+
+    /**
+     * Implements access right checks for the given folder type
+     * @param array $folderIds
+     * @return int
+     */
+    abstract protected function getAccess(array $folderIds);
 
     /**
      * @param  string $tab

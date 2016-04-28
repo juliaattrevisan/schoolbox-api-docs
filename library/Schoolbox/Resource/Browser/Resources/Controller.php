@@ -80,6 +80,10 @@ class Controller extends AbstractController
     {
         $data = parent::getFolderData($folderId);
 
+        // Redirect to this folder next time page gets reloaded
+        $this->getSession()->set('resourcesID', $folderId, $this->namespace);
+
+        $data['parent'] = \Schoolbox\Resource\Folder\Mapper::getInstance()->findCheaplyById($data['folder']->getParent()->getId());
         $data['roles']  = RoleAccessMapper::getInstance()->findAllForFolder($data['folder']);
         $data['access'] = Access::getInstance()->getFolderAccess($this->getUser(), [ $folderId ]);
 
@@ -113,4 +117,9 @@ class Controller extends AbstractController
         return $folder;
     }
 
+    protected function getAccess(array $folderIds)
+    {
+        // find out if we have access to the requested folder
+        return Access::getInstance()->getFolderAccess($this->getUser(), $folderIds);
+    }
 } 

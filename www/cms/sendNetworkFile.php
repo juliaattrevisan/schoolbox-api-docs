@@ -28,9 +28,11 @@ if (is_numeric($_GET['id']) && Cfg::get('webdav_enable')) {
     else
         $attach = "";
 
-    $filesize = @filesize($filename);
-    if ($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
+    $filesize = filesize($filename);
+    if ($filesize == FALSE) { //if we cannot find the file (something is wrong dont link to it)
+        unlink($filename);
         error(41);
+    }
 
     //send headers
     if ($file['mime_type'])
