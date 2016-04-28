@@ -2,18 +2,25 @@
     <div class="row">
         <div class="small-12 island">
             <!-- BEGIN student_block -->
-            <h2 class="subheader"><a href="/search/user/{STUDENT_ID}">{STUDENT_NAME}, Year {STUDENT_YEAR}</a></h2>
             <section>
-                <div class="avatar card wrap-down">
+                <div class="avatar card small-12">
                     <a href="/search/user/{STUDENT_ID}">
-                        <img src="/portrait.php?userId={STUDENT_EXTERNAL_ID}&size=constrain128" alt="{STUDENT_NAME}"/>
+                        <img src="/portrait.php?userId={STUDENT_EXTERNAL_ID}&size=square64" title="View Profile" />
+                        <h3>{STUDENT_NAME}, Year {STUDENT_YEAR}</h3>
                     </a>
-                    <ul class="no-bullet">
-                        <!-- BEGIN subject_block -->
-                        <li><h3><a href="/homepage/code/{STUDENT_SUBJECT_CODE}">{STUDENT_SUBJECT_NAME}</a></h3></li>
-                        <!-- END subject_block -->
-                    </ul>
                 </div>
+
+                <ul class="action-list">
+                    <!-- BEGIN subject_block -->
+                    <li>
+                        <div class="compact avatar card small-12">
+                            <div class="icon-home" title="Visit Homepage"></div>
+                            <a href="/homepage/code/{STUDENT_SUBJECT_CODE}">{STUDENT_SUBJECT_NAME}</a>
+                        </div>
+                    </li>
+                    <!-- END subject_block -->
+                </ul>
+
                 <div class="content">
                     <!-- BEGIN timetable -->
                     <a href="/timetable/{STUDENT_ID}" class="button icon-timetable">Timetable</a>
@@ -28,6 +35,10 @@
                     <!-- BEGIN grades_button -->
                     <a href="/submission/allWork/{STUDENT_ID}" class="button icon-approve" title="View grades">Grades</a>
                     <!-- END grades_button -->
+
+                    <!-- BEGIN pastoral -->
+                    <a href="/pastoral/{STUDENT_ID}" class="button icon-pastoral">Pastoral Care</a>
+                    <!-- END pastoral -->
 
                     <!-- BEGIN eportfolio -->
                     <a href="/eportfolio/{STUDENT_ID}/profile" class="button icon-eportfolio">ePortfolio</a>

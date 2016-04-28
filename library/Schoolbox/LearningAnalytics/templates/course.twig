@@ -240,7 +240,7 @@
             <ul class="information-list">
                 {% for currentStudent in results.ranking.top|slice(0,3) %}
                 <li>
-                    <div class="avatar card">
+                    <div class="avatar card small-12">
                         <a href="/search/user/{{ currentStudent.user.getId() }}" title="View Profile">
                             <img src="/portrait.php?userId={{ currentStudent.user.getExternalId() }}&size=square64" alt="View Profile" />
                             <p>{{ currentStudent.user.getFullName() }}</p>
@@ -267,7 +267,7 @@
             <ul class="information-list">
                 {% for currentStudent in results.ranking.bottom|slice(0,3) %}
                 <li>
-                    <div class="avatar card">
+                    <div class="avatar card small-12">
                         <a href="/search/user/{{ currentStudent.user.getId() }}" title="View Profile">
                             <img src="/portrait.php?userId={{ currentStudent.user.getExternalId() }}&size=square64" alt="View Profile" />
                             <p>{{ currentStudent.user.getFullName() }}</p>
