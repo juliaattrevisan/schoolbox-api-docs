@@ -1,59 +1,80 @@
 <div class="eotc-status {EVENT_STATUS_CLASS}">{EVENT_STATUS}</div>
 
 <div class="row">
-    <div class="large-8 columns">
+    <div class="small-12 columns">
         <h1>{EVENT_TITLE}</h1>
-        <time>{EVENT_START} &ndash; {EVENT_END}</time>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 large-8 island">
+        <h2 class="subheader">Event Details</h2>
 
-        <!-- BEGIN recurring_reminder -->
-        <p>
-            <strong>Recurring:</strong>
-            {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
-        </p>
-        <!-- END recurring_reminder -->
+        <section class="content">
+            <ul class="meta">
+                <li class="icon-calendar">
+                    {EVENT_START} &ndash; {EVENT_END}
+                </li>
 
-        <p>
-            <strong>Related Campuses:</strong>
-            <!-- BEGIN event_campus -->
-            {EVENT_CAMPUS_NAME}
-            <!-- END event_campus -->
-        </p>
+                <!-- BEGIN recurring_reminder -->
+                <li class="icon-calendar">
+                    Recurring {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
+                </li>
+                <!-- END recurring_reminder -->
 
-        <p>
-            <strong>Teacher in Charge:</strong>
-            <a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
-                {EVENT_TEACHER_IN_CHARGE_NAME}
-            </a>
-        </p>
+                <li>
+                    <strong>Related Campuses:</strong>
+                    <!-- BEGIN event_campus -->
+                    {EVENT_CAMPUS_NAME}
+                    <!-- END event_campus -->
+                </li>
 
-        <p>
-            <strong>Location:</strong> {EVENT_LOCATION}
-        </p>
+                <li>
+                    <strong>Teacher in Charge:</strong>
+                    <a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
+                        {EVENT_TEACHER_IN_CHARGE_NAME}
+                    </a>
+                </li>
 
-        <p>
-            {EVENT_DETAIL}
-        </p>
+                <li>
+                    <strong>Location:</strong> {EVENT_LOCATION}
+                </li>
 
-        <p>
-            <b>Created by:</b> <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
-            on {EVENT_CREATED_AT}
-        </p>
+                <li>
+                    <strong>Created by:</strong>
+                    <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
+                    on {EVENT_CREATED_AT}
+                </li>
+            </ul>
 
-        <a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="button icon-modify">Modify Event</a>
-        <a href="/calendar/full/{EVENT_DATESTAMP}/{EVENT_AUTHOR_ID}" class="button icon-calendar">View In Calendar</a>
+            <p>
+                {EVENT_DETAIL}
+            </p>
+
+            <ul class="flex-list buttons">
+                <li><a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="button icon-modify">Modify Event</a></li>
+                <li><a href="/calendar/full/{EVENT_DATESTAMP}/{EVENT_AUTHOR_ID}" class="button icon-calendar">View In Calendar</a></li>
+            </ul>
+        </section>
     </div>
 
-    <div class="large-4 columns">
+    <div class="small-12 large-4 island">
         <!-- BEGIN has_rams -->
-        <h2>RAMS Required</h2>
-        <ul>
-            <!-- BEGIN rams_list -->
-            <li>
-                <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" class="no-text icon-download" alt="Download" title="Download"></a>
-                <img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" width="22" height="22" />{EVENT_RAMS_FILE}
-            </li>
-            <!-- END rams_list -->
-        </ul>
+        <h2 class='subheader'>RAMS Required</h2>
+
+        <section>
+            <ul class="information-list">
+                <!-- BEGIN rams_list -->
+                <li class='content'>
+                    <div class="small-12 compact avatar card">
+                        <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" title="Download">
+                            <img src="/images/mime/60x60/{EVENT_RAMS_MIMETYPE_ICONFILE}" />
+                            <p>{EVENT_RAMS_FILE}</p>
+                        </a>
+                    </div>
+                </li>
+                <!-- END rams_list -->
+            </ul>
+        </section>
         <!-- END has_rams -->
     </div>
 </div>
