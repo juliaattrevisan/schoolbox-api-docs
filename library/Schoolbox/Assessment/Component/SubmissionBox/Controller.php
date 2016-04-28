@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Alaress\Web\Controller\Base as BaseController;
 use DueWork_Rubric_Abstract;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Rubric\Descriptor as RubricDescriptor;
 use Schoolbox\Collection;
 use Schoolbox\User;
 
@@ -126,8 +127,10 @@ class Controller extends BaseController
         foreach ($this->getRubricHeaders($rubric) as $grouping => $criteria) {
             foreach ($criteria as $id => $criterion) {
                 $data[0][] = "$grouping - $criterion";
+                $data[0][] = '';
             }
         }
+        $data[0][] = 'Total';
 
         /**
          * Collate by id, each sub-collection will contain only 1 User element
@@ -141,8 +144,27 @@ class Controller extends BaseController
             $student     = $studentsGrouped[$studentId]->first();
             $studentName = $student->formatName('{lastname}, {firstname}');
 
-            $data[] = [ $studentName, $student->getExternalId() ]
-                + (count($marks) ? $marks : array_pad([], count($data[0]) - 1, ''));
+            $row = [ $studentName, $student->getExternalId() ];
+            $sum = '';
+
+            if (count($marks)) {
+                foreach ($marks as $mark) {
+                    if ($mark instanceof RubricDescriptor) {
+                        $row[] = $mark->getText();
+                        $row[] = $mark->getValue();
+                        $sum += $mark->getValue();
+                    }
+                    else {
+                        $row[] = $mark;
+                        $row[] = '';
+                    }
+                }
+                $row[] = $sum;
+
+            } else {
+                $row = array_merge($row, array_pad([], count($data[0]) - 1, ''));
+            }
+            $data[] = $row;
         }
 
         return $data;
@@ -157,13 +179,14 @@ class Controller extends BaseController
      */
     protected function array2csv(array $array)
     {
-        $rows = [];
-
+        $fp = fopen('php://temp', 'w');
         foreach ($array as $row) {
-            $rows[] = '"' . implode('","', $row) . '"';
+            fputcsv($fp, $row);
         }
-
-        return implode("\n", $rows);
+        rewind($fp);
+        $contents = stream_get_contents($fp);
+        fclose($fp);
+        return $contents;
     }
 
 
