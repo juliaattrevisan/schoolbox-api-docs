@@ -137,7 +137,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
             $reviewed = $reviewedAt->getShort();
 
             if ($available && $canReview) {
-                $marks = round($currentAttempt['totalMarks']).'/'.round($available);
+                $marks = round($currentAttempt['totalMarks'],2).' / '.round($available);
             }
             else {
                 $marks = 'N/A';
