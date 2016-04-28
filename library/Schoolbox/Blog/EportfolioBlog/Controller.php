@@ -262,6 +262,8 @@ class Controller extends Base
         $comment->setBody($this->getRequest()->post["body"]);
         $comment->setCreatedAt(\Alaress_Date_Format::now());
         $this->getEportfolioBlogCommentMapper()->save($comment);
+
+        $this->getResponse()->redirect->afterPost("/eportfolio/" . $this->getRequest()->post["ownerId"] . "/" . $this->getRequest()->post["pageId"]);
     }
 
 
@@ -399,12 +401,15 @@ class Controller extends Base
             "owner_id" => $ownerId,
             "page_id" => $pageId
         ])->sortBy('createdAt', 'desc');
+
         $blogComments = [];
+        $blogImages = [];
 
         $dateSelectorArray = [];
         $blogsSelectedMonth = [];
 
         // This creates an array of unique year/months for the date selector
+
 
         /** @var EportfolioBlogModel $blog */
         foreach ($blogs as $blog) {
@@ -415,6 +420,7 @@ class Controller extends Base
             if ($blog->getCreatedAt()->getYear() == $year && $blog->getCreatedAt()->getMonth() == $month) {
 
                 $blogComments[$blog->getId()] = $this->getEportfolioBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
+                $blogImages[$blog->getId()] = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId());
 
                 /** @var EportfolioBlogCommentModel $comment */
                 foreach ($blogComments[$blog->getId()] as $comment) {
@@ -425,20 +431,24 @@ class Controller extends Base
             }
         }
 
+        $page = $this->getEportfolioPageMapper()->findById($pageId);
+
         // Lets get the party started...
 
         $this->getResponse()->content->set(
             array(
-                'template' => '@blog/archive.twig',
+                'template' => '@eportfolioBlog/archive.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
                     'blogs'             => $blogsSelectedMonth,
+                    'blogImages'      => $blogImages,
                     'blogComments'      => $blogComments,
                     'dateSelectorArray' => $dateSelectorArray,
                     'WRITE_ACCESS'      => WRITE_ACCESS,
                     'READ_ACCESS'       => READ_ACCESS,
                     'FULL_ACCESS'       => FULL_ACCESS,
                     'attachzone'        => $this->getAttachZone(),
+                    'page'              => $page
                 ),
             )
         );

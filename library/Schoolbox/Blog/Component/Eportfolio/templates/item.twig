@@ -112,8 +112,10 @@
                     {% endfor %}
 
                     <li>
-                        <form method="post" action="/blog/comment/insert" class="no-pad">
+                        <form action="/eportfolio/blog/comment/insert/" method="post">
                             <input type="hidden" name="id" value="{{ record.getId }}">
+                            <input type="hidden" name="pageId" value="{{ page.getPageId }}">
+                            <input type="hidden" name="ownerId" value="{{ page.getUid }}">
                             <label class="content">
                                 <textarea name="body" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
                             </label>

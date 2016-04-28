@@ -1,5 +1,5 @@
 <ul class="breadcrumb">
-    <li><a href="/homepage/{{ folder.getId }}" title="Homepage">{{ folder.getName }}</a></li>
+    <li><a href="/eportfolio/{{ page.getUid }}/{{ page.getPageId }}">{{ page.getPageTitle }}</a></li>
     <li class="active"><a href="#">Blog Archive</a></li>
 </ul>
 
@@ -10,7 +10,7 @@
         </div>
     </div>
     <nav>
-        <a href="/blog/modify/new/{{ folder.getId }}" class="icon-add" title="Post Blog"></a>
+        <a href="/eportfolio/blog/modify/new/{{ page.getUid }}/{{ page.getPageId }}" class="icon-add" title="Post Blog"></a>
     </nav>
 </div>
 
@@ -68,7 +68,7 @@
                                 </div>
                             </div>
                             <nav>
-                                <a class="icon-modify" title="Modify" href="/blog/modify/{{ blog.getId }}"></a>
+                                <a class="icon-modify" title="Modify" href="/eportfolio/blog/modify/{{ page.getUid }}/{{ page.getPageId }}/{{ blog.getId }}"></a>
                             </nav>
                         </div>
 
@@ -81,6 +81,23 @@
                         </div>
 
                         <article>{{ blog.getBody | raw }}</article>
+
+                        {% if blogImages[blog.getId] | length > 0 %}
+
+                            <h2 class="subheader">Image Gallery</h2>
+                            <div class="row">
+                                <div class="small-12 island">
+                                    <section class="content no-margin">
+                                        <ul class="inline-list img-gallery" data-image-gallery="">
+                                            {% for image in blogImages[blog.getId] %}
+                                                <li><a href="/storage/image.php?size=maxsize&hash={{ image.hash }}" title="Image {{ loop.index + 1 }}" rel="lightbox"><img src="/storage/image.php?size=constrain200&hash={{ image.hash }}" alt="Image {{ loop.index + 1 }}"></a></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </section>
+                                </div>
+                            </div>
+
+                        {% endif %}
 
                         <ul class="information-list reply">
 
@@ -105,7 +122,10 @@
 
                         </ul>
 
-                        <form method="post" action="/blog/comment/new/{BLOG_ID}">
+                        <form action="/eportfolio/blog/comment/insert/" method="post">
+                            <input type="hidden" name="id" value="{{ blog.getId }}">
+                            <input type="hidden" name="pageId" value="{{ page.getPageId }}">
+                            <input type="hidden" name="ownerId" value="{{ page.getUid }}">
                             <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
                             <input type="submit" class="expand" name="comment" value="Add comment"/>
                         </form>

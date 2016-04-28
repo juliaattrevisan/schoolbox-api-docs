@@ -31,17 +31,17 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/modify/new/{ownerId}/{pageId}'   => 'getInsert',
-                '/modify/{ownerId}/{pageId}/{id}'       => 'getModify',
-                '/{ownerId}/{pageId}/{id}'              => 'getItem',
-                '/archive/{id}'                         => 'getArchiveCurrent',
-                '/archive/{id}/{year}/{month}'          => 'getArchive',
+                '/modify/new/{ownerId}/{pageId}'                => 'getInsert',
+                '/modify/{ownerId}/{pageId}/{id}'               => 'getModify',
+                '/archive/{ownerId}/{pageId}'                   => 'getArchiveCurrent',
+                '/archive/{ownerId}/{pageId}/{year}/{month}'    => 'getArchive',
+                '/{ownerId}/{pageId}/{id}'                      => 'getItem',
             ],
             'POST' => [
-                '/delete'                               => 'postDelete',
-                '/modify'                               => 'postModify',
-                '/comment/insert'                       => 'postCommentInsert',
-                '/comment/delete'                       => 'postCommentDelete',
+                '/delete'                                       => 'postDelete',
+                '/modify'                                       => 'postModify',
+                '/comment/insert'                               => 'postCommentInsert',
+                '/comment/delete'                               => 'postCommentDelete',
             ]
         ];
 
