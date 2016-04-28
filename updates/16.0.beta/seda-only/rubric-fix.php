@@ -43,19 +43,23 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
 
     $log->alert("Initialising rubric data repair");
 
-    // retrieve a list of all non-deleted, non-null returns attached to non-deleted boxes that use rubric marking
+    // retrieve a list of the most-recent-per-box-and-student non-deleted, non-null returns attached to non-deleted boxes that use rubric marking
     $stmt = Database::getInstance()->query("
-        SELECT r.box_id, r.id return_id, `owner` student_id, norm_mark
-        FROM submission_return r
-        WHERE r.box_id IN (
-          SELECT id FROM submission_box 
-          WHERE use_rubric IS TRUE 
-          AND deleted IS FALSE
-          AND task_id IS NULL /* need @armatronic to ratify this line */
-        )
-        AND is_confirmation_of_submission IS FALSE
-        AND deleted IS FALSE
-        AND norm_mark IS NOT NULL
+        SELECT * FROM (
+            SELECT r.box_id, r.id return_id, `owner` student_id, norm_mark
+            FROM submission_return r
+            WHERE r.box_id IN (
+                SELECT id FROM submission_box 
+                WHERE use_rubric IS TRUE
+                AND deleted IS FALSE
+                AND task_id IS NULL
+            )
+            AND is_confirmation_of_submission IS FALSE
+            AND deleted IS FALSE
+            AND norm_mark IS NOT NULL
+            ORDER BY returned DESC
+        ) t
+        GROUP BY box_id, student_id
     ");
 
     // find out if any marks are given for this box/student combo
