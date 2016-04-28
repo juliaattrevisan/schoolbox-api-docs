@@ -36,6 +36,10 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
         $this->parseConfig();
 
+        if ($this->permission < READ_ACCESS) {
+            return false;
+        }
+
         $this->setBlock($templateHandle, 'socialstream_has_newpost', 'socialstream_has_newpost_block');
 
         /* Assign homepage id and settings
