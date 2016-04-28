@@ -13,6 +13,7 @@ namespace Schoolbox\Pastoral\Pastoral;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Pastoral;
 use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
@@ -394,7 +395,7 @@ class Controller extends Base
      * Returns the logged in users pastoral care moderator level
      *
      * @return int
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function getPastoralModeratorLevel() {
         $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
@@ -419,7 +420,7 @@ class Controller extends Base
      *
      * @param $id
      * @throws SchoolboxException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function getIndex($id)
     {
@@ -456,13 +457,13 @@ class Controller extends Base
                 $main = null;
                 try {
                     $main = $this->getUserMapper()->findByExternalId($contact['StudentContactID']);
-                } catch (\Exception $e) {
+                } catch (MapperException $e) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
                 $spouse = null;
                 try {
                     $spouse = $this->getUserMapper()->findByExternalId($contact['StudentContactSpouseID']);
-                } catch (\Exception $e) {
+                } catch (MapperException $e) {
                 }
 
                 $contact['main'] = $main;
@@ -475,7 +476,7 @@ class Controller extends Base
 
         try {
             $records = $this->getPastoralMapper()->findByStudentId($id);
-        } catch (\Exception $e) {
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
@@ -506,7 +507,7 @@ class Controller extends Base
      * @param $studentId
      * @param $id
      * @throws SchoolboxException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function getRecord($studentId, $id)
     {
@@ -592,7 +593,7 @@ class Controller extends Base
 
         try {
             $student = $this->getUserMapper()->findById($id);
-        } catch (\Exception $e) {
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
@@ -630,7 +631,7 @@ class Controller extends Base
 
         try {
             $record = $this->getPastoralMapper()->findById($id);
-        } catch (\Exception $e) {
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
@@ -676,8 +677,9 @@ class Controller extends Base
         // Get the comment we are deleting
 
         try {
-            $comment = $this->getPastoralCommentMapper()->findById($this->getRequest()->post['id']);
-        } catch (\Exception $e) {
+            /** @var PastoralCommentModel $comment */
+            $comment = $this->getPastoralCommentMapper()->findOneByColumn("id", $this->getRequest()->post['id']);
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
@@ -685,6 +687,9 @@ class Controller extends Base
 
         if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $comment->getOwner()->getId())
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+
+        $pastoralExternal = new \External_Pastoral();
+        $pastoralExternal->deleteComment($comment);
 
         $this->getPastoralCommentMapper()->delete($comment);
     }
@@ -716,6 +721,9 @@ class Controller extends Base
             $comment->setCreatedAt(\Alaress_Date_Format::now());
             $this->getPastoralCommentMapper()->setSessionData($_SESSION);
             $this->getPastoralCommentMapper()->save($comment);
+
+            $pastoralExternal = new \External_Pastoral();
+            $pastoralExternal->createComment($comment);
         }
 
         // Go back to pastoral record
@@ -741,7 +749,7 @@ class Controller extends Base
 
         // External interface
 
-        //$pastoralExternal = new \External_Pastoral();
+        $pastoralExternal = new \External_Pastoral();
 
         // Keep track of IDs created
 
@@ -793,7 +801,7 @@ class Controller extends Base
                     $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
                     /** @var PastoralSeverityModel $severity */
                     $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
-                } catch (\Schoolbox\Mapper\Exception $e) {
+                } catch (MapperException $e) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
 
@@ -816,8 +824,6 @@ class Controller extends Base
                     $parent = $record;
                 }
 
-                // $pastoralExternal->createPastoral($record);
-
                 // Save the authorised users
 
                 if (isset($this->getRequest()->post["user_id"])) {
@@ -826,7 +832,7 @@ class Controller extends Base
 
                             try {
                                 $user = $this->getUserMapper()->findbyId($user_id);
-                            } catch (\Exception $e) {
+                            } catch (MapperException $e) {
                                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                             }
 
@@ -858,7 +864,7 @@ class Controller extends Base
                         try {
                             /** @var \Schoolbox\Role $role */
                             $role = $this->getRoleMapper()->findById($role_id);
-                        } catch (\Schoolbox\Mapper\Exception $e) {
+                        } catch (MapperException $e) {
                             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                         }
 
@@ -868,6 +874,8 @@ class Controller extends Base
                         $this->getPastoralAccessMapper()->save($access);
                     }
                 }
+
+                $pastoralExternal->createPastoral($record);
             }
         }
         else
@@ -876,7 +884,7 @@ class Controller extends Base
 
             try {
                 $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
-            } catch (\Exception $e) {
+            } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
 
@@ -897,7 +905,7 @@ class Controller extends Base
                 $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
                 /** @var PastoralSeverityModel $severity */
                 $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
-            } catch (\Exception $e) {
+            } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
 
@@ -910,10 +918,6 @@ class Controller extends Base
             $record->setUpdatedAt(\Alaress_Date_Format::now());
             $this->getPastoralMapper()->setSessionData($_SESSION);
             $this->getPastoralMapper()->save($record);
-
-            // Update external record
-
-            //$pastoralExternal->updatePastoral($record);
 
             // Delete old tags
 
@@ -974,7 +978,7 @@ class Controller extends Base
 
                             try {
                                 $user = $this->getUserMapper()->findById($user_id);
-                            } catch (\Exception $e) {
+                            } catch (MapperException $e) {
                                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                             }
 
@@ -1008,7 +1012,7 @@ class Controller extends Base
                     try {
                         /** @var \Schoolbox\Role $role */
                         $role = $this->getRoleMapper()->findById($role_id);
-                    } catch (\Exception $e) {
+                    } catch (MapperException $e) {
                         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                     }
 
@@ -1033,6 +1037,12 @@ class Controller extends Base
                 }
             }
 
+            // Update external record
+
+            if ($record->getExternalId() != "")
+                $pastoralExternal->updatePastoral($record);
+            else
+                $pastoralExternal->createPastoral($record);
         }
 
         foreach ($records as $record)
@@ -1047,7 +1057,7 @@ class Controller extends Base
 
             try {
                 $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($record->getId());
-            } catch (\Exception $e) {
+            } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
 
@@ -1121,7 +1131,7 @@ class Controller extends Base
 
         try {
             $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
@@ -1139,8 +1149,8 @@ class Controller extends Base
 
         // Delete on external database
 
-        //$pastoralExternal = new \External_Pastoral();
-        //$pastoralExternal->deletePastoral($record);
+        $pastoralExternal = new \External_Pastoral();
+        $pastoralExternal->deletePastoral($record);
 
         // Delete locally
 

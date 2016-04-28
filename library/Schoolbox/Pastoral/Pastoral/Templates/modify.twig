@@ -79,7 +79,7 @@
         $('#addUser').selectizeSelector({
             multiple: true,
             ajax: {
-                url:      '/ajax/user.php?studentId={{ student.getId }}',
+                url:      '/ajax/user.php?studentId={{ student.getId }}{{ record.getStudent.getId }}',
                 type:     'GET',
                 data:     {roleTypeID: 'staff;parentofstudent'},
                 dataType: 'json'

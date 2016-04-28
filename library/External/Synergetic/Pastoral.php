@@ -5,6 +5,7 @@
  * @copyright   Copyright 2016, Alaress Pty Ltd
  */
 
+use Schoolbox\Notif\SilentNotif;
 use Schoolbox\UserMapper;
 use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
@@ -12,6 +13,8 @@ use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
+use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
+use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Alaress\DebugBar\Instance as DebugBar;
@@ -29,94 +32,20 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /** @var PastoralMapper $pastoralMapper */
     protected $pastoralMapper;
 
+    /** @var PastoralCommentMapper $pastoralCommentMapper */
+    protected $pastoralCommentMapper;
+
     /** @var PastoralTypeMapper $pastoralTypeMapper */
     protected $pastoralTypeMapper;
 
     /** @var PastoralAccessMapper $pastoralAccessMapper */
     protected $pastoralAccessMapper;
 
+    /** @var PastoralAttachmentMapper $pastoralAttachmentMapper */
+    protected $pastoralAttachmentMapper;
+
     /** @var PastoralSeverityMapper $pastoralSeverityMapper */
     protected $pastoralSeverityMapper;
-
-    /**
-     * @return UserMapper
-     */
-    public function getUserMapper() {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param $userMapper
-     * @return $this
-     */
-    public function setUserMapper($userMapper) {
-        $this->userMapper = $userMapper;
-        return $this;
-    }
-
-    /**
-     * @return PastoralMapper
-     */
-    public function getPastoralMapper() {
-        return $this->pastoralMapper;
-    }
-
-    /**
-     * @param $pastoralMapper
-     * @return $this
-     */
-    public function setPastoralMapper($pastoralMapper) {
-        $this->pastoralMapper = $pastoralMapper;
-        return $this;
-    }
-
-    /**
-     * @return PastoralTypeMapper
-     */
-    public function getPastoralTypeMapper() {
-        return $this->pastoralTypeMapper;
-    }
-
-    /**
-     * @param $pastoralTypeMapper
-     * @return $this
-     */
-    public function setPastoralTypeMapper($pastoralTypeMapper) {
-        $this->pastoralTypeMapper = $pastoralTypeMapper;
-        return $this;
-    }
-
-    /**
-     * @return PastoralAccessMapper
-     */
-    public function getPastoralAccessMapper() {
-        return $this->pastoralAccessMapper;
-    }
-
-    /**
-     * @param $pastoralAccessMapper
-     * @return $this
-     */
-    public function setPastoralAccessMapper($pastoralAccessMapper) {
-        $this->pastoralAccessMapper = $pastoralAccessMapper;
-        return $this;
-    }
-
-    /**
-     * @return PastoralSeverityMapper
-     */
-    public function getPastoralSeverityMapper() {
-        return $this->pastoralSeverityMapper;
-    }
-
-    /**
-     * @param $pastoralSeverityMapper
-     * @return $this
-     */
-    public function setPastoralSeverityMapper($pastoralSeverityMapper) {
-        $this->pastoralSeverityMapper = $pastoralSeverityMapper;
-        return $this;
-    }    
 
     /**
      * Constructor
@@ -125,9 +54,19 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function __construct()
     {
+        $silence = new SilentNotif();
+
         $this->setDatabase(MSSQL::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
-        $this->setPastoralMapper(PastoralMapper::getInstance());
+
+        $pastoralMapper = PastoralMapper::getInstance();
+        $pastoralMapper->setNotifier($silence);
+        $this->setPastoralMapper($pastoralMapper);
+
+        $pastoralCommentMapper = PastoralCommentMapper::getInstance();
+        $pastoralCommentMapper->setNotifier($silence);
+        $this->setPastoralCommentMapper($pastoralCommentMapper);
+
         $this->setPastoralTypeMapper(PastoralTypeMapper::getInstance());
         $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
         $this->setPastoralSeverityMapper(PastoralSeverityMapper::getInstance());
@@ -173,7 +112,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                           DuplicateFromSeq,
                           SubjectClassesSeq
                   FROM tPastoralCare
-                  WHERE PastoralCareSeq = " . $this->getPastoralIdentifier($pastoral->getExternalId());
+                  WHERE PastoralCareSeq = " . $this->getPastoralIdentifier($pastoral);
 
         return $this->getDatabase()->getAll($query);
     }
@@ -197,14 +136,14 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Get all pastoral care records from Synergetic
 
         $query = "
-SELECT        dbo.tPastoralCare.PastoralCareSeq, dbo.tPastoralCare.ID, dbo.tPastoralCare.ClassCode, dbo.tPastoralCare.ItemDate, dbo.tPastoralCare.MethodCode,
+            SELECT       dbo.tPastoralCare.PastoralCareSeq, dbo.tPastoralCare.ID, dbo.tPastoralCare.ClassCode, dbo.tPastoralCare.ItemDate, dbo.tPastoralCare.MethodCode,
                          dbo.tPastoralCare.Details, dbo.tPastoralCare.PrivateDetails, dbo.tPastoralCare.InitiatorCode, dbo.tPastoralCare.TypeCode, dbo.tPastoralCare.CategoryCode,
                          dbo.tPastoralCare.ClassificationCode, dbo.tPastoralCare.IsFollowUpFlag, dbo.tPastoralCare.FollowUpDate, dbo.tPastoralCare.ConfidentialFlag,
                          dbo.tPastoralCare.CreatedDate, dbo.tPastoralCare.CreatedByID, dbo.tPastoralCare.ModifiedDate, dbo.tPastoralCare.ModifiedByID,
                          dbo.tPastoralCare.EmailSentDate, dbo.tPastoralCare.EmailSentByID, dbo.tPastoralCare.DuplicateFromSeq, dbo.tPastoralCare.SubjectClassesSeq,
                          dbo.luPastoralCareType.Description AS TypeDescription, Community_1.Surname AS StudentLastname, Community_1.Given1 AS StudentFirstname,
                          dbo.Community.Surname AS OwnerLastname, dbo.Community.Given1 AS OwnerFirstname
-FROM            dbo.tPastoralCare INNER JOIN
+            FROM         dbo.tPastoralCare INNER JOIN
                          dbo.luPastoralCareType ON dbo.tPastoralCare.TypeCode = dbo.luPastoralCareType.Code INNER JOIN
                          dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID INNER JOIN
                          dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
@@ -386,22 +325,22 @@ FROM            dbo.tPastoralCare INNER JOIN
 
         // External student ID
 
-        $userMapper = new \Schoolbox\UserMapper();
-        $id = $userMapper->findById($pastoral->getStudent()->getId())->getExternalId();
+        $id = $this->getUserMapper()->findById($pastoral->getStudent()->getId())->getExternalId();
 
         // Set the item date to the post date
 
-        $item_date = "'" . $pastoral->getCreatedAt() . "'";
+        $item_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
+        $item_date = $item_date_alaress->getYear() . "-" . $item_date_alaress->getMonth() . "-" . $item_date_alaress->getDay(true);
 
         // If the message is marked as private, do not put in public details
 
         if ($pastoral->getPrivate()) {
             $details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "'";
         } else {
-            $details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\n\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
+            $details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\r\n\r\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
         }
 
-        $private_details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\n\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
+        $private_details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\r\n\r\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
 
         // Pastoral event type code
 
@@ -410,18 +349,9 @@ FROM            dbo.tPastoralCare INNER JOIN
 
         // Created/modified dates
 
-        $created_date = "'" . $pastoral->getCreatedAt() . "'";
+        $created_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
+        $created_date = $created_date_alaress->getYear() . "-" . $created_date_alaress->getMonth() . "-" . $created_date_alaress->getDay(true);
         $created_by_id = $pastoral->getOwner()->getExternalId();
-
-        // If there is no modified date, give it the created date
-
-        if ($pastoral->getUpdatedAt() != null) {
-            $modified_date = "'" . $pastoral->getUpdatedAt() . "'";
-            $modified_by_id = $pastoral->getOwner()->getExternalId();
-        } else {
-            $modified_date = "'" . $pastoral->getCreatedAt() . "'";
-            $modified_by_id = $pastoral->getOwner()->getExternalId();
-        }
 
         // Execute the query
 
@@ -446,8 +376,8 @@ FROM            dbo.tPastoralCare INNER JOIN
                     {$type_code},
                     {$created_date},
                     {$created_by_id},
-                    {$modified_date},
-                    {$modified_by_id},
+                    {$created_date},
+                    {$created_by_id},
                     '',
                     '',
                     -1
@@ -457,15 +387,15 @@ FROM            dbo.tPastoralCare INNER JOIN
         $result = $this->getDatabase()->query("SELECT SCOPE_IDENTITY() AS insert_id");
         $row = mssql_fetch_object($result);
 
-        $pastoralMapper = new PastoralMapper();
         $pastoral->setExternalId($row->insert_id);
-        $pastoralMapper->save($pastoral);
+        $this->getPastoralMapper()->save($pastoral);
+
+        $this->updatePastoralCareContacts($pastoral);
 
         // TODO: Upload attachments to DocMan (SynergyOneMedia)
 
         /*
-        $attachmentMapper = new AttachmentMapper();
-        $attachments = $attachmentMapper->findByPastoralId($pastoral->getId());
+        $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($pastoral->getId());
 
         foreach ($attachments as $attachment) {
 
@@ -480,6 +410,61 @@ FROM            dbo.tPastoralCare INNER JOIN
         return $result;
     }
 
+    /**
+     * Creates a new pastoral comment in the external database
+     *
+     * @param \Schoolbox\Pastoral\Comment
+     * @param \Schoolbox\Pastoral\Comment\Model $comment
+     * @return bool
+     */
+    public function createComment(\Schoolbox\Pastoral\Comment\Model $comment)
+    {
+        // Get the information necessary to create the query
+
+        // Can only do this if the pastoral record has an external ID
+
+        /** @var PastoralModel $pastoral */
+        $pastoral = $this->getPastoralMapper()->findOneByColumn("id", $comment->getPastoralId());
+
+        if (is_int($pastoral->getExternalId()))
+        {
+            $body = str_replace("'", "''", $comment->getBody());
+
+            $created_date_alaress = \Alaress_Date_Format::newLocal($comment->getCreatedAt());
+            $created_date = $created_date_alaress->getYear() . "-" . $created_date_alaress->getMonth() . "-" . $created_date_alaress->getDay(true);
+            $created_by_id = $comment->getOwner()->getExternalId();
+
+            // Execute the query
+
+            $query = "INSERT INTO PastoralCareComments (
+                            PastoralCareSeq,
+                            IndexOrder,
+                            Comment,
+                            CreatedDate,
+                            CreatedById,
+                            ModifiedDate,
+                            ModifiedById
+                        ) VALUES (
+                            {$pastoral->getExternalId()},
+                            COALESCE((SELECT MAX(IndexOrder) + 1 FROM PastoralCareComments WHERE PastoralCareSeq = {$pastoral->getExternalId()}), 1),
+                            '{$body}',
+                            {$created_date},
+                            {$created_by_id},
+                            {$created_date},
+                            {$created_by_id}
+                        )";
+
+            $this->getDatabase()->query($query);
+            $result = $this->getDatabase()->query("SELECT SCOPE_IDENTITY() AS insert_id");
+            $row = mssql_fetch_object($result);
+
+            $comment->setExternalId($row->insert_id);
+            $this->getPastoralCommentMapper()->save($comment);
+
+            return $result;
+        }
+        return false;
+    }
 
     /**
      * Updates an existing pastoral record
@@ -497,43 +482,37 @@ FROM            dbo.tPastoralCare INNER JOIN
 
             // External student ID
 
-            $userMapper = new \Schoolbox\UserMapper();
-            $id = $userMapper->findById($pastoral->getStudent()->getId())->getExternalId();
+            $id = $this->getUserMapper()->findById($pastoral->getStudent()->getId())->getExternalId();
 
             // Set the item date to the post date
 
-            $item_date = "'" . date("Y-m-d H:i:s", strtotime($pastoral->getCreatedAt())) . "'";
+            $item_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
+            $item_date = $item_date_alaress->getYear() . "-" . $item_date_alaress->getMonth() . "-" . $item_date_alaress->getDay(true);
 
             // If the message is marked as private, do not put in public details
 
             if ($pastoral->getPrivate()) {
                 $details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "'";
             } else {
-                $details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\n\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
+                $details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\r\n\r\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
             }
 
-            $private_details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\n\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
+            $private_details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\r\n\r\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
 
             // Pastoral event type code
 
-            $typeMapper = new PastoralTypeMapper();
-            $type = $typeMapper->findById($pastoral->getType()->getId());
+            $type = $this->getPastoralTypeMapper()->findById($pastoral->getType()->getId());
             $type_code = "'" . $type->getExternalCode() . "'";
 
-            // Created/modified dates
+            // Modified date
 
-            $created_date = "'" . date("Y-m-d H:i:s", strtotime($pastoral->getCreatedAt())) . "'";
-            $created_by_id = $pastoral->getOwner()->getExternalId();
+            if ($pastoral->getUpdatedAt() != null)
+                $modified_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getUpdatedAt());
+            else
+                $modified_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
 
-            // If there is no modified date, give it the created date
-
-            if ($pastoral->getUpdatedAt() != null) {
-                $modified_date = "'" . date("Y-m-d H:i:s", strtotime($pastoral->getUpdatedAt())) . "'";
-                $modified_by_id = $pastoral->getOwner()->getExternalId();
-            } else {
-                $modified_date = "'" . date("Y-m-d H:i:s", strtotime($pastoral->getCreatedAt())) . "'";
-                $modified_by_id = $pastoral->getOwner()->getExternalId();
-            }
+            $modified_date = "'" . $modified_date_alaress->getYear() . "-" . $modified_date_alaress->getMonth() . "-" . $modified_date_alaress->getDay(true) . "'";
+            $modified_by_id = $pastoral->getOwner()->getExternalId();
 
             // Execute the query
 
@@ -543,8 +522,6 @@ FROM            dbo.tPastoralCare INNER JOIN
                         Details = {$details},
                         PrivateDetails = {$private_details},
                         TypeCode = {$type_code},
-                        CreatedDate = {$created_date},
-                        CreatedById = {$created_by_id},
                         ModifiedDate = {$modified_date},
                         ModifiedById = {$modified_by_id},
                         ClassCode = '',
@@ -554,26 +531,76 @@ FROM            dbo.tPastoralCare INNER JOIN
             ";
 
             $result = $this->getDatabase()->query($query);
+
+            $this->updatePastoralCareContacts($pastoral);
+
+            // TODO: Upload attachments to DocMan (SynergyOneMedia)
+
+            /*
+            $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($pastoral->getId());
+
+            foreach ($attachments as $attachment) {
+
+                $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($attachment->getHash());
+                $content = bin2hex($content);
+                $document = "0x".$content;
+
+                $this->getDatabase()->query("INSERT INTO tDocuments (Description, SourceRed, Document) VALUES ('Text', 'Imported from Schoolbox', '{$document}')");
+            }
+            */
+
             return $result;
         }
 
-        // TODO: Upload attachments to DocMan (SynergyOneMedia)
+        return false;
+    }
 
-        /*
-        $attachmentMapper = new AttachmentMapper();
-        $attachments = $attachmentMapper->findByPastoralId($pastoral->getId());
+    /**
+     * Updates pastoral care contacts in Synergetic
+     *
+     * @param PastoralModel $pastoral
+     */
+    public function updatePastoralCareContacts(\Schoolbox\Pastoral\Pastoral\Model $pastoral) {
 
-        foreach ($attachments as $attachment) {
+        $external_id = $pastoral->getExternalId();
 
-            $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($attachment->getHash());
-            $content = bin2hex($content);
-            $document = "0x".$content;
+        // Pummel old contacts for the pastoral care record
+        $query = "DELETE FROM PastoralCareContacts WHERE PastoralCareSeq = {$external_id}";
+        $this->getDatabase()->query($query);
 
-            $this->getDatabase()->query("INSERT INTO tDocuments (Description, SourceRed, Document) VALUES ('Text', 'Imported from Schoolbox', '{$document}')");
+        // Get users that have been given specific access to the record
+
+        $access = $this->getPastoralAccessMapper()->findByPastoralId($pastoral->getId());
+
+        $order = 1;
+
+        /** @var PastoralAccessModel $record */
+        foreach ($access as $record) {
+            if ($user = $record->getUser()) {
+                if ($user->getExternalId()) {
+                    $query = "
+                        INSERT INTO PastoralCareContacts
+                        (
+                          PastoralCareSeq,
+                          IndexOrder,
+                          EmailFlag,
+                          Email,
+                          ID
+                        )
+                        VALUES
+                        (
+                          {$external_id},
+                          {$order},
+                          0,
+                          '{$user->getEmail()}',
+                          {$user->getExternalId()}
+                        );
+                    ";
+                    $this->getDatabase()->query($query);
+                    $order++;
+                }
+            }
         }
-        */
-
-        return true;
     }
 
     /**
@@ -583,6 +610,23 @@ FROM            dbo.tPastoralCare INNER JOIN
     {
         if (trim($pastoral->getExternalId()) != '') {
             $result = $this->getDatabase()->query("DELETE FROM tPastoralCare WHERE PastoralCareSeq = " . $pastoral->getExternalId());
+            return $result;
+        } else {
+
+            // Nothing to delete
+
+            return true;
+        }
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteComment(\Schoolbox\Pastoral\Comment\Model $comment)
+    {
+        if (trim($comment->getExternalId()) != '') {
+            $result = $this->getDatabase()->query("DELETE FROM PastoralCareComments WHERE PastoralCareCommentsSeq = " . $comment->getExternalId());
             return $result;
         } else {
 
@@ -606,5 +650,117 @@ FROM            dbo.tPastoralCare INNER JOIN
     public function getDatabase()
     {
         return $this->database;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper() {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param $userMapper
+     * @return $this
+     */
+    public function setUserMapper($userMapper) {
+        $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralMapper
+     */
+    public function getPastoralMapper() {
+        return $this->pastoralMapper;
+    }
+
+    /**
+     * @param $pastoralMapper
+     * @return $this
+     */
+    public function setPastoralMapper($pastoralMapper) {
+        $this->pastoralMapper = $pastoralMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralTypeMapper
+     */
+    public function getPastoralTypeMapper() {
+        return $this->pastoralTypeMapper;
+    }
+
+    /**
+     * @param $pastoralTypeMapper
+     * @return $this
+     */
+    public function setPastoralTypeMapper($pastoralTypeMapper) {
+        $this->pastoralTypeMapper = $pastoralTypeMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralAccessMapper
+     */
+    public function getPastoralAccessMapper() {
+        return $this->pastoralAccessMapper;
+    }
+
+    /**
+     * @param $pastoralAccessMapper
+     * @return $this
+     */
+    public function setPastoralAccessMapper($pastoralAccessMapper) {
+        $this->pastoralAccessMapper = $pastoralAccessMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralAttachmentMapper
+     */
+    public function getPastoralAttachmentMapper() {
+        return $this->pastoralAttachmentMapper;
+    }
+
+    /**
+     * @param $pastoralAttachmentMapper
+     * @return $this
+     */
+    public function setPastoralAttachmentMapper($pastoralAttachmentMapper) {
+        $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralCommentMapper
+     */
+    public function getPastoralCommentMapper() {
+        return $this->pastoralCommentMapper;
+    }
+
+    /**
+     * @param $pastoralCommentMapper
+     * @return $this
+     */
+    public function setPastoralCommentMapper($pastoralCommentMapper) {
+        $this->pastoralCommentMapper = $pastoralCommentMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralSeverityMapper
+     */
+    public function getPastoralSeverityMapper() {
+        return $this->pastoralSeverityMapper;
+    }
+
+    /**
+     * @param $pastoralSeverityMapper
+     * @return $this
+     */
+    public function setPastoralSeverityMapper($pastoralSeverityMapper) {
+        $this->pastoralSeverityMapper = $pastoralSeverityMapper;
+        return $this;
     }
 }

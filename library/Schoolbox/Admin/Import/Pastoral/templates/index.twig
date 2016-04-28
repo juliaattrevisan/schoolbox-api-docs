@@ -38,19 +38,37 @@
     </div>
 </div>
 
-<div class="small-12 island">
-    <form data-form-import method="post" action="/adminv2/import-pastoral/process">
-        <section class="content">
-            <p>
-                This screen will import all pastoral care records currently stored in your SIS to the Schoolbox Pastoral
-                Care module. This is intended for a one-time import when first enabling the Pastoral Care module, any
-                records created using the import feature (and associated comments/attachment) will be removed on
-                subsequent imports.
-            </p>
-            <p>
-                Click on the button below to begin the import.
-            </p>
-            <input type="submit" data-import value="Import Pastoral Care Records">
-        </section>
-    </form>
-</div>
+{% if externalEnabled == '1' %}
+
+    <div class="small-12 island">
+        <form data-form-import method="post" action="/adminv2/import-pastoral/process">
+            <section class="content">
+                <p>
+                    This screen will import all pastoral care records currently stored in your SIS to the Schoolbox Pastoral
+                    Care module. This is intended for a one-time import when first enabling the Pastoral Care module, any
+                    records created using the import feature (and associated comments/attachment) will be removed on
+                    subsequent imports.
+                </p>
+                <p>
+                    Click on the button below to begin the import.
+                </p>
+                <input type="submit" data-import value="Import Pastoral Care Records">
+            </section>
+        </form>
+    </div>
+
+{% else %}
+
+    <div class="small-12 island">
+        <form data-form-import method="post" action="/adminv2/import-pastoral/process">
+            <section class="content">
+                <p class="no-margin">
+                    Sorry, importing of pastoral care records is only possible if
+                    <a href='/adminv2/setting/External+DB'>External Pastoral Synchronisation</a> is enabled on the
+                    External DB configuration screen.
+                </p>
+            </section>
+        </form>
+    </div>
+
+{% endif %}

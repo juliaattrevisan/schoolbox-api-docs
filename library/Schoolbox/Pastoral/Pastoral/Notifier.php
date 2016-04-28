@@ -175,6 +175,7 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @param Model $model
+     * @param Model $model
      * @param User $userEffected
      * @param array $diff
      * @return Envelope

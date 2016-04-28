@@ -12,21 +12,37 @@ namespace Schoolbox\Admin\Import\Pastoral;
 use Alaress\Web\Controller\Base;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage;
-use Schoolbox\RoleMapper;
-use Schoolbox\CampusMapper;
-use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\News\TopicMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
-use Schoolbox\Pastoral\Severity\Mapper as SeverityMapper;
-use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
+use Schoolbox\Config\ConfigMapper;
 
 class Controller extends Base
 {
+    /**
+     * @var ConfigMapper
+     */
+    protected $configMapper;
+
+    /***
+     * @return ConfigMapper
+     */
+    public function getConfigMapper() {
+        return $this->configMapper;
+    }
+
+    /**
+     * @param ConfigMapper $configMapper
+     * @return $this
+     */
+    public function setConfigMapper($configMapper) {
+        $this->configMapper = $configMapper;
+        return $this;
+    }
+
     /**
      * Controller constructor.
      */
     public function __construct()
     {
+        $this->setConfigMapper(ConfigMapper::getInstance());
     }
 
     public function postImport()
@@ -55,6 +71,7 @@ class Controller extends Base
                 'template' => '@adminImportPastoral/index.twig',
                 'data'     => array(
                     'pageCurrent' => 'import',
+                    'externalEnabled' => $this->getConfigMapper()->get("external_pastoral")
                 ),
             )
         );

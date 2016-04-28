@@ -6,6 +6,7 @@
  */
 
 use \Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
+use \Schoolbox\Pastoral\Comment\Model as PastoralCommentModel;
 
 class External_Pastoral implements External_PastoralInterface
 {
@@ -45,7 +46,7 @@ class External_Pastoral implements External_PastoralInterface
     }
 
     /**
-     * Creates a new pastoral record in the remot system
+     * Creates a new pastoral record in the remote system
      *
      * @param PastoralModel $pastoral
      * @return mixed
@@ -67,11 +68,41 @@ class External_Pastoral implements External_PastoralInterface
     }
 
     /**
+     * Creates a new pastoral comment in the remote system
+     *
+     * @param PastoralCommentModel $comment
+     * @return mixed
+     */
+    public function createComment(PastoralCommentModel $comment)
+    {
+        return $this->getDatabase()->createComment($comment);
+    }
+
+    /**
+     * Updates an existing pastoral comment
+     *
+     * @param PastoralCommentModel $comment
+     * @return mixed
+     */
+    public function updateComment(PastoralCommentModel $comment)
+    {
+        return $this->getDatabase()->updateComment($comment);
+    }
+
+    /**
      * @inheritDoc
      */
     public function deletePastoral(PastoralModel $pastoral)
     {
         return $this->getDatabase()->deletePastoral($pastoral);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteComment(PastoralCommentModel $comment)
+    {
+        return $this->getDatabase()->deleteComment($comment);
     }
 
     /**
