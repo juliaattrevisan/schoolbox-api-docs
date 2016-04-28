@@ -219,6 +219,8 @@
                             <li class="actions-small-1" data-delete-rams-row="{EVENT_RAMS_HASH}">
                                 <div class="list-item">
                                     <div class="compact avatar card small-12">
+                                        <input type="hidden" name="hasRamsFile[{EVENT_RAMS_HASH}]" value="1" />
+
                                         <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" title="Download">
                                             <img src="/images/mime/60x60/{EVENT_RAMS_MIMETYPE_ICONFILE}" class="mime" />
                                             <p>{EVENT_RAMS_FILE}</p>
@@ -235,7 +237,7 @@
                         <ul class="action-list" id="newRamsFiles">
                             <li class="actions-small-1" data-ramsfile>
                                 <div class="list-item">
-                                    <input type="file" name="ramsFile[]" multiple />
+                                    <input type="file" name="newRamsFile[]" multiple />
                                 </div>
                                 <nav>
                                     <a href="#" data-delete-rams class="icon-delete no-text hide"></a>

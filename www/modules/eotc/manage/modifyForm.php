@@ -188,25 +188,34 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			if ($event->getMetadata()->getRamsRequired()) {
 				// Delete files that are checked, preserve ones that aren't
 				$ramsFiles = new \Schoolbox\Collection();
+
+				/* Keep existing RAMS files
+                 */
 				foreach ($event->getMetadata()->getRamsFiles() as $existingFile) {
-					if (empty($_POST['deleteRamsFile'][$existingFile->getHash()])) {
+					if (!empty($_POST['hasRamsFile'][$existingFile->getHash()])) {
 						$ramsFiles->add($existingFile);
 					}
 				}
-				if (!empty($_FILES['ramsFile'])) {
+
+				/* Upload any new RAMS files
+                 */
+				if (!empty($_FILES['newRamsFile'])) {
+
 					// Upload new files
 					// php wy u do fials liek dis
-					foreach ($_FILES['ramsFile']['name'] as $i => $fileName) {
-						if ($_FILES['ramsFile']['error'][$i] === UPLOAD_ERR_OK) {
+					foreach ($_FILES['newRamsFile']['name'] as $i => $fileName) {
+						if ($_FILES['newRamsFile']['error'][$i] === UPLOAD_ERR_OK) {
 							$newFile = \Schoolbox\Resource\Storage\Mapper::getInstance()->accept(
 								$fileName,
-								$_FILES['ramsFile']['tmp_name'][$i],
+								$_FILES['newRamsFile']['tmp_name'][$i],
 								$author->getId()
 							);
+
 							$ramsFiles->add($newFile);
 						}
 					}
 				}
+
 				$event->getMetadata()->setRamsFiles($ramsFiles);
 			}
 			/* RAMS file not needed - remove all existing ones
@@ -232,6 +241,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 				/* Set status id
 				 */
+				/** @var \EOTC\EventStatus $eventStatus */
 				$event->getMetadata()->setStatus($eventStatus);
 				$event->getMetadata()->setComment($_POST['comment']);
 				
