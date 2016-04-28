@@ -18,6 +18,12 @@ class Bulk_Category extends Bulk_Abstract
     private $templateID = 0;
 
     /**
+     * Storage object
+     * @var resource
+     */
+    protected $fp;
+
+    /**
     * Constructor
     *
     * @param $file
@@ -25,7 +31,7 @@ class Bulk_Category extends Bulk_Abstract
     */
     public function __construct($file, $templateID)
     {
-        $this->setFile($file);
+        $this->fp = $file;
         $this->setTemplateID($templateID);
     }
 
@@ -47,17 +53,16 @@ class Bulk_Category extends Bulk_Abstract
 		 */
         $output = array();
 
-        if (is_file($this->getFile())) {
+        if (is_resource($this->fp)) {
             $groups = array_map(array('Scrub', 'text'), $_POST['groupPerm']);
 
             /* Process rows
 			 */
-            $handle = fopen($this->getFile(), 'r');
-            $headerRow = fgetcsv($handle, 1000, ",");
-
-            while (($row = fgetcsv($handle, 1000, ",")) !== false) {
+            $headerRow = fgetcsv($this->fp, 1000, ",");
+            while (($row = fgetcsv($this->fp, 1000, ",")) !== false) {
+                    
                 if (($row[0] != '') && ($row[1] != '')) {
-/* Check parent exists
+                    /* Check parent exists
 					 */
                     try {
                         $category = $categoryMapper->findById($row[0]);
@@ -128,6 +133,9 @@ class Bulk_Category extends Bulk_Abstract
                         $newFolder->getCodes()->add($folderCode);
                     }
 
+                    if (count($code) == 0 && $_POST["inherit"])
+                        $newFolder->setInherit(true);
+
                     $categoryMapper->save($newFolder);
 
                     // Save the homepage contents
@@ -136,21 +144,23 @@ class Bulk_Category extends Bulk_Abstract
                         $homepageConfigMapper->resetToTemplate($homepageConfig);
                     }
 
-                    /* Save roles
-                     */
-                    $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
+                    if (!$_POST["inherit"]) {
+                        /* Save roles
+                         */
+                        $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
 
-                    foreach ($groups as $id => $perm) {
-                        try {
-                            $roleMapper = new \Schoolbox\RoleMapper();
-                            $role = $roleMapper->findById($id);
+                        foreach ($groups as $id => $perm) {
+                            try {
+                                $roleMapper = new \Schoolbox\RoleMapper();
+                                $role = $roleMapper->findById($id);
 
-                            $roleAccess = new \Schoolbox\Permission\Access\RoleAccess();
-                            $roleAccess->setCategory($newFolder);
-                            $roleAccess->setRole($role);
-                            $roleAccess->setType($perm);
-                            $roleAccessMapper->save($roleAccess);
-                        } catch (\Exception $e) {
+                                $roleAccess = new \Schoolbox\Permission\Access\RoleAccess();
+                                $roleAccess->setCategory($newFolder);
+                                $roleAccess->setRole($role);
+                                $roleAccess->setType($perm);
+                                $roleAccessMapper->save($roleAccess);
+                            } catch (\Exception $e) {
+                            }
                         }
                     }
 

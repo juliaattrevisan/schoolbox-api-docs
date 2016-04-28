@@ -1,9 +1,10 @@
-{ADMIN_NAV}
+{# Shared navigation menu #}
+
+{{ renderAdminNavigation(pageCurrent) }}
 
 <div class="row">
     <div class="large-12 columns">
         <h3>Bulk Add Folders</h3>
-
         <table>
             <thead>
                 <tr>
@@ -20,15 +21,15 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- BEGIN folder -->
-                <tr>
-                    <td>{FOLDER_FOLDER}</td>
-                    <td>{FOLDER_STATUS}</td>
-                    <td>{FOLDER_ERROR}</td>
-                </tr>
-                <!-- END folder -->
+                {% for folder in folders %}
+                    <tr>
+                        <td>{{ folder.category }}</td>
+                        <td>{{ folder.status }}</td>
+                        <td>{{ folder.error }}</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
-        <a href="/adminv2/folder" class="button icon-previous">Back to folders</a>
+        <a href="/adminv2/bulk-add-folders" class="button icon-previous">Back to folders</a>
     </div>
 </div>
