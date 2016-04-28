@@ -22,7 +22,7 @@ class ZipFileUpload extends DeprecatedModel
      *
      * @var string
      */
-    private $extractTo = '/tmp';
+    private $extractTo;
 
     /**
      * Zip file prefix
@@ -52,13 +52,22 @@ class ZipFileUpload extends DeprecatedModel
      */
     private $errorFiles = array();
 
+
     /**
-    * Constructor
-    * Set up paths and clean up any existing junk
-    */
-    public function __construct()
+     * Constructor
+     * Set up paths and clean up any existing junk
+     *
+     * @param string $extractTo
+     */
+    public function __construct($extractTo = '')
     {
         parent::DeprecatedModel();
+
+        $this->extractTo = (string)(trim($extractTo) ?: Cfg::get('zip_dir'));
+
+        if (strlen($this->extractTo) == 0) {
+            throw new RuntimeException("No extraction destination available");
+        }
 
         $this->path = $this->extractTo . '/' . $this->prefix . uniqid();
         $this->allowedFileHandler = new AllowedFile();
@@ -87,28 +96,36 @@ class ZipFileUpload extends DeprecatedModel
         $this->verbose = true;
     }
 
+
     /**
-    * Extract files to the path specified. Returns a dirhandle if successfully
-    * extracted files.
-    */
+     * Extract files to the path specified. Returns a dirhandle if successfully
+     * extracted files.
+     *
+     * @param ZipArchive $archive
+     * @return resource
+     */
     public function extract(ZipArchive $archive)
     {
         $extractedFiles = $archive->extractTo($this->getPath());
 
         if (!$extractedFiles) {
             die('Could not extract files.');
-        } else {
-            return opendir($this->getPath());
         }
 
-        return false;
+        return opendir($this->getPath());
     }
 
+
     /**
-    * Traverse directory structure. Create Categorys and Files accordingly,
-    * with the permissions specified
-    */
-    public function traverse($dir, $parentID, $inherit=0)
+     * Traverse directory structure. Create Categorys and Files accordingly,
+     * with the permissions specified
+     *
+     * @param string $dir
+     * @param int    $parentID
+     * @param int    $inherit
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function traverse($dir, $parentID, $inherit = 0)
     {
         if (!$dh = @opendir($dir)) {
             return;
@@ -217,11 +234,14 @@ class ZipFileUpload extends DeprecatedModel
         return;
     }
 
+
     /**
-    * Remove temp folder that was extracted. Or you can feed in a list of
-    * folders to remove. It will prefix this list with the extractTo value for
-    * a bit of safety.
-    */
+     * Remove temp folder that was extracted. Or you can feed in a list of
+     * folders to remove. It will prefix this list with the extractTo value for
+     * a bit of safety.
+     *
+     * @param bool $existing
+     */
     public function cleanup($existing = false)
     {
         if (is_array($existing)) {
@@ -238,8 +258,8 @@ class ZipFileUpload extends DeprecatedModel
     /**
     * Recursively delete a directory
     *
-    * @param string $dir Directory name
-    * @param boolean $deleteRootToo Delete specified top-level directory as well
+    * @param string $dir           Directory name
+    * @param bool   $deleteRootToo Delete specified top-level directory as well
     *
     * Taken from php.net
     */
