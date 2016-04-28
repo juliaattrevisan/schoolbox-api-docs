@@ -39,9 +39,9 @@ try {
         throw new SchoolboxException('Invalid token', 401);
     }
 
-    $back = ConfigMapper::getInstance()->get('export_start');
-    $forward = ConfigMapper::getInstance()->get('export_end');
-    $timetable_forward = ConfigMapper::getInstance()->get('export_timetable_end');
+    $back = ConfigMapper::getInstance()->get('calendar_export_start');
+    $forward = ConfigMapper::getInstance()->get('calendar_export_end');
+    $timetable_forward = ConfigMapper::getInstance()->get('timetable_export_end');
 
     if (!is_int($back)) $back = 1;
     if (!is_int($forward)) $forward = 12;
