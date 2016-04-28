@@ -130,6 +130,11 @@ class Controller extends Base {
                     ->setProvider($provider)
                     ->setCreatedAt($now)
                     ->setTouchedAt($now);
+
+                // if a device ID is given, store that too. The mapper will auto-dedupe because of unique constraints
+                if (isset($data['deviceId'])) {
+                    $registry->setDeviceId($data['deviceId']);
+                }
             }
 
             $this->registryMapper->save($registry);
