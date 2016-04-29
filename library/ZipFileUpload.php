@@ -63,7 +63,7 @@ class ZipFileUpload extends DeprecatedModel
     {
         parent::DeprecatedModel();
 
-        $this->extractTo = (string)(trim($extractTo) ?: Cfg::get('zip_dir'));
+        $this->extractTo = (string)(trim($extractTo) ?: sys_get_temp_dir());
 
         if (strlen($this->extractTo) == 0) {
             throw new RuntimeException("No extraction destination available");
