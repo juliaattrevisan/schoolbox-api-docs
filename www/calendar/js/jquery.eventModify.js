@@ -343,7 +343,7 @@
 				else {
 					return $('input[name="campus[]"]').length;
 				}
-			}
+			};
 
 			/* Check if a Group is selected when using the Group
 			 * level option in the dropdown
@@ -351,19 +351,15 @@
 			var validateGroupSelected = function() {
 				var level = parseInt($('select[name=level]').val());
 
-				if (level == 2) {
-					return true;
-				}
-
-				return false;
-			}
+				return (level == 2);
+			};
 
 			/* For EOTC
 			 * Disabled need for files to be uploaded, regardless of the setting
 			 */
 			var validateRamsFile = function() {
 				return false;
-			}
+			};
 
 			/* For EOTC
 			 */
@@ -379,7 +375,7 @@
 				}
 
 				return false;
-			}
+			};
 
             var validateNotAllDaySelected = function() {
                 var allDaySelector = $(':checkbox[name="allday"]');
@@ -455,14 +451,6 @@
                         }
                     }
 				},
-                errorPlacement: function(error, element) {
-                    var cell = element.closest('td');
-                    if (cell.length) {
-                        error.appendTo(cell);
-                    } else {
-                        error.insertAfter(element);
-                    }
-                },
 				submitHandler: function(form) {
 					var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
 					if (multi) {
