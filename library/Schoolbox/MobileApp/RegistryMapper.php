@@ -23,7 +23,7 @@ class RegistryMapper extends Mapper
     {
         $this->hasTable('mobile_app_registry');
 
-        $this->hasPrototype(Registry::class);
+        $this->hasPrototype(new Registry());
 
         $this->joins('user_id', UserMapper::class);
 
