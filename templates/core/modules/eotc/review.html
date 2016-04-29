@@ -1,43 +1,44 @@
-<h1>Pending EOTC Events</h1>
+<div class="row">
+    <div class="small-12 columns">
+		<h1>Pending EOTC Events</h1>
+    </div>
+</div>
 
 <!-- BEGIN event_list_group -->
-<h2>{EVENT_LIST_GROUP_NAME}</h2>
-<table>
-	<colgroup>
-		<col width="180" />
-		<col />
-		<col width="200" />
-		<col width="180" />
-		<col width="30" />
-		<col width="120" />
-		<col width="130" />
-		<col width="30" />
-	</colgroup>
-	<thead>
-		<tr>
-			<th>Date</th>
-			<th>Title</th>
-			<th>Teacher In Charge</th>
-			<th>Created</th>
-			<th>Students</th>
-			<th>RAMS Required</th>
-			<th>Status</th>
-			<th>View</th>
-		</tr>
-	</thead>
-	<tbody>
-		<!-- BEGIN event -->
-		<tr>
-			<td>{EVENT_START_DATETIME}</td>
-			<td>{EVENT_TITLE}</td>
-			<td><a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">{EVENT_TEACHER_IN_CHARGE_FULLNAME}</a></td>
-			<td>{EVENT_CREATED_AT}</td>
-			<td>{EVENT_STUDENTS}</td>
-			<td>{EVENT_RAMS_REQUIRED}</td>
-			<td>{EVENT_STATUS_NAME}</td>
-			<td><a href="/modules/eotc/status/modify/{EVENT_ID}">View</a></td>
-		</tr>
-		<!-- END event -->
-	</tbody>
-</table>
+<div class="row">
+    <div class="small-12 columns">
+		<h2 class="subheader">{EVENT_LIST_GROUP_NAME}</h2>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Title</th>
+					<th>Teacher In Charge</th>
+					<th>Created</th>
+					<th>Students</th>
+					<th>RAMS Required</th>
+					<th>Status</th>
+					<th>View</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- BEGIN event -->
+				<tr>
+					<td>{EVENT_START_DATETIME}</td>
+					<td>{EVENT_TITLE}</td>
+					<td><a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">{EVENT_TEACHER_IN_CHARGE_FULLNAME}</a></td>
+					<td>{EVENT_CREATED_AT}</td>
+					<td>{EVENT_STUDENTS}</td>
+					<td>{EVENT_RAMS_REQUIRED}</td>
+					<td>{EVENT_STATUS_NAME}</td>
+					<td><a href="/modules/eotc/status/modify/{EVENT_ID}">View</a></td>
+				</tr>
+				<!-- END event -->
+			</tbody>
+		</table>
+	</div>
+</div>
 <!-- END event_list_group -->
+
+
