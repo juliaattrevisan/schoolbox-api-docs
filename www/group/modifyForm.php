@@ -238,7 +238,14 @@ if(isset($_POST['bulkAdd'])) {
 					$user = $userMapper->findByExternalId($key);
 				}
 				elseif(is_string($key)) {
-					$user = $userMapper->findOneByColumn('username', $key);
+					// First assume it is non-numeric external id
+					try {
+						$user = $userMapper->findByExternalId($key);
+					}
+					catch(\Schoolbox\Mapper\Exception $e){
+						// Then assume it is a username
+						$user = $userMapper->findOneByColumn('username', $key);
+					}
 				}
 				else {
 					continue;
