@@ -351,7 +351,7 @@
 			var validateGroupSelected = function() {
 				var level = parseInt($('select[name=level]').val());
 
-				return (level == 2);
+				return level == 2;
 			};
 
 			/* For EOTC
