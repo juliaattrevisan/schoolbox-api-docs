@@ -240,7 +240,7 @@ if(isset($_POST['bulkAdd'])) {
 				elseif(is_string($key)) {
 					// First assume it is non-numeric external id
 					try {
-						$user = $userMapper->findOneByColumn('synergy_id', $key);
+						$user = $userMapper->findByExternalId($key);
 					}
 					catch(\Schoolbox\Mapper\Exception $e){
 						// Then assume it is a username
