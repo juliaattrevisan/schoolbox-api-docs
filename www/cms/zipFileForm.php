@@ -53,7 +53,7 @@ if ($isSuperuser || $isAllowedTeacher) {
 
 	try {
 		$zipFileUploadHandler->extract($archive);
-		$zipFileUploadHandler->traverse($zipFileUploadHandler->getPath(), $_POST['category'], $_POST['inherit']);
+		$zipFileUploadHandler->traverse($zipFileUploadHandler->getPath(), $_POST['category'], $_POST['group'], $_POST['inherit']);
 
 	} catch (\Exception $e) {
 		// handle all the things. except fatals. can't deal with that.

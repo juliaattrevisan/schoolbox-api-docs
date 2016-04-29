@@ -121,10 +121,11 @@ class ZipFileUpload extends DeprecatedModel
      *
      * @param string $dir
      * @param int    $parentID
+     * @param array  $perms
      * @param int    $inherit
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function traverse($dir, $parentID, $inherit = 0)
+    public function traverse($dir, $parentID, array $perms, $inherit = 0)
     {
         if (!$dh = @opendir($dir)) {
             return;
@@ -162,7 +163,7 @@ class ZipFileUpload extends DeprecatedModel
                 $category->setParent($parent);
                 $folderMapper->save($category);
 
-                foreach ($_POST['group'] as $id => $perm) {
+                foreach ($perms as $id => $perm) {
                     try {
                         $roleAccess = $roleAccessMapper->createModel();
                         $roleAccess->setCategory($category);
@@ -185,7 +186,7 @@ class ZipFileUpload extends DeprecatedModel
                  *
                  * Otherwise, it's a file, and we add it to the parent Category
                  */
-                $this->traverse($currentPath, $category->getId());
+                $this->traverse($currentPath, $category->getId(), $perms);
 
             } else {
                 // Ignore filenames starting with a . (these are usually
