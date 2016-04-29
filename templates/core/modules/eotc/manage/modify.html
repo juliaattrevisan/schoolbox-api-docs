@@ -117,9 +117,11 @@
                     <div class="row">
                         <!-- BEGIN recurring_dates -->
                         <div class="small-12 columns">
-                            <label>
-                                Repeat
-                                <span class='hint has-tip tip-top' data-tooltip title="The frequency with which this event recurs, if at all.">?</span>
+                            <section class="content no-margin">
+                                <label>
+                                    Repeat
+                                    <span class='hint has-tip tip-top' data-tooltip title="The frequency with which this event recurs, if at all.">?</span>
+                                </label>
                                 <select name="repeat">
                                     <option value="">Single Event</option>
                                     <option value="daily">Daily</option>
@@ -127,19 +129,19 @@
                                     <option value="fortnightly">Fortnightly</option>
                                     <option value="monthly">Monthly</option>
                                 </select>
-                            </label>
 
-                            <div id="repeatUntil" data-repeat-until>
-                                <label>
-                                    Repeat Until
-                                    <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
-                                    <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
-                                </label>
-                            </div>
+                                <div id="repeatUntil" data-repeat-until>
+                                    <label>
+                                        Repeat Until
+                                        <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
+                                        <input name="repeat_until" data-datepicker='true' type="text" size="15" maxlength="30" value="" />
+                                    </label>
+                                </div>
+                            </section>
                         </div>
                         <!-- END recurring_dates -->
                         <!-- BEGIN recurring_reminder -->
-                        <div class="small-12 island">
+                        <div class="small-12 columns">
                             <section class="content no-margin">
                                 <div data-advanced data-repeat-reminder>
                                     <label>
@@ -153,7 +155,6 @@
                             </section>
                         </div>
                         <!-- END recurring_reminder -->
-
                     </div>
                 </div>
             </fieldset>
@@ -198,49 +199,45 @@
                     <span class='hint has-tip tip-top' data-tooltip title="Please confirm if RAMS is required for this event to take place.">?</span>
                 </legend>
 
-                <div class="small-12 columns">
-                    <input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
-                    <input type="hidden" name="ramsRequired" value="0" />
+                <input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
+                <input type="hidden" name="ramsRequired" value="0" />
+
+                <div class="small-12 large-4 columns">
+                    <input id='ramsRequiredCheckbox' type="checkbox" data-ramscheckbox name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />
+                    <label for="ramsRequiredCheckbox" class="checkbox-label">RAMS is required</label>
                 </div>
+                <div class="small-12 large-8 columns">
 
-                <div class="small-12 columns">
-                    <div class="small-12 large-4 columns">
-                        <input id='ramsRequiredCheckbox' type="checkbox" data-ramscheckbox name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />
-                        <label for="ramsRequiredCheckbox" class="checkbox-label">RAMS is required</label>
-                    </div>
-                    <div class="small-12 large-8 columns">
+                    <ul class="action-list" id="existingRamsFiles">
+                        <!-- BEGIN rams_list -->
+                        <li class="actions-small-1" data-delete-rams-row="{EVENT_RAMS_HASH}">
+                            <div class="list-item">
+                                <div class="compact avatar card small-12">
+                                    <input type="hidden" name="hasRamsFile[{EVENT_RAMS_HASH}]" value="1" />
 
-                        <ul class="action-list" id="existingRamsFiles">
-                            <!-- BEGIN rams_list -->
-                            <li class="actions-small-1" data-delete-rams-row="{EVENT_RAMS_HASH}">
-                                <div class="list-item">
-                                    <div class="compact avatar card small-12">
-                                        <input type="hidden" name="hasRamsFile[{EVENT_RAMS_HASH}]" value="1" />
-
-                                        <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" title="Download">
-                                            <img src="/images/mime/60x60/{EVENT_RAMS_MIMETYPE_ICONFILE}" class="mime" />
-                                            <p>{EVENT_RAMS_FILE}</p>
-                                        </a>
-                                    </div>
+                                    <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" title="Download">
+                                        <img src="/images/mime/60x60/{EVENT_RAMS_MIMETYPE_ICONFILE}" class="mime" />
+                                        <p>{EVENT_RAMS_FILE}</p>
+                                    </a>
                                 </div>
-                                <nav>
-                                    <a class="icon-delete" title="Remove RAMS file" data-delete-rams="{EVENT_RAMS_HASH}"></a>
-                                </nav>
-                            </li>
-                            <!-- END rams_list -->
-                        </ul>
+                            </div>
+                            <nav>
+                                <a class="icon-delete" title="Remove RAMS file" data-delete-rams="{EVENT_RAMS_HASH}"></a>
+                            </nav>
+                        </li>
+                        <!-- END rams_list -->
+                    </ul>
 
-                        <ul class="action-list" id="newRamsFiles">
-                            <li class="actions-small-1" data-ramsfile>
-                                <div class="list-item">
-                                    <input type="file" name="newRamsFile[]" multiple />
-                                </div>
-                                <nav>
-                                    <a href="#" data-delete-rams class="icon-delete no-text hide"></a>
-                                </nav>
-                            </li>
-                        </ul>
-                    </div>
+                    <ul class="action-list" id="newRamsFiles">
+                        <li class="actions-small-1" data-ramsfile>
+                            <div class="list-item">
+                                <input type="file" name="newRamsFile[]" multiple />
+                            </div>
+                            <nav>
+                                <a href="#" data-delete-rams class="icon-delete no-text hide"></a>
+                            </nav>
+                        </li>
+                    </ul>
                 </div>
             </fieldset>
 
@@ -310,7 +307,7 @@
             <fieldset class="content">
                 <legend>Activity Log</legend>
 
-                <div class="small-12 columns">
+                <div class="small-12 columns no-pad">
                     <table>
                         <tbody>
                         <!-- BEGIN activity_log -->
