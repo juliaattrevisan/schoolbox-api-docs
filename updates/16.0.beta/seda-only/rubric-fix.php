@@ -212,12 +212,12 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
                 'descriptorId' => $descrId
             ];
 
-            // aaaand in it goes
-            $success = $markInsertionStmt->execute($params);
-
-            if ($success) {
+            try {
+                // aaaand in it goes
+                $markInsertionStmt->execute($params);
                 $log->debug("Data insertion success: [ $critId, $descrId ]");
-            } else {
+
+            } catch (PDOException $e) {
                 $log->warning("Data insertion failure: [ $critId, $descrId ]");
             }
         }
