@@ -21,7 +21,7 @@ $section = $sectionHandler->getByID($question['section_id']);
  */
 
 /* Disabled: authors can try their own surveys
-if ($assessHandler->isOwner($section['assess_id'])) {
+if ($surveyHandler->isOwner($section['assess_id'])) {
     error(124);
 }
 */

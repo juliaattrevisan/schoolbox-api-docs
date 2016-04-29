@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $questionHandler = new Survey_Question();
 $attemptHandler = new Survey_Attempt();
@@ -21,14 +21,14 @@ if (!is_numeric($this->arg[1])) {
 	error(115);
 }
 
-$assess = $assessHandler->getByID($this->arg[0]);
+$assess = $surveyHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 
 if (!$assess) {
 	error(112);
 }
 
-if ($assessHandler->isDeleted($assess['assess_id'])) {
+if ($surveyHandler->isDeleted($assess['assess_id'])) {
 	error(112);
 }
 
@@ -39,20 +39,20 @@ if (!$section) {
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-if (!$assessHandler->canDoAssessment($assess['assess_id'])) {
+if (!$surveyHandler->canDoAssessment($assess['assess_id'])) {
 	error(19);
 }
 
 /* Check if this assessment can be started
  */
-if ($assessHandler->isExpired($assess['assess_id'])) {
+if ($surveyHandler->isExpired($assess['assess_id'])) {
 	error(120);
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
 	error(144);
 }
 
@@ -63,7 +63,7 @@ if (!$questionHandler->numQuestions($assess['assess_id'])) {
 /* Disabled: doing so will allow teachers to give their test a "dry run" and
  * they can delete their attempts afterwards
 
-if ($assessHandler->isOwner($this->arg[0])) {
+if ($surveyHandler->isOwner($this->arg[0])) {
     error(124);
 }
 */

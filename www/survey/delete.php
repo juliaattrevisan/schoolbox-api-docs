@@ -20,7 +20,7 @@ $groupHandler = new Group();
 /* Proceed regardless of whether the section has been previously erased or not
  *
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($surveyHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 

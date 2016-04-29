@@ -67,7 +67,7 @@ if (!$questionHandler->numQuestions($assess['assess_id'])) {
 /* Disabled: doing so will allow teachers to give their test a "dry run" and
  * they can delete their attempts afterwards
 
-if ($assessHandler->isOwner($this->arg[0])) {
+if ($surveyHandler->isOwner($this->arg[0])) {
     error(124);
 }
 */
