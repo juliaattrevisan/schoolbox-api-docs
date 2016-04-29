@@ -124,6 +124,12 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
                 $endDate->setMinute($_POST['endMinute']);
             }
 
+			/* Start Date cannot be after End Date
+			 */
+			if ($startDate->getDatabase() >= $endDate->getDatabase()) {
+				error(145);
+			}
+
 			/* Spawned further up
 			 */
 			$metadata->setEventType($_POST['type']);
