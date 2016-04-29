@@ -89,7 +89,7 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
     if (is_array($classList) && !empty($classList)) {
         foreach ($classList as $student) {
             try {
-                $user = $userMapper->findOneByColumn('synergy_id', $student['synergy_id']);
+                $user = $userMapper->findByExternalId($student['synergy_id']);
             } catch (\Exception $e) {
                 $user = new \Schoolbox\User();
             }

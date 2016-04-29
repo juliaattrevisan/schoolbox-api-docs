@@ -102,7 +102,7 @@ class Enrolment extends AbstractImporter
                 ;
             }
             try {
-                $student = $this->userMapper->findOneByColumn('synergy_id', $studentCode);
+                $student = $this->userMapper->findByExternalId($studentCode);
             } catch (Mapper\Exception $e) {
                 $this->log->warning(sprintf('Student "%s" not found: skipping!', $studentCode));
                 continue;

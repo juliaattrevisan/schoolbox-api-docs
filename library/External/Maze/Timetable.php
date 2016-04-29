@@ -396,7 +396,7 @@ class External_Maze_Timetable implements External_TimetableInterface
 
                     try {
                         $userMapper = new \Schoolbox\UserMapper();
-                        $user = $userMapper->findOneByColumn('synergy_id', $currentRow[$key]);
+                        $user = $userMapper->findByExternalId($currentRow[$key]);
 
                         /* Paste teacher in
                          */
@@ -492,7 +492,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                 if (strlen($teacherKey)) {
                     try {
                         $userMapper = new \Schoolbox\UserMapper();
-                        $user = $userMapper->findOneByColumn('synergy_id', $teacherKey);
+                        $user = $userMapper->findByExternalId($teacherKey);
 
                         /* Paste teacher in. There are dupe records for teachers at this point,
                          * so accept the first in the list

@@ -807,7 +807,7 @@ class External_Maze_User implements External_UserInterface {
 	public function getPortrait($externalUserId) {
 		$userMapper = new \Schoolbox\UserMapper();
         try {
-		    $user = $userMapper->findOneByColumn('synergy_id', $externalUserId);
+		    $user = $userMapper->findByExternalId($externalUserId);
         } catch (Schoolbox\Mapper\Exception $e) {
             /* User not found */
             return false;

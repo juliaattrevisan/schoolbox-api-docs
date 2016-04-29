@@ -90,7 +90,7 @@ foreach ($csv as $row) {
     // Set its moderators
     if($row['ManagedBy_SynergeticID']) {
         try {
-            $moderator = $userMapper->findOneByColumn('synergy_id', $row['ManagedBy_SynergeticID']);
+            $moderator = $userMapper->findByExternalId($row['ManagedBy_SynergeticID']);
             $resource->addModerator($moderator);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $log->warning("Moderator \"{$row['ManagedBy_SynergeticID']}\" not found - skipping");
