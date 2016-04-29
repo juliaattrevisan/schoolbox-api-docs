@@ -30,7 +30,7 @@ foreach ($_POST['attemptIds'] as $currentAttempt) {
 
 		$allAttempts[] = $attempt;
 
-		if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < WRITE_ACCESS)) {
+		if (!$assessHandler->isOwner($attempt['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < WRITE_ACCESS)) {
 			error(142);
 		}
 	}
