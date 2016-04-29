@@ -441,6 +441,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			}
 			.switch-user {
 				background: $off-canvas;
+                overflow: auto;
 
 				&:hover {
 					background: $off-canvas-hover;
