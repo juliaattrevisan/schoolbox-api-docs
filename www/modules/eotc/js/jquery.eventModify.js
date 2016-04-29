@@ -184,7 +184,7 @@
 
 			/* Ensure you don't have a 0 duration event
 			 */
-			var mort = function() {
+			$.validator.addMethod("validateDatetimesDifferent", function(value, element) {
 				var startDatetime = [
 					$('input[name=startDate]').val(),
 					$('input[name=startHour]').val(),
@@ -200,13 +200,15 @@
 				];
 
 				for (var i = 0; i < startDatetime.length; i++) {
+					console.log('Comparing ' + startDatetime[i] + ' ' + endDatetime[i]);
+
 					if (startDatetime[i] != endDatetime[i]) {
 						return true;
 					}
 				}
 
 				return false;
-			};
+			}, "Start and End datetimes must differ");
 
 			return {
 				'campus[]': {
@@ -235,24 +237,20 @@
 					}
 				},
 				startHour: {
-					required: {
-						depends: mort
-					}
+					required: true,
+					validateDatetimesDifferent: true
 				},
 				startMinute: {
-					required: {
-						depends: mort
-					}
+					required: true,
+					validateDatetimesDifferent: true
 				},
 				endHour: {
-					required: {
-						depends: mort
-					}
+					required: true,
+					validateDatetimesDifferent: true
 				},
 				endMinute: {
-					required: {
-						depends: mort
-					}
+					required: true,
+					validateDatetimesDifferent: true
 				}
 			}
 		}

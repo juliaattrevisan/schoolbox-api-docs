@@ -100,8 +100,8 @@
          * which triggered the datetime synchronisation
          */
         var changeInputs = function(thisInput) {
-            var start = settings.startDate.val() + ' ' + settings.startHour.val() + ':' + settings.startMinute.val() + ' ' + settings.startPeriod.val().toLowerCase();
-            var end = settings.endDate.val() + ' ' + settings.endHour.val() + ':' + settings.endMinute.val() + ' ' + settings.endPeriod.val().toLowerCase();
+            var start = settings.startDate.val() + ' ' + settings.startHour.val() + ':' + settings.startMinute.val() + ' ' + settings.startPeriod.val().toString().toLowerCase();
+            var end = settings.endDate.val() + ' ' + settings.endHour.val() + ':' + settings.endMinute.val() + ' ' + settings.endPeriod.val().toString().toLowerCase();
 
             var startDatetime = moment(start, settings.dateFormat);
             var endDatetime   = moment(end, settings.dateFormat);
