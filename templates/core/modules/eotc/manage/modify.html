@@ -85,6 +85,19 @@
         $('[data-collapser=true]').collapsable({
             container: '[data-collapsable-container]'
         });
+
+        /* Start Time cannot be later than End Time
+         */
+        $.fn.syncDatetimes({
+            startDate: $('input[name=startDate]'),
+            startHour: $('input[name=startHour]'),
+            startMinute: $('input[name=startMinute]'),
+            startPeriod: $('select[name=startPeriod]'),
+            endDate: $('input[name=endDate]'),
+            endHour: $('input[name=endHour]'),
+            endMinute: $('input[name=endMinute]'),
+            endPeriod: $('select[name=endPeriod]')
+        });
     });
 </script>
 
