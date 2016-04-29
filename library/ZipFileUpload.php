@@ -1,5 +1,4 @@
 <?php
-use Schoolbox\UserMapper;
 
 /**
  * ZipFileUpload
@@ -135,7 +134,6 @@ class ZipFileUpload extends DeprecatedModel
         $fileMapper       = \Schoolbox\Resource\File\Mapper::getInstance();
         $folderMapper     = \Schoolbox\Resource\Folder\Mapper::getInstance();
         $roleMapper       = \Schoolbox\RoleMapper::getInstance();
-        $userMapper       = UserMapper::getInstance();
         $roleAccessMapper = \Schoolbox\Permission\Access\RoleAccessMapper::getInstance();
 
         /* Begin traversal
@@ -204,7 +202,7 @@ class ZipFileUpload extends DeprecatedModel
                      */
                     $file = $fileMapper->createModel()
                         ->setFolder($parent)
-                        ->setOwner($userMapper->createModel()->setId($_SESSION['id'])) // we dun need full hydr8
+                        ->setOwner($_SESSION['user']) // we dun need full hydr8
                         ->setTitle($obj)
                         ->setFilename(pathinfo($obj, PATHINFO_FILENAME))
                         ->setStorage($storage);
