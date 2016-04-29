@@ -21,14 +21,14 @@ if (!is_numeric($this->arg[1])) {
 	error(115);
 }
 
-$assess = $surveyHandler->getByID($this->arg[0]);
+$survey = $surveyHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 
-if (!$assess) {
+if (!$survey) {
 	error(112);
 }
 
-if ($surveyHandler->isDeleted($assess['assess_id'])) {
+if ($surveyHandler->isDeleted($survey['assess_id'])) {
 	error(112);
 }
 
@@ -39,24 +39,24 @@ if (!$section) {
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-if (!$surveyHandler->canDoAssessment($assess['assess_id'])) {
+if (!$surveyHandler->canDoAssessment($survey['assess_id'])) {
 	error(19);
 }
 
 /* Check if this assessment can be started
  */
-if ($surveyHandler->isExpired($assess['assess_id'])) {
+if ($surveyHandler->isExpired($survey['assess_id'])) {
 	error(120);
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-if (!$surveyHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
 	error(144);
 }
 
-if (!$questionHandler->numQuestions($assess['assess_id'])) {
+if (!$questionHandler->numQuestions($survey['assess_id'])) {
 	error(137);
 }
 
@@ -73,15 +73,15 @@ if ($surveyHandler->isOwner($this->arg[0])) {
  * Set up Attempt vars
  */
 $userId      = $_SESSION['user']->getId();
-$numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $userId);
+$numAttempts = $attemptHandler->userHasAttempted($survey['assess_id'], $userId);
 
-$attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $userId);
+$attempt = $attemptHandler->getLatestResumableForUser($survey['assess_id'], $userId);
 
 /* If there is a resumable attempt, resume it.
  * Otherwise start a new attempt if there is a limit
  */
 if (!$attempt) {
-	if (($assess['max_attempts'] > 0) && ($numAttempts + 1 > $assess['max_attempts'])) {
+	if (($survey['max_attempts'] > 0) && ($numAttempts + 1 > $survey['max_attempts'])) {
 		/* Clear and exit when you attempt to make more than is allowed
 		 */
 		error(146);
@@ -91,7 +91,7 @@ if (!$attempt) {
         // Assign all questions on init, not starting a section.
         $responseHandler = new Survey_Response();
         $sectionHandler  = new Survey_Section();
-        foreach ($sectionHandler->getList($assess['assess_id']) as $section) {
+        foreach ($sectionHandler->getList($survey['assess_id']) as $section) {
             // Randomized questions aren't available for surveys
             $responseHandler->assignQuestions(
                 $attemptId,
