@@ -64,7 +64,27 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         // derived field; mimetype automatically joined via the extension
         $this->joinsVia('allowedFileExtension', MimetypeMapper::class, 'fileTypeID', 'fileTypeID', 'extension', 'ext', self::TYPE_MODEL, self::COLUMN_JOIN_READONLY, 'mimetype');
 
-        $this->registerCallback(self::CALLBACK_PRESAVE,    [ $this->mgr, 'safetyCheck' ]);
+        $requireSafety = true;
+
+        if (isset($this->sessionData['user'])) {
+            $user = $this->sessionData['user'];
+            if ($user instanceof Schoolbox\User) {
+                $requireSafety = $user->isSuperuser() == false;
+            }
+        }
+
+        if ($requireSafety) {
+            $this->registerCallback(self::CALLBACK_PRESAVE, [ $this->mgr, 'safetyCheck' ]);
+        } else {
+            $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
+                /** @var Model $model */
+                if (!$model->getMimetype() instanceof File\Mimetype) {
+                    // for super users only, we allow this
+                    $model->setMimetype(MimetypeMapper::getInstance()->getUnknownMime());
+                }
+            });
+        }
+
         $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, self::CALLBACK_POSTSAVE ]);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this->mgr, 'delete' ]);
     }
@@ -94,7 +114,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
          */
         $saveResult = $this->mgr->save($storage);
 
-        if ($storage->getMimeType()->isVideo() || $storage->getMimetype()->isAudio()) {
+        if ($storage->getMimetype()->isVideo() || $storage->getMimetype()->isAudio()) {
             $mapper = QueueMapper::getInstance();
             $videoQ = $mapper->createModel();
             $videoQ->setHash($storage->getHash());
