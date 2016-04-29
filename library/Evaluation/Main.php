@@ -45,6 +45,7 @@ abstract class Evaluation_Main extends DeprecatedModel
     const ONLINE_ASSESSMENT_TYPE_ID = 11;
     const UNLIMITED_DURATION        = -1;
 
+
     /**
      * A list of assessments available for a category
      *
@@ -405,4 +406,12 @@ abstract class Evaluation_Main extends DeprecatedModel
             return false;
         }
     }
+
+    /**
+     * Returns whether record exists and URL path is correct for type {Assess | Survey}
+     *
+     * @param numeric $assess_id
+     * @return bool
+     */
+    abstract public function isValidUrlAccess($assess_id);
 }
