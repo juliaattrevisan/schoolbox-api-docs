@@ -16,7 +16,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
         /** @var Alaress\Xml\State $current */
         $current = $this->getInnerIterator()->current();
         $result  = new SimpleXMLElement($current->getReader()->readOuterXml());
-        $id      = (string)$result->attributes()->id;
+        $id      = (string)$result->attributes()->Id;
         if ($current->matches('//TeachingManager/Departments/Department/Subjects/Subject')) {
             return [
                 'RecordType'  => 'Subject',

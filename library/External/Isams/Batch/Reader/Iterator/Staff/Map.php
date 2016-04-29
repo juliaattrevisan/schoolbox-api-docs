@@ -18,7 +18,7 @@ class External_Isams_Batch_Reader_Iterator_Staff_Map extends External_Isams_Batc
     {
         $current = $this->getInnerIterator()->current();
         $result  = new SimpleXMLElement($current->getReader()->readOuterXml());
-        $id      = (string)$result->attributes()->id;
+        $id      = (string)$result->attributes()->Id;
         if ($current->matches('//HRManager/CurrentStaff/StaffMember')) {
             return [
                 'RecordType'         => 'StaffMember',
