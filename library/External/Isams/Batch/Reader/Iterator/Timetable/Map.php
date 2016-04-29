@@ -16,7 +16,7 @@ class External_Isams_Batch_Reader_Iterator_Timetable_Map extends External_Isams_
         /** @var Alaress\Xml\State $current */
         $current = $this->getInnerIterator()->current();
         $result  = new SimpleXMLElement($current->getReader()->readOuterXml());
-        $id      = (string)$result->attributes()->id;
+        $id      = (string)$result->attributes()->Id;
         if ($current->matches('//TimetableManager/Structure/Week')) {
             // Assume that campus is first initials in name
             $campusCode = preg_replace('|^(\\S+).*|', '$1', "$result->Name");
