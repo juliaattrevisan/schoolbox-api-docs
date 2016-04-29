@@ -1,3 +1,93 @@
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript" src="/calendar/js/jquery.eventModify.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>
+
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        $.fn.alaressEditor({
+            targetElements: $('[data-html-editor]')
+        });
+
+        $('[data-suggest=staff]').selectizeSelector({
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: '{STAFF_GROUP_TYPE_IDS}', showCampus: true},
+                dataType: 'json'
+            },
+            value: {EVENT_STAFF},
+            multiple: true
+        })
+
+        $('[data-suggest=teacher-in-charge]').selectizeSelector({
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: '{STAFF_GROUP_TYPE_IDS}', showCampus: true},
+                dataType: 'json'
+            },
+            value: {EVENT_TEACHER_IN_CHARGE},
+            multiple: false
+        })
+
+        /* Confirmation when removing RAMS requirement
+         */
+        $('[data-ramscheckbox]').click(function(event) {
+            var self = $(this);
+
+            /* Untick the checkbox
+             */
+            if (!$(this).is(':checked')) {
+                var modal = $('#ramsModal');
+
+                modal.foundation('reveal', 'open');
+
+                modal.find('[data-rams-ok]').click(function(event) {
+                    self.attr('checked', false);
+                    $('#ramsModal').foundation('reveal', 'close');
+                });
+
+                modal.find('[data-rams-cancel]').click(function(event) {
+                    self.attr('checked', true);
+                    $('#ramsModal').foundation('reveal', 'close');
+                });
+
+                /* Execute modal, then stop
+                 */
+                event.preventDefault();
+            }
+            /* Tick the checkbox
+             */
+            else {
+                self.attr('checked', true);
+            }
+        });
+
+        $('[data-form=event]').eventModify({
+            functionLabel: "{FUNCTION}"
+        });
+
+        /* Collapsables
+         */
+        $('[data-collapser=true]').collapsable({
+            container: '[data-collapsable-container]'
+        });
+    });
+</script>
+
 <ul class="breadcrumb">
     <li><a href="/modules/eotc/myReview" title="EOTC">EOTC</a></li>
     <li class="active"><a href="#">{FUNCTION} {EVENT_TITLE}</a></li>
@@ -202,42 +292,12 @@
                 <input type="hidden" name="ramsUploaded" data-ramsuploaded="{EVENT_RAMS_UPLOADED}" />
                 <input type="hidden" name="ramsRequired" value="0" />
 
-                <div class="small-12 large-4 columns">
+                <div class="small-12 columns">
                     <input id='ramsRequiredCheckbox' type="checkbox" data-ramscheckbox name="ramsRequired" value="1" {EVENT_RAMSREQUIRED_SELECTED} />
                     <label for="ramsRequiredCheckbox" class="checkbox-label">RAMS is required</label>
                 </div>
-                <div class="small-12 large-8 columns">
-
-                    <ul class="action-list" id="existingRamsFiles">
-                        <!-- BEGIN rams_list -->
-                        <li class="actions-small-1" data-delete-rams-row="{EVENT_RAMS_HASH}">
-                            <div class="list-item">
-                                <div class="compact avatar card small-12">
-                                    <input type="hidden" name="hasRamsFile[{EVENT_RAMS_HASH}]" value="1" />
-
-                                    <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" title="Download">
-                                        <img src="/images/mime/60x60/{EVENT_RAMS_MIMETYPE_ICONFILE}" class="mime" />
-                                        <p>{EVENT_RAMS_FILE}</p>
-                                    </a>
-                                </div>
-                            </div>
-                            <nav>
-                                <a class="icon-delete" title="Remove RAMS file" data-delete-rams="{EVENT_RAMS_HASH}"></a>
-                            </nav>
-                        </li>
-                        <!-- END rams_list -->
-                    </ul>
-
-                    <ul class="action-list" id="newRamsFiles">
-                        <li class="actions-small-1" data-ramsfile>
-                            <div class="list-item">
-                                <input type="file" name="newRamsFile[]" multiple />
-                            </div>
-                            <nav>
-                                <a href="#" data-delete-rams class="icon-delete no-text hide"></a>
-                            </nav>
-                        </li>
-                    </ul>
+                <div class="small-12 columns">
+                    {ATTACH_ZONE}
                 </div>
             </fieldset>
 
@@ -398,149 +458,4 @@
         <li><a data-rams-cancel class="button icon-close">Cancel</a></li>
     </ul>
 </div>
-
-<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-<script type="text/javascript" src="/calendar/js/jquery.eventModify.js"></script>
-<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
-<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>
-
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-
-<script type="text/javascript">
-    $(function() {
-        $.fn.alaressEditor({
-            targetElements: $('[data-html-editor]')
-        });
-
-        $('[data-suggest=staff]').selectizeSelector({
-            ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
-                data:     {groupID: '{STAFF_GROUP_TYPE_IDS}', showCampus: true},
-                dataType: 'json'
-            },
-            value: {EVENT_STAFF},
-            multiple: true
-        })
-
-        $('[data-suggest=teacher-in-charge]').selectizeSelector({
-            ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
-                data:     {groupID: '{STAFF_GROUP_TYPE_IDS}', showCampus: true},
-                dataType: 'json'
-            },
-            value: {EVENT_TEACHER_IN_CHARGE},
-            multiple: false
-        })
-
-        /* Confirmation when removing RAMS requirement
-         */
-        $('[data-ramscheckbox]').click(function(event) {
-            var self = $(this);
-
-            /* Untick the checkbox
-             */
-            if (!$(this).is(':checked')) {
-                var modal = $('#ramsModal');
-
-                modal.foundation('reveal', 'open');
-
-                modal.find('[data-rams-ok]').click(function(event) {
-                    self.attr('checked', false);
-                    $('#ramsModal').foundation('reveal', 'close');
-                });
-
-                modal.find('[data-rams-cancel]').click(function(event) {
-                    self.attr('checked', true);
-                    $('#ramsModal').foundation('reveal', 'close');
-                });
-
-                /* Execute modal, then stop
-                 */
-                event.preventDefault();
-            }
-            /* Tick the checkbox
-             */
-            else {
-                self.attr('checked', true);
-            }
-        });
-
-        // My polyfill for multiple file uploads is actually more usable than
-        // HTML5 multifile uploads.
-        $('[data-form=event]').on('change', 'input[type="file"][multiple]', function(event) {
-            var container     = $(this).closest('[data-ramsfile]');
-            var allContainers = $('[data-form=event] [data-ramsfile]').not(container);
-
-            if (this.value.length > 0) {
-                // clone me
-                var newContainer = container.clone();
-                container.find('a[data-delete-rams]').removeClass('hide');
-
-                /* Only append if there is no longer an empty input field
-                 * since you can change the input value of a file that has
-                 * not yet been saved
-                 */
-                var hasEmpty = false;
-
-                $.each($('[data-form=event] input[type="file"][multiple]'), function(index, element) {
-                    if ($(element).val() == '') {
-                        hasEmpty = true;
-                    }
-                });
-
-                if (!hasEmpty) {
-                    $('#newRamsFiles').append(newContainer);
-                }
-            } else {
-                // delete me (unless I'm the only one)
-                if (allContainers.length) {
-                    container.remove();
-                }
-            }
-        });
-
-        $('[data-form=event]').eventModify({
-            functionLabel: "{FUNCTION}"
-        });
-
-        /* Collapsables
-         */
-        $('[data-collapser=true]').collapsable({
-            container: '[data-collapsable-container]'
-        });
-
-        /* Confirmation for deleting existing RAMS files
-         */
-        $('#existingRamsFiles').on('click', '[data-delete-rams]', function(event) {
-            event.preventDefault();
-
-            var element = $(this);
-
-            $(this).confirmDialog({
-                text: "Remove this RAMS file?",
-                confirmEvent: function() {
-                    $('#existingRamsFiles').find('[data-delete-rams-row='+element.attr('data-delete-rams')+']').remove();
-                }
-            });
-        });
-
-        /* Add listener for deleting new RAMS files
-         */
-        $('#newRamsFiles').on('click', '[data-delete-rams]', function(event) {
-            event.preventDefault();
-
-            $(this).closest('[data-ramsfile]').remove();
-        });
-    });
-</script>
 

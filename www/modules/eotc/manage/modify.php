@@ -33,7 +33,6 @@ $page->setBlock(TEMPLATE_content, 'can_add_students', 'can_add_students_block');
 $page->setBlock(TEMPLATE_content, 'can_add_resources', 'can_add_resources_block');
 $page->setBlock('can_add_resources', 'resource', 'resource_block');
 $page->setBlock(TEMPLATE_content, 'can_promote_in_principle', 'can_promote_in_principle_block');
-$page->setBlock(TEMPLATE_content, 'rams_list', 'rams_list_block');
 
 $authenticator = new \EOTC\Authenticator();
 
@@ -41,6 +40,10 @@ $authenticator = new \EOTC\Authenticator();
 $sessionUser = $_SESSION['user'];
 
 $defaultTypeId = '';
+
+$page->setVar([
+    'ATTACH_ZONE' => ''
+]);
 
 /* Modify existing event
  */
@@ -116,27 +119,22 @@ if (is_numeric($_GET['eventID'])) {
         ));
 
         // RAM in the RAMS
-        $page->setVar('rams_list_block', '');
-
         if ($event->getMetadata()->getRamsRequired()) {
+            $hashes = [];
+
             foreach ($event->getMetadata()->getRamsFiles() as $ramsFile) {
-                try {
-                    $mimetype = $ramsFile->getMimetype();
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $mimetype = MimetypeMapper::getInstance()->getUnknownMime();
-                }
-
-                $page->setVar(
-                    array(
-                        'EVENT_RAMS_HASH'              => $ramsFile->getHash(),
-                        'EVENT_RAMS_FILESIZE'          => $ramsFile->getSize(),
-                        'EVENT_RAMS_FILE'              => $ramsFile->getBasename(),
-                        'EVENT_RAMS_MIMETYPE_ICONFILE' => $mimetype->getIconFile(),
-                    )
-                );
-
-                $page->parse('rams_list_block', 'rams_list', true);
+                $hashes[] = $ramsFile->getHash();
             }
+
+            $zone = new \Schoolbox\Resource\Attachment\Zone('ramsZone');
+            $zone
+                ->setMulti(true)
+                ->attachFiles($hashes)
+                ->setThumbnailSize(64)
+                ->setModalTitle('Select RAMS files')
+                ->setMimeFilter('*/*')
+                ->setAttachPrompt('Attach files')
+                ->renderIntoSitePage($page, 'ATTACH_ZONE');
         }
 
         /* -_-
@@ -399,10 +397,6 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     $page->setVar(array(
         'can_promote_in_principle_block' => ''
     ));
-
-    /* There's no RAMS rammed in yet either
-	 */
-    $page->setVar('rams_list_block', '');
 }
 /* Nobody else should be here
  */

@@ -8,6 +8,9 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage;
+
 require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 
 $page = new SitePage();
@@ -179,47 +182,25 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			 */
 			$event->setMetadata($metadata);
 
-			/* If RAMS file is required and one hasn't been uploaded yet,
-			 * save it; otherwise ignore it
-			 *
-			 * As of SB-4367 RAMs files are no longer mandatory, even if
-			 * the checkbox setting declares that one must exist
-			 */
 			if ($event->getMetadata()->getRamsRequired()) {
-				// Delete files that are checked, preserve ones that aren't
-				$ramsFiles = new \Schoolbox\Collection();
-
-				/* Keep existing RAMS files
-                 */
-				foreach ($event->getMetadata()->getRamsFiles() as $existingFile) {
-					if (!empty($_POST['hasRamsFile'][$existingFile->getHash()])) {
-						$ramsFiles->add($existingFile);
+				if (count($_POST['attachment'])) {
+					try {
+						$factory = new CollectorFactory();
+						$files   = $factory->build($_POST['attachment'])->getAll();
+					} catch (\Schoolbox\Mapper\Exception $e) {
+						error(41);
+						exit; // shut UP, storm.
+					} catch (\InvalidArgumentException $e) {
+						error(43);
+						exit;
 					}
+
+					$event->getMetadata()->setRamsFiles(new \Schoolbox\Collection($files));
 				}
-
-				/* Upload any new RAMS files
-                 */
-				if (!empty($_FILES['newRamsFile'])) {
-
-					// Upload new files
-					// php wy u do fials liek dis
-					foreach ($_FILES['newRamsFile']['name'] as $i => $fileName) {
-						if ($_FILES['newRamsFile']['error'][$i] === UPLOAD_ERR_OK) {
-							$newFile = \Schoolbox\Resource\Storage\Mapper::getInstance()->accept(
-								$fileName,
-								$_FILES['newRamsFile']['tmp_name'][$i],
-								$author->getId()
-							);
-
-							$ramsFiles->add($newFile);
-						}
-					}
+				else {
+					$event->getMetadata()->setRamsFiles(new \Schoolbox\Collection());
 				}
-
-				$event->getMetadata()->setRamsFiles($ramsFiles);
 			}
-			/* RAMS file not needed - remove all existing ones
-			 */
 			else {
 				$event->getMetadata()->setRamsFiles(new \Schoolbox\Collection());
 			}
