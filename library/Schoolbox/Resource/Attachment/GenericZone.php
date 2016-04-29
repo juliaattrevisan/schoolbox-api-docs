@@ -9,8 +9,7 @@
 
 namespace Schoolbox\Resource\Attachment;
 
-
-use Schoolbox\FileInterface;
+use Schoolbox\Resource\File\IFile;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\NodeFactory;
 
@@ -38,28 +37,13 @@ class GenericZone extends Zone {
      * worthwhile using a Mapper than returns FileInterfaces.
      *
      * @param string $id
-     * @return FileInterface
+     * @return IFile
      */
     protected function findFile($id)
     {
         return $this->mapper->findById($id);
     }
 
-
-    /**
-     * Returns some PHPlibs, based on the File given
-     *
-     * @param FileInterface $file
-     * @return array
-     */
-    protected function deriveSitePageVars($file)
-    {
-        return array(
-            'AZ_FILE_NAME'    => $file->getFilename(),
-            'AZ_FILE_HASH'    => $this->prefix . ':' . $file->getId(),
-            'AZ_FILE_PREVIEW' => '/ajax/mime/' . $file->getMime()
-        );
-    }
 
 
 

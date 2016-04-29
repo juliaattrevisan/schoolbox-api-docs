@@ -1,7 +1,7 @@
 <?php
 
 use Schoolbox\Breadcrumbs;
-use Schoolbox\Resource\Attachment\GenericZone;
+use Schoolbox\Resource\Attachment\Zone;
 
 if (!Cfg::get('webdav_enable')) {
     error(2);
@@ -12,7 +12,7 @@ $folderHandler = $fileHandler;
 
 // This goes into storage on its way into webdav.
 // Is that okay?
-$zone = new GenericZone('cms', Schoolbox\Resource\Storage\Mapper::getInstance());
+$zone = new Zone('cms');
 $zone->setAttachmentsLabel('')
     ->setAttachPrompt('Post file')
     ->setMimeFilter('*/*')
