@@ -7,11 +7,11 @@
 			ajax: {
 				url:      '/ajax/user.php',
 				type:     'GET',
-				data:     {groupID: '{STAFF_GROUP_TYPE_IDS}', showCampus: true},
+				data:     {roleTypeID: 'staff', showCampus: true},
 				dataType: 'json'
 			},
 			multiple: false
-		})
+		});
 
 		$('#assign-permissions').alaressValidate({
 			rules: {
