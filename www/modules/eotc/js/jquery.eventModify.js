@@ -39,8 +39,7 @@
 			var defaults = {
 				element: element,
 				functionLabel: '',
-				deleteButton: $(),
-				extraValidationRules: {}
+				deleteButton: $()
 			};
 
 			var derived = {
@@ -183,6 +182,32 @@
 				return (ticValue == '[]' || ticValue == '');
 			};
 
+			/* Ensure you don't have a 0 duration event
+			 */
+			var mort = function() {
+				var startDatetime = [
+					$('input[name=startDate]').val(),
+					$('input[name=startHour]').val(),
+					$('input[name=startMinute]').val(),
+					$('select[name=startPeriod]').val()
+				];
+
+				var endDatetime = [
+					$('input[name=endDate]').val(),
+					$('input[name=endHour]').val(),
+					$('input[name=endMinute]').val(),
+					$('select[name=endPeriod]').val()
+				];
+
+				for (var i = 0; i < startDatetime.length; i++) {
+					if (startDatetime[i] != endDatetime[i]) {
+						return true;
+					}
+				}
+
+				return false;
+			};
+
 			return {
 				'campus[]': {
 					required: {
@@ -210,16 +235,24 @@
 					}
 				},
 				startHour: {
-					required: true
+					required: {
+						depends: mort
+					}
 				},
 				startMinute: {
-					required: true
+					required: {
+						depends: mort
+					}
 				},
 				endHour: {
-					required: true
+					required: {
+						depends: mort
+					}
 				},
 				endMinute: {
-					required: true
+					required: {
+						depends: mort
+					}
 				}
 			}
 		}
@@ -231,8 +264,7 @@
 		 */
 		function setupEventValidation() {
 			$(config.element).alaressValidate({
-				rules: $.extend({}, setupEventValidationRules(), config.extraValidationRules),
-				errorPlacement: config.errorPlacement(),
+				rules: setupEventValidationRules(),
 				submitHandler: function(form) {
 					var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
 					if (multi) {
