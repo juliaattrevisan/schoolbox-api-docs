@@ -50,8 +50,16 @@ if ($isSuperuser || $isAllowedTeacher) {
 	$archive->open($filename);
 
 	$zipFileUploadHandler = new ZipFileUpload();
-	$zipFileUploadHandler->extract($archive);
-	$zipFileUploadHandler->traverse($zipFileUploadHandler->getPath(), $_POST['category'], $_POST['inherit']);
+
+	try {
+		$zipFileUploadHandler->extract($archive);
+		$zipFileUploadHandler->traverse($zipFileUploadHandler->getPath(), $_POST['category'], $_POST['inherit']);
+
+	} catch (\Exception $e) {
+		// handle all the things. except fatals. can't deal with that.
+		// but most things should have already been handled internally
+	}
+
 	$zipFileUploadHandler->cleanup();
 
 	/* Error handling

@@ -225,6 +225,19 @@ class ZipFileUpload extends DeprecatedModel
                     if ($this->verbose) {
                         echo "Error: could not make <strong>$obj</strong> in $parentID<br>";
                     }
+
+                } catch (\RuntimeException $e) {
+                    // because common interfaces would make this too easy...
+                    $this->errorFiles[] = array(
+                        'file'    => $obj,
+                        'code'    => $e->getCode(),
+                        'message' => $e->getMessage()
+                    );
+
+                    if ($this->verbose) {
+                        echo "Error: could not make <strong>$obj</strong> in $parentID<br>";
+                    }
+
                 }
             }
         }
