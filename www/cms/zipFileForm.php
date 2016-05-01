@@ -56,6 +56,7 @@ if ($isSuperuser || $isAllowedTeacher) {
 		$zipFileUploadHandler->traverse($zipFileUploadHandler->getPath(), $_POST['category'], $_POST['group'], $_POST['inherit']);
 
 	} catch (\Exception $e) {
+		var_dump($e);
 		// handle all the things. except fatals. can't deal with that.
 		// but most things should have already been handled internally
 	}

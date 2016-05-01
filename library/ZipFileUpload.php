@@ -214,7 +214,7 @@ class ZipFileUpload extends DeprecatedModel
 
                     $fileMapper->save($file);
 
-                } catch (\Schoolbox\Resource\Exception $e) {
+                } catch (\Schoolbox\File\Exception $e) {
                     $this->errorFiles[] = array(
                         'file'    => $obj,
                         'code'    => $e->getCode(),
@@ -225,7 +225,8 @@ class ZipFileUpload extends DeprecatedModel
                         echo "Error: could not make <strong>$obj</strong> in $parentID<br>";
                     }
 
-                } catch (\RuntimeException $e) {
+                }
+                catch (\RuntimeException $e) {
                     // because common interfaces would make this too easy...
                     $this->errorFiles[] = array(
                         'file'    => $obj,
@@ -306,13 +307,11 @@ class ZipFileUpload extends DeprecatedModel
     public function getErrors()
     {
         $errorMessages = array();
+        $query = 'SELECT message FROM error WHERE id = 9';
+        $error = $this->db->getRow($query);
 
         if (count($this->errorFiles)) {
             foreach ($this->errorFiles as $currentFile) {
-                $query = 'SELECT message FROM error WHERE id = ' . $currentFile['code'];
-
-                $error = $this->db->getRow($query);
-
                 $errorMessages[] = array(
                     'file' => $currentFile['file'],
                     'message' => str_replace('%MESSAGE%', $currentFile['message'], $error['message']),
