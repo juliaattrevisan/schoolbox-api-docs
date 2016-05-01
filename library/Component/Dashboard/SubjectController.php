@@ -8,8 +8,18 @@
  */
 class Component_Dashboard_SubjectController extends Component_Dashboard_ControllerAbstract {
 
+    /**
+     * A list of subjects to show
+     *
+     * @var array
+     */
     protected $subject_list;
 
+    /**
+     * Component name
+     *
+     * @var string
+     */
     protected $componentName = 'My Subjects';
 
     /**
@@ -19,12 +29,6 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
      */
     public function execute() {
         $this->subject_list = $_SESSION['subjects'];
-//        usort(
-//            $this->subject_list,
-//            function($a, $b) {
-//                return strcmp($a['name'], $b['name']);
-//            }
-//        );
         return !empty($this->subject_list);
     }
 
@@ -43,8 +47,11 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
         $this->setBlock($templateHandle, "subject", "subject_block");
         $this->setVar('subject_block', '');
         foreach ($this->subject_list as $subject) {
-            $this->setVar('SUBJECT_CODE', $subject['code']);
-            $this->setVar('SUBJECT_NAME', $subject['name']);
+            $this->setVar([
+                'SUBJECT_CODE' => Scrub::text($subject['code']),
+                'SUBJECT_CODE_URL' => Scrub::text(urlencode(urlencode($subject['code']))),
+                'SUBJECT_NAME' => $subject['name']
+            ]);
             $this->parse('subject_block', 'subject', true);
         }
 
