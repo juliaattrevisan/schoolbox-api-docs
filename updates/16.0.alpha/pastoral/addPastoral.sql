@@ -102,9 +102,3 @@ INSERT INTO config (name, value, title, description, field_id, options, type_id,
 -- ALTER TABLE `user` ADD `pastoral_moderator` TINYINT(1) DEFAULT 0;
 
 INSERT INTO `luServices` (`id`, `name`) VALUES (9, 'Pastoral Moderator');
-
-
-INSERT INTO `error` (id, message) VALUES (168, 'You do no have access to the specified pastoral care record.');
-INSERT INTO `error` (id, message) VALUES (169, 'Access to this module is denied.');
-INSERT INTO `error` (id, message) VALUES (170, 'A requested schoolbox user record could not be found.');
-INSERT INTO `error` (id, message) VALUES (171, 'The requetsed pastoral care record could not be found.');
