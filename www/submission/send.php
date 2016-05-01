@@ -43,12 +43,7 @@ if (is_numeric($_GET['return'])) {
         exit;
     }
 
-    // Allow file return owner, parent of owner or all staff access to this file
-    $owner = $return->getOwner()->getId();
-    if (!($owner == $_SESSION['id']
-        || $groupHandler->isParentOfChild($owner)
-        || $groupHandler->isStaff()
-    )) {
+    if (!$return->hasPermission($_SESSION['user'])) {
         error(44);
     }
 
@@ -84,28 +79,11 @@ if (is_numeric($_GET['return'])) {
         exit;
     }
 
-    $subBox = $studentSub->getSubmissionBox();
-
-    try {
-        // Check if file has been published/showcased in the ePortfolio, if so anyone can download the file
-        $showcase = Eportfolio\ShowcaseMapper::getInstance()->findOneByColumn('submission_box_id', $studentSub->getSubmissionBox()->getId());
-        $published = true;
-
-    } catch (Schoolbox\Mapper\Exception $e) {
-        $published = false;
-    }
-
-    // Check if staff has permission
-    $permission = $groupHandler->getPermission($subBox->getCategory()->getId());
-
-    /* Allow students to view their own submitted work
-    * Allow staff members with write permission to this folder access
-    * Allow work that has been showcased to be viewed
-    */
-    if (($studentSub->getOwner()->getId() != $_SESSION['id'])
-        && $permission < WRITE_ACCESS
-        && !$published
-    ) {
+    if (!$studentSub->hasPermission(
+        $_SESSION['user'],
+        \Schoolbox\Permission\Access\UserAccessMapper::getInstance(),
+        \Eportfolio\ShowcaseMapper::getInstance()
+    )) {
         error(44);
     }
 

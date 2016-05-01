@@ -6,6 +6,7 @@
 <script src="/javascript/shared/submissions/jquery.combobox.js" type="text/javascript"></script>
 <script src="/javascript/shared/submissions/jquery.marksheet.js" type="text/javascript"></script>
 <script src="/javascript/resource/jquery.resourceAttach.js" type="text/javascript"></script>
+<script type="text/javascript" src="/javascript/preview/preview.js"></script>
 <script type="text/javascript">
     $(function() {
         $('[data-delete-submission]').click(function(event) {
@@ -121,6 +122,9 @@
 
             markInput.val(markValue);
         });
+
+        // Preview
+        $('[data-plugin="preview"]').preview();
     });
 </script>
 <!-- END custom_head -->
@@ -222,7 +226,7 @@
                             <li class="actions-small-1 actions-medium-3">
                                 <div class="list-item {SUBMISSION_SELECTED}">
                                     <div class="small-12 avatar card">
-                                        <a href="/submission/inlineGrading/view/{BOX_ID}/{OWNER_ID}/{SUBMISSION_ID}" title="Download submission">
+                                        <a href="/submission/send.php?id={SUBMISSION_ID}" data-plugin="preview" title="Download submission">
                                             <img src="/images/mime/60x60/{SUBMISSION_MIMEICON}" class="mime" alt="{SUBMISSION_FILENAME}" />
                                             <p>{SUBMISSION_FILENAME}</p>
                                         </a>

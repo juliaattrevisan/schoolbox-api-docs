@@ -400,4 +400,30 @@ class ReturnedWork implements ISoftDeletable, IFile
     {
         return $this->getReturned();
     }
+
+    /**
+     * Does this user have permission to view this return?
+     *
+     * * Users may view their own returns
+     * * Staff may view returns
+     * * Parents may view their child's returns
+     *
+     * @param  User $user
+     * @return bool
+     */
+    public function hasPermission(User $user)
+    {
+        if ($user->getId() == $this->getOwner()->getId()) {
+            return true;
+        }
+        if ($user->getRole()->isStaff()) {
+            return true;
+        }
+        // le sigh
+        $this->getOwner()->loadParents();
+        if ($this->getOwner()->isChildOf($user)) {
+            return true;
+        }
+        return false;
+    }
 }

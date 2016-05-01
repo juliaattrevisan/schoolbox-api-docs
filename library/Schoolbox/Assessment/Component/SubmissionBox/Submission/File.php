@@ -11,9 +11,12 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
 
 use Alaress_Date_Format as ADF;
+use Eportfolio\ShowcaseMapper;
 use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\File\Mimetype;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
@@ -282,4 +285,42 @@ class File implements IFile
         return $this;
     }
 
+    /**
+     * Does this user have permission to view this submission?
+     *
+     * * Users may view their own returns
+     * * Staff may view returns, as long as they have write permission
+     *   to the folder that it's within
+     * * Parents may view their child's returns
+     * * If this work is showcased, anyone may view it
+     *
+     * @param  User             $user
+     * @param  UserAccessMapper $userAccessMapper
+     * @param  ShowcaseMapper   $showcaseMapper
+     * @return bool
+     */
+    public function hasPermission(User $user, UserAccessMapper $userAccessMapper, ShowcaseMapper $showcaseMapper)
+    {
+        if ($user->getId() == $this->getOwner()->getId()) {
+            return true;
+        }
+        if ($user->getRole()->isStaff()) {
+            return $userAccessMapper->userHasMinimumAccessToAll(
+                $user->getId(),
+                [$this->getSubmissionBox()->getCategory()->getId(),],
+                UserAccess::ACCESS_WRITE
+            );
+        }
+        // le sigh
+        $this->getOwner()->loadParents();
+        if ($this->getOwner()->isChildOf($user)) {
+            return true;
+        }
+        // le sigh again
+        // Check if file has been published/showcased in the ePortfolio, if so anyone can download the file
+        return $showcaseMapper->countByColumnList([
+            'uid'               => $this->getOwner()->getId(),
+            'submission_box_id' => $this->getSubmissionBox()->getId(),
+        ]) > 0;
+    }
 }

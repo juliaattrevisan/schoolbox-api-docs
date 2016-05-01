@@ -1,3 +1,12 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/preview/preview.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-plugin="preview"]').preview();
+    });
+</script>
+<!-- END custom_head -->
+
 <style type='text/css'>
     <!-- BEGIN allowed_files -->
     a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
@@ -46,7 +55,7 @@
                     <!-- BEGIN has_submission -->
                     <div class="five-column">
                         <div class="avatar card small-12">
-                            <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" title="View Profile">
+                            <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" data-plugin="preview" title="View Profile">
                                 <img src="/images/mime/60x60/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="" class="mime" />
                                 <p>{SHOWCASED_WORK_BOX_NAME}</p>
                             </a>

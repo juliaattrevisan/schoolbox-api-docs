@@ -12,6 +12,7 @@ use Schoolbox\Preview\Chain\Internal;
 use Schoolbox\Preview\Chain\External;
 use Schoolbox\Preview\Registry\Decoder\LinkRedir;
 use Schoolbox\Preview\Registry\Decoder\TaskRedir;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -102,7 +103,11 @@ class Controller extends Base
         /* Local Chain
          */
         if ($url->isLocalURL()) {
-            $chain = new Internal($url->getUrl());
+            $user = $_SESSION['user'];
+            if (!$user instanceof User) {
+                $user = new User();
+            }
+            $chain = new Internal($url->getUrl(), $user);
             $result = $chain->getResult();
         }
         /* External Chain
