@@ -230,6 +230,10 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
         DateTimeZone $timezone = null
     ) {
         if (is_array($inputDateFormat)) {
+            if (empty($inputDateFormat)) {
+                $this->setFromFormat($dateTime, null, $timezone);
+                return;
+            }
             foreach ($inputDateFormat as $format) {
                 try {
                     $this->setFromFormat($dateTime, $format, $timezone);
