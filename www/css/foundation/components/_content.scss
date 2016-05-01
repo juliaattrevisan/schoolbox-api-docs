@@ -1577,7 +1577,7 @@ tr:hover{
     min-height: 2rem;
     display: block;
     background-color: $base;
-    margin: 1rem;
+    margin: 0.25rem;
     @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
 	@extend %iconify;
 

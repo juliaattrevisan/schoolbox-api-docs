@@ -25,6 +25,17 @@ try {
     error(2);
 }
 
+/** @var Schoolbox\User $user */
+$user = $_SESSION['user'];
+
+// This should be a POST if AJAX
+$isAjax = SitePage::detectAjax();
+if ($isAjax && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(['error' => 'POST requests only']);
+    header(':', true, 400);
+    exit;
+}
+
 // Am I a student undoing their task completion?
 // I can only undo self-assessable items, all others will have no effect.
 $isUndo     = isset($this->arg[1]) && $this->arg[1] == 'undo';
@@ -50,50 +61,77 @@ if (($permission = $group_handler->getPermission($component->getIdentifier())) <
 // Online assessment or due work? Redirect to that thing
 // Task: mark it as done or that it requires confirmation.
 // Then if there's a link, point to it.
+$url      = '/homepage/' . $component->getIdentifier() . '/#component' . $component_id;
+$isLocal  = true;
+$redirect = false;
 switch ($task->getType()) {
     case Task::TYPE_DUE_WORK:
         // redirect to due work item
         // When the due work item is complete, mark task as complete.
-        SitePage::localRedir(
-            '/submission/submissionHistory/'.$task->getSubmissionBox()->getId().'/'.$_SESSION['id']
-        );
+        $url      = '/submission/submissionHistory/'.$task->getSubmissionBox()->getId().'/'.$user->getId();
+        $redirect = true;
         break;
+
     case Task::TYPE_ONLINE_ASSESS:
         // redirect to online assessment item
         // When it's complete, the mark task is marked as complete.
-        SitePage::localRedir(
-            '/assess/intro/'.$task->getAssessment()->getId().'/'
-        );
+        $url      = '/assess/intro/'.$task->getAssessment()->getId().'/';
+        $redirect = true;
         break;
+
     default:
         // Mark this item as complete.
         // Redirect to the link if there is one, otherwise redirect back to the
         // homepage this is on.
-        $homepageLink = '/homepage/'.$component->getIdentifier().'/#component'.$component_id;
+        $neverRedirect = false;
         if ($unit_instance->isOpen() && !$task->getRequiresConfirmation()) {
+            // Mark/unmark are never redirects.
             if ($isUndo) {
-                Task\InstanceCompletionMapper::getInstance()->unmarkAsCompleted(
-                    $task->getId(),
-                    $_SESSION['id']
-                );
-                SitePage::localRedir($homepageLink);
-                exit;
+                $neverRedirect = true;
+                Task\InstanceCompletionMapper::getInstance()->unmarkAsCompleted($task->getId(), $user->getId());
             } elseif ($isComplete) {
-                Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
-                    $task->getId(),
-                    $_SESSION['id']
-                );
-                SitePage::localRedir($homepageLink);
-                exit;
+                $neverRedirect = true;
+                Task\InstanceCompletionMapper::getInstance()->markAsCompleted($task->getId(), $user->getId());
             }
         }
 
         $link = $task->getLink();
         if (strlen($link) > 0) {
-            header('Location: '.$link);
-            exit;
-        } else {
-            SitePage::localRedir($homepageLink);
+            $url      = $link;
+            $isLocal  = false;
+            $redirect = !$neverRedirect;
         }
         break;
 }
+
+if ($isAjax) {
+    if ($redirect) {
+        echo json_encode([
+            'type'     => 'redirect',
+            'fragment' => $url,
+        ]);
+    } else {
+        // Spit out component HTML and let the calling page deal with it
+        $controller = new Component_Homepage_CourseOutlineController($component, $_SESSION['user'], $this);
+        $renderer   = new Component_Renderer();
+        ob_start();
+        $renderer->renderHomepageComponent(
+            Schoolbox\Resource\Folder\Mapper::getInstance()->findById($unit_instance->getCategory()->getId()),
+            $controller
+        );
+        echo json_encode([
+            'type'     => 'fragment',
+            'fragment' => ob_get_clean(),
+        ]);
+    }
+} else {
+    if ($isLocal) {
+        SitePage::localRedir($url);
+    } else {
+        header('Location: '.$url);
+    }
+}
+
+// Should I have not exited yet: dump the component's content into JSON
+// and let the calling script deal with it
+exit;

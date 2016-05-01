@@ -123,6 +123,37 @@
             }
         );
 
+        // Student updating progress or clicking task name
+        component.on(
+            'click.courseInstance',
+            'a[data-interaction="update_progress"]',
+            function(event) {
+                event.preventDefault();
+
+                var taskRow = $(this).closest('[data-unit_task_id]');
+                var taskId  = taskRow.data('unit_task_id');
+
+                $.ajax({type: 'post', url: this.href, dataType: 'json' })
+                    .done(function(data) {
+                        switch (data.type) {
+                            case 'redirect':
+                                window.location.href = data.fragment;
+                                break;
+                            case 'none':
+                            default:
+                                // Maybe just reload the component?
+                                var component = $(data.fragment);
+                                taskRow.empty().append(
+                                    component.find('[data-unit_task_id="'+taskId+'"]').children()
+                                );
+                                // Reapply preview
+                                taskRow.find(settings.previewSelector).preview();
+                                break;
+                        }
+                    });
+            }
+        );
+
         // Create/edit task form submission
         // Bind to the document and filter on component ID manually,
         // because the form is no longer a child of the component

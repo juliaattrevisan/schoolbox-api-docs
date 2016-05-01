@@ -411,25 +411,22 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         // Students only:
         // Output whether this item is complete.
         $unit_task_class  = '';
-        $unit_task_status = '';
         $unit_task_title  = '';
         $undoable         = false;
         $completable      = false;
         if ($this->readOnly) {
             $unit_task_class = 'progress-tick incomplete';
-            $unit_task_title = 'Incomplete';
+            $unit_task_title = 'Incomplete, click to mark completed';
             $completion_item = $completion_list[$_SESSION['id']];
             if ($completion_item instanceof Task\InstanceCompletion) {
                 switch ($completion_item->getCompletionStatus()) {
                     case Task\InstanceCompletion::COMPLETION_STATUS_COMPLETE:
                         $unit_task_class  = 'progress-tick complete';
-                        $unit_task_status = 'Approved';
-                        $unit_task_title  = 'Approved';
+                        $unit_task_title  = 'Teacher Approved';
                         break;
                     case Task\InstanceCompletion::COMPLETION_STATUS_REQUIRES_CONFIRMATION:
                         $unit_task_class  = 'progress-tick pending';
-                        $unit_task_status = 'Completed';
-                        $unit_task_title  = 'Completed';
+                        $unit_task_title  = 'Self Assessed, click to undo';
                         $undoable         = true;
                         break;
                     case Task\InstanceCompletion::COMPLETION_STATUS_INCOMPLETE:
@@ -467,7 +464,6 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 'UNIT_TASK_SELF_ASSESS'           => ($task->getRequiresConfirmation() ? '' : 'checked'),
                 'UNIT_TASK_COMPLETION_COUNT'      => $complete_count,
                 'UNIT_TASK_GRADIENT'              => $gradient,
-                'UNIT_TASK_COMPLETION_STATUS'     => $unit_task_status,
                 'UNIT_TASK_COMPLETION_TITLE'      => $unit_task_title,
                 'UNIT_TASK_COMPLETE_CLASS'        => $unit_task_class,
                 'UNIT_TASK_SET_STATUS'            => '',
@@ -476,7 +472,6 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                     : '/task/instance/modify/' . $task->getId(),
                 'UNIT_TASK_REVEAL_ATTR'           => '',
                 'unit_task_count_block'           => '',
-                'unit_task_completion_block'      => '',
                 'unit_task_due_date_block'        => '',
                 'unit_task_start_block'           => '',
                 'unit_task_actions_block'         => '',
@@ -494,9 +489,6 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         // Teacher sees the number of students that have completed
         // this task, nobody else does.
         if ($this->readOnly) {
-            if ($unit_task_status) {
-                $this->parse('unit_task_completion_block', 'unit_task_completion');
-            }
             if ($unit->isOpen() && !$task->getRequiresConfirmation()) {
                 // Have I, the student, completed this yet?
                 // Let me undo if so, otherwise let me complete it.
