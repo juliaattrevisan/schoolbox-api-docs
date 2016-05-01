@@ -210,7 +210,7 @@ class Controller extends Base {
         } elseif ($format == 'html') {
             // no limit
             $linesPerPage = PHP_INT_MAX;
-            $template = 'lines';
+            $template = 'html';
             $format   = 'nochrome';
             $useInlineCSS = true;
         } else {
