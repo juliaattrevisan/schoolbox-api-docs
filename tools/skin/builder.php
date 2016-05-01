@@ -93,7 +93,7 @@ if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
     $outfile = SITE_root . '/www/css/'.$siteLocation.'/chrome-foundation.css';
     $outdir  = dirname($outfile);
     $ie9file = SITE_root . '/www/css/'.$siteLocation.'/chrome-foundation-ie9.css';
-    $tmpfile = tempnam(sys_get_temp_dir(), 'css');
+    $tmpfile = sb_tempnam('css');
     $cmd     = sprintf('sass --style compressed %s %s', escapeshellarg($infile), escapeshellarg($tmpfile));
     $logger->info("Building SASS...");
     exec($cmd, $output, $outputCode);

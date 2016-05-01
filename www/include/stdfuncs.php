@@ -153,3 +153,15 @@ REGEXP;
 
     return $ret;
 }
+
+/**
+ * Convenience wrapper for consistent temp file naming
+ *
+ * @param string $prefix
+ * @param string $dir
+ * @return string
+ */
+function sb_tempnam($prefix = '', $dir = '')
+{
+    return tempnam($dir ?: sys_get_temp_dir(), 'sb-' . INSTANCE_ID . ($prefix ? "-$prefix" : ''));
+}

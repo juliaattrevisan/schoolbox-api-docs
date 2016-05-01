@@ -71,7 +71,7 @@ class Download
             return;
         }
 
-        $temp = tempnam(sys_get_temp_dir(), 'cd');
+        $temp = sb_tempnam('croc');
         file_put_contents($temp, $data);
 
         $filename = 'return_' . $this->getSubmission()->getFilename() . '.pdf';

@@ -1,5 +1,4 @@
 <?php
-use Schoolbox\UserMapper;
 
 /**
  * ZipFileUpload
@@ -22,7 +21,7 @@ class ZipFileUpload extends DeprecatedModel
      *
      * @var string
      */
-    private $extractTo = '/tmp';
+    private $extractTo;
 
     /**
      * Zip file prefix
@@ -52,13 +51,22 @@ class ZipFileUpload extends DeprecatedModel
      */
     private $errorFiles = array();
 
+
     /**
-    * Constructor
-    * Set up paths and clean up any existing junk
-    */
-    public function __construct()
+     * Constructor
+     * Set up paths and clean up any existing junk
+     *
+     * @param string $extractTo
+     */
+    public function __construct($extractTo = '')
     {
         parent::DeprecatedModel();
+
+        $this->extractTo = (string)(trim($extractTo) ?: sys_get_temp_dir());
+
+        if (strlen($this->extractTo) == 0) {
+            throw new RuntimeException("No extraction destination available");
+        }
 
         $this->path = $this->extractTo . '/' . $this->prefix . uniqid();
         $this->allowedFileHandler = new AllowedFile();
@@ -87,28 +95,37 @@ class ZipFileUpload extends DeprecatedModel
         $this->verbose = true;
     }
 
+
     /**
-    * Extract files to the path specified. Returns a dirhandle if successfully
-    * extracted files.
-    */
+     * Extract files to the path specified. Returns a dirhandle if successfully
+     * extracted files.
+     *
+     * @param ZipArchive $archive
+     * @return resource
+     */
     public function extract(ZipArchive $archive)
     {
         $extractedFiles = $archive->extractTo($this->getPath());
 
         if (!$extractedFiles) {
             die('Could not extract files.');
-        } else {
-            return opendir($this->getPath());
         }
 
-        return false;
+        return opendir($this->getPath());
     }
 
+
     /**
-    * Traverse directory structure. Create Categorys and Files accordingly,
-    * with the permissions specified
-    */
-    public function traverse($dir, $parentID, $inherit=0)
+     * Traverse directory structure. Create Categorys and Files accordingly,
+     * with the permissions specified
+     *
+     * @param string $dir
+     * @param int    $parentID
+     * @param array  $perms
+     * @param int    $inherit
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function traverse($dir, $parentID, array $perms, $inherit = 0)
     {
         if (!$dh = @opendir($dir)) {
             return;
@@ -118,7 +135,6 @@ class ZipFileUpload extends DeprecatedModel
         $fileMapper       = \Schoolbox\Resource\File\Mapper::getInstance();
         $folderMapper     = \Schoolbox\Resource\Folder\Mapper::getInstance();
         $roleMapper       = \Schoolbox\RoleMapper::getInstance();
-        $userMapper       = UserMapper::getInstance();
         $roleAccessMapper = \Schoolbox\Permission\Access\RoleAccessMapper::getInstance();
 
         /* Begin traversal
@@ -147,7 +163,7 @@ class ZipFileUpload extends DeprecatedModel
                 $category->setParent($parent);
                 $folderMapper->save($category);
 
-                foreach ($_POST['group'] as $id => $perm) {
+                foreach ($perms as $id => $perm) {
                     try {
                         $roleAccess = $roleAccessMapper->createModel();
                         $roleAccess->setCategory($category);
@@ -170,7 +186,7 @@ class ZipFileUpload extends DeprecatedModel
                  *
                  * Otherwise, it's a file, and we add it to the parent Category
                  */
-                $this->traverse($currentPath, $category->getId());
+                $this->traverse($currentPath, $category->getId(), $perms);
 
             } else {
                 // Ignore filenames starting with a . (these are usually
@@ -187,7 +203,7 @@ class ZipFileUpload extends DeprecatedModel
                      */
                     $file = $fileMapper->createModel()
                         ->setFolder($parent)
-                        ->setOwner($userMapper->createModel()->setId($_SESSION['id'])) // we dun need full hydr8
+                        ->setOwner($_SESSION['user']) // we dun need full hydr8
                         ->setTitle($obj)
                         ->setFilename(pathinfo($obj, PATHINFO_FILENAME))
                         ->setStorage($storage);
@@ -198,7 +214,7 @@ class ZipFileUpload extends DeprecatedModel
 
                     $fileMapper->save($file);
 
-                } catch (\Schoolbox\Resource\Exception $e) {
+                } catch (\Schoolbox\File\Exception $e) {
                     $this->errorFiles[] = array(
                         'file'    => $obj,
                         'code'    => $e->getCode(),
@@ -208,6 +224,20 @@ class ZipFileUpload extends DeprecatedModel
                     if ($this->verbose) {
                         echo "Error: could not make <strong>$obj</strong> in $parentID<br>";
                     }
+
+                }
+                catch (\RuntimeException $e) {
+                    // because common interfaces would make this too easy...
+                    $this->errorFiles[] = array(
+                        'file'    => $obj,
+                        'code'    => $e->getCode(),
+                        'message' => $e->getMessage()
+                    );
+
+                    if ($this->verbose) {
+                        echo "Error: could not make <strong>$obj</strong> in $parentID<br>";
+                    }
+
                 }
             }
         }
@@ -217,11 +247,14 @@ class ZipFileUpload extends DeprecatedModel
         return;
     }
 
+
     /**
-    * Remove temp folder that was extracted. Or you can feed in a list of
-    * folders to remove. It will prefix this list with the extractTo value for
-    * a bit of safety.
-    */
+     * Remove temp folder that was extracted. Or you can feed in a list of
+     * folders to remove. It will prefix this list with the extractTo value for
+     * a bit of safety.
+     *
+     * @param bool $existing
+     */
     public function cleanup($existing = false)
     {
         if (is_array($existing)) {
@@ -238,8 +271,8 @@ class ZipFileUpload extends DeprecatedModel
     /**
     * Recursively delete a directory
     *
-    * @param string $dir Directory name
-    * @param boolean $deleteRootToo Delete specified top-level directory as well
+    * @param string $dir           Directory name
+    * @param bool   $deleteRootToo Delete specified top-level directory as well
     *
     * Taken from php.net
     */
@@ -274,13 +307,11 @@ class ZipFileUpload extends DeprecatedModel
     public function getErrors()
     {
         $errorMessages = array();
+        $query = 'SELECT message FROM error WHERE id = 9';
+        $error = $this->db->getRow($query);
 
         if (count($this->errorFiles)) {
             foreach ($this->errorFiles as $currentFile) {
-                $query = 'SELECT message FROM error WHERE id = ' . $currentFile['code'];
-
-                $error = $this->db->getRow($query);
-
                 $errorMessages[] = array(
                     'file' => $currentFile['file'],
                     'message' => str_replace('%MESSAGE%', $currentFile['message'], $error['message']),

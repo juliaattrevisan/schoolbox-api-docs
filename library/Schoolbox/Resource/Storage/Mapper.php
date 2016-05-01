@@ -228,7 +228,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
     public function acceptStream($filename, $fp, $public = false)
     {
         // this might seem hacky, but to ensure all the safety checks pass, this data needs to be a tempfile (just like an upload)
-        $tempLocation = tempnam(sys_get_temp_dir(), 'sb');
+        $tempLocation = sb_tempnam('otfs');
 
         // dump the stream into our tempfile
         file_put_contents($tempLocation, $fp);
