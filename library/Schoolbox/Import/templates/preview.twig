@@ -15,11 +15,13 @@
     </div>
 
     <div class="small-12 island">
-        <section class="content">
+        <section class="content no-pad no-margin">
             <ul class="information-list ups" data-log>
                 {% include '@upsRuleset/log/lines.twig' %}
             </ul>
+        </section>
 
+        <section class="content">
             {% block form %}
             <form action="{{ routeLookup(basename ~ '.import') }}" method="post">
 
