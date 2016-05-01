@@ -136,6 +136,10 @@ class Mapper extends BaseMapper
     const ERROR_EOTC_EVENT_NO_STUDENTS = 165;
     const ERROR_QUESTION_BANK_CATEGORY = 166;
     const ERROR_SURVEY_NOT_FOUND = 167;
+    const ERROR_PASTORAL_PERM_RECORD = 168;
+    const ERROR_PASTORAL_PERM_MODULE = 169;
+    const ERROR_PASTORAL_USER_NOT_FOUND = 170;
+    const ERROR_PASTORAL_NOT_FOUND = 171;
 
     public function mapping()
     {
