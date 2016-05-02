@@ -19,6 +19,7 @@ use Schoolbox\News\TopicMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Pastoral\Severity\Mapper as SeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
+use Schoolbox\Pastoral\Category\Mapper as CategoryMapper;
 
 class Controller extends Base
 {
@@ -338,13 +339,40 @@ class Controller extends Base
                 ]
             ],
             'lu_pastoral_type'      => [
-                'title'             => 'Pastoral Record Types',
+                'title'             => 'Pastoral Types',
                 'mapper'            => TypeMapper::class,
                 'sort'              => 'name',
                 'fields'            => [
+                    'id'          => [
+                        'readonly'  => true,
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                    ],
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 10,
+                        'width'     => 9,
+                    ],
+                    'externalCode' => [
+                        'caption'   => 'SIS Code',
+                        'width'     => 2,
+                        'tooltip'   => 'This is used when exporting pastoral care records to your SIS pastoral care module. This should be the matching code in your SIS lookup table for this pastoral record type (e.g. luPastoralCareType). If you are not using (or do not want to export back to) your external SIS pastoral care module this can be left blank.',
+                    ],
+                ]
+            ],
+            'lu_pastoral_category'    => [
+                'title'             => 'Pastoral Sub-Types/Categories',
+                'mapper'            => CategoryMapper::class,
+                'sort'              => 'pastoralTypeId',
+                'fields'            => [
+                    'name'          => [
+                        'caption'   => 'Name',
+                        'width'     => 8,
+                    ],
+                    'pastoralTypeId' => [
+                        'getter'    => 'getPastoralTypeId',
+                        'caption'   => 'Parent Pastoral Type ID',
+                        'width'     => 2,
+                        'tooltip'   => 'This is the ID number of the Pastoral Type under which this category will appear.',
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
