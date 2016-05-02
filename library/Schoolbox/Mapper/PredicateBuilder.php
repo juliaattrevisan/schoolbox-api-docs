@@ -8,15 +8,15 @@
 
 namespace Schoolbox\Mapper;
 
+use Alaress\IDatabase;
 use Countable;
-use Database;
 use Traversable;
 use UnderflowException;
 
 class PredicateBuilder
 {
 
-    /** @var Database */
+    /** @var IDatabase */
     protected $database;
 
     /** @var string */
@@ -32,10 +32,10 @@ class PredicateBuilder
     /**
      * PredicateBuilder constructor.
      *
-     * @param Database $db
-     * @param string   $table
+     * @param IDatabase $db
+     * @param string    $table
      */
-    public function __construct(Database $db, $table)
+    public function __construct(IDatabase $db, $table)
     {
         $this->setTable($table);
         $this->database = $db;

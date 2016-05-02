@@ -9,8 +9,7 @@
 
 namespace Schoolbox;
 
-use Countable;
-use Database;
+use Alaress\IDatabase;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -104,7 +103,7 @@ abstract class Mapper implements IMapper, Serializable
     const COLUMN_SOFTDELETE        = 32;
 
     /**
-     * @var Database
+     * @var IDatabase
      */
     protected $database;
 
@@ -296,7 +295,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @param  \Database $database
+     * @param  IDatabase $database
      *
      * @return $this
      */
@@ -307,7 +306,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @return \Database
+     * @return IDatabase
      */
     public function getDatabase()
     {
