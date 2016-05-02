@@ -63,7 +63,7 @@
                                 </div>
                             </div>
 
-                            {% if session.user.getId == comment.getOwner.getId or session.user.isSuperuser %}
+                            {% if session.user.getId == blog.getOwner.getId or session.user.isSuperuser %}
                                 <nav>
                                     <a class="icon-modify" href="/blog/modify/{{ blog.getId }}" title="Modify Blog post"></a>
                                 </nav>
