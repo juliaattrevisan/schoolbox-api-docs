@@ -164,17 +164,13 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
      */
     protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
     {
-        $parts = parent::buildWherePart($predicate, $columnList, $options);
-
+        // if the mime is specified, add a LIKE predicate to the query
         if (isset($options['mime'])) {
             $mime = str_replace('*', '%', $options['mime']);
-            $parts['where'][] = sprintf(
-                "`m`.`mime` LIKE %s",
-                $this->database->quote($mime)
-            );
+            $predicate->like('m.mime', $mime);
         }
 
-        return $parts;
+        return parent::buildWherePart($predicate, $columnList, $options);
     }
 
     /**

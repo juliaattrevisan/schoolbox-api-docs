@@ -183,16 +183,13 @@ class Mapper extends Schoolbox\Mapper implements Receiver
      */
     protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
     {
-        $parts = parent::buildWherePart($predicate, $columnList, $options);
-
+        // if the mime is specified, add a LIKE predicate to the query
         if (isset($options['mime'])) {
             $mime = str_replace('*', '%', $options['mime']);
-            $parts['where'][] = sprintf("`allowedFileTypes`.`mime` LIKE %s",
-                $this->database->quote($mime)
-            );
+            $predicate->like('allowedFileTypes.mime', $mime);
         }
 
-        return $parts;
+        return parent::buildWherePart($predicate, $columnList, $options);
     }
 
 
