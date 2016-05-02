@@ -125,11 +125,24 @@ class TimetableStructure extends AbstractImporter
                     );
                     $campus->setStartDay($row['Term Offset'] + 1);
                 }
+                try {
+                    $termStart = new Alaress_Date_Format(
+                        $row['Term Start'],
+                        [Alaress_Date_Format::DATABASE_DATE_FORMAT, 'd/m/Y']
+                    );
+                    $termFinish = new Alaress_Date_Format(
+                        $row['Term Finish'],
+                        [Alaress_Date_Format::DATABASE_DATE_FORMAT, 'd/m/Y']
+                    );
+                } catch (\InvalidArgumentException $e) {
+                    $this->log->warning('"Term Start" and "Term Finish" must both be dates in YYYY-MM-DD or DD/MM/YYYY format');
+                    continue;
+                }
                 $campus
                     ->setCycle($cycle)
                     ->setCampus($campusObject)
-                    ->setStart(new Alaress_Date_Format($row['Term Start'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
-                    ->setFinish(new Alaress_Date_Format($row['Term Finish'], Alaress_Date_Format::DATABASE_DATE_FORMAT))
+                    ->setStart($termStart)
+                    ->setFinish($termFinish)
                     ->setStartDay($row['Term Start Day Number']);
 
                 $result[$key] = [
@@ -151,12 +164,19 @@ class TimetableStructure extends AbstractImporter
 //            ]);
             $period = new TimetablePeriod();
             $this->log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
+            try {
+                $periodStart  = new Alaress_Date_Format($row['Period Start'], ['H:i', 'G:ia', 'Hi']);
+                $periodFinish = new Alaress_Date_Format($row['Period Finish'], ['H:i', 'G:ia', 'Hi']);
+            } catch (\InvalidArgumentException $e) {
+                $this->log->warning('"Period Start" and "Period Finish" must both be times in HH:MM format');
+                continue;
+            }
             $period
                 ->setCycle($result[$key]['cycle'])
                 ->setDay($day)
                 ->setTitle($title)
-                ->setStart(new Alaress_Date_Format($row['Period Start'], 'H:i'))
-                ->setFinish(new Alaress_Date_Format($row['Period Finish'], 'H:i'))
+                ->setStart($periodStart)
+                ->setFinish($periodFinish)
                 ->setUsable(true);
             if (!isset($result[$key]['periods'][$day])) {
                 $result[$key]['periods'][$day] = new Collection();

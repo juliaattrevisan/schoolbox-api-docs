@@ -102,4 +102,31 @@ class ConstructionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('2015-03-26', $clone->getDatabaseDate());
     }
 
+    /**
+     * Ensures that a date can be built properly from multiple formats.
+     */
+    public function testMultipleDateFormatsFirstMatches()
+    {
+        $date = $this->buildDateObject('25/03/2015', ['d/m/Y', 'Y-m-d']);
+        $this->assertEquals('2015-03-25', $date->getDatabaseDate());
+    }
+
+    /**
+     * Ensures that a date can be built properly from multiple formats.
+     */
+    public function testMultipleDateFormatsLastMatches()
+    {
+        $date = $this->buildDateObject('2015-03-25', ['d/m/Y', 'Y-m-d']);
+        $this->assertEquals('2015-03-25', $date->getDatabaseDate());
+    }
+
+    /**
+     * Ensures that a date errors out if no format matches.
+     *
+     * @expectedException InvalidArgumentException
+     */
+    public function testMultipleDateFormatsNoneMatches()
+    {
+        $this->buildDateObject('2015-03-25', ['d/m/Y', 'Ymd']);
+    }
 }

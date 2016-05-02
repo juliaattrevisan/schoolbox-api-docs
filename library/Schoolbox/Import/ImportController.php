@@ -55,6 +55,7 @@ class ImportController extends Base
             'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
             'basename'       => $this->basename,
             'hasExternalDb'  => ($this->getDi()->get('config')->get('external_type') != 'schoolbox'),
+            'now'            => \Alaress_Date_Format::now(),
         ];
     }
 
