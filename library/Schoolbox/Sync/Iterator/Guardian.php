@@ -73,17 +73,7 @@ class Guardian extends IteratorIterator
 
         /* Email
          */
-        $email = array();
-        if(substr_count($currentResult['student_contact_default_email'],';') > 0){
-            $emailList = explode(';',$currentResult['student_contact_default_email']);
-            foreach ($emailList as $anEmail) {
-                $email[] = $anEmail;
-            }
-        }
-        else {
-            $email[] = $currentResult['student_contact_default_email'];
-        }
-
+        $email = preg_split('/[,;]/', $currentResult['student_contact_default_email']);
         foreach ($email as $key => $anEmail) {
             $currentEmail = new User\Common\Email();
             $currentEmail->setAddress($anEmail);

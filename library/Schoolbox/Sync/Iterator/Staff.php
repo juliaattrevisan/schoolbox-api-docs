@@ -54,27 +54,10 @@ class Staff extends IteratorIterator
 
         /* Email
          */
-        $email = array();
-        if(substr_count($currentResult['email'],';') > 0){
-            $emailList = explode(';',$currentResult['email']);
-            foreach ($emailList as $anEmail) {
-                $email[] = $anEmail;
-            }
-        }
-        else {
-            $email[] = $currentResult['email'];
-        }
-
-        if(substr_count($currentResult['occup_email'],';') > 0){
-            $emailList = explode(';',$currentResult['occup_email']);
-            foreach ($emailList as $anEmail) {
-                $email[] = $anEmail;
-            }
-        }
-        else {
-            $email[] = $currentResult['occup_email'];
-        }
-
+        $email = array_merge(
+            preg_split('/[,;]/', $currentResult['email']),
+            preg_split('/[,;]/', $currentResult['occup_email'])
+        );
         foreach ($email as $key => $anEmail) {
             $currentEmail = new User\Common\Email();
             $currentEmail->setAddress($anEmail);
