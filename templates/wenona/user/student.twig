@@ -1,7 +1,22 @@
 {% extends '@core/user/student.twig' %}
 
-{% block details_hohTeacher %}
-{% endblock details_hohTeacher %}
+{% block medicalAlert %}
+{% endblock medicalAlert %}
+
+{% block details_tutorTeacher %}
+    {% if showClasses %}
+        {% if tutorTeacher %}
+            <dt class="no-margin small-6 medium-3">Pastoral Care Teacher</dt>
+            <dd class="no-margin small-6 medium-9">
+                {% if tutorTeacher.getId() %}
+                    <a href="{{ session.mailhandle }}{{ tutorTeacher.getEmail() }}">{{ tutorTeacher.formatName() }}</a>
+                {% else %}
+                    {{ tutorTeacher.formatName() }}
+                {% endif %}
+            </dd>
+        {% endif %}
+    {% endif %}
+{% endblock details_tutorTeacher %}
 
 {% block details_coordTeacher %}
     {% if coordTeacher %}
@@ -16,8 +31,8 @@
     {% endif %}
 {% endblock details_coordTeacher %}
 
-{% block medicalAlert %}
-{% endblock medicalAlert %}
+{% block details_hohTeacher %}
+{% endblock details_hohTeacher %}
 
 {# Buttons - add intranet at start of list #}
 {% block buttons %}
