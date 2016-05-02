@@ -25,12 +25,14 @@ if (!is_numeric($this->arg[1])) {
     error(115);
 }
 
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
+}
+
 $survey = $surveyHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 
-if (!$survey) {
-    error(112);
-}
+
 
 if ($surveyHandler->isDeleted($survey['assess_id'])) {
     error(112);

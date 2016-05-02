@@ -13,15 +13,15 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 $surveyHandler = new Survey_Main();
 $groupHandler = new Group();
 
-$survey = $surveyHandler->getByID($this->arg[0]);
-
 if (!is_numeric($this->arg[0])) {
     error(112);
 }
 
-if (!$survey) {
-    error(112);
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
 }
+
+$survey = $surveyHandler->getByID($this->arg[0]);
 
 try {
     $folderMapper = new FolderMapper();

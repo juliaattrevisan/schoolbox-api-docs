@@ -17,11 +17,11 @@ $surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $attemptHandler = new Survey_Attempt();
 
-$survey = $surveyHandler->getByID($this->arg[0]);
-
-if (!$survey) {
-    error(112);
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
 }
+
+$survey = $surveyHandler->getByID($this->arg[0]);
 
 if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
     error(126);

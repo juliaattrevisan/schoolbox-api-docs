@@ -34,6 +34,10 @@ if ($surveyHandler->isDeleted($section['assess_id'])) {
 	error(112);
 }
 
+if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
+    $this->pageNotFound();
+}
+
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */

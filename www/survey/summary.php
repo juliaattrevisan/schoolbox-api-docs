@@ -15,13 +15,14 @@ $sectionHandler = new Survey_Section();
 $attemptHandler = new Survey_Attempt();
 $groupHandler = new Group();
 
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
+}
+
 $survey = $surveyHandler->getIntro($this->arg[0]);
 $allSummary = $surveyHandler->getIntroSummary($this->arg[0]);
 $allSections = $sectionHandler->getList($survey['assess_id']);
 
-if (!$survey) {
-    error(112);
-}
 
 if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);

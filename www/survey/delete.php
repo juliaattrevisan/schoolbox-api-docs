@@ -26,6 +26,9 @@ if ($surveyHandler->isDeleted($this->arg[0])) {
 
  *
  */
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+	$this->pageNotFound();
+}
 
 $survey = $surveyHandler->getByID($this->arg[0]);
 

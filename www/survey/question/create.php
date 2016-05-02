@@ -27,6 +27,10 @@ if (!empty($_POST)) {
     $section = $sectionHandler->getByID($_POST['section_id']);
     $survey = $surveyHandler->getByID($section['assess_id']);
 
+    if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
+    }
+
     if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
                 $survey['category_id']
             ) < WRITE_ACCESS)
@@ -87,6 +91,10 @@ if (!empty($_POST)) {
 
     $section = $sectionHandler->getByID($this->arg[0]);
     $survey = $surveyHandler->getByID($section['assess_id']);
+
+    if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
+    }
 
     if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
                 $survey['category_id']

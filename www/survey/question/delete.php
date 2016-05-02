@@ -28,6 +28,10 @@ if ($section) {
 	$survey = $surveyHandler->getByID($section['assess_id']);
 }
 
+if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
+	$this->pageNotFound();
+}
+
 if ($surveyHandler->isDeleted($section['assess_id'])) {
 	error(112);
 }

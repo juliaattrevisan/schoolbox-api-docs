@@ -13,11 +13,11 @@ use Schoolbox\Breadcrumbs;
 $groupHandler  = new Group();
 $surveyHandler = new Survey_Main();
 
-$survey = $surveyHandler->getByID($this->arg[0]);
-
-if (!$survey) {
-    error(112);
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
 }
+
+$survey = $surveyHandler->getByID($this->arg[0]);
 
 if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);

@@ -23,13 +23,14 @@ if (!is_numeric($this->arg[0])) {
     error(112);
 }
 
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
+}
+
 /* Get intro summary for the assessment
  */
 $survey = $surveyHandler->getIntro($this->arg[0]);
 
-if (!$survey) {
-    error(112);
-}
 
 if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);

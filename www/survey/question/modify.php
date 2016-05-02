@@ -25,6 +25,10 @@ if (!empty($_POST)) {
     $section = $sectionHandler->getByID(Scrub::text($_POST['section_id']));
     $survey = $surveyHandler->getByID($section['assess_id']);
 
+    if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
+    }
+
     if ($surveyHandler->isDeleted($survey['assess_id'])) {
         error(112);
     }
@@ -91,6 +95,10 @@ else {
 
     if ($section) {
         $survey = $surveyHandler->getByID($section['assess_id']);
+    }
+
+    if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
     }
 
     if ($surveyHandler->isDeleted($section['assess_id'])) {

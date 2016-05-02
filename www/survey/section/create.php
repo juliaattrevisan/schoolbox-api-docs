@@ -14,6 +14,10 @@ $surveyHandler = new Survey_Main();
 $groupHandler = new Group();
 
 if (!empty($_POST)) {
+    if (!$surveyHandler->isValidUrlAccess(Scrub::text($_POST['assess_id']))) {
+        $this->pageNotFound();
+    }
+
     $survey = $surveyHandler->getByID(Scrub::text($_POST['assess_id']));
 
     if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
@@ -37,6 +41,10 @@ if (!empty($_POST)) {
         error(51);
     }
 
+    if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+        $this->pageNotFound();
+    }
+
     if ($surveyHandler->isDeleted($this->arg[0])) {
         error(112);
     }
@@ -45,10 +53,6 @@ if (!empty($_POST)) {
      * new Section
      */
     $survey = $surveyHandler->getByID($this->arg[0]);
-
-    if (empty($survey)) {
-        error(112);
-    }
 
     if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
         error(130);
