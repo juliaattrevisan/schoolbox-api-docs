@@ -15,7 +15,7 @@
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $questionHandler = new Survey_Question();
 $factory = new Survey_Factory();
@@ -25,16 +25,16 @@ $groupHandler = new Group();
  */
 if (!empty($_POST)) {
     $section = $sectionHandler->getByID($_POST['section_id']);
-    $assess = $assessHandler->getByID($section['assess_id']);
+    $survey = $surveyHandler->getByID($section['assess_id']);
 
-    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission(
-                $assess['category_id']
+    if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
+                $survey['category_id']
             ) < WRITE_ACCESS)
     ) {
         error(130);
     }
 
-    if ($assessHandler->isDeleted($section['assess_id'])) {
+    if ($surveyHandler->isDeleted($section['assess_id'])) {
         error(112);
     }
 
@@ -86,16 +86,16 @@ if (!empty($_POST)) {
     }
 
     $section = $sectionHandler->getByID($this->arg[0]);
-    $assess = $assessHandler->getByID($section['assess_id']);
+    $survey = $surveyHandler->getByID($section['assess_id']);
 
-    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission(
-                $assess['category_id']
+    if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
+                $survey['category_id']
             ) < WRITE_ACCESS)
     ) {
         error(130);
     }
 
-    if ($assessHandler->isDeleted($section['assess_id'])) {
+    if ($surveyHandler->isDeleted($section['assess_id'])) {
         error(112);
     }
 
@@ -105,14 +105,14 @@ if (!empty($_POST)) {
 
     try {
         $folderMapper = new FolderMapper();
-        $folder = $folderMapper->findById($assess['category_id']);
+        $folder = $folderMapper->findById($survey['category_id']);
     }
     catch (\Exception $e) {
         error(13);
     }
 
-    $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
-    $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
+    $assessStartDate = new Alaress_Date_Format(strtotime($survey['start']), 'U');
+    $assessFinishDate = new Alaress_Date_Format(strtotime($survey['finish']), 'U');
 
     /* Render create page
      */
@@ -277,13 +277,13 @@ if (!empty($_POST)) {
             'class' => '',
         ],
         [
-            'text' => $assess['title'],
-            'href' => "/survey/summary/{$assess['assess_id']}",
+            'text' => $survey['title'],
+            'href' => "/survey/summary/{$survey['assess_id']}",
             'class' => '',
         ],
         [
             'text' => $section['title'],
-            'href' => "/survey/summary/{$assess['assess_id']}",
+            'href' => "/survey/summary/{$survey['assess_id']}",
             'class' => '',
         ],
         [

@@ -10,17 +10,17 @@
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $groupHandler = new Group();
 
 if (!empty($_POST)) {
-    $assess = $assessHandler->getByID(Scrub::text($_POST['assess_id']));
+    $survey = $surveyHandler->getByID(Scrub::text($_POST['assess_id']));
 
-    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
         error(130);
     }
 
-    if ($assessHandler->isDeleted(Scrub::text($_POST['assess_id']))) {
+    if ($surveyHandler->isDeleted(Scrub::text($_POST['assess_id']))) {
         error(112);
     }
 
@@ -37,33 +37,33 @@ if (!empty($_POST)) {
         error(51);
     }
 
-    if ($assessHandler->isDeleted($this->arg[0])) {
+    if ($surveyHandler->isDeleted($this->arg[0])) {
         error(112);
     }
 
     /* Find out whether the test exists to which you are attempting to add a
      * new Section
      */
-    $assess = $assessHandler->getByID($this->arg[0]);
+    $survey = $surveyHandler->getByID($this->arg[0]);
 
-    if (empty($assess)) {
+    if (empty($survey)) {
         error(112);
     }
 
-    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
         error(130);
     }
 
     try {
         $folderMapper = new FolderMapper();
-        $folder = $folderMapper->findById($assess['category_id']);
+        $folder = $folderMapper->findById($survey['category_id']);
     }
     catch (\Exception $e) {
         error(117);
     }
 
-    $assessStartDate  = new Alaress_Date_Format(strtotime($assess['start']), 'U');
-    $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
+    $assessStartDate  = new Alaress_Date_Format(strtotime($survey['start']), 'U');
+    $assessFinishDate = new Alaress_Date_Format(strtotime($survey['finish']), 'U');
 
     /* Render create page
      */
@@ -76,7 +76,7 @@ if (!empty($_POST)) {
         'ASSESS_ASSESS_ID'     => $this->arg[0],
         'ASSESS_KIND_LC'       => 'survey',
         'ASSESS_KIND'          => 'Survey',
-        'ASSESS_TITLE'         => Scrub::text($assess['title']),
+        'ASSESS_TITLE'         => Scrub::text($survey['title']),
         'ASSESS_START_DATE'    => $assessStartDate->getLocalShort(),
         'ASSESS_FINISH_DATE'   => $assessFinishDate->getLocalShort(),
         'ASSESS_CATEGORY_ID'   => $folder->getId(),
@@ -95,8 +95,8 @@ if (!empty($_POST)) {
             'class' => '',
         ],
         [
-            'text' => $assess['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'text' => $survey['title'],
+            'href' => "/assess/summary/{$survey['assess_id']}",
             'class' => '',
         ],
         [

@@ -9,7 +9,7 @@
  * @version     SVN: $Id$
  */
 
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $questionHandler = new Survey_Question();
 $answerHandler = new Survey_Answer();
 $sectionHandler = new Survey_Section();
@@ -25,14 +25,14 @@ if ($question) {
 }
 
 if ($section) {
-	$assess = $assessHandler->getByID($section['assess_id']);
+	$survey = $surveyHandler->getByID($section['assess_id']);
 }
 
-if ($assessHandler->isDeleted($section['assess_id'])) {
+if ($surveyHandler->isDeleted($section['assess_id'])) {
 	error(112);
 }
 
-if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
     error(130);
 }
 

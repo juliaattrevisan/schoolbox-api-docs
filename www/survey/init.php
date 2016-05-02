@@ -17,9 +17,15 @@ if (!is_numeric($this->arg[0])) {
 	error(112);
 }
 
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+	$this->pageNotFound();
+}
+
 if (!is_numeric($this->arg[1])) {
 	error(115);
 }
+
+
 
 $survey = $surveyHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);

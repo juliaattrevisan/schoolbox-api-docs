@@ -9,7 +9,7 @@
  * @version     SVN: $Id$
  */
 
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $questionHandler = new Survey_Question();
 $factory = new Survey_Factory();
@@ -25,14 +25,14 @@ if (!is_numeric($this->arg[1])) {
     error(115);
 }
 
-$assess = $assessHandler->getByID($this->arg[0]);
+$survey = $surveyHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 
-if (!$assess) {
+if (!$survey) {
     error(112);
 }
 
-if ($assessHandler->isDeleted($assess['assess_id'])) {
+if ($surveyHandler->isDeleted($survey['assess_id'])) {
     error(112);
 }
 
@@ -43,24 +43,24 @@ if (!$section) {
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-if (!$assessHandler->canDoAssessment($assess['assess_id'])) {
+if (!$surveyHandler->canDoAssessment($survey['assess_id'])) {
     error(19);
 }
 
 /* Check if this assessment can be started
  */
-if ($assessHandler->isExpired($assess['assess_id'])) {
+if ($surveyHandler->isExpired($survey['assess_id'])) {
     error(120);
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
     error(144);
 }
 
-if (!$questionHandler->numQuestions($assess['assess_id'])) {
+if (!$questionHandler->numQuestions($survey['assess_id'])) {
     error(137);
 }
 
@@ -76,12 +76,12 @@ if ($surveyHandler->isOwner($this->arg[0])) {
  *
  * Set up Attempt vars
  */
-$numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
+$numAttempts = $attemptHandler->userHasAttempted($survey['assess_id'], $_SESSION['id']);
 
-$attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
+$attempt = $attemptHandler->getLatestResumableForUser($survey['assess_id'], $_SESSION['id']);
 $attemptStartTime     = ($attempt['start'] ? strtotime($attempt['start']) : $_SERVER['REQUEST_TIME']);
-$attemptTimeRemaining = $attemptStartTime + $assess['duration'] - $_SERVER['REQUEST_TIME'];
-$attemptEndTime = $attemptStartTime + $assess['duration'];
+$attemptTimeRemaining = $attemptStartTime + $survey['duration'] - $_SERVER['REQUEST_TIME'];
+$attemptEndTime = $attemptStartTime + $survey['duration'];
 
 /* Redirect back to the homepage if you've reached the end, or had
  * your attempt_id cleared from the session
@@ -95,12 +95,12 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  * attempts waiting for you to complete and you don't have an attempt_id
  */
 if (!is_numeric($attempt['attempt_id'])) {
-	SitePage::localRedir('/homepage/' . $assess['category_id']);
+	SitePage::localRedir('/homepage/' . $survey['category_id']);
 }
 
 /* Check if Attempt ran out of time
  */
-if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)) {
+if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($survey['duration'] != Assess_Main::UNLIMITED_DURATION)) {
     error(122);
 }
 
@@ -113,7 +113,7 @@ $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
-$this->setTitle('Assessment: ' . $assess['title']);
+$this->setTitle('Assessment: ' . $survey['title']);
 
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
@@ -122,12 +122,12 @@ $attemptStart = new Alaress_Date_Format($attemptStartTime, 'U');
 $attemptEnd = new Alaress_Date_Format($attemptEndTime, 'U');
 
 $this->setVar(array(
-	'ASSESS_ASSESS_ID' => $assess['assess_id'],
-	'ASSESS_TITLE' => Scrub::text($assess['title']),
+	'ASSESS_ASSESS_ID' => $survey['assess_id'],
+	'ASSESS_TITLE' => Scrub::text($survey['title']),
 	'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
     'ATTEMPT_ID' => $attempt['attempt_id'],
     'ATTEMPT_START' => $attemptStart->getShort(),
-	'ATTEMPT_END' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEnd->getShort(),
+	'ATTEMPT_END' => $survey['duration'] == Survey_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEnd->getShort(),
 	'SECTION_TITLE' => Scrub::text($section['title']),
 	'SECTION_DESCRIPTION' => Scrub::html($section['description']),
 	'CURRENT_SECTION_SEQUENCE' => $section['sequence'],

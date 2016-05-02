@@ -11,7 +11,7 @@
 
 /* Get a list of questions and answers to softdelete
  */
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $attemptHandler = new Survey_Attempt();
 $responseHandler = new Survey_Response();
 $groupHandler = new Group();
@@ -26,11 +26,11 @@ foreach ($_POST['attemptIds'] as $currentAttempt) {
 	if (is_numeric($currentAttempt)) {
 		$attempt = $attemptHandler->getByID($currentAttempt);
 
-		$attempt['assess'] = $assessHandler->getByID($attempt['assess_id']);
+		$attempt['assess'] = $surveyHandler->getByID($attempt['assess_id']);
 
 		$allAttempts[] = $attempt;
 
-		if (!$assessHandler->isOwner($attempt['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < WRITE_ACCESS)) {
+		if (!$surveyHandler->isOwner($attempt['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < WRITE_ACCESS)) {
 			error(142);
 		}
 	}

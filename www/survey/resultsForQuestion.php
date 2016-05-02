@@ -11,7 +11,7 @@
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
-$assessHandler   = new Survey_Main();
+$surveyHandler   = new Survey_Main();
 $factory         = new Survey_Factory();
 $questionHandler = new Survey_Question();
 $groupHandler    = new Group();
@@ -20,18 +20,18 @@ if (!is_numeric($this->arg[0])) {
     error(112);
 }
 
-$assess = $assessHandler->getByID($this->arg[0]);
+$survey = $surveyHandler->getByID($this->arg[0]);
 
-if (!$assess) {
+if (!$survey) {
     error(112);
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);
 }
 
-if (!$assessHandler->isOwner($assess['assess_id'])
-    && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)
+if (!$surveyHandler->isOwner($survey['assess_id'])
+    && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)
 ) {
     error(125);
 }
@@ -40,14 +40,14 @@ try {
     $folderMapper = new FolderMapper();
 
     /** @var \Schoolbox\Resource\Folder\Model $folder */
-    $folder = $folderMapper->findById($assess['category_id']);
+    $folder = $folderMapper->findById($survey['category_id']);
 }
 catch (\Exception $e) {
     error(13);
 }
 
 $surveyExporter = new Survey_Export_Graph(
-    $assess,
+    $survey,
     $factory,
     new Survey_Section(),
     new Survey_Attempt(),
@@ -73,7 +73,7 @@ $this->setBlock('respondent', 'respondent_name', 'respondent_name_block');
 
 /* If not using Anonymous Result, set respondent details
  */
-if ($assess['anonymous_result']) {
+if ($survey['anonymous_result']) {
     $this->setVar('respondent_heading_block', '');
 } else {
     $this->parse('respondent_heading_block', 'respondent_heading');
@@ -123,7 +123,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
 
                 /* If not using Anonymous Result, set respondent details
                  */
-                if ($assess['anonymous_result']) {
+                if ($survey['anonymous_result']) {
                     $this->setVar('respondent_name_block', '');
                 } else {
                     $this->parse('respondent_name_block', 'respondent_name', true);
@@ -141,8 +141,8 @@ if (is_array($sectionValues) && count($sectionValues)) {
 
 $this->setVar(
     array(
-        'SURVEY_NAME'       => Scrub::text($assess['title']),
-        'SURVEY_ID'         => $assess['assess_id'],
+        'SURVEY_NAME'       => Scrub::text($survey['title']),
+        'SURVEY_ID'         => $survey['assess_id'],
         'QUESTION_QUESTION' => $questionList
     )
 );
@@ -155,8 +155,8 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => ''
     ],
     [
-        'text'  => Scrub::text($assess['title']),
-        'href'  => '/survey/summary/' . $assess['assess_id'],
+        'text'  => Scrub::text($survey['title']),
+        'href'  => '/survey/summary/' . $survey['assess_id'],
         'class' => ''
     ],
     [

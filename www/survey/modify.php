@@ -11,19 +11,19 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 
 $groupHandler  = new Group();
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 
-$assess = $assessHandler->getByID($this->arg[0]);
+$survey = $surveyHandler->getByID($this->arg[0]);
 
-if (!$assess) {
+if (!$survey) {
     error(112);
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);
 }
 
-if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
     error(125);
 }
 
@@ -56,7 +56,7 @@ if (!empty($_POST)) {
       * Doing so would change ownership; thus, changes made by a superuser would prevent the
       * original author from being able to modify it.
       */
-    $assessHandler->update(
+    $surveyHandler->update(
         array(
             'assess_id'          => $this->arg[0],
             'category_id'        => $_POST['category_id'],
@@ -87,13 +87,13 @@ if (!empty($_POST)) {
 
     $this->setTitle('Manage Survey');
 
-    $assessStartDate  = new Alaress_Date_Format(strtotime($assess['start']), 'U');
-    $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
+    $assessStartDate  = new Alaress_Date_Format(strtotime($survey['start']), 'U');
+    $assessFinishDate = new Alaress_Date_Format(strtotime($survey['finish']), 'U');
 
     $folderMapper = new FolderMapper();
 
     try {
-        $folder = $folderMapper->findById($assess['category_id']);
+        $folder = $folderMapper->findById($survey['category_id']);
     }
     catch (\Exception $e) {
         error(117);
@@ -102,20 +102,20 @@ if (!empty($_POST)) {
     $this->setVar(
         array(
             'ACTION'                          => 'modify',
-            'ASSESS_HEADING'                  => Scrub::text($assess['title']),
-            'ASSESS_ASSESS_ID'                => $assess['assess_id'],
+            'ASSESS_HEADING'                  => Scrub::text($survey['title']),
+            'ASSESS_ASSESS_ID'                => $survey['assess_id'],
             'ASSESS_ACTION'                   => 'Modify',
             'ASSESS_KIND'                     => 'Survey',
             'ASSESS_KIND_LC'                  => 'survey',
             'ASSESS_CATEGORY_ID'              => $folder->getId(),
             'ASSESS_CATEGORY_NAME'            => $folder->getName(),
-            'ASSESS_TITLE'                    => Scrub::text($assess['title']),
-            'ASSESS_DESCRIPTION'              => $assess['description'],
+            'ASSESS_TITLE'                    => Scrub::text($survey['title']),
+            'ASSESS_DESCRIPTION'              => $survey['description'],
             'ASSESS_START_DATE'               => $assessStartDate->getLocalShort(),
             'ASSESS_FINISH_DATE'              => $assessFinishDate->getLocalShort(),
-            'ASSESS_ANONYMOUS_RESULT_CHECKED' => $assess['anonymous_result'] ? 'checked="checked"' : '',
-            'ASSESS_NOTIFY_AUTHOR_CHECKED'    => $assess['notify_author'] ? 'checked="checked"' : '',
-            'ASSESS_COMPLETION_MESSAGE'       => Scrub::text($assess['completion_message']),
+            'ASSESS_ANONYMOUS_RESULT_CHECKED' => $survey['anonymous_result'] ? 'checked="checked"' : '',
+            'ASSESS_NOTIFY_AUTHOR_CHECKED'    => $survey['notify_author'] ? 'checked="checked"' : '',
+            'ASSESS_COMPLETION_MESSAGE'       => Scrub::text($survey['completion_message']),
             'HAS_ALL_QUESTIONS'               => 'large-8',
         )
     );
@@ -174,7 +174,7 @@ if (!empty($_POST)) {
      */
     $this->setVar(
         array(
-            'MAX_ATTEMPTS_CHECKED' => $assess['max_attempts'] == 0 ? 'checked="checked"' : '',
+            'MAX_ATTEMPTS_CHECKED' => $survey['max_attempts'] == 0 ? 'checked="checked"' : '',
         )
     );
 
@@ -192,8 +192,8 @@ if (!empty($_POST)) {
             'class' => '',
         ],
         [
-            'text' => $assess['title'],
-            'href' => "/survey/summary/{$assess['assess_id']}",
+            'text' => $survey['title'],
+            'href' => "/survey/summary/{$survey['assess_id']}",
             'class' => 'active',
         ]
     ]);
