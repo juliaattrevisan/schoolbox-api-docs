@@ -112,7 +112,7 @@ class PredicateBuilder
      */
     public function like($columnName, $columnValue)
     {
-        return $this->addPredicate($columnName, '%' . $this->database->quoteForLike($columnValue) . '%', 'LIKE');
+        return $this->addPredicate($columnName, $this->database->quoteForLike($columnValue), 'LIKE');
     }
 
     /**
