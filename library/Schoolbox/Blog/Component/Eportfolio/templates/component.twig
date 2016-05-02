@@ -71,6 +71,7 @@
 
                             <article>
                                 {{ blog.getBody | raw }}
+
                                 {% if blogImages[blog.getId] | length > 0 %}
 
                                     <ul class="inline-list img-gallery" data-image-gallery="">
@@ -80,6 +81,7 @@
                                     </ul>
 
                                 {% endif %}
+
                                 {% if blogComments[blog.getId] | length > 0 %}
                                     <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="button icon-chat" data-numcomments="{{ blogComments[blog.getId] | length }}">Show Comments ({{ blogComments[blog.getId] | length }})</a>
                                 {% endif %}

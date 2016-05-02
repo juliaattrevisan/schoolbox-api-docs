@@ -190,7 +190,7 @@ class Blog extends DeprecatedModel {
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                            AND `deleted_at` IS NULL
+                            AND `blog`.`deleted_at` IS NULL
                         ORDER BY `$sort_by` $sort_dir
                         LIMIT $offset, $limit;
             ";
@@ -206,7 +206,7 @@ class Blog extends DeprecatedModel {
                                 AND `userAccess`.uid = {$_SESSION['id']}
                             WHERE (`perms`.cid OR `userAccess`.sid)
                                 AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                                AND `deleted_at` IS NULL
+                                AND `blog`.`deleted_at` IS NULL
             ";
 
             $count = $this->db->getOne($count_query);

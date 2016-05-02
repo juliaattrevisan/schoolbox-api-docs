@@ -80,24 +80,21 @@
                             <p class="meta">Posted {{ blog.getCreatedAt.getLong }}</p>
                         </div>
 
-                        <article>{{ blog.getBody | raw }}</article>
+                        <article>
 
-                        {% if blogImages[blog.getId] | length > 0 %}
+                            {{ blog.getBody | raw }}
 
-                            <h2 class="subheader">Image Gallery</h2>
-                            <div class="row">
-                                <div class="small-12 island">
-                                    <section class="content no-margin">
-                                        <ul class="inline-list img-gallery" data-image-gallery="">
-                                            {% for image in blogImages[blog.getId] %}
-                                                <li><a href="/storage/image.php?size=maxsize&hash={{ image.hash }}" title="Image {{ loop.index + 1 }}" rel="lightbox"><img src="/storage/image.php?size=constrain200&hash={{ image.hash }}" alt="Image {{ loop.index + 1 }}"></a></li>
-                                            {% endfor %}
-                                        </ul>
-                                    </section>
-                                </div>
-                            </div>
+                            {% if blogImages[blog.getId] | length > 0 %}
 
-                        {% endif %}
+                                <ul class="inline-list img-gallery" data-image-gallery="">
+                                    {% for image in blogImages[blog.getId] %}
+                                        <li><a href="/storage/image.php?size=maxsize&hash={{ image.hash }}" title="Image {{ loop.index + 1 }}" rel="lightbox"><img src="/storage/image.php?size=constrain200&hash={{ image.hash }}" alt="Image {{ loop.index + 1 }}"></a></li>
+                                    {% endfor %}
+                                </ul>
+
+                            {% endif %}
+
+                        </article>
 
                         <ul class="information-list reply">
 

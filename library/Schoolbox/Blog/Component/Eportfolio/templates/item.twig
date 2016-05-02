@@ -57,25 +57,18 @@
         </section>
 
         <section class="content">
-            <article>{{ record.getBody | raw }}</article>
+            <article>
+                {{ record.getBody | raw }}
+
+                {% if images | length > 0 %}
+                    <ul class="inline-list img-gallery" data-image-gallery="">
+                        {% for image in images %}
+                            <li><a href="/storage/image.php?size=maxsize&hash={{ image.hash }}" title="Image {{ loop.index + 1 }}" rel="lightbox"><img src="/storage/image.php?size=constrain200&hash={{ image.hash }}" alt="Image {{ loop.index + 1 }}"></a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </article>
         </section>
-
-        {% if images | length > 0 %}
-
-            <h2 class="subheader">Image Gallery</h2>
-            <div class="row">
-                <div class="small-12 island">
-                    <section class="content no-margin">
-                        <ul class="inline-list img-gallery" data-image-gallery="">
-                            {% for image in images %}
-                                <li><a href="/storage/image.php?size=maxsize&hash={{ image.hash }}" title="Image {{ loop.index + 1 }}" rel="lightbox"><img src="/storage/image.php?size=constrain200&hash={{ image.hash }}" alt="Image {{ loop.index + 1 }}"></a></li>
-                            {% endfor %}
-                        </ul>
-                    </section>
-                </div>
-            </div>
-
-        {% endif %}
 
         {% if comments | length > 0 %}
 

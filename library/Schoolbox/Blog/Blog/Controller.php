@@ -399,6 +399,7 @@ class Controller extends Base
 
         $blogs = $this->getBlogMapper()->findByColumn("folder_id", $id)->sortBy('createdAt', 'desc');
         $blogComments = [];
+        $blogImages = [];
 
         $dateSelectorArray = [];
         $blogsSelectedMonth = [];
@@ -415,6 +416,7 @@ class Controller extends Base
             if ($blog->getCreatedAt()->getYear() == $year && $blog->getCreatedAt()->getMonth() == $month) {
 
                 $blogComments[$blog->getId()] = $this->getBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
+                $blogImages[$blog->getId()] = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
 
                 /** @var BlogCommentModel $comment */
                 foreach ($blogComments[$blog->getId()] as $comment) {
@@ -434,6 +436,7 @@ class Controller extends Base
                     'session'           => $_SESSION,
                     'folder'            => $folder,
                     'blogs'             => $blogsSelectedMonth,
+                    'blogImages'        => $blogImages,
                     'blogComments'      => $blogComments,
                     'dateSelectorArray' => $dateSelectorArray,
                     'WRITE_ACCESS'      => WRITE_ACCESS,
