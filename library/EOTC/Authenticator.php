@@ -9,7 +9,7 @@
  */
 
 namespace EOTC;
-
+use \Schoolbox\User;
 
 class Authenticator {
 
@@ -40,10 +40,10 @@ class Authenticator {
 	/**
 	 * Determine whether the specified user can spawn an ETOC event
 	 *
-	 * @param \Schoolbox\User $user
+	 * @param User $user
 	 * @return bool
 	 */
-	public function isEOTCCreator(\Schoolbox\User $user) {
+	public function isEOTCCreator(User $user) {
 		if ($user->getRole()->isStaff() || $user->isSuperuser()) {
 			return true;
 		}
@@ -55,10 +55,10 @@ class Authenticator {
 	 * Determine whether the specified user is an EOTC Administrator
 	 * (a staff user with at least one valid EOTC Permission assigned)
 	 *
-	 * @param \Schoolbox\User $user
+	 * @param User $user
 	 * @return bool
 	 */
-	public function isEOTCAdministrator(\Schoolbox\User $user) {
+	public function isEOTCAdministrator(User $user) {
 		if ($user->isSuperuser()) {
 			return true;
 		}
@@ -73,14 +73,65 @@ class Authenticator {
 	}
 
 	/**
-	 * Allow event authors to modify status of events from In Principle
-	 * to the next status
+	 * Determine whether the specified user is an EOTC Subscribed User
+	 * This encompasses Attendance Officer, Operations Officer, etc
+	 * and whatever other roles STK uses to manage their stuff
 	 *
-	 * @param \Schoolbox\User $user
+	 * @param User $user
 	 * @param Event $event
 	 * @return bool
 	 */
-	public function canSelfPromote(\Schoolbox\User $user, Event $event) {
+	public function isSubscribedUser(User $user, Event $event)
+	{
+		$allSubscriptions = $this->getPermissionMapper()->findSubscriptionsByUser($user);
+
+		foreach ($allSubscriptions as $currentSubscription) {
+			$inCampus = $this->isPermissionInCampus($currentSubscription, $event);
+			$hasStatus = $this->isPermissionInStatus($currentSubscription, $event);
+
+			if ($inCampus && $hasStatus) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Subscribed User has subscribed to the Event's campus
+	 *
+	 * @param EventPermission $permission
+	 * @param Event $event
+	 * @return bool
+	 */
+	private function isPermissionInCampus(EventPermission $permission, Event $event)
+	{
+
+		return false;
+	}
+
+	/**
+	 * Subscribed User has subscribed to the Event's current status
+	 *
+	 * @param EventPermission $permission
+	 * @param Event $event
+	 * @return bool
+	 */
+	private function isPermissionInStatus(EventPermission $permission, Event $event)
+	{
+
+		return false;
+	}
+
+	/**
+	 * Allow event authors to modify status of events from In Principle
+	 * to the next status
+	 *
+	 * @param User $user
+	 * @param Event $event
+	 * @return bool
+	 */
+	public function canSelfPromote(User $user, Event $event) {
 		if ($event->getMetadata()->getStatus()->isInPrinciple()) {
 			if ($event->getAuthor()->getId() == $user->getId()) {
 				return true;
@@ -100,11 +151,11 @@ class Authenticator {
 	 * Determine whether the current user's permissions allow them
 	 * to change the status of $event
 	 *
-	 * @param \Schoolbox\User $user
+	 * @param User $user
 	 * @param Event $event
 	 * @return bool
 	 */
-	public function canPromote(\Schoolbox\User $user, Event $event) {
+	public function canPromote(User $user, Event $event) {
 		if ($user->isSuperuser()) {
 			return true;
 		}
