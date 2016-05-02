@@ -10,9 +10,11 @@
  */
 
 use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\IDatabase;
 use DebugBar\DataCollector\PDO as DebugPDO;
 
-class Database implements Serializable {
+class Database implements IDatabase, Serializable
+{
     /**
      * An instance of database
      *
@@ -176,7 +178,7 @@ class Database implements Serializable {
      * @param array  $driverOptions
      * @return PDOStatement
      */
-    public function prepare($statement, $driverOptions = array()) {
+    public function prepare($statement, array $driverOptions = array()) {
 
         return $this->connection->prepare($statement, $driverOptions);
 
@@ -191,7 +193,7 @@ class Database implements Serializable {
      * @param array  $args
      * @return PDOStatement
      */
-    public function query($statement, $args = null) {
+    public function query($statement, array $args = null) {
         if (empty($args)) {
             return $this->connection->query($statement);
         }
