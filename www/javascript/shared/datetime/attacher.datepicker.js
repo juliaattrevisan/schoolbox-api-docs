@@ -17,10 +17,16 @@
             nextText: '&raquo;',
             prevText: '&laquo;',
             onSelect: function (string) {
-                var input = $(this);
-                $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
-                    input.val(data.time).blur();
-                })
+                var input         = $(this);
+                var previousValue = input.data('previousValue') || "";
+
+                // jQuery datepicker no longer triggers a change event.
+                // Do it manually.
+                if (string != previousValue) {
+                    $(this).trigger('change');
+                }
+                input.data('previousValue', string);
+
             }
         });
     })
