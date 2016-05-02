@@ -69,33 +69,23 @@
                                 </nav>
                             {% endif %}
 
-                            <article>{{ blog.getBody | raw }}</article>
+                            <article>
+                                {{ blog.getBody | raw }}
+                                {% if blogImages[blog.getId] | length > 0 %}
 
-                            {% if blogImages[blog.getId] | length > 0 %}
+                                    <ul class="inline-list img-gallery" data-image-gallery="">
+                                        {% for image in blogImages[blog.getId] %}
+                                            <li><a href="/storage/image.php?size=maxsize&hash={{ image.hash }}" title="Image {{ loop.index + 1 }}" rel="lightbox"><img src="/storage/image.php?size=square128&hash={{ image.hash }}" alt="Image {{ loop.index + 1 }}"></a></li>
+                                        {% endfor %}
+                                    </ul>
 
-                                <div class="row">
-                                    <div class="small-12 island">
-                                        <section class="content no-margin">
-                                            <ul class="inline-list img-gallery" data-image-gallery="">
-                                                {% for image in blogImages[blog.getId] %}
-                                                    <li><a href="/storage/image.php?size=maxsize&hash={{ image.hash }}" title="Image {{ loop.index + 1 }}" rel="lightbox"><img src="/storage/image.php?size=square128&hash={{ image.hash }}" alt="Image {{ loop.index + 1 }}"></a></li>
-                                                {% endfor %}
-                                            </ul>
-                                        </section>
-                                    </div>
-                                </div>
-
-                            {% endif %}
-
-                            <div class="content">
-
+                                {% endif %}
                                 {% if blogComments[blog.getId] | length > 0 %}
                                     <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="button icon-chat" data-numcomments="{{ blogComments[blog.getId] | length }}">Show Comments ({{ blogComments[blog.getId] | length }})</a>
                                 {% endif %}
 
                                 <a data-toggle="commentform-{{ blog.getId }}" class='button icon-add' >Add Comment</a>
-
-                            </div>
+                            </article>
 
                             <ul class="information-list reply" id="blogComment_{{ blog.getId }}">
 
