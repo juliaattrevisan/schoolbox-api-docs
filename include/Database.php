@@ -44,7 +44,7 @@ class Database implements Serializable {
     /**
      * An array of additional PDO connection options
      *
-     * @var Array
+     * @var array
      */
     private $options;
 
@@ -79,10 +79,10 @@ class Database implements Serializable {
 	/**
 	 * Establishes the database connection
 	 *
-	 * @param String $dsn
-	 * @param String $username
-	 * @param String $password
-	 * @param Array $options
+	 * @param string $dsn
+	 * @param string $username
+	 * @param string $password
+	 * @param array  $options
 	 * @throws Schoolbox\External\Exception
 	 * @return Bool
 	 */
@@ -172,8 +172,8 @@ class Database implements Serializable {
      * Wrapper for PDO::prepare
      * PDO::prepare prepares a statement for execution and returns a PDOStatement object.
      *
-     * @param String $statement
-     * @param Array $driverOptions
+     * @param string $statement
+     * @param array  $driverOptions
      * @return PDOStatement
      */
     public function prepare($statement, $driverOptions = array()) {
@@ -187,7 +187,7 @@ class Database implements Serializable {
      * PDO::query() executes an SQL statement in a single function call, returning the result set (if any)
      * returned by the statement as a PDOStatement object.
      *
-     * @param String $statement
+     * @param string $statement
      * @param array  $args
      * @return PDOStatement
      */
@@ -203,8 +203,8 @@ class Database implements Serializable {
     /**
      * Wrapper for PDO::quote
      *
-     * @param $string
-     * @param int $parameter_type
+     * @param string $string
+     * @param int    $parameter_type
      * @return string
      */
     public function quote($string, $parameter_type = PDO::PARAM_STR) {
@@ -272,8 +272,8 @@ class Database implements Serializable {
      * on the underlying driver. For example, PDO_PGSQL() requires you to specify the name of a sequence object
      * for the name parameter.
      *
-     * @param Null $name
-     * @return String
+     * @param null $name
+     * @return string
      */
     public function lastInsertId($name = null) {
 
@@ -284,6 +284,7 @@ class Database implements Serializable {
     /**
      * Wrapper for PDO::beginTransaction
      * Initiates a transaction
+     *
      * @return bool true on success or false on failure.
      */
     public function beginTransaction() {
@@ -294,6 +295,7 @@ class Database implements Serializable {
      * Wrapper for PDO::commit
      * Commits a transaction
      * @link http://php.net/manual/en/pdo.commit.php
+     *
      * @return bool true on success or false on failure.
      */
     public function commit() {
@@ -305,6 +307,7 @@ class Database implements Serializable {
      * Wrapper for PDO::rollBack
      * Rolls back a transaction
      * @link http://php.net/manual/en/pdo.rollback.php
+     *
      * @return bool true on success or false on failure.
      */
     public function rollBack() {
@@ -315,6 +318,7 @@ class Database implements Serializable {
      * Wrapper for PDO::inTransaction
      * Checks if inside a transaction
      * @link http://php.net/manual/en/pdo.intransaction.php
+     *
      * @return bool true if a transaction is currently active, and false if not.
      */
     public function inTransaction() {
@@ -324,7 +328,7 @@ class Database implements Serializable {
     /**
      * Returns whether or not the database connection has been initialised.
      *
-     * @return Bool
+     * @return bool
      */
     public function isConnected() {
         if (isset($this->connection) && !empty($this->connection)) {
