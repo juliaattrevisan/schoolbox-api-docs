@@ -163,10 +163,9 @@ class TimetableStructure extends AbstractImporter
 //                'title'    => $title,
 //            ]);
             $period = new TimetablePeriod();
-            $this->log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
             try {
-                $periodStart  = new Alaress_Date_Format($row['Period Start'], ['H:i', 'G:ia']);
-                $periodFinish = new Alaress_Date_Format($row['Period Finish'], ['H:i', 'G:ia']);
+                $periodStart  = new Alaress_Date_Format($row['Period Start'], ['H:i', 'G:ia', 'Hi']);
+                $periodFinish = new Alaress_Date_Format($row['Period Finish'], ['H:i', 'G:ia', 'Hi']);
             } catch (\InvalidArgumentException $e) {
                 $this->log->warning('"Period Start" and "Period Finish" must both be times in HH:MM format');
                 continue;
