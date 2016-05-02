@@ -15,16 +15,25 @@ use Schoolbox\External\Normalise\User;
 
 class Staff extends IteratorIterator
 {
+    use StackableTrait;
+
     /**
-     * Return the current element
-     *
+     * @return string
+     */
+    protected function getIdField()
+    {
+        return 'staff_id';
+    }
+
+    /**
+     * @param  array $preStack
      * @return User\Staff
      */
-    public function current()
+    public function buildFromStack($preStack)
     {
         // Build a normalized object out of the current item
         // (copypasted from Adapter->getStaffUserAccountInfo)
-        $currentResult = parent::current();
+        $currentResult = current($preStack);
         $staff         = new User\Staff();
         $staff
             ->setId($currentResult['staff_id'])
@@ -52,13 +61,17 @@ class Staff extends IteratorIterator
             ->setActive($currentResult['active_flag'])
         ;
 
-        /* Email
+        /* Email - one for every item in stack
          */
-        $email = array_merge(
-            preg_split('/[,;]/', $currentResult['email']),
-            preg_split('/[,;]/', $currentResult['occup_email'])
-        );
-        foreach ($email as $key => $anEmail) {
+        $email = [];
+        foreach ($preStack as $result) {
+            $email = array_merge(
+                $email,
+                preg_split('/[,;]/', $result['email']),
+                preg_split('/[,;]/', $result['occup_email'])
+            );
+        }
+        foreach (array_unique($email) as $key => $anEmail) {
             $currentEmail = new User\Common\Email();
             $currentEmail->setAddress($anEmail);
 
