@@ -200,8 +200,6 @@
 				];
 
 				for (var i = 0; i < startDatetime.length; i++) {
-					console.log('Comparing ' + startDatetime[i] + ' ' + endDatetime[i]);
-
 					if (startDatetime[i] != endDatetime[i]) {
 						return true;
 					}
