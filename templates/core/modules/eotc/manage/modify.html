@@ -25,23 +25,23 @@
             ajax: {
                 url:      '/ajax/user.php',
                 type:     'GET',
-                data:     {groupID: '{STAFF_GROUP_TYPE_IDS}', showCampus: true},
+                data:     {roleTypeID: 'staff', showCampus: true},
                 dataType: 'json'
             },
             value: {EVENT_STAFF},
             multiple: true
-        })
+        });
 
         $('[data-suggest=teacher-in-charge]').selectizeSelector({
             ajax: {
                 url:      '/ajax/user.php',
                 type:     'GET',
-                data:     {groupID: '{STAFF_GROUP_TYPE_IDS}', showCampus: true},
+                data:     {roleTypeID: 'staff', showCampus: true},
                 dataType: 'json'
             },
             value: {EVENT_TEACHER_IN_CHARGE},
             multiple: false
-        })
+        });
 
         /* Confirmation when removing RAMS requirement
          */
