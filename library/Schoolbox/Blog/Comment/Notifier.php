@@ -16,7 +16,7 @@ use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
@@ -66,7 +66,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 */
 	public function bundleTriggers($bundle) {
 		// we only care about create
-		if($bundle->getMethod() == Mapper::METHOD_CREATE) {
+		if($bundle->getMethod() == BaseMapper::METHOD_CREATE) {
 
 			/** @var Comment $comment */
 			$comment = $bundle->getEvent()->getObject();
