@@ -52,7 +52,7 @@
                     <img src="/portrait.php?userId={{ record.getOwner.getExternalId }}&size=square64" />
                     <p>{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</p>
                 </a>
-                <p class="meta">{{ record.getCreatedAt.getLong }}</p>
+                <p class="meta">Posted by <a href="/search/user/{{ record.getOwner.getId }}">{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</a> {{ record.getCreatedAt.getRelativeTime }}</p>
             </div>
         </section>
 
@@ -94,7 +94,7 @@
                                         <img src="/portrait.php?userId={{ comment.getOwner.getExternalId }}&size=square64" />
                                         <p>{{ comment.getOwner.getFirstname }} {{ comment.getOwner.getLastname }}</p>
                                     </a>
-                                    <p class="meta">{{ comment.getCreatedAt.getLong }}</p>
+                                    <p class="meta">{{ comment.getCreatedAt.getRelativeTime }}</p>
                                 </div>
                             </div>
 
