@@ -456,57 +456,32 @@ class UnitInstanceMapper extends BaseMapper {
      * Gets all units and tasks for the given category.
      *
      * @param  int $category_id The category to get units for
+     * @param  int $courseId    If provided, restrict results to this course
      * @return UnitInstance[]|Collection
      */
-    public function findForCategoryId($category_id) {
-
-        /** @var UnitInstance[] $unit_instance_list */
-        $unit_instance_list = $this->findByColumn(
-            'category_id',
-            $category_id,
-            array(
-                'order' => array('open_date' => 'desc')
-            )
-        );
-
-        // Load tasks into each unit
-        /** @var Task\Instance[]|Collection $task_list */
-        $task_list = $this->findJoinedModelList('task', $unit_instance_list, ['order' => ['order' => 'asc',],]);
-
-        // Load completions for each unit, and load into task list
-        /** @var Task\InstanceCompletion[]|Collection $completion_list */
-        $completion_list = $this->getJoinMapper('task')
-            ->getJoinMapper('completion')
-            ->findLatestForList($task_list->getColumnValues('id'));
-
-        $grouped_completion_list = $completion_list->groupByCallback(
-            function($item) {
-                /** @var Task\InstanceCompletion $item */
-                return $item->getTaskInstance()->getId();
-            }
-        );
-        foreach ($task_list as $task) {
-            $grouped_list = $grouped_completion_list->getOffset($task->getId());
-            if ($grouped_list instanceof Collection) {
-                $task->setCompletionList($grouped_list);
-            }
+    public function findForCategoryId($category_id, $courseId = null)
+    {
+        /** @var UnitInstance[]|Collection $unit_instance_list */
+        if ($courseId) {
+            $query = "
+                SELECT {$this->getColumnString('ui')}
+                FROM {$this->getTable()} `ui`
+                INNER JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
+                WHERE `ui`.`category_id` = :category
+                AND `uc`.`parent` = :course
+            ";
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute(['category' => $category_id, 'course' => $courseId]);
+            $unit_instance_list = $this->hydrateList($statement, 'ui');
+        } else {
+            $unit_instance_list = $this->findByColumnList(
+                ['category_id' => $category_id,],
+                array(
+                    'order' => array('open_date' => 'desc')
+                )
+            );
         }
-
-        // Load task list for all units
-        $grouped_task_list = $task_list->groupByCallback(
-            function($item) {
-                /** @var Task\Instance $item */
-                return $item->getUnitInstance()->getId();
-            }
-        );
-        foreach ($unit_instance_list as $unit_instance) {
-            $task_list = $grouped_task_list->getOffset($unit_instance->getId());
-            if ($task_list instanceof Collection) {
-                $unit_instance->setTasks($task_list);
-            }
-        }
-
-        return $unit_instance_list;
+        return $this->augment($unit_instance_list);
     }
 
 
@@ -724,5 +699,52 @@ class UnitInstanceMapper extends BaseMapper {
         ]);
 
         return $this->hydrateList($statement, 'cui');
+    }
+
+    /**
+     * @param UnitInstance[]|Collection $unit_instance_list
+     *
+     * @return UnitInstance[]|Collection
+     */
+    protected function augment($unit_instance_list)
+    {
+        // Load tasks into each unit
+        /** @var Task\Instance[]|Collection $task_list */
+        $task_list = $this->findJoinedModelList('task', $unit_instance_list, ['order' => ['order' => 'asc',],]);
+
+        // Load completions for each unit, and load into task list
+        /** @var Task\InstanceCompletion[]|Collection $completion_list */
+        $completion_list = $this->getJoinMapper('task')
+            ->getJoinMapper('completion')
+            ->findLatestForList($task_list->getColumnValues('id'));
+
+        $grouped_completion_list = $completion_list->groupByCallback(
+            function ($item) {
+                /** @var Task\InstanceCompletion $item */
+                return $item->getTaskInstance()->getId();
+            }
+        );
+        foreach ($task_list as $task) {
+            $grouped_list = $grouped_completion_list->getOffset($task->getId());
+            if ($grouped_list instanceof Collection) {
+                $task->setCompletionList($grouped_list);
+            }
+        }
+
+        // Load task list for all units
+        $grouped_task_list = $task_list->groupByCallback(
+            function ($item) {
+                /** @var Task\Instance $item */
+                return $item->getUnitInstance()->getId();
+            }
+        );
+        foreach ($unit_instance_list as $unit_instance) {
+            $task_list = $grouped_task_list->getOffset($unit_instance->getId());
+            if ($task_list instanceof Collection) {
+                $unit_instance->setTasks($task_list);
+            }
+        }
+
+        return $unit_instance_list;
     }
 }
