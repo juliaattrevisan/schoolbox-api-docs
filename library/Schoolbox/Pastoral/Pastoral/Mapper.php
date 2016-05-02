@@ -22,6 +22,8 @@ use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Tags\Mapper as PastoralTagsMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
+use Schoolbox\Pastoral\Category\Mapper as PastoralCategoryMapper;
+use Schoolbox\Pastoral\Category\Model as PastoralCategoryModel;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
@@ -120,6 +122,7 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->joins('parent_id', self::class, 'id', null, null, 'parent', 'parent');
         $this->joins('type_id', PastoralTypeMapper::class, 'id', null, null, 'type', 'type');
+        $this->joins('category_id', PastoralCategoryMapper::class, 'id', null, null, 'category', 'category');
         $this->joins('severity_id', PastoralSeverityMapper::class, 'id', null, null, 'severity', 'severity');
         $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner', 'owner');
         $this->joins('student_id', UserMapper::class, 'id', null, null, 'student', 'student');

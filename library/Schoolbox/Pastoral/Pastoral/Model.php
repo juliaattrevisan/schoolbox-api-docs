@@ -29,6 +29,9 @@ class Model implements ISoftDeletable
     /** @var Pastoral\Type\Model */
     protected $type;
 
+    /** @var Pastoral\Category\Model */
+    protected $category;
+
     /** @var Pastoral\Severity\Model */
     protected $severity;
 
@@ -243,6 +246,22 @@ class Model implements ISoftDeletable
      */
     public function getType() {
         return $this->type;
+    }
+
+    /**
+     * @param Pastoral\Category\Model $category
+     * @return self
+     */
+    public function setCategory($category) {
+        $this->category = $category;
+        return $this;
+    }
+
+    /**
+     * @return Pastoral\Category\Model
+     */
+    public function getCategory() {
+        return $this->category;
     }
 
     /**

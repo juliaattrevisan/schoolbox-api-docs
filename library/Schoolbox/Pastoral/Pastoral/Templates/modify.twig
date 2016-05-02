@@ -13,6 +13,24 @@
 
         $.fn.alaressEditor();
 
+        function loadCategories() {
+            var pastoralType = $('[data-type]').val();
+
+            $('[data-category]').remove();
+
+            $.get('/pastoral/categories/' + pastoralType).success(function(data) {
+
+                $.each(data, function() {
+                    $('[data-category-select]').append('<option data-category value="' + this.id + '">' + this.name + '</option>')
+                });
+
+            });
+        }
+
+        $('[data-type]').change(function() {
+            loadCategories();
+        });
+
         $('#tags').selectizeSelector({
             ajax: {
                 url:      '/ajax/tags.php',
@@ -185,11 +203,23 @@
                         </label>
                     </div>
                     <div class="small-12 medium-6 columns">
-                    <label>
+                        <label>
                             Type
-                            <select class="required" name="typeId">
+                            <select data-type class="required" name="typeId">
                                 {% for type in types %}
                                     <option {% if type.id == record.getType.getId %}selected{% endif %} value="{{ type.id }}">{{ type.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Sub-Type/Category
+                            <select data-category-select name="categoryId">
+                                {% for category in categories %}
+                                    {% if category.pastoralTypeId == record.getType.getId %}
+                                        <option data-category {% if category.id == record.getCategory.getId %}selected{% endif %} value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endif %}
                                 {% endfor %}
                             </select>
                         </label>

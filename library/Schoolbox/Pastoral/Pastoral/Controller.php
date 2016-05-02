@@ -25,6 +25,8 @@ use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Comment\Model as PastoralCommentModel;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
+use Schoolbox\Pastoral\Category\Mapper as PastoralCategoryMapper;
+use Schoolbox\Pastoral\Category\Model as PastoralCategoryModel;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Schoolbox\Pastoral\Tags\Mapper as PastoralTagsMapper;
@@ -50,6 +52,11 @@ class Controller extends Base
      */
     protected $userAccessMapper;
 
+    /**
+     * @var PastoralCategoryMapper
+     */
+    protected $pastoralCategoryMapper;
+    
     /**
      * @var PastoralTypeMapper
      */
@@ -110,6 +117,7 @@ class Controller extends Base
         $this->setFileMapper(FileMapper::getInstance());
         $this->setPastoralMapper(PastoralMapper::getInstance());
         $this->setUserAccessMapper(UserAccessMapper::getInstance());
+        $this->setPastoralCategoryMapper(PastoralCategoryMapper::getInstance());
         $this->setPastoralTypeMapper(PastoralTypeMapper::getInstance());
         $this->setPastoralSeverityMapper(PastoralSeverityMapper::getInstance());
         $this->setPastoralTagsMapper(PastoralTagsMapper::getInstance());
@@ -172,6 +180,16 @@ class Controller extends Base
         return $result;
     }
 
+    
+    public function getCategories($typeId) {
+
+        $results = ($this->getPastoralCategoryMapper()->findByColumn('pastoral_type_id', $typeId)->sortBy("name", "asc"));
+
+        header("Content-type: application/json");
+        echo json_encode($results->jsonSerialize());
+        exit;
+    }
+    
     /**
      * Generate a pastoral report with the relevant filtering applied, this version has the accordion and pagination
      */
@@ -616,6 +634,7 @@ class Controller extends Base
                     'id'                => '',
                     'record'            => null,
                     'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
+                    'categories'        => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),
                     'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
                     'roles'             => $this->getRoleMapper()->findAll(),
                     'attachzone'        => $this->getAttachZone(),
@@ -660,6 +679,7 @@ class Controller extends Base
                     'session'           => $_SESSION,
                     'record'            => $record,
                     'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
+                    'categories'        => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),
                     'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
                     'roles'             => $this->getRoleMapper()->findAll(),
                     'WRITE_ACCESS'      => WRITE_ACCESS,
@@ -814,6 +834,8 @@ class Controller extends Base
                 try {
                     /** @var PastoralTypeModel $type */
                     $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
+                    /** @var PastoralCategoryModel $type */
+                    $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
                     /** @var PastoralSeverityModel $severity */
                     $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
                 } catch (MapperException $e) {
@@ -823,6 +845,7 @@ class Controller extends Base
                 $record->setStudent($student);
                 $record->setHeading($this->getRequest()->post["heading"]);
                 $record->setType($type);
+                $record->setCategory($category);
                 $record->setSeverity($severity);
                 $record->setBody($this->getRequest()->post["body"]);
                 $record->setPrivate($this->getRequest()->post["private"]);
@@ -918,6 +941,8 @@ class Controller extends Base
             try {
                 /** @var PastoralTypeModel $type */
                 $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
+                /** @var PastoralCategoryModel $type */
+                $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
                 /** @var PastoralSeverityModel $severity */
                 $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
             } catch (MapperException $e) {
@@ -926,6 +951,7 @@ class Controller extends Base
 
             $record->setHeading($this->getRequest()->post["heading"]);
             $record->setType($type);
+            $record->setCategory($category);
             $record->setSeverity($severity);
             $record->setBody($this->getRequest()->post["body"]);
             $record->setPrivate($this->getRequest()->post["private"]);
@@ -1224,6 +1250,20 @@ class Controller extends Base
     public function getPastoralTypeMapper() {
         return $this->pastoralTypeMapper;
     }
+
+    /**
+     * @param $pastoralCategoryMapper
+     */
+    public function setPastoralCategoryMapper($pastoralCategoryMapper) {
+        $this->pastoralCategoryMapper = $pastoralCategoryMapper;
+    }
+
+    /**
+     * @return PastoralCategoryMapper
+     */
+    public function getPastoralCategoryMapper() {
+        return $this->pastoralCategoryMapper;
+    }    
 
     /**
      * @param $pastoralSeverityMapper
