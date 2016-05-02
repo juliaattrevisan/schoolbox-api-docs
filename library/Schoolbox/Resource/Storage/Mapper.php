@@ -25,7 +25,7 @@ use Schoolbox\Video\QueueMapper;
  *
  * @package Schoolbox\Resource\Storage
  *
- * @method Model hydrate()
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel()
  */
 class Mapper extends Schoolbox\Mapper implements Receiver
