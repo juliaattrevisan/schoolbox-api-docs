@@ -27,6 +27,7 @@ use Schoolbox\Blog\EportfolioComment\Model as EportfolioBlogCommentModel;
 use Schoolbox\Blog\EportfolioComment\Mapper as EportfolioBlogCommentMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Eportfolio\PageMapper as EportfolioPageMapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Controller extends Base
 {
@@ -40,6 +41,7 @@ class Controller extends Base
         $this->setUserAccessMapper(UserAccessMapper::getInstance());
         $this->setRoleMapper(RoleMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
+        $this->setFileMapper(FileMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setEportfolioBlogMapper(EportfolioBlogMapper::getInstance());
         $this->setEportfolioBlogCommentMapper(EportfolioBlogCommentMapper::getInstance());
@@ -156,6 +158,7 @@ class Controller extends Base
 
                 $hash_array = explode(":", $hash);
 
+
                 // Only add attachments which don't already exist
 
                 if (!in_array($hash_array[1], $retainedAttachments)) {
@@ -178,6 +181,7 @@ class Controller extends Base
      * @param int $ownerId      The owner of the eportfolio we are viewing
      * @param int $pageId       The page on the eportfolio we are viewing
      * @param int $id           The id of blog article we are viewing
+     * @throws \Schoolbox\Application\Exception
      */
     public function getItem($ownerId, $pageId, $id)
     {
@@ -384,7 +388,7 @@ class Controller extends Base
      * @param int $pageId       ID of the e-portfolio page of the blog into which we are inserting the new blog psot
      */
     public function getArchiveCurrent($ownerId, $pageId) {
-        return $this->getArchive($ownerId, $pageId, date("Y"), date("n"));
+        $this->getArchive($ownerId, $pageId, date("Y"), date("n"));
     }
 
     /**
@@ -462,6 +466,11 @@ class Controller extends Base
      * @var UserAccessMapper
      */
     protected $userAccessMapper;
+
+    /**
+     * @var FileMapper;
+     */
+    protected $fileMapper;
 
     /**
      * @var RoleMapper
@@ -608,6 +617,20 @@ class Controller extends Base
      */
     public function getEportfolioPageMapper() {
         return $this->eportfolioPageMapper;
+    }
+
+    /**
+     * @param $fileMapper
+     */
+    public function setFileMapper($fileMapper) {
+        $this->fileMapper = $fileMapper;
+    }
+
+    /**
+     * @return FileMapper
+     */
+    public function getFileMapper() {
+        return $this->fileMapper;
     }
 }
 

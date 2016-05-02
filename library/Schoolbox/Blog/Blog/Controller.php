@@ -27,6 +27,7 @@ use Schoolbox\Blog\Comment\Mapper as BlogCommentMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Controller extends Base
 {
@@ -42,6 +43,7 @@ class Controller extends Base
         $this->setUserMapper(UserMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
+        $this->setFileMapper(FileMapper::getInstance());
         $this->setBlogMapper(BlogMapper::getInstance());
         $this->setBlogCommentMapper(BlogCommentMapper::getInstance());
         $this->setBlogImageMapper(BlogImageMapper::getInstance());
@@ -150,6 +152,11 @@ class Controller extends Base
             foreach ($this->getRequest()->post["attachment"] as $hash) {
 
                 $hash_array = explode(":", $hash);
+
+                if ($hash_array[0] == 'browse') {
+                    $file = $this->getFileMapper()->findById($hash_array[1]);
+                    $hash_array[1] = $file->getHash();
+                }
 
                 // Only add attachments which don't already exist
 
@@ -483,6 +490,11 @@ class Controller extends Base
     protected $blogCommentMapper;
 
     /**
+     * @var FileMapper;
+     */
+    protected $fileMapper;
+
+    /**
      * @var FolderMapper;
      */
     protected $folderMapper;
@@ -560,6 +572,20 @@ class Controller extends Base
      */
     public function getFolderMapper() {
         return $this->folderMapper;
+    }
+
+    /**
+     * @param $fileMapper
+     */
+    public function setFileMapper($fileMapper) {
+        $this->fileMapper = $fileMapper;
+    }
+
+    /**
+     * @return FileMapper
+     */
+    public function getFileMapper() {
+        return $this->fileMapper;
     }
 
     /**
