@@ -33,9 +33,17 @@ $page->setBlock(TEMPLATE_content, 'can_add_students', 'can_add_students_block');
 $page->setBlock(TEMPLATE_content, 'can_add_resources', 'can_add_resources_block');
 $page->setBlock('can_add_resources', 'resource', 'resource_block');
 $page->setBlock(TEMPLATE_content, 'can_promote_in_principle', 'can_promote_in_principle_block');
-$page->setBlock(TEMPLATE_content, 'rams_list', 'rams_list_block');
 
 $authenticator = new \EOTC\Authenticator();
+
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+$defaultTypeId = '';
+
+$page->setVar([
+    'ATTACH_ZONE' => ''
+]);
 
 /* Modify existing event
  */
@@ -51,9 +59,9 @@ if (is_numeric($_GET['eventID'])) {
 
     /* Edit rules
 	 */
-    $canAdminister = $authenticator->isEOTCAdministrator($_SESSION['user']);
-    $isAuthor = (($event->getAuthor()->getId() == $_SESSION['user']->getId()) && $authenticator->isEOTCCreator($_SESSION['user']));
-    $isTeacherInCharge = ($event->getTeacherInCharge() instanceof \Schoolbox\User) && ($event->getTeacherInCharge()->getId() == $_SESSION['user']->getId());
+    $canAdminister = $authenticator->isEOTCAdministrator($sessionUser);
+    $isAuthor = (($event->getAuthor()->getId() == $sessionUser->getId()) && $authenticator->isEOTCCreator($sessionUser));
+    $isTeacherInCharge = ($event->getTeacherInCharge() instanceof \Schoolbox\User) && ($event->getTeacherInCharge()->getId() == $sessionUser->getId());
 
     /* EOTC Administrators and event authors can edit this event
 	 */
@@ -71,6 +79,7 @@ if (is_numeric($_GET['eventID'])) {
 
         $allCampuses = $event->getCampusCollection()->getAll();
 
+        /** @var \Schoolbox\Campus $currentCampus */
         foreach ($allCampuses as $currentCampus) {
             $defaultCampusId[] = $currentCampus->getId();
         }
@@ -79,6 +88,7 @@ if (is_numeric($_GET['eventID'])) {
 		 */
         $staffSelected = array();
 
+        /** @var \Schoolbox\User $currentStaff */
         foreach ($event->getMetadata()->getStaffAttendees() as $currentStaff) {
             $staffSelected[] = array(
                 'id' => $currentStaff->getId(),
@@ -109,27 +119,22 @@ if (is_numeric($_GET['eventID'])) {
         ));
 
         // RAM in the RAMS
-        $page->setVar('rams_list_block', '');
-
         if ($event->getMetadata()->getRamsRequired()) {
+            $hashes = [];
+
             foreach ($event->getMetadata()->getRamsFiles() as $ramsFile) {
-                try {
-                    $mimetype = $ramsFile->getMimetype();
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $mimetype = MimetypeMapper::getInstance()->getUnknownMime();
-                }
-
-                $page->setVar(
-                    array(
-                        'EVENT_RAMS_HASH'              => $ramsFile->getHash(),
-                        'EVENT_RAMS_FILESIZE'          => $ramsFile->getSize(),
-                        'EVENT_RAMS_FILE'              => $ramsFile->getBasename(),
-                        'EVENT_RAMS_MIMETYPE_ICONFILE' => $mimetype->getIconFile(),
-                    )
-                );
-
-                $page->parse('rams_list_block', 'rams_list', true);
+                $hashes[] = $ramsFile->getHash();
             }
+
+            $zone = new \Schoolbox\Resource\Attachment\Zone('ramsZone');
+            $zone
+                ->setMulti(true)
+                ->attachFiles($hashes)
+                ->setThumbnailSize(64)
+                ->setModalTitle('Select RAMS files')
+                ->setMimeFilter('*/*')
+                ->setAttachPrompt('Attach files')
+                ->renderIntoSitePage($page, 'ATTACH_ZONE');
         }
 
         /* -_-
@@ -164,6 +169,8 @@ if (is_numeric($_GET['eventID'])) {
             'EVENT_REDIRECT' => $event->setupRedirect($_GET['returnTo'], $event->getStartDateTime()->getUsingFormat('d-m-Y'), $_GET['sid'], $_GET['userId']),
             'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
             'STAFF_GROUP_TYPE_IDS' =>  implode(';', $groupHandler->getStaffGroupTypeIds()),
+            'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
+            'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
         ));
 
         /* Recurrence
@@ -176,10 +183,15 @@ if (is_numeric($_GET['eventID'])) {
             $recurrence = $eventRecurrenceMapper->getSeriesRecurrence($event);
         }
 
+        /** @var $recurrenceStart \Alaress_Date_Format */
+        /** @var $recurrenceEnd \Alaress_Date_Format */
         if (!empty($recurrence)) {
+            $recurrenceStart = $recurrence['start'];
+            $recurrenceEnd = $recurrence['end'];
+
             $page->setVar('EVENT_REC_FREQ', ucfirst($recurrence['freq']));
-            $page->setVar('EVENT_REC_START', $recurrence['start']->getLongDateOnly());
-            $page->setVar('EVENT_REC_END', $recurrence['end']->getLongDateOnly());
+            $page->setVar('EVENT_REC_START', $recurrenceStart->getLongDateOnly());
+            $page->setVar('EVENT_REC_END', $recurrenceEnd->getLongDateOnly());
             $page->parse('recurring_reminder_block', 'recurring_reminder');
             $page->setVar('recurring_dates_block', '');
         } else {
@@ -221,6 +233,7 @@ if (is_numeric($_GET['eventID'])) {
 
         $i = 0;
 
+        /** @var \EOTC\ActivityLog\Log $currentLog */
         foreach ($event->getMetadata()->getActivityLog() as $currentLog) {
 
             /* If there are no activityLog items, mappers will spawn a single
@@ -259,7 +272,7 @@ if (is_numeric($_GET['eventID'])) {
         /* Cannot self-promote until a status is In Principle
 		 * Only an author can do it to his own event
 		 */
-        $authorSelfPromote = $isAuthor && $authenticator->canSelfPromote($_SESSION['user'], $event);
+        $authorSelfPromote = $isAuthor && $authenticator->canSelfPromote($sessionUser, $event);
         $teacherInChargeSelfPromote = $isTeacherInCharge && $authenticator->canSelfPromote($event->getTeacherInCharge(), $event);
 
         if ($authorSelfPromote || $teacherInChargeSelfPromote) {
@@ -275,7 +288,7 @@ if (is_numeric($_GET['eventID'])) {
 }
 /* Create new event
  */
-elseif ($authenticator->isEOTCCreator($_SESSION['user'])) {
+elseif ($authenticator->isEOTCCreator($sessionUser)) {
 
     /* Set up default dates
 	 */
@@ -311,8 +324,8 @@ elseif ($authenticator->isEOTCCreator($_SESSION['user'])) {
 	 * Even if you're not a teacher
 	 */
     $teacherInCharge = array(
-        'id' => $_SESSION['user']->getId(),
-        'name' => $_SESSION['user']->getFullname(),
+        'id' => $sessionUser->getId(),
+        'name' => $sessionUser->getFullname(),
     );
 
     /* -_-
@@ -328,7 +341,7 @@ elseif ($authenticator->isEOTCCreator($_SESSION['user'])) {
         'EVENT_RAMSREQUIRED_SELECTED' => 'checked="checked"',
         'EVENT_RAMS_UPLOADED' => 0,
         'EVENT_ID' => '',
-        'EVENT_AUTHOR_ID' => $_SESSION['user']->getId(),
+        'EVENT_AUTHOR_ID' => $sessionUser->getId(),
         'EVENT_TITLE' => '',
         'EVENT_TIMEINPUTS' => 'hide',
         'EVENT_START_DATE' => $event->getStartDateTime()->getLocalShort(),
@@ -348,6 +361,8 @@ elseif ($authenticator->isEOTCCreator($_SESSION['user'])) {
         'EVENT_STATUS_CLASS' => $status->getStyle(),
         'STUDENT_GROUP_TYPE_IDS' => implode(';', $groupHandler->getStudentGroupTypeIds()),
         'STAFF_GROUP_TYPE_IDS' =>  implode(';', $groupHandler->getStaffGroupTypeIds()),
+        'EVENT_RECURRENCE_COLLAPSE_STATE' => 'collapsed',
+        'EVENT_RECURRENCE_COLLAPSE_CLASS' => 'hide',
     ));
 
     /* Recurrence
@@ -382,10 +397,6 @@ elseif ($authenticator->isEOTCCreator($_SESSION['user'])) {
     $page->setVar(array(
         'can_promote_in_principle_block' => ''
     ));
-
-    /* There's no RAMS rammed in yet either
-	 */
-    $page->setVar('rams_list_block', '');
 }
 /* Nobody else should be here
  */

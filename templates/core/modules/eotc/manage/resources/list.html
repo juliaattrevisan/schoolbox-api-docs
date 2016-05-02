@@ -1,52 +1,72 @@
-<h1>Allocate Resources to {EVENT_NAME}</h1>
-<span class="header-actions">
-	<a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="button icon-previous">Back</a>
-</span>
+<ul class="breadcrumb">
+    <li><a href="/modules/eotc/myReview" title="EOTC">EOTC</a></li>
+    <li><a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" title="Modify {EVENT_NAME}">Modify {EVENT_NAME}</a></li>
+    <li class="active"><a href="#">Resource List</a></li>
+</ul>
 
-<form data-bookitemform action='/resource-booking/booking/bookItem/' method="get">
-     <fieldset>
-         <label>
-             Search for a resource
-             <select data-resourcebookingsuggest name="resourcebooking[]" multiple placeholder="Start typing the name of a resource"></select>
-         </label>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Allocate Resources to {EVENT_NAME}</h1>
+    </div>
+</div>
 
-         <input type="submit" value="Submit" />
-     </fieldset>
-</form>
+<div class="row">
+    <div class="small-12 island">
+        <form data-bookitemform action='/resource-booking/booking/bookItem/' method="get">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>Search for a resource</label>
+                        <select data-resourcebookingsuggest name="resourcebooking[]" multiple placeholder="Start typing the name of a resource"></select>
+                    </div>
+                </fieldset>
+            </section>
 
-<h2>Current Resource Bookings</h2>
-<table class="full-width">
-    <colgroup>
-        <col />
-        <col />
-        <col />
-        <col />
-        <col />
-    </colgroup>
-	<thead>
-		<tr>
-			<th>Resource Name</th>
-			<th>Booking Name</th>
-			<th>Start</th>
-			<th>End</th>
-			<th>Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-		<!-- BEGIN resourcebooking -->
-		<tr>
-			<td><a href="/resource-booking/item/{RESOURCE_ID}">{RESOURCE_NAME}</a></td>
-			<td><a href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit">{RESOURCEBOOKING_NAME}</a></td>
-			<td>{RESOURCEBOOKING_START}</td>
-			<td>{RESOURCEBOOKING_END}</td>
-			<td>
-                <a aria-haspopup="true" href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit" class="button no-text icon-modify" alt="Remove Booking" title="Update Booking"></a>
-                <a data-action="delete" aria-haspopup="true" href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" class="button no-text icon-delete" alt="Remove Booking" title="Remove Booking"></a>
-            </td>
-		</tr>
-		<!-- END resourcebooking -->
-	</tbody>
-</table>
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Current Resource Bookings</h2>
+
+        <table>
+            <colgroup>
+                <col />
+                <col />
+                <col />
+                <col />
+                <col />
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Resource Name</th>
+                <th>Booking Name</th>
+                <th>Start</th>
+                <th>End</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN resourcebooking -->
+            <tr>
+                <td><a href="/resource-booking/item/{RESOURCE_ID}">{RESOURCE_NAME}</a></td>
+                <td><a href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit">{RESOURCEBOOKING_NAME}</a></td>
+                <td>{RESOURCEBOOKING_START}</td>
+                <td>{RESOURCEBOOKING_END}</td>
+                <td class="actions-small-2">
+                    <nav>
+                        <a aria-haspopup="true" href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit" class="icon-modify" alt="Remove Booking" title="Update Booking"></a>
+                        <a aria-haspopup="true" href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" class="icon-delete" alt="Remove Booking" title="Remove Booking" data-action="delete"></a>
+                    </nav>
+                </td>
+            </tr>
+            <!-- END resourcebooking -->
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>

@@ -1,150 +1,205 @@
-<div class="eotc-status {EVENT_STATUS_CLASS}">{EVENT_STATUS}</div>
+<ul class="breadcrumb">
+    <li><a href="/modules/eotc/review" title="EOTC">EOTC</a></li>
+    <li class="active"><a href="#">{EVENT_TITLE}</a></li>
+</ul>
 
 <div class="row">
-    <div class="large-8 columns">
+    <div class="small-12 columns">
+        <div class="eotc-status {EVENT_STATUS_CLASS}">{EVENT_STATUS}</div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
         <h1>{EVENT_TITLE}</h1>
-        <time>{EVENT_START} &ndash; {EVENT_END}</time>
+    </div>
+</div>
 
-        <!-- BEGIN recurring_reminder -->
-        <p>
-            <strong>Recurring:</strong>
-            {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
-        </p>
-        <!-- END recurring_reminder -->
+<div class="row">
+    <div class="small-12 large-8 island">
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Event Details</h2>
+                </div>
+            </div>
+            <nav>
+                <a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="icon-modify" title="Modify Event"></a>
+                <a href="/calendar/full/{EVENT_DATESTAMP}/{EVENT_AUTHOR_ID}" class="icon-calendar" title="View In Calendar"></a>
+            </nav>
+        </div>
 
-        <p>
-            <strong>Related Campuses:</strong>
-            <!-- BEGIN event_campus -->
-            {EVENT_CAMPUS_NAME}
-            <!-- END event_campus -->
-        </p>
+        <section class="content">
+            <ul class="meta">
+                <li class="icon-calendar">
+                    {EVENT_START} &ndash; {EVENT_END}
+                </li>
 
-        <p>
-            <strong>Teacher in Charge:</strong>
-            <a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
-                {EVENT_TEACHER_IN_CHARGE_NAME}
-            </a>
-        </p>
+                <!-- BEGIN recurring_reminder -->
+                <li class="icon-calendar">
+                    Recurring {EVENT_REC_FREQ}, beginning <strong>{EVENT_REC_START}</strong> and ending <strong>{EVENT_REC_END}</strong>.
+                </li>
+                <!-- END recurring_reminder -->
 
-        <p>
-            <strong>Location:</strong> {EVENT_LOCATION}
-        </p>
+                <li>
+                    <strong>Related Campuses:</strong>
+                    <!-- BEGIN event_campus -->
+                    {EVENT_CAMPUS_NAME}
+                    <!-- END event_campus -->
+                </li>
 
-        <p>
-            {EVENT_DETAIL}
-        </p>
+                <li>
+                    <strong>Teacher in Charge:</strong>
+                    <a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
+                        {EVENT_TEACHER_IN_CHARGE_NAME}
+                    </a>
+                </li>
 
-        <p>
-            <b>Created by:</b> <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
-            on {EVENT_CREATED_AT}
-        </p>
+                <li>
+                    <strong>Location:</strong> {EVENT_LOCATION}
+                </li>
 
-        <a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="button icon-modify">Modify Event</a>
-        <a href="/calendar/full/{EVENT_DATESTAMP}/{EVENT_AUTHOR_ID}" class="button icon-calendar">View In Calendar</a>
+                <li>
+                    <strong>Created by:</strong>
+                    <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
+                    on {EVENT_CREATED_AT}
+                </li>
+            </ul>
+
+            <div>
+                {EVENT_DETAIL}
+            </div>
+        </section>
     </div>
 
-    <div class="large-4 columns">
+    <div class="small-12 large-4 island">
         <!-- BEGIN has_rams -->
-        <h2>RAMS Required</h2>
-        <ul>
-            <!-- BEGIN rams_list -->
-            <li>
-                <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" class="no-text icon-download" alt="Download" title="Download"></a>
-                <img src="/images/mime/22x22/{EVENT_RAMS_MIMETYPE_ICONFILE}" width="22" height="22" />{EVENT_RAMS_FILE}
-            </li>
-            <!-- END rams_list -->
-        </ul>
+        <h2 class='subheader'>RAMS Required</h2>
+
+        <section>
+            <ul class="information-list">
+                <!-- BEGIN rams_list -->
+                <li class='content'>
+                    <div class="small-12 compact avatar card">
+                        <a href="/storage/fetch.php?hash={EVENT_RAMS_HASH}" title="Download">
+                            <img src="/images/mime/60x60/{EVENT_RAMS_MIMETYPE_ICONFILE}" />
+                            <p>{EVENT_RAMS_FILE}</p>
+                        </a>
+                    </div>
+                </li>
+                <!-- END rams_list -->
+            </ul>
+        </section>
         <!-- END has_rams -->
     </div>
 </div>
 
 <div class="row">
-    <div class="large-12 columns">
-        <h2>People</h2>
-        <ul>
-            <li>
-                Staff:
-                <!-- BEGIN event_staff -->
-                <a href="/search/user/{EVENT_STAFF_ID}">{EVENT_STAFF_NAME}</a>
-                <!-- END event_staff -->
-            </li>
-            <li>
-                Students: {EVENT_STUDENT_COUNT}
-                <!-- BEGIN event_student -->
-                <!-- END event_student -->
-            </li>
-        </ul>
-        <a href="/modules/eotc/status/attendance/csv/{EVENT_ID}" class="button icon-export">Download CSV</a>
-        <a href="/modules/eotc/status/attendance/list/{EVENT_ID}" class="button icon-view">View List</a>
+    <div class="small-12 island">
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">People</h2>
+                </div>
+            </div>
+            <nav>
+                <a href="/modules/eotc/status/attendance/csv/{EVENT_ID}" class="icon-export" title="Download CSV"></a>
+                <a href="/modules/eotc/status/attendance/list/{EVENT_ID}" class="icon-view" title="View List"></a>
+            </nav>
+        </div>
+
+
+        <section class="content">
+            <ul class="information-list">
+                <li>
+                    Staff:
+                    <!-- BEGIN event_staff -->
+                    <a href="/search/user/{EVENT_STAFF_ID}">{EVENT_STAFF_NAME}</a>
+                    <!-- END event_staff -->
+                </li>
+                <li>
+                    Students: {EVENT_STUDENT_COUNT}
+                    <!-- BEGIN event_student -->
+                    <!-- END event_student -->
+                </li>
+            </ul>
+        </section>
     </div>
 </div>
 
 <div class="row">
-    <h2>Resources ({EVENT_RESOURCE_COUNT})</h2>
+    <div class="small-12 columns">
+        <h2 class="subheader">Resources ({EVENT_RESOURCE_COUNT})</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Resource Name</th>
-                <th>Booking Name</th>
-                <th>Start</th>
-                <th>End</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN event_resourcebooking -->
-            <tr>
-                <td><a href="/resource-booking/item/{EVENT_RESOURCE_ID}">{EVENT_RESOURCE_NAME}</a></td>
-                <td><a href="/resource-booking/booking/{EVENT_RESOURCEBOOKING_ID}/edit">{EVENT_RESOURCEBOOKING_NAME}</a></td>
-                <td>{EVENT_RESOURCEBOOKING_START}</td>
-                <td>{EVENT_RESOURCEBOOKING_END}</td>
-            </tr>
-            <!-- END event_resourcebooking -->
-        </tbody>
-    </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>Resource Name</th>
+                    <th>Booking Name</th>
+                    <th>Start</th>
+                    <th>End</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN event_resourcebooking -->
+                <tr>
+                    <td><a href="/resource-booking/item/{EVENT_RESOURCE_ID}">{EVENT_RESOURCE_NAME}</a></td>
+                    <td><a href="/resource-booking/booking/{EVENT_RESOURCEBOOKING_ID}/edit">{EVENT_RESOURCEBOOKING_NAME}</a></td>
+                    <td>{EVENT_RESOURCEBOOKING_START}</td>
+                    <td>{EVENT_RESOURCEBOOKING_END}</td>
+                </tr>
+                <!-- END event_resourcebooking -->
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- BEGIN has_event_activity_log -->
 <div class="row">
-    <h2>Activity Log</h2>
-    <table>
-        <tbody>
-            <!-- BEGIN event_activity_log -->
-            <tr>
-                <td>{EVENT_ACTIVITY_LOG_CREATED_AT}</td>
-                <td>{EVENT_ACTIVITY_LOG_MESSAGE}</td>
-            </tr>
-            <!-- END event_activity_log -->
-        </tbody>
-    </table>
+    <div class="small-12 columns">
+        <h2 class="subheader">Activity Log</h2>
+
+        <table>
+            <tbody>
+                <!-- BEGIN event_activity_log -->
+                <tr>
+                    <td>{EVENT_ACTIVITY_LOG_CREATED_AT}</td>
+                    <td>{EVENT_ACTIVITY_LOG_MESSAGE}</td>
+                </tr>
+                <!-- END event_activity_log -->
+            </tbody>
+        </table>
+    </div>
 </div>
 <!-- END has_event_activity_log -->
 
 <!-- BEGIN has_change_event_status -->
 <div class="row">
-    <h2>Change Event Status</h2>
-    <form action="/modules/eotc/status/modifyForm.php" method="post">
-        <input name='eventId' type="hidden" value="{EVENT_ID}">
+    <div class="small-12 island">
+        <h2 class="subheader">Change Event Status</h2>
 
-        <label>
-            Change Status
-            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Change the status of the event.">?</span>
-            <select name="statusId">
-                <!-- BEGIN event_status -->
-                <option value="{EVENT_STATUS_ID}" {EVENT_STATUS_SELECTED}>{EVENT_STATUS_NAME}</option>
-                <!-- END event_status -->
-            </select>
-        </label>
-        <label>
-            Comment
-            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Add a comment.">?</span>
-            <textarea name="comment"></textarea>
-        </label>
+        <form action="/modules/eotc/status/modifyForm.php" method="post">
+            <input name='eventId' type="hidden" value="{EVENT_ID}">
 
-        <input type="submit" value="Update" />
-    </form>
+            <section>
+                <fieldset class='content'>
+                    <div class="small-12 columns">
+                        <label>Change Status <span data-tooltip class="hint has-tip tip-top" title="Change the status of the event.">?</span></label>
+
+                        <select name="statusId">
+                            <!-- BEGIN event_status -->
+                            <option value="{EVENT_STATUS_ID}" {EVENT_STATUS_SELECTED}>{EVENT_STATUS_NAME}</option>
+                            <!-- END event_status -->
+                        </select>
+
+                        <label>Comment <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Add a comment.">?</span></label>
+                        <textarea name="comment"></textarea>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Update" />
+        </form>
+    </div>
 </div>
 <!-- END has_change_event_status -->
-
-<a href="/modules/eotc/review" class="button icon-previous">Back to Review EOTC Events</a>
-

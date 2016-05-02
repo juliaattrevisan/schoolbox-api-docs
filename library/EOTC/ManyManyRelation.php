@@ -99,7 +99,7 @@ class ManyManyRelation extends \Schoolbox\Mapper {
 	 *
 	 * @return array
 	 */
-	private function getJoin() {
+	public function getJoin() {
 		return $this->join;
 	}
 

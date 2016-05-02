@@ -1,63 +1,85 @@
-<h1>People attending {EVENT_NAME}</h1>
-<span class="header-actions">
-    <a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" class="button icon-previous">Back</a>
-</span>
+<ul class="breadcrumb">
+    <li><a href="/modules/eotc/myReview" title="EOTC">EOTC</a></li>
+    <li><a href="/modules/eotc/manage/modify.php?eventID={EVENT_ID}" title="Modify {EVENT_NAME}">Modify {EVENT_NAME}</a></li>
+    <li class="active"><a href="#">Attendance List</a></li>
+</ul>
 
-<div class="large-6 columns">
-    <form action="/modules/eotc/manage/attendance/add" method="post">
-        <input type="hidden" name="eventId" value="{EVENT_ID}" />
-        <fieldset>
-            <legend>Add Individual Student</legend>
-            
-            <label>
-                <select data-studentsuggest name="selected[]" multiple placeholder="Search Students"></select>
-            </label>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>People attending {EVENT_NAME}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 large-6 island">
+        <form action="/modules/eotc/manage/attendance/add" method="post">
+            <input type="hidden" name="eventId" value="{EVENT_ID}" />
+
+            <section>
+                <fieldset class="content">
+                    <legend>Add Individual Student</legend>
+
+                    <div class="small-12 columns">
+                        <label>Student</label>
+                        <select data-studentsuggest name="selected[]" multiple placeholder="Search Students"></select>
+                    </div>
+                </fieldset>
+            </section>
 
             <input type="submit" value="Add Students" />
-        </fieldset>
-    </form>
+        </form>
+    </div>
+    <div class="small-12 large-6 island">
+        <form action="/modules/eotc/manage/attendance/addByCourseCode" method="post">
+            <input type="hidden" name="eventId" value="{EVENT_ID}" />
+
+            <section>
+                <fieldset class="content">
+                    <legend>Add By Course Code</legend>
+
+                    <div class="small-12 columns">
+                        <div class="row">
+                            <div class="small-12 large-6 columns">
+                                <label>Category</label>
+                                <select data-selector name="filetype">
+                                    <option value="">Please select</option>
+                                    <!-- BEGIN filetype -->
+                                    <option value="{FILETYPE_ID}">{FILETYPE_NAME}</option>
+                                    <!-- END filetype -->
+                                </select>
+                            </div>
+                            <div class="small-12 large-6 columns">
+                                <label>Class Code</label>
+                                <select name="courseCode" disabled>
+                                    <option value="">Please select</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Add Students" />
+        </form>
+    </div>
 </div>
 
-<div class="large-6 columns">
-    <form action="/modules/eotc/manage/attendance/addByCourseCode" method="post">
-        <input type="hidden" name="eventId" value="{EVENT_ID}" />
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Current Attendees</h2>
 
-        <fieldset>
-            <legend>Add By Course Code</legend>
+        <form action="/modules/eotc/manage/attendance/remove" method="post">
+            <input type="hidden" name="eventId" value="{EVENT_ID}" />
 
-            <label>Category
-                <select data-selector name="filetype">
-                    <option value="">Please select</option>
-                    <!-- BEGIN filetype -->
-                    <option value="{FILETYPE_ID}">{FILETYPE_NAME}</option>
-                    <!-- END filetype -->
-                </select>
-            </label>
-            <label>Class Code
-                <select name="courseCode" disabled>
-                    <option value="">Please select</option>
-                </select>
-            </label>
-        </fieldset>
-        <input type="submit" value="Add Students" />
-    </form>
-</div>
-
-<div class="full-width">
-    <h2>Current Attendees</h2>
-
-    <form action="/modules/eotc/manage/attendance/remove" method="post">
-        <input type="hidden" name="eventId" value="{EVENT_ID}" />
-
-        <table data-attendees class="full-width">
-            <colgroup>
-                <col width="1" />
-                <col width="100"/>
-                <col />
-                <col />
-                <col />
-            </colgroup>
-            <thead>
+            <table data-attendees class="full-width">
+                <colgroup>
+                    <col width="1" />
+                    <col width="100"/>
+                    <col />
+                    <col />
+                    <col />
+                </colgroup>
+                <thead>
                 <tr>
                     <th>
                         <input id='selectall' data-selectall="true" type="checkbox" />
@@ -68,25 +90,26 @@
                     <th>Firstname</th>
                     <th>Group</th>
                 </tr>
-            </thead>
-            <tbody>
-            <!-- BEGIN student_attendee -->
-            <tr>
-                <td>
-                    <input id='student{STUDENT_ATTENDEE_ID}' name="selected[]" type="checkbox" value="{STUDENT_ATTENDEE_ID}" />
-                    <label for="student{STUDENT_ATTENDEE_ID}" class="checkbox-label"></label>
-                </td>
-                <td>{STUDENT_ATTENDEE_ID}</td>
-                <td>{STUDENT_ATTENDEE_LASTNAME}</td>
-                <td>{STUDENT_ATTENDEE_FIRSTNAME}</td>
-                <td>{STUDENT_ATTENDEE_ROLE_NAME}</td>
-            </tr>
-            <!-- END student_attendee -->
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                <!-- BEGIN student_attendee -->
+                <tr>
+                    <td>
+                        <input id='student{STUDENT_ATTENDEE_ID}' name="selected[]" type="checkbox" value="{STUDENT_ATTENDEE_ID}" />
+                        <label for="student{STUDENT_ATTENDEE_ID}" class="checkbox-label"></label>
+                    </td>
+                    <td>{STUDENT_ATTENDEE_ID}</td>
+                    <td>{STUDENT_ATTENDEE_LASTNAME}</td>
+                    <td>{STUDENT_ATTENDEE_FIRSTNAME}</td>
+                    <td>{STUDENT_ATTENDEE_ROLE_NAME}</td>
+                </tr>
+                <!-- END student_attendee -->
+                </tbody>
+            </table>
 
-        <input type="submit" value="Remove Selected" />
-    </form>
+            <input type="submit" value="Remove Selected" />
+        </form>
+    </div>
 </div>
 
 <script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
