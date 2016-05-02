@@ -29,10 +29,10 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		'EVENT_ID' => $event->getId(),
 		'EVENT_NAME' => $event->getTitle(),
 		'EVENT_NAME_ENCODED' => urlencode($event->getTitle()),
-		'EVENT_START_DATE' => $event->getStartDateTime()->getDateOnly(),
-		'EVENT_START_TIME' => $event->getStartDateTime()->getTimeOnly(),
-		'EVENT_END_DATE' => $event->getEndDateTime()->getDateOnly(),
-		'EVENT_END_TIME' => $event->getEndDateTime()->getTimeOnly(),
+		'EVENT_START_DATE' => $event->getStartDateTime()->getDatabaseDate(),
+		'EVENT_START_TIME' => $event->getStartDateTime()->getUsingFormat('H:i'),
+		'EVENT_END_DATE' => $event->getEndDateTime()->getDatabaseDate(),
+		'EVENT_END_TIME' => $event->getEndDateTime()->getUsingFormat('H:i'),
 	));
 
 	/* Render a list of existing bookings for this EOTC Event
