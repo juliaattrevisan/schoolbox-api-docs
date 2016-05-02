@@ -47,13 +47,25 @@
 <div class="row">
     <div class="small-12 island">
         <section>
-            <div class="avatar card">
-                <a href="/search/user/{{ record.getOwner.getId }}">
-                    <img src="/portrait.php?userId={{ record.getOwner.getExternalId }}&size=square64" />
-                    <p>{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</p>
-                </a>
-                <p class="meta">Posted by <a href="/search/user/{{ record.getOwner.getId }}">{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</a> {{ record.getCreatedAt.getRelativeTime }}</p>
-            </div>
+            <ul class="information-list">
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="avatar card small-12">
+                            <a href="/search/user/{{ record.getOwner.getId }}">
+                                <img src="/portrait.php?userId={{ record.getOwner.getExternalId }}&size=square64" />
+                                <p>{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</p>
+                            </a>
+                            <p class="meta">Posted by <a href="/search/user/{{ record.getOwner.getId }}">{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</a> {{ record.getCreatedAt.getRelativeTime }}</p>
+                        </div>
+                    </div>
+                    {% if session.user.getId == record.getOwner.getId or session.user.isSuperuser %}
+                        <nav>
+                            <a class="icon-modify" href="/eportfolio/blog/modify/{{ page.getUid }}/{{ page.getPageId }}/{{ record.getId }}" title="Modify Blog post"></a>
+                        </nav>
+                    {% endif %}
+                </li>
+            </ul>
+
         </section>
 
         <section class="content">
