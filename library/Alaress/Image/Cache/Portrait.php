@@ -75,39 +75,8 @@ class Portrait extends BrokenFS
             throw new \InvalidArgumentException('Portrait not found');
         }
 
-        $this->purgeOldTransformations();
-
         if (!$this->canViewImage()) {
             throw new \RuntimeException('Cannot view image');
-        }
-    }
-
-    /**
-     * Purges transformations that are older than the portrait in $portraitPath.
-     */
-    public function purgeOldTransformations()
-    {
-        if (!$this->resource->exists()) {
-            return;
-        }
-
-        $portraitAge = $this->resource->getTimestamp();
-
-        $cachePath = $this->loadCache()->getPath();
-        $cacheDir  = pathinfo($cachePath, PATHINFO_DIRNAME);
-
-        try {
-            /** @var Fly\Directory $dir */
-            $dir = $this->cacheFs->get($cacheDir);
-
-            foreach ($dir->getContents() as $meta) {
-                $modTime = $this->cacheFs->getTimestamp($meta['path']);
-                if ($modTime < $portraitAge) {
-                    $this->cacheFs->delete($meta['path']);
-                }
-            }
-        } catch (Fly\FileNotFoundException $e) {
-            // this simply means the cache directory doesn't exist
         }
     }
 
