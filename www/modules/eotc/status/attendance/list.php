@@ -15,7 +15,7 @@ try {
 	$mapper = new \EOTC\EventMapper();
 	$event = $mapper->findById($this->arg[0]);
 }
-catch (\RuntimeException $e) {
+catch (\Schoolbox\Mapper\Exception $e) {
 	error(160);
 }
 
