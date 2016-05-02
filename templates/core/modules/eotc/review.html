@@ -1,3 +1,7 @@
+<ul class="breadcrumb">
+	<li><a class="active" title="EOTC">EOTC</a></li>
+</ul>
+
 <div class="row">
     <div class="small-12 columns">
 		<h1>Pending EOTC Events</h1>
@@ -19,7 +23,7 @@
 					<th>Students</th>
 					<th>RAMS Required</th>
 					<th>Status</th>
-					<th>View</th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -32,7 +36,11 @@
 					<td>{EVENT_STUDENTS}</td>
 					<td>{EVENT_RAMS_REQUIRED}</td>
 					<td>{EVENT_STATUS_NAME}</td>
-					<td><a href="/modules/eotc/status/modify/{EVENT_ID}">View</a></td>
+					<td class="actions-small-1">
+						<nav>
+							<a href="/modules/eotc/status/modify/{EVENT_ID}" class="icon-view" title="View"></a>
+						</nav>
+					</td>
 				</tr>
 				<!-- END event -->
 			</tbody>
