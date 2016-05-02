@@ -106,6 +106,11 @@ class Authenticator {
 	 */
 	private function isPermissionInCampus(EventPermission $permission, Event $event)
 	{
+		foreach ($event->getCampusCollection() as $currentCampus) {
+			if ($permission->getCampusId()->getId() == $currentCampus->getId()) {
+				return true;
+			}
+		}
 
 		return false;
 	}
@@ -119,8 +124,7 @@ class Authenticator {
 	 */
 	private function isPermissionInStatus(EventPermission $permission, Event $event)
 	{
-
-		return false;
+		return $permission->getStatusId()->getId() == $event->getMetadata()->getStatus()->getId();
 	}
 
 	/**

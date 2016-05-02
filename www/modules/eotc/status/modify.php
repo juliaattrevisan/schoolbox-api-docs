@@ -20,6 +20,11 @@ try {
     error(160);
 }
 
+if ($authenticator->isSubscribedUser($_SESSION['user'], $event)) {
+}
+
+die();
+
 if (!$authenticator->isEOTCAdministrator($_SESSION['user']) && !$authenticator->canPromote($_SESSION['user'], $event)) {
     error(19);
 }
