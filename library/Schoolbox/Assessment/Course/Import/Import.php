@@ -5,8 +5,8 @@ namespace Schoolbox\Assessment\Course\Import;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
+use Schoolbox\Assessment\Course\Unit\Model as Unit;
 use Schoolbox\Assessment\Course\Unit\Mapper as UnitMapper;
-use Schoolbox\Assessment\Course\TaskMapper;
 
 /**
  * Import
@@ -27,8 +27,6 @@ class Import
     /** @var FolderMapper */
     private $folderMapper;
 
-    /** @var TaskMapper */
-    private $taskMapper;
 
     /**
      * Constructor
@@ -39,7 +37,6 @@ class Import
         $this->setCourseMapper(CourseMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setUnitMapper(UnitMapper::getInstance());
-        $this->setTaskMapper(TaskMapper::getInstance());
     }
 
     /**
@@ -177,10 +174,11 @@ class Import
         /* A course was already chosen
          */
         try {
-            $data['units'] = $this->getCourseMapper()->findByParent($courseId);
+            $data['units'] = $this->getUnitMapper()->findByCourseId($courseId);
 
             foreach ($data['units'] as $unit) {
-                $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
+                /** @var Unit $unit */
+                $data['tasks'][$unit->getId()] = $unit->getTasks();
             }
         } catch (\Exception $e) {
 
@@ -256,25 +254,4 @@ class Import
         return $this;
     }
 
-    /**
-     * Get task mapper
-     *
-     * @return TaskMapper
-     */
-    private function getTaskMapper()
-    {
-        return $this->taskMapper;
-    }
-
-    /**
-     * Set task mapper
-     *
-     * @param TaskMapper $taskMapper
-     * @return $this
-     */
-    private function setTaskMapper($taskMapper)
-    {
-        $this->taskMapper = $taskMapper;
-        return $this;
-    }
 }
