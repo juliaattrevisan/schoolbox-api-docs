@@ -245,7 +245,10 @@
                     'object[id,name,width,height];' +
                     'param[name,value];' +
                     'embed[src,type,allowscriptaccess,allowfullscreen,wmode,width,height];' +
-                    'a[id,href,target];'
+                    'a[id,href,target];' +
+                    'map[!name];' +
+                    'area[!shape,!coords,!href,target,!alt];' +
+                    'img[usemap];'
                 ,
 
                 /* Remove annoying dialog that always appears
