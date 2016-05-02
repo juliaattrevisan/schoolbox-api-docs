@@ -188,12 +188,14 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('student', 's')},
                 {$this->getJoinColumnString('severity', 'sv')},
 				{$this->getJoinColumnString('owner', 'o')},
-				{$this->getJoinColumnString('type', 't')}
+				{$this->getJoinColumnString('type', 't')},
+				{$this->getJoinColumnString('category', 'c')}
             FROM {$this->getTable()} `r`
             LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
             LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
             LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
+            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
             WHERE s.id = ?
             AND r.deleted_at IS NULL
             ORDER BY r.created_at DESC
@@ -248,12 +250,14 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('student', 's')},
                 {$this->getJoinColumnString('severity', 'sv')},
 				{$this->getJoinColumnString('owner', 'o')},
-				{$this->getJoinColumnString('type', 't')}
+				{$this->getJoinColumnString('type', 't')},
+				{$this->getJoinColumnString('category', 'c')}
             FROM {$this->getTable()} `r`
             LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
             LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
             LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
+            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
             WHERE r.id = ?
             AND r.deleted_at IS NULL
         ";
@@ -383,12 +387,14 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('student', 's')},
                 {$this->getJoinColumnString('severity', 'sv')},
 				{$this->getJoinColumnString('owner', 'o')},
-				{$this->getJoinColumnString('type', 't')}
+				{$this->getJoinColumnString('type', 't')},
+				{$this->getJoinColumnString('category', 'c')}
             FROM {$this->getTable()} `r`
             LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
             LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
             LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
+            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
             {$criteria_sql}
             ORDER BY
               `s`.lastname,
@@ -635,11 +641,14 @@ class Mapper extends BaseMapper
         $severity = $this->hydrateJoin($row, 'severity', 'sv');
         /** @var PastoralTypeModel $type */
         $type = $this->hydrateJoin($row, 'type', 't');
+        /** @var PastoralCategoryModel $category */
+        $category = $this->hydrateJoin($row, 'category', 'c');
 
         $record->setStudent($student);
         $record->setOwner($owner);
         $record->setSeverity($severity);
         $record->setType($type);
+        $record->setCategory($category);
 
         // Don't know if this is right for the one-to-many joins, but it works
 

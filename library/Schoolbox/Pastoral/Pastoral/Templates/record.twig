@@ -93,7 +93,7 @@
 
                                 <p class="spaced meta">
                                     {# Pastoral event type #}
-                                    {{ record.getType.getName }} |
+                                    {{ record.getType.getName }} {% if record.getCategory.getName != '' %}({{ record.getCategory.getName }}){% endif %} |
 
                                     {# Pastoral event severity #}
                                     {{ record.getSeverity.getName }} |
