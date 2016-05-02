@@ -42,6 +42,10 @@ if ($assessHandler->isDeleted($section['assess_id'])) {
  */
 $assess = $assessHandler->getByID($section['assess_id']);
 
+if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+    $this->pageNotFound();
+}
+
 if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
 	error(143);
 }

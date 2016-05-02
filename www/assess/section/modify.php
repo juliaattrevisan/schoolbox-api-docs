@@ -14,6 +14,10 @@ $assessHandler = new Assess_Main();
 $groupHandler = new Group();
 
 if (!empty($_POST)) {
+    if (!$assessHandler->isValidUrlAccess($_POST['assess_id'])) {
+        $this->pageNotFound();
+    }
+
 
     $return_url = $_POST["return_url"] != '' ? "?return_url={$_POST["return_url"]}" : "";
 
@@ -52,6 +56,10 @@ if (!empty($_POST)) {
 
     $sectionHandler = new Assess_Section();
     $section = $sectionHandler->getByID($this->arg[0]);
+
+    if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
+    }
 
     if ($section) {
         $assess = $assessHandler->getByID($section['assess_id']);

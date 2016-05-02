@@ -28,6 +28,10 @@ if ($section) {
 	$assess = $assessHandler->getByID($section['assess_id']);
 }
 
+if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+	$this->pageNotFound();
+}
+
 if ($assessHandler->isDeleted($section['assess_id'])) {
 	error(112);
 }

@@ -25,6 +25,10 @@ if (!is_numeric($this->arg[1])) {
     error(115);
 }
 
+if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
+}
+
 $assess = $assessHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 

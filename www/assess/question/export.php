@@ -19,6 +19,10 @@ $currentQuestion = $questionHandler->getById($this->arg[0]);
 $section         = $sectionHandler->getByID($currentQuestion['section_id']);
 $assess          = $assessHandler->getBYID($section['assess_id']);
 
+if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+    $this->pageNotFound();
+}
+
 if (!$currentQuestion) {
     error(119);
 }

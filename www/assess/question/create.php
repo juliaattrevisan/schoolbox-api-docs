@@ -31,6 +31,10 @@ if (!empty($_POST)) {
     $section = $sectionHandler->getByID($_POST['section_id']);
     $assess = $assessHandler->getByID($section['assess_id']);
 
+    if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
+    }
+
     if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
         error(130);
     }
@@ -92,6 +96,10 @@ if (!empty($_POST)) {
 
     $section = $sectionHandler->getByID($this->arg[0]);
     $assess = $assessHandler->getByID($section['assess_id']);
+
+    if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
+    }
 
     if ($assessHandler->isDeleted($section['assess_id'])) {
         error(112);

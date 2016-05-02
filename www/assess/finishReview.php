@@ -23,6 +23,10 @@ if (!is_numeric($this->arg[1])) {
     error(118);
 }
 
+if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+	$this->pageNotFound();
+}
+
 $assessMapper = OnlineAssessmentMapper::getInstance();
 $attemptMapper = AttemptMapper::getInstance();
 

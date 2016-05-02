@@ -14,6 +14,10 @@ $assessHandler = new Assess_Main();
 $groupHandler = new Group();
 
 if (!empty($_POST)) {
+    if (!$assessHandler->isValidUrlAccess($_POST['assess_id'])) {
+        $this->pageNotFound();
+    }
+
     $assess = $assessHandler->getByID($_POST['assess_id']);
 
     if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
@@ -47,6 +51,10 @@ if (!empty($_POST)) {
 } else {
     if (empty($this->arg[0])) {
         error(51);
+    }
+
+    if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+        $this->pageNotFound();
     }
 
     if ($assessHandler->isDeleted($this->arg[0])) {

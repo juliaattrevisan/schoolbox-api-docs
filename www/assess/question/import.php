@@ -34,6 +34,10 @@ if (!$currentSection) {
     error(115);
 }
 
+if (!$assessHandler->isValidUrlAccess($currentSection['assess_id'])) {
+    $this->pageNotFound();
+}
+
 if ($sectionHandler->isDeleted($this->arg[0])) {
     error(115);
 }
