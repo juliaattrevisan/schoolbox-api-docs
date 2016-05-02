@@ -375,7 +375,7 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
 
     /**
      * Normalizes response and answer for comparison - replaces all spaces,
-     * and converts to lower case.
+     * converts to lower case, and replaces the em dash character with standard hyphen.
      *
      * @param string $response
      *
@@ -383,6 +383,6 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      */
     protected function normalizeForComparison($response)
     {
-        return mb_strtolower(trim(preg_replace('/\\s+/', ' ', $response)), 'UTF-8');
+        return mb_strtolower(trim(preg_replace('/\\s+/', ' ', str_replace("—","-",$response))), 'UTF-8');
     }
 }
