@@ -1,6 +1,10 @@
 <?php
 /**
- * ${NAME}
+ * Status Modify
+ *
+ * Allows you to see the current status of an EOTC Event, such as
+ * its details. This is -not- the EOTC Event modify screen which
+ * allows you to change those details.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -18,14 +22,17 @@ catch (\RuntimeException $e) {
     error(160);
 }
 
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
 /* Only EOTC Administrators, those who can promote, and Subscribed Users
  * can view this page
  */
 $authenticator = new \EOTC\Authenticator();
 
-$isEOTCAdministrator = $authenticator->isEOTCAdministrator($_SESSION['user']);
-$isCanPromote = $authenticator->canPromote($_SESSION['user'], $event);
-$isSubscribedUser = $authenticator->isSubscribedUser($_SESSION['user'], $event);
+$isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser);
+$isCanPromote = $authenticator->canPromote($sessionUser, $event);
+$isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
 
 if ($isEOTCAdministrator || $isCanPromote || $isSubscribedUser) {
     $this->setFile(TEMPLATE_content, 'modules/eotc/status/modify.html');
@@ -59,17 +66,25 @@ if ($isEOTCAdministrator || $isCanPromote || $isSubscribedUser) {
     /* Recurrence
      */
     // Is there a recurrence? If so don't show the repeat selector.
-    $recurrence = array();
+    $recurrence = [];
+
     if ($event->getSeriesId()) {
         $eventRecurrenceMapper = new \Schoolbox\Calendar\EventRecurrenceMapper($mapper);
         $recurrence            = $eventRecurrenceMapper->getSeriesRecurrence($event);
     }
+
     if (!empty($recurrence)) {
+
+        /** @var \Alaress_Date_Format $recurrenceStart */
+        /** @var \Alaress_Date_Format $recurrenceEnd */
+        $recurrenceStart = $recurrence['start'];
+        $recurrenceEnd = $recurrence['end'];
+
         $this->setVar(
             array(
                 'EVENT_REC_FREQ'  => ucfirst($recurrence['freq']),
-                'EVENT_REC_START' => $recurrence['start']->getLongDateOnly(),
-                'EVENT_REC_END'   => $recurrence['end']->getLongDateOnly(),
+                'EVENT_REC_START' => $recurrenceStart->getLongDateOnly(),
+                'EVENT_REC_END'   => $recurrenceEnd->getLongDateOnly(),
             )
         );
         $this->parse('recurring_reminder_block', 'recurring_reminder');
@@ -92,8 +107,8 @@ if ($isEOTCAdministrator || $isCanPromote || $isSubscribedUser) {
 
     if ($event->getMetadata()->getRamsRequired()) {
         /* Sometimes event/file relations get recorded with a storage_id of 0
-             * so we need to check whether one actually legitimately saved properly
-             */
+         * so we need to check whether one actually legitimately saved properly
+         */
         foreach ($event->getMetadata()->getRamsFiles() as $ramsFile) {
             $mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
             $mimetype       = $mimetypeMapper->getByFilename($ramsFile->getBasename());
@@ -278,12 +293,12 @@ if ($isEOTCAdministrator || $isCanPromote || $isSubscribedUser) {
         )
     );
 
-    if ($authenticator->canPromote($_SESSION['user'], $event)) {
+    if ($authenticator->canPromote($sessionUser, $event)) {
         $eventStatusMapper = new \EOTC\EventStatusMapper();
 
         /* Soops have access to all statuses
          */
-        if ($_SESSION['user']->isSuperuser()) {
+        if ($sessionUser->isSuperuser()) {
             $allEventStatus = $eventStatusMapper->findAll();
         } else {
             $allEventStatus = $eventStatusMapper->findAvailableStatuses($event);
