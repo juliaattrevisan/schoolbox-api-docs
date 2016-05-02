@@ -60,7 +60,7 @@
                     </div>
                     {% if session.user.getId == record.getOwner.getId or session.user.isSuperuser %}
                         <nav>
-                            <a class="icon-modify" href="/blog/modify/{{ blog.getId }}" title="Modify Blog post"></a>
+                            <a class="icon-modify" href="/blog/modify/{{ record.getId }}" title="Modify Blog post"></a>
                         </nav>
                     {% endif %}
                 </li>

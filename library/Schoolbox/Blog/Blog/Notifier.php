@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Blog\Blog;
 
-
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
@@ -18,7 +17,7 @@ use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
@@ -51,7 +50,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 	 */
 	public function bundleTriggers($bundle) {
 		// we only care about notifying blog post creation
-		if($bundle->getMethod() == Mapper::METHOD_CREATE) {
+		if($bundle->getMethod() == BaseMapper::METHOD_CREATE) {
 			/** @var BlogModel $blog */
 			$blog = $bundle->getEvent()->getObject();
 			$bundle->attach(self::TRIGGER_POSTED, $blog->getCreatedAt()->getUnixTimeStamp());
