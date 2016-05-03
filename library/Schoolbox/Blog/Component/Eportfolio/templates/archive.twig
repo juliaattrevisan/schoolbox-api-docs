@@ -82,7 +82,7 @@
 
                         <article>
 
-                            {{ blog.getBody | raw }}
+                            {{ blog.getBody | purify }}
 
                             {% if blogImages[blog.getId] | length > 0 %}
 
@@ -110,7 +110,7 @@
                                 </div>
                                 <article>
                                     <p>
-                                        {{ comment.getBody }}
+                                        {{ comment.getBody | purify }}
                                     </p>
                                 </article>
                             </li>

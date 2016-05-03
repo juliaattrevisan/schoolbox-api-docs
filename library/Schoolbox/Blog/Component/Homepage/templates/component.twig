@@ -70,7 +70,7 @@
                             {% endif %}
 
                             <article>
-                                {{ blog.getBody | raw }}
+                                {{ blog.getBody | purify }}
                                 {% if blogImages[blog.getId] | length > 0 %}
                                 <ul class="inline-list img-gallery" data-image-gallery="">
                                     {% for image in blogImages[blog.getId] %}
@@ -107,7 +107,7 @@
                                         {% endif %}
 
                                         <article>
-                                            <p>{{ comment.getBody | raw }}</p>
+                                            <p>{{ comment.getBody | purify }}</p>
                                         </article>
                                     </li>
 
