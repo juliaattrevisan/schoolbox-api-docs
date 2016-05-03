@@ -364,25 +364,35 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
 
     /**
      * Compares to strings for the purposes of marking exact answer
+     *
+     * Returns true when identical
+     *
+     * @param $str1
+     * @param $str2
+     * @return bool
      */
     protected function compareStrings($str1, $str2) {
-         if(strcmp($this->normalizeForComparison($str1),$this->normalizeForComparison($str2)) == 0) {
-             return true;
-         } else {
-             return false;
-         }
+         return strcmp($this->normalizeForComparison($str1),$this->normalizeForComparison($str2)) == 0);
     }
 
     /**
      * Normalizes response and answer for comparison - replaces all spaces,
      * converts to lower case, and replaces the em dash character with standard hyphen.
      *
-     * @param string $response
+     * @param string $str
      *
      * @return string
      */
-    protected function normalizeForComparison($response)
+    protected function normalizeForComparison($str)
     {
-        return mb_strtolower(trim(preg_replace('/\\s+/', ' ', str_replace("—","-",$response))), 'UTF-8');
+        /* Equivalent characters for automarking purposes
+         * Replace em and en dashes with hyphen
+         */
+        $equivalences = strtr($str, [
+            '—' => '-',
+            '–' => '-'
+        ]);
+
+        return mb_strtolower(trim(preg_replace('/\\s+/', ' ', $equivalences)), 'UTF-8');
     }
 }
