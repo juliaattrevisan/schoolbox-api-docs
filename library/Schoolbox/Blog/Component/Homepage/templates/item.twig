@@ -86,19 +86,18 @@
         </section>
 
 
-        {% if comments | length > 0 %}
+
 
             <h2 class="subheader">Comments</h2>
 
             <section>
                 <ul class="information-list">
-
                     {% for comment in comments %}
 
                         <li class="actions-small-1">
 
                             <div class="list-item">
-                                <div class="avatar card">
+                                <div class="avatar card small-12">
                                     <a href="/search/user/{{ comment.getOwner.getId }}">
                                         <img src="/portrait.php?userId={{ comment.getOwner.getExternalId }}&size=square64" />
                                         <p>{{ comment.getOwner.getFirstname }} {{ comment.getOwner.getLastname }}</p>
@@ -119,7 +118,6 @@
                         </li>
 
                     {% endfor %}
-
                     <li>
                         <form method="post" action="/blog/comment/insert" class="no-pad">
                             <input type="hidden" name="id" value="{{ record.getId }}">
@@ -133,7 +131,6 @@
                 </ul>
             </section>
 
-        {% endif %}
 
     </div>
 </div>

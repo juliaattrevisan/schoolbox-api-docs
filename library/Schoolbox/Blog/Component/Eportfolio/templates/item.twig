@@ -82,8 +82,6 @@
             </article>
         </section>
 
-        {% if comments | length > 0 %}
-
             <h2 class="subheader">Comments</h2>
 
             <section>
@@ -94,7 +92,7 @@
                         <li class="actions-small-1">
 
                             <div class="list-item">
-                                <div class="avatar card">
+                                <div class="avatar card small-12">
                                     <a href="/search/user/{{ comment.getOwner.getId }}">
                                         <img src="/portrait.php?userId={{ comment.getOwner.getExternalId }}&size=square64" />
                                         <p>{{ comment.getOwner.getFirstname }} {{ comment.getOwner.getLastname }}</p>
@@ -130,8 +128,5 @@
                     </li>
                 </ul>
             </section>
-
-        {% endif %}
-
     </div>
 </div>
