@@ -1,0 +1,5 @@
+<ul class="inline-list img-gallery" data-image-gallery="">
+    {% for image in images %}
+        <li><a href="/storage/image.php?size=maxsize&hash={{ image.hash }}" title="" rel="lightbox"><img src="/storage/image.php?size=square128&hash={{ image.hash }}" alt=""></a></li>
+    {% endfor %}
+</ul>
