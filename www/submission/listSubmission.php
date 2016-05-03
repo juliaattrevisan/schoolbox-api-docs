@@ -80,10 +80,12 @@ else {
         array('term' => $currentTerm,)
     );
 
-    $involvedIn = $groupHandler->involvedInSubjects($_SESSION['id']);
-    if(is_array($involvedIn)) {
-        foreach($involvedIn as $subject) {
-            $subjectList[] = $subject['id'];
+    if($currentTerm->isMarkableBy($_SESSION['user']) && $currentTerm->contains(Alaress_Date_Format::now()) ) {
+        $involvedIn = $groupHandler->involvedInSubjects($_SESSION['id']);
+        if (is_array($involvedIn)) {
+            foreach ($involvedIn as $subject) {
+                $subjectList[] = $subject['id'];
+            }
         }
     }
 
