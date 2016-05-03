@@ -541,26 +541,6 @@ class Bootstrap implements BootstrapInterface {
     {
 		$outputStackTrace = Config::get('debug_show_stack_trace');
 
-		// This is a kludge to get MSSQL external database errors rendering prettily to the end user.
-
-		if ($e instanceof \Exception) {
-
-			if (strpos(strtolower($e->getFile()), "library/mssql.php") !== FALSE) {
-
-				// Error occurred in the file which handles external database connections, display a
-				// pretty error message that doesn't scare the user.
-
-				$di = $this->kernel->getDependencyInjector();
-				if ($di instanceof Di\Container) {
-					/** @var \SitePage $page */
-					$page = $di->get('layoutEngine');
-					$page->error(null, nl2br($e->getMessage()));
-				} else {
-					echo $e->getMessage();
-				}
-			}
-		}
-
         if ($e instanceof \Exception) {
             $error = array(
                 'file'    => $e->getFile(),
