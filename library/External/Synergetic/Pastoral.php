@@ -11,6 +11,8 @@ use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
+use Schoolbox\Pastoral\Category\Mapper as PastoralCategoryMapper;
+use Schoolbox\Pastoral\Category\Model as PastoralCategoryModel;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
@@ -37,6 +39,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
     /** @var PastoralTypeMapper $pastoralTypeMapper */
     protected $pastoralTypeMapper;
+
+    /** @var PastoralCategoryMapper $pastoralCategoryMapper */
+    protected $pastoralCategoryMapper;
 
     /** @var PastoralAccessMapper $pastoralAccessMapper */
     protected $pastoralAccessMapper;
@@ -68,6 +73,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $this->setPastoralCommentMapper($pastoralCommentMapper);
 
         $this->setPastoralTypeMapper(PastoralTypeMapper::getInstance());
+        $this->setPastoralCategoryMapper(PastoralCategoryMapper::getInstance());
         $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
         $this->setPastoralSeverityMapper(PastoralSeverityMapper::getInstance());
     }
@@ -133,11 +139,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                          dbo.tPastoralCare.CreatedDate, dbo.tPastoralCare.CreatedByID, dbo.tPastoralCare.ModifiedDate, dbo.tPastoralCare.ModifiedByID,
                          dbo.tPastoralCare.EmailSentDate, dbo.tPastoralCare.EmailSentByID, dbo.tPastoralCare.DuplicateFromSeq, dbo.tPastoralCare.SubjectClassesSeq,
                          dbo.luPastoralCareType.Description AS TypeDescription, Community_1.Surname AS StudentLastname, Community_1.Given1 AS StudentFirstname,
-                         dbo.Community.Surname AS OwnerLastname, dbo.Community.Given1 AS OwnerFirstname
-            FROM         dbo.tPastoralCare INNER JOIN
-                         dbo.luPastoralCareType ON dbo.tPastoralCare.TypeCode = dbo.luPastoralCareType.Code INNER JOIN
-                         dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID INNER JOIN
-                         dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
+                         dbo.Community.Surname AS OwnerLastname, dbo.Community.Given1 AS OwnerFirstname, dbo.luPastoralCareCategory.Description as CategoryDescription
+            FROM         dbo.tPastoralCare 
+            INNER JOIN   dbo.luPastoralCareType ON dbo.tPastoralCare.TypeCode = dbo.luPastoralCareType.Code 
+            INNER JOIN   dbo.luPastoralCareCategory ON dbo.luPastoralCareCategory.PastoralCareTypeCode = dbo.luPastoralCareType.Code 
+            INNER JOIN   dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID 
+            INNER JOIN   dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
         ";
 
         $records = $this->getDatabase()->getAll($query);
@@ -185,9 +192,28 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             }
             catch (\Exception $e)
             {
+                // Type doesn't exist in Schoolbox, create it
+
                 $type = new PastoralTypeModel();
                 $type->setName($record["TypeDescription"]);
                 $this->getPastoralTypeMapper()->save($type);
+            }
+
+            // Retrieve category
+
+            try
+            {
+                $category = $this->getPastoralCategoryMapper()->findOneByColumn('external_code', $record["CategoryCode"]);
+            }
+            catch (\Exception $e)
+            {
+                // Category doesn't exist in Schoolbox, create it
+                
+                $category = new PastoralCategoryModel();
+                $category->setName($record["CategoryDescription"]);
+                $category->setExternalCode($record["CategoryCode"]);
+                $category->setPastoralTypeId($type->getId());
+                $this->getPastoralCategoryMapper()->save($category);
             }
 
             // Lookup
@@ -221,6 +247,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $pastoralRecord->setHeading($record["heading"]);
                 $pastoralRecord->setBody($record["Details"]);
                 $pastoralRecord->setType($type);
+                $pastoralRecord->setCategory($category);
                 $pastoralRecord->setStudent($student);
                 $pastoralRecord->setOwner($owner);
                 $pastoralRecord->setSeverity($severity);
@@ -258,6 +285,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     $pastoralRecordPrivate->setHeading($record["heading"]);
                     $pastoralRecordPrivate->setBody($record["PrivateDetails"]);
                     $pastoralRecordPrivate->setType($type);
+                    $pastoralRecordPrivate->setCategory($category);
                     $pastoralRecordPrivate->setStudent($student);
                     $pastoralRecordPrivate->setOwner($owner);
                     $pastoralRecordPrivate->setPrivate(true);
@@ -338,6 +366,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $type = $this->getPastoralTypeMapper()->findById($pastoral->getType()->getId());
         $type_code = "'" . $type->getExternalCode() . "'";
 
+        // Pastoral category code
+
+        $category = $this->getPastoralCategoryMapper()->findById($pastoral->getCategory()->getId());
+        $category_code = "'" . $category->getExternalCode() . "'";
+
         // Created/modified dates
 
         $created_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
@@ -352,6 +385,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     Details,
                     PrivateDetails,
                     TypeCode,
+                    CategoryCode,
                     CreatedDate,
                     CreatedById,
                     ModifiedDate,
@@ -365,6 +399,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     {$details},
                     {$private_details},
                     {$type_code},
+                    {$category_code},
                     {$created_date},
                     {$created_by_id},
                     {$created_date},
@@ -495,6 +530,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $type = $this->getPastoralTypeMapper()->findById($pastoral->getType()->getId());
             $type_code = "'" . $type->getExternalCode() . "'";
 
+            // Pastoral category code
+
+            $category = $this->getPastoralCategoryMapper()->findById($pastoral->getCategory()->getId());
+            $category_code = "'" . $category->getExternalCode() . "'";
+
             // Modified date
 
             if ($pastoral->getUpdatedAt() != null)
@@ -513,6 +553,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         Details = {$details},
                         PrivateDetails = {$private_details},
                         TypeCode = {$type_code},
+                        CategoryCode = {$category_code},
                         ModifiedDate = {$modified_date},
                         ModifiedById = {$modified_by_id},
                         ClassCode = '',
@@ -688,6 +729,22 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function setPastoralTypeMapper($pastoralTypeMapper) {
         $this->pastoralTypeMapper = $pastoralTypeMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralCategoryMapper
+     */
+    public function getPastoralCategoryMapper() {
+        return $this->pastoralCategoryMapper;
+    }
+
+    /**
+     * @param $pastoralCategoryMapper
+     * @return $this
+     */
+    public function setPastoralCategoryMapper($pastoralCategoryMapper) {
+        $this->pastoralCategoryMapper = $pastoralCategoryMapper;
         return $this;
     }
 
