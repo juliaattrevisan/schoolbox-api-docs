@@ -87,10 +87,12 @@ class Feed {
         $query = "SELECT f.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
 						af.description as type, inline, c.name as cat_name, c.id as cat_id
 				  FROM file f
+				  LEFT JOIN storage s on f.hash = s.hash
+				  LEFT JOIN allowedFileExtension afe ON s.ext = afe.extension
+				  LEFT JOIN allowedFileTypes af ON afe.extension = af.fileTypeID
 				  LEFT JOIN user u ON u.id = f.owner
-				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
 				  LEFT JOIN category c ON c.id = f.category
-				  WHERE f.category $where AND f.hidden = 0 AND f.deleted = 0
+				  WHERE f.category $where AND f.hidden = 0 AND f.deleted_at IS NULL
 				  ORDER BY f.submitted DESC LIMIT 0, $limit";
 
         $this->db->query($query);

@@ -28,12 +28,6 @@ class RerouteOverride {
     /** @var array */
     protected $delivery;
 
-    /**
-     * @deprecated
-     * @var int
-     */
-	protected $outgoingLevel;
-
 
 	/**
 	 * @param string $msgRouteKey
@@ -66,22 +60,6 @@ class RerouteOverride {
         $this->delivery = $delivery;
         return $this;
     }
-
-	/**
-     * @deprecated use setDelivery()
-	 * @param int $outgoingLevel
-	 */
-	public function setOutgoingLevel($outgoingLevel) {
-		$this->outgoingLevel = $outgoingLevel;
-	}
-
-	/**
-     * @deprecated use getDelivery()
-	 * @return int
-	 */
-	public function getOutgoingLevel() {
-		return $this->outgoingLevel;
-	}
 
 	/**
 	 * @param User $user

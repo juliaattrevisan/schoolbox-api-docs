@@ -20,30 +20,8 @@ class Reroute {
 	/** @var Source */
 	protected $source;
 
-    /**
-     * @deprecated
-     * @var int
-     */
-	protected $outgoingLevel;
-
     /** @var array */
     protected $delivery;
-
-	/**
-     * @deprecated use setDelivery()
-	 * @param int $outgoingLevel
-	 */
-	public function setOutgoingLevel($outgoingLevel) {
-		$this->outgoingLevel = $outgoingLevel;
-	}
-
-	/**
-     * @deprecated use getDelivery()
-	 * @return int
-	 */
-	public function getOutgoingLevel() {
-		return $this->outgoingLevel;
-	}
 
 	/**
 	 * @param \Schoolbox\Realtime\Message\Source $source
