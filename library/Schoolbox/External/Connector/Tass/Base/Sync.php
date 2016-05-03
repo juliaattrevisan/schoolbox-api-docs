@@ -162,7 +162,13 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT DISTINCT
-                te.tch_code         AS staff_id,
+                CASE
+                    WHEN
+                        (te.tch_code) IS NULL
+                        OR (te.tch_code) = ''
+                    THEN t.emp_code
+                    ELSE te.tch_code
+                END                 AS staff_id,
                 p.username          AS network_login,
                 CASE
                     WHEN
@@ -179,14 +185,20 @@ class Sync implements SyncInterface
                 ''                  AS occup_email,
                 t.e_mail            AS email,
                 ''                  AS staff_campus,
-                ''                  AS staff_category_type,
+                CASE
+                    WHEN
+                        (te.tch_code) IS NULL
+                        OR (te.tch_code) = ''
+                    THEN 'STAFF'
+                    ELSE 'TEACHER'
+                END                 AS staff_category_type,
                 ''                  AS staff_category,
                 td.tch_dept         AS staff_department
             FROM tel_vw_telemf AS t
-            LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
+            LEFT JOIN teacher AS te ON t.emp_code = te.emp_code AND t.cust_code = te.cmpy_code
             LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
-            LEFT JOIN portalusers AS p ON prodcode='TIA' AND te.cmpy_code = p.cmpy_code AND (te.emp_code = p.portal_code OR te.tch_code = p.portal_code)
-            WHERE te.cmpy_code = {$this->database->smartQuote($this->companyCode)}
+            LEFT JOIN portalusers AS p ON prodcode='TIA' AND t.cust_code = p.cmpy_code AND (t.emp_code = p.portal_code OR te.tch_code = p.portal_code) 
+            WHERE t.cust_code = {$this->database->smartQuote($this->companyCode)}
         ";
         return new Iterator\Staff(
             $this->database->getIterator($query)->addMap([$this->database, 'trimRow'])
