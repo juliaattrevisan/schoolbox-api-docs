@@ -13,8 +13,8 @@ $assessHandler = new Assess_Main();
 
 $assess = $assessHandler->getByID($this->arg[0]);
 
-if (!$assess) {
-	error(112);
+if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+	$this->pageNotFound();
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {

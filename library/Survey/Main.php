@@ -160,4 +160,19 @@ class Survey_Main extends Evaluation_Main
             }
         }
     }
+
+    /**
+     * Returns whether record exists and availability == 'survey'
+     *
+     * @param numeric $assess_id
+     * @return bool
+     */
+    public function isValidUrlAccess($assess_id)
+    {
+        $query = "SELECT availability
+                  FROM {$this->_table}
+                  WHERE assess_id = " . $this->db->smartQuote($assess_id);
+
+        return 'survey' == $this->db->getOne($query);
+    }
 }

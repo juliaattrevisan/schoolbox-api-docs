@@ -152,4 +152,19 @@ class Assess_Main extends Evaluation_Main {
 			"SELECT name FROM lu_submission_type WHERE id = " . $this->db->smartQuote(self::ONLINE_ASSESSMENT_TYPE_ID)
 		);
 	}
+
+	/**
+	 * Returns whether record exists and availability == 'assess'
+	 *
+	 * @param numeric $assess_id
+	 * @return bool
+	 */
+	public function isValidUrlAccess($assess_id)
+	{
+		$query = "SELECT availability
+                  FROM {$this->_table}
+                  WHERE assess_id = " . $this->db->smartQuote($assess_id);
+
+		return 'assess' == $this->db->getOne($query);
+	}
 }

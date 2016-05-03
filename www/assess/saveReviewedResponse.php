@@ -18,6 +18,10 @@ $question = $questionHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($question['section_id']);
 $assess = $assessHandler->getByID($section['assess_id']);
 
+if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+    $this->pageNotFound();
+}
+
 if ($assessHandler->isDeleted($section['assess_id'])) {
 	error(112);
 }

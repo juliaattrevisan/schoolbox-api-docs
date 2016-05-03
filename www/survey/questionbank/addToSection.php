@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $questionHandler = new Survey_Question();
 $answerHandler = new Survey_Answer();
@@ -33,15 +33,15 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
         error(1);
     }
 
-    $assess = $assessHandler->getByID($section['assess_id']);
-
     /* Check if online assessment exists. If it does, check if you own it
       */
-    if (!$assess) {
-        error(112);
+    if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
     }
 
-    if ($assess['user_id'] == $_SESSION['id']) {
+    $survey = $surveyHandler->getByID($section['assess_id']);
+
+    if ($survey['user_id'] == $_SESSION['id']) {
         $allQuestionBankIDs = $_POST['question_bank_id'];
 
         foreach ($allQuestionBankIDs as $currentQuestionBankID) {
@@ -61,7 +61,7 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
             ));
         }
 
-        SitePage::localRedir('/survey/summary/' . $assess['assess_id']);
+        SitePage::localRedir('/survey/summary/' . $survey['assess_id']);
     } else {
         error(131);
     }

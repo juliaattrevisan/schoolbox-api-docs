@@ -33,13 +33,14 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
         error(1);
     }
 
+    /* Check if online assessment exists and URL is valid. If it does, check if you own it
+      */
+    if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
+    }
+
     $assess = $assessHandler->getByID($section['assess_id']);
 
-    /* Check if online assessment exists. If it does, check if you own it
-      */
-    if (!$assess) {
-        error(112);
-    }
 
     if ($assess['user_id'] == $_SESSION['id']) {
         $allQuestionBankIDs = $_POST['question_bank_id'];

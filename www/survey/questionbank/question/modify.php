@@ -11,7 +11,7 @@
 use Schoolbox\Breadcrumbs;
 
 $factory = new Survey_Factory();
-$SurveyHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $groupHandler = new Group();
 
 /* If a question was submitted

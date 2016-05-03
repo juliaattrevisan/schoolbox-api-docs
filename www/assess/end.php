@@ -27,8 +27,8 @@ if (!is_numeric($attemptId)) {
     SitePage::localRedir('/assess/intro/' . $this->arg[0]);
 }
 
-if (!$assess) {
-    error(112);
+if (!$assessHandler->isValidUrlAccess($assess['assess_id'])) {
+    $this->pageNotFound();
 }
 
 if ($assessHandler->isDeleted($assess['assess_id'])) {

@@ -16,6 +16,10 @@ foreach ($_POST['selectedIds'] as $currentAttempt) {
 	if (is_numeric($currentAttempt)) {
 		$attempt = $attemptHandler->getByID($currentAttempt);
 
+		if (!$assessHandler->isValidUrlAccess($attempt['assess_id'])) {
+			$this->pageNotFound();
+		}
+
 		$attempt['assess'] = $assessHandler->getByID($attempt['assess_id']);
 
 		$allAttempts[] = $attempt;

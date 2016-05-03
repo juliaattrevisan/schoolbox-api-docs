@@ -20,6 +20,10 @@ $groupHandler = new Group();
 $assessId = $this->arg[0];
 $assess   = $assessHandler->getByID($assessId);
 
+if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+	$this->pageNotFound();
+}
+
 if (!$assessHandler->isOwner($assessId) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
 	error(126);
 }

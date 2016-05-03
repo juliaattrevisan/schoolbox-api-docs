@@ -13,7 +13,7 @@
 use Schoolbox\Breadcrumbs;
 use Schoolbox\UserMapper;
 
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $attemptHandler = new Survey_Attempt();
 $groupHandler = new Group();
@@ -23,35 +23,36 @@ if (!is_numeric($this->arg[0])) {
     error(112);
 }
 
-/* Get intro summary for the assessment
- */
-$assess = $assessHandler->getIntro($this->arg[0]);
-
-if (!$assess) {
-    error(112);
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+/* Get intro summary for the assessment
+ */
+$survey = $surveyHandler->getIntro($this->arg[0]);
+
+
+if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);
 }
 
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-if (!$assessHandler->canDoAssessment($assess['assess_id'])) {
+if (!$surveyHandler->canDoAssessment($survey['assess_id'])) {
     error(19);
 }
 
 /* Check if this assessment can be started
  */
-if ($assessHandler->isExpired($assess['assess_id'])) {
+if ($surveyHandler->isExpired($survey['assess_id'])) {
     error(120);
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
     error(144);
 }
 
@@ -59,12 +60,12 @@ if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['c
  *
  * Set up Attempt vars
  */
-$numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
+$numAttempts = $attemptHandler->userHasAttempted($survey['assess_id'], $_SESSION['id']);
 
-$attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
+$attempt = $attemptHandler->getLatestResumableForUser($survey['assess_id'], $_SESSION['id']);
 $attemptStartTime = strtotime($attempt['start']);
-$attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
-$attemptEndTime = $attemptStartTime + $assess['duration'];
+$attemptTimeRemaining = $attemptStartTime + $survey['duration'] - time();
+$attemptEndTime = $attemptStartTime + $survey['duration'];
 
 /* If there is a resumable attempt, resume it.
  * Otherwise start a new attempt if there is a limit
@@ -72,38 +73,38 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
 if (!$attempt) {
     /* Clear and exit when you attempt to make more than is allowed
       */
-    if (($assess['max_attempts'] > 0) && ($numAttempts + 1 > $assess['max_attempts'])) {
+    if (($survey['max_attempts'] > 0) && ($numAttempts + 1 > $survey['max_attempts'])) {
         error(146);
     }
 }
 
 /* Check if Attempt ran out of time
  */
-if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)) {
+if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($survey['duration'] != Assess_Main::UNLIMITED_DURATION)) {
     error(122);
 }
 
 /* Continue once you get past checks
  */
-$author = UserMapper::getInstance()->findById($assess['user_id']);
-$folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
+$author = UserMapper::getInstance()->findById($survey['user_id']);
+$folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($survey['category_id']);
 
-$allSummary = $assessHandler->getIntroSummary($assess['assess_id']);
-$allSections = $sectionHandler->getList($assess['assess_id']);
+$allSummary = $surveyHandler->getIntroSummary($survey['assess_id']);
+$allSections = $sectionHandler->getList($survey['assess_id']);
 
-$assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
-$assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
+$assessStartDate = new Alaress_Date_Format(strtotime($survey['start']), 'U');
+$assessFinishDate = new Alaress_Date_Format(strtotime($survey['finish']), 'U');
 
 $this->setFile(TEMPLATE_content, 'survey/intro.html');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
 $this->setBlock(TEMPLATE_content, 'has_assess_description', 'has_assess_description_block');
-$this->setTitle('Assessment: ' . $assess['title']);
+$this->setTitle('Assessment: ' . $survey['title']);
 
 $this->setVar(array(
-    'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => Scrub::text($assess['title']),
-    'ASSESS_DESCRIPTION' => Scrub::html($assess['description']),
+    'ASSESS_ASSESS_ID' => $survey['assess_id'],
+    'ASSESS_TITLE' => Scrub::text($survey['title']),
+    'ASSESS_DESCRIPTION' => Scrub::html($survey['description']),
     'ASSESS_START' => $assessStartDate->getShort(),
     'ASSESS_FINISH' => $assessFinishDate->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
@@ -113,12 +114,12 @@ $this->setVar(array(
     'ASSESS_AUTHOR_ROLE' => $author->getRole()->getName(),
     'ASSESS_FOLDER' => $folder->getName() . ( $folder->getCodeString() ? ' ('.$folder->getCodeString().')': ''),
     'ASSESS_FOLDER_ID' => $folder->getId(),
-    'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+    'ASSESS_DURATION' => $survey['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $surveyHandler->sec2hms($survey['duration']),
 ));
 
-$assess['description'] = trim($assess['description']);
+$survey['description'] = trim($survey['description']);
 
-if (empty($assess['description'])) {
+if (empty($survey['description'])) {
     $this->setVar('has_assess_description_block', '');
 } else {
     $this->parse('has_assess_description_block', 'has_assess_description', true);
@@ -151,8 +152,8 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         'class' => ''
     ],
     [
-        'text'  => $assess['title'],
-        'href'  => '/survey/intro/' . $assess['assess_id'],
+        'text'  => $survey['title'],
+        'href'  => '/survey/intro/' . $survey['assess_id'],
         'class' => 'active'
     ],
 ]);

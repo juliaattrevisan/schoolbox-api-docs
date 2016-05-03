@@ -11,7 +11,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 
 $factory = new Survey_Factory();
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $groupHandler = new Group();
 
@@ -23,13 +23,17 @@ if (!empty($_POST)) {
     }
 
     $section = $sectionHandler->getByID(Scrub::text($_POST['section_id']));
-    $assess = $assessHandler->getByID($section['assess_id']);
+    $survey = $surveyHandler->getByID($section['assess_id']);
 
-    if ($assessHandler->isDeleted($assess['assess_id'])) {
+    if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
+    }
+
+    if ($surveyHandler->isDeleted($survey['assess_id'])) {
         error(112);
     }
 
-    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
         error(130);
     }
 
@@ -90,14 +94,18 @@ else {
     }
 
     if ($section) {
-        $assess = $assessHandler->getByID($section['assess_id']);
+        $survey = $surveyHandler->getByID($section['assess_id']);
     }
 
-    if ($assessHandler->isDeleted($section['assess_id'])) {
+    if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
+    }
+
+    if ($surveyHandler->isDeleted($section['assess_id'])) {
         error(112);
     }
 
-    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
         error(130);
     }
 
@@ -107,7 +115,7 @@ else {
 
     try {
         $folderMapper = new FolderMapper();
-        $folder = $folderMapper->findById($assess['category_id']);
+        $folder = $folderMapper->findById($survey['category_id']);
     }
     catch (\Exception $e) {
         error(13);
@@ -164,15 +172,15 @@ else {
       */
     $this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
 
-    $assessHandler = new Survey_Main();
-    $assess = $assessHandler->getByID($section['assess_id']);
+    $surveyHandler = new Survey_Main();
+    $survey = $surveyHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
         'ASSESS_SECTION_TITLE' => $section['title'],
         'ASSESS_ASSESS_ID'     => $section['assess_id'],
         'ASSESS_KIND_LC'       => 'survey',
         'ASSESS_KIND'          => 'Survey',
-        'ASSESS_CATEGORY_ID'   => $assess['category_id'],
+        'ASSESS_CATEGORY_ID'   => $survey['category_id'],
         'SECTION_ID'           => $question['section_id'],
         'SEQUENCE'             => $question['sequence'],
         'QUESTION_ID'          => $question['question_id'],
@@ -191,13 +199,13 @@ else {
             'class' => '',
         ],
         [
-            'text' => $assess['title'],
-            'href' => "/survey/summary/{$assess['assess_id']}",
+            'text' => $survey['title'],
+            'href' => "/survey/summary/{$survey['assess_id']}",
             'class' => '',
         ],
         [
             'text' => $section['title'],
-            'href' => "/survey/summary/{$assess['assess_id']}",
+            'href' => "/survey/summary/{$survey['assess_id']}",
             'class' => '',
         ],
         [

@@ -38,8 +38,8 @@ $section = $sectionHandler->getByID($this->arg[1]);
 $attemptList = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $this->arg[2]);
 $attempt     = array_pop($attemptList);
 
-if (!$assess) {
-    error(112);
+if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {

@@ -31,13 +31,13 @@ if (!is_numeric($this->arg[2])) {
     error(128);
 }
 
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
+}
+
 $survey  = $surveyHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 $attempt = $attemptHandler->getByID($this->arg[2]);
-
-if (!$survey) {
-    error(112);
-}
 
 if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);

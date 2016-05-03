@@ -12,7 +12,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 
 $groupHandler  = new Group();
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 
 if (!empty($_POST)) {
     if ($groupHandler->getPermission(Scrub::text($_POST['category_id'])) < WRITE_ACCESS) {
@@ -42,7 +42,7 @@ if (!empty($_POST)) {
         error(145);
     }
 
-    $assess_id = $assessHandler->create(
+    $assess_id = $surveyHandler->create(
         array(
             'category_id'        => $_POST['category_id'],
             'user_id'            => $_SESSION['id'],

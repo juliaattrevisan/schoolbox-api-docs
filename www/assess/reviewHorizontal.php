@@ -32,8 +32,8 @@ if (!is_numeric($this->arg[0])) {
 
 $assess = $assessHandler->getByID($this->arg[0]);
 
-if (!$assess) {
-	error(112);
+if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+	$this->pageNotFound();
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {

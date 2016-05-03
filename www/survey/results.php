@@ -10,36 +10,36 @@
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $groupHandler = new Group();
-
-$assess = $assessHandler->getByID($this->arg[0]);
 
 if (!is_numeric($this->arg[0])) {
     error(112);
 }
 
-if (!$assess) {
-    error(112);
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
 }
+
+$survey = $surveyHandler->getByID($this->arg[0]);
 
 try {
     $folderMapper = new FolderMapper();
-    $folder = $folderMapper->findById($assess['category_id']);
+    $folder = $folderMapper->findById($survey['category_id']);
 }
 catch (\Exception $e) {
     error(13);
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);
 }
 
-if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
     error(125);
 }
 
-$surveyExporter = new Survey_Export_Graph($assess, new Survey_Factory(), new Survey_Section(), new Survey_Attempt(), new Survey_Question());
+$surveyExporter = new Survey_Export_Graph($survey, new Survey_Factory(), new Survey_Section(), new Survey_Attempt(), new Survey_Question());
 $sectionValues = $surveyExporter->getSectionValues();
 
 /* Data collected, now we can show it.
@@ -52,9 +52,9 @@ $this->setBlock('section', 'question', 'question_block');
 $this->setBlock('question', 'graph', 'graph_block');
 
 $this->setVar(array(
-    'SURVEY_NAME' => Scrub::text($assess['title']),
-	'ASSESS_ID' => $assess['assess_id'],
-	'CID' => $assess['category_id'],
+    'SURVEY_NAME' => Scrub::text($survey['title']),
+	'ASSESS_ID' => $survey['assess_id'],
+	'CID' => $survey['category_id'],
 ));
 
 $factory = new Survey_Factory();
@@ -69,8 +69,8 @@ if (is_array($sectionValues) && count($sectionValues)) {
                 /* Question data
                  */
                 $this->setVar(array(
-                    'ASSESS_ID' => $assess['assess_id'],
-                    'CID' => $assess['category_id'],
+                    'ASSESS_ID' => $survey['assess_id'],
+                    'CID' => $survey['category_id'],
                     'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
                     'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
                     'QUESTION_INDEX' => $i++,

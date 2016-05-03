@@ -28,6 +28,10 @@ if (!empty($_POST)) {
     $section = $sectionHandler->getByID($_POST['section_id']);
     $assess = $assessHandler->getByID($section['assess_id']);
 
+    if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
+    }
+
     if ($assessHandler->isDeleted($section['assess_id'])) {
         error(112);
     }
@@ -98,6 +102,10 @@ if (!empty($_POST)) {
 
     if ($section) {
         $assess = $assessHandler->getByID($section['assess_id']);
+    }
+
+    if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
     }
 
     if ($assessHandler->isDeleted($section['assess_id'])) {

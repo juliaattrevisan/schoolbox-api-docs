@@ -28,6 +28,10 @@ if (!$assess) {
 	error(112);
 }
 
+if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
+    $this->pageNotFound();
+}
+
 if (!$assessHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(130);
 }

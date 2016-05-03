@@ -15,7 +15,7 @@
  */
 
 $factory = new Survey_Factory();
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $attemptHandler = new Survey_Attempt();
 $responseHandler = new Survey_Response();
 $sectionHandler = new Survey_Section();
@@ -34,13 +34,13 @@ if (!is_numeric($this->arg[2])) {
     error(128);
 }
 
-$assess = $assessHandler->getByID($this->arg[0]);
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
+}
+
+$survey = $surveyHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 $attempt = $attemptHandler->getByID($this->arg[2]);
-
-if (!$assess) {
-    error(112);
-}
 
 if (!$section) {
     error(115);
@@ -50,12 +50,12 @@ if (!$attempt) {
     error(128);
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);
 }
 
-if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission(
-    $assess['category_id']
+if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
+    $survey['category_id']
 ) < WRITE_ACCESS)
 ) {
     error(127);
@@ -89,16 +89,16 @@ $this->setBlock(TEMPLATE_content, 'question', 'question_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
-$this->setTitle('Assessment: ' . $assess['title']);
+$this->setTitle('Assessment: ' . $survey['title']);
 
 try {
-    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($assess['category_id']);
+    $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($survey['category_id']);
 } catch (Schoolbox\Mapper\Exception $e) {
     error(112);
     exit;
 }
-$openDate = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
-$dueDate  = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+$openDate = new Alaress_Date_Format($survey['start'], Alaress_Date_Format::DATABASE_FORMAT);
+$dueDate  = new Alaress_Date_Format($survey['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $start = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $finish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 $user = $attemptHandler->getUser($attempt['attempt_id']);
@@ -108,18 +108,18 @@ $user = $attemptHandler->getUser($attempt['attempt_id']);
  */
 $this->setVar(
     array(
-        'ASSESS_ASSESS_ID'            => $assess['assess_id'],
-        'ASSESS_TITLE'                => Scrub::text($assess['title']),
+        'ASSESS_ASSESS_ID'            => $survey['assess_id'],
+        'ASSESS_TITLE'                => Scrub::text($survey['title']),
         'ASSESS_START'                => $openDate->getShort(),
         'ASSESS_FINISH'               => $dueDate->getShort(),
         'ATTEMPT_ATTEMPT_ID'          => $attemptId,
         'ATTEMPT_START'               => $start->getShort(),
         'ATTEMPT_FINISH'              => $finish->getShort(),
-        'ATTEMPT_TIME_TAKEN'          => $assessHandler->sec2hms($finish->diffInSeconds($start, true)),
+        'ATTEMPT_TIME_TAKEN'          => $surveyHandler->sec2hms($finish->diffInSeconds($start, true)),
         'SECTION_TITLE'               => Scrub::text($section['title']),
         'SECTION_DESCRIPTION'         => Scrub::html($section['description']),
         'ASSESS_PREVIOUSLY_REVIEWED'  => $reviewedAt,
-        'RESPONDENT_NAME'             => $assess['anonymous_result'] ? 'Anonymous' : $userHandler->formatName($user),
+        'RESPONDENT_NAME'             => $survey['anonymous_result'] ? 'Anonymous' : $userHandler->formatName($user),
         'ASSESS_CATEGORY_NAME'        => Scrub::text($folder->getName()),
         'ASSESS_CATEGORY_ID'          => $folder->getId(),
         'attemptFinished_block'       => '',
@@ -133,7 +133,7 @@ $this->setVar(
 // Otherwise:
 // not yet finished if survey is open, unfinished if closed
 if (!isset($attempt['finish'])) {
-    $close = new DateTime($assess['finish']);
+    $close = new DateTime($survey['finish']);
     if ($close->getTimestamp() < $_SERVER['REQUEST_TIME']) {
         $this->parse('attemptUnfinished_block', 'attemptUnfinished');
     }

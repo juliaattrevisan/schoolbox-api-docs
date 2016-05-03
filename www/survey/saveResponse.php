@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $attemptHandler = new Survey_Attempt();
 $questionHandler = new Survey_Question();
 $sectionHandler = new Survey_Section();
@@ -21,25 +21,29 @@ $section = $sectionHandler->getByID($question['section_id']);
  */
 
 /* Disabled: authors can try their own surveys
-if ($assessHandler->isOwner($section['assess_id'])) {
+if ($surveyHandler->isOwner($section['assess_id'])) {
     error(124);
 }
 */
 
-if ($assessHandler->isExpired($section['assess_id'])) {
+if ($surveyHandler->isExpired($section['assess_id'])) {
     error(120);
 }
 
-if ($assessHandler->isDeleted($section['assess_id'])) {
+if ($surveyHandler->isDeleted($section['assess_id'])) {
 	error(112);
+}
+
+if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
+    $this->pageNotFound();
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-$assess = $assessHandler->getByID($section['assess_id']);
+$survey = $surveyHandler->getByID($section['assess_id']);
 
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
 	error(144);
 }
 

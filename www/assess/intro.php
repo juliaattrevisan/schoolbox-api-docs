@@ -23,6 +23,10 @@ if (!is_numeric($this->arg[0])) {
     error(112);
 }
 
+if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
+}
+
 /* Get intro summary for the assessment
  */
 $assess = $assessHandler->getIntro($this->arg[0]);

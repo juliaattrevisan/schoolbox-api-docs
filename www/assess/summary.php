@@ -19,8 +19,8 @@ $assess = $assessHandler->getIntro($this->arg[0]);
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);
 $allSections = $sectionHandler->getList($assess['assess_id']);
 
-if (!$assess) {
-    error(112);
+if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {

@@ -16,6 +16,10 @@ $questionHandler = new Survey_Question();
 $responseHandler = new Survey_Response();
 $groupHandler    = new Group();
 
+if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
+}
+
 $survey    = $surveyHandler->getByID($this->arg[0]);
 $attempt   = $attemptHandler->getByID($this->arg[1]);
 $attemptId = $attempt['attempt_id'];
@@ -23,9 +27,6 @@ if (!is_numeric($attemptId)) {
     SitePage::localRedir('/survey/intro/' . $this->arg[0]);
 }
 
-if (!$survey) {
-    error(112);
-}
 
 if ($surveyHandler->isDeleted($survey['assess_id'])) {
     error(112);

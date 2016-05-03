@@ -41,8 +41,8 @@ $attempt = $attemptHandler->getByID($this->arg[2]);
 $attemptList = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $this->arg[2]);
 $attempt     = array_pop($attemptList);
 
-if (!$assess) {
-    error(112);
+if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
 }
 
 if (!$section) {

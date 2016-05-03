@@ -14,11 +14,11 @@ $surveyHandler = new Survey_Main();
 $groupHandler = new Group();
 
 if (!empty($_POST)) {
-    $survey = $surveyHandler->getByID(Scrub::text($_POST['assess_id']));
-
-    if (!$survey) {
-        error(112);
+    if (!$surveyHandler->isValidUrlAccess(Scrub::text($_POST['assess_id']))) {
+        $this->pageNotFound();
     }
+
+    $survey = $surveyHandler->getByID(Scrub::text($_POST['assess_id']));
 
     if ($surveyHandler->isDeleted($_POST['assess_id'])) {
         error(112);
@@ -51,12 +51,15 @@ if (!empty($_POST)) {
     $sectionHandler = new Survey_Section();
     $section = $sectionHandler->getByID($this->arg[0]);
 
-    if ($section) {
-        $survey = $surveyHandler->getByID($section['assess_id']);
-    }
-    else {
+    if (!$section) {
         error(112);
     }
+
+    if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
+        $this->pageNotFound();
+    }
+
+    $survey = $surveyHandler->getByID($section['assess_id']);
 
     if (!$surveyHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
         error(130);
@@ -112,7 +115,7 @@ if (!empty($_POST)) {
         ],
         [
             'text' => $survey['title'],
-            'href' => "/assess/summary/{$survey['assess_id']}",
+            'href' => "/survey/summary/{$survey['assess_id']}",
             'class' => '',
         ],
         [

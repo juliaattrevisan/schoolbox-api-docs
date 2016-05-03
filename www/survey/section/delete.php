@@ -24,8 +24,8 @@ if ($section) {
 	$survey = $surveyHandler->getByID($section['assess_id']);
 }
 
-if (!$survey) {
-	error(112);
+if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
+    $this->pageNotFound();
 }
 
 if (!$surveyHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {

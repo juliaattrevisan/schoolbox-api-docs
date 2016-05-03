@@ -30,6 +30,10 @@ $groupHandler = new Group();
 $currentSection = $sectionHandler->getById($this->arg[0]);
 $survey = $surveyHandler->getByID($currentSection['assess_id']);
 
+if (!$surveyHandler->isValidUrlAccess($currentSection['assess_id'])) {
+    $this->pageNotFound();
+}
+
 if (!$currentSection) {
     error(115);
 }

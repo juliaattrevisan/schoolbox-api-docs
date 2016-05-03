@@ -27,6 +27,10 @@ if (!$assess) {
     error(112);
 }
 
+if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
+    $this->pageNotFound();
+}
+
 if ($assessHandler->isDeleted($this->arg[0])) {
     error(112);
 }
