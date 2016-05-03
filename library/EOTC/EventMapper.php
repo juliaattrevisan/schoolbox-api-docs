@@ -149,7 +149,7 @@ class EventMapper extends Calendar\EventMapper {
 	/**
 	 * Custom findAllByListGroups
 	 *
-	 * @return object
+	 * @return ListGroup\Collection
 	 */
 	public function findAllByListGroups() {
 		$authorMapper = $this->getJoinMapper('author');
