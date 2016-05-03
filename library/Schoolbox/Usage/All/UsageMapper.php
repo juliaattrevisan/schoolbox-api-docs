@@ -84,7 +84,7 @@ class UsageMapper
                 INNER JOIN `user` ON `user`.id = `file`.owner
                 INNER JOIN `groups` ON `user`.group_id = `groups`.id
                 INNER JOIN `storage` ON `file`.`hash` = `storage`.`hash`
-                WHERE `file`.`deleted` = 0
+                WHERE `file`.`deleted_at` IS NULL
                 GROUP BY `groups`.id)
                 UNION
                 (SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS bytes
@@ -92,7 +92,7 @@ class UsageMapper
                 INNER JOIN `user` ON `user`.id = `myFile`.owner
                 INNER JOIN `groups` ON `user`.group_id = `groups`.id
                 INNER JOIN `storage` ON `myFile`.`hash` = `storage`.`hash`
-                WHERE `myFile`.`deleted` = 0
+                WHERE `myFile`.`deleted_at` IS NULL
                 GROUP BY `groups`.id)
                 UNION
                 (SELECT `groups`.id, `groups`.name, SUM(filesize) AS bytes
@@ -253,13 +253,13 @@ class UsageMapper
                 (SELECT owner AS userId, SUM(`s`.`filesize`) AS bytes
                 FROM `file` `f`
                 INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-                WHERE `f`.`deleted` = 0
+                WHERE `f`.`deleted_at` IS NULL
                 GROUP BY `f`.`owner`)
                 UNION
                 (SELECT owner AS userId, SUM(`s`.`filesize`) AS bytes
                 FROM `myFile` `f`
                 INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-                WHERE `f`.`deleted` = 0
+                WHERE `f`.`deleted_at` IS NULL
                 GROUP BY `f`.`owner`)
                 UNION
                 (SELECT uploaded_by AS userId, SUM(filesize) AS bytes
