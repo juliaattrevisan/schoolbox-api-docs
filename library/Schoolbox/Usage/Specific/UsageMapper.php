@@ -81,11 +81,6 @@ class UsageMapper
                 AND `f`.`deleted` = 0
                 GROUP BY `f`.`owner`)
                 UNION
-                (SELECT SUM(filesize) AS bytes, COUNT(*) AS num
-                FROM `storage`
-                WHERE `uploaded_by` = :userId
-                GROUP BY `uploaded_by`)
-                UNION
                 (SELECT SUM(`s`.`filesize`) AS bytes, COUNT(*) AS num
                 FROM `student_submission` `f`
                 INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
@@ -188,26 +183,6 @@ class UsageMapper
                 $mimeJoin
                 WHERE `f`.`owner` = :userId
                 AND `f`.`deleted_at` IS NULL
-                AND `t`.`mime` LIKE 'audio/%')
-
-                UNION
-
-                (SELECT 'Images' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
-                FROM `storage` `s`
-                $mimeJoin
-                WHERE `s`.`uploaded_by` = :userId
-                AND `t`.`mime` LIKE 'image/%')
-                UNION
-                (SELECT 'Video' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
-                FROM `storage` `s`
-                $mimeJoin
-                WHERE `s`.`uploaded_by` = :userId
-                AND `t`.`mime` LIKE 'video/%')
-                UNION
-                (SELECT 'Audio' AS `name`, COALESCE(SUM(`s`.`filesize`), 0) AS bytes
-                FROM `storage` `s`
-                $mimeJoin
-                WHERE `s`.`uploaded_by` = :userId
                 AND `t`.`mime` LIKE 'audio/%')
 
                 UNION
