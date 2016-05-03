@@ -221,7 +221,7 @@ class External_Synergetic_User implements External_UserInterface
     public function getParentEmails($synergyIds)
     {
         $emailList = array();
-        $id_list   = implode(',', array_map('intval', $synergyIds));
+        $id_list   = implode(',', array_map([$this->getDatabase(), 'smartQuote'], $synergyIds));
         if (empty($id_list)) {
             return array();
         }
@@ -464,10 +464,9 @@ class External_Synergetic_User implements External_UserInterface
          */
         if (strlen($yearlevel)) {
             if (is_numeric($yearlevel)) {
-                // forcibly cast to int in case it's a something non-int that's still numeric
-                $yearlevel = (int)$yearlevel;
                 $query .= "
-                AND (StudentYearLevel = '{$yearlevel}' OR Year.Description = '{$yearlevel}')";
+                AND (StudentYearLevel = '{$this->getDatabase()->quote($yearlevel)}'
+                     OR Year.Description = '{$this->getDatabase()->quote($yearlevel)}')";
             } else {
                 // if year is NOT numeric, don't attempt to compare StudentYearLevel (will bug out)
                 $query .= "
@@ -737,7 +736,7 @@ class External_Synergetic_User implements External_UserInterface
                     StudentClasses.ClassCode = SubjectClasses.ClassCode AND
                     StudentClasses.FileSemester = '" . $this->database->quote($this->getCurrentSemester($synergyID)) . "' AND
                     StudentClasses.FileYear = '" . $this->database->quote($this->getCurrentYear($synergyID)) . "' AND
-                    StudentClasses.ID=$synergyID
+                    StudentClasses.ID = '{$this->database->quote($synergyID)}'
                 LEFT JOIN luFileType ON StudentClasses.FileType = luFileType.Code
                 WHERE
                     StudentClasses.StartDate <= getdate()
@@ -760,7 +759,7 @@ class External_Synergetic_User implements External_UserInterface
                     c1.ClassCode = c2.ClassCode AND
                     c1.FileSemester = '" . $this->database->quote($this->getCurrentSemester($synergyID)) . "' AND
                     c1.FileYear = '" . $this->database->quote($this->getCurrentYear($synergyID)) . "' AND
-                    c1.StaffID = $synergyID
+                    c1.StaffID = '{$this->database->quote($synergyID)}'
                 LEFT JOIN luFileType ON c2.FileType = luFileType.Code
             ";
         }
@@ -803,7 +802,7 @@ class External_Synergetic_User implements External_UserInterface
             FROM SynergyOne.dbo.Constituencies Constituencies
             LEFT JOIN SynergyOne.dbo.Relationships Relationships ON Relationships.RelatedID = Constituencies.ID
             LEFT JOIN SynergyOne.dbo.Community Community ON Relationships.RelatedID = Community.ID
-            WHERE Relationships.ID = '{$synergyID}'
+            WHERE Relationships.ID = '{$this->database->quote($synergyID)}'
             AND Constituencies.ConstitCode='@SC'
             AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD','HOPT','HOCD','HS','HOMES')
             ORDER BY Community.BirthDate
@@ -813,7 +812,7 @@ class External_Synergetic_User implements External_UserInterface
 
     public function getEmail($id)
     {
-        $query = "SELECT Email FROM Community WHERE id = $id";
+        $query = "SELECT Email FROM Community WHERE id = {$this->database->quote($id)}";
         return $this->getDatabase()->getOne($query);
     }
 
@@ -928,11 +927,7 @@ class External_Synergetic_User implements External_UserInterface
         $staffCategory = explode(',',\Config::get('synergetic_staff_dir_restrict'));
         $scWhere = '';
         if(is_array($staffCategory) && $staffCategory[0] != '') {
-            $db = $this->getDatabase();
-            $staffCategoryString = implode(',', array_map(function ($var) use ($db) {
-                        return "'".$db->quote($var)."'";
-                    }
-                    , $staffCategory));
+            $staffCategoryString = implode(',', array_map([$this->getDatabase(), 'smartQuote'], $staffCategory));
             $scWhere = "AND StaffCategory NOT IN ($staffCategoryString)";
         }
 
@@ -1022,8 +1017,7 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getCampusFromTimetable($staffID)
     {
-        $staffID = (int)$staffID;
-        $query = "SELECT DISTINCT( ClassCampus ) AS campus FROM timetable WHERE StaffID = '$staffID' AND FileYear = ".date('Y');
+        $query = "SELECT DISTINCT( ClassCampus ) AS campus FROM timetable WHERE StaffID = '{$this->database->quote($staffID)}' AND FileYear = ".date('Y');
         return $this->getDatabase()->getAll($query);
     }
 
