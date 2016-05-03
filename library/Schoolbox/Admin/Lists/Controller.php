@@ -345,12 +345,12 @@ class Controller extends Base
                 'fields'            => [
                     'id'          => [
                         'readonly'  => true,
-                        'caption'   => 'ID',
-                        'width'     => 1,
+                        'caption'   => 'Pastoral Type ID',
+                        'width'     => 2,
                     ],
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 9,
+                        'width'     => 8,
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
@@ -364,15 +364,15 @@ class Controller extends Base
                 'mapper'            => CategoryMapper::class,
                 'sort'              => 'pastoralTypeId',
                 'fields'            => [
-                    'name'          => [
-                        'caption'   => 'Name',
-                        'width'     => 8,
-                    ],
                     'pastoralTypeId' => [
                         'getter'    => 'getPastoralTypeId',
                         'caption'   => 'Parent Pastoral Type ID',
                         'width'     => 2,
-                        'tooltip'   => 'This is the ID number of the Pastoral Type under which this category will appear.',
+                        'tooltip'   => 'This is the ID number of the Pastoral Type under which this category will appear (refer to the \'Pastoral Types\' tab for a list of ID numbers).',
+                    ],
+                    'name'          => [
+                        'caption'   => 'Name',
+                        'width'     => 8,
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
