@@ -276,7 +276,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     }
                 }
 
-                if ($record["Details"] != $record["PrivateDetails"] && trim($record["PrivateDetails"]) != "")
+                if ($record["Details"] != $record["PrivateDetails"] && trim($record["PrivateDetails"]) != "" && $record["PrivateDetails"] != "No Private Details Entered")
                 {
                     // Need to create a separate private record
 
