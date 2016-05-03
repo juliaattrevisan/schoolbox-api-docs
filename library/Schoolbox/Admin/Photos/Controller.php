@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\Photos;
 
 use Alaress\Web\Controller\Base;
 use Guzzle\Common\Collection;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage;
@@ -110,23 +111,31 @@ class Controller extends Base
      */
     public function postUpload()
     {
+        $post = $this->getRequest()->post;
+        
         /** @var \Schoolbox\Config\Loader $config */
         $config = $this->getDi()->get("config");
 
-        if (is_array($this->getRequest()->post["attachment"])) {
-            foreach ($this->getRequest()->post["attachment"] as $hash) {
-                $hash_array = explode(":", $hash);
-                $storageObject = $this->getStorageMapper()->findByHash($hash_array[1]);
-                if ($storageObject->getMimetype()->isImage()) {
-                    if (strtolower($storageObject->getExtension()) == "jpg") {
-                        $destination = realpath($config->get("portrait_dir")) . "/" . $storageObject->getFilename() . ".jpg";
+        $portraits = (new CollectorFactory())->build($post['attachment'])->getAll();
 
-                        if (file_exists($destination))
-                            unlink($destination);
+        /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+        foreach ($portraits as $storageObject) {
+            if ($storageObject->getMimetype()->isImage()) {
 
-                        file_put_contents($destination, $storageObject->read());
-                    }
-                }
+                // Has to have a JPG extension for it to be found by external class, however image format is
+                // completely irrelevant
+
+                $destination = realpath($config->get("portrait_dir")) . "/" . $storageObject->getFilename() . ".jpg";
+                $source = realpath($config->get("storage_dir") . "/" . $storageObject->getPath());
+
+                // Remove any existing image
+
+                if (file_exists($destination))
+                    unlink($destination);
+
+                // Create a symlink to storage object
+
+                symlink($source, $destination);
             }
         }
 
