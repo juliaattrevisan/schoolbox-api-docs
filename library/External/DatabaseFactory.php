@@ -50,7 +50,10 @@ class External_DatabaseFactory
         foreach ($databaseClasses as $databaseClass) {
             if (class_exists($databaseClass, true)) {
                 try {
-                    return new $databaseClass();
+                    $dbClass =  new $databaseClass();
+                    // Store an offline database connector as a fallback if something goes wrong with the external connection
+                    $dbClass->offlineClass = new $offlineClass;
+                    return $dbClass;
                 } catch (\Schoolbox\External\Exception $e) {
                 }
             }

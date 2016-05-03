@@ -80,16 +80,40 @@ trait External_CacheTrait
     protected function getCachedResult($method, $params, $timeout = null)
     {
         $database = $this->getDatabase();
-        return $this->getCache()->cacheFunctionCall(
-            get_class($database).'.'.$method,
-            function ($params) use ($database, $method) {
-                return call_user_func_array(
-                    array($database, $method),
-                    $params
-                );
-            },
-            $params,
-            $timeout
-        );
+
+        try {
+
+            return $this->getCache()->cacheFunctionCall(
+                get_class($database) . '.' . $method,
+                function ($params) use ($database, $method) {
+                    return call_user_func_array(
+                        array($database, $method),
+                        $params
+                    );
+                },
+                $params,
+                $timeout
+            );
+
+        } catch (\Schoolbox\External\Exception $e) {
+
+            if ($database->offlineActive != true) {
+                $database->offlineClass->offlineActive = true;
+                $this->setDatabase($database->offlineClass);
+                $database = $this->getDatabase();
+            }
+
+            return $this->getCache()->cacheFunctionCall(
+                get_class($database) . '.' . $method,
+                function ($params) use ($database, $method) {
+                    return call_user_func_array(
+                        array($database, $method),
+                        $params
+                    );
+                },
+                $params,
+                $timeout
+            );
+        }
     }
 }
