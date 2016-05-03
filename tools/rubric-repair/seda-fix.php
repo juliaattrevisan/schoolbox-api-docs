@@ -1,5 +1,6 @@
 <?php
 /**
+ * READ JIRA TICKET SB-12028 <http://jira.alaress.com.au:8080/browse/SB-12028> BEFORE ATTEMPTING TO DO ANYTHING WITH THIS SCRIPT
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -11,7 +12,7 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 
 
-require_once __DIR__ . '/../../../conf/core/require.php';
+require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Rubric Data Repair', array(
