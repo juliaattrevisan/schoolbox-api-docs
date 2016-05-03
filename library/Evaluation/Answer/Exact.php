@@ -23,7 +23,7 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * the setup phase.
      *
      * @param  $object
-     * @param  $question_id
+     * @param int $question_id
      * @return bool|int
      */
     public function create($object, $question_id) {
@@ -61,11 +61,11 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * load its existing answers and populate fields; otherwise empty them or
      * set to other default values.
      *
-     * @param  $page
+     * @param SitePage $page
      * @param string $question_id
      * @return void
      */
-    public function modify($page, $question_id = '') {
+    public function modify(SitePage $page, $question_id = '') {
         if (is_numeric($question_id)) {
             $currentAnswer = parent::getForQuestion($question_id);
 
@@ -88,11 +88,11 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
 	/**
 	 * Render answers in the QuestionBank
 	 *
-	 * @param  $page
+	 * @param SitePage $page
 	 * @param string $answer
 	 * @return void
 	 */
-	public function modifyInQuestionBank($page, $answer) {
+	public function modifyInQuestionBank(SitePage $page, $answer) {
 		$page->setVar(array(
 			'ANSWER' => Scrub::text($answer),
 		));
@@ -101,8 +101,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
 	/**
 	 * Serialize for db storage (we shouldn't be using serialize anymore)
 	 *
-	 * @param $data
-	 * @return string
+	 * @param array $data
+	 * @return array
 	 */
 	public function encodeForQuestionBank($data) {
 		return $data;
@@ -112,12 +112,12 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
      *
-     * @param  $page
-     * @param  $attemptId
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param int $question_id
      * @return void
      */
-    public function prepareResponse($page, $attemptId, $question_id)
+    public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
 		/* Optional configuration hook
 		 */
@@ -154,18 +154,17 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * Clear child blocks after parsing out the parent. Keep this in its own
      * method for polymorphic algorithm
      *
-     * @param  $page
+     * @param SitePage $page
      * @return void
      */
-    public function cleanupParse($page) {
+    public function cleanupParse(SitePage $page) {
     }
 
     /**
      * Saves a response for this Answer type. This should be customised based on
      * the format and structure of the answer (e.g. serialize multichoice)
      *
-     * @param $data
-     *
+     * @param array $data
      * @return array
      */
     public function saveResponse($data) {
@@ -178,11 +177,11 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * Exports the answer to Moodle XML format. This is a modified version of
      * $this->reviewResponse()
      *
-     * @param  $page
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $question_id
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id) {
+    public function exportMoodleAnswer(SitePage $page, $question_id) {
         $currentAnswer = $this->getByQuestionID($question_id);
 
         /* Show correct answer
@@ -202,7 +201,7 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * structure of the original xml export.
      *
      * @param  $xmlObj
-     * @param  $question_id
+     * @param int $question_id
      * @return bool|int
      */
     public function importMoodleAnswer($xmlObj, $question_id) {
@@ -219,8 +218,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
     /**
      * Get the response for a particular question
      *
-     * @param  $attempt_id
-     * @param  $question_id
+     * @param int $attempt_id
+     * @param int $question_id
      *
      * @return array
      */
@@ -245,8 +244,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
     /**
      * Get the response for a particular question
      *
-     * @param  $attempt_id
-     * @param  $question_id
+     * @param int $attempt_id
+     * @param int $question_id
      *
      * @return mixed
      */
@@ -262,12 +261,12 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * Show the response someone submitted and also show the correct answer.
      * Provide an option for the teacher to review the mark and adjust.
      *
-     * @param  $page
-     * @param  $attemptId
-     * @param  $question_id
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param int $question_id
      * @return void
      */
-    public function reviewResponse($page, $attemptId, $question_id)
+    public function reviewResponse(SitePage $page, $attemptId, $question_id)
     {
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
@@ -307,11 +306,11 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
 	 * Show the response someone submitted and also show the correct answer.
 	 * Provide an option for the teacher to review the mark and adjust.
 	 *
-	 * @param $page
-	 * @param $attemptId
-	 * @param $currentQuestion
+	 * @param SitePage $page
+	 * @param int $attemptId
+	 * @param array $currentQuestion
 	 */
-	public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
+	public function reviewResponseHorizontal(SitePage $page, $attemptId, $currentQuestion) {
 		$existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
 		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
@@ -346,11 +345,11 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
 	 * The answer for a question during horizontal marking, so it appears at the
 	 * top under the question itself, and not repeated for each attempt
 	 *
-	 * @param $page
-	 * @param $currentQuestion
+	 * @param SitePage $page
+	 * @param array $currentQuestion
 	 * @return void
 	 */
-	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
+	public function reviewResponseHorizontalAnswerForQuestion(SitePage $page, $currentQuestion) {
 		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 
 		/* Show correct answer
@@ -372,7 +371,7 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * @return bool
      */
     protected function compareStrings($str1, $str2) {
-         return strcmp($this->normalizeForComparison($str1),$this->normalizeForComparison($str2)) == 0);
+         return strcmp($this->normalizeForComparison($str1),$this->normalizeForComparison($str2)) == 0;
     }
 
     /**
@@ -380,7 +379,6 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
      * converts to lower case, and replaces the em dash character with standard hyphen.
      *
      * @param string $str
-     *
      * @return string
      */
     protected function normalizeForComparison($str)
