@@ -3,7 +3,7 @@
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 
-class Calendar extends DeprecatedModel
+class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 {
 
     const ATTENDANCE_STATUS_PENDING = 1;

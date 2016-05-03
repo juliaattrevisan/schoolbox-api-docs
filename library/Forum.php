@@ -3,7 +3,7 @@
 define('FORUM_THREADS_PER_PAGE', 30);
 define('FORUM_POSTS_PER_PAGE', 15);
 
-class Forum extends DeprecatedModel {
+class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
     function Forum() {
 

@@ -15,7 +15,7 @@ define('RECENT_WORK_LIMIT', 12);
  * Class Submission
  * @deprecated use Schoolbox\Assessment\SubmissionBoxMapper
  */
-class Submission extends DeprecatedModel
+class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 {
 
     /**

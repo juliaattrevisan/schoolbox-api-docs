@@ -1,6 +1,6 @@
 <?php
 
-class Blog extends DeprecatedModel {
+class Blog extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
 	/**
 	 * @deprecated

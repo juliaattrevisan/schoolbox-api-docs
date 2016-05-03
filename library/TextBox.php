@@ -1,6 +1,6 @@
 <?php
 
-class TextBox extends DeprecatedModel {
+class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
     function TextBox() {
         $this->_table = 'textBox';
