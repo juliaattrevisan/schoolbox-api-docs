@@ -73,13 +73,7 @@
                                 {{ blog.getBody | purify }}
 
                                 {% if blogImages[blog.getId] | length > 0 %}
-
-                                    <ul class="inline-list img-gallery" data-image-gallery="">
-                                        {% for image in blogImages[blog.getId] %}
-                                            <li><a href="/storage/image.php?size=maxsize&hash={{ image.hash }}" title="Image {{ loop.index + 1 }}" rel="lightbox"><img src="/storage/image.php?size=square128&hash={{ image.hash }}" alt="Image {{ loop.index + 1 }}"></a></li>
-                                        {% endfor %}
-                                    </ul>
-
+                                    {% include '@blog/sub/imageGallery.twig' with {images: blogImages[blog.getId()]} %}
                                 {% endif %}
 
                                 {% if blogComments[blog.getId] | length > 0 %}
