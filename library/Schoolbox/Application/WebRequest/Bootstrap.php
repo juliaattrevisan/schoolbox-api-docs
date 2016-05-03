@@ -539,7 +539,8 @@ class Bootstrap implements BootstrapInterface {
      */
     public function shutdownSafely(\Exception $e = null)
     {
-        $outputStackTrace = Config::get('debug_show_stack_trace');
+		$outputStackTrace = Config::get('debug_show_stack_trace');
+
         if ($e instanceof \Exception) {
             $error = array(
                 'file'    => $e->getFile(),

@@ -1,13 +1,13 @@
 <?php
 /************************************************************
-*                                                           *
-* 		Copyright (c) 2013 Alaress Pty Ltd				*
-*                                                           *
-*	This file provides abstraction of the  MSSQL database.	*
-*	This used for Synergetic connections. 	 				*
-*	It also includes error handling and a debug mode.		*
-*                                                           *
-************************************************************/
+ *                                                           *
+ * 		Copyright (c) 2013 Alaress Pty Ltd				*
+ *                                                           *
+ *	This file provides abstraction of the  MSSQL database.	*
+ *	This used for Synergetic connections. 	 				*
+ *	It also includes error handling and a debug mode.		*
+ *                                                           *
+ ************************************************************/
 
 use Alaress\DebugBar\DataCollector\MssqlDatabaseCollector;
 
@@ -37,55 +37,55 @@ class MSSQL {
 	 */
 	protected $collector = null;
 
-    /**
-     * The database connection resource
-     * @var resource
-     */
-    protected $dbf = null;
+	/**
+	 * The database connection resource
+	 * @var resource
+	 */
+	protected $dbf = null;
 
-    /**
-     * Database host address
-     * @var string
-     */
-    protected $host = null;
+	/**
+	 * Database host address
+	 * @var string
+	 */
+	protected $host = null;
 
-    /**
-     * Database user
-     * @var string
-     */
-    protected $user = null;
+	/**
+	 * Database user
+	 * @var string
+	 */
+	protected $user = null;
 
-    /**
-     * Database password
-     * @var string
-     */
-    protected $passwd = null;
+	/**
+	 * Database password
+	 * @var string
+	 */
+	protected $passwd = null;
 
-    /**
-     * Database name
-     * @var string
-     */
-    protected $db = null;
+	/**
+	 * Database name
+	 * @var string
+	 */
+	protected $db = null;
 
-    /**
-     * Most recent result resource
-     * @var resource
-     */
-    protected $result = null;
+	/**
+	 * Most recent result resource
+	 * @var resource
+	 */
+	protected $result = null;
 
-    /**
+	/**
 	 * Static instance of this class
 	 *
 	 * @var self
 	 */
 	protected static $instance = null;
 
-    /**
-     * @param bool $db
-     * @param bool $optionalConfig
-     * @param bool $newConnection Enforces a new connection, even if already connected with these credentials.
-     */
-    function MSSQL($db = false, $optionalConfig = false, $newConnection = false) {
+	/**
+	 * @param bool $db
+	 * @param bool $optionalConfig
+	 * @param bool $newConnection Enforces a new connection, even if already connected with these credentials.
+	 */
+	function MSSQL($db = false, $optionalConfig = false, $newConnection = false) {
 
 		/* Blasphemy (heresy unavoidable)
 		 * Hijack these settings for alternative config
@@ -95,8 +95,6 @@ class MSSQL {
 			$this->user = $optionalConfig['user'];
 			$this->passwd = $optionalConfig['passwd'];
 			$this->db = $optionalConfig['db'];
-
-			$this->connect($newConnection);
 			$encoding = $optionalConfig['encoding'];
 		}
 		else {
@@ -105,10 +103,6 @@ class MSSQL {
 			$this->passwd = Cfg::get('external_db_passwd');
 			$this->debug = 0;
 			$this->db = $db?$db:Cfg::get('external_db_db');
-
-			if(Cfg::get('external_enable') == 1) {
-				$this->connect($newConnection);
-			}
 			$encoding = Cfg::get('external_db_encoding');
 		}
 		if (!empty($encoding)) {
@@ -118,7 +112,7 @@ class MSSQL {
 
 	/**
 	 * Gets static instance of this class (with default settings). Should be
-     * alright as this never gets called
+	 * alright as this never gets called
 	 *
 	 * @return self
 	 */
@@ -129,14 +123,14 @@ class MSSQL {
 		return self::$instance;
 	}
 
-    /**
-     * Connect to database
-     *
-     * @param bool $newConnection Enforces a new connection, even if already connected with these credentials.
-     *
-     * @throws Schoolbox\External\Exception
-     */
-    function connect($newConnection = false) {
+	/**
+	 * Connect to database
+	 *
+	 * @param bool $newConnection Enforces a new connection, even if already connected with these credentials.
+	 *
+	 * @throws Schoolbox\External\Exception
+	 */
+	function connect($newConnection = false) {
 		if (!isset($this->dbf)) {
 			// mssql.charset not already set? set it to UTF-8 here.
 			if (strlen(ini_get('mssql.charset')) === 0) {
@@ -146,24 +140,24 @@ class MSSQL {
 		}
 
 		if ($this->dbf == false) {
-			throw new \Schoolbox\External\Exception("External database is offline.");
+			throw new \Schoolbox\External\Exception("Schoolbox was unable to connect to your schools external database.\nIf this problem persists, please contact your system administrator.");
+		} else {
+			if (!$this->changeDb($this->db)) {
+				throw new \Schoolbox\External\Exception("Schoolbox was unable to connect to your schools external database.\nThe server was online, however the database could not be accessed. If this problem persists, please contact your system administrator.");
+			} else {
+				/* Set Default NULL ON, due to stored procs requiring this */
+				mssql_query('SET ANSI_NULL_DFLT_ON ON', $this->dbf);
+				mssql_query('SET CONCAT_NULL_YIELDS_NULL ON', $this->dbf);
+			}
 		}
-
-		if (!$this->changeDb($this->db)) {
-			throw new \Schoolbox\External\Exception("External database is online, but unable to connect.");
-		}
-
-        /* Set Default NULL ON, due to stored procs requiring this */
-        mssql_query('SET ANSI_NULL_DFLT_ON ON',$this->dbf);
-        mssql_query('SET CONCAT_NULL_YIELDS_NULL ON', $this->dbf);
 	}
 
-    /**
-     * Change to a different DB on server
-     * @param string $db
-     * @return bool
-     */
-    function changeDB($db) {
+	/**
+	 * Change to a different DB on server
+	 * @param string $db
+	 * @return bool
+	 */
+	function changeDB($db) {
 		if(@mssql_select_db($db, $this->dbf))
 		{
 			$this->db = $db;
@@ -190,12 +184,16 @@ class MSSQL {
 		return $this->collector;
 	}
 
-    /**
-     * @param string $sql_q
-     * @return bool|resource
-     */
-    function query($sql_q)
+	/**
+	 * @param string $sql_q
+	 * @return bool|resource
+	 */
+	function query($sql_q)
 	{
+		if (!$this->isConnected()) {
+			$this->connect();
+		}
+
 		// SB-6907: Cathedral's SQL server won't accept long query strings, so
 		// strip any leading space from each line of the query.
 		// (I can't guarantee that this won't change the meaning of any query,
@@ -246,6 +244,10 @@ class MSSQL {
 	 */
 	public function executeProcedure($name, $params, $multipleResultSets = false)
 	{
+		if (!$this->isConnected()) {
+			$this->connect();
+		}
+
 		$bound_outputs = array();
 		$proc          = $this->buildProcedure($name, $params, $bound_outputs);
 
@@ -273,7 +275,7 @@ class MSSQL {
 					/* This fixes issue where output params were not available after resultset was returned */
 					mssql_next_result($result);
 				}
-            }
+			}
 			elseif ($result === false) {
 				// Did the procedure error out? Return nothing instead.
 				$success       = false;
@@ -287,7 +289,7 @@ class MSSQL {
 		}
 		mssql_free_statement($proc);
 
-        return array(
+		return array(
 			'success' => $success,
 			'output'  => $bound_outputs,
 			'result'  => $return,
@@ -421,10 +423,10 @@ class MSSQL {
 	 * @return array
 	 */
 	public function trimAll($rowset) {
-        if(is_array($rowset)) {
-		    return array_map(array($this, 'trimRow'), $rowset);
-        }
-        return $rowset;
+		if(is_array($rowset)) {
+			return array_map(array($this, 'trimRow'), $rowset);
+		}
+		return $rowset;
 	}
 
 	/**
@@ -436,10 +438,10 @@ class MSSQL {
 	 * @return array
 	 */
 	public function trimRow($row) {
-        if(is_array($row)) {
-		    return array_map(array($this, 'trimField'), $row);
-        }
-        return $row;
+		if(is_array($row)) {
+			return array_map(array($this, 'trimField'), $row);
+		}
+		return $row;
 	}
 
 	/**
@@ -546,7 +548,7 @@ class MSSQL {
 	 * @return bool
 	 */
 	public function isConnected() {
-		if ($this->dbf !== null) {
+		if ($this->dbf !== null && $this->dbf != false) {
 			return true;
 		}
 

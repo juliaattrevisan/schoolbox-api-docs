@@ -15,7 +15,11 @@ class External_Timetable implements External_TimetableInterface
     use External_CacheTrait;
 
     private $database;
-
+    
+    /**
+     * @var External_Offline_Timetable
+     */
+    private $offline;
     /**
      * Constructor
      *
@@ -26,6 +30,7 @@ class External_Timetable implements External_TimetableInterface
     {
         $factory = new External_DatabaseFactory();
         $this->setDatabase($factory->buildTimetableConnector($databaseName));
+        $this->setOffline(new External_Offline_Timetable());
         $this->setCache(Redis::getInstance());
         $this->setTimeout(Config::get('external_cache_timeout'));
     }
@@ -271,6 +276,22 @@ class External_Timetable implements External_TimetableInterface
     private function getDatabase()
     {
         return $this->database;
+    }
+    
+    /**
+     * @return External_Offline_Timetable
+     */
+    public function getOffline()
+    {
+        return $this->offline;
+    }
+
+    /**
+     * @param External_Offline_Timetable $offline
+     */
+    public function setOffline($offline)
+    {
+        $this->offline = $offline;
     }
 
 }

@@ -50,7 +50,8 @@ class External_DatabaseFactory
         foreach ($databaseClasses as $databaseClass) {
             if (class_exists($databaseClass, true)) {
                 try {
-                    return new $databaseClass();
+                    $dbClass =  new $databaseClass();
+                    return $dbClass;
                 } catch (\Schoolbox\External\Exception $e) {
                 }
             }
