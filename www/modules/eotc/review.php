@@ -12,7 +12,10 @@
  */
 $authenticator = new \EOTC\Authenticator();
 
-if (!$authenticator->isEOTCAdministrator($_SESSION['user'])) {
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+if (!$authenticator->isEOTCAdministrator($sessionUser)) {
 	error(19);
 }
 
@@ -25,6 +28,8 @@ $this->setVar(array(
 ));
 
 $eventMapper = new \EOTC\EventMapper();
+
+/** @var \EOTC\ListGroup\Collection $allListGroups */
 $allListGroups = $eventMapper->findAllByListGroups([
 	\EOTC\EventStatusMapper::STATUS_DRAFT,
 	\EOTC\EventStatusMapper::STATUS_INPRINCIPLE,
@@ -36,9 +41,7 @@ $allListGroups = $eventMapper->findAllByListGroups([
 /* Using foreach() won't increment the $position, which I use to get the name
  * of the collection currently being iterated
  */
-for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) {
-	$currentListGroup = $allListGroups->current();
-
+foreach ($allListGroups as $currentListGroup) {
 	if ($currentListGroup->count()) {
 		$this->setVar(array(
 			'EVENT_LIST_GROUP_NAME' => $allListGroups->getCurrentName()
@@ -51,7 +54,7 @@ for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) 
 
 			/* Only list events you can manipulate
 			 */
-			if ($authenticator->canPromote($_SESSION['user'], $currentEvent)) {
+			if ($authenticator->canPromote($sessionUser, $currentEvent)) {
 				$this->setVar(array(
 					'EVENT_ID' => $currentEvent->getId(),
 					'EVENT_STATUS_NAME' => $currentEvent->getMetadata()->getStatus()->getName(),

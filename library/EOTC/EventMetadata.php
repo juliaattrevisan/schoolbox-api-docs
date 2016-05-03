@@ -181,7 +181,7 @@ class EventMetadata {
 	/**
 	 * Set id
 	 *
-	 * @param null $id
+	 * @param int $id
 	 */
 	public function setId($id) {
 		$this->id = $id;
@@ -190,7 +190,7 @@ class EventMetadata {
 	/**
 	 * Get id
 	 *
-	 * @return null
+	 * @return int
 	 */
 	public function getId() {
 		return $this->id;
@@ -235,7 +235,7 @@ class EventMetadata {
 	/**
 	 * Set updated at
 	 *
-	 * @param null $updatedAt
+	 * @param \Alaress_Date_Format $updatedAt
 	 */
 	public function setUpdatedAt($updatedAt) {
 		$this->updatedAt = $updatedAt;
@@ -244,7 +244,7 @@ class EventMetadata {
 	/**
 	 * Get updated at
 	 *
-	 * @return null
+	 * @return \Alaress_Date_Format
 	 */
 	public function getUpdatedAt() {
 		return $this->updatedAt;
