@@ -12,6 +12,7 @@ namespace Schoolbox\Blog\Blog;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -78,6 +79,8 @@ class Controller extends Base
      */
     public function postModify() {
 
+        $post = $this->getRequest()->post;
+
         // Check if we are inserting/updating a record
 
         if (!empty($this->getRequest()->post["id"])) {
@@ -109,22 +112,15 @@ class Controller extends Base
 
         // Get all attachments associated with this record
 
-        try {
-            $attachments = $this->getBlogImageMapper()->findByColumn("blog_id", $record->getId());
-        } catch (\Exception $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-        }
+        $attachments = $this->getBlogImageMapper()->findByColumn("blog_id", $record->getId());
 
         foreach ($attachments as $attachment) {
 
             $foundAttachment = false;
 
-            if (is_array($this->getRequest()->post["attachment"])) {
-                foreach ($this->getRequest()->post["attachment"] as $hash) {
-
-                    $hash_array = explode(":", $hash);
-
-                    if ($attachment->getHash() == $hash_array[1]) {
+            if (is_array($post["attachment"])) {
+                foreach ($post["attachment"] as $hash) {
+                    if ($attachment->getHash() == $hash) {
                         $foundAttachment = true;
                         break;
                     }
@@ -148,22 +144,17 @@ class Controller extends Base
 
         // Save any new attachments
 
-        if (is_array($this->getRequest()->post["attachment"])) {
-            foreach ($this->getRequest()->post["attachment"] as $hash) {
+        $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();
 
-                $hash_array = explode(":", $hash);
+        /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+        foreach ($attachmentObjects as $storageObject) {
+            // Only add attachments which don't already exist and are actually images
 
-                if ($hash_array[0] == 'browse') {
-                    $file = $this->getFileMapper()->findById($hash_array[1]);
-                    $hash_array[1] = $file->getHash();
-                }
-
-                // Only add attachments which don't already exist
-
-                if (!in_array($hash_array[1], $retainedAttachments)) {
+            if ($storageObject->getMimeType()->isImage()) {
+                if (!in_array($storageObject->getHash(), $retainedAttachments)) {
                     $attachment = new BlogImageModel();
                     $attachment->setBlogId($record->getId());
-                    $attachment->setHash($hash_array[1]);
+                    $attachment->setHash($storageObject->getHash());
                     $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                     $this->getBlogImageMapper()->save($attachment);
                 }
