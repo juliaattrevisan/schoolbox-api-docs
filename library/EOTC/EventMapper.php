@@ -27,6 +27,12 @@ class EventMapper extends Calendar\EventMapper {
 	const INTERVAL_MAX_6MONTH_OLD = 'WHERE e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 6 MONTH)';
 
 	/**
+	 * Only show events that are at most 1 month old
+	 * and also show all future events
+	 */
+	const INTERVAL_MAX_1MONTH_OLD_AND_FUTURE = 'WHERE (e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 1 MONTH)) OR (e.start_datetime >= NOW())';
+
+	/**
 	 * Show all events (very heavy)
 	 */
 	const INTERVAL_ALL = '';
