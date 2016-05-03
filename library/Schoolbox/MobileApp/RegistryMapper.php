@@ -11,6 +11,7 @@ namespace Schoolbox\MobileApp;
 
 
 use Schoolbox\Mapper;
+use Schoolbox\UserMapper;
 
 class RegistryMapper extends Mapper
 {
@@ -22,41 +23,15 @@ class RegistryMapper extends Mapper
     {
         $this->hasTable('mobile_app_registry');
 
-        $this->hasModel('Schoolbox\\MobileApp\\Registry');
+        $this->hasPrototype(new Registry());
 
-        $this->hasMap(array(
-            'column'            => 'user_id',
-            'property'          => 'user',
-            'type'              => self::TYPE_MODEL,
-            'join'              => 'user',
-            'join_def'          => array(
-                'other_key'         => 'id',
-                'mapper'            => 'Schoolbox\\UserMapper'
-            )
-        ));
-        $this->hasMap(array(
-            'column'            => 'app_token',
-            'property'          => 'token',
-            'type'              => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'            => 'provider',
-            'property'          => 'provider',
-            'type'              => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'            => 'created_at',
-            'property'          => 'createdAt',
-            'type'              => self::TYPE_DATETIME,
-            'created_timestamp' => true
-        ));
-        $this->hasMap(array(
-            'column'            => 'touched_at',
-            'property'          => 'touchedAt',
-            'type'              => self::TYPE_DATETIME,
-            'updated_timestamp' => true
-        ));
+        $this->joins('user_id', UserMapper::class);
 
+        $this->uses('app_token',  self::TYPE_STRING, null, 'token');
+        $this->uses('device_id',  self::TYPE_STRING);
+        $this->uses('provider',   self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('touched_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }
 
 
