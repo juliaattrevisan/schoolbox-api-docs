@@ -59,7 +59,7 @@ if (is_numeric($_GET['eventID'])) {
 
     /* Edit rules
 	 */
-    $canAdminister = $authenticator->isEOTCAdministrator($sessionUser);
+    $canAdminister = $authenticator->isEOTCAdministrator($sessionUser, $event);
     $isAuthor = (($event->getAuthor()->getId() == $sessionUser->getId()) && $authenticator->isEOTCCreator($sessionUser));
     $isTeacherInCharge = ($event->getTeacherInCharge() instanceof \Schoolbox\User) && ($event->getTeacherInCharge()->getId() == $sessionUser->getId());
 

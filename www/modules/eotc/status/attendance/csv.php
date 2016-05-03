@@ -27,7 +27,7 @@ $sessionUser = $_SESSION['user'];
  */
 $authenticator = new \EOTC\Authenticator();
 
-$isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser);
+$isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
 $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
 
 if ($isEOTCAdministrator || $isSubscribedUser) {

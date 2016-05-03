@@ -40,6 +40,7 @@ for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) 
 
 		$i = 0;
 
+		/** @var \EOTC\Event $currentEvent */
 		foreach ($currentListGroup as $currentEvent) {
 
 			/* Only list events you can manipulate

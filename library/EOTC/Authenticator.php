@@ -56,17 +56,34 @@ class Authenticator {
 	 * (a staff user with at least one valid EOTC Permission assigned)
 	 *
 	 * @param User $user
+	 * @param Event $event
 	 * @return bool
 	 */
-	public function isEOTCAdministrator(User $user) {
+	public function isEOTCAdministrator(User $user, Event $event = null) {
 		if ($user->isSuperuser()) {
 			return true;
 		}
 
 		$allPermissions = $this->getPermissionMapper()->findByUser($user);
 
-		if ($allPermissions->count()) {
-			return true;
+		/* Check permissions against a particular event's campus and status
+		 */
+		if ($event) {
+			foreach ($allPermissions as $currentPermission) {
+				$inCampus  = $this->isPermissionInCampus($currentPermission, $event);
+				$hasStatus = $this->isPermissionInStatus($currentPermission, $event);
+
+				if ($inCampus && $hasStatus) {
+					return true;
+				}
+			}
+		}
+		/* Determine whether you are an EOTC administrator, in general
+		 */
+		else {
+			if ($allPermissions->count()) {
+				return true;
+			}
 		}
 
 		return false;

@@ -11,6 +11,7 @@
 require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 
 $page = new SitePage();
+$event = false;
 
 $eventMapper = new \EOTC\EventMapper();
 
@@ -32,7 +33,7 @@ $authenticator = new \EOTC\Authenticator();
 
 $canPromote = $authenticator->canPromote($_SESSION['user'], $event);
 
-if ($authenticator->isEOTCAdministrator($_SESSION['user']) || $canPromote) {
+if ($authenticator->isEOTCAdministrator($_SESSION['user'], $event) || $canPromote) {
 
 	/* Remember original states so we know which obs to spawn
 	 */
