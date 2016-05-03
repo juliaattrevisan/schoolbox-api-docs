@@ -642,7 +642,18 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     public function deletePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
     {
         if (trim($pastoral->getExternalId()) != '') {
-            $result = $this->getDatabase()->query("DELETE FROM tPastoralCare WHERE PastoralCareSeq = " . $pastoral->getExternalId());
+            $result = $this->getDatabase()->query("DELETE FROM PastoralCareContacts WHERE PastoralCareSeq = " . $pastoral->getExternalId());
+
+            if ($result)
+                $result = $this->getDatabase()->query("DELETE FROM PastoralCareComments WHERE PastoralCareSeq = " . $pastoral->getExternalId());
+            else
+                return false;
+
+            if ($result)
+                $result = $this->getDatabase()->query("DELETE FROM tPastoralCare WHERE PastoralCareSeq = " . $pastoral->getExternalId());
+            else
+                return false;
+
             return $result;
         } else {
 
