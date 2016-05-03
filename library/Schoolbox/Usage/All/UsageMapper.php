@@ -113,7 +113,7 @@ class UsageMapper
                 INNER JOIN `user` ON `user`.id = `submission_return`.owner
                 INNER JOIN `groups` ON `user`.group_id = `groups`.id
                 INNER JOIN `storage` ON `submission_return`.`hash` = `storage`.`hash`
-                WHERE `submission_return`.`deleted` = 0
+                WHERE `submission_return`.`deleted_at` IS NULL
                 GROUP BY `groups`.id)
             ) allTotals ON `groups`.id = allTotals.id
             GROUP BY `groups`.name
@@ -274,7 +274,7 @@ class UsageMapper
                 (SELECT owner AS userId, SUM(`s`.`filesize`) AS bytes
                 FROM `submission_return` `f`
                 INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
-                WHERE `f`.`deleted` = 0
+                WHERE `f`.`deleted_at` IS NULL
                 GROUP BY `f`.`owner`)
             ) allTotals ON `user`.id = allTotals.userId
             GROUP BY `user`.id
