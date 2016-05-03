@@ -13,27 +13,31 @@ require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 $page = new SitePage();
 $event = false;
 
-$eventMapper = new \EOTC\EventMapper();
-
 /* Spawn an existing event if id provided
- * Otherwise spawn a new one
  */
 try {
-	$event = $eventMapper->findById($_POST['eventId']);
+	$mapper = new \EOTC\EventMapper();
+	$event = $mapper->findById($_POST['eventId']);
 }
-catch (\Exception $e) {
+catch (\Schoolbox\Mapper\Exception $e) {
 	error(160);
 }
 
-/* Only EOTC Administrators can view this page
- * and a special case for events currently in status In Principle; creators
- * can self-promote this status into the next.
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+/* Only EOTC Administrators, those who can promote, and Subscribed Users
+ * can view this page
  */
 $authenticator = new \EOTC\Authenticator();
 
-$canPromote = $authenticator->canPromote($_SESSION['user'], $event);
+/* Only EOTC Administrators can view this page and a special case for
+ * events where creators can self-promote this status into the next.
+ */
+$isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
+$isCanPromote = $authenticator->canPromote($sessionUser, $event);
 
-if ($authenticator->isEOTCAdministrator($_SESSION['user'], $event) || $canPromote) {
+if ($isEOTCAdministrator || $isCanPromote) {
 
 	/* Remember original states so we know which obs to spawn
 	 */
@@ -42,6 +46,7 @@ if ($authenticator->isEOTCAdministrator($_SESSION['user'], $event) || $canPromot
 
 	/* Update with values
 	 */
+	/** @var \EOTC\EventStatus $status */
 	$statusMapper = new \EOTC\EventStatusMapper();
 	$status = $statusMapper->findById($_POST['statusId']);
 
@@ -58,7 +63,7 @@ if ($authenticator->isEOTCAdministrator($_SESSION['user'], $event) || $canPromot
 	/* Activity Log
 	 */
 	$registry = new \EOTC\ActivityLog\Registry();
-	$factory = new \EOTC\ActivityLog\Factory($event, $_SESSION['user']);
+	$factory = new \EOTC\ActivityLog\Factory($event, $sessionUser);
 
 	/* If a status changed, log it
 	 */
@@ -78,7 +83,7 @@ if ($authenticator->isEOTCAdministrator($_SESSION['user'], $event) || $canPromot
 
 	/* Promoter redirect back to modify screen
 	 */
-	if ($canPromote) {
+	if ($isCanPromote) {
 		$page->localRedir('/modules/eotc/manage/modify.php?eventID=' . $event->getId());
 	}
 	/* Admin redirect back to status screen
