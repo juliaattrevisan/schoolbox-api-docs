@@ -142,7 +142,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                          dbo.Community.Surname AS OwnerLastname, dbo.Community.Given1 AS OwnerFirstname, dbo.luPastoralCareCategory.Description as CategoryDescription
             FROM         dbo.tPastoralCare 
             INNER JOIN   dbo.luPastoralCareType ON dbo.tPastoralCare.TypeCode = dbo.luPastoralCareType.Code 
-            INNER JOIN   dbo.luPastoralCareCategory ON dbo.luPastoralCareCategory.PastoralCareTypeCode = dbo.luPastoralCareType.Code 
+            INNER JOIN   dbo.luPastoralCareCategory ON dbo.luPastoralCareCategory.Code = dbo.tPastoralCare.CategoryCode 
             INNER JOIN   dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID 
             INNER JOIN   dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
         ";
@@ -188,7 +188,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
             try
             {
-                $type = $this->getPastoralTypeMapper()->findOneByColumn('name', $record["TypeDescription"]);
+                $type = $this->getPastoralTypeMapper()->findOneByColumn('external_code', $record["TypeCode"]);
             }
             catch (\Exception $e)
             {
@@ -196,6 +196,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 $type = new PastoralTypeModel();
                 $type->setName($record["TypeDescription"]);
+                $type->setExternalCode($record["TypeCode"]);
                 $this->getPastoralTypeMapper()->save($type);
             }
 
