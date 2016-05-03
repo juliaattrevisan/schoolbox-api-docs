@@ -97,8 +97,7 @@ trait External_CacheTrait
 
         } catch (\Schoolbox\External\Exception $e) {
 
-            if ($database->offlineActive != true) {
-                $database->offlineClass->offlineActive = true;
+            if (isset($database->offlineClass)) {
                 $this->setDatabase($database->offlineClass);
                 $database = $this->getDatabase();
             }
