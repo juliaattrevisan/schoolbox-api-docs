@@ -95,8 +95,6 @@ class MSSQL {
 			$this->user = $optionalConfig['user'];
 			$this->passwd = $optionalConfig['passwd'];
 			$this->db = $optionalConfig['db'];
-
-			$this->connect($newConnection);
 			$encoding = $optionalConfig['encoding'];
 		}
 		else {
@@ -105,10 +103,6 @@ class MSSQL {
 			$this->passwd = Cfg::get('external_db_passwd');
 			$this->debug = 0;
 			$this->db = $db?$db:Cfg::get('external_db_db');
-
-			if(Cfg::get('external_enable') == 1) {
-				$this->connect($newConnection);
-			}
 			$encoding = Cfg::get('external_db_encoding');
 		}
 		if (!empty($encoding)) {
