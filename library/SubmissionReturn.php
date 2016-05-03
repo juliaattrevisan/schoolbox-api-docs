@@ -1,9 +1,17 @@
 <?php
 
+/**
+ * Class SubmissionReturn
+ * @deprecated
+ */
 class SubmissionReturn extends DeprecatedModel
 {
 
-    function SubmissionReturn()
+    /**
+     * SubmissionReturn constructor.
+     * @deprecated
+     */
+    function __construct()
     {
 
         $this->_table = "submission_return";
@@ -12,23 +20,30 @@ class SubmissionReturn extends DeprecatedModel
         parent::DeprecatedModel();
     }
 
+
+    /**
+     * @deprecated
+     *
+     * @param $box_id
+     * @return array|bool
+     */
     function getByBoxID($box_id)
     {
-        $query = "SELECT r.*,user.title, user.firstname, user.lastname, user.id AS uid, username, user.synergy_id,
-                         user.group_id,
-                         local_email, alt_email
-                         FROM ( `" . $this->_table . "` r,  user)
-                  WHERE r.deleted = 0 AND user.id = r.owner AND box_id = " . $this->db->smartQuote($box_id) . " and user.deleted_at is null
+        $query = "SELECT r.*,user.title, user.firstname, user.lastname, user.id AS uid, username, user.synergy_id, user.group_id, local_email, alt_email
+                  FROM ( `" . $this->_table . "` r,  user)
+                  WHERE r.deleted_at IS NULL 
+                  AND user.id = r.owner 
+                  AND box_id = " . $this->db->smartQuote($box_id) . " 
+                  AND user.deleted_at IS NULL
                   ORDER BY lastname, firstname DESC ";
         return $this->db->getAll($query);
     }
 
     /**
-     * Gets list of al students who have had work returned for this submission
-     * box ID.
+     * Gets list of all students who have had work returned for this submission box ID.
+     * @deprecated
      *
      * @param  int $boxId
-     *
      * @return array
      */
     public function getStudentListByBoxId($boxId)
@@ -50,6 +65,14 @@ class SubmissionReturn extends DeprecatedModel
         return $studentList;
     }
 
+
+    /**
+     * @deprecated
+     *
+     * @param     $user_id
+     * @param int $box_id
+     * @return array|bool|null
+     */
     function getOneByUser($user_id, $box_id = 0)
     {
         $query = "SELECT
@@ -57,9 +80,9 @@ class SubmissionReturn extends DeprecatedModel
                     c.name categoryName,
                     s.name,
                     s.description,
-                    s.fid
+                    -1 AS fid
                   FROM ( `" . $this->_table . "` r, submission_box s, category c )
-                  WHERE r.deleted = 0
+                  WHERE r.deleted_at IS NULL
                   AND r.box_id = s.id
                   AND s.category = c.id
                   AND s.deleted IS FALSE
@@ -71,6 +94,16 @@ class SubmissionReturn extends DeprecatedModel
         return $this->db->getRow($query);
     }
 
+
+    /**
+     * @deprecated
+     *
+     * @param      $user_id
+     * @param int  $box_id
+     * @param bool $limit
+     * @return array|bool
+     * @throws \Schoolbox\Mapper\Exception
+     */
     function getByUser($user_id, $box_id = 0, $limit = false)
     {
         $query = "SELECT
@@ -78,12 +111,12 @@ class SubmissionReturn extends DeprecatedModel
                     c.name categoryName,
                     s.name,
                     s.description,
-                    s.fid,
+                    -1 AS fid,
                     s.max_mark,
                     m.slug
                   FROM ( `" . $this->_table . "` r, submission_box s, category c )
                   LEFT JOIN submission_mark_type m ON s.mark_type = m.mark_type_id
-                  WHERE r.deleted = 0
+                  WHERE r.deleted_at IS NULL
                   AND r.box_id = s.id
                   AND s.category = c.id
                   AND s.deleted IS FALSE
@@ -121,36 +154,14 @@ class SubmissionReturn extends DeprecatedModel
         return $result;
     }
 
-    /**
-     * Gets all returned work
-     *
-     * @param  <type> $user_id
-     * @param  <type> $box_id
-     * @param  <type> $limit
-     *
-     * @return <type>
-     */
-    function getAllByUser($user_id, $box_id = 0, $limit = false)
-    {
-        $query = "  SELECT
-                    r.*,
-                    c.name categoryName,
-                    s.name, s.description, s.fid
-                    FROM ( `" . $this->_table . "` r, submission_box s, category c)
-                    WHERE r.deleted = 0
-                    AND r.box_id = s.id
-                    AND s.category = c.id
-                    AND r.owner = '$user_id'";
-        if ($box_id) {
-            $query .= " AND r.box_id = $box_id";
-        }
-        $query .= " ORDER BY returned DESC";
-        if (is_numeric($limit)) {
-            $query .= " LIMIT $limit";
-        }
-        return $this->db->getAll($query);
-    }
 
+    /**
+     * @deprecated
+     *
+     * @param $user_id
+     * @param $timestamp
+     * @return array|bool|null
+     */
     function getByUserAndTime($user_id, $timestamp)
     {
         $query = "SELECT sr.*, sb.max_mark, smt.slug
@@ -162,6 +173,14 @@ class SubmissionReturn extends DeprecatedModel
         return $this->db->getRow($query);
     }
 
+
+    /**
+     * @deprecated
+     *
+     * @param     $user_id
+     * @param int $box_id
+     * @return array|bool|null
+     */
     function getLetterGradeByUser($user_id, $box_id = 0)
     {
         // join on submission_errors and both grades table.
@@ -215,6 +234,8 @@ class SubmissionReturn extends DeprecatedModel
     }
 
     /**
+     * @deprecated
+     *
      * @param float $mark
      * @param int $gradeGroupId The grade group to fetch from.
      *                          defaults to config default_grade_group.
@@ -241,12 +262,12 @@ class SubmissionReturn extends DeprecatedModel
      *  - 'A+' remains 'A+'
      *  - 'Credit' becomes 'CR'
      *  - 'High Distinction' becomes 'HD'
+     * @deprecated
      *
      * @param float  $percentage
      * @param array  $gradeGroupIds The grade groups to turn to a letter grade.
      *                              Defaults to config default_grade_group
      * @param string $separator
-     *
      * @return string
      */
     function percent2letter($percentage, $gradeGroupIds = array(), $separator = ' / ')
@@ -269,9 +290,9 @@ class SubmissionReturn extends DeprecatedModel
     /**
      * This function is intended for narrow spaces, so do some string manipulation.
      * If you don't need this, just use self::getLetterGradeByValue()
+     * @deprecated
      *
      * @param $letter
-     *
      * @return string
      */
     function shortenGrade($letter)
@@ -296,6 +317,11 @@ class SubmissionReturn extends DeprecatedModel
         return strtoupper($rtn);
     }
 
+    /**
+     * @deprecated
+     * @param $box_id
+     * @return bool
+     */
     function securityCheck($box_id)
     {
         $groupHandler = new Group();
@@ -316,43 +342,4 @@ class SubmissionReturn extends DeprecatedModel
         }
     }
 
-    function create($return, $file = false)
-    {
-        $return['filename'] = $file['name'];
-        $return['returned'] = 'NOW()';
-
-        $fileID = parent::create($return);
-
-        if (is_array($file)) {
-            $this->moveFile($fileID, $file);
-        }
-
-        //Update student submission to be marked
-        $this->db->update(
-            'student_submission',
-            array('box_id', 'owner'),
-            array('box_id' => $return['box_id'], 'owner' => $return['owner'], 'marked' => '1')
-        );
-
-        return $fileID ? true : false;
-
-    }
-
-    public function update($return, $file = false)
-    {
-        if (is_array($file)) {
-            $return['filename'] = $file['name'];
-        }
-        if ($result = parent::update($return)) {
-            if (is_array($file)) {
-                $this->moveFile($return['id'], $file);
-            }
-        }
-        return $result;
-    }
-
-    public function moveFile($file_id, $file)
-    {
-        move_uploaded_file($file['tmp_name'], Cfg::get('returns_dir') . "/" . $file_id . ".dat");
-    }
 }
