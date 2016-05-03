@@ -194,7 +194,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 			AND sb.deleted IS FALSE
 			AND sb.mark_visibility IN {$this->getArrayPlaceholders($visibilities, 'vis')}
 			AND sr.owner = :user_id
-			AND sr.deleted IS FALSE
 			AND sr.is_confirmation_of_submission IS FALSE
 			ORDER BY sr.returned DESC
 			LIMIT :limit
@@ -242,7 +241,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
         $filters = array(
             'sb.category = :category',
             'sr.owner = :student',
-            'sr.deleted IS FALSE',
             'sb.deleted IS FALSE',
             'sb.task_id IS NULL',
         );
@@ -334,7 +332,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 			LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'file', 'mime')}
 			WHERE sr.owner = :user_id
 			AND sb.id = :box_id
-			AND sr.deleted IS FALSE
 			AND sr.is_confirmation_of_submission IS FALSE
 			ORDER BY sr.returned DESC
 		";
@@ -413,7 +410,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 			FROM {$this->getTable()} sr
 			WHERE sr.owner = :user_id
 			AND sr.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
-			AND sr.deleted IS FALSE
 			GROUP BY sr.box_id
 		";
         $statement = $this->database->prepare($query);

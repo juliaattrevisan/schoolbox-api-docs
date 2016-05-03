@@ -268,7 +268,6 @@ class FileMapper extends Mapper
             WHERE sb.category IN {$boxJoin->getArrayPlaceholders($categories, 'category')}
             AND sb.deleted IS FALSE
             AND ss.owner = :user_id
-            AND ss.body IS NULL
             AND ss.draft IS FALSE
             ORDER BY ss.submitted DESC
             LIMIT :limit
@@ -307,7 +306,6 @@ class FileMapper extends Mapper
             LEFT JOIN {$boxJoin->getJoinSql('category', 'sb', 'c')}
             WHERE sb.id = :box_id
             AND ss.owner = :user_id
-            AND ss.body IS NULL
             AND ss.draft IS FALSE
             ORDER BY ss.submitted DESC
         ";
