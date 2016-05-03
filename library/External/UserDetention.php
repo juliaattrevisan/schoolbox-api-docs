@@ -19,6 +19,11 @@ class External_UserDetention implements External_UserDetentionInterface {
     protected $database;
 
     /**
+     * @var External_Offline_UserDetention
+     */
+    private $offline;
+    
+    /**
      * Constructor
      *
      * @throws Exception
@@ -27,6 +32,7 @@ class External_UserDetention implements External_UserDetentionInterface {
     public function __construct($databaseName = '') {
         $factory = new External_DatabaseFactory();
         $this->setDatabase($factory->buildUserDetentionConnector($databaseName));
+        $this->setOffline(new External_Offline_UserDetention());
         $this->setCache(Redis::getInstance());
         $this->setTimeout(Config::get('external_cache_timeout'));
     }
@@ -104,5 +110,21 @@ class External_UserDetention implements External_UserDetentionInterface {
     private function getDatabase()
     {
         return $this->database;
+    }
+
+    /**
+     * @return External_Offline_User
+     */
+    public function getOffline()
+    {
+        return $this->offline;
+    }
+
+    /**
+     * @param External_Offline_User $offline
+     */
+    public function setOffline($offline)
+    {
+        $this->offline = $offline;
     }
 }

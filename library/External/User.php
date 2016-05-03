@@ -16,6 +16,11 @@ class External_User implements External_UserInterface {
 	private $database;
 
 	/**
+	 * @var External_Offline_User
+	 */
+	private $offline;
+
+	/**
 	 * Constructor
 	 *
 	 * @throws Exception
@@ -24,6 +29,7 @@ class External_User implements External_UserInterface {
 	public function __construct($databaseName = '') {
 		$factory = new External_DatabaseFactory();
 		$this->setDatabase($factory->buildUserConnector($databaseName));
+        $this->setOffline(new External_Offline_User());
         $this->setCache(Redis::getInstance());
         $this->setTimeout(Config::get('external_cache_timeout'));
 	}
@@ -259,7 +265,24 @@ class External_User implements External_UserInterface {
      * @return External_UserInterface
      */
     private function getDatabase () {
-		return $this->database;
-	}
+        return $this->database;
+    }
+    
+    /**
+     * @return External_Offline_User
+     */
+    public function getOffline()
+    {
+        return $this->offline;
+    }
+    
+    /**
+     * @param External_Offline_User $offline
+     */
+    public function setOffline($offline)
+    {
+        $this->offline = $offline;
+    }
+
 
 }

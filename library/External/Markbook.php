@@ -17,6 +17,11 @@ class External_Markbook implements External_MarkbookInterface
     private $database;
 
     /**
+     * @var External_Offline_Markbook
+     */
+    private $offline;
+
+    /**
      * Constructor
      *
      * @throws Exception
@@ -25,6 +30,8 @@ class External_Markbook implements External_MarkbookInterface
     public function __construct($databaseName = '') {
         $factory = new External_DatabaseFactory();
         $this->setDatabase($factory->buildMarkbookConnector($databaseName));
+        $this->setOffline(new External_Offline_Markbook());
+
     }
 
     /**
@@ -93,6 +100,22 @@ class External_Markbook implements External_MarkbookInterface
     public function getDatabase()
     {
         return $this->database;
+    }
+
+    /**
+     * @return External_Offline_Markbook
+     */
+    public function getOffline()
+    {
+        return $this->offline;
+    }
+
+    /**
+     * @param External_Offline_Markbook $offline
+     */
+    public function setOffline($offline)
+    {
+        $this->offline = $offline;
     }
 
 } 

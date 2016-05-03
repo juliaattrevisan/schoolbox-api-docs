@@ -97,22 +97,14 @@ trait External_CacheTrait
 
         } catch (\Schoolbox\External\Exception $e) {
 
-            if (isset($database->offlineClass)) {
-                $this->setDatabase($database->offlineClass);
+            /** If there was a problem with the connection, fall back to offline implementation */
+            if ($this->getOffline()) {
+                $this->setDatabase($this->getOffline());
                 $database = $this->getDatabase();
             }
 
-            return $this->getCache()->cacheFunctionCall(
-                get_class($database) . '.' . $method,
-                function ($params) use ($database, $method) {
-                    return call_user_func_array(
-                        array($database, $method),
-                        $params
-                    );
-                },
-                $params,
-                $timeout
-            );
+            return call_user_func_array(array($database, $method), $params);
+
         }
     }
 }

@@ -15,6 +15,11 @@ class External_Ping implements External_PingInterface {
 	protected $database;
 
 	/**
+	 * @var External_Offline_Ping
+	 */
+	private $offline;
+	
+	/**
 	 * Constructor
 	 *
 	 * @throws Exception
@@ -23,6 +28,7 @@ class External_Ping implements External_PingInterface {
 	public function __construct($databaseName = '') {
 		$factory = new External_DatabaseFactory();
 		$this->database = $factory->buildPingConnector($databaseName);
+		$this->setOffline(new External_Offline_Ping());
 	}
 
 	public function isResponsive() {
@@ -30,5 +36,21 @@ class External_Ping implements External_PingInterface {
 			return false;
 		}
 		return $this->database->isResponsive();
+	}
+
+	/**
+	 * @return External_Offline_Ping
+	 */
+	public function getOffline()
+	{
+		return $this->offline;
+	}
+
+	/**
+	 * @param External_Offline_Ping $offline
+	 */
+	public function setOffline($offline)
+	{
+		$this->offline = $offline;
 	}
 }

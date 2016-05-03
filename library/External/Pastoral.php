@@ -16,6 +16,11 @@ class External_Pastoral implements External_PastoralInterface
     private $database;
 
     /**
+     * @var External_Offline_Pastoral
+     */
+    private $offline;
+    
+    /**
      * Constructor
      *
      * @throws Exception
@@ -24,6 +29,7 @@ class External_Pastoral implements External_PastoralInterface
     public function __construct($databaseName = '') {
         $factory = new External_DatabaseFactory();
         $this->setDatabase($factory->buildPastoralConnector($databaseName));
+        $this->setOffline(new External_Offline_Pastoral());
     }
 
     /**
@@ -119,6 +125,22 @@ class External_Pastoral implements External_PastoralInterface
     public function getDatabase()
     {
         return $this->database;
+    }
+
+    /**
+     * @return External_Offline_Pastoral
+     */
+    public function getOffline()
+    {
+        return $this->offline;
+    }
+
+    /**
+     * @param External_Offline_Pastoral $offline
+     */
+    public function setOffline($offline)
+    {
+        $this->offline = $offline;
     }
 
 } 

@@ -15,6 +15,11 @@ class External_Class implements External_ClassInterface{
 	private $database;
 
 	/**
+	 * @var External_Offline_Class
+	 */
+	private $offline;
+	
+	/**
 	 * Constructor
 	 *
 	 * @throws Exception
@@ -23,7 +28,8 @@ class External_Class implements External_ClassInterface{
 	public function __construct($databaseName = '') {
 		$factory = new External_DatabaseFactory();
 		$this->setDatabase($factory->buildClassConnector($databaseName));
-        $this->setCache(Redis::getInstance());
+		$this->setOffline(new External_Offline_Class());
+		$this->setCache(Redis::getInstance());
         $this->setTimeout(Config::get('external_cache_timeout'));
 	}
 
@@ -66,5 +72,21 @@ class External_Class implements External_ClassInterface{
 
 	private function getDatabase () {
 		return $this->database;
+	}
+	
+	/**
+	 * @return External_Offline_Class
+	 */
+	public function getOffline()
+	{
+		return $this->offline;
+	}
+
+	/**
+	 * @param External_Offline_Class $offline
+	 */
+	public function setOffline($offline)
+	{
+		$this->offline = $offline;
 	}
 }
