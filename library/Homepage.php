@@ -195,40 +195,35 @@ class Homepage
     }
 
 
-    /**
+   /**
     * Removes componentry from homepage and resets to the template that was used to create it.
-     * Also soft-deletes homepage content where applicable
+    * Also soft-deletes homepage content where applicable
     *
     * @return void
     */
     public function emptyHomepage()
     {
-        // TODO for 13.0.0: refactor this to call iterate across Component_Homepage_*Controllers instead, and call deleteData() if available
-        //      ^ well...that clearly didn't happen: we're up to 15.0.0 now...
+        /** @var $homepageCleanables \Schoolbox\IHomepageCleanable[] */
+        $homepageCleanables = array(
+            new Assess_Main(),
+            new Blog(),
+            new Calendar(),
+            new CategoryNews(),
+            new Chat(),
+            new Forum(),
+            new Poll(),
+            new Submission(),
+            new Survey_Main(),
+            new TextBox(),
+            new Wiki(),
 
-        // soft delete the data using handlers
-        $allHandlers = array(
-            'Assess_Main', 'Blog', 'Calendar', 'CategoryNews', 'Chat', 'Dropbox', 'Forum',
-            'Poll', 'Submission', 'Survey_Main', 'TextBox', 'Wiki'
+            Resource\File\Mapper::getInstance(),
+            Schoolbox\Dropbox\Mapper::getInstance(),
+            \SocialStream\PostMapper::getInstance(),
         );
 
-        if (is_array($allHandlers) && count($allHandlers)) {
-            foreach ($allHandlers as $currentComponent) {
-                $handler = new $currentComponent();
-                $handler->homepageClean($this->cid);
-            }
-        }
-
-
-        // soft delete the data using mappers
-        $mappers = [
-            [ Resource\File\Mapper::getInstance(), 'category' ]
-        ];
-
-        foreach ($mappers as $array) {
-            /** @var Schoolbox\Mapper $mapper */
-            list ($mapper, $folderField) = $array;
-            $mapper->deleteByColumn($folderField, $this->cid);
+        foreach ($homepageCleanables as $homepageCleanable){
+            $homepageCleanable->homepageClean($this->cid);
         }
 
         // reset the homepage
