@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\File\Mimetype;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
@@ -22,6 +23,8 @@ class ReturnedWork implements ISoftDeletable, IFile
 {
 
     use StorableTrait;
+
+    use Traits\Model\DeletedAtDate;
 
     /**
      * @var SubmissionBox
@@ -72,13 +75,6 @@ class ReturnedWork implements ISoftDeletable, IFile
      * @var \Alaress_Date_Format
      */
     protected $returned;
-
-    /**
-     * Whether this returned work item is softdeleted or not
-     *
-     * @var
-     */
-    protected $deleted;
 
     /**
      * Optional crocodoc uuid
@@ -266,40 +262,6 @@ class ReturnedWork implements ISoftDeletable, IFile
     public function getReturned()
     {
         return $this->returned;
-    }
-
-    /**
-     * Set deleted
-     *
-     * @param mixed $deleted
-     */
-    public function setDeleted($deleted)
-    {
-        $this->deleted = $deleted;
-    }
-
-    /**
-     * Get deleted
-     *
-     * @return mixed
-     */
-    public function getDeleted()
-    {
-        return $this->deleted;
-    }
-
-    /**
-     * Whether or not this returned work is softdeleted
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        if ($this->getDeleted()) {
-            return true;
-        }
-
-        return false;
     }
 
     /* Getters/Setters

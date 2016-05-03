@@ -15,9 +15,7 @@ ALTER TABLE `myFile`
   DROP INDEX `deleted`;
 
 ALTER TABLE `submission_return`
-  DROP COLUMN `mime_type`,
-  DROP COLUMN `deleted`,
-  DROP INDEX `deleted`;
+  DROP COLUMN `mime_type`;
 
 ALTER TABLE `student_submission`
   DROP COLUMN `mime_type`,
