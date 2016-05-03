@@ -81,16 +81,9 @@ if ($isEOTCAdministrator || $isCanPromote) {
 	 */
 	$registry->notify();
 
-	/* Promoter redirect back to modify screen
-	 */
-	if ($isCanPromote) {
-		$page->localRedir('/modules/eotc/manage/modify.php?eventID=' . $event->getId());
-	}
 	/* Admin redirect back to status screen
 	 */
-	else {
-		$page->localRedir('/modules/eotc/status/modify/' . $event->getId());
-	}
+	$page->localRedir('/modules/eotc/status/modify/' . $event->getId());
 }
 else {
 	error(19);
