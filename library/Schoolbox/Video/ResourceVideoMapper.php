@@ -115,7 +115,7 @@ class ResourceVideoMapper extends Mapper
             JOIN storage s ON s.hash = f.hash
             JOIN allowedFileExtension e ON s.ext = e.extension
             JOIN allowedFileTypes ft ON ft.fileTypeID = e.fileTypeID
-            WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0' AND ft.mime like :mime
+            WHERE category = :cat AND vq.status != 'failed' AND ft.mime like :mime
         ";
 
         /* Sort order
