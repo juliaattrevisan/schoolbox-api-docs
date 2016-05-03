@@ -23,7 +23,12 @@ class DAV_ExtendedClient extends Sabre\DAV\Client
         $absolutePath = $this->getAbsoluteUrl($path);
         $request      = new Sabre\HTTP\Request('PUT', $absolutePath);
         $curl         = curl_init($absolutePath);
-        $request->setBody($file);
+        if (is_resource($file)) {
+            $request->setBody($file);
+        } else {
+            $fp = fopen($file, 'r');
+            $request->setBody($fp);
+        }
 
         $settings = $this->createCurlSettingsArray($request);
         $settings[CURLOPT_HTTPAUTH]   = Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC;
