@@ -15,12 +15,16 @@ ALTER TABLE `blog` CHANGE `cid` `folder_id` INT(6) UNSIGNED NOT NULL;
 ALTER TABLE `blog` CHANGE `created` `created_at` DATETIME NOT NULL;
 ALTER TABLE `blog` CHANGE `deleted` `deleted_at` DATETIME;
 ALTER TABLE `blog` CHANGE `owner` `owner_id` INT(6) UNSIGNED NOT NULL;
+ALTER TABLE `blog` ADD COLUMN `updated_at` DATETIME NOT NULL AFTER `created_at`;
+UPDATE `blog` SET `updated_at` = `created_at`;
 
 ALTER TABLE `blogComment` RENAME TO `blog_comment`;
 ALTER TABLE `blog_comment` CHANGE `bid` `blog_id` INT(6) UNSIGNED NOT NULL;
 ALTER TABLE `blog_comment` CHANGE `owner` `owner_id` INT(6) UNSIGNED NOT NULL;
 ALTER TABLE `blog_comment` CHANGE `created` `created_at` DATETIME NOT NULL;
 ALTER TABLE `blog_comment` CHANGE `deleted` `deleted_at` DATETIME;
+ALTER TABLE `blog_comment` ADD COLUMN `updated_at` DATETIME NOT NULL AFTER `created_at`;
+UPDATE `blog_comment` SET `updated_at` = `created_at`;
 
 -- ePortfolio Blogs
 
