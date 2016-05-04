@@ -17,6 +17,8 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Blog\Blog\Mapper as BlogMapper;
 use Schoolbox\Blog\Blog\Controller as BlogController;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -97,11 +99,15 @@ class Module extends BaseModule
             $matcher,
             '.*',
             function ($params) {
-                if (array_key_exists('folderId', $params)) {
-                    $params['folder'] = Folder\Mapper::getInstance()->findById($params['folderId']);
-                }
-                if (array_key_exists('id', $params)) {
-                    $params['blog'] = BlogMapper::getInstance()->findById($params['id']);
+                try {
+                    if (array_key_exists('folderId', $params)) {
+                        $params['folder'] = Folder\Mapper::getInstance()->findById($params['folderId']);
+                    }
+                    if (array_key_exists('id', $params)) {
+                        $params['blog'] = BlogMapper::getInstance()->findById($params['id']);
+                    }
+                } catch (MapperException $e) {
+                    ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
             }
         );
