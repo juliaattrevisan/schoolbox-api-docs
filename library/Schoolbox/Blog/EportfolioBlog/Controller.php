@@ -74,18 +74,27 @@ class Controller extends Base
     }
 
     /**
-     * Save changes to existing record/Insert new record
+     * Insert new record
      */
-    public function postModify()
+    public function postInsert()
+    {
+        $this->postModify();
+    }
+
+    /**
+     * Save changes to existing record/Insert new record
+     * @param int $id The blog being modified
+     */
+    public function postModify($id = null)
     {
         // Check if we are updating or inserting
 
-        if (!empty($this->getRequest()->post["id"])) {
+        if (!empty($id)) {
 
             // Updating an existing record, just grab a handle to it
 
             /** @var EportfolioBlogModel $record */
-            $record = $this->getEportfolioBlogMapper()->findById($this->getRequest()->post["id"]);
+            $record = $this->getEportfolioBlogMapper()->findById($id);
 
         } else {
 
@@ -240,12 +249,11 @@ class Controller extends Base
 
     /**
      * Create new blog comment
+     * @param int $id The post to add a comment to
      * @throws MapperException
      */
-    public function postCommentInsert()
+    public function postCommentInsert($id)
     {
-        $id = $this->getRequest()->post["id"];
-
         try {
 
             // Retrieve the blog item the comment is being added to
@@ -273,15 +281,16 @@ class Controller extends Base
 
     /**
      * Delete blog comment
+     * @param int $commentId The comment to delete
      * @throws MapperException
      */
-    public function postCommentDelete() {
+    public function postCommentDelete($commentId) {
 
         try {
             // Retrieve the comment we are trying to delete
             
             /** @var EportfolioBlogCommentModel $comment */
-            $comment = $this->getEportfolioBlogCommentMapper()->findById($this->getRequest()->post["id"]);
+            $comment = $this->getEportfolioBlogCommentMapper()->findById($commentId);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
@@ -299,12 +308,11 @@ class Controller extends Base
 
     /**
      * Delete blog post
+     * @param int $id The post to delete
      * @throws MapperException
      */
-    public function postDelete() 
+    public function postDelete($id)
     {
-        $id = $this->getRequest()->post["id"];
-
         try {
             // Retrieve the blog we are deleting
             
