@@ -24,7 +24,7 @@ ALTER TABLE `blog_comment` CHANGE `deleted` `deleted_at` DATETIME;
 
 -- ePortfolio Blogs
 
-CREATE TABLE `eportfolio_blog_image` (
+CREATE TABLE `eportfolio_component_blog_image` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT '',
   `blog_id` INT NULL COMMENT '',
   `hash` VARCHAR(50) NULL COMMENT '',
