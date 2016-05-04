@@ -51,6 +51,7 @@ class Module extends BaseModule
             ],
             'POST' => [
                 '/delete/{id}'                       => 'postDelete',
+                '/modify'                            => 'postInsert',
                 '/modify/{id}'                       => 'postModify',
                 '/comment/insert/{id}'               => 'postCommentInsert',
                 '/comment/delete/{commentId}'        => 'postCommentDelete',
@@ -118,10 +119,10 @@ class Module extends BaseModule
             )
         );
 
-        // getInsert, postDelete: has write access to homepage
+        // getInsert, postInsert, postDelete: has write access to homepage
         $this->addRoutePermission(
             $authorizer,
-            '(getInsert|postDelete)',
+            '(getInsert|postInsert|postDelete)',
             new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getFolderIdCallback, $access)
         );
 

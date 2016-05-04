@@ -75,34 +75,31 @@ class Controller extends Base
     }
 
     /**
-     * Save changes to existing record/Insert new record
+     * POST request for creating a new record.
+     *
+     * @throws MapperException
      */
-    public function postModify() {
+    public function postInsert()
+    {
+        /** @var BlogModel $blog */
+        $blog = $this->getBlogMapper()->createModel();
+        $blog->setFolder($this->getRequest()->post["categoryId"]);
+        $blog->setOwner($this->getUser());
+        $blog->setCreatedAt(\Alaress_Date_Format::now());
+        $this->postModify($blog);
+    }
 
+    /**
+     * Save changes to existing record/Insert new record
+     * @param BlogModel $blog the blog post the user wants to modify
+     */
+    public function postModify(BlogModel $blog)
+    {
         $post = $this->getRequest()->post;
 
-        // Check if we are inserting/updating a record
-
-        if (!empty($this->getRequest()->post["id"])) {
-
-            // Updating an existing record
-
-            /** @var BlogModel $record */
-            $record = $this->getBlogMapper()->findById($this->getRequest()->post["id"]);
-        } else {
-
-            // Creating a new record
-
-            /** @var BlogModel $record */
-            $record = $this->getBlogMapper()->createModel();
-            $record->setFolder($this->getRequest()->post["categoryId"]);
-            $record->setOwner($this->getUser());
-            $record->setCreatedAt(\Alaress_Date_Format::now());
-        }
-
-        $record->setBody($this->getRequest()->post["body"]);
-        $record->setHeading($this->getRequest()->post["heading"]);
-        $this->getBlogMapper()->save($record);
+        $blog->setBody($this->getRequest()->post["body"]);
+        $blog->setHeading($this->getRequest()->post["heading"]);
+        $this->getBlogMapper()->save($blog);
 
         // Process image gallery attachments
 
@@ -112,7 +109,7 @@ class Controller extends Base
 
         // Get all attachments associated with this record
 
-        $attachments = $this->getBlogImageMapper()->findByColumn("blog_id", $record->getId());
+        $attachments = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
 
         foreach ($attachments as $attachment) {
 
@@ -143,8 +140,11 @@ class Controller extends Base
         }
 
         // Save any new attachments
-
-        $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();
+        if (is_array($post["attachment"])) {
+            $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();
+        } else {
+            $attachmentObjects = [];
+        }
 
         /** @var \Schoolbox\Resource\Storage\Model $storageObject */
         foreach ($attachmentObjects as $storageObject) {
@@ -153,7 +153,7 @@ class Controller extends Base
             if ($storageObject->getMimeType()->isImage()) {
                 if (!in_array($storageObject->getHash(), $retainedAttachments)) {
                     $attachment = new BlogImageModel();
-                    $attachment->setBlogId($record->getId());
+                    $attachment->setBlogId($blog->getId());
                     $attachment->setHash($storageObject->getHash());
                     $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                     $this->getBlogImageMapper()->save($attachment);
