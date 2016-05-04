@@ -1245,18 +1245,13 @@ class Controller extends Base\Base
                 );
 
                 // respond with stage 4: coursework list
-                $this->getResponse()->content->set
-                ([
-                    'template' => "@course/unitImportResults.twig",
-                    'format' => 'nochrome',
-                    'data' => [
-                        'ownerships' => $post['ownerships'],
-                        'homepage' => $post["homepage"],
-                        'componentId' => $post["componentId"],
-                        'courseHomepage' => $post["course_homepage"],
-                        'unitDates' => $post["unit"],
-                        'units' => $allTaskDates['units']
-                    ]
+                $this->tpl('unitImportResults', [
+                    'ownerships' => $post['ownerships'],
+                    'homepage' => $post["homepage"],
+                    'componentId' => $post["componentId"],
+                    'courseHomepage' => $post["course_homepage"],
+                    'unitDates' => $post["unit"],
+                    'units' => $allTaskDates['units']
                 ]);
             }
         }

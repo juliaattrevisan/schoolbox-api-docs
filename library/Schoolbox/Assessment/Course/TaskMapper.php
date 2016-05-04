@@ -219,7 +219,8 @@ class TaskMapper extends Schoolbox\Mapper {
         $query = "
             SELECT {$this->getColumnString('t')}
             FROM {$this->getTable()} t
-            WHERE t.category_id = :unitCategoryId;
+            WHERE t.category_id = :unitCategoryId
+            AND t.deleted_at IS NULL;
         ";
 
         $statement = $this->database->prepare($query);
