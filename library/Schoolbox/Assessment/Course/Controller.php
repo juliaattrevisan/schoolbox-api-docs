@@ -985,7 +985,7 @@ class Controller extends Base\Base
          */
         foreach ($unitDates as $unit) {
             if ($unit['import'] && !isset($unitCache[$unit['unit_id']])) {
-                $unitCache[$unit['unit_id']] = $this->getCourseMapper()->findById($unit['unit_id']);
+                $unitCache[$unit['unit_id']] = $this->getUnitMapper()->findById($unit['unit_id']);
             }
         }
 
