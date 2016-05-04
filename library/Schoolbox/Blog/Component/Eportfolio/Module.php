@@ -68,6 +68,16 @@ class Module extends BaseModule
     {
         // All routes: must be logged in
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
+
+        // getInsert: Eportfolio_Authenticator->canCreate
+        // getModify: Eportfolio_Authenticator->canModify || isOwner
+        // getArchive: Eportfolio_Authenticator->canView
+        // getItem: Eportfolio_Authenticator->canView
+        // postDelete: Eportfolio_Authenticator->canModify || isOwner
+        // postInsert: Eportfolio_Authenticator->canModify
+        // postModify: Eportfolio_Authenticator->canModify
+        // postCommentInsert: Eportfolio_Authenticator->canView
+        // postCommentDelete: Eportfolio_Authenticator->canModify || isOwner
     }
 
     /**
