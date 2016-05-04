@@ -60,7 +60,7 @@ class Sync implements SyncInterface
                 boardingStatus AS student_boarder,
                 cateringHouse  AS student_boarding_house,
                 ''             AS student_campus
-            FROM Schoolbox_Student
+            FROM Schoolbox_Students
             ORDER BY denbighID ASC
         ");
         $statement->execute();
@@ -84,16 +84,16 @@ class Sync implements SyncInterface
                 s.denbighID      AS student_id,
                 s.academicYear   AS student_year_level,
                 ''               AS student_campus,
-                s.gender         AS student_gender,
+                ''               AS student_gender,
                 s.firstname      AS student_preferred,
                 s.surname        AS student_surname
             FROM Addresses adr
             LEFT JOIN Parents par ON par.familyDenbighID = adr.familyDenbighID
             LEFT JOIN People peo ON peo.denbighID = par.peopleDenbighID
-            LEFT JOIN Schoolbox_Students ON s.familyDenbighID = par.familyDenbighID
+            LEFT JOIN Schoolbox_Students s ON s.familyDenbighID = par.familyDenbighID
             WHERE peo.id IS NOT NULL
             GROUP BY peo.denbighID
-            ORDER BY familyDenbighID ASC, denbighID ASC
+            ORDER BY adr.familyDenbighID ASC, peo.denbighID ASC
         ");
         $statement->execute();
         return new Iterator\Guardian($statement);
