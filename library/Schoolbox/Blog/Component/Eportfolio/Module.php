@@ -12,9 +12,17 @@ namespace Schoolbox\Blog\Component\Eportfolio;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use \Schoolbox\User;
+use Eportfolio\PageMapper as EportfolioPageMapper;
+use Schoolbox\Blog\EportfolioBlog\Controller as BlogController;
+use Schoolbox\Blog\EportfolioBlog\Mapper as EportfolioBlogMapper;
+use Schoolbox\Blog\EportfolioComment\Mapper as EportfolioBlogCommentMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 
 class Module extends BaseModule
@@ -58,7 +66,41 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
+        // All routes: must be logged in
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
+    }
+
+    /**
+     * Loads owner, page, blog and comment objects into requests which use them.
+     *
+     * {@inheritdoc}
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $this->addRoutePreload(
+            $matcher,
+            '.*',
+            function ($params) {
+                $newParams = [];
+                try {
+                    if (array_key_exists('ownerId', $params)) {
+                        $newParams['owner'] = UserMapper::getInstance()->findById($params['ownerId']);
+                    }
+                    if (array_key_exists('pageId', $params)) {
+                        $newParams['page'] = EportfolioPageMapper::getInstance()->findById($params['pageId']);
+                    }
+                    if (array_key_exists('id', $params)) {
+                        $newParams['blog'] = EportfolioBlogMapper::getInstance()->findById($params['id']);
+                    }
+                    if (array_key_exists('commentId', $params)) {
+                        $newParams['comment'] = EportfolioBlogCommentMapper::getInstance()->findById($params['commentId']);
+                    }
+                } catch (MapperException $e) {
+                    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                }
+                return $newParams;
+            }
+        );
     }
 
     /**
@@ -66,7 +108,7 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew('Schoolbox\\Blog\\EportfolioBlog\\Controller'));
+        $injector->set('controller:'.$this->basename, $injector->lazyNew(BlogController::class));
     }
 
     /**
