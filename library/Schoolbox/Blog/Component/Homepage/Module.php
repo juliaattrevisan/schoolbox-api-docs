@@ -31,11 +31,11 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/modify/new/{id}'              => 'getInsert',
-                '/modify/{id}'                  => 'getModify',
-                '/{id}'                         => 'getItem',
-                '/archive/{id}'                 => 'getArchiveCurrent',
-                '/archive/{id}/{year}/{month}'  => 'getArchive',
+                '/modify/new/{folderId}'             => 'getInsert',
+                '/modify/{id}'                       => 'getModify',
+                '/{id}'                              => 'getItem',
+                '/archive/{folderId}'                => 'getArchiveCurrent',
+                '/archive/{folderId}/{year}/{month}' => 'getArchive',
             ],
             'POST' => [
                 '/delete'                       => 'postDelete',
