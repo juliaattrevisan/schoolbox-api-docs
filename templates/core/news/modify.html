@@ -7,7 +7,10 @@
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
-
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>
 <script type="text/javascript">
     $(function () {
         $.fn.alaressEditor();
@@ -157,15 +160,15 @@
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label>
+                            <label class="timepick">
                                 Hour
-                                <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" class="timeField"/>
+                                <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" class="timeField" data-timepicker="hour" />
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label>
+                            <label class="timepick">
                                 Minute
-                                <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" class="timeField"/>
+                                <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" class="timeField" data-timepicker="minute" />
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
@@ -186,15 +189,15 @@
                             <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" maxlength="50" value="{ITEM_DATETIME_EXPIRES}"/>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label>
+                            <label class="timepick">
                                 Hour
-                                <input name="expires_hour" type="text" maxlength="2" value="{EXPIRES_HOUR}" class="timeField"/>
+                                <input name="expires_hour" type="text" maxlength="2" value="{EXPIRES_HOUR}" class="timeField" data-timepicker="hour" />
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label>
+                            <label class="timepick">
                                 Minute
-                                <input name="expires_minute" type="text" maxlength="2" value="{EXPIRES_MIN}" class="timeField"/>
+                                <input name="expires_minute" type="text" maxlength="2" value="{EXPIRES_MIN}" class="timeField" data-timepicker="minute" />
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
