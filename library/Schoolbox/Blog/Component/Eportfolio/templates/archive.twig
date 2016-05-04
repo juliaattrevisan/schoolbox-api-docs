@@ -113,8 +113,7 @@
 
                         </ul>
 
-                        <form action="/eportfolio/blog/comment/insert/" method="post">
-                            <input type="hidden" name="id" value="{{ blog.getId }}">
+                        <form action="/eportfolio/blog/comment/insert/{{ blog.getId }}" method="post">
                             <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                             <input type="hidden" name="ownerId" value="{{ page.getUid }}">
                             <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>

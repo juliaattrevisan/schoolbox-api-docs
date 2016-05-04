@@ -16,9 +16,7 @@
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this blog post?',
                     confirmEvent: function() {
-                        $.post('/eportfolio/blog/delete', {
-                            id: {{ record.getId }}
-                        })
+                        $.post('/eportfolio/blog/delete/{{ record.getId }}')
                         .done(function() {
                             // Remove from list after AJAX returns
 
