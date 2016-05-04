@@ -59,6 +59,7 @@ class HasHomepageAccess extends All
     {
         $this->accessLevel        = $accessLevel;
         $this->homepageIdentifier = $categoryIdentifier;
+        $this->access             = $access;
         $this
             ->addRule(new IsLoggedIn())
             ->addRule(new Callback(array($this, 'authorizeMethod')))
