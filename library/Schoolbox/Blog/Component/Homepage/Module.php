@@ -14,6 +14,9 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Blog\Blog\Controller as BlogController;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\User;
 use Twig_Loader_Chain;
 
@@ -65,7 +68,7 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew('Schoolbox\\Blog\\Blog\\Controller'));
+        $injector->set('controller:'.$this->basename, $injector->lazyNew(BlogController::class));
     }
 
     /**
