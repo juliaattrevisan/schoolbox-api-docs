@@ -30,15 +30,16 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
      */
     protected function mapping()
     {
-        $this->hasTable('eportfolio_blog_comment');
+        $this->hasTable('eportfolio_component_blog_comment');
         $this->hasPrototype(new EportfolioBlogCommentModel);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('blog_id', EportfolioBlogMapper::class, 'id', null, null, 'blog');
         $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner');
         $this->uses('body', self::TYPE_STRING);
-        $this->uses('created_at', self::TYPE_DATETIME);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->hasSoftDeleteDateField('deleted_at');
 
         $this->hasJoin(

@@ -28,6 +28,9 @@ class Model {
 	protected $createdAt;
 
 	/** @var \Alaress_Date_Format */
+	protected $updatedAt;
+
+	/** @var \Alaress_Date_Format */
 	protected $deletedAt;
 
 	/** @var string */
@@ -111,6 +114,24 @@ class Model {
 	 */
 	public function getDeletedAt() {
 		return $this->deletedAt;
+	}
+
+	/**
+	 * @return \Alaress_Date_Format
+	 */
+	public function getUpdatedAt()
+	{
+		return $this->updatedAt;
+	}
+
+	/**
+	 * @param  \Alaress_Date_Format $updatedAt
+	 * @return $this
+	 */
+	public function setUpdatedAt($updatedAt)
+	{
+		$this->updatedAt = $updatedAt;
+		return $this;
 	}
 
 	/**
