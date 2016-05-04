@@ -29,6 +29,7 @@ use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Schoolbox\Pastoral\Tags\Mapper as PastoralTagsMapper;
 use Schoolbox\Pastoral\Tags\Model as PastoralTagsModel;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -738,6 +739,8 @@ class Controller extends Base
      */
     public function postSave()
     {
+        $post = $this->getRequest()->post;
+
         if ($this->getUser()->getRole()->isStudent())
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
 
@@ -1070,12 +1073,13 @@ class Controller extends Base
 
                 $foundAttachment = false;
 
-                if (is_array($this->getRequest()->post["attachment"])) {
-                    foreach ($this->getRequest()->post["attachment"] as $hash) {
+                if (is_array($post['attachment'])) {
+                    $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();
 
-                        $hash_array = explode(":", $hash);
+                    /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+                    foreach ($attachmentObjects as $storageObject) {
 
-                        if ($attachment->getHash() == $hash_array[1]) {
+                        if ($attachment->getHash() == $storageObject->getHash()) {
                             $foundAttachment = true;
                             break;
                         }
@@ -1099,17 +1103,18 @@ class Controller extends Base
 
             // Save any new attachments
 
-            if (is_array($this->getRequest()->post["attachment"])) {
-                foreach ($this->getRequest()->post["attachment"] as $hash) {
+            if (is_array($post['attachment'])) {
+                $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();
 
-                    $hash_array = explode(":", $hash);
+                /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+                foreach ($attachmentObjects as $storageObject) {
 
                     // Only add attachments which don't already exist
 
-                    if (!in_array($hash_array[1], $retainedAttachments)) {
+                    if (!in_array($storageObject->getHash(), $retainedAttachments)) {
                         $attachment = new PastoralAttachmentModel();
                         $attachment->setPastoralId($record->getId());
-                        $attachment->setHash($hash_array[1]);
+                        $attachment->setHash($storageObject->getHash());
                         $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                         $this->getPastoralAttachmentMapper()->save($attachment);
                     }

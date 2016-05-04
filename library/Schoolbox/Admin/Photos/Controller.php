@@ -116,26 +116,29 @@ class Controller extends Base
         /** @var \Schoolbox\Config\Loader $config */
         $config = $this->getDi()->get("config");
 
-        $portraits = (new CollectorFactory())->build($post['attachment'])->getAll();
+        if (is_array($post['attachment'])) {
+            $portraits = (new CollectorFactory())->build($post['attachment'])->getAll();
 
-        /** @var \Schoolbox\Resource\Storage\Model $storageObject */
-        foreach ($portraits as $storageObject) {
-            if ($storageObject->getMimetype()->isImage()) {
+            /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+            foreach ($portraits as $storageObject) {
+                if ($storageObject->getMimetype()->isImage()) {
 
-                // Has to have a JPG extension for it to be found by external class, however image format is
-                // completely irrelevant
+                    // Has to have a JPG extension for it to be found by external class, however image format is
+                    // completely irrelevant
 
-                $destination = realpath($config->get("portrait_dir")) . "/" . $storageObject->getFilename() . ".jpg";
-                $source = realpath($config->get("storage_dir") . "/" . $storageObject->getPath());
+                    $destination = realpath($config->get("portrait_dir")) . "/" . $storageObject->getFilename() . ".jpg";
+                    $source = realpath($config->get("storage_dir") . "/" . $storageObject->getPath());
 
-                // Remove any existing image
+                    // Remove any existing image
 
-                if (file_exists($destination))
-                    unlink($destination);
+                    if (file_exists($destination)) {
+                        unlink($destination);
+                    }
 
-                // Create a symlink to storage object
+                    // Create a symlink to storage object
 
-                symlink($source, $destination);
+                    symlink($source, $destination);
+                }
             }
         }
 
