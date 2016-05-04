@@ -12,11 +12,14 @@ namespace Schoolbox\Blog\Component\Homepage;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Blog\Blog\Mapper as BlogMapper;
 use Schoolbox\Blog\Blog\Controller as BlogController;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
 use \Schoolbox\User;
 use Twig_Loader_Chain;
 
@@ -80,6 +83,27 @@ class Module extends BaseModule
                 $getFolderIdCallback,
                 Access::getInstance()
             )
+        );
+    }
+
+    /**
+     * Loads folder and blog object into requests which use them.
+     *
+     * {@inheritdoc}
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $this->addRoutePreload(
+            $matcher,
+            '.*',
+            function ($params) {
+                if (array_key_exists('folderId', $params)) {
+                    $params['folder'] = Folder\Mapper::getInstance()->findById($params['folderId']);
+                }
+                if (array_key_exists('id', $params)) {
+                    $params['blog'] = BlogMapper::getInstance()->findById($params['id']);
+                }
+            }
         );
     }
 
