@@ -99,16 +99,18 @@ class Module extends BaseModule
             $matcher,
             '.*',
             function ($params) {
+                $newParams = [];
                 try {
                     if (array_key_exists('folderId', $params)) {
-                        $params['folder'] = Folder\Mapper::getInstance()->findById($params['folderId']);
+                        $newParams['folder'] = Folder\Mapper::getInstance()->findById($params['folderId']);
                     }
                     if (array_key_exists('id', $params)) {
-                        $params['blog'] = BlogMapper::getInstance()->findById($params['id']);
+                        $newParams['blog'] = BlogMapper::getInstance()->findById($params['id']);
                     }
                 } catch (MapperException $e) {
-                    ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
+                return $newParams;
             }
         );
     }

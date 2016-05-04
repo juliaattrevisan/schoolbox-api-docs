@@ -340,22 +340,12 @@ class Controller extends Base
 
     /**
      * Display insert new blog post page
-     * @param int $folderId ID of the folder into which we are inserting the new post
+     * @param FolderModel $folder the folder into which we are inserting the new post
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getInsert($folderId)
+    public function getInsert(FolderModel $folder)
     {
-        try {
-            // Grab handle to the folder
-
-            /** @var FolderModel $folder */
-            $folder = $this->getFolderMapper()->findById($folderId);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-        }
-
         // Lets get the party started...
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@blog/modify.twig',
@@ -373,29 +363,23 @@ class Controller extends Base
 
     /**
      * Gets blog archive for the current calendar month
-     * @param int $folderId The ID of the folder whose blog archive we want to view
+     * @param FolderModel $folder The ID of the folder whose blog archive we want to view
      */
-    public function getArchiveCurrent($folderId) {
-        $this->getArchive($folderId, date("Y"), date("n"));
+    public function getArchiveCurrent(FolderModel $folder)
+    {
+        $this->getArchive($folder, date("Y"), date("n"));
     }
 
     /**
      * Gets blog archive for the selected calendar month
-     * @param int $folderId The ID of the folder whose blog archive we want to view
+     * @param FolderModel $folder the folder whose blog archive we want to view
      * @param int $year     Archive year we are currently looking at (if not supplied will be based on current date)
      * @param int $month    Archive month we are currently looking at (if not supplied will be based on current date)
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getArchive($folderId, $year, $month) {
-
-        try {
-            /** @var FolderModel $folder */
-            $folder = $this->getFolderMapper()->findById($folderId);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-        }
-
-        $blogs = $this->getBlogMapper()->findByColumn("folder_id", $folderId)->sortBy('createdAt', 'desc');
+    public function getArchive(FolderModel $folder, $year, $month)
+    {
+        $blogs = $this->getBlogMapper()->findByColumn("folder_id", $folder->getId())->sortBy('createdAt', 'desc');
         $blogComments = [];
         $blogImages = [];
 
