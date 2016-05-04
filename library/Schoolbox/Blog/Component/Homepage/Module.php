@@ -19,6 +19,8 @@ use Aura\Router\Router;
 use Schoolbox\Blog\Blog\Mapper as BlogMapper;
 use Schoolbox\Blog\Blog\Model as BlogModel;
 use Schoolbox\Blog\Blog\Controller as BlogController;
+use Schoolbox\Blog\Comment\Model as BlogCommentModel;
+use Schoolbox\Blog\Comment\Mapper as BlogCommentMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -67,12 +69,9 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
+        // All routes: must be logged in
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
 
-        // Permissions:
-        // TODO add delete settings into route
-        // * postDelete: has write access to homepage
-        // * postComment: has read access to homepage
         $getFolderIdCallback = function ($params) {
             if ($params['folder'] instanceof Folder\Model) {
                 return $params['folder']->getId();
@@ -85,19 +84,44 @@ class Module extends BaseModule
             }
             return null;
         };
+        $getCommentFolderIdCallback = function ($params) {
+            if ($params['folder'] instanceof Folder\Model) {
+                return $params['folder']->getId();
+            }
+            return null;
+        };
         $access = Access::getInstance();
 
-        // getArchive: has read access to homepage
+        // getArchive, postCommentInsert: has read access to homepage
         $this->addRoutePermission(
             $authorizer,
-            '(getArchiveCurrent|getArchive)',
+            '(getArchiveCurrent|getArchive|postCommentInsert)',
             new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, $getFolderIdCallback, $access)
         );
 
-        // getInsert: has write access to homepage
+        // postCommentDelete: has read access to homepage, or created the comment
         $this->addRoutePermission(
             $authorizer,
-            'getInsert',
+            'postCommentDelete',
+            new Rule\Any(
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, $getCommentFolderIdCallback, $access),
+                new Rule\Callback(
+                    function ($params, User $user) {
+                        if ($params['comment'] instanceof BlogCommentModel) {
+                            if ($params['comment']->getOwner()->getId() == $user->getId()) {
+                                return;
+                            }
+                        }
+                        throw new Unauthorized();
+                    }
+                )
+            )
+        );
+
+        // getInsert, postDelete: has write access to homepage
+        $this->addRoutePermission(
+            $authorizer,
+            '(getInsert|postDelete)',
             new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getFolderIdCallback, $access)
         );
 
@@ -108,10 +132,10 @@ class Module extends BaseModule
             new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, $getBlogFolderIdCallback, $access)
         );
 
-        // getModify: has write access to blog's homepage, or created the post
+        // getModify, postModify: has write access to blog's homepage, or created the post
         $this->addRoutePermission(
             $authorizer,
-            'getModify',
+            '(getModify|postModify)',
             new Rule\Any(
                 new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getBlogFolderIdCallback, $access),
                 new Rule\Callback(
@@ -146,6 +170,9 @@ class Module extends BaseModule
                     }
                     if (array_key_exists('id', $params)) {
                         $newParams['blog'] = BlogMapper::getInstance()->findById($params['id']);
+                    }
+                    if (array_key_exists('commentId', $params)) {
+                        $newParams['comment'] = BlogCommentMapper::getInstance()->findById($params['commentId']);
                     }
                 } catch (MapperException $e) {
                     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
