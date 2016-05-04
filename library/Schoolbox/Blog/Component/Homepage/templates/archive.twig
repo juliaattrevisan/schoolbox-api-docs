@@ -113,7 +113,7 @@
 
                         </ul>
 
-                        <form method="post" action="/blog/comment/new/{BLOG_ID}">
+                        <form method="post" action="/blog/comment/insert/{{ blog.getId }}">
                             <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
                             <input type="submit" class="expand" name="comment" value="Add comment"/>
                         </form>

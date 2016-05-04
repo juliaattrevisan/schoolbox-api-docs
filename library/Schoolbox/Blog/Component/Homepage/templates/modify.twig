@@ -18,9 +18,7 @@
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this blog post?',
                     confirmEvent: function() {
-                        $.post('/blog/delete', {
-                            id: {{ record.getId }}
-                        })
+                        $.post('/blog/delete/{{ record.getId }}')
                         .done(function() {
                             // Remove from list after AJAX returns
 
@@ -61,9 +59,8 @@
 </div>
 <div class="row">
     <div class="small-12 island">
-        <form method="post" id="blogForm" action="/blog/modify">
+        <form method="post" id="blogForm" action="/blog/modify/{{ record.getId }}">
             <input type="hidden" name="categoryId" value="{% if record != undefined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}" />
-            <input type="hidden" name="id" value="{{ record.getId }}" />
 
             <section>
                 <fieldset class="content">

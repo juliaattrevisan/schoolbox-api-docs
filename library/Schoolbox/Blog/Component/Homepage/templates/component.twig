@@ -15,9 +15,7 @@
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this comment?',
                     confirmEvent: function() {
-                        $.post('/blog/comment/delete', {
-                            id: commentId
-                        })
+                        $.post('/blog/comment/delete/'+String(commentId))
                         .done(function() {
                             // Remove from list after AJAX returns
 
@@ -111,9 +109,8 @@
 
                                 <li class="row hide" id="commentform-{{ blog.getId }}">
                                     <div class="column small-12 no-pad">
-                                        <form action="/blog/comment/insert/" method="post">
+                                        <form action="/blog/comment/insert/{{ blog.getId }}" method="post">
                                             <input type="hidden" name="component" value="1">
-                                            <input type="hidden" name="id" value="{{ blog.getId }}">
                                             <div class="avatar card">
                                                 <img src="/portrait.php?userId={{ session.user.getExternalId }}&size=square64" />
                                                 <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>

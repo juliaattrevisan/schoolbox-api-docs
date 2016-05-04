@@ -48,10 +48,10 @@ class Module extends BaseModule
                 '/archive/{folderId}/{year}/{month}' => 'getArchive',
             ],
             'POST' => [
-                '/delete'                       => 'postDelete',
-                '/modify'                       => 'postModify',
-                '/comment/insert'               => 'postCommentInsert',
-                '/comment/delete'               => 'postCommentDelete',
+                '/delete/{id}'                       => 'postDelete',
+                '/modify/{id}'                       => 'postModify',
+                '/comment/insert/{id}'               => 'postCommentInsert',
+                '/comment/delete/{commentId}'        => 'postCommentDelete',
             ]
         ];
 
