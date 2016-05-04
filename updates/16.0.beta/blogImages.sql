@@ -33,16 +33,18 @@ CREATE TABLE `eportfolio_blog_image` (
   `deleted_at` DATETIME NULL DEFAULT NULL COMMENT '',
   PRIMARY KEY (`id`) COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
 
-ALTER TABLE `eportfolio_blog` CHANGE `created` `created_at` DATETIME NOT NULL;
-ALTER TABLE `eportfolio_blog` CHANGE `deleted` `deleted_at` DATETIME;
-ALTER TABLE `eportfolio_blog` CHANGE `owner` `owner_id` INT(6) UNSIGNED NOT NULL;
-ALTER TABLE `eportfolio_blog` ADD `page_id` INT NULL;
+DROP TABLE IF EXISTS `eportfolio_blog`;
+# ALTER TABLE `eportfolio_blog` CHANGE `created` `created_at` DATETIME NOT NULL;
+# ALTER TABLE `eportfolio_blog` CHANGE `deleted` `deleted_at` DATETIME;
+# ALTER TABLE `eportfolio_blog` CHANGE `owner` `owner_id` INT(6) UNSIGNED NOT NULL;
+# ALTER TABLE `eportfolio_blog` ADD `page_id` INT NULL;
 
-ALTER TABLE `eportfolio_blogComment` RENAME TO `eportfolio_blog_comment`;
-ALTER TABLE `eportfolio_blog_comment` CHANGE `bid` `blog_id` INT(6) UNSIGNED NOT NULL;
-ALTER TABLE `eportfolio_blog_comment` CHANGE `owner` `owner_id` INT(6) UNSIGNED NOT NULL;
-ALTER TABLE `eportfolio_blog_comment` CHANGE `created` `created_at` DATETIME NOT NULL;
-ALTER TABLE `eportfolio_blog_comment` CHANGE `deleted` `deleted_at` DATETIME;
+DROP TABLE IF EXISTS `eportfolio_blogComment`;
+# ALTER TABLE `eportfolio_blogComment` RENAME TO `eportfolio_blog_comment`;
+# ALTER TABLE `eportfolio_blog_comment` CHANGE `bid` `blog_id` INT(6) UNSIGNED NOT NULL;
+# ALTER TABLE `eportfolio_blog_comment` CHANGE `owner` `owner_id` INT(6) UNSIGNED NOT NULL;
+# ALTER TABLE `eportfolio_blog_comment` CHANGE `created` `created_at` DATETIME NOT NULL;
+# ALTER TABLE `eportfolio_blog_comment` CHANGE `deleted` `deleted_at` DATETIME;
 
 -- Rename component definition class names to reflect newly created classes
 
