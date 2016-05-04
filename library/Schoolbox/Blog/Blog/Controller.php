@@ -163,36 +163,33 @@ class Controller extends Base
 
         // Redirect user page to blog detail page
 
-        $this->getResponse()->redirect->afterPost("/blog/{$record->getId()}");
+        $this->getResponse()->redirect->afterPost("/blog/{$blog->getId()}");
     }
 
     /**
      * Display detail page for selected blog post
-     * @param int $id       ID of the blog post the user wants to view
+     * @param BlogModel $blog the blog post the user wants to view
      */
-    public function getItem($id)
+    public function getItem(BlogModel $blog)
     {
         try
         {
             // Grab the record
 
-            /** @var BlogModel $record */
-            $record = $this->getBlogMapper()->findById($id);
-
             // Hydrate the owner and folder details
 
             /** @var FolderModel $folder */
-            $folder = $this->getFolderMapper()->findById($record->getFolder()->getId());
+            $folder = $this->getFolderMapper()->findById($blog->getFolder()->getId());
 
             /** @var User $user */
-            $user = $this->getUserMapper()->findById($record->getOwner()->getId());
-            
-            $record->setFolder($folder);
-            $record->setOwner($user);
+            $user = $this->getUserMapper()->findById($blog->getOwner()->getId());
+
+            $blog->setFolder($folder);
+            $blog->setOwner($user);
 
             // Load in comments
 
-            $comments = $this->getBlogCommentMapper()->findByColumn("blog_id", $record->getId());
+            $comments = $this->getBlogCommentMapper()->findByColumn("blog_id", $blog->getId());
 
             /** @var BlogCommentModel $comment */
             foreach ($comments as $comment) {
@@ -203,7 +200,7 @@ class Controller extends Base
 
             // Load in images
 
-            $images = $this->getBlogImageMapper()->findByColumn("blog_id", $record->getId());
+            $images = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
         }
         catch (MapperException $e)
         {
@@ -217,7 +214,7 @@ class Controller extends Base
                 'template' => '@blog/item.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
-                    'record'            => $record,
+                    'record'            => $blog,
                     'comments'          => $comments,
                     'images'            => $images
                 ),
@@ -227,22 +224,12 @@ class Controller extends Base
 
     /**
      * Create new blog comment
+     * @param BlogModel $blog
      * @throws MapperException
      */
-    public function postCommentInsert() {
-        $id = $this->getRequest()->post["id"];
-
-        try {
-            // Grab handle to the blog the comment is being added to
-
-            /** @var BlogModel $blog */
-            $blog = $this->getBlogMapper()->findById($id);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-        }
-
+    public function postCommentInsert(BlogModel $blog)
+    {
         // Add the comment
-
         /** @var BlogCommentModel $comment */
         $comment = $this->getBlogCommentMapper()->createModel();
 
@@ -259,21 +246,12 @@ class Controller extends Base
 
     /**
      * Delete blog comment
+     * @param BlogCommentModel $comment
      * @throws MapperException
      */
-    public function postCommentDelete()
+    public function postCommentDelete(BlogCommentModel $comment)
     {
-        try {
-            // Grab a handle to the comment we are deleting
-
-            /** @var BlogCommentModel $comment */
-            $comment = $this->getBlogCommentMapper()->findById($this->getRequest()->post["id"]);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-        }
-
         // Only the owner of the comment is allowed to delete it
-
         if ($comment->getOwner()->getId() != $this->getUser()->getId() && !$this->getUser()->isSuperuser()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_BLOG_MODIFY);
         }
@@ -285,21 +263,12 @@ class Controller extends Base
 
     /**
      * Delete blog post
+     * @param BlogModel $blog
      * @throws MapperException
      */
-    public function postDelete()
+    public function postDelete(BlogModel $blog)
     {
-        try {
-            // Grab handle to the blog post we're deleting
-
-            /** @var BlogModel $comment */
-            $blog = $this->getBlogMapper()->findById($this->getRequest()->post["id"]);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-        }
-
         // Only the owner of the post is allowed to delete it
-
         if ($blog->getOwner()->getId() != $this->getUser()->getId() && !$this->getUser()->isSuperuser()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_BLOG_MODIFY);
         }
@@ -311,15 +280,12 @@ class Controller extends Base
 
     /**
      * Displays modify blog post page
-     * @param int $id       ID of the blog post we are modifying
+     * @param BlogModel $blog the blog post we are modifying
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getModify($id)
+    public function getModify(BlogModel $blog)
     {
-        // Grab handle to the post we want to modify
-
-        $record = $this->getBlogMapper()->findById($id);
-        $record->setFolder($this->getFolderMapper()->findById($record->getFolder()->getId()));
+        $blog->setFolder($this->getFolderMapper()->findById($blog->getFolder()->getId()));
 
         // Lets get the party started...
 
@@ -328,11 +294,11 @@ class Controller extends Base
                 'template' => '@blog/modify.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
-                    'record'            => $record,
+                    'record'            => $blog,
                     'WRITE_ACCESS'      => WRITE_ACCESS,
                     'READ_ACCESS'       => READ_ACCESS,
                     'FULL_ACCESS'       => FULL_ACCESS,
-                    'attachzone'        => $this->getAttachZone($this->getBlogImageMapper()->findByColumn("blog_id", $id)),
+                    'attachzone'        => $this->getAttachZone($this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
                 ),
             )
         );
