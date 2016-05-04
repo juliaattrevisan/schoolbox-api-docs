@@ -335,13 +335,14 @@ class Feed {
 
         $where = $this->getFilterFromCategoryId($cid);
 
-        $query = "SELECT c.id, name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
+        $query = "SELECT c.id, c.name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, pc.name as cat_name, pc.id as cat_id
 					FROM cmsLog
 					JOIN category c ON objectId = c.id
 					JOIN user u ON user = u.id
-					WHERE parent $where AND object = 'folder' AND action = 'create'
+					JOIN category pc ON pc.id = c.parent
+					WHERE c.parent $where AND object = 'folder' AND action = 'create'
 					ORDER BY time DESC LIMIT 0, $limit";
-
+        
         $this->db->query($query);
 
         $userHandler = new User();
