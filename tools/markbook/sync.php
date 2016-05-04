@@ -100,7 +100,8 @@ foreach($categoryList as $category) {
             $return = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
             $return->setSubmissionBox($submissionBox->getSubmissionBox());
             $return->setNormalizedMark($result[0]['norm_mark']);
-            $return->setMarker($result[0]['marker']);
+            $return->setMarker(new \Schoolbox\User);
+            $return->getMarker()->setId($result[0]['marker']);
             $return->setOwner(new \Schoolbox\User);
             $return->getOwner()->setId($result[0]['owner']);
             $return->setComment($result[0]['comment']);
