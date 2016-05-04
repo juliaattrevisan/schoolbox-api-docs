@@ -41,97 +41,11 @@
 <div class="small-12 island">
     <form data-form-import method="post" action="/adminv2/import-pastoral/process">
         <section class="content">
-            <p>
-                This screen will import all pastoral care records currently stored in your SIS to the Schoolbox Pastoral
-                Care module. This is intended for a one-time import when first enabling the Pastoral Care module, any
-                records created using the import feature (and associated comments/attachment) will be removed on
-                subsequent imports.
+            <p class="no-margin">
+                Pastoral import is currently in process, you will receive a Schoolbox notification once the
+                process has completed. Depending on the number of records to be imported this may take several
+                minutes to complete.
             </p>
-            <p>
-                Click on the button below to begin the import.
-            </p>
-            <input type="submit" data-import value="Import Pastoral Care Records">
         </section>
     </form>
-</div>
-
-<div class="small-12 island">
-    <h1>Import Results</h1>
-
-    {% if skipped | length > 0 %}
-
-        <h2 class="subheader">Skipped Records ({{ skipped | length }})</h2>
-        <section class="content">
-            <p class="no-margin">These records could not be automatically imported, please refer to the messages in red for more information.</p>
-        </section>
-
-        <table>
-            <thead>
-            <tr>
-                <th width="225">Student</th>
-                <th width="225">Creator</th>
-                <th>Reason</th>
-                <th class="text-right">Heading</th>
-            </tr>
-            </thead>
-            <tbody>
-
-            {% for record in skipped %}
-                <tr>
-                    <td>{{ record['StudentFirstname'] }} {{ record['StudentLastname'] }}</td>
-                    <td>{{ record['OwnerFirstname'] }} {{ record['OwnerLastname'] }}</td>
-                    <td>
-                        <span style="color:red;">{{ record['reason'] }}</span>
-                    </td>
-                    <td class="text-right">
-                        {{ record["heading"] }}
-                        {% if record['private'] == 1 %}
-                            <b>(PRIVATE RECORD)</b>
-                        {% endif %}
-                    </td>
-                </tr>
-
-
-            {% endfor %}
-
-            </tbody>
-        </table>
-
-    {% endif %}
-
-    {% if imported | length > 0 %}
-
-        <h2 class="subheader">Imported Records ({{ imported | length }})</h2>
-        <section class="content">
-            <p class="no-margin">The following records were successfully imported.</p>
-        </section>
-        <table>
-            <thead>
-            <tr>
-                <th width="225">Student</th>
-                <th width="225">Creator</th>
-                <th class="text-right">Heading</th>
-            </tr>
-            </thead>
-            <tbody>
-
-                {% for record in imported %}
-                    <tr>
-                        <td>{{ record['StudentFirstname'] }} {{ record['StudentLastname'] }}</td>
-                        <td>{{ record['OwnerFirstname'] }} {{ record['OwnerLastname'] }}</td>
-                        <td class="text-right">
-                            {{ record["heading"] }}
-                            {% if record['private'] == 1 %}
-                                <b>(PRIVATE RECORD)</b>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-
-            </tbody>
-        </table>
-
-    {% endif %}
-
-    </div>
 </div>

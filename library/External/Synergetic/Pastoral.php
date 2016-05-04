@@ -130,7 +130,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function importPastoral()
     {
-        // Get all pastoral care records from Synergetic
+        // Get all pastoral care records from Synergetic for current students only
 
         $query = "
             SELECT       dbo.tPastoralCare.PastoralCareSeq, dbo.tPastoralCare.ID, dbo.tPastoralCare.ClassCode, dbo.tPastoralCare.ItemDate, dbo.tPastoralCare.MethodCode,
@@ -139,22 +139,24 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                          dbo.tPastoralCare.CreatedDate, dbo.tPastoralCare.CreatedByID, dbo.tPastoralCare.ModifiedDate, dbo.tPastoralCare.ModifiedByID,
                          dbo.tPastoralCare.EmailSentDate, dbo.tPastoralCare.EmailSentByID, dbo.tPastoralCare.DuplicateFromSeq, dbo.tPastoralCare.SubjectClassesSeq,
                          dbo.luPastoralCareType.Description AS TypeDescription, Community_1.Surname AS StudentLastname, Community_1.Given1 AS StudentFirstname,
-                         dbo.Community.Surname AS OwnerLastname, dbo.Community.Given1 AS OwnerFirstname, dbo.luPastoralCareCategory.Description as CategoryDescription
-            FROM         dbo.tPastoralCare 
-            INNER JOIN   dbo.luPastoralCareType ON dbo.tPastoralCare.TypeCode = dbo.luPastoralCareType.Code 
-            INNER JOIN   dbo.luPastoralCareCategory ON dbo.luPastoralCareCategory.Code = dbo.tPastoralCare.CategoryCode 
-            INNER JOIN   dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID 
-            INNER JOIN   dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
+                         dbo.Community.Surname AS OwnerLastname, dbo.Community.Given1 AS OwnerFirstname
+            FROM         dbo.tPastoralCare INNER JOIN
+                         dbo.luPastoralCareType ON dbo.tPastoralCare.TypeCode = dbo.luPastoralCareType.Code INNER JOIN
+                         dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID INNER JOIN
+                         dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
+            WHERE        dbo.tPastoralCare.ID IN (SELECT ID FROM dbo.vStudents)
         ";
 
-        $records = $this->getDatabase()->getAll($query);
+        /** @var MssqlResultIterator $records */
+        $records = $this->getDatabase()->getIterator($query);
 
         $owner = null;
         $student = null;
 
-        // Give the import 5 minutes to complete
+        // Give the import 30 minutes to complete and bump up the memory limit to handle large recordsets
 
-        set_time_limit(60 * 5);
+        ini_set('memory_limit', '2048M');
+        set_time_limit(60 * 30);
 
         try
         {
@@ -177,27 +179,39 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $imported = [];
         $skipped = [];
         $userCache = [];
+        $typeCache = [];
 
-        foreach ($records as $record)
+        $records->next();
+
+        while ($records->valid())
         {
+            $record = $records->current();
+
             // Delete any existing external record
 
             $this->getPastoralMapper()->deleteByColumn("external_id", $record["PastoralCareSeq"]);
 
             // Retrieve type
 
-            try
-            {
-                $type = $this->getPastoralTypeMapper()->findOneByColumn('external_code', $record["TypeCode"]);
-            }
-            catch (\Exception $e)
-            {
-                // Type doesn't exist in Schoolbox, create it
+            if (!isset($typeCache[$record["TypeDescription"]])) {
+                try
+                {
+                    $type = $this->getPastoralTypeMapper()->findOneByColumn('name', $record["TypeDescription"]);
+                }
+                catch (\Exception $e)
+                {
+                    // Type doesn't exist in Schoolbox, create it
+                    
+                    $type = new PastoralTypeModel();
+                    $type->setName($record["TypeDescription"]);
+                    $type->setExternalCode($record["TypeCode"]);
+                    $this->getPastoralTypeMapper()->save($type);
+                }
 
-                $type = new PastoralTypeModel();
-                $type->setName($record["TypeDescription"]);
-                $type->setExternalCode($record["TypeCode"]);
-                $this->getPastoralTypeMapper()->save($type);
+                $typeCache[$record["TypeDescription"]] = $type;
+            }
+            else {
+                $type = $typeCache[$record["TypeDescription"]];
             }
 
             // Retrieve category
@@ -324,6 +338,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 $skipped[] = $record;
             }
+
+            $records->next();
         }
 
         return [

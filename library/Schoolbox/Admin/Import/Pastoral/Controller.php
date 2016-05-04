@@ -47,19 +47,47 @@ class Controller extends Base
 
     public function postImport()
     {
-        $pastoralExternal = new \External_Pastoral();
-        $results = $pastoralExternal->importPastoral();
+        // Do the import in a detached state so it doesn't time out
 
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@adminImportPastoral/importResults.twig',
-                'data'     => array(
-                    'pageCurrent' => 'import',
-                    'imported' => $results['imported'],
-                    'skipped' => $results['skipped']
-                ),
-            )
-        );
+        $this->getResponse()->content->set([
+            'template' => '@adminImportPastoral/importResults.twig',
+            'data'     => array(
+                'pageCurrent' => 'import'
+            ),
+            'postOutput' => [
+                function() {
+                    $this->importCallback();
+                }
+            ],
+        ]);
+
+    }
+
+    /**
+     * Do pastoral record import in a detached state so it doesn't block the user
+     */
+    public function importCallback()
+    {
+        try
+        {
+            $pastoralExternal = new \External_Pastoral();
+            $pastoralExternal->importPastoral();
+        }
+        catch (\Exception $e)
+        {
+            //                                  .
+            //                                 -|-
+            //                                  |
+            //                              .-'~~~`-.
+            //                            .'         `.
+            //                            |  R  I  P  |
+            //                            |           |
+            //                            |    S B    |
+            //                          \\|           |//
+            // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            //
+            // "I'm sorry- the client had detached, there was nothing more we could do"
+        }
     }
 
     public function getIndex()
