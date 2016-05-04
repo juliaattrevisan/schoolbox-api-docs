@@ -76,14 +76,14 @@ class Controller extends Base
 
     /**
      * POST request for creating a new record.
-     *
+     * @param  FolderModel $folder the folder we're creating a record in
      * @throws MapperException
      */
-    public function postInsert()
+    public function postInsert(FolderModel $folder)
     {
         /** @var BlogModel $blog */
         $blog = $this->getBlogMapper()->createModel();
-        $blog->setFolder($this->getRequest()->post["categoryId"]);
+        $blog->setFolder($folder);
         $blog->setOwner($this->getUser());
         $blog->setCreatedAt(\Alaress_Date_Format::now());
         $this->postModify($blog);

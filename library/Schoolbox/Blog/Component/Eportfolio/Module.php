@@ -47,7 +47,7 @@ class Module extends BaseModule
             ],
             'POST' => [
                 '/delete/{id}'                               => 'postDelete',
-                '/modify'                                    => 'postInsert',
+                '/insert/{ownerId}/{pageId}'                 => 'postInsert',
                 '/modify/{id}'                               => 'postModify',
                 '/comment/insert/{id}'                       => 'postCommentInsert',
                 '/comment/delete/{commentId}'                => 'postCommentDelete',

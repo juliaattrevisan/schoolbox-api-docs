@@ -59,7 +59,9 @@
 </div>
 <div class="row">
     <div class="small-12 island">
-        <form method="post" id="blogForm" action="/blog/modify/{{ record.getId }}">
+        <form method="post"
+              id="blogForm"
+              action="{{ record.getId ? routeLookup('blog.postModify', {id: record.getId}) : routeLookup('blog.postInsert', {folderId: folder.getId}) }}">
             <input type="hidden" name="categoryId" value="{% if record != undefined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}" />
 
             <section>

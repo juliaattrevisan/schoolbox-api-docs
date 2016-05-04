@@ -76,7 +76,7 @@ class Controller extends Base
     /**
      * Insert new record
      */
-    public function postInsert()
+    public function postInsert($ownerId, $pageId)
     {
         $this->postModify();
     }

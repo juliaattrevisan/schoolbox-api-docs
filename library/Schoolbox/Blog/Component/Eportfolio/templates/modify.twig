@@ -57,7 +57,9 @@
 </div>
 <div class="row">
     <div class="small-12 island">
-        <form method="post" id="blogForm" action="/eportfolio/blog/modify">
+        <form method="post"
+              id="blogForm"
+              action="{{ record.getId ? routeLookup('eportfolioBlog.postModify', {id: record.getId}) : routeLookup('eportfolioBlog.postInsert', {pageId: page.getPageId, ownerId: page.getUid }) }}">
             <input type="hidden" name="pageId" value="{{ page.getPageId }}" />
             <input type="hidden" name="ownerId" value="{{ page.getUid }}" />
             <input type="hidden" name="id" value="{{ record.getId }}" />
