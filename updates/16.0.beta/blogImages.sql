@@ -46,6 +46,8 @@ DROP TABLE IF EXISTS `eportfolio_blogComment`;
 # ALTER TABLE `eportfolio_blog_comment` CHANGE `created` `created_at` DATETIME NOT NULL;
 # ALTER TABLE `eportfolio_blog_comment` CHANGE `deleted` `deleted_at` DATETIME;
 
+ALTER TABLE `eportfolio_component_blogcomment` RENAME TO `eportfolio_component_blog_comment`;
+
 -- Rename component definition class names to reflect newly created classes
 
 UPDATE `component_definition` SET `class` = 'Schoolbox\\Blog\\Component\\Homepage\\Controller' WHERE `class` = 'Component_Homepage_BlogController';
