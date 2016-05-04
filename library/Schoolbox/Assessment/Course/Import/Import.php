@@ -143,7 +143,7 @@ class Import
                     'name' => $pair['label'],
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (MapperException $e) {
 
             /* TODO: No destination found
              */

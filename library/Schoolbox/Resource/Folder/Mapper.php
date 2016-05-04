@@ -706,7 +706,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $query = "
             {$this->getSelectString()}
             {$this->getFromString()}
-            WHERE c.deleted_at IS NULL
+            WHERE category.deleted_at IS NULL
             AND (cc.code = :code OR cc.code LIKE :codeLike)
         ";
         $statement = $this->database->prepare($query);
