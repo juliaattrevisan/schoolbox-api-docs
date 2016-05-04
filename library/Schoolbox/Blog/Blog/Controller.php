@@ -251,13 +251,7 @@ class Controller extends Base
      */
     public function postCommentDelete(BlogCommentModel $comment)
     {
-        // Only the owner of the comment is allowed to delete it
-        if ($comment->getOwner()->getId() != $this->getUser()->getId() && !$this->getUser()->isSuperuser()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_BLOG_MODIFY);
-        }
-
         // Delete the comment
-
         $this->getBlogCommentMapper()->delete($comment);
     }
 
@@ -268,13 +262,7 @@ class Controller extends Base
      */
     public function postDelete(BlogModel $blog)
     {
-        // Only the owner of the post is allowed to delete it
-        if ($blog->getOwner()->getId() != $this->getUser()->getId() && !$this->getUser()->isSuperuser()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_BLOG_MODIFY);
-        }
-
         // Delete the blog
-
         $this->getBlogMapper()->delete($blog);
     }
 
@@ -288,7 +276,6 @@ class Controller extends Base
         $blog->setFolder($this->getFolderMapper()->findById($blog->getFolder()->getId()));
 
         // Lets get the party started...
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@blog/modify.twig',
