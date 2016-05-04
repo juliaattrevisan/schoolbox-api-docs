@@ -34,11 +34,11 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, 'folder');
         $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner');
-        $this->uses('created_at', self::TYPE_DATETIME);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
-        $this->hasSoftDeleteDateField('deleted_at');
 
         /** Joins */
 

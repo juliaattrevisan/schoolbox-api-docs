@@ -10,10 +10,14 @@
 
 namespace Schoolbox\Blog\Comment;
 
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\User;
 use Schoolbox\Blog\Blog\Model as BlogModel;
 
-class Model {
+class Model implements ISoftDeletable
+{
+	use DeletedAtDate;
 
 	/** @var int */
 	protected $id;
@@ -28,7 +32,7 @@ class Model {
 	protected $createdAt;
 
 	/** @var \Alaress_Date_Format */
-	protected $deletedAt;
+	protected $updatedAt;
 
 	/** @var string */
 	protected $body;
@@ -98,19 +102,21 @@ class Model {
 	}
 
 	/**
-	 * @param \Alaress_Date_Format $deletedAt
-	 * @return self
+	 * @return \Alaress_Date_Format
 	 */
-	public function setDeletedAt($deletedAt) {
-		$this->deletedAt = $deletedAt;
-		return $this;
+	public function getUpdatedAt()
+	{
+		return $this->updatedAt;
 	}
 
 	/**
-	 * @return \Alaress_Date_Format
+	 * @param  \Alaress_Date_Format $updatedAt
+	 * @return $this
 	 */
-	public function getDeletedAt() {
-		return $this->deletedAt;
+	public function setUpdatedAt($updatedAt)
+	{
+		$this->updatedAt = $updatedAt;
+		return $this;
 	}
 
 	/**
