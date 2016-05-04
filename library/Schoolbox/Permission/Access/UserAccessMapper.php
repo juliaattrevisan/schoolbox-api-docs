@@ -299,8 +299,13 @@ class UserAccessMapper extends Mapper
         $synergyIdArray = array();
 
         // index by synid
-        foreach ($classListArray as $array) {
-            $synergyIdArray[$array['synergy_id']] = $array['synergy_id'];
+        foreach ($classListArray as $value) {
+            // compensate for <expletive of choice> inconsistent handler return type
+            if (is_array($value)) {
+                $synergyIdArray[$value['synergy_id']] = $value['synergy_id'];
+            } else {
+                $synergyIdArray[$value] = $value;
+            }
         }
 
         $extUserCollection = UserMapper::getInstance()->findByColumnList(array(
