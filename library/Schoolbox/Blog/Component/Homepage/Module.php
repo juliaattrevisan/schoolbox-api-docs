@@ -10,12 +10,14 @@
 namespace Schoolbox\Blog\Component\Homepage;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Blog\Blog\Mapper as BlogMapper;
+use Schoolbox\Blog\Blog\Model as BlogModel;
 use Schoolbox\Blog\Blog\Controller as BlogController;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -68,22 +70,60 @@ class Module extends BaseModule
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
 
         // Permissions:
-        // * getInsert: has write access to homepage
-        // * getModify: has write access to homepage, or created the post
-        // * getItem:   has read access to homepage
-        // * getArchive: has read access to homepage
+        // TODO add delete settings into route
         // * postDelete: has write access to homepage
         // * postComment: has read access to homepage
         $getFolderIdCallback = function ($params) {
-            return $params['folderId'];
+            if ($params['folder'] instanceof Folder\Model) {
+                return $params['folder']->getId();
+            }
+            return null;
         };
+        $getBlogFolderIdCallback = function ($params) {
+            if ($params['blog'] instanceof BlogModel) {
+                return $params['blog']->getId();
+            }
+            return null;
+        };
+        $access = Access::getInstance();
+
+        // getArchive: has read access to homepage
         $this->addRoutePermission(
             $authorizer,
             '(getArchiveCurrent|getArchive)',
-            new Rule\HasHomepageAccess(
-                UserAccess::ACCESS_READ,
-                $getFolderIdCallback,
-                Access::getInstance()
+            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, $getFolderIdCallback, $access)
+        );
+
+        // getInsert: has write access to homepage
+        $this->addRoutePermission(
+            $authorizer,
+            'getInsert',
+            new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getFolderIdCallback, $access)
+        );
+
+        // getItem: has read access to blog's homepage
+        $this->addRoutePermission(
+            $authorizer,
+            'getItem',
+            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, $getBlogFolderIdCallback, $access)
+        );
+
+        // getModify: has write access to blog's homepage, or created the post
+        $this->addRoutePermission(
+            $authorizer,
+            'getModify',
+            new Rule\Any(
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getBlogFolderIdCallback, $access),
+                new Rule\Callback(
+                    function ($params, User $user) {
+                        if ($params['blog'] instanceof BlogModel) {
+                            if ($params['blog']->getOwner()->getId() == $user->getId()) {
+                                return;
+                            }
+                        }
+                        throw new Unauthorized();
+                    }
+                )
             )
         );
     }
