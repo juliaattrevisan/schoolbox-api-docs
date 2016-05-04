@@ -61,6 +61,26 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
+
+        // Permissions:
+        // * getInsert: has write access to homepage
+        // * getModify: has write access to homepage, or created the post
+        // * getItem:   has read access to homepage
+        // * getArchive: has read access to homepage
+        // * postDelete: has write access to homepage
+        // * postComment: has read access to homepage
+        $getFolderIdCallback = function ($params) {
+            return $params['folderId'];
+        };
+        $this->addRoutePermission(
+            $authorizer,
+            '(getArchiveCurrent|getArchive)',
+            new Rule\HasHomepageAccess(
+                UserAccess::ACCESS_READ,
+                $getFolderIdCallback,
+                Access::getInstance()
+            )
+        );
     }
 
     /**
