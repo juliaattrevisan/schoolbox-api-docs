@@ -10,10 +10,14 @@
 
 namespace Schoolbox\Blog\EportfolioComment;
 
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\User;
 use Schoolbox\Blog\EportfolioBlog\Model as EportfolioBlogModel;
 
-class Model {
+class Model implements ISoftDeletable
+{
+	use DeletedAtDate;
 
 	/** @var int */
 	protected $id;
@@ -29,9 +33,6 @@ class Model {
 
 	/** @var \Alaress_Date_Format */
 	protected $updatedAt;
-
-	/** @var \Alaress_Date_Format */
-	protected $deletedAt;
 
 	/** @var string */
 	protected $body;
@@ -98,22 +99,6 @@ class Model {
 	 */
 	public function getCreatedAt() {
 		return $this->createdAt;
-	}
-
-	/**
-	 * @param \Alaress_Date_Format $deletedAt
-	 * @return self
-	 */
-	public function setDeletedAt($deletedAt) {
-		$this->deletedAt = $deletedAt;
-		return $this;
-	}
-
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getDeletedAt() {
-		return $this->deletedAt;
 	}
 
 	/**
