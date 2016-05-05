@@ -16,7 +16,9 @@ use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Searchable;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
@@ -45,7 +47,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         $this->hasJoin(
             'folder',
             array(
-                'mapper' => '\\Schoolbox\\Resource\\Folder\\Mapper',
+                'mapper' => FolderMapper::class,
                 'this_key' => 'folder_id',
                 'other_key' => 'id'
             )
@@ -54,7 +56,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         $this->hasJoin(
             'owner',
             array(
-                'mapper' => '\\Schoolbox\\UserMapper',
+                'mapper' => UserMapper::class,
                 'this_key' => 'owner_id',
                 'other_key' => 'id'
             )
@@ -63,7 +65,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         $this->hasJoin(
             'perms',
             array(
-                'mapper' => '\\Schoolbox\\Permission\\Access\\RoleAccessMapper',
+                'mapper' => RoleAccessMapper::class,
                 'this_key' => 'folder_id',
                 'other_key' => 'cid'
             )
@@ -72,7 +74,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         $this->hasJoin(
             'userAccess',
             array(
-                'mapper' => '\\Schoolbox\\Permission\\Access\\UserAccessMapper',
+                'mapper' => UserAccessMapper::class,
                 'this_key' => 'folder_id',
                 'other_key' => 'sid'
             )

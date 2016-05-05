@@ -43,7 +43,7 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
         $this->hasJoin(
             'owner',
             array(
-                'mapper' => '\\Schoolbox\\UserMapper',
+                'mapper' => UserMapper::class,
                 'this_key' => 'owner_id',
                 'other_key' => 'id'
             )
@@ -52,7 +52,7 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
         $this->hasJoin(
             'blog',
             array(
-                'mapper' => '\\Schoolbox\\Blog\\EportfolioBlog\\Mapper',
+                'mapper' => EportfolioBlogMapper::class,
                 'this_key' => 'blog',
                 'other_key' => 'id'
             )

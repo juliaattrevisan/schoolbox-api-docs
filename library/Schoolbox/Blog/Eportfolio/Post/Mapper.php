@@ -45,7 +45,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         $this->hasJoin(
             'user',
             array(
-                'mapper' => '\\Schoolbox\\UserMapper',
+                'mapper' => UserMapper::class,
                 'this_key' => 'owner_id',
                 'other_key' => 'id'
             )
