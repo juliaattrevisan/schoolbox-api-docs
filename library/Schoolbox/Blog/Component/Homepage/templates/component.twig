@@ -53,7 +53,7 @@
 
                             <div class="list-item">
                                 <div class="avatar card small-12">
-                                    <a href="/blog/{{ blog.getId }}">
+                                    <a href="{{ routeLookup('blog.getItem', { id: blog.getId }) }}">
                                         <img src="/portrait.php?userId={{ blog.getOwner.getExternalId }}&size=square64" />
                                         <h3>{{ blog.getHeading }}</h3>
                                     </a>
@@ -63,7 +63,7 @@
 
                             {% if session.user.getId == blog.getOwner.getId or session.user.isSuperuser %}
                                 <nav>
-                                    <a class="icon-modify" href="/blog/modify/{{ blog.getId }}" title="Modify Blog post"></a>
+                                    <a class="icon-modify" href="{{ routeLookup('blog.getModify', { id: blog.getId }) }}" title="Modify Blog post"></a>
                                 </nav>
                             {% endif %}
 
@@ -109,7 +109,7 @@
 
                                 <li class="row hide" id="commentform-{{ blog.getId }}">
                                     <div class="column small-12 no-pad">
-                                        <form action="/blog/comment/insert/{{ blog.getId }}" method="post">
+                                        <form action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}" method="post">
                                             <input type="hidden" name="component" value="1">
                                             <div class="avatar card">
                                                 <img src="/portrait.php?userId={{ session.user.getExternalId }}&size=square64" />
@@ -126,8 +126,8 @@
 
                 </ul>
                 <div class="content">
-                    <a href="/blog/archive/{{ folder.getId }}" class="button icon-archive">View Archive</a>
-                    <a href="/blog/modify/new/{{ folder.getId }}" class="button icon-upload">Post Blog</a>
+                    <a href="{{ routeLookup('blog.getArchiveCurrent', { folderId: folder.getId }) }}" class="button icon-archive">View Archive</a>
+                    <a href="{{ routeLookup('blog.getInsert', { folderId: folder.getId }) }}" class="button icon-upload">Post Blog</a>
                 </div>
             </section>
         </div>

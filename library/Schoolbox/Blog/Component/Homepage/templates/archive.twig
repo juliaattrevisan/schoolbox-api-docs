@@ -10,7 +10,7 @@
         </div>
     </div>
     <nav>
-        <a href="/blog/modify/new/{{ folder.getId }}" class="icon-add" title="Post Blog"></a>
+        <a href="{{ routeLookup('blog.getInsert', {folderId: folder.getId}) }}" class="icon-add" title="Post Blog"></a>
     </nav>
 </div>
 
@@ -38,7 +38,7 @@
                         {% endif %}
 
                         <li>
-                            <a href='/blog/archive/{{ folder.getId }}/{{ date.getYear }}/{{ date.getMonth }}'>{{ date | date('F') }}</a><br>
+                            <a href='{{ routeLookup('blog.getArchive', {folderId: folder.getId, year: date.getYear, month: date.getMonth}) }}'>{{ date | date('F') }}</a><br>
                         </li>
                     {% endfor %}
                     </ul>
@@ -68,7 +68,7 @@
                                 </div>
                             </div>
                             <nav>
-                                <a class="icon-modify" title="Modify" href="/blog/modify/{{ blog.getId }}"></a>
+                                <a class="icon-modify" title="Modify" href="{{ routeLookup('blog.getModify', { id: blog.getId }) }}"></a>
                             </nav>
                         </div>
 
@@ -113,7 +113,7 @@
 
                         </ul>
 
-                        <form method="post" action="/blog/comment/insert/{{ blog.getId }}">
+                        <form method="post" action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}">
                             <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
                             <input type="submit" class="expand" name="comment" value="Add comment"/>
                         </form>

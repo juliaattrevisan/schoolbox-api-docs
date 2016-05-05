@@ -37,7 +37,7 @@
     </div>
     {% if session.user.getId == comment.getOwner.getId or session.user.isSuperuser %}
         <nav>
-            <a class="icon icon-modify" href="/blog/modify/{{ record.getId }}" title="Modify"></a>
+            <a class="icon icon-modify" href="{{ routeLookup('blog.getModify', { id: record.getId }) }}" title="Modify"></a>
         </nav>
     {% endif %}
 </div>
@@ -58,7 +58,7 @@
                     </div>
                     {% if session.user.getId == record.getOwner.getId or session.user.isSuperuser %}
                         <nav>
-                            <a class="icon-modify" href="/blog/modify/{{ record.getId }}" title="Modify Blog post"></a>
+                            <a class="icon-modify" href="{{ routeLookup('blog.getModify', { id: record.getId }) }}" title="Modify Blog post"></a>
                         </nav>
                     {% endif %}
                 </li>
@@ -111,7 +111,7 @@
 
                     {% endfor %}
                     <li>
-                        <form method="post" action="/blog/comment/insert/{{ record.getId }}" class="no-pad">
+                        <form method="post" action="{{ routeLookup('blog.postCommentInsert', { id: record.getId }) }}" class="no-pad">
                             <label class="content">
                                 <textarea name="body" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
                             </label>
