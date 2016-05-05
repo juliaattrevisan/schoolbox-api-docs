@@ -110,10 +110,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 
 		$authorExtId  = $author->getExternalId();
 
-		$categoryId   = $blog->getFolder()->getId();
+		$folderId     = $blog->getFolder()->getId();
 		
 		/** @var FolderModel $folder */
-		$folder     = FolderMapper::getInstance()->findById($categoryId);
+		$folder     = FolderMapper::getInstance()->findById($folderId);
 
 		$bob = new Builder();
 
@@ -124,7 +124,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 				'catname' => new CategoryParam($folder)
 			))
 			->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
-			->setHref("/homepage/$categoryId#blog_$blogId")
+			->setHref("/homepage/$folderId#blog_$blogId")
 			->setSeverity(Logger::INFO)
 			->setNamespace($this->getSlug())
 			->addTopic("blog.$blogId.posted")
@@ -132,7 +132,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 			->addFilter('roletype', $roletype)
 			->setBody($blog->getBody());
 
-		$envelope->broadcastToCategory($categoryId, UserAccess::ACCESS_READ, $bob->build());
+		$envelope->broadcastToCategory($folderId, UserAccess::ACCESS_READ, $bob->build());
 
 		return $envelope;
 	}
