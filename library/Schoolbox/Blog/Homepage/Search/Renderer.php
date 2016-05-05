@@ -8,12 +8,12 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Blog\Search;
+namespace Schoolbox\Blog\Homepage\Search;
 
+use Alaress_Date_Format;
 use Schoolbox\Resource\Search\Renderer\Handler;
 use Scrub;
 use TextFormatter;
-use Alaress_Date_Format;
 
 class Renderer extends Handler
 {

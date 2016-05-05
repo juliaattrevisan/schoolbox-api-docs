@@ -36,7 +36,7 @@ $handle = array(
     ),
     'blog' => array(
         'handler' => new Blog(),
-        'renderer' => new \Schoolbox\Blog\Search\Renderer($this, '', '', 0, $keyword),
+        'renderer' => new \Schoolbox\Blog\Homepage\Search\Renderer($this, '', '', 0, $keyword),
     ),
     'wiki' => array(
         'handler' => new Wiki(),
