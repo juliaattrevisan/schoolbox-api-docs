@@ -388,7 +388,7 @@ class Controller extends Base\Base
         try {
             $parentId = $post->get('parent');
             if ($parentId === "0" || $parentId > 0) {
-                $parent = $this->getCourseMapper()->findById($parentId);
+                $parent = $this->getFolderMapper()->findById($parentId);
             } else {
                 // cause a snap if no (or invalid) parent was supplied
                 throw new BaseMapper\Exception("Invalid parent nominated");
