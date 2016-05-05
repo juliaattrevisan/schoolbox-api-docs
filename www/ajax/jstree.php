@@ -18,7 +18,7 @@ use Schoolbox\Resource\Folder;
 
 $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
     Folder\Mapper::getInstance(),
-    TaskMapper::getInstance(),
+    Schoolbox\Assessment\Course\Unit\Mapper::getInstance(),
     UserAccessMapper::getInstance(),
     RoleAccessMapper::getInstance(),
     $_SESSION['user'],

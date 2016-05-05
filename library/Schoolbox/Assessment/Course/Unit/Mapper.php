@@ -143,4 +143,16 @@ class Mapper extends Folder\Mapper
         return $this->findByColumn('parent', $courseId, $options);
     }
 
+    /**
+     * Convenience method for countByColumn('parent')
+     *
+     * @param int   $courseId
+     * @param array $options
+     * @return int
+     */
+    public function countByCourseId($courseId, array $options = [])
+    {
+        return $this->countByColumn('parent', $courseId, $options);
+    }
+
 }

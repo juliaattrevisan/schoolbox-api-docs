@@ -792,10 +792,10 @@ class Controller extends Base\Base
         // the valid list of parents:
         //  - start at facultyTop $this->getCourseMapper()->getFacultyNode(),
         //  - recurse into every folder for which the user has WRITE access
-        //  - stop at, and exclude, all Courses (folder that has > 0 children with > 0 tasks) (apparently this point is up for debate..?)
+        //  - stop at, and exclude, all Courses (folder that has > 0 units)
         //  - continue to exhaustion
 
-        $tb = new TreeBuilder($this->getCourseMapper(), $this->getTaskMapper(), $this->getUser());
+        $tb = new TreeBuilder($this->getFolderMapper(), $this->getUnitMapper(), $this->getUser());
 
         $facultyNode = $this->getCourseMapper()->getFacultyNode();
 
