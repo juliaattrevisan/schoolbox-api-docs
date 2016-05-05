@@ -15,6 +15,9 @@ $assessHandler = new Assess_Main();
 $attemptHandler = false;
 $groupHandler = new Group();
 
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
 if (!is_numeric($this->arg[0])) {
     error(112);
 }
@@ -48,7 +51,7 @@ catch(\Schoolbox\Mapper\Exception $e) {
 	exit;
 }
 
-if($assess->getUser()->getId() != $_SESSION['user']->getId() && $groupHandler->getPermission($assess->getCategory()->getId()) < WRITE_ACCESS) {
+if($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPermission($assess->getCategory()->getId()) < WRITE_ACCESS) {
 	error(127);
 }
 
