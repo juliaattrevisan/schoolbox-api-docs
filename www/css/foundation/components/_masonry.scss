@@ -180,7 +180,7 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-podcast;
   color: $icon-color-podcast;
 }
-.icon-masonry-Schoolbox_Blog_Component_Homepage_Controller:before {
+.icon-masonry-Schoolbox_Blog_Homepage_Component_Controller:before {
   @extend .icon-comment;
   color: $icon-color-chat;
 }
@@ -269,7 +269,7 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-list;
   color: $icon-color-basic-list;
 }
-.icon-masonry-Schoolbox_Blog_Component_Eportfolio_Controller:before {
+.icon-masonry-Schoolbox_Blog_Eportfolio_Component_Controller:before {
   @extend .icon-blog;
   color: $icon-color-blog;
 }

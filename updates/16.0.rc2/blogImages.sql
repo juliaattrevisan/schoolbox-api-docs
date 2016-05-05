@@ -54,5 +54,5 @@ ALTER TABLE `eportfolio_component_blogcomment` RENAME TO `eportfolio_component_b
 
 -- Rename component definition class names to reflect newly created classes
 
-UPDATE `component_definition` SET `class` = 'Schoolbox\\Blog\\Component\\Homepage\\Controller' WHERE `class` = 'Component_Homepage_BlogController';
-UPDATE `component_definition` SET `class` = 'Schoolbox\\Blog\\Component\\Eportfolio\\Controller' WHERE `class` = 'Component_Eportfolio_BlogController';
+UPDATE `component_definition` SET `class` = 'Schoolbox\\Blog\\Homepage\\Component\\Controller' WHERE `class` = 'Component_Homepage_BlogController';
+UPDATE `component_definition` SET `class` = 'Schoolbox\\Blog\\Eportfolio\\Component\\Controller' WHERE `class` = 'Component_Eportfolio_BlogController';

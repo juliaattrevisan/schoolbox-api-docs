@@ -8,7 +8,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Blog\Component\Eportfolio;
+namespace Schoolbox\Blog\Eportfolio\Component;
 
 use Component_Eportfolio_ControllerAbstract;
 use Component_Instance;

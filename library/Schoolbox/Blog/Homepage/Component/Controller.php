@@ -8,7 +8,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Blog\Component\Homepage;
+namespace Schoolbox\Blog\Homepage\Component;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
