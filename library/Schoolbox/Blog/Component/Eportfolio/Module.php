@@ -80,7 +80,7 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             'getInsert',
-            new Rule\Callback($this->getAuthenticationCallback('canCreate'))
+            $this->getAuthenticationRule('canCreate')
         );
 
         // getArchive: Eportfolio_Authenticator->canView on page
@@ -89,7 +89,7 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             '(getArchive|getItem|postCommentInsert)',
-            new Rule\Callback($this->getAuthenticationCallback('canView'))
+            $this->getAuthenticationRule('canView')
         );
 
         // getModify: Eportfolio_Authenticator->canModify on blog's page || isOwner of post
@@ -100,20 +100,19 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             '(getModify|postDelete|postInsert|postModify|postCommentDelete)',
-            new Rule\Callback($this->getAuthenticationCallback('canModify'))
+            $this->getAuthenticationRule('canModify')
         );
-
     }
 
     /**
      * @param string $method `Eportfolio_Authenticator` method to call:
      *                       should be 'canCreate', 'canView', 'canModify'
      *
-     * @return callable for use in `new Rule\Callback()`
+     * @return Rule\IAuthorizationRule
      */
-    protected function getAuthenticationCallback($method)
+    protected function getAuthenticationRule($method)
     {
-        return function ($params, User $user) use ($method) {
+        $callback = function ($params, User $user) use ($method) {
             // Allow owner of either blog or comment to do stuff
             if ($params['comment'] instanceof EportfolioBlogCommentModel) {
                 if ($params['comment']->getOwner()->getId() == $user->getId()) {
@@ -145,6 +144,7 @@ class Module extends BaseModule
             }
             throw new Unauthorized();
         };
+        return new Rule\Callback($callback);
     }
 
     /**
