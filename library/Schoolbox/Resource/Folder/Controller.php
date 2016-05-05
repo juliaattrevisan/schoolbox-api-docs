@@ -453,7 +453,7 @@ class Controller extends BaseController
      * @param User         $user
      * @throws MapperException
      */
-    protected function setCodesOnFolder(Model $model, $classCodeString, array $curriculumCodes, User $user)
+    protected function setCodesOnFolder(Model $model, $classCodeString, $curriculumCodes, User $user)
     {
         $codeMapper           = $this->getCodeMapper();
         $curriculumNodeMapper = $this->getCurriculumNodeMapper();
