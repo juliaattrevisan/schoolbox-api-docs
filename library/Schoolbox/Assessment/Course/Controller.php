@@ -1351,7 +1351,7 @@ class Controller extends Base\Base
         /** @var \Schoolbox\User[] $owners */
         $owners = [];
 
-        if (isset($post['ownerships'])) {
+        if (isset($post['ownerships']) && is_array($post['ownerships']) && count($post['ownerships'])) {
             // unsquash ownerships
             foreach (explode(',', $post['ownerships']) as $ownership) {
                 if (preg_match('/^\\d+:\\d+/', $ownership)) {
@@ -1518,7 +1518,7 @@ class Controller extends Base\Base
 
                         $unit_instance_list->add($unit_instance);
 
-                    } catch (\Exception $e) {
+                    } catch (MapperException $e) {
 
                         // Adding a new unit into the course.
 
@@ -1527,7 +1527,7 @@ class Controller extends Base\Base
                         $unit_instance
                             ->setWorkDates($post["work"]) // Override due work dates in cloner
                             ->setQuizDates($post["quiz"]) // Override quiz dates in cloner
-                            ->setWorkOwner($owners[$homepage])
+                            ->setWorkOwner(isset($owners[$homepage]) ? $owners[$homepage] : $this->getUser())
                             ->setComponent($componentCache[$homepage])
                             ->setTitle($unitCache[$currentUnit['id']]->getName())
                             ->setCategory($homepageCache[$homepage])
