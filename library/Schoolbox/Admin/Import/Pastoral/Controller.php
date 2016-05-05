@@ -74,8 +74,6 @@ class Controller extends Base
     public function postImport()
     {
         // Do the import in a detached state so it doesn't time out
-        $pastoralExternal = new \External_Pastoral();
-        $pastoralExternal->importPastoral($this->getUser()->getId());
 
         $this->getResponse()->content->set([
             'template' => '@adminImportPastoral/importResults.twig',
@@ -125,6 +123,8 @@ class Controller extends Base
     {
         try
         {
+            $pastoralExternal = new \External_Pastoral();
+            $pastoralExternal->importPastoral($this->getUser()->getId());
         }
         catch (\Exception $e)
         {
