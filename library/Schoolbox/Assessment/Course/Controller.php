@@ -241,6 +241,7 @@ class Controller extends Base\Base
             foreach ($data['units'] as $unit) {
                 $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
+                $data['usages'][$unit->getId() ] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
 
                 // obtain the Course Builder Component Instance from the homepage.
                 if (count($instances[$unit->getId()]) == 0) {
