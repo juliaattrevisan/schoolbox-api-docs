@@ -270,7 +270,7 @@ class Controller extends Base
                     'WRITE_ACCESS'      => WRITE_ACCESS,
                     'READ_ACCESS'       => READ_ACCESS,
                     'FULL_ACCESS'       => FULL_ACCESS,
-                    'attachzone'        => $this->getAttachZone($this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $id)),
+                    'attachzone'        => $this->getAttachZone($this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
                     'page'              => $page
                 ),
             )
