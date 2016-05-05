@@ -58,6 +58,7 @@ class Renderer extends Handler
                 $createdTime = new Alaress_Date_Format($blog['created_at'], 'Y-m-d H:i:s');
 
                 $this->getPage()->setVar(array(
+                    'BLOG_ID' => $blog['id'],
                     'BLOG_CID' => $blog['folder_id'],
                     'BLOG_HEADING' => Scrub::text($blog['heading']),
                     'BLOG_BODY' => TextFormatter::cutSentence(Scrub::html2text($blog['body']), 150),
