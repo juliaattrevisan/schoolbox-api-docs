@@ -85,12 +85,6 @@ class Module extends BaseModule
             }
             return null;
         };
-        $getCommentFolderIdCallback = function ($params) {
-            if ($params['folder'] instanceof Folder\Model) {
-                return $params['folder']->getId();
-            }
-            return null;
-        };
         $access = Access::getInstance();
 
         // getArchive, postCommentInsert: has read access to homepage
@@ -105,7 +99,7 @@ class Module extends BaseModule
             $authorizer,
             'postCommentDelete',
             new Rule\Any(
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, $getCommentFolderIdCallback, $access),
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, $getFolderIdCallback, $access),
                 new Rule\Callback(
                     function ($params, User $user) {
                         if ($params['comment'] instanceof BlogCommentModel) {
@@ -166,14 +160,22 @@ class Module extends BaseModule
             function ($params) {
                 $newParams = [];
                 try {
-                    if (array_key_exists('folderId', $params)) {
-                        $newParams['folder'] = Folder\Mapper::getInstance()->findById($params['folderId']);
+                    if (array_key_exists('commentId', $params)) {
+                        /** @var BlogCommentModel $comment */
+                        $comment              = BlogCommentMapper::getInstance()->findById($params['commentId']);
+                        $newParams['comment'] = $comment;
+                        // Load blog in next step
+                        $params['id']         = $comment->getBlog()->getId();
                     }
                     if (array_key_exists('id', $params)) {
-                        $newParams['blog'] = BlogMapper::getInstance()->findById($params['id']);
+                        /** @var BlogModel $blog */
+                        $blog               = BlogMapper::getInstance()->findById($params['id']);
+                        $newParams['blog']  = $blog;
+                        // Load folder in next step
+                        $params['folderId'] = $blog->getFolder()->getId();
                     }
-                    if (array_key_exists('commentId', $params)) {
-                        $newParams['comment'] = BlogCommentMapper::getInstance()->findById($params['commentId']);
+                    if (array_key_exists('folderId', $params)) {
+                        $newParams['folder'] = Folder\Mapper::getInstance()->findById($params['folderId']);
                     }
                 } catch (MapperException $e) {
                     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
