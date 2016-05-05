@@ -76,45 +76,32 @@ class Controller extends Base
 
     /**
      * Insert new record
+     *
+     * @param User                $owner
+     * @param EportfolioPageModel $page
      */
-    public function postInsert($ownerId, $pageId)
+    public function postInsert(User $owner, EportfolioPageModel $page)
     {
-        $this->postModify();
+        // Inserting new record, create an object and shunt in the required values
+        /** @var EportfolioBlogModel $record */
+        $record = $this->getEportfolioBlogMapper()->createModel();
+        $record->setOwner($owner);
+        $record->setPageId($page->getPageId());
+        $this->postModify($record);
     }
 
     /**
      * Save changes to existing record/Insert new record
-     * @param int $id The blog being modified
+     *
+     * @param EportfolioBlogModel $blog
      */
-    public function postModify($id = null)
+    public function postModify(EportfolioBlogModel $blog)
     {
-        // Check if we are updating or inserting
-
-        if (!empty($id)) {
-
-            // Updating an existing record, just grab a handle to it
-
-            /** @var EportfolioBlogModel $record */
-            $record = $this->getEportfolioBlogMapper()->findById($id);
-
-        } else {
-
-            // Inserting new record, create an object and shunt in the required values
-
-            $user = $this->getUserMapper()->findById($this->getRequest()->post["ownerId"]);
-
-            /** @var EportfolioBlogModel $record */
-            $record = $this->getEportfolioBlogMapper()->createModel();
-            $record->setOwner($user);
-            $record->setPageId($this->getRequest()->post["pageId"]);
-            $record->setCreatedAt(\Alaress_Date_Format::now());
-        }
 
         // Update details and save the record
-
-        $record->setBody($this->getRequest()->post["body"]);
-        $record->setHeading($this->getRequest()->post["heading"]);
-        $this->getEportfolioBlogMapper()->save($record);
+        $blog->setBody($this->getRequest()->post["body"]);
+        $blog->setHeading($this->getRequest()->post["heading"]);
+        $this->getEportfolioBlogMapper()->save($blog);
 
         // Update image gallery pictures
 
@@ -125,7 +112,7 @@ class Controller extends Base
         // Get all attachments associated with this record
 
         try {
-            $attachments = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $record->getId());
+            $attachments = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId());
         } catch (\Exception $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
@@ -173,7 +160,7 @@ class Controller extends Base
 
                 if (!in_array($hash_array[1], $retainedAttachments)) {
                     $attachment = new EportfolioBlogImageModel();
-                    $attachment->setBlogId($record->getId());
+                    $attachment->setBlogId($blog->getId());
                     $attachment->setHash($hash_array[1]);
                     $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                     $this->getEportfolioBlogImageMapper()->save($attachment);
@@ -238,21 +225,11 @@ class Controller extends Base
 
     /**
      * Create new blog comment
-     * @param int $id The post to add a comment to
+     * @param EportfolioBlogModel $blog
      * @throws MapperException
      */
-    public function postCommentInsert($id)
+    public function postCommentInsert(EportfolioBlogModel $blog)
     {
-        try {
-
-            // Retrieve the blog item the comment is being added to
-
-            /** @var EportfolioBlogModel $blog */
-            $blog = $this->getEportfolioBlogMapper()->findById($id);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-        }
-
         // Create the comment and save
 
         /** @var EportfolioBlogCommentModel $comment */
@@ -270,55 +247,21 @@ class Controller extends Base
 
     /**
      * Delete blog comment
-     * @param int $commentId The comment to delete
+     * @param EportfolioBlogCommentModel $comment
      * @throws MapperException
      */
-    public function postCommentDelete($commentId) {
-
-        try {
-            // Retrieve the comment we are trying to delete
-            
-            /** @var EportfolioBlogCommentModel $comment */
-            $comment = $this->getEportfolioBlogCommentMapper()->findById($commentId);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-        }
-
-        // Only the owner of the comment is allowed to delete it
-
-        if ($comment->getOwner()->getId() != $this->getUser()->getId() && !$this->getUser()->isSuperuser()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_BLOG_MODIFY);
-        }
-
-        // Delete it
-        
+    public function postCommentDelete(EportfolioBlogCommentModel $comment)
+    {
         $this->getEportfolioBlogCommentMapper()->delete($comment);
     }
 
     /**
      * Delete blog post
-     * @param int $id The post to delete
+     * @param EportfolioBlogModel $blog
      * @throws MapperException
      */
-    public function postDelete($id)
+    public function postDelete(EportfolioBlogModel $blog)
     {
-        try {
-            // Retrieve the blog we are deleting
-            
-            /** @var EportfolioBlogModel $comment */
-            $blog = $this->getEportfolioBlogMapper()->findById($id);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-        }
-
-        // Only the owner of the post is allowed to delete it
-
-        if ($blog->getOwner()->getId() != $this->getUser()->getId() && !$this->getUser()->isSuperuser()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_BLOG_MODIFY);
-        }
-        
-        // Delete it
-
         $this->getEportfolioBlogMapper()->delete($blog);
     }
 
