@@ -10,6 +10,7 @@
 namespace Schoolbox\Admin\Import\Pastoral;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Import\Pastoral\Mapper as LogMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Config\ConfigMapper;
@@ -20,6 +21,11 @@ class Controller extends Base
      * @var ConfigMapper
      */
     protected $configMapper;
+
+    /**
+     * @var LogMapper
+     */
+    protected $logMapper;
 
     /***
      * @return ConfigMapper
@@ -37,12 +43,29 @@ class Controller extends Base
         return $this;
     }
 
+    /***
+     * @return LogMapper
+     */
+    public function getLogMapper() {
+        return $this->logMapper;
+    }
+
+    /**
+     * @param LogMapper $logMapper
+     * @return $this
+     */
+    public function setLogMapper($logMapper) {
+        $this->logMapper = $logMapper;
+        return $this;
+    }
+
     /**
      * Controller constructor.
      */
     public function __construct()
     {
         $this->setConfigMapper(ConfigMapper::getInstance());
+        $this->setLogMapper(LogMapper::getInstance());
     }
 
     /**
@@ -64,6 +87,34 @@ class Controller extends Base
                     $this->importCallback();
                 }
             ],
+        ]);
+    }
+
+    /**
+     * Display list of available logs
+     */
+    public function getLog()
+    {
+        $this->getResponse()->content->set([
+            'template' => '@adminImportPastoral/log.twig',
+            'data'     => array(
+                'pageCurrent' => 'import',
+                'logs' => $this->getLogMapper()->findImportIds()
+            )
+        ]);
+    }
+
+    /**
+     * Display list of available logs
+     */
+    public function getLogDetail($id)
+    {
+        $this->getResponse()->content->set([
+            'template' => '@adminImportPastoral/logDetail.twig',
+            'data'     => array(
+                'pageCurrent' => 'import',
+                'logs' => $this->getLogMapper()->findByColumn("import_id", $id)->sortBy('createdAt', 'asc')
+            )
         ]);
     }
 

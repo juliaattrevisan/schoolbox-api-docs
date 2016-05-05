@@ -25,6 +25,8 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'getIndex', $basePath, "");
+        $this->addGetRoute($router, 'getLog', $basePath, "/log");
+        $this->addGetRoute($router, 'getLogDetail', $basePath, "/log/{id}");
         $this->addPostRoute($router, 'postImport', $basePath, "/process");
     }
 

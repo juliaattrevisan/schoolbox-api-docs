@@ -6,6 +6,12 @@
             $("[data-form-import]").submit();
         });
     });
+    $(function(){
+        $('[data-import-logs]').click(function(e) {
+            e.preventDefault();
+            window.location.href = '/adminv2/import-pastoral/log';
+        });
+    });
 </script>
 
 {# Shared navigation menu #}
@@ -53,6 +59,7 @@
                     Click on the button below to begin the import (the import process may take several minutes to complete).
                 </p>
                 <input type="submit" data-import value="Import Pastoral Care Records">
+                <input type="submit" data-import-logs value="View Import Logs">
             </section>
         </form>
     </div>
