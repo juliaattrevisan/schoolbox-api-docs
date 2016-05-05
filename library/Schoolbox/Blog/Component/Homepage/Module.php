@@ -73,46 +73,20 @@ class Module extends BaseModule
         // All routes: must be logged in
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
 
-        $getFolderIdCallback = function ($params) {
-            if ($params['folder'] instanceof Folder\Model) {
-                return $params['folder']->getId();
-            }
-            return null;
-        };
-        $access = Access::getInstance();
-
         // getArchive, postCommentInsert: has read access to homepage
+        // getItem: has read access to blog's homepage
         $this->addRoutePermission(
             $authorizer,
-            '(getArchiveCurrent|getArchive|postCommentInsert)',
-            $this->getAuthenticationRule(UserAccess::ACCESS_READ)
-        );
-
-        // postCommentDelete: has read access to homepage, or created the comment
-        $this->addRoutePermission(
-            $authorizer,
-            'postCommentDelete',
+            '(getArchiveCurrent|getArchive|postCommentInsert|getItem)',
             $this->getAuthenticationRule(UserAccess::ACCESS_READ)
         );
 
         // getInsert, postInsert, postDelete: has write access to homepage
-        $this->addRoutePermission(
-            $authorizer,
-            '(getInsert|postInsert|postDelete)',
-            $this->getAuthenticationRule(UserAccess::ACCESS_WRITE)
-        );
-
-        // getItem: has read access to blog's homepage
-        $this->addRoutePermission(
-            $authorizer,
-            'getItem',
-            $this->getAuthenticationRule(UserAccess::ACCESS_READ)
-        );
-
+        // postCommentDelete: has write access to homepage, or created the comment
         // getModify, postModify: has write access to blog's homepage, or created the post
         $this->addRoutePermission(
             $authorizer,
-            '(getModify|postModify)',
+            '(getInsert|postInsert|postDelete|getModify|postModify|postCommentDelete)',
             $this->getAuthenticationRule(UserAccess::ACCESS_WRITE)
         );
     }
