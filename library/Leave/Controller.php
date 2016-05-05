@@ -363,9 +363,15 @@ class Leave_Controller extends Controller
             $this->getPage()->parse('student_autocomplete_block', 'student_autocomplete');
             $this->getPage()->parse('student_autocomplete_javascript_block', 'student_autocomplete_javascript');
         } elseif ($this->getGroup()->isParent()) {
+            $studentBoarders = array();
+            foreach($_SESSION['children'] as $child){
+                if($this->getUserMapper()->findById($child['id'])->getResidentialHouse()->getId() > 0){
+                    $studentBoarders[] = $child;
+                }
+            }
             $this->getPage()->dropDown(
                 'student_drop',
-                $_SESSION['children'],
+                $studentBoarders,
                 null,
                 'student_selector',
                 array(
