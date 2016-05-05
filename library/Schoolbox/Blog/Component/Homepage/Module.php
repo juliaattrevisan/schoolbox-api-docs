@@ -85,60 +85,73 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             '(getArchiveCurrent|getArchive|postCommentInsert)',
-            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, $getFolderIdCallback, $access)
+            $this->getAuthenticationRule(UserAccess::ACCESS_READ)
         );
 
         // postCommentDelete: has read access to homepage, or created the comment
         $this->addRoutePermission(
             $authorizer,
             'postCommentDelete',
-            new Rule\Any(
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, $getFolderIdCallback, $access),
-                new Rule\Callback(
-                    function ($params, User $user) {
-                        if ($params['comment'] instanceof BlogCommentModel) {
-                            if ($params['comment']->getOwner()->getId() == $user->getId()) {
-                                return;
-                            }
-                        }
-                        throw new Unauthorized();
-                    }
-                )
-            )
+            $this->getAuthenticationRule(UserAccess::ACCESS_READ)
         );
 
         // getInsert, postInsert, postDelete: has write access to homepage
         $this->addRoutePermission(
             $authorizer,
             '(getInsert|postInsert|postDelete)',
-            new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getFolderIdCallback, $access)
+            $this->getAuthenticationRule(UserAccess::ACCESS_WRITE)
         );
 
         // getItem: has read access to blog's homepage
         $this->addRoutePermission(
             $authorizer,
             'getItem',
-            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, $getFolderIdCallback, $access)
+            $this->getAuthenticationRule(UserAccess::ACCESS_READ)
         );
 
         // getModify, postModify: has write access to blog's homepage, or created the post
         $this->addRoutePermission(
             $authorizer,
             '(getModify|postModify)',
-            new Rule\Any(
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getFolderIdCallback, $access),
-                new Rule\Callback(
-                    function ($params, User $user) {
-                        if ($params['blog'] instanceof BlogModel) {
-                            if ($params['blog']->getOwner()->getId() == $user->getId()) {
-                                return;
-                            }
-                        }
-                        throw new Unauthorized();
-                    }
-                )
-            )
+            $this->getAuthenticationRule(UserAccess::ACCESS_WRITE)
         );
+    }
+
+    /**
+     * @param string $accessLevel UserAccess::ACCESS_* constant
+     *
+     * @return Rule\IAuthorizationRule
+     */
+    protected function getAuthenticationRule($accessLevel)
+    {
+        // Allow any user who owns either the blog or comment to do stuff
+        $ownershipRule = new Rule\Callback(
+            function ($params, User $user) {
+                if ($params['blog'] instanceof BlogModel) {
+                    if ($params['blog']->getOwner()->getId() == $user->getId()) {
+                        return;
+                    }
+                }
+                if ($params['comment'] instanceof BlogCommentModel) {
+                    if ($params['comment']->getOwner()->getId() == $user->getId()) {
+                        return;
+                    }
+                }
+                throw new Unauthorized();
+            }
+        );
+        // Allow anyone who has $accessLevel on this folder to do stuff
+        $permissionRule = new Rule\HasHomepageAccess(
+            $accessLevel,
+            function ($params) {
+                if ($params['folder'] instanceof Folder\Model) {
+                    return $params['folder']->getId();
+                }
+                return null;
+            },
+            Access::getInstance()
+        );
+        return new Rule\Any($ownershipRule, $permissionRule);
     }
 
     /**
