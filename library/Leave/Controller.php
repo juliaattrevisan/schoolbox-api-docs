@@ -524,6 +524,10 @@ class Leave_Controller extends Controller
      */
     public function processCreateRequest($data)
     {
+        if(!$this->hasCreatePermission()){
+            error(19);
+        }
+
         if (!is_array($data) || empty($data['request'])) {
             $this->getPage()->error(2);
         }
@@ -540,30 +544,25 @@ class Leave_Controller extends Controller
             $created = Alaress_Date_Format::now();
             $request = new Leave_Request();
 
+            /** @var \Schoolbox\User $author */
+            $author = $_SESSION["user"];
+
             /* Use the userId field when submitting on someone else's behalf,
 			 * otherwise just your own id
 			 */
-            $userId = $data['userId'];
-            try {
-                $user = $this->getUserMapper()->findById($userId);
-            } catch (Schoolbox\Mapper\Exception $e) {
-                throw new SchoolboxNotFoundException('User not found');
-            }
-            /** @var $sessionUser \Schoolbox\User */
-            $sessionUser = $_SESSION['user'];
-
-            $request->setUser(
-                ($this->hasViewPermission($userId, $user->getResidentialHouse()->getId())
-                    ? $userId
-                    : $sessionUser->getId())
-            );
-
-            // Does this user have a house?
-            if (!$request->getUser()->getResidentialHouse()->getId()) {
-                error(19);
+            if(isset($data['userId'])) {
+                try {
+                    /** @var \Schoolbox\User $boarder */
+                    $boarder = $this->getUserMapper()->findById($data['userId']);
+                } catch (Schoolbox\Mapper\Exception $e) {
+                    throw new Exception_Schoolbox_NotFound('User not found');
+                }
+            } else {
+                $boarder = $author;
             }
 
-            $request->setAuthor($_SESSION['user']);
+            $request->setUser($boarder);
+            $request->setAuthor($author);
             $request->setStart($start->getDatabase());
             $request->setFinish($finish->getDatabase());
             $request->setHostType($data['request']['hostType']);
