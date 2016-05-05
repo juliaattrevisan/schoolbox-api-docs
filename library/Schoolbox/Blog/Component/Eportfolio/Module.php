@@ -10,15 +10,20 @@
 namespace Schoolbox\Blog\Component\Eportfolio;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Eportfolio_Authenticator;
 use Eportfolio\PageMapper as EportfolioPageMapper;
+use Eportfolio\Page as EportfolioPageModel;
 use Schoolbox\Blog\EportfolioBlog\Controller as BlogController;
 use Schoolbox\Blog\EportfolioBlog\Mapper as EportfolioBlogMapper;
+use Schoolbox\Blog\EportfolioBlog\Model as EportfolioBlogModel;
 use Schoolbox\Blog\EportfolioComment\Mapper as EportfolioBlogCommentMapper;
+use Schoolbox\Blog\EportfolioComment\Model as EportfolioBlogCommentModel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -54,11 +59,13 @@ class Module extends BaseModule
             ]
         ];
 
-        foreach ($routes['GET'] as $path => $alias)
+        foreach ($routes['GET'] as $path => $alias) {
             $this->addGetRoute($router, $alias, $basePath, $path);
+        }
 
-        foreach ($routes['POST'] as $path => $alias)
+        foreach ($routes['POST'] as $path => $alias) {
             $this->addPostRoute($router, $alias, $basePath, $path);
+        }
     }
 
     /**
@@ -69,15 +76,75 @@ class Module extends BaseModule
         // All routes: must be logged in
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
 
-        // getInsert: Eportfolio_Authenticator->canCreate
-        // getModify: Eportfolio_Authenticator->canModify || isOwner
-        // getArchive: Eportfolio_Authenticator->canView
-        // getItem: Eportfolio_Authenticator->canView
-        // postDelete: Eportfolio_Authenticator->canModify || isOwner
-        // postInsert: Eportfolio_Authenticator->canModify
-        // postModify: Eportfolio_Authenticator->canModify
-        // postCommentInsert: Eportfolio_Authenticator->canView
-        // postCommentDelete: Eportfolio_Authenticator->canModify || isOwner
+        // getInsert: Eportfolio_Authenticator->canCreate on page
+        $this->addRoutePermission(
+            $authorizer,
+            'getInsert',
+            new Rule\Callback($this->getAuthenticationCallback('canCreate'))
+        );
+
+        // getArchive: Eportfolio_Authenticator->canView on page
+        // getItem: Eportfolio_Authenticator->canView on blog's page
+        // postCommentInsert: Eportfolio_Authenticator->canView on blog's page
+        $this->addRoutePermission(
+            $authorizer,
+            '(getArchive|getItem|postCommentInsert)',
+            new Rule\Callback($this->getAuthenticationCallback('canView'))
+        );
+
+        // getModify: Eportfolio_Authenticator->canModify on blog's page || isOwner of post
+        // postDelete: Eportfolio_Authenticator->canModify on blog's page || isOwner of post
+        // postInsert: Eportfolio_Authenticator->canModify on page
+        // postModify: Eportfolio_Authenticator->canModify on blog's page || isOwner of post
+        // postCommentDelete: Eportfolio_Authenticator->canModify on comment's blog's page || isOwner of comment
+        $this->addRoutePermission(
+            $authorizer,
+            '(getModify|postDelete|postInsert|postModify|postCommentDelete)',
+            new Rule\Callback($this->getAuthenticationCallback('canModify'))
+        );
+
+    }
+
+    /**
+     * @param string $method `Eportfolio_Authenticator` method to call:
+     *                       should be 'canCreate', 'canView', 'canModify'
+     *
+     * @return callable for use in `new Rule\Callback()`
+     */
+    public function getAuthenticationCallback($method)
+    {
+        return function ($params, User $user) use ($method) {
+            // Allow owner of either blog or comment to do stuff
+            if ($params['comment'] instanceof EportfolioBlogCommentModel) {
+                if ($params['comment']->getOwner()->getId() == $user->getId()) {
+                    return;
+                }
+            }
+            if ($params['blog'] instanceof EportfolioBlogModel) {
+                if ($params['blog']->getOwner()->getId() == $user->getId()) {
+                    return;
+                }
+            }
+            if ($params['page'] instanceof EportfolioPageModel) {
+                $auth = new Eportfolio_Authenticator(
+                    $user->getId(),
+                    $params['page']->getUid(),
+                    $params['page']->getPageId()
+                );
+                if (!method_exists($auth, $method)) {
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'Method "Eportfolio_Authenticator::%s" does not exist',
+                            $method
+                        )
+                    );
+                }
+                if ($auth->$method()) {
+                    return;
+                }
+            }
+            throw new Unauthorized();
+        };
     }
 
     /**
@@ -96,14 +163,21 @@ class Module extends BaseModule
                     if (array_key_exists('ownerId', $params)) {
                         $newParams['owner'] = UserMapper::getInstance()->findById($params['ownerId']);
                     }
-                    if (array_key_exists('pageId', $params)) {
-                        $newParams['page'] = EportfolioPageMapper::getInstance()->findById($params['pageId']);
+                    if (array_key_exists('commentId', $params)) {
+                        /** @var EportfolioBlogCommentModel $comment */
+                        $comment              = EportfolioBlogCommentMapper::getInstance()->findById($params['commentId']);
+                        $newParams['comment'] = $comment;
+                        $newParams['blog']    = $comment->getBlog();
                     }
                     if (array_key_exists('id', $params)) {
-                        $newParams['blog'] = EportfolioBlogMapper::getInstance()->findById($params['id']);
+                        /** @var EportfolioBlogModel $blog */
+                        $blog              = EportfolioBlogMapper::getInstance()->findById($params['id']);
+                        $newParams['blog'] = $blog;
+                        // Add page in next step
+                        $params['pageId']  = $blog->getPageId();
                     }
-                    if (array_key_exists('commentId', $params)) {
-                        $newParams['comment'] = EportfolioBlogCommentMapper::getInstance()->findById($params['commentId']);
+                    if (array_key_exists('pageId', $params)) {
+                        $newParams['page'] = EportfolioPageMapper::getInstance()->findById($params['pageId']);
                     }
                 } catch (MapperException $e) {
                     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
