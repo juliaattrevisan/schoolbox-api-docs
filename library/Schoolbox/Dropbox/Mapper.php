@@ -26,7 +26,7 @@ use Schoolbox\Resource\AbstractFileMapper;
  * @method  Model findById($id)
  * @method  Model createModel()
  */
-class Mapper extends AbstractFileMapper
+class Mapper extends AbstractFileMapper implements Schoolbox\IHomepageCleanable
 {
 
     /** @var Resource\Storage\Mapper */
@@ -104,6 +104,16 @@ class Mapper extends AbstractFileMapper
             AND ci.module = 'homepage'
             AND identifier = ?
         ", [ $folder->getId() ])->fetchColumn() > 0;
+    }
+
+    /**
+     * Soft-deletes content for specified homepage
+     *
+     * @param int $cid
+     * @return void
+     */
+    public function homepageClean($cid){
+        $this->deleteByColumn('category',$cid);
     }
 
 } 

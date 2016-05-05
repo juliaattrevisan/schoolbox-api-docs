@@ -1,6 +1,6 @@
 <?php
 
-class Wiki extends DeprecatedModel
+class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 {
 	function Wiki()
 	{

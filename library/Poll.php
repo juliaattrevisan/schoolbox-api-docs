@@ -1,6 +1,6 @@
 <?php
 
-class Poll extends DeprecatedModel {
+class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
 	function Poll () {
 	

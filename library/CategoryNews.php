@@ -4,7 +4,7 @@
  * @deprecated use Schoolbox\Resource\Category\NewsMapper
  * Class CategoryNews
  */
-class CategoryNews extends DeprecatedModel {
+class CategoryNews extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
 
 	function CategoryNews () {
 

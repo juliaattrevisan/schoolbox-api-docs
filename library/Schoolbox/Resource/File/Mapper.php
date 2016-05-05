@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\File;
 
 use Schoolbox\Collection;
+use Schoolbox\IHomepageCleanable;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Resource;
 use Schoolbox\User;
@@ -24,7 +25,7 @@ use Schoolbox\User;
  * @method Model findById($id)
  * @method Model createModel()
  */
-class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMapper, Searchable
+class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMapper, Searchable, IHomepageCleanable
 {
 
     /**
@@ -237,5 +238,16 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
             }
         }
         return true;
+    }
+
+
+    /**
+     * Soft-deletes content for specified homepage
+     *
+     * @param int $cid
+     * @return void
+     */
+    public function homepageClean($cid){
+        $this->deleteByColumn('category',$cid);
     }
 }

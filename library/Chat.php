@@ -1,6 +1,6 @@
 <?php
 
-class Chat extends DeprecatedModel {
+class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
     function __construct () {
             $this->_table = "chat";
             $this->_index = "id";

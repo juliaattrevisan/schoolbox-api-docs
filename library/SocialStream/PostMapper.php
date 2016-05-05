@@ -17,7 +17,7 @@ use Schoolbox\Collection;
 use SocialStream\Post\Factory;
 use SocialStream_Post_Abstract;
 
-class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMapperInterface
+class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMapperInterface, Schoolbox\IHomepageCleanable
 {
 
     /**
@@ -486,5 +486,15 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
             $c->add($post);
         }
         return $c;
+    }
+
+    /**
+     * Soft-deletes content for specified homepage
+     *
+     * @param int $cid
+     * @return void
+     */
+    public function homepageClean($cid){
+        $this->deleteByColumn('homepage_id',$cid);
     }
 }
