@@ -300,20 +300,21 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         //  TODO do this properly instead of by fetching amount*2 then filtering
         $allBlogs = \Schoolbox\Blog\Eportfolio\Post\Mapper::getInstance()
             ->findForOwner($this->getUser())
-            ->limit($this->getNumRecentBlogs() * 2);
-        
+            ->limit(0, $this->getNumRecentBlogs() * 2);
+
         $allBlogs = $allBlogs->filter(function($blog) {
-            /** @var \Component\Eportfolio\Blog $blog */
+            /** @var Schoolbox\Blog\Eportfolio\Post\Model $blog */
             return $this->canUserViewPage($blog->getPageId());
         });
 
         if ($allBlogs->count()) {
             $j = 0;
 
+            /** @var Schoolbox\Blog\Eportfolio\Post\Model[] $allBlogs */
             foreach ($allBlogs as $currentBlog) {
                 $this->getPage()->setVar(array(
                     'RECENT_BLOG_BLOG_ID' => $currentBlog->getId(),
-                    'RECENT_BLOG_TITLE' => $currentBlog->getTitle(),
+                    'RECENT_BLOG_TITLE' => $currentBlog->getHeading(),
                     'RECENT_BLOG_CREATED_AT' => $currentBlog->getCreatedAt()->getRelativeTime(),
                     'RECENT_BLOG_PAGE_ID' => $currentBlog->getPageId(),
                     'ON_OFF' => ++$j % 2 ? '' : 'dark',
