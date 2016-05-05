@@ -49,7 +49,7 @@
 
                 /* Alternate expando style
                  */
-                component.find('a[data-interaction="toggle-expanded"]').on('click', function(event){
+                component.on('click', 'a[data-interaction="toggle-expanded"]', function(event){
                     event.preventDefault();
 
                     $(this).closest('li').find('[data-task-list]').removeClass('hide');
