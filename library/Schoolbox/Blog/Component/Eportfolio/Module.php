@@ -111,7 +111,7 @@ class Module extends BaseModule
      *
      * @return callable for use in `new Rule\Callback()`
      */
-    public function getAuthenticationCallback($method)
+    protected function getAuthenticationCallback($method)
     {
         return function ($params, User $user) use ($method) {
             // Allow owner of either blog or comment to do stuff
