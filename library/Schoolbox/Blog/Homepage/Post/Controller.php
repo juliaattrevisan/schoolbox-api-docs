@@ -111,50 +111,40 @@ class Controller extends Base
 
         $attachments = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
 
+        if (is_array($post["attachment"])) {
+            $storages = (new CollectorFactory())->build($post["attachment"])->getAll();
+        } else {
+            $storages = [];
+        }
+
         foreach ($attachments as $attachment) {
-
             $foundAttachment = false;
-
-            if (is_array($post["attachment"])) {
-                foreach ($post["attachment"] as $hash) {
-                    if ($attachment->getHash() == $hash) {
-                        $foundAttachment = true;
-                        break;
-                    }
+            foreach ($storages as $storage) {
+                if ($storage->getHash() == $attachment->getHash()) {
+                    $foundAttachment = true;
+                    break;
                 }
             }
 
             if (!$foundAttachment) {
-
                 // The attachment was found in the database, remove it
-
                 $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                 $this->getBlogImageMapper()->delete($attachment);
 
             } else {
-
                 // We are keeping this attachment
-
                 $retainedAttachments[] = $attachment->getHash();
             }
         }
 
-        // Save any new attachments
-        if (is_array($post["attachment"])) {
-            $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();
-        } else {
-            $attachmentObjects = [];
-        }
-
-        /** @var \Schoolbox\Resource\Storage\Model $storageObject */
-        foreach ($attachmentObjects as $storageObject) {
+        /** @var \Schoolbox\Resource\Storage\Model $storage */
+        foreach ($storages as $storage) {
             // Only add attachments which don't already exist and are actually images
-
-            if ($storageObject->getMimeType()->isImage()) {
-                if (!in_array($storageObject->getHash(), $retainedAttachments)) {
+            if ($storage->getMimetype()->isImage()) {
+                if (!in_array($storage->getHash(), $retainedAttachments)) {
                     $attachment = new BlogImageModel();
                     $attachment->setBlogId($blog->getId());
-                    $attachment->setHash($storageObject->getHash());
+                    $attachment->setHash($storage->getHash());
                     $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                     $this->getBlogImageMapper()->save($attachment);
                 }

@@ -24,6 +24,7 @@ use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\RoleMapper;
@@ -117,54 +118,40 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
+        if (is_array($this->getRequest()->post["attachment"])) {
+            $storages = (new CollectorFactory())->build($this->getRequest()->post['attachment'])->getAll();
+        } else {
+            $storages = [];
+        }
         foreach ($attachments as $attachment) {
-
             $foundAttachment = false;
-
-            if (is_array($this->getRequest()->post["attachment"])) {
-                foreach ($this->getRequest()->post["attachment"] as $hash) {
-
-                    $hash_array = explode(":", $hash);
-
-                    if ($attachment->getHash() == $hash_array[1]) {
-                        $foundAttachment = true;
-                        break;
-                    }
+            foreach ($storages as $storage) {
+                if ($storage->getHash() == $attachment->getHash()) {
+                    $foundAttachment = true;
+                    break;
                 }
             }
 
             if (!$foundAttachment) {
-
                 // The attachment was found in the database, remove it
-
                 $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                 $this->getEportfolioBlogImageMapper()->delete($attachment);
 
             } else {
-
                 // We are keeping this attachment
-
                 $retainedAttachments[] = $attachment->getHash();
             }
         }
 
         // Save any new attachments
-
-        if (is_array($this->getRequest()->post["attachment"])) {
-            foreach ($this->getRequest()->post["attachment"] as $hash) {
-
-                $hash_array = explode(":", $hash);
-
-
-                // Only add attachments which don't already exist
-
-                if (!in_array($hash_array[1], $retainedAttachments)) {
-                    $attachment = new EportfolioBlogImageModel();
-                    $attachment->setBlogId($blog->getId());
-                    $attachment->setHash($hash_array[1]);
-                    $attachment->setUpdatedAt(\Alaress_Date_Format::now());
-                    $this->getEportfolioBlogImageMapper()->save($attachment);
-                }
+        foreach ($storages as $storage) {
+            // Only add attachments which don't already exist
+            if (!in_array($storage->getHash(), $retainedAttachments)) {
+                $attachment = new EportfolioBlogImageModel();
+                $attachment->setBlogId($blog->getId());
+                $attachment->setHash($storage->getHash());
+                $attachment->setUpdatedAt(\Alaress_Date_Format::now());
+                $this->getEportfolioBlogImageMapper()->save($attachment);
             }
         }
 
