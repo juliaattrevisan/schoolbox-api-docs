@@ -53,7 +53,7 @@
 
                             <div class="list-item">
                                 <div class="avatar card small-12">
-                                    <a href="/eportfolio/blog/{{ page.getUid }}/{{ page.getPageId }}/{{ blog.getId }}">
+                                    <a href="{{ routeLookup('eportfolioBlog.getItem', {ownerId: page.getUid, pageId: page.getPageId, id: blog.getId}) }}">
                                         <img src="/portrait.php?userId={{ blog.getOwner.getExternalId }}&size=square64" />
                                         <h3>{{ blog.getHeading }}</h3>
                                     </a>
@@ -63,7 +63,7 @@
 
                             {% if session.user.getId == blog.getOwner.getId or session.user.isSuperuser %}
                                 <nav>
-                                    <a class="icon-modify" href="/eportfolio/blog/modify/{{ page.getUid }}/{{ page.getPageId }}/{{ blog.getId }}" title="Modify Blog post"></a>
+                                    <a class="icon-modify" href="{{ routeLookup('eportfolioBlog.getModify', {ownerId: page.getUid, pageId: page.getPageId, id: blog.getId}) }}" title="Modify Blog post"></a>
                                 </nav>
                             {% endif %}
 
@@ -111,7 +111,7 @@
 
                                 <li class="row hide" id="commentform-{{ blog.getId }}">
                                     <div class="column small-12 no-pad">
-                                        <form action="/eportfolio/blog/comment/insert/{{ blog.getId }}" method="post">
+                                        <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
                                             <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                                             <input type="hidden" name="ownerId" value="{{ page.getUid }}">
                                             <div class="avatar card">
@@ -129,8 +129,8 @@
 
                 </ul>
                 <div class="content">
-                    <a href="/eportfolio/blog/archive/{{ page.getUid }}/{{ page.getPageId }}" class="button icon-archive">View Archive</a>
-                    <a href="/eportfolio/blog/modify/new/{{ page.getUid }}/{{ page.getPageId }}" class="button icon-upload">Post Blog</a>
+                    <a href="{{ routeLookup('eportfolioBlog.getArchiveCurrent', {ownerId: page.getUid, pageId: page.getPageId}) }}" class="button icon-archive">View Archive</a>
+                    <a href="{{ routeLookup('eportfolioBlog.getInsert', {ownerId: page.getUid, pageId: page.getPageId, id: blog.getId}) }}" class="button icon-upload">Post Blog</a>
                 </div>
             </section>
         </div>

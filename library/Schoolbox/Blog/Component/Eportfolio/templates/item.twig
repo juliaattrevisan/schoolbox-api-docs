@@ -37,7 +37,7 @@
     </div>
     {% if session.user.getId == comment.getOwner.getId or session.user.isSuperuser %}
         <nav>
-            <a class="icon-modify" href="/eportfolio/blog/modify/{{ page.getUid }}/{{ page.getPageId }}/{{ record.getId }}" title="Modify Blog post"></a>
+            <a class="icon-modify" href="{{ routeLookup('eportfolioBlog.getModify', {ownerId: page.getUid, pageId: page.getPageId, id: record.getId}) }}" title="Modify Blog post"></a>
         </nav>
     {% endif %}
 </div>
@@ -58,7 +58,7 @@
                     </div>
                     {% if session.user.getId == record.getOwner.getId or session.user.isSuperuser %}
                         <nav>
-                            <a class="icon-modify" href="/eportfolio/blog/modify/{{ page.getUid }}/{{ page.getPageId }}/{{ record.getId }}" title="Modify Blog post"></a>
+                            <a class="icon-modify" href="{{ routeLookup('eportfolioBlog.getModify', {ownerId: page.getUid, pageId: page.getPageId, id: record.getId}) }}" title="Modify Blog post"></a>
                         </nav>
                     {% endif %}
                 </li>
@@ -109,7 +109,7 @@
                     {% endfor %}
 
                     <li>
-                        <form action="/eportfolio/blog/comment/insert/{{ record.getId }}" method="post">
+                        <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: record.getId}) }}" method="post">
                             <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                             <input type="hidden" name="ownerId" value="{{ page.getUid }}">
                             <label class="content">
