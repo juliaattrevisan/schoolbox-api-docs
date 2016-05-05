@@ -77,6 +77,10 @@ class Chat extends DeprecatedModel {
     }
 */
     function update_poll ($category_id, $user_id) {
+        if(!is_numeric($user_id)) {
+            return false;
+        }
+
         $query = "INSERT INTO chat_poll (user_id, category_id, time)
                   VALUES ($user_id, $category_id, NOW())
                   ON DUPLICATE KEY UPDATE time = NOW()";
