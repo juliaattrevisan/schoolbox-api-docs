@@ -71,7 +71,7 @@
                             </nav>
                         </div>
 
-                        <div class="avatar card">
+                        <div class="avatar card small-12">
                             <a href="/search/user/{{ blog.getOwner.getId }}" title="View Profile">
                                 <img src="/portrait.php?userId={{ blog.getOwner.getExternalId }}&size=square64" alt="View Profile" />
                                 <p>{{ blog.getOwner.getFirstname }} {{ blog.getOwner.getLastname }}</p>
@@ -94,7 +94,7 @@
                             {% for comment in blogComments[blog.getId] %}
 
                             <li>
-                                <div class="avatar card">
+                                <div class="avatar card small-12">
                                     <a href="/search/user/{{ comment.getOwner.getId }}" title="View Profile">
                                         <img src="/portrait.php?userId={{ comment.getOwner.getExternalId }}&size=square64" alt="View Profile" />
                                         <p>{{ comment.getOwner.getFirstname }} {{ comment.getOwner.getLastname }}</p>

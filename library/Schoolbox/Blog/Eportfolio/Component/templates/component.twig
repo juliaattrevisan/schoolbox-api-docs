@@ -114,7 +114,7 @@
                                         <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
                                             <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                                             <input type="hidden" name="ownerId" value="{{ page.getUid }}">
-                                            <div class="avatar card">
+                                            <div class="avatar card small-12">
                                                 <img src="/portrait.php?userId={{ session.user.getExternalId }}&size=square64" />
                                                 <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
                                             </div>

@@ -111,7 +111,7 @@
                                     <div class="column small-12 no-pad">
                                         <form action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}" method="post">
                                             <input type="hidden" name="component" value="1">
-                                            <div class="avatar card">
+                                            <div class="avatar card small-12">
                                                 <img src="/portrait.php?userId={{ session.user.getExternalId }}&size=square64" />
                                                 <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
                                             </div>
