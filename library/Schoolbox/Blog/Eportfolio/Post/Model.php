@@ -1,6 +1,6 @@
 <?php
 /**
- * Mapper for e-portfolio blog comments
+ * Model for e-portfolio blog posts
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -8,12 +8,12 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Blog\EportfolioComment;
+namespace Schoolbox\Blog\Eportfolio\Post;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
-use Schoolbox\Blog\EportfolioBlog\Model as EportfolioBlogModel;
 
 class Model implements ISoftDeletable
 {
@@ -22,17 +22,23 @@ class Model implements ISoftDeletable
 	/** @var int */
 	protected $id;
 
-	/** @var EportfolioBlogModel */
-	protected $blog;
+	/** @var Folder */
+	protected $folder;
 
 	/** @var User */
 	protected $owner;
+
+	/** @var Integer */
+	protected $pageId;
 
 	/** @var \Alaress_Date_Format */
 	protected $createdAt;
 
 	/** @var \Alaress_Date_Format */
 	protected $updatedAt;
+
+	/** @var string */
+	protected $heading;
 
 	/** @var string */
 	protected $body;
@@ -54,19 +60,35 @@ class Model implements ISoftDeletable
 	}
 
 	/**
-	 * @param EportfolioBlogModel $blog
+	 * @param int $pageId
 	 * @return self
 	 */
-	public function setBlog($blog) {
-		$this->blog = $blog;
+	public function setPageId($pageId) {
+		$this->pageId = $pageId;
 		return $this;
 	}
 
 	/**
-	 * @return EportfolioBlogModel
+	 * @return int
 	 */
-	public function getBlog() {
-		return $this->blog;
+	public function getPageId() {
+		return $this->pageId;
+	}	
+
+	/**
+	 * @param Folder $folder
+	 * @return self
+	 */
+	public function setFolder($folder) {
+		$this->folder = $folder;
+		return $this;
+	}
+
+	/**
+	 * @return Folder
+	 */
+	public function getFolder() {
+		return $this->folder;
 	}
 
 	/**
@@ -117,6 +139,22 @@ class Model implements ISoftDeletable
 	{
 		$this->updatedAt = $updatedAt;
 		return $this;
+	}
+
+	/**
+	 * @param string $heading
+	 * @return self
+	 */
+	public function setHeading($heading) {
+		$this->heading = $heading;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getHeading() {
+		return $this->heading;
 	}
 
 	/**

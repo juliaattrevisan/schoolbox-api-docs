@@ -8,20 +8,18 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Blog\EportfolioComment;
+namespace Schoolbox\Blog\Eportfolio\Comment;
 
 use PDO;
+use Schoolbox\Blog\Eportfolio\Comment\Model as EportfolioBlogCommentModel;
+use Schoolbox\Blog\Eportfolio\Post\Mapper as EportfolioBlogMapper;
+use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\Collection;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Blog\EportfolioComment\Model as EportfolioBlogCommentModel;
-use Schoolbox\Blog\EportfolioBlog\Mapper as EportfolioBlogMapper;
-use Schoolbox\Blog\EportfolioBlog\Model as EportfolioBlogModel;
-use Schoolbox\Mapper\Searchable;
-use Schoolbox\Feed\FeedableMapperInterface;
 
 class Mapper extends BaseMapper implements FeedableMapperInterface
 {

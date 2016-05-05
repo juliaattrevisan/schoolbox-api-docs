@@ -8,11 +8,11 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Blog\EportfolioImage;
+namespace Schoolbox\Blog\Eportfolio\Image;
 
+use Schoolbox\Blog\Eportfolio\Image\Model as EportfolioBlogImageModel;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Blog\EportfolioImage\Model as EportfolioBlogImageModel;
 
 class Mapper extends BaseMapper
 {

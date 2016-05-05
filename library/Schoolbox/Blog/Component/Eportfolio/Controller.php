@@ -12,18 +12,18 @@ namespace Schoolbox\Blog\Component\Eportfolio;
 
 use Component_Eportfolio_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
-use SitePage;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Blog\EportfolioBlog\Mapper as EportfolioBlogMapper;
-use Schoolbox\Blog\EportfolioBlog\Model as EportfolioBlogModel;
-use Schoolbox\Blog\EportfolioComment\Mapper as EportfolioBlogCommentMapper;
-use Schoolbox\Blog\EportfolioComment\Model as EportfolioBlogCommentModel;
-use Schoolbox\Blog\EportfolioImage\Mapper as EportfolioBlogImageMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\UserMapper;
 use Eportfolio\PageMapper as EportfolioPageMapper;
+use Schoolbox\Blog\Eportfolio\Comment\Mapper as EportfolioBlogCommentMapper;
+use Schoolbox\Blog\Eportfolio\Comment\Model as EportfolioBlogCommentModel;
+use Schoolbox\Blog\Eportfolio\Image\Mapper as EportfolioBlogImageMapper;
+use Schoolbox\Blog\Eportfolio\Post\Mapper as EportfolioBlogMapper;
+use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+use SitePage;
 
 class Controller extends Component_Eportfolio_ControllerAbstract
 {

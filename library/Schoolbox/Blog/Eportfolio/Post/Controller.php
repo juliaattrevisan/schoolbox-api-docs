@@ -9,26 +9,26 @@
  *
  */
 
-namespace Schoolbox\Blog\EportfolioBlog;
+namespace Schoolbox\Blog\Eportfolio\Post;
 
 use Alaress\Web\Controller\Base;
+use Eportfolio\Page as EportfolioPageModel;
+use Eportfolio\PageMapper as EportfolioPageMapper;
+use Schoolbox\Blog\Eportfolio\Comment\Mapper as EportfolioBlogCommentMapper;
+use Schoolbox\Blog\Eportfolio\Comment\Model as EportfolioBlogCommentModel;
+use Schoolbox\Blog\Eportfolio\Image\Mapper as EportfolioBlogImageMapper;
+use Schoolbox\Blog\Eportfolio\Image\Model as EportfolioBlogImageModel;
+use Schoolbox\Blog\Eportfolio\Post\Mapper as EportfolioBlogMapper;
+use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Blog\EportfolioImage\Model as EportfolioBlogImageModel;
-use Schoolbox\Blog\EportfolioImage\Mapper as EportfolioBlogImageMapper;
-use Schoolbox\Blog\EportfolioBlog\Model as EportfolioBlogModel;
-use Schoolbox\Blog\EportfolioBlog\Mapper as EportfolioBlogMapper;
-use Schoolbox\Blog\EportfolioComment\Model as EportfolioBlogCommentModel;
-use Schoolbox\Blog\EportfolioComment\Mapper as EportfolioBlogCommentMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Eportfolio\PageMapper as EportfolioPageMapper;
-use Eportfolio\Page as EportfolioPageModel;
-use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Controller extends Base
 {
