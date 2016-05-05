@@ -281,6 +281,10 @@ class Leave_Controller extends Controller
      */
     public function executeCreateRequest()
     {
+        if(!$this->hasCreatePermission()){
+            error(19);
+        }
+
         return array();
     }
 
@@ -371,6 +375,43 @@ class Leave_Controller extends Controller
             );
             $this->getPage()->parse('student_selector_block', 'student_selector');
         }
+    }
+
+    /**
+     * Does this user have create permission?
+     *
+     * The current user has permission if:
+     * * They are staff, or
+     * * They are a student in a Residential House,
+     * * They are a parent of a student in a Residential House
+     *
+     * @return bool
+     */
+    protected function hasCreatePermission()
+    {
+        /** @var \Schoolbox\User $user */
+        $user = $_SESSION["user"];
+
+        // Are they staff?
+        if($user->getRole()->isStaff()) {
+            return true;
+        }
+
+        // Are they a boarder?
+        if($user->getResidentialHouse()->getId() > 0) {
+            return true;
+        }
+
+        // Are they a parent of a boarder?
+        if(is_array($_SESSION['children'])){
+            foreach($_SESSION['children'] as $child){
+                if($this->userMapper->findById($child['id'])->getResidentialHouse()->getId() > 0) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
