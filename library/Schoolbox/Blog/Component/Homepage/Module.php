@@ -79,12 +79,6 @@ class Module extends BaseModule
             }
             return null;
         };
-        $getBlogFolderIdCallback = function ($params) {
-            if ($params['blog'] instanceof BlogModel) {
-                return $params['blog']->getId();
-            }
-            return null;
-        };
         $access = Access::getInstance();
 
         // getArchive, postCommentInsert: has read access to homepage
@@ -124,7 +118,7 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             'getItem',
-            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, $getBlogFolderIdCallback, $access)
+            new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, $getFolderIdCallback, $access)
         );
 
         // getModify, postModify: has write access to blog's homepage, or created the post
@@ -132,7 +126,7 @@ class Module extends BaseModule
             $authorizer,
             '(getModify|postModify)',
             new Rule\Any(
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getBlogFolderIdCallback, $access),
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getFolderIdCallback, $access),
                 new Rule\Callback(
                     function ($params, User $user) {
                         if ($params['blog'] instanceof BlogModel) {
