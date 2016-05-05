@@ -52,28 +52,6 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         );
     }
 
-
-    /**
-     * Returns a list of years and months which have blog posts
-     *
-     * @param int $ownerId
-     * @return array
-     */
-    public function getOccupiedDateList($ownerId)
-    {
-        $stmt = $this->database->prepare(
-            "
-			SELECT YEAR(`created_at`) as 'year', `created_at`, MONTH(`created`) as 'month'
-			FROM {$this->getTable()}
-			WHERE `cid` = :cid
-			GROUP BY `year` DESC, `month` DESC
-		"
-        );
-
-        $stmt->execute(array('cid' => $ownerId));
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
     /**
      * Performs a search with the given parameters, and returns a Collection of the resultant set.
      *
