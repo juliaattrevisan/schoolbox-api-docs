@@ -1636,7 +1636,7 @@ class Controller extends Base\Base
         else {
             /* TODO: Error; component never existed
              */
-            $destination = null;
+            $destination = $this->getFolderMapper()->createModel();
         }
 
         $this->tpl('import', [
