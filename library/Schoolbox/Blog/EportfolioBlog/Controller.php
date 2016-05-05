@@ -27,6 +27,7 @@ use Schoolbox\Blog\EportfolioComment\Model as EportfolioBlogCommentModel;
 use Schoolbox\Blog\EportfolioComment\Mapper as EportfolioBlogCommentMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Eportfolio\PageMapper as EportfolioPageMapper;
+use Eportfolio\Page as EportfolioPageModel;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Controller extends Base
@@ -187,29 +188,22 @@ class Controller extends Base
 
     /**
      * Display selected blog post
-     * @param int $ownerId      The owner of the eportfolio we are viewing
-     * @param int $pageId       The page on the eportfolio we are viewing
-     * @param int $id           The id of blog article we are viewing
-     * @throws \Schoolbox\Application\Exception
+     * @param EportfolioPageModel $page
+     * @param EportfolioBlogModel $blog
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function getItem($ownerId, $pageId, $id)
+    public function getItem(EportfolioPageModel $page, EportfolioBlogModel $blog)
     {
         try
         {
-            // Grab the record
-
-            /** @var EportfolioBlogModel $record */
-            $record = $this->getEportfolioBlogMapper()->findById($id);
-
             // Hydrate owner details
 
             /** @var User $user */
-            $user = $this->getUserMapper()->findById($record->getOwner()->getId());
-            $record->setOwner($user);
+            $user = $this->getUserMapper()->findById($blog->getOwner()->getId());
+            $blog->setOwner($user);
 
             // Load any comments and hydrate their owners
-
-            $comments = $this->getEportfolioBlogCommentMapper()->findByColumn("blog_id", $record->getId());
+            $comments = $this->getEportfolioBlogCommentMapper()->findByColumn("blog_id", $blog->getId());
 
             /** @var EportfolioBlogCommentModel $comment */
             foreach ($comments as $comment) {
@@ -219,12 +213,7 @@ class Controller extends Base
             }
 
             // Load any images
-
-            $images = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $record->getId());
-
-            // Load details of the page the item is on
-
-            $page = $this->getEportfolioPageMapper()->findById($pageId);
+            $images = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId());
         }
         catch (MapperException $e)
         {
@@ -238,7 +227,7 @@ class Controller extends Base
                 'template' => '@eportfolioBlog/item.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
-                    'record'            => $record,
+                    'record'            => $blog,
                     'comments'          => $comments,
                     'images'            => $images,
                     'page'              => $page
@@ -335,24 +324,19 @@ class Controller extends Base
 
     /**
      * Displays modify blog post page
-     * @param int $ownerId      ID of the owner of the e-portfolio we are currently viewing   
-     * @param int $pageId       ID of the e-portfolio page of the blog we are currently viewing
-     * @param int $id           ID of the blog entry we are currently modifying 
+     * @param EportfolioPageModel $page
+     * @param EportfolioBlogModel $blog
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getModify($ownerId, $pageId, $id) 
+    public function getModify(EportfolioPageModel $page, EportfolioBlogModel $blog)
     {
-        $page = $this->getEportfolioPageMapper()->findById($pageId);
-        $record = $this->getEportfolioBlogMapper()->findById($id);
-
         // Lets get the party started...
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@eportfolioBlog/modify.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
-                    'record'            => $record,
+                    'record'            => $blog,
                     'WRITE_ACCESS'      => WRITE_ACCESS,
                     'READ_ACCESS'       => READ_ACCESS,
                     'FULL_ACCESS'       => FULL_ACCESS,
@@ -365,16 +349,12 @@ class Controller extends Base
 
     /**
      * Display insert new blog post page
-     * @param int $ownerId      ID of the owner of the e-portfolio we are currently viewing
-     * @param int $pageId       ID of the e-portfolio page of the blog into which we are inserting the new blog psot
+     * @param EportfolioPageModel $page
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getInsert($ownerId, $pageId) 
+    public function getInsert(EportfolioPageModel $page)
     {
-        $page = $this->getEportfolioPageMapper()->findById($pageId);
-
         // Lets get the party started...
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@eportfolioBlog/modify.twig',
@@ -392,26 +372,23 @@ class Controller extends Base
 
     /**
      * Gets blog archive for the current calendar month
-     * @param int $ownerId      ID of the owner of the e-portfolio we are currently viewing
-     * @param int $pageId       ID of the e-portfolio page of the blog into which we are inserting the new blog psot
+     * @param EportfolioPageModel $page
      */
-    public function getArchiveCurrent($ownerId, $pageId) {
-        $this->getArchive($ownerId, $pageId, date("Y"), date("n"));
+    public function getArchiveCurrent(EportfolioPageModel $page) {
+        $this->getArchive($page, date("Y"), date("n"));
     }
 
     /**
      * Gets blog archive for the selected calendar month
-     * @param int $ownerId      ID of the owner of the e-portfolio we are currently viewing
-     * @param int $pageId       ID of the e-portfolio page of the blog into which we are inserting the new blog psot
-     * @param int $year         Archive year we are currently looking at (if not supplied will be based on current date)
-     * @param int $month        Archive month we are currently looking at (if not supplied will be based on current date)
+     * @param EportfolioPageModel $page  the e-portfolio page of the blog into which we are inserting the new blog psot
+     * @param int                 $year  Archive year we are currently looking at (if not supplied will be based on current date)
+     * @param int                 $month Archive month we are currently looking at (if not supplied will be based on current date)
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getArchive($ownerId, $pageId, $year, $month) {
-
+    public function getArchive(EportfolioPageModel $page, $year, $month)
+    {
         $blogs = $this->getEportfolioBlogMapper()->findByColumnList([
-            "owner_id" => $ownerId,
-            "page_id" => $pageId
+            "page_id" => $page->getPageId(),
         ])->sortBy('createdAt', 'desc');
 
         $blogComments = [];
@@ -443,10 +420,7 @@ class Controller extends Base
             }
         }
 
-        $page = $this->getEportfolioPageMapper()->findById($pageId);
-
         // Lets get the party started...
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@eportfolioBlog/archive.twig',
