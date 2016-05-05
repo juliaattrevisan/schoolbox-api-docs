@@ -1,0 +1,86 @@
+<script>
+    $(function(){
+        $('[data-import-logs]').click(function(e) {
+            e.preventDefault();
+            window.location.href = '/adminv2/import-pastoral/log';
+        });
+    });
+</script>
+
+{# Shared navigation menu #}
+
+{{ renderAdminNavigation(pageCurrent) }}
+
+<div class="row">
+    <div class="small-12 island collapse">
+        <h1>Pastoral Care Records</h1>
+        <dl class="sub-nav">
+            <dd>
+                <a href="/adminv2/import/user">User</a>
+            </dd>
+            <dd>
+                <a href="/adminv2/import/timetable-structure">Timetable Structure</a>
+            </dd>
+            <dd>
+                <a href="/adminv2/import/timetable">Timetable</a>
+            </dd>
+            <dd>
+                <a href="/adminv2/import/enrolment">Enrolment</a>
+            </dd>
+            <dd>
+                <a href="/adminv2/photos/upload">User Photos</a>
+            </dd>
+            <dd class="active">
+                <a href="/adminv2/import-pastoral">Pastoral Care Records</a>
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="small-12 island">
+    {% if logs.length > 0 %}
+        <section>
+            <h2 class="subheader">Pastoral Care Log</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <td>Time</td>
+                        <td>Student Name</td>
+                        <td>Creator Name</td>
+                        <td>Heading</td>
+                        <td class="right">Result</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        {% if log.result != 'Completed' %}
+                            <tr>
+                                <td>
+                                    {{ log.createdAt.getHour }}:{{ log.createdAt.getMinute(true) }}:{{ log.createdAt.getSecond }}
+                                </td>
+                                <td>
+                                    {{ log.studentName }}
+                                </td>
+                                <td>
+                                    {{ log.creatorName }}
+                                </td>
+                                <td>
+                                    {{ log.heading }}
+                                </td>
+                                <td class="right">
+                                    {{ log.result }}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    {% else %}
+        <h2 class="subheader">Pastoral Care Log</h2>
+        <section class="content">
+            <p class="no-margin">No log entries found</p>
+        </section>
+    {% endif %}
+    <input type="submit" data-import-logs value="Back">
+</div>

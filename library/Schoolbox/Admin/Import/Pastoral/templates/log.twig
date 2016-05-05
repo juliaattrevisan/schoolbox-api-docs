@@ -1,0 +1,54 @@
+<script>
+    $(function(){
+        $('[data-back]').click(function(e) {
+            e.preventDefault();
+            window.location.href = '/adminv2/import-pastoral';
+        });
+    });
+</script>
+
+{# Shared navigation menu #}
+
+{{ renderAdminNavigation(pageCurrent) }}
+
+<div class="row">
+    <div class="small-12 island collapse">
+        <h1>Pastoral Care Records</h1>
+        <dl class="sub-nav">
+            <dd>
+                <a href="/adminv2/import/user">User</a>
+            </dd>
+            <dd>
+                <a href="/adminv2/import/timetable-structure">Timetable Structure</a>
+            </dd>
+            <dd>
+                <a href="/adminv2/import/timetable">Timetable</a>
+            </dd>
+            <dd>
+                <a href="/adminv2/import/enrolment">Enrolment</a>
+            </dd>
+            <dd>
+                <a href="/adminv2/photos/upload">User Photos</a>
+            </dd>
+            <dd class="active">
+                <a href="/adminv2/import-pastoral">Pastoral Care Records</a>
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="small-12 island">
+    <h2 class="subheader">Pastoral Care Import Logs</h2>
+    <section>
+        <table>
+            {% for log in logs %}
+            <tr>
+                <td>
+                    <a href="/adminv2/import-pastoral/log/{{ log.import_id }}">{{ log.created_at.getLong }}</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </section>
+    <input type="submit" data-back value="Back">
+</div>
