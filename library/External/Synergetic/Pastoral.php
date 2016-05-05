@@ -20,6 +20,7 @@ use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Alaress\DebugBar\Instance as DebugBar;
+use Schoolbox\Admin\Import\Pastoral\Mapper as PastoralLogMapper;
 
 class External_Synergetic_Pastoral implements External_PastoralInterface
 {
@@ -33,6 +34,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
     /** @var PastoralMapper $pastoralMapper */
     protected $pastoralMapper;
+
+    /** @var PastoralLogMapper $pastoralMapper */
+    protected $pastoralLogMapper;
 
     /** @var PastoralCommentMapper $pastoralCommentMapper */
     protected $pastoralCommentMapper;
@@ -72,6 +76,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $pastoralCommentMapper->setNotifier($silence);
         $this->setPastoralCommentMapper($pastoralCommentMapper);
 
+        $this->setPastoralLogMapper(PastoralLogMapper::getInstance());
         $this->setPastoralTypeMapper(PastoralTypeMapper::getInstance());
         $this->setPastoralCategoryMapper(PastoralCategoryMapper::getInstance());
         $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
@@ -128,8 +133,16 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * Does an import of all pastoral care records stored in Synergetic
      */
-    public function importPastoral()
+    public function importPastoral($userId)
     {
+        /** @var \Schoolbox\Collection $results */
+        $results = $this->getPastoralLogMapper()->findAll()->sortBy("importId", "desc");
+
+        if ($results->count() > 0) {
+            $importId = $results->first()->getImportId() + 1;
+        } else {
+            $importId = 1;
+        }
         // Get all pastoral care records from Synergetic for current students only
 
         $query = "
@@ -326,6 +339,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         }
                     }
                 }
+                $record['reason'] = "Imported";
             }
             catch (\Exception $e)
             {
@@ -339,8 +353,28 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $skipped[] = $record;
             }
 
+            $log = new \Schoolbox\Admin\Import\Pastoral\Model();
+            $log->setUserId($userId);
+            $log->setPastoralId($pastoralRecord->getId());
+            $log->setImportId($importId);
+            $log->setHeading($record["heading"]);
+            $log->setStudentName($student->getFirstname() . " " . $student->getLastname());
+            $log->setCreatorName($owner->getFirstname() . " " . $owner->getLastname());
+            $log->setCreatedAt(\Alaress_Date_Format::now());
+            $log->setResult($record['reason']);
+            $this->getPastoralLogMapper()->save($log);
+
+
             $records->next();
         }
+
+        $log = new \Schoolbox\Admin\Import\Pastoral\Model();
+        $log->setUserId($userId);
+        $log->setImportId($importId);
+        $log->setHeading("Import Completed");
+        $log->setResult("Completed");
+        $log->setCreatedAt(\Alaress_Date_Format::now());
+        $this->getPastoralLogMapper()->save($log);
 
         return [
             'imported' => $imported,
@@ -757,6 +791,22 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function setPastoralTypeMapper($pastoralTypeMapper) {
         $this->pastoralTypeMapper = $pastoralTypeMapper;
+        return $this;
+    }
+
+    /**
+     * @return PastoralLogMapper
+     */
+    public function getPastoralLogMapper() {
+        return $this->pastoralLogMapper;
+    }
+
+    /**
+     * @param $pastoralLogMapper
+     * @return $this
+     */
+    public function setPastoralLogMapper($pastoralLogMapper) {
+        $this->pastoralLogMapper = $pastoralLogMapper;
         return $this;
     }
 

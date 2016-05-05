@@ -45,9 +45,14 @@ class Controller extends Base
         $this->setConfigMapper(ConfigMapper::getInstance());
     }
 
+    /**
+     * Start pastoral import in a detached state
+     */
     public function postImport()
     {
         // Do the import in a detached state so it doesn't time out
+        $pastoralExternal = new \External_Pastoral();
+        $pastoralExternal->importPastoral($this->getUser()->getId());
 
         $this->getResponse()->content->set([
             'template' => '@adminImportPastoral/importResults.twig',
@@ -60,7 +65,6 @@ class Controller extends Base
                 }
             ],
         ]);
-
     }
 
     /**
@@ -70,8 +74,6 @@ class Controller extends Base
     {
         try
         {
-            $pastoralExternal = new \External_Pastoral();
-            $pastoralExternal->importPastoral();
         }
         catch (\Exception $e)
         {
@@ -84,9 +86,9 @@ class Controller extends Base
             //                            |           |
             //                            |    S B    |
             //                          \\|           |//
-            // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
             //
-            // "I'm sorry- the client had detached, there was nothing more we could do"
+            // "I'm sorry- the client has detached, there is nothing more we can do"
         }
     }
 

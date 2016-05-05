@@ -88,7 +88,7 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * Import pastoral care records from external SIS
      */
-    public function importPastoral()
+    public function importPastoral($userId)
     {
         // NOOP
     }
