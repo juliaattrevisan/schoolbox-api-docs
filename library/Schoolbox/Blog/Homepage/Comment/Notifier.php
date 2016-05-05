@@ -7,12 +7,15 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Blog\Comment;
+namespace Schoolbox\Blog\Homepage\Comment;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
+use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
+use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
+use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
@@ -24,11 +27,8 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\User;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Blog\Blog\Mapper as BlogMapper;
-use Schoolbox\Blog\Blog\Model as BlogModel;
-use Schoolbox\Blog\Comment\Model as BlogCommentModel;
+use Schoolbox\User;
 
 class Notifier extends AbstractModuleNotifier implements SourceInterface {
 

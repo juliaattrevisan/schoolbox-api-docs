@@ -16,17 +16,17 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Blog\Blog\Mapper as BlogMapper;
-use Schoolbox\Blog\Blog\Model as BlogModel;
-use Schoolbox\Blog\Blog\Controller as BlogController;
-use Schoolbox\Blog\Comment\Model as BlogCommentModel;
-use Schoolbox\Blog\Comment\Mapper as BlogCommentMapper;
+use Schoolbox\Blog\Homepage\Comment\Mapper as BlogCommentMapper;
+use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
+use Schoolbox\Blog\Homepage\Post\Controller as BlogController;
+use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
+use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
-use \Schoolbox\User;
+use Schoolbox\User;
 use Twig_Loader_Chain;
 
 class Module extends BaseModule

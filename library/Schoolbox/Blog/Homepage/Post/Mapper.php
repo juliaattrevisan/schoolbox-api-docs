@@ -8,19 +8,19 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Blog\Blog;
+namespace Schoolbox\Blog\Homepage\Post;
 
 use PDO;
+use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Searchable;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Blog\Blog\Model as BlogModel;
 
 class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
 {

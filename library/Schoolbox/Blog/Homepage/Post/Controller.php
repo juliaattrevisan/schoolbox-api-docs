@@ -8,27 +8,27 @@
  *
  */
 
-namespace Schoolbox\Blog\Blog;
+namespace Schoolbox\Blog\Homepage\Post;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Blog\Homepage\Comment\Mapper as BlogCommentMapper;
+use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
+use Schoolbox\Blog\Homepage\Image\Mapper as BlogImageMapper;
+use Schoolbox\Blog\Homepage\Image\Model as BlogImageModel;
+use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
+use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Blog\Image\Model as BlogImageModel;
-use Schoolbox\Blog\Image\Mapper as BlogImageMapper;
-use Schoolbox\Blog\Blog\Model as BlogModel;
-use Schoolbox\Blog\Blog\Mapper as BlogMapper;
-use Schoolbox\Blog\Comment\Model as BlogCommentModel;
-use Schoolbox\Blog\Comment\Mapper as BlogCommentMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Controller extends Base
 {

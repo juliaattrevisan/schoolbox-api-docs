@@ -8,18 +8,18 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Blog\Comment;
+namespace Schoolbox\Blog\Homepage\Comment;
 
 use PDO;
+use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
+use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
+use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
+use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Blog\Comment\Model as BlogCommentModel;
-use Schoolbox\Blog\Blog\Mapper as BlogMapper;
-use Schoolbox\Blog\Blog\Model as BlogModel;
-use Schoolbox\Feed\FeedableMapperInterface;
 
 class Mapper extends BaseMapper implements FeedableMapperInterface
 {

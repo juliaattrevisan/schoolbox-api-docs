@@ -1,19 +1,19 @@
 <?php
 /**
- * Model for normal (non-eportfolio) blog comments
- *
+ * Model for normal (non-eportfolio) blog posts
+ * 
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Blog\Comment;
+namespace Schoolbox\Blog\Homepage\Post;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
-use Schoolbox\Blog\Blog\Model as BlogModel;
 
 class Model implements ISoftDeletable
 {
@@ -22,8 +22,8 @@ class Model implements ISoftDeletable
 	/** @var int */
 	protected $id;
 
-	/** @var BlogModel */
-	protected $blog;
+	/** @var Folder */
+	protected $folder;
 
 	/** @var User */
 	protected $owner;
@@ -33,6 +33,9 @@ class Model implements ISoftDeletable
 
 	/** @var \Alaress_Date_Format */
 	protected $updatedAt;
+
+	/** @var string */
+	protected $heading;
 
 	/** @var string */
 	protected $body;
@@ -54,19 +57,19 @@ class Model implements ISoftDeletable
 	}
 
 	/**
-	 * @param BlogModel $blog
+	 * @param Folder $folder
 	 * @return self
 	 */
-	public function setBlog($blog) {
-		$this->blog = $blog;
+	public function setFolder($folder) {
+		$this->folder = $folder;
 		return $this;
 	}
 
 	/**
-	 * @return BlogModel
+	 * @return Folder
 	 */
-	public function getBlog() {
-		return $this->blog;
+	public function getFolder() {
+		return $this->folder;
 	}
 
 	/**
@@ -117,6 +120,22 @@ class Model implements ISoftDeletable
 	{
 		$this->updatedAt = $updatedAt;
 		return $this;
+	}
+
+	/**
+	 * @param string $heading
+	 * @return self
+	 */
+	public function setHeading($heading) {
+		$this->heading = $heading;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getHeading() {
+		return $this->heading;
 	}
 
 	/**

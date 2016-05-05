@@ -12,18 +12,18 @@ namespace Schoolbox\Blog\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Blog\Homepage\Comment\Mapper as BlogCommentMapper;
+use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
+use Schoolbox\Blog\Homepage\Image\Mapper as BlogImageMapper;
+use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
+use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
-use SitePage;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Blog\Blog\Mapper as BlogMapper;
-use Schoolbox\Blog\Blog\Model as BlogModel;
-use Schoolbox\Blog\Comment\Mapper as BlogCommentMapper;
-use Schoolbox\Blog\Comment\Model as BlogCommentModel;
-use Schoolbox\Blog\Image\Mapper as BlogImageMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
+use SitePage;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {

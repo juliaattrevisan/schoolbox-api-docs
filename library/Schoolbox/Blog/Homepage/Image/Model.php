@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Blog\Image;
+namespace Schoolbox\Blog\Homepage\Image;
 
 class Model {
 
