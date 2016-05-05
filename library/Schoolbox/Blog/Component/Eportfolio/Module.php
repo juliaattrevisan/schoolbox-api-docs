@@ -167,7 +167,8 @@ class Module extends BaseModule
                         /** @var EportfolioBlogCommentModel $comment */
                         $comment              = EportfolioBlogCommentMapper::getInstance()->findById($params['commentId']);
                         $newParams['comment'] = $comment;
-                        $newParams['blog']    = $comment->getBlog();
+                        // Add blog in next step
+                        $params['id']         = $comment->getBlog()->getId();
                     }
                     if (array_key_exists('id', $params)) {
                         /** @var EportfolioBlogModel $blog */
