@@ -1584,18 +1584,21 @@ class Controller extends Base\Base
         /** @var Collection|UnitInstance[] $selectedUnitInstances */
         $selectedUnitInstances = $this->getUnitInstanceMapper()->findForComponent($compInst);
 
-        // casually crack out Big Bertha and drill, drill, drill... :/
-        $owner = $this->getUserMapper()->findById($selectedUnitInstances->first()->getTasks()->first()->getOwner()->getId());
+        /** @var Collection $tasks */
+        $tasks = $selectedUnitInstances->first()->getTasks();
+        if ($tasks->count() > 0) {
+            $owner = $this->getUserMapper()->findById($tasks->first()->getOwner()->getId());
+        } else {
+            // no tasks in this unit: use the session user
+            $owner = $this->getUser();
+        }
 
         foreach ($selectedUnitInstances as $selectedUnitInstance) {
             $compendium[$selectedUnitInstance->getUnitCategory()->getId()]['selected'] = $selectedUnitInstance;
         }
 
-        /** @var Folder\Model $course */
         $course   = $this->getUnitInstanceMapper()->findCourseForUnit($selectedUnitInstances->first());
-
-        /** @var Collection|Folder\Model[] $allUnits */
-        $allUnits = $this->getCourseMapper()->findAllChildren($course->getId());
+        $allUnits = $course->getUnits();
 
         foreach ($allUnits as $unit) {
             $compendium[$unit->getId()]['folder'] = $unit;
@@ -1633,7 +1636,7 @@ class Controller extends Base\Base
         else {
             /* TODO: Error; component never existed
              */
-
+            $destination = null;
         }
 
         $this->tpl('import', [
@@ -1799,7 +1802,7 @@ class Controller extends Base\Base
         $lineages = [];
 
         foreach ($allCourses as $course) {
-            $lineages[$course->getId()] = $this->getCourseMapper()->getLineage($course);
+            $lineages[$course->getId()] = $this->getLineage($course);
         }
 
         /* Find all the Units in this Folder; also includes
