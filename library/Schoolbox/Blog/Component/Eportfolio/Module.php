@@ -80,7 +80,7 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             'getInsert',
-            $this->getAuthenticationRule('canCreate')
+            $this->buildAuthorizationRule('canCreate')
         );
 
         // getArchive: Eportfolio_Authenticator->canView on page
@@ -89,7 +89,7 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             '(getArchive|getItem|postCommentInsert)',
-            $this->getAuthenticationRule('canView')
+            $this->buildAuthorizationRule('canView')
         );
 
         // getModify: Eportfolio_Authenticator->canModify on blog's page || isOwner of post
@@ -100,7 +100,7 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             '(getModify|postDelete|postInsert|postModify|postCommentDelete)',
-            $this->getAuthenticationRule('canModify')
+            $this->buildAuthorizationRule('canModify')
         );
     }
 
@@ -110,7 +110,7 @@ class Module extends BaseModule
      *
      * @return Rule\IAuthorizationRule
      */
-    protected function getAuthenticationRule($method)
+    protected function buildAuthorizationRule($method)
     {
         $callback = function ($params, User $user) use ($method) {
             // Allow owner of either blog or comment to do stuff

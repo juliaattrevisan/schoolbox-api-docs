@@ -78,7 +78,7 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             '(getArchiveCurrent|getArchive|postCommentInsert|getItem)',
-            $this->getAuthenticationRule(UserAccess::ACCESS_READ)
+            $this->buildAuthorizationRule(UserAccess::ACCESS_READ)
         );
 
         // getInsert, postInsert, postDelete: has write access to homepage
@@ -87,7 +87,7 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             '(getInsert|postInsert|postDelete|getModify|postModify|postCommentDelete)',
-            $this->getAuthenticationRule(UserAccess::ACCESS_WRITE)
+            $this->buildAuthorizationRule(UserAccess::ACCESS_WRITE)
         );
     }
 
@@ -96,7 +96,7 @@ class Module extends BaseModule
      *
      * @return Rule\IAuthorizationRule
      */
-    protected function getAuthenticationRule($accessLevel)
+    protected function buildAuthorizationRule($accessLevel)
     {
         // Allow any user who owns either the blog or comment to do stuff
         $ownershipRule = new Rule\Callback(
