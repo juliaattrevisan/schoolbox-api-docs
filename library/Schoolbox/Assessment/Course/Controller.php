@@ -1058,7 +1058,6 @@ class Controller extends Base\Base
 
             foreach ($temp as $current) {
                 $class  = 'Task';
-                $itemId = 0;
                 $detail = null;
                 try {
                     if ($current->getAssessment()->getId()) {
@@ -1071,15 +1070,7 @@ class Controller extends Base\Base
                         $detail = $this->getSubmissionBoxMapper()->findById($itemId);
                     }
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    // Something's wrong with this task. Do not import.
-                    trigger_error(
-                        sprintf(
-                            'Item that was supposed to be imported "%s:%d" could not be found - skipping!',
-                            $class,
-                            $itemId
-                        ),
-                        E_USER_WARNING
-                    );
+                    // the underlying assessment entity does not exist. do not import.
                     continue;
                 }
 
