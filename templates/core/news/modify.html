@@ -5,6 +5,12 @@
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.sync-dates.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
+<script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
+<script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>
 <script type="text/javascript">
     $(function () {
         $.fn.alaressEditor();
@@ -150,19 +156,19 @@
                             <label for="item_datetime_published">
                                 Publish Date
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a date for when this news item will become available">?</span>
-                                <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
+                                <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" data-datepicker='true' data-datepicker-sync data-datepicker-sync-enddate="#item_datetime_expires" maxlength="50" value="{ITEM_DATETIME_PUBLISHED}"/>
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label>
+                            <label class="timepick">
                                 Hour
-                                <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" class="timeField"/>
+                                <input name="publish_hour" type="text" maxlength="2" value="{PUBLISH_HOUR}" class="timeField" data-timepicker="hour" />
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label>
+                            <label class="timepick">
                                 Minute
-                                <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" class="timeField"/>
+                                <input name="publish_minute" type="text" maxlength="2" value="{PUBLISH_MIN}" class="timeField" data-timepicker="minute" />
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
@@ -183,15 +189,15 @@
                             <input type="text" class="required" name="item_datetime_expires" id="item_datetime_expires" maxlength="50" value="{ITEM_DATETIME_EXPIRES}"/>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label>
+                            <label class="timepick">
                                 Hour
-                                <input name="expires_hour" type="text" maxlength="2" value="{EXPIRES_HOUR}" class="timeField"/>
+                                <input name="expires_hour" type="text" maxlength="2" value="{EXPIRES_HOUR}" class="timeField" data-timepicker="hour" />
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
-                            <label>
+                            <label class="timepick">
                                 Minute
-                                <input name="expires_minute" type="text" maxlength="2" value="{EXPIRES_MIN}" class="timeField"/>
+                                <input name="expires_minute" type="text" maxlength="2" value="{EXPIRES_MIN}" class="timeField" data-timepicker="minute" />
                             </label>
                         </div>
                         <div class="small-4 large-2 columns">
