@@ -11,7 +11,7 @@ use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
  * @version     SVN: $Id$
  */
 
-$assessHandler = false;
+$assessHandler = new Assess_Main();
 $attemptHandler = false;
 $groupHandler = new Group();
 
