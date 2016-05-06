@@ -87,8 +87,11 @@
                         {# Don't delete the inline style, it's needed -#}
                         <ul class="information-list" {% if not folder.id %}style="display:none;"{% endif %} data-mage-collapsed>
                         {% for unit in units %}
-                            {% include '@course/unit.twig' with { i: loop.index, '_writable': true } %}
+                            {% if access[unit.id] > 0 %}
+                                {% include '@course/unit.twig' with { i: loop.index, '_writable': access[unit.id] > 1 } %}
+                            {% endif %}
                         {% endfor %}
+                        {% if not folder.id or access[folder.id] > 1 %}
                             <li class="actions-small-1" data-unit>
                                 <input type="hidden" name="id" value="{{ folder.id }}" data-folder-id>
                                 <div class="list-item content">
@@ -111,17 +114,20 @@
                                     </div>
                                 </div>
                             </li>
+                        {% endif %}
                         </ul>
                     </div>
                 </fieldset>
             </section>
+            {% if not folder.id or access[folder.id] > 1 %}
             <div class="row" data-mage="unit-info">
                 {# Don't delete the inline style, it's needed -#}
                 <div class="small-12 column" {% if not folder.id %}data-mage-collapsed style="display: none;"{% endif %}>
                     <input type="submit" name="submit" value="Save Course" data-mage-working="Saving..." data-mage-next="main-course" />
                 </div>
             </div>
-        {#</form>#}
+            {% endif %}
+        </div>
     </div>
 </div>
 <div id="parent-select" data-reveal class="reveal-modal"></div>

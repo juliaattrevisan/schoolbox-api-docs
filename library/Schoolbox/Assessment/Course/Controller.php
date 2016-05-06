@@ -236,9 +236,11 @@ class Controller extends Base\Base
             $instances = [];
 
             $data['folder'] = $folder;
+            $date['access'][$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $folder->getId() ]);
             $data['units']  = $this->getUnitMapper()->findByCourseId($folder->getId());
 
             foreach ($data['units'] as $unit) {
+                $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unit->getId() ]);
                 $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
 
