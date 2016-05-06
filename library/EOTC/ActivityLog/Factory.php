@@ -20,14 +20,14 @@ class Factory {
 	 *
  	 * @var Event
 	 */
-	private $event = null;
+	private $event;
 
 	/**
 	 * An instance of \Schoolbox\User
 	 *
 	 * @var User
 	 */
-	private $actioner = null;
+	private $actioner;
 
 	/**
 	 * Factory constructor.

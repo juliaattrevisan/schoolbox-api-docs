@@ -1,6 +1,8 @@
 <?php
 /**
- * ${NAME}
+ * Permission ModifyForm
+ *
+ * Process the EOTC Administrator settings
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -12,22 +14,25 @@ require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 
 $page = new SitePage();
 
-if (!$_SESSION['user']->isSuperuser()) {
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+if (!$sessionUser->isSuperuser()) {
 	error(19);
 }
 
-$userMapper = new \Schoolbox\UserMapper();
-
 try {
+	/** @var \Schoolbox\User $user */
+	$userMapper = \Schoolbox\UserMapper::getInstance();
 	$user = $userMapper->findById($_POST['staff']);
 }
-catch (\Exception $e) {
+catch (\Schoolbox\Mapper\Exception $e) {
 	error(31);
 }
 
 /* Delete all perms for this user, and re-add new ones
  */
-$permissionMapper = new \EOTC\EventPermissionMapper();
+$permissionMapper = \EOTC\EventPermissionMapper::getInstance();
 $permissionMapper->deleteForUser($user);
 
 if (is_array($_POST['campus']) && count($_POST['campus'])) {

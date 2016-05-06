@@ -1,12 +1,17 @@
 <?php
 /**
- * ${NAME}
+ * Review
+ *
+ * Show all the EOTC events to an EOTC Administrator
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use \EOTC\EventStatusMapper;
+use \EOTC\EventMapper;
 
 /* Only EOTC Administrators can view this page
  */
@@ -27,16 +32,14 @@ $this->setVar(array(
 	'event_list_group_block' => ''
 ));
 
-$eventMapper = new \EOTC\EventMapper();
-
 /** @var \EOTC\ListGroup\Collection $allListGroups */
-$allListGroups = $eventMapper->findAllByListGroups([
-	\EOTC\EventStatusMapper::STATUS_DRAFT,
-	\EOTC\EventStatusMapper::STATUS_INPRINCIPLE,
-	\EOTC\EventStatusMapper::STATUS_DETAILSCOMPLETED,
-	\EOTC\EventStatusMapper::STATUS_READYFORFINALAPPROVAL,
-	\EOTC\EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL,
-], \EOTC\EventMapper::INTERVAL_MAX_6MONTH_OLD);
+$allListGroups = EventMapper::getInstance()->findAllByListGroups([
+	EventStatusMapper::STATUS_DRAFT,
+	EventStatusMapper::STATUS_INPRINCIPLE,
+	EventStatusMapper::STATUS_DETAILSCOMPLETED,
+	EventStatusMapper::STATUS_READYFORFINALAPPROVAL,
+	EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL,
+], EventMapper::INTERVAL_MAX_6MONTH_OLD);
 
 /* Using foreach() won't increment the $position, which I use to get the name
  * of the collection currently being iterated

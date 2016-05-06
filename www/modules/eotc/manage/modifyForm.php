@@ -18,7 +18,7 @@ $page = new SitePage();
 $authenticator = new \EOTC\Authenticator();
 
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
-	$userMapper = new \Schoolbox\UserMapper();
+	$userMapper = \Schoolbox\UserMapper::getInstance();
 
 	/** @var Schoolbox\User $user */
 	$owner = $_SESSION['user'];
@@ -31,7 +31,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			 */
 			$until = null;
 
-			$eventMapper = new \EOTC\EventMapper();
+			$eventMapper = \EOTC\EventMapper::getInstance();
 
 			/* Spawn an existing event if id provided
 			 * Otherwise spawn a new one
@@ -39,8 +39,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			if (is_numeric($_POST['id'])) {
 				try {
 					$event = $eventMapper->findById($_POST['id']);
-					}
-				catch (\Exception $e) {
+				}
+				catch (\Schoolbox\Mapper\Exception $e) {
 					error(160);
 					exit;
 				}
@@ -52,7 +52,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			/* Spawn and assign metadata record to event
 			 */
 			try {
-				$metadataMapper = new \EOTC\EventMetadataMapper();
+				$metadataMapper = \EOTC\EventMetadataMapper::getInstance();
 				$metadata = $metadataMapper->findByEvent($event);
 			}
 			catch (\Exception $e) {
@@ -68,13 +68,13 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			/* Author
 			 */
-			$userMapper = new \Schoolbox\UserMapper();
+			$userMapper = \Schoolbox\UserMapper::getInstance();
 
 			try {
 				/** @var \Schoolbox\User $author */
 				$author = $userMapper->findById($_POST['authorId']);
 			}
-			catch (Schoolbox\Mapper\Exception $e) {
+			catch (\Schoolbox\Mapper\Exception $e) {
 				error(2);
 				exit;
 			}
@@ -85,7 +85,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				/** @var \Schoolbox\User $teacherInCharge */
 				$teacherInCharge = $userMapper->findById($_POST['teacherInCharge']);
 			}
-			catch (Schoolbox\Mapper\Exception $e) {
+			catch (\Schoolbox\Mapper\Exception $e) {
 				error(2);
 				exit;
 			}
@@ -95,7 +95,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				/** @var \Schoolbox\Calendar\EventType $eventType */
 				$eventType = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findById($_POST['type']);
 			}
-			catch (Schoolbox\Mapper\Exception $e) {
+			catch (\Schoolbox\Mapper\Exception $e) {
 				error(2);
 				exit;
 			}
@@ -158,7 +158,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			$resourceBookingCollection = new \Schoolbox\Collection();
 
 			if (is_numeric($event->getId())) {
-				$resourceBookingCollection = $metadataMapper->findResourceBookings($metadata->getId());
+				$resourceBookingCollection = \EOTC\EventMetadataMapper::getInstance()->findResourceBookings($metadata->getId());
 			}
 
 			$metadata->setResourceBookings($resourceBookingCollection);
@@ -217,7 +217,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 			$canSelfPromote = $authenticator->canSelfPromote($_SESSION['user'], $event);
 
 			if (isset($_POST['promoteInPrinciple']) && ($_POST['promoteInPrinciple'] == 1) && $canSelfPromote) {
-				$eventStatusMapper = new \EOTC\EventStatusMapper();
+				$eventStatusMapper = \EOTC\EventStatusMapper::getInstance();
 				$nextStatusId = $eventStatusMapper->findNextStatus($event);
 				$eventStatus = $eventStatusMapper->findById($nextStatusId);
 

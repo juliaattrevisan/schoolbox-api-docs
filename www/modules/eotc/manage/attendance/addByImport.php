@@ -9,13 +9,15 @@
  */
 $authenticator = new \EOTC\Authenticator();
 
+$event = false;
+
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
-	$eventMapper = new \EOTC\EventMapper();
+	$eventMapper = \EOTC\EventMapper::getInstance();
 
 	try {
 		$event = $eventMapper->findById($_POST['eventId']);
 	}
-	catch (\Exception $e) {
+	catch (\Schoolbox\Mapper\Exception $e) {
 		error(160);
 	}
 
@@ -37,7 +39,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 		/* Spawn mapper
 		 */
-		$userMapper = new \Schoolbox\UserMapper();
+		$userMapper = \Schoolbox\UserMapper::getInstance();
 
 		foreach($allComponents as $currentComponent) {
 
@@ -54,13 +56,12 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 					$user = $userMapper->findOneByColumn('username', $currentComponent);
 					$allIds[] = $user->getId();
 				}
-				catch (\Exception $e) {
+				catch (\Schoolbox\Mapper\Exception $e) {
 				}
 			}
 		}
 
-		$metadataMapper = new \EOTC\EventMetadataMapper();
-		$metadataMapper->addStudentAttendeesRelationsSpecific($event->getMetadata(), $allIds);
+		\EOTC\EventMetadataMapper::getInstance()->addStudentAttendeesRelationsSpecific($event->getMetadata(), $allIds);
 	}
 
 	$this->localRedir('/modules/eotc/manage/attendance/list/' . $event->getId());

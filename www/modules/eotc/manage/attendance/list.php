@@ -10,12 +10,14 @@
 
 $authenticator = new \EOTC\Authenticator();
 
+$event = false;
+
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
-    $eventMapper = new \EOTC\EventMapper();
+    $eventMapper = \EOTC\EventMapper::getInstance();
 
     try {
         $event = $eventMapper->findById($this->arg[0]);
-    } catch (\Exception $e) {
+    } catch (\Schoolbox\Mapper\Exception $e) {
         error(160);
     }
 
@@ -26,9 +28,11 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
     $this->setBlock(TEMPLATE_content, 'filetype', 'filetype_block');
 
     $eventCampusCodes = array();
+
     foreach ($event->getCampusCollection() as $campus) {
         $eventCampusCodes[] = $campus->getExtTimetableCode();
     }
+
     $this->setVar(
         array(
             'EVENT_ID'               => $event->getId(),
@@ -54,6 +58,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
     );
 
     $this->setVar('filetype_block', '');
+
     if (is_array($allFiletypes) && count($allFiletypes)) {
         foreach ($allFiletypes as $currentFiletype) {
             if (array_key_exists($currentFiletype['Code'], $hardcodedFiletypes)) {
@@ -63,13 +68,15 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
                         'FILETYPE_NAME' => $currentFiletype['Description']
                     )
                 );
+
                 $this->parse('filetype_block', 'filetype', true);
             }
         }
     }
 
     if ($event->getMetadata()->getStudentAttendees()->count()) {
-        $roleMapper = new \Schoolbox\RoleMapper();
+        $roleMapper = \Schoolbox\RoleMapper::getInstance();
+
         foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
             $role = $roleMapper->findById($currentStudent->getRole()->getId());
             $this->setVar(

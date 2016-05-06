@@ -1,6 +1,8 @@
 <?php
 /**
- * ${NAME}
+ * EOTC Policy
+ *
+ * A giant wall of text
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -8,7 +10,7 @@
  * @version     SVN: $Id$
  */
 
-$configMapper = new \EOTC\ConfigMapper();
+$configMapper = \EOTC\ConfigMapper::getInstance();
 $config = $configMapper->findByColumn('name', 'policy')->first();
 
 $this->setFile(TEMPLATE_content, 'modules/eotc/policy.html');

@@ -1,6 +1,8 @@
 <?php
 /**
- * ${NAME}
+ * Permission Modify
+ *
+ * Assign EOTC Administratosr
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -8,7 +10,10 @@
  * @version     SVN: $Id$
  */
 
-if (!$_SESSION['user']->isSuperuser()) {
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+if (!$sessionUser->isSuperuser()) {
     error(19);
 }
 
@@ -32,13 +37,14 @@ $this->setVar('STAFF_GROUP_TYPE_IDS', implode(';', $groupHandler->getStaffGroupT
 
 /* Edit existing permissions for someone
  */
-$userMapper            = new \Schoolbox\UserMapper();
-$eventPermissionMapper = new \EOTC\EventPermissionMapper();
+$userMapper            = \Schoolbox\UserMapper::getInstance();
+$eventPermissionMapper = \EOTC\EventPermissionMapper::getInstance();
 
 if (is_numeric($this->arg[0])) {
     try {
+        /** @var \Schoolbox\User $user */
         $user = $userMapper->findById($this->arg[0]);
-    } catch (\Exception $e) {
+    } catch (\Schoolbox\Mapper\Exception $e) {
         error(31);
     }
 
@@ -59,7 +65,7 @@ foreach ($allPermissions as $currentPermission) {
     $campusIds[] = $currentPermission->getCampusId()->getId();
 }
 
-$campusMapper = new \Schoolbox\CampusMapper();
+$campusMapper = \Schoolbox\CampusMapper::getInstance();
 $allCampuses  = $campusMapper->findAll();
 
 foreach ($allCampuses as $currentCampus) {
@@ -88,7 +94,7 @@ foreach ($allPermissions as $currentPermission) {
     $statusIds[] = $currentPermission->getStatusId()->getId();
 }
 
-$statusMapper = new \EOTC\EventStatusMapper();
+$statusMapper = \EOTC\EventStatusMapper::getInstance();
 
 /* Ignore Rejected and Approved
  */

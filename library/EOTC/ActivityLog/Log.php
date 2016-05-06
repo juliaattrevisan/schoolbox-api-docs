@@ -26,7 +26,7 @@ class Log {
 	 *
 	 * @var User
 	 */
-	protected $actioner = null;
+	protected $actioner;
 
 	/**
 	 * Metadata record
@@ -54,21 +54,21 @@ class Log {
 	 *
 	 * @var \Alaress_Date_Format
 	 */
-	protected $createdAt = null;
+	protected $createdAt;
 
 	/**
 	 * An instance of Alaress_Date_Format
 	 *
 	 * @var \Alaress_Date_Format
 	 */
-	protected $updatedAt = null;
+	protected $updatedAt;
 
 	/**
 	 * An instance of Alaress_Date_Format
 	 *
 	 * @var \Alaress_Date_Format
 	 */
-	protected $deletedAt = null;
+	protected $deletedAt;
 
 	/**
 	 * The final notification string
@@ -89,8 +89,7 @@ class Log {
 	 * @return mixed|void
 	 */
 	public function notify() {
-		$mapper = new Mapper();
-		$mapper->save($this);
+		Mapper::getInstance()->save($this);
 	}
 
 	/* Getters/Setters
