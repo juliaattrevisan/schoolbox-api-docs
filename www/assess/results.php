@@ -198,6 +198,8 @@ catch (\Exception $e) {
 
 /* Set up template
  */
+/** @var SitePage $this
+ */
 $this->setFile(TEMPLATE_content, 'assess/results.html');
 $this->setBlock(TEMPLATE_content, 'user_attempts', 'user_attempts_block');
 $this->setBlock('user_attempts', 'attempt', 'attempt_block');
