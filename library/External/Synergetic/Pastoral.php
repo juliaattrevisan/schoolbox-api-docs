@@ -340,6 +340,17 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     }
                 }
                 $record['reason'] = "Imported";
+
+                $log = new \Schoolbox\Admin\Import\Pastoral\Model();
+                $log->setUserId($userId);
+                $log->setPastoralId($pastoralRecord->getId());
+                $log->setImportId($importId);
+                $log->setHeading($record["heading"]);
+                $log->setStudentName($student->getFirstname() . " " . $student->getLastname());
+                $log->setCreatorName($owner->getFirstname() . " " . $owner->getLastname());
+                $log->setCreatedAt(\Alaress_Date_Format::now());
+                $log->setResult($record['reason']);
+                $this->getPastoralLogMapper()->save($log);
             }
             catch (\Exception $e)
             {
@@ -351,19 +362,17 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     $record['reason'] = "Student does not have a user record in Schoolbox";
 
                 $skipped[] = $record;
+
+                $log = new \Schoolbox\Admin\Import\Pastoral\Model();
+                $log->setUserId($userId);
+                $log->setImportId($importId);
+                $log->setHeading($record["heading"]);
+                $log->setStudentName($student->getFirstname() . " " . $student->getLastname());
+                $log->setCreatorName($owner->getFirstname() . " " . $owner->getLastname());
+                $log->setCreatedAt(\Alaress_Date_Format::now());
+                $log->setResult($record['reason']);
+                $this->getPastoralLogMapper()->save($log);
             }
-
-            $log = new \Schoolbox\Admin\Import\Pastoral\Model();
-            $log->setUserId($userId);
-            $log->setPastoralId($pastoralRecord->getId());
-            $log->setImportId($importId);
-            $log->setHeading($record["heading"]);
-            $log->setStudentName($student->getFirstname() . " " . $student->getLastname());
-            $log->setCreatorName($owner->getFirstname() . " " . $owner->getLastname());
-            $log->setCreatedAt(\Alaress_Date_Format::now());
-            $log->setResult($record['reason']);
-            $this->getPastoralLogMapper()->save($log);
-
 
             $records->next();
         }
