@@ -19,8 +19,23 @@
     </li>
 </ul>
 <div class="row">
+    <div class="small-12 actions-small-1 island">
+        <div class="list-item">
+            <h1>{{ folder.id ? 'Modify' : 'New' }} Course</h1>
+        </div>
+            {% if folder.id %}
+        <nav>
+                {% if folder.hasHomepage %}
+            <a class="icon-home" href="/homepage/{{ folder.id }}" title="View Homepage"></a>
+                {% else %}
+            <a class="icon-folder" href="/resources/{{ folder.id }}" title="View Resources"></a>
+                {% endif %}
+        </nav>
+            {% endif %}
+    </div>
+</div>
+<div class="row">
     <div class="small-12 island" id="main-course">
-        <h1>{{ folder.id ? 'Modify' : 'New' }} Course</h1>
             <section>
                 <fieldset class="content" data-mage="course-info">
                     <legend>Course Information</legend>
