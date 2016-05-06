@@ -387,6 +387,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
          * Replace em and en dashes with hyphen
          */
         $equivalences = strtr($str, [
+            '×' => 'x',
+            '÷' => '/',
             '—' => '-',
             '–' => '-'
         ]);
