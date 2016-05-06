@@ -27,7 +27,10 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
      *
      * @var Collection|UnitInstance[]
      */
-    protected $unit_list;
+    protected $unit_list = [];
+
+    /** @var int[] */
+    protected $accessList = [];
 
     /** @var Folder\Model */
     protected $originalCourse;
@@ -67,6 +70,12 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
 
         // Build student list
         if (count($this->unit_list)) {
+
+            // collate access for each unit
+            foreach ($this->unit_list as $instance)  {
+                $unitId = $instance->getUnitCategory()->getId();
+                $this->accessList[$unitId] = \Schoolbox\Permission\Access\Access::getInstance()->getFolderAccess($_SESSION['user'], [ $unitId ]);
+            }
 
             $this->originalCourse = Folder\Mapper::getInstance()->findById(
                 Folder\Mapper::getInstance()->findCheaplyById(
@@ -187,6 +196,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         $this->setBlock($templateHandle, 'course_modify', 'course_modify_block');
         $this->setBlock('course_unit_list', 'unit', 'unit_block');
         $this->setBlock('unit', 'unit_expand', 'unit_expand_block');
+        $this->setBlock('unit_expand', 'unit_link', 'unit_link_block');
         $this->setBlock('unit', 'unit_no_expand', 'unit_no_expand_block');
         $this->setBlock('unit', 'unit_completion', 'unit_completion_block');
         $this->setBlock('unit', 'unit_actions', 'unit_actions_block');
@@ -382,7 +392,15 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         $display_task_list =
             $unit->getTasks()->count() > 0 &&
             ($unit->isOpen() || $unit->isAfterDueDate() || !$this->readOnly);
+
         if ($display_task_list) {
+
+            if ($this->accessList[$unit->getUnitCategory()->getId()] >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ) {
+                $this->parse('unit_link_block', 'unit_link');
+            } else {
+                $this->setVar('unit_link_block', $this->getVar('UNIT_NAME'));
+            }
+
             $this->parse('unit_expand_block', 'unit_expand');
         } else {
             $this->parse('unit_no_expand_block', 'unit_no_expand');
