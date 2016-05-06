@@ -1,59 +1,66 @@
 <?php
 /**
- * ${NAME}
+ * Attendance List
  *
- * A read-only version of list.php
+ * A read-only version of list.php which shows you who is attending
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-
-/* Only EOTC Administrators can view this page
- */
-$authenticator = new \EOTC\Authenticator();
-
-if (!$authenticator->isEOTCAdministrator($_SESSION['user'])) {
-	error(19);
-}
-
-$eventMapper = new \EOTC\EventMapper();
+$event = false;
 
 try {
-	$event = $eventMapper->findById($this->arg[0]);
+	$mapper = new \EOTC\EventMapper();
+	$event = $mapper->findById($this->arg[0]);
 }
-catch (\Exception $e) {
+catch (\Schoolbox\Mapper\Exception $e) {
 	error(160);
 }
 
-$this->setFile(TEMPLATE_content, 'modules/eotc/status/attendance.html');
-$this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
 
-$this->setVar(array(
-	'EVENT_ID' => $event->getId(),
-	'EVENT_NAME' => $event->getTitle(),
-));
+/* Only EOTC Administrators and Subscribed Users can view this page
+ */
+$authenticator = new \EOTC\Authenticator();
 
-if ($event->getMetadata()->getStudentAttendees()->count()) {
-	$roleMapper = new \Schoolbox\RoleMapper();
+$isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
+$isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
 
-	foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
-		$role = $roleMapper->findById($currentStudent->getRole()->getId());
+if ($isEOTCAdministrator || $isSubscribedUser) {
+	$this->setFile(TEMPLATE_content, 'modules/eotc/status/attendance.html');
+	$this->setBlock(TEMPLATE_content, 'student_attendee', 'student_attendee_block');
 
+	$this->setVar(array(
+		'EVENT_ID' => $event->getId(),
+		'EVENT_NAME' => $event->getTitle(),
+	));
+
+	if ($event->getMetadata()->getStudentAttendees()->count()) {
+		$roleMapper = new \Schoolbox\RoleMapper();
+
+		foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
+			$role = $roleMapper->findById($currentStudent->getRole()->getId());
+
+			$this->setVar(array(
+				'STUDENT_ATTENDEE_EXTERNAL_ID' => $currentStudent->getExternalId(),
+				'STUDENT_ATTENDEE_ID' => $currentStudent->getId(),
+				'STUDENT_ATTENDEE_FIRSTNAME' => $currentStudent->getFirstname(),
+				'STUDENT_ATTENDEE_LASTNAME' => $currentStudent->getLastname(),
+				'STUDENT_ATTENDEE_ROLE_NAME' => $role->getName(),
+			));
+
+			$this->parse('student_attendee_block', 'student_attendee', true);
+		}
+	}
+	else {
 		$this->setVar(array(
-			'STUDENT_ATTENDEE_EXTERNAL_ID' => $currentStudent->getExternalId(),
-            'STUDENT_ATTENDEE_ID' => $currentStudent->getId(),
-			'STUDENT_ATTENDEE_FIRSTNAME' => $currentStudent->getFirstname(),
-			'STUDENT_ATTENDEE_LASTNAME' => $currentStudent->getLastname(),
-			'STUDENT_ATTENDEE_ROLE_NAME' => $role->getName(),
+			'student_attendee_block' => ''
 		));
-
-		$this->parse('student_attendee_block', 'student_attendee', true);
 	}
 }
 else {
-	$this->setVar(array(
-		'student_attendee_block' => ''
-	));
+	error(19);
 }

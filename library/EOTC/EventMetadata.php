@@ -127,7 +127,7 @@ class EventMetadata {
 	/**
 	 * Set created at
 	 *
-	 * @param null $createdAt
+	 * @param \Alaress_Date_Format $createdAt
 	 */
 	public function setCreatedAt($createdAt) {
 		$this->createdAt = $createdAt;
@@ -136,7 +136,7 @@ class EventMetadata {
 	/**
 	 * Get created at
 	 *
-	 * @return null
+	 * @return \Alaress_Date_Format
 	 */
 	public function getCreatedAt() {
 		return $this->createdAt;
@@ -145,7 +145,7 @@ class EventMetadata {
 	/**
 	 * Set deleted at
 	 *
-	 * @param null $deletedAt
+	 * @param \Alaress_Date_Format $deletedAt
 	 */
 	public function setDeletedAt($deletedAt) {
 		$this->deletedAt = $deletedAt;
@@ -154,7 +154,7 @@ class EventMetadata {
 	/**
 	 * Get deleted at
 	 *
-	 * @return null
+	 * @return \Alaress_Date_Format
 	 */
 	public function getDeletedAt() {
 		return $this->deletedAt;
