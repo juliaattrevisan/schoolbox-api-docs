@@ -9,14 +9,14 @@
  */
 
 namespace EOTC\ActivityLog;
-
+use \Schoolbox\Collection;
 
 class Registry {
 
 	/**
 	 * A Collection of observers
 	 *
-	 * @var array
+	 * @var Collection
 	 */
 	private $registry = null;
 
@@ -24,7 +24,7 @@ class Registry {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->setRegistry(new \Schoolbox\Collection());
+		$this->setRegistry(new Collection());
 	}
 
 	/**
@@ -51,7 +51,7 @@ class Registry {
 	/**
 	 * Set registry
 	 *
-	 * @param array $registry
+	 * @param Collection $registry
 	 */
 	private function setRegistry($registry) {
 		$this->registry = $registry;
@@ -60,7 +60,7 @@ class Registry {
 	/**
 	 * Get registry
 	 *
-	 * @return array
+	 * @return Collection
 	 */
 	private function getRegistry() {
 		return $this->registry;

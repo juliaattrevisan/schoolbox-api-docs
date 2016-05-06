@@ -266,11 +266,12 @@ if ($isEOTCAdministrator || $isCanPromote || $isSubscribedUser) {
     $i = 0;
 
     foreach ($event->getMetadata()->getActivityLog() as $currentLog) {
+
         /* If there are no activityLog items, mappers will spawn a single
-             * object where every property is null
-             *
-             * TODO: Mappers probably shouldn't spawn you such objects
-             */
+         * object where every property is null
+         *
+         * TODO: Mappers probably shouldn't spawn you such objects
+         */
         if ($currentLog->getId()) {
             $this->setVar(
                 array(
