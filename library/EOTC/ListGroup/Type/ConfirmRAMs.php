@@ -25,7 +25,7 @@ class ConfirmRAMs extends Base {
 	/**
 	 * Determine where to go next
 	 *
-	 * @return $this|mixed
+	 * @return $this|null
 	 */
 	public function determine() {
 
@@ -42,5 +42,7 @@ class ConfirmRAMs extends Base {
 		if ($this->getNext()) {
 			return $this->getNext()->determine();
 		}
+
+		return null;
 	}
 } 

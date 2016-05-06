@@ -10,27 +10,28 @@
 
 namespace EOTC\ActivityLog;
 
+use \Schoolbox\User;
 
 class Log {
 
 	/**
 	 * Log id
 	 *
-	 * @var string
+	 * @var int
 	 */
 	protected $id = '';
 
 	/**
 	 * An instance of \Schoolbox\User
 	 *
-	 * @var null
+	 * @var User
 	 */
 	protected $actioner = null;
 
 	/**
 	 * Metadata record
 	 *
-	 * @var null
+	 * @var int
 	 */
 	protected $metadataId = -1;
 
@@ -51,21 +52,21 @@ class Log {
 	/**
 	 * An instance of Alaress_Date_Format
 	 *
-	 * @var null
+	 * @var \Alaress_Date_Format
 	 */
 	protected $createdAt = null;
 
 	/**
 	 * An instance of Alaress_Date_Format
 	 *
-	 * @var null
+	 * @var \Alaress_Date_Format
 	 */
 	protected $updatedAt = null;
 
 	/**
 	 * An instance of Alaress_Date_Format
 	 *
-	 * @var null
+	 * @var \Alaress_Date_Format
 	 */
 	protected $deletedAt = null;
 
@@ -224,7 +225,7 @@ class Log {
 	/**
 	 * Set metadata id
 	 *
-	 * @param null $metadataId
+	 * @param int $metadataId
 	 */
 	public function setMetadataId($metadataId) {
 		$this->metadataId = $metadataId;
@@ -233,7 +234,7 @@ class Log {
 	/**
 	 * Get metadata id
 	 *
-	 * @return null
+	 * @return int
 	 */
 	public function getMetadataId() {
 		return $this->metadataId;

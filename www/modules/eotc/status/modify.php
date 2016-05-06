@@ -14,6 +14,14 @@
 
 $event = false;
 
+/* Only EOTC Administrators can view this page
+ */
+$authenticator = new \EOTC\Authenticator();
+
+$sessionUser = $_SESSION['user'];
+
+$mapper = \EOTC\EventMapper::getInstance();
+
 try {
     $mapper = new \EOTC\EventMapper();
     $event = $mapper->findById($this->arg[0]);
@@ -24,6 +32,10 @@ catch (\Schoolbox\Mapper\Exception $e) {
 
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
+
+if (!$authenticator->isEOTCAdministrator($sessionUser) && !$authenticator->canPromote($sessionUser, $event)) {
+    error(19);
+}
 
 /* Only EOTC Administrators, those who can promote, and Subscribed Users
  * can view this page

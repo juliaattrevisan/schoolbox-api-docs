@@ -21,6 +21,11 @@ use \EOTC\Event;
 class PriorityChain {
 
 	/**
+	 * @var Response
+	 */
+	private $result;
+
+	/**
 	 * Constructor
 	 *
 	 * @param \EOTC\Event $event

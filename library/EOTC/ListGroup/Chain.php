@@ -21,6 +21,13 @@ use \EOTC\Event;
 class Chain {
 
 	/**
+	 * The item exists in this ListGroup node
+	 *
+	 * @var Response
+	 */
+	private $result;
+
+	/**
 	 * Constructor
 	 *
 	 * @param \EOTC\Event $event
@@ -72,14 +79,14 @@ class Chain {
 	/**
 	 * Set result
 	 *
-	 * @param string $result
+	 * @param Response $result
 	 */
 	private function setResult($result) {
 		$this->result = $result;
 	}
 
 	/**
-	 * @return string
+	 * @return Response
 	 */
 	public function getResult() {
 		return $this->result;

@@ -40,5 +40,7 @@ class Rejected extends Base {
 		if ($this->getNext()) {
 			return $this->getNext()->determine();
 		}
+
+		return null;
 	}
 } 

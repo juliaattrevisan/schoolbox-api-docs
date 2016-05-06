@@ -30,7 +30,7 @@ $this->setVar(array(
 	'event_list_group_block' => ''
 ));
 
-$eventMapper = new \EOTC\EventMapper();
+$eventMapper = \EOTC\EventMapper::getInstance();
 
 /** @var \EOTC\ListGroup\Collection $allListGroups */
 $allListGroups = $eventMapper->findAllByListGroups([

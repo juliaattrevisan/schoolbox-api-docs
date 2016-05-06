@@ -14,7 +14,7 @@
  */
 
 namespace EOTC\ListGroup;
-
+use EOTC\Event;
 
 class Collection extends \Schoolbox\Collection {
 
@@ -28,7 +28,7 @@ class Collection extends \Schoolbox\Collection {
 	/**
 	 * An instance of Mapping
 	 *
-	 * @var null
+	 * @var Mapping
 	 */
 	private $mapping = null;
 
@@ -50,9 +50,11 @@ class Collection extends \Schoolbox\Collection {
 	 * based on the event's status id and RAMS requirements (or any
 	 * other determination as defined in Chain)
 	 *
-	 * @param $event
+	 * @param Event $event
 	 */
-	public function assign($event) {
+	public function assign(Event $event) {
+
+		/** @var Response $location */
 		if (is_numeric($event->getSeriesId())) {
 			if (!in_array($event->getSeriesId(), $this->getProcessedSeriesIds())) {
 				$this->finish($event->getSeriesId());
@@ -145,7 +147,7 @@ class Collection extends \Schoolbox\Collection {
 	/**
 	 * Set mapping
 	 *
-	 * @param null $mapping
+	 * @param Mapping $mapping
 	 */
 	private function setMapping($mapping) {
 		$this->mapping = $mapping;
@@ -154,7 +156,7 @@ class Collection extends \Schoolbox\Collection {
 	/**
 	 * Get mapping
 	 *
-	 * @return null
+	 * @return Mapping
 	 */
 	private function getMapping() {
 		return $this->mapping;
