@@ -718,6 +718,15 @@ class Controller extends Base\Base
         $this->tpl($template, array_merge($data, $options));
     }
 
+    /**
+     * @param int $folderId
+     * @param int $min
+     * @return bool
+     */
+    protected function confirmAccess($folderId, $min = UserAccess::ACCESS_READ)
+    {
+        return $this->getAccess()->getFolderAccess($this->getUser(), [ $folderId ]) >= $min;
+    }
 
     /**
      * List the courses. Returns a combined array of Folder instances
@@ -730,16 +739,26 @@ class Controller extends Base\Base
     {
         $allCourses = $this->getCourseMapper()->findCourseListByName($searchParam);
 
-        $data = [
-            'courses' => $allCourses
-        ];
+        $data = [];
 
         foreach ($allCourses as $currentCourse) {
+
+            // confirm you at least have read access...
+            if (!$this->confirmAccess($currentCourse->getId())) {
+                continue;
+            }
+
+            $data['courses'][] = $currentCourse;
 
             $allUnits = $this->getUnitMapper()->findByCourseId($currentCourse->getId());
 
             // Append to unit index, by ID
             foreach ($allUnits as $currentUnit) {
+                // confirm you at least have read access...s
+                if (!$this->confirmAccess($currentUnit->getId())) {
+                    continue;
+                }
+
                 $data['units'][$currentCourse->getId()][] = $currentUnit;
             }
 
