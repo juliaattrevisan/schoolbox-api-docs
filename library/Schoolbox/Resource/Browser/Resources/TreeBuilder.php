@@ -9,13 +9,11 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
-use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Course\Unit\Mapper as UnitMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\File;
@@ -27,23 +25,23 @@ use Schoolbox\User;
 class TreeBuilder extends AbstractTreeBuilder
 {
 
-    /** @var TaskMapper */
-    protected $taskMapper;
+    /** @var UnitMapper */
+    protected $unitMapper;
 
     /** @var User */
     protected $user;
 
     /**
      * @param Folder\ILocator  $locator
-     * @param TaskMapper       $taskMapper
+     * @param UnitMapper       $unitMapper
      * @param User             $user
      * @param string           $rootLabel
      */
-    public function __construct(Folder\ILocator $locator, TaskMapper $taskMapper, $user, $rootLabel = 'Resources')
+    public function __construct(Folder\ILocator $locator, UnitMapper $unitMapper, User $user, $rootLabel = 'Resources')
     {
         parent::__construct($locator, 'sbfsfile', $rootLabel);
 
-        $this->taskMapper       = $taskMapper;
+        $this->unitMapper       = $unitMapper;
         $this->user             = $user;
     }
 
@@ -56,14 +54,9 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     public function getFolderIcon(IFolder $folder)
     {
-        // Type: homepage or folder
-        // Could be a course as well, if any child has tasks.
-        $childIds = $this->folderLocator
-            ->findByParentId($folder->getId())
-            ->getColumnValues('id');
-
-        if ($this->taskMapper->countByColumn('category_id', $childIds)) {
+        if ($this->unitMapper->countByCourseId($folder->getId()) > 0) {
             $type = 'course';
+
         } else {
             $type = $folder->hasHomepage() ? 'home' : 'folder';
         }

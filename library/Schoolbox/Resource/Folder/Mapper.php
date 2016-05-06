@@ -12,13 +12,15 @@
 
 namespace Schoolbox\Resource\Folder;
 
-use \Schoolbox\Application\Exception\Exception as SchoolboxException;
-use \Schoolbox\Mapper\Exception as MapperException;
+use PDO;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Mapper\Exception as MapperException;
 use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\GroupMapper;
@@ -38,9 +40,10 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  *
  * @package Schoolbox\Resource\Folder
  * @method Model createModel()
+ * @method Collection|Model[] findByColumnList($columnList, $options = []);
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
-class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
+class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 {
     const INHERIT_ON = 1;
     const INHERIT_OFF = 0;
@@ -89,40 +92,14 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      */
     protected function mapping()
     {
-        $this->hasModel('\\Schoolbox\\Resource\\Folder\\Model');
-        $this->hasTable('category');
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'name',
-                'property' => 'name',
-                'type'     => self::TYPE_STRING,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'inherit',
-                'property' => 'inherit',
-                'type'     => self::TYPE_BOOLEAN,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'parent',
-                'property' => 'parent',
-                'type'     => self::TYPE_MODEL,
-                'join'     => 'parent',
-            )
-        );
+        parent::mapping();
 
-        //
+        $this->hasPrototype(new Model());
+        $this->hasTable('category');
+
+        $this->uses('inherit', self::TYPE_BOOLEAN);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
         // Joins:
         $this->hasJoin(
             'codes', array(
@@ -160,17 +137,6 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             )
         );
 
-        //
-        // Parent object: has reference to itself as a mapper.
-        $this->hasJoin(
-            'parent', array(
-                'multiple'  => true,
-                'mapper'    => $this,
-                'this_key'  => 'category',
-                'other_key' => 'id',
-            )
-        );
-
         $this->joinsVia(
             'curriculum_node_for_category',
             Node\Mapper::class,
@@ -183,22 +149,12 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
             'curriculumNodes'
         );
 
-        $this->hasMap(
-            array(
-                'column'   => 'deleted_at',
-                'property' => 'deletedAt',
-                'type'     => self::TYPE_DATETIME,
-            )
-        );
-
-
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, self::CALLBACK_PRESAVE));
         $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, self::CALLBACK_POSTSAVE));
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveHomepageConfig']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteCategoryCodes'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteCategoryCodes'));
 
-        $this->hasSoftDeleteDateField('deleted_at');
     }
 
     /**
@@ -543,10 +499,10 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $qmarks = implode(', ', array_pad([], count($code), '?'));
 
         // search on curriculum node code
-        $q = $this->getFindQuery() . "WHERE cn.code in ($qmarks)";
+        $q = $this->getSelectString() . "WHERE cn.code in ($qmarks)";
 
         // search, hydrate, return
-        return $this->hydrateFromFindQuery($this->getDatabase()->query($q, $code));
+        return $this->hydrateSelect($this->getDatabase()->query($q, $code));
     }
 
     /**
@@ -557,14 +513,15 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      *
      * @return string
      */
-    protected function getFindQuery()
+    protected function getSelectString()
     {
         $code_mapper = $this->getJoinMapper('codes');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper = $this->getJoinMapper('groups');
+
         return "
             SELECT
-                {$this->getColumnString('c')},
+                {$this->getColumnString()},
                 {$code_mapper->getColumnString('cc')},
                 {$homepageConfig_mapper->getColumnString('hp')},
                 {$group_mapper->getColumnString('ug')},
@@ -573,17 +530,30 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 {$this->getJoinColumnString('curriculum_node_for_category.level.source', 'cnls')},
                 {$this->getJoinColumnString('curriculum_node_for_category.area', 'cna')},
                 {$this->getJoinColumnString('curriculum_node_for_category.area.source', 'cnas')}
-            FROM {$this->getTable()} c
-            LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
-            LEFT JOIN {$this->getJoinSql('homepages', 'c', 'hp')}
-            LEFT JOIN {$this->getJoinSql('groups', 'c', 'ug')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', 'c', 'cn')}
+        ";
+    }
+
+
+    /**
+     * It seems we're going down this road...
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('codes', '', 'cc')}
+            LEFT JOIN {$this->getJoinSql('homepages', '', 'hp')}
+            LEFT JOIN {$this->getJoinSql('groups', '', 'ug')}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', '', 'cn')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level', 'cn', 'cnl')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level.source', 'cnl', 'cnls')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area', 'cn', 'cna')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area.source', 'cna', 'cnas')}
         ";
     }
+
 
     /**
      * Search by name
@@ -592,7 +562,8 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * @param bool $userGroupsOnly
      * @return Collection|Model[]
      */
-    public function searchByName($keyword, $userGroupsOnly = false) {
+    public function searchByName($keyword, $userGroupsOnly = false)
+    {
         $code_mapper  = $this->getJoinMapper('codes');
         $group_mapper = $this->getJoinMapper('groups');
 
@@ -648,7 +619,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      * @throws MapperException if statement returned no category
      * @return Collection|Model[]
      */
-    protected function hydrateFromFindQuery($statement)
+    protected function hydrateSelect($statement)
     {
         $code_mapper = $this->getJoinMapper('codes');
 
@@ -662,13 +633,13 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         $addedClassCodes      = [];
         $addedCurriculumNodes = [];
 
-        foreach ($statement as $row) {
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
-            $testId = $row['c.id'];
+            $testId = $row['id'];
 
             // create if not exists
             if (!array_key_exists($testId, $categories)) {
-                $category = $categories[$testId] = $this->hydrate($row, 'c');
+                $category = $categories[$testId] = $this->hydrate($row);
 
                 /** @var HomepageConfig $homepageConfig */
                 $homepageConfig = $homepageConfig_mapper->hydrate($row, 'hp');
@@ -680,8 +651,8 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 $category->setHomepage($homepageConfig);
                 $category->setGroup($group);
 
-                if (isset($row['c.taskCount'])) {
-                    $categories[$testId]->setTaskCount($row['c.taskCount']);
+                if (isset($row['taskCount'])) {
+                    $categories[$testId]->setTaskCount($row['taskCount']);
                 }
             }
 
@@ -731,10 +702,11 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
      */
     public function findByCode($code)
     {
-        $query = $this->getFindQuery();
         // Retrieve all codes for category, not just $code
-        $query .= "
-            WHERE c.deleted_at IS NULL
+        $query = "
+            {$this->getSelectString()}
+            {$this->getFromString()}
+            WHERE category.deleted_at IS NULL
             AND (cc.code = :code OR cc.code LIKE :codeLike)
         ";
         $statement = $this->database->prepare($query);
@@ -744,7 +716,7 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                 'codeLike' => '%/' . $this->database->quoteForLike($code),
             )
         );
-        $model = $this->hydrateFromFindQuery($statement)->first();
+        $model = $this->hydrateSelect($statement)->first();
 
         if (!$model instanceof Model) {
             throw new MapperException("Instance of object not found");
@@ -771,8 +743,11 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
     public function findAllByArchivedCode($code)
     {
         // Don't need no category codes here
-        $query = $this->getFindQuery();
-        $query .= 'WHERE c.name LIKE :code';
+        $query = "
+            {$this->getSelectString()}
+            {$this->getFromString()}
+            WHERE c.name LIKE :code
+        ";
         $statement = $this->database->prepare($query);
         $statement->execute(
             array(
@@ -782,8 +757,10 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
         return $this->hydrateList($statement, 'c');
     }
 
+
     /**
-     * {@inheritdoc}
+     * @param int $id
+     * @return Model
      */
     public function findById($id)
     {
@@ -796,19 +773,9 @@ class Mapper extends \Schoolbox\Mapper implements ILocator, Searchable
                         ->setParent($this->createModel()->setId('#'));
         }
 
-        $query = $this->getFindQuery();
-        $query .= 'WHERE c.id=?';
-        $statement = $this->database->prepare($query);
-        $statement->execute(array($id));
-        $collection = $this->hydrateFromFindQuery($statement);
-
-        // emulate findOneBy functionality: there must be exactly one
-        if ($collection->count() != 1) {
-            throw new MapperException("Instance of object not found");
-        }
-
-        return $collection->first();
+        return parent::findById($id);
     }
+
 
     /**
      * Port of \Group->involvedInCategoryList() method.

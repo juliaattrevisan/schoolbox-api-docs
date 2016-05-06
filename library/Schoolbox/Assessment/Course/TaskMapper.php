@@ -219,7 +219,8 @@ class TaskMapper extends Schoolbox\Mapper {
         $query = "
             SELECT {$this->getColumnString('t')}
             FROM {$this->getTable()} t
-            WHERE t.category_id = :unitCategoryId;
+            WHERE t.category_id = :unitCategoryId
+            AND t.deleted_at IS NULL;
         ";
 
         $statement = $this->database->prepare($query);
@@ -255,4 +256,39 @@ class TaskMapper extends Schoolbox\Mapper {
         }
         return true;
     }
+
+
+    /**
+     * Count the number of tasks in the given unit
+     *
+     * @param Folder $unit
+     * @return int
+     */
+    public function countByUnit(Folder $unit)
+    {
+        return $this->countByColumn('category_id', $unit->getId());
+    }
+
+
+    /**
+     * Count the number of tasks in the given units and return as an associative array
+     *
+     * @param Collection|Folder[] $units
+     * @return array
+     */
+    public function countForEachUnit(Collection $units)
+    {
+        $unitIds = $units->getColumnValues('id');
+
+        // preset everything to zero: we still want the keys populated even if the query somehow returns nothing
+        $taskCounts = array_combine($unitIds, array_fill(0, count($unitIds), 0));
+
+        foreach ($units as $unit) {
+            // iterate and find the task count for each unit
+            $taskCounts[$unit->getId()] = $this->countByUnit($unit);
+        }
+
+        return $taskCounts;
+    }
+
 }

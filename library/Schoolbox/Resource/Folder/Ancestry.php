@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Resource\Folder;
 
+use OverflowException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Collection;
@@ -39,10 +40,12 @@ class Ancestry
 
     /**
      * Constructor
+     *
+     * @param FolderMapper $folderMapper
      */
-    public function __construct()
+    public function __construct(FolderMapper $folderMapper)
     {
-        $this->setFolderMapper(FolderMapper::getInstance());
+        $this->setFolderMapper($folderMapper);
     }
 
     /**
@@ -53,12 +56,29 @@ class Ancestry
         $this->cache = [];
     }
 
+
+    /**
+     * Find ancestry, and return whether or not the given parent is in it.
+     *
+     * @param Model $folder
+     * @param Model $parent
+     * @return bool
+     */
+    public function hasParent(Folder $folder, Folder $parent)
+    {
+        $parentId    = $parent->getId();
+        $ancestorIds = $this->findParentsCheaply($folder)->getColumnValues('id');
+
+        return in_array($parentId, $ancestorIds);
+    }
+
     /**
      * Find ancestry using findById() which also gives you hydrations
      * on joins and other objects
      *
      * @param Model $folder
      * @param Model $stopFolder
+     * @throws OverflowException if the folder is its own parent somehow
      * @return Collection
      */
     public function findParents(Folder $folder, Folder $stopFolder = null)
@@ -71,6 +91,7 @@ class Ancestry
      *
      * @param Model $folder
      * @param Model $stopFolder
+     * @throws OverflowException if the folder is its own parent somehow
      * @return Collection
      */
     public function findParentsCheaply(Folder $folder, Folder $stopFolder = null)
@@ -87,9 +108,10 @@ class Ancestry
      * @param  Folder $stopFolder If supplied, the parent list is truncated
      *                                 above this category.
      * @param bool $cheaply If true, use the findCheaplyById() for speed
+     * @throws OverflowException if the folder is its own parent somehow
      * @return Collection
      */
-    private function findParentAncestry(Folder $folder, Folder $stopFolder, $cheaply)
+    private function findParentAncestry(Folder $folder, Folder $stopFolder = null, $cheaply)
     {
         /** @var Model[] $stack */
         $stack = array($folder);
@@ -139,7 +161,7 @@ class Ancestry
 
             // This category is its own parent somehow. That shouldn't happen.
             if (array_key_exists($parent_id, $ancestry)) {
-                throw new \OverflowException(
+                throw new OverflowException(
                     'Folder "'.$folder->getId().'" is its own parent somehow'
                 );
             }
@@ -215,13 +237,4 @@ class Ancestry
         return $this->recursionLimit;
     }
 
-    /**
-     * Set recursion limit
-     *
-     * @param int $recursionLimit
-     */
-    private function setRecursionLimit($recursionLimit)
-    {
-        $this->recursionLimit = $recursionLimit;
-    }
 }

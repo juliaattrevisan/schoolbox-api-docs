@@ -10,6 +10,11 @@
  */
 
 class Component_Definition {
+
+	const MODULE_DASHBOARD  = 'dashboard';
+	const MODULE_HOMEPAGE   = 'homepage';
+	const MODULE_EPORTFOLIO = 'eportfolio';
+
 	/**
 	 * @var int
 	 */
@@ -174,6 +179,33 @@ class Component_Definition {
 	 */
 	public function getModule() {
 		return $this->module;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isHomepageModule()
+	{
+		return $this->getModule() == self::MODULE_HOMEPAGE;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isDashboardModule()
+	{
+		return $this->getModule() == self::MODULE_DASHBOARD;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isEportfolioModule()
+	{
+		return $this->getModule() == self::MODULE_EPORTFOLIO;
 	}
 
 	/**

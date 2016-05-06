@@ -11,6 +11,7 @@ namespace Component\Eportfolio;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\PredicateBuilder;
 
 class FileListMapper extends Schoolbox\Mapper
 {
@@ -163,22 +164,20 @@ class FileListMapper extends Schoolbox\Mapper
 
 
     /**
-     * @param array $columnList
-     * @param array $options
+     * @param PredicateBuilder $predicate
+     * @param array            $columnList
+     * @param array            $options
      * @return array
      */
-    protected function buildWherePart($columnList, $options)
+    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
     {
-        $parts = parent::buildWherePart($columnList, $options);
-
+        // if the mime is specified, add a LIKE predicate to the query
         if (isset($options['mime'])) {
             $mime = str_replace('*', '%', $options['mime']);
-            $parts['where'][] = sprintf("{$this->mimeAlias}.`mime` LIKE %s",
-                $this->database->quote($mime)
-            );
+            $predicate->like("{$this->mimeAlias}.mime", $mime);
         }
 
-        return $parts;
+        return parent::buildWherePart($predicate, $columnList, $options);
     }
 
 

@@ -13,6 +13,7 @@ use ArrayAccess;
 use Homepage;
 use OutOfBoundsException;
 use RangeException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Curriculum;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -96,7 +97,7 @@ class Controller extends BaseController
      * Display update folder screen
      *
      * @param $id
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function getFolderModify($id)
     {
@@ -174,7 +175,7 @@ class Controller extends BaseController
      * Display create folder screen
      *
      * @param $parentId
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function getFolderCreate($parentId)
     {
@@ -243,7 +244,7 @@ class Controller extends BaseController
     /**
      * Delete folder AJAX
      *
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function postDeleteFolder()
     {
@@ -278,7 +279,7 @@ class Controller extends BaseController
     /**
      * Move folder with an AJAX response
      *
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function postMoveFolder()
     {
@@ -329,7 +330,7 @@ class Controller extends BaseController
     /**
      * Update a folders details
      *
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function postUpdateFolder()
     {
@@ -629,7 +630,7 @@ class Controller extends BaseController
     /**
      * Delete folder and all children (superusers only)
      *
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function postDeleteFolderAll()
     {
@@ -659,7 +660,7 @@ class Controller extends BaseController
     /**
      * Reset folder content
      *
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function postFolderReset()
     {

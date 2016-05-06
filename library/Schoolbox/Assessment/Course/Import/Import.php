@@ -5,7 +5,8 @@ namespace Schoolbox\Assessment\Course\Import;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
-use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Course\Unit\Model as Unit;
+use Schoolbox\Assessment\Course\Unit\Mapper as UnitMapper;
 
 /**
  * Import
@@ -17,26 +18,15 @@ use Schoolbox\Assessment\Course\TaskMapper;
  */
 class Import
 {
-    /**
-     * A CourseMapper instance
-     *
-     * @var CourseMapper
-     */
-    private $courseMapper = null;
+    /** @var CourseMapper */
+    private $courseMapper;
 
-    /**
-     * A FolderMapper instance
-     *
-     * @var FolderMapper
-     */
-    private $folderMapper = null;
+    /** @var UnitMapper */
+    private $unitMapper;
 
-    /**
-     * A TaskMapper instance
-     *
-     * @var TaskMapper
-     */
-    private $taskMapper = null;
+    /** @var FolderMapper */
+    private $folderMapper;
+
 
     /**
      * Constructor
@@ -46,7 +36,7 @@ class Import
     {
         $this->setCourseMapper(CourseMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
-        $this->setTaskMapper(TaskMapper::getInstance());
+        $this->setUnitMapper(UnitMapper::getInstance());
     }
 
     /**
@@ -55,7 +45,7 @@ class Import
      *
      * Searches by both name and class code
      *
-     * @param $query
+     * @param string $query
      * @return array
      */
     public function importClasses($query)
@@ -117,14 +107,14 @@ class Import
          */
         try {
             if ($courseId) {
-                $folder = $this->getCourseMapper()->findCourseById($courseId);
-                $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
+                $course = $this->getCourseMapper()->findById($courseId);
+                $course->setParent($this->getFolderMapper()->findById($course->getParent()->getId()));
 
-                $data['folder'] = $folder;
+                $data['folder'] = $course;
 
                 $data['sources'] = [
-                    'id'   => $folder->getId(),
-                    'name' => $folder->getName()
+                    'id'   => $course->getId(),
+                    'name' => $course->getName()
                 ];
 
                 /* Bolt on the Unit/Task data
@@ -142,18 +132,18 @@ class Import
         try {
             if ($classCode) {
                 try {
-                    $folder = $this->getFolderMapper()->findByCode($classCode);
+                    $course = $this->getFolderMapper()->findByCode($classCode);
                 } catch (MapperException $e) {
-                    $folder = $this->getFolderMapper()->findById($classCode);
+                    $course = $this->getFolderMapper()->findById($classCode);
                 }
-                $pair   = $folder->findValueLabelPair();
+                $pair   = $course->findValueLabelPair();
 
                 $data['destinations'] = [
                     'id'   => $pair['value'],
                     'name' => $pair['label'],
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (MapperException $e) {
 
             /* TODO: No destination found
              */
@@ -184,10 +174,11 @@ class Import
         /* A course was already chosen
          */
         try {
-            $data['units'] = $this->getCourseMapper()->findByParent($courseId);
+            $data['units'] = $this->getUnitMapper()->findByCourseId($courseId);
 
             foreach ($data['units'] as $unit) {
-                $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
+                /** @var Unit $unit */
+                $data['tasks'][$unit->getId()] = $unit->getTasks();
             }
         } catch (\Exception $e) {
 
@@ -215,10 +206,30 @@ class Import
      * Set course mapper
      *
      * @param CourseMapper $courseMapper
+     * @return self
      */
     private function setCourseMapper($courseMapper)
     {
         $this->courseMapper = $courseMapper;
+        return $this;
+    }
+
+    /**
+     * @return UnitMapper
+     */
+    public function getUnitMapper()
+    {
+        return $this->unitMapper;
+    }
+
+    /**
+     * @param UnitMapper $unitMapper
+     * @return self
+     */
+    public function setUnitMapper($unitMapper)
+    {
+        $this->unitMapper = $unitMapper;
+        return $this;
     }
 
     /**
@@ -235,29 +246,12 @@ class Import
      * Set folder mapper
      *
      * @param FolderMapper $folderMapper
+     * @return self
      */
     private function setFolderMapper($folderMapper)
     {
         $this->folderMapper = $folderMapper;
+        return $this;
     }
 
-    /**
-     * Get task mapper
-     *
-     * @return null
-     */
-    private function getTaskMapper()
-    {
-        return $this->taskMapper;
-    }
-
-    /**
-     * Set task mapper
-     *
-     * @param null $taskMapper
-     */
-    private function setTaskMapper($taskMapper)
-    {
-        $this->taskMapper = $taskMapper;
-    }
 }

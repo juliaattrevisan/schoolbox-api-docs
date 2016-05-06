@@ -137,6 +137,27 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         return $this->findByFields($sql, array(':module' => $module, ':identifier' => $identifier));
     }
 
+
+    /**
+     * Locates a Course Builder component on a homepage
+     *
+     * @param int $folderId
+     * @throws Schoolbox\Mapper\Exception
+     * @return Component_Instance
+     */
+    public function findCourseBuilder($folderId)
+    {
+        $c = $this->createCollection(array_values(
+            $this->findByContextAndClass('homepage', $folderId, Component_Homepage_CourseBuilderController::class)
+        ));
+
+        if ($c->count()) {
+            return $c->first();
+        }
+
+        throw new Schoolbox\Mapper\Exception("Instance of Course Builder not found on folder $folderId.");
+    }
+
     /**
      * @param string $module
      * @param string $identifier

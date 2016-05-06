@@ -37,6 +37,7 @@ use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Category;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Code;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
@@ -48,6 +49,7 @@ use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class Controller extends Base\Base
 {
@@ -69,6 +71,9 @@ class Controller extends Base\Base
 
     /** @var CourseMapper */
     protected $courseMapper;
+
+    /** @var Unit\Mapper */
+    protected $unitMapper;
 
     /** @var Component_DefinitionMapper */
     protected $componentDefinitionMapper;
@@ -106,6 +111,7 @@ class Controller extends Base\Base
     public function __construct()
     {
         $this->setCourseMapper(CourseMapper::getInstance());
+        $this->setUnitMapper(Unit\Mapper::getInstance());
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setOnlineAssessmentMapper(OnlineAssessmentMapper::getInstance());
@@ -213,48 +219,39 @@ class Controller extends Base\Base
         $data = [];
 
         if ($id) {
-            $folder = $this->getCourseMapper()->findById($id);
-            $folder->setParent($this->getCourseMapper()->findById($folder->getParent()->getId()));
 
-            $instances        = [];
-            $instanceMapper   = $this->getComponentInstanceMapper();
+            // this is the one exception to the rule: you may modify a FOLDER to convert it into a course by adding units.
+            // as such, this searches for folders rather than explicitly courses, but said course:
+            //   - must live in the faculty root; and
+            //   - must not have any course descendants itself
+            $folder = $this->getFolderMapper()->findById($id);
+
+            // check ancestry
+            if (!$this->getCourseMapper()->mayBeConvertedToCourse($folder)) {
+                $this->sendError('Folder chosen may not be converted to a course');
+            }
+
+            $folder->setParent($this->getFolderMapper()->findById($folder->getParent()->getId()));
+
+            $instances = [];
 
             $data['folder'] = $folder;
-            $data['units']  = $this->getCourseMapper()->findByParent($id)->filter(function ($folder) use ($instanceMapper, &$instances) {
-                /**
-                 * This folder is considered a unit:
-                 *      IF it has a course builder component (this is new logic)
-                 *      OR it has tasks (since the component may have been deleted)
-                 *
-                 * @var Folder\Model $folder
-                 */
-
-                $id = $folder->getId();
-
-                // check for instance (and cache it while you're at it)
-                $instances[$id] = array_values($instanceMapper->findByContextAndClass('homepage', $id, \Component_Homepage_CourseBuilderController::class));
-
-                // if there's an instance, you know she's a keeper
-                return $folder->getTaskCount() ? true : count($instances[$id]) > 0;
-            });
+            $data['units']  = $this->getUnitMapper()->findByCourseId($folder->getId());
 
             foreach ($data['units'] as $unit) {
                 $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
 
                 // obtain the Course Builder Component Instance from the homepage.
-                if (count($instances[$unit->getId()]) == 0) {
-                    // shove that new instance into where we expect it to be
-                    $instances[$unit->getId()] = [ $this->injectNewComponent($unit) ];
-                }
+                $instances[$unit->getId()] = $this->getCourseBuilderInstance($unit);
 
                 foreach ($data['tasks'][$unit->getId()] as $task) {
                     /** @var Task $task */
-                    $data['taskReveals'][$task->getId()] = new TaskBuilder($instances[$unit->getId()][0], $task);
+                    $data['taskReveals'][$task->getId()] = new TaskBuilder($instances[$unit->getId()], $task);
                 }
 
                 // set reference to this reveal instance
-                $data['reveals'][$unit->getId()] = new TaskBuilder($instances[$unit->getId()][0]);
+                $data['reveals'][$unit->getId()] = new TaskBuilder($instances[$unit->getId()]);
             }
         }
 
@@ -324,11 +321,13 @@ class Controller extends Base\Base
         // if something got passed, don't care: overriding it
         $post['id'] = $id;
 
-        // save unit name changes
-        foreach ($post['unitname'] as $unitId => $unitName) {
-            $this->getFolderMapper()->save(
-                $this->getFolderMapper()->findById($unitId)->setName($unitName)
-            );
+        if (is_array($post['unitname'])) {
+            // save unit name changes
+            foreach ($post['unitname'] as $unitId => $unitName) {
+                $this->getFolderMapper()->save(
+                    $this->getFolderMapper()->findById($unitId)->setName($unitName)
+                );
+            }
         }
 
         $this->saveCourse($post, $rq->isXhr(), 'course.courseList');
@@ -391,7 +390,7 @@ class Controller extends Base\Base
         try {
             $parentId = $post->get('parent');
             if ($parentId === "0" || $parentId > 0) {
-                $parent = $this->getCourseMapper()->findById($parentId);
+                $parent = $this->getFolderMapper()->findById($parentId);
             } else {
                 // cause a snap if no (or invalid) parent was supplied
                 throw new BaseMapper\Exception("Invalid parent nominated");
@@ -491,7 +490,7 @@ class Controller extends Base\Base
      * @param $problem
      * @param array $resolutions
      * @param int $statusCode
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     protected function sendError($problem, array $resolutions = [], $statusCode = 400)
     {
@@ -656,7 +655,7 @@ class Controller extends Base\Base
         $folder    = $query->get('folder');
         $search    = $query->get('query');
 
-        $data  = $this->getCourseMapper()->findCourseList($search);
+        $data  = $this->getCourseData($search);
 
         // only offer suggestions if you're not searching
         if ($folder && !$search) {
@@ -693,6 +692,51 @@ class Controller extends Base\Base
         }
 
         $this->tpl($template, array_merge($data, $options));
+    }
+
+
+    /**
+     * List the courses. Returns a combined array of Folder instances
+     * and information about any found Units and their task counts
+     *
+     * @param string $searchParam
+     * @return array
+     */
+    protected function getCourseData($searchParam)
+    {
+        $allCourses = $this->getCourseMapper()->findCourseListByName($searchParam);
+
+        $data = [
+            'courses' => $allCourses
+        ];
+
+        foreach ($allCourses as $currentCourse) {
+
+            $allUnits = $this->getUnitMapper()->findByCourseId($currentCourse->getId());
+
+            // Append to unit index, by ID
+            foreach ($allUnits as $currentUnit) {
+                $data['units'][$currentCourse->getId()][] = $currentUnit;
+            }
+
+            /* Also store the path to this Course
+             */
+            $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
+        }
+
+        return $data;
+    }
+
+
+    /**
+     * Convenience method
+     *
+     * @param Folder\Model $course
+     * @return Collection
+     */
+    protected function getLineage(Folder\Model $course)
+    {
+        return $this->getAncestry()->findParentsCheaply($course, $this->getCourseMapper()->getFacultyNode());
     }
 
 
@@ -750,10 +794,10 @@ class Controller extends Base\Base
         // the valid list of parents:
         //  - start at facultyTop $this->getCourseMapper()->getFacultyNode(),
         //  - recurse into every folder for which the user has WRITE access
-        //  - stop at, and exclude, all Courses (folder that has > 0 children with > 0 tasks) (apparently this point is up for debate..?)
+        //  - stop at, and exclude, all Courses (folder that has > 0 units)
         //  - continue to exhaustion
 
-        $tb = new TreeBuilder($this->getCourseMapper(), $this->getTaskMapper(), $this->getUser());
+        $tb = new TreeBuilder($this->getFolderMapper(), $this->getUnitMapper(), $this->getUser());
 
         $facultyNode = $this->getCourseMapper()->getFacultyNode();
 
@@ -805,7 +849,7 @@ class Controller extends Base\Base
         $this->tpl('unitImportForm', [
             'homepage'       => implode(',', array_keys($ownerships)),
             'courseHomepage' => $courseHomepage,
-            'units'          => $this->getCourseMapper()->findByParentId($courseHomepage),
+            'units'          => $this->getUnitMapper()->findByCourseId($courseHomepage),
             'ownerships'     => implode(',', array_map(
                     function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
             )
@@ -858,7 +902,7 @@ class Controller extends Base\Base
         $courseHomepage = trim($this->getRequest()->post["importCourse"]);
 
         try {
-            $this->getCourseMapper()->findCourseById($courseHomepage);
+            $this->getCourseMapper()->findById($courseHomepage);
 
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...
@@ -943,7 +987,7 @@ class Controller extends Base\Base
          */
         foreach ($unitDates as $unit) {
             if ($unit['import'] && !isset($unitCache[$unit['unit_id']])) {
-                $unitCache[$unit['unit_id']] = $this->getCourseMapper()->findById($unit['unit_id']);
+                $unitCache[$unit['unit_id']] = $this->getUnitMapper()->findById($unit['unit_id']);
             }
         }
 
@@ -1203,18 +1247,13 @@ class Controller extends Base\Base
                 );
 
                 // respond with stage 4: coursework list
-                $this->getResponse()->content->set
-                ([
-                    'template' => "@course/unitImportResults.twig",
-                    'format' => 'nochrome',
-                    'data' => [
-                        'ownerships' => $post['ownerships'],
-                        'homepage' => $post["homepage"],
-                        'componentId' => $post["componentId"],
-                        'courseHomepage' => $post["course_homepage"],
-                        'unitDates' => $post["unit"],
-                        'units' => $allTaskDates['units']
-                    ]
+                $this->tpl('unitImportResults', [
+                    'ownerships' => $post['ownerships'],
+                    'homepage' => $post["homepage"],
+                    'componentId' => $post["componentId"],
+                    'courseHomepage' => $post["course_homepage"],
+                    'unitDates' => $post["unit"],
+                    'units' => $allTaskDates['units']
                 ]);
             }
         }
@@ -1314,7 +1353,7 @@ class Controller extends Base\Base
         /** @var \Schoolbox\User[] $owners */
         $owners = [];
 
-        if (isset($post['ownerships'])) {
+        if (isset($post['ownerships']) && is_array($post['ownerships']) && count($post['ownerships'])) {
             // unsquash ownerships
             foreach (explode(',', $post['ownerships']) as $ownership) {
                 if (preg_match('/^\\d+:\\d+/', $ownership)) {
@@ -1481,7 +1520,7 @@ class Controller extends Base\Base
 
                         $unit_instance_list->add($unit_instance);
 
-                    } catch (\Exception $e) {
+                    } catch (MapperException $e) {
 
                         // Adding a new unit into the course.
 
@@ -1490,7 +1529,7 @@ class Controller extends Base\Base
                         $unit_instance
                             ->setWorkDates($post["work"]) // Override due work dates in cloner
                             ->setQuizDates($post["quiz"]) // Override quiz dates in cloner
-                            ->setWorkOwner($owners[$homepage])
+                            ->setWorkOwner(isset($owners[$homepage]) ? $owners[$homepage] : $this->getUser())
                             ->setComponent($componentCache[$homepage])
                             ->setTitle($unitCache[$currentUnit['id']]->getName())
                             ->setCategory($homepageCache[$homepage])
@@ -1547,18 +1586,21 @@ class Controller extends Base\Base
         /** @var Collection|UnitInstance[] $selectedUnitInstances */
         $selectedUnitInstances = $this->getUnitInstanceMapper()->findForComponent($compInst);
 
-        // casually crack out Big Bertha and drill, drill, drill... :/
-        $owner = $this->getUserMapper()->findById($selectedUnitInstances->first()->getTasks()->first()->getOwner()->getId());
+        /** @var Collection $tasks */
+        $tasks = $selectedUnitInstances->first()->getTasks();
+        if ($tasks->count() > 0) {
+            $owner = $this->getUserMapper()->findById($tasks->first()->getOwner()->getId());
+        } else {
+            // no tasks in this unit: use the session user
+            $owner = $this->getUser();
+        }
 
         foreach ($selectedUnitInstances as $selectedUnitInstance) {
             $compendium[$selectedUnitInstance->getUnitCategory()->getId()]['selected'] = $selectedUnitInstance;
         }
 
-        /** @var Folder\Model $course */
         $course   = $this->getUnitInstanceMapper()->findCourseForUnit($selectedUnitInstances->first());
-
-        /** @var Collection|Folder\Model[] $allUnits */
-        $allUnits = $this->getCourseMapper()->findAllChildren($course->getId());
+        $allUnits = $course->getUnits();
 
         foreach ($allUnits as $unit) {
             $compendium[$unit->getId()]['folder'] = $unit;
@@ -1596,7 +1638,7 @@ class Controller extends Base\Base
         else {
             /* TODO: Error; component never existed
              */
-
+            $destination = $this->getFolderMapper()->createModel();
         }
 
         $this->tpl('import', [
@@ -1762,7 +1804,7 @@ class Controller extends Base\Base
         $lineages = [];
 
         foreach ($allCourses as $course) {
-            $lineages[$course->getId()] = $this->getCourseMapper()->getLineage($course);
+            $lineages[$course->getId()] = $this->getLineage($course);
         }
 
         /* Find all the Units in this Folder; also includes
@@ -1834,8 +1876,10 @@ class Controller extends Base\Base
      */
     public function deleteCourse()
     {
+        // mmm, this should be a URI param
         $courseId = $this->getRequest()->post->get('courseId');
 
+        // TODO a TODO here would have been nice...
         new \Alaress_Probe($courseId);
 
         die();
@@ -1865,7 +1909,7 @@ class Controller extends Base\Base
      *
      * @return CourseMapper
      */
-    private function getCourseMapper()
+    protected function getCourseMapper()
     {
         return $this->courseMapper;
     }
@@ -1875,17 +1919,38 @@ class Controller extends Base\Base
      *
      * @param CourseMapper $courseMapper
      */
-    private function setCourseMapper($courseMapper)
+    public function setCourseMapper($courseMapper)
     {
         $this->courseMapper = $courseMapper;
     }
+
+
+    /**
+     * @return Unit\Mapper
+     */
+    public function getUnitMapper()
+    {
+        return $this->unitMapper;
+    }
+
+
+    /**
+     * @param Unit\Mapper $unitMapper
+     * @return static
+     */
+    public function setUnitMapper($unitMapper)
+    {
+        $this->unitMapper = $unitMapper;
+        return $this;
+    }
+
 
     /**
      * Get folder mapper
      *
      * @return FolderMapper
      */
-    private function getFolderMapper()
+    protected function getFolderMapper()
     {
         return $this->folderMapper;
     }
@@ -1895,7 +1960,7 @@ class Controller extends Base\Base
      *
      * @param FolderMapper $folderMapper
      */
-    private function setFolderMapper($folderMapper)
+    public function setFolderMapper($folderMapper)
     {
         $this->folderMapper = $folderMapper;
     }
@@ -1905,7 +1970,7 @@ class Controller extends Base\Base
      *
      * @return TaskMapper
      */
-    private function getTaskMapper()
+    protected function getTaskMapper()
     {
         return $this->taskMapper;
     }
@@ -1915,7 +1980,7 @@ class Controller extends Base\Base
      *
      * @param TaskMapper $taskMapper
      */
-    private function setTaskMapper($taskMapper)
+    public function setTaskMapper($taskMapper)
     {
         $this->taskMapper = $taskMapper;
     }
@@ -1926,7 +1991,7 @@ class Controller extends Base\Base
      *
      * @return Component_InstanceMapper
      */
-    private function getComponentInstanceMapper()
+    protected function getComponentInstanceMapper()
     {
         return $this->componentInstanceMapper;
     }
@@ -1936,7 +2001,7 @@ class Controller extends Base\Base
      *
      * @param Component_InstanceMapper $componentInstanceMapper
      */
-    private function setComponentInstanceMapper($componentInstanceMapper)
+    public function setComponentInstanceMapper($componentInstanceMapper)
     {
         $this->componentInstanceMapper = $componentInstanceMapper;
     }
@@ -1946,7 +2011,7 @@ class Controller extends Base\Base
      *
      * @return Component_DefinitionMapper
      */
-    private function getComponentDefinitionMapper()
+    protected function getComponentDefinitionMapper()
     {
         return $this->componentDefinitionMapper;
     }
@@ -1956,7 +2021,7 @@ class Controller extends Base\Base
      *
      * @param Component_DefinitionMapper $componentDefinitionMapper
      */
-    private function setComponentDefinitionMapper($componentDefinitionMapper)
+    public function setComponentDefinitionMapper($componentDefinitionMapper)
     {
         $this->componentDefinitionMapper = $componentDefinitionMapper;
     }
@@ -1966,7 +2031,7 @@ class Controller extends Base\Base
      *
      * @return UnitInstanceMapper
      */
-    private function getUnitInstanceMapper()
+    protected function getUnitInstanceMapper()
     {
         return $this->unitInstanceMapper;
     }
@@ -1976,7 +2041,7 @@ class Controller extends Base\Base
      *
      * @param UnitInstanceMapper $unitInstanceMapper
      */
-    private function setUnitInstanceMapper($unitInstanceMapper)
+    public function setUnitInstanceMapper($unitInstanceMapper)
     {
         $this->unitInstanceMapper = $unitInstanceMapper;
     }
@@ -1986,7 +2051,7 @@ class Controller extends Base\Base
      *
      * @param SubmissionBoxMapper $submissionBoxMapper
      */
-    private function setSubmissionBoxMapper($submissionBoxMapper)
+    public function setSubmissionBoxMapper($submissionBoxMapper)
     {
         $this->submissionBoxMapper = $submissionBoxMapper;
     }
@@ -1996,7 +2061,7 @@ class Controller extends Base\Base
      *
      * @return SubmissionBoxMapper
      */
-    private function getSubmissionBoxMapper()
+    protected function getSubmissionBoxMapper()
     {
         return $this->submissionBoxMapper;
     }
@@ -2006,7 +2071,7 @@ class Controller extends Base\Base
      *
      * @return OnlineAssessmentMapper
      */
-    private function getOnlineAssessmentMapper()
+    protected function getOnlineAssessmentMapper()
     {
         return $this->onlineAssessmentMapper;
     }
@@ -2016,7 +2081,7 @@ class Controller extends Base\Base
      *
      * @param OnlineAssessmentMapper $onlineAssessmentMapper
      */
-    private function setOnlineAssessmentMapper($onlineAssessmentMapper)
+    public function setOnlineAssessmentMapper($onlineAssessmentMapper)
     {
         $this->onlineAssessmentMapper = $onlineAssessmentMapper;
     }
@@ -2063,7 +2128,7 @@ class Controller extends Base\Base
     /**
      * @return CourseConfigMapper
      */
-    public function getCourseConfigMapper()
+    protected function getCourseConfigMapper()
     {
         return $this->courseConfigMapper;
     }
@@ -2082,7 +2147,7 @@ class Controller extends Base\Base
     /**
      * @return Error\Mapper
      */
-    public function getErrorMapper()
+    protected function getErrorMapper()
     {
         return $this->errorMapper;
     }
@@ -2102,7 +2167,7 @@ class Controller extends Base\Base
     /**
      * @return UserAccessMapper
      */
-    public function getUserAccessMapper()
+    protected function getUserAccessMapper()
     {
         return $this->userAccessMapper;
     }
@@ -2122,7 +2187,7 @@ class Controller extends Base\Base
     /**
      * @return UserMapper
      */
-    public function getUserMapper()
+    protected function getUserMapper()
     {
         return $this->userMapper;
     }
@@ -2161,7 +2226,7 @@ class Controller extends Base\Base
     /**
      * @return TaskInstanceMapper
      */
-    public function getTaskInstanceMapper()
+    protected function getTaskInstanceMapper()
     {
         return $this->taskInstanceMapper;
     }
@@ -2173,4 +2238,14 @@ class Controller extends Base\Base
     {
         $this->taskInstanceMapper = $taskInstanceMapper;
     }
+
+
+    /**
+     * @return Ancestry
+     */
+    public function getAncestry()
+    {
+        return $this->getCourseMapper()->getAncestry();
+    }
+
 }

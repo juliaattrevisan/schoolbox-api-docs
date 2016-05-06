@@ -100,6 +100,7 @@
                 <div class="row">
                     <div class="small-12 island">
                         <section>
+                            {% if unit.items | length %}
                             <ul class="information-list">
                                 {# All work items in the current unit #}
 
@@ -116,6 +117,9 @@
                                     </li>
                                 {% endfor %}
                             </ul>
+                            {% else %}
+                            <p class="content">This unit contains no coursework.</p>
+                            {% endif %}
                         </section>
                     </div>
                 </div>

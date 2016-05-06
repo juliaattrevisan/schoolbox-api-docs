@@ -9,14 +9,25 @@
  */
 namespace Schoolbox\Assessment\Course;
 
+use Component_Homepage_CourseBuilderController;
+use PDO;
+use PDOStatement;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\PredicateBuilder;
+use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\Assessment\Course
+ * @method Model findById($id)
+ */
 class Mapper extends FolderMapper
 {
     /**
@@ -34,14 +45,31 @@ class Mapper extends FolderMapper
      *
      * @var Ancestry
      */
-    private $ancestry = null;
+    protected $ancestry;
 
     /**
-     * Hook method which occurs after mapping()
+     * @inheritdoc
+     *
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    protected function mapping()
+    {
+        parent::mapping();
+
+        $this->hasPrototype(new Model());
+
+        // reverse join onto self for unit definition
+        $this->joins('id', Unit\Mapper::class, 'parent', null, self::COLUMN_JOIN_MULTI, 'units', 'unit');
+
+        $this->ancestry = new Ancestry(FolderMapper::getInstance());
+    }
+
+
+    /**
+     * Hook method which occurs after successful construction
      */
     protected function postSetup()
     {
-        $this->setAncestry(new Ancestry());
 
         /* TODO: Replace /homepage/29 in config/course_homepage with just int
          * Faculty Root Node can be obtained Cheaply
@@ -49,145 +77,103 @@ class Mapper extends FolderMapper
          */
         $facultyNodeId = preg_replace('/[^0-9]/', '', $this->getConfigLoader()->get('course_homepage'));
 
-        $this->setFacultyNode($this->findCheaplyById($facultyNodeId));
+        $this->setFacultyNode(FolderMapper::getInstance()->findCheaplyById($facultyNodeId));
     }
 
-    /**
-     * Delegation method
-     *
-     * Clear out all the objects in the Ancestry
-     */
-    public function resetAncestry()
-    {
-        $this->getAncestry()->reset();
-    }
 
     /**
-     * Similar to findById() but restricts finds to Course Folders only
-     * Courses must have Units and Tasks to be matched successfully
+     * Return the first part of the string required to select from this mapper
      *
-     * @param $id
-     * @return Folder
-     * @throws MapperException
+     * @return string
      */
-    public function findCourseById($id)
+    protected function getSelectString()
     {
-        $query = "
-            SELECT
-                course.*,
-                COUNT(task.id) AS taskCount
-            FROM category course
-            LEFT JOIN category unit ON unit.parent = course.id AND unit.deleted_at IS NULL
-            INNER JOIN `task` ON task.category_id = unit.id AND task.deleted_at IS NULL
-            WHERE course.deleted_at IS NULL
-            AND course.id = :id
-            GROUP BY course.id
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('unit', 'unit')}
         ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute([
-            'id' => $id
-        ]);
-
-        $row = $statement->fetch(\PDO::FETCH_ASSOC);
-
-        if ($row) {
-            return $this->hydrate($row);
-        }
-
-        throw new MapperException('Course not found');
     }
 
+
     /**
-     * List the courses. Returns a combined array of Folder instances
-     * and information about any found Units and their task counts
+     * It seems we're going down this road...
      *
-     * @param $searchParam
-     * @return array
+     * @return string
      */
-    public function findCourseListByName($searchParam)
+    protected function getFromString()
     {
-        $query = "
-            SELECT
-                course.id,
-                COUNT(task.id) AS taskCount
-            FROM category course
-            LEFT JOIN category unit ON unit.parent = course.id AND unit.deleted_at IS NULL
-            INNER JOIN `task` ON task.category_id = unit.id AND task.deleted_at IS NULL
-            WHERE course.deleted_at IS NULL
-            AND course.name LIKE :searchParam
-            GROUP BY course.id
+        return "
+            FROM `{$this->getTable()}`
+            LEFT JOIN {$this->getJoinSql('unit', '', 'unit', true)}
+            INNER JOIN component_instance ci ON ci.identifier = unit.id AND ci.module = :module
+            LEFT JOIN component_definition cd ON ci.component_definition_id = cd.id
         ";
-
-        /* Find all the Courses with names like $searchParam,
-         * if that was provided (otherwise returns all)
-         */
-        $statement = $this->database->prepare($query);
-        $statement->execute([
-            'searchParam' => "%{$this->database->quoteForLike($searchParam)}%"
-        ]);
-
-        /* Accumulate a list of ids
-         */
-        $allFolderIds = [];
-
-        foreach ($statement as $row) {
-            $allFolderIds[] = $row['id'];
-        }
-
-        /* Manufacture a list of Courses so we can get their
-         * Unit information and Task Counts
-         */
-
-        /** @var Collection|Folder[] $courses */
-        $allCourses = $this->findByColumn('id', $allFolderIds);
-
-        return $allCourses;
     }
 
+
     /**
-     * List the courses. Returns a combined array of Folder instances
-     * and information about any found Units and their task counts
-     *
-     * @param $searchParam
-     * @return array
+     * @param  PDOStatement $statement
+     * @return Collection|Folder[]
      */
-    public function findCourseList($searchParam)
+    protected function hydrateSelect($statement)
     {
-        $allCourses = $this->findCourseListByName($searchParam);
+        /** @var Model[] $cache */
+        $cache = [];
 
-        $data = [
-            'courses' => $allCourses
-        ];
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
-        foreach ($allCourses as $currentCourse) {
-            $allUnits = $this->findTaskCountForAllUnits($currentCourse);
+            $courseId = $row['id'];
 
-            /* Only display units which have tasks in them
-             */
-            foreach ($allUnits as $currentUnit) {
-                if ($currentUnit->getTaskCount()) {
-                    $data['units'][$currentCourse->getId()][] = $currentUnit;
-                }
+            if (empty($cache[$courseId])) {
+                $cache[$courseId] = $this->hydrate($row);
+                $cache[$courseId]->setUnits($this->createCollection());
             }
 
-            /* Also store the path to this Course
-             */
-            $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
+            $cache[$courseId]->getUnits()->add($this->hydrateJoin($row, 'unit', 'unit'));
         }
 
-        return $data;
+        return $this->createCollection(array_values($cache));
     }
 
 
     /**
-     * @param Folder $course
-     * @return Collection
+     * Builds a where part and params for this query out of a column list
+     *
+     * @param PredicateBuilder $predicate
+     * @param  array           $columnList
+     * @param  array           $options
+     *
+     * @return array where:  The where parts of the query
+     *               params: the parameters
+     * @throws \UnderflowException
      */
-    public function getLineage(Folder $course)
+    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
     {
-        return $this->getAncestry()->findParentsCheaply($course, $this->getFacultyNode());
+        $predicate->equals('cd.class', Component_Homepage_CourseBuilderController::class);
+
+        if ($options['deleted'] == false) {
+            $predicate->isNull('unit.deleted_at');
+        }
+
+        // add custom param from component_instance join
+        $predicate->putParam('module', 'homepage');
+
+        return parent::buildWherePart($predicate, $columnList, $options);
     }
+
+
+    /**
+     * List the courses. Convenience method for findByColumn('name', LIKE($name));
+     *
+     * @param string $searchParam
+     * @param array  $options
+     * @return Collection|Folder[]
+     */
+    public function findCourseListByName($searchParam, $options = [])
+    {
+        return $this->findByColumn('name', "%{$this->database->quoteForLike($searchParam)}%", $options);
+    }
+
 
     /**
      * Get a list of Units and Tasks for a particular Course
@@ -197,9 +183,11 @@ class Mapper extends FolderMapper
      * linked to a homepage. If there is a homepage for the unit, we
      * also need to check access perms before providing a link to users
      *
+     * @deprecated idk where this needs to go, but it needs to not be here
+     *
      * @param Folder $course
      * @return Collection|Folder[]
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function findTaskCountForAllUnits(Folder $course)
     {
@@ -281,33 +269,14 @@ class Mapper extends FolderMapper
 
 
     /**
-     * Find the number of tasks for each subfolder (unit) of the given course
+     * Find the number of tasks for each subfolder (unit) of the given course, indexed by ID. Convenience method.
      *
      * @param Folder $course
      * @return array
      */
     protected function findUnitTaskCount(Folder $course)
     {
-        $taskCountQuery = "
-            SELECT
-                unit.id,
-                COUNT(task.id) AS taskCount
-            FROM {$this->getTable()} course
-            LEFT JOIN {$this->getTable()} unit ON unit.parent = course.id AND unit.deleted_at IS NULL
-            LEFT JOIN task ON task.category_id = unit.id AND task.deleted_at IS NULL
-            WHERE course.deleted_at IS NULL AND course.id = ?
-            GROUP BY unit.id
-        ";
-
-        $taskCountStatement = $this->database->prepare($taskCountQuery);
-        $taskCountStatement->execute([$course->getId()]);
-        $taskCounts = [];
-
-        foreach ($taskCountStatement as $row) {
-            $taskCounts[$row['id']] = $row['taskCount'];
-        }
-
-        return $taskCounts;
+        return TaskMapper::getInstance()->countForEachUnit(Unit\Mapper::getInstance()->findByCourseId($course->getId()));
     }
 
 
@@ -326,13 +295,13 @@ class Mapper extends FolderMapper
     /**
      * Returns whether or not the given folder is, in fact, a course
      *
-     * @param Folder $folder
+     * @param Folder $course
      * @return bool
      */
-    public function verifyCourse(Folder $folder)
+    public function verifyCourse(Folder $course)
     {
-        // more than 0 tasks means this is a course
-        return $this->findCourseTaskCount($folder) > 0;
+        // a course is defined as a folder that contains units
+        return Unit\Mapper::getInstance()->findByCourseId($course->getId())->count() > 0;
     }
 
 
@@ -360,30 +329,10 @@ class Mapper extends FolderMapper
     }
 
     /**
-     * Get ancestry
-     *
-     * @return Ancestry
-     */
-    private function getAncestry()
-    {
-        return $this->ancestry;
-    }
-
-    /**
-     * Set ancestry
-     *
-     * @param Ancestry $ancestry
-     */
-    private function setAncestry($ancestry)
-    {
-        $this->ancestry = $ancestry;
-    }
-
-    /**
      * Delete unit from course
      *
      * @param $id
-     * @throws \Schoolbox\Application\Exception
+     * @throws SchoolboxException
      */
     public function deleteUnit($id)
     {
@@ -392,6 +341,7 @@ class Mapper extends FolderMapper
         $errorMapper = ErrorMapper::getInstance();
         $folderMapper = FolderMapper::getInstance();
         $unitInstanceMapper = UnitInstanceMapper::getInstance();
+        $access = Access::getInstance();
 
         // Locate the unit we want to delete
 
@@ -401,7 +351,7 @@ class Mapper extends FolderMapper
             throw $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
-        if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
+        if ($access->getFolderAccess($this->getSessionUser(), [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
         {
             try {
                 $folderMapper->deleteFolder($unit->getUnitCategory()->getId());
@@ -417,4 +367,70 @@ class Mapper extends FolderMapper
         }
     }
 
+
+    /**
+     * It is permissible that a folder be converted to a course (ie. have units put inside it)
+     * if and only if the following two conditions are met:
+     *  1) it is in the Faculty area (that is, it is a descendant of facultyRoot)
+     *  2) it does not contain any courses anywhere beneath it
+     *  3) it is not a unit
+     *
+     * @param Folder $folder
+     * @return bool
+     */
+    public function mayBeConvertedToCourse(Folder $folder)
+    {
+        // it's a Course... it's allowed to be a course
+        if ($folder instanceof Model) {
+            return true;
+        }
+
+        if ($this->inFacultyArea($folder)) {
+            try {
+                Unit\Mapper::getInstance()->findById($folder->getId());
+            } catch (MapperException $e) {
+                // this is the desired case here: not a unit
+                return !$this->containsCourses($folder);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Folder $folder
+     * @return bool
+     */
+    protected function inFacultyArea(Folder $folder)
+    {
+        return $this->getAncestry()->hasParent($folder, $this->getFacultyNode());
+    }
+
+    /**
+     * Iteratively checks whether or not the given folder contains courses
+     *
+     * @param Folder $folder
+     * @return bool
+     */
+    protected function containsCourses(Folder $folder)
+    {
+        foreach ($this->findAll() as $course) {
+            $ancestorIds = $this->getAncestry()->findParents($course)->getColumnValues('id');
+
+            if (in_array($folder->getId(), $ancestorIds)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @return Ancestry
+     */
+    public function getAncestry()
+    {
+        return $this->ancestry;
+    }
 }

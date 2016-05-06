@@ -122,9 +122,17 @@
                 stageFour.mage({
                     onXhrDone: function(data) {
 
-                        {# Go back to wherever you came from (hopefully) #}
+                        try {
+                            if (typeof data == 'object' && 'redirect' in data && data.redirect) {
+                                {# Go back to wherever you came from (hopefully) -#}
+                                window.location.href = data.redirect;
+                            } else {
+                                window.history.back();
+                            }
+                        } catch (e) {
+                            window.history.back();
+                        }
 
-                        window.location.href = data.redirect;
                     }
                 }).bind('validate', function() {
 

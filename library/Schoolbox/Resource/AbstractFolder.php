@@ -141,7 +141,7 @@ abstract class AbstractFolder implements IFolder
     /**
      * Set parent
      *
-     * @param  self $parent
+     * @param  AbstractFolder $parent
      * @return $this
      */
     public function setParent($parent)
@@ -160,4 +160,4 @@ abstract class AbstractFolder implements IFolder
         return $this->parent;
     }
 
-} 
+}

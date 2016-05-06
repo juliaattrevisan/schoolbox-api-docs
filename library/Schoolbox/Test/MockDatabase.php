@@ -15,9 +15,13 @@
 
 namespace Schoolbox\Test;
 
+use Alaress\IDatabase;
+use PDO;
+use PDOStatement;
 use PHPUnit_Framework_TestCase;
 
-class MockDatabase {
+class MockDatabase implements IDatabase
+{
 
     /**
      * The test case, required for creating mocks
@@ -82,10 +86,11 @@ class MockDatabase {
      * Returns the mocked statement.
      *
      * @param string $query Ignored
+     * @param array  $args  Ignored
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    public function prepare($query) {
+    public function prepare($query, array $args = []) {
         return $this->mock_statement;
     }
 
@@ -98,4 +103,43 @@ class MockDatabase {
     public function quoteIdentifier($string) {
         return $string;
     }
+
+
+    /**
+     * Returns the mocked statement.
+     *
+     * @param string $statement
+     * @param array  $args
+     * @return PDOStatement
+     */
+    public function query($statement, array $args = null)
+    {
+        return $this->prepare($statement, $args);
+    }
+
+
+    /**
+     * Mock of quote
+     *
+     * @param string $string
+     * @param int    $parameter_type
+     * @return string
+     */
+    public function quote($string, $parameter_type = PDO::PARAM_STR)
+    {
+        return $string;
+    }
+
+
+    /**
+     * Mock of quoteForLike
+     *
+     * @param  string $string
+     * @return string
+     */
+    public function quoteForLike($string)
+    {
+        return $string;
+    }
+
 }

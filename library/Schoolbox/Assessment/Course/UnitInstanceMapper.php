@@ -10,17 +10,13 @@
 namespace Schoolbox\Assessment\Course;
 
 use Component_Instance;
-use Component_InstanceMapper;
+use Schoolbox\Assessment\Course;
 use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Course\Task\Cloner;
-use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress_Date_Format;
 
 
@@ -123,36 +119,19 @@ class UnitInstanceMapper extends BaseMapper {
      * $unitInstance was spawned
      *
      * @param UnitInstance $unitInstance
-     * @return object
+     * @return Course\Model
      * @throws BaseMapper\Exception
      */
-    public function findCourseForUnit(UnitInstance $unitInstance) {
-        $folderMapper = $this->getJoinMapper('course_folder');
+    public function findCourseForUnit(UnitInstance $unitInstance)
+    {
+        $unit = $unitInstance->getUnitCategory();
 
-        $query = "
-            SELECT {$folderMapper->getColumnString('cf')}
-            FROM {$this->getTable()} `ui`
-            LEFT JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
-            LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
-            WHERE `ui`.`unit_category_id` = :unitId
-            GROUP BY `cf`.`id`
-            LIMIT 1
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute(array(
-            'unitId' => $unitInstance->getUnitCategory()->getId()
-        ));
-
-        $row = $statement->fetch();
-
-        if ($row != false) {
-            $folder = $folderMapper->hydrate($row, 'cf');
-
-            return $folder;
+        if (!$unit->getParent() instanceof Folder) {
+            // dynamic hydration.....
+            $unit = Course\Unit\Mapper::getInstance()->findById($unit->getId());
         }
 
-        throw new BaseMapper\Exception('Instance of object not found');
+        return Course\Mapper::getInstance()->findById($unit->getParent()->getId());
     }
 
     /**
@@ -676,7 +655,7 @@ class UnitInstanceMapper extends BaseMapper {
      * For particular folders, find all the unit instances which have
      * open dates occurring between $from and $to
      *
-     * @param $folderIds An array of folderIds
+     * @param array               $folderIds An array of folderIds
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
      * @return Collection

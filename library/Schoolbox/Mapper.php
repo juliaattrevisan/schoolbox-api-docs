@@ -9,8 +9,7 @@
 
 namespace Schoolbox;
 
-use Countable;
-use Database;
+use Alaress\IDatabase;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -19,6 +18,7 @@ use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\PredicateBuilder;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Schedule\Event;
@@ -103,7 +103,7 @@ abstract class Mapper implements IMapper, Serializable
     const COLUMN_SOFTDELETE        = 32;
 
     /**
-     * @var Database
+     * @var IDatabase
      */
     protected $database;
 
@@ -159,7 +159,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Stores the singleton instance of the mapper
      *
-     * @var array[Mapper]
+     * @var static[]
      */
     static protected $instance;
 
@@ -197,6 +197,7 @@ abstract class Mapper implements IMapper, Serializable
         $class_name = get_called_class();
         if (!isset(self::$instance[$class_name])) {
             self::$instance[$class_name] = new static();
+            self::$instance[$class_name]->postSetup();
         }
         return self::$instance[$class_name];
     }
@@ -214,7 +215,6 @@ abstract class Mapper implements IMapper, Serializable
         $this->setColumnFactory(new ColumnFactory());
         $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
         $this->mapping();
-        $this->postSetup();
     }
 
     /**
@@ -246,10 +246,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * Secondary hook method which occurs after mapping()
-     *
-     * TODO: This might be superfluous if setup() can be moved
-     * after mapping() - I don't see it being used anywhere.
+     * Secondary hook method which occurs after successful construction
      *
      * This was made because a subclass of Mapper needed to make a
      * db call, but that needs to occur after mapping() since it
@@ -298,7 +295,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @param  \Database $database
+     * @param  IDatabase $database
      *
      * @return $this
      */
@@ -309,7 +306,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @return \Database
+     * @return IDatabase
      */
     public function getDatabase()
     {
@@ -369,6 +366,16 @@ abstract class Mapper implements IMapper, Serializable
     {
         return $this->sessionData;
     }
+
+
+    /**
+     * @return User
+     */
+    public function getSessionUser()
+    {
+        return $this->sessionData['user'];
+    }
+
 
     /**
      * Gets a single object as a collection, if it isn't one already.
@@ -1047,47 +1054,36 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function deleteByColumnList($columnList)
     {
-        $quoted_table = $this->database->quoteIdentifier($this->table);
-        // only soft-delete if this is a soft-deletable model
-        if ($softDelete = $this->getSoftDeleteUpdateSql()) {
-            $query = "UPDATE $quoted_table SET $softDelete WHERE ";
-        } else {
-            $query = "DELETE FROM $quoted_table WHERE ";
-        }
-        // Build WHERE part
-        $where_parts = array();
-        $params      = array();
+        return $this->executeDelete($this->getDeleteString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList);
+    }
+
+
+    /**
+     * Deletes (whether hard or soft) all records that match the given set of column values
+     * Returns the number of records deleted.
+     *
+     * @param string           $deleteString
+     * @param PredicateBuilder $predicate
+     * @param array            $columnList
+     * @return int
+     */
+    protected function executeDelete($deleteString, PredicateBuilder $predicate, array $columnList)
+    {
         // as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
         if (empty($columnList)) {
             return 0;
         }
-        foreach ($columnList as $columnName => $columnValue) {
-            $escaped_name = $this->database->quoteIdentifier($columnName);
-            if (!isset($columnValue)) {
-                $where_parts[] = "$escaped_name IS NULL";
-            } else {
-                // This method is smart enough to work with arrays and IN statements
-                // If the list of values is empty, though: there's no way
-                // that the query could ever return anything, so just return
-                // an empty collection.
-                if (is_array($columnValue)) {
-                    if (count($columnValue) === 0) {
-                        return 0;
-                    }
-                    $where_parts[] = "$escaped_name IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
-                    $params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
-                } else {
-                    $where_parts[]              = "$escaped_name = :{$columnName}_0";
-                    $params[$columnName . '_0'] = $columnValue;
-                }
-            }
-        }
-        $query .= implode(' AND ', $where_parts);
-        $statement = $this->database->prepare($query);
-        foreach ($params as $name => $value) {
-            $statement->bindValue($name, $value);
-        }
-        $statement->execute();
+
+        // Build WHERE part
+        $predicate->addColumnList($columnList);
+
+        // build query
+        $query = $deleteString . ' WHERE ' . implode(' AND ', $predicate->getWhere());
+
+        // execute with predicate params
+        $statement = $this->getDatabase()->query($query, $predicate->getParams());
+
+        // return the number of rows deleted
         return $statement->rowCount();
     }
 
@@ -1351,6 +1347,45 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findByColumnList($columnList, $options = array())
     {
+        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
+    }
+
+
+    /**
+     * @param string           $select
+     * @param string           $from
+     * @param PredicateBuilder $predicate
+     * @param array            $columnList
+     * @param array            $options
+     * @return Collection
+     */
+    protected function executeSelect($select, $from, PredicateBuilder $predicate, array $columnList, array $options = [])
+    {
+        try {
+            $statement = $this->prepareSelect($select, $from, $predicate, $columnList, $options);
+            $statement->execute();
+
+            return $this->hydrateSelect($statement);
+
+        } catch (UnderflowException $e) {
+            return $this->hydrateList([]);
+        }
+    }
+
+
+    /**
+     * @param string           $select
+     * @param string           $from
+     * @param PredicateBuilder $predicate
+     * @param array            $columnList
+     * @param array            $options
+     * @throws UnderflowException
+     * @return PDOStatement
+     */
+    protected function prepareSelect($select, $from, PredicateBuilder $predicate, array $columnList, array $options = [])
+    {
+        $query = "$select $from";
+
         // Compatibility with old deleted option: if a non-array was passed,
         // assume that we're asking for whether the item was deleted.
         if (!is_array($options)) {
@@ -1364,25 +1399,23 @@ abstract class Mapper implements IMapper, Serializable
         );
         $options      = array_merge($defaults, $options);
         $quoted_table = $this->database->quoteIdentifier($this->table);
-        $query        = $this->getSelectString();
-        $params      = array();
-        if (!empty($columnList)) {
-            // Build WHERE part
-            // If it underflows, someone passed an empty column value - return an
-            // empty set.
-            try {
-                $where = $this->buildWherePart($columnList, $options);
-            } catch (\UnderflowException $e) {
-                return $this->hydrateList(array());
-            }
-            $where_parts = $where['where'];
-            $params      = $where['params'];
-            $query .= ' WHERE ';
-            $query .= implode(' AND ', $where_parts);
+
+        // filter on soft-deletions if this mapper supports them
+        if (isset($this->soft_delete_column) && $options['deleted'] == false) {
+            $predicate->equals($this->soft_delete_column, $this->soft_delete_undeleted_value);
         }
-        if (!$options['deleted'] && ($delete_part = $this->getSoftDeleteFilterSql())) {
-            $query .= (empty($columnList) ? ' WHERE ' : ' AND ') . $delete_part;
+
+        // If this underflows, someone passed an empty column value - return an empty set.
+        $where = $this->buildWherePart($predicate, $columnList, $options);
+
+        // capture this regardless of emptiness
+        $params = $where['params'];
+
+        // only actually add a where clause if there are predicates to test
+        if ($predicate->count()) {
+            $query .= ' WHERE ' . implode(' AND ', $where['where']);
         }
+
         // Build ORDER part (in an injection-safe way)
         $order_parts = array();
         if (!empty($options['order'])) {
@@ -1425,13 +1458,31 @@ abstract class Mapper implements IMapper, Serializable
         if (isset($offset)) {
             $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
         }
-        $statement->execute();
 
-        return $this->hydrateSelect($statement);
+        return $statement;
     }
 
 
     /**
+     * Return the first part of the string required to delete from this mapper
+     *
+     * @return string
+     */
+    protected function getDeleteString()
+    {
+        $quoted_table = $this->database->quoteIdentifier($this->table);
+
+        // only soft-delete if this is a soft-deletable model
+        if ($softDelete = $this->getSoftDeleteUpdateSql()) {
+            return "UPDATE $quoted_table SET $softDelete";
+        }
+
+        return "DELETE FROM $quoted_table";
+    }
+
+    /**
+     * Return the first part of the string required to select from this mapper
+     *
      * @return string
      */
     protected function getSelectString()
@@ -1439,6 +1490,18 @@ abstract class Mapper implements IMapper, Serializable
         // in the core mapper this is quite trivial, but implementing classes can override
         $quoted_table = $this->database->quoteIdentifier($this->table);
         return "SELECT {$this->getColumnString()} FROM $quoted_table";
+    }
+
+
+    /**
+     * It seems we're going down this road...
+     * To prevent cataclysmic backward-incompatibility, in the core, the FROM is absorbed into the SELECT... for now...
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "";
     }
 
 
@@ -1512,7 +1575,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function isUnique($columnList = [], $currentId)
     {
-        $query = $this->selectScalarByColumnList($this->getIdentifier()['column'], $columnList);
+        $query = $this->selectScalarByColumnList($this->getTable() . '.' . $this->getIdentifier()['column'], $columnList);
         $query->execute();
         while (($dupeId = $query->fetchColumn()) !== false) {
             if ($currentId == $dupeId) {
@@ -1539,36 +1602,15 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function selectScalarByColumnList($selection, array $columnList, array $options = [])
     {
-        // set options (deleted is the only relevant one)
-        if (!is_array($options)) {
-            $options = array('deleted' => $options,);
+        $select = "SELECT $selection";
+
+        // grab a from string if it hasn't been implemented yet
+        if (!($from = $this->getFromString())) {
+            $from = "FROM {$this->getTable()}";
         }
-        $defaults    = array(
-            'deleted' => false,
-        );
-        $options     = array_merge($defaults, $options);
-        $quotedTable = $this->database->quoteIdentifier($this->table);
-        $query       = "SELECT $selection FROM $quotedTable";
-        $params      = array();
-        // Build WHERE part
-        // If it underflows, someone passed an empty column value - return an
-        // empty set.
-        if (!empty($columnList)) {
-            $where = $this->buildWherePart($columnList, $options);
-            $whereParts = $where['where'];
-            $params     = $where['params'];
-            $query .= ' WHERE ';
-            $query .= implode(' AND ', $whereParts);
-        }
-        // Include soft delete filter
-        if (!$options['deleted'] && ($deletePart = $this->getSoftDeleteFilterSql())) {
-            $query .= (empty($columnList) ? ' WHERE ' : ' AND ') . $deletePart;
-        }
-        // Build query and bind parameters to it
-        $statement = $this->database->prepare($query);
-        foreach ($params as $name => $value) {
-            $statement->bindValue($name, $value);
-        }
+
+        $statement = $this->prepareSelect($select, $from, new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList, $options);
+
         $statement->execute();
 
         return $statement;
@@ -1609,7 +1651,7 @@ abstract class Mapper implements IMapper, Serializable
     public function findIdsByColumnList(array $columnList, array $options = [])
     {
         try {
-            $stmt = $this->selectScalarByColumnList($this->identifier['column'], $columnList, $options);
+            $stmt = $this->selectScalarByColumnList('DISTINCT ' . $this->getTable() . '.' . $this->getIdentifier()['column'], $columnList, $options);
         } catch (UnderflowException $e) {
             return [];
         }
@@ -1620,6 +1662,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Builds a where part and params for this query out of a column list
      *
+     * @param PredicateBuilder $predicate
      * @param  array $columnList
      * @param  array $options
      *
@@ -1627,73 +1670,9 @@ abstract class Mapper implements IMapper, Serializable
      *               params: the parameters
      * @throws \UnderflowException
      */
-    protected function buildWherePart($columnList, $options)
+    protected function buildWherePart(PredicateBuilder $predicate, $columnList, $options)
     {
-        $where_parts = array();
-        $params      = array();
-
-        foreach ($columnList as $columnName => $columnValue) {
-
-            // accommodate joins
-            $xpl = explode('.', $columnName) ?: [];
-
-            if (count($xpl) == 1) {
-                $table = $this->getTable();
-                $field = $xpl[0];
-            } elseif (count($xpl) == 2) {
-                $table = $xpl[0];
-                $field = $xpl[1];
-
-                // remove the period so SQL doesn't freak out
-                $columnName = str_replace('.', '_', $columnName);
-            } else {
-                // bad
-                continue;
-            }
-
-            if (substr($columnName, 0, 1) == "!")
-                $columnName = substr($columnName, 1);
-
-            // If a field name starts with "!" character then we'll assume the query intention for the field is "not equal"
-
-            if (substr($field, 0, 1) == "!") {
-                $whereNot = "NOT ";
-                $whereComparison = "<>";
-                $field = substr($field, 1);
-            } else {
-                $whereNot = "";
-                $whereComparison = "=";
-            }
-
-            $escaped_name = $this->database->quoteIdentifier($table) . '.' . $this->database->quoteIdentifier($field);
-
-            if (!isset($columnValue)) {
-                $where_parts[] = "$escaped_name IS {$whereNot}NULL";
-            } else {
-                // This method is smart enough to work with arrays and IN statements
-                // If the list of values is empty, though: there's no way
-                // that the query could ever return anything, so just return
-                // an empty collection.
-                if (is_array($columnValue)
-                    || ($columnValue instanceof Traversable && $columnValue instanceof Countable)
-                ) {
-                    if (count($columnValue) === 0) {
-                        throw new \UnderflowException('List of column values is empty');
-                    }
-
-                    $where_parts[] = "$escaped_name {$whereNot}IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
-                    $params        = array_merge($params, $this->getArrayParameters($columnValue, $columnName));
-                } else {
-                    $where_parts[]              = "$escaped_name {$whereComparison} :{$columnName}_0";
-                    $params[$columnName . '_0'] = $columnValue;
-                }
-            }
-        }
-
-        return array(
-            'where'  => $where_parts,
-            'params' => $params,
-        );
+        return $predicate->addColumnList($columnList)->getPredicates();
     }
 
     /**
@@ -2424,6 +2403,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Gets a string of placeholders for an array - usually used for creating a
      * list of placeholders for an IN condition.
+     * @deprecated this has been moved to Mapper\PredicateBuilder
      *
      * @param array  $input
      * @param string $prefix If not supplied, ? will be used as the placeholder
@@ -2433,11 +2413,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getArrayPlaceholders($input, $prefix = null)
     {
-        $placeholders = array();
-        foreach ($input as $i => $param) {
-            $placeholders[] = isset($prefix) ? (':' . $prefix . '_' . $i) : '?';
-        }
-        return '(' . implode(',', $placeholders) . ')';
+        return PredicateBuilder::getArrayPlaceholders($input, $prefix);
     }
 
     /**
@@ -2446,6 +2422,7 @@ abstract class Mapper implements IMapper, Serializable
      * Used in conjunction with getArrayPlaceholders() - calling this with the
      * same input and prefix will generate params and placeholders that work
      * with each other.
+     * @deprecated this has been moved to Mapper\PredicateBuilder
      *
      * @param array  $input
      * @param string $prefix If not supplied, ? will be assumed as placeholder
@@ -2455,15 +2432,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getArrayParameters($input, $prefix = null)
     {
-        $params = array();
-        foreach ($input as $i => $param) {
-            if (isset($prefix)) {
-                $params[$prefix . '_' . $i] = $param;
-            } else {
-                $params[] = $param;
-            }
-        }
-        return $params;
+        return PredicateBuilder::getArrayParameters($input, $prefix);
     }
 
     /**
