@@ -170,10 +170,8 @@ class Synchronise_Synergetic_Tintern_Strategy_Parent extends Synchronise_Base_St
                 ORDER BY StudentContactID
             ";
 
-            return $this->getDatabase()->getAll($query);
+            $this->list = $this->getDatabase()->getAll($query);
         }
-
-        return [];
     }
 
     private function setDatabase($database) {
