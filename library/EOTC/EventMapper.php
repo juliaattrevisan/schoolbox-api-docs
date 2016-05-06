@@ -149,9 +149,15 @@ class EventMapper extends Calendar\EventMapper {
 	/**
 	 * Custom findAllByListGroups
 	 *
-	 * @return ListGroup\Collection
+	 * Use $allowedStatus to only show events matching a particular
+	 * set of of EOTC\EventStatus ids. Leaving $allowedStatus empty
+	 * will spawn all events regardless of status (it will not skip
+	 * over any events)
+	 *
+	 * @param array $allowedStatus an array of EOTC\EventStatus ids
+	 * @return @return ListGroup\Collection
 	 */
-	public function findAllByListGroups() {
+	public function findAllByListGroups($allowedStatus = []) {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
@@ -193,18 +199,6 @@ class EventMapper extends Calendar\EventMapper {
 			/** @var Event $eventItem */
 			$eventItem = $this->hydrate($row, 'e');
 
-			/** @var User $teacherInChargeItem */
-			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
-			$eventItem->setTeacherInCharge($teacherInChargeItem);
-
-			/** @var EventType $eventTypeItem */
-			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
-			$eventItem->setType($eventTypeItem);
-
-			/* Accumulate campuses for this event
-			 */
-			$eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
-
 			/* Accumulate the metadata for this event
 			 * Only use the first record
 			 */
@@ -216,11 +210,30 @@ class EventMapper extends Calendar\EventMapper {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
+				/* Ignore this event, because it's not one of the Status
+				 * we've chosen to include
+				 */
+				if (count($allowedStatus) && !in_array($eventItem->getMetadata()->getStatus()->getId(), $allowedStatus)) {
+					continue;
+				}
+
 				/* Accumulate student attendees for this event
 				 */
 				$allStudents = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
 				$eventItem->getMetadata()->setStudentAttendees($allStudents);
 			}
+
+			/** @var User $teacherInChargeItem */
+			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
+			$eventItem->setTeacherInCharge($teacherInChargeItem);
+
+			/** @var EventType $eventTypeItem */
+			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
+			$eventItem->setType($eventTypeItem);
+
+			/* Accumulate campuses for this event
+			 */
+			$eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
 
 			/* Assign it to an Event List Group
 			 */

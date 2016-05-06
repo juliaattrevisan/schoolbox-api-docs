@@ -25,7 +25,13 @@ $this->setVar(array(
 ));
 
 $eventMapper = new \EOTC\EventMapper();
-$allListGroups = $eventMapper->findAllByListGroups();
+$allListGroups = $eventMapper->findAllByListGroups([
+	\EOTC\EventStatusMapper::STATUS_DRAFT,
+	\EOTC\EventStatusMapper::STATUS_INPRINCIPLE,
+	\EOTC\EventStatusMapper::STATUS_DETAILSCOMPLETED,
+	\EOTC\EventStatusMapper::STATUS_READYFORFINALAPPROVAL,
+	\EOTC\EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL,
+]);
 
 /* Using foreach() won't increment the $position, which I use to get the name
  * of the collection currently being iterated
