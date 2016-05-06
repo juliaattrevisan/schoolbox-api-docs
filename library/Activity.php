@@ -86,7 +86,7 @@ class Activity {
 
         //check if any new files have been submitted
         $query = "SELECT COUNT(*) AS filecount FROM file WHERE
-			deleted = 0 AND category = $id AND submitted >= '$lastcatvisit'";
+			deleted_at IS NULL AND category = $id AND submitted >= '$lastcatvisit'";
         $result = $this->db->getRow($query);
 
         $count['files'] = $result['filecount'];
