@@ -74,6 +74,13 @@ class MSSQL {
 	protected $result = null;
 
 	/**
+	 * Does this instance require a new connection?
+	 *
+	 * @var bool
+	 */
+	protected $newConnection = false;
+
+	/**
 	 * Static instance of this class
 	 *
 	 * @var self
@@ -105,6 +112,7 @@ class MSSQL {
 			$this->db = $db?$db:Cfg::get('external_db_db');
 			$encoding = Cfg::get('external_db_encoding');
 		}
+		$this->newConnection = $newConnection;
 		if (!empty($encoding)) {
 			$this->encoding = $encoding;
 		}
@@ -126,17 +134,15 @@ class MSSQL {
 	/**
 	 * Connect to database
 	 *
-	 * @param bool $newConnection Enforces a new connection, even if already connected with these credentials.
-	 *
 	 * @throws Schoolbox\External\Exception
 	 */
-	function connect($newConnection = false) {
+	function connect() {
 		if (!isset($this->dbf)) {
 			// mssql.charset not already set? set it to UTF-8 here.
 			if (strlen(ini_get('mssql.charset')) === 0) {
 				ini_set('mssql.charset', 'UTF-8');
 			}
-			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd, $newConnection);
+			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd, $this->newConnection);
 		}
 
 		if ($this->dbf == false) {
