@@ -81,9 +81,9 @@ if ($isEOTCAdministrator || $isCanPromote) {
 	 */
 	$registry->notify();
 
-	/* Admin redirect back to status screen
+	/* Admin redirect back to review screen
 	 */
-	$page->localRedir('/modules/eotc/status/modify/' . $event->getId());
+	$page->localRedir('/modules/eotc/review/');
 }
 else {
 	error(19);
