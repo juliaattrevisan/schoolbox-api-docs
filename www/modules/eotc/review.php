@@ -36,12 +36,14 @@ $allListGroups = $eventMapper->findAllByListGroups([
 	\EOTC\EventStatusMapper::STATUS_DETAILSCOMPLETED,
 	\EOTC\EventStatusMapper::STATUS_READYFORFINALAPPROVAL,
 	\EOTC\EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL,
-]);
+], \EOTC\EventMapper::INTERVAL_MAX_6MONTH_OLD);
 
 /* Using foreach() won't increment the $position, which I use to get the name
  * of the collection currently being iterated
  */
-foreach ($allListGroups as $currentListGroup) {
+for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) {
+	$currentListGroup = $allListGroups->current();
+
 	if ($currentListGroup->count()) {
 		$this->setVar(array(
 			'EVENT_LIST_GROUP_NAME' => $allListGroups->getCurrentName()

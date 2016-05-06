@@ -22,6 +22,16 @@ use Schoolbox\User;
 class EventMapper extends Calendar\EventMapper {
 
 	/**
+	 * Only show events that are at most 6 months old
+	 */
+	const INTERVAL_MAX_6MONTH_OLD = 'WHERE e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 6 MONTH)';
+
+	/**
+	 * Show all events (very heavy)
+	 */
+	const INTERVAL_ALL = '';
+
+	/**
 	 * Calls for the core mapping of events, then extends it
 	 */
 	protected function mapping() {
@@ -155,9 +165,10 @@ class EventMapper extends Calendar\EventMapper {
 	 * over any events)
 	 *
 	 * @param array $allowedStatus an array of EOTC\EventStatus ids
-	 * @return @return ListGroup\Collection
+	 * @param string $interval a const which determines filtering
+	 * @return ListGroup\Collection
 	 */
-	public function findAllByListGroups($allowedStatus = []) {
+	public function findAllByListGroups($allowedStatus = [], $interval) {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
@@ -180,7 +191,7 @@ class EventMapper extends Calendar\EventMapper {
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
 			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			WHERE e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 6 MONTH)
+			{$interval}
 			ORDER BY e.start_datetime
 		";
 
