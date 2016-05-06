@@ -427,9 +427,6 @@ class Controller extends Base\Base
         }
 
         try {
-            /** @var Folder\Controller $folderController */
-            $folderController = $this->getController('folder');
-
             $datums = [
                 // the basics
                 'categoryID'      => $id,
@@ -469,7 +466,7 @@ class Controller extends Base\Base
                 ]);
             }
 
-            $folder = $folderController->persistFolder($datums, $this->getUser());
+            $folder = $this->persistFolder($datums);
 
             return $folder;
 
@@ -561,9 +558,6 @@ class Controller extends Base\Base
         }
 
         try {
-            /** @var Folder\Controller $folderController */
-            $folderController = $this->getController('folder');
-
             // Need:
             // base config
             // course config
@@ -573,7 +567,7 @@ class Controller extends Base\Base
                 $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
             }
 
-            $folder = $folderController->persistFolder([
+            $folder = $this->persistFolder([
                 // the basics (note lack of ID and Codes)
                 'name'            => $name,
                 'parent'          => $post['id'],
@@ -586,8 +580,7 @@ class Controller extends Base\Base
                 // leave these always off
                 'recursive'       => false, // LEAVE THIS
                 'code'            => null,  // LEAVE THIS
-
-            ], $this->getUser());
+            ]);
 
             $instance  = $this->getCourseBuilderInstance($folder);
             $folderId  = $folder->getId();
@@ -617,6 +610,35 @@ class Controller extends Base\Base
         }
     }
 
+
+    /**
+     * Wrapper around Folder\Controller::persistFolder() and does some extra perms checking
+     *
+     * @param array $data
+     * @return Folder\Model
+     */
+    protected function persistFolder(array $data)
+    {
+        /** @var Folder\Controller $folderController */
+        $folderController = $this->getController('folder');
+
+        $folder = $folderController->persistFolder($data, $this->getUser());
+
+        // Check that the initiating user has write access to the newly-created folder, and if not,
+        // explicitly give it to them. This covers the case where the template allows you to create a folder
+        // to which you don't have appropriate access
+        if ($this->getAccess()->getFolderAccess($this->getUser(), [ $folder->getId() ]) < UserAccess::ACCESS_WRITE) {
+            $ua = $this->getUserAccessMapper()->createModel();
+            $ua->setUser($this->getUser())
+                ->setAccessLevel(UserAccess::ACCESS_WRITE)
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setServiceIdentifier($folder->getId());
+
+            $this->getUserAccessMapper()->save($ua);
+        }
+
+        return $folder;
+    }
 
     /**
      * Dump out a list of courses
