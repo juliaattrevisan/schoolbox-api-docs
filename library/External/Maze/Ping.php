@@ -1,16 +1,6 @@
 <?php
 
-class External_Maze_Ping implements External_PingInterface {
-
-	/**
-	 * Connects to Maze database in the same manner that the other classes
-	 * would, and returns whether the database is responsive.
-	 *
-	 * @return bool
-	 */
-    public function isResponsive() {
-		$db = new MSSQL();
-
-		return $db->isConnected();
-	}
+class External_Maze_Ping implements External_PingInterface
+{
+    use External_MssqlPingTrait;
 }
