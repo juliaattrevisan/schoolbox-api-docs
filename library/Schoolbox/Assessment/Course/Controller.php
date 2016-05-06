@@ -737,7 +737,7 @@ class Controller extends Base\Base
      */
     protected function getCourseData($searchParam)
     {
-        $allCourses = $this->getCourseMapper()->findCourseListByName($searchParam);
+        $allCourses = $this->getCourseMapper()->findCourseListByName($searchParam, [ 'order' => [ 'name' => 'ASC' ] ]);
 
         $data = [];
 
