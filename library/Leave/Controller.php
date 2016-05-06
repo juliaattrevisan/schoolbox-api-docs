@@ -281,6 +281,10 @@ class Leave_Controller extends Controller
      */
     public function executeCreateRequest()
     {
+        if(!$this->hasCreatePermission()){
+            error(19);
+        }
+
         return array();
     }
 
@@ -359,9 +363,15 @@ class Leave_Controller extends Controller
             $this->getPage()->parse('student_autocomplete_block', 'student_autocomplete');
             $this->getPage()->parse('student_autocomplete_javascript_block', 'student_autocomplete_javascript');
         } elseif ($this->getGroup()->isParent()) {
+            $studentBoarders = array();
+            foreach($_SESSION['children'] as $child){
+                if($this->getUserMapper()->findById($child['id'])->getResidentialHouse()->getId() > 0){
+                    $studentBoarders[] = $child;
+                }
+            }
             $this->getPage()->dropDown(
                 'student_drop',
-                $_SESSION['children'],
+                $studentBoarders,
                 null,
                 'student_selector',
                 array(
@@ -371,6 +381,43 @@ class Leave_Controller extends Controller
             );
             $this->getPage()->parse('student_selector_block', 'student_selector');
         }
+    }
+
+    /**
+     * Does this user have create permission?
+     *
+     * The current user has permission if:
+     * * They are staff, or
+     * * They are a student in a Residential House,
+     * * They are a parent of a student in a Residential House
+     *
+     * @return bool
+     */
+    protected function hasCreatePermission()
+    {
+        /** @var \Schoolbox\User $user */
+        $user = $_SESSION["user"];
+
+        // Are they staff?
+        if($user->getRole()->isStaff()) {
+            return true;
+        }
+
+        // Are they a boarder?
+        if($user->getResidentialHouse()->getId() > 0) {
+            return true;
+        }
+
+        // Are they a parent of a boarder?
+        if(is_array($_SESSION['children'])){
+            foreach($_SESSION['children'] as $child){
+                if($this->userMapper->findById($child['id'])->getResidentialHouse()->getId() > 0) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -477,6 +524,10 @@ class Leave_Controller extends Controller
      */
     public function processCreateRequest($data)
     {
+        if(!$this->hasCreatePermission()){
+            error(19);
+        }
+
         if (!is_array($data) || empty($data['request'])) {
             $this->getPage()->error(2);
         }
@@ -493,30 +544,25 @@ class Leave_Controller extends Controller
             $created = Alaress_Date_Format::now();
             $request = new Leave_Request();
 
+            /** @var \Schoolbox\User $author */
+            $author = $_SESSION["user"];
+
             /* Use the userId field when submitting on someone else's behalf,
 			 * otherwise just your own id
 			 */
-            $userId = $data['userId'];
-            try {
-                $user = $this->getUserMapper()->findById($userId);
-            } catch (Schoolbox\Mapper\Exception $e) {
-                throw new SchoolboxNotFoundException('User not found');
-            }
-            /** @var $sessionUser \Schoolbox\User */
-            $sessionUser = $_SESSION['user'];
-
-            $request->setUser(
-                ($this->hasViewPermission($userId, $user->getResidentialHouse()->getId())
-                    ? $userId
-                    : $sessionUser->getId())
-            );
-
-            // Does this user have a house?
-            if (!$request->getUser()->getResidentialHouse()->getId()) {
-                error(19);
+            if(isset($data['userId'])) {
+                try {
+                    /** @var \Schoolbox\User $boarder */
+                    $boarder = $this->getUserMapper()->findById($data['userId']);
+                } catch (Schoolbox\Mapper\Exception $e) {
+                    throw new Exception_Schoolbox_NotFound('User not found');
+                }
+            } else {
+                $boarder = $author;
             }
 
-            $request->setAuthor($_SESSION['user']);
+            $request->setUser($boarder);
+            $request->setAuthor($author);
             $request->setStart($start->getDatabase());
             $request->setFinish($finish->getDatabase());
             $request->setHostType($data['request']['hostType']);
@@ -710,7 +756,8 @@ class Leave_Controller extends Controller
                 array(
                     'REQUEST_ID' => $request->getId(),
                     'REQUEST_STATUS' => $request->getStatus(true),
-                    'USER_NAME' => $request->getAuthor()->formatName(),
+                    'AUTHOR_NAME' => $request->getAuthor()->formatName(),
+                    'USER_NAME' => $request->getUser()->formatName(),
                     'USER_EXTERNAL_ID' => $user->getExternalId(),
                     'USER_YEAR' => $user->getYear(),
                     'USER_HOUSE' => Scrub::text($house->getHouse()),
