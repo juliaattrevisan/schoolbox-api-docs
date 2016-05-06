@@ -206,7 +206,7 @@ class Import
      * Set course mapper
      *
      * @param CourseMapper $courseMapper
-     * @return $this
+     * @return self
      */
     private function setCourseMapper($courseMapper)
     {
@@ -224,7 +224,7 @@ class Import
 
     /**
      * @param UnitMapper $unitMapper
-     * @return $this
+     * @return self
      */
     public function setUnitMapper($unitMapper)
     {
@@ -246,7 +246,7 @@ class Import
      * Set folder mapper
      *
      * @param FolderMapper $folderMapper
-     * @return $this
+     * @return self
      */
     private function setFolderMapper($folderMapper)
     {
