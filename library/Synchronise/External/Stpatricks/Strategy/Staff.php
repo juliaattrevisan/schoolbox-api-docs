@@ -49,7 +49,7 @@ class Synchronise_External_Stpatricks_Strategy_Staff extends Synchronise_Externa
         $newUser['lastname'] = trim($currentUser['lastName']);
         $newUser['synergy_id'] = $currentUser['staffID'];
         $newUser['alt_email'] = $currentUser['localEmail'];
-        $newUser['local_email'] = 1;
+        $newUser['local_email'] = 0;
 
         // Campus config: needs to map to a campus id
         $newUser['defaultCampus'] = 1;
