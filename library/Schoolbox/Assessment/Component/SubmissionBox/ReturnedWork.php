@@ -104,7 +104,9 @@ class ReturnedWork implements ISoftDeletable, IFile
      */
     public function getGradientFromNormalizedMark()
     {
-        return max(0, min(10, (int)($this->getNormalizedMark() / 10)));
+        if (!empty($this->getNormalizedMark())) {
+            return max(0, min(10, (int)($this->getNormalizedMark() / 10)));
+        }
     }
 
     /**
