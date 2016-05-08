@@ -436,33 +436,6 @@ class Healthcheck
     }
 
     /**
-    * Test maze
-    */
-    private function MazeCheckStoredProcedures()
-    {
-        echo "\nMaze Permission Check - Stored Procedures\n";
-        $db = new MSSQL();
-        $db->debug = true;
-        $splist[] = array(
-         'klp_GetTimetableStructure',
-         array(
-             array('@Today', date('Y-m-d'), SQLVARCHAR, false, true, -1),
-             array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
-         )
-        );
-        $splist[] = array(
-         'klp_GetTimetable',
-         array(
-             array('@Today', date('Y-m-d H:i:s'), SQLVARCHAR, false, false, -1),
-             array('@ReturnClassPeriodsOnly', 'Y', SQLVARCHAR, false, false, -1),
-         )
-        );
-        foreach ($splist as $sp) {
-            $this->executeProcedure($db, $sp[0], $sp[1]);
-        }
-    }
-
-    /**
     * Test chub
     */
     private function SchoolproCheckStoredProcedures()
