@@ -83,7 +83,7 @@ class Controller extends Base
             ->setModalTitle('Select Image')
             ->setAttachmentsLabel('')
             ->setAttachPrompt('Upload Image')
-            ->setMimeFilter('image/jpeg')
+            ->setMimeFilter('image/*')
             ->setReadOnly(false)
             ->setMulti(true);
 
@@ -127,7 +127,6 @@ class Controller extends Base
                     // completely irrelevant
 
                     $destination = realpath($config->get("portrait_dir")) . "/" . $storageObject->getFilename() . ".jpg";
-                    $source = realpath($config->get("storage_dir") . "/" . $storageObject->getPath());
 
                     // Remove any existing image
 
@@ -135,9 +134,11 @@ class Controller extends Base
                         unlink($destination);
                     }
 
-                    // Create a symlink to storage object
+                    // And save the image into the portrait folder
 
-                    symlink($source, $destination);
+                    $fp = fopen($destination, 'wb');
+                    stream_copy_to_stream($storageObject->readStream(), $fp);
+                    fclose($fp);
                 }
             }
         }
