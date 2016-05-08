@@ -647,24 +647,14 @@ if (!in_array($box->getCategory()->getId(), $categoryIDList)) {
 if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHandler->isParent())) {
     // get filetype details
     $return = $recent_return->getReturnedWork();
-
     $mark = $recentMark;
-
-    if ($box->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER
-        || in_array($mark, $errors)
-    ) {
-        $mark = $returnHandler->shortenGrade($mark);
-    } else {
-        $mark = Scrub::Text($mark);
-    }
 
     $this->setVar(
         array(
             'RETURNED_WORK_OWNER_ID'   => $return->getOwner()->getId(),
             'RETURNED_WORK_ID'         => $return->getId(),
             'RETURNED_WORK_COMMENT'    => Scrub::Text($recentComment),
-            'RETURNED_WORK_MARK'       => $mark,
-            'RETURNED_WORK_MARK_TIP'   => $mark == $recentMark ? '' : $recentMark,
+            'RETURNED_WORK_MARK'       => Scrub::Text($mark),
             'RETURNED_WORK_GRADIENT'   => $return->getGradientFromNormalizedMark(),
             'STATUS_HEALTH'            => 'ok',
             'STATUS_LABEL'             => 'Marked'
