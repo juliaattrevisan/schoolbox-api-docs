@@ -10,7 +10,7 @@
 trait External_MssqlPingTrait
 {
     /**
-     * Connects to TASS database, and returns whether the database is
+     * Connects to MSSQL database, and returns whether the database is
      * responsive.
      *
      * @return bool
