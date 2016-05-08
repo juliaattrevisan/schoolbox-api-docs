@@ -34,10 +34,6 @@ catch (\Schoolbox\Mapper\Exception $e) {
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
-if (!$authenticator->isEOTCAdministrator($sessionUser) && !$authenticator->canPromote($sessionUser, $event)) {
-    error(19);
-}
-
 /* Only EOTC Administrators, those who can promote, and Subscribed Users
  * can view this page
  */
