@@ -41,12 +41,10 @@ $allListGroups = $eventMapper->findAllByListGroups([
 /* Using foreach() won't increment the $position, which I use to get the name
  * of the collection currently being iterated
  */
-for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) {
-	$currentListGroup = $allListGroups->current();
-
+foreach ($allListGroups as $key => $currentListGroup) {
 	if ($currentListGroup->count()) {
 		$this->setVar(array(
-			'EVENT_LIST_GROUP_NAME' => $allListGroups->getCurrentName()
+			'EVENT_LIST_GROUP_NAME' => $allListGroups->getCurrentName($key)
 		));
 
 		$i = 0;

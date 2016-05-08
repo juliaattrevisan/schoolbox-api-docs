@@ -84,10 +84,12 @@ class Collection extends \Schoolbox\Collection {
 	/**
 	 * The name of the Event List Group currently being processed
 	 *
+	 * @param string $key
+	 *
 	 * @return mixed
 	 */
-	public function getCurrentName() {
-		return $this->getMapping()->getName($this->key());
+	public function getCurrentName($key) {
+		return $this->getMapping()->getName($key);
 	}
 
 	/**
