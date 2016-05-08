@@ -103,9 +103,8 @@ function processAttempt(
         $page->setVar(array(
             'ATTEMPT_TIMESTAMP' => $attemptFinishDate->getUnixTimestamp(),
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
-            'ATTEMPT_FINISH' => "<span class='show-for-xlarge'>{$finish}</span><span class='show-for-large-down'>{$finish}</span>",
+            'ATTEMPT_FINISH' => $finish,
             'ATTEMPT_NOT_FINISH' => '',
-            'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
             'unsubmitted_block' => ''
         ));
 
@@ -119,9 +118,8 @@ function processAttempt(
         $page->setVar(array(
             'ATTEMPT_TIMESTAMP' => '',
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
-            'ATTEMPT_FINISH' => '<div>Incomplete</div>',
+            'ATTEMPT_FINISH' => 'Incomplete',
             'ATTEMPT_NOT_FINISH' => '',
-            'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
             'submitted_block' => '',
             'has_marks_block' => '',
         ));

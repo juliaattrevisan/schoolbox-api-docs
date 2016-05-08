@@ -146,12 +146,12 @@
                     <tr data-student="{ATTEMPT_ATTEMPT_ID}">
                         <td class="no-pad" data-order="{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}">
                             <div class="avatar card small-12">
-                                <a href="/search/user/{USER_ID}" title="View Profile">
+                                <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}" title="View Attempt">
                                     <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile">
                                     <b>{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}</b>
                                 </a>
-                                <div class="show-for-large-down"><b class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</b></div>
-                                <div class="show-for-xlarge-only">
+                                <div class="show-for-large-down"><span class="gradient-{ATTEMPT_GRADIENT}"><b>{ATTEMPT_PERCENTAGE}</b></span></div>
+                                <div class="show-for-xlarge-up">
                                     <!-- BEGIN has_marks -->
                                     <!-- BEGIN attempted -->
                                                 <span class="gradient-{ATTEMPT_GRADIENT}">
@@ -187,14 +187,13 @@
                                 <div>{ATTEMPT_TIME_TAKEN}</div>
                             </div>
                         </td>
-                        <td class="text-right show-for-xlarge" data-order="{ATTEMPT_PERCENTAGE}">
-                            <div>
-                                <h2 class="show-for-xlarge"><b><span class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</span></b></h2>
+                        <td class="text-right show-for-xlarge-up" data-order="{ATTEMPT_PERCENTAGE}">
+                            <div class="avatar card small-12">
+                                <h2><b><span class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</span></b></h2>
                             </div>
                         </td>
                         <td class="actions-xlarge-4 actions-small-1">
                             <nav>
-                                {ATTEMPT_REVIEW}
                                 {ATTEMPT_CHECKBOX}
                             </nav>
                         </td>
