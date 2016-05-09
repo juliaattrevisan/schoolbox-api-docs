@@ -77,6 +77,13 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
     }
 */
     function update_poll ($category_id, $user_id) {
+        if(!is_numeric($user_id)) {
+            return false;
+        }
+
+        $category_id = $this->db->smartQuote($category_id);
+        $user_id = $this->db->smartQuote($user_id);
+
         $query = "INSERT INTO chat_poll (user_id, category_id, time)
                   VALUES ($user_id, $category_id, NOW())
                   ON DUPLICATE KEY UPDATE time = NOW()";
