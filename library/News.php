@@ -46,24 +46,6 @@ class News extends DeprecatedModel
         return $news;
     }
 
-    /**
-	 * @deprecated use \Schoolbox\News\RoleMapper::findAll()
-	 * @return mixed
-	 */
-    public function getGroupList()
-    {
-        $query = "SELECT id, name FROM groups";
-        $groupList = $this->db->getAll($query);
-        if (is_array($groupList)) {
-            $i = 0;
-            foreach ($groupList as $group) {
-                $output[$i]['GROUP_ID'] = $group['id'];
-                $output[$i++]['GROUP_NAME'] = $group['name'];
-            }
-        }
-        return $output;
-    }
-
     public function getCampusList()
     {
         $query = "SELECT id, name FROM luCampus";

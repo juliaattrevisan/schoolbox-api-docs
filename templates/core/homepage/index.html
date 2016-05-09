@@ -202,6 +202,14 @@
                 }
             }
         });
+
+        // Adds page to my links
+        $('[data-post-mylink]','#tab-control').click( function (event) {
+            event.preventDefault();
+            $.post("/cms/myLinksForm.php", { url: "{HOMEPAGE_URL}", description: "{HEADING}"} );
+            location.reload();
+        });
+
     });
 </script>
 <!-- END modify_layout -->
@@ -255,7 +263,7 @@
         <!-- END manage_page -->
         <!-- BEGIN addmylinks -->
         <li>
-            <a href="/cms/myLinksForm.php?url={HOMEPAGE_URL}&description={HEADING}&return=1" class="icon-favourite">Add to My Links</a>
+            <a href="#" class="icon-favourite" data-post-mylink >Add to My Links</a>
         </li>
         <!-- END addmylinks -->
         <!-- BEGIN view_stats -->

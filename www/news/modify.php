@@ -4,6 +4,8 @@ $newsHandler = new News();
 $groupHandler = new Group(NEWS_SERVICE);
 $userHandler = new User();
 
+$roleMapper = new \Schoolbox\RoleMapper();
+
 // check permission
 if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS) {
 	error(23);
@@ -66,7 +68,11 @@ if (is_numeric($this->arg[0])) {
     $zone->attachFiles(array($news['item_image']));
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
-	$groupList = $newsHandler->getGroupList();
+	$roleCollection = $roleMapper->findAll();
+	foreach($roleCollection as $role){
+		$groupList[] = ['GROUP_ID'=>$role->getId(), 'GROUP_NAME'=>$role->getName()];
+	}
+
 	$campusList = $newsHandler->getCampusList();
 
 	$this->checkList('group_selection', $groupList, $news['groupList']);
@@ -135,7 +141,11 @@ else {
 
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
-    $groupList = $newsHandler->getGroupList();
+	$roleCollection = $roleMapper->findAll();
+	foreach($roleCollection as $role){
+		$groupList[] = ['GROUP_ID'=>$role->getId(), 'GROUP_NAME'=>$role->getName()];
+	}
+
 	$campusList = $newsHandler->getCampusList();
 
 	$this->checkList('group_selection', $groupList);
