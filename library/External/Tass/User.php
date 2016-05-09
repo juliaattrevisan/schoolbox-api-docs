@@ -405,7 +405,7 @@ class External_Tass_User implements External_UserInterface
                 s.*
             FROM student AS s
             LEFT JOIN studboard AS sb ON s.stud_code = sb.stud_code AND s.cmpy_code = sb.cmpy_code
-            WHERE s.dol IS NULL
+            WHERE (s.dol IS NULL OR s.dol > getdate())
         ";
 
         $result = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));

@@ -34,7 +34,7 @@ class External_Tass_Cathedral_User extends External_Tass_User implements Externa
                 -- s.dol AS StudentLeavingDate
             FROM student AS s
             WHERE s.campus_code IS NOT NULL
-            AND s.dol IS NULL
+            AND (s.dol IS NULL OR s.dol > getdate())
         ";
         $result = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
         return $result;
