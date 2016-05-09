@@ -98,7 +98,7 @@ if(count($criterionCollection)) {
                 'CRITERION_NAME' => $crit->getName(),
             ));
 
-            $usageCount = CriterionMapper::getInstance()->countUsage($crit->getID());
+            $usageCount = UsageMapper::getInstance()->countUsage($crit->getID());
             if($usageCount > 0) {
                 $this->setVar('CRITERION_USAGE', $usageCount);
                 $this->setVar('criterion_enabled_block', '');
