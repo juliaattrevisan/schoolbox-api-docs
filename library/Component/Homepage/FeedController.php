@@ -65,7 +65,6 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
                     'EVENT_BODY'     => $n['title'],
                     'EVENT_TIME'     => $date->getShort(),
                     'EVENT_LONGTIME' => $date->getLong(),
-                    'EVENT_DARK'     => $j++ % 2 ? 'dark' : '',
                 )
             );
             $this->parse('event_block', 'event', true);

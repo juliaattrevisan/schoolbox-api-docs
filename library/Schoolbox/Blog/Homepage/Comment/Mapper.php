@@ -102,14 +102,14 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
             /** @var User $owner */
             $owner = $this->hydrateJoin($r, 'owner', 'u');
 
-            /** @var FolderModel $folder */
-            $folder = $this->hydrateJoin($r, 'folder', 'c');
-
             /** @var BlogModel $blog */
-            $blog = $this->hydrate($r, 'b');
-            $blog->setOwner($owner);
-            $blog->setFolder($folder);
-            $c->add($blog);
+            $blog = $this->hydrateJoin($r, 'blog', 'b');
+
+            /** @var BlogCommentModel $blog */
+            $blogComment = $this->hydrate($r, 'bc');
+            $blogComment->setOwner($owner);
+            $blogComment->setBlog($blog);
+            $c->add($blogComment);
         }
 
         return $c;

@@ -120,11 +120,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface {
 		$bob->setTitle(':author blogged about :title in :catname')
 			->setParams(array(
 				'author' => new UserParam($author, ParameterInterface::STACKING_REPLACE),
-				'title'  => new Param($blog->getHeading()),
+				'title'  => new Param($blog->getHeading(), "/blog/$blogId"),
 				'catname' => new CategoryParam($folder)
 			))
 			->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
-			->setHref("/homepage/$folderId#blog_$blogId")
+			->setHref("/blog/$blogId")
 			->setSeverity(Logger::INFO)
 			->setNamespace($this->getSlug())
 			->addTopic("blog.$blogId.posted")
