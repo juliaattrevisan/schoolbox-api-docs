@@ -11,12 +11,11 @@ namespace Schoolbox\Permission\Access;
 
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Notif\Message\Message;
-use Schoolbox\Notif\Message\Messenger;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
@@ -24,7 +23,6 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Rerouter\RerouterCommander;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
@@ -121,7 +119,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param string     $label
      * @param UserAccess $userAccess
      * @param User       $effector
-     * @return Messenger
+     * @return Envelope
      */
     protected function notifyAdmin($body, $label, $userAccess, $effector = null)
     {
@@ -129,10 +127,8 @@ class UserAccessNotifier extends AbstractModuleNotifier
 
         $bob = new Builder();
 
-        /** @var Folder $cat */
         $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
 
-        /** @var User $user */
         $user = UserMapper::getInstance()->findById($userAccess->getUser()->getId());
 
         /** @var ParameterInterface[] $params */
@@ -162,7 +158,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
     /**
      * @param UserAccess $userAccess
      * @param User       $user
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffJoined($userAccess, $user)
     {
@@ -177,7 +173,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
     /**
      * @param UserAccess $userAccess
      * @param User       $user
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffLeft($userAccess, $user)
     {
@@ -192,7 +188,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
     /**
      * @param UserAccess $userAccess
      * @param User       $user
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffRequested($userAccess, $user)
     {
@@ -204,12 +200,12 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param UserAccess $userAccess
      * @param User       $user
      * @param array      $diff
-     * @return Messenger
+     * @return Envelope
      */
     protected function notifyApproved($userAccess, $user, $diff = null)
     {
-        $msgr = new Messenger();
-
+        $envelope = new Envelope();
+        $bob = new Builder();
 
         // TODO uncomment these bits of the method to make it more informative once the Mapper can handle composite IDs
 //		// no diff in access level, this isn't something we're interested in
@@ -221,12 +217,10 @@ class UserAccessNotifier extends AbstractModuleNotifier
 //		$newAccess = $diff['accessLevel'][0];
 //		$oldAccess = $diff['accessLevel'][1];
 
-        /** @var Folder $cat */
-        $cat = FolderMapper::getInstance()
-                             ->findById($userAccess->getServiceIdentifier());
+        // no try-catch: mapper exceptions are caught by the worker
+        $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
 
         // Customize the approval message
-        $messageText = '';
         switch ($userAccess->getAccessLevel()) {
             case UserAccess::ACCESS_DENY:
                 $messageText = ':moderator has removed your access to :groupname';
@@ -240,21 +234,26 @@ class UserAccessNotifier extends AbstractModuleNotifier
             case UserAccess::ACCESS_FULL:
                 $messageText = ':moderator has made you an administrator of :groupname';
                 break;
+            default:
+                // can't handle this: bail out and send nothing
+                return $envelope;
         }
-        $msg = new Message(
-            $messageText,
-            "/portrait.php?size={$this->iconSize}&userId=" . $user->getExternalId(),
-            "/homepage/" . $cat->getId()
-        );
 
-        $msgr->targetToUser($userAccess->getUser()->getId(), $msg, "group.{$cat->getId()}.approved", Logger::NOTICE,
-            array(
-                'moderator' => array($user->formatName(), '/search/user/' . $user->getId()),
-                'groupname' => array($cat->getName(), '/homepage/' . $cat->getId())
-            )
-        );
+        $bob->setTitle($messageText)
+            ->setSeverity(Logger::NOTICE)
+            ->setHref("/homepage/{$cat->getId()}")
+            ->setIcon("/portrait.php?size={$this->iconSize}&userId={$user->getExternalId()}")
+            ->setNamespace($this->getSlug())
+            ->setParams([
+                'moderator' => new UserParam($user, Param::STACKING_REPLACE),
+                'groupname' => new CategoryParam($cat)
+            ])
+            ->addTopic("group.{$cat->getId()}.approved")
+        ;
 
-        return $msgr;
+        $envelope->targetToUser($userAccess->getUser(), $bob->build());
+
+        return $envelope;
     }
 
 
@@ -262,7 +261,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param UserAccess $userAccess
      * @param User       $user
      * @param array      $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStaffApproved($userAccess, $user, $diff = null)
     {
@@ -274,7 +273,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param UserAccess $userAccess
      * @param User       $user
      * @param array      $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyStudentApproved($userAccess, $user, $diff = null)
     {
@@ -286,7 +285,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param UserAccess $userAccess
      * @param User       $user
      * @param array      $diff
-     * @return Messenger
+     * @return Envelope
      */
     public function notifyParentApproved($userAccess, $user, $diff = null)
     {
