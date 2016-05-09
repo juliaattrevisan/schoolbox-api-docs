@@ -81,6 +81,9 @@ class Chat extends DeprecatedModel {
             return false;
         }
 
+        $category_id = $this->db->smartQuote($category_id);
+        $user_id = $this->db->smartQuote($user_id);
+
         $query = "INSERT INTO chat_poll (user_id, category_id, time)
                   VALUES ($user_id, $category_id, NOW())
                   ON DUPLICATE KEY UPDATE time = NOW()";
