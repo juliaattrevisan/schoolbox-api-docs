@@ -101,6 +101,7 @@ function processAttempt(
         $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
 
         $page->setVar(array(
+            'ATTEMPT_TIMESTAMP' => $attemptFinishDate->getUnixTimestamp(),
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
             'ATTEMPT_FINISH' => "<span class='show-for-xlarge'>{$finish}</span><span class='show-for-large-down'>{$finish}</span>",
             'ATTEMPT_NOT_FINISH' => '',
@@ -116,6 +117,7 @@ function processAttempt(
         $attemptStartDate = new Alaress_Date_Format($currentAttempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
         $timeTaken        = $assessHandler->sec2hms($attemptStartDate->diffInSeconds(Alaress_Date_Format::now()));
         $page->setVar(array(
+            'ATTEMPT_TIMESTAMP' => '',
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
             'ATTEMPT_FINISH' => '<div>Incomplete</div>',
             'ATTEMPT_NOT_FINISH' => '',
@@ -361,6 +363,7 @@ if (is_array($allStudents) && count($allStudents)) {
                 'ATTEMPT_CHECKBOX' => '',
                 'ATTEMPT_NOT_FINISH' => 'Not Submitted',
                 'ATTEMPT_REVIEW' => '',
+                'ATTEMPT_TIMESTAMP' => '',
                 'ATTEMPT_TIME_TAKEN' => '',
                 'ATTEMPT_TOTAL_MARKS' => '',
                 'ATTEMPT_TOTAL_AVAILABLE_MARKS' => '',
