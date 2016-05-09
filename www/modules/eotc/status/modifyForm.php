@@ -35,7 +35,7 @@ $authenticator = new \EOTC\Authenticator();
  * events where creators can self-promote this status into the next.
  */
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
-$isCanSelfPromote = $authenticator->canSelfPromote($sessionuser, $event);
+$isCanSelfPromote = $authenticator->canSelfPromote($sessionUser, $event);
 
 if ($isEOTCAdministrator || $isCanSelfPromote) {
 
