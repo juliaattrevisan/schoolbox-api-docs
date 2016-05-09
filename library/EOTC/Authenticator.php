@@ -175,6 +175,24 @@ class Authenticator {
 	}
 
 	/**
+	 * Determine whether an EOTC event is in its final stages
+	 *
+	 * @param User $user
+	 * @param Event $event
+	 * @return bool
+	 */
+	public function canFinalise(User $user, Event $event)
+	{
+		if ($this->isEOTCAdministrator($user)) {
+			if ($event->getMetadata()->getStatus()->isApproved() || $event->getMetadata()->getStatus()->isRejected()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Gets whether the requested status change is allowed.
 	 *
 	 * Currently, the only barred change is that events may not be approved if

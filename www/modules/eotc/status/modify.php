@@ -32,15 +32,15 @@ $sessionUser = $_SESSION['user'];
  */
 $authenticator = new \EOTC\Authenticator();
 
-if (!$authenticator->isEOTCAdministrator($sessionUser)) {
-    error(19);
-}
-
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
 $isCanSelfPromote = $authenticator->canSelfPromote($sessionUser, $event);
 $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
 
-if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser) {
+/* All EOTC Administrators can see Approved/Rejected events
+ */
+$isCanFinalise = $authenticator->canFinalise($sessionUser, $event);
+
+if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFinalise) {
     $this->setFile(TEMPLATE_content, 'modules/eotc/status/modify.html');
     $this->setBlock(TEMPLATE_content, 'event_campus', 'event_campus_block');
     $this->setBlock(TEMPLATE_content, 'event_staff', 'event_staff_block');
@@ -301,7 +301,7 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser) {
         )
     );
 
-    if ($isEOTCAdministrator) {
+    if ($isCanFinalise) {
         $eventStatusMapper = \EOTC\EventStatusMapper::getInstance();
 
         /* Soops have access to all statuses
