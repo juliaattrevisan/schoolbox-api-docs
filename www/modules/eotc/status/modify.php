@@ -33,11 +33,10 @@ $sessionUser = $_SESSION['user'];
 $authenticator = new \EOTC\Authenticator();
 
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
-$isCanPromote = $authenticator->canPromote($sessionUser, $event);
 $isCanSelfPromote = $authenticator->canSelfPromote($sessionUser, $event);
 $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
 
-if ($isEOTCAdministrator || $isCanPromote || $isCanSelfPromote || $isSubscribedUser) {
+if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser) {
     $this->setFile(TEMPLATE_content, 'modules/eotc/status/modify.html');
     $this->setBlock(TEMPLATE_content, 'event_campus', 'event_campus_block');
     $this->setBlock(TEMPLATE_content, 'event_staff', 'event_staff_block');
@@ -298,7 +297,7 @@ if ($isEOTCAdministrator || $isCanPromote || $isCanSelfPromote || $isSubscribedU
         )
     );
 
-    if ($isCanPromote) {
+    if ($isEOTCAdministrator) {
         $eventStatusMapper = \EOTC\EventStatusMapper::getInstance();
 
         /* Soops have access to all statuses

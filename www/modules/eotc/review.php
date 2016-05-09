@@ -54,7 +54,7 @@ foreach ($allListGroups as $key => $currentListGroup) {
 
 			/* Only list events you can manipulate
 			 */
-			if ($authenticator->canPromote($sessionUser, $currentEvent)) {
+			if ($authenticator->isEOTCAdministrator($sessionUser, $currentEvent)) {
 				$this->setVar(array(
 					'EVENT_ID' => $currentEvent->getId(),
 					'EVENT_STATUS_NAME' => $currentEvent->getMetadata()->getStatus()->getName(),

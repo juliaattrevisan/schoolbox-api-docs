@@ -55,6 +55,12 @@ class Authenticator {
 	 * Determine whether the specified user is an EOTC Administrator
 	 * (a staff user with at least one valid EOTC Permission assigned)
 	 *
+	 * Only EOTC Administrators can Promote event statuses
+	 * EOTC Administrator must have matching campus/status permissions
+	 *
+	 * Allow all EOTC Administrators to see Approved events
+	 * Allow all EOTC Administrators to see Rejected events
+	 *
 	 * @param User $user
 	 * @param Event $event
 	 * @return bool
@@ -161,34 +167,6 @@ class Authenticator {
 			/* Teacher in Charge can self promote, too
 			 */
 			if ($event->getTeacherInCharge()->getId() == $user->getId()) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Determine whether the current user's permissions allow them
-	 * to change the status of $event
-	 *
-	 * Only EOTC Administrators can Promote event statuses
-	 * EOTC Administrator must have matching campus/status permissions
-	 *
-	 * Allow all EOTC Administrators to see Approved events
-	 * Allow all EOTC Administrators to see Rejected events
-	 *
-	 * @param User $user
-	 * @param Event $event
-	 * @return bool
-	 */
-	public function canPromote(User $user, Event $event) {
-		if ($this->isEOTCAdministrator($user, $event)) {
-			if ($event->getMetadata()->getStatus()->isApproved()) {
-				return true;
-			}
-
-			if ($event->getMetadata()->getStatus()->isRejected()) {
 				return true;
 			}
 		}
