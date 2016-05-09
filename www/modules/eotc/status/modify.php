@@ -32,6 +32,10 @@ $sessionUser = $_SESSION['user'];
  */
 $authenticator = new \EOTC\Authenticator();
 
+if (!$authenticator->isEOTCAdministrator($sessionUser)) {
+    error(19);
+}
+
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
 $isCanSelfPromote = $authenticator->canSelfPromote($sessionUser, $event);
 $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
