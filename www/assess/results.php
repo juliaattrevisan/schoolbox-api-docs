@@ -105,6 +105,7 @@ function processAttempt(
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
             'ATTEMPT_FINISH' => $finish,
             'ATTEMPT_NOT_FINISH' => '',
+            'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
             'unsubmitted_block' => ''
         ));
 
@@ -120,6 +121,7 @@ function processAttempt(
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
             'ATTEMPT_FINISH' => 'Incomplete',
             'ATTEMPT_NOT_FINISH' => '',
+            'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
             'submitted_block' => '',
             'has_marks_block' => '',
         ));

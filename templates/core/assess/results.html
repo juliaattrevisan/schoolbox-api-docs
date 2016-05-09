@@ -146,7 +146,7 @@
                     <tr data-student="{ATTEMPT_ATTEMPT_ID}">
                         <td class="no-pad" data-order="{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}">
                             <div class="avatar card small-12">
-                                <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}" title="View Attempt">
+                                <a href="/search/user/{USER_ID}" title="View Profile">
                                     <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile">
                                     <b>{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}</b>
                                 </a>
@@ -194,6 +194,7 @@
                         </td>
                         <td class="actions-xlarge-4 actions-small-1">
                             <nav>
+                                {ATTEMPT_REVIEW}
                                 {ATTEMPT_CHECKBOX}
                             </nav>
                         </td>
