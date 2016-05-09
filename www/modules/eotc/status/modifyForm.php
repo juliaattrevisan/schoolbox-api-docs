@@ -36,8 +36,9 @@ $authenticator = new \EOTC\Authenticator();
  */
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
 $isCanPromote = $authenticator->canPromote($sessionUser, $event);
+$isCanSelfPromote = $authenticator->canSelfPromote($sessionuser, $event);
 
-if ($isEOTCAdministrator || $isCanPromote) {
+if ($isEOTCAdministrator || $isCanPromote || $isCanSelfPromote) {
 
 	/* Remember original states so we know which obs to spawn
 	 */

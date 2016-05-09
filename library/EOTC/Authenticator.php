@@ -172,56 +172,25 @@ class Authenticator {
 	 * Determine whether the current user's permissions allow them
 	 * to change the status of $event
 	 *
+	 * Only EOTC Administrators can Promote event statuses
+	 * EOTC Administrator must have matching campus/status permissions
+	 *
+	 * Allow all EOTC Administrators to see Approved events
+	 * Allow all EOTC Administrators to see Rejected events
+	 *
 	 * @param User $user
 	 * @param Event $event
 	 * @return bool
 	 */
 	public function canPromote(User $user, Event $event) {
-		if ($user->isSuperuser()) {
-			return true;
-		}
-
-		/* Allow all EOTC administrators to see Approved events
-		 */
-		if ($event->getMetadata()->getStatus()->isApproved()) {
-			return true;
-		}
-
-		/* Allow all EOTC administrators to see Rejected events
-		 */
-		if ($event->getMetadata()->getStatus()->isRejected()) {
-			return true;
-		}
-
-		$allPermissions = $this->getPermissionMapper()->findByUser($user);
-
-		/* Check that you have access to the campus as well as the status
-		 */
-		$hasMatchingPermission = false;
-		$hasMatchingCampus = false;
-
-		foreach($allPermissions as $currentPermission) {
-
-			/* If you haven't matched a campus, search for it
-			 * Ignore loop if you have already matched a campus
-			 */
-			if (!$hasMatchingCampus) {
-				foreach($event->getCampusCollection() as $currentCampus) {
-					if ($currentPermission->getCampusId()->getId() == $currentCampus->getId()) {
-						$hasMatchingCampus = true;
-					}
-				}
+		if ($this->isEOTCAdministrator($user, $event)) {
+			if ($event->getMetadata()->getStatus()->isApproved()) {
+				return true;
 			}
 
-			/* If you haven't matched a permission, search for it
-			 */
-			if ($currentPermission->getStatusId()->getId() == $event->getMetadata()->getStatus()->getId()) {
-				$hasMatchingPermission = true;
+			if ($event->getMetadata()->getStatus()->isRejected()) {
+				return true;
 			}
-		}
-
-		if ($hasMatchingCampus && $hasMatchingPermission) {
-			return true;
 		}
 
 		return false;
