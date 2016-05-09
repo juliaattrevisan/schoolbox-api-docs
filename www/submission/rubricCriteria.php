@@ -77,6 +77,7 @@ $topID = 0;
 if(count($criterionCollection)) {
 
     /* Create group structure */
+    $criteriaList = [];
     foreach($criterionCollection as $crit) {
         $criteriaList[$crit->getGrouping()][] = $crit;
     }
@@ -97,8 +98,7 @@ if(count($criterionCollection)) {
                 'CRITERION_NAME' => $crit->getName(),
             ));
 
-            $usage = UsageMapper::getInstance()->findByColumnList(array('criterion_id' => $crit->getID()));
-            $usageCount = count($usage);
+            $usageCount = UsageMapper::getInstance()->countUsage($crit->getID());
             if($usageCount > 0) {
                 $this->setVar('CRITERION_USAGE', $usageCount);
                 $this->setVar('criterion_enabled_block', '');
