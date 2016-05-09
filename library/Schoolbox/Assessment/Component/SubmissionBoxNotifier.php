@@ -177,16 +177,16 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
 
         // ok, we're clear to attach some triggers now
 
-        $open     = $box->getOpenDate()->getUnixTimestamp();
-        $closed   = $box->getDueDate()->getUnixTimestamp();
+        $open     = $box->getOpenDate()->getUnixTimeStamp();
+        $closed   = $box->getDueDate()->getUnixTimeStamp();
         $upcoming = $closed - (self::UPCOMING_WINDOW * 3600);
-        $late     = $box->getLateDate()->getUnixTimestamp();
+        $late     = $box->getLateDate()->getUnixTimeStamp();
 
         switch ($bundle->getMethod()) {
             case Mapper::METHOD_UPDATE:
 
                 // don't spawn/replace an open-on-replace if it's in the past
-                if ($box->getOpenDate()->getUnixTimestamp() > time()) {
+                if ($box->getOpenDate()->getUnixTimeStamp() > time()) {
                     $bundle->attach(self::TRIGGER_OPEN, $open);
                 }
 
@@ -254,8 +254,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $boxes = $this->mapper->findForFeed($context, $limit, $offset);
 
         foreach ($boxes as $box) {
-            $c->merge(new Collection($this->notifyStudentOpen($box, $box->getOwner())->getAll($box->getOpenDate()->getUnixTimestamp())));
-            $c->merge(new Collection($this->notifyFeedClosed($box, $box->getOwner())->getAll($box->getDueDate()->getUnixTimestamp())));
+            $c->merge(new Collection($this->notifyStudentOpen($box, $box->getOwner())->getAll($box->getOpenDate()->getUnixTimeStamp())));
+            $c->merge(new Collection($this->notifyFeedClosed($box, $box->getOwner())->getAll($box->getDueDate()->getUnixTimeStamp())));
         }
 
         return $c;
@@ -378,8 +378,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $submissionBox = $this->mapper->findById($boxId);
 
         // discard all update notifications if the submissionbox isn't open (EXCEPT work returns opening up)
-        $openStamp  = $submissionBox->getOpenDate()->getUnixTimestamp();
-        $closeStamp = $submissionBox->getDueDate()->getUnixTimestamp();
+        $openStamp  = $submissionBox->getOpenDate()->getUnixTimeStamp();
+        $closeStamp = $submissionBox->getDueDate()->getUnixTimeStamp();
         $now        = time();
 
         // if the box hasn't even opened yet, we don't want to know about it at all
@@ -680,8 +680,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         // discard all update notifications if the submissionbox isn't open (EXCEPT work returns opening up)
-        $openStamp  = $submissionBox->getOpenDate()->getUnixTimestamp();
-        $closeStamp = $submissionBox->getDueDate()->getUnixTimestamp();
+        $openStamp  = $submissionBox->getOpenDate()->getUnixTimeStamp();
+        $closeStamp = $submissionBox->getDueDate()->getUnixTimeStamp();
         $now        = time();
 
         // if the box hasn't even opened yet, we don't want to know about it at all
@@ -792,7 +792,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         $submissionBox = $this->mapper->findById($boxId);
 
         // don't raise notifications if this box doesn't accept online submissions
-        if (!$submissionBox->getAcceptOnline() || $submissionBox->getDueDate()->getUnixTimestamp() > time()) {
+        if (!$submissionBox->getAcceptOnline() || $submissionBox->getDueDate()->getUnixTimeStamp() > time()) {
             return $envelope;
         }
 
@@ -834,7 +834,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         // if the late date has passed, ignore this message
-        if ($submissionBox->getLateDate()->getUnixTimestamp() > time()) {
+        if ($submissionBox->getLateDate()->getUnixTimeStamp() > time()) {
             return $envelope;
         }
 
@@ -905,6 +905,7 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         }
 
         return $this->notifyOverdue($submissionBox, $envelope, $bob, function ($student) use (&$envelope, &$bob) {
+            /** @var User $student */
             $bob->setParam('child', new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'));
             $envelope->targetToParent($student->getId(), $bob->build());
         });
