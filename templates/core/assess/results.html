@@ -123,9 +123,9 @@
                 <thead>
                     <tr>
                         <th>Student</th>
+                        <th class="text-right show-for-xlarge-up">Grade</th>
                         <th>Status</th>
                         <th>Date Submitted</th>
-                        <th class="show-for-xlarge">Grade</th>
                         <th class="text-right no-pad" data-orderable="false">
                             <!-- BEGIN checkbox -->
                             <div>
@@ -162,6 +162,11 @@
                                 </div>
                             </div>
                         </td>
+                        <td class="text-right show-for-xlarge-up" data-order="{ATTEMPT_PERCENTAGE}">
+                            <div class="avatar card small-12">
+                                <h2><b><span class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</span></b></h2>
+                            </div>
+                        </td>
                         <td>
                             <!-- BEGIN submitted -->
                             <div class="gradient-10">Quiz Completed</div>
@@ -185,11 +190,6 @@
                             <div class="avatar card">
                                 <div>{ATTEMPT_FINISH}</div>
                                 <div>{ATTEMPT_TIME_TAKEN}</div>
-                            </div>
-                        </td>
-                        <td class="text-right show-for-xlarge-up" data-order="{ATTEMPT_PERCENTAGE}">
-                            <div class="avatar card small-12">
-                                <h2><b><span class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</span></b></h2>
                             </div>
                         </td>
                         <td class="actions-xlarge-4 actions-small-1">
