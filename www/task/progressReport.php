@@ -372,8 +372,8 @@ foreach ($student_list as $student) {
                 $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_MARK', $attempt['return']['mark']);
                 // Gradient: norm_mark/max_mark
                 $gradient = '';
-                if (isset($attempt['mark']['norm_mark'])) {
-                    $gradient = (int)($attempt['mark']['norm_mark'] / 10);
+                if (isset($attempt['return']['norm_mark'])) {
+                    $gradient = (int)($attempt['return']['norm_mark'] / 10);
                 }
                 $this->setVar('STUDENT_UNIT_TASK_SUBMISSION_GRADIENT', $gradient);
                 $this->parse('student_unit_task_submission_box_mark_block', 'student_unit_task_submission_box_mark');

@@ -123,9 +123,9 @@
                 <thead>
                     <tr>
                         <th>Student</th>
+                        <th class="text-right show-for-xlarge-up">Grade</th>
                         <th>Status</th>
                         <th>Date Submitted</th>
-                        <th class="show-for-xlarge">Grade</th>
                         <th class="text-right no-pad" data-orderable="false">
                             <!-- BEGIN checkbox -->
                             <div>
@@ -150,8 +150,8 @@
                                     <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile">
                                     <b>{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}</b>
                                 </a>
-                                <div class="show-for-large-down"><b class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</b></div>
-                                <div class="show-for-xlarge-only">
+                                <div class="show-for-large-down"><span class="gradient-{ATTEMPT_GRADIENT}"><b>{ATTEMPT_PERCENTAGE}</b></span></div>
+                                <div class="show-for-xlarge-up">
                                     <!-- BEGIN has_marks -->
                                     <!-- BEGIN attempted -->
                                                 <span class="gradient-{ATTEMPT_GRADIENT}">
@@ -160,6 +160,11 @@
                                     <!-- END attempted -->
                                     <!-- END has_marks -->
                                 </div>
+                            </div>
+                        </td>
+                        <td class="text-right show-for-xlarge-up" data-order="{ATTEMPT_PERCENTAGE}">
+                            <div class="avatar card small-12">
+                                <h2><b><span class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</span></b></h2>
                             </div>
                         </td>
                         <td>
@@ -185,11 +190,6 @@
                             <div class="avatar card">
                                 <div>{ATTEMPT_FINISH}</div>
                                 <div>{ATTEMPT_TIME_TAKEN}</div>
-                            </div>
-                        </td>
-                        <td class="text-right show-for-xlarge" data-order="{ATTEMPT_PERCENTAGE}">
-                            <div>
-                                <h2 class="show-for-xlarge"><b><span class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</span></b></h2>
                             </div>
                         </td>
                         <td class="actions-xlarge-4 actions-small-1">
