@@ -196,16 +196,28 @@ class RubricMapper
         $in = implode(', :', $in);
 
         $criteriaStatement = $this->database->query("
-            SELECT COUNT(box_id) usages, COALESCE(selected, 0) selected, crit_id, `grouping`, `name`
+            SELECT
+                COUNT(box_id) usages,
+                COALESCE(selected, 0)
+                selected,
+                crit_id,
+                `grouping`,
+                `name`
             FROM (
-              SELECT b.id box_id, submission_box_id = :boxId selected, c.id crit_id, `sequence`, `grouping`, `name`
-              FROM rubric_usage u
-              RIGHT JOIN rubric_criterion c ON u.criterion_id = c.id
-              LEFT JOIN submission_box b ON u.submission_box_id = b.id AND b.deleted IS NOT TRUE
-              WHERE parent_type = 'category'
-              AND parent_id IN (:$in)
-              AND deleted_at IS NULL
-              ORDER BY selected DESC
+                SELECT
+                    b.id box_id,
+                    b.id = :boxId selected,
+                    c.id crit_id,
+                    u.`sequence`,
+                    c.`grouping`,
+                    c.`name`
+                FROM rubric_usage u
+                RIGHT JOIN rubric_criterion c ON u.criterion_id = c.id
+                LEFT JOIN submission_box b ON u.submission_box_id = b.id AND b.deleted IS NOT TRUE
+                WHERE parent_type = 'category'
+                AND parent_id IN (:$in)
+                AND deleted_at IS NULL
+                ORDER BY selected DESC
             ) t
             GROUP BY crit_id
             ORDER BY selected DESC, `sequence` ASC, `grouping` ASC, `name` ASC;
