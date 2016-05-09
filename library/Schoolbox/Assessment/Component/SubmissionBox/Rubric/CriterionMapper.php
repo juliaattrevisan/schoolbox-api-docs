@@ -140,4 +140,26 @@ class CriterionMapper extends Schoolbox\Mapper {
         }
         return true;
     }
+
+    /**
+     * Retrieves the number of submission boxes in which this criterion is used.
+     *
+     * This count does not include deleted submission boxes.
+     *
+     * @param  int $criterionId
+     * @return int
+     */
+    public function countUsage($criterionId)
+    {
+        $query = "
+            SELECT COUNT(DISTINCT sb.id)
+            FROM {$this->getTable()} rc
+            INNER JOIN rubric_usage ru ON rc.id = ru.criterion_id
+            INNER JOIN submission_box sb ON ru.submission_box_id = sb.id AND sb.deleted IS NOT TRUE
+            WHERE rc.id = ?
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([$criterionId]);
+        return intval($statement->fetchColumn());
+    }
 }
