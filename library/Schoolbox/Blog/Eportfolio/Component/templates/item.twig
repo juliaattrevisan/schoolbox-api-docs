@@ -35,7 +35,7 @@
             <h1>{{ record.getHeading }}</h1>
         </div>
     </div>
-    {% if session.user.getId == comment.getOwner.getId or session.user.isSuperuser %}
+    {% if isRouteAuthorized('eportfolioBlog.getModify', {page: page, blog: record }) %}
         <nav>
             <a class="icon-modify" href="{{ routeLookup('eportfolioBlog.getModify', {ownerId: page.getUid, pageId: page.getPageId, id: record.getId}) }}" title="Modify Blog post"></a>
         </nav>
@@ -45,25 +45,17 @@
 <div class="row">
     <div class="small-12 island">
         <section>
-            <ul class="information-list">
-                <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="avatar card small-12">
-                            <a href="/search/user/{{ record.getOwner.getId }}">
-                                <img src="/portrait.php?userId={{ record.getOwner.getExternalId }}&size=square64" />
-                                <p>{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</p>
-                            </a>
-                            <p class="meta">Posted by <a href="/search/user/{{ record.getOwner.getId }}">{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</a> {{ record.getCreatedAt.getRelativeTime }}</p>
-                        </div>
+            <div class="row">
+                <div class="small-12 column">
+                    <div class="avatar card small-12">
+                        <a href="/search/user/{{ record.getOwner.getId }}">
+                            <img src="/portrait.php?userId={{ record.getOwner.getExternalId }}&size=square64" />
+                            <p>{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</p>
+                        </a>
+                        <p class="meta">Posted by <a href="/search/user/{{ record.getOwner.getId }}">{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</a> {{ record.getCreatedAt.getRelativeTime }}</p>
                     </div>
-                    {% if session.user.getId == record.getOwner.getId or session.user.isSuperuser %}
-                        <nav>
-                            <a class="icon-modify" href="{{ routeLookup('eportfolioBlog.getModify', {ownerId: page.getUid, pageId: page.getPageId, id: record.getId}) }}" title="Modify Blog post"></a>
-                        </nav>
-                    {% endif %}
-                </li>
-            </ul>
-
+                </div>
+            </div>
         </section>
 
         <section class="content">
@@ -97,7 +89,7 @@
 
                             {# Only the owner of a comment can delete it #}
 
-                            {% if session.user.getId == comment.getOwner.getId or session.user.isSuperuser %}
+                            {% if isRouteAuthorized('eportfolioBlog.postCommentDelete', {comment: comment, page: page }) %}
                                 <nav>
                                     <a class="icon icon-delete" data-interaction="delete" data-comment-id="{{ comment.getId }}"></a>
                                 </nav>

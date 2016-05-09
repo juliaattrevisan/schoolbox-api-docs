@@ -66,9 +66,11 @@
                                     <h2>{{ blog.getHeading }}</h2>
                                 </div>
                             </div>
+                            {% if isRouteAuthorized('eportfolioBlog.getModify', {page: page, blog: blog }) %}
                             <nav>
                                 <a class="icon-modify" title="Modify" href="{{ routeLookup('eportfolioBlog.getModify', {ownerId: page.getUid, pageId: page.getPageId, id: blog.getId }) }}"></a>
                             </nav>
+                            {% endif %}
                         </div>
 
                         <div class="avatar card small-12">

@@ -63,12 +63,14 @@
                         <div class="actions-small-1 row">
                             <div class="list-item">
                                 <div class="small-12 column">
-                                    <h2>{{ blog.getHeading }}</h2>
+                                    <h2><a href="/blog/{{ blog.id }}">{{ blog.getHeading }}</a></h2>
                                 </div>
                             </div>
+                            {% if isRouteAuthorized('blog.getModify', { folder: folder }) %}
                             <nav>
                                 <a class="icon-modify" title="Modify" href="{{ routeLookup('blog.getModify', { id: blog.getId }) }}"></a>
                             </nav>
+                            {%  endif %}
                         </div>
 
                         <div class="avatar card small-12">

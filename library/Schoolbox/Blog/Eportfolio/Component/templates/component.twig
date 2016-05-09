@@ -61,7 +61,7 @@
                                 </div>
                             </div>
 
-                            {% if session.user.getId == blog.getOwner.getId or session.user.isSuperuser %}
+                            {% if isRouteAuthorized('eportfolioBlog.getModify', {page: page, blog: blog }) %}
                                 <nav>
                                     <a class="icon-modify" href="{{ routeLookup('eportfolioBlog.getModify', {ownerId: page.getUid, pageId: page.getPageId, id: blog.getId}) }}" title="Modify Blog post"></a>
                                 </nav>
@@ -96,7 +96,7 @@
                                             </div>
                                         </div>
 
-                                        {% if session.user.getId == comment.getOwner.getId or session.user.isSuperuser %}
+                                        {% if isRouteAuthorized('eportfolioBlog.postCommentDelete', {comment: comment, page: page }) %}
                                             <nav>
                                                 <a data-interaction="deletecomment" class="icon-delete" data-blog-id="{{ blog.getId }}" data-comment-id="{{ comment.getId }}"></a>
                                             </nav>
