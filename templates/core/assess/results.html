@@ -144,7 +144,7 @@
                     <!-- BEGIN user_attempts -->
                     <!-- BEGIN attempt -->
                     <tr data-student="{ATTEMPT_ATTEMPT_ID}">
-                        <td class="no-pad">
+                        <td class="no-pad" data-order="{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}">
                             <div class="avatar card small-12">
                                 <a href="/search/user/{USER_ID}" title="View Profile">
                                     <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile">
@@ -187,7 +187,7 @@
                                 <div>{ATTEMPT_TIME_TAKEN}</div>
                             </div>
                         </td>
-                        <td class="text-right show-for-xlarge">
+                        <td class="text-right show-for-xlarge" data-order="{ATTEMPT_PERCENTAGE}">
                             <div>
                                 <h2 class="show-for-xlarge"><b><span class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</span></b></h2>
                             </div>
