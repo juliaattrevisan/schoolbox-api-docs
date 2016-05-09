@@ -22,6 +22,22 @@ use Schoolbox\User;
 class EventMapper extends Calendar\EventMapper {
 
 	/**
+	 * Only show events that are at most 6 months old
+	 */
+	const INTERVAL_MAX_6MONTH_OLD = 2;
+
+	/**
+	 * Only show events that are at most 1 month old
+	 * and also show all future events
+	 */
+	const INTERVAL_MAX_1MONTH_OLD_AND_FUTURE = 1;
+
+	/**
+	 * Show all events (very heavy)
+	 */
+	const INTERVAL_ALL = 0;
+
+	/**
 	 * Calls for the core mapping of events, then extends it
 	 */
 	protected function mapping() {
@@ -149,12 +165,35 @@ class EventMapper extends Calendar\EventMapper {
 	/**
 	 * Custom findAllByListGroups
 	 *
+	 * Use $allowedStatus to only show events matching a particular
+	 * set of of EOTC\EventStatus ids. Leaving $allowedStatus empty
+	 * will spawn all events regardless of status (it will not skip
+	 * over any events)
+	 *
+	 * @param array $allowedStatus an array of EOTC\EventStatus ids
+	 * @param int $interval a const which determines filtering
 	 * @return ListGroup\Collection
 	 */
-	public function findAllByListGroups() {
+	public function findAllByListGroups($allowedStatus = [], $interval) {
 		$authorMapper = $this->getJoinMapper('author');
 		$eventTypeMapper = $this->getJoinMapper('eventType');
 		$teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
+
+		/* Choose which hardcoded fragment to use
+		 */
+		switch ($interval) {
+			case self::INTERVAL_MAX_1MONTH_OLD_AND_FUTURE:
+				$sql = 'WHERE (e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 1 MONTH)) OR (e.start_datetime >= NOW())';
+				break;
+
+			case self::INTERVAL_MAX_6MONTH_OLD:
+				$sql = 'WHERE e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 6 MONTH)';
+				break;
+
+			default:
+				$sql = '';
+				break;
+		}
 
 		/* Looked for a way to convince GROUP BY to group records with
 		 * integer series_id's, but leave NULL ones individual
@@ -174,7 +213,7 @@ class EventMapper extends Calendar\EventMapper {
 			LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
 			LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
 			LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-			WHERE e.start_datetime >= DATE_SUB(CURDATE(),INTERVAL 6 MONTH)
+			{$sql}
 			ORDER BY e.start_datetime
 		";
 
@@ -193,18 +232,6 @@ class EventMapper extends Calendar\EventMapper {
 			/** @var Event $eventItem */
 			$eventItem = $this->hydrate($row, 'e');
 
-			/** @var User $teacherInChargeItem */
-			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
-			$eventItem->setTeacherInCharge($teacherInChargeItem);
-
-			/** @var EventType $eventTypeItem */
-			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
-			$eventItem->setType($eventTypeItem);
-
-			/* Accumulate campuses for this event
-			 */
-			$eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
-
 			/* Accumulate the metadata for this event
 			 * Only use the first record
 			 */
@@ -216,11 +243,30 @@ class EventMapper extends Calendar\EventMapper {
 				$metadataMapper = new EventMetadataMapper();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
+				/* Ignore this event, because it's not one of the Status
+				 * we've chosen to include
+				 */
+				if (count($allowedStatus) && !in_array($eventItem->getMetadata()->getStatus()->getId(), $allowedStatus)) {
+					continue;
+				}
+
 				/* Accumulate student attendees for this event
 				 */
 				$allStudents = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
 				$eventItem->getMetadata()->setStudentAttendees($allStudents);
 			}
+
+			/** @var User $teacherInChargeItem */
+			$teacherInChargeItem = $teacherInChargeMapper->hydrate($row, 'c');
+			$eventItem->setTeacherInCharge($teacherInChargeItem);
+
+			/** @var EventType $eventTypeItem */
+			$eventTypeItem = $eventTypeMapper->hydrate($row, 't');
+			$eventItem->setType($eventTypeItem);
+
+			/* Accumulate campuses for this event
+			 */
+			$eventItem->setCampusCollection($this->findCampuses($eventItem->getId()));
 
 			/* Assign it to an Event List Group
 			 */

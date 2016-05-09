@@ -16,8 +16,8 @@ $event = false;
 /* Spawn an existing event if id provided
  */
 try {
-	$mapper = new \EOTC\EventMapper();
-	$event = $mapper->findById($_POST['eventId']);
+	$eventMapper = \EOTC\EventMapper::getInstance();
+	$event = $eventMapper->findById($_POST['eventId']);
 }
 catch (\Schoolbox\Mapper\Exception $e) {
 	error(160);
@@ -46,8 +46,9 @@ if ($isEOTCAdministrator || $isCanPromote) {
 
 	/* Update with values
 	 */
+	$statusMapper = \EOTC\EventStatusMapper::getInstance();
+
 	/** @var \EOTC\EventStatus $status */
-	$statusMapper = new \EOTC\EventStatusMapper();
 	$status = $statusMapper->findById($_POST['statusId']);
 
 	if (!$authenticator->isStatusChangeAllowed($event, $status))  {
@@ -57,7 +58,7 @@ if ($isEOTCAdministrator || $isCanPromote) {
 	$event->getMetadata()->setStatus($status);
 	$event->getMetadata()->setComment($_POST['comment']);
 
-	$metadataMapper = new \EOTC\EventMetadataMapper();
+	$metadataMapper = \EOTC\EventMetadataMapper::getInstance();
 	$metadataMapper->save($event->getMetadata());
 
 	/* Activity Log

@@ -17,18 +17,25 @@ use \EOTC\ListGroup\Mapping;
 abstract class Base {
 
 	/**
+	 * A chain node
+	 *
+	 * @var Base
+	 */
+	protected $next;
+
+	/**
 	 * An instance of \EOTC\Event
 	 *
-	 * @var null
+	 * @var \EOTC\Event
 	 */
-	protected $event = null;
+	protected $event;
 
 	/**
 	 * An instance of \EOTC\ListGroup\Mapping
 	 *
-	 * @var null
+	 * @var \EOTC\ListGroup\Mapping
 	 */
-	protected $mapping = null;
+	protected $mapping;
 
 	/**
 	 * eotc_status primary key
@@ -53,7 +60,7 @@ abstract class Base {
 	 * Determine what the next status is, and where the
 	 * event should currently be grouped
 	 *
-	 * @return mixed
+	 * @return Base
 	 */
 	abstract public function determine();
 
@@ -69,7 +76,7 @@ abstract class Base {
 	/**
 	 * Set event
 	 *
-	 * @param null $event
+	 * @param \EOTC\Event $event
 	 */
 	protected function setEvent($event) {
 		$this->event = $event;
@@ -78,7 +85,7 @@ abstract class Base {
 	/**
 	 * Get event
 	 *
-	 * @return null
+	 * @return \EOTC\Event
 	 */
 	protected function getEvent() {
 		return $this->event;
@@ -87,7 +94,7 @@ abstract class Base {
 	/**
 	 * Set next
 	 *
-	 * @param  $next
+	 * @param Base|None $next
 	 */
 	public function setNext($next) {
 		$this->next = $next;
@@ -96,7 +103,7 @@ abstract class Base {
 	/**
 	 * Get next
 	 *
-	 * @return bool
+	 * @return Base|None
 	 */
 	public function getNext() {
 		return $this->next;
@@ -105,7 +112,7 @@ abstract class Base {
 	/**
 	 * Set mapping
 	 *
-	 * @param null $mapping
+	 * @param \EOTC\ListGroup\Mapping $mapping
 	 */
 	protected function setMapping($mapping) {
 		$this->mapping = $mapping;
@@ -114,7 +121,7 @@ abstract class Base {
 	/**
 	 * Get mapping
 	 *
-	 * @return null
+	 * @return \EOTC\ListGroup\Mapping
 	 */
 	protected function getMapping() {
 		return $this->mapping;

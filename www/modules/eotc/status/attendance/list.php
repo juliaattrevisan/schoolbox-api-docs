@@ -12,8 +12,8 @@
 $event = false;
 
 try {
-	$mapper = new \EOTC\EventMapper();
-	$event = $mapper->findById($this->arg[0]);
+	$eventMapper = \EOTC\EventMapper::getInstance();
+	$event = $eventMapper->findById($this->arg[0]);
 }
 catch (\Schoolbox\Mapper\Exception $e) {
 	error(160);
@@ -39,7 +39,7 @@ if ($isEOTCAdministrator || $isSubscribedUser) {
 	));
 
 	if ($event->getMetadata()->getStudentAttendees()->count()) {
-		$roleMapper = new \Schoolbox\RoleMapper();
+		$roleMapper = \Schoolbox\RoleMapper::getInstance();
 
 		foreach ($event->getMetadata()->getStudentAttendees() as $currentStudent) {
 			$role = $roleMapper->findById($currentStudent->getRole()->getId());

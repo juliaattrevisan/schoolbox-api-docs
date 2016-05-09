@@ -12,21 +12,25 @@ require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
 
 $page = new SitePage();
 
-if (!$_SESSION['user']->isSuperuser()) {
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+if (!$sessionUser->isSuperuser()) {
 	error(19);
 }
 
 try {
-	$userMapper = new \Schoolbox\UserMapper();
+	/** @var \Schoolbox\User $user */
+	$userMapper = \Schoolbox\UserMapper::getInstance();
 	$user = $userMapper->findById($this->arg[0]);
 }
-catch (\Exception $e) {
+catch (\Schoolbox\Mapper\Exception $e) {
 	error(31);
 }
 
 /* Delete all perms for this user, and re-add new ones
  */
-$permissionMapper = new \EOTC\EventPermissionMapper();
+$permissionMapper = \EOTC\EventPermissionMapper::getInstance();
 $permissionMapper->deleteForUser($user);
 
 $page->localRedir('/modules/eotc/permission/modify/' . $user->getId());

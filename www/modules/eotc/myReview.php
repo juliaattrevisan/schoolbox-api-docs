@@ -1,13 +1,19 @@
 <?php
 /**
- * ${NAME}
+ * My Review
+ *
+ * A list of all EOTC events that $sessionUser created
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser()) {
+
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+if ($sessionUser->getRole()->isStaff() || $sessionUser->isSuperuser()) {
 	$this->setFile(TEMPLATE_content, 'modules/eotc/myReview.html');
 	$this->setBlock(TEMPLATE_content, 'event', 'event_block');
 
@@ -15,8 +21,8 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
 		'event_block' => ''
 	));
 
-	$eventMapper = new \EOTC\EventMapper();
-	$allEvents = $eventMapper->findAllByListGroupsForUser($_SESSION['user']);
+	$eventMapper = \EOTC\EventMapper::getInstance();
+	$allEvents = $eventMapper->findAllByListGroupsForUser($sessionUser);
 
 	/* using foreach() won't increment the $position, which I use to get the name
 	 * of the collection currently being iterated

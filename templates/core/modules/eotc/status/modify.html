@@ -41,25 +41,25 @@
                 </li>
                 <!-- END recurring_reminder -->
 
-                <li>
+                <li class="icon-home">
                     <strong>Related Campuses:</strong>
                     <!-- BEGIN event_campus -->
                     {EVENT_CAMPUS_NAME}
                     <!-- END event_campus -->
                 </li>
 
-                <li>
+                <li class="icon-teacher">
                     <strong>Teacher in Charge:</strong>
                     <a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
                         {EVENT_TEACHER_IN_CHARGE_NAME}
                     </a>
                 </li>
 
-                <li>
+                <li class="icon-location">
                     <strong>Location:</strong> {EVENT_LOCATION}
                 </li>
 
-                <li>
+                <li class="icon-staff-students">
                     <strong>Created by:</strong>
                     <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
                     on {EVENT_CREATED_AT}
@@ -108,16 +108,15 @@
             </nav>
         </div>
 
-
-        <section class="content">
+        <section class="">
             <ul class="information-list">
-                <li>
+                <li class="content">
                     Staff:
                     <!-- BEGIN event_staff -->
                     <a href="/search/user/{EVENT_STAFF_ID}">{EVENT_STAFF_NAME}</a>
                     <!-- END event_staff -->
                 </li>
-                <li>
+                <li class="content">
                     Students: {EVENT_STUDENT_COUNT}
                     <!-- BEGIN event_student -->
                     <!-- END event_student -->

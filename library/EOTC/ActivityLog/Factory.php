@@ -10,27 +10,32 @@
 
 namespace EOTC\ActivityLog;
 
+use \EOTC\Event;
+use \Schoolbox\User;
 
 class Factory {
 
 	/**
 	 * An instance of \EOTC\Event
 	 *
- 	 * @var null
+ 	 * @var Event
 	 */
-	private $event = null;
+	private $event;
 
 	/**
 	 * An instance of \Schoolbox\User
 	 *
-	 * @var null
+	 * @var User
 	 */
-	private $actioner = null;
+	private $actioner;
 
 	/**
-	 * Constructor
+	 * Factory constructor.
+	 *
+	 * @param Event $event
+	 * @param User $actioner
 	 */
-	public function __construct($event, $actioner) {
+	public function __construct(Event $event, User $actioner) {
 		$this->setEvent($event);
 		$this->setActioner($actioner);
 	}
@@ -38,8 +43,8 @@ class Factory {
 	/**
 	 * Spawn a log
 	 *
-	 * @param $type
-	 * @return Base
+	 * @param string $type
+	 * @return Log
 	 */
 	public function produce($type) {
 		switch($type) {
@@ -72,7 +77,7 @@ class Factory {
 	/**
 	 * Set actioner
 	 *
-	 * @param null $actioner
+	 * @param User $actioner
 	 */
 	public function setActioner($actioner) {
 		$this->actioner = $actioner;
@@ -81,7 +86,7 @@ class Factory {
 	/**
 	 * Get actioner
 	 *
-	 * @return null
+	 * @return User
 	 */
 	public function getActioner() {
 		return $this->actioner;
@@ -90,7 +95,7 @@ class Factory {
 	/**
 	 * Set event
 	 *
-	 * @param null $event
+	 * @param Event $event
 	 */
 	public function setEvent($event) {
 		$this->event = $event;
@@ -99,7 +104,7 @@ class Factory {
 	/**
 	 * Get event
 	 *
-	 * @return null
+	 * @return Event
 	 */
 	public function getEvent() {
 		return $this->event;

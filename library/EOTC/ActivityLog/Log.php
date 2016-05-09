@@ -10,27 +10,28 @@
 
 namespace EOTC\ActivityLog;
 
+use \Schoolbox\User;
 
 class Log {
 
 	/**
 	 * Log id
 	 *
-	 * @var string
+	 * @var int
 	 */
 	protected $id = '';
 
 	/**
 	 * An instance of \Schoolbox\User
 	 *
-	 * @var null
+	 * @var User
 	 */
-	protected $actioner = null;
+	protected $actioner;
 
 	/**
 	 * Metadata record
 	 *
-	 * @var null
+	 * @var int
 	 */
 	protected $metadataId = -1;
 
@@ -51,23 +52,23 @@ class Log {
 	/**
 	 * An instance of Alaress_Date_Format
 	 *
-	 * @var null
+	 * @var \Alaress_Date_Format
 	 */
-	protected $createdAt = null;
+	protected $createdAt;
 
 	/**
 	 * An instance of Alaress_Date_Format
 	 *
-	 * @var null
+	 * @var \Alaress_Date_Format
 	 */
-	protected $updatedAt = null;
+	protected $updatedAt;
 
 	/**
 	 * An instance of Alaress_Date_Format
 	 *
-	 * @var null
+	 * @var \Alaress_Date_Format
 	 */
-	protected $deletedAt = null;
+	protected $deletedAt;
 
 	/**
 	 * The final notification string
@@ -88,8 +89,7 @@ class Log {
 	 * @return mixed|void
 	 */
 	public function notify() {
-		$mapper = new Mapper();
-		$mapper->save($this);
+		Mapper::getInstance()->save($this);
 	}
 
 	/* Getters/Setters
@@ -224,7 +224,7 @@ class Log {
 	/**
 	 * Set metadata id
 	 *
-	 * @param null $metadataId
+	 * @param int $metadataId
 	 */
 	public function setMetadataId($metadataId) {
 		$this->metadataId = $metadataId;
@@ -233,7 +233,7 @@ class Log {
 	/**
 	 * Get metadata id
 	 *
-	 * @return null
+	 * @return int
 	 */
 	public function getMetadataId() {
 		return $this->metadataId;

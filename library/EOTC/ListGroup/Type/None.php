@@ -34,10 +34,9 @@ class None {
 	/**
 	 * Determine where to go next
 	 *
-	 * @throws \Exception
-	 * @return $this|mixed
+	 * @throws \RuntimeException
 	 */
 	public function determine() {
-		throw new \Exception('Cannot assign event to a list group.');
+		throw new \RuntimeException('Cannot assign event to a list group.');
 	}
 } 

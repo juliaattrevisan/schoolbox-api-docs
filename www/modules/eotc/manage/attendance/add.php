@@ -1,6 +1,8 @@
 <?php
 /**
- * ${NAME}
+ * Attendance Add
+ *
+ * Add a person to the event
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -11,17 +13,18 @@
 $authenticator = new \EOTC\Authenticator();
 
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
-	$eventMapper = new \EOTC\EventMapper();
+	$eventMapper = \EOTC\EventMapper::getInstance();
 
 	try {
+		/** @var \EOTC\Event $event */
 		$event = $eventMapper->findById($_POST['eventId']);
 	}
-	catch (\Exception $e) {
+	catch (\Schoolbox\Mapper\Exception $e) {
 		error(160);
 	}
 
 	if (is_array($_POST['selected']) && count($_POST['selected'])) {
-		$metadataMapper = new \EOTC\EventMetadataMapper();
+		$metadataMapper = \EOTC\EventMetadataMapper::getInstance();
 		$metadataMapper->addStudentAttendeesRelationsSpecific($event->getMetadata(), $_POST['selected']);
 	}
 

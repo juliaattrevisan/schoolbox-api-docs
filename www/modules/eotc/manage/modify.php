@@ -1,6 +1,8 @@
 <?php
 /**
- * ${NAME}
+ * Manage Modify
+ *
+ * Modify EOTC events
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -8,15 +10,11 @@
  * @version     SVN: $Id$
  */
 
-// scopecheck!
-use Schoolbox\File\MimetypeMapper;
-
 if (isset($this)) {
     $page = $this;
 } else {
     /* Direct access to modify.php -_-
      */
-
     /** @var Alaress\Application\Kernel $kernel */
     $kernel = require_once(__DIR__ . '/../../../../include/Bootstrap.php');
 
@@ -48,12 +46,12 @@ $page->setVar([
 /* Modify existing event
  */
 if (is_numeric($_GET['eventID'])) {
-    $mapper = new \EOTC\EventMapper();
+    $mapper = \EOTC\EventMapper::getInstance();
 
     try {
         /** @var EOTC\Event $event */
         $event = $mapper->findById($_GET['eventID']);
-    } catch (\Exception $e) {
+    } catch (\Schoolbox\Mapper\Exception $e) {
         error(160);
     }
 
@@ -69,7 +67,7 @@ if (is_numeric($_GET['eventID'])) {
         /* Do a check for missing metadata
 		 */
         if (!$event->getMetadata()) {
-            throw new \Exception('No metadata record found for this event.');
+            throw new \RuntimeException('No metadata record found for this event.');
         }
 
         /* Default values
@@ -202,12 +200,12 @@ if (is_numeric($_GET['eventID'])) {
         /* Resources
 		 */
         if ($event->getMetadata()->getResourceBookings()->count()) {
-            $resourceMapper = new \Schoolbox\ResourceBooking\Item\Mapper();
-            $resourceBookingMapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
+            $resourceMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
+            $resourceBookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
 
+            /* TODO: Optimise this!
+             */
             foreach ($event->getMetadata()->getResourceBookings() as $currentResourceBooking) {
-                /* TODO: Optimise this!
-				 */
                 $resource = $resourceMapper->findById($currentResourceBooking->getResource()->getId());
                 $resourceBooking = $resourceBookingMapper->findById($currentResourceBooking->getId());
 
@@ -317,8 +315,7 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
         'ADVANCED_CLOSE' => 'hidden',
     ));
 
-    $statusMapper = new \EOTC\EventStatusMapper();
-    $status = $statusMapper->findDefaultStatus();
+    $status = \EOTC\EventStatusMapper::getInstance()->findDefaultStatus();
 
     /* You are the default teacher in charge
 	 * Even if you're not a teacher
@@ -406,8 +403,7 @@ else {
 
 /* Event Types
  */
-$calendarEventTypeMapper = new \EOTC\EventTypeMapper();
-$allEventTypes = $calendarEventTypeMapper->findAll();
+$allEventTypes = \EOTC\EventTypeMapper::getInstance()->findAll();
 
 $page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, array(
     'id' => 'EVENT_EVENTTYPE_ID',
@@ -416,8 +412,7 @@ $page->dropDown('type_drop', $allEventTypes, $defaultTypeId, TEMPLATE_content, a
 
 /* Campus Checkbox Array when using Campus Event Level
  */
-$campusMapper = new \Schoolbox\CampusMapper();
-$campusList = $campusMapper->findAll();
+$campusList = \Schoolbox\CampusMapper::getInstance()->findAll();
 
 if ($campusList->count()) {
     $allCampuses = array();

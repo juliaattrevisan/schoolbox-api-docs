@@ -9,13 +9,15 @@
  */
 $authenticator = new \EOTC\Authenticator();
 
+$event = false;
+
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
-	$eventMapper = new \EOTC\EventMapper();
+	$eventMapper = \EOTC\EventMapper::getInstance();
 
 	try {
 		$event = $eventMapper->findById($_POST['eventId']);
 	}
-	catch (\Exception $e) {
+	catch (\Schoolbox\Mapper\Exception $e) {
 		error(160);
 	}
 
@@ -26,7 +28,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		$allStudents = $externalHandler->getStudents($_POST['courseCode']);
 
 		if (is_array($allStudents) && count($allStudents)) {
-			$userMapper = new \Schoolbox\UserMapper();
+			$userMapper = \Schoolbox\UserMapper::getInstance();
 			$ids = array();
 
 			foreach($allStudents as $currentStudent) {
@@ -34,12 +36,11 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 					$user = $userMapper->findByExternalId($currentStudent['synergy_id']);
 					$ids[] = $user->getId();
 				}
-				catch (\Exception $e) {
+				catch (\Schoolbox\Mapper\Exception $e) {
 				}
 			}
 
-			$metadataMapper = new \EOTC\EventMetadataMapper();
-			$metadataMapper->addStudentAttendeesRelationsSpecific($event->getMetadata(), $ids);
+			\EOTC\EventMetadataMapper::getInstance()->addStudentAttendeesRelationsSpecific($event->getMetadata(), $ids);
 		}
 	}
 

@@ -14,6 +14,15 @@
 
 $event = false;
 
+/* Only EOTC Administrators can view this page
+ */
+$authenticator = new \EOTC\Authenticator();
+
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+$mapper = \EOTC\EventMapper::getInstance();
+
 try {
     $mapper = new \EOTC\EventMapper();
     $event = $mapper->findById($this->arg[0]);
@@ -106,12 +115,13 @@ if ($isEOTCAdministrator || $isCanPromote || $isSubscribedUser) {
     );
 
     if ($event->getMetadata()->getRamsRequired()) {
+        $mimetypeMapper = \Schoolbox\File\MimetypeMapper::getInstance();
+
         /* Sometimes event/file relations get recorded with a storage_id of 0
          * so we need to check whether one actually legitimately saved properly
          */
         foreach ($event->getMetadata()->getRamsFiles() as $ramsFile) {
-            $mimetypeMapper = new \Schoolbox\File\MimetypeMapper();
-            $mimetype       = $mimetypeMapper->getByFilename($ramsFile->getBasename());
+            $mimetype = $mimetypeMapper->getByFilename($ramsFile->getBasename());
 
             $this->setVar(
                 array(
@@ -216,13 +226,13 @@ if ($isEOTCAdministrator || $isCanPromote || $isSubscribedUser) {
     );
 
     if ($event->getMetadata()->getResourceBookings()->count()) {
-        $resourceMapper        = new \Schoolbox\ResourceBooking\Item\Mapper();
-        $resourceBookingMapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
+        $resourceMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
+        $resourceBookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
 
+        /* TODO: Optimise this!
+         */
         foreach ($event->getMetadata()->getResourceBookings() as $currentResourceBooking) {
-            /* TODO: Optimise this!
-                     */
-            $resource        = $resourceMapper->findById($currentResourceBooking->getResource()->getId());
+            $resource = $resourceMapper->findById($currentResourceBooking->getResource()->getId());
             $resourceBooking = $resourceBookingMapper->findById($currentResourceBooking->getId());
 
             $this->setVar(
@@ -252,11 +262,12 @@ if ($isEOTCAdministrator || $isCanPromote || $isSubscribedUser) {
     $i = 0;
 
     foreach ($event->getMetadata()->getActivityLog() as $currentLog) {
+
         /* If there are no activityLog items, mappers will spawn a single
-             * object where every property is null
-             *
-             * TODO: Mappers probably shouldn't spawn you such objects
-             */
+         * object where every property is null
+         *
+         * TODO: Mappers probably shouldn't spawn you such objects
+         */
         if ($currentLog->getId()) {
             $this->setVar(
                 array(
@@ -294,7 +305,7 @@ if ($isEOTCAdministrator || $isCanPromote || $isSubscribedUser) {
     );
 
     if ($authenticator->canPromote($sessionUser, $event)) {
-        $eventStatusMapper = new \EOTC\EventStatusMapper();
+        $eventStatusMapper = \EOTC\EventStatusMapper::getInstance();
 
         /* Soops have access to all statuses
          */

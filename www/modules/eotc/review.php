@@ -1,6 +1,8 @@
 <?php
 /**
- * ${NAME}
+ * Review
+ *
+ * Show all the EOTC events to an EOTC Administrator
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -8,11 +10,17 @@
  * @version     SVN: $Id$
  */
 
+use \EOTC\EventStatusMapper;
+use \EOTC\EventMapper;
+
 /* Only EOTC Administrators can view this page
  */
 $authenticator = new \EOTC\Authenticator();
 
-if (!$authenticator->isEOTCAdministrator($_SESSION['user'])) {
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+if (!$authenticator->isEOTCAdministrator($sessionUser)) {
 	error(19);
 }
 
@@ -24,18 +32,19 @@ $this->setVar(array(
 	'event_list_group_block' => ''
 ));
 
-$eventMapper = new \EOTC\EventMapper();
-$allListGroups = $eventMapper->findAllByListGroups();
+/** @var \EOTC\ListGroup\Collection $allListGroups */
+$allListGroups = EventMapper::getInstance()->findAllByListGroups([
+	EventStatusMapper::STATUS_DRAFT,
+	EventStatusMapper::STATUS_INPRINCIPLE,
+	EventStatusMapper::STATUS_DETAILSCOMPLETED,
+	EventStatusMapper::STATUS_READYFORFINALAPPROVAL,
+	EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL,
+], EventMapper::INTERVAL_MAX_6MONTH_OLD);
 
-/* Using foreach() won't increment the $position, which I use to get the name
- * of the collection currently being iterated
- */
-for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) {
-	$currentListGroup = $allListGroups->current();
-
+foreach ($allListGroups as $key => $currentListGroup) {
 	if ($currentListGroup->count()) {
 		$this->setVar(array(
-			'EVENT_LIST_GROUP_NAME' => $allListGroups->getCurrentName()
+			'EVENT_LIST_GROUP_NAME' => $allListGroups->getCurrentName($key)
 		));
 
 		$i = 0;
@@ -45,7 +54,7 @@ for ($allListGroups->rewind(); $allListGroups->valid(); $allListGroups->next()) 
 
 			/* Only list events you can manipulate
 			 */
-			if ($authenticator->canPromote($_SESSION['user'], $currentEvent)) {
+			if ($authenticator->canPromote($sessionUser, $currentEvent)) {
 				$this->setVar(array(
 					'EVENT_ID' => $currentEvent->getId(),
 					'EVENT_STATUS_NAME' => $currentEvent->getMetadata()->getStatus()->getName(),

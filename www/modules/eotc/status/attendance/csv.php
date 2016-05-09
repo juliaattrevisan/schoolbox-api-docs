@@ -13,8 +13,8 @@
 $event = false;
 
 try {
-	$mapper = new \EOTC\EventMapper();
-	$event = $mapper->findById($this->arg[0]);
+	$eventMapper = \EOTC\EventMapper::getInstance();
+	$event = $eventMapper->findById($this->arg[0]);
 }
 catch (\Schoolbox\Mapper\Exception $e) {
 	error(160);
@@ -41,7 +41,7 @@ if ($isEOTCAdministrator || $isSubscribedUser) {
 	/* If there are attendees, pop it out
      */
 	if ($event->getMetadata()->getStudentAttendees()->count()) {
-		$roleMapper = new \Schoolbox\RoleMapper();
+		$roleMapper = \Schoolbox\RoleMapper::getInstance();
 
 		$row = array(
 			'Synergy ID',

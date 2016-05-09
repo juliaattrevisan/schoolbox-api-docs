@@ -10,13 +10,15 @@
 
 $authenticator = new \EOTC\Authenticator();
 
+$event = false;
+
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
-	$eventMapper = new \EOTC\EventMapper();
+	$eventMapper = \EOTC\EventMapper::getInstance();
 
 	try {
 		$event = $eventMapper->findById($this->arg[0]);
 	}
-	catch (\Exception $e) {
+	catch (\Schoolbox\Mapper\Exception $e) {
 		error(160);
 	}
 
@@ -37,8 +39,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 	/* Render a list of existing bookings for this EOTC Event
 	 */
-	$resourceMapper = new \Schoolbox\ResourceBooking\Item\Mapper();
-	$resourceBookingMapper = new \Schoolbox\ResourceBooking\Booking\Mapper();
+	$resourceMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
+	$resourceBookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
 
 	if ($event->getMetadata()->getResourceBookings()->count()) {
 		foreach ($event->getMetadata()->getResourceBookings() as $currentResourceBooking) {

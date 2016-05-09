@@ -1,6 +1,8 @@
 <?php
 /**
- * ${NAME}
+ * Config Modify
+ *
+ * Modify EOTC Configuration settings
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -8,7 +10,10 @@
  * @version     SVN: $Id$
  */
 
-if ($_SESSION['user']->isSuperuser()) {
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+if ($sessionUser->isSuperuser()) {
 	$configMapper = new \EOTC\ConfigMapper();
 
 	$firstReminder = $configMapper->findByColumn('name', 'first_reminder')->first();

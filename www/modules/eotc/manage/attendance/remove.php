@@ -10,19 +10,20 @@
 
 $authenticator = new \EOTC\Authenticator();
 
+$event = false;
+
 if ($authenticator->isEOTCCreator($_SESSION['user'])) {
-	$eventMapper = new \EOTC\EventMapper();
+	$eventMapper = \EOTC\EventMapper::getInstance();
 
 	try {
 		$event = $eventMapper->findById($_POST['eventId']);
 	}
-	catch (\Exception $e) {
+	catch (\Schoolbox\Mapper\Exception $e) {
 		error(160);
 	}
 
 	if (is_array($_POST['selected']) && count($_POST['selected'])) {
-		$metadataMapper = new \EOTC\EventMetadataMapper();
-		$metadataMapper->deleteStudentAttendeesRelationsSpecific($event->getMetadata(), $_POST['selected']);
+		\EOTC\EventMetadataMapper::getInstance()->deleteStudentAttendeesRelationsSpecific($event->getMetadata(), $_POST['selected']);
 	}
 
 	$this->localRedir('/modules/eotc/manage/attendance/list/' . $event->getId());
