@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\Photos;
 
 use Alaress\Web\Controller\Base;
 use Guzzle\Common\Collection;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage;
@@ -82,7 +83,7 @@ class Controller extends Base
             ->setModalTitle('Select Image')
             ->setAttachmentsLabel('')
             ->setAttachPrompt('Upload Image')
-            ->setMimeFilter('image/jpeg')
+            ->setMimeFilter('image/*')
             ->setReadOnly(false)
             ->setMulti(true);
 
@@ -110,22 +111,34 @@ class Controller extends Base
      */
     public function postUpload()
     {
+        $post = $this->getRequest()->post;
+        
         /** @var \Schoolbox\Config\Loader $config */
         $config = $this->getDi()->get("config");
 
-        if (is_array($this->getRequest()->post["attachment"])) {
-            foreach ($this->getRequest()->post["attachment"] as $hash) {
-                $hash_array = explode(":", $hash);
-                $storageObject = $this->getStorageMapper()->findByHash($hash_array[1]);
+        if (is_array($post['attachment'])) {
+            $portraits = (new CollectorFactory())->build($post['attachment'])->getAll();
+
+            /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+            foreach ($portraits as $storageObject) {
                 if ($storageObject->getMimetype()->isImage()) {
-                    if (strtolower($storageObject->getExtension()) == "jpg") {
-                        $destination = realpath($config->get("portrait_dir")) . "/" . $storageObject->getFilename() . ".jpg";
 
-                        if (file_exists($destination))
-                            unlink($destination);
+                    // Has to have a JPG extension for it to be found by external class, however image format is
+                    // completely irrelevant
 
-                        file_put_contents($destination, $storageObject->read());
+                    $destination = realpath($config->get("portrait_dir")) . "/" . $storageObject->getFilename() . ".jpg";
+
+                    // Remove any existing image
+
+                    if (file_exists($destination)) {
+                        unlink($destination);
                     }
+
+                    // And save the image into the portrait folder
+
+                    $fp = fopen($destination, 'wb');
+                    stream_copy_to_stream($storageObject->readStream(), $fp);
+                    fclose($fp);
                 }
             }
         }
