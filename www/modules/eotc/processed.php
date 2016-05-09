@@ -51,26 +51,21 @@ foreach ($allListGroups as $key => $currentListGroup) {
 
 		/** @var \EOTC\Event $currentEvent */
 		foreach ($currentListGroup as $currentEvent) {
+			$this->setVar(array(
+				'EVENT_ID' => $currentEvent->getId(),
+				'EVENT_STATUS_NAME' => $currentEvent->getMetadata()->getStatus()->getName(),
+				'EVENT_TITLE' => $currentEvent->getTitle(),
+				'EVENT_START_DATETIME' => $currentEvent->getStartDatetime()->getShort(),
+				'EVENT_TEACHER_IN_CHARGE_ID' => $currentEvent->getTeacherInCharge()->getId(),
+				'EVENT_TEACHER_IN_CHARGE_FULLNAME' => $currentEvent->getTeacherInCharge()->getFullname(),
+				'EVENT_CREATED_AT' => $currentEvent->getMetadata()->getCreatedAt()->getShort(),
+				'EVENT_STUDENTS' => $currentEvent->getMetadata()->getStudentAttendees()->count(),
+				'EVENT_RAMS_REQUIRED' => $currentEvent->getMetadata()->getRamsRequired() ? 'Y' : 'N',
+			));
 
-			/* Only list events you can manipulate
-			 */
-			if ($authenticator->canPromote($sessionUser, $currentEvent)) {
-				$this->setVar(array(
-					'EVENT_ID' => $currentEvent->getId(),
-					'EVENT_STATUS_NAME' => $currentEvent->getMetadata()->getStatus()->getName(),
-					'EVENT_TITLE' => $currentEvent->getTitle(),
-					'EVENT_START_DATETIME' => $currentEvent->getStartDatetime()->getShort(),
-					'EVENT_TEACHER_IN_CHARGE_ID' => $currentEvent->getTeacherInCharge()->getId(),
-					'EVENT_TEACHER_IN_CHARGE_FULLNAME' => $currentEvent->getTeacherInCharge()->getFullname(),
-					'EVENT_CREATED_AT' => $currentEvent->getMetadata()->getCreatedAt()->getShort(),
-					'EVENT_STUDENTS' => $currentEvent->getMetadata()->getStudentAttendees()->count(),
-					'EVENT_RAMS_REQUIRED' => $currentEvent->getMetadata()->getRamsRequired() ? 'Y' : 'N',
-				));
+			$this->parse('event_block', 'event', true);
 
-				$this->parse('event_block', 'event', true);
-
-				$i++;
-			}
+			$i++;
 		}
 
 		/* Only parse if an event you can manipulate was found

@@ -35,9 +35,13 @@ $authenticator = new \EOTC\Authenticator();
  * events where creators can self-promote this status into the next.
  */
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
-$isCanPromote = $authenticator->canPromote($sessionUser, $event);
+$isCanSelfPromote = $authenticator->canSelfPromote($sessionUser, $event);
 
-if ($isEOTCAdministrator || $isCanPromote) {
+/* All EOTC Administrators can alter Approved/Rejected events
+ */
+$isCanFinalise = $authenticator->canFinalise($sessionUser, $event);
+
+if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 
 	/* Remember original states so we know which obs to spawn
 	 */

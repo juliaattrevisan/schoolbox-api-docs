@@ -14,13 +14,6 @@
 
 $event = false;
 
-/* Only EOTC Administrators can view this page
- */
-$authenticator = new \EOTC\Authenticator();
-
-/** @var \Schoolbox\User $sessionUser */
-$sessionUser = $_SESSION['user'];
-
 $mapper = \EOTC\EventMapper::getInstance();
 
 try {
@@ -40,10 +33,14 @@ $sessionUser = $_SESSION['user'];
 $authenticator = new \EOTC\Authenticator();
 
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
-$isCanPromote = $authenticator->canPromote($sessionUser, $event);
+$isCanSelfPromote = $authenticator->canSelfPromote($sessionUser, $event);
 $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
 
-if ($isEOTCAdministrator || $isCanPromote || $isSubscribedUser) {
+/* All EOTC Administrators can see Approved/Rejected events
+ */
+$isCanFinalise = $authenticator->canFinalise($sessionUser, $event);
+
+if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFinalise) {
     $this->setFile(TEMPLATE_content, 'modules/eotc/status/modify.html');
     $this->setBlock(TEMPLATE_content, 'event_campus', 'event_campus_block');
     $this->setBlock(TEMPLATE_content, 'event_staff', 'event_staff_block');
@@ -304,7 +301,7 @@ if ($isEOTCAdministrator || $isCanPromote || $isSubscribedUser) {
         )
     );
 
-    if ($authenticator->canPromote($sessionUser, $event)) {
+    if ($isCanFinalise) {
         $eventStatusMapper = \EOTC\EventStatusMapper::getInstance();
 
         /* Soops have access to all statuses
