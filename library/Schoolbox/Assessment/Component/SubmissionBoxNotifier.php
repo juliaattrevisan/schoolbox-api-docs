@@ -725,8 +725,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
         // extended or shortened
         if (!empty($diff['dueDate'])) {
             foreach ($students as $student) {
-                $oldDate = strtotime($diff['finish'][1]);
-                $newDate = strtotime($diff['finish'][0]);
+                $oldDate = strtotime($diff['dueDate'][1]);
+                $newDate = strtotime($diff['dueDate'][0]);
                 $verb = $newDate > $oldDate ? 'extended' : 'changed';
                 $bob = $this
                     ->setForNotifyDueDateChanged($bob, $submissionBox, $diff, $user)
