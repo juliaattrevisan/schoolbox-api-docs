@@ -68,6 +68,15 @@
                     });
             }
         });
+
+        $(document).ready(function() {
+            $('[data-sortable]').DataTable( {
+                "paging":   false,
+                "searching": false,
+                "info": false
+
+            } );
+        } );
     });
 </script>
 <!-- END custom_head -->
@@ -110,91 +119,90 @@
 <div class="row">
     <div class="small-12 island">
         <section>
-            <ul class="information-list">
-
-                <!-- BEGIN checkbox -->
-                <li class="show-for-medium-up">
-                    <div class="actions-xlarge-4 actions-small-1">
-                        <div class="list-item">
-                            <div class="small-12"></div>
-                        </div>
-                        <nav>
-                            <span title="Select all attempts">
-                                <input data-selectall="review[]" id="review-all" type="checkbox">
-                                <label for="review-all" class="checkbox-toggle">
-                                    <span class="icon-tick" title="Toggle All Reviewed"></span>
-                                </label>
-                            </span>
-                        </nav>
-                    </div>
-                </li>
-                <!-- END checkbox -->
-
-                <!-- BEGIN user_attempts -->
-                    <!-- BEGIN attempt -->
-                        <li data-student="{ATTEMPT_ATTEMPT_ID}">
-                            <div class="actions-xlarge-4 actions-small-1">
-                                <div class="list-item">
-                                    <div class="small-7 medium-4 large-4 xlarge-3 columns">
-                                        <div class="row">
-                                            <div class="avatar card small-12">
-                                                <a href="/search/user/{USER_ID}" title="View Profile">
-                                                    <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile">
-                                                    <b>{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}</b>
-                                                </a>
-                                                <div class="show-for-large-down"><b>{ATTEMPT_PERCENTAGE}</b></div>
-                                                <div class="show-for-xlarge-only">
-                                                <!-- BEGIN has_marks -->
-                                                    <!-- BEGIN attempted -->
-                                                        <span class="gradient-{ATTEMPT_GRADIENT}">
-                                                            {ATTEMPT_TOTAL_MARKS}/{ATTEMPT_TOTAL_AVAILABLE_MARKS}
-                                                        </span>
-                                                    <!-- END attempted -->
-                                                <!-- END has_marks -->
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="small-5 medium-3 large-3 xlarge-3 columns">
-                                        <!-- BEGIN submitted -->
-                                            <div class="gradient-10">Quiz Completed</div>
-                                        <!-- END submitted -->
-
-                                        <!-- BEGIN unsubmitted -->
-                                            {ATTEMPT_FINISH}
-                                        <!-- END unsubmitted -->
-
-                                        {ATTEMPT_NOT_FINISH}
-
-                                        <!-- BEGIN reviewed -->
-                                            <span class="label success"><b>Reviewed</b></span>
-                                        <!-- END reviewed -->
-
-                                        <!-- BEGIN not_reviewed -->
-                                            <span class="label neutral"><b>Not Reviewed</b></span>
-                                        <!-- END not_reviewed -->
-                                    </div>
-                                    <div class="medium-3 large-3 xlarge-4 columns show-for-medium-up">
-                                        <div class="avatar card small-12">
-                                            <div>{ATTEMPT_FINISH}</div>
-                                            <div>{ATTEMPT_TIME_TAKEN}</div>
-                                        </div>
-                                    </div>
-                                    <div class="xlarge-2 columns text-right show-for-xlarge">
-                                        <div class="avatar card small-12">
-                                            <h2><b><span class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</span></b></h2>
-                                        </div>
-                                    </div>
-                                </div>
-                                <nav>
-                                    {ATTEMPT_REVIEW}
-                                    {ATTEMPT_CHECKBOX}
-                                </nav>
+            <table data-sortable>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Status</th>
+                        <th>Date Submitted</th>
+                        <th class="show-for-xlarge">Grade</th>
+                        <th class="text-right no-pad" data-orderable="false">
+                            <!-- BEGIN checkbox -->
+                            <div>
+                                <span title="Select all attempts" class="show-for-medium-up">
+                                    <input data-selectall="review[]" id="review-all" type="checkbox">
+                                    <label for="review-all" class="checkbox-toggle">
+                                        <span class="icon-tick" title="Toggle All Reviewed"></span>
+                                    </label>
+                                </span>
                             </div>
-                        </li>
+                            <!-- END checkbox -->
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN user_attempts -->
+                    <!-- BEGIN attempt -->
+                    <tr data-student="{ATTEMPT_ATTEMPT_ID}">
+                        <td class="no-pad" data-order="{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}">
+                            <div class="avatar card small-12">
+                                <a href="/search/user/{USER_ID}" title="View Profile">
+                                    <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile">
+                                    <b>{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}</b>
+                                </a>
+                                <div class="show-for-large-down"><b class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</b></div>
+                                <div class="show-for-xlarge-only">
+                                    <!-- BEGIN has_marks -->
+                                    <!-- BEGIN attempted -->
+                                                <span class="gradient-{ATTEMPT_GRADIENT}">
+                                                    {ATTEMPT_TOTAL_MARKS}/{ATTEMPT_TOTAL_AVAILABLE_MARKS}
+                                                </span>
+                                    <!-- END attempted -->
+                                    <!-- END has_marks -->
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <!-- BEGIN submitted -->
+                            <div class="gradient-10">Quiz Completed</div>
+                            <!-- END submitted -->
+
+                            <!-- BEGIN unsubmitted -->
+                            {ATTEMPT_FINISH}
+                            <!-- END unsubmitted -->
+
+                            {ATTEMPT_NOT_FINISH}
+
+                            <!-- BEGIN reviewed -->
+                            <span class="label success"><b>Reviewed</b></span>
+                            <!-- END reviewed -->
+
+                            <!-- BEGIN not_reviewed -->
+                            <span class="label neutral"><b>Not Reviewed</b></span>
+                            <!-- END not_reviewed -->
+                        </td>
+                        <td class="no-pad" data-order="{ATTEMPT_TIMESTAMP}">
+                            <div class="avatar card">
+                                <div>{ATTEMPT_FINISH}</div>
+                                <div>{ATTEMPT_TIME_TAKEN}</div>
+                            </div>
+                        </td>
+                        <td class="text-right show-for-xlarge" data-order="{ATTEMPT_PERCENTAGE}">
+                            <div>
+                                <h2 class="show-for-xlarge"><b><span class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</span></b></h2>
+                            </div>
+                        </td>
+                        <td class="actions-xlarge-4 actions-small-1">
+                            <nav>
+                                {ATTEMPT_REVIEW}
+                                {ATTEMPT_CHECKBOX}
+                            </nav>
+                        </td>
+                    </tr>
                     <!-- END attempt -->
-                <!-- END user_attempts -->
-            </ul>
+                    <!-- END user_attempts -->
+                </tbody>
+            </table>
         </section>
     </div>
 </div>
