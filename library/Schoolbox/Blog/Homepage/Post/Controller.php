@@ -231,7 +231,7 @@ class Controller extends Base
 
         // Redirect back to the blog page
 
-        $this->getResponse()->redirect->afterPost("/homepage/{$blog->getFolder()->getId()}");
+        $this->getResponse()->redirect->afterPost("/blog/{$blog->getId()}");
     }
 
     /**

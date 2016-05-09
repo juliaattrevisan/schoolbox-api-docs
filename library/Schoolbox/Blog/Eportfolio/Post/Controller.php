@@ -157,7 +157,7 @@ class Controller extends Base
 
         // Send them back to the item detail page
 
-        $this->getResponse()->redirect->afterPost("/eportfolio/" . $this->getRequest()->post["ownerId"] . "/" . $this->getRequest()->post["pageId"]);
+        $this->getResponse()->redirect->afterPost('/eportfolio/blog/' . $this->getRequest()->post["ownerId"] . '/' . $this->getRequest()->post["pageId"] .'/'. $blog->getId());
     }
 
     /**
@@ -224,11 +224,11 @@ class Controller extends Base
 
         $comment->setOwner($this->getUser());
         $comment->setBlog($blog);
-        $comment->setBody($this->getRequest()->post["body"]);
+        $comment->setBody($this->getRequest()->post['body']);
         $comment->setCreatedAt(\Alaress_Date_Format::now());
         $this->getEportfolioBlogCommentMapper()->save($comment);
 
-        $this->getResponse()->redirect->afterPost("/eportfolio/" . $this->getRequest()->post["ownerId"] . "/" . $this->getRequest()->post["pageId"]);
+        $this->getResponse()->redirect->afterPost('/eportfolio/blog/' . $this->getRequest()->post['ownerId'] . '/' . $this->getRequest()->post['pageId'] .'/'. $blog->getId());
     }
 
 
@@ -339,7 +339,7 @@ class Controller extends Base
             if ($blog->getCreatedAt()->getYear() == $year && $blog->getCreatedAt()->getMonth() == $month) {
 
                 $blogComments[$blog->getId()] = $this->getEportfolioBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
-                $blogImages[$blog->getId()] = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId());
+                $blogImages[$blog->getId()] = $this->getEportfolioBlogImageMapper()->findByColumn('blog_id', $blog->getId());
 
                 /** @var EportfolioBlogCommentModel $comment */
                 foreach ($blogComments[$blog->getId()] as $comment) {
