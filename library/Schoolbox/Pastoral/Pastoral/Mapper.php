@@ -10,7 +10,7 @@ namespace Schoolbox\Pastoral\Pastoral;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -34,7 +34,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 class Mapper extends BaseMapper
 {
     /**
-     * @var ErrorMapper $errorMapper
+     * @var ErrorMapper
      */
     protected $errorMapper;
 
@@ -174,7 +174,7 @@ class Mapper extends BaseMapper
      * @var int $id
      *
      * @return Collection|Pastoral\Model[]
-     * @throws BaseMapper\Exception
+     * @throws MapperException
      */
 
     public function findByStudentId($id)
@@ -234,7 +234,7 @@ class Mapper extends BaseMapper
      * @var int $id
      *
      * @return Pastoral\Model
-     * @throws BaseMapper\Exception
+     * @throws MapperException
      */
 
     public function findById($id)
@@ -280,7 +280,7 @@ class Mapper extends BaseMapper
             }
         }
 
-        throw new BaseMapper\Exception('Instance of object not found');
+        throw new MapperException('Instance of object not found');
     }
 
     /**
@@ -289,7 +289,7 @@ class Mapper extends BaseMapper
      * @var int $parentId
      *
      * @return Collection|Model
-     * @throws BaseMapper\Exception
+     * @throws MapperException
      */
 
     public function findByParentId($parentId)

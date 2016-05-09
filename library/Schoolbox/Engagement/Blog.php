@@ -24,7 +24,7 @@ class Blog
 
     public function createdPost(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
         $query = "SELECT COUNT(*) FROM blog
-                  WHERE created >= :start AND created <= :end";
+                  WHERE created_at >= :start AND created_at <= :end";
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(':start', $start->getDatabaseDate());
@@ -35,8 +35,8 @@ class Blog
     }
 
     public function createdComment(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
-        $query = "SELECT COUNT(*) FROM blogComment
-                  WHERE created >= :start AND created <= :end";
+        $query = "SELECT COUNT(*) FROM blog_comment
+                  WHERE created_at >= :start AND created_at <= :end";
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(':start', $start->getDatabaseDate());

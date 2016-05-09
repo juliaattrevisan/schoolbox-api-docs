@@ -36,6 +36,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Controller extends Base
 {
@@ -95,12 +96,18 @@ class Controller extends Base
     protected $errorMapper;
 
     /**
+     * @var FileMapper
+     */
+    protected $fileMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
     {
         // Grab instances of all the mappers
 
+        $this->setFileMapper(FileMapper::getInstance());
         $this->setPastoralMapper(PastoralMapper::getInstance());
         $this->setUserAccessMapper(UserAccessMapper::getInstance());
         $this->setPastoralTypeMapper(PastoralTypeMapper::getInstance());
@@ -1109,6 +1116,11 @@ class Controller extends Base
                 /** @var \Schoolbox\Resource\Storage\Model $storageObject */
                 foreach ($attachmentObjects as $storageObject) {
 
+                    if ($hash_array[0] == 'browse') {
+                        $file = $this->getFileMapper()->findById($hash_array[1]);
+                        $hash_array[1] = $file->getHash();
+                    }
+
                     // Only add attachments which don't already exist
 
                     if (!in_array($storageObject->getHash(), $retainedAttachments)) {
@@ -1325,6 +1337,19 @@ class Controller extends Base
         return $this->errorMapper;
     }
 
+    /**
+     * @param $fileMapper
+     */
+    public function setFileMapper($fileMapper) {
+        $this->fileMapper = $fileMapper;
+    }
+
+    /**
+     * @return FileMapper
+     */
+    public function getFileMapper() {
+        return $this->fileMapper;
+    }
 }
 
 /*

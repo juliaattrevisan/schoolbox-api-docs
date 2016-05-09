@@ -1,0 +1,120 @@
+<script type="text/javascript">
+    $(function() {
+
+        $('[data-image-gallery] li').magnificPopup({
+            delegate: 'a',
+            type: 'image'
+        });
+
+        $('[data-interaction="delete"]').click(function(event) {
+            event.preventDefault();
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this comment?',
+                confirmEvent: function() {
+                    $.post('/blog/comment/delete/'+String($(event.target).data('comment-id')))
+                    .done(function() {
+                        // Remove from list after AJAX returns
+
+                        $(event.target).closest('li').remove();
+                    });
+                }
+            });
+        })
+    });
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="/homepage/{{ record.getFolder.getId }}">{{ record.getFolder.getName }}</a></li>
+    <li class="active"><a href="#">{{ record.getHeading }}</a></li>
+</ul>
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ record.getHeading }}</h1>
+        </div>
+    </div>
+    {% if isRouteAuthorized('blog.getModify', { blog: blog, folder: record.getFolder }) %}
+    <nav>
+        <a class="icon icon-modify" href="{{ routeLookup('blog.getModify', { id: record.getId }) }}" title="Modify"></a>
+    </nav>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="avatar card small-12">
+                        <a href="/search/user/{{ record.getOwner.getId }}">
+                            <img src="/portrait.php?userId={{ record.getOwner.getExternalId }}&size=square64" />
+                            <p>{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</p>
+                        </a>
+                        <p class="meta">Posted by <a href="/search/user/{{ record.getOwner.getId }}">{{ record.getOwner.getFirstname }} {{ record.getOwner.getLastname }}</a> {{ record.getCreatedAt.getRelativeTime }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content">
+            <article>
+
+                {{ record.getBody | purify }}
+
+                {% if images | length > 0 %}
+                    {% include '@blog/sub/imageGallery.twig' with {images: images} %}
+                {% endif %}
+
+            </article>
+        </section>
+
+
+
+
+            <h2 class="subheader">Comments</h2>
+
+            <section>
+                <ul class="information-list">
+                    {% for comment in comments %}
+
+                        <li class="actions-small-1">
+
+                            <div class="list-item">
+                                <div class="avatar card small-12">
+                                    <a href="/search/user/{{ comment.getOwner.getId }}">
+                                        <img src="/portrait.php?userId={{ comment.getOwner.getExternalId }}&size=square64" />
+                                        <p>{{ comment.getOwner.getFirstname }} {{ comment.getOwner.getLastname }}</p>
+                                    </a>
+                                    <p class="meta">{{ comment.getCreatedAt.getRelativeTime }}</p>
+                                </div>
+                            </div>
+
+                            {# Only the owner of a comment can delete it #}
+
+                            {% if isRouteAuthorized('blog.postCommentDelete', { comment: comment, folder: record.getFolder}) %}
+                                <nav>
+                                    <a class="icon icon-delete" data-interaction="delete" data-comment-id="{{ comment.getId }}"></a>
+                                </nav>
+                            {% endif %}
+
+                            <article>{{ comment.getBody | purify }}</article>
+                        </li>
+
+                    {% endfor %}
+                    <li>
+                        <form method="post" action="{{ routeLookup('blog.postCommentInsert', { id: record.getId }) }}" class="no-pad">
+                            <label class="content">
+                                <textarea name="body" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                            </label>
+
+                            <input type="submit" class="no-margin" name="comment" value="Add comment"/>
+                        </form>
+                    </li>
+                </ul>
+            </section>
+
+
+    </div>
+</div>

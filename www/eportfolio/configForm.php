@@ -99,7 +99,9 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             $componentInstanceMapper->cascadeSequence($eportfolioHandler->getSettingsPageOwner());
 
             // get the Instance's Definition's Controller
-            $factory = new Component_Eportfolio_Factory(new \Schoolbox\User(), new SitePage(false));
+            $componentSitepage = new SitePage(false);
+            $componentSitepage->setDi($kernel->getDependencyInjector());
+            $factory = new Component_Eportfolio_Factory(new \Schoolbox\User(), $componentSitepage);
 
             // $component instanceof Component_ControllerAbstract
             $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
