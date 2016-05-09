@@ -132,6 +132,7 @@ class AttemptMapper extends Mapper
             'a.category_id = :category',
             'a.deleted_at IS NULL',
             'aa.user_id = :student',
+            'aa.reviewed_at IS NOT NULL',
             'aa.deleted_at IS NULL',
             'aq.deleted_at IS NULL',
         );
