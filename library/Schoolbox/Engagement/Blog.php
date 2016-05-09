@@ -36,7 +36,7 @@ class Blog
 
     public function createdComment(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
         $query = "SELECT COUNT(*) FROM blog_comment
-                  WHERE created >= :start AND created <= :end";
+                  WHERE created_at >= :start AND created_at <= :end";
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(':start', $start->getDatabaseDate());
