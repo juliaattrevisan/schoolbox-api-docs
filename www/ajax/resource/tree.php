@@ -77,5 +77,5 @@ try {
 } catch (AuthenticationTimedOut $e) {
     $this->error(null, "Office 365 error: {$e->getMessage()}");
 } catch (RuntimeException $e) {
-    die('<span class="auth-required">Click <a data-gettoken href="/ajax/oauth/microsoft">here</a> to connect your Office 365 account.</span>');
+    die('<a data-gettoken href="/ajax/oauth/microsoft" class="button submit">Connect Office 365 account</a>');
 }
