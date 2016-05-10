@@ -286,8 +286,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 $student->getExternalId())
             ) {
                 if (isset($mark) || !empty($comment)) {
+
+                    if (isset($mark)) {
+                        $mark = round($mark);
+                    }
+
                     $query = "UPDATE StudentAssessmentMarkBook SET
-                            Result = '".round($mark)."',
+                            Result = '{$mark}',
                             TopicComment = '".$this->getDatabase()->quote($comment)."'
                           WHERE
                               FileType = '{$assessmentRemote['FileType']}' AND
@@ -313,10 +318,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             } else {
                 if (isset($mark) || !empty($comment)) {
 
-                    if (!isset($mark))
-                        $mark = '';
-                    else
+                    if (isset($mark)) {
                         $mark = round($mark);
+                    }
 
                     $query = "INSERT INTO StudentAssessmentMarkBook (
                                   FileType,
