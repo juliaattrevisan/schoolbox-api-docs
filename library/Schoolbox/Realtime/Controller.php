@@ -281,77 +281,17 @@ class Controller extends BaseController
      */
     public function configure()
     {
-        // TODO put this in a mapper
-        $stmt = Database::getInstance()->query("
-            SELECT  ns.id ns_id, ns.slug, ns.label, src.id src_id, src.key, src.description, perm.mask, perm.role_default, reroute.delivery
-            FROM msg_source src
-            LEFT JOIN groups g ON g.`group_type` = src.`role_type`
-            LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id AND g.`id` = perm.`role_id`
-            LEFT JOIN msg_namespace ns ON ns.id = src.namespace
-            LEFT JOIN msg_reroute reroute ON src.id = reroute.msg_source_id AND reroute.user_id = :user_id
-            WHERE perm.role_id = :role_id
-            ORDER BY `slug` ASC, `key` ASC
-        ", [
-            'user_id' => $this->getUser()->getId(),
-            'role_id' => $this->getUser()->getRole()->getId()
-        ]);
-
-        $data = [];
-
-        $schedule = $this->getUser()->getRole()->getDigestSchedule();
-
-        while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-
-            if (empty($data[$r['ns_id']])) {
-                $data[$r['ns_id']] = [
-                    'id'      => $r['ns_id'],
-                    'slug'    => $r['slug'],
-                    'label'   => $r['label'],
-                ];
-            }
-
-            $mask     = array_fill_keys(explode(',', $r['mask']), true);
-            $default  = array_fill_keys(explode(',', $r['role_default']), true);
-
-            // if no digest schedule, don't offer it as an option
-            if (!$schedule) {
-                unset($mask['DI']);
-                unset($default['DI']);
-            }
-
-            if ($r['delivery']) {
-                $delivery = array_fill_keys(explode(',', $r['delivery']), true);
-
-            } else {
-                $delivery = $default;
-            }
-
-            // apply mask
-            $target = array_intersect_key($delivery, $mask);
-
-            // if target falls outside mask, set to default
-            if (!count($target)) {
-                $target = $default;
-            }
-
-            $data[$r['ns_id']]['sources'][$r['src_id']] = [
-                'id'             => $r['src_id'],
-                'key'            => $r['key'],
-                'description'    => $r['description'],
-                'mask'           => array_keys($mask),
-                'default'        => array_keys($target),
-            ];
-        }
-
         $c = new Cronterpreter(ConfigMapper::getInstance()->get('date_time'));
 
         // TODO lookup on mobile registry table
         $mobile = true;
         $digest = false;
 
+        $schedule = $this->getUser()->getRole()->getDigestSchedule();
+
         if ($schedule) {
             try {
-                $digest = $c->interpret($this->getUser()->getRole()->getDigestSchedule());
+                $digest = $c->interpret($schedule);
             } catch (InvalidArgumentException $e) {
                 // noop
             }
@@ -371,14 +311,14 @@ class Controller extends BaseController
             'title'    => 'Message Settings',
             'template' => '@messages/settings.twig',
             'data'     => [
-                'hideNotificationsTray' => $_SESSION['user']->getHideNotificationsTray() ? 1 : 0,
+                'hideNotificationsTray' => $this->getUser()->getHideNotificationsTray() ? 1 : 0,
                 'ns'        => $ns,
                 'sources'   => $sources,
                 'perms'     => $this->getConfig()->getPermissionList($digest, $mobile),
                 'digest'    => $digest,
                 'mobile'    => $mobile,
                 'groups'    => $this->calculateFollowment(),
-                'config'    => $data,
+                'config'    => $this->getRoutePermissionMapper()->findAllRoutePermissionsForUser($this->getUser()),
             ]
         ]);
     }
