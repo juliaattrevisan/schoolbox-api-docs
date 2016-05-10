@@ -125,28 +125,6 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Get timetable period label
-     *
-     * @param $i
-     * @return string
-     */
-    private function getTimetablePeriodLabel($i)
-    {
-        return $this->timetablePeriodLabel . ($i < 10 ? 0 . $i : $i);
-    }
-
-    /**
-     * Get timetable day label
-     *
-     * @param $i
-     * @return string
-     */
-    private function getTimetableDayLabel($i)
-    {
-        return $this->timetableDayLabel . ($i < 10 ? 0 . $i : $i);
-    }
-
-    /**
      * Get the day number for the date specified
      *
      * @param \Schoolbox\Campus $campus
