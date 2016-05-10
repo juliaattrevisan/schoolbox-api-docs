@@ -188,8 +188,14 @@ class External_Maze_Timetable implements External_TimetableInterface
             $i = 1;
 
             foreach ($allTimes as $currentTime) {
-                if ($currentTime['startTime']->getDatabaseTime() <= $now->getDatabaseTime()) {
-                    if ($currentTime['endTime']->getDatabaseTime() > $now->getDatabaseTime()) {
+
+                /** @var \Alaress_Date_Format $startTime */
+                /** @var \Alaress_Date_Format $endTime */
+                $startTime = $currentTime['startTime'];
+                $endTime = $currentTime['endTime'];
+
+                if ($startTime->getDatabaseTime() <= $now->getDatabaseTime()) {
+                    if ($endTime->getDatabaseTime() > $now->getDatabaseTime()) {
                         return array(
                             'PeriodNumber'    => $i,
                             'PeriodNumberSeq' => 1,
@@ -219,15 +225,18 @@ class External_Maze_Timetable implements External_TimetableInterface
     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
     {
         if (empty($externalUserId)) {
-            return array();
+            return [];
         }
+
         if ($this->getGroupHandler()->isStudent($userId)) {
             return $this->getStudentTimetable($externalUserId, $campus, $dayNumber);
-        } else {
-            if ($this->getGroupHandler()->isStaff($userId)) {
-                return $this->getStaffTimetable($externalUserId, $campus, $dayNumber);
-            }
         }
+
+        if ($this->getGroupHandler()->isStaff($userId)) {
+            return $this->getStaffTimetable($externalUserId, $campus, $dayNumber);
+        }
+
+        return [];
     }
 
     /**
@@ -246,7 +255,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
     {
         if (empty($externalUserId)) {
-            return array();
+            return [];
         }
 
         if ($this->getGroupHandler()->isStudent($userId)) {
@@ -256,6 +265,8 @@ class External_Maze_Timetable implements External_TimetableInterface
         if ($this->getGroupHandler()->isStaff($userId)) {
             return $this->getStaffTimetable($externalUserId, $campus, $this->getDayNumber($campus, $date->getUnixTimeStamp()), $date);
         }
+
+        return [];
     }
 
     /**
@@ -299,11 +310,17 @@ class External_Maze_Timetable implements External_TimetableInterface
      * @param $externalUserId
      * @param \Schoolbox\Campus $campus
      * @param $dayNumber
+     * @param \Alaress_Date_Format $date
      * @return array
      */
-    public function getStaffTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber)
+    public function getStaffTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber, \Alaress_Date_Format $date = null)
     {
-        $definition = $this->getTimetableDefinition($externalUserId, $campus);
+        if ($date instanceof \Alaress_Date_Format) {
+            $definition = $this->getTimetableDefinition($externalUserId, $campus, null, $date->getDatabaseDate());
+        }
+        else {
+            $definition = $this->getTimetableDefinition($externalUserId, $campus);
+        }
 
         $finalTimetable = array();
 
@@ -350,6 +367,8 @@ class External_Maze_Timetable implements External_TimetableInterface
 
         if (is_array($allRows) && count($allRows)) {
             foreach ($allRows as $currentRow) {
+                $key = '';
+
                 $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['description'] = $currentRow['FULLNAME'];
                 $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['code'] = $this->getHelper()->generateClassCode(
                     $currentRow['SUBJ'],
@@ -662,25 +681,5 @@ class External_Maze_Timetable implements External_TimetableInterface
     private function getGroupHandler()
     {
         return $this->groupHandler;
-    }
-
-    /**
-     * Set timetable period label
-     *
-     * @param string $timetablePeriodLabel
-     */
-    private function setTimetablePeriodLabel($timetablePeriodLabel)
-    {
-        $this->timetablePeriodLabel = $timetablePeriodLabel;
-    }
-
-    /**
-     * Set timetable day label
-     *
-     * @param string $timetableDayLabel
-     */
-    private function setTimetableDayLabel($timetableDayLabel)
-    {
-        $this->timetableDayLabel = $timetableDayLabel;
     }
 }
