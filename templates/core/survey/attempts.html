@@ -7,6 +7,34 @@
             "searching": false,
             "order": [1, "asc"]
         });
+
+
+        // Delete all checked attempts
+
+        $("[delete-selected]").click(function(event) {
+            event.preventDefault();
+
+            if ($('input[name="attemptIds[]"]:checked').length === 0) {
+                alert('You must select at least at least one attempt to delete');
+            } else {
+
+                $(this).confirmDialog({
+                    text:         'Are you sure you want to delete the selected attempts?',
+                    confirmEvent: function() {
+                        var attemptIds = $('input[name="attemptIds[]"]:checked').map(function() {
+                            return $(this).val();
+                        }).get();
+
+                        $.post('/survey/deleteAttempt', {attemptIds: attemptIds})
+                                .always(function() {
+                                    location.reload();
+                                });
+
+                    }
+                });
+            }
+        });
+
     });
 </script>
 <!-- END custom_head -->
@@ -23,45 +51,43 @@
     <div class="small-12 island">
         <h2 class="subheader">Attempts</h2>
         <section>
-            <form action='/survey/deleteAttempt' method='post'>
-                <div class="scrollable">
-                    <table data-sortable>
-                        <thead>
-                        <tr>
-                            <th data-orderable="false"></th>
-                            <!-- BEGIN respondent_heading -->
-                            <th>Lastname</th>
-                            <th>Firstname</th>
-                            <!-- END respondent_heading -->
-                            <th>Start</th>
-                            <th>Finish</th>
-                            <th data-orderable="false">&nbsp;</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <!-- BEGIN attempt -->
-                        <tr>
-                            <td>
-                                <input type='checkbox' id='attempt-{ATTEMPT_ATTEMPT_ID}' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
-                                <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
-                            </td>
-                            <!-- BEGIN respondent_name -->
-                            <td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}</a></td>
-                            <td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_FIRSTNAME}</a></td>
-                            <!-- END respondent_name -->
-                            <td>{ATTEMPT_START}</td>
-                            <td>{ATTEMPT_FINISH}</td>
-                            <td><a href='/survey/review/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="icon-view no-text"></a></td>
-                        </tr>
-                        <!-- END attempt -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="scrollable">
+                <table data-sortable>
+                    <thead>
+                    <tr>
+                        <th data-orderable="false"></th>
+                        <!-- BEGIN respondent_heading -->
+                        <th>Lastname</th>
+                        <th>Firstname</th>
+                        <!-- END respondent_heading -->
+                        <th>Start</th>
+                        <th>Finish</th>
+                        <th data-orderable="false">&nbsp;</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN attempt -->
+                    <tr>
+                        <td>
+                            <input type='checkbox' id='attempt-{ATTEMPT_ATTEMPT_ID}' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
+                            <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
+                        </td>
+                        <!-- BEGIN respondent_name -->
+                        <td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}</a></td>
+                        <td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_FIRSTNAME}</a></td>
+                        <!-- END respondent_name -->
+                        <td>{ATTEMPT_START}</td>
+                        <td>{ATTEMPT_FINISH}</td>
+                        <td><a href='/survey/review/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="icon-view no-text"></a></td>
+                    </tr>
+                    <!-- END attempt -->
+                    </tbody>
+                </table>
+            </div>
 
-                <div class="content">
-                    <input type='submit' value='Delete selected' />
-                </div>
-            </form>
+            <div class="content">
+                <a class="button submit expand" delete-selected href="#">Delete selected</a>
+            </div>
         </section>
     </div>
 </div>
