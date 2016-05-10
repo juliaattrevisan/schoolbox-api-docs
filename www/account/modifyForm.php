@@ -45,7 +45,7 @@ if (isset($_POST['current_password'])) {
         // Test password against existing
         $currentHash = $user->getPassword();
         if ($passwordService->verify($_POST['current_password'], $currentHash)
-            || $userMapper->hashPassword($_POST['current_password'], $currentHash)
+            || $userMapper->hashPassword($_POST['current_password']) == $currentHash
         ) {
             $user
                 ->setRetrievablePassword($_POST['new_password'])
