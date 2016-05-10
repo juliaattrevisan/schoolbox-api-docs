@@ -40,7 +40,7 @@ class Synchronise_External_Stpatricks_Strategy_Definition extends Synchronise_Ex
         );
 
         $this->setDefinition('timetable',
-            array('classCode', 'day', 'period', 'room')
+            array('classCode', 'day', 'period', 'room', 'teacher_id')
         );
     }
 
