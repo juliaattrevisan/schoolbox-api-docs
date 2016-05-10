@@ -357,7 +357,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             $settings = array(
                 'userName' =>  'SEC/' . $_SESSION['username'],
                 'password' => $_SESSION['password'],
-                'baseUri' => 'http://myschoolfiles.sec.local',
+                'baseUri' => 'http://myschoolfiles',
             );
 
             if ($groupHandler->isStaff()) {
@@ -369,9 +369,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 );
             } elseif ($groupHandler->isStudent()) {
                 $paths = array(
-                    $settings['baseUri'].'/StudentHome/' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
-                    $settings['baseUri'].'/Assets/',
-                    $settings['baseUri'].'/Submissions/'
+                    $settings['baseUri'].'/StudentHome/' . (12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/'
                 );
             }
         } elseif ($site_location == 'btac') {
