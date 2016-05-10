@@ -38,6 +38,7 @@ try {
     exit;
 }
 
+/** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'survey/attempts.html');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 $this->setBlock(TEMPLATE_content, 'respondent_heading', 'respondent_heading_block');
