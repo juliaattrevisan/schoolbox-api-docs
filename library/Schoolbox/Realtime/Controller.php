@@ -290,7 +290,7 @@ class Controller extends BaseController
             LEFT JOIN msg_namespace ns ON ns.id = src.namespace
             LEFT JOIN msg_reroute reroute ON src.id = reroute.msg_source_id AND reroute.user_id = :user_id
             WHERE perm.role_id = :role_id
-            ORDER BY min_level < max_level DESC, `slug` ASC, `key` ASC
+            ORDER BY `slug` ASC, `key` ASC
         ", [
             'user_id' => $this->getUser()->getId(),
             'role_id' => $this->getUser()->getRole()->getId()
