@@ -31,40 +31,42 @@
     <div class="small-12 columns">
         <h2 class="subheader">Current Resource Bookings</h2>
 
-        <table>
-            <colgroup>
-                <col />
-                <col />
-                <col />
-                <col />
-                <col />
-            </colgroup>
-            <thead>
-            <tr>
-                <th>Resource Name</th>
-                <th>Booking Name</th>
-                <th>Start</th>
-                <th>End</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- BEGIN resourcebooking -->
-            <tr>
-                <td><a href="/resource-booking/item/{RESOURCE_ID}">{RESOURCE_NAME}</a></td>
-                <td><a href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit">{RESOURCEBOOKING_NAME}</a></td>
-                <td>{RESOURCEBOOKING_START}</td>
-                <td>{RESOURCEBOOKING_END}</td>
-                <td class="actions-small-2">
-                    <nav>
-                        <a aria-haspopup="true" href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit" class="icon-modify" alt="Remove Booking" title="Update Booking"></a>
-                        <a aria-haspopup="true" href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" class="icon-delete" alt="Remove Booking" title="Remove Booking" data-action="delete"></a>
-                    </nav>
-                </td>
-            </tr>
-            <!-- END resourcebooking -->
-            </tbody>
-        </table>
+        <div class="scrollable">
+            <table>
+                <colgroup>
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Resource Name</th>
+                    <th>Booking Name</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN resourcebooking -->
+                <tr>
+                    <td><a href="/resource-booking/item/{RESOURCE_ID}">{RESOURCE_NAME}</a></td>
+                    <td><a href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit">{RESOURCEBOOKING_NAME}</a></td>
+                    <td>{RESOURCEBOOKING_START}</td>
+                    <td>{RESOURCEBOOKING_END}</td>
+                    <td class="actions-small-2">
+                        <nav>
+                            <a aria-haspopup="true" href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit" class="icon-modify" alt="Remove Booking" title="Update Booking"></a>
+                            <a aria-haspopup="true" href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" class="icon-delete" alt="Remove Booking" title="Remove Booking" data-action="delete"></a>
+                        </nav>
+                    </td>
+                </tr>
+                <!-- END resourcebooking -->
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

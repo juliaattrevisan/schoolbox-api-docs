@@ -130,26 +130,28 @@
     <div class="small-12 columns">
         <h2 class="subheader">Resources ({EVENT_RESOURCE_COUNT})</h2>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Resource Name</th>
-                    <th>Booking Name</th>
-                    <th>Start</th>
-                    <th>End</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- BEGIN event_resourcebooking -->
-                <tr>
-                    <td><a href="/resource-booking/item/{EVENT_RESOURCE_ID}">{EVENT_RESOURCE_NAME}</a></td>
-                    <td><a href="/resource-booking/booking/{EVENT_RESOURCEBOOKING_ID}/edit">{EVENT_RESOURCEBOOKING_NAME}</a></td>
-                    <td>{EVENT_RESOURCEBOOKING_START}</td>
-                    <td>{EVENT_RESOURCEBOOKING_END}</td>
-                </tr>
-                <!-- END event_resourcebooking -->
-            </tbody>
-        </table>
+        <div class="scrollable">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Resource Name</th>
+                        <th>Booking Name</th>
+                        <th>Start</th>
+                        <th>End</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN event_resourcebooking -->
+                    <tr>
+                        <td><a href="/resource-booking/item/{EVENT_RESOURCE_ID}">{EVENT_RESOURCE_NAME}</a></td>
+                        <td><a href="/resource-booking/booking/{EVENT_RESOURCEBOOKING_ID}/edit">{EVENT_RESOURCEBOOKING_NAME}</a></td>
+                        <td>{EVENT_RESOURCEBOOKING_START}</td>
+                        <td>{EVENT_RESOURCEBOOKING_END}</td>
+                    </tr>
+                    <!-- END event_resourcebooking -->
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -158,16 +160,18 @@
     <div class="small-12 columns">
         <h2 class="subheader">Activity Log</h2>
 
-        <table>
-            <tbody>
-                <!-- BEGIN event_activity_log -->
-                <tr>
-                    <td>{EVENT_ACTIVITY_LOG_CREATED_AT}</td>
-                    <td>{EVENT_ACTIVITY_LOG_MESSAGE}</td>
-                </tr>
-                <!-- END event_activity_log -->
-            </tbody>
-        </table>
+        <div class="scrollable">
+            <table>
+                <tbody>
+                    <!-- BEGIN event_activity_log -->
+                    <tr>
+                        <td>{EVENT_ACTIVITY_LOG_CREATED_AT}</td>
+                        <td>{EVENT_ACTIVITY_LOG_MESSAGE}</td>
+                    </tr>
+                    <!-- END event_activity_log -->
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <!-- END has_event_activity_log -->
