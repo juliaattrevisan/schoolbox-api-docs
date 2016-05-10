@@ -6,60 +6,46 @@
 	});
 </script>
 
-<h1>EOTC Configuration Settings</h1>
+<div class="row">
+    <div class="small-12 columns">
+		<h1>EOTC Configuration Settings</h1>
+    </div>
+</div>
 
-<form action="/modules/eotc/config/modifyForm.php" method="post">
-	<table class="standardForm">
-		<tbody>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>First Reminder</h4>
-					<p>
-						Email reminder sent this amount of days before event if it has not been
-						finalised. Email reminder will go to all people capable of approving event.
-					</p>
-				</td>
-				<td>
-					<input type="text" name="firstReminder" value="{CONFIG_FIRST_REMINDER}" />
-				</td>
-			</tr>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Daily Reminder</h4>
-					<p>
-						Email reminder will be sent each day from this many days before the event
-						to remind all those who can approve they must approve this event.
-					</p>
-				</td>
-				<td>
-					<input type="text" name="dailyReminder" value="{CONFIG_DAILY_REMINDER}" />
-				</td>
-			</tr>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Urgent Threshold</h4>
-					<p>
-						Events that are not fully approved will be shown as urgent this many days
-						out form their due date.
-					</p>
-				</td>
-				<td>
-					<input type="text" name="urgentThreshold" value="{CONFIG_URGENT_THRESHOLD}" />
-				</td>
-			</tr>
-			<tr>
-				<td class="formLabelWidth">
-					<h4>Policy</h4>
-					<p>
-						EOTC Policy.
-					</p>
-				</td>
-				<td>
-					<textarea name="policy" class="fullwidth">{CONFIG_POLICY}</textarea>
-				</td>
-			</tr>
-		</tbody>
-	</table>
+<div class="row">
+	<div class="small-12 island">
+		<form action="/modules/eotc/config/modifyForm.php" method="post">
+			<section>
+				<fieldset class="content">
+					<legend>First Reminder <span class='hint has-tip tip-top' title="Email reminder sent this amount of days before event if it has not been finalised. Email reminder will go to all people capable of approving event." data-tooltip="">?</span></legend>
+					<div class="small-12 columns">
+						<input type="text" name="firstReminder" value="{CONFIG_FIRST_REMINDER}" />
+					</div>
+				</fieldset>
 
-	<input type="submit" value="Submit" class="submit-btn-plain" />
-</form>
+				<fieldset class="content">
+					<legend>Daily Reminder <span class='hint has-tip tip-top' title="Email reminder will be sent each day from this many days before the event to remind all those who can approve they must approve this event." data-tooltip="">?</span></legend>
+					<div class="small-12 columns">
+						<input type="text" name="dailyReminder" value="{CONFIG_DAILY_REMINDER}" />
+					</div>
+				</fieldset>
+
+				<fieldset class="content">
+					<legend>Urgent Threshold <span class='hint has-tip tip-top' title="Events that are not fully approved will be shown as urgent this many days out form their due date." data-tooltip="">?</span></legend>
+					<div class="small-12 columns">
+						<input type="text" name="urgentThreshold" value="{CONFIG_URGENT_THRESHOLD}" />
+					</div>
+				</fieldset>
+
+				<fieldset class="content">
+					<legend>Policy <span class='hint has-tip tip-top' title="EOTC Policy." data-tooltip="">?</span></legend>
+					<div class="small-12 columns">
+						<textarea name="policy" class="fullwidth">{CONFIG_POLICY}</textarea>
+					</div>
+				</fieldset>
+			</section>
+
+			<input type="submit" value="Submit" />
+		</form>
+	</div>
+</div>
