@@ -79,6 +79,8 @@ class ImportController extends Base
      */
     public function preview()
     {
+        set_time_limit(1800);
+
         $logger = $this->buildLogger();
         try {
             $reader = $this->buildReader($upload = $this->buildUpload());
@@ -103,6 +105,8 @@ class ImportController extends Base
      */
     public function import()
     {
+        set_time_limit(1800);
+        
         $logger = $this->buildLogger();
         try {
             $reader = $this->buildReader($upload = $this->buildUpload());
