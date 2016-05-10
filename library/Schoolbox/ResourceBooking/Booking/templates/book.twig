@@ -462,7 +462,7 @@ $(function() {
                     <div class="small-12 columns">
                         <label>
                             Notes
-                            <textarea name="notes">{{ item.notes }}</textarea>
+                            <textarea name="notes" id="resource-booking-notes" >{{ item.notes }}</textarea>
                         </label>
 
                         {# Only a user who may moderate this item may ignore the rules. #}
@@ -504,7 +504,7 @@ $(function() {
                                     <div class="small-11 columns">
                                         <label for="related-item-{{ relatedItem.id }}">{{ relatedItem.name }}</label>
                                         <div data-relation="related-resource-notes" style="{% if relatedBooking is empty %}display:none{% endif %}">
-                                            <textarea name="related_item[{{ relatedItem.id }}][notes]">{{ relatedBooking.notes }}</textarea>
+                                            <textarea id="related-item-{{ relatedItem.id }}-notes" name="related_item[{{ relatedItem.id }}][notes]">{{ relatedBooking.notes }}</textarea>
                                         </div>
 
                                     </div>
