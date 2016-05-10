@@ -95,44 +95,29 @@ class External_Maze_Timetable implements External_TimetableInterface
      * @param string $externalUserId
      * @param \Schoolbox\Campus $campus
      * @param int $day
+     * @param string $date
      * @return array
      */
     public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
         $query = "
-			SELECT TOP 50 *
-			FROM TH
-			INNER JOIN TCTD ON TH.THKEY = TCTD.QKEY
-			WHERE THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-		";
+            SELECT *
+            FROM TCTD
+            WHERE QKEY = '{$this->getHelper()->getCurrentTHKEY()}' AND
+            CAST(TCTDKEY AS DATE) = CAST('{$date}' AS DATE)
+        ";
 
         $result = $this->getDb()->getAll($query);
 
         $timetableDef = array();
 
         if (count($result) && is_array($result)) {
-            $definition = $result[0];
-
-            for ($i = 1; $i <= $definition['THROWS']; $i++) {
-                $dayTempKey = $this->getTimetableDayLabel($i);
-
-                /* Day-specific e.g. for Dashboard
-                 */
-                if (!$day || "Day {$day}" == $definition[$dayTempKey]) {
-/* TH_RLABEL01, TH_RLABEL02...TH_RLABEL13
-                     */
-                    $periodTempKey = $this->getTimetablePeriodLabel($i);
-
-                    /* Ram it in
-                     */
-                    if ($definition[$periodTempKey]) {
-                        $timetableDef['desc'][] = $definition[$periodTempKey];
-                        $timetableDef['start'][] = $this->getHelper()->mazeTime($result[$i - 1]['TIME_START']);
-                        $timetableDef['end'][] = $this->getHelper()->mazeTime($result[$i - 1]['TIME_END']);
-                        $timetableDef['number'][] = $i;
-                        $timetableDef['sequence'][] = $i;
-                    }
-                }
+            foreach ($result as $current) {
+                $timetableDef['desc'][] = "Period {$current['TIME_INDEX']}";
+                $timetableDef['start'][] = $this->getHelper()->mazeTime($current['TIME_START']);
+                $timetableDef['end'][] = $this->getHelper()->mazeTime($current['TIME_END']);
+                $timetableDef['number'][] = $current['TIME_INDEX'];
+                $timetableDef['sequence'][] = 1;
             }
         }
 
@@ -282,7 +267,17 @@ class External_Maze_Timetable implements External_TimetableInterface
      */
     public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
     {
-        return $this->getDayTimetable($externalUserId, $userId, $campus, $this->getDayNumber($campus, $date->getUnixTimeStamp()));
+        if (empty($externalUserId)) {
+            return array();
+        }
+
+        if ($this->getGroupHandler()->isStudent($userId)) {
+            return $this->getStudentTimetable($externalUserId, $campus, $this->getDayNumber($campus, $date->getUnixTimeStamp()), $date);
+        }
+
+        if ($this->getGroupHandler()->isStaff($userId)) {
+            return $this->getStaffTimetable($externalUserId, $campus, $this->getDayNumber($campus, $date->getUnixTimeStamp()), $date);
+        }
     }
 
     /**
@@ -421,11 +416,17 @@ class External_Maze_Timetable implements External_TimetableInterface
      * @param $externalUserId
      * @param \Schoolbox\Campus $campus
      * @param $dayNumber
+     * @param \Alaress_Date_Format $date
      * @return mixed
      */
-    public function getStudentTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber)
+    public function getStudentTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber, \Alaress_Date_Format $date = null)
     {
-        $definition = $this->getTimetableDefinition($externalUserId, $campus);
+        if ($date instanceof \Alaress_Date_Format) {
+            $definition = $this->getTimetableDefinition($externalUserId, $campus, null, $date->getDatabaseDate());
+        }
+        else {
+            $definition = $this->getTimetableDefinition($externalUserId, $campus);
+        }
 
         $finalTimetable = array();
 
