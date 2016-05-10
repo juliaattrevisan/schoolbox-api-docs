@@ -17,7 +17,6 @@
             if ($('input[name="attemptIds[]"]:checked').length === 0) {
                 alert('You must select at least at least one attempt to delete');
             } else {
-
                 $(this).confirmDialog({
                     text:         'Are you sure you want to delete the selected attempts?',
                     confirmEvent: function() {
@@ -29,9 +28,29 @@
                                 .always(function() {
                                     location.reload();
                                 });
-
                     }
                 });
+            }
+        });
+
+
+        // Whenever a checkbox is changed, untick the 'select all' checkbox at the top
+
+        $("input[name='attemptIds[]']").change(function() {
+            $('#review-all').prop('checked', false);
+        });
+
+
+        // Select all checkout at top
+
+        $('[data-selectall]').change(function(event) {
+            var selectors = $('input[name="' + event.target.getAttribute('data-selectall') + '"]');
+
+            if ($(this).is(':checked')) {
+                selectors.prop('checked', true);
+            }
+            else {
+                selectors.prop('checked', false);
             }
         });
 
@@ -62,7 +81,18 @@
                         <!-- END respondent_heading -->
                         <th>Start</th>
                         <th>Finish</th>
-                        <th data-orderable="false">&nbsp;</th>
+                        <th data-orderable="false" class="text-right no-pad">
+                            <!-- BEGIN checkbox -->
+                            <div>
+                                <span title="Select all attempts" class="show-for-medium-up">
+                                    <input data-selectall="attemptIds[]" id="review-all" type="checkbox">
+                                    <label for="review-all" class="checkbox-toggle">
+                                        <span class="icon-tick" title="Toggle All Reviewed"></span>
+                                    </label>
+                                </span>
+                            </div>
+                            <!-- END checkbox -->
+                        </th>
                     </tr>
                     </thead>
                     <tbody>

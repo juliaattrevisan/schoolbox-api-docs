@@ -114,6 +114,9 @@ if (is_array($allAttempts) && count($allAttempts)) {
            */
         $this->setVar('respondent_name_block', '');
     }
+} else {
+    $this->setBlock(TEMPLATE_content, 'checkbox', 'checkbox_block');
+    $this->setVar('checkbox_block','');
 }
 
 $trail = new Breadcrumbs();
