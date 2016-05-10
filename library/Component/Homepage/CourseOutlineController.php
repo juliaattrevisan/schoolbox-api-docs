@@ -389,9 +389,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         $this->parse('unit_completion_block', 'unit_completion');
 
         // Output list of tasks within units, only if the task is open
-        $display_task_list =
-            $unit->getTasks()->count() > 0 &&
-            ($unit->isOpen() || $unit->isAfterDueDate() || !$this->readOnly);
+        $display_task_list = ($unit->isOpen() || $unit->isAfterDueDate() || !$this->readOnly);
 
         if ($display_task_list) {
 
