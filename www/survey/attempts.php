@@ -118,6 +118,8 @@ if (is_array($allAttempts) && count($allAttempts)) {
 } else {
     $this->setBlock(TEMPLATE_content, 'checkbox', 'checkbox_block');
     $this->setVar('checkbox_block','');
+    $this->setBlock(TEMPLATE_content, 'buttons', 'buttons_block');
+    $this->setVar('buttons_block','');
 }
 
 $trail = new Breadcrumbs();
