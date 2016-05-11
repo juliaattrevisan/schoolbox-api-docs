@@ -63,9 +63,10 @@ class External_Schoolbox_User implements External_UserInterface
             INNER JOIN user_relation ON user.id = user_relation.relation_id
             INNER JOIN `user` parent ON parent.id = user_relation.user_id
             WHERE user.synergy_id IN ($id_list)
+            AND user_relation.relation_type = :relation_type
         "
         );
-        $statement->execute();
+        $statement->execute(array(':relation_type' => self::RELATION_TYPE_PARENT));
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $emailList[$row['StudentContactID']] = $row['StudentContactEmail'];
         }
