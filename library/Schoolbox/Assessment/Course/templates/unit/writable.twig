@@ -25,9 +25,11 @@
             {% for task in tasks[unit.id] %}
                 {% include '@course/task.twig' with { '_writable': true } %}
             {% else %}
-                <li class="empty-state">
-                    <i class="icon-course"></i>
-                    <p>No coursework in this unit yet.</p>
+                <li>
+                    <div class="empty-state">
+                        <i class="icon-course"></i>
+                        <p>No coursework in this unit yet.</p>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
