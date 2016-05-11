@@ -13,14 +13,6 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
 
     public function __construct() {
         $this->database = MSSQL::getInstance();
-        if (DebugBar::isEnabled()) {
-            $this->database->installCollector();
-            /** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
-            $collector = $this->database->getCollector();
-            if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
-                DebugBar::getInstance()->addCollector($collector);
-            }
-        }
     }
 
     /**
