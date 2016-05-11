@@ -1248,11 +1248,17 @@ class Controller extends Base\Base
                     /* Add date validation
                      */
                     try {
-                        \Alaress_Date_Format::newLocalShort($unit['open_date']);
-                        \Alaress_Date_Format::newLocalShort($unit['due_date']);
+                        $openDate = \Alaress_Date_Format::newLocalShort($unit['open_date']);
+                        $dueDate  = \Alaress_Date_Format::newLocalShort($unit['due_date']);
+                        if ($openDate->gt($dueDate)) {
+                            $errorDate = true;
+                            $this->throwError('The open date must be before the close date');
+                            break;
+                        }
                     }
                     catch (\Exception $e) {
                         $errorDate = true;
+                        $this->throwError('You must specify a valid open and close date for each unit you are importing');
                         break;
                     }
                 }
@@ -1262,13 +1268,7 @@ class Controller extends Base\Base
 
             if (!$foundUnit) {
                 $this->throwError('You must select at least one unit to import');
-            }
-            else if ($errorDate) {
-                // Make sure dates were specified
-                $this->throwError('You must specify a valid open and close date for each unit you are importing');
-            }
-            else {
-
+            } elseif (!$errorDate) {
                 /* Figger out when each task should open, due, late, etc
                  * A superposition of Task Instances over Task Abstracts
                  *
