@@ -1,10 +1,10 @@
 <?php
 
-/************************************************************
+/*************************************************************
  *                                                           *
- *        Copyright (c) 2013 Alaress Pty Ltd                *
+ *        Copyright (c) 2013 Alaress Pty Ltd                 *
  *                                                           *
- *    This file provides access to Denbigh user info        *
+ *    This file provides access to Schoolbox user info       *
  *                                                           *
  ************************************************************/
 class External_Schoolbox_User implements External_UserInterface
