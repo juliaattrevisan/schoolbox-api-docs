@@ -11,6 +11,7 @@ namespace Alaress\File\Remote;
 
 
 use OutOfBoundsException;
+use \Schoolbox\Config\Loader as ConfigLoader;
 
 class GDriveFetcher implements FetcherInterface
 {
@@ -27,6 +28,17 @@ class GDriveFetcher implements FetcherInterface
     /** @var array */
     protected $metaCache = array();
 
+    /** @var ConfigLoader */
+    protected $configLoader;
+
+    public function getConfigLoader() {
+        return $this->configLoader;
+    }
+
+    public function setConfigLoader($configLoader) {
+        $this->configLoader = $configLoader;
+        return $this;
+    }
 
     /**
      * @param string   $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
@@ -43,6 +55,8 @@ class GDriveFetcher implements FetcherInterface
                 'Authorization: ' . $httpAuth
             ));
         }
+
+        $this->setConfigLoader(new ConfigLoader());
     }
 
 
@@ -93,8 +107,8 @@ class GDriveFetcher implements FetcherInterface
             $url = null;
             $ext = '';
 
-        } elseif (isset($metadata['exportLinks']['application/pdf'])) {
-            // if there is a PDF-export option for this file, always give that preference
+        } elseif ($this->getConfigLoader()->get('googledrive_pdf_export') == 1 && isset($metadata['exportLinks']['application/pdf'])) {
+            // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
             $url = $metadata['exportLinks']['application/pdf'];
             $ext = '.pdf';
 
