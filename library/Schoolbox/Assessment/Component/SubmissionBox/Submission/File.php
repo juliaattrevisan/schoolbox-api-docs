@@ -301,6 +301,9 @@ class File implements IFile
      */
     public function hasPermission(User $user, UserAccessMapper $userAccessMapper, ShowcaseMapper $showcaseMapper)
     {
+        if ($user->isSuperuser()) {
+            return true;
+        }
         if ($user->getId() == $this->getOwner()->getId()) {
             return true;
         }
