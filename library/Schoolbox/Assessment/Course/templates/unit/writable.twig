@@ -24,6 +24,13 @@
         <ul class="information-list sortable" data-sortable data-task_list>
             {% for task in tasks[unit.id] %}
                 {% include '@course/task.twig' with { '_writable': true } %}
+            {% else %}
+                <li>
+                    <div class="empty-state">
+                        <i class="icon-course"></i>
+                        <p>No coursework in this unit yet.</p>
+                    </div>
+                </li>
             {% endfor %}
         </ul>
         <ul class="flex-list buttons">

@@ -23,7 +23,9 @@
             </ul>
         </section>
     {% else %}
-        <p>No results found.</p>
+        <section>
+            <p class="content">No results found.</p>
+        </section>
 
         <a class='button submit expand' href="/course/new/{{ query | url_encode }}">Create a Course called {{ query }}</a>
     {% endif %}

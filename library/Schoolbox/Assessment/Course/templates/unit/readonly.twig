@@ -1,8 +1,15 @@
 <li class="actions-small-1 content">
     <h3>{{ unit.name }}</h3>
+        {% if tasks[unit.id] | length %}
     <ul class="information-list no-pad">
         {% for task in tasks[unit.id] %}
             {% include '@course/task.twig' with { '_writable': false } %}
         {% endfor %}
     </ul>
+        {% else %}
+    <div class="empty-state">
+        <i class="icon-course"></i>
+        <p>No coursework in this unit.</p>
+    </div>
+        {% endif %}
 </li>
