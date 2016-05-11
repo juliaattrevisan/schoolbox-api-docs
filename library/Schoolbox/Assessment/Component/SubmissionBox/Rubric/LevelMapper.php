@@ -33,7 +33,7 @@ class LevelMapper extends Mapper
      */
     protected function mapping()
     {
-        $this->hasPrototype(new Level());
+        $this->hasModel(Level::class);
 
         $this->hasTable('rubric_level');
 

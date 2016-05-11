@@ -73,11 +73,8 @@ class Mapper extends AbstractFileMapper implements Schoolbox\IHomepageCleanable
      */
     protected function mapping()
     {
-        $model = new Model();
-        $model->setStorage($this->getStorageMapper()->createModel());
-
         $this->hasTable('dropbox');
-        $this->hasPrototype($model);
+        $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('description', self::TYPE_STRING, null, 'title'); // TODO rename this field!

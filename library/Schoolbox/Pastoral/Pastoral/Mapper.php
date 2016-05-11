@@ -109,7 +109,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('pastoral');
-        $this->hasPrototype(new PastoralModel);
+        $this->hasModel(PastoralModel::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('external_id', self::TYPE_INTEGER);
         $this->uses('body', self::TYPE_STRING);

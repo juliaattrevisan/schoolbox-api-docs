@@ -23,7 +23,6 @@ use Schoolbox\User;
  * @package Schoolbox\Resource\File
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findById($id)
- * @method Model createModel()
  */
 class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMapper, Searchable, IHomepageCleanable
 {
@@ -46,11 +45,8 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
     {
         parent::mapping();
 
-        $model = new Model();
-        $model->setStorage($this->getStorageMapper()->createModel());
-
         $this->hasTable('file');
-        $this->hasPrototype($model);
+        $this->hasModel(Model::class);
 
         $this->uses('comment', self::TYPE_STRING, null, 'description'); // TODO rename that field!
         $this->uses('hidden', self::TYPE_BOOLEAN);

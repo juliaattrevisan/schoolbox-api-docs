@@ -36,7 +36,7 @@ class Mapper extends Folder\Mapper
     protected function mapping()
     {
         parent::mapping();
-        $this->hasPrototype(new Model());
+        $this->hasModel(Model::class);
 
         // define the join for unit tasks (it's a reverse join, but it works)
         $this->joins('id', TaskMapper::getInstance(), 'category_id', null, self::COLUMN_JOIN_MULTI, 'tasks', 'task');

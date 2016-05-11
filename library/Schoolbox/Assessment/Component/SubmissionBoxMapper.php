@@ -41,7 +41,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
     {
         $this->hasTable('submission_box');
 
-        $this->hasPrototype(new SubmissionBox());
+        $this->hasModel(SubmissionBox::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);

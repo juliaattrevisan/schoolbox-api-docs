@@ -56,7 +56,7 @@ class Mapper extends FolderMapper
     {
         parent::mapping();
 
-        $this->hasPrototype(new Model());
+        $this->hasModel(Model::class);
 
         // reverse join onto self for unit definition
         $this->joins('id', Unit\Mapper::class, 'parent', null, self::COLUMN_JOIN_MULTI, 'units', 'unit');

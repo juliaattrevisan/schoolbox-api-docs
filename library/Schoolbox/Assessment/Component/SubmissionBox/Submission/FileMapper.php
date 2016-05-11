@@ -27,7 +27,6 @@ use Schoolbox\UserMapper;
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\Submission
  * @method File findById($id)
- * @method File createModel()
  * @method File hydrate(array $row, $alias = '', $callback = null)
  */
 class FileMapper extends Mapper
@@ -56,6 +55,18 @@ class FileMapper extends Mapper
         return $this;
     }
 
+    /**
+     * @param int $idValue
+     * @throws Mapper\Exception
+     * @return File
+     */
+    public function createModel($idValue = null)
+    {
+        /** @var File $model */
+        $model = parent::createModel($idValue);
+        $model->setStorage($this->getStorageMapper()->createModel());
+        return $model;
+    }
 
     /**
      * @return void
@@ -63,11 +74,7 @@ class FileMapper extends Mapper
     protected function mapping()
     {
         $this->hasTable('student_submission');
-
-        $file = new File();
-        $file->setStorage($this->getStorageMapper()->createModel());
-
-        $this->hasPrototype($file);
+        $this->hasModel(File::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('marked', self::TYPE_BOOLEAN);

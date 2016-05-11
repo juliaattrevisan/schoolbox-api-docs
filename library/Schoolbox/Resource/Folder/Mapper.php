@@ -94,7 +94,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         parent::mapping();
 
-        $this->hasPrototype(new Model());
+        $this->hasModel(Model::class);
         $this->hasTable('category');
 
         $this->uses('inherit', self::TYPE_BOOLEAN);

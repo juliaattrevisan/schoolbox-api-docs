@@ -22,7 +22,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('blog_image');
-        $this->hasPrototype(new BlogImageModel);
+        $this->hasModel(BlogImageModel::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('blog_id', self::TYPE_INTEGER);
         $this->uses('hash', self::TYPE_STRING);

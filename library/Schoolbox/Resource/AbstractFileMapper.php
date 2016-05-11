@@ -35,6 +35,18 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
      */
     protected $storageMapper;
 
+    /**
+     * @param int $idValue
+     * @throws \Schoolbox\Mapper\Exception
+     * @return AbstractFile
+     */
+    public function createModel($idValue = null)
+    {
+        /** @var AbstractFile $model */
+        $model = parent::createModel($idValue);
+        $model->setStorage($this->getStorageMapper()->createModel());
+        return $model;
+    }
 
     /**
      * @return void

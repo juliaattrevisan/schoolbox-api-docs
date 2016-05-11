@@ -26,7 +26,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('pastoral_access');
-        $this->hasPrototype(new Model());
+        $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('pastoral_id', self::TYPE_INTEGER);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');

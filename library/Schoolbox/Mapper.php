@@ -115,15 +115,9 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Class name of the model to associate with this mapper.
      *
-     * @deprecated use self::$prototype instead
      * @var string
      */
     protected $model;
-
-    /**
-     * @var object
-     */
-    protected $prototype;
 
     /**
      * Class name of the module notifier to associate with this mapper.
@@ -1947,7 +1941,6 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * @deprecated use self::hasPrototype() instead
      * @param string $model
      * @return bool
      */
@@ -1959,22 +1952,6 @@ abstract class Mapper implements IMapper, Serializable
         $this->model = $model;
         return true;
     }
-
-
-    /**
-     * @param object $prototype
-     * @return bool
-     */
-    protected function hasPrototype($prototype)
-    {
-        if (!is_object($prototype)) {
-            return false;
-        }
-        $this->prototype = $prototype;
-        $this->model     = get_class($prototype);
-        return true;
-    }
-
 
     protected function hasModuleNotifier($classname)
     {
@@ -2303,23 +2280,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function createModel($idValue = null)
     {
-        if ($this->prototype) {
-            // prototype has higher precedence than model class
-            $model = clone $this->prototype;
-
-            // iterate the map and clone any objects in there
-            foreach ($this->map as $map) {
-                $getProp = $this->getGetMethodName($map['property']);
-                $setProp = $this->getSetMethodName($map['property']);
-
-                // only clone if it's actually an object
-                if (is_object($value = $model->$getProp())) {
-                    $model->$setProp(clone $value);
-                }
-            }
-        }
-        elseif ($this->model) {
-            // TODO model is deprecated, this case is to be removed
+        if ($this->model) {
             // create a new, blank model if one is defined
             $model = new $this->model;
         }
