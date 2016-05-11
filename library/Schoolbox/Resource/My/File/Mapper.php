@@ -26,6 +26,7 @@ use Schoolbox\User;
  * @package Schoolbox\Resource\My\File
  * @method Model findById($id)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model createModel()
  */
 class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
 {
@@ -48,11 +49,8 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
     {
         parent::mapping();
 
-        $model = new Model();
-        $model->setStorage($this->getStorageMapper()->createModel());
-
         $this->hasTable('myFile');
-        $this->hasPrototype($model);
+        $this->hasModel(Model::class);
 
         $this->uses('published', self::TYPE_DATETIME, null, 'publishedAt');
 
