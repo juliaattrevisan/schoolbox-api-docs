@@ -589,21 +589,29 @@ class SitePage extends Page
      */
     function error($ec, $args = [], $code = 400)
     {
+        // Backward-compatibility with $args being a message
+        if (is_string($args)) {
+            $args = ['message' => $args];
+        }
         /* Enforce structure
          */
         if (!is_array($args)) {
-            $args = [
-                'code' => '',
-                'header' => '',
-                'info' => '',
-                'summary' => '',
-                'url' => '',
-                'date' => '',
-                'meta' => '',
-                'outputStackTrace',
-                'stackTrace' => '',
-            ];
+            $args = [];
         }
+
+        $defaultArgs = [
+            'code' => '',
+            'header' => '',
+            'info' => '',
+            'summary' => '',
+            'url' => '',
+            'date' => '',
+            'meta' => '',
+            'outputStackTrace' => '',
+            'stackTrace' => '',
+            'message' => '',
+        ];
+        $args = array_merge($defaultArgs, $args);
 
         /* If an error code is set, extract textual information from
          * the db via ErrorMapper. Otherwise just use a custom message
