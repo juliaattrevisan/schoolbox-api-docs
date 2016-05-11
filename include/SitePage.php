@@ -634,7 +634,7 @@ class SitePage extends Page
 
         /* Set up any replacements
          */
-        $error->setMessage(str_replace("%MESSAGE%", $args['error']['message'], $error->getMessage()));
+        $error->setMessage(str_replace("%MESSAGE%", $args['message'], $error->getMessage()));
 
         header(':', true, $code);
 
