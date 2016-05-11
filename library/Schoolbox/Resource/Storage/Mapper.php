@@ -27,7 +27,6 @@ use Schoolbox\Video\QueueMapper;
  * @package Schoolbox\Resource\Storage
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
- * @method Model createModel()
  */
 class Mapper extends Schoolbox\Mapper implements Receiver
 {
@@ -45,6 +44,18 @@ class Mapper extends Schoolbox\Mapper implements Receiver
         $this->setManager(new Manager($factory->build($this->config_loader->get('storage_dir')), new Alaress_Byte_Format()));
     }
 
+    /**
+     * @param int $idValue
+     * @throws \Schoolbox\Mapper\Exception
+     * @return Model
+     */
+    public function createModel($idValue = null)
+    {
+        /** @var Model $model */
+        $model = parent::createModel($idValue);
+        $model->setFilesystem($this->mgr->getFilesystem(Manager::FS_STORAGE));
+        return $model;
+    }
 
     /**
      * @return void
@@ -52,7 +63,7 @@ class Mapper extends Schoolbox\Mapper implements Receiver
     protected function mapping()
     {
         $this->hasTable('storage');
-        $this->hasPrototype(new Model($this->mgr->getFilesystem(Manager::FS_STORAGE)));
+        $this->hasModel(Model::class);
 
         $this->uses('hash', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
         $this->uses('filename', self::TYPE_STRING);
