@@ -8,7 +8,7 @@ use Schoolbox\Config\ConfigMapper;
 
 // not in sitepage context, redirect
 if(!isset($this)) {
-    require_once(dirname(__FILE__). '/../../include/Bootstrap.php');
+    require_once(dirname(__FILE__). '/../../library/Bootstrap.php');
     SitePage::localRedir('/submission/submissionHistory');
 }
 

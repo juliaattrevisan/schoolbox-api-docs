@@ -4,7 +4,7 @@
     use Schoolbox\User;
     use Schoolbox\Permission\Access\UserAccessMapper;
 
-    require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+    require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
     $categoryId = $_REQUEST['categoryID'];
     $groupHandler = new Group(HOMEPAGE_SERVICE);

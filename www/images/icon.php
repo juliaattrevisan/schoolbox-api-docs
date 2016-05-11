@@ -11,7 +11,7 @@
 use Alaress\Image\Cache\BrokenFS;
 use Alaress\Image\Processor\Freeform;
 
-require_once __DIR__.'/../../include/Bootstrap.php';
+require_once __DIR__.'/../../library/Bootstrap.php';
 
 $path = '/images/core/icons/activity-icons-72x72px.png';
 

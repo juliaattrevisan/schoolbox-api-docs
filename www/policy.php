@@ -1,5 +1,5 @@
 <?php
-require_once('../include/Bootstrap.php');
+require_once('../library/Bootstrap.php');
 
 $page = new SitePage(false);
 $page->setSite();

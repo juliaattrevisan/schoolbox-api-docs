@@ -16,7 +16,7 @@ if (isset($this)) {
     exit;
 }
 
-require_once('../../include/Bootstrap.php');
+require_once('../../library/Bootstrap.php');
 new SitePage();
 
 header('Content-Type: application/json');

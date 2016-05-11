@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-require_once('../include/Alaress/Soap/NTLM/SoapClientAuth.php');
+require_once('../library/Alaress/Soap/NTLM/SoapClientAuth.php');
 
 class Alaress_Soap_NTLM_Client extends SoapClientAuth {
 

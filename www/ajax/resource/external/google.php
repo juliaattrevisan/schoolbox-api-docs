@@ -13,7 +13,7 @@ use Schoolbox\Resource\Storage;
  */
 
 if (empty($this) || $_SERVER['REQUEST_METHOD'] != 'POST') {
-    require_once __DIR__ . '/../../../../include/Bootstrap.php';
+    require_once __DIR__ . '/../../../../library/Bootstrap.php';
     // nope. go away
     SitePage::localRedir('/resource/external/google');
 }

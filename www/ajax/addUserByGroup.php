@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 require_once SITE_root . '/www/include/stdfuncs.php';
 
 $groupHandler = new Group();

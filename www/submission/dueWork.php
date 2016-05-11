@@ -8,7 +8,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 if (!isset($this)) {
-    require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+    require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
     SitePage::localRedir('/submission/dueWork');
 }
 

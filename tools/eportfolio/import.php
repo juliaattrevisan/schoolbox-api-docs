@@ -13,7 +13,7 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
-require_once __DIR__ . '/../../include/Bootstrap.php';
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 $options          = getopt('u:r::U::p::', array('skip-duplicates', 'enable-eportfolio', 'dry-run'));
 $userId           = $options['u'];

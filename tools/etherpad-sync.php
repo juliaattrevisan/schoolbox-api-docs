@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-require_once(dirname(__FILE__) . '/../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
 
 /* Load the pad from our db to get its groupId
  * Error out if you can't find it

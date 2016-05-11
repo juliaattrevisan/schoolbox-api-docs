@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 $liss = new External_Liss_Server();
 $liss->start();

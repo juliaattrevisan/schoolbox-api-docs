@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-require_once __DIR__ . '/../../../include/Bootstrap.php';
+require_once __DIR__ . '/../../../library/Bootstrap.php';
 
 if($argc < 3) {
 	die("Usage: php {$argv[0]} <sessionID> <count>\n");

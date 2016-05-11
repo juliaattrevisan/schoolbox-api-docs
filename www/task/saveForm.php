@@ -8,7 +8,7 @@
  */
 
 /** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
-$kernel = require_once __DIR__ . '/../../include/Bootstrap.php';
+$kernel = require_once __DIR__ . '/../../library/Bootstrap.php';
 
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;

@@ -5,7 +5,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Schedule\Event;
 
-require_once('../../include/Bootstrap.php');
+require_once('../../library/Bootstrap.php');
 
 $page = new SitePage();
 $groupHandler = new Group(HOMEPAGE_SERVICE);

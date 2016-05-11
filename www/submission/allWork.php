@@ -17,7 +17,7 @@ use Schoolbox\Assessment\Term;
 
 // require sitepage context
 if(!isset($this)) {
-	require_once '../../include/Bootstrap.php';
+	require_once '../../library/Bootstrap.php';
 	SitePage::localRedir('/submission/allWork');
 }
 

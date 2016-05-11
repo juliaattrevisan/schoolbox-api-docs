@@ -3,7 +3,7 @@
 // If you inject the dependency injection engine into Sitepage,
 // it can use Twig to generate component content.
 /** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
-$kernel = require_once dirname(__FILE__) . '/../../../include/Bootstrap.php';
+$kernel = require_once dirname(__FILE__) . '/../../../library/Bootstrap.php';
 
 $page = new SitePage();
 

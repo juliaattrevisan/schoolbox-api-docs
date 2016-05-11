@@ -14,7 +14,7 @@ if (isset($this)) {
     $this->localRedir('/adminv2/grades');
     exit;
 }
-require_once __DIR__.'/../../include/Bootstrap.php';
+require_once __DIR__.'/../../library/Bootstrap.php';
 
 // Build sitepage and session, and get permissions
 $page = new SitePage();

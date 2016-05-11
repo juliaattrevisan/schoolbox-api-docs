@@ -9,7 +9,7 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Calendar\Event\Collection\Exporter;

@@ -11,7 +11,7 @@
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage;
 
-require_once(dirname(__FILE__) . '/../../../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../../../library/Bootstrap.php');
 
 $page = new SitePage();
 

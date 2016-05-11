@@ -22,7 +22,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
 /** @var Kernel $kernel */
-$kernel = require_once __DIR__ . '/../../../include/Bootstrap.php';
+$kernel = require_once __DIR__ . '/../../../library/Bootstrap.php';
 
 class SchoolNewsMap extends ArticleMapper
 {

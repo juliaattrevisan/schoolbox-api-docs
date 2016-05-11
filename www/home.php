@@ -7,6 +7,6 @@
 
 /* Page deprecated and replaced  by new dashboard system*/
 
-require_once(dirname(__FILE__) . '/../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
 
 SitePage::localRedir('/');

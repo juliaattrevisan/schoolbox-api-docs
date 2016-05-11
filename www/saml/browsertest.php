@@ -1,7 +1,7 @@
 <?php
 /* Test for detecting browsers */
 
-require_once __DIR__.'/../../include/Bootstrap.php';
+require_once __DIR__.'/../../library/Bootstrap.php';
 echo "<pre>";
 echo "Detected Browser Info:\n\n";
 

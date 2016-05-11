@@ -1,6 +1,6 @@
 <?php
 /** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
-$kernel = require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+$kernel = require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 
 $page = new SitePage();
 $page->setDi($kernel->getDependencyInjector());

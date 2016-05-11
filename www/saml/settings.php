@@ -18,7 +18,7 @@
  *    You must provide this, and it should point to the consume.php script or its equivalent.
  */
 
-require_once __DIR__.'/../../include/Bootstrap.php';
+require_once __DIR__.'/../../library/Bootstrap.php';
 
 $settings = new OneLogin_Saml_Settings();
 

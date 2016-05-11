@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-require_once('../../include/Bootstrap.php');
+require_once('../../library/Bootstrap.php');
 
 // kickstart a session
 new SitePage();

@@ -11,7 +11,7 @@
  * @idea_stolen_from Matt Day <matt.day@alaress.com.au>
  */
 
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 use Alaress\Lumberjack\Logger;
 

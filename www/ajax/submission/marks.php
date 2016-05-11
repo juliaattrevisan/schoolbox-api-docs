@@ -18,7 +18,7 @@ if(isset($this)) {
 }
 
 // get autoloader and trigger session
-require_once('../../../include/Bootstrap.php');
+require_once('../../../library/Bootstrap.php');
 new SitePage();
 
 // no request method, this didn't come via apache

@@ -11,7 +11,7 @@
 
 // require SitePage context
 if (!isset($this)) {
-    require_once('../../../include/Bootstrap.php');
+    require_once('../../../library/Bootstrap.php');
     httpError(400, 101); // resource not available
 }
 

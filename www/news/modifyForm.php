@@ -1,7 +1,7 @@
 <?php
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 $page = new SitePage();
 $newsHandler = new News();

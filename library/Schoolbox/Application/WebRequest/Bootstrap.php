@@ -64,7 +64,7 @@ class Bootstrap implements BootstrapInterface {
 	public function loadConfiguration() {
 		require_once __DIR__ . '/../../../../www/conf/conf.php';
 		require_once SITE_root . '/www/include/stdfuncs.php';
-		require_once SITE_root . '/include/constants.php';
+		require_once SITE_root . '/library/constants.php';
 	}
 
 
@@ -84,7 +84,7 @@ class Bootstrap implements BootstrapInterface {
 	 * @return void
 	 */
 	public function registerAutoLoading() {
-		require_once 'include/Autoloader.php';
+		require_once 'library/Autoloader.php';
 		Autoloader::initialise();
 	}
 

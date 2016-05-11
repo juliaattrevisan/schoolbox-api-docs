@@ -10,7 +10,7 @@ use Schoolbox\Calendar\EventRelations;
  * @version     SVN: $Id$
  */
 
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 $groupHandler    = new Group();
 $calendarHandler = new Calendar();

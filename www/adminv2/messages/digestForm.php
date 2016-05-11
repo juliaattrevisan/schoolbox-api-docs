@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-require_once('../../../include/Bootstrap.php');
+require_once('../../../library/Bootstrap.php');
 
 if(isset($this) || empty($_POST)) {
 	SitePage::localRedir('/adminv2/messages');

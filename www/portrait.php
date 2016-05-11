@@ -14,7 +14,7 @@
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
 
-require_once '../include/Bootstrap.php';
+require_once '../library/Bootstrap.php';
 
 //
 // Alaress_Image_Cache_Portrait needs to know if someone is logged in.

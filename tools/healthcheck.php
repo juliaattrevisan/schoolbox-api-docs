@@ -10,7 +10,7 @@
 
 echo "[".date('Y-m-d H:i:s')."] Running health check script\n";
 
-require_once(dirname(__FILE__) . '/../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
 
 $siteLocation = Cfg::get('site_location');
 

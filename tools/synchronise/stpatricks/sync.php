@@ -8,7 +8,7 @@
  */
 
 $options = getopt("v", array('perform-update', 'diagnostic'));
-require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
 $sync = new Synchronise_Facade('Stpatricks', isset($options['v']), isset($options['perform-update']));
 
 // these should be in order of dependencies (and vertically formatted for easier visual scanning)

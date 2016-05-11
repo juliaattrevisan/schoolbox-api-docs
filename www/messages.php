@@ -15,7 +15,7 @@ use Schoolbox\Realtime\Notification\Decorator;
 /** @var SitePage $this */
 
 if(!isset($this)) {
-	require_once('../include/Bootstrap.php');
+	require_once('../library/Bootstrap.php');
 	error(2);
 	exit;
 }

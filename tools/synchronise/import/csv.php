@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 
-require_once(__DIR__ . '/../../../include/Bootstrap.php');
+require_once(__DIR__ . '/../../../library/Bootstrap.php');
 
 use Alaress\Csv\Reader;
 use Alaress\Lumberjack\Logger;

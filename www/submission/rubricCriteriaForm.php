@@ -12,7 +12,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\UsageMapper;
 
-require_once('../../include/Bootstrap.php');
+require_once('../../library/Bootstrap.php');
 
 // this is a script and not to be SitePage'd
 if(isset($this)) {

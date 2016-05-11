@@ -1,7 +1,7 @@
 <?php
 use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
 

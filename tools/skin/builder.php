@@ -5,7 +5,7 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 use Alaress\Lumberjack\Logger;
 

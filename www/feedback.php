@@ -1,6 +1,6 @@
 <?php
 /** @var Alaress\Application\Kernel $kernel */
-$kernel = require_once dirname(__FILE__) . '/../include/Bootstrap.php';
+$kernel = require_once dirname(__FILE__) . '/../library/Bootstrap.php';
 
 session_start();
 

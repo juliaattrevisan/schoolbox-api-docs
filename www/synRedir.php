@@ -1,6 +1,6 @@
 <?php
 /* Script to automatically login to synergetic portal based on existing login creditials */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php');
 $page = new SitePage;
 $user = $_SESSION['user'];
 $url = new \Zend\Uri\Uri(Cfg::get('external_portal'));

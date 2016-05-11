@@ -8,7 +8,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-require_once __DIR__.'/../../../include/Bootstrap.php';
+require_once __DIR__.'/../../../library/Bootstrap.php';
 
 $db     = Database::getInstance();
 $logger = new \Alaress\Lumberjack\Logger();

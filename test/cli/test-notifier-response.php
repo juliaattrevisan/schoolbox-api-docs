@@ -18,7 +18,7 @@ if (count($argv) < 4) {
     die("Usage: {$argv[0]} <NotifierClass> <ObjectID> <MethodName>\n");
 }
 
-require_once __DIR__ . '/../../include/Bootstrap.php';
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 list (, $classname, $id, $method) = $argv;
 

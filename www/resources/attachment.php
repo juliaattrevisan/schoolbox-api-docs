@@ -11,7 +11,7 @@ use Schoolbox\Resource\Attachment\Factory as ResourceAttachmentFactory;
 use Schoolbox\Resource\Attachment\Context\Factory as ResourceContextFactory;
 
 if (empty($this)) {
-    require_once __DIR__ . '/../../include/Bootstrap.php';
+    require_once __DIR__ . '/../../library/Bootstrap.php';
     SitePage::localRedir('/resources/attachment');
 }
 
