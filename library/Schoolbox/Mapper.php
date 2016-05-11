@@ -115,7 +115,6 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Class name of the model to associate with this mapper.
      *
-     * @deprecated use self::$prototype instead
      * @var string
      */
     protected $model;
@@ -2318,7 +2317,6 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
         elseif ($this->model) {
-            // TODO model is deprecated, this case is to be removed
             // create a new, blank model if one is defined
             $model = new $this->model;
         }
