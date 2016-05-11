@@ -29,7 +29,7 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
     protected function mapping()
     {
         $this->hasTable('eportfolio_component_blog_comment');
-        $this->hasPrototype(new EportfolioBlogCommentModel);
+        $this->hasModel(EportfolioBlogCommentModel::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('blog_id', EportfolioBlogMapper::class, 'id', null, null, 'blog');

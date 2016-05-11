@@ -28,7 +28,7 @@ class Mapper extends Schoolbox\Mapper
      */
     protected function mapping()
     {
-        $this->hasPrototype(new Model());
+        $this->hasModel(Model::class);
         $this->hasTable('ups_condition_type');
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);

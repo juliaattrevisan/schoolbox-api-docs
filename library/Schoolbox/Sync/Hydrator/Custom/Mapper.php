@@ -37,7 +37,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasPrototype(new Model());
+        $this->hasModel(Model::class);
         $this->hasTable('ups_custom_hydrator');
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('class', self::TYPE_STRING);

@@ -24,7 +24,7 @@ class UserMapper extends SchoolboxMapper
     {
         parent::mapping();
 
-        $this->hasPrototype(new User());
+        $this->hasModel(User::class);
 
         $this->registerCallback('postSave', array($this, 'postSave'));
     }

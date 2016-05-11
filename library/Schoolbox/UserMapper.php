@@ -27,7 +27,7 @@ class UserMapper extends Mapper
     {
 
         $this->hasTable('user');
-        $this->hasPrototype(new User());
+        $this->hasModel(User::class);
 
         $this->hasMap(
             array(

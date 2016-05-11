@@ -1947,7 +1947,6 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * @deprecated use self::hasPrototype() instead
      * @param string $model
      * @return bool
      */

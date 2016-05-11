@@ -27,7 +27,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasPrototype(new Model());
+        $this->hasModel(Model::class);
         $this->hasTable('ups_config');
         $this->uses('role_type', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
         $this->uses('enabled', self::TYPE_BOOLEAN);

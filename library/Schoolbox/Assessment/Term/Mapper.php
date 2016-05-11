@@ -27,7 +27,7 @@ class Mapper extends BaseMapper
     public function mapping()
     {
         $this->hasTable('term');
-        $this->hasPrototype(new Model());
+        $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('code', self::TYPE_STRING);

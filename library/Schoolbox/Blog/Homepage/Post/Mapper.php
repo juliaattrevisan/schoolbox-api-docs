@@ -32,7 +32,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
     protected function mapping()
     {
         $this->hasTable('blog');
-        $this->hasPrototype(new BlogModel);
+        $this->hasModel(BlogModel::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, 'folder');
         $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner');

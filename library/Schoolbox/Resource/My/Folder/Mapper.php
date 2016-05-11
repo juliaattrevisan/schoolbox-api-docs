@@ -50,7 +50,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
 
         $this->hasTable('myFolder');
 
-        $this->hasPrototype(new Model());
+        $this->hasModel(Model::class);
 
         $this->joins('owner', UserMapper::class, 'id');
     }

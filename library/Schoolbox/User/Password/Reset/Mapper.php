@@ -24,7 +24,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('user_password_reset_request');
-        $this->hasPrototype(new Model());
+        $this->hasModel(Model::class);
 
         $this->uses('token', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
         $this->uses('ip', self::TYPE_STRING);

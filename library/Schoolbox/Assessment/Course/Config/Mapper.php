@@ -20,7 +20,7 @@ class Mapper extends BaseMapper
     public function mapping()
     {
         $this->hasTable('course_builder_config');
-        $this->hasPrototype(new Model());
+        $this->hasModel(Model::class);
 
         $this->hasMap(
             array(

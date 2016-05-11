@@ -36,7 +36,7 @@ class Mapper extends Schoolbox\Mapper
     protected function mapping()
     {
         $this->hasTable('ups_log');
-        $this->hasPrototype(new Model());
+        $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('role_type', self::TYPE_STRING);
