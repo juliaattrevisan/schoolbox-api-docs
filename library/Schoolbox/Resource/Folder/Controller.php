@@ -634,22 +634,33 @@ class Controller extends BaseController
      */
     public function postDeleteFolderAll()
     {
+        $this->recursiveDelete($this->getRequest()->post["id"], $this->getUser());
+    }
+
+
+    /**
+     * @param int  $id
+     * @param User $user
+     * @throws SchoolboxException
+     */
+    public function recursiveDelete($id, User $user)
+    {
         $errorMapper = $this->getErrorMapper();
         $folderMapper = $this->getFolderMapper();
 
-        if (!$this->getUser()->isSuperuser()) {
+        if (!$user->isSuperuser()) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_DELETE_SUBFOLDERS);
         }
 
         try {
-            $folder = $folderMapper->findById($this->getRequest()->post["id"]);
+            $folder = $folderMapper->findById($id);
         } catch (\Exception $e ) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
         }
 
         $folderMapper->recursiveDelete($folder);
 
-        $_SESSION['resourcesID'] = $folder->getParent()->getId();
+        $this->getSession()->set('resourcesID', $folder->getParent()->getId());
 
         $this->getResponse()->content->set([
             'format' => 'json',
