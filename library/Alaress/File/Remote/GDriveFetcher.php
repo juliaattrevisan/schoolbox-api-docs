@@ -114,7 +114,11 @@ class GDriveFetcher implements FetcherInterface
 
         } else {
 
-            if ($metadata['mimeType'] == "application/vnd.google-apps.document") {
+            if ($metadata['mimeType'] == "application/vnd.google-apps.presentation") {
+                // Get PPTX format slides
+                $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.presentationml.presentation'];
+                $ext = '.pptx';
+            } else if ($metadata['mimeType'] == "application/vnd.google-apps.document") {
                 // Get DOCX format spreadsheet
                 $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
                 $ext = '.docx';
