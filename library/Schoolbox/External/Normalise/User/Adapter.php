@@ -853,6 +853,12 @@ class Adapter  implements \External_UserInterface {
                     ->setAddress($currentResult['StudentContactDefaultEmail'])
                 ;
 
+                $guardian1WorkEmail = new Common\Email();
+                $guardian1WorkEmail
+                    ->setAddress($currentResult['StudentContactDefaultWiorkOccup1Email'])
+                ;
+
+
                 $guardian1 = new Guardian();
                 $guardian1
                     ->setId($currentResult['StudentContactID'])
@@ -860,6 +866,7 @@ class Adapter  implements \External_UserInterface {
                     ->setPreferredName(strlen($currentResult['StudentContactPreferred']) ? $currentResult['StudentContactPreferred'] : $currentResult['StudentContactLegalFullName'])
                     ->setLastname($currentResult['StudentContactSurname'])
                     ->addEmail($guardian1Email)
+                    ->addWorkEmail($guardian1WorkEmail)
                     ->setPubliclyVisible($currentResult['PrimaryDirectoryIncludeFlag'])
                     ->setType($currentResult['StudentContactType'])
                 ;

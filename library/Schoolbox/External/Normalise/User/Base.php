@@ -112,6 +112,13 @@ abstract class Base {
     protected $email = '';
 
     /**
+     * Work Email address
+     *
+     * @var \Schoolbox\Collection
+     */
+    protected $workEmail = '';
+
+    /**
      * Home phone
      *
      * @var Phone
@@ -171,6 +178,23 @@ abstract class Base {
     public function addEmail($email) {
         if (strlen(trim($email->getAddress()))) {
             $this->getEmail()->add($email);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Delegate method
+     *
+     * Add a work email to the collection
+     *
+     * @param Email $workEmail
+     * @return $this
+     */
+    public function addWorkEmail($workEmail)
+    {
+        if (strlen(trim($workEmail->getAddress()))) {
+            $this->getWorkEmail()->add($workEmail);
         }
 
         return $this;
@@ -265,6 +289,28 @@ abstract class Base {
     public function getEmail()
     {
         return $this->email;
+    }
+
+    /**
+     * Set work email
+     *
+     * @param Collection $workEmail
+     * @return $this
+     */
+    public function setWorkEmail($workEmail)
+    {
+        $this->workEmail = $workEmail;
+        return $this;
+    }
+
+    /**
+     * Get work email
+     *
+     * @return Collection
+     */
+    public function getWorkEmail()
+    {
+        return $this->workEmail;
     }
 
     /**
