@@ -67,7 +67,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
             return false;
         }
 
-        if ($this->permission < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
@@ -100,7 +100,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
             'can_modify_news_block' => '',
         ));
 
-        $newsPermission = $this->permission;
+        $newsPermission = $this->contentPermission;
 
         switch ($newsPermission) {
             case FULL_ACCESS:
@@ -151,8 +151,8 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
                 // news_edit_other allows users with write access to edit other's news
                 $canModify = $news['owner'] == $_SESSION['id']
-                    || $this->permission >= FULL_ACCESS
-                    || ($this->permission >= WRITE_ACCESS && Config::get('news_edit_other'));
+                    || $this->contentPermission >= FULL_ACCESS
+                    || ($this->contentPermission >= WRITE_ACCESS && Config::get('news_edit_other'));
 
                 if ($canModify) {
                     $this->parse('can_modify_news_block', 'can_modify_news');
@@ -165,7 +165,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
                 /* Anyone with write access can now see the publish date for news items
 		         */
-                if ($this->permission >= WRITE_ACCESS) {
+                if ($this->contentPermission >= WRITE_ACCESS) {
                     $publishDate = new Alaress_Date_Format($news['published'], 'U');
 
                     if (strlen($news['published']) && $news['published'] > time()) {

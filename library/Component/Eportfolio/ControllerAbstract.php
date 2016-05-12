@@ -29,13 +29,13 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
 
         /** @var Schoolbox\User $_SESSION['user'] */
         if ($_SESSION['user']->isSuperuser()) {
-            $this->permission = \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+            $this->contentPermission = \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
         } elseif (!isset($context)) {
-            $this->permission = \Schoolbox\Permission\Access\UserAccess::ACCESS_DENY;
+            $this->contentPermission = \Schoolbox\Permission\Access\UserAccess::ACCESS_DENY;
         } else {
-            $this->permission = $context->getPermission();
+            $this->contentPermission = $context->getPermission();
         }
-        $this->controlPermission = $this->permission;
+        $this->controlPermission = $this->contentPermission;
 
         /* Check primary key is being used correctly!
          */

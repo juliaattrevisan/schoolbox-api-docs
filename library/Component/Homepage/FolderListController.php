@@ -72,7 +72,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         }
         $this->parseConfig();
 
-        if ($this->permission < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
@@ -93,7 +93,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         $this->setVar('folders_block', '');
 
         $maxFolders = $this->getConfig('size');
-        if (count($allFolders) && $this->permission > DENY_ACCESS) {
+        if (count($allFolders) && $this->contentPermission > DENY_ACCESS) {
             $j = 0;
 
             $this->setVar('folders_block', '');
@@ -113,7 +113,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
                 $this->setVar($output);
 
-                if ($this->permission >= WRITE_ACCESS) {
+                if ($this->contentPermission >= WRITE_ACCESS) {
                     $this->parse('modify_folder_block', 'modify_folder');
                 } else {
                     $this->setVar('modify_folder_block', '');
@@ -139,7 +139,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
         $this->setBlock($templateHandle, "submit_folder", "submit_folder_block");
 
-        if ($this->permission < WRITE_ACCESS) {
+        if ($this->contentPermission < WRITE_ACCESS) {
             $this->setVar("submit_folder_block", "");
         } else {
             $this->parse("submit_folder_block", "submit_folder");

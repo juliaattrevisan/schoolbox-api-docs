@@ -69,7 +69,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             array(
                 'context'  => $this->getContext(),
                 'node'     => $this->curriculumNode,
-                'readonly' => ($this->permission <= UserAccess::ACCESS_READ),
+                'readonly' => ($this->contentPermission <= UserAccess::ACCESS_READ),
             )
         );
     }

@@ -44,7 +44,7 @@ abstract class Component_ControllerAbstract
      *
      * @var int
      */
-    protected $permission = DENY_ACCESS;
+    protected $contentPermission = DENY_ACCESS;
 
     /**
      * Permission for component controls, as opposed to the component content.
@@ -720,7 +720,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasReadAccess()
     {
-        return $this->permission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ;
+        return $this->contentPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ;
     }
 
     /**
@@ -730,7 +730,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasWriteAccess()
     {
-        return $this->permission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
+        return $this->contentPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
     }
 
     /**
@@ -740,7 +740,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasFullAccess()
     {
-        return $this->permission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+        return $this->contentPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
     }
 
     /**

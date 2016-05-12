@@ -100,7 +100,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
 
         //setup block for submission button
         $this->setBlock($templateHandle, "submit_event", "submit_event_block");
-        if ($this->permission < WRITE_ACCESS) {
+        if ($this->contentPermission < WRITE_ACCESS) {
             $this->setVar("submit_event_block", "");
         } else {
             $this->parse("submit_event_block", "submit_event");

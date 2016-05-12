@@ -82,7 +82,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
         }
 
         // Permission denied if user doesn't have write access to category
-        if ($this->permission < WRITE_ACCESS) {
+        if ($this->contentPermission < WRITE_ACCESS) {
             return false;
         }
 

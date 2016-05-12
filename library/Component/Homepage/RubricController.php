@@ -82,7 +82,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             $this->parse('rubric_criterion_block', 'rubric_criterion', true);
         }
 
-        if ($this->permission >= WRITE_ACCESS) {
+        if ($this->contentPermission >= WRITE_ACCESS) {
             $this->parse('modify_rubric_block', 'modify_rubric');
         } else {
             $this->setVar('modify_rubric_block', '');

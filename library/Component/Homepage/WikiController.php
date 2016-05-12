@@ -69,7 +69,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         }
 
 
-        if ($this->permission < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
@@ -111,9 +111,9 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
          */
         $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->instance->getId());
 
-        if (((int)$value === 1) && ($this->permission < WRITE_ACCESS)) {
+        if (((int)$value === 1) && ($this->contentPermission < WRITE_ACCESS)) {
             $this->parse("submit_wiki_block", "submit_wiki");
-        } elseif ($this->permission < WRITE_ACCESS) {
+        } elseif ($this->contentPermission < WRITE_ACCESS) {
             $this->setVar("submit_wiki_block", "");
         } else {
             /* Allow Create is off
@@ -160,7 +160,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
                     )
                 );
 
-                if (($this->permission >= READ_ACCESS && $wiki['locked'] == 'false') || $this->permission >= WRITE_ACCESS) {
+                if (($this->contentPermission >= READ_ACCESS && $wiki['locked'] == 'false') || $this->contentPermission >= WRITE_ACCESS) {
                     $this->parse('modify_wiki_block', 'modify_wiki');
                 }
 

@@ -130,13 +130,13 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
                     $this->setVar($output);
                     if ($audio->getStatus() == "completed") {
-                        if ($this->permission > READ_ACCESS) {
+                        if ($this->contentPermission > READ_ACCESS) {
                             $this->parse('audio_edit_block', 'audio_edit', true);
                         } else {
                             $this->setVar('audio_edit_block', '');
                         }
                         $this->parse('audio_list_block', 'audio_list', true);
-                    } elseif ($this->permission >= WRITE_ACCESS) {
+                    } elseif ($this->contentPermission >= WRITE_ACCESS) {
                         $this->setVar(
                             array(
                                 'AUDIO_LIST_STATUS'    => $audio->getStatus(),
@@ -153,7 +153,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
         //setup block for submission button
         $this->setBlock($templateHandle, "submit_file", "submit_file_block");
-        if ($this->permission < WRITE_ACCESS) {
+        if ($this->contentPermission < WRITE_ACCESS) {
             $this->setVar("submit_file_block", "");
         } else {
             $this->parse("submit_file_block", "submit_file");
