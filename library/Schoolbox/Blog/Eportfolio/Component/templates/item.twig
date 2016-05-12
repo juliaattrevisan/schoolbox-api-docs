@@ -100,6 +100,7 @@
 
                     {% endfor %}
 
+                    {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {id: record.getId}) %}
                     <li>
                         <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: record.getId}) }}" method="post">
                             <input type="hidden" name="pageId" value="{{ page.getPageId }}">
@@ -111,6 +112,7 @@
                             <input type="submit" class="no-margin" name="comment" value="Add comment"/>
                         </form>
                     </li>
+                    {% endif %}
                 </ul>
             </section>
     </div>

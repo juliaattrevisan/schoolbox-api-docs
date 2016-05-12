@@ -10,7 +10,9 @@
         </div>
     </div>
     <nav>
+        {% if isRouteAuthorized('eportfolioBlog.getInsert', {ownerId: page.getUid, pageId: page.getPageId}) %}
         <a href="{{ routeLookup('eportfolioBlog.getInsert', {ownerId: page.getUid, pageId: page.getPageId}) }}" class="icon-add" title="Post Blog"></a>
+        {% endif %}
     </nav>
 </div>
 
@@ -37,9 +39,11 @@
                             <ul class="information-list">
                         {% endif %}
 
+                        {% if isRouteAuthorized('eportfolioBlog.getArchive', {ownerId: page.getUid, pageId: page.getPageId, year: date.getYear, month: date.getMonth}) %}
                         <li>
                             <a href='{{ routeLookup('eportfolioBlog.getArchive', {ownerId: page.getUid, pageId: page.getPageId, year: date.getYear, month: date.getMonth}) }}'>{{ date | date('F') }}</a><br>
                         </li>
+                        {% endif %}
                     {% endfor %}
                     </ul>
                 </li>
@@ -114,12 +118,14 @@
 
                         </ul>
 
+                        {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {id: blog.getId}) %}
                         <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
                             <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                             <input type="hidden" name="ownerId" value="{{ page.getUid }}">
                             <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
                             <input type="submit" class="expand" name="comment" value="Add comment"/>
                         </form>
+                        {% endif %}
                     </li>
 
                     {% endfor %}
