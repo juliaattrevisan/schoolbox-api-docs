@@ -60,7 +60,7 @@ CKEDITOR.dialog.add('schoolboxanchorDialog', function (editorInstance) {
                     {
                         type: 'text',
                         id: 'schoolboxanchor-display',
-                        label: 'Acnhor Text',
+                        label: 'Anchor Text',
                         validate: CKEDITOR.dialog.validate.notEmpty("Anchor cannot be empty."),
 
                         /* Editing an existing element
