@@ -349,7 +349,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                 $colorObject = $this->getColorFactory()->build('000000');
             }
             $vars = array(
-                $field => $colorObject
+                $field => (string)$colorObject
             );
 
             $this->getPage()->setVar($vars);
