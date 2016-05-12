@@ -76,7 +76,9 @@
                                     <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="button icon-chat" data-numcomments="{{ blogComments[blog.getId] | length }}">Show Comments ({{ blogComments[blog.getId] | length }})</a>
                                 {% endif %}
 
+                                {% if isRouteAuthorized('blog.postCommentInsert', { id: blog.getId }) %}
                                 <a data-toggle="commentform-{{ blog.getId }}" class='button icon-add' >Add Comment</a>
+                                {% endif %}
                             </article>
 
                             <ul class="information-list reply" id="blogComment_{{ blog.getId }}">
@@ -107,6 +109,7 @@
 
                                 {% endfor %}
 
+                                {% if isRouteAuthorized('blog.postCommentInsert', { id: blog.getId }) %}
                                 <li class="row hide" id="commentform-{{ blog.getId }}">
                                     <div class="column small-12 no-pad">
                                         <form action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}" method="post">
@@ -119,6 +122,7 @@
                                         </form>
                                     </div>
                                 </li>
+                                {% endif %}
                             </ul>
                         </li>
 
@@ -126,8 +130,12 @@
 
                 </ul>
                 <div class="content">
+                    {% if isRouteAuthorized('blog.getArchiveCurrent', { folderId: folder.getId }) %}
                     <a href="{{ routeLookup('blog.getArchiveCurrent', { folderId: folder.getId }) }}" class="button icon-archive">View Archive</a>
+                    {% endif %}
+                    {% if isRouteAuthorized('blog.getInsert', { folderId: folder.getId }) %}
                     <a href="{{ routeLookup('blog.getInsert', { folderId: folder.getId }) }}" class="button icon-upload">Post Blog</a>
+                    {% endif %}
                 </div>
             </section>
         </div>
