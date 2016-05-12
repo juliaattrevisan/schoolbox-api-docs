@@ -35,7 +35,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
         } else {
             $this->contentPermission = $context->getPermission();
         }
-        $this->controlPermission = $this->contentPermission;
+        $this->contextPermission = $this->contentPermission;
 
         /* Check primary key is being used correctly!
          */

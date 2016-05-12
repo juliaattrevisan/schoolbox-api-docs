@@ -55,7 +55,7 @@ abstract class Component_ControllerAbstract
      *
      * @var int
      */
-    protected $controlPermission = DENY_ACCESS;
+    protected $contextPermission = DENY_ACCESS;
 
     /**
      * The maximum permission allowed for this component.
@@ -309,7 +309,7 @@ abstract class Component_ControllerAbstract
     protected function determineConfigPermissions($config) {
         if (is_array($config) && count($config)) {
             // have write access
-            if ($this->controlPermission > READ_ACCESS) {
+            if ($this->contextPermission > READ_ACCESS) {
                 // display full configuration block
                 return array(true, true, true);
             } // do not have write access
@@ -323,7 +323,7 @@ abstract class Component_ControllerAbstract
         } // there is no configuration
         else {
             // have write access
-            if ($this->controlPermission > READ_ACCESS) {
+            if ($this->contextPermission > READ_ACCESS) {
                 // display delete option
                 return array(true, false, false);
             } // do not have write access
