@@ -744,6 +744,36 @@ abstract class Component_ControllerAbstract
     }
 
     /**
+     * Checks if the user's permission on this component's context is at least read level.
+     *
+     * @return bool
+     */
+    public function hasContextReadAccess()
+    {
+        return $this->contextPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ;
+    }
+
+    /**
+     * Checks if the user's permission on this component's context is at least write level.
+     *
+     * @return bool
+     */
+    public function hasContextWriteAccess()
+    {
+        return $this->contextPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
+    }
+
+    /**
+     * Checks if the user's permission on this component's context is admin level.
+     *
+     * @return bool
+     */
+    public function hasContextFullAccess()
+    {
+        return $this->contextPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+    }
+
+    /**
      * Assign component name default
      *
      * @param $componentName
