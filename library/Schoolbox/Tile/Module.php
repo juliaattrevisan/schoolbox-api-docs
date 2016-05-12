@@ -18,6 +18,7 @@ use Aura\Router\Router;
 use Component_Instance;
 use Component_InstanceMapper;
 use External_UserInterface;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder;
@@ -202,17 +203,7 @@ class Module extends BaseModule
 
         $rule = new Rule\Any(
             new Rule\IsSuperuser(),
-            new Rule\HasServicePermission(
-                UserAccess::SERVICE_HOMEPAGE,
-                UserAccess::ACCESS_WRITE,
-                $getHomepageIdCallback
-            ),
-            new Rule\HasHomepagePermissionThroughRole(
-                UserAccess::ACCESS_WRITE,
-                $getHomepageIdCallback,
-                $this->getRoleAccessMapper()
-            ),
-            new Rule\IsTeacherOfClass($this->getExternalDb(), $getHomepageCallback)
+            new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getHomepageIdCallback, Access::getInstance())
         );
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
         $this->addRoutePermission($authorizer, '.*', $rule);
