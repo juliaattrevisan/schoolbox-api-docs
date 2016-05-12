@@ -741,6 +741,12 @@ if ($box->isRubric()) {
     }
 
     $context = [ 'rubric' => $grid->toContext($_SESSION['user']) ];
+
+    // Hide total mark from students and parents
+    if(!($groupHandler->isSuperuser() || $groupHandler->isStaff())){
+        unset($context['rubric']['total']);
+    }
+
     $this->setVar('rubric_block', $this->getTwig()->render('@rubric/grid.twig', $context));
     $this->parse('has_rubric_block', 'has_rubric');
 }
