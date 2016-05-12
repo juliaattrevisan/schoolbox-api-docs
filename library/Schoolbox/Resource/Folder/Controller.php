@@ -414,7 +414,12 @@ class Controller extends BaseController
 
         } else {
             // apply codes
-            $this->setCodesOnFolder($model, $postData['code'], $postData['curriculumCodes'], $user);
+            $this->setCodesOnFolder(
+                $model,
+                $postData['code'],
+                (is_array($postData['curriculumCodes']) ? $postData['curriculumCodes'] : []),
+                $user
+            );
         }
 
         $affectedIds = $folderMapper->save($model);
