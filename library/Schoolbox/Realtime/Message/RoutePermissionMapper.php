@@ -15,6 +15,7 @@ use OutOfBoundsException;
 use PDO;
 use PDOStatement;
 use Schoolbox\Mapper;
+use Schoolbox\User;
 
 class RoutePermissionMapper extends Mapper {
 
@@ -101,6 +102,77 @@ class RoutePermissionMapper extends Mapper {
 			'role_id'       => $roleId
 		));
 	}
+
+
+    /**
+     * @param User $user
+     * @return array
+     */
+    public function findAllRoutePermissionsForUser(User $user)
+    {
+        $stmt = $this->database->query("
+            SELECT  ns.id ns_id, ns.slug, ns.label, src.id src_id, src.key, src.description, perm.mask, perm.role_default, reroute.delivery
+            FROM msg_source src
+            LEFT JOIN groups g ON g.`group_type` = src.`role_type`
+            LEFT JOIN msg_route_perm perm ON src.id = perm.msg_source_id AND g.`id` = perm.`role_id`
+            LEFT JOIN msg_namespace ns ON ns.id = src.namespace
+            LEFT JOIN msg_reroute reroute ON src.id = reroute.msg_source_id AND reroute.user_id = :user_id
+            WHERE perm.role_id = :role_id
+            ORDER BY `slug` ASC, `key` ASC
+        ", [
+            'user_id' => $user->getId(),
+            'role_id' => $user->getRole()->getId()
+        ]);
+
+        $data = [];
+
+        $schedule = $user->getRole()->getDigestSchedule();
+
+        while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+
+            if (empty($data[$r['ns_id']])) {
+                $data[$r['ns_id']] = [
+                    'id'      => $r['ns_id'],
+                    'slug'    => $r['slug'],
+                    'label'   => $r['label'],
+                ];
+            }
+
+            $mask     = array_fill_keys(explode(',', $r['mask']), true);
+            $default  = array_fill_keys(explode(',', $r['role_default']), true);
+
+            // if no digest schedule, don't offer it as an option
+            if (!$schedule) {
+                unset($mask['DI']);
+                unset($default['DI']);
+            }
+
+            if ($r['delivery']) {
+                $delivery = array_fill_keys(explode(',', $r['delivery']), true);
+
+            } else {
+                $delivery = $default;
+            }
+
+            // apply mask
+            $target = array_intersect_key($delivery, $mask);
+
+            // if target falls outside mask, set to default
+            if (!count($target)) {
+                $target = $default;
+            }
+
+            $data[$r['ns_id']]['sources'][$r['src_id']] = [
+                'id'             => $r['src_id'],
+                'key'            => $r['key'],
+                'description'    => $r['description'],
+                'mask'           => array_keys($mask),
+                'default'        => array_keys($target),
+            ];
+        }
+
+        return $data;
+    }
 
 
     /**

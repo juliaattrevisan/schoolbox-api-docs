@@ -346,7 +346,6 @@ class Config
 
             $override->setUser($user);
             $override->setRouteKey($this->castToRoutingKey($id));
-            $override->setOutgoingLevel(0);
             $override->setDelivery([ 'MU' ]);
 
             $overrides->add($override);

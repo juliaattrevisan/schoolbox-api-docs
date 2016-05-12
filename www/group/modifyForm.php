@@ -76,7 +76,7 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
         $override = new RerouteOverride();
         $override->setUser($userMapper->createModel()->setId(0)); // ID 0 = global
         $override->setRouteKey('service.1.' . $group->getCategory());
-        $override->setOutgoingLevel(0);
+        $override->setDelivery([ 'MU' ]);
 
         if ($_POST['msg']['enabled']) {
             $force  = !!$_POST['msg']['force_follow'];
