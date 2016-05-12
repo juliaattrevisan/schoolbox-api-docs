@@ -311,7 +311,6 @@ class Controller extends BaseController
             'title'    => 'Message Settings',
             'template' => '@messages/settings.twig',
             'data'     => [
-                'hideNotificationsTray' => $this->getUser()->getHideNotificationsTray() ? 1 : 0,
                 'ns'        => $ns,
                 'sources'   => $sources,
                 'perms'     => $this->getConfig()->getPermissionList($digest, $mobile),
