@@ -10,7 +10,7 @@
         </div>
     </div>
     <nav>
-        {% if isRouteAuthorized('eportfolioBlog.getInsert', {ownerId: page.getUid, pageId: page.getPageId}) %}
+        {% if isRouteAuthorized('eportfolioBlog.getInsert', {ownerId: page.getUid, page: page}) %}
         <a href="{{ routeLookup('eportfolioBlog.getInsert', {ownerId: page.getUid, pageId: page.getPageId}) }}" class="icon-add" title="Post Blog"></a>
         {% endif %}
     </nav>
@@ -39,7 +39,7 @@
                             <ul class="information-list">
                         {% endif %}
 
-                        {% if isRouteAuthorized('eportfolioBlog.getArchive', {ownerId: page.getUid, pageId: page.getPageId, year: date.getYear, month: date.getMonth}) %}
+                        {% if isRouteAuthorized('eportfolioBlog.getArchive', {ownerId: page.getUid, page: page, year: date.getYear, month: date.getMonth}) %}
                         <li>
                             <a href='{{ routeLookup('eportfolioBlog.getArchive', {ownerId: page.getUid, pageId: page.getPageId, year: date.getYear, month: date.getMonth}) }}'>{{ date | date('F') }}</a><br>
                         </li>
@@ -118,7 +118,7 @@
 
                         </ul>
 
-                        {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {id: blog.getId}) %}
+                        {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog}) %}
                         <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
                             <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                             <input type="hidden" name="ownerId" value="{{ page.getUid }}">

@@ -103,7 +103,7 @@
                         </li>
 
                     {% endfor %}
-                    {% if isRouteAuthorized('blog.postCommentInsert', { id: blog.getId }) %}
+                    {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
                     <li>
                         <form method="post" action="{{ routeLookup('blog.postCommentInsert', { id: record.getId }) }}" class="no-pad">
                             <label class="content">
