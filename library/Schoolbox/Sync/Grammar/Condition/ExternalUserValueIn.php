@@ -40,7 +40,13 @@ class ExternalUserValueIn extends Condition\In
         $reader = new ObjectReader();
         $value  = $reader->read($externalUser, $this->field);
 
-        return in_array($value, $this->validValues);
+        // this occurs if the field being read is multi, such as emails and campus codes
+        if (is_array($value)) {
+            // require ANY, not ALL
+            return count(array_intersect($this->validValues, $value));
+        } else {
+            return in_array($value, $this->validValues);
+        }
     }
 
 
