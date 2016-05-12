@@ -44,7 +44,7 @@ abstract class Component_ControllerAbstract
      *
      * @var int
      */
-    protected $permission = 0;
+    protected $permission = DENY_ACCESS;
 
     /**
      * Permission for component controls, as opposed to the component content.
@@ -55,7 +55,7 @@ abstract class Component_ControllerAbstract
      *
      * @var int
      */
-    protected $controlPermission = 0;
+    protected $controlPermission = DENY_ACCESS;
 
     /**
      * The maximum permission allowed for this component.
