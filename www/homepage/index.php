@@ -99,9 +99,9 @@ $defaultColour = array(
 $listColor = [];
 foreach ($homepageHandler->getColorList() as $key => $color) {
     try {
-        $listColor[$key] = $colorFactory->build($color);
+        $listColor[$key] = (string)$colorFactory->build($color);
     } catch (InvalidArgumentException $e) {
-        $listColor[$key] = $colorFactory->build('000000');
+        $listColor[$key] = (string)$colorFactory->build('000000');
     }
 }
 
