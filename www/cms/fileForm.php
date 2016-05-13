@@ -92,6 +92,11 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     try {
         // sooo, this case is much simpler
         if ($modifyExisting) {
+
+            if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS || 0 == $_POST['category']) {
+                error(6);
+            }
+
             $file->setFolder(FolderMapper::getInstance()->createModel()->setId($_POST['category']));
             $affectedIds = FileMapper::getInstance()->save($file);
 
@@ -104,7 +109,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             $destinations = is_array($_POST['category']) ? $_POST['category'] : array($_POST['category']);
 
             foreach ($destinations as $cat) {
-                if ($groupHandler->getPermission($cat) < WRITE_ACCESS) {
+                if ($groupHandler->getPermission($cat) < WRITE_ACCESS || 0 == $cat) {
                     error(6);
                 }
 
@@ -142,7 +147,9 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     try {
         $file = FileMapper::getInstance()->findById($_POST['move']);
 
-        if ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
+        if(0 == $_POST['categoryID']){
+            $result = "Cannot attach files to root";
+        } elseif ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
             $result = "Insufficient permssions";
         } elseif ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
             $result = "Insufficient permssions";
