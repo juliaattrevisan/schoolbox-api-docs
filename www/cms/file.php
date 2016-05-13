@@ -76,6 +76,11 @@ if(is_numeric($this->arg[0])) {
 }
 else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
+	// Prevent files attached to root
+	if(0 == $this->arg[1]){
+		error(6);
+	}
+
 	/* Add new file to system */
 
 	$this->setFile(TEMPLATE_content, 'cms/modify-file.html');
