@@ -16,6 +16,7 @@ use HouseResidentialMapper;
 use Schoolbox\Campus as CampusModel;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\External\Importer\User\Result;
 use Schoolbox\External\UserProfile as UserProfileModel;
 use Schoolbox\External\UserProfileMapper;
 use Schoolbox\External\UserRelation as UserRelationModel;
@@ -320,9 +321,35 @@ class User extends AbstractImporter
                 $userResult->setChildren($this->hydrateChildren($row, $userChildren));
             }
 
-            $result[] = $userResult;
+            // Step 5: sanity check - is data logically valid?
+            try{
+                $this->sanityCheck($userResult);
+                $result[] = $userResult;
+            } catch (\UnexpectedValueException $e){
+                $this->log->warning(sprintf("%s - skipping",$e->getMessage()),['row' => $row]);
+                continue;
+            }
         }
+
         return $result;
+    }
+
+    /**
+     * Performs a sanity check on this user
+     *
+     * Throws validation exceptions if it isn't.
+     *
+     * @param User\Result $userResult
+     * @throws \UnexpectedValueException if a value isn't what it should be
+     */
+    protected function sanityCheck(User\Result $userResult)
+    {
+        $userId = $userResult->getUser()->getExternalId();
+        foreach ($userResult->getChildren() as $child) {
+            if ($userId === $child->getExternalId()) {
+                throw new \UnexpectedValueException("A child cannot be their own parent. External ID: $userId");
+            }
+        }
     }
 
     /**

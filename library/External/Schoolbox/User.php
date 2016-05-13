@@ -1,10 +1,10 @@
 <?php
 
-/************************************************************
+/*************************************************************
  *                                                           *
- *        Copyright (c) 2013 Alaress Pty Ltd                *
+ *        Copyright (c) 2013 Alaress Pty Ltd                 *
  *                                                           *
- *    This file provides access to Denbigh user info        *
+ *    This file provides access to Schoolbox user info       *
  *                                                           *
  ************************************************************/
 class External_Schoolbox_User implements External_UserInterface
@@ -63,9 +63,10 @@ class External_Schoolbox_User implements External_UserInterface
             INNER JOIN user_relation ON user.id = user_relation.relation_id
             INNER JOIN `user` parent ON parent.id = user_relation.user_id
             WHERE user.synergy_id IN ($id_list)
+            AND user_relation.relation_type = :relation_type
         "
         );
-        $statement->execute();
+        $statement->execute(array(':relation_type' => self::RELATION_TYPE_PARENT));
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $emailList[$row['StudentContactID']] = $row['StudentContactEmail'];
         }
