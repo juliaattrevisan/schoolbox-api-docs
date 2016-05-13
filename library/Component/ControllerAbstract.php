@@ -774,6 +774,16 @@ abstract class Component_ControllerAbstract
     }
 
     /**
+     * Returns whether this component is using an Alternative Data Source.
+     *
+     * @return bool
+     */
+    public function isUsingAltSource()
+    {
+        return intval($this->getConfig("src")) > 0;
+    }
+
+    /**
      * Assign component name default
      *
      * @param $componentName
