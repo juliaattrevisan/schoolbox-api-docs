@@ -122,15 +122,25 @@
             ].join(' '));
             */
 
-            $.post(
-                '/cms/' + draggedTypeGen + 'Form.php',
-                {
-                    move: draggedId,
-                    categoryID: dropTargetId,
-                    ajax: 1
-                }
-            );
-
+            if (draggedTypeGen == 'category') {
+                // /cms/categoryForm.php no longer exists, use controller instead.
+                $.post(
+                    '/resource/folder/move/',
+                    {
+                        source: draggedId,
+                        destination: dropTargetId
+                    }
+                );
+            } else {
+                $.post(
+                    '/cms/' + draggedTypeGen + 'Form.php',
+                    {
+                        move: draggedId,
+                        categoryID: dropTargetId,
+                        ajax: 1
+                    }
+                );
+            }
         });
 
         var $window    = $(window),
