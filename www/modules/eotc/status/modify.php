@@ -301,7 +301,7 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
         )
     );
 
-    if ($isCanFinalise) {
+    if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
         $eventStatusMapper = \EOTC\EventStatusMapper::getInstance();
 
         /* Soops have access to all statuses
