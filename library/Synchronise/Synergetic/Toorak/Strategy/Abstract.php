@@ -182,7 +182,11 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
 				return 1;
 			case '32':
 			case '33':
+			case '34':
+			case '35':
+			case '43':
 			case '44':
+			case '45':
 				return 3;
 			default:
 				return false;
@@ -228,9 +232,13 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
 				return 6;
 			//
 			// Pre-schools
-			case 32:
-			case 33:
-			case 44:
+			case '32':
+			case '33':
+			case '34':
+			case '35':
+			case '43':
+			case '44':
+			case '45':
 				return 19;
 			default:
 				return false;
