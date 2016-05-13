@@ -67,8 +67,7 @@ class Staff extends IteratorIterator
         foreach ($preStack as $result) {
             $email = array_merge(
                 $email,
-                preg_split('/[,;]/', $result['email']),
-                preg_split('/[,;]/', $result['occup_email'])
+                preg_split('/[,;]/', $result['email'])
             );
         }
         foreach (array_unique($email) as $key => $anEmail) {
@@ -78,6 +77,25 @@ class Staff extends IteratorIterator
             /** @var User\Common\Email $currentEmail */
             if (strlen($currentEmail->getAddress())) {
                 $staff->addEmail($currentEmail);
+            }
+	}
+
+        /* Work Email - one for every item in stack
+         */
+        $workEmail = [];
+        foreach ($preStack as $result) {
+            $workEmail = array_merge(
+                $workEmail,
+                preg_split('/[,;]/', $result['work_email'])
+            );
+        }
+        foreach (array_unique($workEmail) as $key => $anEmail) {
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
+
+            /** @var User\Common\Email $currentEmail */
+            if (strlen($currentEmail->getAddress())) {
+                $staff->addWorkEmail($currentEmail);
             }
         }
 
