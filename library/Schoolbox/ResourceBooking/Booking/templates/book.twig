@@ -163,7 +163,9 @@ $(function() {
          * Occurs when submit event listener is used
          * for things like validation etc.
          */
-        CKEDITOR.instances['notes'].updateElement();
+        $.each(CKEDITOR.instances, function() {
+            this.updateElement();
+        });
 
         var ajaxParams = {
             url:      form.attr('action'),
