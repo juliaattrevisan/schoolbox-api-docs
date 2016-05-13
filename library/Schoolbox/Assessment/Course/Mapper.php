@@ -70,16 +70,22 @@ class Mapper extends FolderMapper
      */
     protected function postSetup()
     {
-
-        /* TODO: Replace /homepage/29 in config/course_homepage with just int
-         * Faculty Root Node can be obtained Cheaply
-         * but we have to strip out the /homepage/ part
-         */
-        $facultyNodeId = preg_replace('/[^0-9]/', '', $this->getConfigLoader()->get('course_homepage'));
-
-        $this->setFacultyNode(FolderMapper::getInstance()->findCheaplyById($facultyNodeId));
+        $this->setFacultyNode(FolderMapper::getInstance()->findCheaplyById($this->determineFacultyNode()));
     }
 
+    /**
+     * Determine the faculty node id
+     * All courses live beneath this node in the resource browser
+     *
+     * Faculty Root Node can be obtained Cheaply
+     * but we have to strip out the /homepage/ or /resource/ part
+     *
+     * @return string
+     */
+    public function determineFacultyNode()
+    {
+        return preg_replace('/[^0-9]/', '', $this->getConfigLoader()->get('course_homepage'));
+    }
 
     /**
      * Return the first part of the string required to select from this mapper

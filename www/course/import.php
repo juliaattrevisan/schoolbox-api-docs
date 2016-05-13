@@ -71,7 +71,7 @@ $homepage = FolderMapper::getInstance()->findById($homepage_id);
 
 $course_homepage = FolderMapper::getInstance()->findById($course_homepage_id);
 $course_base_homepage = new Category();
-$course_base_homepage->setId(str_replace('/homepage/', '', Config::get('course_homepage')));
+$course_base_homepage->setId(\Schoolbox\Assessment\Course\Mapper::getInstance()->determineFacultyNode());
 $course_homepage_path = FolderMapper::getInstance()->findParents($course_homepage, $course_base_homepage);
 $course_homepage_path->add($course_homepage);
 foreach ($course_homepage_path as $parent) {

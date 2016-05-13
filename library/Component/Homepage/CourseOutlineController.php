@@ -168,7 +168,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             array(
                 'SESSION_NAME'    => session_name(),
                 'SESSION_ID'      => session_id(),
-                'COURSE_HOMEPAGE' => str_replace('/homepage/', '', Config::get('course_homepage')),
+                'COURSE_HOMEPAGE' => \Schoolbox\Assessment\Course\Mapper::getInstance()->determineFacultyNode(),
             )
         );
 

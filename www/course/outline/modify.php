@@ -74,7 +74,7 @@ $homepage = FolderMapper::getInstance()->findById($component->getIdentifier());
 
 // Output course breadcrumbs (for every course that is in this outline)
 $courseBaseHomepage = new Category();
-$courseBaseHomepage->setId(str_replace('/homepage/', '', Config::get('course_homepage')));
+$courseBaseHomepage->setId(\Schoolbox\Assessment\Course\Mapper::getInstance()->determineFacultyNode());
 
 // Keep a list of the units that have already been shown
 $unitCategoryIdList = array();
