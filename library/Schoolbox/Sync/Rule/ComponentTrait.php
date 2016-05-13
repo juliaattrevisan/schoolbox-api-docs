@@ -82,7 +82,15 @@ trait ComponentTrait
         if (!is_array($arguments)) {
             throw new \InvalidArgumentException('Arguments must be an array, got ' . gettype($arguments));
         }
-        $this->arguments = $arguments;
+
+        /* Square brackets persist in the db but we don't want that format
+         * Deal with the bad data by removing it, temporarily, as re-saving
+         * rulesets will repair the bad data for us anyway
+         */
+        foreach ($arguments as $current) {
+            $this->arguments[] = is_string($current) ? str_replace('[]', '', $current) : $current;
+        }
+
         return $this;
     }
 

@@ -94,7 +94,15 @@ class Factory
 
         $ffactory = new FieldFactory();
 
-        $set = new UserRuleset($this->userMapper, $context, $ffactory->buildMap($roletype), $this->log);
+        $map = $ffactory->buildMap($roletype);
+        $map = array_combine(
+            array_map(function ($k) {
+                return str_replace("[]", "", $k);
+            }, array_keys($map))
+            , array_values($map)
+        );
+
+        $set = new UserRuleset($this->userMapper, $context, $map, $this->log);
 
         foreach ($ruleCollection as $rule) {
             $translatedRule = $this->translateRuleModelToAddableRule($rule);
