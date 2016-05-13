@@ -16,24 +16,24 @@ if (!in_array($_SESSION['gid'], $groupHandler->canChangePassword()) && !$_SESSIO
 
 if (isset($_POST['current_password'])) {
     if (empty($_POST['current_password'])) {
-        error(105, "You must enter your current password.");
+        error(105, ['message' => "You must enter your current password."]);
     }
 
     if ($_POST['new_password'] != $_POST['confirm_password']) {
-        error(105, "The new and confirmation passwords you entered do not match.");
+        error(105, ['message' => "The new and confirmation passwords you entered do not match."]);
     }
 
     if (strlen($_POST['new_password']) < 6) {
-        error(105, "Your new password must be at least 6 characters long.");
+        error(105, ['message' => "Your new password must be at least 6 characters long."]);
     } else {
         if (!preg_match('/[a-z]/i', $_POST['new_password'])) {
-            error(105, "Your new password must have at least one letter.");
+            error(105, ['message' => "Your new password must have at least one letter."]);
         }
         if (!preg_match('/\\d/', $_POST['new_password'])) {
-            error(105, "Your new password must have at least one number.");
+            error(105, ['message' => "Your new password must have at least one number."]);
         }
         if (!preg_match('/[^a-z\\d]/i', $_POST['new_password'])) {
-            error(105, "Your new password must have at least one non-letter or number character.");
+            error(105, ['message' => "Your new password must have at least one non-letter or number character."]);
         }
     }
 
@@ -45,7 +45,7 @@ if (isset($_POST['current_password'])) {
         // Test password against existing
         $currentHash = $user->getPassword();
         if ($passwordService->verify($_POST['current_password'], $currentHash)
-            || $userMapper->hashPassword($_POST['current_password'], $currentHash)
+            || $userMapper->hashPassword($_POST['current_password']) == $currentHash
         ) {
             $user
                 ->setRetrievablePassword($_POST['new_password'])
@@ -55,7 +55,7 @@ if (isset($_POST['current_password'])) {
         } else {
             $userHandler->logUserPasswordChange($user->getUsername(), 'change_pwd_fail', 'warn');
             $userHandler->sendPasswordChangeFailureEmail($user->getId());
-            error(105, "Your current password did not match what is stored in the database.");
+            error(105, ['message' => "Your current password did not match what is stored in the database."]);
             exit;
         }
 
@@ -88,6 +88,6 @@ if (isset($_POST['current_password'])) {
 
         SitePage::localRedir('/account/modify/success');
     } catch (Exception $e) {
-        error(105, $e->getMessage());
+        error(105, ['message' => $e->getMessage()]);
     }
 }
