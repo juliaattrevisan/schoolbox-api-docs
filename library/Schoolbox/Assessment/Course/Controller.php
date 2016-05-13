@@ -243,6 +243,7 @@ class Controller extends Base\Base
                 $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unit->getId() ]);
                 $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
+                $data['usages'][$unit->getId() ] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
 
                 // obtain the Course Builder Component Instance from the homepage.
                 $instances[$unit->getId()] = $this->getCourseBuilderInstance($unit);
