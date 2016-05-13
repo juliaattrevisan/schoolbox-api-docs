@@ -12,4 +12,15 @@
 class Assess_Export_Xml extends Evaluation_Export_Xml {
 	protected $evaluationType = 'assess';
 	protected $templateFile = 'assess/exportToMoodle.html';
+
+
+	/**
+	 * Returns TRUE, reflecting fact that a Quiz can count towards final year mark.
+	 * 
+	 * @return bool
+	 */
+	public function hasWeighting()
+	{
+		return TRUE;
+	}
 }
