@@ -1,64 +1,29 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.validate.extensions.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressValidate.js"></script>
 <script type="text/javascript">
-$(document).ready(function () {
-	$('#accountForm').submit(function (event) {
-
-		event.stopPropagation();
-
-		var current = $('#current_password').val(),
-			password = $('#new_password').val(),
-			confirmp = $('#confirm_password').val(),
-			msgs = {
-				current_password: [],
-				new_password:     [],
-				confirm_password: []
+	$(document).ready(function () {
+		$('#accountForm').alaressValidate({
+			rules: {
+				new_password: {
+					// Regex: must contain [a-z], \d and ^[a-z\d] (case-insensitive)
+					pattern: /^(?=.*[a-z])(?=.*\d)(?=.*[^a-z\d])/i
+				},
+				confirm_password: {
+					equalsOtherField: $('#new_password')
+				}
 			},
-			letter_re = /[a-z]/i,
-			number_re = /\d/,
-			nonalpha_re = /[^a-z\d]/i
-		;
-
-		if (current == '') {
-			msgs.current_password.push('You must enter your current password.');
-		}
-		if (password.length < 6) {
-			msgs.new_password.push('Your new password must be at least 6 characters long.');
-		}
-		else {
-			if (!letter_re.test(password)) {
-				msgs.new_password.push('Your new password must have at least one letter.');
+			messages: {
+				new_password: {
+					pattern: 'Your new password must be at least 6 characters in length and contain at least one letter, one number and one symbol or punctuation character.'
+				},
+				confirm_password: {
+					equalsOtherField: 'New Password and Confirm New Password must match.'
+				}
 			}
-			if (!number_re.test(password)) {
-				msgs.new_password.push('Your new password must have at least one number.');
-			}
-			if (!nonalpha_re.test(password)) {
-				msgs.new_password.push('Your new password must have at least one punctuation or symbol character.');
-			}
-		}
-		if (password != confirmp) {
-			msgs.confirm_password.push('The new and confirmation passwords you entered do not match.');
-		}
-
-		var slots = $('#current_password_messages, #new_password_messages, #confirm_password_messages');
-		slots.hide().empty();
-		if (msgs.current_password.length === 0
-			&& msgs.new_password.length === 0
-			&& msgs.confirm_password.length === 0
-		) {
-			return true;
-		}
-		else {
-			$.each(msgs, function(key) {
-				var slot = $('#'+key+'_messages');
-				$.each(this, function(k,text) {
-					slot.append($('<li></li>').text(text).addClass("error-notification"));
-				});
-			});
-			slots.fadeIn('fast');
-			return false;
-		}
+		});
 	});
-});
 </script>
 <!-- END custom_head -->
 
@@ -81,16 +46,33 @@ $(document).ready(function () {
 
 						<label>
 							Current Password
-							<input type="password" name="current_password" id="current_password" size="35" maxlength="50" />
+							<input type="password"
+								   name="current_password"
+								   id="current_password"
+								   size="35"
+								   data-rule-minlength="6"
+								   maxlength="50"
+								   required />
 						</label>
 						<label>
 							New Password
-							<input type="password" name="new_password" id="new_password" size="35" maxlength="50" />
-							<ul id="new_password_messages"></ul>
+							<input type="password"
+								   name="new_password"
+								   id="new_password"
+								   size="35"
+								   data-rule-minlength="6"
+								   maxlength="50"
+								   required />
 						</label>
 						<label>
 							Confirm New Password
-							<input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" />
+							<input type="password"
+								   name="confirm_password"
+								   id="confirm_password"
+								   size="35"
+								   data-rule-minlength="6"
+								   maxlength="50"
+								   required />
 						</label>
 					</div>
 				</fieldset>
