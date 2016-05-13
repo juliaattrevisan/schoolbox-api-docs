@@ -144,7 +144,7 @@ class Module extends BaseModule
             }
             throw new Unauthorized();
         };
-        return new Rule\Callback($callback);
+        return new Rule\Any(new Rule\IsSuperuser(), new Rule\Callback($callback));
     }
 
     /**
