@@ -163,11 +163,6 @@ class UserProfile {
     protected $email;
 
     /**
-     * @var string
-     */
-    protected $birth_date;
-
-    /**
      * @param  \Alaress_Date_Format $dob
      * @return $this
      */
@@ -645,21 +640,5 @@ class UserProfile {
      */
     public function getUserId() {
         return $this->user_id;
-    }
-
-    /**
-     * @param  string $birth_date
-     * @return $this
-     */
-    public function setBirthDate($birth_date) {
-        $this->birth_date = $birth_date;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBirthDate() {
-        return $this->birth_date;
     }
 }

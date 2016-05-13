@@ -157,11 +157,6 @@ class UserProfileMapper extends Schoolbox\Mapper {
             'type'     => self::TYPE_STRING,
         ));
         $this->hasMap(array(
-            'column'   => 'birth_date',
-            'property' => 'birthDate',
-            'type'     => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
             'column'   => 'gender',
             'property' => 'gender',
             'type'     => self::TYPE_STRING,
