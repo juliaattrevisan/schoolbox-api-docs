@@ -50,7 +50,7 @@ abstract class Component_ControllerAbstract
      * Permission for component controls, as opposed to the component content.
      *
      * These permissions are always based off of the component's context, as
-     * opposed to component content permissions (@see $this->permission), which
+     * opposed to component content permissions (@see $this->contentPermission), which
      * may be based off of an alternate source.
      *
      * @var int
