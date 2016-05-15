@@ -106,55 +106,57 @@
     <div class="small-12 columns">
 		<h2 class="subheader">Current EOTC Admins</h2>
 
-		<table>
-			<thead>
-				<tr>
-					<th>
-						Firstname
-					</th>
-					<th>
-						Lastname
-					</th>
-					<th>
-						Campus
-					</th>
-					<th>
-						Status
-					</th>
-					<th>
-						Subscriptions
-					</th>
-					<th>
+		<div class="scrollable">
+			<table>
+				<thead>
+					<tr>
+						<th>
+							Firstname
+						</th>
+						<th>
+							Lastname
+						</th>
+						<th>
+							Campus
+						</th>
+						<th>
+							Status
+						</th>
+						<th>
+							Subscriptions
+						</th>
+						<th>
 
-					</th>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+				<!-- BEGIN permission -->
+				<tr>
+					<td>
+						{PERMISSION_USER_FIRSTNAME}
+					</td>
+					<td>
+						{PERMISSION_USER_LASTNAME}
+					</td>
+					<td>
+						{PERMISSION_CAMPUS_NAMES}
+					</td>
+					<td>
+						{PERMISSION_STATUS_NAMES}
+					</td>
+					<td>
+						{PERMISSION_STATUS_SUBSCRIPTIONS}
+					</td>
+					<td class="actions-small-1">
+						<nav>
+							<a href="/modules/eotc/permission/delete/{PERMISSION_USER_ID}" class='icon-delete' title="Remove" data-delete-admin></a>
+						</nav>
+					</td>
 				</tr>
-			</thead>
-			<tbody>
-			<!-- BEGIN permission -->
-			<tr>
-				<td>
-					{PERMISSION_USER_FIRSTNAME}
-				</td>
-				<td>
-					{PERMISSION_USER_LASTNAME}
-				</td>
-				<td>
-					{PERMISSION_CAMPUS_NAMES}
-				</td>
-				<td>
-					{PERMISSION_STATUS_NAMES}
-				</td>
-				<td>
-					{PERMISSION_STATUS_SUBSCRIPTIONS}
-				</td>
-				<td class="actions-small-1">
-					<nav>
-						<a href="/modules/eotc/permission/delete/{PERMISSION_USER_ID}" class='icon-delete' title="Remove" data-delete-admin></a>
-					</nav>
-				</td>
-			</tr>
-			<!-- END permission -->
-			</tbody>
-		</table>
+				<!-- END permission -->
+				</tbody>
+			</table>
+		</div>
     </div>
 </div>

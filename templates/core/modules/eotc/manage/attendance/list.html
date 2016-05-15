@@ -71,41 +71,36 @@
         <form action="/modules/eotc/manage/attendance/remove" method="post">
             <input type="hidden" name="eventId" value="{EVENT_ID}" />
 
-            <table data-attendees class="full-width">
-                <colgroup>
-                    <col width="1" />
-                    <col width="100"/>
-                    <col />
-                    <col />
-                    <col />
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>
-                        <input id='selectall' data-selectall="true" type="checkbox" />
-                        <label for="selectall" class="checkbox-label"></label>
-                    </th>
-                    <th>ID</th>
-                    <th>Lastname</th>
-                    <th>Firstname</th>
-                    <th>Group</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- BEGIN student_attendee -->
-                <tr>
-                    <td>
-                        <input id='student{STUDENT_ATTENDEE_ID}' name="selected[]" type="checkbox" value="{STUDENT_ATTENDEE_ID}" />
-                        <label for="student{STUDENT_ATTENDEE_ID}" class="checkbox-label"></label>
-                    </td>
-                    <td>{STUDENT_ATTENDEE_ID}</td>
-                    <td>{STUDENT_ATTENDEE_LASTNAME}</td>
-                    <td>{STUDENT_ATTENDEE_FIRSTNAME}</td>
-                    <td>{STUDENT_ATTENDEE_ROLE_NAME}</td>
-                </tr>
-                <!-- END student_attendee -->
-                </tbody>
-            </table>
+            <div class="scrollable">
+                <table data-attendees class="full-width">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input id='selectall' data-selectall="true" type="checkbox" />
+                                <label for="selectall" class="checkbox-label"></label>
+                            </th>
+                            <th>ID</th>
+                            <th>Lastname</th>
+                            <th>Firstname</th>
+                            <th>Group</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN student_attendee -->
+                    <tr>
+                        <td>
+                            <input id='student{STUDENT_ATTENDEE_ID}' name="selected[]" type="checkbox" value="{STUDENT_ATTENDEE_ID}" />
+                            <label for="student{STUDENT_ATTENDEE_ID}" class="checkbox-label"></label>
+                        </td>
+                        <td>{STUDENT_ATTENDEE_ID}</td>
+                        <td>{STUDENT_ATTENDEE_LASTNAME}</td>
+                        <td>{STUDENT_ATTENDEE_FIRSTNAME}</td>
+                        <td>{STUDENT_ATTENDEE_ROLE_NAME}</td>
+                    </tr>
+                    <!-- END student_attendee -->
+                    </tbody>
+                </table>
+            </div>
 
             <input type="submit" value="Remove Selected" />
         </form>
