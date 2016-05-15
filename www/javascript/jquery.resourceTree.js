@@ -121,6 +121,11 @@
                                 return false;
                             }
 
+                            // Cannot move a file to root
+                            if("file" == node.type && 0 == node_parent.id){
+                                return false;
+                            }
+
                             // also check that you're not trying to drag onto a file
                             if (node_parent.original.type == 'file' || node_parent.original.type == 'link'  ) {
                                 return false;
