@@ -36,12 +36,16 @@
                         <!-- BEGIN image_scroller -->
                         <div data-imageslider-image class="text-center">
                             <!-- BEGIN linked_image -->
-                            <a href="{IMAGE_URL}">
-                                <img src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}"/>
+                            <a href="{IMAGE_URL}" >
+                                <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
+                                    <img src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}" />
+                                </div>
                             </a>
                             <!-- END linked_image -->
                             <!-- BEGIN unlinked_image -->
-                            <img src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}"/>
+                            <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
+                                <img src="/cms/image.php?id={IMAGE_ID}&height=1024&width=1024" alt="{IMAGE_NAME}" />
+                            </div>
                             <!-- END unlinked_image -->
                             <!-- BEGIN show_caption -->
                             <p class="meta">{IMAGE_NAME}</p>

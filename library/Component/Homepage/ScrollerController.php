@@ -75,7 +75,8 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                 'COMPONENT_CONFIG_TIMING_VALUE_MS'       => $this->getConfig('timing') ? $this->getConfig(
                             'timing'
                         ) * 1000 : '2000',
-                'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide')
+                'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
+                'COMPONENT_CONFIG_IMAGE_RATIO'          => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square' ,
             )
         );
 

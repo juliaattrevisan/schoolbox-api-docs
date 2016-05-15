@@ -1,0 +1,30 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+class Component_Config_ImageRatio extends Component_Config_Abstract
+{
+
+    protected $options       = array('portrait','landscape','square');
+    protected $showAllOption = true;
+
+    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    {
+
+        // has an internal block for the select element
+        $page->setBlock($keyblock, 'imageratio', 'imageratio_block');
+        $page->setVar('imageratio_block', '');
+
+        foreach ($this->options as $o) {
+            $page->setVar('COMPONENT_CONFIG_IMAGERATIO_NAME', ucfirst($o));
+            $page->setVar('COMPONENT_CONFIG_IMAGERATIO_VALUE', $o);
+            $page->setVar('COMPONENT_CONFIG_IMAGERATIO_SELECTED', $o == $configValue ? ' selected="selected"' : '');
+            $page->parse('imageratio_block', 'imageratio', true);
+        }
+
+    }
+}
