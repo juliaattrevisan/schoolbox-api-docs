@@ -12,7 +12,6 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\Factory;
 use Schoolbox\IMapper;
 use Schoolbox\Resource\Folder;
@@ -120,7 +119,7 @@ class RubricMapper
             WHERE rc.parent_type = 'category'
             AND rc.parent_id IN (:$in)
             AND rc.deleted_at IS NULL
-            AND b.deleted IS NOT TRUE
+            AND (b.deleted IS NOT TRUE OR b.deleted IS NULL)
             GROUP BY rc.id
         ", $args);
 
@@ -445,7 +444,9 @@ class RubricMapper
 
         // first 2 "cells" must be blank
         if ($headerRow[0] || $headerRow[1]) {
-            throw new \Schoolbox\Resource\Exception("Not a valid rubric CSV file");
+            //Excel was getting rid of levels that are not set so lets try and repair
+            $headerRow = array_fill(0, count($headerRow),'');
+            rewind($fp);
         }
 
         $square[] = $headerRow;
