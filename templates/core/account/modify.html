@@ -30,19 +30,11 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 column">
-                        <div class="alert-box">
-                            <p>Your new password must be at least 6 characters in length and contain at least one
-                                letter, one number and one symbol or punctuation character.<br/>
-                                (examples of symbol characters: $, #, _, &amp;)</p>
-                        </div>
-
                         <label>
                             Current Password
                             <input type="password"
                                    name="current_password"
                                    id="current_password"
-                                   size="35"
-                                   maxlength="50"
                                    required/>
                         </label>
                         <label>
@@ -50,9 +42,7 @@
                             <input type="password"
                                    name="new_password"
                                    id="new_password"
-                                   size="35"
-                                   data-rule-minlength="6"
-                                   maxlength="50"
+                                   data-rule-minlength="8"
                                    required/>
                         </label>
                         <label>
@@ -60,9 +50,7 @@
                             <input type="password"
                                    name="confirm_password"
                                    id="confirm_password"
-                                   size="35"
-                                   data-rule-minlength="6"
-                                   maxlength="50"
+                                   data-rule-minlength="8"
                                    required/>
                         </label>
                     </div>
