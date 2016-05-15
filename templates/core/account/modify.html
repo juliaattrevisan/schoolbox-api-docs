@@ -1,23 +1,15 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/components/jquery-validation/additional-methods.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.validate.extensions.js"></script>
 <script type="text/javascript" src="/javascript/jquery.alaressValidate.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         $('#accountForm').alaressValidate({
             rules: {
-                new_password: {
-                    // Regex: must contain [a-z], \d and ^[a-z\d] (case-insensitive)
-                    pattern: /^(?=.*[a-z])(?=.*\d)(?=.*[^a-z\d])/i
-                },
                 confirm_password: {
                     equalsOtherField: $('#new_password')
                 }
             },
             messages: {
-                new_password: {
-                    pattern: 'Your new password must be at least 6 characters in length and contain at least one letter, one number and one symbol or punctuation character.'
-                },
                 confirm_password: {
                     equalsOtherField: 'New Password and Confirm New Password must match.'
                 }
