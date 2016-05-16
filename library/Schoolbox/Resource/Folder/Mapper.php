@@ -499,7 +499,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $qmarks = implode(', ', array_pad([], count($code), '?'));
 
         // search on curriculum node code
-        $q = $this->getSelectString() . "WHERE cn.code in ($qmarks)";
+        $q = $this->getSelectString() . $this->getFromString() . "WHERE cn.code in ($qmarks)";
 
         // search, hydrate, return
         return $this->hydrateSelect($this->getDatabase()->query($q, $code));
