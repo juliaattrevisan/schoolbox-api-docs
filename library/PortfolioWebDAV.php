@@ -202,7 +202,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             }
         } elseif ($site_location=='stmichaels') {
             $settings = array(
-                'baseUri' => 'https://smgs-data.stmichaels.vic.edu.au/',
+                'baseUri' => 'https://drives.stmichaels.vic.edu.au/',
                 'userName' => "smgs/" . $_SESSION['username'],
                 'password' => $_SESSION['password'],
             );
