@@ -8,9 +8,9 @@
 
 namespace Schoolbox\Assessment\Course;
 
+use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Web\Controller as Base;
-use Alaress\Authorizer\Failure;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Request\Values;
 use Component_DefinitionMapper;
@@ -25,6 +25,9 @@ use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
+use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum;
 use Schoolbox\Error;
@@ -43,9 +46,6 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
-use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
-use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -1283,12 +1283,12 @@ class Controller extends Base\Base
 
                 // respond with stage 4: coursework list
                 $this->tpl('unitImportResults', [
-                    'ownerships' => $post['ownerships'],
-                    'homepage' => $post["homepage"],
-                    'componentId' => $post["componentId"],
+                    'ownerships'     => $post['ownerships'],
+                    'homepage'       => $post["homepage"],
+                    'componentId'    => $post["componentId"],
                     'courseHomepage' => $post["course_homepage"],
-                    'unitDates' => $post["unit"],
-                    'units' => $allTaskDates['units']
+                    'unitDates'      => $post["unit"],
+                    'units'          => $allTaskDates['units']
                 ]);
             }
         }
