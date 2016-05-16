@@ -74,25 +74,24 @@
                 <table data-sortable>
                     <thead>
                     <tr>
-                        <th data-orderable="false"></th>
+                        <th data-orderable="false">
+                            <!-- BEGIN checkbox -->
+                            <div>
+                                <span title="Select all attempts" class="show-for-medium-up">
+                                    <input data-selectall="attemptIds[]" id="review-all" type="checkbox">
+                                    <label for="review-all" class="checkbox-label" title="Toggle All Reviewed"></label>
+                                </span>
+                            </div>
+                            <!-- END checkbox -->
+                        </th>
                         <!-- BEGIN respondent_heading -->
                         <th>Lastname</th>
                         <th>Firstname</th>
                         <!-- END respondent_heading -->
                         <th>Start</th>
                         <th>Finish</th>
-                        <th data-orderable="false" class="text-right no-pad">
-                            <!-- BEGIN checkbox -->
-                            <div>
-                                <span title="Select all attempts" class="show-for-medium-up">
-                                    <input data-selectall="attemptIds[]" id="review-all" type="checkbox">
-                                    <label for="review-all" class="checkbox-toggle">
-                                        <span class="icon-tick" title="Toggle All Reviewed"></span>
-                                    </label>
-                                </span>
-                            </div>
-                            <!-- END checkbox -->
-                        </th>
+                        <th data-orderable="false"></th>
+
                     </tr>
                     </thead>
                     <tbody>
