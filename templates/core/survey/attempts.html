@@ -1,4 +1,5 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 <script type="text/javascript">
     $(function() {
         $('[data-sortable]').DataTable({
@@ -32,28 +33,6 @@
                 });
             }
         });
-
-
-        // Whenever a checkbox is changed, untick the 'select all' checkbox at the top
-
-        $("input[name='attemptIds[]']").change(function() {
-            $('#review-all').prop('checked', false);
-        });
-
-
-        // Select all checkout at top
-
-        $('[data-selectall]').change(function(event) {
-            var selectors = $('input[name="' + event.target.getAttribute('data-selectall') + '"]');
-
-            if ($(this).is(':checked')) {
-                selectors.prop('checked', true);
-            }
-            else {
-                selectors.prop('checked', false);
-            }
-        });
-
     });
 </script>
 <!-- END custom_head -->
@@ -78,7 +57,7 @@
                             <!-- BEGIN checkbox -->
                             <div>
                                 <span title="Select all attempts" class="show-for-medium-up">
-                                    <input data-selectall="attemptIds[]" id="review-all" type="checkbox">
+                                    <input data-selectall="attemptIds[]" id="review-all" type="checkbox" data-select-all data-select-all-for-group="attempts">
                                     <label for="review-all" class="checkbox-label" title="Toggle All Reviewed"></label>
                                 </span>
                             </div>
@@ -98,7 +77,7 @@
                     <!-- BEGIN attempt -->
                     <tr>
                         <td>
-                            <input type='checkbox' id='attempt-{ATTEMPT_ATTEMPT_ID}' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
+                            <input type='checkbox' id='attempt-{ATTEMPT_ATTEMPT_ID}' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}' data-select-all-group="attempts">
                             <label for="attempt-{ATTEMPT_ATTEMPT_ID}" class="checkbox-label"></label>
                         </td>
                         <!-- BEGIN respondent_name -->
