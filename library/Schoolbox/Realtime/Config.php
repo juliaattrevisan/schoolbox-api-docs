@@ -23,6 +23,7 @@ use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use UnderflowException;
 
 class Config 
 {
@@ -334,7 +335,7 @@ class Config
         RerouteOverrideMapper::getInstance()->deleteByColumnList(array(
             'user_id'        => $user->getId(),
             'msg_route_key'  => array_map([ $this, 'castToRoutingKey' ], $follow),
-            'outgoing_level' => 0
+            'delivery'       => RoutePermission::MUTE
         ));
 
         // insert new entries for homepages the user is UN-following
