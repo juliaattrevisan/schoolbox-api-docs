@@ -68,7 +68,7 @@ abstract class Evaluation_Export_Xml {
 
 		$assess = $this->getAssess();
 
-		$this->getPage()->setVar(array(
+		$varArr = array(
 			'ASSESS_TITLE' => htmlspecialchars($assess['title'], ENT_QUOTES),
 			'ASSESS_DESCRIPTION' => Scrub::HTML($assess['description']),
 			'ASSESS_COMPLETION_MESSAGE' => Scrub::HTML($assess['completion_message']),
@@ -77,8 +77,12 @@ abstract class Evaluation_Export_Xml {
 			'ASSESS_DURATION' => $assess['duration'],
 			'ASSESS_MAX_ATTEMPTS' => $assess['max_attempts'],
 			'ASSESS_AVAILABILITY' => $assess['availability'],
-            'ASSESS_MARK_VISIBILITY' => $assess['mark_visibility'],
-		));
+			'ASSESS_MARK_VISIBILITY' => $assess['mark_visibility'],
+		);
+		if($this->hasWeighting()){
+			$varArr['ASSESS_WEIGHT'] = $assess['weight'];
+		}
+		$this->getPage()->setVar($varArr);
 
 		if (is_array($this->getAllSections()) && count($this->getAllSections())) {
 			foreach($this->getAllSections() as $currentSection) {
@@ -181,6 +185,13 @@ abstract class Evaluation_Export_Xml {
 	public function retrieveContents() {
 		return $this->getPage()->template->parse('finaloutput', 'xml');
 	}
+
+	/**
+	 * Returns whether this Evaluation can count towards final year mark
+	 * 
+	 * @return bool
+	 */
+	public abstract function hasWeighting();
 
 	/**
 	 * Generate a filename for the exported xml

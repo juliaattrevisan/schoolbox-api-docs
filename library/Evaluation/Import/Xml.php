@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Evaluation_Import_Xml {
+abstract class Evaluation_Import_Xml {
 	protected $assessHandler = null;
 	protected $sectionHandler = null;
 	protected $factory = null;
@@ -54,6 +54,13 @@ class Evaluation_Import_Xml {
 	}
 
 	/**
+	 * Returns whether this Evaluation can count towards final year mark
+	 *
+	 * @return boolean
+	 */
+	public abstract function hasWeighting();
+
+	/**
 	 * Load data from source
 	 *
 	 * @return SimpleXMLElement
@@ -96,7 +103,7 @@ class Evaluation_Import_Xml {
 		 */
 		$this->setTitle((string)$xml->title);
 
-		$assess_id = $this->getAssessHandler()->create(array(
+		$dataArr = array(
 			'category_id' => $this->getCategoryId(),
 			'user_id' => $_SESSION['id'],
 			'title' => $this->getTitle(),
@@ -107,9 +114,15 @@ class Evaluation_Import_Xml {
 			'duration' => $xml->duration,
 			'max_attempts' => $max_attempts,
 			'availability' => $xml->availability,
-            'mark_visibility' => $xml->markvisibility,
+			'mark_visibility' => $xml->markvisibility,
 			'created_at' => 'NOW()',
-		));
+		);
+
+		if($this->hasWeighting()){
+			$dataArr['weight'] = $xml->weight ?: 0;
+		}
+
+		$assess_id = $this->getAssessHandler()->create($dataArr);
 
 		if (!$assess_id) {
 			error(112);
