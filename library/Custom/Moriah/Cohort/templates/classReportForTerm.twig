@@ -236,10 +236,19 @@
                         <div class="avatar card small-12">
                             <span class="icon-course icon-32"></span>
                             <h3>{{ result.course.getNameWithCodes() }}</h3>
+                            {% if user.getRole().isStaff() %}
                             <p class="meta">
                                 Used by {{ otherUsageCount ?: 'no' }}
                                 other {% if otherUsageCount == 1 %}class{% else %}classes{% endif %}.
                             </p>
+                            <ul class="meta">
+                                {% for folder in result.folders %}
+                                {% if folder.getId() != class.getId() %}
+                                <li><a href="/homepage/{{ folder.getId() }}">{{ folder.getNameWithCodes() }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
                         </div>
                         <ul class="action-list reply">
                         {% for baseUnitId, unitResult in result.units %}

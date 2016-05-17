@@ -68,21 +68,22 @@ class Statistics
     protected $attemptMapper;
 
     /**
-     * @var UnitInstanceMapper
-     */
-    protected $unitInstanceMapper;
-
-    /**
      * Constructor
      *
      * @param Folder     $course      The course or unit home page to get stats for.
      * @param Term\Model $term        The term to limit results to
+     * @param User       $student     The user for whom the report is for
      * @param User       $currentUser The user who is viewing the report
      * @param int[]      $workTypes   If not empty, limit to these work types
      *                                (Quizzes are SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT)
      */
-    public function __construct(Folder $course, Term\Model $term, User $currentUser, $workTypes = [])
-    {
+    public function __construct(
+        Folder $course,
+        Term\Model $term,
+        User $student,
+        User $currentUser,
+        $workTypes = []
+    ) {
         $this->course = $course;
 
         // compile the due work, assessments, marks returned, et al
@@ -97,7 +98,7 @@ class Statistics
          * Exclude hidden quizzes from the Assessments cube
          */
         $quizVisibility   = new Visibility();
-        $quizVisibilities = $quizVisibility->getVisibilityArray($currentUser);
+        $quizVisibilities = $quizVisibility->getVisibilityArray($student, $currentUser);
 
         // Get any classes which use this course.
         // (ever, not just in this date span - assessments could have varying due dates)
@@ -153,6 +154,11 @@ class Statistics
             }
         }
     }
+
+    /**
+     * @var UnitInstanceMapper
+     */
+    protected $unitInstanceMapper;
 
     /**
      * Return the category this statistics object is referencing

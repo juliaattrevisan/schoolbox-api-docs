@@ -25,29 +25,24 @@
     <div class="small-12 island">
         <section>
             <ul class="action-list">
-                <li>
-                    {% for class in classes %}
-                        {% set courseCount = courses[class.getId()]|length %}
+                {% for class in classes %}
+                    {% set courseCount = courses[class.getId()]|length %}
+                    {% if courseCount > 0 %}
+                    <li>
                         <div class="list-item">
-                            <div class="compact avatar card small-12 {% if courseCount == 0 %}removed{% endif %}">
-                                {% set cardContents %}
+                            <div class="compact avatar card small-12">
+                                <a href="{{ routeLookup('customMoriahCohort.classReport', {studentId: student.getId(), classId: class.getId()}) }}">
                                     <span class="icon-home"></span>
                                     <h3>{{ class.getNameWithCodes() }}</h3>
                                     <p class="meta">
                                         {{ courseCount }} {% if courseCount == 1 %}course{% else %}courses{% endif %}
                                     </p>
-                                {% endset %}
-                                {% if courseCount > 0 %}
-                                    <a href="{{ routeLookup('customMoriahCohort.classReport', {studentId: student.getId(), classId: class.getId()}) }}">
-                                        {{ cardContents }}
-                                    </a>
-                                {% else %}
-                                    {{ cardContents }}
-                                {% endif %}
+                                </a>
                             </div>
                         </div>
-                    {% endfor %}
-                </li>
+                    </li>
+                    {% endif %}
+                {% endfor %}
             </ul>
         </section>
     </div>

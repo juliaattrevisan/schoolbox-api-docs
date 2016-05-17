@@ -143,6 +143,7 @@ class Controller extends Base
                 $courseStats = new Course\Statistics(
                     $course,
                     $term,
+                    $student,
                     $this->getUser(),
                     [WorkType::TYPE_ASSESSMENT_TASK]
                 );
@@ -183,6 +184,7 @@ class Controller extends Base
                 'template' => '@customMoriahCohort/classReportForTerm.twig',
                 'title'    => $class->getNameWithCodes() . ' Class Report for '.$student->formatName(),
                 'data'     => [
+                    'user'            => $this->getUser(),
                     'student'         => $student,
                     'class'           => $class,
                     'courses'         => $courseList,

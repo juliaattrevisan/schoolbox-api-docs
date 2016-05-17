@@ -79,7 +79,7 @@ class ClassStatistics {
 		 * Exclude hidden quizzes from the Assessments cube
 		 */
 		$quizVisibility = new \Assess\Visibility();
-		$quizVisibilities = $quizVisibility->getVisibilityArray($user);
+		$quizVisibilities = $quizVisibility->getVisibilityArray($user, $_SESSION['user']);
 
 		// retrieve ALL the submission boxes for this category
 		$boxCollection = $this->submissionBoxMapper->findByColumnList(
