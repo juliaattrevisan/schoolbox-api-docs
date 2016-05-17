@@ -127,6 +127,19 @@ $(function() {
         'This item may not be booked for more than ' + {{ include('sub/interval.twig', {interval: item.resource.maxReservationTime})|json_encode|raw }} + '.'
     )
 
+    // Repeat-Until must be after StartDate
+    $.validator.addMethod(
+            'afterStart',
+            function(value,element){
+                var startDate       = moment($('#start_datetime_date').val(),momentFormat);
+                var repeatUntilDate = moment(value,momentFormat);
+
+                return '' == value || startDate.valueOf() < repeatUntilDate.valueOf();
+            },
+            'Repeat-Until date must be after start date'
+    )
+
+
     // Set up errors, dialog boxes, form
     var errors = {}
     var form   = $('form#resource-booking-form')
@@ -258,6 +271,9 @@ $(function() {
             'end_datetime[meridien]': {
                 required: true,
                 pattern:  /^(?:am|pm)$/i
+            },
+            'repeat_until': {
+                'afterStart': true
             }
         },
         submitHandler: function() {
@@ -291,7 +307,10 @@ $(function() {
             'start_datetime[minute]':   "Please enter a valid minute value.",
             'end_datetime[minute]':     "Please enter a valid minute value.",
             'start_datetime[meridien]': "Please select AM or PM.",
-            'end_datetime[meridien]':   "Please select AM or PM."
+            'end_datetime[meridien]':   "Please select AM or PM.",
+            'repeat_until': {
+                'afterStart': "Repeat-until date must be after start date"
+            }
         }
     })
 
