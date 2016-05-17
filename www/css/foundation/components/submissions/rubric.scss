@@ -72,6 +72,7 @@ table.rb {
         resize: none;
         overflow-y: auto;
         height: 100px; /* yes, I used pixels. wanna fight about it? */
+        min-width: 5rem;
         &:focus {
             background-color: $container-bg;
         }
