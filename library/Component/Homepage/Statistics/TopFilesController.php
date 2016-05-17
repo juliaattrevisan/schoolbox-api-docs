@@ -20,10 +20,16 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
             $this->endDate->getDatabase()
         );
 
-        $stmt = Database::getInstance()->prepare(
-            "
-            SELECT f.id, f.`realname`, f.submitted, f.file_size, COUNT(f.id) AS `count` FROM cmsLog cl
+        $stmt = Database::getInstance()->prepare("
+            SELECT
+                f.id,
+                f.`realname`,
+                f.submitted,
+                s.filesize,
+                COUNT(f.id) AS `count`
+            FROM cmsLog cl
             LEFT JOIN `file` f ON cl.`objectId` = f.id AND cl.`object` = 'file'
+            INNER JOIN `storage` s ON `f`.`hash` = `s`.`hash`
             WHERE f.id IS NOT NULL
             AND f.`category` = :cid
             $dateFilter
