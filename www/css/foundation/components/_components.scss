@@ -254,6 +254,13 @@ ul.tileList {
         background-position: center;
         // relative so that .cover-photo-controls shows inside .cover-photo
         position: relative;
+        ~ nav {
+            position:absolute;
+            top:1rem;
+            @media #{$small-only}  { right: 1rem; }
+            @media #{$medium-only} { right: 2.5rem; }
+            @media #{$large-up}    { right: 2rem; }
+        }
     }
     &.cover-photo-controls {
         position: absolute;
