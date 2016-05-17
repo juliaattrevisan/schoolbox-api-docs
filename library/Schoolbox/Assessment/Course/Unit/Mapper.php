@@ -108,7 +108,7 @@ class Mapper extends Folder\Mapper
      * @throws MapperException if statement returned no category
      * @return Collection|Folder\Model[]
      */
-    protected function hydrateSelect($statement)
+    protected function hydrateSelect(PDOStatement $statement)
     {
         /** @var Model[] $cache */
         $cache = [];

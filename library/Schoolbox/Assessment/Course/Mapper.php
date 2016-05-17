@@ -115,7 +115,7 @@ class Mapper extends FolderMapper
      * @param  PDOStatement $statement
      * @return Collection|Folder[]
      */
-    protected function hydrateSelect($statement)
+    protected function hydrateSelect(PDOStatement $statement)
     {
         /** @var Model[] $cache */
         $cache = [];

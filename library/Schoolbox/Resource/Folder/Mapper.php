@@ -13,6 +13,7 @@
 namespace Schoolbox\Resource\Folder;
 
 use PDO;
+use PDOStatement;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Mapper\Exception as MapperException;
 use External_UserInterface;
@@ -615,11 +616,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Helper method for hydrating a result from a query created by getFindQuery().
      *
-     * @param  \PDOStatement $statement
+     * @param  PDOStatement $statement
      * @throws MapperException if statement returned no category
      * @return Collection|Model[]
      */
-    protected function hydrateSelect($statement)
+    protected function hydrateSelect(PDOStatement $statement)
     {
         $code_mapper = $this->getJoinMapper('codes');
 
