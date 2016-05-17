@@ -329,6 +329,8 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
 	 */
     $groupHandler = new Group();
 
+    /* Set an arbitrary start/end time initially
+     */
     $page->setVar(array(
         'EVENT_RAMS_FILE' => '',
         'EVENT_CURRENT_STUDENTS' => 0,
@@ -342,13 +344,13 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
         'EVENT_TITLE' => '',
         'EVENT_TIMEINPUTS' => 'hide',
         'EVENT_START_DATE' => $event->getStartDateTime()->getLocalShort(),
-        'EVENT_START_HOUR' => '',
-        'EVENT_START_MIN' => '',
+        'EVENT_START_HOUR' => '9',
+        'EVENT_START_MIN' => '00',
         'EVENT_START_AM' => '',
         'EVENT_START_PM' => '',
         'EVENT_END_DATE' => $event->getEndDateTime()->getLocalShort(),
-        'EVENT_END_HOUR' => '',
-        'EVENT_END_MIN' => '',
+        'EVENT_END_HOUR' => '10',
+        'EVENT_END_MIN' => '00',
         'EVENT_END_AM' => '',
         'EVENT_END_PM' => '',
         'EVENT_LOCATION' => '',
