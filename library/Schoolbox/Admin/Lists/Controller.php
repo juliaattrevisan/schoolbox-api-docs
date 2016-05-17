@@ -382,7 +382,8 @@ class Controller extends Base
             $finder = $tables[$table]['findAllMethod'];
             $rows = $mapper->$finder();
         } else {
-            $rows = $mapper->findAll();
+            $orderArr = array($mapper->getIdentifier()['column'] => 'ASC');
+            $rows = $mapper->findAll(array('order' => $orderArr));
         }
 
         if (isset($tables[$table]['sortable'])) {
