@@ -43,8 +43,10 @@ class Synchronise_External_Stpatricks_Strategy_Timetable extends Synchronise_Ext
                 SELECT `id` FROM `class` WHERE `code` = :code
             ");
             $timetableStmt = Database::getInstance()->prepare("
-                INSERT INTO `class_period` (id, class_id, period_id, room) VALUES (NULL, :classID, :periodID, :room)
+                INSERT INTO `class_period` (id, class_id, period_id, room, teacher_id) VALUES (NULL, :classID, :periodID, :room, :teacher_id)
             ");
+
+            $teacherArray = [];
 
             foreach($this->entityData as $timetable) {
                 // check the period and class exist
@@ -53,12 +55,27 @@ class Synchronise_External_Stpatricks_Strategy_Timetable extends Synchronise_Ext
                 $classStmt->execute(array('code' => $timetable['classCode']));
                 $class = $classStmt->fetchColumn();
 
+                if (isset($teacherArray[$timetable['teacher_id']]))
+                    $teacher_id = $teacherArray[$timetable['teacher_id']];
+                else {
+                    $result = Database::getInstance()->query("SELECT id FROM user WHERE synergy_id = '{$timetable['teacher_id']}';");
+                    if ($result) {
+                        $row = $result->fetch(PDO::FETCH_ASSOC);
+                        $teacher_id = $row['id'];
+                    } else {
+                        $teacher_id = 0;
+                    }
+
+                    $teacherArray[$timetable['teacher_id']] = $teacher_id;
+                }
+
                 // got the period and class IDs, go ahead and insert the timetabling
                 if($period && $class) {
                     $timetableStmt->execute(array(
                         'classID' => $class,
                         'periodID' => $period,
                         'room' => $timetable['room'],
+                        'teacher_id' => $teacher_id
                     ));
                 }
                 elseif($this->getVerboseFilter()->getVerbose()) {
