@@ -21,6 +21,8 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFolderMapper;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Folder\Search\Result;
 use Schoolbox\Resource\GroupMapper;
@@ -285,8 +287,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         // persist the Code objects
-
         Code\Mapper::getInstance()->save($model->getCodes());
+
+        // remove any mutes that might exist on this subject (classes are not allowed to be muted)
+        RerouteOverrideMapper::getInstance()->deleteByColumnList([
+            'delivery'      => RoutePermission::MUTE,
+            'msg_route_key' => "service.1.{$model->getId()}"
+        ]);
 
         return true;
     }
