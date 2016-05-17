@@ -155,9 +155,10 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         if ($this->getCurrentUser()->getId() == $this->getUserId()) {
             $zone = new \Schoolbox\Resource\Attachment\Zone('cover-photo');
             $zone
+                ->setButtonMode(true)
                 ->setMulti(false)
                 ->setMimeFilter('image/*')
-                ->setThumbnailSize(64)
+                ->setThumbnailSize(32)
                 ->setAttachPrompt('upload a cover photo')
                 ->setModalTitle('Select a cover photo')
                 ->setAttachmentsLabel('');

@@ -11,6 +11,9 @@
                 return;
             }
 
+            // just for this brief moment in time, let's ensure you can't detach
+            $(this).find('[data-dz-remove]').detach();
+
             $.ajax({
                 url: '/eportfolio/coverphoto/modifyForm.php',
                 method: 'post',
@@ -76,18 +79,10 @@
             <!-- BEGIN no_cover_photo -->
             <!-- END no_cover_photo -->
         </div>
+        <nav>
+            {ATTACH_ZONE}
+        </nav>
     </div>
-
-    <div class="small-12 island">
-        <section>
-            <fieldset class="content no-pad">
-                <div class="small-12 columns">
-                    {ATTACH_ZONE}
-                </div>
-            </fieldset>
-        </section>
-    </div>
-
     <div class="small-12 columns text-center eportfolio profile-name">
         <h1>{USER_FULLNAME}</h1>
         <p class="meta">
