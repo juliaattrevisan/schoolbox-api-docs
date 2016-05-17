@@ -103,6 +103,7 @@
                         </li>
 
                     {% endfor %}
+                    {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
                     <li>
                         <form method="post" action="{{ routeLookup('blog.postCommentInsert', { id: record.getId }) }}" class="no-pad">
                             <label class="content">
@@ -112,6 +113,7 @@
                             <input type="submit" class="no-margin" name="comment" value="Add comment"/>
                         </form>
                     </li>
+                    {% endif %}
                 </ul>
             </section>
 

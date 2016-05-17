@@ -125,7 +125,7 @@ class Module extends BaseModule
             },
             Access::getInstance()
         );
-        return new Rule\Any($ownershipRule, $permissionRule);
+        return new Rule\Any(new Rule\IsSuperuser(), $ownershipRule, $permissionRule);
     }
 
     /**

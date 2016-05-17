@@ -109,6 +109,7 @@
 
                                 {% endfor %}
 
+                                {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog}) %}
                                 <li class="row hide" id="commentform-{{ blog.getId }}">
                                     <div class="column small-12 no-pad">
                                         <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
@@ -122,6 +123,7 @@
                                         </form>
                                     </div>
                                 </li>
+                                {% endif %}
                             </ul>
                         </li>
 
@@ -129,8 +131,12 @@
 
                 </ul>
                 <div class="content">
+                    {% if isRouteAuthorized('eportfolioBlog.getArchiveCurrent', {ownerId: page.getUid, page: page}) %}
                     <a href="{{ routeLookup('eportfolioBlog.getArchiveCurrent', {ownerId: page.getUid, pageId: page.getPageId}) }}" class="button icon-archive">View Archive</a>
+                    {% endif %}
+                    {% if isRouteAuthorized('eportfolioBlog.getInsert', {ownerId: page.getUid, page: page, blog: blog}) %}
                     <a href="{{ routeLookup('eportfolioBlog.getInsert', {ownerId: page.getUid, pageId: page.getPageId, id: blog.getId}) }}" class="button icon-upload">Post Blog</a>
+                    {% endif %}
                 </div>
             </section>
         </div>

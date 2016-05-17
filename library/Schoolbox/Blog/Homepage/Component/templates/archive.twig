@@ -10,7 +10,9 @@
         </div>
     </div>
     <nav>
+        {% if isRouteAuthorized('blog.getInsert', {folder: folder}) %}
         <a href="{{ routeLookup('blog.getInsert', {folderId: folder.getId}) }}" class="icon-add" title="Post Blog"></a>
+        {% endif %}
     </nav>
 </div>
 
@@ -37,9 +39,11 @@
                             <ul class="information-list">
                         {% endif %}
 
+                        {% if isRouteAuthorized('blog.getArchive', {folder: folder, year: date.getYear, month: date.getMonth}) %}
                         <li>
                             <a href='{{ routeLookup('blog.getArchive', {folderId: folder.getId, year: date.getYear, month: date.getMonth}) }}'>{{ date | date('F') }}</a><br>
                         </li>
+                        {% endif %}
                     {% endfor %}
                     </ul>
                 </li>
@@ -114,10 +118,12 @@
 
                         </ul>
 
+                        {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
                         <form method="post" action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}">
                             <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
                             <input type="submit" class="expand" name="comment" value="Add comment"/>
                         </form>
+                        {% endif %}
                     </li>
 
                     {% endfor %}
