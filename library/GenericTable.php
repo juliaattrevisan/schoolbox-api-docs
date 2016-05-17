@@ -32,10 +32,10 @@ class GenericTable extends DeprecatedModel {
 
     function getAllInFields($fields) {
         if(!is_array($fields))
-            return $this->getAll();
+            return $this->getAll($this->_index);
 
         $fieldString = implode('`, `', $fields);
-        $query = "SELECT `$fieldString` FROM `$this->_table`";
+        $query = "SELECT `$fieldString` FROM `$this->_table` ORDER BY $this->_index";
 
         return $this->db->getAll($query);
     }
