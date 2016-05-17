@@ -85,6 +85,7 @@ class Controller extends Base
             'template' => '@customMoriahCohort/classList.twig',
             'title'    => 'Class List for '.$student->formatName(),
             'data'     => [
+                'user'    => $this->getUser(),
                 'student' => $student,
                 'classes' => $classes,
                 'courses' => $courses,
