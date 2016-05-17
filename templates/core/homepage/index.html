@@ -204,7 +204,7 @@
         });
 
         // Adds page to my links
-        $('[data-post-mylink]','#tab-control').click( function (event) {
+        $('#postToMyLinks').click( function (event) {
             event.preventDefault();
             $.post("/cms/myLinksForm.php", { url: "{HOMEPAGE_URL}", description: "{HEADING}"} );
             location.reload();
@@ -263,7 +263,7 @@
         <!-- END manage_page -->
         <!-- BEGIN addmylinks -->
         <li>
-            <a href="#" class="icon-favourite" data-post-mylink >Add to My Links</a>
+            <a href="#" class="icon-favourite" id="postToMyLinks" >Add to My Links</a>
         </li>
         <!-- END addmylinks -->
         <!-- BEGIN view_stats -->
