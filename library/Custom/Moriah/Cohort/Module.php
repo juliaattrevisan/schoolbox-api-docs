@@ -39,9 +39,9 @@ class Module extends BaseModule
     protected $userMapper;
 
     /**
-     * @var Course\Mapper
+     * @var Folder\Mapper
      */
-    protected $courseMapper;
+    protected $folderMapper;
 
     /**
      * @var Term\Mapper
@@ -68,10 +68,10 @@ class Module extends BaseModule
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
-        $this->userMapper   = $injector->newInstance(UserMapper::class);
-        $this->courseMapper = $injector->newInstance(Course\Mapper::class);
-        $this->termMapper   = $injector->newInstance(Term\Mapper::class);
-        $this->externalDb   = $injector->newInstance(\External_User::class);
+        $this->userMapper   = UserMapper::getInstance();
+        $this->folderMapper = Folder\Mapper::getInstance();
+        $this->termMapper   = Term\Mapper::getInstance();
+        $this->externalDb   = new \External_User();
     }
 
     /**
@@ -113,7 +113,7 @@ class Module extends BaseModule
             $matcher,
             '(?:classReport|classReportForTerm)',
             function ($params) {
-                return ['class' => $this->courseMapper->findById($params['classId']),];
+                return ['class' => $this->folderMapper->findById($params['classId']),];
             }
         );
         $this->addRoutePreload(
@@ -143,7 +143,7 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'folderMapper'       => $this->courseMapper,
+                    'folderMapper'       => $this->folderMapper,
                     'unitInstanceMapper' => $injector->lazyNew(Course\UnitInstanceMapper::class),
                     'termMapper'         => $this->termMapper,
                 ]
