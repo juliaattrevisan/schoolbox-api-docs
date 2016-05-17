@@ -5,7 +5,12 @@
     $(function () {
         // Upload file when it gets attached
         var dropzone = $('#cover-photo-zone');
-        dropzone.on('accept.attachzone', function(event, file) {
+        dropzone.on('accept.attachzone success.attachzone', function(event, file) {
+
+            if (!file.hash) {
+                return;
+            }
+
             $.ajax({
                 url: '/eportfolio/coverphoto/modifyForm.php',
                 method: 'post',
