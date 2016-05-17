@@ -1911,13 +1911,10 @@ class Controller extends Base\Base
      */
     public function deleteCourse()
     {
-        // mmm, this should be a URI param
-        $courseId = $this->getRequest()->post->get('courseId');
+        /** @var Folder\Controller $folderController */
+        $folderController = $this->getController('folder');
 
-        // TODO a TODO here would have been nice...
-        new \Alaress_Probe($courseId);
-
-        die();
+        $folderController->recursiveDelete($this->getRequest()->post->get('courseId'), $this->getUser());
     }
 
     /**
