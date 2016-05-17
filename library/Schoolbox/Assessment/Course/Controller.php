@@ -749,23 +749,34 @@ class Controller extends Base\Base
                 continue;
             }
 
-            $data['courses'][] = $currentCourse;
+            try
+            {
+                // Try to grab the lineage before we do anything else- this throw an exception for orphaned folders
+                // and folders that are their own parents
 
-            $allUnits = $this->getUnitMapper()->findByCourseId($currentCourse->getId());
+                $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
 
-            // Append to unit index, by ID
-            foreach ($allUnits as $currentUnit) {
-                // confirm you at least have read access...s
-                if (!$this->confirmAccess($currentUnit->getId())) {
-                    continue;
+                $data['courses'][] = $currentCourse;
+
+                $allUnits = $this->getUnitMapper()->findByCourseId($currentCourse->getId());
+
+                // Append to unit index, by ID
+                foreach ($allUnits as $currentUnit) {
+                    // confirm you at least have read access...s
+                    if (!$this->confirmAccess($currentUnit->getId())) {
+                        continue;
+                    }
+
+                    $data['units'][$currentCourse->getId()][] = $currentUnit;
                 }
 
-                $data['units'][$currentCourse->getId()][] = $currentUnit;
+            } catch (MapperException $e) {
+                // This catches folders that were dumped at the orphanage by their unloving parent, continue on our
+                // way- this will not get rendered
+            } catch (\OverflowException $e) {
+                // This catches John Connor folders that jumped in a time machine and became their own parents, continue
+                // on our way- this will not get rendered
             }
-
-            /* Also store the path to this Course
-             */
-            $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
         }
 
         return $data;
