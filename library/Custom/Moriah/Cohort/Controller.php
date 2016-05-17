@@ -127,6 +127,9 @@ class Controller extends Base
             return;
         }
 
+        // Student needs parents
+        $student->loadParents();
+
         // Build course list
         $courseLists = $this->unitInstanceMapper->findAllCoursesUsedInFolders([$class->getId()]);
         if (!isset($courseLists[$class->getId()])) {
