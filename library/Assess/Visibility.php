@@ -56,8 +56,11 @@ class Visibility {
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
 		}
-		else if ($currentUser->isParentOf($student)) {
-			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
+		else {
+			$student->loadParents();
+			if ($currentUser->isParentOf($student)) {
+				$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
+			}
 		}
 
 		return $visibilities;
