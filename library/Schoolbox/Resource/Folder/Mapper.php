@@ -1062,6 +1062,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         /* get the breadcrumb back up to the root directory
          */
+        $parentFolders = [];
         while ($parentId != 0) {
             try {
                 $nextCategory = $this->findCheaplyById($category->getParent()->getId());
@@ -1070,8 +1071,14 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $category = $nextCategory;
 
                 $parentId = $nextCategory->getParent()->getId();
-            }
-            catch (\Exception $e) {
+                if (isset($parentFolders[$parentId])) {
+                    // I'm my own parent - that's just crazy
+                    break;
+                }
+                $parentFolders[$parentId] = true;
+            } catch (\Exception $e) {
+                // I don't have any parents - abort
+                break;
             }
         }
 
