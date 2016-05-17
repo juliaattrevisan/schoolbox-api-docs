@@ -143,6 +143,7 @@ class Controller extends Base
                 $courseStats = new Course\Statistics(
                     $course,
                     $term,
+                    $student,
                     $this->getUser(),
                     [WorkType::TYPE_ASSESSMENT_TASK]
                 );

@@ -40,24 +40,23 @@ class Visibility {
 	 * Note that the assess_visibility table has been made synonymous with the
 	 * consts defined in SubmissionBox (zero-based) and thus won't autoincrement
 	 *
-	 * @param \Schoolbox\User $user
+	 * @param \Schoolbox\User $student     The student whose visibility we're checking
+	 * @param \Schoolbox\User $currentUser The user who's viewing the student
 	 * @return array
 	 */
-	public function getVisibilityArray(\Schoolbox\User $user) {
-		$groupHandler = new \Group();
-
+	public function getVisibilityArray(\Schoolbox\User $student, \Schoolbox\User $currentUser)
+	{
 		$visibilities = array();
-
-		if ($user->isSuperuser() || $user->getRole()->isStaff()) {
+		if ($currentUser->isSuperuser() || $currentUser->getRole()->isStaff()) {
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
 		}
-		else if ($user->getRole()->isStudent()) {
+		else if ($currentUser->getRole()->isStudent()) {
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
 		}
-		else if ($groupHandler->isParentOfChild($user->getId())) {
+		else if ($currentUser->isParentOf($student)) {
 			$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
 		}
 
