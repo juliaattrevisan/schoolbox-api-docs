@@ -85,7 +85,6 @@ class Controller extends Base
             'template' => '@customMoriahCohort/classList.twig',
             'title'    => 'Class List for '.$student->formatName(),
             'data'     => [
-                'user'    => $this->getUser(),
                 'student' => $student,
                 'classes' => $classes,
                 'courses' => $courses,
@@ -184,6 +183,7 @@ class Controller extends Base
                 'template' => '@customMoriahCohort/classReportForTerm.twig',
                 'title'    => $class->getNameWithCodes() . ' Class Report for '.$student->formatName(),
                 'data'     => [
+                    'user'            => $this->getUser(),
                     'student'         => $student,
                     'class'           => $class,
                     'courses'         => $courseList,
