@@ -855,7 +855,7 @@ class Adapter  implements \External_UserInterface {
 
                 $guardian1WorkEmail = new Common\Email();
                 $guardian1WorkEmail
-                    ->setAddress($currentResult['StudentContactDefaultWiorkOccup1Email'])
+                    ->setAddress($currentResult['StudentContactWorkEmail'])
                 ;
 
 
