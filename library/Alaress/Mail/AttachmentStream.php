@@ -8,6 +8,8 @@
 
 namespace Alaress\Mail;
 
+use Swift_IoException;
+
 /**
  * Class AttachmentStream
  *
