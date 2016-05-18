@@ -61,7 +61,10 @@ if (!$submission_box->getAcceptOnline()) {
 if ($_SESSION['user']->getId() != $user->getId()) {
     $studentRetHandler = new SubmissionReturn();
     // This may exit
-    $studentRetHandler->securityCheck($box_id);
+
+    if (!$studentRetHandler->securityCheck($box_id)) {
+        error(25);
+    }
 }
 
 // if not multi, check there isn't already a (non-draft) submission

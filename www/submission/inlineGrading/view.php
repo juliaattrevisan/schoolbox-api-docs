@@ -36,7 +36,11 @@ $currentUid = $this->arg[1];
 
 // Security check
 $studentRetHandler = new SubmissionReturn();
-$studentRetHandler->securityCheck($submissionBoxId);
+
+if (!$studentRetHandler->securityCheck($submissionBoxId)) {
+	error(25);
+}
+
 unset($studentRetHandler);
 
 /* This is an optional argument

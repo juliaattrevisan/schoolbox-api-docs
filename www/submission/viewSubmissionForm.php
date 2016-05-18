@@ -15,7 +15,10 @@ if (is_numeric($_GET['delete'])) {
 	}
 
 	$subBox = $submissionHandler->getByID($studentSub['box_id']);
-    $subReturn->securityCheck($studentSub['box_id']);
+
+	if (!$subReturn->securityCheck($studentSub['box_id'])) {
+		error(25);
+	}
 
 	$submissionStudent->delete($studentSub['id']);
 

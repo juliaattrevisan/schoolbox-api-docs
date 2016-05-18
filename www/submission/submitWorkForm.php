@@ -32,7 +32,10 @@ $submissions = new Collection();
 if (isset($_POST['user_id']) && $_POST['user_id'] != $_SESSION['user']->getId()) {
     $user = \Schoolbox\UserMapper::getInstance()->findById($_POST['user_id']);
     $returnHandler = new SubmissionReturn();
-    $returnHandler->securityCheck($_POST['box_id']);
+
+    if (!$returnHandler->securityCheck($_POST['box_id'])) {
+        error(25);
+    }
 } else {
     $user = $_SESSION['user'];
 }

@@ -19,7 +19,10 @@ $boxId = $_POST['box_id'];
 if (isset($_POST['user_id']) && $_POST['user_id'] != $_SESSION['user']->getId()) {
     $user = \Schoolbox\UserMapper::getInstance()->findById($_POST['user_id']);
     $returnHandler = new SubmissionReturn();
-    $returnHandler->securityCheck($boxId);
+
+    if (!$returnHandler->securityCheck($boxId)) {
+        error(25);
+    }
 } else {
     $user = $_SESSION['user'];
 }

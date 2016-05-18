@@ -22,7 +22,10 @@ catch (\Schoolbox\Mapper\Exception\Deleted $e) {
 }
 
 $studentRetHandler = new SubmissionReturn();
-$studentRetHandler->securityCheck($submissionBoxId);
+
+if (!$studentRetHandler->securityCheck($submissionBoxId)) {
+    error(25);
+}
 
 // we log the viewing of this page, I know not why
 $submissionHandler = new Submission();

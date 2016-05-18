@@ -33,7 +33,11 @@ if (is_numeric($_GET['delete'])) {
     $boxId  = $return->getSubmissionBox()->getId();
     $userId = $return->getOwner()->getId();
     $studentRetHandler = new SubmissionReturn();
-    $studentRetHandler->securityCheck($return->getSubmissionBox()->getId());
+
+    if (!$studentRetHandler->securityCheck($return->getSubmissionBox()->getId())) {
+        error(25);
+    }
+
     unset($studentRetHandler);
 
     // Delete and redir somewhere
@@ -56,7 +60,11 @@ $submissionBox = $submissionBoxMapper->findById($_POST['box_id']);
 
 // Security check
 $studentRetHandler = new SubmissionReturn();
-$studentRetHandler->securityCheck($submissionBox->getId());
+
+if (!$studentRetHandler->securityCheck($submissionBox->getId())) {
+    error(25);
+}
+
 unset($studentRetHandler);
 
 $term = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submissionBox->getDueDate());

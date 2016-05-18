@@ -334,12 +334,10 @@ class SubmissionReturn extends DeprecatedModel
             if ($groupHandler->getPermission($cid) >= WRITE_ACCESS) {
                 return true;
             } else {
-                error(25);
+                return false;
             }
-        } else {
-            //Submission box does not exist
-            error(25);
         }
-    }
 
+        return false;
+    }
 }

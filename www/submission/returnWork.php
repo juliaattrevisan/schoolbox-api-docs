@@ -20,7 +20,9 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
     $userMapper = new UserMapper();
     $user = $userMapper->findById($this->arg[1]);
 
-    $subReturn->securityCheck($this->arg[0]);
+    if (!$subReturn->securityCheck($this->arg[0])) {
+        error(25);
+    }
 
     $submissionBoxMapper = new SubmissionBoxMapper();
     $submissionBox = $submissionBoxMapper->findById($this->arg[0]);
