@@ -106,17 +106,19 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     $mail->setBody($converter->getText(), null, 'utf-8');
     $mail->addPart($message, 'text/html', 'utf-8');
 
+    $basename = '';
     try {
         $factory = new CollectorFactory();
         $files = $factory->build($attachments)->getAll();
 
         foreach ($files as $storage) {
             $stream = new AttachmentStream($storage->readStream());
-            $attach = Swift_Attachment::newInstance($stream, $storage->getBasename(), $storage->getMime());
+            $basename = $storage->getBasename();
+            $attach = Swift_Attachment::newInstance($stream, $basename, $storage->getMime());
             $mail->attach($attach);
         }
-    } catch (Swift_IoException $e){
-        error(9, $e->getMessage().': '.$storage->getBasename());
+    } catch (Swift_IoException $e) {
+        error(9, $e->getMessage().': '.$basename);
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(41);
         exit; // shut UP, storm.
