@@ -153,6 +153,11 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$assessId = $attempt->getAssessment()->getId();
 		/** @var OnlineAssessment $assess */
 		$assess   = $this->assessMapper->findById($assessId);
+
+		if (!$assess->isMarkShownToStudents()) {
+			return $envelope;
+		}
+
         $category = $this->categoryMapper->findById($assess->getCategory()->getId());
 
 		$studentId = $attempt->getUser()->getId();
@@ -186,7 +191,11 @@ class AttemptNotifier extends AbstractModuleNotifier {
 	public function notifyParentMarked($attempt, $teacher, $diff = null) {
 		$envelope = new Envelope();
 
-		if($this->conf->get('restrict_parent_duework_access')) {
+		$assessId = $attempt->getAssessment()->getId();
+		/** @var OnlineAssessment $assess */
+		$assess   = $this->assessMapper->findById($assessId);
+
+		if ($this->conf->get('restrict_parent_duework_access') || !$assess->isMarkShownToParents()) {
 			return $envelope;
 		}
 
