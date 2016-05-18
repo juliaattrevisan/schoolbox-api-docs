@@ -115,6 +115,8 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
             $attach = Swift_Attachment::newInstance($stream, $storage->getBasename(), $storage->getMime());
             $mail->attach($attach);
         }
+    } catch (Swift_IoException $e){
+        error(9, $e->getMessage().': '.$storage->getBasename());
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(41);
         exit; // shut UP, storm.
