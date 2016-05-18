@@ -5,6 +5,7 @@
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+<script type="text/javascript" src="/javascript/jquery.chained.min.js"></script>
 
 <script type="text/javascript">
     $(function () {
@@ -12,24 +13,6 @@
         var form = $('form#pastoralForm');
 
         $.fn.alaressEditor();
-
-        function loadCategories() {
-            var pastoralType = $('[data-type]').val();
-
-            $('[data-category]').remove();
-
-            $.get('/pastoral/categories/' + pastoralType).success(function(data) {
-
-                $.each(data, function() {
-                    $('[data-category-select]').append('<option data-category value="' + this.id + '">' + this.name + '</option>')
-                });
-
-            });
-        }
-
-        $('[data-type]').change(function() {
-            loadCategories();
-        });
 
         $('#tags').selectizeSelector({
             ajax: {
@@ -137,6 +120,8 @@
                 }
             });
         });
+
+        $('#category').chained('#type');
     });
 </script>
 <!-- END custom_head -->
@@ -205,7 +190,7 @@
                     <div class="small-12 medium-6 columns">
                         <label>
                             Type
-                            <select data-type class="required" name="typeId">
+                            <select class="required" name="typeId" id="type">
                                 {% for type in types %}
                                     <option {% if type.id == record.getType.getId %}selected{% endif %} value="{{ type.id }}">{{ type.name }}</option>
                                 {% endfor %}
@@ -214,12 +199,10 @@
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
-                            Sub-Type/Category
-                            <select data-category-select name="categoryId">
+                            Sub-Type
+                            <select name="categoryId" id="category">
                                 {% for category in categories %}
-                                    {% if category.pastoralTypeId == record.getType.getId %}
-                                        <option data-category {% if category.id == record.getCategory.getId %}selected{% endif %} value="{{ category.id }}">{{ category.name }}</option>
-                                    {% endif %}
+                                    <option class="{{ category.getPastoralTypeId() }}" {% if category.id == record.getCategory.getId %}selected{% endif %} value="{{ category.id }}">{{ category.name }}</option>
                                 {% endfor %}
                             </select>
                         </label>

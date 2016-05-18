@@ -180,16 +180,6 @@ class Controller extends Base
         return $result;
     }
 
-    
-    public function getCategories($typeId) {
-
-        $results = ($this->getPastoralCategoryMapper()->findByColumn('pastoral_type_id', $typeId)->sortBy("name", "asc"));
-
-        header("Content-type: application/json");
-        echo json_encode($results->jsonSerialize());
-        exit;
-    }
-    
     /**
      * Generate a pastoral report with the relevant filtering applied, this version has the accordion and pagination
      */

@@ -360,7 +360,7 @@ class Controller extends Base
                 ]
             ],
             'lu_pastoral_category'    => [
-                'title'             => 'Pastoral Sub-Types/Categories',
+                'title'             => 'Pastoral Sub-Types',
                 'mapper'            => CategoryMapper::class,
                 'sort'              => 'pastoralTypeId',
                 'fields'            => [
