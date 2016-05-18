@@ -119,7 +119,7 @@ function processAttempt(
         $page->setVar(array(
             'ATTEMPT_TIMESTAMP' => '',
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
-            'ATTEMPT_FINISH' => '<div>Incomplete</div>',
+            'ATTEMPT_FINISH' => 'Incomplete',
             'ATTEMPT_NOT_FINISH' => '',
             'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
             'submitted_block' => '',
