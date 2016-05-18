@@ -1543,6 +1543,14 @@ tr:hover{
 		// (it's in a CSS native function)
 		max-width: calc(100% - #{rem-calc(($base-font-size * 2.5))});
 	}
+
+	/* Modal should always appear in a visible location in browser
+	 * not just at the top of the page (terrible).
+	 *
+	 * Multiple problems exist:
+	 * http://foundation.zurb.com/forum/posts/21450-reveal-modal-positioning-and-background-issues
+	 */
+	position: fixed;
 }
 
 // Fix stupid foundation bug
