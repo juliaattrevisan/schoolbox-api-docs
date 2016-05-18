@@ -10,6 +10,7 @@
  ************************************************************/
 
 use Alaress\DebugBar\DataCollector\MssqlDatabaseCollector;
+use Alaress\DebugBar\Instance as DebugBar;
 
 class MSSQL {
 
@@ -156,6 +157,16 @@ class MSSQL {
 				mssql_query('SET CONCAT_NULL_YIELDS_NULL ON', $this->dbf);
 			}
 		}
+
+		if (DebugBar::isEnabled()) {
+			$this->installCollector();
+			/** @var \DebugBar\DataCollector\DataCollectorInterface $collector */
+			$collector = $this->getCollector();
+			if (!DebugBar::getInstance()->hasCollector($collector->getName())) {
+				DebugBar::getInstance()->addCollector($collector);
+			}
+		}
+
 	}
 
 	/**
@@ -198,6 +209,7 @@ class MSSQL {
 	{
 		if (!$this->isConnected()) {
 			$this->connect();
+
 		}
 
 		// SB-6907: Cathedral's SQL server won't accept long query strings, so
