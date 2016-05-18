@@ -13,6 +13,7 @@ namespace Schoolbox\Assessment\Component;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress_Date_Format;
 use Monolog\Logger;
+use Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
@@ -21,8 +22,10 @@ use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -577,6 +580,27 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 			unset($diff['finish']);
 		}
+
+		// INCREASE in mark visibility (quiz can be finished in this instance)
+		// doesn't actually create messages, just triggers for others to be created
+		if (isset($diff['markVisibility'])) {
+			list($new, $old) = $diff['markVisibility'];
+			if ($new > $old) {
+				// for anyone who has been marked, raise the assess.marked notification
+				/** @var Collection|Attempt[] $attempts */
+				$attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId());
+				foreach ($attempts as $attempt) {
+					// simulate a save event, so as to spawn notifications for returned work
+					$n = new Notif(Notif::TOPIC_APPLICATION);
+					$n->notice(serialize(new Event(
+						$attempt->getMarker(), Mapper::METHOD_CREATE,
+						$attempt, $this->attemptMapper, null
+					)));
+				}
+			}
+			unset($diff['markVisibility']);
+		}
+
 
 
 		// if none of the above apply, but there are changes, just be generic
