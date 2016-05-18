@@ -194,6 +194,12 @@ $(document).ready(function() {
         .on('selectize.item_remove', function() {
             $('#individualGroupID').val('')
         });
+
+    // Adds page to my links
+    $('#emailAllGroup').click( function (event) {
+        event.preventDefault();
+        $('#emailAll').submit();
+    });
 });
 </script>
 <!-- END custom_head -->
@@ -209,10 +215,17 @@ $(document).ready(function() {
     </nav>
     <ul id="tab-control" class="f-dropdown" data-dropdown-content>
         <!-- BEGIN mail_all -->
-        <li><a href="/mail/createMail.php?replyto=&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;&amp;bcc={EMAILALL}" class="icon-email">Email All Group Members</a></li>
+        <li><a href="#" class="icon-email" id="emailAllGroup">Email Group Members</a></li>
         <!-- END mail_all -->
         <li><a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" class="icon-delete" data-action="disband">Disband Group</a></li>
     </ul>
+
+    <!-- hidden email form -->
+    <form action="/mail/createMail.php" method="post" id="emailAll">
+        <input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;"/>
+        <input type="hidden" name="bcc" value="{EMAILALL}"/>
+    </form>
+
 </div>
 
 <div class="row">
