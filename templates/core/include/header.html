@@ -64,6 +64,18 @@
             }
         });
 
+        /* Ensure modals always appear in a visible location
+         *
+         * This causes weird animation problems on certain screens
+         * and the callback open.fndtn.reveal doesn't fire when the
+         * modal is built dynamically with js -_-
+         */
+        $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
+        });
+
+        $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
+            $(this).css({'top': ($(window).scrollTop() + (6.25*16)) + 'px'});
+        });
     });
 
     // Date formats (global variable)
