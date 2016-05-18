@@ -9,8 +9,11 @@
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
 <script type="text/javascript">
 $(function() {
+
+    // Disable iFrame embed on mail content
     $.fn.alaressEditor({
-        targetElements: $('#body')
+        targetElements: $('#body'),
+        removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe'
     });
 
     var options = {
