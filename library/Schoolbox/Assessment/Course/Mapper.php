@@ -384,7 +384,7 @@ class Mapper extends FolderMapper
 
     /**
      * It is permissible that a folder be converted to a course (ie. have units put inside it)
-     * if and only if the following two conditions are met:
+     * if and only if the following three conditions are met:
      *  1) it is in the Faculty area (that is, it is a descendant of facultyRoot)
      *  2) it does not contain any courses anywhere beneath it
      *  3) it is not a unit
