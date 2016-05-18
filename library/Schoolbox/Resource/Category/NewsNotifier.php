@@ -29,6 +29,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 
@@ -38,7 +39,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	protected $userMapper;
 
 	/** @var FolderMapper */
-	protected $categoryMapper;
+	protected $folderMapper;
 
 	/**
 	 * Instantiate all your dependencies within yourself.
@@ -47,8 +48,8 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 * @return void
 	 */
 	public function loadDependencies($dependencies = null) {
-		$this->userMapper = UserMapper::getInstance();
-		$this->categoryMapper = FolderMapper::getInstance();
+		$this->setUserMapper(UserMapper::getInstance());
+		$this->setFolderMapper(FolderMapper::getInstance());
 		parent::loadDependencies($dependencies);
 	}
 
@@ -125,6 +126,14 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$envelope = new Envelope();
 		$bob = new Builder();
 
+		try {
+			// Use the author of the news article as the effector
+			$user = $this->getUserMapper()->findById($news->getOwner()->getId());
+		} catch (MapperException $e) {
+			// Failed to find them, use the original effector
+		}
+
+		$author = $user->formatName();
 
 		$icon = sprintf("/portrait.php?userId=%s&size={$this->iconSize}", $user->getExternalId());
 
@@ -134,7 +143,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 		$shortDate  = $news->getPostDate()->getDateOnly();
 		$authorName = $user->formatName();
 
-		$cat = $this->categoryMapper->findById($news->getCategory()->getId());
+		$cat = $this->getFolderMapper()->findById($news->getCategory()->getId());
 		$catId = $cat->getId();
 		$catName = $cat->getName();
 
@@ -151,7 +160,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 			->addFilter('roletype', $roleType)
 			->setMeta([
 				'title'  => $heading,
-				'author' => $user->formatName(),
+				'author' => $author,
 				'date'   => $news->getPostDate()->getLong()
 			])
 			->setByline("$shortDate by $authorName in $catName")
@@ -195,6 +204,38 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	 */
 	public function notifyParentPublished($news, $user, $diff = null) {
 		return $this->generateNotification(Role::PARENT, $news, $user);
+	}
+
+	/**
+	 * @return FolderMapper
+	 */
+	public function getFolderMapper() {
+		return $this->folderMapper;
+	}
+
+	/**
+	 * @param FolderMapper $folderMapper
+	 * @return $this
+	 */
+	public function setFolderMapper($folderMapper) {
+		$this->folderMapper = $folderMapper;
+		return $this;
+	}
+
+	/**
+	 * @return UserMapper
+	 */
+	public function getUserMapper() {
+		return $this->userMapper;
+	}
+
+	/**
+	 * @param UserMapper $userMapper
+	 * @return $this
+	 */
+	public function setUserMapper($userMapper) {
+		$this->userMapper = $userMapper;
+		return $this;
 	}
 
 } 
