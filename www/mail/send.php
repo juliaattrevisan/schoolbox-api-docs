@@ -1,6 +1,7 @@
 <?php
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage;
+use Alaress\Mail\AttachmentStream;
 
 /************************************************************
 *                                                           *
@@ -105,16 +106,19 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     $mail->setBody($converter->getText(), null, 'utf-8');
     $mail->addPart($message, 'text/html', 'utf-8');
 
+    $basename = '';
     try {
         $factory = new CollectorFactory();
         $files = $factory->build($attachments)->getAll();
 
         foreach ($files as $storage) {
-            $attach = Swift_Attachment::newInstance($storage->read(), $storage->getBasename(), $storage->getMime());
-            $attach->setFilename($storage->getBasename());
-            $attach->setContentType($storage->getMime());
+            $stream = new AttachmentStream($storage->readStream());
+            $basename = $storage->getBasename();
+            $attach = Swift_Attachment::newInstance($stream, $basename, $storage->getMime());
             $mail->attach($attach);
         }
+    } catch (Swift_IoException $e) {
+        error(9, $e->getMessage().': '.$basename);
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(41);
         exit; // shut UP, storm.
