@@ -71,7 +71,7 @@
          * modal is built dynamically with js -_-
          */
         $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
-            console.log('opens');
+            $(this).css({'top': ($(window).scrollTop() + (6.25*16)) + 'px'});
         });
 
         $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
