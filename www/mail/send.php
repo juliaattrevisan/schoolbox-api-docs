@@ -1,7 +1,7 @@
 <?php
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Mail\AttachmentStream;
+use Alaress\Mail\AttachmentStream;
 
 /************************************************************
 *                                                           *

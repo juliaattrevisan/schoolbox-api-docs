@@ -6,7 +6,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Mail;
+namespace Alaress\Mail;
 
 /**
  * Class AttachmentStream
