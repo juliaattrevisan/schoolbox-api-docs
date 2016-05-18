@@ -52,16 +52,41 @@ class Guardian extends IteratorIterator
             ->setGender($currentResult['student_gender'])
         ;
 
-        /* Email
+        /* Email - one for every item in stack
          */
-        $email = preg_split('/[,;]/', $currentResult['student_contact_default_email']);
-        foreach ($email as $key => $anEmail) {
+        $email = [];
+        foreach ($preStack as $result) {
+            $email = array_merge(
+                $email,
+                preg_split('/[,;]/', $result['student_contact_default_email'])
+            );
+        }
+        foreach (array_unique($email) as $key => $anEmail) {
             $currentEmail = new User\Common\Email();
             $currentEmail->setAddress($anEmail);
 
             /** @var User\Common\Email $currentEmail */
             if (strlen($currentEmail->getAddress())) {
                 $guardian->addEmail($currentEmail);
+            }
+        }
+
+        /* Work Email - one for every item in stack
+         */
+        $workEmail = [];
+        foreach ($preStack as $result) {
+            $workEmail = array_merge(
+                $workEmail,
+                preg_split('/[,;]/', $result['student_contact_work_email'])
+            );
+        }
+        foreach (array_unique($workEmail) as $key => $anEmail) {
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
+
+            /** @var User\Common\Email $currentEmail */
+            if (strlen($currentEmail->getAddress())) {
+                $guardian->addWorkEmail($currentEmail);
             }
         }
 
