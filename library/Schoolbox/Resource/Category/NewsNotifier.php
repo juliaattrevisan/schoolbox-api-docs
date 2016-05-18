@@ -175,7 +175,8 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 	}
 
 	/**
-	 * @param News $news
+	 * @param News $newsgit checkout -b emdienn-hotfix-develop/SB-12235 develop
+git pull git@github.com:emdienn/schoolbox.git hotfix-develop/SB-12235
 	 * @param User $user
 	 * @param array $diff
 	 * @return Envelope

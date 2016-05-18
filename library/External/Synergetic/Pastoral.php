@@ -189,8 +189,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $this->getPastoralSeverityMapper()->Save($severity);
         }
 
-        $imported = [];
-        $skipped = [];
         $userCache = [];
         $typeCache = [];
 
@@ -283,7 +281,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $pastoralRecord->setCreatedAt(\Alaress_Date_Format::newLocal($record["CreatedDate"]));
                 $pastoralRecord->setUpdatedAt(\Alaress_Date_Format::newLocal($record["ModifiedDate"]));
                 $this->getPastoralMapper()->save($pastoralRecord);
-                $imported[] = $record;
 
                 $audience_query = "SELECT ID FROM PastoralCareContacts WHERE PastoralCareSeq = {$record["PastoralCareSeq"]}";
                 $audience_records = $this->getDatabase()->getAll($audience_query);
@@ -322,7 +319,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     $pastoralRecordPrivate->setUpdatedAt(\Alaress_Date_Format::newLocal($record["ModifiedDate"]));
                     $this->getPastoralMapper()->save($pastoralRecordPrivate);
                     $record["private"] = 1;
-                    $imported[] = $record;
 
                     if (is_array($audience_records))
                     foreach ($audience_records as $audience_record)
@@ -361,8 +357,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 else if ($student == null)
                     $record['reason'] = "Student does not have a user record in Schoolbox";
 
-                $skipped[] = $record;
-
                 $log = new \Schoolbox\Admin\Import\Pastoral\Model();
                 $log->setUserId($userId);
                 $log->setImportId($importId);
@@ -384,11 +378,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $log->setResult("Completed");
         $log->setCreatedAt(\Alaress_Date_Format::now());
         $this->getPastoralLogMapper()->save($log);
-
-        return [
-            'imported' => $imported,
-            'skipped' => $skipped
-        ];
     }
 
     /**
