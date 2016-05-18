@@ -67,14 +67,13 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row eportfolio">
     <div class="small-12 columns">
-        <div class="eportfolio cover-photo text-center" data-role="eportfolio-cover-photo"
+        <div class="cover-photo" data-role="eportfolio-cover-photo"
              <!-- BEGIN has_cover_photo -->
              style="background-image: url(/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH});"
              <!-- END has_cover_photo -->
             >
-            <img class='eportfolio profile-image' src='/portrait.php?userId={USER_EXTERNAL_ID}&size=constrain200' alt="{USER_FULLNAME}" />
 
             <!-- BEGIN no_cover_photo -->
             <!-- END no_cover_photo -->
@@ -83,11 +82,14 @@
             {ATTACH_ZONE}
         </nav>
     </div>
-    <div class="small-12 columns text-center eportfolio profile-name">
-        <h1>{USER_FULLNAME}</h1>
-        <p class="meta">
-            {USER_YEAR}{USER_CAMPUS}{USER_HOUSE}
-        </p>
+    <div class="avatar card small-12">
+        <div class="wrap">
+            <img class='profile-image' src='/portrait.php?userId={USER_EXTERNAL_ID}&size=constrain200' alt="{USER_FULLNAME}" />
+            <h1>{USER_FULLNAME}</h1>
+            <p class="meta">
+                {USER_YEAR}{USER_CAMPUS}{USER_HOUSE}
+            </p>
+        </div>
     </div>
 </div>
 
