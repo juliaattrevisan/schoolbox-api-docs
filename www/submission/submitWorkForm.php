@@ -9,6 +9,9 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Video\QueueMapper;
 
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
 $page = new SitePage;
 
 // attachment submission
@@ -29,12 +32,21 @@ $submissions = new Collection();
 
 // Allow teachers to impersonate students
 /** @var Schoolbox\User $user */
-if (isset($_POST['user_id']) && $_POST['user_id'] != $_SESSION['user']->getId()) {
+if (isset($_POST['user_id']) && $_POST['user_id'] != $sessionUser->getId()) {
     $user = \Schoolbox\UserMapper::getInstance()->findById($_POST['user_id']);
     $returnHandler = new SubmissionReturn();
 
-    if (!$returnHandler->securityCheck($_POST['box_id'])) {
+    try {
+        $box = $boxMap->findById($_POST['box_id']);
+    }
+    catch (\Schoolbox\Mapper\Exception $e) {
+        error(17);
+        exit();
+    }
+
+    if (!$boxMap->hasAccess($sessionUser, $box, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
         error(25);
+        exit();
     }
 } else {
     $user = $_SESSION['user'];
