@@ -64,6 +64,22 @@
             }
         });
 
+        /* Ensure modals always appear in a visible location
+         *
+         * The callback open.fndtn.reveal doesn't fire when the
+         * modal is built dynamically with js -_-
+         *
+         * Also, arbitrary 6.25rem padding at top (in the design)
+         */
+        var modalTop = 6.25*16;
+
+        $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
+            $(this).css({'top': $(window).scrollTop() + modalTop + 'px'});
+        });
+
+        $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
+            $(this).css({'top': $(window).scrollTop() + modalTop + 'px'});
+        });
     });
 
     // Date formats (global variable)

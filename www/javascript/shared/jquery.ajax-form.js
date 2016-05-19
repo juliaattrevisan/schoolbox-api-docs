@@ -61,7 +61,7 @@
     AjaxForm.prototype.buildRevealModal = function() {
         var self  = this;
         var modal = $(
-            '<div class="reveal-modal" data-reveal aria-hidden="true" role="dialog">' +
+            '<div class="reveal-modal" id="retry-modal" data-reveal aria-hidden="true" role="dialog">' +
             '<h2>Save failed</h2>' +
             '<p>Do you wish to retry?</p>' +
             '<ul class="flex-list">' +
@@ -70,6 +70,9 @@
             '</ul>' +
             '</div>'
         );
+
+        modal.appendTo('body');
+
         return modal
             .on('click', '[data-action="retry"]', function(e) {
                 modal.foundation('reveal', 'close');
