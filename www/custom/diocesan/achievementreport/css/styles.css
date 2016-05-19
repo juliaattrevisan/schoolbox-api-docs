@@ -41,7 +41,7 @@
 /* thead/tr/th style subheading, for subheadings which can't
  * go in thead element
  */
-.achievement-report td.subheading {
+.achievement-report .subheading {
     font-weight: bold;
 }
 

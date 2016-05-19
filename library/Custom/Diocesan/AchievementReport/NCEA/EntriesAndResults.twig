@@ -1,22 +1,22 @@
-<table class="no-bottom-margin">
-    <thead class="generic-heading-highlight">
-        <tr>
-            <th>Entries And Results {{ year }}</th>
-        </tr>
-    </thead>
-</table>
+<div class="row">
+    <div class="small-12 island">
+        <section class="content generic-heading-highlight no-margin">
+            Entries And Results {{ year }}
+        </section>
+    </div>
+</div>
 
 {% for courseName, allData in entriesAndResults.data %}
 <table>
     <tbody>
         <tr>
-            <td class="subheading" colspan="6">
-                {{ courseName }}
+            <td colspan="6">
+                <p class="subheading">{{ courseName }}</p>
 
-                <ul class="teacher-list">
+                <ul class="sub-nav">
                     {% for currentTeacherName, currentTeacherEmail in allData.allTeachers %}
                     <li>
-                        <em>{% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a>{% else %}{{ currentTeacherName }}{% endif %}{% if not loop.last %}, {% endif %}</em>
+                        {% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a>{% else %}{{ currentTeacherName }}{% endif %}{% if not loop.last %}, {% endif %}
                     </li>
                     {% endfor %}
                 </ul>
@@ -46,7 +46,7 @@
     <tfoot>
         <tr>
             <td colspan="6">
-                <table class="summary">
+                <table class="no-margin">
                     <thead>
                         <tr>
                             <th colspan="2"></th>
