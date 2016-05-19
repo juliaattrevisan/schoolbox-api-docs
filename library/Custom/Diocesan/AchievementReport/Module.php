@@ -22,6 +22,7 @@ use Twig_Loader_Filesystem;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule {
+    protected $basename = 'achievementreport';
 
     /**
      * {@inheritdoc}
