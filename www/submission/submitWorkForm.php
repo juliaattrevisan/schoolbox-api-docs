@@ -9,10 +9,10 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Video\QueueMapper;
 
+$page = new SitePage;
+
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
-
-$page = new SitePage;
 
 // attachment submission
 if (!is_numeric($_POST['box_id'])) {
