@@ -14,17 +14,29 @@ $submission_mapper = new Submission\FileMapper();
 
 $boxId = $_POST['box_id'];
 
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
 // Allow teachers to impersonate students
 /** @var Schoolbox\User $user */
-if (isset($_POST['user_id']) && $_POST['user_id'] != $_SESSION['user']->getId()) {
+if (isset($_POST['user_id']) && $_POST['user_id'] != $sessionUser->getId()) {
     $user = \Schoolbox\UserMapper::getInstance()->findById($_POST['user_id']);
     $returnHandler = new SubmissionReturn();
 
-    if (!$returnHandler->securityCheck($boxId)) {
+    try {
+        $box = $box_mapper->findById($boxId);
+    }
+    catch (\Schoolbox\Mapper\Exception $e) {
+        error(17);
+        exit();
+    }
+
+    if (!$box_mapper->hasAccess($sessionUser, $box, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
         error(25);
+        exit();
     }
 } else {
-    $user = $_SESSION['user'];
+    $user = $sessionUser;
 }
 $isDraft = isset($_POST['save_draft']);
 $body    = $_POST['body'];
