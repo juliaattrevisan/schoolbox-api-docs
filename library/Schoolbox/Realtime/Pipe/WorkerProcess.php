@@ -27,6 +27,7 @@ use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\UserQueue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\User;
 
 class WorkerProcess extends AbstractProcess
@@ -150,6 +151,10 @@ class WorkerProcess extends AbstractProcess
 
         if (!is_callable($callback)) {
             throw new RuntimeException("Unable to execute callback, got " . json_encode($callback));
+        }
+        
+        if (is_array($callback) && isset($callback[0]) && $callback[0] instanceof AbstractModuleNotifier) {
+            $callback[0]->enableLogging($this->notif, $this->log);
         }
 
         $this->log->debug("Executing " . $this->callable2string($callback));

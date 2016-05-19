@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Schedule\Module;
 
 
+use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionMethod;
 use RuntimeException;
@@ -17,6 +18,7 @@ use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\IMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\Source;
@@ -31,6 +33,12 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
 
     /** @var IConfigLoader */
     protected $conf;
+
+    /** @var Notif */
+    protected $notif;
+
+    /** @var LoggerInterface */
+    protected $log;
 
     /** @var IMapper */
     protected $mapper;
@@ -278,4 +286,15 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
         return $this->mapper;
     }
 
+
+    /**
+     * @param Notif           $notif
+     * @param LoggerInterface $log
+     * @return void
+     */
+    public function enableLogging(Notif $notif, LoggerInterface $log)
+    {
+        $this->notif = $notif;
+        $this->log   = $log;
+    }
 }
