@@ -36,6 +36,9 @@ abstract class AbstractProcess implements WorkerInterface
     /** @var DispatchStrategyInterface */
     protected $strat;
 
+    /** @var LoggerInterface */
+    protected $log;
+
     /**
      * Timer for ensuring a worker doesn't sit idle for too long
      *
