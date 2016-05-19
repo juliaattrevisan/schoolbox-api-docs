@@ -395,13 +395,8 @@ class SubmissionBoxNotifier extends AbstractModuleNotifier implements SourceInte
                 // for anyone who has marks given, raise the duework.returned notification
                 /** @var Collection|ReturnedWork[] $returns */
                 $returns = $this->returnedWorkMapper->findByColumn('box_id', $submissionBox->getId());
-                $this->notif->setTopic(Notif::TOPIC_APPLICATION);
                 foreach ($returns as $return) {
-                    // simulate a save event, so as to spawn notifications for returned work
-                    $this->notif->notice(serialize(new Event(
-                        $return->getMarker(), Mapper::METHOD_CREATE,
-                        $return, $this->returnedWorkMapper, null
-                    )));
+                    $this->raiseNotification($return->getMarker(), Mapper::METHOD_CREATE, $return, $this->returnedWorkMapper);
                 }
             }
             unset($diff['markVisibility']);

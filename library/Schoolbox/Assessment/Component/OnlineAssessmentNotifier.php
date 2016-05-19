@@ -589,13 +589,8 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 				// for anyone who has been marked, raise the assess.marked notification
 				/** @var Collection|Attempt[] $attempts */
 				$attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId());
-				$this->notif->setTopic(Notif::TOPIC_APPLICATION);
 				foreach ($attempts as $attempt) {
-					// simulate a save event, so as to spawn notifications for returned work
-					$this->notif->notice(serialize(new Event(
-						$attempt->getMarker(), Mapper::METHOD_CREATE,
-						$attempt, $this->attemptMapper, null
-					)));
+					$this->raiseNotification($attempt->getMarker(), Mapper::METHOD_CREATE, $attempt, $this->attemptMapper);
 				}
 			}
 			unset($diff['markVisibility']);

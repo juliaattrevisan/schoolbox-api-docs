@@ -23,7 +23,9 @@ use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
+use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\ScheduleException;
+use Schoolbox\User;
 
 abstract class AbstractModuleNotifier implements ModuleNotifierInterface
 {
@@ -296,5 +298,21 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
     {
         $this->notif = $notif;
         $this->log   = $log;
+    }
+
+
+    /**
+     * @param User       $effector
+     * @param string     $action
+     * @param object     $model
+     * @param Mapper     $mapper
+     * @param array|null $diff
+     * @return void
+     */
+    protected function raiseNotification(User $effector, $action, $model, Mapper $mapper, array $diff = null)
+    {
+        $this->notif
+             ->setTopic(Notif::TOPIC_APPLICATION)
+             ->notice(serialize(new Event($effector, $action, $model, $mapper, $diff)));
     }
 }
