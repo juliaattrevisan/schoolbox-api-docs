@@ -16,24 +16,39 @@
                     <li><a href="/homepage/code/{STUDENT_SUBJECT_CODE}">{STUDENT_SUBJECT_NAME}</a></li>
                     <!-- END subject_block -->
                 </ul>
-				<!-- BEGIN due_work -->
+
+                <!-- BEGIN grades_button -->
+                <!-- not required -->
+                <!-- END grades_button -->
+
+                <!-- Start on School Grades page initially -->
+                <a href="/modules/custom/diocesan/achievementreport/schoolgrades/{STUDENT_EXTERNAL_ID}" class="btn go-to"><span></span>Achievement</a>
+
+                <a href="/synergetic/results" class="btn go-to"><span></span>Progress</a>
+
+                <!-- BEGIN due_work -->
                 <a href="/submission/dueWork/0/{STUDENT_ID}" class="btn due-work"><span></span>Due Work</a>
 				<!-- END due_work -->
-                <!-- BEGIN grades_button -->
-                <a href="/submission/allWork/{STUDENT_ID}" class="btn tick" title="View grades"><span></span>Grades</a>
-                <!-- END grades_button -->
+
+                <!-- BEGIN eportfolio -->
+                <a href="/eportfolio/{STUDENT_ID}/profile" class="btn eportfolio"><span></span>ePortfolio</a>
+                <!-- END eportfolio -->
+
+                <a href="/synergetic/contacts" class="btn go-to"><span></span>Contacts</a>
+
+                <a href="/calendar/full/{CAL_TODAY_DATE}/{STUDENT_ID}" class="btn calendar"><span></span>Calendar</a>
+
                 <!-- BEGIN timetable -->
                 <a href="/timetable/{STUDENT_ID}" class="btn time-table"><span></span>Timetable</a>
                 <!-- END timetable -->
 
+                <a href="/synergetic/attendances2" class="btn go-to"><span></span>Attendance</a>
+
+                <a href="/synergetic/docs" class="btn go-to"><span></span>Documents</a>
+
                 <!-- BEGIN pastoral -->
                 <a href="/pastoral/{STUDENT_ID}" class="button icon-pastoral">Pastoral Care</a>
                 <!-- END pastoral -->
-
-				<!-- BEGIN eportfolio -->
-				<a href="/eportfolio/{STUDENT_ID}/profile" class="btn eportfolio"><span></span>ePortfolio</a>
-				<!-- END eportfolio -->
-                <a href="/calendar/full/{CAL_TODAY_DATE}/{STUDENT_ID}" class="btn calendar"><span></span>Calendar</a>
             </div>
         </li>
         <!-- END student_block -->
