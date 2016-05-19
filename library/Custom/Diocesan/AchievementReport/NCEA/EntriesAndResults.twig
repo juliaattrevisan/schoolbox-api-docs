@@ -13,13 +13,13 @@
             <td colspan="6">
                 <p class="subheading">{{ courseName }}</p>
 
-                <ul class="sub-nav">
+                {% if allData.allTeachers|length %}
+                    <p class="meta">
                     {% for currentTeacherName, currentTeacherEmail in allData.allTeachers %}
-                    <li>
                         {% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a>{% else %}{{ currentTeacherName }}{% endif %}{% if not loop.last %}, {% endif %}
-                    </li>
                     {% endfor %}
-                </ul>
+                    </p>
+                {% endif %}
             </td>
         </tr>
         <tr>
