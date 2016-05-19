@@ -1,9 +1,15 @@
-<h1>Literacy/Numeracy</h1>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Literacy/Numeracy</h2>
+        <section class="content">
+            {% for checkboxName, selected in literacyNumeracyCheckbox.data %}
+            <div>
+                <input id='literacy-numeracy-{{ loop.index }}' type="checkbox" disabled {% if selected > 0 %}checked="checked"{% endif %} />
+                <label for="literacy-numeracy-{{ loop.index }}" class="checkbox-label">{{ checkboxName }}</label>
+            </div>
+            {% endfor %}
+        </section>
+    </div>
+</div>
 
-<ul>
-    {% for checkboxName, selected in literacyNumeracyCheckbox.data %}
-    <li>
-        <input type="checkbox" disabled {% if selected > 0 %}checked="checked"{% endif %} /> {{ checkboxName }}
-    </li>
-    {% endfor %}
-</ul>
+
