@@ -30,15 +30,15 @@ $conf              = ConfigMapper::getInstance();
 
 //
 // Submission mapper - will get the most recent submission for this student.
-$box_id = $this->arg[0];
-$user = $_SESSION['user'];
+$box_id      = $this->arg[0];
+$sessionUser = $_SESSION['user'];
 
 /** @var \Schoolbox\User $user */
 if (isset($this->arg[1])) {
     // Teachers of this class may now impersonate handing in work as a student.
     $user = \Schoolbox\UserMapper::getInstance()->findById($this->arg[1]);
 } else {
-    $user = $_SESSION['user'];
+    $user = $sessionUser;
 }
 
 //
@@ -58,11 +58,11 @@ if (!$submission_box->getAcceptOnline()) {
 }
 
 // If impersonating a student, I have to have write access to this page
-if ($user->getId() != $user->getId()) {
+if ($user->getId() != $sessionUser->getId()) {
     $studentRetHandler = new SubmissionReturn();
     // This may exit
 
-    if (!$submission_box->hasAccess($user, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+    if (!$submission_box->hasAccess($sessionUser, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
         error(25);
     }
 }
@@ -122,7 +122,7 @@ if (strlen(trim($policy)) > 0) {
     $this->setVar('STUDENT_SUBMIT_TERMS', Scrub::html($policy));
     $this->parse('confirm_terms_block', 'confirm_terms');
 }
-if ($user->getId() != $user->getId()) {
+if ($user->getId() != $sessionUser->getId()) {
     $this->parse('submit_on_behalf_block', 'submit_on_behalf');
 }
 unset($html2text, $policy);
