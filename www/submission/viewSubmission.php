@@ -5,11 +5,15 @@ if (!isset($this)) {
     SitePage::localRedir('/submission/viewSubmission');
 }
 
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
 $submissionBoxId = $this->arg[0];
 
 // check the ID is valid
 if (!is_numeric($submissionBoxId)) {
     error(2);
+    exit();
 }
 
 // compile the list of students over which we will iterate
@@ -19,12 +23,14 @@ try {
 }
 catch (\Schoolbox\Mapper\Exception\Deleted $e) {
     error(17);
+    exit();
 }
 
 $studentRetHandler = new SubmissionReturn();
 
-if (!$studentRetHandler->securityCheck($submissionBoxId)) {
+if (!$submissionBoxMapper->hasAccess($sessionUser, $submissionBox, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
     error(25);
+    exit();
 }
 
 // we log the viewing of this page, I know not why
