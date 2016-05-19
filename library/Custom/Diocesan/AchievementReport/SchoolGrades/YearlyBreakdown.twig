@@ -54,21 +54,26 @@
 
             {% for year, allCourses in yearlyBreakdown.data.yearStack %}
             <div data-yearly-breakdown data-yearly-breakdown-year="{{ year }}" style="display:none">
+                <div class="row">
+                    <div class="small-12 island">
+                        <section class="content generic-heading-highlight no-margin">
+                            {{ yearlyBreakdown.heading }} {{ year }}
+                        </section>
+                    </div>
+                </div>
+
                 <table>
                     <thead>
-                    <tr class="generic-heading-highlight">
-                        <th colspan="8">{{ yearlyBreakdown.heading }} {{ year }}</th>
-                    </tr>
-                    <tr>
-                        <th>Course</th>
-                        <th class="numeric">Entered Grades</th>
-                        <th class="letter">N</th>
-                        <th class="letter">A</th>
-                        <th class="letter">M</th>
-                        <th class="letter">E</th>
-                        <th class="numeric">Achieved</th>
-                        <th class="numeric">Available</th>
-                    </tr>
+                        <tr>
+                            <th>Course</th>
+                            <th class="numeric">Entered Grades</th>
+                            <th class="letter">N</th>
+                            <th class="letter">A</th>
+                            <th class="letter">M</th>
+                            <th class="letter">E</th>
+                            <th class="numeric">Achieved</th>
+                            <th class="numeric">Available</th>
+                        </tr>
                     </thead>
                     <tbody>
                     {% for courseName, yearlyValues in allCourses %}

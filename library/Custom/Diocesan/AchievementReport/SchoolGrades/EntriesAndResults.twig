@@ -1,22 +1,23 @@
+<div class="row">
+    <div class="small-12 island">
+        <section class="content generic-heading-highlight no-margin">
+            {{ entriesAndResults.heading }} {{ year }}
+        </section>
+    </div>
+</div>
+
 <table>
-    <thead class="generic-heading-highlight">
-    <tr>
-        <th colspan="3">{{ entriesAndResults.heading }} {{ year }}</th>
-    </tr>
-    </thead>
     <tbody>
         {% for courseName, areaData in entriesAndResults.data[year] %}
             <tr>
                 <td class="subheading">
                     {{ courseName }}
 
-                    <ul class="sub-nav">
-                        {% for currentTeacherName, currentTeacherEmail in areaData.allTeachers %}
-                        <li>
-                            {% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a>{% else %}{{ currentTeacherName }}{% endif %}{% if not loop.last %}, {% endif %}
-                        </li>
-                        {% endfor %}
-                    </ul>
+                    {% if areaData.allTeachers|length %}
+                    <p class="meta">
+                        {% for currentTeacherName, currentTeacherEmail in areaData.allTeachers %}{% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a>{% else %}{{ currentTeacherName }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+                    </p>
+                    {% endif %}
                 </td>
                 <td class="subheading">Result</td>
             </tr>
