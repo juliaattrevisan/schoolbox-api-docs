@@ -12,16 +12,16 @@ namespace Schoolbox\Assessment\Component;
 use PDO;
 use Schoolbox;
 use Schoolbox\Assessment\Activity;
-use Schoolbox\Collection;
-use Schoolbox\Curriculum\Node;
-use Schoolbox\Feed\FeedableMapperInterface;
-use Schoolbox\User;
-use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\File;
-use Schoolbox\Resource\Storage;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node;
+use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\Storage;
+use Schoolbox\User;
 use External_Markbook;
 
 /**

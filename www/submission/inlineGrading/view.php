@@ -8,7 +8,6 @@
  */
 
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Renderer;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use \Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as SubmissionMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -20,7 +19,6 @@ use \Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Collection;
 use \Crocodoc\Renderer\Factory;
-use \Rubric\Renderer\Vertical;
 use Schoolbox\Breadcrumbs;
 
 /** @var SitePage $this */
@@ -34,17 +32,28 @@ if (count($this->arg) < 2) {
 $submissionBoxId = $this->arg[0];
 $currentUid = $this->arg[1];
 
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+try {
+	$submissionBoxMapper = new SubmissionBoxMapper();
+	$submissionBox       = $submissionBoxMapper->findById($submissionBoxId);
+}
+catch (\Schoolbox\Mapper\Exception $e) {
+	error(17);
+	exit();
+}
+
 // Security check
-$studentRetHandler = new SubmissionReturn();
-$studentRetHandler->securityCheck($submissionBoxId);
-unset($studentRetHandler);
+
+if (!$submissionBox->hasAccess($sessionUser, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+	error(25);
+}
 
 /* This is an optional argument
  */
 $submissionId = $this->arg[2];
 
-$submissionBoxMapper = new SubmissionBoxMapper();
-$submissionBox = $submissionBoxMapper->findById($submissionBoxId);
 $term          = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submissionBox->getDueDate());
 
 /* Add category codes

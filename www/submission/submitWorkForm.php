@@ -11,6 +11,9 @@ use Schoolbox\Video\QueueMapper;
 
 $page = new SitePage;
 
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
 // attachment submission
 if (!is_numeric($_POST['box_id'])) {
     error(2);
@@ -29,10 +32,22 @@ $submissions = new Collection();
 
 // Allow teachers to impersonate students
 /** @var Schoolbox\User $user */
-if (isset($_POST['user_id']) && $_POST['user_id'] != $_SESSION['user']->getId()) {
+if (isset($_POST['user_id']) && $_POST['user_id'] != $sessionUser->getId()) {
     $user = \Schoolbox\UserMapper::getInstance()->findById($_POST['user_id']);
     $returnHandler = new SubmissionReturn();
-    $returnHandler->securityCheck($_POST['box_id']);
+
+    try {
+        $box = $boxMap->findById($_POST['box_id']);
+    }
+    catch (\Schoolbox\Mapper\Exception $e) {
+        error(17);
+        exit();
+    }
+
+    if (!$box->hasAccess($sessionUser, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+        error(25);
+        exit();
+    }
 } else {
     $user = $_SESSION['user'];
 }

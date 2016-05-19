@@ -21,6 +21,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Collection;
+use Schoolbox\Permission\Access\Access;
 
 class SubmissionBox implements ISoftDeletable
 {
@@ -802,5 +803,28 @@ class SubmissionBox implements ISoftDeletable
             default:
                 return false;
         }
+    }
+
+    /**
+     * Determine whether $user has $requiredAccessLevel (or greater)
+     * upon the Folder associated with $submissionBox
+     *
+     * @param User $user
+     * @param $requiredAccessLevel
+     * @return bool
+     */
+    public function hasAccess(User $user, $requiredAccessLevel)
+    {
+        $access = Access::getInstance();
+
+        /* Access level for $user on $submissionBox
+         */
+        $boxLevel = $access->getFolderAccess($user, [$this->getCategory()->getId()]);
+
+        if ($boxLevel >= $requiredAccessLevel) {
+            return true;
+        }
+
+        return false;
     }
 }

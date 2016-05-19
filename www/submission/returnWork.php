@@ -17,13 +17,27 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
     $subHandler = new Submission;
     $subReturn = new SubmissionReturn;
 
-    $userMapper = new UserMapper();
-    $user = $userMapper->findById($this->arg[1]);
+    try {
+        $userMapper = new UserMapper();
+        $user       = $userMapper->findById($this->arg[1]);
+    }
+    catch (\Schoolbox\Mapper\Exception $e) {
+        error(170);
+        exit();
+    }
 
-    $subReturn->securityCheck($this->arg[0]);
+    try {
+        $submissionBoxMapper = new SubmissionBoxMapper();
+        $submissionBox       = $submissionBoxMapper->findById($this->arg[0]);
+    }
+    catch (\Schoolbox\Mapper\Exception $e) {
+        error(17);
+        exit();
+    }
 
-    $submissionBoxMapper = new SubmissionBoxMapper();
-    $submissionBox = $submissionBoxMapper->findById($this->arg[0]);
+    if (!$submissionBox->hasAccess($_SESSION['user'], \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+        error(25);
+    }
 
     $this->setTitle('Grading ' . \Scrub::text($submissionBox->getCategory()->getName()) . ' for ' . \Scrub::text($submissionBox->getName()));
 
@@ -83,6 +97,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
     $this->parse("mark_type_{$slug}_block", "mark_type_{$slug}");
 } else {
     error(2);
+    exit();
 }
 
 

@@ -32,9 +32,21 @@ if (is_numeric($_GET['delete'])) {
     // Security check
     $boxId  = $return->getSubmissionBox()->getId();
     $userId = $return->getOwner()->getId();
-    $studentRetHandler = new SubmissionReturn();
-    $studentRetHandler->securityCheck($return->getSubmissionBox()->getId());
-    unset($studentRetHandler);
+
+    $submissionboxMapper = \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance();
+
+    try {
+        $submissionBox = $submissionBoxMapper->findById($boxId);
+    }
+    catch (\Schoolbox\Mapper\Exception $e) {
+        error(17);
+        exit();
+    }
+
+    if (!$submissionBox->hasAccess($sessionUser, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+        error(25);
+        exit();
+    }
 
     // Delete and redir somewhere
     $mapper->delete($return);
@@ -51,13 +63,20 @@ $user = $userMapper->findById($_POST['uid']);
 
 /* Get the submission box object
  */
-$submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
-$submissionBox = $submissionBoxMapper->findById($_POST['box_id']);
+try {
+    $submissionBoxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+    $submissionBox       = $submissionBoxMapper->findById($_POST['box_id']);
+}
+catch (\Schoolbox\Mapper\Exception $e) {
+    error(17);
+    exit();
+}
 
 // Security check
-$studentRetHandler = new SubmissionReturn();
-$studentRetHandler->securityCheck($submissionBox->getId());
-unset($studentRetHandler);
+if (!$submissionBox->hasAccess($sessionUser, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+    error(25);
+    exit();
+}
 
 $term = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($submissionBox->getDueDate());
 if (!$term->isMarkableBy($_SESSION['user'])) {
