@@ -548,13 +548,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $timetable = array();
 
         // Build the timetable
-        foreach ($timetabledef['desc'] as $x => $name) {
-            $timetable[$x]['periodName']     = $timetabledef['desc'][$x];
-            $timetable[$x]['periodStart']    = $timetabledef['start'][$x];
-            $timetable[$x]['periodEnd']      = $timetabledef['end'][$x];
-            $timetable[$x]['periodNumber']   = $timetabledef['number'][$x];
-            $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
-            $timetable[$x]['class']          = array();
+        if(is_array($timetabledef['desc'])) {
+            foreach ($timetabledef['desc'] as $x => $name) {
+                $timetable[$x]['periodName'] = $timetabledef['desc'][$x];
+                $timetable[$x]['periodStart'] = $timetabledef['start'][$x];
+                $timetable[$x]['periodEnd'] = $timetabledef['end'][$x];
+                $timetable[$x]['periodNumber'] = $timetabledef['number'][$x];
+                $timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
+                $timetable[$x]['class'] = array();
+            }
         }
 
         // Add classes into it
