@@ -80,7 +80,7 @@ class Sync implements SyncInterface
         // Not yet supported: children from split families
         $companyCode = $this->database->smartQuote($this->companyCode);
         $query = "
-            SELECT
+            SELECT DISTINCT
                 'P' + p.par_code AS student_contact_id,
                 ''               AS student_contact_title,
                 p.f_name         AS student_contact_given_name,
@@ -95,7 +95,7 @@ class Sync implements SyncInterface
                 s.surname        AS student_surname
             FROM parent AS p
             INNER JOIN paraddress as pa
-                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
+                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code AND pa.add_num = '1'
             LEFT JOIN pia_sfaccess AS sf
                 ON p.par_code = sf.par_code
                 AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
@@ -104,10 +104,12 @@ class Sync implements SyncInterface
                 ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
             WHERE p.cmpy_code = $companyCode
             AND   p.f_name IS NOT NULL
+            AND   s.given_name IS NOT NULL
+            AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
 
             UNION ALL
 
-            SELECT
+            SELECT DISTINCT
                 'S' + p.par_code AS student_contact_id,
                 ''               AS student_contact_title,
                 p.m_name         AS student_contact_given_name,
@@ -122,7 +124,7 @@ class Sync implements SyncInterface
                 s.surname        AS student_surname
             FROM parent AS p
             INNER JOIN paraddress as pa
-                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code
+                ON p.par_code = pa.par_code AND p.cmpy_code = pa.cmpy_code AND pa.add_num = '1'
             LEFT JOIN pia_sfaccess AS sf
                 ON p.par_code = sf.par_code
                 AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
@@ -130,7 +132,9 @@ class Sync implements SyncInterface
             LEFT JOIN student as s
                 ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
             WHERE p.cmpy_code = $companyCode
-            AND   p.f_name IS NOT NULL
+            AND   p.m_name IS NOT NULL
+            AND   s.given_name IS NOT NULL
+            AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
 
             ORDER BY student_contact_id ASC
         ";
