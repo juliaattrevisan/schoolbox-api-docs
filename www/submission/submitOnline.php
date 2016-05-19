@@ -58,11 +58,11 @@ if (!$submission_box->getAcceptOnline()) {
 }
 
 // If impersonating a student, I have to have write access to this page
-if ($_SESSION['user']->getId() != $user->getId()) {
+if ($user->getId() != $user->getId()) {
     $studentRetHandler = new SubmissionReturn();
     // This may exit
 
-    if (!$studentRetHandler->securityCheck($box_id)) {
+    if (!$box_mapper->hasAccess($user, $submission_box, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
         error(25);
     }
 }
@@ -122,7 +122,7 @@ if (strlen(trim($policy)) > 0) {
     $this->setVar('STUDENT_SUBMIT_TERMS', Scrub::html($policy));
     $this->parse('confirm_terms_block', 'confirm_terms');
 }
-if ($user->getId() != $_SESSION['user']->getId()) {
+if ($user->getId() != $user->getId()) {
     $this->parse('submit_on_behalf_block', 'submit_on_behalf');
 }
 unset($html2text, $policy);
