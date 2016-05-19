@@ -50,21 +50,38 @@ class Student extends IteratorIterator
             ->setLogin($currentResult['network_login'])
         ;
 
-        /* Assign emails
+        /* Email - one for every item in stack
          */
-        $email1 = new User\Common\Email();
-        $email1
-            ->setAddress($currentResult['student_email']);
+        $email = [];
+        $email = array_merge(
+            $email,
+            preg_split('/[,;]/', $currentResult['student_email'])
+        );
+        foreach (array_unique($email) as $key => $anEmail) { 
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
 
-        $email2 = new User\Common\Email();
-        $email2
-            ->setAddress($currentResult['student_occup_email']);
-
-        foreach (array($email1, $email2) as $currentEmail) {
             /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) {
+            if (strlen($currentEmail->getAddress())) { 
                 $student->addEmail($currentEmail);
-            }
+            } 
+        } 
+
+        /* Work Email - one for every item in stack
+         */
+        $workEmail = [];
+        $workEmail = array_merge(
+            $workEmail,
+            preg_split('/[,;]/', $currentResult['student_work_email'])
+        );
+        foreach (array_unique($workEmail) as $key => $anEmail) { 
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
+
+            /** @var User\Common\Email $currentEmail */
+            if (strlen($currentEmail->getAddress())) { 
+                $student->addWorkEmail($currentEmail);
+            } 
         }
 
         /* Boarding House should be set if it has a value
