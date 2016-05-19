@@ -590,7 +590,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 				/** @var Collection|Attempt[] $attempts */
 				$attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId());
 				foreach ($attempts as $attempt) {
-					$this->raiseNotification($attempt->getMarker(), Mapper::METHOD_CREATE, $attempt, $this->attemptMapper);
+					$this->raiseNotification($quiz->getUser(), Mapper::METHOD_CREATE, $attempt, $this->attemptMapper);
 				}
 			}
 			unset($diff['markVisibility']);
