@@ -91,6 +91,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
                 'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
                     'timing'
                 ) * 1000 : '2000',
+                'COMPONENT_CONFIG_IMAGE_RATIO'          => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square' ,
             )
         );
 
