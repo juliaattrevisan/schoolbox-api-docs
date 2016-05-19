@@ -257,8 +257,8 @@
 
                 /* Remove default plugins; add Schoolbox Custom Plugins
                  */
-                removePlugins: 'image,uploadimage,link',
-                extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink,schoolboxanchor,image2',
+                removePlugins: 'image,image2,uploadimage,link',
+                extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink,schoolboxanchor,dragresize',
 
                 /* Other settings
                  */
