@@ -1,23 +1,6 @@
 /**
  * Global styles
  */
-section.avatar {
-    margin-bottom: 8px;
-}
-section.avatar a {
-    display: block;
-    height: 32px;
-    line-height: 32px;
-    margin-left: 40px;
-}
-section.avatar img {
-    position: absolute;
-    left: 0;
-}
-.achievement-report h1 {
-    margin: 24px 0 12px 0;
-}
-
 .achievement-report table {
     width: 100%;
     border-collapse: collapse;
@@ -53,10 +36,6 @@ section.avatar img {
 .achievement-report tfoot tr.totals td {
     border-top: 3px solid #ddd;
     font-style: italic;
-}
-
-.achievement-report .no-bottom-margin {
-    margin-bottom: 0px;
 }
 
 /* thead/tr/th style subheading, for subheadings which can't
