@@ -76,6 +76,9 @@ $allowedHandler    = new AllowedFile;
 
 $currentUserId = $_SESSION['id'];
 
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
 // if no second argument supplied and student, assume current user rather than just dying
 if ($this->arg[1] == false && $groupHandler->isStudent()) {
     SitePage::localRedir("/submission/submissionHistory/{$this->arg[0]}/{$currentUserId}");
@@ -151,9 +154,11 @@ $this->setVar(
 $externalClassHandler = new External_Class();
 
 $folder = $folderMapper->findById($box->getCategory()->getId());
+$classCode = '';
 
 if ($folder->getCodes()->count()) {
-/* Get all the folder codes, implode them into a csv
+
+    /* Get all the folder codes, implode them into a csv
      * as per the handler
      */
     $temp = array();
@@ -507,7 +512,7 @@ if (count($submission_history)) {
 // and if the current time is between open and late
 $isSubmissionOnStudentBehalf = $userID != $currentUserId;
 $hasSubmitPermission =
-    (!$isSubmissionOnStudentBehalf || $returnHandler->securityCheck($box->getId()))
+    (!$isSubmissionOnStudentBehalf || $boxMapper->hasAccess($sessionUser, $box, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE))
     && $box->isOpen()
     && $box->getAcceptOnline();
 if (isset($recent_activity)) {
@@ -553,7 +558,7 @@ if (isset($recent_activity)) {
     $this->setVar($output);
 
     // if we are the owning student, display plagiarism details if they are available
-    if (($userID == $currentUserId && $conf->get('plagscan_student_visible')) || $_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser()) {
+    if (($userID == $currentUserId && $conf->get('plagscan_student_visible')) || $sessionUser->getRole()->isStaff() || $sessionUser->isSuperuser()) {
         // retrieve plagiarism score, if available
         $docMapper = Plagscan_DocumentMapper::getInstance();
         $plagDoc   = null;
@@ -690,6 +695,7 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
     $this->setVar('return_file_block', '');
 
     if (count($fileReturn)) {
+        /** @var \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $returnedFile */
         foreach($fileReturn as $returnedFile) {
             if($returnedFile->getStorage()->getHash()) {
                 try{
