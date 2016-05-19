@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\Storage\GC;
 
+use League\Flysystem\Exception as FlysystemException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\GC\Check\Check;
@@ -121,7 +122,9 @@ class GarbageCollector
             try {
                 $this->removeFromStorage($hash);
             } catch (MapperException $e) {
-                $this->log->error("Could not delete storage file '$hash'");
+                $this->log->error("Could not delete storage file '$hash' due to a database issue: ".$e->getMessage());
+            } catch (FlysystemException $e) {
+                $this->log->error("Could not delete storage file '$hash' due to filesystem issue: ".$e->getMessage());
             }
         }
 
