@@ -168,13 +168,19 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * Add code
+     * Add code. Ensures added code not already present.
      *
      * @param  FolderCode $code
      * @return $this
      */
     public function addCode($code)
     {
+        foreach($this->getCodes() as $existing){
+            if($existing->getCode() == $code->getCode()){
+                return $this;
+            }
+        }
+
         $this->getCodes()->add($code);
         return $this;
     }
