@@ -38,6 +38,7 @@ try {
     exit;
 }
 
+/** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'survey/attempts.html');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 $this->setBlock(TEMPLATE_content, 'respondent_heading', 'respondent_heading_block');
@@ -114,6 +115,11 @@ if (is_array($allAttempts) && count($allAttempts)) {
            */
         $this->setVar('respondent_name_block', '');
     }
+} else {
+    $this->setBlock(TEMPLATE_content, 'checkbox', 'checkbox_block');
+    $this->setVar('checkbox_block','');
+    $this->setBlock(TEMPLATE_content, 'buttons', 'buttons_block');
+    $this->setVar('buttons_block','');
 }
 
 $trail = new Breadcrumbs();
