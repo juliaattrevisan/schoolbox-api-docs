@@ -19,6 +19,7 @@ use Database;
 use Schoolbox\Config\ConfigMapper;
 use Config\Modules\ModuleConfigInterface;
 use Schoolbox\Notif\SilentNotif;
+use Schoolbox\Notif\Notif;
 
 class Bootstrap implements BootstrapInterface {
 
@@ -133,7 +134,8 @@ class Bootstrap implements BootstrapInterface {
 		$di = $this->kernel->getDependencyInjector();
 
 		// Configuration
-		$di->set('config', $di->lazyNew('Schoolbox\\Config\\ConfigMapper'));
+		$di->set('config', $di->lazyNew(ConfigMapper::class));
+		$di->set('notif', $di->lazyNew(Notif::class));
 
         // Set correct timezone
         date_default_timezone_set($timezone = $di->get('config')->get('date_timezone'));
@@ -144,22 +146,6 @@ class Bootstrap implements BootstrapInterface {
 
         // All modules relate to web requests, not daemons.
         // Therefore, no modules need to be set up.
-
-//		require_once 'conf/modules/ModuleConfigInterface.php';
-//
-//		// Initialise module configuration
-//		foreach(glob(SITE_root . '/conf/modules/*.php') as $routePath) {
-//			require_once $routePath;
-//			$start = strrpos($routePath, '/') + 1;
-//			$length = strrpos($routePath, '.php') - $start;
-//			$class = 'Config\\Modules\\' . substr($routePath, $start, $length);
-//
-//			if(class_exists($class, false)) {
-//				/** @var ModuleConfigInterface $obj */
-//				$obj = new $class();
-//				$obj->configure($this->kernel);
-//			}
-//		}
 
 		$di->set('ups.logger',
 			$di->lazyNew(
