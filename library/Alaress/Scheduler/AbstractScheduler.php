@@ -45,7 +45,7 @@ abstract class AbstractScheduler extends SignalEmitter implements SchedulerInter
     protected $clock;
 
     // TODO release this dependency on the Schoolbox domain
-    /** @var \Schoolbox\IConfigLoader */
+    /** @var IConfigLoader */
     protected $conf;
 
     /** @var string */
