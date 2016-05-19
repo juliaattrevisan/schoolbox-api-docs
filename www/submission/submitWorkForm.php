@@ -44,7 +44,7 @@ if (isset($_POST['user_id']) && $_POST['user_id'] != $sessionUser->getId()) {
         exit();
     }
 
-    if (!$boxMap->hasAccess($sessionUser, $box, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+    if (!$box->hasAccess($sessionUser, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
         error(25);
         exit();
     }

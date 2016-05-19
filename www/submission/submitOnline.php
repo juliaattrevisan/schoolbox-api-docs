@@ -62,7 +62,7 @@ if ($user->getId() != $user->getId()) {
     $studentRetHandler = new SubmissionReturn();
     // This may exit
 
-    if (!$box_mapper->hasAccess($user, $submission_box, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+    if (!$submission_box->hasAccess($user, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
         error(25);
     }
 }

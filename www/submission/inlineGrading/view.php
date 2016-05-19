@@ -46,7 +46,7 @@ catch (\Schoolbox\Mapper\Exception $e) {
 
 // Security check
 
-if (!$submissionBoxMapper->hasAccess($sessionUser, $submissionBox, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+if (!$submissionBox->hasAccess($sessionUser, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
 	error(25);
 }
 

@@ -25,7 +25,7 @@ if (is_numeric($_GET['delete'])) {
 		exit();
 	}
 
-	if (!$submissionBoxMapper->hasAccess($sessionUser, $box, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+	if (!$box->hasAccess($sessionUser, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
 		error(25);
 		exit();
 	}

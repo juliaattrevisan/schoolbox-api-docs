@@ -35,7 +35,7 @@ if (is_numeric($this->arg[0]) && is_numeric($this->arg[1])) {
         exit();
     }
 
-    if (!$submissionBoxMapper->hasAccess($user, $submissionBox, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+    if (!$submissionBox->hasAccess($user, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
         error(25);
     }
 

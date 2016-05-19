@@ -512,7 +512,7 @@ if (count($submission_history)) {
 // and if the current time is between open and late
 $isSubmissionOnStudentBehalf = $userID != $currentUserId;
 $hasSubmitPermission =
-    (!$isSubmissionOnStudentBehalf || $boxMapper->hasAccess($sessionUser, $box, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE))
+    (!$isSubmissionOnStudentBehalf || $box->hasAccess($sessionUser, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE))
     && $box->isOpen()
     && $box->getAcceptOnline();
 if (isset($recent_activity)) {

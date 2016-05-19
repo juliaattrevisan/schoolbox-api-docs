@@ -43,7 +43,7 @@ if (is_numeric($_GET['delete'])) {
         exit();
     }
 
-    if (!$submissionboxMapper->hasAccess($sessionUser, $submissionBox, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+    if (!$submissionBox->hasAccess($sessionUser, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
         error(25);
         exit();
     }
@@ -73,7 +73,7 @@ catch (\Schoolbox\Mapper\Exception $e) {
 }
 
 // Security check
-if (!$submissionboxMapper->hasAccess($sessionUser, $submissionBox, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
+if (!$submissionBox->hasAccess($sessionUser, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
     error(25);
     exit();
 }
