@@ -62,7 +62,7 @@ class HardLinks extends DbCheck
 
             "SELECT hash FROM submission_return
              WHERE hash IS NOT NULL
-             AND deleted IS FALSE",
+             AND deleted_at IS NULL",
 
             "SELECT background_image_hash FROM tile
              WHERE background_image_hash IS NOT NULL
