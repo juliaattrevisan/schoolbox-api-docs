@@ -479,6 +479,10 @@ class External_Schoolpro_User implements External_UserInterface
             $cacheTime    = @filemtime($photoPath);
             $modifiedTime = strtotime($result['result'][0]['CaptureDate']);
 
+            if (!file_exists($photoPath) && Config::get('photo_sis_import') == 0) {
+                return false;
+            }
+            
             if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
                 $vars = array(
                     'sbGetPortraitFile',

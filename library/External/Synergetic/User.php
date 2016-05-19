@@ -87,6 +87,7 @@ class External_Synergetic_User implements External_UserInterface
         if (!is_numeric($externalUserId)) {
             return false;
         }
+
         $query = "
             SELECT vPhotos.ModifiedDate
             FROM SynergyOne.dbo.vPhotos vPhotos
@@ -103,6 +104,11 @@ class External_Synergetic_User implements External_UserInterface
                       */
             $cacheTime    = @filemtime($photoPath);
             $modifiedTime = strtotime($photo['ModifiedDate']);
+
+            if (!file_exists($photoPath) && Config::get('photo_sis_import') == 0) {
+                return false;
+            }
+            
             if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
                 $query = "
                     SELECT vPhotos.Photo, vPhotos.PhotoType

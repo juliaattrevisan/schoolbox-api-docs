@@ -846,6 +846,10 @@ class External_Maze_User implements External_UserInterface {
 			$cacheTime = @filemtime($photoPath);
 			$modifiedTime = strtotime($photo['ModifiedDate']);
 
+			if (!file_exists($photoPath) && Config::get('photo_sis_import') == 0) {
+				return false;
+			}
+			
 			if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
 				if ($this->getGroup()->isStudent($user->getId())) {
 					$query = "

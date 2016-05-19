@@ -1018,8 +1018,9 @@ class External_Denbigh2_User implements External_UserInterface
 
         if(is_readable($photoPath)) {
             return $photoPath;
-        }
-        else {
+        } else if (!file_exists($photoPath) && Config::get('photo_sis_import') == 0) {
+            return false;
+        } else {
             $userMapper = new \Schoolbox\UserMapper();
             $roleMapper = new \Schoolbox\RoleMapper();
 
