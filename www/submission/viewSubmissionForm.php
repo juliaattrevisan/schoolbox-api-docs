@@ -6,6 +6,8 @@ $submissionHandler = new Submission();
 $submissionStudent = new SubmissionStudent();
 $subReturn = new SubmissionReturn;
 
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
 
 if (is_numeric($_GET['delete'])) {
 	$studentSub = $submissionStudent->getByID($_GET['delete']);
@@ -14,10 +16,18 @@ if (is_numeric($_GET['delete'])) {
 		error(44);
 	}
 
-	$subBox = $submissionHandler->getByID($studentSub['box_id']);
+	try {
+		$submissionBoxMapper = \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance();
+		$box = $submissionBoxMapper->findById($studentSub['box_id']);
+	}
+	catch (\Schoolbox\Mapper\Exception $e) {
+		error(17);
+		exit();
+	}
 
-	if (!$subReturn->securityCheck($studentSub['box_id'])) {
+	if (!$submissionBoxMapper->hasAccess($sessionUser, $box, \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE)) {
 		error(25);
+		exit();
 	}
 
 	$submissionStudent->delete($studentSub['id']);
