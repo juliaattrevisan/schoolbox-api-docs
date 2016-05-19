@@ -247,6 +247,7 @@
             <section>
                 <fieldset class="content" data-mage="part-course-select" {% if _part3 %}disabled{% endif %}>
                     <legend>1. Course</legend>
+                    <input type="hidden" name="componentId" value="{{ componentId }}">
                     {% if not _part3 %}
                     <div class="meta small-12 column" data-mage-helptext>
                         <p>Select the course that is to be imported, and one or more classes as the target destination.</p>
