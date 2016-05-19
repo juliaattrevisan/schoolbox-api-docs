@@ -1,10 +1,10 @@
 <style type="text/css">
-    p.divider {
+    .divider {
         margin-top:48px;
         width:100%;
         color: #fff;
-        background-color:#666;
-        padding: 8px;
+        background-color:#0066b0;
+        padding: 4px 8px;
     }
 </style>
 
@@ -74,7 +74,7 @@
     </div>
 </div>
 
-<p class="divider">Avatar Card Actions</p>
+<h2 class="divider">Avatar Card Actions</h2>
 <div class="row">
     <div class="small-6 columns">
         <div class="row">
@@ -148,31 +148,31 @@
     </div>
     <div class="small-6 columns">
         <pre>
-&lt;div class="row">
-    &lt;div class="small-12 columns no-pad">
-        &lt;ul class="action-list">
-            &lt;li class="actions-small-1">
-                &lt;div class="list-item">
-                    &lt;div class="small-12 avatar card">
-                        &lt;a href="#" title="">
-                            &lt;img src="" class="content" alt="">
-                            &lt;p>&lt;/p>
-                        &lt;/a>
-                        &lt;p class="meta">&lt;/p>
-                    &lt;/div>
-                &lt;/div>
-                &lt;nav>
-                    &lt;a href="" class="icon-download" title="Download">&lt;/a>
-                &lt;/nav>
-            &lt;/li>
-        &lt;/ul>
-    &lt;/div>
-&lt;/div>
+        &lt;div class="row">
+            &lt;div class="small-12 columns no-pad">
+                &lt;ul class="action-list">
+                    &lt;li class="actions-small-1">
+                        &lt;div class="list-item">
+                            &lt;div class="small-12 avatar card">
+                                &lt;a href="#" title="">
+                                    &lt;img src="" class="content" alt="">
+                                    &lt;p>&lt;/p>
+                                &lt;/a>
+                                &lt;p class="meta">&lt;/p>
+                            &lt;/div>
+                        &lt;/div>
+                        &lt;nav>
+                            &lt;a href="" class="icon-download" title="Download">&lt;/a>
+                        &lt;/nav>
+                    &lt;/li>
+                &lt;/ul>
+            &lt;/div>
+        &lt;/div>
         </pre>
     </div>
 </div>
 
-<p class="divider">Component Prototype - Action List (Eve)</p>
+<h2 class="divider">Component Prototype - Action List (Eve)</h2>
 <div class="row">
     <div class="small-6 columns">
         <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
@@ -180,17 +180,18 @@
                 <div class="small-12 island">
                     <section>
                         <ul class="action-list">
-                            <li class="row">
-                                <div class="column small-11">
-                                    <h3>
-                                        <a href='#'>Your thing</a>
-                                    </h3>
-
-                                    <p class="meta">Last updated on Thingo</p>
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="info card small-12">
+                                        <h3>
+                                            <a href='#'>Your thing</a>
+                                        </h3>
+                                        <p class="meta">Last updated on Thingo</p>
+                                    </div>
                                 </div>
-                                <div class="one actions">
+                                <nav>
                                     <a class="icon-modify no-text" href="#" title="Modify your thing"></a>
-                                </div>
+                                </nav>
                             </li>
                         </ul>
 
@@ -204,39 +205,40 @@
     </div>
     <div class="small-6 columns">
         <pre>
-&lt;div id='component{COMPONENT_INSTANCE_ID}' data-component>
-    {CONFIGURATION}
+        &lt;div id='component{COMPONENT_INSTANCE_ID}' data-component>
+            {CONFIGURATION}
 
-    &lt;div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        &lt;div class="small-12 island">
-            &lt;section>
-                &lt;ul class="action-list">
-                    &lt;li class="row">
-                        &lt;div class="column small-11">
-                            &lt;h3>
-                                &lt;a href='#'>&lt;/a>
-                            &lt;/h3>
+            &lt;div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+                &lt;div class="small-12 island">
+                    &lt;section>
+                        &lt;ul class="action-list">
+                            &lt;li class="actions-small-1">
+                                &alt;div class="list-item">
+                                    &lt;div class="info card small-11">
+                                        &lt;h3>
+                                            &lt;a href='#'>&lt;/a>
+                                        &lt;/h3>
+                                        &lt;p class="meta">Last updated on &lt;/p>
+                                    &lt;/div>
+                                &alt;/div>
+                                &lt;nav>
+                                    &lt;a class="icon-modify no-text" href="#" title="">&lt;/a>
+                                &lt;/nav>
+                            &lt;/li>
+                        &lt;/ul>
 
-                            &lt;p class="meta">Last updated on &lt;/p>
+                        &lt;div class="content">
+                            &lt;a href="" class="button icon-add">&lt;/a>
                         &lt;/div>
-                        &lt;div class="one actions">
-                            &lt;a class="icon-modify no-text" href="#" title="">&lt;/a>
-                        &lt;/div>
-                    &lt;/li>
-                &lt;/ul>
-
-                &lt;div class="content">
-                    &lt;a href="" class="button icon-add">&lt;/a>
+                    &lt;/section>
                 &lt;/div>
-            &lt;/section>
+            &lt;/div>
         &lt;/div>
-    &lt;/div>
-&lt;/div>
         </pre>
     </div>
 </div>
 
-<p class="divider">Component Prototype - Basic (Adam)</p>
+<h2 class="divider">Component Prototype - Basic (Adam)</h2>
 <div class="row">
     <div class="small-6 columns">
         <div id='component{COMPONENT_INSTANCE_ID}' class='component-container {COMPONENT_CLASS}' data-component>
@@ -257,26 +259,26 @@
     </div>
     <div class="small-6 columns">
         <pre>
-&lt;div id='component{COMPONENT_INSTANCE_ID}' data-component>
-    &lt;!-- Custom javascript -->
+        &lt;div id='component{COMPONENT_INSTANCE_ID}' data-component>
+            &lt;!-- Custom javascript -->
 
-    {CONFIGURATION}
+            {CONFIGURATION}
 
-    &lt;div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        &lt;div class="small-12 island">
-            &lt;section>
-                &lt;div class="content">
+            &lt;div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+                &lt;div class="small-12 island">
+                    &lt;section>
+                        &lt;div class="content">
 
+                        &lt;/div>
+                    &lt;/section>
                 &lt;/div>
-            &lt;/section>
+            &lt;/div>
         &lt;/div>
-    &lt;/div>
-&lt;/div>
         </pre>
     </div>
 </div>
 
-<p class="divider">Padding Island (Fat Island)</p>
+<h2 class="divider">Padding Island (Fat Island)</h2>
 <div class="row">
     <div class="small-6 columns">
         <div class="row">
@@ -296,25 +298,25 @@
     </div>
     <div class="small-6 columns">
         <pre>
-&lt;div class="row">
-    &lt;div class="small-12 island">
-        &lt;h2 class="subheader">Lorem ipsizzle go to hizzle phat amizzle.&lt;/h2>
-        &lt;section>
-            &lt;div class="content">
-                &lt;p>
-                    Praesent dang mi nizzle maurizzle posuere bibendizzle.
-                    Fizzle lacinia bow wow wow crunk. Cras izzle enim izzle
-                    leo sodales euismod.
-                &lt;/p>
+        &lt;div class="row">
+            &lt;div class="small-12 island">
+                &lt;h2 class="subheader">Lorem ipsizzle go to hizzle phat amizzle.&lt;/h2>
+                &lt;section>
+                    &lt;div class="content">
+                        &lt;p>
+                            Praesent dang mi nizzle maurizzle posuere bibendizzle.
+                            Fizzle lacinia bow wow wow crunk. Cras izzle enim izzle
+                            leo sodales euismod.
+                        &lt;/p>
+                    &lt;/div>
+                &lt;/section>
             &lt;/div>
-        &lt;/section>
-    &lt;/div>
-&lt;/div>
+        &lt;/div>
         </pre>
     </div>
 </div>
 
-<p class="divider">No-Padding Island (Skinny Island)</p>
+<h2 class="divider">No-Padding Island (Skinny Island)</h2>
 <div class="row">
     <div class="small-6 columns">
         <div class="row">
@@ -332,23 +334,23 @@
     </div>
     <div class="small-6 columns">
         <pre>
-&lt;div class="row">
-    &lt;div class="small-12 island">
-        &lt;h2 class="subheader">Lorem ipsizzle go to hizzle phat amizzle.&lt;/h2>
-        &lt;section>
-            &lt;p>
-                Praesent dang mi nizzle maurizzle posuere bibendizzle.
-                Fizzle lacinia bow wow wow crunk. Cras izzle enim izzle
-                leo sodales euismod.
-            &lt;/p>
-        &lt;/section>
-    &lt;/div>
-&lt;/div>
+        &lt;div class="row">
+            &lt;div class="small-12 island">
+                &lt;h2 class="subheader">Lorem ipsizzle go to hizzle phat amizzle.&lt;/h2>
+                &lt;section>
+                    &lt;p>
+                        Praesent dang mi nizzle maurizzle posuere bibendizzle.
+                        Fizzle lacinia bow wow wow crunk. Cras izzle enim izzle
+                        leo sodales euismod.
+                    &lt;/p>
+                &lt;/section>
+            &lt;/div>
+        &lt;/div>
         </pre>
     </div>
 </div>
 
-<p class="divider">Multi Island (Archipelago)</p>
+<h2 class="divider">Multi Island (Archipelago)</h2>
 <div class="row">
     <div class="small-6 columns">
         <div class="row">
@@ -392,44 +394,44 @@
     </div>
     <div class="small-6 columns">
         <pre>
-&lt;div class="row">
-    &lt;div class="small-4 island">
-        &lt;h2 class="subheader">Bali&lt;/h2>
-        &lt;section>
-            &lt;div class="content">
-                &lt;p>
-                    Praesent dang mi nizzle maurizzle posuere bibendizzle.
-                    Fizzle lacinia bow wow wow crunk. Cras izzle enim izzle
-                    leo sodales euismod.
-                &lt;/p>
+        &lt;div class="row">
+            &lt;div class="small-4 island">
+                &lt;h2 class="subheader">Bali&lt;/h2>
+                &lt;section>
+                    &lt;div class="content">
+                        &lt;p>
+                            Praesent dang mi nizzle maurizzle posuere bibendizzle.
+                            Fizzle lacinia bow wow wow crunk. Cras izzle enim izzle
+                            leo sodales euismod.
+                        &lt;/p>
+                    &lt;/div>
+                &lt;/section>
             &lt;/div>
-        &lt;/section>
-    &lt;/div>
-    &lt;div class="small-4 island">
-        &lt;h2 class="subheader">Tasmania&lt;/h2>
-        &lt;section>
-            &lt;div class="content">
-                &lt;p>
-                    Praesent dang mi nizzle maurizzle posuere bibendizzle.
-                    Fizzle lacinia bow wow wow crunk. Cras izzle enim izzle
-                    leo sodales euismod.
-                &lt;/p>
+            &lt;div class="small-4 island">
+                &lt;h2 class="subheader">Tasmania&lt;/h2>
+                &lt;section>
+                    &lt;div class="content">
+                        &lt;p>
+                            Praesent dang mi nizzle maurizzle posuere bibendizzle.
+                            Fizzle lacinia bow wow wow crunk. Cras izzle enim izzle
+                            leo sodales euismod.
+                        &lt;/p>
+                    &lt;/div>
+                &lt;/section>
             &lt;/div>
-        &lt;/section>
-    &lt;/div>
-    &lt;div class="small-4 island">
-        &lt;h2 class="subheader">Madagascar&lt;/h2>
-        &lt;section>
-            &lt;div class="content">
-                &lt;p>
-                    Praesent dang mi nizzle maurizzle posuere bibendizzle.
-                    Fizzle lacinia bow wow wow crunk. Cras izzle enim izzle
-                    leo sodales euismod.
-                &lt;/p>
+            &lt;div class="small-4 island">
+                &lt;h2 class="subheader">Madagascar&lt;/h2>
+                &lt;section>
+                    &lt;div class="content">
+                        &lt;p>
+                            Praesent dang mi nizzle maurizzle posuere bibendizzle.
+                            Fizzle lacinia bow wow wow crunk. Cras izzle enim izzle
+                            leo sodales euismod.
+                        &lt;/p>
+                    &lt;/div>
+                &lt;/section>
             &lt;/div>
-        &lt;/section>
-    &lt;/div>
-&lt;/div>
+        &lt;/div>
         </pre>
     </div>
 </div>
