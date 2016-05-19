@@ -1,6 +1,10 @@
-<section class="avatar">
-    <a href='/search/user/{{ user.getId() }}'>
-        <img src="/portrait.php?userId={{ externalUser.StudentID }}&size=square32" />
-        {{ externalUser.StudentGiven1 }} {{ externalUser.StudentSurname }}
-    </a>
-</section>
+<div class="row">
+    <div class="small-12 columns">
+        <div class="avatar card small-12">
+            <a href="/search/user/{{ user.getId() }}" title="View Profile">
+                <img src="/portrait.php?userId={{ externalUser.StudentID }}&size=square64" alt="View Profile" />
+                <p>{{ externalUser.StudentGiven1 }} {{ externalUser.StudentSurname }}</p>
+            </a>
+        </div>
+    </div>
+</div>
