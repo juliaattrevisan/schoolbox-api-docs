@@ -810,17 +810,16 @@ class SubmissionBox implements ISoftDeletable
      * upon the Folder associated with $submissionBox
      *
      * @param User $user
-     * @param SubmissionBox $submissionBox
      * @param $requiredAccessLevel
      * @return bool
      */
-    public function hasAccess(User $user, SubmissionBox $submissionBox, $requiredAccessLevel)
+    public function hasAccess(User $user, $requiredAccessLevel)
     {
         $access = Access::getInstance();
 
         /* Access level for $user on $submissionBox
          */
-        $boxLevel = $access->getFolderAccess($user, [$submissionBox->getCategory()->getId()]);
+        $boxLevel = $access->getFolderAccess($user, [$this->getCategory()->getId()]);
 
         if ($boxLevel >= $requiredAccessLevel) {
             return true;
