@@ -93,7 +93,8 @@
             var frm = $('<form/>').attr('action', '/rubric/csv').attr('method', 'post').append($('table[data-rubric]').clone());
 
             frm.on('submit', function () {
-                frm.detach();
+                // “This is what the beginning of the end of the world will look like” ― Guillermo del Toro, The Strain
+                setTimeout(function(){frm.detach();},0);
             });
 
             frm.appendTo($('body')).submit();
