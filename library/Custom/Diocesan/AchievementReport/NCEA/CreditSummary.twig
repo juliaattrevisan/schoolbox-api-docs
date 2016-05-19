@@ -1,40 +1,47 @@
-<h1>{{ creditSummary.heading }}</h1>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">{{ creditSummary.heading }}</h2>
 
-<table class="credit-summary">
-    <thead>
-        <tr>
-            <th></th>
-            <th></th>
-            {% for currentType, typeSettings in creditSummary.allTypes %}
-            <th colspan="6" class="centered {{ typeSettings.css }}">{{ typeSettings.long }}</th>
-            {% endfor %}
-        </tr>
-        <tr class="equal-widths generic-heading-highlight">
-            <th class="centered">Level</th>
-            <th class="numeric">Total Entered Credits</th>
-            {% for currentType, typeSettings in creditSummary.allTypes %}
-            <th class="numeric">Entered Credits</th>
-            {% for currentLetter in creditSummary.allLetters %}
-            <th class="letter">{{ currentLetter }}</th>
-            {% endfor %}
-            <th class="numeric">Available</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for currentLevel, allLevelValues in creditSummary.data.table.creditSummary %}
-        <tr>
-            <td class="centered">{{ currentLevel }}</td>
-            <td class="numeric">{{ allLevelValues.totalEnteredCredits }}</td>
-            {% for currentType, typeSettings in creditSummary.allTypes %}
-            <td class="numeric">{{ allLevelValues[currentType].enteredCredits }}</td>
-            {% for currentLetter in creditSummary.allLetters %}
-            <td class="letter">{{ allLevelValues[currentType].letters[currentLetter] }}</td>
-            {% endfor %}
-            <td class="numeric">{{ allLevelValues[currentType].availableCredits }}</td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <section>
+            <table class="credit-summary">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        {% for currentType, typeSettings in creditSummary.allTypes %}
+                        <th colspan="6" class="centered {{ typeSettings.css }}">{{ typeSettings.long }}</th>
+                        {% endfor %}
+                    </tr>
+                    <tr class="equal-widths generic-heading-highlight">
+                        <th class="centered">Level</th>
+                        <th class="numeric">Total Entered Credits</th>
+                        {% for currentType, typeSettings in creditSummary.allTypes %}
+                        <th class="numeric">Entered Credits</th>
+                            {% for currentLetter in creditSummary.allLetters %}
+                            <th class="letter">{{ currentLetter }}</th>
+                            {% endfor %}
+                        <th class="numeric">Available</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for currentLevel, allLevelValues in creditSummary.data.table.creditSummary %}
+                    <tr>
+                        <td class="centered">{{ currentLevel }}</td>
+                        <td class="numeric">{{ allLevelValues.totalEnteredCredits }}</td>
+                        {% for currentType, typeSettings in creditSummary.allTypes %}
+                            <td class="numeric">{{ allLevelValues[currentType].enteredCredits }}</td>
+                            {% for currentLetter in creditSummary.allLetters %}
+                                <td class="letter">{{ allLevelValues[currentType].letters[currentLetter] }}</td>
+                            {% endfor %}
+                            <td class="numeric">{{ allLevelValues[currentType].availableCredits }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
 
