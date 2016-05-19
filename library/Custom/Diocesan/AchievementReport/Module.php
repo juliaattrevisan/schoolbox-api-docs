@@ -112,6 +112,7 @@ class Module extends BaseModule {
         }
         catch (\Exception $e) {
             error(31);
+            exit();
         }
 
         /* Teachers and parents of children have access to a report
@@ -119,8 +120,11 @@ class Module extends BaseModule {
          */
         $groupHandler = new \Group();
 
-        $isSuperuser = $_SESSION['user']->isSuperuser();
-        $isStaff = $_SESSION['user']->getRole()->isStaff();
+        /** @var \Schoolbox\User $sessionUser */
+        $sessionUser = $_SESSION['user'];
+
+        $isSuperuser = $sessionUser->isSuperuser();
+        $isStaff = $sessionUser->getRole()->isStaff();
         $isParentOfChild = $groupHandler->isParentOfChild($user->getId());
 
         /* If you're none of the above, get out
