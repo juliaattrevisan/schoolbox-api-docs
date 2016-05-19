@@ -1,15 +1,16 @@
 <link href="/custom/diocesan/achievementreport/css/styles.css" media="screen" rel="stylesheet" type='text/css' />
-<script type="text/javascript" src="/javascript/components/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <script type="text/javascript" src="/custom/diocesan/achievementreport/js/schoolgrades/nameGraph.js"></script>
 
 {% include '@templates/Avatar.twig' %}
 {% include '@templates/Navigation.twig' %}
 
-<div class="achievement-report school-grades">
-    {% include '@schoolgrades/GradeSummary.twig' %}
-    {% include '@schoolgrades/YearlyBreakdown.twig' %}
+<div class="row">
+    <div class="small-12 columns achievement-report school-grades">
+        {% include '@schoolgrades/GradeSummary.twig' %}
+        {% include '@schoolgrades/YearlyBreakdown.twig' %}
 
-    <h1>Further Information</h1>
-    {% include '@schoolgrades/Footer.twig' %}
+        {% include '@schoolgrades/Footer.twig' %}
+    </div>
 </div>
 

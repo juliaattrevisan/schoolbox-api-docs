@@ -10,10 +10,10 @@
                 <td class="subheading">
                     {{ courseName }}
 
-                    <ul class="teacher-list">
+                    <ul class="sub-nav">
                         {% for currentTeacherName, currentTeacherEmail in areaData.allTeachers %}
                         <li>
-                            <em>{% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a></em>{% else %}{{ currentTeacherName }}{% endif %}</em>{% if not loop.last %}, {% endif %}
+                            {% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a>{% else %}{{ currentTeacherName }}{% endif %}{% if not loop.last %}, {% endif %}
                         </li>
                         {% endfor %}
                     </ul>

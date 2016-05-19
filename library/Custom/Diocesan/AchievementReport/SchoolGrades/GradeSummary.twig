@@ -28,33 +28,41 @@
     });
 </script>
 
-<h1>{{ gradeSummary.heading }}</h1>
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">{{ gradeSummary.heading }}</h2>
 
-<table>
-    <thead class="generic-heading-highlight">
-        <tr>
-            <th class="numeric">Year</th>
-            <th class="numeric">Entered Grades</th>
-            <th class="letter">N</th>
-            <th class="letter">A</th>
-            <th class="letter">M</th>
-            <th class="letter">E</th>
-            <th class="numeric">Available</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for year, values in gradeSummary.data %}
-        <tr>
-            <td class="numeric">{{ year }}</td>
-            <td class="numeric">{{ values.enteredGrades }}</td>
-            <td class="letter">{{ values.letters.N }}</td>
-            <td class="letter">{{ values.letters.A }}</td>
-            <td class="letter">{{ values.letters.M }}</td>
-            <td class="letter">{{ values.letters.E }}</td>
-            <td class="numeric">{{ values.availableGrades }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <section>
+            <table>
+                <thead class="generic-heading-highlight">
+                <tr>
+                    <th class="numeric">Year</th>
+                    <th class="numeric">Entered Grades</th>
+                    <th class="letter">N</th>
+                    <th class="letter">A</th>
+                    <th class="letter">M</th>
+                    <th class="letter">E</th>
+                    <th class="numeric">Available</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for year, values in gradeSummary.data %}
+                    <tr>
+                        <td class="numeric">{{ year }}</td>
+                        <td class="numeric">{{ values.enteredGrades }}</td>
+                        <td class="letter">{{ values.letters.N }}</td>
+                        <td class="letter">{{ values.letters.A }}</td>
+                        <td class="letter">{{ values.letters.M }}</td>
+                        <td class="letter">{{ values.letters.E }}</td>
+                        <td class="numeric">{{ values.availableGrades }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
 
-<div data-graph="resultSummary"></div>
+            <div data-graph="resultSummary"></div>
+        </section>
+    </div>
+</div>
+
+
