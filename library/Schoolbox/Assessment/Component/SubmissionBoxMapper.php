@@ -12,16 +12,17 @@ namespace Schoolbox\Assessment\Component;
 use PDO;
 use Schoolbox;
 use Schoolbox\Assessment\Activity;
-use Schoolbox\Collection;
-use Schoolbox\Curriculum\Node;
-use Schoolbox\Feed\FeedableMapperInterface;
-use Schoolbox\User;
-use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\File;
-use Schoolbox\Resource\Storage;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node;
+use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\Storage;
+use Schoolbox\User;
 use External_Markbook;
 
 /**
@@ -1010,5 +1011,29 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
             );
         }
         return true;
+    }
+
+    /**
+     * Determine whether $user has $requiredAccessLevel (or greater)
+     * upon the Folder associated with $submissionBox
+     *
+     * @param User $user
+     * @param SubmissionBox $submissionBox
+     * @param $requiredAccessLevel
+     * @return bool
+     */
+    public function hasAccess(User $user, SubmissionBox $submissionBox, $requiredAccessLevel)
+    {
+        $access = Access::getInstance();
+
+        /* Access level for $user on $submissionBox
+         */
+        $boxLevel = $access->getFolderAccess($user, [$submissionBox->getCategory()->getId()]);
+
+        if ($boxLevel >= $requiredAccessLevel) {
+            return true;
+        }
+
+        return false;
     }
 }
