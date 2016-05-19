@@ -23,6 +23,7 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\UserQueue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -34,6 +35,9 @@ class WorkerProcess extends AbstractProcess
     /** @var UserQueueFactory */
     protected $uqf;
 
+    /** @var Notif */
+    protected $notif;
+
 
     /**
      * @param LoopInterface             $loop
@@ -41,11 +45,13 @@ class WorkerProcess extends AbstractProcess
      * @param PipeWriter                $writer
      * @param DispatchStrategyInterface $strat
      * @param UserQueueFactory          $uqf
+     * @param Notif                     $notif
      */
-    public function __construct($loop, $log, $writer, $strat, $uqf)
+    public function __construct($loop, $log, $writer, $strat, $uqf, $notif)
     {
         parent::__construct($loop, $log, $writer, $strat);
         $this->uqf = $uqf;
+        $this->notif = $notif;
     }
 
 
