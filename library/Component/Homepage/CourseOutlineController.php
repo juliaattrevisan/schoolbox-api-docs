@@ -433,7 +433,8 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             // check the folder still exists
             Folder\Mapper::getInstance()->findCheaplyById($folderId);
             return true;
-        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        }
+        catch (\Schoolbox\Mapper\Exception $e) {
             return false;
         }
     }

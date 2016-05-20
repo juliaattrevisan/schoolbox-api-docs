@@ -1109,6 +1109,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             SELECT id, name, parent, inherit
             FROM `{$this->getTable()}` c
             WHERE id = :folderId
+            AND deleted_at IS NULL
         ";
 
         $statement = $this->database->prepare($query);
