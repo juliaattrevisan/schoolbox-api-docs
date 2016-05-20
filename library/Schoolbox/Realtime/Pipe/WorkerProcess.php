@@ -23,9 +23,11 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\UserQueue\UserQueueFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\User;
 
 class WorkerProcess extends AbstractProcess
@@ -34,6 +36,9 @@ class WorkerProcess extends AbstractProcess
     /** @var UserQueueFactory */
     protected $uqf;
 
+    /** @var Notif */
+    protected $notif;
+
 
     /**
      * @param LoopInterface             $loop
@@ -41,11 +46,13 @@ class WorkerProcess extends AbstractProcess
      * @param PipeWriter                $writer
      * @param DispatchStrategyInterface $strat
      * @param UserQueueFactory          $uqf
+     * @param Notif                     $notif
      */
-    public function __construct($loop, $log, $writer, $strat, $uqf)
+    public function __construct($loop, $log, $writer, $strat, $uqf, $notif)
     {
         parent::__construct($loop, $log, $writer, $strat);
         $this->uqf = $uqf;
+        $this->notif = $notif;
     }
 
 
@@ -144,6 +151,10 @@ class WorkerProcess extends AbstractProcess
 
         if (!is_callable($callback)) {
             throw new RuntimeException("Unable to execute callback, got " . json_encode($callback));
+        }
+        
+        if (is_array($callback) && isset($callback[0]) && $callback[0] instanceof AbstractModuleNotifier) {
+            $callback[0]->enableLogging($this->notif, $this->log);
         }
 
         $this->log->debug("Executing " . $this->callable2string($callback));

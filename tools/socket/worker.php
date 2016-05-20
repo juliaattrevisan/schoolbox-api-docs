@@ -1,6 +1,10 @@
 #!/usr/bin/php
 <?php
 
+use Aura\Di;
+use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
+use Schoolbox\Notif\Notif;
 
 /**
  *
@@ -31,6 +35,12 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Worker', array(
 
 $kernel->run(
        function ($di, $loop, $log, $options) {
+           /**
+            * @var Di\Container $di
+            * @var LoopInterface $loop
+            * @var LoggerInterface $log
+            * @var array $opts
+            */
 
            // use the default strat
            $strat = new \Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy();
@@ -48,8 +58,11 @@ $kernel->run(
               ->setRedis($client)
               ->setKind(\Schoolbox\Notif\UserQueue\UserQueueFactory::UQ_INSTANT);
 
+           /** @var Notif $n */
+           $n = $di->get('notif');
+
            // create a new worker; we don't need to store the instance, it'll be held within the loop
-           new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, $log, $writer, $strat, $qf);
+           new \Schoolbox\Realtime\Pipe\WorkerProcess($loop, $log, $writer, $strat, $qf, $n);
        }
 );
 

@@ -7,6 +7,7 @@ use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
 use Schoolbox\Realtime\Schedule\Scheduler;
@@ -72,9 +73,15 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$sched) {
     $mqc->declareQueue($q)
         ->bindQueue($q, '*.' . Notif::TOPIC_APPLICATION);
 
+	/** @var Notif $notif */
+	$notif = $di->get('notif');
+
+	/** @var IConfigLoader $conf */
+	$conf = $di->get('config');
+
 	try {
-		$strat = new SchedulerDispatchStrategy(new Notif(), new QueueItemMapper(), $opts['flags']);
-		$sched = new Scheduler($loop, $strat, $log, $q);
+		$strat = new SchedulerDispatchStrategy($notif, new QueueItemMapper(), $opts['flags']);
+		$sched = new Scheduler($loop, $strat, $log, $q, $conf, $notif);
 
         $sched->setJitCache(new RedisCache(Redis::getClientInstance(), $log, INSTANCE_ID));
 
@@ -86,8 +93,7 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$sched) {
 	}
 	catch(AMQPRuntimeException $e) {
 		$log->alert("Unable to connect to RabbitMQ: server is offline.");
-		$n = new Notif(Notif::TOPIC_NOTIFICATION);
-		$n->alert('RabbitMQ is offline');
+		$notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert('RabbitMQ is offline');
 		throw $e;
 	}
 

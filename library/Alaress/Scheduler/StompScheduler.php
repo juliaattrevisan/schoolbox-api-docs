@@ -10,6 +10,7 @@
 namespace Alaress\Scheduler;
 
 
+use Alaress\Date\IClock;
 use Alaress\Scheduler\Interactive\Interactor;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
@@ -23,6 +24,7 @@ use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Exception\ConnectionException;
 use React\Stomp\Protocol\Frame;
+use Schoolbox\IConfigLoader;
 
 abstract class StompScheduler extends AbstractScheduler {
 
@@ -41,9 +43,11 @@ abstract class StompScheduler extends AbstractScheduler {
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param string $scheduleQueue
      * @param LoggerInterface $log
+     * @param IConfigLoader $conf
+     * @param IClock $clock
      */
-    public function __construct($loop, $dispatchStrategy, $scheduleQueue, $log) {
-        parent::__construct($loop, $dispatchStrategy, $log);
+    public function __construct($loop, $dispatchStrategy, $scheduleQueue, $log, $conf = null, $clock = null) {
+        parent::__construct($loop, $dispatchStrategy, $log, $conf, $clock);
         $this->method = DefaultDispatchStrategy::TASK_PUBLISH;
         $this->scheduleQueue = $scheduleQueue;
 

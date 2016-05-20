@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Schedule;
 
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Async\Notification\Postman;
+use Alaress\Date\IClock;
 use Alaress\Scheduler\Cache\ICache;
 use Alaress\Scheduler\Stomp\ResolutionManager;
 use Alaress\Scheduler\StompScheduler;
@@ -75,15 +76,15 @@ class Scheduler extends StompScheduler
      * @param LoggerInterface           $log
      * @param string                    $scheduleQueue - don't forget to declare this in rabbit!
      * @param IConfigLoader             $conf
+     * @param Notif                     $notif
+     * @param IClock                    $clock
      */
-    public function __construct($loop, $dispatchStrategy, $log, $scheduleQueue, $conf = null)
+    public function __construct($loop, $dispatchStrategy, $log, $scheduleQueue, $conf, $notif, $clock = null)
     {
-        // cast optional param
-        $this->conf  = $conf ? : ConfigMapper::getInstance();
-        $this->notif = new Notif();
+        $this->notif = $notif;
 
         // run construction
-        parent::__construct($loop, $dispatchStrategy, $scheduleQueue, $log);
+        parent::__construct($loop, $dispatchStrategy, $scheduleQueue, $log, $conf, $clock);
         $this->resolvers = new ResolutionManager();
 
         // register signal listeners
