@@ -6,12 +6,16 @@
     display: block;
 }
 
-/* Anchor elements display a little flag
- */
-.cke_editable a[id] {
-    padding-left: 16px;
-    margin-left: 4px;
-    background-image: url('/javascript/ckeditor/plugins/schoolboxanchor/anchor.png');
-    background-repeat: no-repeat;
-    background-position: 0 0;
+.cke_editable {
+    margin: 0;
+
+    /* Anchor elements display a little flag
+     */
+    a[id] {
+        padding-left: 16px;
+        margin-left: 4px;
+        background-image: url('/javascript/ckeditor/plugins/schoolboxanchor/anchor.png');
+        background-repeat: no-repeat;
+        background-position: 0 0;
+    }
 }
