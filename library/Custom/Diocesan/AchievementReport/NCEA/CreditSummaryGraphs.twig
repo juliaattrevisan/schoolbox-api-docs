@@ -1,12 +1,20 @@
-<div class="graph-socket">
-    {% include '@ncea/Graphs/TotalAchievedCredits.twig' with {dataset: dataset} %}
-</div>
-<div class="graph-socket">
-    {% include '@ncea/Graphs/StandardType.twig' with {dataset: dataset} %}
-</div>
-<div class="graph-socket">
-    {% include '@ncea/Graphs/AssessmentType.twig' with {dataset: dataset} %}
-</div>
-<div class="graph-socket">
-    {% include '@ncea/Graphs/Result.twig' with {dataset: dataset}  %}
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="row">
+                <div class="small-12 medium-6 large-3 columns">
+                    {% include '@ncea/Graphs/TotalAchievedCredits.twig' with {dataset: dataset} %}
+                </div>
+                <div class="small-12 medium-6 large-3 columns">
+                    {% include '@ncea/Graphs/StandardType.twig' with {dataset: dataset} %}
+                </div>
+                <div class="small-12 medium-6 large-3 columns">
+                    {% include '@ncea/Graphs/AssessmentType.twig' with {dataset: dataset} %}
+                </div>
+                <div class="small-12 medium-6 large-3 columns">
+                    {% include '@ncea/Graphs/Result.twig' with {dataset: dataset} %}
+                </div>
+            </div>
+        </section>
+    </div>
 </div>
