@@ -55,66 +55,72 @@
 
 <!-- BEGIN student_block -->
 <div class="row">
-    <div class="small-12 large-4 columns">
-        <a href="/search/user/{STUDENT_ID}" title="View Profile">
-            <img src="/portrait.php?userId={STUDENT_EXTERNAL_ID}&size=constrain200" alt="View Profile" />
-        </a>
+    <div class="small-12 island">
+        <section class="content">
+            <div class="row">
+                <div class="small-12 large-4 columns">
+                    <a href="/search/user/{STUDENT_ID}" title="View Profile">
+                        <img src="/portrait.php?userId={STUDENT_EXTERNAL_ID}&size=constrain200" alt="View Profile" />
+                    </a>
 
-        <h2>{STUDENT_NAME}</h2>
+                    <h2 class="no-margin">{STUDENT_NAME}</h2>
 
-        <p class="meta">
-            Year {STUDENT_YEAR}
-        </p>
-    </div>
+                    <p class="meta">
+                        Year {STUDENT_YEAR}
+                    </p>
 
-    <div class="small-12 large-8 columns">
-        <ul>
-            <!-- BEGIN subject_block -->
-            <li><a href="/homepage/code/{STUDENT_SUBJECT_CODE}">{STUDENT_SUBJECT_NAME}</a></li>
-            <!-- END subject_block -->
-        </ul>
+                    <ul class="information-list">
+                        <!-- BEGIN subject_block -->
+                        <li><a href="/homepage/code/{STUDENT_SUBJECT_CODE}">{STUDENT_SUBJECT_NAME}</a></li>
+                        <!-- END subject_block -->
+                    </ul>
+                </div>
 
-        <ul class="dio-buttons no-pad no-margin">
-            <!-- BEGIN grades_button -->
-            <!-- not required -->
-            <!-- END grades_button -->
-            <li>
-                <a class="achievement" href="/modules/custom/diocesan/achievementreport/{STUDENT_EXTERNAL_ID}">Achievement</a>
-            </li>
-            <li>
-                <a class="progress" href="/synergetic/stures">Progress</a>
-            </li>
-            <li>
-                <a class="timetable" href="/timetable/{STUDENT_ID}">Timetable</a>
-            </li>
-            <li>
-                <a class="attendance" href="/synergetic/attendances2">Attendance</a>
-            </li>
-            <!-- BEGIN due_work -->
-            <li>
-                <a class="duework" href="/submission/dueWork/0/{STUDENT_ID}">Due Work</a>
-            </li>
-            <!-- END due_work -->
-            <li>
-                <a class="calendar" href="/calendar/full/{CAL_TODAY_DATE}/{STUDENT_ID}">Calendar</a>
-            </li>
-            <!-- BEGIN eportfolio -->
-            <li>
-                <a class="eportfolio" href="/eportfolio/{STUDENT_ID}/profile">ePortfolio</a>
-            </li>
-            <!-- END eportfolio -->
-            <li>
-                <a class="contacts" href="/synergetic/contacts">Contacts</a>
-            </li>
-            <li>
-                <a class="documents" href="/synergetic/docs">Documents</a>
-            </li>
-            <li>
-                <!-- BEGIN pastoral -->
-                <a href="/pastoral/{STUDENT_ID}" class="button icon-pastoral">Pastoral Care</a>
-                <!-- END pastoral -->
-            </li>
-        </ul>
+                <div class="small-12 large-8 columns">
+                    <ul class="dio-buttons no-pad no-margin">
+                        <!-- BEGIN grades_button -->
+                        <!-- not required -->
+                        <!-- END grades_button -->
+                        <li>
+                            <a class="achievement" href="/modules/custom/diocesan/achievementreport/{STUDENT_EXTERNAL_ID}">Achievement</a>
+                        </li>
+                        <li>
+                            <a class="progress" href="/synergetic/stures">Progress</a>
+                        </li>
+                        <li>
+                            <a class="timetable" href="/timetable/{STUDENT_ID}">Timetable</a>
+                        </li>
+                        <li>
+                            <a class="attendance" href="/synergetic/attendances2">Attendance</a>
+                        </li>
+                        <!-- BEGIN due_work -->
+                        <li>
+                            <a class="duework" href="/submission/dueWork/0/{STUDENT_ID}">Due Work</a>
+                        </li>
+                        <!-- END due_work -->
+                        <li>
+                            <a class="calendar" href="/calendar/full/{CAL_TODAY_DATE}/{STUDENT_ID}">Calendar</a>
+                        </li>
+                        <!-- BEGIN eportfolio -->
+                        <li>
+                            <a class="eportfolio" href="/eportfolio/{STUDENT_ID}/profile">ePortfolio</a>
+                        </li>
+                        <!-- END eportfolio -->
+                        <li>
+                            <a class="contacts" href="/synergetic/contacts">Contacts</a>
+                        </li>
+                        <li>
+                            <a class="documents" href="/synergetic/docs">Documents</a>
+                        </li>
+                        <!-- BEGIN pastoral -->
+                        <li>
+                            <a href="/pastoral/{STUDENT_ID}" class="button icon-pastoral">Pastoral Care</a>
+                        </li>
+                        <!-- END pastoral -->
+                    </ul>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 <!-- END student_block -->
