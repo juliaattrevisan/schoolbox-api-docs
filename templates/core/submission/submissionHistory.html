@@ -3,6 +3,7 @@
 <script type="text/javascript" src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript" src="/javascript/preview/preview.js"></script>
+<script src="/submission/inlineGrading/js/inlineGrading.js" type="text/javascript"></script>
 <script language="JavaScript" type="text/javascript">
     $(function () {
 
@@ -97,6 +98,9 @@
                             <p class="meta">Submitted <time>{MOST_RECENT_SUBMISSION_FILE_DATE}</time></p>
                             <p class="meta">{MOST_RECENT_SUBMISSION_FILE_SIZE}</p>
                         </a>
+                        <!-- BEGIN return_file_uuid -->
+                        <a href="/submission/inlineGrading/viewStudent/{BOX_ID}/{OWNER_ID}/{RETURNED_WORK_SUBMISSION_ID}">View Online</a>
+                        <!-- END return_file_uuid -->
                     </div>
                     <!-- BEGIN plag_score -->
                     <article class="grade">
@@ -158,12 +162,6 @@
 
     </div>
 
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        {INJECTED_INTERFACE_TEMPLATE}
-    </div>
 </div>
 
 <!-- BEGIN has_rubric -->
