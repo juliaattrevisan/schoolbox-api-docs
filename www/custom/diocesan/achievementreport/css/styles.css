@@ -1,130 +1,128 @@
-/**
- * Global styles
+/* Custom: Achievement Report
  */
-.achievement-report table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 40px;
-}
+.achievement-report {
 
-.achievement-report th,
-.achievement-report td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-}
+    /**
+     * Generic styles
+     */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 40px;
 
-.achievement-report th.letter,
-.achievement-report td.letter
-{
-    width: 40px;
-    text-align: right;
-}
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
 
-.achievement-report th.numeric,
-.achievement-report td.numeric
-{
-    width: 90px;
-    text-align: right;
-}
+            &.letter {
+                width: 40px;
+                text-align: right;
+            }
 
-.achievement-report th.centered,
-.achievement-report td.centered {
-    text-align: center;
-}
+            &.numeric {
+                width: 90px;
+                text-align: right;
+            }
 
-.achievement-report tfoot tr.totals td {
-    border-top: 3px solid #ddd;
-    font-style: italic;
-}
+            &.centered {
+                text-align: center;
+            }
+        }
 
-/* thead/tr/th style subheading, for subheadings which can't
- * go in thead element
- */
-.achievement-report .subheading {
-    font-weight: bold;
-}
+        tfoot tr.totals td {
+            border-top: 3px solid #ddd;
+            font-style: italic;
+        }
+    }
 
-/* Colours - Internal/External background colours
- */
-.achievement-report .type-pink {
-    background-color: #FF00FF
-}
+    /* thead/tr/th style subheading, for subheadings which can't
+     * go in thead element. Also applies for multi-level headings
+     */
+    .subheading {
+        font-weight: bold;
+    }
 
-.achievement-report .type-blue,
-.achievement-report .generic-heading-highlight {
-    background-color: #6495ED
-}
+    /* Colours - Internal/External background colours
+     */
+    .type-pink {
+        background-color: #FF00FF
+    }
 
-/* Key
- */
-.achievement-report dl.key {
-    width: 50%;
-}
+    .type-blue, .generic-heading-highlight {
+        background-color: #6495ED
+    }
 
-.achievement-report dl.key dt {
-    width: 40px;
-}
+    /* Key, used in footer explanations typically
+     */
+    dl.key {
+        width: 50%;
 
-/**** Page Specific ****/
+        dt {
+            width: 40px;
+        }
+    }
 
-/**
- * School Grades
- */
+    /**
+     * School Grades Report
+     */
+    &.school-grades {
 
-/* Spacer row
- */
-.achievement-report.school-grades tr.spacer td {
-    border-left: 0px;
-    border-right: 0px;
-}
+        /* Spacer row
+         */
+        tr.spacer td {
+            border-left: 0px;
+            border-right: 0px;
+        }
+    }
 
-/**
- * IB
- */
+    /**
+     * IB
+     */
+    &.ib {
 
-/* Progress Grade Summary
- */
-.achievement-report.ib th.year,
-.achievement-report.ib td.year {
-    width: 100px;
-}
+        /* Progress Grade Summary
+         */
+        th, td {
+            width: 100px;
+        }
 
-.achievement-report.ib th.term,
-.achievement-report.ib td.term {
-    width: 100px;
-}
+        tr.progress-grade {
+            width: 100px;
+        }
 
-.achievement-report.ib tr.progress-grade,
-.achievement-report.ib td {
-    width: 100px;
-}
+        .yearly-breakdown-graph {
+            height: 100px;
+        }
+    }
 
-.achievement-report.ib .yearly-breakdown-graph {
-    height: 100px;
-}
+    /**
+     * NCEA
+     */
+    &.ncea {
+        table {
+            &.credit-summary {
+                .equal-widths {
+                    th, td {
+                        width: 7.14%
+                    }
+                }
+            }
 
-/**
- * NCEA
- */
-.achievement-report.ncea table.credit-summary .equal-widths th,
-.achievement-report.ncea table.credit-summary .equal-widths td
-{
-    width: 7.14%
-}
+            &.summary {
+                margin-bottom: 0px;
 
-.achievement-report.ncea table.summary {
-    margin-bottom: 0px;
-}
+                th.level, td.level {
+                    width: 100px;
+                }
+            }
+        }
 
-.achievement-report.ncea table.summary th.level,
-.achievement-report.ncea table.summary td.level {
-    width: 100px;
-}
-
-.achievement-report.ncea div.graph-socket {
-    width: 25%;
-    height: 400px;
-    margin-bottom: 32px;
-    float: left;
+        div.graph-socket {
+            width: 25%;
+            height: 400px;
+            margin-bottom: 32px;
+            float: left;
+        }
+    }
 }
