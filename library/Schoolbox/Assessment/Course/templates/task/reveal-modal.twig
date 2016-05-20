@@ -58,6 +58,14 @@ $data = {
 
         });
 
+        {# Did I submit an attachment? Remove it from the modal to enable reuse -#}
+        form.on('submit',function(){
+            form.find('[data-attachment="attach"]').find('[data-dz-remove]').each(function() {
+                var event = new CustomEvent('click');
+                this.dispatchEvent(event);
+            });
+        });
+
         {# Did I remove an attachment? Remove the URL too -#}
         modal.on('click', 'a[data-dz-remove]', function() {
             form.find('input[name=url]').val('').prop('readonly', false);
