@@ -128,7 +128,12 @@ class UnitInstanceMapper extends BaseMapper {
 
         if (!$unit->getParent() instanceof Folder) {
             // dynamic hydration.....
-            $unit = Course\Unit\Mapper::getInstance()->findById($unit->getId());
+            try {
+                $unit = Course\Unit\Mapper::getInstance()->findById($unit->getId());
+            } catch (BaseMapper\Exception\Deleted $e) {
+                // I reject your deletion of this object
+                $unit = $e->getDeletedObject();
+            }
         }
 
         return Course\Mapper::getInstance()->findById($unit->getParent()->getId());
