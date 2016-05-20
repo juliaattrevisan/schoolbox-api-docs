@@ -61,7 +61,10 @@
             </ul>
             <!-- END attachments -->
         </section>
+
+
     </div>
+
     <div class="small-12 large-5 xlarge-4 island">
 
         <!-- BEGIN recent_submission -->
@@ -95,9 +98,6 @@
                             <p class="meta">Submitted <time>{MOST_RECENT_SUBMISSION_FILE_DATE}</time></p>
                             <p class="meta">{MOST_RECENT_SUBMISSION_FILE_SIZE}</p>
                         </a>
-                        <!-- BEGIN return_file_uuid -->
-                        <a href="/submission/inlineGrading/viewStudent/{BOX_ID}/{OWNER_ID}/{RETURNED_WORK_SUBMISSION_ID}">View Online</a>
-                        <!-- END return_file_uuid -->
                     </div>
                     <!-- BEGIN plag_score -->
                     <article class="grade">
@@ -106,7 +106,23 @@
                     </article>
                     <!-- END plag_score -->
                 </li>
+                <!-- BEGIN return_file_uuid -->
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="compact avatar card small-12">
+                            <a href="/submission/inlineGrading/viewStudent/{MOST_RECENT_SUBMISSION_FILE_ID}">
+                                <div class="icon-comment"></div>
+                                <h3>View Annotations</h3>
+                            </a>
+                        </div>
+                    </div>
+                    <nav>
+                        <a href='/submission/inlineGrading/download/{MOST_RECENT_SUBMISSION_FILE_ID}' class='icon-download' title="Download"></a>
+                    </nav>
+                </li>
+                <!-- END return_file_uuid -->
                 <!-- END recent_submission_download -->
+
             </ul>
         </section>
         <!-- END recent_submission -->
@@ -137,21 +153,6 @@
                     </div>
                 </li>
                 <!-- END return_file -->
-                <!-- BEGIN return_file_uuid -->
-                <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="compact avatar card small-12">
-                            <a href="/submission/inlineGrading/viewStudent/{RETURNED_WORK_SUBMISSION_ID}">
-                                <div class="icon-comment"></div>
-                                <h3>View Annotations</h3>
-                            </a>
-                        </div>
-                    </div>
-                    <nav>
-                        <a href='/submission/inlineGrading/download/{RETURNED_WORK_SUBMISSION_ID}' class='icon-download' title="Download"></a>
-                    </nav>
-                </li>
-                <!-- END return_file_uuid -->
             </ul>
         </section>
         <a href="#" id="view-history" class="button icon-history" title="View History" data-reveal-id="history-wrap">View History</a>
