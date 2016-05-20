@@ -19,6 +19,9 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
  */
 $page = new SitePage();
 
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
 if (is_numeric($_GET['delete'])) {
     // Delete a previously returned work
     $mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
