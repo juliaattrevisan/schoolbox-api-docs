@@ -6,6 +6,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\UserMapper;
+use \Crocodoc\Renderer\Factory;
 
 // not in sitepage context, redirect
 if (!isset($this)) {
@@ -810,4 +811,16 @@ if (!$box->getAcceptOnline()) {
     $this->setVar('show_status_block', '');
 } else {
     $this->parse('show_status_block', 'show_status');
+}
+
+// Try to Crocodoc the most recent submission
+
+foreach ($submission_history as $activity_item) {
+    $submission = $activity_item->getSubmission();
+    if ($submission instanceof Component\SubmissionBox\Submission\File) {
+        $templateFactory = new Factory($this, $submission, $allReturnedWork, [], $term);
+        $renderer = $templateFactory->produce();
+        $renderer->render();
+        break;
+    }
 }
