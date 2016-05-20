@@ -31,6 +31,7 @@ $this->setBlock('has_rubric', 'rubric', 'rubric_block');
 $this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
 $this->setBlock(TEMPLATE_content, 'attachments', 'attachments_block');
 $this->setBlock('returned_work', 'return_file', 'return_file_block');
+$this->setBlock('returned_work', 'return_file_uuid', 'return_file_uuid_block');
 $this->setBlock('recent_submission', 'plag_score', 'plag_score_block');
 $this->setBlock('recent_submission', 'recent_submission_download', 'recent_submission_download_block');
 $this->setBlock('subject', 'work', 'work_block');
@@ -810,16 +811,4 @@ if (!$box->getAcceptOnline()) {
     $this->setVar('show_status_block', '');
 } else {
     $this->parse('show_status_block', 'show_status');
-}
-
-// Try to Crocodoc the most recent submission
-
-foreach ($submission_history as $activity_item) {
-    $submission = $activity_item->getSubmission();
-    if ($submission instanceof Component\SubmissionBox\Submission\File) {
-        $templateFactory = new Factory($this, $submission, $allReturnedWork, [], $term);
-        $renderer = $templateFactory->produce();
-        $renderer->render();
-        break;
-    }
 }
