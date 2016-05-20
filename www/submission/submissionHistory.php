@@ -6,7 +6,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\UserMapper;
-use \Crocodoc\Renderer\Factory;
 
 // not in sitepage context, redirect
 if (!isset($this)) {
