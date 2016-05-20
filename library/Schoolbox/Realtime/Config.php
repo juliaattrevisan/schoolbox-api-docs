@@ -330,7 +330,7 @@ class Config
         asort($unfollow);
         asort($involvements);
 
-        // anything not explictly muted is turned on
+        // anything not explicitly muted is turned on
         $follow = array_diff($involvements, $unfollow);
         asort($follow);
 
@@ -350,7 +350,7 @@ class Config
 
             $override->setUser($user);
             $override->setRouteKey($this->castToRoutingKey($id));
-            $override->setDelivery([ 'MU' ]);
+            $override->setDelivery([ RoutePermission::MUTE ]);
 
             $overrides->add($override);
         }
