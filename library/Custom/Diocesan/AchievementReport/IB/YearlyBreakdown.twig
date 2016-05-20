@@ -97,54 +97,32 @@
                         });
                     </script>
 
-                    <table>
-                        <thead>
-                        <tr class="generic-heading-highlight">
-                            <th colspan="5">{{ yearlyBreakdown.heading }} {{ year }}</th>
-                        </tr>
-                        <tr>
-                            <th>Course</th>
-                            <th class="centered">Term</th>
-                            <th>Level</th>
-                            <th>Progress Grade</th>
-                            <th>Progress Chart</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for currentCourse, values in allCourses %}
-                            {% if year == yearlyBreakdown.currentYear %}
-                                <tr>
-                                    <td rowspan="2">{{ currentCourse }}</td>
-                                    <td class="centered">4</td>
-                                    <td>{{ values.allTerms.4.level }}</td>
-                                    <td>
-                                        {% if values.allTerms.4.progressGrade %}
-                                            {{ values.allTerms.4.progressGrade }}
-                                        {% endif %}
-                                    </td>
-                                    <td class='yearly-breakdown-graph' rowspan="2">
-                                        <div class='yearly-breakdown-graph' data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="centered">2</td>
-                                    <td>{{ values.allTerms.2.level }}</td>
-                                    <td>
-                                        {% if values.allTerms.2.progressGrade %}
-                                            {{ values.allTerms.2.progressGrade }}
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% else %}
-                                {% set hasTerm4Data = (values.allTerms.4.level != '' or values.allTerms.4.progressGrade != '') %}
-                                {% set hasTerm2Data = (values.allTerms.2.level != '' or values.allTerms.2.progressGrade != '') %}
-
-                                {% if hasTerm4Data and hasTerm2Data %}
+                    <div class="scrollable">
+                        <table>
+                            <thead>
+                            <tr class="generic-heading-highlight">
+                                <th colspan="5">{{ yearlyBreakdown.heading }} {{ year }}</th>
+                            </tr>
+                            <tr>
+                                <th>Course</th>
+                                <th class="centered">Term</th>
+                                <th>Level</th>
+                                <th>Progress Grade</th>
+                                <th>Progress Chart</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for currentCourse, values in allCourses %}
+                                {% if year == yearlyBreakdown.currentYear %}
                                     <tr>
                                         <td rowspan="2">{{ currentCourse }}</td>
                                         <td class="centered">4</td>
                                         <td>{{ values.allTerms.4.level }}</td>
-                                        <td>{{ values.allTerms.4.progressGrade }}</td>
+                                        <td>
+                                            {% if values.allTerms.4.progressGrade %}
+                                                {{ values.allTerms.4.progressGrade }}
+                                            {% endif %}
+                                        </td>
                                         <td class='yearly-breakdown-graph' rowspan="2">
                                             <div class='yearly-breakdown-graph' data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
                                         </td>
@@ -152,35 +130,59 @@
                                     <tr>
                                         <td class="centered">2</td>
                                         <td>{{ values.allTerms.2.level }}</td>
-                                        <td>{{ values.allTerms.2.progressGrade }}</td>
-                                    </tr>
-                                {% elseif hasTerm4Data and not hasTerm2Data %}
-                                    <tr>
-                                        <td>{{ currentCourse }}</td>
-                                        <td class="centered">4</td>
-                                        <td>{{ values.allTerms.4.level }}</td>
-                                        <td>{{ values.allTerms.4.progressGrade }}</td>
-                                        <td class='yearly-breakdown-graph'>
-                                            <div class='yearly-breakdown-graph' data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
+                                        <td>
+                                            {% if values.allTerms.2.progressGrade %}
+                                                {{ values.allTerms.2.progressGrade }}
+                                            {% endif %}
                                         </td>
                                     </tr>
-                                {% elseif not hasTerm4Data and hasTerm2Data %}
-                                    <tr>
-                                        <td>{{ currentCourse }}</td>
-                                        <td class="centered">2</td>
-                                        <td>{{ values.allTerms.2.level }}</td>
-                                        <td>{{ values.allTerms.2.progressGrade }}</td>
-                                        <td class='yearly-breakdown-graph'>
-                                            <div class='yearly-breakdown-graph' data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
-                                        </td>
-                                    </tr>
-                                {% elseif not hasTerm4Data and nothasTerm2Data %}
-                                    {# no data; do nothing#}
+                                {% else %}
+                                    {% set hasTerm4Data = (values.allTerms.4.level != '' or values.allTerms.4.progressGrade != '') %}
+                                    {% set hasTerm2Data = (values.allTerms.2.level != '' or values.allTerms.2.progressGrade != '') %}
+
+                                    {% if hasTerm4Data and hasTerm2Data %}
+                                        <tr>
+                                            <td rowspan="2">{{ currentCourse }}</td>
+                                            <td class="centered">4</td>
+                                            <td>{{ values.allTerms.4.level }}</td>
+                                            <td>{{ values.allTerms.4.progressGrade }}</td>
+                                            <td class='yearly-breakdown-graph' rowspan="2">
+                                                <div class='yearly-breakdown-graph' data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="centered">2</td>
+                                            <td>{{ values.allTerms.2.level }}</td>
+                                            <td>{{ values.allTerms.2.progressGrade }}</td>
+                                        </tr>
+                                    {% elseif hasTerm4Data and not hasTerm2Data %}
+                                        <tr>
+                                            <td>{{ currentCourse }}</td>
+                                            <td class="centered">4</td>
+                                            <td>{{ values.allTerms.4.level }}</td>
+                                            <td>{{ values.allTerms.4.progressGrade }}</td>
+                                            <td class='yearly-breakdown-graph'>
+                                                <div class='yearly-breakdown-graph' data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
+                                            </td>
+                                        </tr>
+                                    {% elseif not hasTerm4Data and hasTerm2Data %}
+                                        <tr>
+                                            <td>{{ currentCourse }}</td>
+                                            <td class="centered">2</td>
+                                            <td>{{ values.allTerms.2.level }}</td>
+                                            <td>{{ values.allTerms.2.progressGrade }}</td>
+                                            <td class='yearly-breakdown-graph'>
+                                                <div class='yearly-breakdown-graph' data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
+                                            </td>
+                                        </tr>
+                                    {% elseif not hasTerm4Data and nothasTerm2Data %}
+                                        {# no data; do nothing#}
+                                    {% endif %}
                                 {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             {% endfor %}
         </section>

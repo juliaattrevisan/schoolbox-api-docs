@@ -62,46 +62,48 @@
                     </div>
                 </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Course</th>
-                            <th class="numeric">Entered Grades</th>
-                            <th class="letter">N</th>
-                            <th class="letter">A</th>
-                            <th class="letter">M</th>
-                            <th class="letter">E</th>
-                            <th class="numeric">Achieved</th>
-                            <th class="numeric">Available</th>
+                <div class="scrollable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th class="numeric">Entered Grades</th>
+                                <th class="letter">N</th>
+                                <th class="letter">A</th>
+                                <th class="letter">M</th>
+                                <th class="letter">E</th>
+                                <th class="numeric">Achieved</th>
+                                <th class="numeric">Available</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for courseName, yearlyValues in allCourses %}
+                            <tr>
+                                <td>{{ courseName }}</td>
+                                <td class="numeric">{{ yearlyValues.enteredGrades }}</td>
+                                <td class="letter">{{ yearlyValues.letters.N }}</td>
+                                <td class="letter">{{ yearlyValues.letters.A }}</td>
+                                <td class="letter">{{ yearlyValues.letters.M }}</td>
+                                <td class="letter">{{ yearlyValues.letters.E }}</td>
+                                <td class="numeric">{{ yearlyValues.achievedGrades }}</td>
+                                <td class="numeric">{{ yearlyValues.availableGrades }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                        <tr class="totals">
+                            <td></td>
+                            <td class="numeric">{{ yearlyBreakdown.data.totals[year].enteredGrades }}</td>
+                            <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.N }}</td>
+                            <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.A }}</td>
+                            <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.M }}</td>
+                            <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.E }}</td>
+                            <td class="numeric">{{ yearlyBreakdown.data.totals[year].achievedGrades }}</td>
+                            <td class="numeric">{{ yearlyBreakdown.data.totals[year].availableGrades }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                    {% for courseName, yearlyValues in allCourses %}
-                        <tr>
-                            <td>{{ courseName }}</td>
-                            <td class="numeric">{{ yearlyValues.enteredGrades }}</td>
-                            <td class="letter">{{ yearlyValues.letters.N }}</td>
-                            <td class="letter">{{ yearlyValues.letters.A }}</td>
-                            <td class="letter">{{ yearlyValues.letters.M }}</td>
-                            <td class="letter">{{ yearlyValues.letters.E }}</td>
-                            <td class="numeric">{{ yearlyValues.achievedGrades }}</td>
-                            <td class="numeric">{{ yearlyValues.availableGrades }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                    <tfoot>
-                    <tr class="totals">
-                        <td></td>
-                        <td class="numeric">{{ yearlyBreakdown.data.totals[year].enteredGrades }}</td>
-                        <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.N }}</td>
-                        <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.A }}</td>
-                        <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.M }}</td>
-                        <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.E }}</td>
-                        <td class="numeric">{{ yearlyBreakdown.data.totals[year].achievedGrades }}</td>
-                        <td class="numeric">{{ yearlyBreakdown.data.totals[year].availableGrades }}</td>
-                    </tr>
-                    </tfoot>
-                </table>
+                        </tfoot>
+                    </table>
+                </div>
 
                 {% include '@schoolgrades/EntriesAndResults.twig' %}
             </div>

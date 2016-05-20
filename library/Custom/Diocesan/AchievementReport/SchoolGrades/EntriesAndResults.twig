@@ -6,57 +6,59 @@
     </div>
 </div>
 
-<table>
-    <tbody>
-        {% for courseName, areaData in entriesAndResults.data[year] %}
-            <tr>
-                <td class="subheading">
-                    {{ courseName }}
+<div class="scrollable">
+    <table>
+        <tbody>
+            {% for courseName, areaData in entriesAndResults.data[year] %}
+                <tr>
+                    <td class="subheading">
+                        {{ courseName }}
 
-                    {% if areaData.allTeachers|length %}
-                    <p class="meta">
-                        {% for currentTeacherName, currentTeacherEmail in areaData.allTeachers %}{% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a>{% else %}{{ currentTeacherName }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
-                    </p>
-                    {% endif %}
-                </td>
-                <td class="subheading">Result</td>
-            </tr>
-            {#
-                Hide subjects with no term4 and no term2 values only
-                for previous years - this indicates students didn't
-                get round to doing the subject properly and thus the
-                entire thing should be ignored
-            #}
-            {% for currentArea, values in areaData.allAreas %}
-            {% if year == entriesAndResults.currentYear %}
-            <tr>
-                <td>{{ currentArea }}</td>
-                <td>
-                    {% if values.letters.term4 != '' %}
-                        {{ values.letters.term4 }}
-                    {% else %}
-                        {{ values.letters.term2 }}
-                    {% endif %}
-                </td>
-            </tr>
-            {% elseif (values.letters.term4 != '' or values.letters.term2 != '') %}
-            <tr>
-                <td>{{ currentArea }}</td>
-                <td>
-                    {% if values.letters.term4 != '' %}
-                        {{ values.letters.term4 }}
-                    {% else %}
-                        {{ values.letters.term2 }}
-                    {% endif %}
-                </td>
-            </tr>
+                        {% if areaData.allTeachers|length %}
+                        <p class="meta">
+                            {% for currentTeacherName, currentTeacherEmail in areaData.allTeachers %}{% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a>{% else %}{{ currentTeacherName }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+                        </p>
+                        {% endif %}
+                    </td>
+                    <td class="subheading">Result</td>
+                </tr>
+                {#
+                    Hide subjects with no term4 and no term2 values only
+                    for previous years - this indicates students didn't
+                    get round to doing the subject properly and thus the
+                    entire thing should be ignored
+                #}
+                {% for currentArea, values in areaData.allAreas %}
+                {% if year == entriesAndResults.currentYear %}
+                <tr>
+                    <td>{{ currentArea }}</td>
+                    <td>
+                        {% if values.letters.term4 != '' %}
+                            {{ values.letters.term4 }}
+                        {% else %}
+                            {{ values.letters.term2 }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% elseif (values.letters.term4 != '' or values.letters.term2 != '') %}
+                <tr>
+                    <td>{{ currentArea }}</td>
+                    <td>
+                        {% if values.letters.term4 != '' %}
+                            {{ values.letters.term4 }}
+                        {% else %}
+                            {{ values.letters.term2 }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                {% if not loop.last %}
+                <tr class="spacer">
+                    <td colspan="2"></td>
+                </tr>
             {% endif %}
-            {% endfor %}
-            {% if not loop.last %}
-            <tr class="spacer">
-                <td colspan="2"></td>
-            </tr>
-        {% endif %}
-    {% endfor %}
-    </tbody>
-</table>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

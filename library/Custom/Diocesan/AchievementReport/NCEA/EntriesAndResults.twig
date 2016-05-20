@@ -7,82 +7,84 @@
 </div>
 
 {% for courseName, allData in entriesAndResults.data %}
-<table>
-    <tbody>
-        <tr>
-            <td colspan="6">
-                <p class="subheading">{{ courseName }}</p>
+<div class="scrollable">
+    <table>
+        <tbody>
+            <tr>
+                <td colspan="6">
+                    <p class="subheading">{{ courseName }}</p>
 
-                {% if allData.allTeachers|length %}
-                    <p class="meta">
-                    {% for currentTeacherName, currentTeacherEmail in allData.allTeachers %}
-                        {% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a>{% else %}{{ currentTeacherName }}{% endif %}{% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                    </p>
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <td class="subheading centered numeric">Std</td>
-            <td class="subheading centered numeric">Int/Ext</td>
-            <td class="subheading">Title</td>
-            <td class="subheading centered numeric">Lvl</td>
-            <td class="subheading centered numeric">Credits</td>
-            <td class="subheading centered numeric">Result</td>
-        </tr>
-        {% for currentEntry in allData.allEntries %}
-        {% if (currentEntry.Result|length > 0) or (entriesAndResults.year == entriesAndResults.currentYear) %}
-        <tr>
-            <td class="centered numeric">{{ currentEntry.NCEAStandardNumber }}</td>
-            <td class="centered numeric">{{ currentEntry.InternalorExternalAssessment }}</td>
-            <td>{{ currentEntry.StandardTitle }}</td>
-            <td class="centered numeric">{{ currentEntry.Level }}</td>
-            <td class="centered numeric">{{ currentEntry.EnteredCredits }}</td>
-            <td class="centered numeric">{{ currentEntry.Result }}</td>
-        </tr>
-        {% endif %}
-        {% endfor %}
-    </tbody>
-    <tfoot>
-        <tr>
-            <td colspan="6">
-                <table class="no-margin">
-                    <thead>
-                        <tr>
-                            <th colspan="2"></th>
-                            {% for currentType, typeSettings in creditSummary.allTypes %}
-                            <th colspan="6" class="centered {{ typeSettings.css }}">{{ typeSettings.long }}</th>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <th class="level">Level</th>
-                            <th class="numeric">Total Entered Credits</th>
-                            {% for currentType, typeSettings in entriesAndResults.allTypes %}
-                            <th class="numeric">Entered Credits</th>
-                            {% for currentLetter in entriesAndResults.allLetters %}
-                            <th class="numeric">{{ currentLetter }}</th>
-                            {% endfor %}
-                            <th class="numeric">Available</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="level">{{ allData.summary.level }}</td>
-                            <td class="numeric">{{ allData.summary.totalEnteredCredits }}</td>
+                    {% if allData.allTeachers|length %}
+                        <p class="meta">
+                        {% for currentTeacherName, currentTeacherEmail in allData.allTeachers %}
+                            {% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a>{% else %}{{ currentTeacherName }}{% endif %}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                        </p>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="subheading centered numeric">Std</td>
+                <td class="subheading centered numeric">Int/Ext</td>
+                <td class="subheading">Title</td>
+                <td class="subheading centered numeric">Lvl</td>
+                <td class="subheading centered numeric">Credits</td>
+                <td class="subheading centered numeric">Result</td>
+            </tr>
+            {% for currentEntry in allData.allEntries %}
+            {% if (currentEntry.Result|length > 0) or (entriesAndResults.year == entriesAndResults.currentYear) %}
+            <tr>
+                <td class="centered numeric">{{ currentEntry.NCEAStandardNumber }}</td>
+                <td class="centered numeric">{{ currentEntry.InternalorExternalAssessment }}</td>
+                <td>{{ currentEntry.StandardTitle }}</td>
+                <td class="centered numeric">{{ currentEntry.Level }}</td>
+                <td class="centered numeric">{{ currentEntry.EnteredCredits }}</td>
+                <td class="centered numeric">{{ currentEntry.Result }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="6">
+                    <table class="no-margin">
+                        <thead>
+                            <tr>
+                                <th colspan="2"></th>
+                                {% for currentType, typeSettings in creditSummary.allTypes %}
+                                <th colspan="6" class="centered {{ typeSettings.css }}">{{ typeSettings.long }}</th>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <th class="level">Level</th>
+                                <th class="numeric">Total Entered Credits</th>
+                                {% for currentType, typeSettings in entriesAndResults.allTypes %}
+                                <th class="numeric">Entered Credits</th>
+                                {% for currentLetter in entriesAndResults.allLetters %}
+                                <th class="numeric">{{ currentLetter }}</th>
+                                {% endfor %}
+                                <th class="numeric">Available</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="level">{{ allData.summary.level }}</td>
+                                <td class="numeric">{{ allData.summary.totalEnteredCredits }}</td>
 
-                            {% for currentType, typeSettings in entriesAndResults.allTypes %}
-                            <td class="numeric">{{ allData.summary.type[currentType].enteredCredits }}</td>
-                            {% for currentLetter in entriesAndResults.allLetters %}
-                            <td class="numeric">{{ allData.summary.type[currentType].letters[currentLetter] }}</td>
-                            {% endfor %}
-                            <td class="numeric">{{ allData.summary.type[currentType].availableCredits }}</td>
-                            {% endfor %}
-                        </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-    </tfoot>
-</table>
+                                {% for currentType, typeSettings in entriesAndResults.allTypes %}
+                                <td class="numeric">{{ allData.summary.type[currentType].enteredCredits }}</td>
+                                {% for currentLetter in entriesAndResults.allLetters %}
+                                <td class="numeric">{{ allData.summary.type[currentType].letters[currentLetter] }}</td>
+                                {% endfor %}
+                                <td class="numeric">{{ allData.summary.type[currentType].availableCredits }}</td>
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
 {% endfor %}
