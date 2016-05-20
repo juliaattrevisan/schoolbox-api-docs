@@ -8,8 +8,8 @@
 
     a {
         text-align: center;
-        padding-top: 120px;
-        margin-bottom: 10px;
+        padding-top: 8rem;
+        margin-bottom: 0.5rem;
         background-color: transparent !important;
         background-repeat: no-repeat;
         background-position: center top;
@@ -63,20 +63,20 @@
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 40px;
+        margin-bottom: 2rem;
 
         th, td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 0.5rem;
             text-align: left;
 
             &.letter {
-                width: 40px;
+                width: 2rem;
                 text-align: right;
             }
 
             &.numeric {
-                width: 90px;
+                width: 5rem;
                 text-align: right;
             }
 
@@ -114,7 +114,7 @@
         width: 50%;
 
         dt {
-            width: 40px;
+            width: 2rem;
         }
     }
 
@@ -139,15 +139,15 @@
         /* Progress Grade Summary
          */
         th, td {
-            width: 100px;
+            width: 6rem;
         }
 
         tr.progress-grade {
-            width: 100px;
+            width: 6rem;
         }
 
         .yearly-breakdown-graph {
-            height: 100px;
+            height: 6rem;
         }
     }
 
@@ -168,8 +168,18 @@
                 margin-bottom: 0;
 
                 th.level, td.level {
-                    width: 100px;
+                    width: 6rem;
                 }
+            }
+        }
+
+        .sequential-table {
+            .scrollable {
+                margin-bottom: 2rem;
+            }
+
+            table {
+                margin: 0;
             }
         }
     }
