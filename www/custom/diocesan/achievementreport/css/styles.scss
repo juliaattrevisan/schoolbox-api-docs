@@ -1,0 +1,187 @@
+/* Custom: My Child Component
+ */
+.dio-buttons li {
+    border: 0;
+    width: 130px;
+    height: 130px;
+    margin-bottom: 1rem;
+    display: block;
+    float: left;
+
+    a {
+        text-align: center;
+        padding-top: 7rem;
+        background-color: transparent !important;
+        background-repeat: no-repeat;
+        background-position: center top;
+        display: block;
+
+        &.achievement {
+            background-image: url('/custom/diocesan/achievementreport/img/achievement.png');
+        }
+
+        &.progress {
+            background-image: url('/custom/diocesan/achievementreport/img/progress.png');
+        }
+
+        &.duework {
+            background-image: url('/custom/diocesan/achievementreport/img/duework.png');
+        }
+
+        &.contacts {
+            background-image: url('/custom/diocesan/achievementreport/img/contacts.png');
+        }
+
+        &.calendar {
+            background-image: url('/custom/diocesan/achievementreport/img/calendar.png');
+        }
+
+        &.timetable {
+            background-image: url('/custom/diocesan/achievementreport/img/timetable.png');
+        }
+
+        &.attendance {
+            background-image: url('/custom/diocesan/achievementreport/img/attendance.png');
+        }
+
+        &.documents {
+            background-image: url('/custom/diocesan/achievementreport/img/documents.png');
+        }
+
+        &.eportfolio {
+            background-image: url('/custom/diocesan/achievementreport/img/blog.png');
+        }
+    }
+}
+
+/* Custom: Achievement Report
+ */
+.achievement-report {
+
+    /**
+     * Generic styles
+     */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 0.5rem;
+            text-align: left;
+
+            &.letter {
+                width: 2rem;
+                text-align: right;
+            }
+
+            &.numeric {
+                width: 5rem;
+                text-align: right;
+            }
+
+            &.centered {
+                text-align: center;
+            }
+        }
+
+        tfoot tr.totals td {
+            border-top: 3px solid #ddd;
+            font-style: italic;
+        }
+    }
+
+    /* thead/tr/th style subheading, for subheadings which can't
+     * go in thead element. Also applies for multi-level headings
+     */
+    .subheading {
+        font-weight: bold;
+    }
+
+    /* Colours - Internal/External background colours
+     */
+    .type-pink {
+        background-color: #FF00FF
+    }
+
+    .type-blue, .generic-heading-highlight {
+        background-color: #6495ED
+    }
+
+    /* Key, used in footer explanations typically
+     */
+    dl.key {
+        width: 50%;
+
+        dt {
+            width: 2rem;
+        }
+    }
+
+    /**
+     * School Grades Report
+     */
+    &.school-grades {
+
+        /* Spacer row
+         */
+        tr.spacer td {
+            border-left: 0;
+            border-right: 0;
+        }
+    }
+
+    /**
+     * IB
+     */
+    &.ib {
+
+        /* Progress Grade Summary
+         */
+        th, td {
+            width: 6rem;
+        }
+
+        tr.progress-grade {
+            width: 6rem;
+        }
+
+        .yearly-breakdown-graph {
+            height: 6rem;
+        }
+    }
+
+    /**
+     * NCEA
+     */
+    &.ncea {
+        table {
+            &.credit-summary {
+                .equal-widths {
+                    th, td {
+                        width: 7.14%
+                    }
+                }
+            }
+
+            &.summary {
+                margin-bottom: 0;
+
+                th.level, td.level {
+                    width: 6rem;
+                }
+            }
+        }
+
+        .sequential-table {
+            .scrollable {
+                margin-bottom: 2rem;
+            }
+
+            table {
+                margin: 0;
+            }
+        }
+    }
+}

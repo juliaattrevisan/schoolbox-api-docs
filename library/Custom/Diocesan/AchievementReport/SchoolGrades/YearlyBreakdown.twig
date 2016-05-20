@@ -1,0 +1,114 @@
+<script type="text/javascript">
+    $(function() {
+
+        /* Preselected breakdown year
+         */
+        var preselectedYear = '{{ preselectedYear }}';
+
+        if (!isNaN(preselectedYear)) {
+            $('[data-year="' + preselectedYear + '"]').addClass('current');
+            $('[data-yearly-breakdown-year="' + preselectedYear + '"]').show();
+
+            /* Move to navigation element
+             */
+            $(document).scrollTop($('[data-year-selector]').offset().top);
+        }
+
+        $('[data-year-selector]').on('click touchstart', 'a', function(event) {
+            event.preventDefault();
+
+            $('[data-year-selector]').find('a').removeClass('current');
+            $(this).addClass('current');
+
+            $('[data-yearly-breakdown]').hide();
+            $('[data-yearly-breakdown-year="' + $(this).attr('data-year') + '"]').show();
+
+            /* Update url by removing the last four digits (selected year)
+             * and appending the newly selected year
+             *
+             * This allows you to bookmark hidden divs, since it works in
+             * conjunction with aura routing
+             */
+            var baseUrl = window.location.href.replace(/\/(\d{4})$/, '');
+            window.history.pushState('', '', baseUrl + '/' + $(this).attr('data-year'));
+
+            /* Move to navigation element
+             */
+            $(document).scrollTop($('[data-year-selector]').offset().top);
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">School Grades Summary by Year</h2>
+
+        <section>
+            <ul class="sub-nav" data-year-selector>
+                {% for year, allCourses in yearlyBreakdown.data.yearStack %}
+                <li>
+                    <a href='#' data-year="{{ year }}">{{ year }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+
+            {% for year, allCourses in yearlyBreakdown.data.yearStack %}
+            <div data-yearly-breakdown data-yearly-breakdown-year="{{ year }}" style="display:none">
+                <div class="row">
+                    <div class="small-12 island">
+                        <section class="content generic-heading-highlight no-margin">
+                            {{ yearlyBreakdown.heading }} {{ year }}
+                        </section>
+                    </div>
+                </div>
+
+                <div class="scrollable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th class="numeric">Entered Grades</th>
+                                <th class="letter">N</th>
+                                <th class="letter">A</th>
+                                <th class="letter">M</th>
+                                <th class="letter">E</th>
+                                <th class="numeric">Achieved</th>
+                                <th class="numeric">Available</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for courseName, yearlyValues in allCourses %}
+                            <tr>
+                                <td>{{ courseName }}</td>
+                                <td class="numeric">{{ yearlyValues.enteredGrades }}</td>
+                                <td class="letter">{{ yearlyValues.letters.N }}</td>
+                                <td class="letter">{{ yearlyValues.letters.A }}</td>
+                                <td class="letter">{{ yearlyValues.letters.M }}</td>
+                                <td class="letter">{{ yearlyValues.letters.E }}</td>
+                                <td class="numeric">{{ yearlyValues.achievedGrades }}</td>
+                                <td class="numeric">{{ yearlyValues.availableGrades }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                        <tr class="totals">
+                            <td></td>
+                            <td class="numeric">{{ yearlyBreakdown.data.totals[year].enteredGrades }}</td>
+                            <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.N }}</td>
+                            <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.A }}</td>
+                            <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.M }}</td>
+                            <td class="letter">{{ yearlyBreakdown.data.totals[year].letters.E }}</td>
+                            <td class="numeric">{{ yearlyBreakdown.data.totals[year].achievedGrades }}</td>
+                            <td class="numeric">{{ yearlyBreakdown.data.totals[year].availableGrades }}</td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                {% include '@schoolgrades/EntriesAndResults.twig' %}
+            </div>
+        {% endfor %}
+        </section>
+    </div>
+</div>
+

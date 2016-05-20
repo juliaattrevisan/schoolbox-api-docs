@@ -1,0 +1,25 @@
+<link href="/custom/diocesan/achievementreport/css/styles.css" media="screen" rel="stylesheet" type='text/css' />
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script type="text/javascript" src="/custom/diocesan/achievementreport/js/ncea/stackedBar.js"></script>
+
+{% include '@templates/Avatar.twig' %}
+{% include '@templates/Navigation.twig' %}
+
+<div class="row">
+    <div class="small-12 columns achievement-report ncea">
+        {% include '@ncea/LiteracyNumeracyCheckbox.twig' %}
+        {% include '@ncea/Qualifications.twig' %}
+        {% include '@ncea/CreditSummary.twig' %}
+        {% include '@ncea/CreditSummaryGraphs.twig' with {dataset: creditSummary} %}
+
+        {% include '@ncea/CourseCreditSummaryNavigation.twig' %}
+
+        {% if year > 0 %}
+            {% include '@ncea/CreditSummaryGraphs.twig' with {dataset: creditSummaryYear} %}
+            {% include '@ncea/CourseCreditSummary.twig' %}
+            {% include '@ncea/EntriesAndResults.twig' %}
+        {% endif %}
+
+        {% include '@ncea/Footer.twig' %}
+    </div>
+</div>

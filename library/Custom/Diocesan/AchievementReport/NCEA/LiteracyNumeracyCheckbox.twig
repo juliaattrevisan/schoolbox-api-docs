@@ -1,0 +1,23 @@
+{% if literacyNumeracyCheckbox.data|length %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Literacy/Numeracy</h2>
+        <section>
+            <ul class="information-list">
+                {% for checkboxName, selected in literacyNumeracyCheckbox.data %}
+                <li>
+                    <div class="list-item">
+                        <div class="compact avatar card small-12">
+                            {% if selected > 0 %}
+                            <div class="icon-approve"></div>
+                            {% endif %}
+                            <p> {{ checkboxName }}</p>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
+{% endif %}

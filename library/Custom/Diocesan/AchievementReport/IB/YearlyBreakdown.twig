@@ -1,0 +1,193 @@
+<script type="text/javascript">
+    $(function() {
+
+        /* Preselected breakdown year
+         */
+        var preselectedYear = '{{ preselectedYear }}';
+
+        if (!isNaN(preselectedYear)) {
+            $('[data-year="' + preselectedYear + '"').addClass('current');
+            $('[data-yearly-breakdown-year="' + preselectedYear + '"]').show();
+
+            /* Move to navigation element
+             */
+            $(document).scrollTop($('[data-year-selector]').offset().top);
+        }
+
+        /* Select a breakdown to view
+         */
+        $('[data-year-selector]').find('a').click(function(event) {
+            event.preventDefault();
+
+            $('[data-year-selector]').find('a').removeClass('current');
+            $(this).addClass('current');
+
+            $('[data-yearly-breakdown]').hide();
+            $('[data-yearly-breakdown-year="' + $(this).attr('data-year') + '"]').show();
+
+            /* http://stackoverflow.com/questions/16216722/highcharts-hidden-charts-dont-get-re-size-properly
+             */
+            $(window).resize();
+
+            /* Update url by removing the last four digits (selected year)
+             * and appending the newly selected year
+             *
+             * This allows you to bookmark hidden divs, since it works in
+             * conjunction with aura routing
+             */
+            var baseUrl = window.location.href.replace(/\/(\d{4})$/, '');
+            window.history.pushState('', '', baseUrl + '/' + $(this).attr('data-year'));
+
+            /* Move to navigation element
+             */
+            $(document).scrollTop($('[data-year-selector]').offset().top);
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Progress Grade Summary by Year</h2>
+
+        <section>
+            <ul class="sub-nav" data-year-selector>
+                {% for year, allCourses in yearlyBreakdown.data %}
+                    <li>
+                        <a href='#' data-year="{{ year }}">{{ year }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            {% for year, allCourses in yearlyBreakdown.data %}
+                <div data-yearly-breakdown data-yearly-breakdown-year="{{ year }}" style="display:none;">
+                    <script type="text/javascript">
+                        $(function() {
+                            {% for currentCourse, values in allCourses %}
+                            var tempData = [];
+                            var tempCategories = [];
+
+                            /* Always display both terms for current year
+                             * Hardcode term 4 and 2
+                             */
+                            {% if values.allTerms[4].progressGrade is defined  %}
+                            tempData.push({y: {{ values.allTerms[4].progressGrade }}, color: '#fd9800'});
+                            tempCategories.push('Term 4');
+                            {% endif %}
+
+                            {% if values.allTerms[2].progressGrade is defined  %}
+                            tempData.push({y: {{ values.allTerms[2].progressGrade }}, color: '#7fc9fc'});
+                            tempCategories.push('Term 2');
+                            {% endif %}
+
+                            $('[data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"]').ib_yearlyBreakdown({
+                                title: '',
+
+                                categories: tempCategories,
+
+                                series: [{
+                                    data: tempData
+                                }]
+                            });
+
+                            {% endfor %}
+
+                            /* http://stackoverflow.com/questions/16216722/highcharts-hidden-charts-dont-get-re-size-properly
+                             */
+                            $(window).resize();
+                        });
+                    </script>
+
+                    <div class="scrollable">
+                        <table>
+                            <thead>
+                            <tr class="generic-heading-highlight">
+                                <th colspan="5">{{ yearlyBreakdown.heading }} {{ year }}</th>
+                            </tr>
+                            <tr>
+                                <th>Course</th>
+                                <th class="centered">Term</th>
+                                <th>Level</th>
+                                <th>Progress Grade</th>
+                                <th>Progress Chart</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for currentCourse, values in allCourses %}
+                                {% if year == yearlyBreakdown.currentYear %}
+                                    <tr>
+                                        <td rowspan="2">{{ currentCourse }}</td>
+                                        <td class="centered">4</td>
+                                        <td>{{ values.allTerms.4.level }}</td>
+                                        <td>
+                                            {% if values.allTerms.4.progressGrade %}
+                                                {{ values.allTerms.4.progressGrade }}
+                                            {% endif %}
+                                        </td>
+                                        <td class='yearly-breakdown-graph' rowspan="2">
+                                            <div class='yearly-breakdown-graph' data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="centered">2</td>
+                                        <td>{{ values.allTerms.2.level }}</td>
+                                        <td>
+                                            {% if values.allTerms.2.progressGrade %}
+                                                {{ values.allTerms.2.progressGrade }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    {% set hasTerm4Data = (values.allTerms.4.level != '' or values.allTerms.4.progressGrade != '') %}
+                                    {% set hasTerm2Data = (values.allTerms.2.level != '' or values.allTerms.2.progressGrade != '') %}
+
+                                    {% if hasTerm4Data and hasTerm2Data %}
+                                        <tr>
+                                            <td rowspan="2">{{ currentCourse }}</td>
+                                            <td class="centered">4</td>
+                                            <td>{{ values.allTerms.4.level }}</td>
+                                            <td>{{ values.allTerms.4.progressGrade }}</td>
+                                            <td class='yearly-breakdown-graph' rowspan="2">
+                                                <div class='yearly-breakdown-graph' data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="centered">2</td>
+                                            <td>{{ values.allTerms.2.level }}</td>
+                                            <td>{{ values.allTerms.2.progressGrade }}</td>
+                                        </tr>
+                                    {% elseif hasTerm4Data and not hasTerm2Data %}
+                                        <tr>
+                                            <td>{{ currentCourse }}</td>
+                                            <td class="centered">4</td>
+                                            <td>{{ values.allTerms.4.level }}</td>
+                                            <td>{{ values.allTerms.4.progressGrade }}</td>
+                                            <td class='yearly-breakdown-graph'>
+                                                <div class='yearly-breakdown-graph' data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
+                                            </td>
+                                        </tr>
+                                    {% elseif not hasTerm4Data and hasTerm2Data %}
+                                        <tr>
+                                            <td>{{ currentCourse }}</td>
+                                            <td class="centered">2</td>
+                                            <td>{{ values.allTerms.2.level }}</td>
+                                            <td>{{ values.allTerms.2.progressGrade }}</td>
+                                            <td class='yearly-breakdown-graph'>
+                                                <div class='yearly-breakdown-graph' data-yearly-breakdown-graph="{{ values.classcode }}_{{ year }}"></div>
+                                            </td>
+                                        </tr>
+                                    {% elseif not hasTerm4Data and nothasTerm2Data %}
+                                        {# no data; do nothing#}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        </section>
+    </div>
+</div>
+
+
+

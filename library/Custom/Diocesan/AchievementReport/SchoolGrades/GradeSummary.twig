@@ -1,0 +1,70 @@
+<script type="text/javascript">
+    $(function() {
+        $('[data-graph="resultSummary"]').schoolGrades_nameGraph({
+            title: 'Result Summary',
+
+            /* N, A, M, E, available
+             */
+            colors: ['#a0a0a0', '#660033', '#7b68ee', '#228b22', '#001933'],
+
+            categories: [{% for year, values in gradeSummary.data %}'Year {{ year }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+
+            series: [
+                {% for currentColumn in gradeSummary.columns %}
+                {% if currentColumn == 'availableGrades' %}
+                {
+                    name: 'Available Grades',
+                    data: [{% for year, values in gradeSummary.data %}{{ values[currentColumn] }}{% if not loop.last %}, {% endif %}{% endfor %}]
+                }
+                {% else %}
+                {
+                    name: '{{ currentColumn }}',
+                    data: [{% for year, values in gradeSummary.data %}{{ values.letters[currentColumn] }}{% if not loop.last %}, {% endif %}{% endfor %}]
+                },
+                {% endif %}
+                {% endfor %}
+            ]
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">{{ gradeSummary.heading }}</h2>
+
+        <section>
+            <div class="scrollable">
+                <table>
+                    <thead class="generic-heading-highlight">
+                    <tr>
+                        <th class="numeric">Year</th>
+                        <th class="numeric">Entered Grades</th>
+                        <th class="letter">N</th>
+                        <th class="letter">A</th>
+                        <th class="letter">M</th>
+                        <th class="letter">E</th>
+                        <th class="numeric">Available</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for year, values in gradeSummary.data %}
+                        <tr>
+                            <td class="numeric">{{ year }}</td>
+                            <td class="numeric">{{ values.enteredGrades }}</td>
+                            <td class="letter">{{ values.letters.N }}</td>
+                            <td class="letter">{{ values.letters.A }}</td>
+                            <td class="letter">{{ values.letters.M }}</td>
+                            <td class="letter">{{ values.letters.E }}</td>
+                            <td class="numeric">{{ values.availableGrades }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div data-graph="resultSummary"></div>
+        </section>
+    </div>
+</div>
+
+

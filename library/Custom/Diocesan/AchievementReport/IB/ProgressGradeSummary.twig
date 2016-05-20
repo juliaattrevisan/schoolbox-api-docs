@@ -1,0 +1,85 @@
+<script type="text/javascript">
+    $(function() {
+        $('#element').ib_progressGradeSummary({
+            colors: ['#5f0466', '#6399fd', '#2e9c2f', '#fe07fe', '#7fc9fc', '#fd9800', '#fe3299'],
+            categories: [
+                {% for year, allTerms in progressGradeSummary.data.existenceStack %}
+                {% for currentTerm, values in allTerms %}
+                'Year {{ year }}, Term {{ currentTerm }}'{% if not loop.last %}, {% endif %}
+                {% endfor %}
+                {% if not loop.last %}, {% endif %}
+                {% endfor %}
+            ],
+            series: [
+                {% for progressGrade, allYearValues in progressGradeSummary.data.graphStack %}
+                {
+                    name: 'Progress Grade {{ progressGrade }}',
+                    data: [
+                        {% for year, allTermValues in allYearValues %}
+                        {% for currentTerm, value in allTermValues %}
+
+                        {% if progressGradeSummary.data.existenceStack[year][currentTerm] == true %}
+                        {{ value }}
+                        {% if not loop.last %}, {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                        {% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                }{% if not loop.last %},
+                {% endif %}
+                {% endfor %}
+            ]
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">{{ progressGradeSummary.heading }}</h2>
+
+        <section>
+            <div id="element"></div>
+
+            <div class="scrollable">
+                <table>
+                    <thead class="generic-heading-highlight">
+                    <tr>
+                        <th class='centered year' rowspan="2">Year</th>
+                        <th class='centered term' rowspan="2">Term</th>
+                        <th class='numeric' rowspan="2">Entered Grades</th>
+                        <th class='centered' colspan="7">Progress Grades</th>
+                    </tr>
+                    <tr class="progress-grade">
+                        <th class='numeric'>1</th>
+                        <th class='numeric'>2</th>
+                        <th class='numeric'>3</th>
+                        <th class='numeric'>4</th>
+                        <th class='numeric'>5</th>
+                        <th class='numeric'>6</th>
+                        <th class='numeric'>7</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for year, allTerms in progressGradeSummary.data.tableStack %}
+                        {% for currentTerm, values in allTerms %}
+                            {% if progressGradeSummary.data.existenceStack[year][currentTerm] == true %}
+                                <tr>
+                                    <td class='centered year'>{{ year }}</td>
+                                    <td class='centered term'>{{ currentTerm }}</td>
+                                    <td class='numeric'>{{ values.enteredGrades }}</td>
+                                    {% for i in range(1, 7) %}
+                                        <td class='numeric'>{{ values.progressGrades[i] }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+

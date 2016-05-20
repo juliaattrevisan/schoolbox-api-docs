@@ -1,0 +1,403 @@
+<?php
+/**
+ * CreditSummary
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Custom\Diocesan\AchievementReport\NCEA;
+
+class CreditSummary extends Base {
+
+    /**
+     * Heading
+     *
+     * @var string
+     */
+    protected $heading = 'Credit Summary - All Years';
+
+    /**
+     * Hook method
+     *
+     * @return mixed
+     */
+    protected function setup()
+    {
+    }
+
+    /**
+     * Returns data for twig rendering
+     *
+     * @return mixed
+     */
+    public function findData()
+    {
+        $allResults = $this->findValues();
+
+        $finalStack = array();
+        $finalStack['table']['creditSummary'] = $this->findTable($allResults);
+        $finalStack['graph']['totalAchievedCredits'] = $this->findTotalAchievedCredits($allResults);
+        $finalStack['graph']['standardType'] = $this->findStandardType($allResults);
+        $finalStack['graph']['assessmentType'] = $this->findAssessmentType($allResults);
+        $finalStack['graph']['result'] = $this->findResult($allResults);
+
+        return $finalStack;
+    }
+
+    /**
+     * Find all the numeric data to be used throughout this section
+     *
+     * @return array|bool
+     */
+    private function findValues() {
+        $query = "
+            SELECT
+                id,
+                Level,
+                InternalorExternalAssessment,
+                EnteredCredits,
+                StrippedResult,
+                ResultCredits,
+                StandardType,
+                StudentYear
+            FROM
+                SynergyOne.dbo.uvSchoolBoxNCEAResults
+            WHERE
+                id = '{$this->getExternalUserId()}' AND
+                WithdrawnFlag = 0
+        ";
+
+        if ($this->getYear()) {
+            $query .= "
+                AND StudentYear = '{$this->getYear()}'
+            ";
+        }
+
+        $result = $this->getDb()->getAll($query);
+
+        if (is_array($result)) {
+            return $result;
+        }
+
+        return array();
+    }
+
+    /**
+     * Find values to populate the Credit Summary - All Years table
+     * Rearrange everything into a nice order
+     *
+     * @param $allResults
+     * @return array
+     */
+    private function findTable($allResults) {
+        $finalStack = array();
+
+        foreach ($allResults as $current) {
+            $level = $current['Level'];
+            $internalExternal = $current['InternalorExternalAssessment'];
+            $letter = $current['StrippedResult'];
+
+            if (!is_array($finalStack[$level])) {
+                $finalStack[$level] = array(
+                    'totalEnteredCredits' => 0,
+                    'IN' => array(
+                        'enteredCredits' => 0,
+                        'letters' => array_fill_keys($this->getLetterRegistry(), 0),
+                        'availableCredits' => 0,
+                    ),
+                    'EX' => array(
+                        'enteredCredits' => 0,
+                        'letters' => array_fill_keys($this->getLetterRegistry(), 0),
+                        'availableCredits' => 0,
+                    )
+                );
+            }
+
+            /* Total Entered Credits = Internally Assessed Entered Credits + Externally Assessed Entered Credits
+             *                       = sum(EnteredCredits)
+             */
+            $finalStack[$level]['totalEnteredCredits'] += $current['EnteredCredits'];
+
+            /* Entered Credits for a particular level and internal/external assessed type
+             */
+            $finalStack[$level][$internalExternal]['enteredCredits'] += $current['EnteredCredits'];
+            $finalStack[$level][$internalExternal]['availableCredits'] += $current['EnteredCredits'];
+
+            /* Ignore progressive results for current year
+             */
+            if (!$this->isProgressive($current['Result'])) {
+                if ($this->includeData($internalExternal, $current['StudentYear'])) {
+
+                    /* Special case for N
+                     *
+                     * According to Sheeba,
+                     * N = sum of enteredcredits where strippedresult=N  [when result is not achieved
+                     * the resultscredit data is 0, hence use entered credits]
+                     */
+                    if (in_array($letter, array('N'))) {
+                        $finalStack[$level][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
+                        $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
+                    }
+                    /* Regular summation for A, M, E
+                     */
+                    elseif (in_array($letter, $this->getAchievementLetterRegistry())) {
+                        $finalStack[$level][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
+                        $finalStack[$level][$internalExternal]['availableCredits'] -= $current['ResultCredits'];
+                    }
+                    /* Other cases to exclude in Available Credits calculation
+                     *
+                     * According to Sheeba,
+                     * Available = 1-2-(sum of enteredcredits where strippedresult=Y, V or Z)
+                     * [when result of Y,V or Z is assigned due to absence or not attempting,
+                     * it is no longer available for assessment]
+                     */
+                    elseif (in_array($letter, $this->getExclusionLetterRegistry())) {
+                        $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
+                    }
+                }
+            }
+        }
+
+        krsort($finalStack);
+
+        return $finalStack;
+    }
+
+    /**
+     * Find values to populate Total Achieved Credits graph
+     *
+     * @param $allResults
+     * @return array
+     */
+    private function findTotalAchievedCredits($allResults) {
+        $finalStack = array();
+        $totalEnteredCredits = array();
+
+        /* Accumulate "Achieved" values
+         */
+        foreach ($allResults as $current) {
+            $level = $current['Level'];
+            $internalExternal = $current['InternalorExternalAssessment'];
+
+            if (!is_array($finalStack[$level])) {
+                $finalStack[$level] = array(
+                    'achieved' => 0,
+                    'available' => 0,
+                    'exclusions' => 0,
+                );
+
+                $totalEnteredCredits[$level] = 0;
+            }
+
+            /* Ignore progressive results for current year
+             */
+            if (!$this->isProgressive($current['Result'])) {
+                if ($this->includeData($internalExternal, $current['StudentYear'])) {
+
+                    /* Sum of A, M, E values from both Internally Assessed
+                     * and Externally Assessed types
+                     */
+                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                        $finalStack[$level]['achieved'] += $current['ResultCredits'];
+                    }
+                    /* Special treatment
+                     */
+                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                        $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                    }
+                }
+            }
+
+            $totalEnteredCredits[$level] += $current['EnteredCredits'];
+        }
+
+        /* Accumulate "Available" values
+         */
+        foreach ($finalStack as $level => $totals) {
+            $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['achieved'] - $finalStack[$level]['exclusions'];
+        }
+
+        krsort($finalStack);
+
+        return $finalStack;
+    }
+
+    /**
+     * Find values to populate Standard Type graph
+     *
+     * @param $allResults
+     * @return array
+     */
+    private function findStandardType($allResults) {
+        $finalStack = array();
+        $unitTypeList = array('U');
+        $achievementTypeList = array('A');
+        $totalEnteredCredits = array();
+
+        foreach ($allResults as $current) {
+            $level = $current['Level'];
+            $internalExternal = $current['InternalorExternalAssessment'];
+
+            if (!is_array($finalStack[$level])) {
+                $finalStack[$level] = array(
+                    'unit' => 0,
+                    'achievement' => 0,
+                    'available' => 0,
+                    'exclusions' => 0,
+                );
+
+                $totalEnteredCredits[$level] = 0;
+            }
+
+            /* Ignore progressive results for current year
+             */
+            if (!$this->isProgressive($current['Result'])) {
+                if ($this->includeData($internalExternal, $current['StudentYear'])) {
+
+                    /* Only accumulate some values
+                     */
+                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                        if (in_array($current['StandardType'], $unitTypeList)) {
+                            $finalStack[$level]['unit'] += $current['ResultCredits'];
+                        }
+                        elseif (in_array($current['StandardType'], $achievementTypeList)) {
+                            $finalStack[$level]['achievement'] += $current['ResultCredits'];
+                        }
+                    }
+                    /* Special treatment
+                     */
+                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                        $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                    }
+                }
+            }
+
+            $totalEnteredCredits[$level] += $current['EnteredCredits'];
+        }
+
+        /* Accumulate "Available" values
+         */
+        foreach ($finalStack as $level => $totals) {
+            $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['unit'] - $totals['achievement'] - $finalStack[$level]['exclusions'];
+        }
+
+        krsort($finalStack);
+
+        return $finalStack;
+    }
+
+    /**
+     * Find values to populate Assessment Type graph
+     *
+     * @param $allResults
+     * @return array
+     */
+    private function findAssessmentType($allResults) {
+        $finalStack = array();
+        $totalEnteredCredits = array();
+
+        foreach ($allResults as $current) {
+            $level = $current['Level'];
+            $internalExternal = $current['InternalorExternalAssessment'];
+
+            if (!is_array($finalStack[$level])) {
+                $finalStack[$level] = array(
+                    'IN' => 0,
+                    'EX' => 0,
+                    'available' => 0,
+                    'exclusions' => 0,
+                );
+
+                $totalEnteredCredits[$level] = 0;
+            }
+
+            /* Ignore progressive results for current year
+             */
+            if (!$this->isProgressive($current['Result'])) {
+                if ($this->includeData($internalExternal, $current['StudentYear'])) {
+
+                    /* Only accumulate some values
+                     */
+                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                        $finalStack[$level][$internalExternal] += $current['ResultCredits'];
+                    }
+                    /* Special treatment
+                     */
+                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                        $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                    }
+                }
+            }
+
+            $totalEnteredCredits[$level] += $current['EnteredCredits'];
+        }
+
+        /* Accumulate "Available" values
+         */
+        foreach ($finalStack as $level => $totals) {
+            $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['IN'] - $totals['EX'] - $finalStack[$level]['exclusions'];
+        }
+
+        krsort($finalStack);
+
+        return $finalStack;
+    }
+
+    /**
+     * Find values to populate Result graph
+     *
+     * @param $allResults
+     * @return array
+     */
+    private function findResult($allResults) {
+        $finalStack = array();
+        $totalEnteredCredits = array();
+
+        foreach ($allResults as $current) {
+            $level = $current['Level'];
+            $internalExternal = $current['InternalorExternalAssessment'];
+
+            if (!is_array($finalStack[$level])) {
+                $finalStack[$level] = array_fill_keys($this->getAchievementLetterRegistry(), 0);
+
+                $finalStack[$level]['available'] = 0;
+                $finalStack[$level]['exclusions'] = 0;
+
+                $totalEnteredCredits[$level] = 0;
+            }
+
+            $totalEnteredCredits[$level] += $current['EnteredCredits'];
+
+            /* Ignore progressive results for current year
+             */
+            if (!$this->isProgressive($current['Result'])) {
+                if ($this->includeData($internalExternal, $current['StudentYear'])) {
+
+                    /* Only accumulate some values
+                     */
+                    if (in_array($current['StrippedResult'], $this->getAchievementLetterRegistry())) {
+                        $finalStack[$level][$current['StrippedResult']] += $current['ResultCredits'];
+                    }
+                    /* Special treatment
+                     */
+                    elseif (in_array($current['StrippedResult'], $this->getExclusionLetterRegistry()) || in_array($current['StrippedResult'], array('N'))) {
+                        $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
+                    }
+                }
+            }
+        }
+
+        /* Accumulate "Available" values
+         */
+        foreach ($finalStack as $level => $totals) {
+            $finalStack[$level]['available'] = $totalEnteredCredits[$level] - $totals['A'] - $totals['M'] - $totals['E'] - $finalStack[$level]['exclusions'];
+        }
+
+        krsort($finalStack);
+
+        return $finalStack;
+    }
+}

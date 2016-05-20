@@ -1,0 +1,43 @@
+<script type="text/javascript">
+    $(function() {
+        $('[data-graph="assessment-type-{{ dataset.suffix }}"]').ncea_stackedBar({
+            title: 'Assessment Type',
+
+            colors: ['#FF00FF', '#6495ED', '#001933'],
+
+            categories: [
+                {% for currentLevel, allLevelValues in dataset.data.graph.assessmentType %}
+                '{{ currentLevel }}'{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            ],
+
+            series: [
+                {
+                    name: 'Internal',
+                    data: [
+                        {% for currentLevel, allLevelValues in dataset.data.graph.assessmentType %}
+                        {{ allLevelValues.IN }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'External',
+                    data: [
+                        {% for currentLevel, allLevelValues in dataset.data.graph.assessmentType %}
+                        {{ allLevelValues.EX }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                },
+                {
+                    name: 'Available',
+                    data: [
+                        {% for currentLevel, allLevelValues in dataset.data.graph.assessmentType %}
+                        {{ allLevelValues.available }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ]
+                }
+            ]
+        });
+    });
+</script>
+<div data-graph="assessment-type-{{ dataset.suffix }}"></div>
