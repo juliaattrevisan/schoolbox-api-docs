@@ -411,16 +411,16 @@ class Controller extends BaseController
 
             // ...and role permissions
             $roleAccessMapper->deleteByColumn("cid", $postData["categoryID"]);
-
-        } else {
-            // apply codes
-            $this->setCodesOnFolder(
-                $model,
-                $postData['code'],
-                (is_array($postData['curriculumCodes']) ? $postData['curriculumCodes'] : []),
-                $user
-            );
         }
+
+        // apply codes
+        $this->setCodesOnFolder(
+            $model,
+            $postData['code'],
+            (is_array($postData['curriculumCodes']) ? $postData['curriculumCodes'] : []),
+            $user
+        );
+
 
         $affectedIds = $folderMapper->save($model);
 
