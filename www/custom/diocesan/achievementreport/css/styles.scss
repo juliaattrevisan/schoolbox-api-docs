@@ -1,3 +1,58 @@
+/* Custom: My Child Component
+ */
+.dio-buttons li {
+    border: 0;
+    width: 130px;
+    display: block;
+    float: left;
+
+    a {
+        text-align: center;
+        padding-top: 120px;
+        margin-bottom: 10px;
+        background-color: transparent !important;
+        background-repeat: no-repeat;
+        background-position: center top;
+        display: block;
+
+        &.achievement {
+            background-image: url('/custom/diocesan/achievementreport/img/achievement.png');
+        }
+
+        &.progress {
+            background-image: url('/custom/diocesan/achievementreport/img/progress.png');
+        }
+
+        &.duework {
+            background-image: url('/custom/diocesan/achievementreport/img/duework.png');
+        }
+
+        &.contacts {
+            background-image: url('/custom/diocesan/achievementreport/img/contacts.png');
+        }
+
+        &.calendar {
+            background-image: url('/custom/diocesan/achievementreport/img/calendar.png');
+        }
+
+        &.timetable {
+            background-image: url('/custom/diocesan/achievementreport/img/timetable.png');
+        }
+
+        &.attendance {
+            background-image: url('/custom/diocesan/achievementreport/img/attendance.png');
+        }
+
+        &.documents {
+            background-image: url('/custom/diocesan/achievementreport/img/documents.png');
+        }
+
+        &.eportfolio {
+            background-image: url('/custom/diocesan/achievementreport/img/blog.png');
+        }
+    }
+}
+
 /* Custom: Achievement Report
  */
 .achievement-report {
@@ -71,8 +126,8 @@
         /* Spacer row
          */
         tr.spacer td {
-            border-left: 0px;
-            border-right: 0px;
+            border-left: 0;
+            border-right: 0;
         }
     }
 
@@ -110,7 +165,7 @@
             }
 
             &.summary {
-                margin-bottom: 0px;
+                margin-bottom: 0;
 
                 th.level, td.level {
                     width: 100px;
