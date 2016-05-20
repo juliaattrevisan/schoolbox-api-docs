@@ -206,7 +206,6 @@ class User implements JsonSerializable, ISoftDeletable
         $this->setRole(new Role());
         $this->setSchoolHouse(new House());
         $this->setResidentialHouse(new HouseResidential());
-        $this->setAccessList(new Collection());
     }
 
     /**
