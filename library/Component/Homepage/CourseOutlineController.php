@@ -393,7 +393,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
 
         if ($display_task_list) {
 
-            if ($this->accessList[$unit->getUnitCategory()->getId()] >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ) {
+            if ($this->canLinkToUnit($unit)) {
                 $this->parse('unit_link_block', 'unit_link');
             } else {
                 $this->setVar('unit_link_block', $this->getVar('UNIT_NAME'));
@@ -413,6 +413,31 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
 
         $this->parse('unit_block', 'unit', true);
     }
+
+
+    /**
+     * @param UnitInstance $unit
+     * @throws \Schoolbox\Mapper\Exception
+     * @return bool
+     */
+    protected function canLinkToUnit(UnitInstance $unit)
+    {
+        $folderId = $unit->getUnitCategory()->getId();
+
+        // no perms, quick and easy failure
+        if ($this->accessList[$folderId] < \Schoolbox\Permission\Access\UserAccess::ACCESS_READ) {
+            return false;
+        }
+
+        try {
+            // check the folder still exists
+            Folder\Mapper::getInstance()->findCheaplyById($folderId);
+            return true;
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+            return false;
+        }
+    }
+
 
     /**
      * Displays this task in the list of tasks for a unit.
