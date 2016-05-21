@@ -92,7 +92,8 @@ class AttemptNotifier extends AbstractModuleNotifier {
      */
     public function bundleTriggers($bundle) {
         if ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
-            if (array_key_exists('finish', $bundle->getEvent()->getDiff())) {
+			$diff = $bundle->getEvent()->getDiff();
+            if (isset($diff['finish'])) {
                 $bundle->attach(self::TRIGGER_ATTEMPTED, self::IMMEDIATELY);
 
             } else {
