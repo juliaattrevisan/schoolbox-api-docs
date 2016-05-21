@@ -210,7 +210,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
                 $timezone ?: clone $dateTime->getDateTimeObject()->getTimezone()
             );
         }
-        throw new InvalidArgumentException('Could not create LaravelDate from $dateTime');
+        throw new InvalidArgumentException("Could not create LaravelDate from '$dateTime");
     }
 
     /**
