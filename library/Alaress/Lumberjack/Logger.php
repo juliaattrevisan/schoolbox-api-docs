@@ -235,16 +235,7 @@ class Logger implements LoggerInterface {
      */
     public function log($level, $message, array $context = array())
     {
-        try {
-            // unwind the stack
-            while($this->log->popHandler());
-        }
-        catch(\LogicException $e) {
-            // wind on the new handlers
-            foreach($this->handlers as $h) {
-                $this->log->pushHandler($h);
-            }
-        }
+        $this->log->setHandlers($this->handlers);
 
         try {
             $this->log->log($level, $message, $context);
