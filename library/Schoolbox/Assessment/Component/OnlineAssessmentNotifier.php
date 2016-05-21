@@ -502,13 +502,15 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$quizId = $quiz->getId();
 		$quiz   = $this->fullyHydrateQuiz($quiz);
 
-		// discard all update notifications if the submissionbox isn't open
-		$openStamp = $quiz->getStart()->getUnixTimestamp();
-		$closeStamp = $quiz->getFinish()->getUnixTimestamp();
-		$now = time();
+		// discard all update notifications if the quiz isn't open *EXCEPT mark visibility changes*
+		if (empty($diff['markVisibility'])) {
+			$openStamp = $quiz->getStart()->getUnixTimestamp();
+			$closeStamp = $quiz->getFinish()->getUnixTimestamp();
+			$now = time();
 
-		if($openStamp > $now || $closeStamp < $now) {
-			return $msgr;
+			if($openStamp > $now || $closeStamp < $now) {
+				return $msgr;
+			}
 		}
 
 		// if there's no actual difference
