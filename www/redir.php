@@ -31,7 +31,11 @@ if ($link instanceof \Schoolbox\Resource\Link) {
 }
 
 if (!empty($url)) {
-    header('Location: ' . $url);
+    $translator = new Schoolbox\Cyberhound\Url\Translator(
+        Config::get('cyberhound_api_url'),
+        Config::get('cyberhound_api_shared_key')
+    );
+    header('Location: ' . $translator->translate($url));
     exit;
 } else {
     error(2);
