@@ -1031,7 +1031,14 @@ class Controller extends Base\Base
          */
         foreach ($unitDates as $unit) {
             if ($unit['import'] && !isset($unitCache[$unit['unit_id']])) {
-                $unitCache[$unit['unit_id']] = $this->getUnitMapper()->findById($unit['unit_id']);
+                try {
+                    $u = $this->getUnitMapper()->findById($unit['unit_id']);
+                } catch (MapperException\Deleted $e) {
+                    // ignore deletions here; the assumption is that any unit passed into here is legit. If you modify a class import and
+                    // any source units have been deleted, their existence still needs to be honoured.
+                    $u = $e->getDeletedObject();
+                }
+                $unitCache[$unit['unit_id']] = $u;
             }
         }
 
@@ -1276,10 +1283,15 @@ class Controller extends Base\Base
                  * (a Task Abstract is one specified in the original Unit
                  * but has not yet been imported)
                  */
-                $allTaskDates = $this->determineTaskDates(
-                    $post["unit"],
-                    $post->get('componentId')
-                );
+                try {
+                    $allTaskDates = $this->determineTaskDates(
+                        $post["unit"],
+                        $post->get('componentId')
+                    );
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $this->sendError($e->getMessage());
+                    return;
+                }
 
                 // respond with stage 4: coursework list
                 $this->tpl('unitImportResults', [
@@ -1468,6 +1480,9 @@ class Controller extends Base\Base
                     if (!isset($unitCache[$currentUnit['id']])) {
                         try {
                             $unitCache[$currentUnit['id']] = $this->getFolderMapper()->findById($currentUnit['id']);
+                        } catch (MapperException\Deleted $e) {
+                            // accommodate deleted units
+                            $unitCache[$currentUnit['id']] = $e->getDeletedObject();
                         } catch (\Exception $e) {
                             $this->throwError('An unexpected error occurred');
                             return;
