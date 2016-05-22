@@ -11,6 +11,7 @@ namespace Alaress\File\Remote;
 
 
 use OutOfBoundsException;
+use \Schoolbox\Config\Loader as ConfigLoader;
 
 class GDriveFetcher implements FetcherInterface
 {
@@ -27,6 +28,17 @@ class GDriveFetcher implements FetcherInterface
     /** @var array */
     protected $metaCache = array();
 
+    /** @var ConfigLoader */
+    protected $configLoader;
+
+    public function getConfigLoader() {
+        return $this->configLoader;
+    }
+
+    public function setConfigLoader($configLoader) {
+        $this->configLoader = $configLoader;
+        return $this;
+    }
 
     /**
      * @param string   $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
@@ -43,6 +55,8 @@ class GDriveFetcher implements FetcherInterface
                 'Authorization: ' . $httpAuth
             ));
         }
+
+        $this->setConfigLoader(new ConfigLoader());
     }
 
 
@@ -93,15 +107,35 @@ class GDriveFetcher implements FetcherInterface
             $url = null;
             $ext = '';
 
-        } elseif (isset($metadata['exportLinks']['application/pdf'])) {
-            // if there is a PDF-export option for this file, always give that preference
+        } elseif ($this->getConfigLoader()->get('googledrive_export_pdf') == '1' && isset($metadata['exportLinks']['application/pdf'])) {
+            // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
             $url = $metadata['exportLinks']['application/pdf'];
             $ext = '.pdf';
 
         } else {
-            // fall back to the download URL
-            $url = $metadata['downloadUrl'];
-            $ext = $this->deriveFileExtension($metadata);
+
+            if ($metadata['mimeType'] == "application/vnd.google-apps.presentation") {
+                // Get PPTX format slides
+                $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.presentationml.presentation'];
+                $ext = '.pptx';
+            } else if ($metadata['mimeType'] == "application/vnd.google-apps.document") {
+                // Get DOCX format spreadsheet
+                $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                $ext = '.docx';
+            } else if ($metadata['mimeType'] == "application/vnd.google-apps.spreadsheet") {
+                // Get XLSX format spreadsheet
+                $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+                $ext = '.xlsx';
+            } else if (!empty($metadata['downloadUrl'])) {
+                // Fall back to the download URL
+                $url = $metadata['downloadUrl'];
+                $ext = $this->deriveFileExtension($metadata);
+            } else {
+                // Last ditched PDF attempt if the download URL not set
+                $url = $metadata['exportLinks']['application/pdf'];
+                $ext = '.pdf';
+            }
+
         }
 
         if (!$url) {
