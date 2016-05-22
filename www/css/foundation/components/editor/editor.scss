@@ -93,3 +93,10 @@ a.cke_button {
         background-color: #cae9b9;
     }
 }
+
+/* For putting dragresize handles in the right place
+ * It's getting reset by cke_reset, so bring firepower
+ */
+.cke_contents {
+    padding: 1rem !important;
+}
