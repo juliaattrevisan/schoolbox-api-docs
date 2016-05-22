@@ -22,6 +22,8 @@ use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Tags\Mapper as PastoralTagsMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
+use Schoolbox\Pastoral\Category\Mapper as PastoralCategoryMapper;
+use Schoolbox\Pastoral\Category\Model as PastoralCategoryModel;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
@@ -120,6 +122,7 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME);
         $this->joins('parent_id', self::class, 'id', null, null, 'parent', 'parent');
         $this->joins('type_id', PastoralTypeMapper::class, 'id', null, null, 'type', 'type');
+        $this->joins('category_id', PastoralCategoryMapper::class, 'id', null, null, 'category', 'category');
         $this->joins('severity_id', PastoralSeverityMapper::class, 'id', null, null, 'severity', 'severity');
         $this->joins('owner_id', UserMapper::class, 'id', null, null, 'owner', 'owner');
         $this->joins('student_id', UserMapper::class, 'id', null, null, 'student', 'student');
@@ -185,12 +188,14 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('student', 's')},
                 {$this->getJoinColumnString('severity', 'sv')},
 				{$this->getJoinColumnString('owner', 'o')},
-				{$this->getJoinColumnString('type', 't')}
+				{$this->getJoinColumnString('type', 't')},
+				{$this->getJoinColumnString('category', 'c')}
             FROM {$this->getTable()} `r`
             LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
             LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
             LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
+            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
             WHERE s.id = ?
             AND r.deleted_at IS NULL
             ORDER BY r.created_at DESC
@@ -245,12 +250,14 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('student', 's')},
                 {$this->getJoinColumnString('severity', 'sv')},
 				{$this->getJoinColumnString('owner', 'o')},
-				{$this->getJoinColumnString('type', 't')}
+				{$this->getJoinColumnString('type', 't')},
+				{$this->getJoinColumnString('category', 'c')}
             FROM {$this->getTable()} `r`
             LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
             LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
             LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
+            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
             WHERE r.id = ?
             AND r.deleted_at IS NULL
         ";
@@ -380,12 +387,14 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('student', 's')},
                 {$this->getJoinColumnString('severity', 'sv')},
 				{$this->getJoinColumnString('owner', 'o')},
-				{$this->getJoinColumnString('type', 't')}
+				{$this->getJoinColumnString('type', 't')},
+				{$this->getJoinColumnString('category', 'c')}
             FROM {$this->getTable()} `r`
             LEFT JOIN {$this->getJoinSql('student', 'r', 's')}
             LEFT JOIN {$this->getJoinSql('severity', 'r', 'sv')}
             LEFT JOIN {$this->getJoinSql('owner', 'r', 'o')}
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
+            LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
             {$criteria_sql}
             ORDER BY
               `s`.lastname,
@@ -632,11 +641,14 @@ class Mapper extends BaseMapper
         $severity = $this->hydrateJoin($row, 'severity', 'sv');
         /** @var PastoralTypeModel $type */
         $type = $this->hydrateJoin($row, 'type', 't');
+        /** @var PastoralCategoryModel $category */
+        $category = $this->hydrateJoin($row, 'category', 'c');
 
         $record->setStudent($student);
         $record->setOwner($owner);
         $record->setSeverity($severity);
         $record->setType($type);
+        $record->setCategory($category);
 
         // Don't know if this is right for the one-to-many joins, but it works
 

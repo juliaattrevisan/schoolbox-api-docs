@@ -31,19 +31,20 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/report-builder'    => 'getReportBuilder',
-                '/report'            => 'getReport',
-                '/report-print'      => 'getReportPrint',
-                '/insert/{id}'       => 'getInsert',
-                '/update/{id}'       => 'getUpdate',
-                '/{studentId}/{id}'  => 'getRecord',
-                '/{id}'              => 'getIndex',
+                '/report-builder'       => 'getReportBuilder',
+                '/report'               => 'getReport',
+                '/report-print'         => 'getReportPrint',
+                '/categories/{typeId}'  => 'getCategories',
+                '/insert/{id}'          => 'getInsert',
+                '/update/{id}'          => 'getUpdate',
+                '/{studentId}/{id}'     => 'getRecord',
+                '/{id}'                 => 'getIndex',
             ],
             'POST' => [
-                '/save'              => 'postSave',
-                '/comment'           => 'postComment',
-                '/comment-delete'    => 'postCommentDelete',
-                '/delete'            => 'postDelete',
+                '/save'                 => 'postSave',
+                '/comment'              => 'postComment',
+                '/comment-delete'       => 'postCommentDelete',
+                '/delete'               => 'postDelete',
             ]
         ];
 
