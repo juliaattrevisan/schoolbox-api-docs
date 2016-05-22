@@ -132,9 +132,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 		} catch (MapperException $e) {
 			// Failed to find them, use the original effector
 		}
-
-		$author = $user->formatName();
-
+		
 		$icon = sprintf("/portrait.php?userId=%s&size={$this->iconSize}", $user->getExternalId());
 
 		$articleId = $news->getId();
@@ -160,7 +158,7 @@ class NewsNotifier extends AbstractModuleNotifier implements SourceInterface {
 			->addFilter('roletype', $roleType)
 			->setMeta([
 				'title'  => $heading,
-				'author' => $author,
+				'author' => $authorName,
 				'date'   => $news->getPostDate()->getLong()
 			])
 			->setByline("$shortDate by $authorName in $catName")
