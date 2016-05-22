@@ -1,0 +1,1 @@
+INSERT INTO config (name, value, title, description, field_id, options, type_id, editable, hidden, required) VALUES ('googledrive_export_pdf', '1', 'Google Drive Always Convert To PDF', 'If enabled, down Google Docs,Slides and Sheets as PDF rather than Microsoft equivalents', 3, null, 10, 'true', 'false', 'false');
