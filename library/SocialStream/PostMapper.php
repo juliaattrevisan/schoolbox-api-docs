@@ -148,6 +148,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      */
     public function findById($identifier)
     {
+        /** @var Schoolbox\UserMapper $user_mapper */
         $user_mapper = $this->getJoinMapper('user');
 
         $query = "
@@ -218,6 +219,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      */
     public function findLatestForHomepage($homepageId, $start, $offset)
     {
+        /** @var Schoolbox\UserMapper $user_mapper */
         $user_mapper = $this->getJoinMapper('user');
 
         $query = "
@@ -278,6 +280,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      */
     public function findLatestForHomepageSlow($homepageId, $end, $offset)
     {
+        /** @var Schoolbox\UserMapper $user_mapper */
         $user_mapper = $this->getJoinMapper('user');
 
         $query = "
@@ -323,10 +326,11 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      * to which comments and replies belong.
      *
      * @param $ids
-     * @return \Collection
+     * @return Collection
      */
     public function findHierarchy($ids)
     {
+        /** @var Schoolbox\UserMapper $user_mapper */
         $user_mapper = $this->getJoinMapper('user');
 
         $query = "
@@ -366,7 +370,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      * @param array $row
      * @return SocialStream_Post_Abstract
      */
-    public function createModel($row)
+    public function createModel($row = null)
     {
         // default
         $type = 'string';
@@ -385,12 +389,12 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
 
 
     /**
-     * @param Array    $row
-     * @param String   $alias
+     * @param array    $row
+     * @param string   $alias
      * @param callable $callback
      * @return SocialStream_Post_Abstract
      */
-    public function hydrate($row, $alias = '', $callback = null)
+    public function hydrate(array $row, $alias = '', $callback = null)
     {
         $model = $this->createModel($row);
 
@@ -403,7 +407,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
             }
 
             $columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
-            $this->setModelProperty($model, $propertyName, $columnValue, $map);
+            $this->setModelProperty($model, $propertyName, $columnValue);
         }
 
         if (!empty($callback) && is_callable($callback)) {

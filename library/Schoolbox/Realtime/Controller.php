@@ -20,6 +20,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\RerouteOverride;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Resource\Folder;
@@ -231,7 +232,7 @@ class Controller extends BaseController
         $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
         foreach ($muted as $k => $id) {
             $muted[$k] = $this->getRerouteOverrideMapper()
-                ->getMatchingRoutes("service.$service", 0, $id)
+                ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
                 ->map(
                     function ($override) use ($routeKeyRegex) {
                         /** @var RerouteOverride $override */

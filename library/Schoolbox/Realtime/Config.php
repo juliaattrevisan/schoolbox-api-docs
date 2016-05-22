@@ -312,29 +312,33 @@ class Config
 
     /**
      * @param User  $user
-     * @param array $allFollow
+     * @param array $follow
      * @return array
      */
-    public function persistFollow(User $user, $allFollow)
+    public function persistFollow(User $user, $follow)
     {
-        $follow = [];
-        $unfollow = [];
+        $involvements = $user->getAccessList()->getColumnValues('serviceIdentifier');
 
-        foreach ($allFollow as $key => $value) {
-            if ($value) {
-                $follow[] = $key;
-            } else {
-                $unfollow[] = $key;
+        // mute anything explicitly passed as 'off' which ALSO appears in the involvement list
+        $unfollow = [];
+        foreach ($follow as $k => $v) {
+            if (in_array($k, $involvements) && $v == 0) {
+                $unfollow[] = $k;
             }
         }
 
+        asort($unfollow);
+        asort($involvements);
+
+        // anything not explicitly muted is turned on
+        $follow = array_diff($involvements, $unfollow);
         asort($follow);
 
         // delete any overrides for homepages the user is RE-following
         RerouteOverrideMapper::getInstance()->deleteByColumnList(array(
             'user_id'        => $user->getId(),
             'msg_route_key'  => array_map([ $this, 'castToRoutingKey' ], $follow),
-            'outgoing_level' => 0
+            'delivery'       => RoutePermission::MUTE
         ));
 
         // insert new entries for homepages the user is UN-following
@@ -346,7 +350,7 @@ class Config
 
             $override->setUser($user);
             $override->setRouteKey($this->castToRoutingKey($id));
-            $override->setDelivery([ 'MU' ]);
+            $override->setDelivery([ RoutePermission::MUTE ]);
 
             $overrides->add($override);
         }

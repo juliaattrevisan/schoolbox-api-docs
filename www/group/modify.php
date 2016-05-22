@@ -4,6 +4,7 @@
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+use Schoolbox\Realtime\Message\RoutePermission;
 
 $this->setFile(TEMPLATE_content, 'group/modify.html');
 $this->setBlock(TEMPLATE_content, 'groupOwner', 'groupOwner_block');
@@ -68,7 +69,7 @@ if (is_numeric($this->arg[0])) {
     $search = array(
         'user_id'        => 0,
         'msg_route_key'  => "service.1.{$category->getId()}",
-        'outgoing_level' => 0
+        'delivery'       => RoutePermission::MUTE
     );
 
     /* Group Messaging
@@ -156,7 +157,7 @@ if (is_numeric($this->arg[0])) {
             $search = array(
                 'user_id'        => array(0, $member['uid']),
                 'msg_route_key'  => "service.1.{$category->getId()}",
-                'outgoing_level' => 0
+                'delivery'       => RoutePermission::MUTE
             );
 
             $following = !RerouteOverrideMapper::getInstance()->isRouteMuted(

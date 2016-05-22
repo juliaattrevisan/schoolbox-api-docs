@@ -1068,8 +1068,13 @@ abstract class Mapper implements IMapper, Serializable
             return 0;
         }
 
-        // Build WHERE part
-        $predicate->addColumnList($columnList);
+        try {
+            // Build WHERE part
+            $predicate->addColumnList($columnList);
+        } catch (UnderflowException $e) {
+            // this means an empty IN was provided, so no records can be matched: bail out
+            return 0;
+        }
 
         // build query
         $query = $deleteString . ' WHERE ' . implode(' AND ', $predicate->getWhere());
