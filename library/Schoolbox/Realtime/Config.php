@@ -23,6 +23,7 @@ use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use UnderflowException;
 
 class Config 
 {
