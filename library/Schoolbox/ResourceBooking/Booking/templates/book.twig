@@ -11,10 +11,16 @@ $(function() {
     var momentFormat = dateDisplayFormats.momentJs;
     $.fn.alaressEditor();
 
+    $('#repeat_until').datepicker({
+        constrainInput: false,
+        minDate: moment($('#start_datetime_date').val(),momentFormat).toDate()
+    })
+
     // Datepickers
     $('input[data-datepicker]').datepicker({
         constrainInput:false,
         minDate: 0
+
 //        onClose:function (string) {
 //            var input = $j(this);
 //            $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
@@ -22,8 +28,16 @@ $(function() {
 //            })
 //        }
     })
+
     $('input[name="start_datetime[date]"]').syncDates({
         endDate: $('input[name="end_datetime[date]"]')
+    })
+
+    $('input[name="start_datetime[date]"]').change(function () {
+        $('#repeat_until').datepicker('option', {
+            minDate: moment($('#start_datetime_date').val(), momentFormat).toDate()
+        })
+
     })
 
     // Timetable selector
@@ -126,6 +140,19 @@ $(function() {
         getValidatorRemoteMethod('too_long', 'end_datetime'),
         'This item may not be booked for more than ' + {{ include('sub/interval.twig', {interval: item.resource.maxReservationTime})|json_encode|raw }} + '.'
     )
+
+    // Repeat-Until must be after StartDate
+    $.validator.addMethod(
+            'afterStart',
+            function(value,element){
+                var startDate       = moment($('#start_datetime_date').val(),momentFormat);
+                var repeatUntilDate = moment(value,momentFormat);
+
+                return '' == value || startDate.valueOf() < repeatUntilDate.valueOf();
+            },
+            'Repeat-Until date must be after start date'
+    )
+
 
     // Set up errors, dialog boxes, form
     var errors = {}
@@ -258,6 +285,9 @@ $(function() {
             'end_datetime[meridien]': {
                 required: true,
                 pattern:  /^(?:am|pm)$/i
+            },
+            'repeat_until': {
+                'afterStart': true
             }
         },
         submitHandler: function() {
@@ -291,7 +321,10 @@ $(function() {
             'start_datetime[minute]':   "Please enter a valid minute value.",
             'end_datetime[minute]':     "Please enter a valid minute value.",
             'start_datetime[meridien]': "Please select AM or PM.",
-            'end_datetime[meridien]':   "Please select AM or PM."
+            'end_datetime[meridien]':   "Please select AM or PM.",
+            'repeat_until': {
+                'afterStart': "Repeat-until date must be after start date"
+            }
         }
     })
 
@@ -442,7 +475,7 @@ $(function() {
                         <label id="repeatUntil"l>
                             Repeat Until
                             <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
-                            <input data-datepicker name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/>
+                            <input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/>
                         </label>
                     </div>
                 </fieldset>
