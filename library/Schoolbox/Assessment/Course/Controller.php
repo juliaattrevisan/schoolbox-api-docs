@@ -230,12 +230,15 @@ class Controller extends Base\Base
                 // As such, we now search for folders rather than explicitly courses, but said course:
                 //   - must live in the faculty root; and
                 //   - must not have any course descendants itself
-                $folder = $this->getFolderMapper()->findById($id);
+                try {
+                    $folder = $this->getFolderMapper()->findById($id);
+                } catch (MapperException $e) {
+                    throw $this->getErrorMapper()->generateException(13);
+                }
 
                 // check ancestry
                 if (!$this->getCourseMapper()->mayBeConvertedToCourse($folder)) {
-                    $this->sendError('Folder chosen may not be converted to a course');
-                    return;
+                    throw $this->getErrorMapper()->generateException(172);
                 }
             }
 
