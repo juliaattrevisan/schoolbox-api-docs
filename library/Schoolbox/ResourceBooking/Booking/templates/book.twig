@@ -11,10 +11,16 @@ $(function() {
     var momentFormat = dateDisplayFormats.momentJs;
     $.fn.alaressEditor();
 
+    $('#repeat_until').datepicker({
+        constrainInput: false,
+        minDate: moment($('#start_datetime_date').val(),momentFormat).toDate()
+    })
+
     // Datepickers
     $('input[data-datepicker]').datepicker({
         constrainInput:false,
         minDate: 0
+
 //        onClose:function (string) {
 //            var input = $j(this);
 //            $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
@@ -22,8 +28,16 @@ $(function() {
 //            })
 //        }
     })
+
     $('input[name="start_datetime[date]"]').syncDates({
         endDate: $('input[name="end_datetime[date]"]')
+    })
+
+    $('input[name="start_datetime[date]"]').change(function () {
+        $('#repeat_until').datepicker('option', {
+            minDate: moment($('#start_datetime_date').val(), momentFormat).toDate()
+        })
+
     })
 
     // Timetable selector
@@ -461,7 +475,7 @@ $(function() {
                         <label id="repeatUntil"l>
                             Repeat Until
                             <span class='hint has-tip tip-top' data-tooltip title="The date at which recurrence should cease.">?</span>
-                            <input data-datepicker name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/>
+                            <input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/>
                         </label>
                     </div>
                 </fieldset>
