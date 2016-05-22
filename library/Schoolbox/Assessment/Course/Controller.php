@@ -220,15 +220,26 @@ class Controller extends Base\Base
 
         if ($id) {
 
-            // this is the one exception to the rule: you may modify a FOLDER to convert it into a course by adding units.
-            // as such, this searches for folders rather than explicitly courses, but said course:
-            //   - must live in the faculty root; and
-            //   - must not have any course descendants itself
-            $folder = $this->getFolderMapper()->findById($id);
+            try {
+                // First, check whether or not this is already a course. We don't want to barr access to courses that
+                // are already courses.
+                $folder = $this->getCourseMapper()->findById($id);
 
-            // check ancestry
-            if (!$this->getCourseMapper()->mayBeConvertedToCourse($folder)) {
-                $this->sendError('Folder chosen may not be converted to a course');
+            } catch (MapperException $e) {
+                // It was not a course: you may modify a FOLDER to convert it into a course by adding units.
+                // As such, we now search for folders rather than explicitly courses, but said course:
+                //   - must live in the faculty root; and
+                //   - must not have any course descendants itself
+                try {
+                    $folder = $this->getFolderMapper()->findById($id);
+                } catch (MapperException $e) {
+                    throw $this->getErrorMapper()->generateException(13);
+                }
+
+                // check ancestry
+                if (!$this->getCourseMapper()->mayBeConvertedToCourse($folder)) {
+                    throw $this->getErrorMapper()->generateException(172);
+                }
             }
 
             $folder->setParent($this->getFolderMapper()->findById($folder->getParent()->getId()));

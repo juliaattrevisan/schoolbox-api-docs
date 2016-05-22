@@ -18,7 +18,7 @@ use Aura\Router\Route;
 use ReflectionMethod;
 use RuntimeException;
 use Zend\Uri\Uri;
-use Schoolbox\Application\Exception as SchoolboxException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 
 class Kernel extends \Alaress\Application\Kernel
