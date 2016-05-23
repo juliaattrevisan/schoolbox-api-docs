@@ -71,7 +71,12 @@
                  */
                 messages: {
                     question: "Please enter a question.",
-                    answer: "Please fill out an answer."
+                    answer: {
+                        required: "Please fill out an answer.",
+                        minlength: "Please fill out an answer.",
+                        emptyAnswer: "Please fill out an answer."
+                    }
+
                 },
 
                 errorPlacement: function(error, element) {
