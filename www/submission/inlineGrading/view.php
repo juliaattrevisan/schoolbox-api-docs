@@ -74,6 +74,7 @@ $stack = array();
 
 $this->setFile(TEMPLATE_content, 'submission/inlineGrading/view.html');
 $this->setBlock(TEMPLATE_content, 'download_annotated', 'download_annotated_block');
+$this->setBlock(TEMPLATE_content, 'submit_student', 'submit_student_block');
 $this->setBlock(TEMPLATE_content, 'submit_button', 'submit_button_block');
 $this->setVar('download_annotated_block', '');
 
@@ -131,6 +132,13 @@ foreach ($dueWorkDetail->getSitepageData() as $studentId => $studentData) {
             $this->setVar('marked_submitted_block', '');
         } else {
             $this->parse('marked_submitted_block', 'marked_submitted');
+        }
+
+        if($submissionBox->getAcceptOnline()) {
+            $this->parse('submit_student_block', 'submit_student');
+        }
+        else {
+            $this->setVar('submit_student_block', '');
         }
 
         $this->setBlock('studentNavTpl', 'show_status', 'show_status_block');
