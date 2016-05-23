@@ -9,6 +9,54 @@
 	$(function() {
 		var exportForm = $('#calendar-export-form-container');
 
+        var mapping = [];
+        mapping['sources'] = 'source';
+        mapping['campus'] = 'campus';
+        mapping['groups'] = 'group';
+        mapping['events'] = 'events';
+
+        var mappingAll = [];
+        mappingAll['sources'] = 'sourceSelectAll';
+        mappingAll['campus'] = 'campusSelectAll';
+        mappingAll['groups'] = 'groupsSelectAll';
+        mappingAll['events'] = 'eventTypeSelectAll';
+
+        function updateFilters() {
+            var index = 0;
+            var fList = [];
+
+            $('.checklist').each(function() {
+
+                var count = 0;
+
+                var className = $(this)[0].className;
+                var sourceName = className.split(" ")[1];
+
+                fList[index] = [sourceName, {}];
+                fList[index][1] = [];
+
+                var selectAll = $('#' + mappingAll[sourceName])[0];
+
+                if (selectAll.checked)
+                    fList[index][1][count++] = selectAll.value;
+
+                $('[name="' + mapping[sourceName] + '"]:checked').each(function() {
+                    fList[index][1][count++] = $(this).val();
+                });
+
+                index++;
+            });
+
+            $.post('/calendar/ajax/filter', {
+                view: 'list',
+                fList: fList
+            });
+        }
+
+        $('[data-update-filter]').change(function() {
+            updateFilters();
+        });
+
 		$('[data-filters="true"]').filterSelector({
 			filterContainer: '#calendar-controls',
 			eventContainer: $('[data-eventlist="true"]'),
@@ -74,6 +122,7 @@
         //select all clicked
         $('#calendar-controls').on('change','.select_all', function(e) {
             $(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
+            updateFilters();
         });
 
         /* Export calendar
@@ -164,10 +213,10 @@
                 <div class="small-6 large-3 columns">
                     <fieldset class="checklist sources">
                         <legend>Sources</legend>
-                        <input type="checkbox" class="select_all" id="sourceSelectAll"/>
+                        <input type="checkbox" class="select_all" id="sourceSelectAll" />
                         <label for="sourceSelectAll">Select all</label>
                         <!-- BEGIN filter_source -->
-                        <input type="checkbox" name="source" id="source{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="applyFilters"/>
+                        <input data-update-filter type="checkbox" name="source" id="source{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="applyFilters"/>
                         <label for="source{SOURCE_ID}">{SOURCE_NAME}</label>
                         <!-- END filter_source -->
                     </fieldset>
@@ -175,10 +224,10 @@
                 <div class="small-6 large-3 columns">
                     <fieldset class="checklist groups">
                         <legend>Groups</legend>
-                        <input type="checkbox" class="select_all" id="groupsSelectAll" checked />
+                        <input type="checkbox" class="select_all" id="groupsSelectAll" />
                         <label for="groupsSelectAll">Select all</label>
                         <!-- BEGIN filter_group -->
-                        <input type="checkbox" name="group" id="group{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="applyFilters"/>
+                        <input data-update-filter type="checkbox" name="group" id="group{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="applyFilters"/>
                         <label for="group{GROUP_ID}">{GROUP_NAME}</label>
                         <!-- END filter_group -->
                     </fieldset>
@@ -186,10 +235,10 @@
                 <div class="small-6 large-3 columns">
                     <fieldset class="checklist campus">
                         <legend>Campus</legend>
-                        <input type="checkbox" class="select_all"  id="campusSelectAll" checked />
+                        <input type="checkbox" class="select_all"  id="campusSelectAll" />
                         <label for="campusSelectAll">Select all</label>
                         <!-- BEGIN filter_campus -->
-                        <input type="checkbox" name="campus" id="campus{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="applyFilters"/>
+                        <input data-update-filter type="checkbox" name="campus" id="campus{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="applyFilters"/>
                         <label for="campus{CAMPUS_ID}">{CAMPUS_NAME}</label>
                         <!-- END filter_campus -->
                     </fieldset>
@@ -197,10 +246,10 @@
                 <div class="small-6 large-3 columns">
                     <fieldset class="checklist events">
                         <legend>Event</legend>
-                        <input type="checkbox" id="eventTypeSelectAll" class="select_all" checked />
+                        <input type="checkbox" id="eventTypeSelectAll" class="select_all" />
                         <label for="eventTypeSelectAll">Select all</label>
                         <!-- BEGIN filter_event_type -->
-                        <input type="checkbox" name="events" id="eventType{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="applyFilters"/>
+                        <input data-update-filter type="checkbox" name="events" id="eventType{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="applyFilters"/>
                         <label for="eventType{EVENT_TYPE_ID}"><span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span></label>
                         <!-- END filter_event_type -->
                     </fieldset>
@@ -208,7 +257,7 @@
             </fieldset>
         </section>
     </form>
-    <a href="#" id="applyFilters" class="button icon-tick">Apply Filters</a>
+    <a href="#" data-update-filter id="applyFilters" class="button icon-tick">Apply Filters</a>
     <!--/filter-drop-->
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
