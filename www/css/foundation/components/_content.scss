@@ -1369,15 +1369,6 @@ ul.flex-list {
         }
     }
 
-    &.info {
-        ~ article{
-            margin-left: (rem-calc($base-font-size));
-        }
-        ~ .progress {
-            margin-bottom: 0;
-        }
-    }
-
     &.wrap-down {
         h3, p, .meta {
             overflow-x: visible;
