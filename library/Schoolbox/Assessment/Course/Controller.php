@@ -1823,14 +1823,22 @@ class Controller extends Base\Base
     }
 
     /**
-     * Delete unit. This will delete the underlying folder and all its content.
+     * Delete unit INSTANCE. This will delete the instance and all its content.
      *
      * @api   POST /course/unit/delete
      * @level 160
      */
     public function deleteUnit()
     {
-        $this->getCourseMapper()->deleteUnit($this->getRequest()->post["id"]);
+        $unitInstanceMapper = UnitInstanceMapper::getInstance();
+
+        try {
+            // Locate the unit instance we want to delete
+            $unit = $unitInstanceMapper->findById($this->getRequest()->post["id"]);
+            $unitInstanceMapper->delete($unit);
+        } catch (\Exception $e) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_RESOURCE_NOT_FOUND);
+        }
 
         $this->getResponse()->content->set([
             'format' => 'json',
