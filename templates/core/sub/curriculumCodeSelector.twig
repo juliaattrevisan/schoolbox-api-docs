@@ -12,6 +12,12 @@
 
 <select id="curriculum-codes" name="curriculumCodes[]" multiple></select>
 
+{# Synchronous: Empty code so that when no code is selected something is actually sent to form.
+ # This distinguishes between all codes being cleared and this input not existing at all.
+ # Async: This field MUST be placed after non-empty value.
+ #}
+<input type="hidden" name="curriculumCodes[]" value="" />
+
 {# Not yet implemented - resource browser like search #}
 {#
 <a href="#"
