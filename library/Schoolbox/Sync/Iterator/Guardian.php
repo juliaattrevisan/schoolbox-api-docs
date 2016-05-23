@@ -19,41 +19,22 @@ use Schoolbox\External\Normalise\User;
 
 class Guardian extends IteratorIterator
 {
-    /**
-     * @var int
-     */
-    protected $rowNum = 0;
+    use StackableTrait;
 
     /**
-     * @var array|Guardian[]
+     * @return string
      */
-    protected $stack = [];
-
-    /**
-     * Loads separate parent records from the iterator, and loads them into
-     * the stack for this item.
-     */
-    protected function buildStack()
+    protected function getIdField()
     {
-        $id       = null;
-        $preStack = [];
-        while (parent::valid() && $row = parent::current()) {
-            $thisId = $row['student_contact_id'];
-            if (!isset($id)) {
-                $id = $thisId;
-            }
+        return 'student_contact_id';
+    }
 
-            // Is this the next parent? step back to previous and break
-            if ($thisId != $id) {
-                break;
-            }
-            $preStack[] = $row;
-            parent::next();
-        }
-        if (empty($preStack)) {
-            $this->stack = [];
-            return;
-        }
+    /**
+     * @param  array $preStack
+     * @return User\Guardian
+     */
+    protected function buildFromStack($preStack)
+    {
 
         // Forge a single parent out of the disparate parts of the prestack
         // Only the following fields will vary:
@@ -71,11 +52,43 @@ class Guardian extends IteratorIterator
             ->setGender($currentResult['student_gender'])
         ;
 
-        /* Email
+        /* Email - one for every item in stack
          */
-        $email = new User\Common\Email();
-        $email->setAddress($currentResult['student_contact_default_email']);
-        $guardian->addEmail($email);
+        $email = [];
+        foreach ($preStack as $result) {
+            $email = array_merge(
+                $email,
+                preg_split('/[,;]/', $result['student_contact_default_email'])
+            );
+        }
+        foreach (array_unique($email) as $key => $anEmail) {
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
+
+            /** @var User\Common\Email $currentEmail */
+            if (strlen($currentEmail->getAddress())) {
+                $guardian->addEmail($currentEmail);
+            }
+        }
+
+        /* Work Email - one for every item in stack
+         */
+        $workEmail = [];
+        foreach ($preStack as $result) {
+            $workEmail = array_merge(
+                $workEmail,
+                preg_split('/[,;]/', $result['student_contact_work_email'])
+            );
+        }
+        foreach (array_unique($workEmail) as $key => $anEmail) {
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
+
+            /** @var User\Common\Email $currentEmail */
+            if (strlen($currentEmail->getAddress())) {
+                $guardian->addWorkEmail($currentEmail);
+            }
+        }
 
         /* Account
          */
@@ -107,50 +120,6 @@ class Guardian extends IteratorIterator
             $student->getCampus()->add($campus);
             $guardian->addStudent($student);
         }
-        $this->stack[] = $guardian;
-    }
-
-    /**
-     * Checks if the iterator is valid
-     *
-     * @return bool
-     */
-    public function valid()
-    {
-        if (!empty($this->stack)) {
-            return true;
-        }
-        $this->buildStack();
-        return !empty($this->stack);
-    }
-
-    /**
-     * Return the current element
-     *
-     * @return User\Guardian
-     */
-    public function current()
-    {
-        // Stack is managed by valid()
-        return $this->stack[0];
-    }
-
-    /**
-     * Move forward to next element
-     */
-    public function next()
-    {
-        array_shift($this->stack);
-        $this->rowNum++;
-    }
-
-    /**
-     * Get the key of the current element
-     *
-     * @return int
-     */
-    public function key()
-    {
-        return $this->rowNum;
+        return $guardian;
     }
 }

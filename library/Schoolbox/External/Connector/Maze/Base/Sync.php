@@ -41,7 +41,7 @@ class Sync implements SyncInterface
                 FIRST_NAME AS student_given_name,
                 FIRST_NAME AS student_preferred,
                 SURNAME    AS student_surname,
-                NULL       AS student_occup_email,
+                NULL       AS student_work_email,
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
                            AS student_year_level,
                 HOUSE      AS student_house,
@@ -118,7 +118,7 @@ class Sync implements SyncInterface
                 FIRST_NAME AS staff_preferred_name,
                 SURNAME    AS staff_surname,
                 NULL       AS default_email_code,
-                NULL       AS occup_email,
+                NULL       AS work_email,
                 SF_EMAIL   AS email,
                 CAMPUS     AS staff_campus,
                 NULL       AS staff_category_type,

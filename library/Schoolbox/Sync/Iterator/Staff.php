@@ -15,16 +15,25 @@ use Schoolbox\External\Normalise\User;
 
 class Staff extends IteratorIterator
 {
+    use StackableTrait;
+
     /**
-     * Return the current element
-     *
+     * @return string
+     */
+    protected function getIdField()
+    {
+        return 'staff_id';
+    }
+
+    /**
+     * @param  array $preStack
      * @return User\Staff
      */
-    public function current()
+    public function buildFromStack($preStack)
     {
         // Build a normalized object out of the current item
         // (copypasted from Adapter->getStaffUserAccountInfo)
-        $currentResult = parent::current();
+        $currentResult = current($preStack);
         $staff         = new User\Staff();
         $staff
             ->setId($currentResult['staff_id'])
@@ -52,22 +61,41 @@ class Staff extends IteratorIterator
             ->setActive($currentResult['active_flag'])
         ;
 
-        /* Email
+        /* Email - one for every item in stack
          */
-        $email1 = new User\Common\Email();
-        $email1
-            ->setAddress($currentResult['email'])
-        ;
+        $email = [];
+        foreach ($preStack as $result) {
+            $email = array_merge(
+                $email,
+                preg_split('/[,;]/', $result['email'])
+            );
+        }
+        foreach (array_unique($email) as $key => $anEmail) {
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
 
-        $email2 = new User\Common\Email();
-        $email2
-            ->setAddress($currentResult['occup_email'])
-        ;
-
-        foreach (array($email1, $email2) as $currentEmail) {
             /** @var User\Common\Email $currentEmail */
             if (strlen($currentEmail->getAddress())) {
                 $staff->addEmail($currentEmail);
+            }
+	}
+
+        /* Work Email - one for every item in stack
+         */
+        $workEmail = [];
+        foreach ($preStack as $result) {
+            $workEmail = array_merge(
+                $workEmail,
+                preg_split('/[,;]/', $result['work_email'])
+            );
+        }
+        foreach (array_unique($workEmail) as $key => $anEmail) {
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
+
+            /** @var User\Common\Email $currentEmail */
+            if (strlen($currentEmail->getAddress())) {
+                $staff->addWorkEmail($currentEmail);
             }
         }
 

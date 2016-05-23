@@ -38,6 +38,7 @@ class FieldFactory
             'publiclyVisible'        => 'Visibility',
             'gender'                 => 'Gender',
             'email[].address'        => 'Email Address(es)',
+            'workEmail[].address'    => 'Work Email Address(es)',
 
             'phoneHome.number'       => 'Home Phone Number',
             'phoneHome.silent'       => 'Home Phone Silent Status',

@@ -58,7 +58,7 @@ class Sync implements SyncInterface
                 vStudents.StudentSurname       AS student_surname,
                 StudentGender                  AS student_gender,
                 StudentEmail                   AS student_email,
-                StudentOccupEmail              AS student_occup_email,
+                StudentOccupEmail              AS student_work_email,
                 vStudents.StudentYearLevel     AS student_year_level,
                 vStudents.StudentHouse         AS student_house,
                 vStudents.StudentBoarder       AS student_boarder,
@@ -88,6 +88,7 @@ class Sync implements SyncInterface
                 s.StudentContactPreferred    AS student_contact_preferred,
                 s.StudentContactSurname      AS student_contact_surname,
                 s.StudentContactDefaultEmail AS student_contact_default_email,
+                s.StudentContactOccupEmail   AS student_contact_work_email,
                 s.StudentId                  AS student_id,
                 s.StudentYearLevel           AS student_year_level,
                 s.StudentCampus              AS student_campus,
@@ -110,6 +111,7 @@ class Sync implements SyncInterface
                 s.StudentContactSpousePreferred    AS student_contact_preferred,
                 s.StudentContactSpouseSurname      AS student_contact_surname,
                 s.StudentContactSpouseDefaultEmail AS student_contact_default_email,
+                s.StudentContactSpouseOccupEmail   AS student_contact_work_email,
                 s.StudentId                        AS student_id,
                 s.StudentYearLevel                 AS student_year_level,
                 s.StudentCampus                    AS student_campus,
@@ -134,21 +136,21 @@ class Sync implements SyncInterface
     {
         $query = "
             SELECT
-                vStaff.StaffID            AS staff_id,
-                NetworkLogin              AS network_login,
-                ActiveFlag                AS active_flag,
-                vStaff.StaffTitle         AS staff_title,
-                vStaff.StaffGiven1        AS staff_given_name,
-                vStaff.StaffPreferredName AS staff_preferred_name,
-                vStaff.StaffSurname       AS staff_surname,
-                DefaultEmailCode          AS default_email_code,
-                OccupEmail                AS occup_email,
-                Email                     AS email,
-                vStaff.StaffCampus        AS staff_campus,
-                StaffCategoryType         AS staff_category_type,
-                StaffCategory             AS staff_category,
+                vStaff.StaffID                    AS staff_id,
+                Community.NetworkLogin            AS network_login,
+                ActiveFlag                        AS active_flag,
+                vStaff.StaffTitle                 AS staff_title,
+                vStaff.StaffGiven1                AS staff_given_name,
+                vStaff.StaffPreferredName         AS staff_preferred_name,
+                vStaff.StaffSurname               AS staff_surname,
+                Community.DefaultEmailCode        AS default_email_code,
+                vCommunity.OccupEmail             AS work_email,
+                vCommunity.DefaultEmail           AS email,
+                vStaff.StaffCampus                AS staff_campus,
+                vStaff.StaffCategoryType          AS staff_category_type,
+                vStaff.StaffCategory              AS staff_category,
                 JobPositions.StaffJobPositionCode AS staff_position,
-                vStaff.StaffDepartment    AS staff_department
+                vStaff.StaffDepartment            AS staff_department
             FROM SynergyOne.dbo.vStaff vStaff
             LEFT JOIN SynergyOne.dbo.Community ON Community.ID = vStaff.StaffID
             LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
@@ -156,6 +158,7 @@ class Sync implements SyncInterface
                 OR    JobPositions.StaffJobPositionStartDate IS NULL )
                 AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
                 OR    JobPositions.StaffJobPositionEndDate IS NULL )
+            LEFT JOIN SynergyOne.dbo.vCommunityAddresses vCommunity ON vStaff.StaffID = vCommunity.ID
             WHERE ActiveFlag = 1 AND vStaff.StaffRegistrationType != 'STDNT'
             ORDER BY vStaff.StaffID ASC
         ";

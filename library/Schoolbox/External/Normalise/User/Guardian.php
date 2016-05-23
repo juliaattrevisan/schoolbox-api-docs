@@ -64,6 +64,7 @@ class Guardian extends Base {
         $this->setPostalAddress(new Address());
         $this->setHomeAddress(new Address());
         $this->setEmail(new Collection());
+        $this->setWorkEmail(new Collection());
         $this->setPhoneHome(new Phone());
         $this->setPhoneMobile(new Phone());
         $this->setPhoneWork(new Phone());

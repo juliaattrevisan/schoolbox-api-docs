@@ -43,7 +43,7 @@ class Sync implements SyncInterface
                 s.LastName    AS student_surname,
                 s.Sex         AS student_gender,
                 s.Email       AS student_email,
-                ''            AS student_occup_email,
+                ''            AS student_work_email,
                 s.Year        AS student_year_level,
                 s.House       AS student_house,
                 ''            AS student_boarder,
@@ -104,7 +104,8 @@ class Sync implements SyncInterface
                 t.FirstName AS staff_preferred_name,
                 t.LastName  AS staff_surname,
                 ''          AS default_email_code,
-                t.Email     AS occup_email,
+                t.Email     AS email,
+                ''          AS work_email,
                 t.CampusID  AS staff_campus,
                 CASE WHEN t.IsTeachingStaff = 'Y'
                     THEN 'Teaching'
