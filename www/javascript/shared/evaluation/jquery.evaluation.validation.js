@@ -79,4 +79,17 @@
             return !isNaN(value);
         }, "Amount must be a number");
     }
+
+    /**
+     * Ensures a Cloze Question's Answer contains at least one gap to be filled
+     *
+     * @param config
+     */
+    $.fn.addCustomRules_containsClozeField = function(config) {
+        $.validator.addMethod("hasClozeField", function(value, element, param) {
+            var text = $(element).val();
+            return $(text).find('.'+param).length > 0;
+        }, "Answer must contain at least 1 Cloze field");
+    }
+    
 }(jQuery));
