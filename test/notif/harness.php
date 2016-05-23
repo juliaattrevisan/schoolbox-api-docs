@@ -20,6 +20,7 @@ spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 $kernel = new Schoolbox\Application\Daemon\Kernel('Assessment Return Notifications', [
     'verbose' => [ false, false, false ],
     'errors'  => E_ALL,
+    'flags'   => getopt('', ['work', 'quiz'])
 ]);
 
 $kernel->run(function($di, $loop, $log, $opts) {
@@ -29,6 +30,20 @@ $kernel->run(function($di, $loop, $log, $opts) {
      * @var LoggerInterface $log
      * @var array $opts
      */
+
+    $flags = $opts['flags'];
+
+    $doWork = true;
+    $doQuiz = true;
+
+
+    if (!empty($flags)) {
+        $doWork = false;
+        $doQuiz = false;
+    }
+
+    if (isset($flags['work'])) { $doWork = true; }
+    if (isset($flags['quiz'])) { $doQuiz = true; }
 
     // waaaait
     wait($log, 10);
@@ -40,85 +55,100 @@ $kernel->run(function($di, $loop, $log, $opts) {
     $prhodes = UserMapper::getInstance()->findById(74);
     $zsmith  = UserMapper::getInstance()->findById(151);
 
-    // mappers
-    $workMap = Component\SubmissionBoxMapper::getInstance();
-    $workMap->setSessionData(['user' => $zsmith]);
-    $rtnMap  = Component\SubmissionBox\ReturnedWorkMapper::getInstance();
-    $rtnMap->setSessionData(['user' => $zsmith]);
-    $quizMap = Component\OnlineAssessmentMapper::getInstance();
-    $quizMap->setSessionData(['user' => $zsmith]);
-    $attMap  = Component\OnlineAssessment\AttemptMapper::getInstance();
-    $attMap->setSessionData(['user' => $zsmith]);
-
     // connections
     $redis = Alaress\Redis::getClientInstance();
 
-    // "jerry springer show"
-    $work = $workMap->findById(54);
+    if ($doWork) {
+        // mappers
+        $workMap = Component\SubmissionBoxMapper::getInstance();
+        $workMap->setSessionData(['user' => $zsmith]);
+        $rtnMap  = Component\SubmissionBox\ReturnedWorkMapper::getInstance();
+        $rtnMap->setSessionData(['user' => $zsmith]);
 
-    // "lesson 1 - pretest"
-    $quiz = $quizMap->findById(39);
+        // "jerry springer show"
+        $work = $workMap->findById(54);
+        $work->setMarkVisibility(0);
 
-    // "obfuscate!"
-    $work->setMarkVisibility(0);
-    $quiz->setMarkVisibility(0);
+        // save that
+        $log->info("Set Work visibility to 0");
+        $workMap->save($work);
+    }
 
-    // save that
-    $log->info("Set Work visibility to 0");
-    $workMap->save($work);
-    $log->info("Set Quiz visibility to 0");
-    $quizMap->save($quiz);
+    if ($doQuiz) {
+        // mappers
+        $quizMap = Component\OnlineAssessmentMapper::getInstance();
+        $quizMap->setSessionData(['user' => $zsmith]);
+        $attMap  = Component\OnlineAssessment\AttemptMapper::getInstance();
+        $attMap->setSessionData(['user' => $zsmith]);
+
+        // "lesson 1 - pretest"
+        $quiz = $quizMap->findById(39);
+        $quiz->setMarkVisibility(0);
+
+        // save that
+        $log->info("Set Quiz visibility to 0");
+        $quizMap->save($quiz);
+    }
+
 
     //
     // now is the fun part... injecting marks (hint: not fun)
     //
 
-    // work: just save a return
-    $log->info("Save new Work Return record");
-    $rtnMap->save($rtnMap->hydrate([
-        'box_id'    => $work->getId(),
-        'marker'    => $zsmith->getId(),
-        'owner'     => $drhodes->getId(),
-        'comment'   => 'INJECTION',
-        'mark'      => 'INJECTION',
-        'norm_mark' => 85,
-    ]));
+    if ($doWork) {
+        // work: just save a return
+        $log->info("Save new Work Return record");
+        $rtnMap->save($rtnMap->hydrate([
+            'box_id'    => $work->getId(),
+            'marker'    => $zsmith->getId(),
+            'owner'     => $drhodes->getId(),
+            'comment'   => 'INJECTION',
+            'mark'      => 'INJECTION',
+            'norm_mark' => 85,
+        ]));
+    }
 
-    // quiz: first create an attempt without a reviewed_at, then review it
-    $attempt = $attMap->hydrate([
-        'assess_id' => $quiz->getId(),
-        'user_id'   => $drhodes->getId(),
-        'start'     => Alaress_Date_Format::now()->addDays(-1)->getDatabase(),
-        'finish'    => Alaress_Date_Format::now()->addDays(-1)->addHours(1)->getDatabase(),
-    ]);
+    if ($doQuiz) {
+        // quiz: first create an attempt without a reviewed_at, then review it
+        $attempt = $attMap->hydrate([
+            'assess_id' => $quiz->getId(),
+            'user_id'   => $drhodes->getId(),
+            'start'     => Alaress_Date_Format::now()->addDays(-1)->getDatabase(),
+            'finish'    => Alaress_Date_Format::now()->addDays(-1)->addHours(1)->getDatabase(),
+        ]);
 
-    $log->info("Save new Quiz Attempt record");
-    $attMap->save($attempt);
+        $log->info("Save new Quiz Attempt record");
+        $attMap->save($attempt);
 
-    $attempt->setReviewed(Alaress_Date_Format::now());
+        $attempt->setReviewed(Alaress_Date_Format::now());
 
-    $log->info("Update Quiz Attempt record with review date");
-    $attMap->save($attempt);
+        $log->info("Update Quiz Attempt record with review date");
+        $attMap->save($attempt);
+    }
 
     for ($i = 1; $i < 3; ++$i) {
         // sleeeeeeeep...
         wait($log);
 
-        stateCheck($log, $redis, $drhodes, $prhodes, $i-1);
+        stateCheck($log, $redis, $drhodes, $prhodes, $i-1, $doWork, $doQuiz);
 
-        $log->info("Set Work visibility to $i");
-        $work->setMarkVisibility($i);
-        $workMap->save($work);
+        if ($doWork) {
+            $log->info("Set Work visibility to $i");
+            $work->setMarkVisibility($i);
+            $workMap->save($work);
+        }
 
-        $log->info("Set Quiz visibility to $i");
-        $quiz->setMarkVisibility($i);
-        $quizMap->save($quiz);
+        if ($doQuiz) {
+            $log->info("Set Quiz visibility to $i");
+            $quiz->setMarkVisibility($i);
+            $quizMap->save($quiz);
+        }
     }
 
     // sleeeeeeeep...
     wait($log);
 
-    stateCheck($log, $redis, $drhodes, $prhodes, 2);
+    stateCheck($log, $redis, $drhodes, $prhodes, 2, $doWork, $doQuiz);
 
 });
 
@@ -129,97 +159,116 @@ $kernel->run(function($di, $loop, $log, $opts) {
  * @param User            $student
  * @param User            $parent
  * @param int             $expected
+ * @param bool            $doWork
+ * @param bool            $doQuiz
  */
-function stateCheck(LoggerInterface $log, Redis $redis, User $student, User $parent, $expected)
+function stateCheck(LoggerInterface $log, Redis $redis, User $student, User $parent, $expected, $doWork, $doQuiz)
 {
+    $studentMsgs = [];
+    $parentMsgs  = [];
+
+    if ($doWork) {
+        $studentMsgs[] = ":teacher has marked your work for :boxname in :catname";
+        $parentMsgs[]  = ":teacher has marked :student's work for :boxname in :catname";
+    }
+    if ($doQuiz) {
+        $studentMsgs[] = ':staff has marked your attempt of :quiz in :cat';
+        $parentMsgs[]  = ":staff has marked :child's attempt of :quiz in :cat";
+    }
+
     switch ($expected) {
         case 0: // staff only
-            assertNoMessages($log, $redis, $student);
-            assertNoMessages($log, $redis, $parent);
+            assertMessageReceipt($log, $redis, $student, []);
+            assertMessageReceipt($log, $redis, $parent, []);
             break;
         case 1: // + students
-            assertMessages($log, $redis, $student);
-            assertNoMessages($log, $redis, $parent);
+            assertMessageReceipt($log, $redis, $student, $studentMsgs);
+            assertMessageReceipt($log, $redis, $parent, []);
             break;
         case 2: // + parents
-            assertMessages($log, $redis, $student);
-            assertMessages($log, $redis, $parent);
+            assertMessageReceipt($log, $redis, $student, $studentMsgs);
+            assertMessageReceipt($log, $redis, $parent, $parentMsgs);
             break;
     }
 }
-
 
 /**
  * @param LoggerInterface $log
  * @param Redis           $redis
  * @param User            $user
+ * @param array           $expected
  */
-function assertMessages(LoggerInterface $log, Redis $redis, User $user)
+function assertMessageReceipt(LoggerInterface $log, Redis $redis, User $user, array $expected)
 {
+    sort($expected);
+
     $userId   = $user->getId();
     $userName = $user->formatName();
     $str      = "User $userId ($userName)";
 
-    $msgCount = count($members = $redis->smembers("msg:vagrantx:q:$userId:listed"));
+    $redisData = $redis->smembers("msg:vagrantx:q:$userId:listed");
+    $actual    = messageTitles($redisData);
 
-    switch ($msgCount) {
-        case 2:
-            $log->info("$str has 2 messages, as expected");
-            break;
-        case 1:
-            $log->error("$str only received 1 message; 2 expected: interrogation required");
-            $log->warning($members[0]);
+    $actualCount   = count($actual);
+    $expectedCount = count($expected);
 
-            $data = json_decode(gzuncompress(`redis-cli get {$members[0]}`), true);
-            $a = reset($data);
-            $title = reset($a);
-            $log->warning($title);
+    $diff = array_diff($actual, $expected);
 
-            break;
-        case 0:
-            $log->alert("$str received no messages; 2 expected");
-            break;
-        default:
-            $log->error("$str somehow has $msgCount messages; 2 expected");
+    if ($actualCount == $expectedCount) {
+        // the counts match: so far so good
+
+        if ($expectedCount == 0) {
+            // don't interrogate contents for correctness
+            $log->info("$str has no messages, as expected");
+
+        } else {
+            // check we actually received what we expected
+            $log->info("$str has $actualCount message(s), as expected: checking contents");
+
+            if (count($diff)) {
+                // show the difference between the arrays
+                $log->warning("Messages received did not meet expectation:");
+                $log->warning("Diff: " . json_encode($diff));
+
+            } else {
+                $log->info("All ok!", ['char' => '+']);
+            }
+        }
+
+    } elseif ($actualCount == 0) {
+        // nothing received; courtesy of the elseif we know this is a mismatch
+        $log->error("$str received no messages; $expectedCount expected");
+
+    } elseif ($actualCount > $expectedCount) {
+        // ...too many messages..? -_-'
+        $log->error("$str somehow has $actualCount message(s); $expectedCount expected");
+        $log->warning("Diff: " . json_encode($diff));
+
+    } else {
+        // most likely bug scenario: not all expected messages received
+        $log->error("$str only received $actualCount message(s); $expectedCount expected: checking contents");
+        $log->warning("Diff: " . json_encode($diff));
     }
-
 }
 
 
 /**
- * @param LoggerInterface $log
- * @param Redis           $redis
- * @param User            $user
+ * @param array $members
+ * @return array
  */
-function assertNoMessages(LoggerInterface $log, Redis $redis, User $user)
+function messageTitles($members)
 {
-    $userId   = $user->getId();
-    $userName = $user->formatName();
-    $str      = "User $userId ($userName)";
+    $titles = [];
 
-    $msgCount = count($members = $redis->smembers("msg:vagrantx:q:$userId:listed"));
-
-    switch ($msgCount) {
-        case 2:
-            $log->alert("$str received 2 messages; 0 expected");
-            break;
-        case 1:
-            $log->alert("$str only received 1 message; 0 expected: interrogation required");
-            $log->warning($members[0]);
-
-            $data = json_decode(gzuncompress(`redis-cli get {$members[0]}`), true);
-            $a = reset($data);
-            $title = reset($a);
-            $log->warning($title);
-
-            break;
-        case 0:
-            $log->info("$str received no messages, as expected");
-            break;
-        default:
-            $log->error("$str somehow has $msgCount messages; 0 expected");
+    foreach ($members as $member) {
+        $data = json_decode(gzuncompress(`redis-cli get $member`), true);
+        $a = reset($data);
+        $titles[] = reset($a);
     }
 
+    sort($titles);
+
+    return $titles;
 }
 
 
@@ -227,7 +276,7 @@ function assertNoMessages(LoggerInterface $log, Redis $redis, User $user)
  * @param LoggerInterface $log
  * @param int             $ttl
  */
-function wait(LoggerInterface $log, $ttl = 30)
+function wait(LoggerInterface $log, $ttl = 10)
 {
     $log->debug("Waiting $ttl seconds to let async processes do their thing");
 
