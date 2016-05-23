@@ -578,9 +578,15 @@
             });
 
             $('#createQuestionForm').shortCreate({
+                rules: {
+                    answer: {
+                        hasClozeField: "selected-word"
+                    }
+                },
                 customValidationRules: function(config) {
                     $.fn.addCustomRules_greaterThanZero(config);
                     $.fn.addCustomRules_emptyAnswer(config);
+                    $.fn.addCustomRules_containsClozeField(config);
                 }
             });
         }
