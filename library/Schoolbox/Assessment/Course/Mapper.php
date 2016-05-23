@@ -233,33 +233,15 @@ class Mapper extends FolderMapper
     public function deleteUnit($id)
     {
         // Grab handles to the mappers as we'll reuse them
-
         $errorMapper = ErrorMapper::getInstance();
-        $folderMapper = FolderMapper::getInstance();
         $unitInstanceMapper = UnitInstanceMapper::getInstance();
-        $access = Access::getInstance();
 
         // Locate the unit we want to delete
-
         try {
             $unit = $unitInstanceMapper->findById($id);
+            $unitInstanceMapper->delete($unit);
         } catch (\Exception $e) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-        }
-
-        if ($access->getFolderAccess($this->getSessionUser(), [$unit->getUnitCategory()->getId()]) >= WRITE_ACCESS)
-        {
-            try {
-                $folderMapper->deleteFolder($unit->getUnitCategory()->getId());
-            } catch (\Exception $e) {
-                throw $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-            }
-
-            $unitInstanceMapper->delete($unit);
-        }
-        else
-        {
-            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
     }
 
