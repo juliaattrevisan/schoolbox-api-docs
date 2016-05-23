@@ -225,28 +225,6 @@ class Mapper extends FolderMapper
     }
 
     /**
-     * Delete unit from course
-     *
-     * @param $id
-     * @throws SchoolboxException
-     */
-    public function deleteUnit($id)
-    {
-        // Grab handles to the mappers as we'll reuse them
-        $errorMapper = ErrorMapper::getInstance();
-        $unitInstanceMapper = UnitInstanceMapper::getInstance();
-
-        // Locate the unit we want to delete
-        try {
-            $unit = $unitInstanceMapper->findById($id);
-            $unitInstanceMapper->delete($unit);
-        } catch (\Exception $e) {
-            throw $errorMapper->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-        }
-    }
-
-
-    /**
      * It is permissible that a folder be converted to a course (ie. have units put inside it)
      * if and only if the following three conditions are met:
      *  1) it is in the Faculty area (that is, it is a descendant of facultyRoot)
