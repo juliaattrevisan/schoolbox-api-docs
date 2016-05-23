@@ -377,11 +377,6 @@ class Controller extends Base\Base
         } else if(isset($post['curriculumCodes'])){
             $post['curriculumCodes'] = explode(',', $post['curriculumCodes']);
         }
-        foreach($post['curriculumCodes'] as $key => $val){
-            if(empty($val)){
-                unset($post['curriculumCodes'][$key]);
-            }
-        }
 
         $this->saveCourse($post, $rq->isXhr(), 'course.courseList');
     }
