@@ -101,8 +101,10 @@
          */
         function applyValidator() {
             $(config.element).submit(function() {
-                // update underlying textarea before submit validation
-                CKEDITOR.instances.question.updateElement();
+                // update underlying textareas before submit validation
+                $.each(CKEDITOR.instances, function(prop, val){
+                    CKEDITOR.instances[prop].updateElement();
+                });
             }).alaressValidate({
                 onfocusout: false,
                 rules: config.rules,
