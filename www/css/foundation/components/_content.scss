@@ -611,6 +611,7 @@ $rotate-th-width: $square-grid-td-size;
 	// Only sections inside islands have these styles
   	section{
 		@extend %container;
+		@extend .clearfix;
 	}
 	.content{
 		@extend %content;
