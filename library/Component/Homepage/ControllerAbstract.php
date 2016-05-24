@@ -29,8 +29,8 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         } else {
             $sourceId = $this->getContext()->getId();
         }
-        $this->permission        = min($g->getPermission($sourceId), $this->getMaximumPermission());
-        $this->controlPermission = min($g->getPermission($this->getContext()->getId()), $this->getMaximumPermission());
+        $this->contentPermission        = min($g->getPermission($sourceId), $this->getMaximumPermission());
+        $this->contextPermission = min($g->getPermission($this->getContext()->getId()), $this->getMaximumPermission());
         $this->sitepage->setVar('ID', $this->getContext()->getId());
 
         $this->postConstruct();

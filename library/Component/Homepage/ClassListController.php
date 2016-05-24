@@ -145,7 +145,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
             /* Student bulk email
               */
-            if ($this->permission > READ_ACCESS && \Cfg::get('mail_enable')) {
+            if ($this->contentPermission > READ_ACCESS && \Cfg::get('mail_enable')) {
                 $this->setVar(
                     array(
                         'REPLY_TO'           => $emailHandler->formatEmailFromArray($_SESSION),
@@ -161,7 +161,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             /* Parent bulk email
               */
             if (count($synergyIds)
-                && $this->permission > READ_ACCESS
+                && $this->contentPermission > READ_ACCESS
                 && (Cfg::get('email_all_parents') == 1)
                 && \Cfg::get('mail_enable')
             ) {

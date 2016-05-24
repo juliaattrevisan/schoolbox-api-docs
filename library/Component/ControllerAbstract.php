@@ -44,18 +44,18 @@ abstract class Component_ControllerAbstract
      *
      * @var int
      */
-    protected $permission = 0;
+    protected $contentPermission = DENY_ACCESS;
 
     /**
      * Permission for component controls, as opposed to the component content.
      *
      * These permissions are always based off of the component's context, as
-     * opposed to component content permissions (@see $this->permission), which
+     * opposed to component content permissions (@see $this->contentPermission), which
      * may be based off of an alternate source.
      *
      * @var int
      */
-    protected $controlPermission = 0;
+    protected $contextPermission = DENY_ACCESS;
 
     /**
      * The maximum permission allowed for this component.
@@ -309,7 +309,7 @@ abstract class Component_ControllerAbstract
     protected function determineConfigPermissions($config) {
         if (is_array($config) && count($config)) {
             // have write access
-            if ($this->controlPermission > READ_ACCESS) {
+            if ($this->contextPermission > READ_ACCESS) {
                 // display full configuration block
                 return array(true, true, true);
             } // do not have write access
@@ -323,7 +323,7 @@ abstract class Component_ControllerAbstract
         } // there is no configuration
         else {
             // have write access
-            if ($this->controlPermission > READ_ACCESS) {
+            if ($this->contextPermission > READ_ACCESS) {
                 // display delete option
                 return array(true, false, false);
             } // do not have write access
@@ -720,7 +720,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasReadAccess()
     {
-        return $this->permission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ;
+        return $this->contentPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ;
     }
 
     /**
@@ -730,7 +730,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasWriteAccess()
     {
-        return $this->permission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
+        return $this->contentPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
     }
 
     /**
@@ -740,7 +740,47 @@ abstract class Component_ControllerAbstract
      */
     public function hasFullAccess()
     {
-        return $this->permission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+        return $this->contentPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+    }
+
+    /**
+     * Checks if the user's permission on this component's context is at least read level.
+     *
+     * @return bool
+     */
+    public function hasContextReadAccess()
+    {
+        return $this->contextPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ;
+    }
+
+    /**
+     * Checks if the user's permission on this component's context is at least write level.
+     *
+     * @return bool
+     */
+    public function hasContextWriteAccess()
+    {
+        return $this->contextPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
+    }
+
+    /**
+     * Checks if the user's permission on this component's context is admin level.
+     *
+     * @return bool
+     */
+    public function hasContextFullAccess()
+    {
+        return $this->contextPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+    }
+
+    /**
+     * Returns whether this component is using an Alternative Data Source.
+     *
+     * @return bool
+     */
+    public function isUsingAltSource()
+    {
+        return intval($this->getConfig("src")) > 0;
     }
 
     /**

@@ -36,7 +36,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
         $this->parseConfig();
 
-        if ($this->permission < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 

@@ -31,10 +31,10 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
          */
         if (is_object($context)) {
             $contextId = $context->getId();
-            $this->permission = $g->getPermission($context->getId());
+            $this->contentPermission = $g->getPermission($context->getId());
         } elseif (is_array($context)) {
             $contextId = $context['id'];
-            $this->permission = $g->getPermission($context['id']);
+            $this->contentPermission = $g->getPermission($context['id']);
         }
 
         $args = $this->sitepage->arg;

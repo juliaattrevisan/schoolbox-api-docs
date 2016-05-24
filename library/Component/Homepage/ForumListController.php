@@ -75,7 +75,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
         $this->parseConfig();
 
-        if ($this->permission < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
@@ -135,7 +135,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
                 $this->setVar('forum_reply_block', '');
 
-                if ($is_post_allowed && ($thread['locked'] != 'true' || $this->permission >= FULL_ACCESS)) {
+                if ($is_post_allowed && ($thread['locked'] != 'true' || $this->contentPermission >= FULL_ACCESS)) {
                     $this->parse('forum_reply_block', 'forum_reply');
                 }
 

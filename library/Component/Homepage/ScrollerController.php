@@ -60,7 +60,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
          */
         $this->parseConfig();
 
-        if ($this->permission < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
@@ -102,7 +102,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source->getId());
 
         // Controls such as Post Images
-        if ($this->permission < WRITE_ACCESS) {
+        if ($this->contentPermission < WRITE_ACCESS) {
             $this->setVar("submit_image_scroller_block", "");
         } else {
             $this->parse("submit_image_scroller_block", "submit_image_scroller");

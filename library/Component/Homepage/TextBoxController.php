@@ -65,7 +65,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         }
 
         /* If user does not have access to the source, do not output anything */
-        if ($this->permission < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
@@ -93,7 +93,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
          * To just edit one homepage's textbox, you need write access to that homepage.
          */
         $editing = false;
-        if ($this->permission >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
+        if ($this->contentPermission >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
             if ($this->sitepage->arg[1] == 'textBoxModify') {
                 $editing = true;
                 $this->setVar(
@@ -115,7 +115,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             $this->parse('text_editable_block', 'text_editable');
         } else {
             // modify links
-            if ($this->permission >= WRITE_ACCESS) {
+            if ($this->contentPermission >= WRITE_ACCESS) {
                 if ($this->getTextbox()->getId()) {
                     $this->parse('modify_text_block', 'modify_text');
                 } else {
@@ -134,7 +134,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         }
         $this->parseConfig();
 
-        if ($this->permission < WRITE_ACCESS && $this->getConfig('compactMode') ) {
+        if ($this->contentPermission < WRITE_ACCESS && $this->getConfig('compactMode') ) {
             /* Remove headers */
             $this->setVar('CONFIGURATION', '');
             $this->setBlock($templateHandle, 'header', 'header_block');

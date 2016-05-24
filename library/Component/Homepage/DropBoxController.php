@@ -40,7 +40,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
         $this->setBlock($templateHandle, "drop_staff", "drop_staff_block");
         $this->setBlock('drop_staff', 'drop_file', 'drop_file_block');
 
-        if ($this->permission < WRITE_ACCESS) {
+        if ($this->contentPermission < WRITE_ACCESS) {
             $this->setVar('drop_success_block', '');
             if ($_SESSION['dropSuccess']) {
                 $this->parse('drop_success_block', 'drop_success', true);

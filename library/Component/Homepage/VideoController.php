@@ -105,7 +105,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             }
         }
 
-        if ($this->permission < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
@@ -145,7 +145,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                     )
                 );
 
-                if ($this->permission > READ_ACCESS) {
+                if ($this->contentPermission > READ_ACCESS) {
                     $this->parse('video_edit_block', 'video_edit', true);
                 } else {
                     $this->setVar('video_edit_block', '');
@@ -153,7 +153,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
                 if ($video->getStatus() == "completed") {
                     $this->parse('video_list_block', 'video_list', true);
-                } elseif ($this->permission >= WRITE_ACCESS) {
+                } elseif ($this->contentPermission >= WRITE_ACCESS) {
                     $this->setVar(
                         array(
                             'VIDEO_LIST_STATUS'    => $video->getStatus(),
@@ -172,7 +172,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             $this->setVar('default_video_block', '');
         }
 
-        if ($this->permission >= WRITE_ACCESS) {
+        if ($this->contentPermission >= WRITE_ACCESS) {
             $this->parse('submit_video_block', 'submit_video');
         } else {
             $this->setVar('submit_video_block', '');

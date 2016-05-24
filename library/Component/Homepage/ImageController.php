@@ -40,7 +40,7 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
         //outputs an custom image and link to the homepage
         $this->setBlock($templateHandle, 'previewimage', 'preview_block');
         $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
-        if ($this->permission < \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE) {
+        if ($this->contentPermission < \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE) {
             $this->setVar('submit_image_block', '');
         } else {
             $this->parse('submit_image_block', 'submit_image');

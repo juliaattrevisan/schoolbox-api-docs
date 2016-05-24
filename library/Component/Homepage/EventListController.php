@@ -100,7 +100,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
         //setup block for submission button
         $this->setBlock($templateHandle, "submit_event", "submit_event_block");
-        if ($this->permission < WRITE_ACCESS) {
+        if ($this->contentPermission < WRITE_ACCESS) {
             $this->setVar(array(
                     'submit_event_block' => '',
                     'import_events_block' => ''

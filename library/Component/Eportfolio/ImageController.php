@@ -74,7 +74,7 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
 
 		/* Show edit buttons
 		 */
-		if ($this->permission >= WRITE_ACCESS) {
+		if ($this->contentPermission >= WRITE_ACCESS) {
 			$this->parse('dropzone_block', 'dropzone');
 			$this->parse('modify_button_block', 'modify_button');
 		} else {

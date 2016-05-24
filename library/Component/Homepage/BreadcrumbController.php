@@ -57,7 +57,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
 
         $this->parseConfig();
 
-        if ($this->permission < WRITE_ACCESS && $this->getConfig('compactMode') ) {
+        if ($this->contentPermission < WRITE_ACCESS && $this->getConfig('compactMode') ) {
             /* Remove headers */
             $this->setVar('CONFIGURATION', '');
             $this->setBlock($templateHandle, 'header', 'header_block');

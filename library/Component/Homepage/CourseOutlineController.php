@@ -66,7 +66,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
         $this->unit_list = UnitInstanceMapper::getInstance()->findForComponent($this->getInstance());
-        $this->readOnly  = $this->permission < WRITE_ACCESS;
+        $this->readOnly  = $this->contentPermission < WRITE_ACCESS;
 
         // Build student list
         if (count($this->unit_list)) {

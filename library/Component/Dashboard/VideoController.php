@@ -156,7 +156,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
 
                     $this->parse('video_list_block', 'video_list', true);
                 } else {
-                    if ($this->permission >= WRITE_ACCESS) {
+                    if ($this->contentPermission >= WRITE_ACCESS) {
                         if (strlen($comment)) {
                             $this->setVar(array(
                                 'VIDEO_PENDING_COMMENT' => $comment

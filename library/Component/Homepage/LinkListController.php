@@ -81,7 +81,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
         $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
-        if ($this->permission < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
@@ -120,7 +120,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $j = 0;
 
         foreach ($allLinks as $currentLink) {
-            if ($currentLink->getHidden() && $this->permission < WRITE_ACCESS) {
+            if ($currentLink->getHidden() && $this->contentPermission < WRITE_ACCESS) {
                 continue;
             }
             $this->setVar(
@@ -139,7 +139,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             );
 
             // Controls
-            if ($this->permission < WRITE_ACCESS) {
+            if ($this->contentPermission < WRITE_ACCESS) {
                 $this->setVar('modify_link_block', '');
             } else {
                 $this->parse('modify_link_block', 'modify_link');
@@ -152,7 +152,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setVar('LINK_CAT_ID', $this->source->getId());
         $this->setBlock($templateHandle, "submit_link", "submit_link_block");
 
-        if ($this->permission < WRITE_ACCESS) {
+        if ($this->contentPermission < WRITE_ACCESS) {
             $this->setVar("submit_link_block", "");
         } else {
             $this->parse("submit_link_block", "submit_link");
