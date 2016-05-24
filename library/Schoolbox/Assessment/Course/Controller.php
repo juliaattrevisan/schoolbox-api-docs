@@ -1175,7 +1175,7 @@ class Controller extends Base\Base
                         $itemId = $current->getSubmissionBox()->getId();
                         $detail = $this->getSubmissionBoxMapper()->findById($itemId);
                     }
-                } catch (\Schoolbox\Mapper\Exception $e) {
+                } catch (MapperException $e) {
                     // the underlying assessment entity does not exist. do not import.
                     continue;
                 }
@@ -1299,7 +1299,7 @@ class Controller extends Base\Base
                         $post["unit"],
                         $post->get('componentId')
                     );
-                } catch (\Schoolbox\Mapper\Exception $e) {
+                } catch (MapperException $e) {
                     $this->sendError($e->getMessage());
                     return;
                 }
@@ -1418,7 +1418,7 @@ class Controller extends Base\Base
                     list ($folderId, $userId) = explode(':', $ownership);
                     try {
                         $owners[$folderId] = $this->getUserMapper()->findById($userId);
-                    } catch (\Schoolbox\Mapper\Exception $e) {
+                    } catch (MapperException $e) {
                         // Couldn't find user. That's sort of okay.
                         $owners[$folderId] = null;
                     }
@@ -1735,6 +1735,7 @@ class Controller extends Base\Base
         $requiresDelete = false;
 
         try {
+            /** @var Component_Instance $componentInstance */
             $componentInstance = $this->getComponentInstanceMapper()->findById($componentId);
             $requiresDelete    = true;
         } catch (MapperException $e) {
