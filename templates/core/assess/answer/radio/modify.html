@@ -58,12 +58,7 @@
         $('#createQuestionForm').multiRadioCreate({
             availability: 'assess',
             mode: 'modify',
-            questionBank: questionBank,
-            customValidationRules: function(config) {
-                $.fn.addCustomRules_greaterThanZero(config);
-                $.fn.addCustomRules_emptyInputs(config);
-                $.fn.addCustomRules_somethingChecked(config);
-            }
+            questionBank: questionBank
         });
     });
 </script>
