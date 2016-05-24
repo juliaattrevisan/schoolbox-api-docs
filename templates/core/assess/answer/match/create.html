@@ -42,24 +42,32 @@
             questionBank: false,
             answerName: 'answerRight',
             rules: {
-                question: {
-                    required: true,
-                    minlength: 2
-                },
-                marks: {
-                    required: true,
-                    minlength: 1,
-                    greaterThanZero:true
-                },
                 'answerLeft[]': {
                     required: true,
                     minlength: 1,
-                    emptyInputs: true
+                    emptyInputs: true,
+                    hasUniqueOptions: "answerCollection"
+
                 },
                 'answerRight[]': {
                     required: true,
                     minlength: 1,
-                    emptyInputs: true
+                    emptyInputs: true,
+                    hasUniqueOptions: "answerCollection"
+                }
+            },
+            messages:{
+                'answerLeft[]': {
+                    required: "Please fill out all left matches",
+                    minlength: "Please fill out all left matches",
+                    emptyInputs: "Please fill out all left matches",
+                    hasUniqueOptions: "Each left match must be unique"
+                },
+                'answerRight[]': {
+                    required: "Please fill out all right matches",
+                    minlength: "Please fill out all right matches",
+                    emptyInputs: "Please fill out all right matches",
+                    hasUniqueOptions: "Each right match must be unique"
                 }
             },
             generateAnswer: function(config) {
@@ -77,10 +85,6 @@
                     }
                 });
                 return answerCollection;
-            },
-            customValidationRules: function(config) {
-                $.fn.addCustomRules_greaterThanZero(config);
-                $.fn.addCustomRules_emptyInputs(config);
             }
         });
     });
