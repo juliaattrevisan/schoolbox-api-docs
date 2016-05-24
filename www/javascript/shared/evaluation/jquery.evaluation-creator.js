@@ -70,7 +70,10 @@
                 /* Error messages
                  */
                 messages: {
-                    question: "Please enter a question.",
+                    question: {
+                        required: "Please enter a question.",
+                        minlength: "Please enter a question."
+                    },
                     answer: {
                         required: "Please fill out an answer.",
                         minlength: "Please fill out an answer.",
