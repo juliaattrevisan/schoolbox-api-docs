@@ -246,6 +246,7 @@
                         minlength: 1,
                         greaterThanZero:true
                     },
+                    answer: false,
                     'answer[]': {
                         somethingChecked: true
                     },
