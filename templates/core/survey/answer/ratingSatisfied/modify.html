@@ -56,16 +56,9 @@
             mode: 'modify',
             questionBank: questionBank,
             rules: {
-                question: {
-                    required: true,
-                    minlength: 2
+                'answer[]': {
+                    somethingChecked: false
                 },
-                'answerDescription[]': {
-                    emptyInputs: true
-                }
-            },
-            customValidationRules: function(config) {
-                $.fn.addCustomRules_emptyInputs(config);
             }
         });
     });
