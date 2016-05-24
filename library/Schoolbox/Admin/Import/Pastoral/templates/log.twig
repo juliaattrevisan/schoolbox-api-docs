@@ -39,6 +39,7 @@
 
 <div class="small-12 island">
     <h2 class="subheader">Pastoral Care Import Logs</h2>
+    {% if logs | length > 0 %}
     <section>
         <table>
             {% for log in logs %}
@@ -51,4 +52,10 @@
         </table>
     </section>
     <input type="submit" data-back value="Back">
+    {% else %}
+        <section class="content">
+            <p class="no-margin">No import logs found.</p>
+            <input type="submit" data-back value="Back">
+        </section>
+    {% endif %}
 </div>
