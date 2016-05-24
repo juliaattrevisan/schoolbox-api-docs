@@ -48,7 +48,8 @@
                 },
 
                 /* Actual validation rules
-                 * Defaults to the full set.
+                 * Defaults to the full set. Can be extended/overridden via instance-specific options
+                 * Note: If you wish to remove a default method, you must set it to false in your instance options
                  */
                 rules: {
                     question: {
@@ -68,6 +69,8 @@
                 },
 
                 /* Error messages
+                 * Note: If you override a validation method's default message, you must define your custom messages
+                 *       at the same granularity as the rules, otherwise instance-specific custom messages will not be displayed.
                  */
                 messages: {
                     question: {
