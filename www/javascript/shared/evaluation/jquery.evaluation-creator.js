@@ -234,7 +234,7 @@
                 },
 
                 /* Actual validation rules
-                 * Defaults to the full set.
+                 * Defaults to the full set. Survey-type will need to set somethingChecked: false as not rele
                  */
                 rules: {
                     question: {
@@ -247,9 +247,6 @@
                         greaterThanZero:true
                     },
                     answer: false,
-                    'answer[]': {
-                        somethingChecked: true
-                    },
                     'answerDescription[]': {
                         emptyInputs: true,
                         hasUniqueOptions: "answerCollection"

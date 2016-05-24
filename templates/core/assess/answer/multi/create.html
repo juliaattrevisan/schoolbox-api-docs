@@ -38,7 +38,12 @@ $(function() {
     $('#createQuestionForm').multiRadioCreate({
         availability: 'assess',
         mode: 'create',
-        questionBank: false
+        questionBank: false,
+        rules: {
+            'answer[]': {
+                somethingChecked: true
+            }
+        },
     });
 });
 </script>

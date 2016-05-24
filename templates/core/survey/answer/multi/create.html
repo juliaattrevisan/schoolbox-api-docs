@@ -33,16 +33,10 @@
 <script type='text/javascript' src="/javascript/shared/evaluation/jquery.evaluation.validation.js"></script>
 <script type="text/javascript">
     $(function() {
-        console.log('hi');
         $('#createQuestionForm').multiRadioCreate({
             availability: 'survey',
             mode: 'create',
-            questionBank: false,
-            rules: {
-                'answer[]': {
-                    somethingChecked: false
-                }
-            }
+            questionBank: false
         });
     });
 </script>
