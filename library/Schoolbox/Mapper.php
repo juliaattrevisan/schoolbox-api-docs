@@ -1473,10 +1473,12 @@ abstract class Mapper implements IMapper, Serializable
         }
         // Bind limit and offset if they were set
         if (isset($limit)) {
-            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+            $limit = (int)$limit;
+            $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
         }
         if (isset($offset)) {
-            $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+            $offset = (int)$offset;
+            $statement->bindValue('offset', $offset, \PDO::PARAM_INT);
         }
 
         return $statement;
