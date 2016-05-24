@@ -77,7 +77,6 @@ if (is_numeric($_POST['categoryID'])) {
 		/* modify post
 		 */
 
-        $post->setOwner($_SESSION['user']);
         $post->setBody($_POST['body']);
 
         PostMapper::getInstance()->save($post);
