@@ -1834,8 +1834,18 @@ class Controller extends Base\Base
 
         try {
             // Locate the unit instance we want to delete
+
+            /** @var UnitInstance $unit */
             $unit = $unitInstanceMapper->findById($this->getRequest()->post["id"]);
-            $unitInstanceMapper->delete($unit);
+
+            /** @var Access $access */
+            $access = $this->getAccess();
+
+            if ($access->getFolderAccess($this->getUser(), [$unit->getCategory()->getId()]) >= WRITE_ACCESS) {
+                $unitInstanceMapper->delete($unit, $this->getUser());
+            } else {
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
+            }
         } catch (\Exception $e) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_RESOURCE_NOT_FOUND);
         }
@@ -2016,7 +2026,7 @@ class Controller extends Base\Base
      *
      * @return FolderMapper
      */
-    protected function getFolderMapper()
+    public function getFolderMapper()
     {
         return $this->folderMapper;
     }
@@ -2036,7 +2046,7 @@ class Controller extends Base\Base
      *
      * @return TaskMapper
      */
-    protected function getTaskMapper()
+    public function getTaskMapper()
     {
         return $this->taskMapper;
     }
@@ -2057,7 +2067,7 @@ class Controller extends Base\Base
      *
      * @return Component_InstanceMapper
      */
-    protected function getComponentInstanceMapper()
+    public function getComponentInstanceMapper()
     {
         return $this->componentInstanceMapper;
     }
@@ -2077,7 +2087,7 @@ class Controller extends Base\Base
      *
      * @return Component_DefinitionMapper
      */
-    protected function getComponentDefinitionMapper()
+    public function getComponentDefinitionMapper()
     {
         return $this->componentDefinitionMapper;
     }
@@ -2097,7 +2107,7 @@ class Controller extends Base\Base
      *
      * @return UnitInstanceMapper
      */
-    protected function getUnitInstanceMapper()
+    public function getUnitInstanceMapper()
     {
         return $this->unitInstanceMapper;
     }
@@ -2127,7 +2137,7 @@ class Controller extends Base\Base
      *
      * @return SubmissionBoxMapper
      */
-    protected function getSubmissionBoxMapper()
+    public function getSubmissionBoxMapper()
     {
         return $this->submissionBoxMapper;
     }
@@ -2137,7 +2147,7 @@ class Controller extends Base\Base
      *
      * @return OnlineAssessmentMapper
      */
-    protected function getOnlineAssessmentMapper()
+    public function getOnlineAssessmentMapper()
     {
         return $this->onlineAssessmentMapper;
     }
@@ -2155,7 +2165,7 @@ class Controller extends Base\Base
     /**
      * @return HomepageConfigMapper
      */
-    protected function getHomepageConfigMapper()
+    public function getHomepageConfigMapper()
     {
         return $this->homepageConfigMapper;
     }
@@ -2175,7 +2185,7 @@ class Controller extends Base\Base
     /**
      * @return HomepageTemplateMapper
      */
-    protected function getHomepageTemplateMapper()
+    public function getHomepageTemplateMapper()
     {
         return $this->homepageTemplateMapper;
     }
@@ -2194,7 +2204,7 @@ class Controller extends Base\Base
     /**
      * @return CourseConfigMapper
      */
-    protected function getCourseConfigMapper()
+    public function getCourseConfigMapper()
     {
         return $this->courseConfigMapper;
     }
@@ -2213,7 +2223,7 @@ class Controller extends Base\Base
     /**
      * @return Error\Mapper
      */
-    protected function getErrorMapper()
+    public function getErrorMapper()
     {
         return $this->errorMapper;
     }
@@ -2233,7 +2243,7 @@ class Controller extends Base\Base
     /**
      * @return UserAccessMapper
      */
-    protected function getUserAccessMapper()
+    public function getUserAccessMapper()
     {
         return $this->userAccessMapper;
     }
@@ -2253,7 +2263,7 @@ class Controller extends Base\Base
     /**
      * @return UserMapper
      */
-    protected function getUserMapper()
+    public function getUserMapper()
     {
         return $this->userMapper;
     }
@@ -2273,7 +2283,7 @@ class Controller extends Base\Base
     /**
      * @return Access
      */
-    protected function getAccess()
+    public function getAccess()
     {
         return $this->access;
     }
@@ -2292,7 +2302,7 @@ class Controller extends Base\Base
     /**
      * @return TaskInstanceMapper
      */
-    protected function getTaskInstanceMapper()
+    public function getTaskInstanceMapper()
     {
         return $this->taskInstanceMapper;
     }
