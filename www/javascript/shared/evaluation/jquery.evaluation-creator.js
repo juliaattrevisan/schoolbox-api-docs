@@ -226,7 +226,11 @@
                 /* Setup of custom validation rules to use
                  * Call $.fn.addCustomRules_* here.
                  */
-                customValidationRules: function() {
+                customValidationRules: function(config) {
+                    $.fn.addCustomRules_greaterThanZero(config);
+                    $.fn.addCustomRules_somethingChecked(config);
+                    $.fn.addCustomRules_emptyInputs(config);
+                    $.fn.addCustomRules_uniqueOptions(config);
                 },
 
                 /* Actual validation rules
@@ -246,7 +250,8 @@
                         somethingChecked: true
                     },
                     'answerDescription[]': {
-                        emptyInputs: true
+                        emptyInputs: true,
+                        hasUniqueOptions: "answerCollection"
                     }
                 },
 
