@@ -91,5 +91,38 @@
             return $(text).find('.'+param).length > 0;
         }, "Answer must contain at least 1 Cloze field");
     }
+
+    /**
+     * Ensures a Multi-Choice question's answers are each unique
+     *
+     * Uniqueness is case-sensitive, to cater for questions that depend on exact Capitalisation
+     *
+     * Rule can either set param = bool|string. If string, interpreted as parent to filter selection.
+     *
+     * @param config
+     */
+    $.fn.addCustomRules_uniqueOptions = function(config) {
+        $.validator.addMethod(
+            "hasUniqueOptions",
+            function(value, element, param) {
+                var nameAtt = $(element).attr('name');
+                var parentSelector = 'string' === typeof param
+                    ? '#'+param
+                    : '';
+                var $answerOptions = $(parentSelector + " [name='"+nameAtt+"']");
+                var obj = {};
+                $.each($answerOptions, function(idx,elem){
+                    var val = $(elem).val();
+
+                    // Don't attempt to create empty object keys
+                    if("" === val.trim()){
+                        return false;
+                    }
+                    obj[val] = true;
+                });
+                return $answerOptions.length === Object.keys(obj).length;
+            },
+            "Each answer must be unique");
+    }
     
 }(jQuery));
