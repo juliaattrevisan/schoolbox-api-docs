@@ -13,7 +13,9 @@
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>
 <script type="text/javascript">
     $(function () {
-        $.fn.alaressEditor();
+        $.fn.alaressEditor({
+            targetElements: $('[data-html-editor]')
+        });
 
         $('#item_datetime_published, #item_datetime_expires').datepicker({
             onClose:function (string) {
@@ -96,8 +98,13 @@
                         </label>
 
                         <label>
+                            Blurb
+                            <textarea id="blurb" name="blurb" rows="3">{BLURB}</textarea>
+                        </label>
+
+                        <label>
                             Article
-                            <textarea id="body" name="body">{BODY}</textarea>
+                            <textarea data-html-editor id="body" name="body">{BODY}</textarea>
                         </label>
 
                         <label>

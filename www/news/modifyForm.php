@@ -99,6 +99,7 @@ if ($_POST['heading']) {
 	$article
 		->setHeading($_POST['heading'])
 		->setBody($_POST['body'])
+		->setBlurb($_POST['blurb'])
 		->setTopic($topic)
 		->setPublishDate($publishedDate)
 		->setExpiryDate($expiryDate)

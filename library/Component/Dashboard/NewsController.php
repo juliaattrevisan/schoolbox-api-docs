@@ -37,6 +37,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
         $this->setBlock('topic', "news", "news_block");
         $this->setBlock('news', "news_image", "news_image_block");
         $this->setBlock('news', "news_no_image", "news_no_image_block");
+        $this->setBlock('news', "read_more", "read_more_block");
         $this->setBlock('news', "compact", "compact_block");
         $this->setBlock('news', "full", "full_block");
 
@@ -45,6 +46,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
         $this->setVar("news_block", "");
         $this->setVar("news_image_block", "");
         $this->setVar("news_no_image_block", "");
+        $this->setVar("read_more_block", "");
 
         $topicList = [];
 
@@ -97,7 +99,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                     $output = array(
                         'NEWS_TITLE' => $item['item_heading'],
                         'NEWS_URL' => '/news/item/' . $item['item_id'],
-                        'NEWS_SHORT' => TextFormatter::cutSentence(Scrub::html2text($item['item_body']), 300),
+                        'NEWS_SHORT' => empty($item['item_blurb']) ? TextFormatter::cutSentence(Scrub::html2text($item['item_body']), 300) : Scrub::html2text($item['item_blurb']),
                         'NEWS_TIME' => $newsTime->getRelativeTime(),
                         'NEWS_IMAGE' => $item['item_image'],
                         'NEWS_AUTHOR_NAME' => $userFormatter->formatName($item),
@@ -105,6 +107,11 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                     );
 
                     $this->setVar($output);
+
+                    if (!empty($item['item_blurb']))
+                        $this->parse('read_more_block', 'read_more');
+                    else
+                        $this->setVar('read_more_block', '');
 
                     if ($item['item_image']) {
                         $this->parse('news_image_block', 'news_image');

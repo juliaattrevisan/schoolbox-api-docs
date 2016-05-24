@@ -41,6 +41,9 @@ class Article implements ISoftDeletable {
 	protected $modifiedDate;
 
 	/** @var string */
+	protected $blurb;
+
+	/** @var string */
 	protected $body;
 
 	/** @var bool */
@@ -76,6 +79,22 @@ class Article implements ISoftDeletable {
 	public function getBody() {
 		return $this->body;
 	}
+
+	/**
+	 * @param string $blurb
+	 * @return self
+	 */
+	public function setBlurb($blurb) {
+		$this->blurb = $blurb;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getBlurb() {
+		return $this->blurb;
+	}	
 
 	/**
 	 * @param boolean $deleted
