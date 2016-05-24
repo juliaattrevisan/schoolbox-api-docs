@@ -113,6 +113,9 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                     else
                         $this->setVar('read_more_block', '');
 
+                    if (empty($item['item_body']))
+                        $this->setVar('read_more_block', '');
+
                     if ($item['item_image']) {
                         $this->parse('news_image_block', 'news_image');
                         $this->setVar('news_no_image_block', '');

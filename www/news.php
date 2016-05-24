@@ -183,6 +183,9 @@ if (is_array($items)) {
             else
                 $this->setVar('read_more_block', '');
 
+            if (empty($article['item_body']))
+                $this->setVar('read_more_block', '');
+
             if ($article['item_image']) {
                 $this->parse('news_image_block', 'news_image');
             } else {
