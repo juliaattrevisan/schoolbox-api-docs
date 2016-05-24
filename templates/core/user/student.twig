@@ -311,6 +311,10 @@
                         {% endblock buttons_pastoralCare %}
                     {% endif %}
 
+                    {% if showButtons %}
+                        {% block buttons_miscellaneous %}
+                        {% endblock buttons_miscellaneous %}
+                    {% endif %}
                 {% endblock buttons %}
             </ul>
             {% endblock buttons_island %}
