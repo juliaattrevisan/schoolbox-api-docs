@@ -1453,9 +1453,14 @@ class Controller extends Base\Base
                 try {
 
                     // Updating existing course outline, just grab it from the database
-                    $componentCache[$homepage] = $this->getComponentInstanceMapper()->findById(
-                        $post["component_id"]
-                    );
+                    $component = $this->getComponentInstanceMapper()->findById($post["component_id"]);
+
+                    if ($component->getIdentifier() == $homepage) {
+                        $componentCache[$homepage] = $component;
+                    } else {
+                        // Inserting new course outline, create it on the current homepage
+                        $componentCache[$homepage] = $this->injectNewComponent($homepageCache[$homepage], Component_Homepage_CourseOutlineController::class);
+                    }
 
                 } catch (\Exception $e) {
 
@@ -1499,7 +1504,7 @@ class Controller extends Base\Base
 
                         /** @var UnitInstance $unit_instance */
                         $unit_instance = $this->getUnitInstanceMapper()->findOneByColumnList([
-                            "component_id" => $post["component_id"],
+                            "component_id" => $componentCache[$homepage]->getId(),
                             "category_id" => $homepageCache[$homepage]->getId(),
                             "unit_category_id" => $unitCache[$currentUnit['id']]->getId(),
                             "deleted_at" => null,
