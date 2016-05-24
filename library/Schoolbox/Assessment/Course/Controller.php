@@ -1842,7 +1842,7 @@ class Controller extends Base\Base
             $access = $this->getAccess();
 
             if ($access->getFolderAccess($this->getUser(), [$unit->getCategory()->getId()]) >= WRITE_ACCESS) {
-                $unitInstanceMapper->delete($unit, $this->getUser());
+                $unitInstanceMapper->delete($unit);
             } else {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
             }
