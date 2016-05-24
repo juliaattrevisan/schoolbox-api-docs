@@ -1,0 +1,93 @@
+{% extends '@core/user/student.twig' %}
+
+{% block buttons %}
+    {% if showButtons %}
+        {% block buttons_dueWork %}
+            {% if (not session.user.getRole().isParent()) or (not config.restrict_parent_duework_access) %}
+                <li class="no-pad">
+                    <a href="/submission/dueWork/0/{{ user.getId() }}"
+                       class="no-margin button fat icon-fat icon-32 icon-due-work"
+                       data-equalizer-watch>Due Work</a>
+                </li>
+            {% endif %}
+        {% endblock buttons_dueWork %}
+    {% endif %}
+
+    {% if showButtons %}
+        {% block buttons_grades %}
+            {#{% if (not session.user.getRole().isParent()) or (not config.restrict_parent_grades) %}#}
+                {#<li class="no-pad">#}
+                    {#<a href="/submission/allWork/{{ user.getId() }}"#}
+                       {#class="no-margin fat button icon-fat icon-32 icon-tick"#}
+                       {#data-equalizer-watch>Grades</a>#}
+                {#</li>#}
+            {#{% endif %}#}
+        {% endblock buttons_grades %}
+    {% endif %}
+
+    {% if eportfolioAuth %}
+        {% block buttons_eportfolio %}
+            <li class="no-pad">
+                <a href="/eportfolio/{{ user.getId() }}/profile"
+                   class="no-margin fat button icon-fat icon-32 icon-eportfolio"
+                   data-equalizer-watch>ePortfolio</a>
+            </li>
+        {% endblock buttons_eportfolio %}
+    {% endif %}
+
+    {% if showButtons %}
+        {% block buttons_calendar %}
+            <li class="no-pad">
+                <a href='/calendar/full/{{ now.getURLDate() }}/{{ user.getId() }}'
+                   class="no-margin fat button icon-fat icon-32 icon-calendar"
+                   data-equalizer-watch>{TPL_LOCAL_CALENDAR_PC}</a>
+            </li>
+        {% endblock buttons_calendar %}
+    {% endif %}
+
+    {% if showButtons %}
+        {% if showClasses %}
+            {% block buttons_timetable %}
+                <li class="no-pad">
+                    <a href="/timetable/{{ user.getId() }}"
+                       class="no-margin fat button icon-fat icon-32 icon-timetable"
+                       data-equalizer-watch>Timetable</a>
+                </li>
+            {% endblock buttons_timetable %}
+        {% endif %}
+    {% endif %}
+
+    {% if showButtons %}
+        {% block buttons_boarderLeave %}
+            {% if config.boarder_leave_enabled and user.getResidentialHouse().getId() %}
+                <li class="no-pad">
+                    <a href="/modules/leave/student/{{ user.getId() }}"
+                       class="no-margin fat button icon-fat icon-32 icon-boarder-leave"
+                       data-equalizer-watch>Boarder Leave</a>
+                </li>
+            {% endif %}
+        {% endblock buttons_boarderLeave %}
+    {% endif %}
+
+    {% if showButtons and showPastoral %}
+        {% if isStaff or isParentOfStudent %}
+            <li class="no-pad">
+                <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.getExternalId() }}"
+                   class="no-margin fat icon-fat button icon-32 icon-pastoral"
+                   data-equalizer-watch>Pastoral Care</a>
+            </li>
+        {% endif %}
+    {% endif %}
+
+    {% if showButtons %}
+        {% block buttons_pastoralCare %}
+        {% endblock buttons_pastoralCare %}
+    {% endif %}
+
+    <!-- Start on School Grades page initially -->
+    <li class="no-pad"><a href="/modules/custom/diocesan/achievementreport/{{ user.getExternalId() }}" class="no-margin fat icon-fat button icon-32 icon-progress" data-equalizer-watch>Achievement</a></li>
+    <li class="no-pad"><a href="/synergetic/stures" class="no-margin fat icon-fat button icon-32 icon-progress" data-equalizer-watch>Progress</a></li>
+    <li class="no-pad"><a href="/synergetic/contacts" class="no-margin fat icon-fat button icon-32 icon-progress" data-equalizer-watch>Contacts</a></li>
+    <li class="no-pad"><a href="/synergetic/attendances2" class="no-margin fat icon-fat button icon-32 icon-progress" data-equalizer-watch>Attendance</a></li>
+    <li class="no-pad"><a href="/synergetic/docs" class="no-margin fat icon-fat icon-32 button icon-progress" data-equalizer-watch>Documents</a></li>
+{% endblock buttons %}
