@@ -259,7 +259,13 @@ class Mapper extends FolderMapper
      */
     protected function inFacultyArea(Folder $folder)
     {
-        return $this->getAncestry()->hasParent($folder, $this->getFacultyNode());
+        $facultyNode = $this->getFacultyNode();
+
+        if(0 === $facultyNode->getId()){
+            return true;
+        }
+
+        return $this->getAncestry()->hasParent($folder, $facultyNode);
     }
 
     /**
