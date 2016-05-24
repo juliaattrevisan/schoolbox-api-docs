@@ -88,13 +88,22 @@ class External_Synergetic_User implements External_UserInterface
             return false;
         }
 
+        $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
+
+        if (Config::get('photo_sis_import') == 0) {
+            if (file_exists($photoPath))
+                return $photoPath;
+            else
+                return false;
+        }
+        
         $query = "
             SELECT vPhotos.ModifiedDate
             FROM SynergyOne.dbo.vPhotos vPhotos
             WHERE vPhotos.ID = '" . $this->getDatabase()->quote($externalUserId) . "'
         ";
+
         if ($photo = $this->getDatabase()->getRow($query)) {
-            $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
             //TODO: delete photos on rollover
             /* If the cached file doesn't exist, or the synergetic image is more recent than our
                       * last known cached version, regenerate cached version.
@@ -105,10 +114,6 @@ class External_Synergetic_User implements External_UserInterface
             $cacheTime    = @filemtime($photoPath);
             $modifiedTime = strtotime($photo['ModifiedDate']);
 
-            if (!file_exists($photoPath) && Config::get('photo_sis_import') == 0) {
-                return false;
-            }
-            
             if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
                 $query = "
                     SELECT vPhotos.Photo, vPhotos.PhotoType
@@ -124,6 +129,7 @@ class External_Synergetic_User implements External_UserInterface
             }
             return $photoPath;
         }
+
         return false;
     }
 

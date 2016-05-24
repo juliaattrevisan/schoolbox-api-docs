@@ -452,6 +452,15 @@ class External_Schoolpro_User implements External_UserInterface
             return false;
         }
 
+        $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
+
+        if (Config::get('photo_sis_import') == 0) {
+            if (file_exists($photoPath))
+                return $photoPath;
+            else
+                return false;
+        }
+
         $vars = array(
             'sbGetPortraitLastUpdated',
             array(
@@ -479,10 +488,6 @@ class External_Schoolpro_User implements External_UserInterface
             $cacheTime    = @filemtime($photoPath);
             $modifiedTime = strtotime($result['result'][0]['CaptureDate']);
 
-            if (!file_exists($photoPath) && Config::get('photo_sis_import') == 0) {
-                return false;
-            }
-            
             if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
                 $vars = array(
                     'sbGetPortraitFile',
