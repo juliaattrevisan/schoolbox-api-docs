@@ -179,15 +179,14 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $currentStatus = $eventMetadata->getStatus();
 
         // TODO KNOWN ISSUE IN [EOTC-120]: THIS IS CURRENTLY JUST ALERTS ALL MODERATORS
-        $users = EventPermissionMapper::getInstance()->findAll();
+        $userIds = EventPermissionMapper::getInstance()->findAll()->getColumnValues('userId');
 
-        // append TiC and creator
-        $additions = new Collection([
-            $relEvent->getTeacherInCharge(),
-            $relEvent->getAuthor()
-        ]);
+        $userIds[] = $relEvent->getTeacherInCharge()->getId();
+        $userIds[] = $relEvent->getAuthor()->getId();
 
-        $userIds = $users->mergeUnique($additions, 'id')->getColumnValues('id');
+        $userIds = array_unique($userIds);
+
+        $this->log->warning(json_encode($userIds));
 
         // TODO make this use Carbon-based ADF once it's merged into 15.0
         $days = (int)round(($relEventStart - time()) / self::REMINDER_INTERVAL);
