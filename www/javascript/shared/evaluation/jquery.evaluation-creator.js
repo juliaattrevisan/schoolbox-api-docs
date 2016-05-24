@@ -254,7 +254,7 @@
             var derived = {
             }
 
-            var merged = $.extend(defaults, derived, options);
+            var merged = $.extend(true,defaults, derived, options);
 
             return merged;
         }
@@ -523,7 +523,7 @@
                 css: 'span.selected-word { background: #cae9b9; }'
             }
 
-            var merged = $.extend(defaults, derived, options);
+            var merged = $.extend(true,defaults, derived, options);
 
             return merged;
         }
