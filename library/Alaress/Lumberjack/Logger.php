@@ -250,6 +250,11 @@ class Logger implements LoggerInterface {
      */
     public function log($level, $message, array $context = array())
     {
+        if (count($this->handlers) == 0) {
+            // no handler spec'd - don't try to do anything
+            return;
+        }
+
         $this->log->setHandlers($this->handlers);
 
         try {
