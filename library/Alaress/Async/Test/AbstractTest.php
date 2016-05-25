@@ -11,6 +11,7 @@ namespace Alaress\Async\Test;
 
 use PHPUnit_Framework_TestCase;
 use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
 
 abstract class AbstractTest extends PHPUnit_Framework_TestCase implements TestCase
 {
@@ -18,6 +19,18 @@ abstract class AbstractTest extends PHPUnit_Framework_TestCase implements TestCa
     /** @var LoggerInterface */
     protected $log;
 
+    /** @var LoopInterface */
+    private $loop;
+
+
+    /**
+     * @param LoopInterface $loop
+     */
+    public function attachLoop(LoopInterface $loop)
+    {
+        $this->loop = $loop;
+    }
+    
     /**
      * @param LoggerInterface $log
      * @return void
@@ -25,6 +38,17 @@ abstract class AbstractTest extends PHPUnit_Framework_TestCase implements TestCa
     public function attachLogger(LoggerInterface $log)
     {
         $this->log = $log;
+    }
+
+
+    /**
+     * This test has finished. It is considered to have passed if no assertions failed during execution.
+     *
+     * @return void
+     */
+    protected function markTestComplete()
+    {
+        $this->log->notice("Test complete");
     }
 
 }

@@ -10,6 +10,7 @@ namespace Alaress\Async\Test;
 
 
 use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
 
 interface TestCase
 {
@@ -27,6 +28,11 @@ interface TestCase
      */
     public function requiredDaemons();
 
+
+    /**
+     * @param LoopInterface $loop
+     */
+    public function attachLoop(LoopInterface $loop);
 
     /**
      * @param LoggerInterface $log
