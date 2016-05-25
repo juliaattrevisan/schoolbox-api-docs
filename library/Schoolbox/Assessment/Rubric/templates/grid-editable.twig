@@ -20,9 +20,7 @@
                 </span>
             </th>
             {%- endfor %}
-            {% if rubric.levels|length < levelLimit %}
             <th><a href="#" data-spawn="level">&plus; {{ locale.translate('rubricLevel', false, true) }}</a></th>
-            {% endif %}
         </tr>
         </thead>
         <tbody>
