@@ -23,6 +23,7 @@ $userMapper = UserMapper::getInstance();
 $groupMapper = GroupMapper::getInstance();
 
 $categoryId = $_REQUEST['categoryID'];
+$currentUser = $userMapper->findById($_SESSION["id"]);
 
 try {
 	$folder = $catMapper->findById($categoryId);
@@ -203,6 +204,12 @@ if (!empty($_POST['accessLevel'])) {
 			$ua->setAccessLevel(UserAccess::ACCESS_FULL)
 				->setUser($user);
 			$uaMapper->save($ua);
+
+			if (!$currentUser->isSuperuser()) {
+				echo "<div id='url'>/homepage/{$categoryId}</div>";
+				exit;
+			}
+
 		} elseif ($accessLevel == UserAccess::ACCESS_DENY) {
 			$uaMapper->deleteByColumnList([
 				'service' => UserAccess::SERVICE_HOMEPAGE,
