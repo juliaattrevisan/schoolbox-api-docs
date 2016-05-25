@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Failure\Unauthorized;
+use Alaress\Tree\TreeNode;
 use Alaress\Web\Controller as Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Request\Values;
@@ -28,12 +29,14 @@ use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
+use Schoolbox\Assessment\Course\Unit\Mapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum;
 use Schoolbox\Error;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
@@ -43,10 +46,12 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Code;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -839,6 +844,111 @@ class Controller extends Base\Base
 
 
     /**
+     * Gets a permission string out of a permission code returned from
+     * $this->handler->getPermission().
+     *
+     * @param  $code
+     *
+     * @return string
+     */
+    protected function getPermissionString($code)
+    {
+        switch ($code) {
+            case UserAccess::ACCESS_FULL:
+                return 'full';
+                break;
+            case UserAccess::ACCESS_WRITE:
+                return 'write';
+                break;
+            case UserAccess::ACCESS_READ:
+                return 'read';
+                break;
+            case UserAccess::ACCESS_DENY:
+            default:
+                return '';
+        }
+    }
+
+
+    /**
+     * TODO remove
+     */
+    private function debug(){
+
+
+
+        //echo '<pre>'; print_r($facultyTreeNode);  die();
+    }
+
+    /**
+     * Recursively convert TreeNode tree to nested array
+     * @param TreeNode $node
+     * @param array $courseIds    Maps $courseId => $courseId
+     * @param array $permissions    Maps $folderId => permissionLevel
+     * @return array
+     */
+    private function buildFolderTreeRecursive(TreeNode $node, array $courseIds, array $permissions)
+    {
+        $array = array();
+
+        // Special Case for SB Root
+        if(0 === $node->getId()){
+            $array['id'] = 0;
+            $array['text'] = "Root";
+        } else {
+
+            /** @var Folder\Model $item */
+            $item = $node->getItem();
+            $array['id'] = $item->getId();
+            $array['text'] = $item->getName();
+            $array['type'] = $item->getFolderType();
+
+            $array['li_attr'] = array(
+                'data-permission' => $this->getPermissionString($permissions[$item->getId()]),
+                'data-type' => $item->getFolderType(),
+                'data-id' => $item->getId()
+            );
+            $array['a_attr'] = array(
+                'href' => '/homepage/' . $item->getId()
+            );
+        }
+
+        $array['children'] = array();
+
+        foreach($node->getChildren() as $childNode){
+            // Permission Business Rules
+            // not set = prune subtree
+            // 0 = prune subtree
+            // 1 = show node, but don't permit selection
+            // 2 = show node, permit selection 
+            // 3 = show node, permit selection
+
+            // Folder Type Business Rules
+            // Course = prune subtree
+
+            $childId = $childNode->getId();
+            $isSuper = $this->getUser()->isSuperuser();
+            $isDenied = !isset($permissions[$childId]) || UserAccess::ACCESS_DENY === $permissions[$childId];
+            $isCourse = array_key_exists($childId,$courseIds);
+
+            if( ($isSuper || !$isDenied) && !$isCourse){
+                $array['children'][] = $this->buildFolderTreeRecursive($childNode, $courseIds, $permissions);
+            }
+        }
+
+        //sort children alphabetically
+        if(count($array['children'])){
+            usort($array['children'], function($a,$b){
+                return strcasecmp($a['text'],$b['text']);
+            });
+        }
+
+
+        return $array;
+
+    }
+
+    /**
      * List the folders that are allowed to be course parents
      *
      * @api   GET /course/parent
@@ -846,6 +956,90 @@ class Controller extends Base\Base
      */
     public function parentList()
     {
+
+
+
+$startTime = microtime(true);
+$courseIds = $this->courseMapper->findAllIds();
+$courseIds = array_combine($courseIds,$courseIds);
+
+
+        $user = $this->getUser();
+        $userId = $user->getId();
+        $role = $user->getRole();
+        $roleId = $role->getId();
+        $isSuper = $user->isSuperuser();
+
+        $roleAccessMapper = RoleAccessMapper::getInstance();
+        $roleAccesses = $roleAccessMapper->findByColumn('gid',$roleId);
+
+
+        $rolePermissions = array();
+        foreach($roleAccesses as $roleAccess){
+            $rolePermissions[$roleAccess->getCategory()->getId()] = $roleAccess->getType();
+        }
+
+        // Get individual permissions
+        $userAccesses = $this->userAccessMapper->findByColumnList( array(
+            'uid' => $userId,
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+            )
+        );
+
+        $userPermissions = array();
+        foreach($userAccesses as $userAccess){
+            $userPermissions[$userAccess->getServiceIdentifier()] = $userAccess->getAccessLevel();
+        }
+
+        // Merge permissions
+        $permissions = $rolePermissions;
+        foreach($userPermissions as $folderId => $userPermission){
+            if(array_key_exists($folderId,$permissions)){
+                $permissions[$folderId] = max($permissions[$folderId], $userPermission);
+            } else {
+                $permissions[$folderId] = $userPermission;
+            }
+        }
+
+
+
+        /** @var FolderMapper $folderM */
+        $folderM = $this->getFolderMapper();
+
+        /** @var Collection $collection */
+        $allFolders = $folderM->findAll();
+
+
+        $root = new TreeNode(NULL, 0, NULL);
+        $nodes = array(0 => $root);
+
+        // Convert to flat array of nodes
+        foreach($allFolders as $folder){
+            /** @var Folder\Model $folder */
+            $nodes[$folder->getId()] = new TreeNode($folder, $folder->getId(), $folder->getParent()->getId());
+        }
+
+        // Convert flat to tree
+        foreach($nodes as $id => $node){
+            if(NULL != $node->getParent()){
+                $nodes[$node->getParent()]->addChild($node);
+            }
+        }
+
+
+        $facultyNode = $this->getCourseMapper()->getFacultyNode();
+        $rootNode = $nodes[$facultyNode->getId()];
+
+$rootArr = $this->buildFolderTreeRecursive($rootNode,$courseIds,$permissions);
+$data['branch'] = $rootArr;
+$this->tpl('parentList', $data);
+$endTime = microtime(true);
+error_log('duration new: '.($endTime - $startTime));
+return;
+
+
+
+
         // the valid list of parents:
         //  - start at facultyTop $this->getCourseMapper()->getFacultyNode(),
         //  - recurse into every folder for which the user has WRITE access
@@ -867,7 +1061,9 @@ class Controller extends Base\Base
         $data = [
             'branch' => $data
         ];
-
+$endTime = microtime(true);
+error_log('duration old: '.($endTime - $startTime));
+//echo '<pre>'; print_r($data); die();
         $this->tpl('parentList', $data);
     }
 
@@ -2315,3 +2511,4 @@ class Controller extends Base\Base
     }
 
 }
+
