@@ -30,6 +30,13 @@ interface TestCase
 
 
     /**
+     * Perform any setup required
+     *
+     * @return void
+     */
+    public function prepare();
+
+    /**
      * @param LoopInterface $loop
      */
     public function attachLoop(LoopInterface $loop);

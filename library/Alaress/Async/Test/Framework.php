@@ -205,6 +205,7 @@ class Framework
 
         // attach our logger
         $testCase->attachLogger($log);
+        $testCase->prepare();
 
         // scan for listeners
         foreach ($rc->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
