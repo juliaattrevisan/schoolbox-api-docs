@@ -13,9 +13,7 @@
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>
 <script type="text/javascript">
     $(function () {
-        $.fn.alaressEditor({
-            targetElements: $('[data-html-editor]')
-        });
+        $.fn.alaressEditor();
 
         $('#item_datetime_published, #item_datetime_expires').datepicker({
             onClose:function (string) {

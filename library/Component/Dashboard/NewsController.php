@@ -101,7 +101,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                     $output = array(
                         'NEWS_TITLE' => $item['item_heading'],
                         'NEWS_URL' => '/news/item/' . $item['item_id'],
-                        'NEWS_SHORT' => empty(Scrub::html($item['item_blurb'])) ? TextFormatter::cutSentence(Scrub::html2text($item['item_body']), 300) : Scrub::html2text($item['item_blurb']),
+                        'NEWS_SHORT' => empty($item['item_blurb']) ? TextFormatter::cutSentence(Scrub::html2text($item['item_body']), 300) : Scrub::html($item['item_blurb']),
                         'NEWS_TIME' => $newsTime->getRelativeTime(),
                         'NEWS_IMAGE' => $item['item_image'],
                         'NEWS_AUTHOR_NAME' => $userFormatter->formatName($item),
