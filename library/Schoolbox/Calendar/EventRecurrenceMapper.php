@@ -52,12 +52,10 @@ class EventRecurrenceMapper
         $this->setEventMapper($eventMapper);
 
         // stash the existing notifier so we can use it ourselves
-        $this->notif = $this->getEventMapper()
-                            ->getNotifier();
+        $this->notif = $eventMapper->getNotifier();
 
         // silence!! but srsly, in this context, the event mapper needs to not raise notifications
-        $this->getEventMapper()
-             ->setNotifier(new SilentNotif());
+        $eventMapper->setNotifier(new SilentNotif());
 
         $this->setup();
     }

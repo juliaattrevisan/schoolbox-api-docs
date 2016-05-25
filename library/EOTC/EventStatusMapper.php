@@ -12,6 +12,12 @@ namespace EOTC;
 
 use \Schoolbox\Collection;
 
+/**
+ * Class EventStatusMapper
+ *
+ * @package EOTC
+ * @method EventStatus findById($id)
+ */
 class EventStatusMapper extends \Schoolbox\Mapper {
 
 	/* These consts are referenced in numerous places but

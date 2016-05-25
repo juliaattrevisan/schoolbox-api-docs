@@ -119,7 +119,7 @@ class EventConnector extends EventMapper
             /* Determine current status
              */
             if ($eventItem->getMetadata()) {
-                $metadataMapper = new EventMetadataMapper();
+                $metadataMapper = EventMetadataMapper::getInstance();
                 $metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
             }
 
@@ -194,7 +194,7 @@ class EventConnector extends EventMapper
         if ($user->isSuperuser()) {
             $isEOTCManager = true;
         } else {
-            $permissionMapper = new EventPermissionMapper();
+            $permissionMapper = EventPermissionMapper::getInstance();
             $allPermissions   = $permissionMapper->findByUser($user);
 
             if ($allPermissions->count()) {
@@ -230,7 +230,7 @@ class EventConnector extends EventMapper
             /* Determine current status
              */
             if ($eventItem->getMetadata()) {
-                $metadataMapper = new EventMetadataMapper();
+                $metadataMapper = EventMetadataMapper::getInstance();
                 $metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
                 /* Skip over rejected events so they don't display in the calendar grid,

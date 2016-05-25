@@ -53,7 +53,7 @@ class Urgent extends Base {
 	 * @return bool
 	 */
 	private function isWithinThreshold($timeDifference) {
-		$configMapper = new ConfigMapper();
+		$configMapper = ConfigMapper::getInstance();
 		$config = $configMapper->findUrgentThreshold();
 
 		/* N days before the event starts causes an event to be

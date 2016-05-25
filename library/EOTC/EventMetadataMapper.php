@@ -245,7 +245,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'user_id',
 					'key' => 'id',
-					'mapper' => new UserMapper()
+					'mapper' => UserMapper::getInstance()
 				),
 			)
 		);
@@ -337,7 +337,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'user_id',
 					'key' => 'id',
-					'mapper' => new UserMapper(),
+					'mapper' => UserMapper::getInstance(),
 					'options' => array(
 						'order' => array(
 							'lastname' => 'ASC'
@@ -442,7 +442,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'booking_id',
 					'key' => 'id',
-					'mapper' => new \Schoolbox\ResourceBooking\Booking\Mapper()
+					'mapper' => \Schoolbox\ResourceBooking\Booking\Mapper::getInstance()
 				),
 			)
 		);
@@ -492,7 +492,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'event_id',
 					'key' => 'id',
-					'mapper' => new \EOTC\EventMapper(),
+					'mapper' => \EOTC\EventMapper::getInstance(),
 				),
 			)
 		);
