@@ -178,8 +178,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $relEventStart = (int)$relEvent->getStartDateTime()->getUnixTimeStamp();
         $currentStatus = $eventMetadata->getStatus();
 
-        // TODO KNOWN ISSUE IN [EOTC-120]: THIS IS CURRENTLY JUST ALERTS ALL MODERATORS
-        $userIds = EventPermissionMapper::getInstance()->findAll()->getColumnValues('userId');
+        $userIds = $this->getInterestedUsers($relEvent, $currentStatus);
 
         $userIds[] = $relEvent->getTeacherInCharge()->getId();
         $userIds[] = $relEvent->getAuthor()->getId();
