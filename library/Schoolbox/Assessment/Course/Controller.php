@@ -1455,7 +1455,9 @@ class Controller extends Base\Base
                     // Updating existing course outline, just grab it from the database
                     $component = $this->getComponentInstanceMapper()->findById($post["component_id"]);
 
-                    if ($component->getIdentifier() == $homepage) {
+                    if ($component->getIdentifier() == $homepage
+                        && $component->getModule() == 'homepage'
+                    ) {
                         $componentCache[$homepage] = $component;
                     } else {
                         // Inserting new course outline, create it on the current homepage
