@@ -1,6 +1,6 @@
 <?php
-use Alaress\Async\Test\AbstractTest;
 use Schoolbox\Mapper;
+use Schoolbox\Realtime\Test\AbstractNotificationTest;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -11,13 +11,14 @@ use Schoolbox\UserMapper;
  * @link        http://www.alaress.com.au/
  */
 
-class EotcReminders extends AbstractTest
+class EotcReminders extends AbstractNotificationTest
 {
     const GLENDA_SMITH  = 157;
     const JACKIE_BENSON = 247;
     const ZANE_SMITH    = 151;
     const ANNE_SMITH    = 159;
     const SOPHIA_SAXON  = 160;
+    const RYAN_VOLLMER  = 13;
     const ALARESS_ADMIN = 19;
 
     /** @var User[] */
@@ -43,6 +44,17 @@ class EotcReminders extends AbstractTest
 
 
     /**
+     * Provide the list of daemons that need to be attached for this test
+     *
+     * @return array
+     */
+    public function requiredDaemons()
+    {
+        return [ self::DAEMON_SCHEDULE, self::DAEMON_REROUTE ];
+    }
+
+
+    /**
      * @param int $id
      * @return User
      */
@@ -54,7 +66,6 @@ class EotcReminders extends AbstractTest
 
         return $this->userCache[$id];
     }
-
 
 
     /**
@@ -69,21 +80,66 @@ class EotcReminders extends AbstractTest
         ]);
     }
 
+
     /**
-     * Provide the list of daemons that need to be attached for this test
-     *
-     * @return array
+     * @param int $daysFromNow
+     * @param int $tic
+     * @return \EOTC\Event
      */
-    public function requiredDaemons()
+    protected function createEvent($daysFromNow, $tic = self::RYAN_VOLLMER)
     {
-        return [ self::DAEMON_SCHEDULE, self::DAEMON_REROUTE ];
+        $event  = new \EOTC\Event();
+        $meta   = new \EOTC\EventMetadata();
+        $status = new \EOTC\EventStatus();
+
+        $status->setId(\EOTC\EventStatusMapper::STATUS_DEFAULT);
+        $meta->setStatus($status);
+
+        $author = UserMapper::getInstance()->getSessionUser();
+        $tic    = $this->getUser($tic);
+
+        /** @var \Schoolbox\Calendar\EventType $type */
+        $type = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findById(1);
+
+        // set this to be (5 + 5n) seconds after current time, but (n) days from now
+        $start = Alaress_Date_Format::now()->addSeconds(5 + 5 * $daysFromNow)->addDays($daysFromNow);
+        $end   = Alaress_Date_Format::now()->addMinutes(5)->addDays($daysFromNow);
+
+        $event->setAuthor($author);
+        $event->setTeacherInCharge($tic);
+        $event->setType($type);
+        $event->setTitle("Event $daysFromNow Days From Now");
+        $event->setStartDateTime($start);
+        $event->setEndDateTime($end);
+        $event->setLocation('TEST EOTC LOCATION');
+        $event->setDetail('');
+        $event->setAllDay(false);
+        $event->setPublishDate('1970-01-01');
+        $event->setCampusCollection(new \Schoolbox\Collection([ 1 ]));
+        $event->setMetadata($meta);
+        $event->getMetadata()->setRamsFiles(new \Schoolbox\Collection());
+
+        return $event;
+    }
+
+    protected function persistEvent(\EOTC\Event $event)
+    {
+        $startDate = $event->getStartDateTime();
+        $endDate   = $event->getEndDateTime();
+
+        $eventRelations = new \Schoolbox\Calendar\EventRelations(null, null, null);
+
+        $this->log->info("Saving new event to start at {$startDate->getDatabase()}", [ 'char' => '>' ]);
+
+        $eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper(\EOTC\EventMapper::getInstance());
+        $eventRecurrenceMapper->save($event, 'self', '', '', $startDate, $endDate, null, $eventRelations);
     }
 
 
     /**
      * When both daemons are ready to go, 
      *
-     * @rerouted  Added \d+ subscriptions
+     * @rerouted  Added (?P<count>\d+) subscriptions
      * @scheduled Connected to STOMP
      */
     public function onReady()
@@ -112,7 +168,7 @@ class EotcReminders extends AbstractTest
             $permission->setCampusId(1);
             $permission->setStatusId($statusId);
             $permission->setAllowed($statusId);
-            $permission->setSubscribed($statusId);
+//            $permission->setSubscribed($statusId);
             $permission->setCreatedAt($now);
             $permission->setUpdatedAt($now);
 
@@ -132,65 +188,45 @@ class EotcReminders extends AbstractTest
     {
         $this->log->info("Permissions set", [ 'char' => '<' ]);
 
-        $eventMapper = \EOTC\EventMapper::getInstance();
-        $this->configureMapper($eventMapper);
+        // create a new event to start tomorrow
+        $this->persistEvent($this->createEvent(10));
+        $this->persistEvent($this->createEvent(3));
+        $this->persistEvent($this->createEvent(2));
+        $this->persistEvent($this->createEvent(1));
 
-        $event = new \EOTC\Event();
+        // create an event to start tomorrow, but transition it to
 
-        try {
-            $metadataMapper = \EOTC\EventMetadataMapper::getInstance();
-            $metadata = $metadataMapper->findByEvent($event);
-        }
-        catch (\Exception $e) {
-            $metadata = new \EOTC\EventMetadata();
-            $metadataStatus = new \EOTC\EventStatus();
-            $metadataStatus->setId(\EOTC\EventStatusMapper::STATUS_DEFAULT);
-            $metadata->setStatus($metadataStatus);
-        }
-
-        $author = $teacherInCharge = $this->getUser(self::JACKIE_BENSON);
-
-        /** @var \Schoolbox\Calendar\EventType $eventType */
-        $eventType = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findById(1);
-
-        // set this to be 15 seconds after current time, but tomorrow
-        $startDate = Alaress_Date_Format::now()->addSeconds(15)->addDays(1);
-        $endDate   = Alaress_Date_Format::now()->addMinutes(5)->addDays(1);
-
-        $event->setAuthor($author);
-        $event->setTeacherInCharge($teacherInCharge);
-        $event->setType($eventType);
-        $event->setTitle('TEST EOTC EVENT');
-        $event->setStartDateTime($startDate);
-        $event->setEndDateTime($endDate);
-        $event->setLocation('TEST EOTC LOCATION');
-        $event->setDetail('');
-        $event->setAllDay(false);
-        $event->setPublishDate('1970-01-01');
-        $event->setCampusCollection(new \Schoolbox\Collection([ 1 ]));
-        $event->setMetadata($metadata);
-        $event->getMetadata()->setRamsFiles(new \Schoolbox\Collection());
-
-        $eventRelations = new \Schoolbox\Calendar\EventRelations(null, null, null);
-
-        $this->log->info("Saving new event to start at {$startDate->getDatabase()}", [ 'char' => '>' ]);
-
-        $eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
-        $eventRecurrenceMapper->save($event, 'self', '', '', $startDate, $endDate, null, $eventRelations);
     }
 
 
     /**
-     * @scheduled notify.user.151.eotc.1.upcoming
-     * @scheduled notify.user.157.eotc.1.upcoming
-     * @scheduled notify.user.159.eotc.1.upcoming
-     * @scheduled notify.user.160.eotc.1.upcoming
-     * @scheduled notify.user.247.eotc.1.upcoming
+     * @rerouted SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<userId>\d+)
+     *
+     * @param string $messageId
+     * @param int    $userId
      */
-    public function onBroadcast()
+    public function onDelivery($messageId, $userId)
     {
-        $this->log->notice('5 notifications broadcast', [ 'char' => '>' ]);
-    }
+        // known message ID => [ list of people who should be receiving it ]
+        // the assertion will fail if this message is received by someone outside this list
+        $messageMap = [
+            'b388dab10c71d373e5f000c3a4609432560df33d:b0e6848da29cd8a3f069c1b865261ee7a3a50e94' => [ self::ZANE_SMITH, self::RYAN_VOLLMER ]
+        ];
 
+        try {
+            $message = $this->fetchMessageInstance($messageId)->jsonSerialize();
+
+            $title = $message['title']['text'];
+
+            $this->log->info($title, [ 'char' => '>' ]);
+
+            if (isset($messageMap[$messageId])) {
+                $this->assertContains($userId, $messageMap[$messageId]);
+            }
+
+        } catch (OutOfBoundsException $e) {
+            $this->log->error($e->getMessage(), [$e]);
+        }
+    }
 
 }
