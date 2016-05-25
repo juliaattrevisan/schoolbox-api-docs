@@ -117,7 +117,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         $relEvent  = EventMapper::getInstance()->findById($eventCollection->first()->getId());
 
-        $startTime = $relEvent->getStartDateTime()->getUnixTimestamp();
+        $startTime = $relEvent->getStartDateTime()->getUnixTimeStamp();
 
         // iterate across the number of days to remind
         for ($i = $threshold; $i > 0; --$i) {
@@ -175,7 +175,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         /** @var Event $relEvent */
         $relEvent      = EventMapper::getInstance()->findById($eventCollection->first()->getId());
         $relEventId    = $relEvent->getId();
-        $relEventStart = (int)$relEvent->getStartDateTime()->getUnixTimestamp();
+        $relEventStart = (int)$relEvent->getStartDateTime()->getUnixTimeStamp();
         $currentStatus = $eventMetadata->getStatus();
 
         // TODO KNOWN ISSUE IN [EOTC-120]: THIS IS CURRENTLY JUST ALERTS ALL MODERATORS
@@ -185,8 +185,6 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $userIds[] = $relEvent->getAuthor()->getId();
 
         $userIds = array_unique($userIds);
-
-        $this->log->warning(json_encode($userIds));
 
         // TODO make this use Carbon-based ADF once it's merged into 15.0
         $days = (int)round(($relEventStart - time()) / self::REMINDER_INTERVAL);
@@ -243,9 +241,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $permissionCollection = EventPermissionMapper::getInstance()->findByColumnList(
             array(
                 'campus_id' => $relEvent->getCampusCollection()->getColumnValues('id'),
-                'status_id' => $eventMetadata->getStatus() instanceof EventStatus ?
-                    $eventMetadata->getStatus()->getId() :
-                    $eventMetadata->getStatus()
+                'status_id' => $eventMetadata->getStatus()->getId()
             )
         );
 
@@ -314,10 +310,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         // get list of moderators relevant to the current status
         $currentStatus = $eventMetadata->getStatus();
-        $moderatorIds  = $this->getInterestedUsers(
-            $relEvent,
-            $currentStatus instanceof EventStatus ? $currentStatus->getId() : (int)$currentStatus
-        );
+        $moderatorIds  = $this->getInterestedUsers($relEvent, $currentStatus);
 
         // prep msg data
         $bob->setIcon("/portrait.php?size={$this->iconSize}&userId=$effectorExtId");
@@ -476,7 +469,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                         $bob->setHref($hrefMod)
                             ->setParam('event', new Param($relEventNote, $hrefMod));
 
-                        $ramsModIds = $this->getInterestedUsers($relEvent, EventStatusMapper::STATUS_DETAILSCOMPLETED);
+                        $ramsModIds = $this->getInterestedUsers($relEvent, EventStatusMapper::getInstance()->findById(EventStatusMapper::STATUS_DETAILSCOMPLETED));
 
                         foreach ($ramsModIds as $userId) {
                             $envelope->targetToUser($userId, $bob->build());
@@ -524,12 +517,12 @@ class EventMetadataNotifier extends AbstractModuleNotifier
      * assumed that these users will be subscribed to Approved and Cancelled
      * events.
      *
-     * @param Event     $event        the event in question
-     * @param int|array $targetStatus can be an array of statuses
+     * @param Event       $event        the event in question
+     * @param EventStatus $targetStatus can be an array of statuses
      *
      * @return array
      */
-    protected function getInterestedUsers($event, $targetStatus)
+    protected function getInterestedUsers(Event $event, EventStatus $targetStatus)
     {
         $campusIds = array();
         // coerce "campuses" out of their "collection"
@@ -541,7 +534,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $permissions = EventPermissionMapper::getInstance()->findByColumnList(
             array(
                 'campus_id' => $campusIds,
-                'status_id' => $targetStatus,
+                'status_id' => $targetStatus->getId(),
             )
         );
         $userIds     = array();
