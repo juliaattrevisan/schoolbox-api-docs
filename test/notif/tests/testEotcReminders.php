@@ -25,16 +25,14 @@ class EotcReminders extends AbstractTest
 
 
     /**
-     * Sets up the fixture, for example, open a network connection.
-     * This method is called before a test is executed.
-     *
+     * EotcReminders TestCase constructor.
      */
-    public function setUp()
+    public function prepare()
     {
         // fear not - you are sudo
-        $this->log->notice(`mysql schoolbox < /vagrant/sql/custom/stkentigern/eotc-initial.sql 2>&1`);
-        $this->log->notice(`mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1`);
-        $this->log->notice(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`);
+        $this->log->notice(`mysql schoolbox < /vagrant/sql/custom/stkentigern/eotc-initial.sql 2>&1` . 'EOTC Initial applied');
+        $this->log->notice(`mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1` . 'Weapons to maximum');
+        $this->log->notice(trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' queues cleared');
 
         // configure the mappers we're going to use
         $this->configureMapper(UserMapper::getInstance());
