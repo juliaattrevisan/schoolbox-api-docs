@@ -17,7 +17,7 @@
             output: 'input[data-role="signatureInput"]'
         };
 
-        var settings = $.extend({}, defaults, options);
+        var settings = $.extend(true,{},defaults,options);
         var initial  = settings.init;
         delete settings.init;
 

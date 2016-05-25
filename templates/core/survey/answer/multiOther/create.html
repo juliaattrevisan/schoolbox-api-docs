@@ -36,19 +36,7 @@
         $('#createQuestionForm').multiRadioCreate({
             availability: 'survey',
             mode: 'create',
-            questionBank: false,
-            rules: {
-                question: {
-                    required: true,
-                    minlength: 2
-                },
-                'answerDescription[]': {
-                    emptyInputs: true
-                }
-            },
-            customValidationRules: function(config) {
-                $.fn.addCustomRules_emptyInputs(config);
-            }
+            questionBank: false
         });
     });
 </script>

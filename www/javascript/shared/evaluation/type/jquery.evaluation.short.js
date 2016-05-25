@@ -25,7 +25,7 @@
 				questionForm: $('#questionForm-' + options.id)
 			}
 
-			return $.extend(defaults, derived, options);
+			return $.extend(true,defaults, derived, options);
 		}
 
 		/**

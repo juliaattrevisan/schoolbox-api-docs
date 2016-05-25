@@ -48,7 +48,8 @@
                 },
 
                 /* Actual validation rules
-                 * Defaults to the full set.
+                 * Defaults to the full set. Can be extended/overridden via instance-specific options
+                 * Note: If you wish to remove a default method, you must set it to false in your instance options
                  */
                 rules: {
                     question: {
@@ -68,10 +69,20 @@
                 },
 
                 /* Error messages
+                 * Note: If you override a validation method's default message, you must define your custom messages
+                 *       at the same granularity as the rules, otherwise instance-specific custom messages will not be displayed.
                  */
                 messages: {
-                    question: "Please enter a question.",
-                    answer: "Please fill out an answer."
+                    question: {
+                        required: "Please enter a question.",
+                        minlength: "Please enter a question."
+                    },
+                    answer: {
+                        required: "Please fill out an answer.",
+                        minlength: "Please fill out an answer.",
+                        emptyAnswer: "Please fill out an answer."
+                    }
+
                 },
 
                 errorPlacement: function(error, element) {
@@ -88,7 +99,7 @@
             var derived = {
             }
 
-            var merged = $.extend(defaults, derived, options);
+            var merged = $.extend(true,defaults, derived, options);
 
             return merged;
         }
@@ -217,11 +228,15 @@
                 /* Setup of custom validation rules to use
                  * Call $.fn.addCustomRules_* here.
                  */
-                customValidationRules: function() {
+                customValidationRules: function(config) {
+                    $.fn.addCustomRules_greaterThanZero(config);
+                    $.fn.addCustomRules_somethingChecked(config);
+                    $.fn.addCustomRules_emptyInputs(config);
+                    $.fn.addCustomRules_uniqueOptions(config);
                 },
 
                 /* Actual validation rules
-                 * Defaults to the full set.
+                 * Defaults to the full set. Survey-type will need to set somethingChecked: false as not rele
                  */
                 rules: {
                     question: {
@@ -233,11 +248,10 @@
                         minlength: 1,
                         greaterThanZero:true
                     },
-                    'answer[]': {
-                        somethingChecked: true
-                    },
+                    answer: false,
                     'answerDescription[]': {
-                        emptyInputs: true
+                        emptyInputs: true,
+                        hasUniqueOptions: "answerCollection"
                     }
                 },
 
@@ -251,7 +265,7 @@
             var derived = {
             }
 
-            var merged = $.extend(defaults, derived, options);
+            var merged = $.extend(true,defaults, derived, options);
 
             return merged;
         }
@@ -520,7 +534,7 @@
                 css: 'span.selected-word { background: #cae9b9; }'
             }
 
-            var merged = $.extend(defaults, derived, options);
+            var merged = $.extend(true,defaults, derived, options);
 
             return merged;
         }
@@ -575,9 +589,15 @@
             });
 
             $('#createQuestionForm').shortCreate({
+                rules: {
+                    answer: {
+                        hasClozeField: "selected-word"
+                    }
+                },
                 customValidationRules: function(config) {
                     $.fn.addCustomRules_greaterThanZero(config);
                     $.fn.addCustomRules_emptyAnswer(config);
+                    $.fn.addCustomRules_containsClozeField(config);
                 }
             });
         }

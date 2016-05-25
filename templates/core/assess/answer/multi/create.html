@@ -39,11 +39,11 @@ $(function() {
         availability: 'assess',
         mode: 'create',
         questionBank: false,
-        customValidationRules: function(config) {
-            $.fn.addCustomRules_greaterThanZero(config);
-            $.fn.addCustomRules_emptyInputs(config);
-            $.fn.addCustomRules_somethingChecked(config);
-        }
+        rules: {
+            'answer[]': {
+                somethingChecked: true
+            }
+        },
     });
 });
 </script>

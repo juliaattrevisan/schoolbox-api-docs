@@ -49,22 +49,19 @@
 <script type='text/javascript' src="/javascript/shared/evaluation/jquery.evaluation.validation.js"></script>
 <script type="text/javascript">
     $(function() {
+
         $('#createQuestionForm').multiRadioCreate({
             availability: 'survey',
             mode: 'modify',
             questionBank: questionBank,
             answerName: 'answerRight',
             rules: {
-                question: {
-                    required: true,
-                    minlength: 2
-                },
                 'answerRight[]': {
-                    emptyInputs: true
+                    required: true,
+                    minlength: 1,
+                    emptyInputs: true,
+                    hasUniqueOptions: "answerCollection"
                 }
-            },
-            customValidationRules: function(config) {
-                $.fn.addCustomRules_emptyInputs(config);
             }
         });
     });

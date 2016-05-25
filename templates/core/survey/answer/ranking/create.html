@@ -38,16 +38,12 @@
             questionBank: false,
             answerName: 'answerRight',
             rules: {
-                question: {
-                    required: true,
-                    minlength: 2
-                },
                 'answerRight[]': {
-                    emptyInputs: true
+                    required: true,
+                    minlength: 1,
+                    emptyInputs: true,
+                    hasUniqueOptions: "answerCollection"
                 }
-            },
-            customValidationRules: function(config) {
-                $.fn.addCustomRules_emptyInputs(config);
             }
         });
     });

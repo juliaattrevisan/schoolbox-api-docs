@@ -31,7 +31,7 @@
 
 <ul class="hide" data-clone>
     <li class="row" data-input>
-        <div class="small-1 columns" data-answer-code>
+        <div class="small-3 medium-2 columns" data-answer-code>
             <input name="answerCode[]" type="hidden" value="" data-answer-code-value />
 
             <input name="answer[]" type="checkbox" value="" data-answer-option />
@@ -39,7 +39,7 @@
                 <span class="content" data-answer-code-representation></span>
             </label>
         </div>
-        <div class="small-10 columns">
+        <div class="small-8 medium-9 columns">
             <label class="answer-value">
                 <input name="answerDescription[]" type="text" value="" data-answer-description />
             </label>
@@ -59,11 +59,11 @@
             availability: 'assess',
             mode: 'modify',
             questionBank: questionBank,
-            customValidationRules: function(config) {
-                $.fn.addCustomRules_greaterThanZero(config);
-                $.fn.addCustomRules_emptyInputs(config);
-                $.fn.addCustomRules_somethingChecked(config);
-            }
+            rules: {
+                'answer[]': {
+                    somethingChecked: true
+                }
+            },
         });
     });
 </script>

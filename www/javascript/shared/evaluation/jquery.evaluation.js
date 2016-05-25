@@ -188,7 +188,7 @@
 				derived.result.push(element);
 			}
 
-			var merged = $.extend(defaults, derived);
+			var merged = $.extend(true,defaults, derived);
 			return merged;
 		}
 
