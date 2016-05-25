@@ -874,17 +874,18 @@ class Controller extends Base\Base
     /**
      * This GET is the start of the import process. Import a Course into a set of Folders (classes)
      *
-     * @api   GET /course/import/{courseId}/class/{classCode}
+     * @api   GET /course/import/{courseId}/class/{classCode}{/componentId}
      * @level 160
      *
      * @param int    $courseId
      * @param string $classCode
+     * @param int    $componentId  (Optional) the ID of the component the course is to be imported into
      */
-    public function import($courseId, $classCode)
+    public function import($courseId, $classCode, $componentId=null)
     {
         $importer = new CourseImport();
 
-        $this->tpl('import', $importer->importSelectize($courseId, $classCode));
+        $this->tpl('import', array_merge($importer->importSelectize($courseId, $classCode), ['componentId' => $componentId]));
     }
 
 
@@ -898,12 +899,14 @@ class Controller extends Base\Base
     {
         $ownerships     = $this->getRequest()->post["ownership"];
         $courseHomepage = trim($this->getRequest()->post["importCourse"]);
+        $componentId = trim($this->getRequest()->post["componentId"]);
 
         // process ownership assignments
         // respond with stage 3: unit selection
         $this->tpl('unitImportForm', [
             'homepage'       => implode(',', array_keys($ownerships)),
             'courseHomepage' => $courseHomepage,
+            'componentId'    => $componentId,
             'units'          => $this->getUnitMapper()->findByCourseId($courseHomepage),
             'ownerships'     => implode(',', array_map(
                     function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
@@ -955,6 +958,7 @@ class Controller extends Base\Base
     {
         $homepage       = trim($this->getRequest()->post["importFolders"]);
         $courseHomepage = trim($this->getRequest()->post["importCourse"]);
+        $componentId = trim($this->getRequest()->post["componentId"]);
 
         try {
             $this->getCourseMapper()->findById($courseHomepage);
@@ -1007,7 +1011,8 @@ class Controller extends Base\Base
             $this->tpl('import/ownership', [
                 'targetFolders'       => $folders,
                 'importCourse'        => $courseHomepage,
-                'ownershipCandidates' => $possibleOwnerships
+                'ownershipCandidates' => $possibleOwnerships,
+                'componentId'         => $componentId
             ]);
         }
     }
@@ -1327,6 +1332,7 @@ class Controller extends Base\Base
     public function importSave()
     {
         $post = $this->getRequest()->post;
+
         // Validate dates before we save (nothing to do for tasks)
 
         // Validate due work
@@ -1459,9 +1465,16 @@ class Controller extends Base\Base
                 try {
 
                     // Updating existing course outline, just grab it from the database
-                    $componentCache[$homepage] = $this->getComponentInstanceMapper()->findById(
-                        $post["component_id"]
-                    );
+                    $component = $this->getComponentInstanceMapper()->findById($post["component_id"]);
+
+                    if ($component->getIdentifier() == $homepage
+                        && $component->getModule() == 'homepage'
+                    ) {
+                        $componentCache[$homepage] = $component;
+                    } else {
+                        // Inserting new course outline, create it on the current homepage
+                        $componentCache[$homepage] = $this->injectNewComponent($homepageCache[$homepage], Component_Homepage_CourseOutlineController::class);
+                    }
 
                 } catch (\Exception $e) {
 
@@ -1508,7 +1521,7 @@ class Controller extends Base\Base
 
                         /** @var UnitInstance $unit_instance */
                         $unit_instance = $this->getUnitInstanceMapper()->findOneByColumnList([
-                            "component_id" => $post["component_id"],
+                            "component_id" => $componentCache[$homepage]->getId(),
                             "category_id" => $homepageCache[$homepage]->getId(),
                             "unit_category_id" => $unitCache[$currentUnit['id']]->getId(),
                             "deleted_at" => null,

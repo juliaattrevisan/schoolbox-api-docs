@@ -2,7 +2,7 @@
 {% set collapsePrefix = collapsePrefix ?: 'course' %}
 {% set linkhref =
     folder.id
-        ? routeLookup('course.import', { courseId: course.id, classCode: folder.id })
+        ? routeLookup('course.import', { courseId: course.id, classCode: folder.id, componentId: component.id })
         : routeLookup('course.modifyCourse', { id: course.id })
 %}
 
@@ -14,7 +14,7 @@
 
     <div class="list-item">
         <div class="compact avatar card small-12">
-            <a href="{{ linkhref }}" data-course-id="{{ course.id }}" data-course-name="{{ course.name }}">
+            <a href="{{ linkhref }}" data-course-id="{{ course.id }}" data-course-name="{{ course.name }}" data-component-id="{{ component.id }}">
                 <div class="icon-course icon-16"></div>
                 <h3>{{ course.name }}</h3>
             </a>

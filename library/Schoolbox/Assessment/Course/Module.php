@@ -50,7 +50,7 @@ class Module extends BaseModule
 
                 /* Import screen
                  */
-                '/import/{courseId}/class/{classCode}' => 'import',
+                '/import/{courseId}/class/{classCode}{/componentId}' => 'import',
 
                 /* Dynamic Unit/Task list when choosing course to import
                  */
