@@ -48,7 +48,7 @@
 <div class="row">
     <div class="small-12 island">
         <h1>Message Settings</h1>
-        <form method="post" action="{{ routeLookup('messages.saveConfig') }}">
+        <form method="post" action="{{ routeLookup('messages.saveConfig') }}" id="msg-settings">
             {% if groups %}
                 <h2 class="subheader">Homepages</h2>
 
@@ -111,7 +111,7 @@
             {% for namespace in config %}
                 <h3 class="subheader">Receive {{ namespace.label }} messages when&hellip;</h3>
                 <section>
-                    <ul class='permission-list' id="msg-settings" data-roles data-digest-settings>
+                    <ul class='permission-list' data-roles data-digest-settings>
                         {% for source in namespace.sources %}
                             <li>
                                 <label class="content">&hellip;{{ source.description }}.</label>
