@@ -21,6 +21,9 @@ class EotcReminders extends AbstractNotificationTest
     const RYAN_VOLLMER  = 13;
     const ALARESS_ADMIN = 19;
 
+    const FIRST_REMINDER = 'first_reminder';
+    const DAILY_REMINDER = 'daily_reminder';
+
     /** @var User[] */
     protected $userCache;
 
@@ -40,6 +43,7 @@ class EotcReminders extends AbstractNotificationTest
         $this->configureMapper(\EOTC\EventPermissionMapper::getInstance());
         $this->configureMapper(\EOTC\EventMapper::getInstance());
         $this->configureMapper(\EOTC\EventMetadataMapper::getInstance());
+        $this->configureMapper(\EOTC\ConfigMapper::getInstance());
     }
 
 
@@ -122,6 +126,12 @@ class EotcReminders extends AbstractNotificationTest
         return $event;
     }
 
+
+    /**
+     * Saves the given EOTC event
+     *
+     * @param \EOTC\Event $event
+     */
     protected function persistEvent(\EOTC\Event $event)
     {
         $startDate = $event->getStartDateTime();
@@ -188,14 +198,34 @@ class EotcReminders extends AbstractNotificationTest
     {
         $this->log->info("Permissions set", [ 'char' => '<' ]);
 
-        // create a new event to start tomorrow
-        $this->persistEvent($this->createEvent(10));
-        $this->persistEvent($this->createEvent(3));
-        $this->persistEvent($this->createEvent(2));
-        $this->persistEvent($this->createEvent(1));
+        // retrieve the reminder thresholds
+        $econf = \EOTC\ConfigMapper::getInstance();
 
-        // create an event to start tomorrow, but transition it to
+        $configs = $econf->findByColumn('name', [
+            self::FIRST_REMINDER, self::DAILY_REMINDER
+        ]);
 
+        $configs = array_combine($configs->getColumnValues('name'), $configs->getColumnValues('value'));
+
+        /**
+         * We gon create a LOT of events
+         * @var EOTC\Event[] $events
+         */
+        $events = [];
+
+        $events[] = $this->createEvent($configs[self::FIRST_REMINDER]);
+
+        // create an event for every day between the threshold and now
+        for ($i = $configs[self::DAILY_REMINDER]; $i > 0; --$i) {
+            $events[] = $this->createEvent($i);
+        }
+
+        // TODO build more events that can be pushed through the workflow, then left for reminding
+
+        // cache built - save them
+        foreach ($events as $event) {
+            $this->persistEvent($event);
+        }
     }
 
 
