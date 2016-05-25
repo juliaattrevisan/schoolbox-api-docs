@@ -252,8 +252,6 @@ class Framework
             throw new InvalidArgumentException("No daemons specified for testing, nothing to do.");
         }
 
-        $testCase->setUp();
-
         // ok, the gauntlet has been run. We're good to test.
         return $testCase;
     }
@@ -331,7 +329,7 @@ class Framework
 
         $target = $map[$name];
 
-        $cmd = "$target -vvv --porcelain | tee $logdir/$name.log";
+        $cmd = "$target -vvv --porcelain | tee -a $logdir/$name.log";
 
         // open pipes
         $ds = [
@@ -406,7 +404,11 @@ class Framework
             }
 
             foreach ($regex as $pattern => $count) {
-                if (preg_match($pattern, $line)) {
+                if (preg_match($pattern, $line, $captures)) {
+
+                    // remove the full string capture
+                    array_shift($captures);
+
                     $callbackName = $subscription->getCallbackName();
 
                     $log->notice("$record [match $callbackName]", [ 'char' => '?' ]);
@@ -416,11 +418,11 @@ class Framework
 
                     if (empty($this->hooks[$testClass][$callbackName][$hookKey])) {
                         // doesn't yet exist
-                        $this->hooks[$testClass][$callbackName][$hookKey] = 0;
+                        $this->hooks[$testClass][$callbackName][$hookKey] = [];
                     }
 
                     // increment the counter
-                    $this->hooks[$testClass][$callbackName][$hookKey]++;
+                    $this->hooks[$testClass][$callbackName][$hookKey][] = $captures;
 
                     try {
                         // attempt to fire this subscription; if the preconditions are not met it won't fire
@@ -436,6 +438,7 @@ class Framework
 
                     if ($unhook !== false) {
                         // it fired: unset the hooks so we can go again
+                        // TODO consider unwinding this as a stack rather than blindly unsetting
                         unset($this->hooks[$testClass][$callbackName]);
                     }
 

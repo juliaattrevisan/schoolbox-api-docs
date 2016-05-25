@@ -17,7 +17,7 @@ class Subscription
 
     /** @var array */
     private $conditions;
-    /** @var string */
+    /** @var array */
     private $predicate;
     /** @var ReflectionMethod */
     private $callback;
@@ -35,18 +35,16 @@ class Subscription
     {
         $this->conditions = $conditions;
 
-        $predicates = [];
-
         foreach ($conditions as $daemon => $patterns) {
-            foreach ($patterns as $pattern => $count)
-            $predicates[] = "$daemon:$pattern:$count";
+            foreach ($patterns as $pattern => $count) {
+                $this->predicate["$daemon:$pattern"] = $count;
+            }
         }
 
-        sort($predicates);
-        $this->predicate = implode(';', $predicates);
+        ksort($this->predicate);
 
         $this->callback   = $callback;
-        $this->testCase = $testCase;
+        $this->testCase   = $testCase;
     }
 
 
@@ -79,20 +77,44 @@ class Subscription
 
         $prehooks = [];
 
-        foreach ($hooks as $pattern => $count) {
-            $prehooks[] = "$pattern:$count";
+        $allCaptures = [];
+
+        foreach ($hooks as $pattern => $captures) {
+
+            $count = count($captures);
+
+            foreach ($captures as $capture) {
+                $allCaptures = array_merge($allCaptures, $capture);
+            }
+
+            $prehooks[$pattern] = $count;
         }
 
-        $hook = implode(';', $prehooks);
+        foreach ($this->predicate as $expectedKey => $expectedCount) {
+            // iterate the predicates and check that all have at least one hit
+            if (empty($prehooks[$expectedKey])) {
+                return false;
+            }
 
-        $fire = $hook == $this->predicate;
-
-        if ($fire) {
-            // any assertions in here will throw PHPUnit_Framework_AssertionFailedError
-            // they will be caught be the framework
-            $this->callback->invoke($this->testCase);
+            if ($prehooks[$expectedKey] < $expectedCount) {
+                return false;
+            }
         }
 
-        return $fire;
+        $args = [];
+
+        foreach ($this->callback->getParameters() as $param) {
+            // align all regex captures to the arguments of the test case
+            $name = $param->getName();
+            if (isset($allCaptures[$name])) {
+                $args[$name] = $allCaptures[$name];
+            }
+        }
+
+        // any assertions in here will throw PHPUnit_Framework_AssertionFailedError
+        // they will be caught be the framework
+        $this->callback->invokeArgs($this->testCase, $args);
+
+        return true;
     }
 }
