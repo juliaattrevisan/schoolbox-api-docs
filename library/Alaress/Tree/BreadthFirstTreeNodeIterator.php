@@ -24,6 +24,9 @@ use Zend\Stdlib\SplQueue;
  */
 class BreadthFirstTreeNodeIterator implements \Iterator
 {
+    const DIRECTION_LEFT  = 0;
+    const DIRECTION_RIGHT = 1;
+
     /** @var int $position */
     protected $position;
 
@@ -33,8 +36,9 @@ class BreadthFirstTreeNodeIterator implements \Iterator
     /**
      * BreadthFirstTreeNodeIterator constructor.
      * @param TreeNode $root
+     * @param int $direction
      */
-    public function __construct(TreeNode $root)
+    public function __construct(TreeNode $root, $direction = self::DIRECTION_LEFT)
     {
         $queue = new SplQueue();
         $queue->enqueue($root);
@@ -42,8 +46,11 @@ class BreadthFirstTreeNodeIterator implements \Iterator
         try {
             while (($node = $queue->dequeue()) !== null) {
                 $this->array[] = $node;
-
-                foreach ($node->getChildren() as $childNode) {
+                $children = $node->getChildren();
+                if(self::DIRECTION_RIGHT === $direction){
+                    $children = array_reverse($children);
+                }
+                foreach ($children as $childNode) {
                     $queue->enqueue($childNode);
                 }
             }
@@ -82,16 +89,6 @@ class BreadthFirstTreeNodeIterator implements \Iterator
      */
     public function next()
     {
-        // Are we at final element?
-        if(count($this->array) - 1 === $this->position)
-        {
-            // Try to read in next children
-            $children = $this->array[$this->position]->getChildren();
-
-            foreach ($children as $child) {
-                $this->array[] = $child;
-            }
-        }
         ++$this->position;
     }
 
@@ -102,6 +99,4 @@ class BreadthFirstTreeNodeIterator implements \Iterator
     {
         return isset($this->array[$this->position]);
     }
-
-
 }
