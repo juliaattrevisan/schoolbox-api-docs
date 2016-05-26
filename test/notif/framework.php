@@ -16,6 +16,9 @@ if (posix_getuid() !== 0) {
     die("Make me a sandwich.\n");
 }
 
+// do not allow this to be cached
+unset($_SERVER['REQUEST_TIME']);
+
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
