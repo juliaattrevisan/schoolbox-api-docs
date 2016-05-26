@@ -131,17 +131,31 @@ $(document).ready(function() {
         var data   = form.serializeArray();
         var inputs = form.find(':input').not(':disabled').prop('disabled', true);
 
+        // The AJAX update will return one of two things, either a JSON object with an action/url set, or a HTML page
+        // from which we will yank parts to update the page, this will intercept the ajax successes and redirect if
+        // necessary
+
         $(document).ajaxSuccess(function(event, request, settings) {
+
+            // Try to parse the result as JSON
+
             try {
                 var response = JSON.parse(request.responseText);
-if (response.action == 'redirect')
+
+                // Check if the action was redirect, and if so send them to the appropriate URL
+
+                if (response.action == 'redirect')
                     window.location.href = response.url;
-            } catch (e) { }
+            } catch (e) {
+
+                // Noop. Will fall through to the .done() functio
+
+            }
+
         });
 
         $.ajax({url: form.attr('action'), method: form.attr('method'), data: data})
             .done(function(response) {
-
                 // success stuff. Reload memberlist and waitlist
                 label.labelTimeout({text: 'Done'});
                 label.one('hide.labelTimeout', function() {
