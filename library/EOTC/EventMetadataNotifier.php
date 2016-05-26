@@ -516,13 +516,18 @@ class EventMetadataNotifier extends AbstractModuleNotifier
      * assumed that these users will be subscribed to Approved and Cancelled
      * events.
      *
-     * @param Event       $event        the event in question
-     * @param EventStatus $targetStatus can be an array of statuses
+     * @param Event           $event        the event in question
+     * @param EventStatus|int $targetStatus can be an array of statuses
      *
      * @return array
      */
-    protected function getInterestedUsers(Event $event, EventStatus $targetStatus)
+    protected function getInterestedUsers(Event $event, $targetStatus)
     {
+        if ($targetStatus instanceof EventStatus) {
+            // normalise to int
+            $targetStatus = $targetStatus->getId();
+        }
+
         $campusIds = array();
         // coerce "campuses" out of their "collection"
         // because PHP lacks any form of reassurance that what something is meant to contain actually DOES contain it
@@ -533,7 +538,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $permissions = EventPermissionMapper::getInstance()->findByColumnList(
             array(
                 'campus_id' => $campusIds,
-                'status_id' => $targetStatus->getId(),
+                'status_id' => $targetStatus,
             )
         );
         $userIds     = array();
