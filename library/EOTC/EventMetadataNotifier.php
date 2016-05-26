@@ -180,11 +180,6 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         $userIds = $this->getInterestedUsers($relEvent, $currentStatus);
 
-        $userIds[] = $relEvent->getTeacherInCharge()->getId();
-        $userIds[] = $relEvent->getAuthor()->getId();
-
-        $userIds = array_unique($userIds);
-
         // TODO make this use Carbon-based ADF once it's merged into 15.0
         $days = (int)round(($relEventStart - time()) / self::REMINDER_INTERVAL);
 
