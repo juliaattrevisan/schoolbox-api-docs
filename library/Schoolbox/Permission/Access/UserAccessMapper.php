@@ -465,7 +465,7 @@ class UserAccessMapper extends Mapper
      * @return UserAccess
      * @throws Mapper\Exception
      */
-    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE)
+    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE, $cache = true)
     {
         // Order of priority for permissions
         //
@@ -508,7 +508,7 @@ class UserAccessMapper extends Mapper
 
         // Permission check #1 - Cached results
 
-        if (isset($this->cachedPermissions[$user->getId()][$service][$serviceIdentifier])) {
+        if (isset($this->cachedPermissions[$user->getId()][$service][$serviceIdentifier]) && $cache) {
 
             if ($this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] == -1) {
                 // Found cached exception, throw it
@@ -519,10 +519,9 @@ class UserAccessMapper extends Mapper
             return $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier];
         }
 
-        // Permission check #2 - UserAccess table (last chance before giving up)
+        // Permission check #2 - UserAccess table
 
         try {
-
             $result = $this->findOneByColumnList(
                 array(
                     'service' => $service,

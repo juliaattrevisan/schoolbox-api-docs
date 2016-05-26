@@ -205,11 +205,6 @@ if (!empty($_POST['accessLevel'])) {
 				->setUser($user);
 			$uaMapper->save($ua);
 
-			if (!$currentUser->isSuperuser()) {
-				echo "<div id='url'>/homepage/{$categoryId}</div>";
-				exit;
-			}
-
 		} elseif ($accessLevel == UserAccess::ACCESS_DENY) {
 			$uaMapper->deleteByColumnList([
 				'service' => UserAccess::SERVICE_HOMEPAGE,
@@ -268,11 +263,25 @@ if(isset($_POST['bulkAdd'])) {
 	}
 }
 
-// Once all else is done
-// re-check permissions, redirect user changing ownership to homepage if they have lost ownership
-$groupHandler->clearPermissionsCache();
-if ($groupHandler->getPermission($categoryId) < FULL_ACCESS) {
-	SitePage::localRedir("/homepage/" . $categoryId);
-} else {
+$permission = $groupHandler->getPermission($categoryId, 0, false);
+
+if ($permission < FULL_ACCESS)
+{
+    if (SitePage::detectAjax())
+    {
+        header('Content-type: application/json');
+
+        echo json_encode([
+            "action" => "redirect",
+            "url" => "/homepage/{$categoryId}"
+        ]);
+    }
+    else
+    {
+        SitePage::localRedir("/homepage/" . $categoryId);
+    }
+}
+else
+{
 	SitePage::localRedir('/group/modify/' . $categoryId);
 }

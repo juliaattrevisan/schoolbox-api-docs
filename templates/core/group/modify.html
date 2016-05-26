@@ -131,22 +131,27 @@ $(document).ready(function() {
         var data   = form.serializeArray();
         var inputs = form.find(':input').not(':disabled').prop('disabled', true);
 
+        $(document).ajaxSuccess(function(event, request, settings) {
+            try {
+                var response = JSON.parse(request.responseText);
+if (response.action == 'redirect')
+                    window.location.href = response.url;
+            } catch (e) { }
+        });
+
         $.ajax({url: form.attr('action'), method: form.attr('method'), data: data})
             .done(function(response) {
+
                 // success stuff. Reload memberlist and waitlist
                 label.labelTimeout({text: 'Done'});
                 label.one('hide.labelTimeout', function() {
                     var $response = $(response);
 
-                    if ($response[0].id == 'url') {
-                        window.location.href = $response[0].innerText;
-                    } else {
-                        waitingList.empty().append($response.find('#waitingList').children());
-                        memberList.empty().append($response.find('#members').children());
-                        $('[data-delete-members]').off('click').click(deleteMembers);
-                        $('[data-toggle-all]').off('change').change(deleteAllToggled);
-                        $('input[name="delete[]"]').off('change').change(deleteToggled);
-                    }
+                    waitingList.empty().append($response.find('#waitingList').children());
+                    memberList.empty().append($response.find('#members').children());
+                    $('[data-delete-members]').off('click').click(deleteMembers);
+                    $('[data-toggle-all]').off('change').change(deleteAllToggled);
+                    $('input[name="delete[]"]').off('change').change(deleteToggled);
                 });
             })
             .fail(function() {

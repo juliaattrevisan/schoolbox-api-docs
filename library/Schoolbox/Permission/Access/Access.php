@@ -43,12 +43,14 @@ class Access
         return self::$instance[$class_name];
     }
 
+
     /**
-     * @param \Schoolbox\User $user
+     * @param User $user
      * @param array $folderIds
+     * @param bool $cache           Whether to use cached results or get them from DB again
      * @return int
      */
-    public function getFolderAccess(User $user, array $folderIds)
+    public function getFolderAccess(User $user, array $folderIds, $cache = true)
     {
         // Superusers always have full access
 
@@ -91,7 +93,7 @@ class Access
             try
             {
                 $accessLevels[] = UserAccessMapper::getInstance()
-                    ->getAccess($user, $folderIds[0])
+                    ->getAccess($user, $folderIds[0], UserAccess::SERVICE_HOMEPAGE, $cache)
                     ->getAccessLevel();
 
                 // Short-circuit if access is full
