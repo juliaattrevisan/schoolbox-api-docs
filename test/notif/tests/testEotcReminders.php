@@ -139,7 +139,7 @@ class EotcReminders extends AbstractNotificationTest
 
         $eventRelations = new \Schoolbox\Calendar\EventRelations(null, null, null);
 
-        $this->log->info("Saving new event to start at {$startDate->getDatabase()}", [ 'char' => '>' ]);
+        $this->log->notice("Saving new event to start at {$startDate->getDatabase()}", [ 'char' => '>' ]);
 
         $eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper(\EOTC\EventMapper::getInstance());
         $eventRecurrenceMapper->save($event, 'self', '', '', $startDate, $endDate, null, $eventRelations);
@@ -154,7 +154,7 @@ class EotcReminders extends AbstractNotificationTest
      */
     public function onReady()
     {
-        $this->log->info("Setting EOTC permissions", [ 'char' => '>' ]);
+        $this->log->notice("Setting EOTC permissions", [ 'char' => '>' ]);
 
         $permissionMapper = \EOTC\EventPermissionMapper::getInstance();
         $this->configureMapper($permissionMapper, self::ALARESS_ADMIN);
@@ -196,7 +196,7 @@ class EotcReminders extends AbstractNotificationTest
      */
     public function onSubscribed()
     {
-        $this->log->info("Permissions set", [ 'char' => '<' ]);
+        $this->log->notice("Permissions set", [ 'char' => '<' ]);
 
         // retrieve the reminder thresholds
         $econf = \EOTC\ConfigMapper::getInstance();
