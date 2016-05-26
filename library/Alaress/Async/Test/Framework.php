@@ -435,6 +435,12 @@ class Framework
 
                         // handle the exception
                         $this->log->warning($e->getMessage(), [ $e ]);
+
+                    } catch (\Exception $e) {
+                        // we can't exceptions exploding our harness; this is one of those rare cases you need to catch EVERYTHING
+                        $unhook = true;
+
+                        $this->log->critical($e->getMessage(), [ $e ]);
                     }
 
                     if ($unhook !== false) {
