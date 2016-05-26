@@ -27,7 +27,7 @@ class BreadthFirstTreeNodeIterator implements \Iterator
     /** @var int $position */
     protected $position;
 
-    /** @var SplQueue $queue */
+    /** @var array $array */
     protected $array;
 
     /**

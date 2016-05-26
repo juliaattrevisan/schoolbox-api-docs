@@ -24,7 +24,7 @@ class TreeNode
 
     /**
      * Must match any associated parent node object's id
-     * Note: We store the id of the parent, not a pointer, to enable O(N) flat => tree conversion.
+     * Note: We store the id of the parent, not a pointer, to enable instantiation of child before a parent
      * @var int $parent
      */
     protected $parent;
