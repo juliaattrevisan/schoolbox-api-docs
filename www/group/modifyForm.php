@@ -263,12 +263,20 @@ if(isset($_POST['bulkAdd'])) {
 	}
 }
 
+// Force a refresh of permissions without caching
+
 $permission = $groupHandler->getPermission($categoryId, 0, false);
 
 if ($permission < FULL_ACCESS)
 {
+    // If the user has less then full permission they can no longer stay on the modify group page
+
+    // Check if they came here via AJAX
+
     if (SitePage::detectAjax())
     {
+        // Send a JSON reply with the redirect details
+
         header('Content-type: application/json');
 
         echo json_encode([
@@ -278,10 +286,14 @@ if ($permission < FULL_ACCESS)
     }
     else
     {
+        // Otherwise, just do a normal redirect
+
         SitePage::localRedir("/homepage/" . $categoryId);
     }
 }
 else
 {
+    // Reload the modify page so we can update the DOM
+
 	SitePage::localRedir('/group/modify/' . $categoryId);
 }
