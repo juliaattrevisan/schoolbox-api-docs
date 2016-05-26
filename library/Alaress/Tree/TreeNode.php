@@ -24,6 +24,7 @@ class TreeNode
 
     /**
      * Must match any associated parent node object's id
+     * Note: We store the id of the parent, not a pointer, to enable O(N) flat => tree conversion.
      * @var int $parent
      */
     protected $parent;
@@ -38,7 +39,7 @@ class TreeNode
      * TreeNode constructor.
      * @param mixed $item
      * @param int $id
-     * @param TreeNode $parent
+     * @param int $parent
      * @param TreeNode[]|array $children
      */
     public function __construct($item, $id, $parent = NULL, $children = array() )
