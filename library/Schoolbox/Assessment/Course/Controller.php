@@ -817,32 +817,6 @@ class Controller extends Base\Base
         });
     }
 
-
-    /**
-     * @param AbstractTreeBuilder $tb
-     * @param array               $target
-     * @return array
-     */
-    protected function recursiveTreeBuild(AbstractTreeBuilder $tb, $target)
-    {
-        $target['children'] = $tb->buildChildNodes($target['id']);
-
-        foreach ($target['children'] as $i => $child) {
-
-            if ($child['type'] == 'course') {
-                unset($target['children'][$i]);
-                continue;
-            }
-
-            if ($child['children']) {
-                $target['children'][$i] = $this->recursiveTreeBuild($tb, $child);
-            }
-        }
-
-        return $target;
-    }
-
-
     /**
      * Gets a permission string out of a permission code returned from
      * $this->handler->getPermission().
@@ -877,7 +851,7 @@ class Controller extends Base\Base
      * @param array $permissions    Maps $folderId => permissionLevel
      * @return array
      */
-    private function buildFolderTreeRecursive(TreeNode $node, array $courseIds, array $permissions)
+    private function recursiveTreeBuild(TreeNode $node, array $courseIds, array $permissions)
     {
         $array = array();
 
@@ -922,7 +896,7 @@ class Controller extends Base\Base
             $isCourse = array_key_exists($childId,$courseIds);
 
             if( ($isSuper || !$isDenied) && !$isCourse){
-                $array['children'][] = $this->buildFolderTreeRecursive($childNode, $courseIds, $permissions);
+                $array['children'][] = $this->recursiveTreeBuild($childNode, $courseIds, $permissions);
             }
         }
 
@@ -998,7 +972,7 @@ class Controller extends Base\Base
         }
 
         $courseRoot     = $nodes[$this->getCourseMapper()->getFacultyNode()->getId()];
-        $courseRootArr  = $this->buildFolderTreeRecursive($courseRoot,$courseIds,$permissions);
+        $courseRootArr  = $this->recursiveTreeBuild($courseRoot,$courseIds,$permissions);
         $data['branch'] = $courseRootArr;
         $this->tpl('parentList', $data);
     }
