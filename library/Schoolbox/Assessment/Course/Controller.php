@@ -871,16 +871,6 @@ class Controller extends Base\Base
 
 
     /**
-     * TODO remove
-     */
-    private function debug(){
-
-
-
-        //echo '<pre>'; print_r($facultyTreeNode);  die();
-    }
-
-    /**
      * Recursively convert TreeNode tree to nested array
      * @param TreeNode $node
      * @param array $courseIds    Maps $courseId => $courseId
@@ -897,19 +887,19 @@ class Controller extends Base\Base
             $array['text'] = "Root";
         } else {
 
-            /** @var Folder\Model $item */
-            $item = $node->getItem();
-            $array['id'] = $item->getId();
-            $array['text'] = $item->getName();
-            $array['type'] = $item->getFolderType();
+            /** @var Folder\Model $folder */
+            $folder = $node->getItem();
 
+            $array['id']      = $folder->getId();
+            $array['text']    = $folder->getName();
+            $array['type']    = $folder->getFolderType();
             $array['li_attr'] = array(
-                'data-permission' => $this->getPermissionString($permissions[$item->getId()]),
-                'data-type' => $item->getFolderType(),
-                'data-id' => $item->getId()
+                'data-permission' => $this->getPermissionString($permissions[$folder->getId()]),
+                'data-type'       => $folder->getFolderType(),
+                'data-id'         => $folder->getId()
             );
             $array['a_attr'] = array(
-                'href' => '/homepage/' . $item->getId()
+                'href'            => '/homepage/' . $folder->getId()
             );
         }
 
@@ -917,17 +907,17 @@ class Controller extends Base\Base
 
         foreach($node->getChildren() as $childNode){
             // Permission Business Rules
-            // not set = prune subtree
-            // 0 = prune subtree
-            // 1 = show node, but don't permit selection
-            // 2 = show node, permit selection 
-            // 3 = show node, permit selection
+            // not set => prune subtree
+            // 0 => prune subtree
+            // 1 => show node, but don't permit selection (enforced on save attempt)
+            // 2 => show node, permit selection
+            // 3 => show node, permit selection
 
             // Folder Type Business Rules
-            // Course = prune subtree
+            // isCourse => prune subtree
 
-            $childId = $childNode->getId();
-            $isSuper = $this->getUser()->isSuperuser();
+            $childId  = $childNode->getId();
+            $isSuper  = $this->getUser()->isSuperuser();
             $isDenied = !isset($permissions[$childId]) || UserAccess::ACCESS_DENY === $permissions[$childId];
             $isCourse = array_key_exists($childId,$courseIds);
 
@@ -937,15 +927,11 @@ class Controller extends Base\Base
         }
 
         //sort children alphabetically
-        if(count($array['children'])){
-            usort($array['children'], function($a,$b){
-                return strcasecmp($a['text'],$b['text']);
-            });
-        }
-
+        usort($array['children'], function($a,$b){
+            return strcasecmp($a['text'],$b['text']);
+        });
 
         return $array;
-
     }
 
     /**
@@ -956,36 +942,31 @@ class Controller extends Base\Base
      */
     public function parentList()
     {
+        // the valid list of parents:
+        //  - start at facultyTop $this->getCourseMapper()->getFacultyNode(),
+        //  - recurse into every folder for which the user has WRITE access
+        //  - stop at, and exclude, all Courses (folder that has > 0 units)
+        //  - continue to exhaustion
 
+        $courseIds = $this->courseMapper->findAllIds();
 
+        // Enable later O(1) lookup
+        $courseIds = array_combine($courseIds,$courseIds);
 
-$startTime = microtime(true);
-$courseIds = $this->courseMapper->findAllIds();
-$courseIds = array_combine($courseIds,$courseIds);
-
-
-        $user = $this->getUser();
-        $userId = $user->getId();
-        $role = $user->getRole();
-        $roleId = $role->getId();
-        $isSuper = $user->isSuperuser();
-
+        // Generate Role-based Folder permission map
         $roleAccessMapper = RoleAccessMapper::getInstance();
-        $roleAccesses = $roleAccessMapper->findByColumn('gid',$roleId);
-
-
+        $roleAccesses = $roleAccessMapper->findByColumn('gid',$this->getUser()->getRole()->getId());
         $rolePermissions = array();
         foreach($roleAccesses as $roleAccess){
             $rolePermissions[$roleAccess->getCategory()->getId()] = $roleAccess->getType();
         }
 
-        // Get individual permissions
+        // Generate User-based Folder permission map
         $userAccesses = $this->userAccessMapper->findByColumnList( array(
-            'uid' => $userId,
+            'uid' => $this->getUser()->getId(),
             'service' => UserAccess::SERVICE_HOMEPAGE,
             )
         );
-
         $userPermissions = array();
         foreach($userAccesses as $userAccess){
             $userPermissions[$userAccess->getServiceIdentifier()] = $userAccess->getAccessLevel();
@@ -1001,69 +982,24 @@ $courseIds = array_combine($courseIds,$courseIds);
             }
         }
 
+        $allFolders = $this->getFolderMapper()->findAll();
 
-
-        /** @var FolderMapper $folderM */
-        $folderM = $this->getFolderMapper();
-
-        /** @var Collection $collection */
-        $allFolders = $folderM->findAll();
-
-
-        $root = new TreeNode(NULL, 0, NULL);
-        $nodes = array(0 => $root);
-
-        // Convert to flat array of nodes
+        // Build flat array of nodes
+        $nodes = array(0 => new TreeNode(NULL, 0, NULL));
         foreach($allFolders as $folder){
-            /** @var Folder\Model $folder */
             $nodes[$folder->getId()] = new TreeNode($folder, $folder->getId(), $folder->getParent()->getId());
         }
 
-        // Convert flat to tree
+        // O(N) Convert flat to tree
         foreach($nodes as $id => $node){
-            if(NULL != $node->getParent()){
+            if(NULL !== $node->getParent()){
                 $nodes[$node->getParent()]->addChild($node);
             }
         }
 
-
-        $facultyNode = $this->getCourseMapper()->getFacultyNode();
-        $rootNode = $nodes[$facultyNode->getId()];
-
-$rootArr = $this->buildFolderTreeRecursive($rootNode,$courseIds,$permissions);
-$data['branch'] = $rootArr;
-$this->tpl('parentList', $data);
-$endTime = microtime(true);
-error_log('duration new: '.($endTime - $startTime));
-return;
-
-
-
-
-        // the valid list of parents:
-        //  - start at facultyTop $this->getCourseMapper()->getFacultyNode(),
-        //  - recurse into every folder for which the user has WRITE access
-        //  - stop at, and exclude, all Courses (folder that has > 0 units)
-        //  - continue to exhaustion
-
-        $tb = new TreeBuilder($this->getFolderMapper(), $this->getUnitMapper(), $this->getUser());
-
-        $facultyNode = $this->getCourseMapper()->getFacultyNode();
-
-        $data = [
-            'id'   => $facultyNode->getId(),
-            'text' => $facultyNode->getName()
-        ];
-
-        // recurse, passing $data by reference
-        $data = $this->recursiveTreeBuild($tb, $data);
-
-        $data = [
-            'branch' => $data
-        ];
-$endTime = microtime(true);
-error_log('duration old: '.($endTime - $startTime));
-//echo '<pre>'; print_r($data); die();
+        $courseRoot     = $nodes[$this->getCourseMapper()->getFacultyNode()->getId()];
+        $courseRootArr  = $this->buildFolderTreeRecursive($courseRoot,$courseIds,$permissions);
+        $data['branch'] = $courseRootArr;
         $this->tpl('parentList', $data);
     }
 
