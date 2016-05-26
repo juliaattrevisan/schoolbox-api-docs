@@ -173,7 +173,9 @@ if (is_array($items)) {
                 'NEWS_TITLE' => $article['item_heading'],
                 'POSTER' => $owner,
                 'DATETIME' => $postDate->getLong(),
-                'NEWS_SHORT' => empty($article['item_blurb']) ? TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300) : Scrub::html($article['item_blurb']),
+                'NEWS_SHORT' => empty($article['item_blurb'])
+                    ? '<p>'.TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300).'</p>'
+                    : Scrub::html($article['item_blurb']),
                 'NEWS_IMAGE' => $article['item_image'],
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),
                 'ON_OFF'         => ++$j % 2 ? 'dark' : ''
