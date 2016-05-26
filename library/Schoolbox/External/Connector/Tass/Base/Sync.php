@@ -52,7 +52,7 @@ class Sync implements SyncInterface
                 s.surname        AS student_surname,
                 s.sex            AS student_gender,
                 s.e_mail         AS student_email,
-                ''               AS student_occup_email,
+                ''               AS student_work_email,
                 s.year_grp       AS student_year_level,
                 s.house          AS student_house,
                 CASE
