@@ -35,13 +35,12 @@
     </tr>
     <tr>
         <td>
-            <p>
-                {% if msg.meta.blurb|length %}
-                    {{ msg.meta.blurb | purify }}
-                {% else %}
-                    {{ msg.meta.body | cutSentence(300, true) }}
-                {% endif %}
-            </p>
+            {% if msg.meta.blurb|length %}
+                {# blurb already has a <p> tag #}
+                {{ msg.meta.blurb | purify }}
+            {% else %}
+                <p>{{ msg.meta.body | cutSentence(300, true) }}</p>
+            {% endif %}
         </td>
     </tr>
     {% endif %}
