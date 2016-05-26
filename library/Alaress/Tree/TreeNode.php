@@ -87,11 +87,22 @@ class TreeNode
         $this->children[] = $child;
     }
 
+
     /**
      * Returns an Iterator that performs a breath-first traversal
+     * @param int $direction
      * @return BreadthFirstTreeNodeIterator
      */
-    public function itrBreadthFirst(){
-        return new BreadthFirstTreeNodeIterator($this);
+    public function itrBreadthFirst($direction = BreadthFirstTreeNodeIterator::DIRECTION_LEFT){
+        return new BreadthFirstTreeNodeIterator($this, $direction);
+    }
+
+    /**
+     * Returns an Iterator that performs a depth-first traversal
+     * @param int $direction
+     * @return DepthFirstTreeNodeIterator
+     */
+    public function itrDepthFirst($direction = DepthFirstTreeNodeIterator::DIRECTION_LEFT){
+        return new DepthFirstTreeNodeIterator($this, $direction);
     }
 }
