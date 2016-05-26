@@ -107,6 +107,5 @@
                 }
             });
         }
-        return this;
     }
 }(jQuery));
