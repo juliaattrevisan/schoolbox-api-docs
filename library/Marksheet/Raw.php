@@ -11,9 +11,12 @@ class Marksheet_Raw extends Marksheet_Abstract
 
     public function normaliseMark($mark)
     {
-
         $max = $this->getSubmissionBox()->getMaxMark();
-        $normalised = (($mark / $max) * 100);
+        if(0 == $max) {
+            $normalised = (0 == $mark) ? 0 : 100;
+        } else {
+            $normalised = (($mark / $max) * 100);
+        }
 
         // validation: must be inside bounds
         if ($normalised < 0) {
