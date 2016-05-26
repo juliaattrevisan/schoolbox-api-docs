@@ -15,20 +15,20 @@ $timepicker-item-visible-count: 5;
     @include datepicker-header($sizing);
     @media #{$small-only} {
         width: nth($sizing, 1);
+        line-height: nth($sizing, 1);
     }
     @media #{$medium-up} {
         width: nth($sizing, 2);
+        line-height: nth($sizing, 2);
     }
 }
 
 @mixin datepicker-header($sizing: $datepicker-cell-width) {
     @media #{$small-only} {
         height: nth($sizing, 1);
-        line-height: nth($sizing, 1);
     }
     @media #{$medium-up} {
         height: nth($sizing, 2);
-        line-height: nth($sizing, 2);
     }
 }
 
@@ -82,7 +82,7 @@ $timepicker-item-visible-count: 5;
     .ui-datepicker-today {
         background-color: $datepicker-hover-background !important;
     }
-    tr td:hover, td.ui-datepicker-current-day {
+    tr a:hover, td.ui-datepicker-current-day {
         background-color: $datepicker-selected-background !important;
     }
     thead tr th {
@@ -94,7 +94,7 @@ $timepicker-item-visible-count: 5;
         &.ui-datepicker-other-month {
             @include contrast-bg(0.4, $datepicker-background);
         }
-        a {
+        a, span {
             @include datepicker-cell();
             display: block;
             color: $content-ui-foreground;
@@ -105,13 +105,12 @@ $timepicker-item-visible-count: 5;
 .ui-datepicker-header{
     color: $datepicker-header-color;
     font-weight: $font-weight-bold;
-
     @include datepicker-header();
 
     .ui-datepicker-prev, .ui-datepicker-next {
-        @include datepicker-cell();
         color: $content-ui-foreground;
         display: block;
+        padding: 0.5rem;
         &:hover {
             color: $content-ui-foreground;
             background: $datepicker-hover-background;
@@ -121,6 +120,7 @@ $timepicker-item-visible-count: 5;
 
 .ui-datepicker-title{
     text-align: center;
+    padding: 0.5rem;
 }
 
 .ui-datepicker-prev{
