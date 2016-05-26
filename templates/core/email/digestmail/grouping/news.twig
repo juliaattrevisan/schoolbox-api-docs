@@ -34,7 +34,15 @@
         </td>
     </tr>
     <tr>
-        <td><p>{{ msg.meta.body | cutSentence(300, true) }}</p></td>
+        <td>
+            <p>
+                {% if msg.meta.blurb|length %}
+                    {{ msg.meta.blurb | raw }}
+                {% else %}
+                    {{ msg.meta.body | cutSentence(300, true) }}
+                {% endif %}
+            </p>
+        </td>
     </tr>
     {% endif %}
 {% endblock %}
