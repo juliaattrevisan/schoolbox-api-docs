@@ -461,8 +461,13 @@ class EventMapper extends Calendar\EventMapper {
 			VALUES (:eventId, :campusId)
 		";
 
+		$statement = $this->database->prepare($query);
+
 		foreach ($event->getCampusCollection() as $currentCampus) {
-			$statement = $this->database->prepare($query);
+			$currentCampus = ($currentCampus instanceof \Schoolbox\Campus)
+				? $currentCampus->getId()
+				: $currentCampus;
+
 			$statement->execute([
 				"eventId"  => $event->getId(),
 				"campusId" => $currentCampus
