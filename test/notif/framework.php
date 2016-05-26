@@ -19,10 +19,10 @@ if (posix_getuid() !== 0) {
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$opts = getopt('', ['env:', 'logdir:', 'testcase:']);
+$opts = getopt('v', ['env:', 'logdir:', 'testcase:']);
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Notification Test Framework', [
-    'verbose' => [ false, false, false ],
+    'verbose' => isset($opts['v']) ? $opts['v'] : [ false, false, false ],
     'errors'  => E_ALL,
     'flags'   => $opts
 ]);
