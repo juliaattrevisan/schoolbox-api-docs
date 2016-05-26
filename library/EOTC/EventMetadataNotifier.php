@@ -174,23 +174,35 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         // no event? no messages
         if (!$eventCollection->count()) {
+            $this->log->error("No events attached to EOTC metadata");
             return $envelope;
         }
 
         /** @var Event $relEvent */
         $relEvent      = EventMapper::getInstance()->findById($eventCollection->first()->getId());
         $relEventId    = $relEvent->getId();
-        $relEventStart = (int)$relEvent->getStartDateTime()->getUnixTimeStamp();
+        $relEventStart = $relEvent->getStartDateTime();
         $currentStatus = $eventMetadata->getStatus();
 
         $userIds = $this->getInterestedUsers($relEvent, $currentStatus);
 
-        // TODO make this use Carbon-based ADF once it's merged into 15.0
-        $days = (int)round(($relEventStart - time()) / self::REMINDER_INTERVAL);
+        if (count($userIds) == 0) {
+            // no audience? no messages
+            $this->log->error("No audience for EOTC $relEventId");
+            return $envelope;
+        }
+
+        // compensate for timing issues by pushing "now" back a few minutes.
+        $days = $relEventStart->diffInDays((new \Alaress_Date_Format(time(), 'u'))->addMinutes(-10));
+
+        if ($days == 0) {
+            // wut.
+            $days = 1;
+        }
 
         $href = "/modules/eotc/status/modify/$relEventId";
 
-        $bob->setTitle("Warning: :event starts in $days days, but has not been given final approval")
+        $bob->setTitle(sprintf("Warning: :event starts %s, but has not been given final approval", $days == 1 ? 'tomorrow' : "in $days days"))
             ->setHref($href)
             ->setParams(array(
                 'event' => new Param($relEvent->getTitle(), $href)
