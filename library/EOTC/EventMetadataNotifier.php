@@ -28,8 +28,8 @@ use Schoolbox\User;
 class EventMetadataNotifier extends AbstractModuleNotifier
 {
 
-    const TRIGGER_SUBMITTED = 'submitted';
-    const TRIGGER_UPDATED = 'updated';
+    const TRIGGER_SUBMITTED     = 'submitted';
+    const TRIGGER_UPDATED       = 'updated';
     const TRIGGER_STATUSCHANGED = 'statuschanged';
     const TRIGGER_UPCOMING      = 'upcoming';
 
@@ -114,6 +114,11 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         // retrieve the event that this metadata object is connected to
         $eventCollection = EventMetadataMapper::getInstance()->findEventsForMetadata($object);
+
+        if (!$eventCollection->count()) {
+            // this shouldn't happen, but we have no recourse for it
+            return -1;
+        }
 
         $relEvent  = EventMapper::getInstance()->findById($eventCollection->first()->getId());
 
