@@ -94,8 +94,7 @@ class Mapper extends FolderMapper
      */
     protected function getSelectString()
     {
-        return
-            parent::getSelectString().",
+        return parent::getSelectString().",
             {$this->getJoinColumnString('unit', 'unit')}
         ";
     }
