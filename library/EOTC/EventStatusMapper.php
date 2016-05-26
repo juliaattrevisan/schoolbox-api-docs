@@ -17,6 +17,7 @@ use \Schoolbox\Collection;
  *
  * @package EOTC
  * @method EventStatus findById($id)
+ * @method Collection|EventStatus[] findAll($options = [])
  */
 class EventStatusMapper extends \Schoolbox\Mapper {
 
