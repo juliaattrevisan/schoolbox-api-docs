@@ -97,7 +97,12 @@ $timepicker-item-visible-count: 5;
         a, span {
             @include datepicker-cell();
             display: block;
+        }
+        a {
             color: $content-ui-foreground;
+        }
+        .ui-datepicker-unselectable {
+            opacity: 0.5;
         }
     }
 }
