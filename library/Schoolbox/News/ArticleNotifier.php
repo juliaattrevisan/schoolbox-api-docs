@@ -147,7 +147,8 @@ class ArticleNotifier extends AbstractModuleNotifier {
                     'title'  => $heading,
                     'author' => $authorName,
                     'date'   => $article->getPostDate()->getLong(),
-                    'thumb'  => $thumb
+                    'thumb'  => $thumb,
+                    'blurb'  => $article->getBlurb(),
                 ))
 				->setBody($article->getBody())
 				->setByline("$shortDate by $authorName in $topicName")
