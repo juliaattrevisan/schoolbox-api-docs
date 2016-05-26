@@ -412,7 +412,7 @@ class Framework
 
                     $callbackName = $subscription->getCallbackName();
 
-                    $log->notice("$record [match $callbackName]", [ 'char' => '?' ]);
+                    $log->info("$record [match $callbackName]", [ 'char' => '?' ]);
 
                     // hook into that
                     $hookKey = "$daemonName:$pattern";
