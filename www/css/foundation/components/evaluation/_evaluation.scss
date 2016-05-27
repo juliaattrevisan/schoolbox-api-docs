@@ -4,7 +4,7 @@
 
     /* Respondent chose a correct answer
      */
-    &.evaluation-correct-answer-option {
+    .icon-tick {
         @extend .icon-tick;
         font-size: rem-calc(($base-font-size + 14));
         position: absolute;
@@ -14,7 +14,7 @@
 
     /* Respondent chose an incorrect answer
      */
-    &.evaluation-incorrect-answer-option {
+    .icon-close{
         @extend .icon-close;
         font-size: rem-calc(($base-font-size + 14));
         position: absolute;
@@ -24,7 +24,7 @@
 
     /* Respondent did not choose a correct answer
      */
-    &.evaluation-unselected-answer-option {
+    .icon-previous{
         @extend .icon-previous;
         font-size: rem-calc(($base-font-size + 14));
         position: absolute;
