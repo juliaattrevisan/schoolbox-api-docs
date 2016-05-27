@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Course;
 
 use Component_Homepage_CourseBuilderController;
+use Config\Modules\Course;
 use PDO;
 use PDOStatement;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -119,8 +120,7 @@ class Mapper extends FolderMapper
      * @param  PDOStatement $statement
      * @return Collection|Folder[]
      */
-    protected function hydrateSelect(PDOStatement $statement)
-    {
+    protected function hydrateSelect(PDOStatement $statement) {
         $courses = parent::hydrateSelect($statement);
         $units = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
