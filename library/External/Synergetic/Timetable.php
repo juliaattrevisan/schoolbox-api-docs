@@ -382,12 +382,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $dayNumber = $this->getDayNumber($campus,$date->getUnixTimeStamp());
 
         if (!$this->isExternalIdValid($externalUserId)) {
-            return array();
+            return [];
         }
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
 
         if (!is_array($timetabledef)) {
-            return false;
+            return [];
         }
 
         $campusString = $campus->getExtTimetableCode();
@@ -487,12 +487,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber, $date = null)
     {
         if (!$this->isExternalIdValid($externalUserId)) {
-            return array();
+            return [];
         }
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date);
 
         if (!is_array($timetabledef)) {
-            return false;
+            return [];
         }
 
         $campusString = $campus->getExtTimetableCode();
@@ -590,13 +590,13 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
         if (!$this->isExternalIdValid($externalUserId)) {
-            return array();
+            return [];
         }
 
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $this->getDayNumber($campus));
 
         if (!is_array($timetabledef['desc'])) {
-            return false;
+            return [];
         }
 
         $campusString = $campus->getExtTimetableCode();
