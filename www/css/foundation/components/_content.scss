@@ -611,6 +611,7 @@ $rotate-th-width: $square-grid-td-size;
 	// Only sections inside islands have these styles
   	section{
 		@extend %container;
+		@extend .clearfix;
 	}
 	.content{
 		@extend %content;
@@ -1296,22 +1297,12 @@ ul.flex-list {
 			}
 		}
 
-        /* Progress Meters for Avatar Card List Items
-         *
-         * This is no longer inside .card constructs
+        /* Progress Meters for Avatar Card List Items.
          * They are adjacent (siblings) to .card constructs
          */
         & + .progress {
-            width: calc(100% - 4rem);
-            margin: 0 -0.5rem 0 -1rem;
-            position: absolute;
-            bottom: 0;
-            left: 5rem;
-
-            @media #{$small-only} {
-                width: calc(100% - 3rem);
-                left: 4rem;
-            }
+			clear: both;
+			margin-bottom: 0;
         }
 
 		/* Compact Mode Avatar Cards
@@ -1365,15 +1356,6 @@ ul.flex-list {
 
         .comment {
             padding-bottom: 0.75rem;
-        }
-    }
-
-    &.info {
-        ~ article{
-            margin-left: (rem-calc($base-font-size));
-        }
-        ~ .progress {
-            margin-bottom: 0;
         }
     }
 
