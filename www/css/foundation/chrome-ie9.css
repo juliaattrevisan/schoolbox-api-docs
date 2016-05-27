@@ -2952,10 +2952,10 @@ ul.tileList {
 .evaluation-answer-option {
   color: #000;
   background-color: transparent; }
-  .evaluation-answer-option.evaluation-correct-answer-option span:before {
-    color: #c3e5c3; }
-  .evaluation-answer-option.evaluation-selected-answer-option {
-    background-color: #fff3bd; }
+.evaluation-answer-option.evaluation-correct-answer-option span:before {
+  color: #c3e5c3; }
+.evaluation-answer-option.evaluation-selected-answer-option {
+  background-color: #fff3bd; }
 
 /* Quiz: Matching Pairs
  */
