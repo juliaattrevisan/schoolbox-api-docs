@@ -16,6 +16,7 @@ class EotcReminders extends AbstractNotificationTest
     const GLENDA_SMITH  = 157;
     const JACKIE_BENSON = 247;
     const ZANE_SMITH    = 151;
+    const GARY_GEORGE   = 153;
     const ANNE_SMITH    = 159;
     const SOPHIA_SAXON  = 160;
     const RYAN_VOLLMER  = 13;
@@ -34,9 +35,13 @@ class EotcReminders extends AbstractNotificationTest
     public function prepare()
     {
         // fear not - you are sudo
-        $this->log->notice(`mysql schoolbox < /vagrant/sql/custom/stkentigern/eotc-initial.sql 2>&1` . 'EOTC Initial applied');
-        $this->log->notice(`mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1` . 'Weapons to maximum');
-        $this->log->notice(trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' queues cleared');
+        `mysql schoolbox < /vagrant/sql/custom/stkentigern/eotc-initial.sql 2>&1`;
+        $this->log->notice('EOTC Initial applied');
+        `mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1`;
+        $this->log->notice('Weapons to maximum');
+        $this->log->notice(trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' redis queues cleared');
+        `rabbitmqadmin get queue=vagrantx.sb.sched count=10000 requeue=false`;
+        $this->log->notice("Rabbit schedule queue cleared");
 
         // configure the mappers we're going to use
         $this->configureMapper(UserMapper::getInstance());
@@ -86,11 +91,13 @@ class EotcReminders extends AbstractNotificationTest
 
 
     /**
-     * @param int $daysFromNow
-     * @param int $tic
+     * @param int  $daysFromNow
+     * @param int  $targetStatus
+     * @param bool $rams
+     * @param int  $tic
      * @return \EOTC\Event
      */
-    protected function createEvent($daysFromNow, $tic = self::RYAN_VOLLMER)
+    protected function createEvent($daysFromNow, $targetStatus, $rams = false, $tic = self::RYAN_VOLLMER)
     {
         $event  = new \EOTC\Event();
         $meta   = new \EOTC\EventMetadata();
@@ -105,23 +112,36 @@ class EotcReminders extends AbstractNotificationTest
         /** @var \Schoolbox\Calendar\EventType $type */
         $type = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findById(1);
 
-        // set this to be (5 + 5n) seconds after current time, but (n) days from now
-        $start = Alaress_Date_Format::now()->addSeconds(5 + 5 * $daysFromNow)->addDays($daysFromNow);
-        $end   = Alaress_Date_Format::now()->addMinutes(5)->addDays($daysFromNow);
+        // push this out; it will get reset once the transitions are complete
+        $start = Alaress_Date_Format::now()->addYears(1);
+        $end   = Alaress_Date_Format::now()->addYears(1)->addMinutes(5);
 
+        // keep an easy reference of this test case
+        $config = [
+            'targetStatus' => $targetStatus,
+            'daysFromNow'  => $daysFromNow
+        ];
+        
         $event->setAuthor($author);
         $event->setTeacherInCharge($tic);
         $event->setType($type);
-        $event->setTitle("Event $daysFromNow Days From Now");
+        $event->setTitle("[[ {$daysFromNow}DaysFromNow; Status" . str_replace(' ', '', EOTC\EventStatusMapper::getInstance()->findById($targetStatus)->getName()) . ' ]]');
         $event->setStartDateTime($start);
         $event->setEndDateTime($end);
         $event->setLocation('TEST EOTC LOCATION');
-        $event->setDetail('');
+        $event->setDetail(json_encode($config));
         $event->setAllDay(false);
         $event->setPublishDate('1970-01-01');
         $event->setCampusCollection(new \Schoolbox\Collection([ 1 ]));
         $event->setMetadata($meta);
-        $event->getMetadata()->setRamsFiles(new \Schoolbox\Collection());
+
+        // if rams, grab a file from the DB
+        $ramsCollection = $rams
+            ? Schoolbox\Resource\Storage\Mapper::getInstance()->findByColumn('hash', '9df012f4c34652467d9ca99eeea7472ec8403c99')
+            : new \Schoolbox\Collection();
+
+        $event->getMetadata()->setRamsFiles($ramsCollection);
+        $event->getMetadata()->setRamsRequired($ramsCollection->count() > 0);
 
         return $event;
     }
@@ -131,16 +151,32 @@ class EotcReminders extends AbstractNotificationTest
      * Saves the given EOTC event
      *
      * @param \EOTC\Event $event
+     * @param int         $asUser
      */
-    protected function persistEvent(\EOTC\Event $event)
+    protected function persistEvent(\EOTC\Event $event, $asUser = 0)
     {
         $startDate = $event->getStartDateTime();
         $endDate   = $event->getEndDateTime();
+        $config    = json_decode($event->getDetail(), true);
 
         $eventRelations = new \Schoolbox\Calendar\EventRelations(null, null, null);
 
-        $this->log->notice("Saving new event to start at {$startDate->getDatabase()}", [ 'char' => '>' ]);
+        $this->log->notice(
+            sprintf(
+                "Saving new event to start at %s: [%1d, %2d, %s]",
+                $startDate->getDatabase(),
+                $config['targetStatus'],
+                $config['daysFromNow'],
+                $event->getMetadata()->getRamsRequired() ? 'R' : '.'
+            ),
+            [ 'char' => '>' ]
+        );
 
+        if ($asUser) {
+            // if a session user is specified, configure the mapper to effect as them
+            $this->configureMapper(\EOTC\EventMapper::getInstance(), $asUser);
+        }
+        
         $eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper(\EOTC\EventMapper::getInstance());
         $eventRecurrenceMapper->save($event, 'self', '', '', $startDate, $endDate, null, $eventRelations);
     }
@@ -161,10 +197,11 @@ class EotcReminders extends AbstractNotificationTest
 
         // this is userId => statusLookupId
         $map = [
-            self::ZANE_SMITH   => 1,
-            self::SOPHIA_SAXON => 2,
-            self::ANNE_SMITH   => 2,
-            self::GLENDA_SMITH => 3,
+            self::ZANE_SMITH   => EOTC\EventStatusMapper::STATUS_DEFAULT,
+//            self::SOPHIA_SAXON => EOTC\EventStatusMapper::STATUS_INPRINCIPLE,
+            self::ANNE_SMITH   => EOTC\EventStatusMapper::STATUS_INPRINCIPLE,
+            self::GLENDA_SMITH => EOTC\EventStatusMapper::STATUS_DETAILSCOMPLETED,
+            self::GARY_GEORGE  => EOTC\EventStatusMapper::STATUS_AWAITINGFINALAPPROVAL,
         ];
 
         foreach ($map as $userId => $statusId) {
@@ -199,9 +236,7 @@ class EotcReminders extends AbstractNotificationTest
         $this->log->notice("Permissions set", [ 'char' => '<' ]);
 
         // retrieve the reminder thresholds
-        $econf = \EOTC\ConfigMapper::getInstance();
-
-        $configs = $econf->findByColumn('name', [
+        $configs = \EOTC\ConfigMapper::getInstance()->findByColumn('name', [
             self::FIRST_REMINDER, self::DAILY_REMINDER
         ]);
 
@@ -213,16 +248,30 @@ class EotcReminders extends AbstractNotificationTest
          */
         $events = [];
 
-        $events[] = $this->createEvent($configs[self::FIRST_REMINDER]);
+        foreach ([ false, true ] as $ramsRequired) {
+            foreach (EOTC\EventStatusMapper::getInstance()->findAll() as $targetStatus) {
 
-        // create an event for every day between the threshold and now
-        for ($i = $configs[self::DAILY_REMINDER]; $i > 0; --$i) {
-            $events[] = $this->createEvent($i);
+                if ($targetStatus->getId() == EOTC\EventStatusMapper::STATUS_REJECTED) {
+                    // skip the cancelled status; it be special
+                    continue;
+                }
+
+                if (!$ramsRequired && $targetStatus->getId() == EOTC\EventStatusMapper::STATUS_DETAILSCOMPLETED) {
+                    // skip details complete if rams are not required
+                    continue;
+                }
+
+                $events[] = $this->createEvent($configs[self::FIRST_REMINDER], $targetStatus->getId(), $ramsRequired);
+
+                // create an event for every day between the threshold and now
+                for ($i = $configs[self::DAILY_REMINDER]; $i > 0; --$i) {
+                    $events[] = $this->createEvent($i, $targetStatus->getId(), $ramsRequired);
+                }
+            }
         }
 
-        // TODO build more events that can be pushed through the workflow, then left for reminding
 
-        // cache built - save them
+        // cache built - let's do this.
         foreach ($events as $event) {
             $this->persistEvent($event);
         }
@@ -230,33 +279,162 @@ class EotcReminders extends AbstractNotificationTest
 
 
     /**
-     * @rerouted SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<userId>\d+)
+     *
+     * @param int         $effectorId
+     * @param \EOTC\Event $event
+     * @param int         $toStatus
+     */
+    protected function transitionEvent($effectorId, EOTC\Event $event, $toStatus)
+    {
+        // set the mapper session data
+        $this->configureMapper(EOTC\EventMetadataMapper::getInstance(), $effectorId);
+
+        $status = \EOTC\EventStatusMapper::getInstance()->findById($toStatus);
+
+        $event->getMetadata()->setStatus($status);
+        $event->getMetadata()->setComment('Auto Transition');
+
+        $metadataMapper = \EOTC\EventMetadataMapper::getInstance();
+        $metadataMapper->save($event->getMetadata());
+    }
+
+
+    /**
+     * @scheduled notify.user.(?P<recipientId>\d+).eotc.(?P<eventId>\d+).(?:submitted|statuschanged)
+     *
+     * @param int $recipientId
+     * @param int $eventId
+     */
+    public function onTransition($recipientId, $eventId)
+    {
+
+        // retrieve the event, find out if it's at its target status, and if not, push it forward
+        $event     = EOTC\EventMapper::getInstance()->findById($eventId);
+        $testCase  = json_decode($event->getDetail(), true);
+        $recipient = $this->getUser($recipientId);
+
+        $currentStatus = $event->getMetadata()->getStatus()->getId();
+        $targetStatus  = $testCase['targetStatus'];
+
+        if ($currentStatus < $targetStatus) {
+
+            $newStatus = EOTC\EventStatusMapper::getInstance()->findNextStatus($event);
+
+            if ((new EOTC\Authenticator())->isEOTCAdministrator($recipient, $event)) {
+                // this user is allowed to transition this event from this state
+                $this->log->notice("{$recipient->formatName()} transitioning event #$eventId from $currentStatus to $newStatus", [ 'char' => '>' ]);
+                $this->transitionEvent($recipientId, $event, $newStatus);
+
+            } else {
+                // block user transition
+                $this->log->info("{$recipient->formatName()} cannot transition event #$eventId from $currentStatus to $newStatus");
+            }
+
+        } else {
+            // target status reached: update event startdate
+            $this->log->notice("Event #$eventId has reached its target status of $targetStatus", [ 'char' => '+' ]);
+
+            // if it hasn't been brought forward yet, bring it forward
+            if ($event->getStartDateTime()->getYear() > Alaress_Date_Format::now()->getYear()) {
+
+                // we're going to update the event as the original author
+                $this->configureMapper(EOTC\EventMapper::getInstance(), $event->getAuthor()->getId());
+
+                $start = Alaress_Date_Format::now()->addDays($testCase['daysFromNow'])->addSeconds(30);
+
+                $this->log->notice("As {$event->getAuthor()->formatName()}, setting event #$eventId start time to {$start->getDatabase()}", [ 'char' => '>' ]);
+                $event->setStartDateTime($start);
+
+                EOTC\EventMapper::getInstance()->save($event);
+            }
+
+        }
+
+    }
+
+
+    /**
+     * @scheduled Scheduling trigger 'EOTC\\EventMetadata:upcoming' for (?P<datetime>.*)
+     *
+     * @param string $datetime
+     */
+    public function onUpcomingScheduled($datetime)
+    {
+        $now      = Alaress_Date_Format::now()->addMinutes(-1);
+        $schedule = new Alaress_Date_Format($datetime, 'Y-m-d H:i:s');
+
+        if ($schedule->getYear() > $now->getYear()) {
+            // just show me things from this year
+            return;
+        }
+
+        $this->log->notice("Scheduling trigger 'EOTC\\EventMetadata:upcoming' for $datetime", [ 'char' => '-' ]);
+
+        if (!$schedule->isSameDay($now)) {
+            // this trigger isn't set for today.
+            $diff = $schedule->diffInDays($now);
+            $this->log->notice(sprintf("This trigger is set for %d day%s from now", $diff, $diff == 1 ? '' : 's'));
+        }
+
+    }
+
+
+    /**
+     * @scheduled Executing EOTC\\EventMetadataNotifier::notifyUpcoming
+     */
+    public function onScheduleFire()
+    {
+        $this->log->notice("Firing EOTC\\EventMetadataNotifier::notifyUpcoming", [ 'char' => '?' ]);
+    }
+
+    /**
+     *
+     * @rerouted ^SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<userId>\d+)
      *
      * @param string $messageId
      * @param int    $userId
      */
     public function onDelivery($messageId, $userId)
     {
-        // known message ID => [ list of people who should be receiving it ]
-        // the assertion will fail if this message is received by someone outside this list
-        $messageMap = [
-            'b388dab10c71d373e5f000c3a4609432560df33d:b0e6848da29cd8a3f069c1b865261ee7a3a50e94' => [ self::ZANE_SMITH, self::RYAN_VOLLMER ]
-        ];
+        return;
+        // TODO the below doesn't quite work
 
         try {
             $message = $this->fetchMessageInstance($messageId)->jsonSerialize();
-
-            $title = $message['title']['text'];
-
-            $this->log->info($title, [ 'char' => '>' ]);
-
-            if (isset($messageMap[$messageId])) {
-                $this->assertContains($userId, $messageMap[$messageId]);
-            }
-
         } catch (OutOfBoundsException $e) {
             $this->log->error($e->getMessage(), [$e]);
+            return;
         }
+
+        if (!preg_match('`^/modules/eotc/status/modify/(\d+)$`', $message['href'], $matches)) {
+            // not a message we want to listen to
+            return;
+        }
+
+        $eventId = $matches[1];
+        $event   = EOTC\EventMapper::getInstance()->findById($eventId);
+
+        // won't match 'tomorrow'
+        if (preg_match('`starts in (\d+) days, but`', $message['title']['text'], $matches)) {
+            $distance = $matches[1];
+
+            if ($distance > 1) {
+                // pull this event a day closer
+                $this->log->notice("Pulling event #$eventId one day closer", [ 'char' => '>' ]);
+
+                $nowPlus30 = Alaress_Date_Format::now()->addSeconds(30);
+
+                $event->getStartDateTime()->addDays(-1);
+
+                while ($event->getStartDateTime()->lt($nowPlus30)) {
+                    $event->getStartDateTime()->addSeconds(10);
+                }
+
+                $this->configureMapper(EOTC\EventMapper::getInstance(), $event->getAuthor()->getId());
+                EOTC\EventMapper::getInstance()->save($event);
+            }
+        }
+
     }
 
 }
