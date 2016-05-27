@@ -670,6 +670,9 @@ class External_Synergetic_User implements External_UserInterface
     protected function findFileYearAndSemester($externalUserId = null)
     {
         if ($externalUserId) {
+            if (!$this->isExternalIdValid($externalUserId)) {
+                return [];
+            }
             $result = $this->getDatabase()->executeProcedure(
                 'spsConfigUserDefaultYearSemester',
                 array(
