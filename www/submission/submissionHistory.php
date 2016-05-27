@@ -649,6 +649,7 @@ if (!in_array($box->getCategory()->getId(), $categoryIDList)) {
 
 /* Detect returned work
  */
+$this->setVar('return_file_uuid_block', '');
 if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHandler->isParent())) {
     // get filetype details
     $return = $recent_return->getReturnedWork();
@@ -666,12 +667,7 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
         ));
 
     // Just zero these so they don't appear
-    $this->setVar(
-        array(
-            'RETURNED_WORK_SUBMISSION_ID' => '',
-            'return_file_uuid_block'      => '',
-        )
-    );
+    $this->setVar('RETURNED_WORK_SUBMISSION_ID', '');
 
     /* If there's a crocodoc document, display a link to it.
      * Do this even if there's no returned file in storage.
