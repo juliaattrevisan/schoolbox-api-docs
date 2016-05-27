@@ -40,9 +40,30 @@ class ConfigMapper extends \Schoolbox\Mapper {
 	/**
 	 * Get urgent threshold
 	 *
-	 * @return \Schoolbox\Collection
+	 * @return Config
 	 */
 	public function findUrgentThreshold() {
 		return $this->findOneByColumn('name', 'urgent_threshold');
 	}
+
+	/**
+	 * Get first reminder threshold
+	 *
+	 * @return Config
+	 */
+	public function findFirstReminderThreshold()
+	{
+		return $this->findOneByColumn('name', 'first_reminder');
+	}
+
+	/**
+	 * Get daily reminder threshold
+	 *
+	 * @return Config
+	 */
+	public function findDailyReminderThreshold()
+	{
+		return $this->findOneByColumn('name', 'daily_reminder');
+	}
+
 }
