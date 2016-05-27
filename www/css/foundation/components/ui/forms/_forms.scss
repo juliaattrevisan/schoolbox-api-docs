@@ -568,12 +568,6 @@ select.visibility {
                 }
             }
 
-            /* Repair a miniscule right-margin
-             */
-            .row {
-                width: calc(100% - 2px);
-            }
-
             /* Repair .row .row -1rem margin offset
              */
             .selectize-dropdown-content .row{
