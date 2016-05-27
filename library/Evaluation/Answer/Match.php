@@ -447,7 +447,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                         'ANSWER_RIGHT_VALUE'            => $right[$i],
                         'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
                         'CORRECT'                       => $correct,
-                        'ANSWER_ICON'                   => ($isCorrect ? 'evaluation-correct-answer-option' : 'evaluation-incorrect-answer-option'),
+                        'ANSWER_ICON'                   => ($isCorrect ? 'icon-tick' : 'icon-close'),
                     )
                 );
                 $page->parse('answerOption_block', 'answerOption', true);
