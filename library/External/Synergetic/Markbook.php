@@ -15,6 +15,8 @@ use Alaress\DebugBar\Instance as DebugBar;
 
 class External_Synergetic_Markbook implements External_MarkbookInterface
 {
+    use External_Synergetic_ValidateExternalIdTrait;
+
     /**
      * @var MSSQL
      */
@@ -96,6 +98,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $owner = $assessment->getOwner();
         } else {
             $owner = UserMapper::getInstance()->findById($assessment->getOwner());
+        }
+        if (!$this->isExternalIdValid($owner->getExternalId())) {
+            return false;
         }
 
         $fileYear = $this->getExternalUser()->getCurrentYear($owner->getExternalId());
@@ -258,6 +263,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         }
         $activity->setOwner($student);
 
+        if (!(
+            $this->isExternalIdValid($student->getExternalId())
+            && $this->isExternalIdValid($marker->getExternalId())
+        )) {
+            return false;
+        }
+
         $assessmentRemoteList = $this->getAssessment($activity);
 
         // If assessment box does not exist, create it first
@@ -365,6 +377,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @return bool
      */
     private function doesMarkExist($fileType, $fileYear, $fileSemester, $classCampus, $classCode, $assessmentID, $studentID) {
+        if (!$this->isExternalIdValid($studentID)) {
+            return false;
+        }
         $query = "SELECT COUNT(*) as result
                     FROM StudentAssessmentMarkBook
                     WHERE
