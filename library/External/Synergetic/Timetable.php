@@ -11,6 +11,7 @@ use Alaress\DebugBar\Instance as DebugBar;
 
 class External_Synergetic_Timetable implements External_TimetableInterface
 {
+    use External_Synergetic_ValidateExternalIdTrait;
 
     /**
      * @var MSSQL $database
@@ -380,7 +381,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $dayNumber = $this->getDayNumber($campus,$date->getUnixTimeStamp());
 
-        if (empty($externalUserId)) {
+        if (!$this->isExternalIdValid($externalUserId)) {
             return array();
         }
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
@@ -483,9 +484,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     }
 
 
-     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber, $date = null)
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber, $date = null)
     {
-        if (empty($externalUserId)) {
+        if (!$this->isExternalIdValid($externalUserId)) {
             return array();
         }
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date);
@@ -588,7 +589,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
     public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
-        if (empty($externalUserId)) {
+        if (!$this->isExternalIdValid($externalUserId)) {
             return array();
         }
 
