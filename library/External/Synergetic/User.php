@@ -601,32 +601,38 @@ class External_Synergetic_User implements External_UserInterface
     {
         $query       = "
             SELECT
-                StudentContactID,
-                StudentContactTitle,
-                StudentContactPreferred,
-                StudentContactSurname,
-                StudentContactDefaultEmail,
-                ValidAddressFlag,
-                StudentContactAddress1,
-                StudentContactAddress2,
-                StudentContactAddress3,
-                StudentContactSuburb,
-                StudentContactPostCode,
-                StudentContactState,
-                StudentContactPhoneActual,
-                StudentContactMobilePhone,
-                StudentContactOccupPhone,
-                StudentContactRelation,
-                StudentContactSpouseID,
-                StudentContactSpouseTitle,
-                StudentContactSpousePreferred,
-                StudentContactSpouseSurname,
-                StudentContactSpouseMobilePhone,
-                StudentContactSpouseOccupPhone,
-                StudentContactSpouseDefaultEmail,
-                StudentContactType,StudentContactSpouseRelation
-            FROM
-                SynergyOne.dbo.vStudentContactAllAddress
+                a.StudentContactID,
+                a.StudentContactTitle,
+                a.StudentContactPreferred,
+                a.StudentContactSurname,
+                a.StudentContactDefaultEmail,
+                a.ValidAddressFlag,
+                a.StudentContactAddress1,
+                a.StudentContactAddress2,
+                a.StudentContactAddress3,
+                a.StudentContactSuburb,
+                a.StudentContactPostCode,
+                a.StudentContactState,
+                a.StudentContactPhoneActual,
+                a.StudentContactMobilePhone,
+                a.StudentContactOccupPhone,
+                a.StudentContactRelation,
+                a.StudentContactSpouseID,
+                a.StudentContactSpouseTitle,
+                a.StudentContactSpousePreferred,
+                a.StudentContactSpouseSurname,
+                a.StudentContactSpouseMobilePhone,
+                a.StudentContactSpouseOccupPhone,
+                a.StudentContactSpouseDefaultEmail,
+                a.StudentContactType,
+                a.StudentContactSpouseRelation,
+                r.UseEmail as StudentContactUseEmail,
+                rs.UseEmail as StudentContactSpouseUseEmail
+                
+            FROM SynergyOne.dbo.vStudentContactAllAddress a
+            LEFT JOIN Relationships r ON r.id = a.StudentID AND r.RelatedID = a.StudentContactID
+            LEFT JOIN Relationships rs ON rs.id = a.StudentID AND rs.RelatedID = a.StudentContactSpouseID
+            
             WHERE
                 StudentID = '$externalUserId'
                 AND (StudentContactType = 'SC1' OR StudentContactType = 'SC2' OR StudentContactType = 'SC3')
