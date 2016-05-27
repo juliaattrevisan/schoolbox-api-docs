@@ -347,6 +347,9 @@ class Controller extends Base\Base
                     $this->getFolderMapper()->findById($unitId)->setName($unitName)
                 );
             }
+        } else{
+            $this->sendError(new Base\Exception("Cannot create a Course without Units",["create at least 1 unit"]));
+            return;
         }
 
         $this->saveCourse($post, $rq->isXhr(), 'course.courseList');
