@@ -310,7 +310,7 @@ class Controller extends BaseController
 
             // Move the folder
 
-            $folderMapper->moveFolder($source->getId(), $destination->getId());
+            $folderMapper->moveFolder($source->getId(), $destination->getId(), $this->getUser());
 
             // Yippee, all done.
 

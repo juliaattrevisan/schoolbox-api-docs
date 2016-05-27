@@ -1280,9 +1280,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Delete folder and children
      *
      * @param int $id
+     * @param \Schoolbox\User $deletor
      * @throws SchoolboxException
      */
-    public function deleteFolder($id)
+    public function deleteFolder($id, $deletor)
     {
         // Grab handle to mapper as we'll reuse it
 
@@ -1296,16 +1297,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // Make sure user has write permission to the folder
 
-            if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$id]) >= WRITE_ACCESS) {
+            if (Access::getInstance()->getFolderAccess($deletor, [$id]) >= WRITE_ACCESS) {
 
                 // If the folder has children, then we will only allow superusers to delete it
 
                 if ($folderMapper->countByColumn('parent', $id))
                 {
-                    /** @var \Schoolbox\User $sessionUser */
-                    $sessionUser = $_SESSION["user"];
-
-                    if (!$sessionUser->isSuperuser())
+                    if (!$deletor->isSuperuser())
                     {
                         throw new SchoolboxException('Access Denied');
                     }
@@ -1328,10 +1326,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param int $source
      * @param int $destination
+     * @param \Schoolbox\User $mover
      * @throws SchoolboxException
      * @throws MapperException
      */
-    public function moveFolder($source, $destination)
+    public function moveFolder($source, $destination, $mover)
     {
         $errorMapper = ErrorMapper::getInstance();
 
@@ -1351,9 +1350,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         // Check folder access
 
-        if (Access::getInstance()->getFolderAccess($_SESSION["user"], [$source]) < WRITE_ACCESS ||
-            Access::getInstance()->getFolderAccess($_SESSION["user"], [$destination]) < WRITE_ACCESS ||
-            Access::getInstance()->getFolderAccess($_SESSION["user"], [$movedFolder->getParent()]) < WRITE_ACCESS
+        if (Access::getInstance()->getFolderAccess($mover, [$source]) < WRITE_ACCESS ||
+            Access::getInstance()->getFolderAccess($mover, [$destination]) < WRITE_ACCESS ||
+            Access::getInstance()->getFolderAccess($mover, [$movedFolder->getParent()]) < WRITE_ACCESS
         ) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
