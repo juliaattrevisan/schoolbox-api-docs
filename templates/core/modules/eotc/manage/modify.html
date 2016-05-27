@@ -85,19 +85,6 @@
         $('[data-collapser=true]').collapsable({
             container: '[data-collapsable-container]'
         });
-
-        /* Start Time cannot be later than End Time
-         */
-        $.fn.syncDatetimes({
-            startDate: $('input[name=startDate]'),
-            startHour: $('input[name=startHour]'),
-            startMinute: $('input[name=startMinute]'),
-            startPeriod: $('select[name=startPeriod]'),
-            endDate: $('input[name=endDate]'),
-            endHour: $('input[name=endHour]'),
-            endMinute: $('input[name=endMinute]'),
-            endPeriod: $('select[name=endPeriod]')
-        });
     });
 </script>
 
@@ -134,76 +121,83 @@
                     </label>
                 </div>
 
-                <div class="small-12 large-6 columns">
-                    <label>
-                        From
-                        <input name="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
-                    </label>
-                </div>
+                <div class="small-12 columns no-pad">
 
-                <div class="small-12 large-6 columns">
-                    <div data-timeinputs>
-                        <div class="small-6 large-4 columns">
+                    <div class="row">
+                        <div class="small-12 large-6 columns">
                             <label>
-                                Hour
-                                <div class="timepick">
-                                    <input name="startHour" data-timepicker="hour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" />
-                                </div>
+                                From
+                                <input name="startDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
                             </label>
                         </div>
-                        <div class="small-6 large-4 columns">
-                            <label>
-                                Minute
-                                <div class="timepick">
-                                    <input name="startMinute" data-timepicker="minute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
+
+                        <div class="small-12 large-6 columns no-pad">
+                            <div data-timeinputs>
+                                <div class="small-6 large-4 columns">
+                                    <label>
+                                        Hour
+                                        <div class="timepick">
+                                            <input name="startHour" data-timepicker="hour" class="timeField" type="text" maxlength="2" value="{EVENT_START_HOUR}" />
+                                        </div>
+                                    </label>
                                 </div>
-                            </label>
-                        </div>
-                        <div class="small-12 large-4 columns">
-                            <label>
-                                Period
-                                <select name="startPeriod">
-                                    <option value="am" {EVENT_START_AM}>AM</option>
-                                    <option value="pm" {EVENT_START_PM}>PM</option>
-                                </select>
-                            </label>
+                                <div class="small-6 large-4 columns">
+                                    <label>
+                                        Minute
+                                        <div class="timepick">
+                                            <input name="startMinute" data-timepicker="minute" class="timeField" type="text" maxlength="2" value="{EVENT_START_MIN}" />
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="small-12 large-4 columns">
+                                    <label>
+                                        Period
+                                        <select name="startPeriod">
+                                            <option value="am" {EVENT_START_AM}>AM</option>
+                                            <option value="pm" {EVENT_START_PM}>PM</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="small-12 large-6 columns">
-                    <label>
-                        To
-                        <input name="endDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
-                    </label>
-                </div>
-
-                <div class="small-12 large-6 columns">
-                    <div data-timeinputs>
-                        <div class="small-6 large-4 columns">
+                    <div class="row">
+                        <div class="small-12 large-6 columns">
                             <label>
-                                Hour
-                                <div class="timepick">
-                                    <input name="endHour" data-timepicker="hour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" />
-                                </div>
+                                To
+                                <input name="endDate" data-datepicker='true' type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
                             </label>
                         </div>
-                        <div class="small-6 large-4 columns">
-                            <label>
-                                Minute
-                                <div class="timepick">
-                                    <input name="endMinute" data-timepicker="minute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
+
+                        <div class="small-12 large-6 columns no-pad">
+                            <div data-timeinputs>
+                                <div class="small-6 large-4 columns">
+                                    <label>
+                                        Hour
+                                        <div class="timepick">
+                                            <input name="endHour" data-timepicker="hour" type="text" class="timeField" maxlength="2" value="{EVENT_END_HOUR}" />
+                                        </div>
+                                    </label>
                                 </div>
-                            </label>
-                        </div>
-                        <div class="small-12 large-4 columns">
-                            <label>
-                                Period
-                                <select name="endPeriod">
-                                    <option value="am" {EVENT_END_AM}>AM</option>
-                                    <option value="pm" {EVENT_END_PM}>PM</option>
-                                </select>
-                            </label>
+                                <div class="small-6 large-4 columns">
+                                    <label>
+                                        Minute
+                                        <div class="timepick">
+                                            <input name="endMinute" data-timepicker="minute" type="text" class="timeField" maxlength="2" value="{EVENT_END_MIN}" />
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="small-12 large-4 columns">
+                                    <label>
+                                        Period
+                                        <select name="endPeriod">
+                                            <option value="am" {EVENT_END_AM}>AM</option>
+                                            <option value="pm" {EVENT_END_PM}>PM</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

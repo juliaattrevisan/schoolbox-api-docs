@@ -208,6 +208,36 @@
 				return false;
 			}, "Start and End datetimes must differ");
 
+			/* Ensure start date occurs before end date
+			 */
+			$.validator.addMethod("validateDatetimesCorrect", function(value, element) {
+				var settings = {
+					dateFormat: 'DD/MM/YYYY h:mm a',
+					startDate: $('input[name=startDate]'),
+					startHour: $('input[name=startHour]'),
+					startMinute: $('input[name=startMinute]'),
+					startPeriod: $('select[name=startPeriod]'),
+					endDate: $('input[name=endDate]'),
+					endHour: $('input[name=endHour]'),
+					endMinute: $('input[name=endMinute]'),
+					endPeriod: $('select[name=endPeriod]')
+				};
+
+				var start = settings.startDate.val() + ' ' + settings.startHour.val() + ':' + settings.startMinute.val() + ' ' + settings.startPeriod.val().toString().toLowerCase();
+				var end = settings.endDate.val() + ' ' + settings.endHour.val() + ':' + settings.endMinute.val() + ' ' + settings.endPeriod.val().toString().toLowerCase();
+
+				var startDatetime = moment(start, settings.dateFormat);
+				var endDatetime   = moment(end, settings.dateFormat);
+
+				/* If both dates are valid and end date occurs before start
+				 */
+				if (startDatetime.isValid() && endDatetime.isValid()) {
+					return endDatetime.valueOf() > startDatetime.valueOf();
+				}
+
+				return false;
+			}, "Start date and time must occur before end date and time");
+
 			return {
 				'campus[]': {
 					required: {
@@ -234,21 +264,45 @@
 						param: 1
 					}
 				},
+				startDate: {
+					required: true,
+					validateDatetimesDifferent: true,
+					validateDatetimesCorrect: true
+				},
 				startHour: {
 					required: true,
-					validateDatetimesDifferent: true
+					validateDatetimesDifferent: true,
+					validateDatetimesCorrect: true
 				},
 				startMinute: {
 					required: true,
-					validateDatetimesDifferent: true
+					validateDatetimesDifferent: true,
+					validateDatetimesCorrect: true
+				},
+				startPeriod: {
+					required: true,
+					validateDatetimesDifferent: true,
+					validateDatetimesCorrect: true
+				},
+				endDate: {
+					required: true,
+					validateDatetimesDifferent: true,
+					validateDatetimesCorrect: true
 				},
 				endHour: {
 					required: true,
-					validateDatetimesDifferent: true
+					validateDatetimesDifferent: true,
+					validateDatetimesCorrect: true
 				},
 				endMinute: {
 					required: true,
-					validateDatetimesDifferent: true
+					validateDatetimesDifferent: true,
+					validateDatetimesCorrect: true
+				},
+				endPeriod: {
+					required: true,
+					validateDatetimesDifferent: true,
+					validateDatetimesCorrect: true
 				}
 			}
 		}
