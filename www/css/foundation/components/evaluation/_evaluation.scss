@@ -4,7 +4,7 @@
 
     /* Respondent chose a correct answer
      */
-    .evaluation-correct-answer-option {
+    &.evaluation-correct-answer-option {
         @extend .icon-tick;
         font-size: rem-calc(($base-font-size + 14));
         position: absolute;
@@ -14,7 +14,7 @@
 
     /* Respondent chose an incorrect answer
      */
-    .evaluation-incorrect-answer-option {
+    &.evaluation-incorrect-answer-option {
         @extend .icon-close;
         font-size: rem-calc(($base-font-size + 14));
         position: absolute;
@@ -24,7 +24,7 @@
 
     /* Respondent did not choose a correct answer
      */
-    .evaluation-unselected-answer-option {
+    &.evaluation-unselected-answer-option {
         @extend .icon-previous;
         font-size: rem-calc(($base-font-size + 14));
         position: absolute;
@@ -32,7 +32,7 @@
         color: $warning-color;
     }
 
-    .evaluation-selected-answer-option {
+    &.evaluation-selected-answer-option {
         color: $accent-foreground;
         background-color: $accent-background;
     }
