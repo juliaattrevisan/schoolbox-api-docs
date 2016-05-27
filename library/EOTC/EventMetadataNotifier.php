@@ -33,8 +33,6 @@ class EventMetadataNotifier extends AbstractModuleNotifier
     const TRIGGER_STATUSCHANGED = 'statuschanged';
     const TRIGGER_UPCOMING      = 'upcoming';
 
-    const REMINDER_INTERVAL = 86400;
-
     /**
      * Namespace slug, as defined in msg_namespace
      *
@@ -106,9 +104,6 @@ class EventMetadataNotifier extends AbstractModuleNotifier
      */
     public function getNextReminderTime(Realtime\Schedule\Event $event)
     {
-        $eotcConf  = ConfigMapper::getInstance();
-        $threshold = $eotcConf->findOneByColumn('name', 'daily_reminder')->getValue();
-
         /** @var EventMetadata $object */
         $object = $event->getObject();
 
@@ -120,19 +115,33 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             return -1;
         }
 
-        $relEvent  = EventMapper::getInstance()->findById($eventCollection->first()->getId());
+        $now = \Alaress_Date_Format::now();
 
-        $startTime = $relEvent->getStartDateTime()->getUnixTimeStamp();
+        $startTime = EventMapper::getInstance()->findById($eventCollection->first()->getId())->getStartDateTime();
 
-        // iterate across the number of days to remind
-        for ($i = $threshold; $i > 0; --$i) {
-            // step back in daily increments
-            $reminderTime = $startTime - (self::REMINDER_INTERVAL * $i);
+        $eotcConf  = ConfigMapper::getInstance();
 
-            // if this is in the future, schedule it
-            if ($reminderTime > time()) {
-                return $reminderTime;
-            }
+        // rewind first reminder `n` days from start time
+        $firstReminder = clone $startTime;
+        $firstReminder->addDays(-1 * $eotcConf->findFirstReminderThreshold()->getValue());
+
+        if ($firstReminder->gte($now)) {
+            // if this first reminder is in the future, schedule it
+            return $firstReminder->getUnixTimeStamp();
+        }
+
+        // rewind daily reminder `m` days from start time
+        $dailyReminder = clone $startTime;
+        $dailyReminder->addDays(-1 * $eotcConf->findDailyReminderThreshold()->getValue());
+
+        while ($dailyReminder->lt($now)) {
+            // increment by days until it's in the past
+            $dailyReminder->addDays(1);
+        }
+
+        if ($dailyReminder->lt($startTime)) {
+            // so long as the reminder is before the actual start date, return that
+            return $dailyReminder->getUnixTimeStamp();
         }
 
         // all reminders are in the past. discard this trigger
