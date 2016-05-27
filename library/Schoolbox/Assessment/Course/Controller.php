@@ -2027,7 +2027,7 @@ class Controller extends Base\Base
      *
      * @return FolderMapper
      */
-    public function getFolderMapper()
+    protected function getFolderMapper()
     {
         return $this->folderMapper;
     }
@@ -2047,7 +2047,7 @@ class Controller extends Base\Base
      *
      * @return TaskMapper
      */
-    public function getTaskMapper()
+    protected function getTaskMapper()
     {
         return $this->taskMapper;
     }
@@ -2068,7 +2068,7 @@ class Controller extends Base\Base
      *
      * @return Component_InstanceMapper
      */
-    public function getComponentInstanceMapper()
+    protected function getComponentInstanceMapper()
     {
         return $this->componentInstanceMapper;
     }
@@ -2088,7 +2088,7 @@ class Controller extends Base\Base
      *
      * @return Component_DefinitionMapper
      */
-    public function getComponentDefinitionMapper()
+    protected function getComponentDefinitionMapper()
     {
         return $this->componentDefinitionMapper;
     }
@@ -2108,7 +2108,7 @@ class Controller extends Base\Base
      *
      * @return UnitInstanceMapper
      */
-    public function getUnitInstanceMapper()
+    protected function getUnitInstanceMapper()
     {
         return $this->unitInstanceMapper;
     }
@@ -2138,7 +2138,7 @@ class Controller extends Base\Base
      *
      * @return SubmissionBoxMapper
      */
-    public function getSubmissionBoxMapper()
+    protected function getSubmissionBoxMapper()
     {
         return $this->submissionBoxMapper;
     }
@@ -2148,7 +2148,7 @@ class Controller extends Base\Base
      *
      * @return OnlineAssessmentMapper
      */
-    public function getOnlineAssessmentMapper()
+    protected function getOnlineAssessmentMapper()
     {
         return $this->onlineAssessmentMapper;
     }
@@ -2166,7 +2166,7 @@ class Controller extends Base\Base
     /**
      * @return HomepageConfigMapper
      */
-    public function getHomepageConfigMapper()
+    protected function getHomepageConfigMapper()
     {
         return $this->homepageConfigMapper;
     }
@@ -2186,7 +2186,7 @@ class Controller extends Base\Base
     /**
      * @return HomepageTemplateMapper
      */
-    public function getHomepageTemplateMapper()
+    protected function getHomepageTemplateMapper()
     {
         return $this->homepageTemplateMapper;
     }
@@ -2205,7 +2205,7 @@ class Controller extends Base\Base
     /**
      * @return CourseConfigMapper
      */
-    public function getCourseConfigMapper()
+    protected function getCourseConfigMapper()
     {
         return $this->courseConfigMapper;
     }
@@ -2224,7 +2224,7 @@ class Controller extends Base\Base
     /**
      * @return Error\Mapper
      */
-    public function getErrorMapper()
+    protected function getErrorMapper()
     {
         return $this->errorMapper;
     }
@@ -2244,7 +2244,7 @@ class Controller extends Base\Base
     /**
      * @return UserAccessMapper
      */
-    public function getUserAccessMapper()
+    protected function getUserAccessMapper()
     {
         return $this->userAccessMapper;
     }
@@ -2284,7 +2284,7 @@ class Controller extends Base\Base
     /**
      * @return Access
      */
-    public function getAccess()
+    protected function getAccess()
     {
         return $this->access;
     }
@@ -2303,7 +2303,7 @@ class Controller extends Base\Base
     /**
      * @return TaskInstanceMapper
      */
-    public function getTaskInstanceMapper()
+    protected function getTaskInstanceMapper()
     {
         return $this->taskInstanceMapper;
     }
