@@ -598,7 +598,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                      */
                     if ($selectedByRespondent) {
                         $page->setVar([
-                            'ANSWER_ICON'       => 'icon-cancel',
+                            'ANSWER_ICON'       => 'icon-close',
                             'ANSWER_ICON_TITLE' => 'Respondent chose an incorrect answer',
                             'ANSWER_ICON_CLASS' => 'evaluation-incorrect-answer-option',
                             'ANSWER_CHECKED'    => 'checked',
