@@ -657,17 +657,16 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
 
     $this->setVar(
         array(
-            'RETURNED_WORK_OWNER_ID'   => $return->getOwner()->getId(),
-            'RETURNED_WORK_ID'         => $return->getId(),
-            'RETURNED_WORK_COMMENT'    => Scrub::Text($recentComment),
-            'RETURNED_WORK_MARK'       => Scrub::Text($mark),
-            'RETURNED_WORK_GRADIENT'   => $return->getGradientFromNormalizedMark(),
-            'STATUS_HEALTH'            => 'ok',
-            'STATUS_LABEL'             => 'Marked'
-        ));
-
-    // Just zero these so they don't appear
-    $this->setVar('RETURNED_WORK_SUBMISSION_ID', '');
+            'RETURNED_WORK_SUBMISSION_ID' => '',
+            'RETURNED_WORK_OWNER_ID'      => $return->getOwner()->getId(),
+            'RETURNED_WORK_ID'            => $return->getId(),
+            'RETURNED_WORK_COMMENT'       => Scrub::Text($recentComment),
+            'RETURNED_WORK_MARK'          => Scrub::Text($mark),
+            'RETURNED_WORK_GRADIENT'      => $return->getGradientFromNormalizedMark(),
+            'STATUS_HEALTH'               => 'ok',
+            'STATUS_LABEL'                => 'Marked',
+        )
+    );
 
     /* If there's a crocodoc document, display a link to it.
      * Do this even if there's no returned file in storage.
