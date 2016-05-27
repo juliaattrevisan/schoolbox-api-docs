@@ -286,6 +286,9 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
                 'ANSWER_CORRECT' => $existing['response'] == $currentAnswer['answer']
                     ? 'evaluation-correct-answer-option'
                     : 'evaluation-incorrect-answer-option',
+                'ANSWER_ICON' => $existing['response'] == $currentAnswer['answer']
+                    ? 'icon-tick'
+                    : 'icon-close',
                 'RESPONSE_ID' => $existing['response_id'],
                 'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
                 'REVIEWED_MARKS' => $existing['mark'],

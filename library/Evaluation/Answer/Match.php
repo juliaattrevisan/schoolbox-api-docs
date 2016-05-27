@@ -509,7 +509,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                         'ANSWER_RIGHT_VALUE'            => $right[$i],
                         'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
                         'CORRECT'                       => $correct,
-                        'ANSWER_ICON'                   => ($isCorrect ? 'icon-tick' : 'icon-x'),
+                        'ANSWER_ICON'                   => ($isCorrect ? 'icon-tick' : 'icon-close'),
                     )
                 );
 
