@@ -770,13 +770,4 @@ class Group extends DeprecatedModel
         $query = "SELECT name FROM groups WHERE id = \"{$groupID}\"";
         return $this->db->getOne($query);
     }
-
-    /**
-     * Clears caches for users and groups permissions.
-     */
-    public function clearPermissionsCache()
-    {
-        $this->cache = array();
-        $this->cacheUser = array();
-    }
 }
