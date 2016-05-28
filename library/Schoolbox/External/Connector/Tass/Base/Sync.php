@@ -52,7 +52,7 @@ class Sync implements SyncInterface
                 s.surname        AS student_surname,
                 s.sex            AS student_gender,
                 s.e_mail         AS student_email,
-                ''               AS student_occup_email,
+                ''               AS student_work_email,
                 s.year_grp       AS student_year_level,
                 s.house          AS student_house,
                 CASE
@@ -186,7 +186,7 @@ class Sync implements SyncInterface
                 t.prefer_name_text  AS staff_preferred_name,
                 t.surname_text      AS staff_surname,
                 ''                  AS default_email_code,
-                ''                  AS occup_email,
+                t.school_email      AS work_email,
                 t.e_mail            AS email,
                 ''                  AS staff_campus,
                 CASE
