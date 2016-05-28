@@ -23,6 +23,7 @@ $userMapper = UserMapper::getInstance();
 $groupMapper = GroupMapper::getInstance();
 
 $categoryId = $_REQUEST['categoryID'];
+$currentUser = $userMapper->findById($_SESSION["id"]);
 
 try {
 	$folder = $catMapper->findById($categoryId);
@@ -203,6 +204,7 @@ if (!empty($_POST['accessLevel'])) {
 			$ua->setAccessLevel(UserAccess::ACCESS_FULL)
 				->setUser($user);
 			$uaMapper->save($ua);
+
 		} elseif ($accessLevel == UserAccess::ACCESS_DENY) {
 			$uaMapper->deleteByColumnList([
 				'service' => UserAccess::SERVICE_HOMEPAGE,
@@ -261,11 +263,37 @@ if(isset($_POST['bulkAdd'])) {
 	}
 }
 
-// Once all else is done
-// re-check permissions, redirect user changing ownership to homepage if they have lost ownership
-$groupHandler->clearPermissionsCache();
-if ($groupHandler->getPermission($categoryId) < FULL_ACCESS) {
-	SitePage::localRedir("/homepage/" . $categoryId);
-} else {
+// Force a refresh of permissions without caching
+
+$permission = $groupHandler->getPermission($categoryId, 0, false);
+
+if ($permission < FULL_ACCESS)
+{
+    // If the user has less then full permission they can no longer stay on the modify group page
+
+    // Check if they came here via AJAX
+
+    if (SitePage::detectAjax())
+    {
+        // Send a JSON reply with the redirect details
+
+        header('Content-type: application/json');
+
+        echo json_encode([
+            "action" => "redirect",
+            "url" => "/homepage/{$categoryId}"
+        ]);
+    }
+    else
+    {
+        // Otherwise, just do a normal redirect
+
+        SitePage::localRedir("/homepage/" . $categoryId);
+    }
+}
+else
+{
+    // Reload the modify page so we can update the DOM
+
 	SitePage::localRedir('/group/modify/' . $categoryId);
 }

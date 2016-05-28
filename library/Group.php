@@ -415,7 +415,13 @@ class Group extends DeprecatedModel
         return $this->addUser($relationID, $userID, $type);
     }
 
-    function getPermission($relationID, $userID = 0)
+    /**
+     * @param $relationID
+     * @param int $userID
+     * @param bool $cache
+     * @return bool|int
+     */
+    function getPermission($relationID, $userID = 0, $cache = true)
     {
         if ($userID == 0) {
             if ($_SESSION['id']) {
@@ -428,13 +434,13 @@ class Group extends DeprecatedModel
 
         // Cache users as well
 
-        if (!isset($this->cacheUser[$userID])) {
+        if (!isset($this->cacheUser[$userID]) || !$cache) {
             $this->cacheUser[$userID] = $user = UserMapper::getInstance()->findById($userID);
         } else {
             $user = $this->cacheUser[$userID];
         }
 
-        $permission = Access::getInstance()->getFolderAccess($user, array($relationID));
+        $permission = Access::getInstance()->getFolderAccess($user, array($relationID), $cache);
 
         // allow staff write access to NEWS_SERVICE by default except at shore...
 
@@ -763,14 +769,5 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT name FROM groups WHERE id = \"{$groupID}\"";
         return $this->db->getOne($query);
-    }
-
-    /**
-     * Clears caches for users and groups permissions.
-     */
-    public function clearPermissionsCache()
-    {
-        $this->cache = array();
-        $this->cacheUser = array();
     }
 }
