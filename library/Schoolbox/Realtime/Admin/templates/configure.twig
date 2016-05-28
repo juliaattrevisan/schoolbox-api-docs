@@ -141,8 +141,6 @@
 
     function customiserCallback(data) {
 
-        console.log(data);
-
         $.each(data, function (slug, sources) {
 
             var $ns = $('#configurator').find('[data-namespace='+slug+']');
@@ -166,23 +164,14 @@
                             return !!(config.mask[1] & p || (config.mask[0] && p == 0));
                         };
 
-                    // turned off
-                    if (config == false) {
-                        // ensure off selected
-                        $role.find('td.toggle input[value=0]').prop('checked', true);
+                    // reset all, switch on/off based on masks
+                    options = $role.find('input[data-perm]')
+                        .prop('checked', false)
+                        .prop('disabled', true)
+                        .attr('disabled', 'disabled');
 
-                        return true; // jq:continue
-                    }
-
-                    // ensure on selected
-                    $role.find('td.toggle input[value=1]').prop('checked', true).trigger('change.force');
-
-                    // reset all
-                    options = $role.find('td[data-perm]');
-                    options.find('input').prop('checked', false).attr('disabled', 'disabled');
-
-                    options.filter(inMask).find('input').removeAttr('disabled');
-                    options.filter(inDefault).find('input').prop('checked', true);
+                    options.filter(inMask).prop('disabled', false).removeAttr('disabled');
+                    options.filter(inDefault).prop('checked', true);
 
                     options.eq(0).trigger('change.force');
                 });
